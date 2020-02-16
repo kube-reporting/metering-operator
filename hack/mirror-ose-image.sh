@@ -6,14 +6,14 @@ SOURCE_IMAGE=$1
 OUTPUT_IMAGE=$2
 
 if [[ -z "$SOURCE_IMAGE" ]]; then
-        echo "must pass a source image as the ***REMOVED***rst arg"
+        echo "must pass a source image as the first arg"
         exit 1
-***REMOVED***
+fi
 
 if [[ -z "$OUTPUT_IMAGE" ]]; then
         echo "must pass the output image as the second arg"
         exit 1
-***REMOVED***
+fi
 
 DOCKER_COMMAND=${DOCKER_COMMAND:-docker}
 

@@ -1,6 +1,6 @@
 // Copyright 2015 Google Inc. All rights reserved.
 // Use of this source code is governed by the Apache 2.0
-// license that can be found in the LICENSE ***REMOVED***le.
+// license that can be found in the LICENSE file.
 
 package internal
 
@@ -62,14 +62,14 @@ func NamespaceFromContext(ctx netcontext.Context) string {
 	return ns
 }
 
-// FullyQuali***REMOVED***edAppID returns the fully-quali***REMOVED***ed application ID.
-// This may contain a partition pre***REMOVED***x (e.g. "s~" for High Replication apps),
-// or a domain pre***REMOVED***x (e.g. "example.com:").
-func FullyQuali***REMOVED***edAppID(ctx netcontext.Context) string {
+// FullyQualifiedAppID returns the fully-qualified application ID.
+// This may contain a partition prefix (e.g. "s~" for High Replication apps),
+// or a domain prefix (e.g. "example.com:").
+func FullyQualifiedAppID(ctx netcontext.Context) string {
 	if id, ok := ctx.Value(&appIDOverrideKey).(string); ok {
 		return id
 	}
-	return fullyQuali***REMOVED***edAppID(ctx)
+	return fullyQualifiedAppID(ctx)
 }
 
 func Logf(ctx netcontext.Context, level int64, format string, args ...interface{}) {

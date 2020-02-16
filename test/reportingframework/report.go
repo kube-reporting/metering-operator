@@ -76,14 +76,14 @@ func (rf *ReportingFramework) RequireReportSuccessfullyRuns(t *testing.T, report
 			return true, nil
 		}
 
-		newLogMsg := fmt.Sprintf("Report %s not ***REMOVED***nished, status: %s", report.Name, spew.Sprintf("%v", report.Status))
+		newLogMsg := fmt.Sprintf("Report %s not finished, status: %s", report.Name, spew.Sprintf("%v", report.Status))
 		if newLogMsg != prevLogMsg {
 			t.Log(newLogMsg)
 		}
 		prevLogMsg = newLogMsg
 		return false, nil
 	})
-	require.NoErrorf(t, err, "expected Report to ***REMOVED***nished within %s timeout", waitTimeout)
+	require.NoErrorf(t, err, "expected Report to finished within %s timeout", waitTimeout)
 }
 
 func (rf *ReportingFramework) GetReportResults(t *testing.T, report *metering.Report, waitTimeout time.Duration) []map[string]interface{} {
@@ -114,8 +114,8 @@ func (rf *ReportingFramework) GetReportResults(t *testing.T, report *metering.Re
 	require.NoError(t, err, "expected Report to have 1 row of results before timing out")
 	assert.NotEmpty(t, reportResults, "reports should return at least 1 row")
 
-	***REMOVED***leName := path.Join(rf.ReportOutputDirectory, fmt.Sprintf("%s.json", report.Name))
-	err = ioutil.WriteFile(***REMOVED***leName, reportData, os.ModePerm)
+	fileName := path.Join(rf.ReportOutputDirectory, fmt.Sprintf("%s.json", report.Name))
+	err = ioutil.WriteFile(fileName, reportData, os.ModePerm)
 	require.NoError(t, err, "expected writing report results to disk not to error")
 	return reportResults
 }

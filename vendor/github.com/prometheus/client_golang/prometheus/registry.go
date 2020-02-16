@@ -1,6 +1,6 @@
 // Copyright 2014 The Prometheus Authors
 // Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this ***REMOVED***le except in compliance with the License.
+// you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 //
 // http://www.apache.org/licenses/LICENSE-2.0
@@ -8,7 +8,7 @@
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the speci***REMOVED***c language governing permissions and
+// See the License for the specific language governing permissions and
 // limitations under the License.
 
 package prometheus
@@ -88,7 +88,7 @@ type Registerer interface {
 	// Register registers a new Collector to be included in metrics
 	// collection. It returns an error if the descriptors provided by the
 	// Collector are invalid or if they — in combination with descriptors of
-	// already registered Collectors — do not ful***REMOVED***ll the consistency and
+	// already registered Collectors — do not fulfill the consistency and
 	// uniqueness criteria described in the documentation of metric.Desc.
 	//
 	// If the provided Collector is equal to a Collector already registered
@@ -100,7 +100,7 @@ type Registerer interface {
 	// times concurrently.
 	Register(Collector) error
 	// MustRegister works like Register but registers any number of
-	// Collectors and panics upon the ***REMOVED***rst registration that causes an
+	// Collectors and panics upon the first registration that causes an
 	// error.
 	MustRegister(...Collector)
 	// Unregister unregisters the Collector that equals the Collector passed
@@ -174,9 +174,9 @@ func (gf GathererFunc) Gather() ([]*dto.MetricFamily, error) {
 // be registered has already been registered before, or a different Collector
 // that collects the same metrics has been registered before. Registration fails
 // in that case, but you can detect from the kind of error what has
-// happened. The error contains ***REMOVED***elds for the existing Collector and the
+// happened. The error contains fields for the existing Collector and the
 // (rejected) new Collector that equals the existing one. This can be used to
-// ***REMOVED***nd out if an equal Collector has been registered before and switch over to
+// find out if an equal Collector has been registered before and switch over to
 // using the old one, as demonstrated in the example.
 type AlreadyRegisteredError struct {
 	ExistingCollector, NewCollector Collector
@@ -202,7 +202,7 @@ func (errs MultiError) Error() string {
 	return buf.String()
 }
 
-// MaybeUnwrap returns nil if len(errs) is 0. It returns the ***REMOVED***rst and only
+// MaybeUnwrap returns nil if len(errs) is 0. It returns the first and only
 // contained error as error if len(errs is 1). In all other cases, it returns
 // the MultiError directly. This is helpful for returning a MultiError in a way
 // that only uses the MultiError if needed.
@@ -255,7 +255,7 @@ func (r *Registry) Register(c Collector) error {
 		// Is the descID unique?
 		// (In other words: Is the fqName + constLabel combination unique?)
 		if _, exists := r.descIDs[desc.id]; exists {
-			duplicateDescErr = fmt.Errorf("descriptor %s already exists with the same fully-quali***REMOVED***ed name and const label values", desc)
+			duplicateDescErr = fmt.Errorf("descriptor %s already exists with the same fully-qualified name and const label values", desc)
 		}
 		// If it is not a duplicate desc in this collector, add it to
 		// the collectorID.  (We allow duplicate descs within the same
@@ -270,15 +270,15 @@ func (r *Registry) Register(c Collector) error {
 		// First check existing descriptors...
 		if dimHash, exists := r.dimHashesByName[desc.fqName]; exists {
 			if dimHash != desc.dimHash {
-				return fmt.Errorf("a previously registered descriptor with the same fully-quali***REMOVED***ed name as %s has different label names or a different help string", desc)
+				return fmt.Errorf("a previously registered descriptor with the same fully-qualified name as %s has different label names or a different help string", desc)
 			}
-		} ***REMOVED*** {
+		} else {
 			// ...then check the new descriptors already seen.
 			if dimHash, exists := newDimHashesByName[desc.fqName]; exists {
 				if dimHash != desc.dimHash {
-					return fmt.Errorf("descriptors reported by collector have inconsistent label names or help strings for the same fully-quali***REMOVED***ed name, offender is %s", desc)
+					return fmt.Errorf("descriptors reported by collector have inconsistent label names or help strings for the same fully-qualified name, offender is %s", desc)
 				}
-			} ***REMOVED*** {
+			} else {
 				newDimHashesByName[desc.fqName] = desc.dimHash
 			}
 		}
@@ -468,7 +468,7 @@ func (r *Registry) Gather() ([]*dto.MetricFamily, error) {
 			default:
 				panic("encountered MetricFamily with invalid type")
 			}
-		} ***REMOVED*** {
+		} else {
 			metricFamily = &dto.MetricFamily{}
 			metricFamily.Name = proto.String(desc.fqName)
 			metricFamily.Help = proto.String(desc.help)
@@ -519,7 +519,7 @@ func (r *Registry) Gather() ([]*dto.MetricFamily, error) {
 // interface itself. Its Gather method calls Gather on all Gatherers in the
 // slice in order and returns the merged results. Errors returned from the
 // Gather calles are all returned in a flattened MultiError. Duplicate and
-// inconsistent Metrics are skipped (***REMOVED***rst occurrence in slice order wins) and
+// inconsistent Metrics are skipped (first occurrence in slice order wins) and
 // reported in the returned error.
 //
 // Gatherers can be used to merge the Gather results from multiple
@@ -549,7 +549,7 @@ func (gs Gatherers) Gather() ([]*dto.MetricFamily, error) {
 				for _, err := range multiErr {
 					errs = append(errs, fmt.Errorf("[from Gatherer #%d] %s", i+1, err))
 				}
-			} ***REMOVED*** {
+			} else {
 				errs = append(errs, fmt.Errorf("[from Gatherer #%d] %s", i+1, err))
 			}
 		}
@@ -570,7 +570,7 @@ func (gs Gatherers) Gather() ([]*dto.MetricFamily, error) {
 					))
 					continue
 				}
-			} ***REMOVED*** {
+			} else {
 				existingMF = &dto.MetricFamily{}
 				existingMF.Name = mf.Name
 				existingMF.Help = mf.Help
@@ -619,7 +619,7 @@ func (s metricSorter) Less(i, j int) bool {
 	}
 
 	// We should never arrive here. Multiple metrics with the same
-	// label set in the same scrape will lead to unde***REMOVED***ned ingestion
+	// label set in the same scrape will lead to undefined ingestion
 	// behavior. However, as above, we have to provide stable sorting
 	// here, even for inconsistent metrics. So sort equal metrics
 	// by their timestamp, with missing timestamps (implying "now")
@@ -713,7 +713,7 @@ func checkMetricConsistency(
 				metricFamily.GetName(), dtoMetric,
 			)
 		}
-	} ***REMOVED*** {
+	} else {
 		dimHashes[metricFamily.GetName()] = dh
 	}
 	metricHashes[h] = struct{}{}

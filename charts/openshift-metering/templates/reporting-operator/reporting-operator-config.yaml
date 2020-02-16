@@ -1,74 +1,74 @@
 {{- $operatorValues :=  index .Values "reporting-operator" -}}
 apiVersion: v1
-kind: Con***REMOVED***gMap
+kind: ConfigMap
 metadata:
-  name: reporting-operator-con***REMOVED***g
+  name: reporting-operator-config
   labels:
     app: reporting-operator
 data:
-  log-level: {{ $operatorValues.spec.con***REMOVED***g.logLevel | quote}}
-  log-reports: {{ $operatorValues.spec.con***REMOVED***g.logReports | quote}}
-  log-ddl-queries: {{ $operatorValues.spec.con***REMOVED***g.logDDLQueries | quote}}
-  log-dml-queries: {{ $operatorValues.spec.con***REMOVED***g.logDMLQueries | quote}}
+  log-level: {{ $operatorValues.spec.config.logLevel | quote}}
+  log-reports: {{ $operatorValues.spec.config.logReports | quote}}
+  log-ddl-queries: {{ $operatorValues.spec.config.logDDLQueries | quote}}
+  log-dml-queries: {{ $operatorValues.spec.config.logDMLQueries | quote}}
 
-{{- if $operatorValues.spec.con***REMOVED***g.hive.host }}
-  hive-host: {{ $operatorValues.spec.con***REMOVED***g.hive.host | quote }}
-{{- ***REMOVED*** }}
+{{- if $operatorValues.spec.config.hive.host }}
+  hive-host: {{ $operatorValues.spec.config.hive.host | quote }}
+{{- else }}
   hive-host: "hive-server:10000"
 {{- end }}
 
-{{- if $operatorValues.spec.con***REMOVED***g.hive.tls.enabled }}
-  hive-ca-***REMOVED***le: "/var/run/secrets/hive-tls/ca.crt"
-{{- if $operatorValues.spec.con***REMOVED***g.hive.auth.enabled }}
-  hive-client-cert-***REMOVED***le: "/var/run/secrets/hive-auth/tls.crt"
-  hive-client-key-***REMOVED***le: "/var/run/secrets/hive-auth/tls.key"
+{{- if $operatorValues.spec.config.hive.tls.enabled }}
+  hive-ca-file: "/var/run/secrets/hive-tls/ca.crt"
+{{- if $operatorValues.spec.config.hive.auth.enabled }}
+  hive-client-cert-file: "/var/run/secrets/hive-auth/tls.crt"
+  hive-client-key-file: "/var/run/secrets/hive-auth/tls.key"
 {{- end }}
 {{- end }}
 
-  presto-host: {{ $operatorValues.spec.con***REMOVED***g.presto.host | quote }}
-{{- if $operatorValues.spec.con***REMOVED***g.presto.tls.enabled }}
-  presto-ca-***REMOVED***le: "/var/run/secrets/presto-tls/ca.crt"
-{{- if $operatorValues.spec.con***REMOVED***g.presto.auth.enabled }}
-  presto-client-cert-***REMOVED***le: "/var/run/secrets/presto-auth/tls.crt"
-  presto-client-key-***REMOVED***le: "/var/run/secrets/presto-auth/tls.key"
+  presto-host: {{ $operatorValues.spec.config.presto.host | quote }}
+{{- if $operatorValues.spec.config.presto.tls.enabled }}
+  presto-ca-file: "/var/run/secrets/presto-tls/ca.crt"
+{{- if $operatorValues.spec.config.presto.auth.enabled }}
+  presto-client-cert-file: "/var/run/secrets/presto-auth/tls.crt"
+  presto-client-key-file: "/var/run/secrets/presto-auth/tls.key"
 {{- end }}
 {{- end }}
 
-  prometheus-url: {{ $operatorValues.spec.con***REMOVED***g.prometheus.url | quote}}
-  disable-prometheus-metrics-importer: {{ not $operatorValues.spec.con***REMOVED***g.prometheus.metricsImporter.enabled | quote}}
-{{- if $operatorValues.spec.con***REMOVED***g.prometheus.metricsImporter.con***REMOVED***g.pollInterval }}
-  prometheus-metrics-importer-poll-interval: {{ $operatorValues.spec.con***REMOVED***g.prometheus.metricsImporter.con***REMOVED***g.pollInterval | quote}}
+  prometheus-url: {{ $operatorValues.spec.config.prometheus.url | quote}}
+  disable-prometheus-metrics-importer: {{ not $operatorValues.spec.config.prometheus.metricsImporter.enabled | quote}}
+{{- if $operatorValues.spec.config.prometheus.metricsImporter.config.pollInterval }}
+  prometheus-metrics-importer-poll-interval: {{ $operatorValues.spec.config.prometheus.metricsImporter.config.pollInterval | quote}}
 {{- end }}
-{{- if $operatorValues.spec.con***REMOVED***g.prometheus.metricsImporter.con***REMOVED***g.chunkSize }}
-  prometheus-metrics-importer-chunk-size: {{ $operatorValues.spec.con***REMOVED***g.prometheus.metricsImporter.con***REMOVED***g.chunkSize | quote}}
+{{- if $operatorValues.spec.config.prometheus.metricsImporter.config.chunkSize }}
+  prometheus-metrics-importer-chunk-size: {{ $operatorValues.spec.config.prometheus.metricsImporter.config.chunkSize | quote}}
 {{- end }}
-{{- if $operatorValues.spec.con***REMOVED***g.prometheus.metricsImporter.con***REMOVED***g.stepSize }}
-  prometheus-metrics-importer-step-size: {{ $operatorValues.spec.con***REMOVED***g.prometheus.metricsImporter.con***REMOVED***g.stepSize | quote}}
+{{- if $operatorValues.spec.config.prometheus.metricsImporter.config.stepSize }}
+  prometheus-metrics-importer-step-size: {{ $operatorValues.spec.config.prometheus.metricsImporter.config.stepSize | quote}}
 {{- end }}
-{{- if $operatorValues.spec.con***REMOVED***g.leaderLeaseDuration }}
-  leader-lease-duration: {{ $operatorValues.spec.con***REMOVED***g.leaderLeaseDuration | quote }}
+{{- if $operatorValues.spec.config.leaderLeaseDuration }}
+  leader-lease-duration: {{ $operatorValues.spec.config.leaderLeaseDuration | quote }}
 {{- end }}
-{{- if $operatorValues.spec.con***REMOVED***g.prestoMaxQueryLength }}
-  presto-max-query-length: {{ $operatorValues.spec.con***REMOVED***g.presto.maxQueryLength | quote }}
+{{- if $operatorValues.spec.config.prestoMaxQueryLength }}
+  presto-max-query-length: {{ $operatorValues.spec.config.presto.maxQueryLength | quote }}
 {{- end }}
-{{- if $operatorValues.spec.con***REMOVED***g.prometheus.metricsImporter.con***REMOVED***g.maxQueryRangeDuration }}
-  prometheus-datasource-max-query-range-duration: {{ $operatorValues.spec.con***REMOVED***g.prometheus.metricsImporter.con***REMOVED***g.maxQueryRangeDuration | quote }}
+{{- if $operatorValues.spec.config.prometheus.metricsImporter.config.maxQueryRangeDuration }}
+  prometheus-datasource-max-query-range-duration: {{ $operatorValues.spec.config.prometheus.metricsImporter.config.maxQueryRangeDuration | quote }}
 {{- end }}
-{{- if $operatorValues.spec.con***REMOVED***g.prometheus.metricsImporter.con***REMOVED***g.maxImportBack***REMOVED***llDuration }}
-  prometheus-datasource-max-import-back***REMOVED***ll-duration: {{ $operatorValues.spec.con***REMOVED***g.prometheus.metricsImporter.con***REMOVED***g.maxImportBack***REMOVED***llDuration | quote }}
+{{- if $operatorValues.spec.config.prometheus.metricsImporter.config.maxImportBackfillDuration }}
+  prometheus-datasource-max-import-backfill-duration: {{ $operatorValues.spec.config.prometheus.metricsImporter.config.maxImportBackfillDuration | quote }}
 {{- end }}
-{{- if $operatorValues.spec.con***REMOVED***g.prometheus.metricsImporter.con***REMOVED***g.importFrom }}
-  prometheus-datasource-import-from: {{ $operatorValues.spec.con***REMOVED***g.prometheus.metricsImporter.con***REMOVED***g.importFrom | quote }}
+{{- if $operatorValues.spec.config.prometheus.metricsImporter.config.importFrom }}
+  prometheus-datasource-import-from: {{ $operatorValues.spec.config.prometheus.metricsImporter.config.importFrom | quote }}
 {{- end }}
-{{- if $operatorValues.spec.con***REMOVED***g.prometheus.metricsImporter.auth.useServiceAccountToken }}
-  prometheus-bearer-token-***REMOVED***le: "/var/run/secrets/kubernetes.io/serviceaccount/token"
-{{- ***REMOVED*** }}
-  prometheus-bearer-token-***REMOVED***le: "/var/run/reporting-operator/token"
+{{- if $operatorValues.spec.config.prometheus.metricsImporter.auth.useServiceAccountToken }}
+  prometheus-bearer-token-file: "/var/run/secrets/kubernetes.io/serviceaccount/token"
+{{- else }}
+  prometheus-bearer-token-file: "/var/run/reporting-operator/token"
 {{- end }}
-{{- if $operatorValues.spec.con***REMOVED***g.allNamespaces }}
+{{- if $operatorValues.spec.config.allNamespaces }}
   all-namespaces: "true"
 {{- end }}
-{{- if $operatorValues.spec.con***REMOVED***g.targetNamespaces }}
-  target-namespaces: {{ $operatorValues.spec.con***REMOVED***g.targetNamespaces | join "," | quote }}
+{{- if $operatorValues.spec.config.targetNamespaces }}
+  target-namespaces: {{ $operatorValues.spec.config.targetNamespaces | join "," | quote }}
 {{- end }}
-  enable-***REMOVED***nalizers: {{ $operatorValues.spec.con***REMOVED***g.enableFinalizers | quote}}
+  enable-finalizers: {{ $operatorValues.spec.config.enableFinalizers | quote}}

@@ -1,6 +1,6 @@
 // Copyright 2016 The Go Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE ***REMOVED***le.
+// license that can be found in the LICENSE file.
 
 // Package errgroup provides synchronization, error propagation, and Context
 // cancelation for groups of goroutines working on subtasks of a common task.
@@ -27,16 +27,16 @@ type Group struct {
 
 // WithContext returns a new Group and an associated Context derived from ctx.
 //
-// The derived Context is canceled the ***REMOVED***rst time a function passed to Go
-// returns a non-nil error or the ***REMOVED***rst time Wait returns, whichever occurs
-// ***REMOVED***rst.
+// The derived Context is canceled the first time a function passed to Go
+// returns a non-nil error or the first time Wait returns, whichever occurs
+// first.
 func WithContext(ctx context.Context) (*Group, context.Context) {
 	ctx, cancel := context.WithCancel(ctx)
 	return &Group{cancel: cancel}, ctx
 }
 
 // Wait blocks until all function calls from the Go method have returned, then
-// returns the ***REMOVED***rst non-nil error (if any) from them.
+// returns the first non-nil error (if any) from them.
 func (g *Group) Wait() error {
 	g.wg.Wait()
 	if g.cancel != nil {
@@ -47,7 +47,7 @@ func (g *Group) Wait() error {
 
 // Go calls the given function in a new goroutine.
 //
-// The ***REMOVED***rst call to return a non-nil error cancels the group; its error will be
+// The first call to return a non-nil error cancels the group; its error will be
 // returned by Wait.
 func (g *Group) Go(f func() error) {
 	g.wg.Add(1)

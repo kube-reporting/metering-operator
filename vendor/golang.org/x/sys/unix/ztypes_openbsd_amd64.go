@@ -101,7 +101,7 @@ type Statfs_t struct {
 	F_blocks      uint64
 	F_bfree       uint64
 	F_bavail      int64
-	F_***REMOVED***les       uint64
+	F_files       uint64
 	F_ffree       uint64
 	F_favail      int64
 	F_syncwrites  uint64
@@ -233,7 +233,7 @@ type Cmsghdr struct {
 
 type Inet6Pktinfo struct {
 	Addr    [16]byte /* in6_addr */
-	I***REMOVED***ndex uint32
+	Ifindex uint32
 }
 
 type IPv6MTUInfo struct {

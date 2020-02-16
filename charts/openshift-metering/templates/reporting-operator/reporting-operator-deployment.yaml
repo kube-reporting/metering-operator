@@ -1,6 +1,6 @@
 {{- $operatorValues :=  index .Values "reporting-operator" -}}
 {{/* When using TLS but set probes to use https */}}
-{{- if $operatorValues.spec.con***REMOVED***g.tls.api.enabled -}}
+{{- if $operatorValues.spec.config.tls.api.enabled -}}
 {{- $_ := set $operatorValues.spec.readinessProbe.httpGet "scheme" "HTTPS" -}}
 {{- $_ := set $operatorValues.spec.livenessProbe.httpGet "scheme" "HTTPS" -}}
 {{- end }}
@@ -28,23 +28,23 @@ spec:
 {{ toYaml $operatorValues.spec.labels | indent 8 }}
 {{- end }}
       annotations:
-        reporting-operator-con***REMOVED***g-hash: {{ include (print $.Template.BasePath "/reporting-operator/reporting-operator-con***REMOVED***g.yaml") . | sha256sum }}
-{{- if $operatorValues.spec.con***REMOVED***g.aws.createSecret }}
+        reporting-operator-config-hash: {{ include (print $.Template.BasePath "/reporting-operator/reporting-operator-config.yaml") . | sha256sum }}
+{{- if $operatorValues.spec.config.aws.createSecret }}
         reporting-operator-aws-credentials-secrets-hash: {{ include (print $.Template.BasePath "/reporting-operator/reporting-operator-aws-credentials-secrets.yaml") . | sha256sum }}
 {{- end }}
-{{- if and $operatorValues.spec.con***REMOVED***g.tls.api.enabled $operatorValues.spec.con***REMOVED***g.tls.api.createSecret }}
+{{- if and $operatorValues.spec.config.tls.api.enabled $operatorValues.spec.config.tls.api.createSecret }}
         reporting-operator-tls-secrets-hash: {{ include (print $.Template.BasePath "/reporting-operator/reporting-operator-tls-secrets.yaml") . | sha256sum }}
 {{- end }}
-{{- if and $operatorValues.spec.con***REMOVED***g.presto.tls.enabled $operatorValues.spec.con***REMOVED***g.presto.tls.createSecret }}
+{{- if and $operatorValues.spec.config.presto.tls.enabled $operatorValues.spec.config.presto.tls.createSecret }}
         reporting-operator-presto-server-tls-hash: {{ include (print $.Template.BasePath "/reporting-operator/reporting-operator-presto-tls-secrets.yaml") . | sha256sum }}
 {{- end }}
-{{- if and $operatorValues.spec.con***REMOVED***g.hive.tls.enabled $operatorValues.spec.con***REMOVED***g.hive.tls.createSecret }}
+{{- if and $operatorValues.spec.config.hive.tls.enabled $operatorValues.spec.config.hive.tls.createSecret }}
         reporting-operator-hive-server-tls-hash: {{ include (print $.Template.BasePath "/reporting-operator/reporting-operator-hive-tls-secrets.yaml") . | sha256sum }}
 {{- end }}
-{{- if and $operatorValues.spec.con***REMOVED***g.presto.auth.enabled $operatorValues.spec.con***REMOVED***g.presto.auth.createSecret }}
+{{- if and $operatorValues.spec.config.presto.auth.enabled $operatorValues.spec.config.presto.auth.createSecret }}
         reporting-operator-presto-client-tls-hash: {{ include (print $.Template.BasePath "/reporting-operator/reporting-operator-presto-auth-secrets.yaml") . | sha256sum }}
 {{- end }}
-{{- if and $operatorValues.spec.con***REMOVED***g.hive.auth.enabled $operatorValues.spec.con***REMOVED***g.hive.auth.createSecret }}
+{{- if and $operatorValues.spec.config.hive.auth.enabled $operatorValues.spec.config.hive.auth.createSecret }}
         reporting-operator-hive-client-tls-hash: {{ include (print $.Template.BasePath "/reporting-operator/reporting-operator-hive-auth-secrets.yaml") . | sha256sum }}
 {{- end }}
 {{- if and $operatorValues.spec.authProxy.enabled $operatorValues.spec.authProxy.cookie.createSecret }}
@@ -70,9 +70,9 @@ spec:
       tolerations:
 {{ toYaml $operatorValues.spec.tolerations | indent 8 }}
 {{- end }}
-{{- if $operatorValues.spec.af***REMOVED***nity }}
-      af***REMOVED***nity:
-{{ toYaml $operatorValues.spec.af***REMOVED***nity | indent 8 }}
+{{- if $operatorValues.spec.affinity }}
+      affinity:
+{{ toYaml $operatorValues.spec.affinity | indent 8 }}
 {{- end }}
       containers:
       - name: reporting-operator
@@ -81,194 +81,194 @@ spec:
         env:
         - name: POD_NAME
           valueFrom:
-            ***REMOVED***eldRef:
-              ***REMOVED***eldPath: metadata.name
-{{- if or $operatorValues.spec.con***REMOVED***g.aws.createSecret $operatorValues.spec.con***REMOVED***g.aws.secretName }}
+            fieldRef:
+              fieldPath: metadata.name
+{{- if or $operatorValues.spec.config.aws.createSecret $operatorValues.spec.config.aws.secretName }}
         - name: AWS_ACCESS_KEY_ID
           valueFrom:
             secretKeyRef:
-              name: {{ $operatorValues.spec.con***REMOVED***g.aws.secretName | default "reporting-operator-aws-credentials" }}
+              name: {{ $operatorValues.spec.config.aws.secretName | default "reporting-operator-aws-credentials" }}
               key: aws-access-key-id
         - name: AWS_SECRET_ACCESS_KEY
           valueFrom:
             secretKeyRef:
-              name: {{ $operatorValues.spec.con***REMOVED***g.aws.secretName | default "reporting-operator-aws-credentials" }}
+              name: {{ $operatorValues.spec.config.aws.secretName | default "reporting-operator-aws-credentials" }}
               key: aws-secret-access-key
 {{- end }}
         - name: REPORTING_OPERATOR_LOG_LEVEL
           valueFrom:
-            con***REMOVED***gMapKeyRef:
-              name: reporting-operator-con***REMOVED***g
+            configMapKeyRef:
+              name: reporting-operator-config
               key: log-level
         - name: REPORTING_OPERATOR_LOG_DML_QUERIES
           valueFrom:
-            con***REMOVED***gMapKeyRef:
-              name: reporting-operator-con***REMOVED***g
+            configMapKeyRef:
+              name: reporting-operator-config
               key: log-dml-queries
         - name: REPORTING_OPERATOR_LOG_DDL_QUERIES
           valueFrom:
-            con***REMOVED***gMapKeyRef:
-              name: reporting-operator-con***REMOVED***g
+            configMapKeyRef:
+              name: reporting-operator-config
               key: log-ddl-queries
         - name: REPORTING_OPERATOR_LOG_REPORT
           valueFrom:
-            con***REMOVED***gMapKeyRef:
-              name: reporting-operator-con***REMOVED***g
+            configMapKeyRef:
+              name: reporting-operator-config
               key: log-reports
         - name: REPORTING_OPERATOR_PROMETHEUS_HOST
           valueFrom:
-            con***REMOVED***gMapKeyRef:
-              name: reporting-operator-con***REMOVED***g
+            configMapKeyRef:
+              name: reporting-operator-config
               key: prometheus-url
         - name: REPORTING_OPERATOR_PROMETHEUS_METRICS_IMPORTER_INTERVAL
           valueFrom:
-            con***REMOVED***gMapKeyRef:
-              name: reporting-operator-con***REMOVED***g
+            configMapKeyRef:
+              name: reporting-operator-config
               key: prometheus-metrics-importer-poll-interval
               optional: true
         - name: REPORTING_OPERATOR_PROMETHEUS_METRICS_IMPORTER_CHUNK_SIZE
           valueFrom:
-            con***REMOVED***gMapKeyRef:
-              name: reporting-operator-con***REMOVED***g
+            configMapKeyRef:
+              name: reporting-operator-config
               key: prometheus-metrics-importer-chunk-size
               optional: true
         - name: REPORTING_OPERATOR_PROMETHEUS_METRICS_IMPORTER_STEP_SIZE
           valueFrom:
-            con***REMOVED***gMapKeyRef:
-              name: reporting-operator-con***REMOVED***g
+            configMapKeyRef:
+              name: reporting-operator-config
               key: prometheus-metrics-importer-step-size
               optional: true
         - name: REPORTING_OPERATOR_DISABLE_PROMETHEUS_METRICS_IMPORTER
           valueFrom:
-            con***REMOVED***gMapKeyRef:
-              name: reporting-operator-con***REMOVED***g
+            configMapKeyRef:
+              name: reporting-operator-config
               key: disable-prometheus-metrics-importer
         - name: REPORTING_OPERATOR_ENABLE_FINALIZERS
           valueFrom:
-            con***REMOVED***gMapKeyRef:
-              name: reporting-operator-con***REMOVED***g
-              key: enable-***REMOVED***nalizers
+            configMapKeyRef:
+              name: reporting-operator-config
+              key: enable-finalizers
         - name: REPORTING_OPERATOR_PRESTO_MAX_QUERY_LENGTH
           valueFrom:
-            con***REMOVED***gMapKeyRef:
-              name: reporting-operator-con***REMOVED***g
+            configMapKeyRef:
+              name: reporting-operator-config
               key: presto-max-query-length
               optional: true
         - name: REPORTING_OPERATOR_PROMETHEUS_DATASOURCE_MAX_QUERY_RANGE_DURATION
           valueFrom:
-            con***REMOVED***gMapKeyRef:
-              name: reporting-operator-con***REMOVED***g
+            configMapKeyRef:
+              name: reporting-operator-config
               key: prometheus-datasource-max-query-range-duration
               optional: true
         - name: REPORTING_OPERATOR_PROMETHEUS_DATASOURCE_MAX_IMPORT_BACKFILL_DURATION
           valueFrom:
-            con***REMOVED***gMapKeyRef:
-              name: reporting-operator-con***REMOVED***g
-              key: prometheus-datasource-max-import-back***REMOVED***ll-duration
+            configMapKeyRef:
+              name: reporting-operator-config
+              key: prometheus-datasource-max-import-backfill-duration
               optional: true
         - name: REPORTING_OPERATOR_PROMETHEUS_DATASOURCE_IMPORT_FROM
           valueFrom:
-            con***REMOVED***gMapKeyRef:
-              name: reporting-operator-con***REMOVED***g
+            configMapKeyRef:
+              name: reporting-operator-config
               key: prometheus-datasource-import-from
               optional: true
-{{- /* neither speci***REMOVED***ed = no auth used; both speci***REMOVED***ed = error; either = correct & authenticated */ -}}
-{{- if and $operatorValues.spec.con***REMOVED***g.prometheus.metricsImporter.auth.tokenSecret.enabled $operatorValues.spec.con***REMOVED***g.prometheus.metricsImporter.auth.useServiceAccountToken  }}
+{{- /* neither specified = no auth used; both specified = error; either = correct & authenticated */ -}}
+{{- if and $operatorValues.spec.config.prometheus.metricsImporter.auth.tokenSecret.enabled $operatorValues.spec.config.prometheus.metricsImporter.auth.useServiceAccountToken  }}
   {{ fail "cannot use both token from secret and token from service account" }}
 {{- end }}
         - name: REPORTING_OPERATOR_PROMETHEUS_BEARER_TOKEN_FILE
           valueFrom:
-            con***REMOVED***gMapKeyRef:
-              name: reporting-operator-con***REMOVED***g
-              key: prometheus-bearer-token-***REMOVED***le
+            configMapKeyRef:
+              name: reporting-operator-config
+              key: prometheus-bearer-token-file
               optional: true
-{{- if $operatorValues.spec.con***REMOVED***g.prometheus.certi***REMOVED***cateAuthority.useServiceAccountCA }}
-  {{- if $operatorValues.spec.con***REMOVED***g.prometheus.certi***REMOVED***cateAuthority.con***REMOVED***gMap.enabled }}
-    {{ fail "Cannot both use serviceAccount CA and CA from con***REMOVED***gMap" }}
+{{- if $operatorValues.spec.config.prometheus.certificateAuthority.useServiceAccountCA }}
+  {{- if $operatorValues.spec.config.prometheus.certificateAuthority.configMap.enabled }}
+    {{ fail "Cannot both use serviceAccount CA and CA from configMap" }}
   {{- end }}
         - name: REPORTING_OPERATOR_PROMETHEUS_CA_FILE
           value: "/var/run/secrets/kubernetes.io/serviceaccount/service-ca.crt"
 {{- end }}
-{{- if $operatorValues.spec.con***REMOVED***g.prometheus.certi***REMOVED***cateAuthority.con***REMOVED***gMap.enabled }}
+{{- if $operatorValues.spec.config.prometheus.certificateAuthority.configMap.enabled }}
         - name: REPORTING_OPERATOR_PROMETHEUS_CA_FILE
-          value: "/var/run/reporting-operator/ca/{{ $operatorValues.spec.con***REMOVED***g.prometheus.certi***REMOVED***cateAuthority.con***REMOVED***gMap.***REMOVED***lename }}"
+          value: "/var/run/reporting-operator/ca/{{ $operatorValues.spec.config.prometheus.certificateAuthority.configMap.filename }}"
 {{- end }}
         - name: REPORTING_OPERATOR_PRESTO_HOST
           valueFrom:
-            con***REMOVED***gMapKeyRef:
-              name: reporting-operator-con***REMOVED***g
+            configMapKeyRef:
+              name: reporting-operator-config
               key: presto-host
-{{- if $operatorValues.spec.con***REMOVED***g.presto.tls.enabled }}
+{{- if $operatorValues.spec.config.presto.tls.enabled }}
         - name: REPORTING_OPERATOR_PRESTO_USE_TLS
           value: "true"
         - name: REPORTING_OPERATOR_PRESTO_CA_FILE
           valueFrom:
-            con***REMOVED***gMapKeyRef:
-              name: reporting-operator-con***REMOVED***g
-              key: presto-ca-***REMOVED***le
-{{- ***REMOVED*** }}
+            configMapKeyRef:
+              name: reporting-operator-config
+              key: presto-ca-file
+{{- else }}
         - name: REPORTING_OPERATOR_PRESTO_USE_TLS
           value: "false"
 {{- end }}
-{{- if $operatorValues.spec.con***REMOVED***g.presto.auth.enabled }}
+{{- if $operatorValues.spec.config.presto.auth.enabled }}
         - name: REPORTING_OPERATOR_PRESTO_USE_AUTH
           value: "true"
         - name: REPORTING_OPERATOR_PRESTO_CLIENT_CERT_FILE
           valueFrom:
-            con***REMOVED***gMapKeyRef:
-              name: reporting-operator-con***REMOVED***g
-              key: presto-client-cert-***REMOVED***le
+            configMapKeyRef:
+              name: reporting-operator-config
+              key: presto-client-cert-file
         - name: REPORTING_OPERATOR_PRESTO_CLIENT_KEY_FILE
           valueFrom:
-            con***REMOVED***gMapKeyRef:
-              name: reporting-operator-con***REMOVED***g
-              key: presto-client-key-***REMOVED***le
-{{- ***REMOVED*** }}
+            configMapKeyRef:
+              name: reporting-operator-config
+              key: presto-client-key-file
+{{- else }}
         - name: REPORTING_OPERATOR_PRESTO_USE_AUTH
           value: "false"
 {{- end }}
         - name: REPORTING_OPERATOR_HIVE_HOST
           valueFrom:
-            con***REMOVED***gMapKeyRef:
-              name: reporting-operator-con***REMOVED***g
+            configMapKeyRef:
+              name: reporting-operator-config
               key: hive-host
 
-{{- if $operatorValues.spec.con***REMOVED***g.hive.tls.enabled }}
+{{- if $operatorValues.spec.config.hive.tls.enabled }}
         - name: REPORTING_OPERATOR_HIVE_USE_TLS
           value: "true"
         - name: REPORTING_OPERATOR_HIVE_CA_FILE
           valueFrom:
-            con***REMOVED***gMapKeyRef:
-              name: reporting-operator-con***REMOVED***g
-              key: hive-ca-***REMOVED***le
-{{- ***REMOVED*** }}
+            configMapKeyRef:
+              name: reporting-operator-config
+              key: hive-ca-file
+{{- else }}
         - name: REPORTING_OPERATOR_HIVE_USE_TLS
           value: "false"
 {{- end }}
-{{- if $operatorValues.spec.con***REMOVED***g.hive.auth.enabled }}
+{{- if $operatorValues.spec.config.hive.auth.enabled }}
         - name: REPORTING_OPERATOR_HIVE_USE_AUTH
           value: "true"
         - name: REPORTING_OPERATOR_HIVE_CLIENT_CERT_FILE
           valueFrom:
-            con***REMOVED***gMapKeyRef:
-              name: reporting-operator-con***REMOVED***g
-              key: hive-client-cert-***REMOVED***le
+            configMapKeyRef:
+              name: reporting-operator-config
+              key: hive-client-cert-file
         - name: REPORTING_OPERATOR_HIVE_CLIENT_KEY_FILE
           valueFrom:
-            con***REMOVED***gMapKeyRef:
-              name: reporting-operator-con***REMOVED***g
-              key: hive-client-key-***REMOVED***le
-{{- ***REMOVED*** }}
+            configMapKeyRef:
+              name: reporting-operator-config
+              key: hive-client-key-file
+{{- else }}
         - name: REPORTING_OPERATOR_HIVE_USE_AUTH
           value: "false"
 {{- end }}
 
         - name: REPORTING_OPERATOR_LEASE_DURATION
           valueFrom:
-            con***REMOVED***gMapKeyRef:
-              name: reporting-operator-con***REMOVED***g
+            configMapKeyRef:
+              name: reporting-operator-config
               key: leader-lease-duration
-{{- if $operatorValues.spec.con***REMOVED***g.tls.api.enabled }}
+{{- if $operatorValues.spec.config.tls.api.enabled }}
         - name: REPORTING_OPERATOR_TLS_KEY
           value: "/tls/tls.key"
         - name: REPORTING_OPERATOR_TLS_CERT
@@ -277,7 +277,7 @@ spec:
 {{- if $operatorValues.spec.authProxy.enabled }}
         - name: REPORTING_OPERATOR_USE_TLS
           value: "false"
-{{- ***REMOVED*** }}
+{{- else }}
         - name: REPORTING_OPERATOR_USE_TLS
           value: "true"
 {{- end }}
@@ -290,20 +290,20 @@ spec:
 {{- end }}
         - name: REPORTING_OPERATOR_ALL_NAMESPACES
           valueFrom:
-            con***REMOVED***gMapKeyRef:
-              name: reporting-operator-con***REMOVED***g
+            configMapKeyRef:
+              name: reporting-operator-config
               key: all-namespaces
               optional: true
         - name: REPORTING_OPERATOR_TARGET_NAMESPACES
           valueFrom:
-            con***REMOVED***gMapKeyRef:
-              name: reporting-operator-con***REMOVED***g
+            configMapKeyRef:
+              name: reporting-operator-config
               key: target-namespaces
               optional: true
         - name: REPORTING_OPERATOR_API_LISTEN
 {{- if $operatorValues.spec.authProxy.enabled }}
           value: 127.0.0.1:8080
-{{- ***REMOVED*** }}
+{{- else }}
           value: 0.0.0.0:8080
 {{- end }}
         - name: REPORTING_OPERATOR_METRICS_LISTEN
@@ -319,7 +319,7 @@ spec:
           containerPort: 6060
         - name: metrics
           containerPort: 8082
-{{/* When using auth-proxy, disable probes against the reporting-operator pod since we'll listen on localhost, and we'll con***REMOVED***gure to probe the auth proxy pod instead */}}
+{{/* When using auth-proxy, disable probes against the reporting-operator pod since we'll listen on localhost, and we'll configure to probe the auth proxy pod instead */}}
 {{- if not $operatorValues.spec.authProxy.enabled }}
         readinessProbe:
 {{ toYaml $operatorValues.spec.readinessProbe | indent 10 }}
@@ -327,31 +327,31 @@ spec:
 {{ toYaml $operatorValues.spec.livenessProbe | indent 10 }}
 {{- end }}
         volumeMounts:
-{{- if $operatorValues.spec.con***REMOVED***g.hive.tls.enabled }}
+{{- if $operatorValues.spec.config.hive.tls.enabled }}
         - name: hive-tls
           mountPath: /var/run/secrets/hive-tls
-{{- if $operatorValues.spec.con***REMOVED***g.hive.auth.enabled }}
+{{- if $operatorValues.spec.config.hive.auth.enabled }}
         - name: hive-auth
           mountPath: /var/run/secrets/hive-auth
 {{- end }}
 {{- end }}
-{{- if $operatorValues.spec.con***REMOVED***g.presto.tls.enabled }}
+{{- if $operatorValues.spec.config.presto.tls.enabled }}
         - name: presto-tls
           mountPath: /var/run/secrets/presto-tls
-{{- if $operatorValues.spec.con***REMOVED***g.presto.auth.enabled }}
+{{- if $operatorValues.spec.config.presto.auth.enabled }}
         - name: presto-auth
           mountPath: /var/run/secrets/presto-auth
 {{- end }}
 {{- end }}
-{{- if $operatorValues.spec.con***REMOVED***g.tls.api.enabled }}
+{{- if $operatorValues.spec.config.tls.api.enabled }}
         - name: api-tls
           mountPath: /tls
 {{- end }}
-{{- if $operatorValues.spec.con***REMOVED***g.prometheus.certi***REMOVED***cateAuthority.con***REMOVED***gMap.enabled }}
-        - name: prometheus-certi***REMOVED***cate-authority
+{{- if $operatorValues.spec.config.prometheus.certificateAuthority.configMap.enabled }}
+        - name: prometheus-certificate-authority
           mountPath: /var/run/reporting-operator/ca/
 {{- end }}
-{{- if $operatorValues.spec.con***REMOVED***g.prometheus.metricsImporter.auth.tokenSecret.enabled }}
+{{- if $operatorValues.spec.config.prometheus.metricsImporter.auth.tokenSecret.enabled }}
         - mountPath: /var/run/reporting-operator/token
           name: prometheus-bearer-token
           subPath: token
@@ -363,25 +363,25 @@ spec:
         env:
         - name: NAMESPACE
           valueFrom:
-            ***REMOVED***eldRef:
-              ***REMOVED***eldPath: metadata.namespace
+            fieldRef:
+              fieldPath: metadata.namespace
         args:
         - -provider=openshift
-{{- if $operatorValues.spec.con***REMOVED***g.tls.api.enabled }}
+{{- if $operatorValues.spec.config.tls.api.enabled }}
         - -https-address=:8081
         - -http-address=
-{{- ***REMOVED*** }}
+{{- else }}
         - -https-address=
         - -http-address=:8081
 {{- end }}
         - -upstream=http://127.0.0.1:8080
-        - -htpasswd-***REMOVED***le=/etc/proxy/htpasswd/auth
-{{- if $operatorValues.spec.con***REMOVED***g.tls.api.enabled }}
+        - -htpasswd-file=/etc/proxy/htpasswd/auth
+{{- if $operatorValues.spec.config.tls.api.enabled }}
         - -tls-cert=/etc/tls/tls.crt
         - -tls-key=/etc/tls/tls.key
 {{- end }}
-        - -client-secret-***REMOVED***le=/var/run/secrets/kubernetes.io/serviceaccount/token
-        - -cookie-secret-***REMOVED***le=/etc/proxy/cookie-secret/cookie-secret-seed
+        - -client-secret-file=/var/run/secrets/kubernetes.io/serviceaccount/token
+        - -cookie-secret-file=/etc/proxy/cookie-secret/cookie-secret-seed
         - -request-logging=true
         - -skip-auth-regex=^/healthy$
         - -skip-auth-regex=^/ready$
@@ -389,8 +389,8 @@ spec:
         - -openshift-ca=/var/run/secrets/kubernetes.io/serviceaccount/ca.crt
         - -openshift-service-account=reporting-operator
 {{- if $operatorValues.spec.authProxy.authenticatedEmails.enabled }}
-        - -authenticated-emails-***REMOVED***le=/etc/proxy/authenticated-emails/emails
-{{- ***REMOVED*** }}
+        - -authenticated-emails-file=/etc/proxy/authenticated-emails/emails
+{{- else }}
         - -email-domain=*
 {{- end }}
 {{- if $operatorValues.spec.authProxy.subjectAccessReview.enabled }}
@@ -399,7 +399,7 @@ spec:
 {{- if $operatorValues.spec.authProxy.delegateURLs.enabled }}
         - '-openshift-delegate-urls={{- $operatorValues.spec.authProxy.delegateURLs.policy | trim -}}'
 {{- end }}
-{{/* When using the auth-proxy, con***REMOVED***gure liveness probes correctly to communicate with the proxy using the auth-proxy port */}}
+{{/* When using the auth-proxy, configure liveness probes correctly to communicate with the proxy using the auth-proxy port */}}
 {{- $_ := set $operatorValues.spec.readinessProbe.httpGet "port" 8081 }}
 {{- $_ := set $operatorValues.spec.livenessProbe.httpGet "port" 8081 }}
         readinessProbe:
@@ -412,7 +412,7 @@ spec:
         resources:
 {{ toYaml $operatorValues.spec.authProxy.resources | indent 10 }}
         volumeMounts:
-{{- if $operatorValues.spec.con***REMOVED***g.tls.api.enabled }}
+{{- if $operatorValues.spec.config.tls.api.enabled }}
         - mountPath: /etc/tls
           name: api-tls
 {{- end }}
@@ -426,35 +426,35 @@ spec:
 {{- end }}
 {{- end }}{{/* end of authProxy.enabled */}}
       volumes:
-{{- if $operatorValues.spec.con***REMOVED***g.hive.tls.enabled }}
+{{- if $operatorValues.spec.config.hive.tls.enabled }}
       - name: hive-tls
         secret:
-          secretName: {{ $operatorValues.spec.con***REMOVED***g.hive.tls.secretName }}
-{{- if $operatorValues.spec.con***REMOVED***g.hive.auth.enabled }}
+          secretName: {{ $operatorValues.spec.config.hive.tls.secretName }}
+{{- if $operatorValues.spec.config.hive.auth.enabled }}
       - name: hive-auth
         secret:
-          secretName: {{ $operatorValues.spec.con***REMOVED***g.hive.auth.secretName }}
+          secretName: {{ $operatorValues.spec.config.hive.auth.secretName }}
 {{- end }}
 {{- end }}
-{{- if $operatorValues.spec.con***REMOVED***g.presto.tls.enabled }}
+{{- if $operatorValues.spec.config.presto.tls.enabled }}
       - name: presto-tls
         secret:
-          secretName: {{ $operatorValues.spec.con***REMOVED***g.presto.tls.secretName }}
-{{- if $operatorValues.spec.con***REMOVED***g.presto.auth.enabled }}
+          secretName: {{ $operatorValues.spec.config.presto.tls.secretName }}
+{{- if $operatorValues.spec.config.presto.auth.enabled }}
       - name: presto-auth
         secret:
-          secretName: {{ $operatorValues.spec.con***REMOVED***g.presto.auth.secretName }}
+          secretName: {{ $operatorValues.spec.config.presto.auth.secretName }}
 {{- end }}
 {{- end }}
-{{- if $operatorValues.spec.con***REMOVED***g.tls.api.enabled }}
+{{- if $operatorValues.spec.config.tls.api.enabled }}
       - name: api-tls
         secret:
-          secretName: {{ $operatorValues.spec.con***REMOVED***g.tls.api.secretName }}
+          secretName: {{ $operatorValues.spec.config.tls.api.secretName }}
 {{- end }}
-{{- if $operatorValues.spec.con***REMOVED***g.prometheus.certi***REMOVED***cateAuthority.con***REMOVED***gMap.enabled }}
-      - name: prometheus-certi***REMOVED***cate-authority
-        con***REMOVED***gMap:
-          name: {{ $operatorValues.spec.con***REMOVED***g.prometheus.certi***REMOVED***cateAuthority.con***REMOVED***gMap.name }}
+{{- if $operatorValues.spec.config.prometheus.certificateAuthority.configMap.enabled }}
+      - name: prometheus-certificate-authority
+        configMap:
+          name: {{ $operatorValues.spec.config.prometheus.certificateAuthority.configMap.name }}
 {{- end }}
 {{- if $operatorValues.spec.authProxy.enabled }}
       - name: cookie-secret
@@ -469,10 +469,10 @@ spec:
           secretName: {{ $operatorValues.spec.authProxy.authenticatedEmails.secretName }}
 {{- end }}
 {{- end }}
-{{- if $operatorValues.spec.con***REMOVED***g.prometheus.metricsImporter.auth.tokenSecret.enabled }}
+{{- if $operatorValues.spec.config.prometheus.metricsImporter.auth.tokenSecret.enabled }}
       - name: prometheus-bearer-token
         secret:
-          secretName: {{ $operatorValues.spec.con***REMOVED***g.prometheus.metricsImporter.auth.tokenSecret.name }}
+          secretName: {{ $operatorValues.spec.config.prometheus.metricsImporter.auth.tokenSecret.name }}
 {{- end }}
       restartPolicy: Always
       terminationGracePeriodSeconds: 30

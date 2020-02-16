@@ -75,7 +75,7 @@ spec:
       FROM {| .Report.Inputs.ClusterCpuUsageReportName | reportTableName |}
       WHERE period_start  >= timestamp '{| default .Report.ReportingStart .Report.Inputs.ReportingStart | prestoTimestamp |}'
       AND period_end <= timestamp '{| default .Report.ReportingEnd .Report.Inputs.ReportingEnd | prestoTimestamp |}'
-    {|- ***REMOVED*** |}
+    {|- else |}
       sum(cpu_core_seconds) as total_cluster_usage_cpu_core_seconds,
       avg(cpu_cores) as avg_cluster_usage_cpu_cores,
       avg(pod_count) AS avg_pod_count
@@ -162,7 +162,7 @@ spec:
       FROM {| .Report.Inputs.ClusterMemoryUsageReportName | reportTableName |}
       WHERE period_start  >= timestamp '{| default .Report.ReportingStart .Report.Inputs.ReportingStart | prestoTimestamp |}'
       AND period_end <= timestamp '{| default .Report.ReportingEnd .Report.Inputs.ReportingEnd | prestoTimestamp |}'
-    {|- ***REMOVED*** |}
+    {|- else |}
       sum(memory_byte_seconds) as total_cluster_usage_memory_byte_seconds,
       avg(memory_bytes) as avg_cluster_usage_memory_bytes,
       avg(pod_count) AS avg_pod_count

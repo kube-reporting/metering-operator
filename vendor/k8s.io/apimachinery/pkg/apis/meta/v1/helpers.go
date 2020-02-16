@@ -2,7 +2,7 @@
 Copyright 2016 The Kubernetes Authors.
 
 Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this ***REMOVED***le except in compliance with the License.
+you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
 
     http://www.apache.org/licenses/LICENSE-2.0
@@ -10,7 +10,7 @@ You may obtain a copy of the License at
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the speci***REMOVED***c language governing permissions and
+See the License for the specific language governing permissions and
 limitations under the License.
 */
 
@@ -19,7 +19,7 @@ package v1
 import (
 	"fmt"
 
-	"k8s.io/apimachinery/pkg/***REMOVED***elds"
+	"k8s.io/apimachinery/pkg/fields"
 	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/apimachinery/pkg/selection"
 	"k8s.io/apimachinery/pkg/types"
@@ -201,13 +201,13 @@ func SetMetaDataAnnotation(obj *ObjectMeta, ann string, value string) {
 // SingleObject returns a ListOptions for watching a single object.
 func SingleObject(meta ObjectMeta) ListOptions {
 	return ListOptions{
-		FieldSelector:   ***REMOVED***elds.OneTermEqualSelector("metadata.name", meta.Name).String(),
+		FieldSelector:   fields.OneTermEqualSelector("metadata.name", meta.Name).String(),
 		ResourceVersion: meta.ResourceVersion,
 	}
 }
 
 // NewDeleteOptions returns a DeleteOptions indicating the resource should
-// be deleted within the speci***REMOVED***ed grace period. Use zero to indicate
+// be deleted within the specified grace period. Use zero to indicate
 // immediate deletion. If you would prefer to use the default grace period,
 // use &metav1.DeleteOptions{} directly.
 func NewDeleteOptions(grace int64) *DeleteOptions {
@@ -227,7 +227,7 @@ func NewUIDPreconditions(uid string) *Preconditions {
 	return &Preconditions{UID: &u}
 }
 
-// HasObjectMetaSystemFieldValues returns true if ***REMOVED***elds that are managed by the system on ObjectMeta have values.
+// HasObjectMetaSystemFieldValues returns true if fields that are managed by the system on ObjectMeta have values.
 func HasObjectMetaSystemFieldValues(meta Object) bool {
 	return !meta.GetCreationTimestamp().Time.IsZero() ||
 		len(meta.GetUID()) != 0

@@ -1,6 +1,6 @@
 // Copyright 2013 The Go Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE ***REMOVED***le.
+// license that can be found in the LICENSE file.
 
 // +build ignore
 
@@ -23,7 +23,7 @@ import (
 	"golang.org/x/text/internal/gen"
 )
 
-var outputFile = flag.String("output", "xml.go", "output ***REMOVED***le name")
+var outputFile = flag.String("output", "xml.go", "output file name")
 
 func main() {
 	flag.Parse()
@@ -31,7 +31,7 @@ func main() {
 	r := gen.OpenCLDRCoreZip()
 	buffer, err := ioutil.ReadAll(r)
 	if err != nil {
-		log.Fatal("Could not read zip ***REMOVED***le")
+		log.Fatal("Could not read zip file")
 	}
 	r.Close()
 	z, err := zip.NewReader(bytes.NewReader(buffer), int64(len(buffer)))
@@ -43,9 +43,9 @@ func main() {
 
 	version := gen.CLDRVersion()
 
-	for _, dtd := range ***REMOVED***les {
+	for _, dtd := range files {
 		for _, f := range z.File {
-			if strings.HasSuf***REMOVED***x(f.Name, dtd.***REMOVED***le+".dtd") {
+			if strings.HasSuffix(f.Name, dtd.file+".dtd") {
 				r, err := f.Open()
 				failOnError(err)
 
@@ -61,7 +61,7 @@ func main() {
 			}
 		}
 	}
-	fmt.Fprintln(&buf, "// Version is the version of CLDR from which the XML de***REMOVED***nitions are generated.")
+	fmt.Fprintln(&buf, "// Version is the version of CLDR from which the XML definitions are generated.")
 	fmt.Fprintf(&buf, "const Version = %q\n", version)
 
 	gen.WriteGoFile(*outputFile, "cldr", buf.Bytes())
@@ -69,26 +69,26 @@ func main() {
 
 func failOnError(err error) {
 	if err != nil {
-		log.New(os.Stderr, "", log.Lshort***REMOVED***le).Output(2, err.Error())
+		log.New(os.Stderr, "", log.Lshortfile).Output(2, err.Error())
 		os.Exit(1)
 	}
 }
 
-// con***REMOVED***guration data per DTD type
+// configuration data per DTD type
 type dtd struct {
-	***REMOVED***le string   // base ***REMOVED***le name
+	file string   // base file name
 	root string   // Go name of the root XML element
 	top  []string // create a different type for this section
 
 	skipElem    []string // hard-coded or deprecated elements
 	skipAttr    []string // attributes to exclude
-	prede***REMOVED***ned  []string // hard-coded elements exist of the form <name>Elem
+	predefined  []string // hard-coded elements exist of the form <name>Elem
 	forceRepeat []string // elements to make slices despite DTD
 }
 
-var ***REMOVED***les = []dtd{
+var files = []dtd{
 	{
-		***REMOVED***le: "ldmlBCP47",
+		file: "ldmlBCP47",
 		root: "LDMLBCP47",
 		top:  []string{"ldmlBCP47"},
 		skipElem: []string{
@@ -96,18 +96,18 @@ var ***REMOVED***les = []dtd{
 		},
 	},
 	{
-		***REMOVED***le: "ldmlSupplemental",
+		file: "ldmlSupplemental",
 		root: "SupplementalData",
 		top:  []string{"supplementalData"},
 		skipElem: []string{
 			"cldrVersion", // deprecated, not used
 		},
 		forceRepeat: []string{
-			"plurals", // data de***REMOVED***ned in plurals.xml and ordinals.xml
+			"plurals", // data defined in plurals.xml and ordinals.xml
 		},
 	},
 	{
-		***REMOVED***le: "ldml",
+		file: "ldml",
 		root: "LDML",
 		top: []string{
 			"ldml", "collation", "calendar", "timeZoneNames", "localeDisplayNames", "numbers",
@@ -122,7 +122,7 @@ var ***REMOVED***les = []dtd{
 		skipAttr: []string{
 			"hiraganaQuarternary", // typo in DTD, correct version included as well
 		},
-		prede***REMOVED***ned: []string{"rules"},
+		predefined: []string{"rules"},
 	},
 }
 
@@ -135,7 +135,7 @@ var comments = map[string]string{
 // and proper use of CLDR, but that is not contained in the locale hierarchy.
 `,
 	"ldml": `
-// LDML is the top-level type for locale-speci***REMOVED***c data.
+// LDML is the top-level type for locale-specific data.
 `,
 	"collation": `
 // Collation contains rules that specify a certain sort-order,
@@ -144,16 +144,16 @@ var comments = map[string]string{
 // Process method.
 `,
 	"calendar": `
-// Calendar speci***REMOVED***es the ***REMOVED***elds used for formatting and parsing dates and times.
-// The month and quarter names are identi***REMOVED***ed numerically, starting at 1.
-// The day (of the week) names are identi***REMOVED***ed with short strings, since there is
+// Calendar specifies the fields used for formatting and parsing dates and times.
+// The month and quarter names are identified numerically, starting at 1.
+// The day (of the week) names are identified with short strings, since there is
 // no universally-accepted numeric designation.
 `,
 	"dates": `
 // Dates contains information regarding the format and parsing of dates and times.
 `,
 	"localeDisplayNames": `
-// LocaleDisplayNames speci***REMOVED***es localized display names for for scripts, languages,
+// LocaleDisplayNames specifies localized display names for for scripts, languages,
 // countries, currencies, and variants.
 `,
 	"numbers": `
@@ -190,7 +190,7 @@ var (
 	reToken = regexp.MustCompile(`\w\-`)
 )
 
-// builder is used to read in the DTD ***REMOVED***les from CLDR and generate Go code
+// builder is used to read in the DTD files from CLDR and generate Go code
 // to be used with the encoding/xml package.
 type builder struct {
 	w       io.Writer
@@ -209,7 +209,7 @@ func makeBuilder(w io.Writer, d dtd) builder {
 	}
 }
 
-// parseDTD parses a DTD ***REMOVED***le.
+// parseDTD parses a DTD file.
 func (b *builder) parseDTD(r io.Reader) {
 	for d := xml.NewDecoder(r); ; {
 		t, err := d.Token()
@@ -254,7 +254,7 @@ func (b *builder) parseDTD(r io.Reader) {
 			}
 			if m[4] == "FIXED" {
 				b.version = m[5]
-			} ***REMOVED*** {
+			} else {
 				switch m[1] {
 				case "draft", "references", "alt", "validSubLocales", "standard" /* in Common */ :
 				case "type", "choice":
@@ -304,7 +304,7 @@ func (b *builder) resolve(e *element) {
 			sequenceStart = sequenceStart[:len(sequenceStart)-1]
 		default:
 			if in(b.info.skipElem, m[1]) {
-			} ***REMOVED*** if sub, ok := b.index[m[1]]; ok {
+			} else if sub, ok := b.index[m[1]]; ok {
 				if !found[sub.name] {
 					e.sub = append(e.sub, struct {
 						e      *element
@@ -313,8 +313,8 @@ func (b *builder) resolve(e *element) {
 					found[sub.name] = true
 					b.resolve(sub)
 				}
-			} ***REMOVED*** if m[1] == "#PCDATA" || m[1] == "ANY" {
-			} ***REMOVED*** if m[1] != "EMPTY" {
+			} else if m[1] == "#PCDATA" || m[1] == "ANY" {
+			} else if m[1] != "EMPTY" {
 				log.Fatalf("resolve:%s: element %q not found", e.name, m[1])
 			}
 		}
@@ -334,7 +334,7 @@ func in(set []string, s string) bool {
 
 var repl = strings.NewReplacer("-", " ", "_", " ")
 
-// title puts the ***REMOVED***rst character or each character following '_' in title case and
+// title puts the first character or each character following '_' in title case and
 // removes all occurrences of '_'.
 func title(s string) string {
 	return strings.Replace(strings.Title(repl.Replace(s)), " ", "", -1)
@@ -359,7 +359,7 @@ func (b *builder) writeElem(tab int, e *element) {
 		}
 	}
 	for _, sub := range e.sub {
-		if in(b.info.prede***REMOVED***ned, sub.e.name) {
+		if in(b.info.predefined, sub.e.name) {
 			p("\n%sElem", sub.e.name)
 			continue
 		}
@@ -373,7 +373,7 @@ func (b *builder) writeElem(tab int, e *element) {
 		p("*")
 		if in(b.info.top, sub.e.name) {
 			p(title(sub.e.name))
-		} ***REMOVED*** {
+		} else {
 			b.writeElem(tab, sub.e)
 		}
 		p(" `xml:\"%s\"`", sub.e.name)

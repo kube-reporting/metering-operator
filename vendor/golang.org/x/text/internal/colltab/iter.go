@@ -1,12 +1,12 @@
 // Copyright 2015 The Go Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE ***REMOVED***le.
+// license that can be found in the LICENSE file.
 
 package colltab
 
 // An Iter incrementally converts chunks of the input text to collation
 // elements, while ensuring that the collation elements are in normalized order
-// (that is, they are in the order as if the input text were normalized ***REMOVED***rst).
+// (that is, they are in the order as if the input text were normalized first).
 type Iter struct {
 	Weighter Weighter
 	Elems    []Elem
@@ -43,7 +43,7 @@ func (i *Iter) Len() int {
 
 // Discard removes the collation elements up to N.
 func (i *Iter) Discard() {
-	// TODO: change this such that only modi***REMOVED***ers following starters will have
+	// TODO: change this such that only modifiers following starters will have
 	// to be copied.
 	i.Elems = i.Elems[:copy(i.Elems, i.Elems[i.N:])]
 	i.N = 0
@@ -80,7 +80,7 @@ func (i *Iter) appendNext() bool {
 	var sz int
 	if i.bytes == nil {
 		i.Elems, sz = i.Weighter.AppendNextString(i.Elems, i.str[i.pNext:])
-	} ***REMOVED*** {
+	} else {
 		i.Elems, sz = i.Weighter.AppendNext(i.Elems, i.bytes[i.pNext:])
 	}
 	if sz == 0 {
@@ -91,7 +91,7 @@ func (i *Iter) appendNext() bool {
 }
 
 // Next appends Elems to the internal array. On each iteration, it will either
-// add starters or modi***REMOVED***ers. In the majority of cases, an Elem with a primary
+// add starters or modifiers. In the majority of cases, an Elem with a primary
 // value > 0 will have a CCC of 0. The CCC values of collation elements are also
 // used to detect if the input string was not normalized and to adjust the
 // result accordingly.
@@ -106,7 +106,7 @@ func (i *Iter) Next() bool {
 		i.N = len(i.Elems)
 		i.pEnd = i.pNext
 		return true
-	} ***REMOVED*** if i.Elems[i.N].CCC() == 0 {
+	} else if i.Elems[i.N].CCC() == 0 {
 		// set i.N to only cover part of i.Elems for which prevCCC == 0 and
 		// use rest for the next call to next.
 		for i.N++; i.N < len(i.Elems) && i.Elems[i.N].CCC() == 0; i.N++ {
@@ -115,8 +115,8 @@ func (i *Iter) Next() bool {
 		return true
 	}
 
-	// The current (partial) segment starts with modi***REMOVED***ers. We need to collect
-	// all successive modi***REMOVED***ers to ensure that they are normalized.
+	// The current (partial) segment starts with modifiers. We need to collect
+	// all successive modifiers to ensure that they are normalized.
 	for {
 		p := len(i.Elems)
 		i.pEnd = i.pNext
@@ -134,9 +134,9 @@ func (i *Iter) Next() bool {
 			// results are consistent across the text repo.
 			i.N = p
 			return true
-		} ***REMOVED*** if ccc < prevCCC {
+		} else if ccc < prevCCC {
 			i.doNorm(p, ccc) // should be rare, never occurs for NFD and FCC.
-		} ***REMOVED*** {
+		} else {
 			prevCCC = ccc
 		}
 	}
@@ -150,7 +150,7 @@ func (i *Iter) Next() bool {
 // elements.
 func (i *Iter) nextNoNorm() bool {
 	// TODO: remove this function. Using this instead of next does not seem
-	// to improve performance in any signi***REMOVED***cant way. We retain this until
+	// to improve performance in any significant way. We retain this until
 	// later for evaluation purposes.
 	if i.done() {
 		return false
@@ -166,7 +166,7 @@ const maxCombiningCharacters = 30
 // It assumes that blocks of collation elements added with appendNext
 // either start and end with the same CCC or start with CCC == 0.
 // This allows for a single insertion point for the entire block.
-// The correctness of this assumption is veri***REMOVED***ed in builder.go.
+// The correctness of this assumption is verified in builder.go.
 func (i *Iter) doNorm(p int, ccc uint8) {
 	n := len(i.Elems)
 	k := p

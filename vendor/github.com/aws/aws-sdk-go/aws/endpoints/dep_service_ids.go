@@ -1,6 +1,6 @@
 package endpoints
 
-// Service identi***REMOVED***ers
+// Service identifiers
 //
 // Deprecated: Use client package's EndpointsID value instead of these
 // ServiceIDs. These IDs are not maintained, and are out of date.
@@ -39,7 +39,7 @@ const (
 	CognitoIdpServiceID                   = "cognito-idp"                  // CognitoIdp.
 	CognitoSyncServiceID                  = "cognito-sync"                 // CognitoSync.
 	ComprehendServiceID                   = "comprehend"                   // Comprehend.
-	Con***REMOVED***gServiceID                       = "con***REMOVED***g"                       // Con***REMOVED***g.
+	ConfigServiceID                       = "config"                       // Config.
 	CurServiceID                          = "cur"                          // Cur.
 	DatapipelineServiceID                 = "datapipeline"                 // Datapipeline.
 	DaxServiceID                          = "dax"                          // Dax.
@@ -55,7 +55,7 @@ const (
 	EcsServiceID                          = "ecs"                          // Ecs.
 	ElasticacheServiceID                  = "elasticache"                  // Elasticache.
 	ElasticbeanstalkServiceID             = "elasticbeanstalk"             // Elasticbeanstalk.
-	Elastic***REMOVED***lesystemServiceID            = "elastic***REMOVED***lesystem"            // Elastic***REMOVED***lesystem.
+	ElasticfilesystemServiceID            = "elasticfilesystem"            // Elasticfilesystem.
 	ElasticloadbalancingServiceID         = "elasticloadbalancing"         // Elasticloadbalancing.
 	ElasticmapreduceServiceID             = "elasticmapreduce"             // Elasticmapreduce.
 	ElastictranscoderServiceID            = "elastictranscoder"            // Elastictranscoder.
@@ -63,7 +63,7 @@ const (
 	EntitlementMarketplaceServiceID       = "entitlement.marketplace"      // EntitlementMarketplace.
 	EsServiceID                           = "es"                           // Es.
 	EventsServiceID                       = "events"                       // Events.
-	FirehoseServiceID                     = "***REMOVED***rehose"                     // Firehose.
+	FirehoseServiceID                     = "firehose"                     // Firehose.
 	FmsServiceID                          = "fms"                          // Fms.
 	GameliftServiceID                     = "gamelift"                     // Gamelift.
 	GlacierServiceID                      = "glacier"                      // Glacier.

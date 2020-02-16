@@ -13,8 +13,8 @@ import (
 // the waiter's max attempts have been exhausted.
 const WaiterResourceNotReadyErrorCode = "ResourceNotReady"
 
-// A WaiterOption is a function that will update the Waiter value's ***REMOVED***elds to
-// con***REMOVED***gure the waiter.
+// A WaiterOption is a function that will update the Waiter value's fields to
+// configure the waiter.
 type WaiterOption func(*Waiter)
 
 // WithWaiterMaxAttempts returns the maximum number of times the waiter should
@@ -67,10 +67,10 @@ func WithWaiterRequestOptions(opts ...Option) WaiterOption {
 }
 
 // A Waiter provides the functionality to perform a blocking call which will
-// wait for a resource state to be satis***REMOVED***ed by a service.
+// wait for a resource state to be satisfied by a service.
 //
 // This type should not be used directly. The API operations provided in the
-// service packages pre***REMOVED***xed with "WaitUntil" should be used instead.
+// service packages prefixed with "WaitUntil" should be used instead.
 type Waiter struct {
 	Name      string
 	Acceptors []WaiterAcceptor
@@ -91,7 +91,7 @@ func (w *Waiter) ApplyOptions(opts ...WaiterOption) {
 	}
 }
 
-// WaiterState are states the waiter uses based on WaiterAcceptor de***REMOVED***nitions
+// WaiterState are states the waiter uses based on WaiterAcceptor definitions
 // to identify if the resource state the waiter is waiting on has occurred.
 type WaiterState int
 
@@ -117,14 +117,14 @@ const (
 )
 
 // WaiterMatchMode is the mode that the waiter will use to match the WaiterAcceptor
-// de***REMOVED***nition's Expected attribute.
+// definition's Expected attribute.
 type WaiterMatchMode int
 
 // Modes the waiter will use when inspecting API response to identify target
 // resource states.
 const (
 	PathAllWaiterMatch  WaiterMatchMode = iota // match on all paths
-	PathWaiterMatch                            // match on speci***REMOVED***c path
+	PathWaiterMatch                            // match on specific path
 	PathAnyWaiterMatch                         // match on any path
 	PathListWaiterMatch                        // match on list of paths
 	StatusWaiterMatch                          // match on status code
@@ -160,7 +160,7 @@ func (m WaiterMatchMode) String() string {
 // Context will be used to cancel the waiter's pending requests and retry delays.
 // Use aws.BackgroundContext if no context is available.
 //
-// The waiter will continue until the target state de***REMOVED***ned by the Acceptors,
+// The waiter will continue until the target state defined by the Acceptors,
 // or the max attempts expires.
 //
 // Will return the WaiterResourceNotReadyErrorCode error code if the waiter's
@@ -193,10 +193,10 @@ func (w Waiter) WaitWithContext(ctx aws.Context) error {
 
 		// Delay to wait before inspecting the resource again
 		delay := w.Delay(attempt)
-		if sleepFn := req.Con***REMOVED***g.SleepDelay; sleepFn != nil {
+		if sleepFn := req.Config.SleepDelay; sleepFn != nil {
 			// Support SleepDelay for backwards compatibility and testing
 			sleepFn(delay)
-		} ***REMOVED*** {
+		} else {
 			sleepCtxFn := w.SleepWithContext
 			if sleepCtxFn == nil {
 				sleepCtxFn = aws.SleepWithContext

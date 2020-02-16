@@ -218,7 +218,7 @@ type IPMreq struct {
 type IPMreqn struct {
 	Multiaddr [4]byte /* in_addr */
 	Address   [4]byte /* in_addr */
-	I***REMOVED***ndex   int32
+	Ifindex   int32
 }
 
 type IPv6Mreq struct {
@@ -246,7 +246,7 @@ type Cmsghdr struct {
 
 type Inet6Pktinfo struct {
 	Addr    [16]byte /* in6_addr */
-	I***REMOVED***ndex uint32
+	Ifindex uint32
 }
 
 type IPv6MTUInfo struct {
@@ -352,8 +352,8 @@ type ifData struct {
 	Oqdrops           uint64
 	Noproto           uint64
 	Hwassist          uint64
-	X__i***REMOVED***_epoch      [8]byte
-	X__i***REMOVED***_lastchange [16]byte
+	X__ifi_epoch      [8]byte
+	X__ifi_lastchange [16]byte
 }
 
 type IfData struct {

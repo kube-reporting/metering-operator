@@ -1,20 +1,20 @@
 # Resource Tuning
 
-Often times the default resource requests/limits set by Metering aren't suf***REMOVED***cient for larger clusters with more resources changing and producing more metrics.
+Often times the default resource requests/limits set by Metering aren't sufficient for larger clusters with more resources changing and producing more metrics.
 Without proper resource limits, pods are unable to correctly operate without experiencing pod restarts or crashes (often due to the pod being OOMKilled).
 
 Here's a common list of reasons you may need to increase your resource limits:
 
-- Larger clusters. If you're running more than 10 nodes, it's likely the defaults will insuf***REMOVED***cient. The defaults are set low to make it easier to install onto smaller clusters.
+- Larger clusters. If you're running more than 10 nodes, it's likely the defaults will insufficient. The defaults are set low to make it easier to install onto smaller clusters.
 - Pods being OOMKilled. Check if any pod has a restart count that is increasing over time. Use `kubectl describe pod` to determine why it restarted. If it's due to OOMKilled, then this pod needs more memory.
 - High cluster activity. If you're running on a cluster with high activity in terms of pods being deleted and recreated, this will produce more metrics, and result in higher resource requirements than relatively idle/unchanging clusters.
 - Storage. By default, if you're using HDFS, the storage requested is 5Gi, which will only store a few months of data on a smaller cluster.
-- Performance. More memory for most of these components means they can do more work at once. Additionally, additional replicas of speci***REMOVED***c components can decrease the time it takes to perform speci***REMOVED***c tasks such as generating a report.
+- Performance. More memory for most of these components means they can do more work at once. Additionally, additional replicas of specific components can decrease the time it takes to perform specific tasks such as generating a report.
 
 
 ## Default resource requests and limits
 
-An example Metering con***REMOVED***guration [default-resource-limits.yaml][default-resource-limits] contains the default resource request and limit values for CPU, memory, and storage for every component that Metering installs by default.
+An example Metering configuration [default-resource-limits.yaml][default-resource-limits] contains the default resource request and limit values for CPU, memory, and storage for every component that Metering installs by default.
 This can be a good starting point if you wish to experiment with different values starting with the defaults.
 
 ## Recommended values
@@ -24,17 +24,17 @@ Besides the default limits example, we also provide guidelines and examples of w
 Here are a few guidelines:
 
 - Presto, hive, and hdfs are all written in Java, and thus tend to consume more memory than other applications.
-- Metering is naturally batch oriented and can be bursty in resources, and thus there are many idle periods. Without proper autoscaling, it may be necessary to over-provision resources if you want optimal performance, or ***REMOVED***nd that applications crash without more resources.
+- Metering is naturally batch oriented and can be bursty in resources, and thus there are many idle periods. Without proper autoscaling, it may be necessary to over-provision resources if you want optimal performance, or find that applications crash without more resources.
 - Metering is designed to run at even the largest scale environments like Openshift online, which has clusters with over 5000 namespaces, and over 10,000 pods. It works well on smaller clusters too, but the cost of being able to running at these larger scales can mean the metering stack isn't as easily tuned for a smaller footprint.
 
 In general, we can only provide guidelines based on the environments we run, so we always recommend using your monitoring stack in addition to our documentation to determine what resource limits make sense for you.
 As we work to improve metering, over time we hope to address more of these concerns as part of the metering-operator by leveraging Kubernetes pod autoscaling, jobs, and newer features in the various components we leverage.
 
-We recommend starting with our [recommended-resources-limit.yaml][recommended-resource-limits] example con***REMOVED***guration, and adjusting it based on monitoring data over the period of a few weeks. It's much easier to start with higher values and lower them until you see pods restarting or when monitoring shows pods reaching their resource limits.
+We recommend starting with our [recommended-resources-limit.yaml][recommended-resource-limits] example configuration, and adjusting it based on monitoring data over the period of a few weeks. It's much easier to start with higher values and lower them until you see pods restarting or when monitoring shows pods reaching their resource limits.
 
 ## General Advice
 
-Below is some generally useful information to know when trying to tune the various components and understand _why_ we suggest speci***REMOVED***c values in our [recommended-resources-limit.yaml][recommended-resource-limits] example con***REMOVED***guration.
+Below is some generally useful information to know when trying to tune the various components and understand _why_ we suggest specific values in our [recommended-resources-limit.yaml][recommended-resource-limits] example configuration.
 
 ### reporting-operator
 
@@ -69,5 +69,5 @@ As the amount of data stored in HDFS grows, the overhead for the hdfs-namenode i
 
 For this reason, we often support using Amazon S3 for storage to alleviate the need to scale HDFS.
 
-[default-resource-limits]: ../manifests/metering-con***REMOVED***g/default-resource-limits.yaml
-[recommended-resource-limits]: ../manifests/metering-con***REMOVED***g/recommended-resource-limits.yaml
+[default-resource-limits]: ../manifests/metering-config/default-resource-limits.yaml
+[recommended-resource-limits]: ../manifests/metering-config/recommended-resource-limits.yaml

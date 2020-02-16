@@ -2,7 +2,7 @@
 Copyright The Kubernetes Authors.
 
 Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this ***REMOVED***le except in compliance with the License.
+you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
 
     http://www.apache.org/licenses/LICENSE-2.0
@@ -10,13 +10,13 @@ You may obtain a copy of the License at
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the speci***REMOVED***c language governing permissions and
+See the License for the specific language governing permissions and
 limitations under the License.
 */
 
 package v1beta1
 
-// This ***REMOVED***le contains a collection of methods that can be used from go-restful to
+// This file contains a collection of methods that can be used from go-restful to
 // generate Swagger API documentation for its models. Please read this PR for more
 // information on the implementation: https://github.com/emicklei/go-restful/pull/215
 //
@@ -48,7 +48,7 @@ func (PartialObjectMetadataList) SwaggerDoc() map[string]string {
 var map_Table = map[string]string{
 	"":                  "Table is a tabular representation of a set of API resources. The server transforms the object into a set of preferred columns for quickly reviewing the objects.",
 	"metadata":          "Standard list metadata. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#types-kinds",
-	"columnDe***REMOVED***nitions": "columnDe***REMOVED***nitions describes each column in the returned items array. The number of cells per row will always match the number of column de***REMOVED***nitions.",
+	"columnDefinitions": "columnDefinitions describes each column in the returned items array. The number of cells per row will always match the number of column definitions.",
 	"rows":              "rows is the list of items in the table.",
 }
 
@@ -56,17 +56,17 @@ func (Table) SwaggerDoc() map[string]string {
 	return map_Table
 }
 
-var map_TableColumnDe***REMOVED***nition = map[string]string{
-	"":            "TableColumnDe***REMOVED***nition contains information about a column returned in the Table.",
+var map_TableColumnDefinition = map[string]string{
+	"":            "TableColumnDefinition contains information about a column returned in the Table.",
 	"name":        "name is a human readable name for the column.",
-	"type":        "type is an OpenAPI type de***REMOVED***nition for this column. See https://github.com/OAI/OpenAPI-Speci***REMOVED***cation/blob/master/versions/2.0.md#data-types for more.",
-	"format":      "format is an optional OpenAPI type de***REMOVED***nition for this column. The 'name' format is applied to the primary identi***REMOVED***er column to assist in clients identifying column is the resource name. See https://github.com/OAI/OpenAPI-Speci***REMOVED***cation/blob/master/versions/2.0.md#data-types for more.",
+	"type":        "type is an OpenAPI type definition for this column. See https://github.com/OAI/OpenAPI-Specification/blob/master/versions/2.0.md#data-types for more.",
+	"format":      "format is an optional OpenAPI type definition for this column. The 'name' format is applied to the primary identifier column to assist in clients identifying column is the resource name. See https://github.com/OAI/OpenAPI-Specification/blob/master/versions/2.0.md#data-types for more.",
 	"description": "description is a human readable description of this column.",
-	"priority":    "priority is an integer de***REMOVED***ning the relative importance of this column compared to others. Lower numbers are considered higher priority. Columns that may be omitted in limited space scenarios should be given a higher priority.",
+	"priority":    "priority is an integer defining the relative importance of this column compared to others. Lower numbers are considered higher priority. Columns that may be omitted in limited space scenarios should be given a higher priority.",
 }
 
-func (TableColumnDe***REMOVED***nition) SwaggerDoc() map[string]string {
-	return map_TableColumnDe***REMOVED***nition
+func (TableColumnDefinition) SwaggerDoc() map[string]string {
+	return map_TableColumnDefinition
 }
 
 var map_TableOptions = map[string]string{
@@ -80,9 +80,9 @@ func (TableOptions) SwaggerDoc() map[string]string {
 
 var map_TableRow = map[string]string{
 	"":           "TableRow is an individual row in a table.",
-	"cells":      "cells will be as wide as headers and may contain strings, numbers (float64 or int64), booleans, simple maps, or lists, or null. See the type ***REMOVED***eld of the column de***REMOVED***nition for a more detailed description.",
+	"cells":      "cells will be as wide as headers and may contain strings, numbers (float64 or int64), booleans, simple maps, or lists, or null. See the type field of the column definition for a more detailed description.",
 	"conditions": "conditions describe additional status of a row that are relevant for a human user.",
-	"object":     "This ***REMOVED***eld contains the requested additional information about each object based on the includeObject policy when requesting the Table. If \"None\", this ***REMOVED***eld is empty, if \"Object\" this will be the default serialization of the object for the current API version, and if \"Metadata\" (the default) will contain the object metadata. Check the returned kind and apiVersion of the object before parsing.",
+	"object":     "This field contains the requested additional information about each object based on the includeObject policy when requesting the Table. If \"None\", this field is empty, if \"Object\" this will be the default serialization of the object for the current API version, and if \"Metadata\" (the default) will contain the object metadata. Check the returned kind and apiVersion of the object before parsing.",
 }
 
 func (TableRow) SwaggerDoc() map[string]string {

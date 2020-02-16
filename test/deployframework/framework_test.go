@@ -11,18 +11,18 @@ import (
 	"github.com/operator-framework/operator-metering/pkg/deploy"
 )
 
-func TestNewDeployerCon***REMOVED***g(t *testing.T) {
+func TestNewDeployerConfig(t *testing.T) {
 	df := &DeployFramework{}
-	spec := metering.MeteringCon***REMOVED***gSpec{}
+	spec := metering.MeteringConfigSpec{}
 	testNamespace := "test-ns"
 	testMeteringOpRepo := "test-repo-1"
 	testMeteringOpTag := "test-tag-1"
 	testReportingOpRepo := "test-repo-2"
 	testReportingOpTag := "test-tag-2"
-	cfg, err := df.NewDeployerCon***REMOVED***g(testNamespace, testMeteringOpRepo, testMeteringOpTag, testReportingOpRepo, testReportingOpTag, spec)
+	cfg, err := df.NewDeployerConfig(testNamespace, testMeteringOpRepo, testMeteringOpTag, testReportingOpRepo, testReportingOpTag, spec)
 	require.NoError(t, err)
 
-	expectedCfg := &deploy.Con***REMOVED***g{
+	expectedCfg := &deploy.Config{
 		Namespace:       testNamespace,
 		Repo:            testMeteringOpRepo,
 		Tag:             testMeteringOpTag,
@@ -32,15 +32,15 @@ func TestNewDeployerCon***REMOVED***g(t *testing.T) {
 			"name": testNamespaceLabel,
 		},
 		OperatorResources: nil,
-		MeteringCon***REMOVED***g: &metering.MeteringCon***REMOVED***g{
+		MeteringConfig: &metering.MeteringConfig{
 			ObjectMeta: meta.ObjectMeta{
-				Name:      meteringcon***REMOVED***gMetadataName,
+				Name:      meteringconfigMetadataName,
 				Namespace: testNamespace,
 			},
-			Spec: metering.MeteringCon***REMOVED***gSpec{
+			Spec: metering.MeteringConfigSpec{
 				ReportingOperator: &metering.ReportingOperator{
 					Spec: &metering.ReportingOperatorSpec{
-						Image: &metering.ImageCon***REMOVED***g{
+						Image: &metering.ImageConfig{
 							Repository: testReportingOpRepo,
 							Tag:        testReportingOpTag,
 						},
@@ -50,5 +50,5 @@ func TestNewDeployerCon***REMOVED***g(t *testing.T) {
 		},
 	}
 
-	assert.Equalf(t, cfg, expectedCfg, "meteringcon***REMOVED***g should have reporting-operator image tag and namespace overridden")
+	assert.Equalf(t, cfg, expectedCfg, "meteringconfig should have reporting-operator image tag and namespace overridden")
 }

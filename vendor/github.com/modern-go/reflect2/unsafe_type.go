@@ -11,7 +11,7 @@ type unsafeType struct {
 	ptrRType unsafe.Pointer
 }
 
-func newUnsafeType(cfg *frozenCon***REMOVED***g, type1 reflect.Type) *unsafeType {
+func newUnsafeType(cfg *frozenConfig, type1 reflect.Type) *unsafeType {
 	return &unsafeType{
 		safeType: safeType{
 			Type: type1,

@@ -6,7 +6,7 @@ import (
 	"github.com/go-chi/chi"
 )
 
-// GetHead automatically route unde***REMOVED***ned HEAD requests to GET handlers.
+// GetHead automatically route undefined HEAD requests to GET handlers.
 func GetHead(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if r.Method == "HEAD" {
@@ -15,7 +15,7 @@ func GetHead(next http.Handler) http.Handler {
 			if routePath == "" {
 				if r.URL.RawPath != "" {
 					routePath = r.URL.RawPath
-				} ***REMOVED*** {
+				} else {
 					routePath = r.URL.Path
 				}
 			}
@@ -23,7 +23,7 @@ func GetHead(next http.Handler) http.Handler {
 			// Temporary routing context to look-ahead before routing the request
 			tctx := chi.NewRouteContext()
 
-			// Attempt to ***REMOVED***nd a HEAD handler for the routing path, if not found, traverse
+			// Attempt to find a HEAD handler for the routing path, if not found, traverse
 			// the router as through its a GET route, but proceed with the request
 			// with the HEAD method.
 			if !rctx.Routes.Match(tctx, "HEAD", routePath) {

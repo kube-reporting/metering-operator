@@ -1,6 +1,6 @@
 // Copyright 2009 The Go Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE ***REMOVED***le.
+// license that can be found in the LICENSE file.
 
 // +build arm,linux
 
@@ -72,7 +72,7 @@ func Seek(fd int, offset int64, whence int) (newoffset int64, err error) {
 //sys	recvmsg(s int, msg *Msghdr, flags int) (n int, err error)
 //sys	sendmsg(s int, msg *Msghdr, flags int) (n int, err error)
 
-// 64-bit ***REMOVED***le system and 32-bit uid calls
+// 64-bit file system and 32-bit uid calls
 // (16-bit uid calls are not always supported in newer kernels)
 //sys	Dup2(oldfd int, newfd int) (err error)
 //sys	Fchown(fd int, uid int, gid int) (err error) = SYS_FCHOWN32
@@ -86,7 +86,7 @@ func Seek(fd int, offset int64, whence int) (newoffset int64, err error) {
 //sys	Lchown(path string, uid int, gid int) (err error) = SYS_LCHOWN32
 //sys	Listen(s int, n int) (err error)
 //sys	Lstat(path string, stat *Stat_t) (err error) = SYS_LSTAT64
-//sys	send***REMOVED***le(outfd int, infd int, offset *int64, count int) (written int, err error) = SYS_SENDFILE64
+//sys	sendfile(outfd int, infd int, offset *int64, count int) (written int, err error) = SYS_SENDFILE64
 //sys	Select(nfd int, r *FdSet, w *FdSet, e *FdSet, timeout *Timeval) (n int, err error) = SYS__NEWSELECT
 //sys	Setfsgid(gid int) (err error) = SYS_SETFSGID32
 //sys	Setfsuid(uid int) (err error) = SYS_SETFSUID32
@@ -190,13 +190,13 @@ func Getrlimit(resource int, rlim *Rlimit) (err error) {
 
 	if rl.Cur == rlimInf32 {
 		rlim.Cur = rlimInf64
-	} ***REMOVED*** {
+	} else {
 		rlim.Cur = uint64(rl.Cur)
 	}
 
 	if rl.Max == rlimInf32 {
 		rlim.Max = rlimInf64
-	} ***REMOVED*** {
+	} else {
 		rlim.Max = uint64(rl.Max)
 	}
 	return
@@ -213,16 +213,16 @@ func Setrlimit(resource int, rlim *Rlimit) (err error) {
 	rl := rlimit32{}
 	if rlim.Cur == rlimInf64 {
 		rl.Cur = rlimInf32
-	} ***REMOVED*** if rlim.Cur < uint64(rlimInf32) {
+	} else if rlim.Cur < uint64(rlimInf32) {
 		rl.Cur = uint32(rlim.Cur)
-	} ***REMOVED*** {
+	} else {
 		return EINVAL
 	}
 	if rlim.Max == rlimInf64 {
 		rl.Max = rlimInf32
-	} ***REMOVED*** if rlim.Max < uint64(rlimInf32) {
+	} else if rlim.Max < uint64(rlimInf32) {
 		rl.Max = uint32(rlim.Max)
-	} ***REMOVED*** {
+	} else {
 		return EINVAL
 	}
 

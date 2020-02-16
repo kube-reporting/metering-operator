@@ -9,10 +9,10 @@ var (
 	// providers in the ChainProvider.
 	//
 	// This has been deprecated. For verbose error messaging set
-	// aws.Con***REMOVED***g.CredentialsChainVerboseErrors to true.
+	// aws.Config.CredentialsChainVerboseErrors to true.
 	ErrNoValidProvidersFoundInChain = awserr.New("NoCredentialProviders",
 		`no valid providers in chain. Deprecated.
-	For verbose messaging see aws.Con***REMOVED***g.CredentialsChainVerboseErrors`,
+	For verbose messaging see aws.Config.CredentialsChainVerboseErrors`,
 		nil)
 )
 
@@ -20,7 +20,7 @@ var (
 // and cache that provider until Retrieve is called again.
 //
 // The ChainProvider provides a way of chaining multiple providers together
-// which will pick the ***REMOVED***rst available using priority order of the Providers
+// which will pick the first available using priority order of the Providers
 // in the list.
 //
 // If none of the Providers retrieve valid credentials Value, ChainProvider's
@@ -31,7 +31,7 @@ var (
 // called again.
 //
 // Example of ChainProvider to be used with an EnvProvider and EC2RoleProvider.
-// In this example EnvProvider will ***REMOVED***rst check if any credentials are available
+// In this example EnvProvider will first check if any credentials are available
 // via the environment variables. If there are none ChainProvider will check
 // the next Provider in the list, EC2RoleProvider in this case. If EC2RoleProvider
 // does not return any credentials ChainProvider will return the error
@@ -45,8 +45,8 @@ var (
 //             },
 //         })
 //
-//     // Usage of ChainCredentials with aws.Con***REMOVED***g
-//     svc := ec2.New(session.Must(session.NewSession(&aws.Con***REMOVED***g{
+//     // Usage of ChainCredentials with aws.Config
+//     svc := ec2.New(session.Must(session.NewSession(&aws.Config{
 //       Credentials: creds,
 //     })))
 //

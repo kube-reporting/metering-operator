@@ -8,5 +8,5 @@ s/^---$//g
 s/# Source.*$//g
 # Delete trailing whitespace (spaces, tabs) from end of each line
 s/[ 	]*$//
-# Deletes all blank lines from top and end of ***REMOVED***le
+# Deletes all blank lines from top and end of file
 /./,/^$/!d

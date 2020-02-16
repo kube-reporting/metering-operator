@@ -2,7 +2,7 @@
 Copyright 2015 The Kubernetes Authors.
 
 Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this ***REMOVED***le except in compliance with the License.
+you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
 
     http://www.apache.org/licenses/LICENSE-2.0
@@ -10,7 +10,7 @@ You may obtain a copy of the License at
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the speci***REMOVED***c language governing permissions and
+See the License for the specific language governing permissions and
 limitations under the License.
 */
 
@@ -36,7 +36,7 @@ type DefaultImportTracker struct {
 
 	// Returns true if a given types is an invalid type and should be ignored.
 	IsInvalidType func(*types.Type) bool
-	// Returns the ***REMOVED***nal local name for the given name
+	// Returns the final local name for the given name
 	LocalName func(types.Name) string
 	// Returns the "import" line for a given (path, name).
 	PrintImport func(string, string) string
@@ -99,13 +99,13 @@ func (tracker *DefaultImportTracker) ImportLines() []string {
 }
 
 // LocalNameOf returns the name you would use to refer to the package at the
-// speci***REMOVED***ed path within the body of a ***REMOVED***le.
+// specified path within the body of a file.
 func (tracker *DefaultImportTracker) LocalNameOf(path string) string {
 	return tracker.pathToName[path]
 }
 
 // PathOf returns the path that a given localName is referring to within the
-// body of a ***REMOVED***le.
+// body of a file.
 func (tracker *DefaultImportTracker) PathOf(localName string) (string, bool) {
 	name, ok := tracker.nameToPath[localName]
 	return name, ok

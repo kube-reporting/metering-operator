@@ -2,7 +2,7 @@
 Copyright 2015 The Kubernetes Authors.
 
 Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this ***REMOVED***le except in compliance with the License.
+you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
 
     http://www.apache.org/licenses/LICENSE-2.0
@@ -10,7 +10,7 @@ You may obtain a copy of the License at
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the speci***REMOVED***c language governing permissions and
+See the License for the specific language governing permissions and
 limitations under the License.
 */
 
@@ -24,7 +24,7 @@ import (
 	"k8s.io/apimachinery/pkg/runtime/schema"
 )
 
-// GroupResource speci***REMOVED***es a Group and a Resource, but does not force a version.  This is useful for identifying
+// GroupResource specifies a Group and a Resource, but does not force a version.  This is useful for identifying
 // concepts during lookup stages without having partially valid types
 //
 // +protobuf.options.(gogoproto.goproto_stringer)=false
@@ -40,7 +40,7 @@ func (gr *GroupResource) String() string {
 	return gr.Resource + "." + gr.Group
 }
 
-// GroupVersionResource unambiguously identi***REMOVED***es a resource.  It doesn't anonymously include GroupVersion
+// GroupVersionResource unambiguously identifies a resource.  It doesn't anonymously include GroupVersion
 // to avoid automatic coersion.  It doesn't use a GroupVersion to avoid custom marshalling
 //
 // +protobuf.options.(gogoproto.goproto_stringer)=false
@@ -54,7 +54,7 @@ func (gvr *GroupVersionResource) String() string {
 	return strings.Join([]string{gvr.Group, "/", gvr.Version, ", Resource=", gvr.Resource}, "")
 }
 
-// GroupKind speci***REMOVED***es a Group and a Kind, but does not force a version.  This is useful for identifying
+// GroupKind specifies a Group and a Kind, but does not force a version.  This is useful for identifying
 // concepts during lookup stages without having partially valid types
 //
 // +protobuf.options.(gogoproto.goproto_stringer)=false
@@ -70,7 +70,7 @@ func (gk *GroupKind) String() string {
 	return gk.Kind + "." + gk.Group
 }
 
-// GroupVersionKind unambiguously identi***REMOVED***es a kind.  It doesn't anonymously include GroupVersion
+// GroupVersionKind unambiguously identifies a kind.  It doesn't anonymously include GroupVersion
 // to avoid automatic coersion.  It doesn't use a GroupVersion to avoid custom marshalling
 //
 // +protobuf.options.(gogoproto.goproto_stringer)=false
@@ -84,7 +84,7 @@ func (gvk GroupVersionKind) String() string {
 	return gvk.Group + "/" + gvk.Version + ", Kind=" + gvk.Kind
 }
 
-// GroupVersion contains the "group" and the "version", which uniquely identi***REMOVED***es the API.
+// GroupVersion contains the "group" and the "version", which uniquely identifies the API.
 //
 // +protobuf.options.(gogoproto.goproto_stringer)=false
 type GroupVersion struct {

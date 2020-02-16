@@ -6,7 +6,7 @@ _date() {
         date "$@"
     elif [[ "$OSTYPE" == "darwin"* ]]; then
         gdate "$@"
-    ***REMOVED***
+    fi
 }
 
 _date "$@"

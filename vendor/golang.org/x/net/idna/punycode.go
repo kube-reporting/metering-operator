@@ -2,11 +2,11 @@
 
 // Copyright 2016 The Go Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE ***REMOVED***le.
+// license that can be found in the LICENSE file.
 
 package idna
 
-// This ***REMOVED***le implements the Punycode algorithm from RFC 3492.
+// This file implements the Punycode algorithm from RFC 3492.
 
 import (
 	"math"
@@ -14,7 +14,7 @@ import (
 	"unicode/utf8"
 )
 
-// These parameter values are speci***REMOVED***ed in section 5.
+// These parameter values are specified in section 5.
 //
 // All computation is done with int32s, so that overflow behavior is identical
 // regardless of whether int is 32-bit or 64-bit.
@@ -30,7 +30,7 @@ const (
 
 func punyError(s string) error { return &labelError{s, "A3"} }
 
-// decode decodes a string as speci***REMOVED***ed in section 6.2.
+// decode decodes a string as specified in section 6.2.
 func decode(encoded string) (string, error) {
 	if encoded == "" {
 		return "", nil
@@ -67,7 +67,7 @@ func decode(encoded string) (string, error) {
 			t := k - bias
 			if t < tmin {
 				t = tmin
-			} ***REMOVED*** if t > tmax {
+			} else if t > tmax {
 				t = tmax
 			}
 			if digit < t {
@@ -93,21 +93,21 @@ func decode(encoded string) (string, error) {
 	return string(output), nil
 }
 
-// encode encodes a string as speci***REMOVED***ed in section 6.3 and prepends pre***REMOVED***x to
+// encode encodes a string as specified in section 6.3 and prepends prefix to
 // the result.
 //
-// The "while h < length(input)" line in the speci***REMOVED***cation becomes "for
+// The "while h < length(input)" line in the specification becomes "for
 // remaining != 0" in the Go code, because len(s) in Go is in bytes, not runes.
-func encode(pre***REMOVED***x, s string) (string, error) {
-	output := make([]byte, len(pre***REMOVED***x), len(pre***REMOVED***x)+1+2*len(s))
-	copy(output, pre***REMOVED***x)
+func encode(prefix, s string) (string, error) {
+	output := make([]byte, len(prefix), len(prefix)+1+2*len(s))
+	copy(output, prefix)
 	delta, n, bias := int32(0), initialN, initialBias
 	b, remaining := int32(0), int32(0)
 	for _, r := range s {
 		if r < 0x80 {
 			b++
 			output = append(output, byte(r))
-		} ***REMOVED*** {
+		} else {
 			remaining++
 		}
 	}
@@ -143,7 +143,7 @@ func encode(pre***REMOVED***x, s string) (string, error) {
 				t := k - bias
 				if t < tmin {
 					t = tmin
-				} ***REMOVED*** if t > tmax {
+				} else if t > tmax {
 					t = tmax
 				}
 				if q < t {
@@ -186,11 +186,11 @@ func encodeDigit(digit int32) byte {
 	panic("idna: internal error in punycode encoding")
 }
 
-// adapt is the bias adaptation function speci***REMOVED***ed in section 6.1.
-func adapt(delta, numPoints int32, ***REMOVED***rstTime bool) int32 {
-	if ***REMOVED***rstTime {
+// adapt is the bias adaptation function specified in section 6.1.
+func adapt(delta, numPoints int32, firstTime bool) int32 {
+	if firstTime {
 		delta /= damp
-	} ***REMOVED*** {
+	} else {
 		delta /= 2
 	}
 	delta += delta / numPoints

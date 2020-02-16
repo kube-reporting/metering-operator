@@ -1,5 +1,5 @@
-// Package endpoints provides the types and functionality for de***REMOVED***ning regions
-// and endpoints, as well as querying those de***REMOVED***nitions.
+// Package endpoints provides the types and functionality for defining regions
+// and endpoints, as well as querying those definitions.
 //
 // The SDK's Regions and Endpoints metadata is code generated into the endpoints
 // package, and is accessible via the DefaultResolver function. This function
@@ -35,16 +35,16 @@
 // Using Custom Endpoints
 //
 // The endpoints package also gives you the ability to use your own logic how
-// endpoints are resolved. This is a great way to de***REMOVED***ne a custom endpoint
+// endpoints are resolved. This is a great way to define a custom endpoint
 // for select services, without passing that logic down through your code.
 //
 // If a type implements the Resolver interface it can be used to resolve
-// endpoints. To use this with the SDK's Session and Con***REMOVED***g set the value
-// of the type to the EndpointsResolver ***REMOVED***eld of aws.Con***REMOVED***g when initializing
+// endpoints. To use this with the SDK's Session and Config set the value
+// of the type to the EndpointsResolver field of aws.Config when initializing
 // the session, or service client.
 //
 // In addition the ResolverFunc is a wrapper for a func matching the signature
-// of Resolver.EndpointFor, converting it to a type that satis***REMOVED***es the
+// of Resolver.EndpointFor, converting it to a type that satisfies the
 // Resolver interface.
 //
 //
@@ -59,7 +59,7 @@
 //         return endpoints.DefaultResolver().EndpointFor(service, region, optFns...)
 //     }
 //
-//     sess := session.Must(session.NewSession(&aws.Con***REMOVED***g{
+//     sess := session.Must(session.NewSession(&aws.Config{
 //         Region:           aws.String("us-west-2"),
 //         EndpointResolver: endpoints.ResolverFunc(myCustomResolver),
 //     }))

@@ -18,7 +18,7 @@ type PayloadUnmarshaler interface {
 
 // HandlerPayloadUnmarshal implements the PayloadUnmarshaler from a
 // HandlerList. This provides the support for unmarshaling a payload reader to
-// a shape without needing a SDK request ***REMOVED***rst.
+// a shape without needing a SDK request first.
 type HandlerPayloadUnmarshal struct {
 	Unmarshalers request.HandlerList
 }
@@ -50,7 +50,7 @@ type PayloadMarshaler interface {
 
 // HandlerPayloadMarshal implements the PayloadMarshaler from a HandlerList.
 // This provides support for marshaling a SDK shape into an io.Writer without
-// needing a SDK request ***REMOVED***rst.
+// needing a SDK request first.
 type HandlerPayloadMarshal struct {
 	Marshalers request.HandlerList
 }
@@ -60,7 +60,7 @@ type HandlerPayloadMarshal struct {
 // fails.
 func (h HandlerPayloadMarshal) MarshalPayload(w io.Writer, v interface{}) error {
 	req := request.New(
-		aws.Con***REMOVED***g{},
+		aws.Config{},
 		metadata.ClientInfo{},
 		request.Handlers{},
 		nil,

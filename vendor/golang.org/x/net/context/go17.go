@@ -1,6 +1,6 @@
 // Copyright 2016 The Go Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE ***REMOVED***le.
+// license that can be found in the LICENSE file.
 
 // +build go1.7
 
@@ -25,7 +25,7 @@ var DeadlineExceeded = context.DeadlineExceeded
 
 // WithCancel returns a copy of parent with a new Done channel. The returned
 // context's Done channel is closed when the returned cancel function is called
-// or when the parent context's Done channel is closed, whichever happens ***REMOVED***rst.
+// or when the parent context's Done channel is closed, whichever happens first.
 //
 // Canceling this context releases resources associated with it, so code should
 // call cancel as soon as the operations running in this Context complete.
@@ -39,7 +39,7 @@ func WithCancel(parent Context) (ctx Context, cancel CancelFunc) {
 // WithDeadline(parent, d) is semantically equivalent to parent. The returned
 // context's Done channel is closed when the deadline expires, when the returned
 // cancel function is called, or when the parent context's Done channel is
-// closed, whichever happens ***REMOVED***rst.
+// closed, whichever happens first.
 //
 // Canceling this context releases resources associated with it, so code should
 // call cancel as soon as the operations running in this Context complete.

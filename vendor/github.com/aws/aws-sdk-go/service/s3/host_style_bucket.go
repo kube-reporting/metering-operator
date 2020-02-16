@@ -33,18 +33,18 @@ var accelerateOpBlacklist = operationBlacklist{
 // Request handler to automatically add the bucket name to the endpoint domain
 // if possible. This style of bucket is valid for all bucket names which are
 // DNS compatible and do not contain "."
-func updateEndpointForS3Con***REMOVED***g(r *request.Request) {
-	forceHostStyle := aws.BoolValue(r.Con***REMOVED***g.S3ForcePathStyle)
-	accelerate := aws.BoolValue(r.Con***REMOVED***g.S3UseAccelerate)
+func updateEndpointForS3Config(r *request.Request) {
+	forceHostStyle := aws.BoolValue(r.Config.S3ForcePathStyle)
+	accelerate := aws.BoolValue(r.Config.S3UseAccelerate)
 
 	if accelerate && accelerateOpBlacklist.Continue(r) {
 		if forceHostStyle {
-			if r.Con***REMOVED***g.Logger != nil {
-				r.Con***REMOVED***g.Logger.Log("ERROR: aws.Con***REMOVED***g.S3UseAccelerate is not compatible with aws.Con***REMOVED***g.S3ForcePathStyle, ignoring S3ForcePathStyle.")
+			if r.Config.Logger != nil {
+				r.Config.Logger.Log("ERROR: aws.Config.S3UseAccelerate is not compatible with aws.Config.S3ForcePathStyle, ignoring S3ForcePathStyle.")
 			}
 		}
 		updateEndpointForAccelerate(r)
-	} ***REMOVED*** if !forceHostStyle && r.Operation.Name != opGetBucketLocation {
+	} else if !forceHostStyle && r.Operation.Name != opGetBucketLocation {
 		updateEndpointForHostStyle(r)
 	}
 }
@@ -94,11 +94,11 @@ func updateEndpointForAccelerate(r *request.Request) {
 		return
 	}
 
-	if parts[0] == "s3" || strings.HasPre***REMOVED***x(parts[0], "s3-") {
+	if parts[0] == "s3" || strings.HasPrefix(parts[0], "s3-") {
 		parts[0] = "s3-accelerate"
 	}
 	for i := 1; i+1 < len(parts); i++ {
-		if parts[i] == aws.StringValue(r.Con***REMOVED***g.Region) {
+		if parts[i] == aws.StringValue(r.Config.Region) {
 			parts = append(parts[:i], parts[i+1:]...)
 			break
 		}
@@ -110,7 +110,7 @@ func updateEndpointForAccelerate(r *request.Request) {
 }
 
 // Attempts to retrieve the bucket name from the request input parameters.
-// If no bucket is found, or the ***REMOVED***eld is empty "", false will be returned.
+// If no bucket is found, or the field is empty "", false will be returned.
 func bucketNameFromReqParams(params interface{}) (string, bool) {
 	if iface, ok := params.(bucketGetter); ok {
 		b := iface.getBucket()
@@ -125,7 +125,7 @@ func bucketNameFromReqParams(params interface{}) (string, bool) {
 // explicitly set or if the bucket is not DNS compatible.
 func hostCompatibleBucketName(u *url.URL, bucket string) bool {
 	// Bucket might be DNS compatible but dots in the hostname will fail
-	// certi***REMOVED***cate validation, so do not use host-style.
+	// certificate validation, so do not use host-style.
 	if u.Scheme == "https" && strings.Contains(bucket, ".") {
 		return false
 	}

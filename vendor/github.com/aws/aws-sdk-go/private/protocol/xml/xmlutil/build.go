@@ -47,7 +47,7 @@ type xmlBuilder struct {
 	namespaces map[string]string
 }
 
-// buildValue generic XMLNode builder for any type. Will build value for their speci***REMOVED***c type
+// buildValue generic XMLNode builder for any type. Will build value for their specific type
 // struct, list, map, scalar.
 //
 // Also takes a "type" tag value to set what type a value should be converted to XMLNode as. If
@@ -56,7 +56,7 @@ func (b *xmlBuilder) buildValue(value reflect.Value, current *XMLNode, tag refle
 	value = elemOf(value)
 	if !value.IsValid() { // no need to handle zero values
 		return nil
-	} ***REMOVED*** if tag.Get("location") != "" { // don't handle non-body location values
+	} else if tag.Get("location") != "" { // don't handle non-body location values
 		return nil
 	}
 
@@ -74,8 +74,8 @@ func (b *xmlBuilder) buildValue(value reflect.Value, current *XMLNode, tag refle
 
 	switch t {
 	case "structure":
-		if ***REMOVED***eld, ok := value.Type().FieldByName("_"); ok {
-			tag = tag + reflect.StructTag(" ") + ***REMOVED***eld.Tag
+		if field, ok := value.Type().FieldByName("_"); ok {
+			tag = tag + reflect.StructTag(" ") + field.Tag
 		}
 		return b.buildStruct(value, current, tag)
 	case "list":
@@ -87,7 +87,7 @@ func (b *xmlBuilder) buildValue(value reflect.Value, current *XMLNode, tag refle
 	}
 }
 
-// buildStruct adds a struct and its ***REMOVED***elds to the current XMLNode. All ***REMOVED***elds and any nested
+// buildStruct adds a struct and its fields to the current XMLNode. All fields and any nested
 // types are converted to XMLNodes also.
 func (b *xmlBuilder) buildStruct(value reflect.Value, current *XMLNode, tag reflect.StructTag) error {
 	if !value.IsValid() {
@@ -96,8 +96,8 @@ func (b *xmlBuilder) buildStruct(value reflect.Value, current *XMLNode, tag refl
 
 	// unwrap payloads
 	if payload := tag.Get("payload"); payload != "" {
-		***REMOVED***eld, _ := value.Type().FieldByName(payload)
-		tag = ***REMOVED***eld.Tag
+		field, _ := value.Type().FieldByName(payload)
+		tag = field.Tag
 		value = elemOf(value.FieldByName(payload))
 
 		if !value.IsValid() {
@@ -108,14 +108,14 @@ func (b *xmlBuilder) buildStruct(value reflect.Value, current *XMLNode, tag refl
 	child := NewXMLElement(xml.Name{Local: tag.Get("locationName")})
 
 	// there is an xmlNamespace associated with this struct
-	if pre***REMOVED***x, uri := tag.Get("xmlPre***REMOVED***x"), tag.Get("xmlURI"); uri != "" {
+	if prefix, uri := tag.Get("xmlPrefix"), tag.Get("xmlURI"); uri != "" {
 		ns := xml.Attr{
 			Name:  xml.Name{Local: "xmlns"},
 			Value: uri,
 		}
-		if pre***REMOVED***x != "" {
-			b.namespaces[pre***REMOVED***x] = uri // register the namespace
-			ns.Name.Local = "xmlns:" + pre***REMOVED***x
+		if prefix != "" {
+			b.namespaces[prefix] = uri // register the namespace
+			ns.Name.Local = "xmlns:" + prefix
 		}
 
 		child.Attr = append(child.Attr, ns)
@@ -126,30 +126,30 @@ func (b *xmlBuilder) buildStruct(value reflect.Value, current *XMLNode, tag refl
 	t := value.Type()
 	for i := 0; i < value.NumField(); i++ {
 		member := elemOf(value.Field(i))
-		***REMOVED***eld := t.Field(i)
+		field := t.Field(i)
 
-		if ***REMOVED***eld.PkgPath != "" {
-			continue // ignore unexported ***REMOVED***elds
+		if field.PkgPath != "" {
+			continue // ignore unexported fields
 		}
-		if ***REMOVED***eld.Tag.Get("ignore") != "" {
+		if field.Tag.Get("ignore") != "" {
 			continue
 		}
 
-		mTag := ***REMOVED***eld.Tag
+		mTag := field.Tag
 		if mTag.Get("location") != "" { // skip non-body members
 			nonPayloadFields++
 			continue
 		}
 		payloadFields++
 
-		if protocol.CanSetIdempotencyToken(value.Field(i), ***REMOVED***eld) {
+		if protocol.CanSetIdempotencyToken(value.Field(i), field) {
 			token := protocol.GetIdempotencyToken()
 			member = reflect.ValueOf(token)
 		}
 
 		memberName := mTag.Get("locationName")
 		if memberName == "" {
-			memberName = ***REMOVED***eld.Name
+			memberName = field.Name
 			mTag = reflect.StructTag(string(mTag) + ` locationName:"` + memberName + `"`)
 		}
 		if err := b.buildValue(member, child, mTag); err != nil {
@@ -158,7 +158,7 @@ func (b *xmlBuilder) buildStruct(value reflect.Value, current *XMLNode, tag refl
 	}
 
 	// Only case where the child shape is not added is if the shape only contains
-	// non-payload ***REMOVED***elds, e.g headers/query.
+	// non-payload fields, e.g headers/query.
 	if !(payloadFields == 0 && nonPayloadFields > 0) {
 		current.AddChild(child)
 	}
@@ -185,7 +185,7 @@ func (b *xmlBuilder) buildList(value reflect.Value, current *XMLNode, tag reflec
 				return err
 			}
 		}
-	} ***REMOVED*** {
+	} else {
 		list := NewXMLElement(xname)
 		current.AddChild(list)
 
@@ -299,7 +299,7 @@ func (b *xmlBuilder) buildScalar(value reflect.Value, current *XMLNode, tag refl
 	if tag.Get("xmlAttribute") != "" { // put into current node's attribute list
 		attr := xml.Attr{Name: xname, Value: str}
 		current.Attr = append(current.Attr, attr)
-	} ***REMOVED*** { // regular text node
+	} else { // regular text node
 		current.AddChild(&XMLNode{Name: xname, Text: str})
 	}
 	return nil

@@ -1,14 +1,14 @@
 apiVersion: metering.openshift.io/v1
-kind: MeteringCon***REMOVED***g
+kind: MeteringConfig
 metadata:
   name: "operator-metering"
 spec:
   reporting-operator:
     spec:
-      con***REMOVED***g:
+      config:
         prometheus:
           metricsImporter:
-            con***REMOVED***g:
+            config:
               # reporting-operator does the work of importing Metrics in chunks
               # of 5 minutes (by default), every 5 minutes.
               # This only needs to be adjusted if your cluster is really large,
@@ -84,7 +84,7 @@ spec:
           # If you have a storageClass which provides SSDs, uncomment and
           # specify it here:
           # class: "fast-ssd"
-          # Generally the default metastore size of 5Gi is suf***REMOVED***cient, but
+          # Generally the default metastore size of 5Gi is sufficient, but
           # with a large amount of ReportDataSources, you may wish to
           # increase it.
           size: "10Gi"

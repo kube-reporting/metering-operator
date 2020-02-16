@@ -19,8 +19,8 @@ func Conditionf(t TestingT, comp Comparison, msg string, args ...interface{}) bo
 	return Condition(t, comp, append([]interface{}{msg}, args...)...)
 }
 
-// Containsf asserts that the speci***REMOVED***ed string, list(array, slice...) or map contains the
-// speci***REMOVED***ed substring or element.
+// Containsf asserts that the specified string, list(array, slice...) or map contains the
+// specified substring or element.
 //
 //    assert.Containsf(t, "Hello World", "World", "error message %s", "formatted")
 //    assert.Containsf(t, ["Hello", "World"], "World", "error message %s", "formatted")
@@ -32,7 +32,7 @@ func Containsf(t TestingT, s interface{}, contains interface{}, msg string, args
 	return Contains(t, s, contains, append([]interface{}{msg}, args...)...)
 }
 
-// DirExistsf checks whether a directory exists in the given path. It also fails if the path is a ***REMOVED***le rather a directory or there is an error checking whether it exists.
+// DirExistsf checks whether a directory exists in the given path. It also fails if the path is a file rather a directory or there is an error checking whether it exists.
 func DirExistsf(t TestingT, path string, msg string, args ...interface{}) bool {
 	if h, ok := t.(tHelper); ok {
 		h.Helper()
@@ -40,7 +40,7 @@ func DirExistsf(t TestingT, path string, msg string, args ...interface{}) bool {
 	return DirExists(t, path, append([]interface{}{msg}, args...)...)
 }
 
-// ElementsMatchf asserts that the speci***REMOVED***ed listA(array, slice...) is equal to speci***REMOVED***ed
+// ElementsMatchf asserts that the specified listA(array, slice...) is equal to specified
 // listB(array, slice...) ignoring the order of the elements. If there are duplicate elements,
 // the number of appearances of each of them in both lists should match.
 //
@@ -52,7 +52,7 @@ func ElementsMatchf(t TestingT, listA interface{}, listB interface{}, msg string
 	return ElementsMatch(t, listA, listB, append([]interface{}{msg}, args...)...)
 }
 
-// Emptyf asserts that the speci***REMOVED***ed object is empty.  I.e. nil, "", false, 0 or either
+// Emptyf asserts that the specified object is empty.  I.e. nil, "", false, 0 or either
 // a slice or a channel with len == 0.
 //
 //  assert.Emptyf(t, obj, "error message %s", "formatted")
@@ -139,7 +139,7 @@ func FailNowf(t TestingT, failureMessage string, msg string, args ...interface{}
 	return FailNow(t, failureMessage, append([]interface{}{msg}, args...)...)
 }
 
-// Falsef asserts that the speci***REMOVED***ed value is false.
+// Falsef asserts that the specified value is false.
 //
 //    assert.Falsef(t, myBool, "error message %s", "formatted")
 func Falsef(t TestingT, value bool, msg string, args ...interface{}) bool {
@@ -149,7 +149,7 @@ func Falsef(t TestingT, value bool, msg string, args ...interface{}) bool {
 	return False(t, value, append([]interface{}{msg}, args...)...)
 }
 
-// FileExistsf checks whether a ***REMOVED***le exists in the given path. It also fails if the path points to a directory or there is an error when trying to check the ***REMOVED***le.
+// FileExistsf checks whether a file exists in the given path. It also fails if the path points to a directory or there is an error when trying to check the file.
 func FileExistsf(t TestingT, path string, msg string, args ...interface{}) bool {
 	if h, ok := t.(tHelper); ok {
 		h.Helper()
@@ -157,7 +157,7 @@ func FileExistsf(t TestingT, path string, msg string, args ...interface{}) bool 
 	return FileExists(t, path, append([]interface{}{msg}, args...)...)
 }
 
-// HTTPBodyContainsf asserts that a speci***REMOVED***ed handler returns a
+// HTTPBodyContainsf asserts that a specified handler returns a
 // body that contains a string.
 //
 //  assert.HTTPBodyContainsf(t, myHandler, "GET", "www.google.com", nil, "I'm Feeling Lucky", "error message %s", "formatted")
@@ -170,7 +170,7 @@ func HTTPBodyContainsf(t TestingT, handler http.HandlerFunc, method string, url 
 	return HTTPBodyContains(t, handler, method, url, values, str, append([]interface{}{msg}, args...)...)
 }
 
-// HTTPBodyNotContainsf asserts that a speci***REMOVED***ed handler returns a
+// HTTPBodyNotContainsf asserts that a specified handler returns a
 // body that does not contain a string.
 //
 //  assert.HTTPBodyNotContainsf(t, myHandler, "GET", "www.google.com", nil, "I'm Feeling Lucky", "error message %s", "formatted")
@@ -183,7 +183,7 @@ func HTTPBodyNotContainsf(t TestingT, handler http.HandlerFunc, method string, u
 	return HTTPBodyNotContains(t, handler, method, url, values, str, append([]interface{}{msg}, args...)...)
 }
 
-// HTTPErrorf asserts that a speci***REMOVED***ed handler returns an error status code.
+// HTTPErrorf asserts that a specified handler returns an error status code.
 //
 //  assert.HTTPErrorf(t, myHandler, "POST", "/a/b/c", url.Values{"a": []string{"b", "c"}}
 //
@@ -195,7 +195,7 @@ func HTTPErrorf(t TestingT, handler http.HandlerFunc, method string, url string,
 	return HTTPError(t, handler, method, url, values, append([]interface{}{msg}, args...)...)
 }
 
-// HTTPRedirectf asserts that a speci***REMOVED***ed handler returns a redirect status code.
+// HTTPRedirectf asserts that a specified handler returns a redirect status code.
 //
 //  assert.HTTPRedirectf(t, myHandler, "GET", "/a/b/c", url.Values{"a": []string{"b", "c"}}
 //
@@ -207,7 +207,7 @@ func HTTPRedirectf(t TestingT, handler http.HandlerFunc, method string, url stri
 	return HTTPRedirect(t, handler, method, url, values, append([]interface{}{msg}, args...)...)
 }
 
-// HTTPSuccessf asserts that a speci***REMOVED***ed handler returns a success status code.
+// HTTPSuccessf asserts that a specified handler returns a success status code.
 //
 //  assert.HTTPSuccessf(t, myHandler, "POST", "http://www.google.com", nil, "error message %s", "formatted")
 //
@@ -219,7 +219,7 @@ func HTTPSuccessf(t TestingT, handler http.HandlerFunc, method string, url strin
 	return HTTPSuccess(t, handler, method, url, values, append([]interface{}{msg}, args...)...)
 }
 
-// Implementsf asserts that an object is implemented by the speci***REMOVED***ed interface.
+// Implementsf asserts that an object is implemented by the specified interface.
 //
 //    assert.Implementsf(t, (*MyInterface, "error message %s", "formatted")(nil), new(MyObject))
 func Implementsf(t TestingT, interfaceObject interface{}, object interface{}, msg string, args ...interface{}) bool {
@@ -271,7 +271,7 @@ func InEpsilonSlicef(t TestingT, expected interface{}, actual interface{}, epsil
 	return InEpsilonSlice(t, expected, actual, epsilon, append([]interface{}{msg}, args...)...)
 }
 
-// IsTypef asserts that the speci***REMOVED***ed objects are of the same type.
+// IsTypef asserts that the specified objects are of the same type.
 func IsTypef(t TestingT, expectedType interface{}, object interface{}, msg string, args ...interface{}) bool {
 	if h, ok := t.(tHelper); ok {
 		h.Helper()
@@ -289,7 +289,7 @@ func JSONEqf(t TestingT, expected string, actual string, msg string, args ...int
 	return JSONEq(t, expected, actual, append([]interface{}{msg}, args...)...)
 }
 
-// Lenf asserts that the speci***REMOVED***ed object has speci***REMOVED***c length.
+// Lenf asserts that the specified object has specific length.
 // Lenf also fails if the object has a type that len() not accept.
 //
 //    assert.Lenf(t, mySlice, 3, "error message %s", "formatted")
@@ -300,7 +300,7 @@ func Lenf(t TestingT, object interface{}, length int, msg string, args ...interf
 	return Len(t, object, length, append([]interface{}{msg}, args...)...)
 }
 
-// Nilf asserts that the speci***REMOVED***ed object is nil.
+// Nilf asserts that the specified object is nil.
 //
 //    assert.Nilf(t, err, "error message %s", "formatted")
 func Nilf(t TestingT, object interface{}, msg string, args ...interface{}) bool {
@@ -323,8 +323,8 @@ func NoErrorf(t TestingT, err error, msg string, args ...interface{}) bool {
 	return NoError(t, err, append([]interface{}{msg}, args...)...)
 }
 
-// NotContainsf asserts that the speci***REMOVED***ed string, list(array, slice...) or map does NOT contain the
-// speci***REMOVED***ed substring or element.
+// NotContainsf asserts that the specified string, list(array, slice...) or map does NOT contain the
+// specified substring or element.
 //
 //    assert.NotContainsf(t, "Hello World", "Earth", "error message %s", "formatted")
 //    assert.NotContainsf(t, ["Hello", "World"], "Earth", "error message %s", "formatted")
@@ -336,7 +336,7 @@ func NotContainsf(t TestingT, s interface{}, contains interface{}, msg string, a
 	return NotContains(t, s, contains, append([]interface{}{msg}, args...)...)
 }
 
-// NotEmptyf asserts that the speci***REMOVED***ed object is NOT empty.  I.e. not nil, "", false, 0 or either
+// NotEmptyf asserts that the specified object is NOT empty.  I.e. not nil, "", false, 0 or either
 // a slice or a channel with len == 0.
 //
 //  if assert.NotEmptyf(t, obj, "error message %s", "formatted") {
@@ -349,7 +349,7 @@ func NotEmptyf(t TestingT, object interface{}, msg string, args ...interface{}) 
 	return NotEmpty(t, object, append([]interface{}{msg}, args...)...)
 }
 
-// NotEqualf asserts that the speci***REMOVED***ed values are NOT equal.
+// NotEqualf asserts that the specified values are NOT equal.
 //
 //    assert.NotEqualf(t, obj1, obj2, "error message %s", "formatted")
 //
@@ -362,7 +362,7 @@ func NotEqualf(t TestingT, expected interface{}, actual interface{}, msg string,
 	return NotEqual(t, expected, actual, append([]interface{}{msg}, args...)...)
 }
 
-// NotNilf asserts that the speci***REMOVED***ed object is not nil.
+// NotNilf asserts that the specified object is not nil.
 //
 //    assert.NotNilf(t, err, "error message %s", "formatted")
 func NotNilf(t TestingT, object interface{}, msg string, args ...interface{}) bool {
@@ -372,7 +372,7 @@ func NotNilf(t TestingT, object interface{}, msg string, args ...interface{}) bo
 	return NotNil(t, object, append([]interface{}{msg}, args...)...)
 }
 
-// NotPanicsf asserts that the code inside the speci***REMOVED***ed PanicTestFunc does NOT panic.
+// NotPanicsf asserts that the code inside the specified PanicTestFunc does NOT panic.
 //
 //   assert.NotPanicsf(t, func(){ RemainCalm() }, "error message %s", "formatted")
 func NotPanicsf(t TestingT, f PanicTestFunc, msg string, args ...interface{}) bool {
@@ -382,7 +382,7 @@ func NotPanicsf(t TestingT, f PanicTestFunc, msg string, args ...interface{}) bo
 	return NotPanics(t, f, append([]interface{}{msg}, args...)...)
 }
 
-// NotRegexpf asserts that a speci***REMOVED***ed regexp does not match a string.
+// NotRegexpf asserts that a specified regexp does not match a string.
 //
 //  assert.NotRegexpf(t, regexp.MustCompile("starts", "error message %s", "formatted"), "it's starting")
 //  assert.NotRegexpf(t, "^start", "it's not starting", "error message %s", "formatted")
@@ -393,8 +393,8 @@ func NotRegexpf(t TestingT, rx interface{}, str interface{}, msg string, args ..
 	return NotRegexp(t, rx, str, append([]interface{}{msg}, args...)...)
 }
 
-// NotSubsetf asserts that the speci***REMOVED***ed list(array, slice...) contains not all
-// elements given in the speci***REMOVED***ed subset(array, slice...).
+// NotSubsetf asserts that the specified list(array, slice...) contains not all
+// elements given in the specified subset(array, slice...).
 //
 //    assert.NotSubsetf(t, [1, 3, 4], [1, 2], "But [1, 3, 4] does not contain [1, 2]", "error message %s", "formatted")
 func NotSubsetf(t TestingT, list interface{}, subset interface{}, msg string, args ...interface{}) bool {
@@ -412,7 +412,7 @@ func NotZerof(t TestingT, i interface{}, msg string, args ...interface{}) bool {
 	return NotZero(t, i, append([]interface{}{msg}, args...)...)
 }
 
-// Panicsf asserts that the code inside the speci***REMOVED***ed PanicTestFunc panics.
+// Panicsf asserts that the code inside the specified PanicTestFunc panics.
 //
 //   assert.Panicsf(t, func(){ GoCrazy() }, "error message %s", "formatted")
 func Panicsf(t TestingT, f PanicTestFunc, msg string, args ...interface{}) bool {
@@ -422,7 +422,7 @@ func Panicsf(t TestingT, f PanicTestFunc, msg string, args ...interface{}) bool 
 	return Panics(t, f, append([]interface{}{msg}, args...)...)
 }
 
-// PanicsWithValuef asserts that the code inside the speci***REMOVED***ed PanicTestFunc panics, and that
+// PanicsWithValuef asserts that the code inside the specified PanicTestFunc panics, and that
 // the recovered panic value equals the expected panic value.
 //
 //   assert.PanicsWithValuef(t, "crazy error", func(){ GoCrazy() }, "error message %s", "formatted")
@@ -433,7 +433,7 @@ func PanicsWithValuef(t TestingT, expected interface{}, f PanicTestFunc, msg str
 	return PanicsWithValue(t, expected, f, append([]interface{}{msg}, args...)...)
 }
 
-// Regexpf asserts that a speci***REMOVED***ed regexp matches a string.
+// Regexpf asserts that a specified regexp matches a string.
 //
 //  assert.Regexpf(t, regexp.MustCompile("start", "error message %s", "formatted"), "it's starting")
 //  assert.Regexpf(t, "start...$", "it's not starting", "error message %s", "formatted")
@@ -444,8 +444,8 @@ func Regexpf(t TestingT, rx interface{}, str interface{}, msg string, args ...in
 	return Regexp(t, rx, str, append([]interface{}{msg}, args...)...)
 }
 
-// Subsetf asserts that the speci***REMOVED***ed list(array, slice...) contains all
-// elements given in the speci***REMOVED***ed subset(array, slice...).
+// Subsetf asserts that the specified list(array, slice...) contains all
+// elements given in the specified subset(array, slice...).
 //
 //    assert.Subsetf(t, [1, 2, 3], [1, 2], "But [1, 2, 3] does contain [1, 2]", "error message %s", "formatted")
 func Subsetf(t TestingT, list interface{}, subset interface{}, msg string, args ...interface{}) bool {
@@ -455,7 +455,7 @@ func Subsetf(t TestingT, list interface{}, subset interface{}, msg string, args 
 	return Subset(t, list, subset, append([]interface{}{msg}, args...)...)
 }
 
-// Truef asserts that the speci***REMOVED***ed value is true.
+// Truef asserts that the specified value is true.
 //
 //    assert.Truef(t, myBool, "error message %s", "formatted")
 func Truef(t TestingT, value bool, msg string, args ...interface{}) bool {

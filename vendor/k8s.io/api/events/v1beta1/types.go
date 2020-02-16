@@ -2,7 +2,7 @@
 Copyright 2017 The Kubernetes Authors.
 
 Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this ***REMOVED***le except in compliance with the License.
+you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
 
     http://www.apache.org/licenses/LICENSE-2.0
@@ -10,7 +10,7 @@ You may obtain a copy of the License at
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the speci***REMOVED***c language governing permissions and
+See the License for the specific language governing permissions and
 limitations under the License.
 */
 
@@ -30,7 +30,7 @@ type Event struct {
 	// +optional
 	metav1.ObjectMeta `json:"metadata,omitempty" protobuf:"bytes,1,opt,name=metadata"`
 
-	// Required. Time when this Event was ***REMOVED***rst observed.
+	// Required. Time when this Event was first observed.
 	EventTime metav1.MicroTime `json:"eventTime" protobuf:"bytes,2,opt,name=eventTime"`
 
 	// Data about the Event series this event represents or nil if it's a singleton Event.
@@ -74,16 +74,16 @@ type Event struct {
 	// +optional
 	Type string `json:"type,omitempty" protobuf:"bytes,11,opt,name=type"`
 
-	// Deprecated ***REMOVED***eld assuring backward compatibility with core.v1 Event type
+	// Deprecated field assuring backward compatibility with core.v1 Event type
 	// +optional
 	DeprecatedSource corev1.EventSource `json:"deprecatedSource,omitempty" protobuf:"bytes,12,opt,name=deprecatedSource"`
-	// Deprecated ***REMOVED***eld assuring backward compatibility with core.v1 Event type
+	// Deprecated field assuring backward compatibility with core.v1 Event type
 	// +optional
 	DeprecatedFirstTimestamp metav1.Time `json:"deprecatedFirstTimestamp,omitempty" protobuf:"bytes,13,opt,name=deprecatedFirstTimestamp"`
-	// Deprecated ***REMOVED***eld assuring backward compatibility with core.v1 Event type
+	// Deprecated field assuring backward compatibility with core.v1 Event type
 	// +optional
 	DeprecatedLastTimestamp metav1.Time `json:"deprecatedLastTimestamp,omitempty" protobuf:"bytes,14,opt,name=deprecatedLastTimestamp"`
-	// Deprecated ***REMOVED***eld assuring backward compatibility with core.v1 Event type
+	// Deprecated field assuring backward compatibility with core.v1 Event type
 	// +optional
 	DeprecatedCount int32 `json:"deprecatedCount,omitempty" protobuf:"varint,15,opt,name=deprecatedCount"`
 }
@@ -95,7 +95,7 @@ type EventSeries struct {
 	Count int32 `json:"count" protobuf:"varint,1,opt,name=count"`
 	// Time when last Event from the series was seen before last heartbeat.
 	LastObservedTime metav1.MicroTime `json:"lastObservedTime" protobuf:"bytes,2,opt,name=lastObservedTime"`
-	// Information whether this series is ongoing or ***REMOVED***nished.
+	// Information whether this series is ongoing or finished.
 	State EventSeriesState `json:"state" protobuf:"bytes,3,opt,name=state"`
 }
 

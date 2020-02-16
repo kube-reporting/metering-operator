@@ -1,5 +1,5 @@
 // Copyright 2015 Huan Du. All rights reserved.
-// Licensed under the MIT license that can be found in the LICENSE ***REMOVED***le.
+// Licensed under the MIT license that can be found in the LICENSE file.
 
 package xstrings
 
@@ -150,7 +150,7 @@ func Scrub(str, repl string) string {
 				buf.WriteString(origin[:pos])
 				hasError = true
 			}
-		} ***REMOVED*** if hasError {
+		} else if hasError {
 			hasError = false
 			buf.WriteString(repl)
 
@@ -174,7 +174,7 @@ func Scrub(str, repl string) string {
 // WordSplit splits a string into words. Returns a slice of words.
 // If there is no word in a string, return nil.
 //
-// Word is de***REMOVED***ned as a locale dependent string containing alphabetic characters,
+// Word is defined as a locale dependent string containing alphabetic characters,
 // which may also contain but not start with `'` and `-` characters.
 func WordSplit(str string) []string {
 	var word string

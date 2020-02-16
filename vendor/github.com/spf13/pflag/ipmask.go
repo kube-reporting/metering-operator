@@ -73,7 +73,7 @@ func (f *FlagSet) GetIPv4Mask(name string) (net.IPMask, error) {
 	return val.(net.IPMask), nil
 }
 
-// IPMaskVar de***REMOVED***nes an net.IPMask flag with speci***REMOVED***ed name, default value, and usage string.
+// IPMaskVar defines an net.IPMask flag with specified name, default value, and usage string.
 // The argument p points to an net.IPMask variable in which to store the value of the flag.
 func (f *FlagSet) IPMaskVar(p *net.IPMask, name string, value net.IPMask, usage string) {
 	f.VarP(newIPMaskValue(value, p), name, "", usage)
@@ -84,7 +84,7 @@ func (f *FlagSet) IPMaskVarP(p *net.IPMask, name, shorthand string, value net.IP
 	f.VarP(newIPMaskValue(value, p), name, shorthand, usage)
 }
 
-// IPMaskVar de***REMOVED***nes an net.IPMask flag with speci***REMOVED***ed name, default value, and usage string.
+// IPMaskVar defines an net.IPMask flag with specified name, default value, and usage string.
 // The argument p points to an net.IPMask variable in which to store the value of the flag.
 func IPMaskVar(p *net.IPMask, name string, value net.IPMask, usage string) {
 	CommandLine.VarP(newIPMaskValue(value, p), name, "", usage)
@@ -95,7 +95,7 @@ func IPMaskVarP(p *net.IPMask, name, shorthand string, value net.IPMask, usage s
 	CommandLine.VarP(newIPMaskValue(value, p), name, shorthand, usage)
 }
 
-// IPMask de***REMOVED***nes an net.IPMask flag with speci***REMOVED***ed name, default value, and usage string.
+// IPMask defines an net.IPMask flag with specified name, default value, and usage string.
 // The return value is the address of an net.IPMask variable that stores the value of the flag.
 func (f *FlagSet) IPMask(name string, value net.IPMask, usage string) *net.IPMask {
 	p := new(net.IPMask)
@@ -110,7 +110,7 @@ func (f *FlagSet) IPMaskP(name, shorthand string, value net.IPMask, usage string
 	return p
 }
 
-// IPMask de***REMOVED***nes an net.IPMask flag with speci***REMOVED***ed name, default value, and usage string.
+// IPMask defines an net.IPMask flag with specified name, default value, and usage string.
 // The return value is the address of an net.IPMask variable that stores the value of the flag.
 func IPMask(name string, value net.IPMask, usage string) *net.IPMask {
 	return CommandLine.IPMaskP(name, "", value, usage)

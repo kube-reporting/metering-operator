@@ -1,5 +1,5 @@
 // Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this ***REMOVED***le except in compliance with the License.
+// you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 //
 //     http://www.apache.org/licenses/LICENSE-2.0
@@ -7,11 +7,11 @@
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the speci***REMOVED***c language governing permissions and
+// See the License for the specific language governing permissions and
 // limitations under the License.
 
-// This ***REMOVED***le contains code that was borrowed from prestgo, mainly some
-// data type de***REMOVED***nitions.
+// This file contains code that was borrowed from prestgo, mainly some
+// data type definitions.
 //
 // See https://github.com/avct/prestgo for copyright information.
 //
@@ -20,7 +20,7 @@
 // Copyright (c) 2015 Avocet Systems Ltd.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
-// of this software and associated documentation ***REMOVED***les (the "Software"), to deal
+// of this software and associated documentation files (the "Software"), to deal
 // in the Software without restriction, including without limitation the rights
 // to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
 // copies of the Software, and to permit persons to whom the Software is
@@ -95,8 +95,8 @@ func (d *sqldriver) Open(name string) (driver.Conn, error) {
 
 var _ driver.Driver = &sqldriver{}
 
-// Con***REMOVED***g is a con***REMOVED***guration that can be encoded to a DSN string.
-type Con***REMOVED***g struct {
+// Config is a configuration that can be encoded to a DSN string.
+type Config struct {
 	PrestoURI         string            // URI of the Presto server, e.g. http://user@localhost:8080
 	Source            string            // Source of the connection (optional)
 	Catalog           string            // Catalog (optional)
@@ -105,8 +105,8 @@ type Con***REMOVED***g struct {
 	CustomClientName  string            // Custom client name (optional)
 }
 
-// FormatDSN returns a DSN string from the con***REMOVED***guration.
-func (c *Con***REMOVED***g) FormatDSN() (string, error) {
+// FormatDSN returns a DSN string from the configuration.
+func (c *Config) FormatDSN() (string, error) {
 	prestoURL, err := url.Parse(c.PrestoURI)
 	if err != nil {
 		return "", err
@@ -218,8 +218,8 @@ var customClientRegistry = struct {
 //			IdleConnTimeout:       90 * time.Second,
 //			TLSHandshakeTimeout:   10 * time.Second,
 //			ExpectContinueTimeout: 1 * time.Second,
-//			TLSClientCon***REMOVED***g:       &tls.Con***REMOVED***g{
-//			// your con***REMOVED***g here...
+//			TLSClientConfig:       &tls.Config{
+//			// your config here...
 //			},
 //		},
 //	}
@@ -406,7 +406,7 @@ type stmtError struct {
 	ErrorCode     int                  `json:"errorCode"`
 	ErrorLocation stmtErrorLocation    `json:"errorLocation"`
 	FailureInfo   stmtErrorFailureInfo `json:"failureInfo"`
-	// Other ***REMOVED***elds omitted
+	// Other fields omitted
 }
 
 type stmtErrorLocation struct {
@@ -416,7 +416,7 @@ type stmtErrorLocation struct {
 
 type stmtErrorFailureInfo struct {
 	Type string `json:"type"`
-	// Other ***REMOVED***elds omitted
+	// Other fields omitted
 }
 
 func (e stmtError) Error() string {
@@ -530,11 +530,11 @@ func (qr *driverRows) Columns() []string {
 	return qr.columns
 }
 
-var coltypeLengthSuf***REMOVED***x = regexp.MustCompile(`\(\d+\)$`)
+var coltypeLengthSuffix = regexp.MustCompile(`\(\d+\)$`)
 
 func (qr *driverRows) ColumnTypeDatabaseTypeName(index int) string {
 	name := qr.coltype[index].typeName
-	if m := coltypeLengthSuf***REMOVED***x.FindStringSubmatch(name); m != nil {
+	if m := coltypeLengthSuffix.FindStringSubmatch(name); m != nil {
 		name = name[0 : len(name)-len(m[0])]
 	}
 	return name
@@ -1055,9 +1055,9 @@ func scanNullFloat64(v interface{}) (sql.NullFloat64, error) {
 	switch v {
 	case "NaN":
 		return sql.NullFloat64{Valid: true, Float64: math.NaN()}, nil
-	case "In***REMOVED***nity":
+	case "Infinity":
 		return sql.NullFloat64{Valid: true, Float64: math.Inf(+1)}, nil
-	case "-In***REMOVED***nity":
+	case "-Infinity":
 		return sql.NullFloat64{Valid: true, Float64: math.Inf(-1)}, nil
 	default:
 		return sql.NullFloat64{}, fmt.Errorf("cannot convert %v (%T) to float64", v, v)

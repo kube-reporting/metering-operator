@@ -1,13 +1,13 @@
 # Reports
 
 The `Report` custom resource is used to manage the execution and status of reports.
-Metering produces reports derived from usage data sources which can be used in further analysis and ***REMOVED***ltering.
+Metering produces reports derived from usage data sources which can be used in further analysis and filtering.
 
 ## Report object
 
 A single `Report` resource represents a report which is updated with new information according to a schedule.
-Reports with a `spec.schedule` ***REMOVED***eld set are always running, and will track what time periods it has collected data for, ensuring that if Metering is shutdown or unavailable for an extended period of time, it will back***REMOVED***ll the data starting where it left off.
-If the schedule is unset, then the Report will run once for the time speci***REMOVED***ed by the reportingStart and reportingEnd.
+Reports with a `spec.schedule` field set are always running, and will track what time periods it has collected data for, ensuring that if Metering is shutdown or unavailable for an extended period of time, it will backfill the data starting where it left off.
+If the schedule is unset, then the Report will run once for the time specified by the reportingStart and reportingEnd.
 By default, reports will wait for ReportDataSources to have the progressed in their import process to cover the report period being processed.
 If the report has a schedule, it will wait until the period currently being processed has been covered by the import process.
 
@@ -51,7 +51,7 @@ spec:
 Names the `ReportQuery` used to generate the report.
 The report query controls the schema of the report as well how the results are processed.
 
-*`query` is a required ***REMOVED***eld.*
+*`query` is a required field.*
 
 Use `kubectl` to obtain a list of available `ReportQuery` objects:
 
@@ -105,19 +105,19 @@ pod-memory-usage                             23m
 pod-memory-usage-raw                         23m
 ```
 
-ReportQueries with the `-raw` suf***REMOVED***x are used by other ReportQueries to build more complex queries, and should not be used directly for reports.
+ReportQueries with the `-raw` suffix are used by other ReportQueries to build more complex queries, and should not be used directly for reports.
 
-`namespace-` pre***REMOVED***xed queries aggregate Pod CPU/memory requests by namespace, providing a list of namespaces and their overall usage based on resource requests.
+`namespace-` prefixed queries aggregate Pod CPU/memory requests by namespace, providing a list of namespaces and their overall usage based on resource requests.
 
-`pod-` pre***REMOVED***xed queries are similar to 'namespace-' pre***REMOVED***xed, but aggregate information by Pod, rather than namespace. These queries include the Pod's namespace and node.
+`pod-` prefixed queries are similar to 'namespace-' prefixed, but aggregate information by Pod, rather than namespace. These queries include the Pod's namespace and node.
 
-`node-` pre***REMOVED***xed queries return information about each node's total available resources.
+`node-` prefixed queries return information about each node's total available resources.
 
-`aws-` pre***REMOVED***xed queries are speci***REMOVED***c to AWS. Queries suf***REMOVED***xed with `-aws` return the same data as queries of the same name without the suf***REMOVED***x, and correlate usage with the EC2 billing data.
+`aws-` prefixed queries are specific to AWS. Queries suffixed with `-aws` return the same data as queries of the same name without the suffix, and correlate usage with the EC2 billing data.
 
 The `aws-ec2-billing-data` report is used by other queries, and should not be used as a standalone report. The `aws-ec2-cluster-cost` report provides a total cost based on the nodes included in the cluster, and the sum of their costs for the time period being reported on.
 
-For a complete list of ***REMOVED***elds each report query produces, use `kubectl` to get the object as YAML, and check the `columns` ***REMOVED***eld:
+For a complete list of fields each report query produces, use `kubectl` to get the object as YAML, and check the `columns` field:
 
 ```
 kubectl -n $METERING_NAMESPACE get reportqueries namespace-memory-request -o yaml
@@ -146,7 +146,7 @@ spec:
 
 ## schedule
 
-The schedule block de***REMOVED***nes when the report runs. The main ***REMOVED***elds in the `schedule` section are `period`, and then depending on the value of `period`, the ***REMOVED***elds `hourly`, `daily`, `weekly` and `monthly` allow you to ***REMOVED***ne-tune when the report runs.
+The schedule block defines when the report runs. The main fields in the `schedule` section are `period`, and then depending on the value of `period`, the fields `hourly`, `daily`, `weekly` and `monthly` allow you to fine-tune when the report runs.
 
 For example, if `period` is set to `weekly`, you can add a `weekly` key to the `schedule` block. The following example will run once a week on Wednesday, at 1 PM.
 
@@ -183,9 +183,9 @@ Valid values of `period` are listed below, and the options available to set for 
 - `cron`
   - `expression`
 
-Generally, the `hour`, `minute`, `second` ***REMOVED***elds control when in the day the report runs, and `dayOfWeek`/`dayOfMonth` control what day of the week, or day of month the report runs on, if it's a weekly or monthly report period.
+Generally, the `hour`, `minute`, `second` fields control when in the day the report runs, and `dayOfWeek`/`dayOfMonth` control what day of the week, or day of month the report runs on, if it's a weekly or monthly report period.
 
-For each of these ***REMOVED***elds, there is a range of valid values:
+For each of these fields, there is a range of valid values:
 
 - `hour` is an integer value between 0-23.
 - `minute` is an integer value between 0-59.
@@ -199,12 +199,12 @@ For cron periods, normal cron expressions are valid:
 
 ### reportingStart
 
-To support running a Report against existing data, you can set the `spec.reportingStart` ***REMOVED***eld to a RFC3339 timestamp to tell the Report to run according to its `schedule` starting from `reportingStart` rather than the current time.
+To support running a Report against existing data, you can set the `spec.reportingStart` field to a RFC3339 timestamp to tell the Report to run according to its `schedule` starting from `reportingStart` rather than the current time.
 One important thing to understand is that this will result in the reporting-operator running many queries in succession for each interval in the schedule that's between the `reportingStart` time and the current time.
 This could be thousands of queries if the period is less than daily and the `reportingStart` is more than a few months back.
 If `reportingStart` is left unset, the Report will run at the next full reportingPeriod after the time the report is created.
 
-As an example of how to use this ***REMOVED***eld, if you had data already collected dating back to January 1st, 2019 which you wanted to be included in your Report, you could create a report with the following values:
+As an example of how to use this field, if you had data already collected dating back to January 1st, 2019 which you wanted to be included in your Report, you could create a report with the following values:
 
 ```
 apiVersion: metering.openshift.io/v1
@@ -221,9 +221,9 @@ spec:
 
 ### reportingEnd
 
-To con***REMOVED***gure a Report to only run until a speci***REMOVED***ed time, you can set the `spec.reportingEnd` ***REMOVED***eld to an RFC3339 timestamp.
-The value of this ***REMOVED***eld will cause the Report to stop running on its schedule after it has ***REMOVED***nished generating reporting data for the period covered from its start time until `reportingEnd`.
-Because a schedule will most likely not align with reportingEnd, the last period in the schedule will be shortened to end at the speci***REMOVED***ed reportingEnd time.
+To configure a Report to only run until a specified time, you can set the `spec.reportingEnd` field to an RFC3339 timestamp.
+The value of this field will cause the Report to stop running on its schedule after it has finished generating reporting data for the period covered from its start time until `reportingEnd`.
+Because a schedule will most likely not align with reportingEnd, the last period in the schedule will be shortened to end at the specified reportingEnd time.
 If left unset, then the Report will run forever, or until a `reportingEnd` is set on the Report.
 
 For example, if you wanted to create a report that runs once a week for the month of July:
@@ -248,7 +248,7 @@ For reports with a schedule set, it will not wait for each period's reportingEnd
 
 ### Inputs
 
-The `spec.inputs` ***REMOVED***eld of a Report can be used to override or set values de***REMOVED***ned in a [ReportQuery's spec.inputs ***REMOVED***eld][query-inputs].
+The `spec.inputs` field of a Report can be used to override or set values defined in a [ReportQuery's spec.inputs field][query-inputs].
 
 It is a list of name-value pairs:
 
@@ -263,7 +263,7 @@ The `name` of an input must exist in the ReportQuery's `inputs` list.
 The `value` of the input must be the correct type for the input's `type`.
 
 For an example of how this can be used, see it in action [in a roll-up report](rollup-reports.md#3-create-the-aggregator-report).
-For more details on how inputs can be speci***REMOVED***ed read the [Specifying Inputs][specifying-inputs] section of the ReportQueries documentation.
+For more details on how inputs can be specified read the [Specifying Inputs][specifying-inputs] section of the ReportQueries documentation.
 
 ## Roll-up Reports
 
@@ -312,11 +312,11 @@ For more information on setting up a roll-up report, see the [roll-up report gui
 
 ### Report Status
 
-The execution of a scheduled report can be tracked using its status ***REMOVED***eld. Any errors occurring during the preparation of a report will be recorded here.
+The execution of a scheduled report can be tracked using its status field. Any errors occurring during the preparation of a report will be recorded here.
 
-The `status` ***REMOVED***eld of a `Report` currently has two ***REMOVED***elds:
+The `status` field of a `Report` currently has two fields:
 
-- `conditions`: Conditions is a list of conditions, each of which have a `type`, `status`, `reason`, and `message` ***REMOVED***eld. Possible values of a condition's `type` ***REMOVED***eld are `Running` and `Failure`, indicating the current state of the scheduled report. The `reason` indicates why its `condition` is in its current state with the `status` being either `true`, `false` or `unknown`. The `message` provides a human readable indicating why the condition is in the current state. For detailed information on the `reason` values see [`pkg/apis/metering/v1/util/report_util.go`](https://github.com/operator-framework/operator-metering/blob/master/pkg/apis/metering/v1/util/report_util.go#L10).
+- `conditions`: Conditions is a list of conditions, each of which have a `type`, `status`, `reason`, and `message` field. Possible values of a condition's `type` field are `Running` and `Failure`, indicating the current state of the scheduled report. The `reason` indicates why its `condition` is in its current state with the `status` being either `true`, `false` or `unknown`. The `message` provides a human readable indicating why the condition is in the current state. For detailed information on the `reason` values see [`pkg/apis/metering/v1/util/report_util.go`](https://github.com/operator-framework/operator-metering/blob/master/pkg/apis/metering/v1/util/report_util.go#L10).
 - `lastReportTime`: Indicates the time Metering has collected data up to.
 
 [rfc3339]: https://tools.ietf.org/html/rfc3339#section-5.8

@@ -2,7 +2,7 @@
 Copyright 2016 The Kubernetes Authors.
 
 Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this ***REMOVED***le except in compliance with the License.
+you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
 
     http://www.apache.org/licenses/LICENSE-2.0
@@ -10,7 +10,7 @@ You may obtain a copy of the License at
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the speci***REMOVED***c language governing permissions and
+See the License for the specific language governing permissions and
 limitations under the License.
 */
 
@@ -24,7 +24,7 @@ import (
 	"net"
 	"net/http"
 	"os"
-	"path/***REMOVED***lepath"
+	"path/filepath"
 	gruntime "runtime"
 	"strings"
 	"time"
@@ -44,22 +44,22 @@ const (
 	DefaultBurst int     = 10
 )
 
-var ErrNotInCluster = errors.New("unable to load in-cluster con***REMOVED***guration, KUBERNETES_SERVICE_HOST and KUBERNETES_SERVICE_PORT must be de***REMOVED***ned")
+var ErrNotInCluster = errors.New("unable to load in-cluster configuration, KUBERNETES_SERVICE_HOST and KUBERNETES_SERVICE_PORT must be defined")
 
-// Con***REMOVED***g holds the common attributes that can be passed to a Kubernetes client on
+// Config holds the common attributes that can be passed to a Kubernetes client on
 // initialization.
-type Con***REMOVED***g struct {
+type Config struct {
 	// Host must be a host string, a host:port pair, or a URL to the base of the apiserver.
-	// If a URL is given then the (optional) Path of that URL represents a pre***REMOVED***x that must
+	// If a URL is given then the (optional) Path of that URL represents a prefix that must
 	// be appended to all request URIs used to access the apiserver. This allows a frontend
 	// proxy to easily relocate all of the apiserver endpoints.
 	Host string
 	// APIPath is a sub-path that points to an API root.
 	APIPath string
 
-	// ContentCon***REMOVED***g contains settings that affect how objects are transformed when
+	// ContentConfig contains settings that affect how objects are transformed when
 	// sent to the server.
-	ContentCon***REMOVED***g
+	ContentConfig
 
 	// Server requires Basic authentication
 	Username string
@@ -70,36 +70,36 @@ type Con***REMOVED***g struct {
 	// TODO: demonstrate an OAuth2 compatible client.
 	BearerToken string
 
-	// Path to a ***REMOVED***le containing a BearerToken.
+	// Path to a file containing a BearerToken.
 	// If set, the contents are periodically read.
 	// The last successfully read value takes precedence over BearerToken.
 	BearerTokenFile string
 
-	// Impersonate is the con***REMOVED***guration that RESTClient will use for impersonation.
-	Impersonate ImpersonationCon***REMOVED***g
+	// Impersonate is the configuration that RESTClient will use for impersonation.
+	Impersonate ImpersonationConfig
 
-	// Server requires plugin-speci***REMOVED***ed authentication.
-	AuthProvider *clientcmdapi.AuthProviderCon***REMOVED***g
+	// Server requires plugin-specified authentication.
+	AuthProvider *clientcmdapi.AuthProviderConfig
 
-	// Callback to persist con***REMOVED***g for AuthProvider.
-	AuthCon***REMOVED***gPersister AuthProviderCon***REMOVED***gPersister
+	// Callback to persist config for AuthProvider.
+	AuthConfigPersister AuthProviderConfigPersister
 
 	// Exec-based authentication provider.
-	ExecProvider *clientcmdapi.ExecCon***REMOVED***g
+	ExecProvider *clientcmdapi.ExecConfig
 
-	// TLSClientCon***REMOVED***g contains settings to enable transport layer security
-	TLSClientCon***REMOVED***g
+	// TLSClientConfig contains settings to enable transport layer security
+	TLSClientConfig
 
-	// UserAgent is an optional ***REMOVED***eld that speci***REMOVED***es the caller of this request.
+	// UserAgent is an optional field that specifies the caller of this request.
 	UserAgent string
 
 	// Transport may be used for custom HTTP behavior. This attribute may not
-	// be speci***REMOVED***ed with the TLS client certi***REMOVED***cate options. Use WrapTransport
+	// be specified with the TLS client certificate options. Use WrapTransport
 	// for most client level operations.
 	Transport http.RoundTripper
 	// WrapTransport will be invoked for custom HTTP behavior after the underlying
-	// transport is initialized (either the transport created from TLSClientCon***REMOVED***g,
-	// Transport, or http.DefaultTransport). The con***REMOVED***g may layer other RoundTrippers
+	// transport is initialized (either the transport created from TLSClientConfig,
+	// Transport, or http.DefaultTransport). The config may layer other RoundTrippers
 	// on top of the returned RoundTripper.
 	WrapTransport func(rt http.RoundTripper) http.RoundTripper
 
@@ -117,58 +117,58 @@ type Con***REMOVED***g struct {
 	// The maximum length of time to wait before giving up on a server request. A value of zero means no timeout.
 	Timeout time.Duration
 
-	// Dial speci***REMOVED***es the dial function for creating unencrypted TCP connections.
+	// Dial specifies the dial function for creating unencrypted TCP connections.
 	Dial func(ctx context.Context, network, address string) (net.Conn, error)
 
-	// Version forces a speci***REMOVED***c version to be used (if registered)
+	// Version forces a specific version to be used (if registered)
 	// Do we need this?
 	// Version string
 }
 
-// ImpersonationCon***REMOVED***g has all the available impersonation options
-type ImpersonationCon***REMOVED***g struct {
+// ImpersonationConfig has all the available impersonation options
+type ImpersonationConfig struct {
 	// UserName is the username to impersonate on each request.
 	UserName string
 	// Groups are the groups to impersonate on each request.
 	Groups []string
-	// Extra is a free-form ***REMOVED***eld which can be used to link some authentication information
-	// to authorization information.  This ***REMOVED***eld allows you to impersonate it.
+	// Extra is a free-form field which can be used to link some authentication information
+	// to authorization information.  This field allows you to impersonate it.
 	Extra map[string][]string
 }
 
 // +k8s:deepcopy-gen=true
-// TLSClientCon***REMOVED***g contains settings to enable transport layer security
-type TLSClientCon***REMOVED***g struct {
-	// Server should be accessed without verifying the TLS certi***REMOVED***cate. For testing only.
+// TLSClientConfig contains settings to enable transport layer security
+type TLSClientConfig struct {
+	// Server should be accessed without verifying the TLS certificate. For testing only.
 	Insecure bool
 	// ServerName is passed to the server for SNI and is used in the client to check server
-	// ceriti***REMOVED***cates against. If ServerName is empty, the hostname used to contact the
+	// ceritificates against. If ServerName is empty, the hostname used to contact the
 	// server is used.
 	ServerName string
 
-	// Server requires TLS client certi***REMOVED***cate authentication
+	// Server requires TLS client certificate authentication
 	CertFile string
-	// Server requires TLS client certi***REMOVED***cate authentication
+	// Server requires TLS client certificate authentication
 	KeyFile string
-	// Trusted root certi***REMOVED***cates for server
+	// Trusted root certificates for server
 	CAFile string
 
-	// CertData holds PEM-encoded bytes (typically read from a client certi***REMOVED***cate ***REMOVED***le).
+	// CertData holds PEM-encoded bytes (typically read from a client certificate file).
 	// CertData takes precedence over CertFile
 	CertData []byte
-	// KeyData holds PEM-encoded bytes (typically read from a client certi***REMOVED***cate key ***REMOVED***le).
+	// KeyData holds PEM-encoded bytes (typically read from a client certificate key file).
 	// KeyData takes precedence over KeyFile
 	KeyData []byte
-	// CAData holds PEM-encoded bytes (typically read from a root certi***REMOVED***cates bundle).
+	// CAData holds PEM-encoded bytes (typically read from a root certificates bundle).
 	// CAData takes precedence over CAFile
 	CAData []byte
 }
 
-type ContentCon***REMOVED***g struct {
-	// AcceptContentTypes speci***REMOVED***es the types the client will accept and is optional.
-	// If not set, ContentType will be used to de***REMOVED***ne the Accept header
+type ContentConfig struct {
+	// AcceptContentTypes specifies the types the client will accept and is optional.
+	// If not set, ContentType will be used to define the Accept header
 	AcceptContentTypes string
-	// ContentType speci***REMOVED***es the wire format used to communicate with the server.
+	// ContentType specifies the wire format used to communicate with the server.
 	// This value will be set as the Accept header on requests made to the server, and
 	// as the default content type on any object sent to the server. If not set,
 	// "application/json" is used.
@@ -182,32 +182,32 @@ type ContentCon***REMOVED***g struct {
 	NegotiatedSerializer runtime.NegotiatedSerializer
 }
 
-// RESTClientFor returns a RESTClient that satis***REMOVED***es the requested attributes on a client Con***REMOVED***g
-// object. Note that a RESTClient may require ***REMOVED***elds that are optional when initializing a Client.
+// RESTClientFor returns a RESTClient that satisfies the requested attributes on a client Config
+// object. Note that a RESTClient may require fields that are optional when initializing a Client.
 // A RESTClient created by this method is generic - it expects to operate on an API that follows
 // the Kubernetes conventions, but may not be the Kubernetes API.
-func RESTClientFor(con***REMOVED***g *Con***REMOVED***g) (*RESTClient, error) {
-	if con***REMOVED***g.GroupVersion == nil {
+func RESTClientFor(config *Config) (*RESTClient, error) {
+	if config.GroupVersion == nil {
 		return nil, fmt.Errorf("GroupVersion is required when initializing a RESTClient")
 	}
-	if con***REMOVED***g.NegotiatedSerializer == nil {
+	if config.NegotiatedSerializer == nil {
 		return nil, fmt.Errorf("NegotiatedSerializer is required when initializing a RESTClient")
 	}
-	qps := con***REMOVED***g.QPS
-	if con***REMOVED***g.QPS == 0.0 {
+	qps := config.QPS
+	if config.QPS == 0.0 {
 		qps = DefaultQPS
 	}
-	burst := con***REMOVED***g.Burst
-	if con***REMOVED***g.Burst == 0 {
+	burst := config.Burst
+	if config.Burst == 0 {
 		burst = DefaultBurst
 	}
 
-	baseURL, versionedAPIPath, err := defaultServerUrlFor(con***REMOVED***g)
+	baseURL, versionedAPIPath, err := defaultServerUrlFor(config)
 	if err != nil {
 		return nil, err
 	}
 
-	transport, err := TransportFor(con***REMOVED***g)
+	transport, err := TransportFor(config)
 	if err != nil {
 		return nil, err
 	}
@@ -215,27 +215,27 @@ func RESTClientFor(con***REMOVED***g *Con***REMOVED***g) (*RESTClient, error) {
 	var httpClient *http.Client
 	if transport != http.DefaultTransport {
 		httpClient = &http.Client{Transport: transport}
-		if con***REMOVED***g.Timeout > 0 {
-			httpClient.Timeout = con***REMOVED***g.Timeout
+		if config.Timeout > 0 {
+			httpClient.Timeout = config.Timeout
 		}
 	}
 
-	return NewRESTClient(baseURL, versionedAPIPath, con***REMOVED***g.ContentCon***REMOVED***g, qps, burst, con***REMOVED***g.RateLimiter, httpClient)
+	return NewRESTClient(baseURL, versionedAPIPath, config.ContentConfig, qps, burst, config.RateLimiter, httpClient)
 }
 
 // UnversionedRESTClientFor is the same as RESTClientFor, except that it allows
-// the con***REMOVED***g.Version to be empty.
-func UnversionedRESTClientFor(con***REMOVED***g *Con***REMOVED***g) (*RESTClient, error) {
-	if con***REMOVED***g.NegotiatedSerializer == nil {
+// the config.Version to be empty.
+func UnversionedRESTClientFor(config *Config) (*RESTClient, error) {
+	if config.NegotiatedSerializer == nil {
 		return nil, fmt.Errorf("NegotiatedSerializer is required when initializing a RESTClient")
 	}
 
-	baseURL, versionedAPIPath, err := defaultServerUrlFor(con***REMOVED***g)
+	baseURL, versionedAPIPath, err := defaultServerUrlFor(config)
 	if err != nil {
 		return nil, err
 	}
 
-	transport, err := TransportFor(con***REMOVED***g)
+	transport, err := TransportFor(config)
 	if err != nil {
 		return nil, err
 	}
@@ -243,30 +243,30 @@ func UnversionedRESTClientFor(con***REMOVED***g *Con***REMOVED***g) (*RESTClient
 	var httpClient *http.Client
 	if transport != http.DefaultTransport {
 		httpClient = &http.Client{Transport: transport}
-		if con***REMOVED***g.Timeout > 0 {
-			httpClient.Timeout = con***REMOVED***g.Timeout
+		if config.Timeout > 0 {
+			httpClient.Timeout = config.Timeout
 		}
 	}
 
-	versionCon***REMOVED***g := con***REMOVED***g.ContentCon***REMOVED***g
-	if versionCon***REMOVED***g.GroupVersion == nil {
+	versionConfig := config.ContentConfig
+	if versionConfig.GroupVersion == nil {
 		v := metav1.SchemeGroupVersion
-		versionCon***REMOVED***g.GroupVersion = &v
+		versionConfig.GroupVersion = &v
 	}
 
-	return NewRESTClient(baseURL, versionedAPIPath, versionCon***REMOVED***g, con***REMOVED***g.QPS, con***REMOVED***g.Burst, con***REMOVED***g.RateLimiter, httpClient)
+	return NewRESTClient(baseURL, versionedAPIPath, versionConfig, config.QPS, config.Burst, config.RateLimiter, httpClient)
 }
 
-// SetKubernetesDefaults sets default values on the provided client con***REMOVED***g for accessing the
+// SetKubernetesDefaults sets default values on the provided client config for accessing the
 // Kubernetes API or returns an error if any of the defaults are impossible or invalid.
-func SetKubernetesDefaults(con***REMOVED***g *Con***REMOVED***g) error {
-	if len(con***REMOVED***g.UserAgent) == 0 {
-		con***REMOVED***g.UserAgent = DefaultKubernetesUserAgent()
+func SetKubernetesDefaults(config *Config) error {
+	if len(config.UserAgent) == 0 {
+		config.UserAgent = DefaultKubernetesUserAgent()
 	}
 	return nil
 }
 
-// adjustCommit returns suf***REMOVED***cient signi***REMOVED***cant ***REMOVED***gures of the commit's git hash.
+// adjustCommit returns sufficient significant figures of the commit's git hash.
 func adjustCommit(c string) string {
 	if len(c) == 0 {
 		return "unknown"
@@ -288,13 +288,13 @@ func adjustVersion(v string) string {
 }
 
 // adjustCommand returns the last component of the
-// OS-speci***REMOVED***c command path for use in User-Agent.
+// OS-specific command path for use in User-Agent.
 func adjustCommand(p string) string {
 	// Unlikely, but better than returning "".
 	if len(p) == 0 {
 		return "unknown"
 	}
-	return ***REMOVED***lepath.Base(p)
+	return filepath.Base(p)
 }
 
 // buildUserAgent builds a User-Agent string from given args.
@@ -313,11 +313,11 @@ func DefaultKubernetesUserAgent() string {
 		adjustCommit(version.Get().GitCommit))
 }
 
-// InClusterCon***REMOVED***g returns a con***REMOVED***g object which uses the service account
+// InClusterConfig returns a config object which uses the service account
 // kubernetes gives to pods. It's intended for clients that expect to be
 // running inside a pod running on kubernetes. It will return ErrNotInCluster
 // if called from a process not running in a kubernetes environment.
-func InClusterCon***REMOVED***g() (*Con***REMOVED***g, error) {
+func InClusterConfig() (*Config, error) {
 	const (
 		tokenFile  = "/var/run/secrets/kubernetes.io/serviceaccount/token"
 		rootCAFile = "/var/run/secrets/kubernetes.io/serviceaccount/ca.crt"
@@ -332,42 +332,42 @@ func InClusterCon***REMOVED***g() (*Con***REMOVED***g, error) {
 		return nil, err
 	}
 
-	tlsClientCon***REMOVED***g := TLSClientCon***REMOVED***g{}
+	tlsClientConfig := TLSClientConfig{}
 
 	if _, err := certutil.NewPool(rootCAFile); err != nil {
-		klog.Errorf("Expected to load root CA con***REMOVED***g from %s, but got err: %v", rootCAFile, err)
-	} ***REMOVED*** {
-		tlsClientCon***REMOVED***g.CAFile = rootCAFile
+		klog.Errorf("Expected to load root CA config from %s, but got err: %v", rootCAFile, err)
+	} else {
+		tlsClientConfig.CAFile = rootCAFile
 	}
 
-	return &Con***REMOVED***g{
+	return &Config{
 		// TODO: switch to using cluster DNS.
 		Host:            "https://" + net.JoinHostPort(host, port),
-		TLSClientCon***REMOVED***g: tlsClientCon***REMOVED***g,
+		TLSClientConfig: tlsClientConfig,
 		BearerToken:     string(token),
 		BearerTokenFile: tokenFile,
 	}, nil
 }
 
-// IsCon***REMOVED***gTransportTLS returns true if and only if the provided
-// con***REMOVED***g will result in a protected connection to the server when it
+// IsConfigTransportTLS returns true if and only if the provided
+// config will result in a protected connection to the server when it
 // is passed to restclient.RESTClientFor().  Use to determine when to
 // send credentials over the wire.
 //
 // Note: the Insecure flag is ignored when testing for this value, so MITM attacks are
 // still possible.
-func IsCon***REMOVED***gTransportTLS(con***REMOVED***g Con***REMOVED***g) bool {
-	baseURL, _, err := defaultServerUrlFor(&con***REMOVED***g)
+func IsConfigTransportTLS(config Config) bool {
+	baseURL, _, err := defaultServerUrlFor(&config)
 	if err != nil {
 		return false
 	}
 	return baseURL.Scheme == "https"
 }
 
-// LoadTLSFiles copies the data from the CertFile, KeyFile, and CAFile ***REMOVED***elds into the CertData,
-// KeyData, and CAFile ***REMOVED***elds, or returns an error. If no error is returned, all three ***REMOVED***elds are
+// LoadTLSFiles copies the data from the CertFile, KeyFile, and CAFile fields into the CertData,
+// KeyData, and CAFile fields, or returns an error. If no error is returned, all three fields are
 // either populated or were empty to start.
-func LoadTLSFiles(c *Con***REMOVED***g) error {
+func LoadTLSFiles(c *Config) error {
 	var err error
 	c.CAData, err = dataFromSliceOrFile(c.CAData, c.CAFile)
 	if err != nil {
@@ -386,87 +386,87 @@ func LoadTLSFiles(c *Con***REMOVED***g) error {
 	return nil
 }
 
-// dataFromSliceOrFile returns data from the slice (if non-empty), or from the ***REMOVED***le,
-// or an error if an error occurred reading the ***REMOVED***le
-func dataFromSliceOrFile(data []byte, ***REMOVED***le string) ([]byte, error) {
+// dataFromSliceOrFile returns data from the slice (if non-empty), or from the file,
+// or an error if an error occurred reading the file
+func dataFromSliceOrFile(data []byte, file string) ([]byte, error) {
 	if len(data) > 0 {
 		return data, nil
 	}
-	if len(***REMOVED***le) > 0 {
-		***REMOVED***leData, err := ioutil.ReadFile(***REMOVED***le)
+	if len(file) > 0 {
+		fileData, err := ioutil.ReadFile(file)
 		if err != nil {
 			return []byte{}, err
 		}
-		return ***REMOVED***leData, nil
+		return fileData, nil
 	}
 	return nil, nil
 }
 
-func AddUserAgent(con***REMOVED***g *Con***REMOVED***g, userAgent string) *Con***REMOVED***g {
+func AddUserAgent(config *Config, userAgent string) *Config {
 	fullUserAgent := DefaultKubernetesUserAgent() + "/" + userAgent
-	con***REMOVED***g.UserAgent = fullUserAgent
-	return con***REMOVED***g
+	config.UserAgent = fullUserAgent
+	return config
 }
 
-// AnonymousClientCon***REMOVED***g returns a copy of the given con***REMOVED***g with all user credentials (cert/key, bearer token, and username/password) removed
-func AnonymousClientCon***REMOVED***g(con***REMOVED***g *Con***REMOVED***g) *Con***REMOVED***g {
-	// copy only known safe ***REMOVED***elds
-	return &Con***REMOVED***g{
-		Host:          con***REMOVED***g.Host,
-		APIPath:       con***REMOVED***g.APIPath,
-		ContentCon***REMOVED***g: con***REMOVED***g.ContentCon***REMOVED***g,
-		TLSClientCon***REMOVED***g: TLSClientCon***REMOVED***g{
-			Insecure:   con***REMOVED***g.Insecure,
-			ServerName: con***REMOVED***g.ServerName,
-			CAFile:     con***REMOVED***g.TLSClientCon***REMOVED***g.CAFile,
-			CAData:     con***REMOVED***g.TLSClientCon***REMOVED***g.CAData,
+// AnonymousClientConfig returns a copy of the given config with all user credentials (cert/key, bearer token, and username/password) removed
+func AnonymousClientConfig(config *Config) *Config {
+	// copy only known safe fields
+	return &Config{
+		Host:          config.Host,
+		APIPath:       config.APIPath,
+		ContentConfig: config.ContentConfig,
+		TLSClientConfig: TLSClientConfig{
+			Insecure:   config.Insecure,
+			ServerName: config.ServerName,
+			CAFile:     config.TLSClientConfig.CAFile,
+			CAData:     config.TLSClientConfig.CAData,
 		},
-		RateLimiter:   con***REMOVED***g.RateLimiter,
-		UserAgent:     con***REMOVED***g.UserAgent,
-		Transport:     con***REMOVED***g.Transport,
-		WrapTransport: con***REMOVED***g.WrapTransport,
-		QPS:           con***REMOVED***g.QPS,
-		Burst:         con***REMOVED***g.Burst,
-		Timeout:       con***REMOVED***g.Timeout,
-		Dial:          con***REMOVED***g.Dial,
+		RateLimiter:   config.RateLimiter,
+		UserAgent:     config.UserAgent,
+		Transport:     config.Transport,
+		WrapTransport: config.WrapTransport,
+		QPS:           config.QPS,
+		Burst:         config.Burst,
+		Timeout:       config.Timeout,
+		Dial:          config.Dial,
 	}
 }
 
-// CopyCon***REMOVED***g returns a copy of the given con***REMOVED***g
-func CopyCon***REMOVED***g(con***REMOVED***g *Con***REMOVED***g) *Con***REMOVED***g {
-	return &Con***REMOVED***g{
-		Host:            con***REMOVED***g.Host,
-		APIPath:         con***REMOVED***g.APIPath,
-		ContentCon***REMOVED***g:   con***REMOVED***g.ContentCon***REMOVED***g,
-		Username:        con***REMOVED***g.Username,
-		Password:        con***REMOVED***g.Password,
-		BearerToken:     con***REMOVED***g.BearerToken,
-		BearerTokenFile: con***REMOVED***g.BearerTokenFile,
-		Impersonate: ImpersonationCon***REMOVED***g{
-			Groups:   con***REMOVED***g.Impersonate.Groups,
-			Extra:    con***REMOVED***g.Impersonate.Extra,
-			UserName: con***REMOVED***g.Impersonate.UserName,
+// CopyConfig returns a copy of the given config
+func CopyConfig(config *Config) *Config {
+	return &Config{
+		Host:            config.Host,
+		APIPath:         config.APIPath,
+		ContentConfig:   config.ContentConfig,
+		Username:        config.Username,
+		Password:        config.Password,
+		BearerToken:     config.BearerToken,
+		BearerTokenFile: config.BearerTokenFile,
+		Impersonate: ImpersonationConfig{
+			Groups:   config.Impersonate.Groups,
+			Extra:    config.Impersonate.Extra,
+			UserName: config.Impersonate.UserName,
 		},
-		AuthProvider:        con***REMOVED***g.AuthProvider,
-		AuthCon***REMOVED***gPersister: con***REMOVED***g.AuthCon***REMOVED***gPersister,
-		ExecProvider:        con***REMOVED***g.ExecProvider,
-		TLSClientCon***REMOVED***g: TLSClientCon***REMOVED***g{
-			Insecure:   con***REMOVED***g.TLSClientCon***REMOVED***g.Insecure,
-			ServerName: con***REMOVED***g.TLSClientCon***REMOVED***g.ServerName,
-			CertFile:   con***REMOVED***g.TLSClientCon***REMOVED***g.CertFile,
-			KeyFile:    con***REMOVED***g.TLSClientCon***REMOVED***g.KeyFile,
-			CAFile:     con***REMOVED***g.TLSClientCon***REMOVED***g.CAFile,
-			CertData:   con***REMOVED***g.TLSClientCon***REMOVED***g.CertData,
-			KeyData:    con***REMOVED***g.TLSClientCon***REMOVED***g.KeyData,
-			CAData:     con***REMOVED***g.TLSClientCon***REMOVED***g.CAData,
+		AuthProvider:        config.AuthProvider,
+		AuthConfigPersister: config.AuthConfigPersister,
+		ExecProvider:        config.ExecProvider,
+		TLSClientConfig: TLSClientConfig{
+			Insecure:   config.TLSClientConfig.Insecure,
+			ServerName: config.TLSClientConfig.ServerName,
+			CertFile:   config.TLSClientConfig.CertFile,
+			KeyFile:    config.TLSClientConfig.KeyFile,
+			CAFile:     config.TLSClientConfig.CAFile,
+			CertData:   config.TLSClientConfig.CertData,
+			KeyData:    config.TLSClientConfig.KeyData,
+			CAData:     config.TLSClientConfig.CAData,
 		},
-		UserAgent:     con***REMOVED***g.UserAgent,
-		Transport:     con***REMOVED***g.Transport,
-		WrapTransport: con***REMOVED***g.WrapTransport,
-		QPS:           con***REMOVED***g.QPS,
-		Burst:         con***REMOVED***g.Burst,
-		RateLimiter:   con***REMOVED***g.RateLimiter,
-		Timeout:       con***REMOVED***g.Timeout,
-		Dial:          con***REMOVED***g.Dial,
+		UserAgent:     config.UserAgent,
+		Transport:     config.Transport,
+		WrapTransport: config.WrapTransport,
+		QPS:           config.QPS,
+		Burst:         config.Burst,
+		RateLimiter:   config.RateLimiter,
+		Timeout:       config.Timeout,
+		Dial:          config.Dial,
 	}
 }

@@ -1,6 +1,6 @@
 // Copyright 2015 The Go Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE ***REMOVED***le.
+// license that can be found in the LICENSE file.
 
 package bidi
 
@@ -10,17 +10,17 @@ import (
 	"sort"
 )
 
-// This ***REMOVED***le contains a port of the reference implementation of the
+// This file contains a port of the reference implementation of the
 // Bidi Parentheses Algorithm:
 // http://www.unicode.org/Public/PROGRAMS/BidiReferenceJava/BidiPBAReference.java
 //
-// The implementation in this ***REMOVED***le covers de***REMOVED***nitions BD14-BD16 and rule N0
+// The implementation in this file covers definitions BD14-BD16 and rule N0
 // of UAX#9.
 //
 // Some preprocessing is done for each rune before data is passed to this
 // algorithm:
-//  - opening and closing brackets are identi***REMOVED***ed
-//  - a bracket pair type, like '(' and ')' is assigned a unique identi***REMOVED***er that
+//  - opening and closing brackets are identified
+//  - a bracket pair type, like '(' and ')' is assigned a unique identifier that
 //    is identical for the opening and closing bracket. It is left to do these
 //    mappings.
 //  - The BPA algorithm requires that bracket characters that are canonical
@@ -28,7 +28,7 @@ import (
 //    It is the responsibility of the caller to do this canonicalization.
 //
 // In implementing BD16, this implementation departs slightly from the "logical"
-// algorithm de***REMOVED***ned in UAX#9. In particular, the stack referenced there
+// algorithm defined in UAX#9. In particular, the stack referenced there
 // supports operations that go beyond a "basic" stack. An equivalent
 // implementation based on a linked list is used here.
 
@@ -67,10 +67,10 @@ func (b bracketPairs) Less(i, j int) bool { return b[i].opener < b[j].opener }
 // resolvePairedBrackets runs the paired bracket part of the UBA algorithm.
 //
 // For each rune, it takes the indexes into the original string, the class the
-// bracket type (in pairTypes) and the bracket identi***REMOVED***er (pairValues). It also
+// bracket type (in pairTypes) and the bracket identifier (pairValues). It also
 // takes the direction type for the start-of-sentence and the embedding level.
 //
-// The identi***REMOVED***ers for bracket types are the rune of the canonicalized opening
+// The identifiers for bracket types are the rune of the canonicalized opening
 // bracket for brackets (open or close) or 0 for runes that are not brackets.
 func resolvePairedBrackets(s *isolatingRunSequence) {
 	p := bracketPairer{
@@ -131,7 +131,7 @@ const maxPairingDepth = 63
 //
 // This implementation uses a linked list instead of a stack, because, while
 // elements are added at the front (like a push) they are not generally removed
-// in atomic 'pop' operations, reducing the bene***REMOVED***t of the stack archetype.
+// in atomic 'pop' operations, reducing the benefit of the stack archetype.
 func (p *bracketPairer) locateBrackets(pairTypes []bracketType, pairValues []rune) {
 	// traverse the run
 	// do that explicitly (not in a for-each) so we can record position
@@ -149,7 +149,7 @@ func (p *bracketPairer) locateBrackets(pairTypes []bracketType, pairValues []run
 				p.openers.Init()
 				return
 			}
-			// remember opener location, most recent ***REMOVED***rst
+			// remember opener location, most recent first
 			p.openers.PushFront(i)
 
 		case bpClose:
@@ -203,8 +203,8 @@ func (p *bracketPairer) locateBrackets(pairTypes []bracketType, pairValues []run
 //
 // c Otherwise, if a strong type (opposite the embedding direction) is
 // found, test for adjacent strong types as follows: 1 First, check
-// backwards before the opening paired bracket until the ***REMOVED***rst strong type
-// (L, R, or sos) is found. If that ***REMOVED***rst preceding strong type is opposite
+// backwards before the opening paired bracket until the first strong type
+// (L, R, or sos) is found. If that first preceding strong type is opposite
 // the embedding direction, then set the type for both brackets in the pair
 // to that type. 2 Otherwise, set the type for both brackets in the pair to
 // the embedding direction.
@@ -298,7 +298,7 @@ func (p *bracketPairer) assignBracketType(loc bracketPair, dirEmbed Class, initi
 			dirPair = dirEmbed
 		}
 	}
-	// ***REMOVED***: case "b", strong type found matching embedding,
+	// else: case "b", strong type found matching embedding,
 	// no explicit action needed, as dirPair is already set to embedding
 	// direction
 

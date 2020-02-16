@@ -2,7 +2,7 @@
 Copyright 2015 The Kubernetes Authors.
 
 Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this ***REMOVED***le except in compliance with the License.
+you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
 
     http://www.apache.org/licenses/LICENSE-2.0
@@ -10,7 +10,7 @@ You may obtain a copy of the License at
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the speci***REMOVED***c language governing permissions and
+See the License for the specific language governing permissions and
 limitations under the License.
 */
 
@@ -43,7 +43,7 @@ func DefaultNameSystem() string {
 	return "public"
 }
 
-// Packages makes the sets package de***REMOVED***nition.
+// Packages makes the sets package definition.
 func Packages(_ *generator.Context, arguments *args.GeneratorArgs) generator.Packages {
 	boilerplate, err := arguments.LoadGoBoilerplate()
 	if err != nil {
@@ -58,27 +58,27 @@ func Packages(_ *generator.Context, arguments *args.GeneratorArgs) generator.Pac
 			`// Package sets has auto-generated set types.
 `),
 		// GeneratorFunc returns a list of generators. Each generator makes a
-		// single ***REMOVED***le.
+		// single file.
 		GeneratorFunc: func(c *generator.Context) (generators []generator.Generator) {
 			generators = []generator.Generator{
-				// Always generate a "doc.go" ***REMOVED***le.
+				// Always generate a "doc.go" file.
 				generator.DefaultGen{OptionalName: "doc"},
-				// Make a separate ***REMOVED***le for the Empty type, since it's shared by every type.
+				// Make a separate file for the Empty type, since it's shared by every type.
 				generator.DefaultGen{
 					OptionalName: "empty",
 					OptionalBody: []byte(emptyTypeDecl),
 				},
 			}
-			// Since we want a ***REMOVED***le per type that we generate a set for, we
+			// Since we want a file per type that we generate a set for, we
 			// have to provide a function for this.
 			for _, t := range c.Order {
 				generators = append(generators, &genSet{
 					DefaultGen: generator.DefaultGen{
 						// Use the privatized version of the
-						// type name as the ***REMOVED***le name.
+						// type name as the file name.
 						//
 						// TODO: make a namer that converts
-						// camelCase to '-' separation for ***REMOVED***le
+						// camelCase to '-' separation for file
 						// names?
 						OptionalName: c.Namers["private"].Name(t),
 					},
@@ -90,7 +90,7 @@ func Packages(_ *generator.Context, arguments *args.GeneratorArgs) generator.Pac
 			return generators
 		},
 		FilterFunc: func(c *generator.Context, t *types.Type) bool {
-			// It would be reasonable to ***REMOVED***lter by the type's package here.
+			// It would be reasonable to filter by the type's package here.
 			// It might be necessary if your input directory has a big
 			// import graph.
 			switch t.Kind {
@@ -111,7 +111,7 @@ func Packages(_ *generator.Context, arguments *args.GeneratorArgs) generator.Pac
 	}}
 }
 
-// genSet produces a ***REMOVED***le with a set for a single type.
+// genSet produces a file with a set for a single type.
 type genSet struct {
 	generator.DefaultGen
 	outputPackage string
@@ -119,7 +119,7 @@ type genSet struct {
 	imports       namer.ImportTracker
 }
 
-// Filter ignores all but one type because we're making a single ***REMOVED***le per type.
+// Filter ignores all but one type because we're making a single file per type.
 func (g *genSet) Filter(c *generator.Context, t *types.Type) bool { return t == g.typeToMatch }
 
 func (g *genSet) Namers(c *generator.Context) namer.NameSystems {
@@ -148,7 +148,7 @@ func (g *genSet) args(t *types.Type, kv ...interface{}) interface{} {
 	return m
 }
 
-// GenerateType makes the body of a ***REMOVED***le implementing a set for type t.
+// GenerateType makes the body of a file implementing a set for type t.
 func (g *genSet) GenerateType(c *generator.Context, t *types.Type, w io.Writer) error {
 	sw := generator.NewSnippetWriter(w, c, "$", "$")
 	sw.Do(setCode, g.args(t))
@@ -172,7 +172,7 @@ func (g *genSet) lessBody(sw *generator.SnippetWriter, t *types.Type) {
 	}
 }
 
-// written to the "empty.go" ***REMOVED***le.
+// written to the "empty.go" file.
 var emptyTypeDecl = `
 // Empty is public since it is used by some internal API objects for conversions between external
 // string arrays and internal sets, and conversion logic requires public types today.
@@ -288,7 +288,7 @@ func (s1 $.type|public$) Intersection(s2 $.type|public$) $.type|public$ {
 	if s1.Len() < s2.Len() {
 		walk = s1
 		other = s2
-	} ***REMOVED*** {
+	} else {
 		walk = s2
 		other = s1
 	}

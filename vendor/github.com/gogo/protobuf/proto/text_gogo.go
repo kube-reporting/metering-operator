@@ -4,7 +4,7 @@
 // http://github.com/gogo/protobuf
 //
 // Redistribution and use in source and binary forms, with or without
-// modi***REMOVED***cation, are permitted provided that the following conditions are
+// modification, are permitted provided that the following conditions are
 // met:
 //
 //     * Redistributions of source code must retain the above copyright
@@ -43,7 +43,7 @@ func (tm *TextMarshaler) writeEnum(w *textWriter, v reflect.Value, props *Proper
 	key := int32(0)
 	if v.Kind() == reflect.Ptr {
 		key = int32(v.Elem().Int())
-	} ***REMOVED*** {
+	} else {
 		key = int32(v.Int())
 	}
 	s, ok := m[key]

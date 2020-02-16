@@ -1,10 +1,10 @@
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements. See the NOTICE ***REMOVED***le
+ * or more contributor license agreements. See the NOTICE file
  * distributed with this work for additional information
- * regarding copyright ownership. The ASF licenses this ***REMOVED***le
+ * regarding copyright ownership. The ASF licenses this file
  * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this ***REMOVED***le except in compliance
+ * "License"); you may not use this file except in compliance
  * with the License. You may obtain a copy of the License at
  *
  *   http://www.apache.org/licenses/LICENSE-2.0
@@ -13,14 +13,14 @@
  * software distributed under the License is distributed on an
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
  * KIND, either express or implied. See the License for the
- * speci***REMOVED***c language governing permissions and limitations
+ * specific language governing permissions and limitations
  * under the License.
  */
 
 package thrift
 
 import (
-	"bu***REMOVED***o"
+	"bufio"
 	"bytes"
 	"encoding/binary"
 	"fmt"
@@ -32,7 +32,7 @@ const DEFAULT_MAX_LENGTH = 16384000
 type TFramedTransport struct {
 	transport TTransport
 	buf       bytes.Buffer
-	reader    *bu***REMOVED***o.Reader
+	reader    *bufio.Reader
 	frameSize uint32 //Current remaining size of the frame. if ==0 read next frame header
 	buffer    [4]byte
 	maxLength uint32
@@ -60,11 +60,11 @@ func (p *tFramedTransportFactory) GetTransport(base TTransport) (TTransport, err
 }
 
 func NewTFramedTransport(transport TTransport) *TFramedTransport {
-	return &TFramedTransport{transport: transport, reader: bu***REMOVED***o.NewReader(transport), maxLength: DEFAULT_MAX_LENGTH}
+	return &TFramedTransport{transport: transport, reader: bufio.NewReader(transport), maxLength: DEFAULT_MAX_LENGTH}
 }
 
 func NewTFramedTransportMaxLength(transport TTransport, maxLength uint32) *TFramedTransport {
-	return &TFramedTransport{transport: transport, reader: bu***REMOVED***o.NewReader(transport), maxLength: maxLength}
+	return &TFramedTransport{transport: transport, reader: bufio.NewReader(transport), maxLength: maxLength}
 }
 
 func (p *TFramedTransport) Open() error {

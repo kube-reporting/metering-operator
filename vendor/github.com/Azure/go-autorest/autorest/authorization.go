@@ -3,7 +3,7 @@ package autorest
 // Copyright 2017 Microsoft Corporation
 //
 //  Licensed under the Apache License, Version 2.0 (the "License");
-//  you may not use this ***REMOVED***le except in compliance with the License.
+//  you may not use this file except in compliance with the License.
 //  You may obtain a copy of the License at
 //
 //      http://www.apache.org/licenses/LICENSE-2.0
@@ -11,7 +11,7 @@ package autorest
 //  Unless required by applicable law or agreed to in writing, software
 //  distributed under the License is distributed on an "AS IS" BASIS,
 //  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-//  See the License for the speci***REMOVED***c language governing permissions and
+//  See the License for the specific language governing permissions and
 //  limitations under the License.
 
 import (
@@ -120,7 +120,7 @@ func (ba *BearerAuthorizer) WithAuthorization() PrepareDecorator {
 				// the ordering is important here, prefer RefresherWithContext if available
 				if refresher, ok := ba.tokenProvider.(adal.RefresherWithContext); ok {
 					err = refresher.EnsureFreshWithContext(r.Context())
-				} ***REMOVED*** if refresher, ok := ba.tokenProvider.(adal.Refresher); ok {
+				} else if refresher, ok := ba.tokenProvider.(adal.Refresher); ok {
 					err = refresher.EnsureFresh()
 				}
 				if err != nil {
@@ -249,7 +249,7 @@ type EventGridKeyAuthorizer struct {
 }
 
 // NewEventGridKeyAuthorizer creates a new EventGridKeyAuthorizer
-// with the speci***REMOVED***ed topic key.
+// with the specified topic key.
 func NewEventGridKeyAuthorizer(topicKey string) EventGridKeyAuthorizer {
 	return EventGridKeyAuthorizer{topicKey: topicKey}
 }
@@ -269,7 +269,7 @@ type BasicAuthorizer struct {
 	password string
 }
 
-// NewBasicAuthorizer creates a new BasicAuthorizer with the speci***REMOVED***ed username and password.
+// NewBasicAuthorizer creates a new BasicAuthorizer with the specified username and password.
 func NewBasicAuthorizer(userName, password string) *BasicAuthorizer {
 	return &BasicAuthorizer{
 		userName: userName,

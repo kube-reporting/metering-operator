@@ -1,9 +1,9 @@
 // Copyright 2016 The Go Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE ***REMOVED***le.
+// license that can be found in the LICENSE file.
 
 // Package httplex contains rules around lexical matters of various
-// HTTP-related speci***REMOVED***cations.
+// HTTP-related specifications.
 //
 // This package is shared by the standard library (which vendors it)
 // and x/net/http2. It comes with no API stability promise.
@@ -117,7 +117,7 @@ func HeaderValuesContainsToken(values []string, token string) bool {
 	return false
 }
 
-// isOWS reports whether b is an optional whitespace byte, as de***REMOVED***ned
+// isOWS reports whether b is an optional whitespace byte, as defined
 // by RFC 7230 section 3.2.3.
 func isOWS(b byte) bool { return b == ' ' || b == '\t' }
 
@@ -193,8 +193,8 @@ func isCTL(b byte) bool {
 // letters are not allowed.
 //
 //  RFC 7230 says:
-//   header-***REMOVED***eld   = ***REMOVED***eld-name ":" OWS ***REMOVED***eld-value OWS
-//   ***REMOVED***eld-name     = token
+//   header-field   = field-name ":" OWS field-value OWS
+//   field-name     = token
 //   token          = 1*tchar
 //   tchar = "!" / "#" / "$" / "%" / "&" / "'" / "*" / "+" / "-" / "." /
 //           "^" / "_" / "`" / "|" / "~" / DIGIT / ALPHA
@@ -267,12 +267,12 @@ var validHostByte = [256]bool{
 	'~':  true, // unreserved
 }
 
-// ValidHeaderFieldValue reports whether v is a valid "***REMOVED***eld-value" according to
+// ValidHeaderFieldValue reports whether v is a valid "field-value" according to
 // http://www.w3.org/Protocols/rfc2616/rfc2616-sec4.html#sec4.2 :
 //
-//        message-header = ***REMOVED***eld-name ":" [ ***REMOVED***eld-value ]
-//        ***REMOVED***eld-value    = *( ***REMOVED***eld-content | LWS )
-//        ***REMOVED***eld-content  = <the OCTETs making up the ***REMOVED***eld-value
+//        message-header = field-name ":" [ field-value ]
+//        field-value    = *( field-content | LWS )
+//        field-content  = <the OCTETs making up the field-value
 //                         and consisting of either *TEXT or combinations
 //                         of token, separators, and quoted-string>
 //
@@ -285,22 +285,22 @@ var validHostByte = [256]bool{
 //                         (octets 0 - 31) and DEL (127)>
 //
 // RFC 7230 says:
-//  ***REMOVED***eld-value    = *( ***REMOVED***eld-content / obs-fold )
+//  field-value    = *( field-content / obs-fold )
 //  obj-fold       =  N/A to http2, and deprecated
-//  ***REMOVED***eld-content  = ***REMOVED***eld-vchar [ 1*( SP / HTAB ) ***REMOVED***eld-vchar ]
-//  ***REMOVED***eld-vchar    = VCHAR / obs-text
+//  field-content  = field-vchar [ 1*( SP / HTAB ) field-vchar ]
+//  field-vchar    = VCHAR / obs-text
 //  obs-text       = %x80-FF
 //  VCHAR          = "any visible [USASCII] character"
 //
-// http2 further says: "Similarly, HTTP/2 allows header ***REMOVED***eld values
+// http2 further says: "Similarly, HTTP/2 allows header field values
 // that are not valid. While most of the values that can be encoded
-// will not alter header ***REMOVED***eld parsing, carriage return (CR, ASCII
+// will not alter header field parsing, carriage return (CR, ASCII
 // 0xd), line feed (LF, ASCII 0xa), and the zero character (NUL, ASCII
 // 0x0) might be exploited by an attacker if they are translated
 // verbatim. Any request or response that contains a character not
-// permitted in a header ***REMOVED***eld value MUST be treated as malformed
-// (Section 8.1.2.6). Valid characters are de***REMOVED***ned by the
-// ***REMOVED***eld-content ABNF rule in Section 3.2 of [RFC7230]."
+// permitted in a header field value MUST be treated as malformed
+// (Section 8.1.2.6). Valid characters are defined by the
+// field-content ABNF rule in Section 3.2 of [RFC7230]."
 //
 // This function does not (yet?) properly handle the rejection of
 // strings that begin or end with SP or HTAB.

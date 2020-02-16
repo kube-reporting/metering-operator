@@ -1,8 +1,8 @@
 // Copyright 2014 The Go Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE ***REMOVED***le.
+// license that can be found in the LICENSE file.
 
-// Package context de***REMOVED***nes the Context type, which carries deadlines,
+// Package context defines the Context type, which carries deadlines,
 // cancelation signals, and other request-scoped values across API boundaries
 // and between processes.
 // As of Go 1.7 this package is available in the standard library under the
@@ -10,7 +10,7 @@
 //
 // Incoming requests to a server should create a Context, and outgoing calls to
 // servers should accept a Context. The chain of function calls between must
-// propagate the Context, optionally replacing it with a modi***REMOVED***ed copy created
+// propagate the Context, optionally replacing it with a modified copy created
 // using WithDeadline, WithTimeout, WithCancel, or WithValue.
 //
 // Programs that use Contexts should follow these rules to keep interfaces
@@ -18,7 +18,7 @@
 // propagation:
 //
 // Do not store Contexts inside a struct type; instead, pass a Context
-// explicitly to each function that needs it. The Context should be the ***REMOVED***rst
+// explicitly to each function that needs it. The Context should be the first
 // parameter, typically named ctx:
 //
 // 	func DoSomething(ctx context.Context, arg Arg) error {

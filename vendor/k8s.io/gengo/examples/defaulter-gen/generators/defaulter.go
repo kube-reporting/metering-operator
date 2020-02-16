@@ -2,7 +2,7 @@
 Copyright 2016 The Kubernetes Authors.
 
 Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this ***REMOVED***le except in compliance with the License.
+you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
 
     http://www.apache.org/licenses/LICENSE-2.0
@@ -10,7 +10,7 @@ You may obtain a copy of the License at
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the speci***REMOVED***c language governing permissions and
+See the License for the specific language governing permissions and
 limitations under the License.
 */
 
@@ -20,7 +20,7 @@ import (
 	"bytes"
 	"fmt"
 	"io"
-	"path/***REMOVED***lepath"
+	"path/filepath"
 	"reflect"
 	"strings"
 
@@ -32,7 +32,7 @@ import (
 	"k8s.io/klog"
 )
 
-// CustomArgs is used tby the go2idl framework to pass args speci***REMOVED***c to this
+// CustomArgs is used tby the go2idl framework to pass args specific to this
 // generator.
 type CustomArgs struct {
 	ExtraPeerDirs []string // Always consider these as last-ditch possibilities for conversions.
@@ -60,7 +60,7 @@ func checkTag(comments []string, require ...string) bool {
 
 func defaultFnNamer() *namer.NameStrategy {
 	return &namer.NameStrategy{
-		Pre***REMOVED***x: "SetDefaults_",
+		Prefix: "SetDefaults_",
 		Join: func(pre string, in []string, post string) string {
 			return pre + strings.Join(in, "_") + post
 		},
@@ -69,7 +69,7 @@ func defaultFnNamer() *namer.NameStrategy {
 
 func objectDefaultFnNamer() *namer.NameStrategy {
 	return &namer.NameStrategy{
-		Pre***REMOVED***x: "SetObjectDefaults_",
+		Prefix: "SetObjectDefaults_",
 		Join: func(pre string, in []string, post string) string {
 			return pre + strings.Join(in, "_") + post
 		},
@@ -98,8 +98,8 @@ type defaults struct {
 	// object is the defaulter function for a top level type (typically one with TypeMeta) that
 	// invokes all child defaulters. May be nil if the object defaulter has not yet been generated.
 	object *types.Type
-	// base is a defaulter function de***REMOVED***ned for a type SetDefaults_Pod which does not invoke all
-	// child defaults - the base defaulter alone is insuf***REMOVED***cient to default a type
+	// base is a defaulter function defined for a type SetDefaults_Pod which does not invoke all
+	// child defaults - the base defaulter alone is insufficient to default a type
 	base *types.Type
 	// additional is zero or more defaulter functions of the form SetDefaults_Pod_XXXX that can be
 	// included in the Object defaulter.
@@ -110,7 +110,7 @@ type defaults struct {
 // the underlying type being "Func".
 type defaulterFuncMap map[*types.Type]defaults
 
-// Returns all manually-de***REMOVED***ned defaulting functions in the package.
+// Returns all manually-defined defaulting functions in the package.
 func getManualDefaultingFunctions(context *generator.Context, pkg *types.Package, manualMap defaulterFuncMap) {
 	buffer := &bytes.Buffer{}
 	sw := generator.NewSnippetWriter(buffer, context, "$", "$")
@@ -129,7 +129,7 @@ func getManualDefaultingFunctions(context *generator.Context, pkg *types.Package
 		// Note that all of them have signature:
 		// object: func SetObjectDefaults_inType(*inType)
 		// base: func SetDefaults_inType(*inType)
-		// additional: func SetDefaults_inType_Quali***REMOVED***er(*inType)
+		// additional: func SetDefaults_inType_Qualifier(*inType)
 		if signature.Receiver != nil {
 			continue
 		}
@@ -152,14 +152,14 @@ func getManualDefaultingFunctions(context *generator.Context, pkg *types.Package
 			// We might scan the same package twice, and that's OK.
 			v, ok := manualMap[key]
 			if ok && v.base != nil && v.base.Name.Package != pkg.Path {
-				panic(fmt.Sprintf("duplicate static defaulter de***REMOVED***ned: %#v", key))
+				panic(fmt.Sprintf("duplicate static defaulter defined: %#v", key))
 			}
 			v.base = f
 			manualMap[key] = v
 			klog.V(6).Infof("found base defaulter function for %s from %s", key.Name, f.Name)
 		// Is one of the additional defaulters - a top level defaulter on a type that is
 		// also invoked.
-		case strings.HasPre***REMOVED***x(f.Name.Name, buffer.String()+"_"):
+		case strings.HasPrefix(f.Name.Name, buffer.String()+"_"):
 			key := inType.Elem
 			v, ok := manualMap[key]
 			if ok {
@@ -185,7 +185,7 @@ func getManualDefaultingFunctions(context *generator.Context, pkg *types.Package
 			// We might scan the same package twice, and that's OK.
 			v, ok := manualMap[key]
 			if ok && v.base != nil && v.base.Name.Package != pkg.Path {
-				panic(fmt.Sprintf("duplicate static defaulter de***REMOVED***ned: %#v", key))
+				panic(fmt.Sprintf("duplicate static defaulter defined: %#v", key))
 			}
 			v.object = f
 			manualMap[key] = v
@@ -217,12 +217,12 @@ func Packages(context *generator.Context, arguments *args.GeneratorArgs) generat
 		klog.V(5).Infof("considering pkg %q", i)
 		pkg := context.Universe[i]
 		if pkg == nil {
-			// If the input had no Go ***REMOVED***les, for example.
+			// If the input had no Go files, for example.
 			continue
 		}
-		// typesPkg is where the types that needs defaulter are de***REMOVED***ned.
+		// typesPkg is where the types that needs defaulter are defined.
 		// Sometimes it is different from pkg. For example, kubernetes core/v1
-		// types are de***REMOVED***ned in vendor/k8s.io/api/core/v1, while pkg is at
+		// types are defined in vendor/k8s.io/api/core/v1, while pkg is at
 		// pkg/api/v1.
 		typesPkg := pkg
 
@@ -247,7 +247,7 @@ func Packages(context *generator.Context, arguments *args.GeneratorArgs) generat
 		typesWith := extractTag(pkg.Comments)
 		shouldCreateObjectDefaulterFn := func(t *types.Type) bool {
 			if defaults, ok := existingDefaulters[t]; ok && defaults.object != nil {
-				// A default generator is de***REMOVED***ned
+				// A default generator is defined
 				klog.V(5).Infof("  an object defaulter already exists as %s", defaults.base.Name)
 				return false
 			}
@@ -260,14 +260,14 @@ func Packages(context *generator.Context, arguments *args.GeneratorArgs) generat
 				return true
 			}
 			// For every k8s:defaulter-gen tag at the package level, interpret the value as a
-			// ***REMOVED***eld name (like TypeMeta, ListMeta, ObjectMeta) and trigger defaulter generation
-			// for any type with any of the matching ***REMOVED***eld names. Provides a more useful package
+			// field name (like TypeMeta, ListMeta, ObjectMeta) and trigger defaulter generation
+			// for any type with any of the matching field names. Provides a more useful package
 			// level defaulting than global (because we only need defaulters on a subset of objects -
 			// usually those with TypeMeta).
 			if t.Kind == types.Struct && len(typesWith) > 0 {
-				for _, ***REMOVED***eld := range t.Members {
+				for _, field := range t.Members {
 					for _, s := range typesWith {
-						if ***REMOVED***eld.Name == s {
+						if field.Name == s {
 							return true
 						}
 					}
@@ -283,7 +283,7 @@ func Packages(context *generator.Context, arguments *args.GeneratorArgs) generat
 		}
 		if len(inputTags) == 1 {
 			var err error
-			typesPkg, err = context.AddDirectory(***REMOVED***lepath.Join(pkg.Path, inputTags[0]))
+			typesPkg, err = context.AddDirectory(filepath.Join(pkg.Path, inputTags[0]))
 			if err != nil {
 				klog.Fatalf("cannot import package %s", inputTags[0])
 			}
@@ -307,7 +307,7 @@ func Packages(context *generator.Context, arguments *args.GeneratorArgs) generat
 			newDefaulters[t] = defaults{}
 		}
 
-		// only generate defaulters for objects that actually have de***REMOVED***ned defaulters
+		// only generate defaulters for objects that actually have defined defaulters
 		// prevents empty defaulters from being registered
 		for {
 			promoted := 0
@@ -353,12 +353,12 @@ func Packages(context *generator.Context, arguments *args.GeneratorArgs) generat
 		// if the source path is within a /vendor/ directory (for example,
 		// k8s.io/kubernetes/vendor/k8s.io/apimachinery/pkg/apis/meta/v1), allow
 		// generation to output to the proper relative path (under vendor).
-		// Otherwise, the generator will create the ***REMOVED***le in the wrong location
+		// Otherwise, the generator will create the file in the wrong location
 		// in the output directory.
-		// TODO: build a more fundamental concept in gengo for dealing with modi***REMOVED***cations
+		// TODO: build a more fundamental concept in gengo for dealing with modifications
 		// to vendored packages.
-		if strings.HasPre***REMOVED***x(pkg.SourcePath, arguments.OutputBase) {
-			expandedPath := strings.TrimPre***REMOVED***x(pkg.SourcePath, arguments.OutputBase)
+		if strings.HasPrefix(pkg.SourcePath, arguments.OutputBase) {
+			expandedPath := strings.TrimPrefix(pkg.SourcePath, arguments.OutputBase)
 			if strings.Contains(expandedPath, "/vendor/") {
 				path = expandedPath
 			}
@@ -366,7 +366,7 @@ func Packages(context *generator.Context, arguments *args.GeneratorArgs) generat
 
 		packages = append(packages,
 			&generator.DefaultPackage{
-				PackageName: ***REMOVED***lepath.Base(pkg.Path),
+				PackageName: filepath.Base(pkg.Path),
 				PackagePath: path,
 				HeaderText:  header,
 				GeneratorFunc: func(c *generator.Context) (generators []generator.Generator) {
@@ -382,7 +382,7 @@ func Packages(context *generator.Context, arguments *args.GeneratorArgs) generat
 	return packages
 }
 
-// callTreeForType contains ***REMOVED***elds necessary to build a tree for types.
+// callTreeForType contains fields necessary to build a tree for types.
 type callTreeForType struct {
 	existingDefaulters     defaulterFuncMap
 	newDefaulters          defaulterFuncMap
@@ -397,13 +397,13 @@ func newCallTreeForType(existingDefaulters, newDefaulters defaulterFuncMap) *cal
 	}
 }
 
-// build creates a tree of paths to ***REMOVED***elds (based on how they would be accessed in Go - pointer, elem,
-// slice, or key) and the functions that should be invoked on each ***REMOVED***eld. An in-order traversal of the resulting tree
+// build creates a tree of paths to fields (based on how they would be accessed in Go - pointer, elem,
+// slice, or key) and the functions that should be invoked on each field. An in-order traversal of the resulting tree
 // can be used to generate a Go function that invokes each nested function on the appropriate type. The return
 // value may be nil if there are no functions to call on type or the type is a primitive (Defaulters can only be
 // invoked on structs today). When root is true this function will not use a newDefaulter. existingDefaulters should
-// contain all defaulting functions by type de***REMOVED***ned in code - newDefaulters should contain all object defaulters
-// that could be or will be generated. If newDefaulters has an entry for a type, but the 'object' ***REMOVED***eld is nil,
+// contain all defaulting functions by type defined in code - newDefaulters should contain all object defaulters
+// that could be or will be generated. If newDefaulters has an entry for a type, but the 'object' field is nil,
 // this function skips adding that defaulter - this allows us to avoid generating object defaulter functions for
 // list types that call empty defaulters.
 func (c *callTreeForType) build(t *types.Type, root bool) *callNode {
@@ -419,7 +419,7 @@ func (c *callTreeForType) build(t *types.Type, root bool) *callNode {
 	switch {
 	case !root && generated && newDefaults.object != nil:
 		parent.call = append(parent.call, newDefaults.object)
-		// if we will be generating the defaulter, it by de***REMOVED***nition is a covering
+		// if we will be generating the defaulter, it by definition is a covering
 		// defaulter, so we halt recursion
 		klog.V(6).Infof("the defaulter %s will be generated as an object defaulter", t.Name)
 		return parent
@@ -439,7 +439,7 @@ func (c *callTreeForType) build(t *types.Type, root bool) *callNode {
 		}
 	}
 
-	// base has been added already, now add any additional defaulters de***REMOVED***ned for this object
+	// base has been added already, now add any additional defaulters defined for this object
 	parent.call = append(parent.call, defaults.additional...)
 
 	// if the type already exists, don't build the tree for it and don't generate anything.
@@ -476,17 +476,17 @@ func (c *callTreeForType) build(t *types.Type, root bool) *callNode {
 			parent.children = append(parent.children, *child)
 		}
 	case types.Struct:
-		for _, ***REMOVED***eld := range t.Members {
-			name := ***REMOVED***eld.Name
+		for _, field := range t.Members {
+			name := field.Name
 			if len(name) == 0 {
-				if ***REMOVED***eld.Type.Kind == types.Pointer {
-					name = ***REMOVED***eld.Type.Elem.Name.Name
-				} ***REMOVED*** {
-					name = ***REMOVED***eld.Type.Name.Name
+				if field.Type.Kind == types.Pointer {
+					name = field.Type.Elem.Name.Name
+				} else {
+					name = field.Type.Name.Name
 				}
 			}
-			if child := c.build(***REMOVED***eld.Type, false); child != nil {
-				child.***REMOVED***eld = name
+			if child := c.build(field.Type, false); child != nil {
+				child.field = name
 				parent.children = append(parent.children, *child)
 			}
 		}
@@ -507,7 +507,7 @@ const (
 	conversionPackagePath = "k8s.io/apimachinery/pkg/conversion"
 )
 
-// genDefaulter produces a ***REMOVED***le with a autogenerated conversions.
+// genDefaulter produces a file with a autogenerated conversions.
 type genDefaulter struct {
 	generator.DefaultGen
 	typesPackage       string
@@ -535,7 +535,7 @@ func NewGenDefaulter(sanitizedName, typesPackage, outputPackage string, existing
 }
 
 func (g *genDefaulter) Namers(c *generator.Context) namer.NameSystems {
-	// Have the raw namer for this ***REMOVED***le track what it imports.
+	// Have the raw namer for this file track what it imports.
 	return namer.NameSystems{
 		"raw": namer.NewRawNamer(g.outputPackage, g.imports),
 	}
@@ -545,7 +545,7 @@ func (g *genDefaulter) isOtherPackage(pkg string) bool {
 	if pkg == g.outputPackage {
 		return false
 	}
-	if strings.HasSuf***REMOVED***x(pkg, `"`+g.outputPackage+`"`) {
+	if strings.HasSuffix(pkg, `"`+g.outputPackage+`"`) {
 		return false
 	}
 	return true
@@ -600,7 +600,7 @@ func (g *genDefaulter) GenerateType(c *generator.Context, t *types.Type, w io.Wr
 
 	callTree := newCallTreeForType(g.existingDefaulters, g.newDefaulters).build(t, true)
 	if callTree == nil {
-		klog.V(5).Infof("  no defaulters de***REMOVED***ned")
+		klog.V(5).Infof("  no defaulters defined")
 		return nil
 	}
 	i := 0
@@ -644,28 +644,28 @@ func (g *genDefaulter) generateDefaulter(inType *types.Type, callTree *callNode,
 // That would be represented by a call tree like:
 //
 //   callNode
-//     ***REMOVED***eld: "Spec"
+//     field: "Spec"
 //     children:
-//     - ***REMOVED***eld: "Containers"
+//     - field: "Containers"
 //       children:
 //       - index: true
 //         children:
-//         - ***REMOVED***eld: "LifecycleHook"
+//         - field: "LifecycleHook"
 //           elem: true
 //           call:
 //           - SetDefaults_LifecycleHook
 //
-// which we can traverse to build that Go struct (you must call the ***REMOVED***eld Spec, then Containers, then range over
-// that ***REMOVED***eld, then check whether the LifecycleHook ***REMOVED***eld is nil, before calling SetDefaults_LifecycleHook on
-// the pointer to that ***REMOVED***eld).
+// which we can traverse to build that Go struct (you must call the field Spec, then Containers, then range over
+// that field, then check whether the LifecycleHook field is nil, before calling SetDefaults_LifecycleHook on
+// the pointer to that field).
 type callNode struct {
-	// ***REMOVED***eld is the name of the Go member to access
-	***REMOVED***eld string
+	// field is the name of the Go member to access
+	field string
 	// key is true if this is a map and we must range over the key and values
 	key bool
 	// index is true if this is a slice and we must range over the slice values
 	index bool
-	// elem is true if the previous elements refer to a pointer (typically just ***REMOVED***eld)
+	// elem is true if the previous elements refer to a pointer (typically just field)
 	elem bool
 
 	// call is all of the functions that must be invoked on this particular node, in order
@@ -696,23 +696,23 @@ var (
 )
 
 // varsForDepth creates temporary variables guaranteed to be unique within lexical Go scopes
-// of this depth in a function. It uses canonical Go loop variables for the ***REMOVED***rst 7 levels
-// and then resorts to uglier pre***REMOVED***xes.
+// of this depth in a function. It uses canonical Go loop variables for the first 7 levels
+// and then resorts to uglier prefixes.
 func varsForDepth(depth int) (index, local string) {
 	if depth > len(indexVariables) {
 		index = fmt.Sprintf("i%d", depth)
-	} ***REMOVED*** {
+	} else {
 		index = indexVariables[depth : depth+1]
 	}
 	if depth > len(localVariables) {
 		local = fmt.Sprintf("local%d", depth)
-	} ***REMOVED*** {
+	} else {
 		local = localVariables[depth : depth+1]
 	}
 	return
 }
 
-// writeCalls generates a list of function calls based on the calls ***REMOVED***eld for the provided variable
+// writeCalls generates a list of function calls based on the calls field for the provided variable
 // name and pointer.
 func (n *callNode) writeCalls(varName string, isVarPointer bool, sw *generator.SnippetWriter) {
 	accessor := varName
@@ -735,8 +735,8 @@ func (n *callNode) WriteMethod(varName string, depth int, ancestors []*callNode,
 	// 	sw.Do(fmt.Sprintf("// %s\n", callPath(append(ancestors, n)).String()), nil)
 	// }
 
-	if len(n.***REMOVED***eld) > 0 {
-		varName = varName + "." + n.***REMOVED***eld
+	if len(n.field) > 0 {
+		varName = varName + "." + n.field
 	}
 
 	index, local := varsForDepth(depth)
@@ -756,7 +756,7 @@ func (n *callNode) WriteMethod(varName string, depth int, ancestors []*callNode,
 		sw.Do("for $.index$ := range $.var$ {\n", vars)
 		if n.elem {
 			sw.Do("$.local$ := $.var$[$.index$]\n", vars)
-		} ***REMOVED*** {
+		} else {
 			sw.Do("$.local$ := &$.var$[$.index$]\n", vars)
 		}
 
@@ -793,25 +793,25 @@ func (path callPath) String() string {
 		case p.elem:
 			if len(parts) > 0 {
 				parts[last] = "*" + parts[last]
-			} ***REMOVED*** {
+			} else {
 				parts = append(parts, "*")
 			}
 		case p.index:
 			if len(parts) > 0 {
 				parts[last] = parts[last] + "[i]"
-			} ***REMOVED*** {
+			} else {
 				parts = append(parts, "[i]")
 			}
 		case p.key:
 			if len(parts) > 0 {
 				parts[last] = parts[last] + "[key]"
-			} ***REMOVED*** {
+			} else {
 				parts = append(parts, "[key]")
 			}
 		default:
-			if len(p.***REMOVED***eld) > 0 {
-				parts = append(parts, p.***REMOVED***eld)
-			} ***REMOVED*** {
+			if len(p.field) > 0 {
+				parts = append(parts, p.field)
+			} else {
 				parts = append(parts, "<root>")
 			}
 		}

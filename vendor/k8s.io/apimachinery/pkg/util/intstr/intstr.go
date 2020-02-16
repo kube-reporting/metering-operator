@@ -2,7 +2,7 @@
 Copyright 2014 The Kubernetes Authors.
 
 Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this ***REMOVED***le except in compliance with the License.
+you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
 
     http://www.apache.org/licenses/LICENSE-2.0
@@ -10,7 +10,7 @@ You may obtain a copy of the License at
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the speci***REMOVED***c language governing permissions and
+See the License for the specific language governing permissions and
 limitations under the License.
 */
 
@@ -31,7 +31,7 @@ import (
 
 // IntOrString is a type that can hold an int32 or a string.  When used in
 // JSON or YAML marshalling and unmarshalling, it produces or consumes the
-// inner type.  This allows you to have, for example, a JSON ***REMOVED***eld that can
+// inner type.  This allows you to have, for example, a JSON field that can
 // accept a name or number.
 // TODO: Rename to Int32OrString
 //
@@ -136,7 +136,7 @@ func (intstr *IntOrString) Fuzz(c fuzz.Continue) {
 		intstr.Type = Int
 		c.Fuzz(&intstr.IntVal)
 		intstr.StrVal = ""
-	} ***REMOVED*** {
+	} else {
 		intstr.Type = String
 		intstr.IntVal = 0
 		c.Fuzz(&intstr.StrVal)
@@ -161,7 +161,7 @@ func GetValueFromIntOrPercent(intOrPercent *IntOrString, total int, roundUp bool
 	if isPercent {
 		if roundUp {
 			value = int(math.Ceil(float64(value) * (float64(total)) / 100))
-		} ***REMOVED*** {
+		} else {
 			value = int(math.Floor(float64(value) * (float64(total)) / 100))
 		}
 	}

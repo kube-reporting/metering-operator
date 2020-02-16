@@ -1,7 +1,7 @@
 // Copyright 2010 Google Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this ***REMOVED***le except in compliance with the License.
+// you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 //
 //     http://www.apache.org/licenses/LICENSE-2.0
@@ -9,14 +9,14 @@
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the speci***REMOVED***c language governing permissions and
+// See the License for the specific language governing permissions and
 // limitations under the License.
 
 // MockGen generates mock implementations of Go interfaces.
 package main
 
 // TODO: This does not support recursive embedded interfaces.
-// TODO: This does not support embedding package-local interfaces in a separate ***REMOVED***le.
+// TODO: This does not support embedding package-local interfaces in a separate file.
 
 import (
 	"bytes"
@@ -29,7 +29,7 @@ import (
 	"log"
 	"os"
 	"path"
-	"path/***REMOVED***lepath"
+	"path/filepath"
 	"sort"
 	"strconv"
 	"strings"
@@ -43,11 +43,11 @@ const (
 )
 
 var (
-	source          = flag.String("source", "", "(source mode) Input Go source ***REMOVED***le; enables source mode.")
-	destination     = flag.String("destination", "", "Output ***REMOVED***le; defaults to stdout.")
-	mockNames       = flag.String("mock_names", "", "Comma-separated interfaceName=mockName pairs of explicit mock names to use. Mock names default to 'Mock'+ interfaceName suf***REMOVED***x.")
-	packageOut      = flag.String("package", "", "Package of the generated code; defaults to the package of the input with a 'mock_' pre***REMOVED***x.")
-	selfPackage     = flag.String("self_package", "", "The full package import path for the generated code. The purpose of this flag is to prevent import cycles in the generated code by trying to include its own package. This can happen if the mock's package is set to one of its inputs (usually the main one) and the output is stdio so mockgen cannot detect the ***REMOVED***nal output package. Setting this flag will then tell mockgen which import to exclude.")
+	source          = flag.String("source", "", "(source mode) Input Go source file; enables source mode.")
+	destination     = flag.String("destination", "", "Output file; defaults to stdout.")
+	mockNames       = flag.String("mock_names", "", "Comma-separated interfaceName=mockName pairs of explicit mock names to use. Mock names default to 'Mock'+ interfaceName suffix.")
+	packageOut      = flag.String("package", "", "Package of the generated code; defaults to the package of the input with a 'mock_' prefix.")
+	selfPackage     = flag.String("self_package", "", "The full package import path for the generated code. The purpose of this flag is to prevent import cycles in the generated code by trying to include its own package. This can happen if the mock's package is set to one of its inputs (usually the main one) and the output is stdio so mockgen cannot detect the final output package. Setting this flag will then tell mockgen which import to exclude.")
 	writePkgComment = flag.Bool("write_package_comment", true, "Writes package documentation comment (godoc) if true.")
 
 	debugParser = flag.Bool("debug_parser", false, "Print out parser results only.")
@@ -61,7 +61,7 @@ func main() {
 	var err error
 	if *source != "" {
 		pkg, err = ParseFile(*source)
-	} ***REMOVED*** {
+	} else {
 		if flag.NArg() != 2 {
 			usage()
 			log.Fatal("Expected exactly two arguments")
@@ -81,7 +81,7 @@ func main() {
 	if len(*destination) > 0 {
 		f, err := os.Create(*destination)
 		if err != nil {
-			log.Fatalf("Failed opening destination ***REMOVED***le: %v", err)
+			log.Fatalf("Failed opening destination file: %v", err)
 		}
 		defer f.Close()
 		dst = f
@@ -94,7 +94,7 @@ func main() {
 		packageName = "mock_" + sanitize(pkg.Name)
 	}
 
-	// outputPackagePath represents the fully quali***REMOVED***ed name of the package of
+	// outputPackagePath represents the fully qualified name of the package of
 	// the generated code. Its purposes are to prevent the module from importing
 	// itself and to prevent qualifying type names that come from its own
 	// package (i.e. if there is a type called X then we want to print "X" not
@@ -102,10 +102,10 @@ func main() {
 	// is output into an already existing package.
 	outputPackagePath := *selfPackage
 	if len(outputPackagePath) == 0 && len(*destination) > 0 {
-		dst, _ := ***REMOVED***lepath.Abs(***REMOVED***lepath.Dir(*destination))
-		for _, pre***REMOVED***x := range build.Default.SrcDirs() {
-			if strings.HasPre***REMOVED***x(dst, pre***REMOVED***x) {
-				if rel, err := ***REMOVED***lepath.Rel(pre***REMOVED***x, dst); err == nil {
+		dst, _ := filepath.Abs(filepath.Dir(*destination))
+		for _, prefix := range build.Default.SrcDirs() {
+			if strings.HasPrefix(dst, prefix) {
+				if rel, err := filepath.Rel(prefix, dst); err == nil {
 					outputPackagePath = rel
 					break
 				}
@@ -115,8 +115,8 @@ func main() {
 
 	g := new(generator)
 	if *source != "" {
-		g.***REMOVED***lename = *source
-	} ***REMOVED*** {
+		g.filename = *source
+	} else {
 		g.srcPackage = flag.Arg(0)
 		g.srcInterfaces = flag.Arg(1)
 	}
@@ -150,9 +150,9 @@ func usage() {
 
 const usageText = `mockgen has two modes of operation: source and reflect.
 
-Source mode generates mock interfaces from a source ***REMOVED***le.
+Source mode generates mock interfaces from a source file.
 It is enabled by using the -source flag. Other flags that
-may be useful in this mode are -imports and -aux_***REMOVED***les.
+may be useful in this mode are -imports and -aux_files.
 Example:
 	mockgen -source=foo.go [other options]
 
@@ -169,7 +169,7 @@ type generator struct {
 	buf                       bytes.Buffer
 	indent                    string
 	mockNames                 map[string]string //may be empty
-	***REMOVED***lename                  string            // may be empty
+	filename                  string            // may be empty
 	srcPackage, srcInterfaces string            // may be empty
 
 	packageMap map[string]string // map from import path to package name
@@ -205,7 +205,7 @@ func sanitize(s string) string {
 				t += string(r)
 				continue
 			}
-		} ***REMOVED*** {
+		} else {
 			if unicode.IsLetter(r) || unicode.IsDigit(r) || r == '_' {
 				t += string(r)
 				continue
@@ -221,9 +221,9 @@ func sanitize(s string) string {
 
 func (g *generator) Generate(pkg *model.Package, pkgName string, outputPackagePath string) error {
 	g.p("// Code generated by MockGen. DO NOT EDIT.")
-	if g.***REMOVED***lename != "" {
-		g.p("// Source: %v", g.***REMOVED***lename)
-	} ***REMOVED*** {
+	if g.filename != "" {
+		g.p("// Source: %v", g.filename)
+	} else {
 		g.p("// Source: %v (interfaces: %v)", g.srcPackage, g.srcInterfaces)
 	}
 	g.p("")
@@ -299,7 +299,7 @@ func (g *generator) Generate(pkg *model.Package, pkgName string, outputPackagePa
 	return nil
 }
 
-// The name of the mock type to use for the given interface identi***REMOVED***er.
+// The name of the mock type to use for the given interface identifier.
 func (g *generator) mockName(typeName string) string {
 	if mockName, ok := g.mockNames[typeName]; ok {
 		return mockName
@@ -330,7 +330,7 @@ func (g *generator) GenerateMockInterface(intf *model.Interface, outputPackagePa
 	g.p("")
 
 	// TODO: Re-enable this if we can import the interface reliably.
-	//g.p("// Verify that the mock satis***REMOVED***es the interface at compile time.")
+	//g.p("// Verify that the mock satisfies the interface at compile time.")
 	//g.p("var _ %v = (*%v)(nil)", typeName, mockType)
 	//g.p("")
 
@@ -372,7 +372,7 @@ func makeArgString(argNames, argTypes []string) string {
 		// specify the type only once for consecutive args of the same type
 		if i+1 < len(argTypes) && argTypes[i] == argTypes[i+1] {
 			args[i] = name
-		} ***REMOVED*** {
+		} else {
 			args[i] = name + " " + argTypes[i]
 		}
 	}
@@ -380,7 +380,7 @@ func makeArgString(argNames, argTypes []string) string {
 }
 
 // GenerateMockMethod generates a mock method implementation.
-// If non-empty, pkgOverride is the package in which unquali***REMOVED***ed types reside.
+// If non-empty, pkgOverride is the package in which unqualified types reside.
 func (g *generator) GenerateMockMethod(mockType string, m *model.Method, pkgOverride string) error {
 	argNames := g.getArgNames(m)
 	argTypes := g.getArgTypes(m, pkgOverride)
@@ -398,8 +398,8 @@ func (g *generator) GenerateMockMethod(mockType string, m *model.Method, pkgOver
 		retString = " " + retString
 	}
 
-	ia := newIdenti***REMOVED***erAllocator(argNames)
-	idRecv := ia.allocateIdenti***REMOVED***er("m")
+	ia := newIdentifierAllocator(argNames)
+	idRecv := ia.allocateIdentifier("m")
 
 	g.p("// %v mocks base method", m.Name)
 	g.p("func (%v *%v) %v(%v)%v {", idRecv, mockType, m.Name, argString, retString)
@@ -410,11 +410,11 @@ func (g *generator) GenerateMockMethod(mockType string, m *model.Method, pkgOver
 		if len(argNames) > 0 {
 			callArgs = ", " + strings.Join(argNames, ", ")
 		}
-	} ***REMOVED*** {
+	} else {
 		// Non-trivial. The generated code must build a []interface{},
 		// but the variadic argument may be any type.
-		idVarArgs := ia.allocateIdenti***REMOVED***er("varargs")
-		idVArg := ia.allocateIdenti***REMOVED***er("a")
+		idVarArgs := ia.allocateIdentifier("varargs")
+		idVArg := ia.allocateIdentifier("a")
 		g.p("%s := []interface{}{%s}", idVarArgs, strings.Join(argNames[:len(argNames)-1], ", "))
 		g.p("for _, %s := range %s {", idVArg, argNames[len(argNames)-1])
 		g.in()
@@ -425,8 +425,8 @@ func (g *generator) GenerateMockMethod(mockType string, m *model.Method, pkgOver
 	}
 	if len(m.Out) == 0 {
 		g.p(`%v.ctrl.Call(%v, %q%v)`, idRecv, idRecv, m.Name, callArgs)
-	} ***REMOVED*** {
-		idRet := ia.allocateIdenti***REMOVED***er("ret")
+	} else {
+		idRet := ia.allocateIdentifier("ret")
 		g.p(`%v := %v.ctrl.Call(%v, %q%v)`, idRet, idRecv, idRecv, m.Name, callArgs)
 
 		// Go does not allow "naked" type assertions on nil values, so we use the two-value form here.
@@ -434,7 +434,7 @@ func (g *generator) GenerateMockMethod(mockType string, m *model.Method, pkgOver
 		// Happily, this coincides with the semantics we want here.
 		retNames := make([]string, len(rets))
 		for i, t := range rets {
-			retNames[i] = ia.allocateIdenti***REMOVED***er(fmt.Sprintf("ret%d", i))
+			retNames[i] = ia.allocateIdentifier(fmt.Sprintf("ret%d", i))
 			g.p("%s, _ := %s[%d].(%s)", retNames[i], idRet, i, t)
 		}
 		g.p("return " + strings.Join(retNames, ", "))
@@ -451,7 +451,7 @@ func (g *generator) GenerateMockRecorderMethod(mockType string, m *model.Method)
 	var argString string
 	if m.Variadic == nil {
 		argString = strings.Join(argNames, ", ")
-	} ***REMOVED*** {
+	} else {
 		argString = strings.Join(argNames[:len(argNames)-1], ", ")
 	}
 	if argString != "" {
@@ -465,8 +465,8 @@ func (g *generator) GenerateMockRecorderMethod(mockType string, m *model.Method)
 		argString += fmt.Sprintf("%s ...interface{}", argNames[len(argNames)-1])
 	}
 
-	ia := newIdenti***REMOVED***erAllocator(argNames)
-	idRecv := ia.allocateIdenti***REMOVED***er("mr")
+	ia := newIdentifierAllocator(argNames)
+	idRecv := ia.allocateIdentifier("mr")
 
 	g.p("// %v indicates an expected call of %v", m.Name, m.Name)
 	g.p("func (%s *%vMockRecorder) %v(%v) *gomock.Call {", idRecv, mockType, m.Name, argString)
@@ -477,13 +477,13 @@ func (g *generator) GenerateMockRecorderMethod(mockType string, m *model.Method)
 		if len(argNames) > 0 {
 			callArgs = ", " + strings.Join(argNames, ", ")
 		}
-	} ***REMOVED*** {
+	} else {
 		if len(argNames) == 1 {
 			// Easy: just use ... to push the arguments through.
 			callArgs = ", " + argNames[0] + "..."
-		} ***REMOVED*** {
+		} else {
 			// Hard: create a temporary slice.
-			idVarArgs := ia.allocateIdenti***REMOVED***er("varargs")
+			idVarArgs := ia.allocateIdentifier("varargs")
 			g.p("%s := append([]interface{}{%s}, %s...)",
 				idVarArgs,
 				strings.Join(argNames[:len(argNames)-1], ", "),
@@ -528,17 +528,17 @@ func (g *generator) getArgTypes(m *model.Method, pkgOverride string) []string {
 	return argTypes
 }
 
-type identi***REMOVED***erAllocator map[string]struct{}
+type identifierAllocator map[string]struct{}
 
-func newIdenti***REMOVED***erAllocator(taken []string) identi***REMOVED***erAllocator {
-	a := make(identi***REMOVED***erAllocator, len(taken))
+func newIdentifierAllocator(taken []string) identifierAllocator {
+	a := make(identifierAllocator, len(taken))
 	for _, s := range taken {
 		a[s] = struct{}{}
 	}
 	return a
 }
 
-func (o identi***REMOVED***erAllocator) allocateIdenti***REMOVED***er(want string) string {
+func (o identifierAllocator) allocateIdentifier(want string) string {
 	id := want
 	for i := 2; ; i++ {
 		if _, ok := o[id]; !ok {

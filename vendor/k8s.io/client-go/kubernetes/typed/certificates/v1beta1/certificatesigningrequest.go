@@ -2,7 +2,7 @@
 Copyright The Kubernetes Authors.
 
 Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this ***REMOVED***le except in compliance with the License.
+you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
 
     http://www.apache.org/licenses/LICENSE-2.0
@@ -10,7 +10,7 @@ You may obtain a copy of the License at
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the speci***REMOVED***c language governing permissions and
+See the License for the specific language governing permissions and
 limitations under the License.
 */
 
@@ -21,7 +21,7 @@ package v1beta1
 import (
 	"time"
 
-	v1beta1 "k8s.io/api/certi***REMOVED***cates/v1beta1"
+	v1beta1 "k8s.io/api/certificates/v1beta1"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	types "k8s.io/apimachinery/pkg/types"
 	watch "k8s.io/apimachinery/pkg/watch"
@@ -29,43 +29,43 @@ import (
 	rest "k8s.io/client-go/rest"
 )
 
-// Certi***REMOVED***cateSigningRequestsGetter has a method to return a Certi***REMOVED***cateSigningRequestInterface.
+// CertificateSigningRequestsGetter has a method to return a CertificateSigningRequestInterface.
 // A group's client should implement this interface.
-type Certi***REMOVED***cateSigningRequestsGetter interface {
-	Certi***REMOVED***cateSigningRequests() Certi***REMOVED***cateSigningRequestInterface
+type CertificateSigningRequestsGetter interface {
+	CertificateSigningRequests() CertificateSigningRequestInterface
 }
 
-// Certi***REMOVED***cateSigningRequestInterface has methods to work with Certi***REMOVED***cateSigningRequest resources.
-type Certi***REMOVED***cateSigningRequestInterface interface {
-	Create(*v1beta1.Certi***REMOVED***cateSigningRequest) (*v1beta1.Certi***REMOVED***cateSigningRequest, error)
-	Update(*v1beta1.Certi***REMOVED***cateSigningRequest) (*v1beta1.Certi***REMOVED***cateSigningRequest, error)
-	UpdateStatus(*v1beta1.Certi***REMOVED***cateSigningRequest) (*v1beta1.Certi***REMOVED***cateSigningRequest, error)
+// CertificateSigningRequestInterface has methods to work with CertificateSigningRequest resources.
+type CertificateSigningRequestInterface interface {
+	Create(*v1beta1.CertificateSigningRequest) (*v1beta1.CertificateSigningRequest, error)
+	Update(*v1beta1.CertificateSigningRequest) (*v1beta1.CertificateSigningRequest, error)
+	UpdateStatus(*v1beta1.CertificateSigningRequest) (*v1beta1.CertificateSigningRequest, error)
 	Delete(name string, options *v1.DeleteOptions) error
 	DeleteCollection(options *v1.DeleteOptions, listOptions v1.ListOptions) error
-	Get(name string, options v1.GetOptions) (*v1beta1.Certi***REMOVED***cateSigningRequest, error)
-	List(opts v1.ListOptions) (*v1beta1.Certi***REMOVED***cateSigningRequestList, error)
+	Get(name string, options v1.GetOptions) (*v1beta1.CertificateSigningRequest, error)
+	List(opts v1.ListOptions) (*v1beta1.CertificateSigningRequestList, error)
 	Watch(opts v1.ListOptions) (watch.Interface, error)
-	Patch(name string, pt types.PatchType, data []byte, subresources ...string) (result *v1beta1.Certi***REMOVED***cateSigningRequest, err error)
-	Certi***REMOVED***cateSigningRequestExpansion
+	Patch(name string, pt types.PatchType, data []byte, subresources ...string) (result *v1beta1.CertificateSigningRequest, err error)
+	CertificateSigningRequestExpansion
 }
 
-// certi***REMOVED***cateSigningRequests implements Certi***REMOVED***cateSigningRequestInterface
-type certi***REMOVED***cateSigningRequests struct {
+// certificateSigningRequests implements CertificateSigningRequestInterface
+type certificateSigningRequests struct {
 	client rest.Interface
 }
 
-// newCerti***REMOVED***cateSigningRequests returns a Certi***REMOVED***cateSigningRequests
-func newCerti***REMOVED***cateSigningRequests(c *Certi***REMOVED***catesV1beta1Client) *certi***REMOVED***cateSigningRequests {
-	return &certi***REMOVED***cateSigningRequests{
+// newCertificateSigningRequests returns a CertificateSigningRequests
+func newCertificateSigningRequests(c *CertificatesV1beta1Client) *certificateSigningRequests {
+	return &certificateSigningRequests{
 		client: c.RESTClient(),
 	}
 }
 
-// Get takes name of the certi***REMOVED***cateSigningRequest, and returns the corresponding certi***REMOVED***cateSigningRequest object, and an error if there is any.
-func (c *certi***REMOVED***cateSigningRequests) Get(name string, options v1.GetOptions) (result *v1beta1.Certi***REMOVED***cateSigningRequest, err error) {
-	result = &v1beta1.Certi***REMOVED***cateSigningRequest{}
+// Get takes name of the certificateSigningRequest, and returns the corresponding certificateSigningRequest object, and an error if there is any.
+func (c *certificateSigningRequests) Get(name string, options v1.GetOptions) (result *v1beta1.CertificateSigningRequest, err error) {
+	result = &v1beta1.CertificateSigningRequest{}
 	err = c.client.Get().
-		Resource("certi***REMOVED***catesigningrequests").
+		Resource("certificatesigningrequests").
 		Name(name).
 		VersionedParams(&options, scheme.ParameterCodec).
 		Do().
@@ -73,15 +73,15 @@ func (c *certi***REMOVED***cateSigningRequests) Get(name string, options v1.GetO
 	return
 }
 
-// List takes label and ***REMOVED***eld selectors, and returns the list of Certi***REMOVED***cateSigningRequests that match those selectors.
-func (c *certi***REMOVED***cateSigningRequests) List(opts v1.ListOptions) (result *v1beta1.Certi***REMOVED***cateSigningRequestList, err error) {
+// List takes label and field selectors, and returns the list of CertificateSigningRequests that match those selectors.
+func (c *certificateSigningRequests) List(opts v1.ListOptions) (result *v1beta1.CertificateSigningRequestList, err error) {
 	var timeout time.Duration
 	if opts.TimeoutSeconds != nil {
 		timeout = time.Duration(*opts.TimeoutSeconds) * time.Second
 	}
-	result = &v1beta1.Certi***REMOVED***cateSigningRequestList{}
+	result = &v1beta1.CertificateSigningRequestList{}
 	err = c.client.Get().
-		Resource("certi***REMOVED***catesigningrequests").
+		Resource("certificatesigningrequests").
 		VersionedParams(&opts, scheme.ParameterCodec).
 		Timeout(timeout).
 		Do().
@@ -89,38 +89,38 @@ func (c *certi***REMOVED***cateSigningRequests) List(opts v1.ListOptions) (resul
 	return
 }
 
-// Watch returns a watch.Interface that watches the requested certi***REMOVED***cateSigningRequests.
-func (c *certi***REMOVED***cateSigningRequests) Watch(opts v1.ListOptions) (watch.Interface, error) {
+// Watch returns a watch.Interface that watches the requested certificateSigningRequests.
+func (c *certificateSigningRequests) Watch(opts v1.ListOptions) (watch.Interface, error) {
 	var timeout time.Duration
 	if opts.TimeoutSeconds != nil {
 		timeout = time.Duration(*opts.TimeoutSeconds) * time.Second
 	}
 	opts.Watch = true
 	return c.client.Get().
-		Resource("certi***REMOVED***catesigningrequests").
+		Resource("certificatesigningrequests").
 		VersionedParams(&opts, scheme.ParameterCodec).
 		Timeout(timeout).
 		Watch()
 }
 
-// Create takes the representation of a certi***REMOVED***cateSigningRequest and creates it.  Returns the server's representation of the certi***REMOVED***cateSigningRequest, and an error, if there is any.
-func (c *certi***REMOVED***cateSigningRequests) Create(certi***REMOVED***cateSigningRequest *v1beta1.Certi***REMOVED***cateSigningRequest) (result *v1beta1.Certi***REMOVED***cateSigningRequest, err error) {
-	result = &v1beta1.Certi***REMOVED***cateSigningRequest{}
+// Create takes the representation of a certificateSigningRequest and creates it.  Returns the server's representation of the certificateSigningRequest, and an error, if there is any.
+func (c *certificateSigningRequests) Create(certificateSigningRequest *v1beta1.CertificateSigningRequest) (result *v1beta1.CertificateSigningRequest, err error) {
+	result = &v1beta1.CertificateSigningRequest{}
 	err = c.client.Post().
-		Resource("certi***REMOVED***catesigningrequests").
-		Body(certi***REMOVED***cateSigningRequest).
+		Resource("certificatesigningrequests").
+		Body(certificateSigningRequest).
 		Do().
 		Into(result)
 	return
 }
 
-// Update takes the representation of a certi***REMOVED***cateSigningRequest and updates it. Returns the server's representation of the certi***REMOVED***cateSigningRequest, and an error, if there is any.
-func (c *certi***REMOVED***cateSigningRequests) Update(certi***REMOVED***cateSigningRequest *v1beta1.Certi***REMOVED***cateSigningRequest) (result *v1beta1.Certi***REMOVED***cateSigningRequest, err error) {
-	result = &v1beta1.Certi***REMOVED***cateSigningRequest{}
+// Update takes the representation of a certificateSigningRequest and updates it. Returns the server's representation of the certificateSigningRequest, and an error, if there is any.
+func (c *certificateSigningRequests) Update(certificateSigningRequest *v1beta1.CertificateSigningRequest) (result *v1beta1.CertificateSigningRequest, err error) {
+	result = &v1beta1.CertificateSigningRequest{}
 	err = c.client.Put().
-		Resource("certi***REMOVED***catesigningrequests").
-		Name(certi***REMOVED***cateSigningRequest.Name).
-		Body(certi***REMOVED***cateSigningRequest).
+		Resource("certificatesigningrequests").
+		Name(certificateSigningRequest.Name).
+		Body(certificateSigningRequest).
 		Do().
 		Into(result)
 	return
@@ -129,22 +129,22 @@ func (c *certi***REMOVED***cateSigningRequests) Update(certi***REMOVED***cateSig
 // UpdateStatus was generated because the type contains a Status member.
 // Add a +genclient:noStatus comment above the type to avoid generating UpdateStatus().
 
-func (c *certi***REMOVED***cateSigningRequests) UpdateStatus(certi***REMOVED***cateSigningRequest *v1beta1.Certi***REMOVED***cateSigningRequest) (result *v1beta1.Certi***REMOVED***cateSigningRequest, err error) {
-	result = &v1beta1.Certi***REMOVED***cateSigningRequest{}
+func (c *certificateSigningRequests) UpdateStatus(certificateSigningRequest *v1beta1.CertificateSigningRequest) (result *v1beta1.CertificateSigningRequest, err error) {
+	result = &v1beta1.CertificateSigningRequest{}
 	err = c.client.Put().
-		Resource("certi***REMOVED***catesigningrequests").
-		Name(certi***REMOVED***cateSigningRequest.Name).
+		Resource("certificatesigningrequests").
+		Name(certificateSigningRequest.Name).
 		SubResource("status").
-		Body(certi***REMOVED***cateSigningRequest).
+		Body(certificateSigningRequest).
 		Do().
 		Into(result)
 	return
 }
 
-// Delete takes name of the certi***REMOVED***cateSigningRequest and deletes it. Returns an error if one occurs.
-func (c *certi***REMOVED***cateSigningRequests) Delete(name string, options *v1.DeleteOptions) error {
+// Delete takes name of the certificateSigningRequest and deletes it. Returns an error if one occurs.
+func (c *certificateSigningRequests) Delete(name string, options *v1.DeleteOptions) error {
 	return c.client.Delete().
-		Resource("certi***REMOVED***catesigningrequests").
+		Resource("certificatesigningrequests").
 		Name(name).
 		Body(options).
 		Do().
@@ -152,13 +152,13 @@ func (c *certi***REMOVED***cateSigningRequests) Delete(name string, options *v1.
 }
 
 // DeleteCollection deletes a collection of objects.
-func (c *certi***REMOVED***cateSigningRequests) DeleteCollection(options *v1.DeleteOptions, listOptions v1.ListOptions) error {
+func (c *certificateSigningRequests) DeleteCollection(options *v1.DeleteOptions, listOptions v1.ListOptions) error {
 	var timeout time.Duration
 	if listOptions.TimeoutSeconds != nil {
 		timeout = time.Duration(*listOptions.TimeoutSeconds) * time.Second
 	}
 	return c.client.Delete().
-		Resource("certi***REMOVED***catesigningrequests").
+		Resource("certificatesigningrequests").
 		VersionedParams(&listOptions, scheme.ParameterCodec).
 		Timeout(timeout).
 		Body(options).
@@ -166,11 +166,11 @@ func (c *certi***REMOVED***cateSigningRequests) DeleteCollection(options *v1.Del
 		Error()
 }
 
-// Patch applies the patch and returns the patched certi***REMOVED***cateSigningRequest.
-func (c *certi***REMOVED***cateSigningRequests) Patch(name string, pt types.PatchType, data []byte, subresources ...string) (result *v1beta1.Certi***REMOVED***cateSigningRequest, err error) {
-	result = &v1beta1.Certi***REMOVED***cateSigningRequest{}
+// Patch applies the patch and returns the patched certificateSigningRequest.
+func (c *certificateSigningRequests) Patch(name string, pt types.PatchType, data []byte, subresources ...string) (result *v1beta1.CertificateSigningRequest, err error) {
+	result = &v1beta1.CertificateSigningRequest{}
 	err = c.client.Patch(pt).
-		Resource("certi***REMOVED***catesigningrequests").
+		Resource("certificatesigningrequests").
 		SubResource(subresources...).
 		Name(name).
 		Body(data).

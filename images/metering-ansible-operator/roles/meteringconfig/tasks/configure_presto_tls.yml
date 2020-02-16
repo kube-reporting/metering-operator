@@ -1,11 +1,11 @@
 ---
 
 #
-# Validate user-provided Presto TLS con***REMOVED***guration when top-level spec.tls.enabled is set to false
+# Validate user-provided Presto TLS configuration when top-level spec.tls.enabled is set to false
 #
-- name: Validate the user-provided Presto TLS con***REMOVED***guration
+- name: Validate the user-provided Presto TLS configuration
   include_tasks: validate_presto_tls.yml
-  when: not meteringcon***REMOVED***g_tls_enabled
+  when: not meteringconfig_tls_enabled
 
 #
 # Check for Presto TLS and auth secret existence (to avoid re-generating/overwriting the secret data if that secret name already exists)
@@ -16,7 +16,7 @@
     k8s_facts:
       api_version: v1
       kind: Secret
-      name: "{{ meteringcon***REMOVED***g_spec.presto.spec.con***REMOVED***g.tls.secretName }}"
+      name: "{{ meteringconfig_spec.presto.spec.config.tls.secretName }}"
       namespace: "{{ meta.namespace }}"
     no_log: true
     register: presto_secret_tls_buf
@@ -25,7 +25,7 @@
     k8s_facts:
       api_version: v1
       kind: Secret
-      name: "{{ meteringcon***REMOVED***g_spec.presto.spec.con***REMOVED***g.auth.secretName }}"
+      name: "{{ meteringconfig_spec.presto.spec.config.auth.secretName }}"
       namespace: "{{ meta.namespace }}"
     no_log: true
     register: presto_secret_auth_buf
@@ -34,76 +34,76 @@
     k8s_facts:
       api_version: v1
       kind: Secret
-      name: "{{ meteringcon***REMOVED***g_spec.presto.spec.con***REMOVED***g.connectors.hive.tls.secretName }}"
+      name: "{{ meteringconfig_spec.presto.spec.config.connectors.hive.tls.secretName }}"
       namespace: "{{ meta.namespace }}"
     no_log: true
     register: presto_hive_secret_tls_buf
 
-  - name: Con***REMOVED***gure Presto to use the existing server TLS secret data
+  - name: Configure Presto to use the existing server TLS secret data
     set_fact:
-      _meteringcon***REMOVED***g_presto_server_ca_certi***REMOVED***cate: "{{ _meteringcon***REMOVED***g_tls_root_ca_certi***REMOVED***cate }}"
-      _meteringcon***REMOVED***g_presto_server_certi***REMOVED***cate: "{{ presto_secret_tls_buf.resources[0].data['tls.crt'] | b64decode }}"
-      _meteringcon***REMOVED***g_presto_server_key: "{{ presto_secret_tls_buf.resources[0].data['tls.key'] | b64decode }}"
+      _meteringconfig_presto_server_ca_certificate: "{{ _meteringconfig_tls_root_ca_certificate }}"
+      _meteringconfig_presto_server_certificate: "{{ presto_secret_tls_buf.resources[0].data['tls.crt'] | b64decode }}"
+      _meteringconfig_presto_server_key: "{{ presto_secret_tls_buf.resources[0].data['tls.key'] | b64decode }}"
     no_log: true
     when: presto_tls_secret_exists
 
-  - name: Con***REMOVED***gure Presto to use the existing client TLS secret data
+  - name: Configure Presto to use the existing client TLS secret data
     set_fact:
-      _meteringcon***REMOVED***g_presto_client_ca_certi***REMOVED***cate: "{{ _meteringcon***REMOVED***g_tls_root_ca_certi***REMOVED***cate }}"
-      _meteringcon***REMOVED***g_presto_client_certi***REMOVED***cate: "{{ presto_secret_auth_buf.resources[0].data['tls.crt'] | b64decode }}"
-      _meteringcon***REMOVED***g_presto_client_key: "{{ presto_secret_auth_buf.resources[0].data['tls.key'] | b64decode }}"
+      _meteringconfig_presto_client_ca_certificate: "{{ _meteringconfig_tls_root_ca_certificate }}"
+      _meteringconfig_presto_client_certificate: "{{ presto_secret_auth_buf.resources[0].data['tls.crt'] | b64decode }}"
+      _meteringconfig_presto_client_key: "{{ presto_secret_auth_buf.resources[0].data['tls.key'] | b64decode }}"
     no_log: true
     when: presto_auth_secret_exists
 
-  - name: Con***REMOVED***gure Presto/Hive to use the existing Presto client TLS secret data
+  - name: Configure Presto/Hive to use the existing Presto client TLS secret data
     set_fact:
-      _meteringcon***REMOVED***g_presto_hive_client_ca_certi***REMOVED***cate: "{{ _meteringcon***REMOVED***g_tls_root_ca_certi***REMOVED***cate }}"
-      _meteringcon***REMOVED***g_presto_hive_client_certi***REMOVED***cate: "{{ presto_hive_secret_tls_buf.resources[0].data['tls.crt'] | b64decode }}"
-      _meteringcon***REMOVED***g_presto_hive_client_key: "{{ presto_hive_secret_tls_buf.resources[0].data['tls.key'] | b64decode }}"
+      _meteringconfig_presto_hive_client_ca_certificate: "{{ _meteringconfig_tls_root_ca_certificate }}"
+      _meteringconfig_presto_hive_client_certificate: "{{ presto_hive_secret_tls_buf.resources[0].data['tls.crt'] | b64decode }}"
+      _meteringconfig_presto_hive_client_key: "{{ presto_hive_secret_tls_buf.resources[0].data['tls.key'] | b64decode }}"
     no_log: true
     when: presto_hive_tls_secret_exists
   vars:
     presto_tls_secret_exists: "{{ presto_secret_tls_buf.resources and presto_secret_tls_buf.resources | length > 0 }}"
     presto_auth_secret_exists: "{{ presto_secret_auth_buf.resources and presto_secret_auth_buf.resources | length > 0 }}"
-    presto_hive_tls_secret_exists: "{{ presto_hive_secret_tls_buf.resources is de***REMOVED***ned and presto_hive_secret_tls_buf.resources | length > 0 }}"
-  when: meteringcon***REMOVED***g_tls_enabled
+    presto_hive_tls_secret_exists: "{{ presto_hive_secret_tls_buf.resources is defined and presto_hive_secret_tls_buf.resources | length > 0 }}"
+  when: meteringconfig_tls_enabled
 
 #
-# Generate server and client certi***REMOVED***cates for Presto (as needed) using the Ansible OpenSSL modules when top-level spec.tls.enabled is set to true
+# Generate server and client certificates for Presto (as needed) using the Ansible OpenSSL modules when top-level spec.tls.enabled is set to true
 #
-- name: Con***REMOVED***gure TLS and client-side authentication for Presto and Presto connectors
+- name: Configure TLS and client-side authentication for Presto and Presto connectors
   block:
-  - name: Generate Presto server and client TLS certi***REMOVED***cates and keys
-    include_tasks: con***REMOVED***gure_presto_openssl.yml
+  - name: Generate Presto server and client TLS certificates and keys
+    include_tasks: configure_presto_openssl.yml
 
-  - name: Con***REMOVED***gure Presto to use generated server certi***REMOVED***cate and key
+  - name: Configure Presto to use generated server certificate and key
     set_fact:
-      # presto.spec.con***REMOVED***g.tls
-      _meteringcon***REMOVED***g_presto_server_ca_certi***REMOVED***cate: "{{ _meteringcon***REMOVED***g_tls_root_ca_certi***REMOVED***cate }}"
-      _meteringcon***REMOVED***g_presto_server_certi***REMOVED***cate: "{{ lookup('***REMOVED***le', '{{ certi***REMOVED***cates_dir.path }}/presto_server.crt') + '\n' }}"
-      _meteringcon***REMOVED***g_presto_server_key: "{{ lookup('***REMOVED***le', '{{ certi***REMOVED***cates_dir.path }}/presto_server.key') + '\n' }}"
+      # presto.spec.config.tls
+      _meteringconfig_presto_server_ca_certificate: "{{ _meteringconfig_tls_root_ca_certificate }}"
+      _meteringconfig_presto_server_certificate: "{{ lookup('file', '{{ certificates_dir.path }}/presto_server.crt') + '\n' }}"
+      _meteringconfig_presto_server_key: "{{ lookup('file', '{{ certificates_dir.path }}/presto_server.key') + '\n' }}"
     no_log: true
     when: not presto_tls_secret_exists
 
-  - name: Con***REMOVED***gure Presto to use the generated client certi***REMOVED***cate and key
+  - name: Configure Presto to use the generated client certificate and key
     set_fact:
-      # presto.spec.con***REMOVED***g.auth
-      _meteringcon***REMOVED***g_presto_client_ca_certi***REMOVED***cate: "{{ _meteringcon***REMOVED***g_tls_root_ca_certi***REMOVED***cate }}"
-      _meteringcon***REMOVED***g_presto_client_certi***REMOVED***cate: "{{ lookup('***REMOVED***le', '{{ certi***REMOVED***cates_dir.path }}/presto_client.crt') + '\n' }}"
-      _meteringcon***REMOVED***g_presto_client_key: "{{ lookup('***REMOVED***le', '{{ certi***REMOVED***cates_dir.path }}/presto_client.key') + '\n' }}"
+      # presto.spec.config.auth
+      _meteringconfig_presto_client_ca_certificate: "{{ _meteringconfig_tls_root_ca_certificate }}"
+      _meteringconfig_presto_client_certificate: "{{ lookup('file', '{{ certificates_dir.path }}/presto_client.crt') + '\n' }}"
+      _meteringconfig_presto_client_key: "{{ lookup('file', '{{ certificates_dir.path }}/presto_client.key') + '\n' }}"
     no_log: true
     when: not presto_auth_secret_exists
 
-  - name: Con***REMOVED***gure Presto/Hive to use the generated Presto client certi***REMOVED***cate and key
+  - name: Configure Presto/Hive to use the generated Presto client certificate and key
     set_fact:
       # presto.spec.connectors.hive.tls
-      _meteringcon***REMOVED***g_presto_hive_client_ca_certi***REMOVED***cate: "{{ _meteringcon***REMOVED***g_tls_root_ca_certi***REMOVED***cate }}"
-      _meteringcon***REMOVED***g_presto_hive_client_certi***REMOVED***cate: "{{ lookup('***REMOVED***le', '{{ certi***REMOVED***cates_dir.path }}/presto_client.crt') + '\n' }}"
-      _meteringcon***REMOVED***g_presto_hive_client_key: "{{ lookup('***REMOVED***le', '{{ certi***REMOVED***cates_dir.path }}/presto_client.key') + '\n' }}"
+      _meteringconfig_presto_hive_client_ca_certificate: "{{ _meteringconfig_tls_root_ca_certificate }}"
+      _meteringconfig_presto_hive_client_certificate: "{{ lookup('file', '{{ certificates_dir.path }}/presto_client.crt') + '\n' }}"
+      _meteringconfig_presto_hive_client_key: "{{ lookup('file', '{{ certificates_dir.path }}/presto_client.key') + '\n' }}"
     no_log: true
     when: not presto_hive_tls_secret_exists
   vars:
-    presto_tls_secret_exists: "{{ presto_secret_tls_buf.resources is de***REMOVED***ned and presto_secret_tls_buf.resources | length > 0 }}"
-    presto_auth_secret_exists: "{{ presto_secret_auth_buf.resources is de***REMOVED***ned and presto_secret_auth_buf.resources | length > 0 }}"
-    presto_hive_tls_secret_exists: "{{ presto_hive_secret_tls_buf.resources is de***REMOVED***ned and presto_hive_secret_tls_buf.resources | length > 0 }}"
-  when: meteringcon***REMOVED***g_tls_enabled and (not presto_tls_secret_exists or not presto_auth_secret_exists or not presto_hive_tls_secret_exists)
+    presto_tls_secret_exists: "{{ presto_secret_tls_buf.resources is defined and presto_secret_tls_buf.resources | length > 0 }}"
+    presto_auth_secret_exists: "{{ presto_secret_auth_buf.resources is defined and presto_secret_auth_buf.resources | length > 0 }}"
+    presto_hive_tls_secret_exists: "{{ presto_hive_secret_tls_buf.resources is defined and presto_hive_secret_tls_buf.resources | length > 0 }}"
+  when: meteringconfig_tls_enabled and (not presto_tls_secret_exists or not presto_auth_secret_exists or not presto_hive_tls_secret_exists)

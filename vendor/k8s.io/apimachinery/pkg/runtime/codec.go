@@ -2,7 +2,7 @@
 Copyright 2014 The Kubernetes Authors.
 
 Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this ***REMOVED***le except in compliance with the License.
+you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
 
     http://www.apache.org/licenses/LICENSE-2.0
@@ -10,7 +10,7 @@ You may obtain a copy of the License at
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the speci***REMOVED***c language governing permissions and
+See the License for the specific language governing permissions and
 limitations under the License.
 */
 
@@ -77,7 +77,7 @@ func EncodeOrDie(e Encoder, obj Object) string {
 }
 
 // UseOrCreateObject returns obj if the canonical ObjectKind returned by the provided typer matches gvk, or
-// invokes the ObjectCreator to instantiate a new gvk. Returns an error if the typer cannot ***REMOVED***nd the object.
+// invokes the ObjectCreator to instantiate a new gvk. Returns an error if the typer cannot find the object.
 func UseOrCreateObject(t ObjectTyper, c ObjectCreater, gvk schema.GroupVersionKind, obj Object) (Object, error) {
 	if obj != nil {
 		kinds, _, err := t.ObjectKinds(obj)
@@ -215,8 +215,8 @@ func (s base64Serializer) Decode(data []byte, defaults *schema.GroupVersionKind,
 	return s.Decoder.Decode(out[:n], defaults, into)
 }
 
-// SerializerInfoForMediaType returns the ***REMOVED***rst info in types that has a matching media type (which cannot
-// include media-type parameters), or the ***REMOVED***rst info with an empty media type, or false if no type matches.
+// SerializerInfoForMediaType returns the first info in types that has a matching media type (which cannot
+// include media-type parameters), or the first info with an empty media type, or false if no type matches.
 func SerializerInfoForMediaType(types []SerializerInfo, mediaType string) (SerializerInfo, bool) {
 	for _, info := range types {
 		if info.MediaType == mediaType {
@@ -240,7 +240,7 @@ var (
 
 type internalGroupVersioner struct{}
 
-// KindForGroupVersionKinds returns an internal Kind if one is found, or converts the ***REMOVED***rst provided kind to the internal version.
+// KindForGroupVersionKinds returns an internal Kind if one is found, or converts the first provided kind to the internal version.
 func (internalGroupVersioner) KindForGroupVersionKinds(kinds []schema.GroupVersionKind) (schema.GroupVersionKind, bool) {
 	for _, kind := range kinds {
 		if kind.Version == APIVersionInternal {
@@ -260,10 +260,10 @@ func (disabledGroupVersioner) KindForGroupVersionKinds(kinds []schema.GroupVersi
 	return schema.GroupVersionKind{}, false
 }
 
-// GroupVersioners implements GroupVersioner and resolves to the ***REMOVED***rst exact match for any kind.
+// GroupVersioners implements GroupVersioner and resolves to the first exact match for any kind.
 type GroupVersioners []GroupVersioner
 
-// KindForGroupVersionKinds returns the ***REMOVED***rst match of any of the group versioners, or false if no match occurred.
+// KindForGroupVersionKinds returns the first match of any of the group versioners, or false if no match occurred.
 func (gvs GroupVersioners) KindForGroupVersionKinds(kinds []schema.GroupVersionKind) (schema.GroupVersionKind, bool) {
 	for _, gv := range gvs {
 		target, ok := gv.KindForGroupVersionKinds(kinds)

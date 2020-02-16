@@ -36,9 +36,9 @@ import (
 //        myFunc(svc)
 //    }
 //
-// In your _test.go ***REMOVED***le:
+// In your _test.go file:
 //
-//    // De***REMOVED***ne a mock struct to be used in your unit tests of myFunc.
+//    // Define a mock struct to be used in your unit tests of myFunc.
 //    type mockS3Client struct {
 //        s3iface.S3API
 //    }
@@ -84,9 +84,9 @@ type S3API interface {
 	DeleteBucketWithContext(aws.Context, *s3.DeleteBucketInput, ...request.Option) (*s3.DeleteBucketOutput, error)
 	DeleteBucketRequest(*s3.DeleteBucketInput) (*request.Request, *s3.DeleteBucketOutput)
 
-	DeleteBucketAnalyticsCon***REMOVED***guration(*s3.DeleteBucketAnalyticsCon***REMOVED***gurationInput) (*s3.DeleteBucketAnalyticsCon***REMOVED***gurationOutput, error)
-	DeleteBucketAnalyticsCon***REMOVED***gurationWithContext(aws.Context, *s3.DeleteBucketAnalyticsCon***REMOVED***gurationInput, ...request.Option) (*s3.DeleteBucketAnalyticsCon***REMOVED***gurationOutput, error)
-	DeleteBucketAnalyticsCon***REMOVED***gurationRequest(*s3.DeleteBucketAnalyticsCon***REMOVED***gurationInput) (*request.Request, *s3.DeleteBucketAnalyticsCon***REMOVED***gurationOutput)
+	DeleteBucketAnalyticsConfiguration(*s3.DeleteBucketAnalyticsConfigurationInput) (*s3.DeleteBucketAnalyticsConfigurationOutput, error)
+	DeleteBucketAnalyticsConfigurationWithContext(aws.Context, *s3.DeleteBucketAnalyticsConfigurationInput, ...request.Option) (*s3.DeleteBucketAnalyticsConfigurationOutput, error)
+	DeleteBucketAnalyticsConfigurationRequest(*s3.DeleteBucketAnalyticsConfigurationInput) (*request.Request, *s3.DeleteBucketAnalyticsConfigurationOutput)
 
 	DeleteBucketCors(*s3.DeleteBucketCorsInput) (*s3.DeleteBucketCorsOutput, error)
 	DeleteBucketCorsWithContext(aws.Context, *s3.DeleteBucketCorsInput, ...request.Option) (*s3.DeleteBucketCorsOutput, error)
@@ -96,17 +96,17 @@ type S3API interface {
 	DeleteBucketEncryptionWithContext(aws.Context, *s3.DeleteBucketEncryptionInput, ...request.Option) (*s3.DeleteBucketEncryptionOutput, error)
 	DeleteBucketEncryptionRequest(*s3.DeleteBucketEncryptionInput) (*request.Request, *s3.DeleteBucketEncryptionOutput)
 
-	DeleteBucketInventoryCon***REMOVED***guration(*s3.DeleteBucketInventoryCon***REMOVED***gurationInput) (*s3.DeleteBucketInventoryCon***REMOVED***gurationOutput, error)
-	DeleteBucketInventoryCon***REMOVED***gurationWithContext(aws.Context, *s3.DeleteBucketInventoryCon***REMOVED***gurationInput, ...request.Option) (*s3.DeleteBucketInventoryCon***REMOVED***gurationOutput, error)
-	DeleteBucketInventoryCon***REMOVED***gurationRequest(*s3.DeleteBucketInventoryCon***REMOVED***gurationInput) (*request.Request, *s3.DeleteBucketInventoryCon***REMOVED***gurationOutput)
+	DeleteBucketInventoryConfiguration(*s3.DeleteBucketInventoryConfigurationInput) (*s3.DeleteBucketInventoryConfigurationOutput, error)
+	DeleteBucketInventoryConfigurationWithContext(aws.Context, *s3.DeleteBucketInventoryConfigurationInput, ...request.Option) (*s3.DeleteBucketInventoryConfigurationOutput, error)
+	DeleteBucketInventoryConfigurationRequest(*s3.DeleteBucketInventoryConfigurationInput) (*request.Request, *s3.DeleteBucketInventoryConfigurationOutput)
 
 	DeleteBucketLifecycle(*s3.DeleteBucketLifecycleInput) (*s3.DeleteBucketLifecycleOutput, error)
 	DeleteBucketLifecycleWithContext(aws.Context, *s3.DeleteBucketLifecycleInput, ...request.Option) (*s3.DeleteBucketLifecycleOutput, error)
 	DeleteBucketLifecycleRequest(*s3.DeleteBucketLifecycleInput) (*request.Request, *s3.DeleteBucketLifecycleOutput)
 
-	DeleteBucketMetricsCon***REMOVED***guration(*s3.DeleteBucketMetricsCon***REMOVED***gurationInput) (*s3.DeleteBucketMetricsCon***REMOVED***gurationOutput, error)
-	DeleteBucketMetricsCon***REMOVED***gurationWithContext(aws.Context, *s3.DeleteBucketMetricsCon***REMOVED***gurationInput, ...request.Option) (*s3.DeleteBucketMetricsCon***REMOVED***gurationOutput, error)
-	DeleteBucketMetricsCon***REMOVED***gurationRequest(*s3.DeleteBucketMetricsCon***REMOVED***gurationInput) (*request.Request, *s3.DeleteBucketMetricsCon***REMOVED***gurationOutput)
+	DeleteBucketMetricsConfiguration(*s3.DeleteBucketMetricsConfigurationInput) (*s3.DeleteBucketMetricsConfigurationOutput, error)
+	DeleteBucketMetricsConfigurationWithContext(aws.Context, *s3.DeleteBucketMetricsConfigurationInput, ...request.Option) (*s3.DeleteBucketMetricsConfigurationOutput, error)
+	DeleteBucketMetricsConfigurationRequest(*s3.DeleteBucketMetricsConfigurationInput) (*request.Request, *s3.DeleteBucketMetricsConfigurationOutput)
 
 	DeleteBucketPolicy(*s3.DeleteBucketPolicyInput) (*s3.DeleteBucketPolicyOutput, error)
 	DeleteBucketPolicyWithContext(aws.Context, *s3.DeleteBucketPolicyInput, ...request.Option) (*s3.DeleteBucketPolicyOutput, error)
@@ -140,17 +140,17 @@ type S3API interface {
 	DeletePublicAccessBlockWithContext(aws.Context, *s3.DeletePublicAccessBlockInput, ...request.Option) (*s3.DeletePublicAccessBlockOutput, error)
 	DeletePublicAccessBlockRequest(*s3.DeletePublicAccessBlockInput) (*request.Request, *s3.DeletePublicAccessBlockOutput)
 
-	GetBucketAccelerateCon***REMOVED***guration(*s3.GetBucketAccelerateCon***REMOVED***gurationInput) (*s3.GetBucketAccelerateCon***REMOVED***gurationOutput, error)
-	GetBucketAccelerateCon***REMOVED***gurationWithContext(aws.Context, *s3.GetBucketAccelerateCon***REMOVED***gurationInput, ...request.Option) (*s3.GetBucketAccelerateCon***REMOVED***gurationOutput, error)
-	GetBucketAccelerateCon***REMOVED***gurationRequest(*s3.GetBucketAccelerateCon***REMOVED***gurationInput) (*request.Request, *s3.GetBucketAccelerateCon***REMOVED***gurationOutput)
+	GetBucketAccelerateConfiguration(*s3.GetBucketAccelerateConfigurationInput) (*s3.GetBucketAccelerateConfigurationOutput, error)
+	GetBucketAccelerateConfigurationWithContext(aws.Context, *s3.GetBucketAccelerateConfigurationInput, ...request.Option) (*s3.GetBucketAccelerateConfigurationOutput, error)
+	GetBucketAccelerateConfigurationRequest(*s3.GetBucketAccelerateConfigurationInput) (*request.Request, *s3.GetBucketAccelerateConfigurationOutput)
 
 	GetBucketAcl(*s3.GetBucketAclInput) (*s3.GetBucketAclOutput, error)
 	GetBucketAclWithContext(aws.Context, *s3.GetBucketAclInput, ...request.Option) (*s3.GetBucketAclOutput, error)
 	GetBucketAclRequest(*s3.GetBucketAclInput) (*request.Request, *s3.GetBucketAclOutput)
 
-	GetBucketAnalyticsCon***REMOVED***guration(*s3.GetBucketAnalyticsCon***REMOVED***gurationInput) (*s3.GetBucketAnalyticsCon***REMOVED***gurationOutput, error)
-	GetBucketAnalyticsCon***REMOVED***gurationWithContext(aws.Context, *s3.GetBucketAnalyticsCon***REMOVED***gurationInput, ...request.Option) (*s3.GetBucketAnalyticsCon***REMOVED***gurationOutput, error)
-	GetBucketAnalyticsCon***REMOVED***gurationRequest(*s3.GetBucketAnalyticsCon***REMOVED***gurationInput) (*request.Request, *s3.GetBucketAnalyticsCon***REMOVED***gurationOutput)
+	GetBucketAnalyticsConfiguration(*s3.GetBucketAnalyticsConfigurationInput) (*s3.GetBucketAnalyticsConfigurationOutput, error)
+	GetBucketAnalyticsConfigurationWithContext(aws.Context, *s3.GetBucketAnalyticsConfigurationInput, ...request.Option) (*s3.GetBucketAnalyticsConfigurationOutput, error)
+	GetBucketAnalyticsConfigurationRequest(*s3.GetBucketAnalyticsConfigurationInput) (*request.Request, *s3.GetBucketAnalyticsConfigurationOutput)
 
 	GetBucketCors(*s3.GetBucketCorsInput) (*s3.GetBucketCorsOutput, error)
 	GetBucketCorsWithContext(aws.Context, *s3.GetBucketCorsInput, ...request.Option) (*s3.GetBucketCorsOutput, error)
@@ -160,17 +160,17 @@ type S3API interface {
 	GetBucketEncryptionWithContext(aws.Context, *s3.GetBucketEncryptionInput, ...request.Option) (*s3.GetBucketEncryptionOutput, error)
 	GetBucketEncryptionRequest(*s3.GetBucketEncryptionInput) (*request.Request, *s3.GetBucketEncryptionOutput)
 
-	GetBucketInventoryCon***REMOVED***guration(*s3.GetBucketInventoryCon***REMOVED***gurationInput) (*s3.GetBucketInventoryCon***REMOVED***gurationOutput, error)
-	GetBucketInventoryCon***REMOVED***gurationWithContext(aws.Context, *s3.GetBucketInventoryCon***REMOVED***gurationInput, ...request.Option) (*s3.GetBucketInventoryCon***REMOVED***gurationOutput, error)
-	GetBucketInventoryCon***REMOVED***gurationRequest(*s3.GetBucketInventoryCon***REMOVED***gurationInput) (*request.Request, *s3.GetBucketInventoryCon***REMOVED***gurationOutput)
+	GetBucketInventoryConfiguration(*s3.GetBucketInventoryConfigurationInput) (*s3.GetBucketInventoryConfigurationOutput, error)
+	GetBucketInventoryConfigurationWithContext(aws.Context, *s3.GetBucketInventoryConfigurationInput, ...request.Option) (*s3.GetBucketInventoryConfigurationOutput, error)
+	GetBucketInventoryConfigurationRequest(*s3.GetBucketInventoryConfigurationInput) (*request.Request, *s3.GetBucketInventoryConfigurationOutput)
 
 	GetBucketLifecycle(*s3.GetBucketLifecycleInput) (*s3.GetBucketLifecycleOutput, error)
 	GetBucketLifecycleWithContext(aws.Context, *s3.GetBucketLifecycleInput, ...request.Option) (*s3.GetBucketLifecycleOutput, error)
 	GetBucketLifecycleRequest(*s3.GetBucketLifecycleInput) (*request.Request, *s3.GetBucketLifecycleOutput)
 
-	GetBucketLifecycleCon***REMOVED***guration(*s3.GetBucketLifecycleCon***REMOVED***gurationInput) (*s3.GetBucketLifecycleCon***REMOVED***gurationOutput, error)
-	GetBucketLifecycleCon***REMOVED***gurationWithContext(aws.Context, *s3.GetBucketLifecycleCon***REMOVED***gurationInput, ...request.Option) (*s3.GetBucketLifecycleCon***REMOVED***gurationOutput, error)
-	GetBucketLifecycleCon***REMOVED***gurationRequest(*s3.GetBucketLifecycleCon***REMOVED***gurationInput) (*request.Request, *s3.GetBucketLifecycleCon***REMOVED***gurationOutput)
+	GetBucketLifecycleConfiguration(*s3.GetBucketLifecycleConfigurationInput) (*s3.GetBucketLifecycleConfigurationOutput, error)
+	GetBucketLifecycleConfigurationWithContext(aws.Context, *s3.GetBucketLifecycleConfigurationInput, ...request.Option) (*s3.GetBucketLifecycleConfigurationOutput, error)
+	GetBucketLifecycleConfigurationRequest(*s3.GetBucketLifecycleConfigurationInput) (*request.Request, *s3.GetBucketLifecycleConfigurationOutput)
 
 	GetBucketLocation(*s3.GetBucketLocationInput) (*s3.GetBucketLocationOutput, error)
 	GetBucketLocationWithContext(aws.Context, *s3.GetBucketLocationInput, ...request.Option) (*s3.GetBucketLocationOutput, error)
@@ -180,17 +180,17 @@ type S3API interface {
 	GetBucketLoggingWithContext(aws.Context, *s3.GetBucketLoggingInput, ...request.Option) (*s3.GetBucketLoggingOutput, error)
 	GetBucketLoggingRequest(*s3.GetBucketLoggingInput) (*request.Request, *s3.GetBucketLoggingOutput)
 
-	GetBucketMetricsCon***REMOVED***guration(*s3.GetBucketMetricsCon***REMOVED***gurationInput) (*s3.GetBucketMetricsCon***REMOVED***gurationOutput, error)
-	GetBucketMetricsCon***REMOVED***gurationWithContext(aws.Context, *s3.GetBucketMetricsCon***REMOVED***gurationInput, ...request.Option) (*s3.GetBucketMetricsCon***REMOVED***gurationOutput, error)
-	GetBucketMetricsCon***REMOVED***gurationRequest(*s3.GetBucketMetricsCon***REMOVED***gurationInput) (*request.Request, *s3.GetBucketMetricsCon***REMOVED***gurationOutput)
+	GetBucketMetricsConfiguration(*s3.GetBucketMetricsConfigurationInput) (*s3.GetBucketMetricsConfigurationOutput, error)
+	GetBucketMetricsConfigurationWithContext(aws.Context, *s3.GetBucketMetricsConfigurationInput, ...request.Option) (*s3.GetBucketMetricsConfigurationOutput, error)
+	GetBucketMetricsConfigurationRequest(*s3.GetBucketMetricsConfigurationInput) (*request.Request, *s3.GetBucketMetricsConfigurationOutput)
 
-	GetBucketNoti***REMOVED***cation(*s3.GetBucketNoti***REMOVED***cationCon***REMOVED***gurationRequest) (*s3.Noti***REMOVED***cationCon***REMOVED***gurationDeprecated, error)
-	GetBucketNoti***REMOVED***cationWithContext(aws.Context, *s3.GetBucketNoti***REMOVED***cationCon***REMOVED***gurationRequest, ...request.Option) (*s3.Noti***REMOVED***cationCon***REMOVED***gurationDeprecated, error)
-	GetBucketNoti***REMOVED***cationRequest(*s3.GetBucketNoti***REMOVED***cationCon***REMOVED***gurationRequest) (*request.Request, *s3.Noti***REMOVED***cationCon***REMOVED***gurationDeprecated)
+	GetBucketNotification(*s3.GetBucketNotificationConfigurationRequest) (*s3.NotificationConfigurationDeprecated, error)
+	GetBucketNotificationWithContext(aws.Context, *s3.GetBucketNotificationConfigurationRequest, ...request.Option) (*s3.NotificationConfigurationDeprecated, error)
+	GetBucketNotificationRequest(*s3.GetBucketNotificationConfigurationRequest) (*request.Request, *s3.NotificationConfigurationDeprecated)
 
-	GetBucketNoti***REMOVED***cationCon***REMOVED***guration(*s3.GetBucketNoti***REMOVED***cationCon***REMOVED***gurationRequest) (*s3.Noti***REMOVED***cationCon***REMOVED***guration, error)
-	GetBucketNoti***REMOVED***cationCon***REMOVED***gurationWithContext(aws.Context, *s3.GetBucketNoti***REMOVED***cationCon***REMOVED***gurationRequest, ...request.Option) (*s3.Noti***REMOVED***cationCon***REMOVED***guration, error)
-	GetBucketNoti***REMOVED***cationCon***REMOVED***gurationRequest(*s3.GetBucketNoti***REMOVED***cationCon***REMOVED***gurationRequest) (*request.Request, *s3.Noti***REMOVED***cationCon***REMOVED***guration)
+	GetBucketNotificationConfiguration(*s3.GetBucketNotificationConfigurationRequest) (*s3.NotificationConfiguration, error)
+	GetBucketNotificationConfigurationWithContext(aws.Context, *s3.GetBucketNotificationConfigurationRequest, ...request.Option) (*s3.NotificationConfiguration, error)
+	GetBucketNotificationConfigurationRequest(*s3.GetBucketNotificationConfigurationRequest) (*request.Request, *s3.NotificationConfiguration)
 
 	GetBucketPolicy(*s3.GetBucketPolicyInput) (*s3.GetBucketPolicyOutput, error)
 	GetBucketPolicyWithContext(aws.Context, *s3.GetBucketPolicyInput, ...request.Option) (*s3.GetBucketPolicyOutput, error)
@@ -232,9 +232,9 @@ type S3API interface {
 	GetObjectLegalHoldWithContext(aws.Context, *s3.GetObjectLegalHoldInput, ...request.Option) (*s3.GetObjectLegalHoldOutput, error)
 	GetObjectLegalHoldRequest(*s3.GetObjectLegalHoldInput) (*request.Request, *s3.GetObjectLegalHoldOutput)
 
-	GetObjectLockCon***REMOVED***guration(*s3.GetObjectLockCon***REMOVED***gurationInput) (*s3.GetObjectLockCon***REMOVED***gurationOutput, error)
-	GetObjectLockCon***REMOVED***gurationWithContext(aws.Context, *s3.GetObjectLockCon***REMOVED***gurationInput, ...request.Option) (*s3.GetObjectLockCon***REMOVED***gurationOutput, error)
-	GetObjectLockCon***REMOVED***gurationRequest(*s3.GetObjectLockCon***REMOVED***gurationInput) (*request.Request, *s3.GetObjectLockCon***REMOVED***gurationOutput)
+	GetObjectLockConfiguration(*s3.GetObjectLockConfigurationInput) (*s3.GetObjectLockConfigurationOutput, error)
+	GetObjectLockConfigurationWithContext(aws.Context, *s3.GetObjectLockConfigurationInput, ...request.Option) (*s3.GetObjectLockConfigurationOutput, error)
+	GetObjectLockConfigurationRequest(*s3.GetObjectLockConfigurationInput) (*request.Request, *s3.GetObjectLockConfigurationOutput)
 
 	GetObjectRetention(*s3.GetObjectRetentionInput) (*s3.GetObjectRetentionOutput, error)
 	GetObjectRetentionWithContext(aws.Context, *s3.GetObjectRetentionInput, ...request.Option) (*s3.GetObjectRetentionOutput, error)
@@ -260,17 +260,17 @@ type S3API interface {
 	HeadObjectWithContext(aws.Context, *s3.HeadObjectInput, ...request.Option) (*s3.HeadObjectOutput, error)
 	HeadObjectRequest(*s3.HeadObjectInput) (*request.Request, *s3.HeadObjectOutput)
 
-	ListBucketAnalyticsCon***REMOVED***gurations(*s3.ListBucketAnalyticsCon***REMOVED***gurationsInput) (*s3.ListBucketAnalyticsCon***REMOVED***gurationsOutput, error)
-	ListBucketAnalyticsCon***REMOVED***gurationsWithContext(aws.Context, *s3.ListBucketAnalyticsCon***REMOVED***gurationsInput, ...request.Option) (*s3.ListBucketAnalyticsCon***REMOVED***gurationsOutput, error)
-	ListBucketAnalyticsCon***REMOVED***gurationsRequest(*s3.ListBucketAnalyticsCon***REMOVED***gurationsInput) (*request.Request, *s3.ListBucketAnalyticsCon***REMOVED***gurationsOutput)
+	ListBucketAnalyticsConfigurations(*s3.ListBucketAnalyticsConfigurationsInput) (*s3.ListBucketAnalyticsConfigurationsOutput, error)
+	ListBucketAnalyticsConfigurationsWithContext(aws.Context, *s3.ListBucketAnalyticsConfigurationsInput, ...request.Option) (*s3.ListBucketAnalyticsConfigurationsOutput, error)
+	ListBucketAnalyticsConfigurationsRequest(*s3.ListBucketAnalyticsConfigurationsInput) (*request.Request, *s3.ListBucketAnalyticsConfigurationsOutput)
 
-	ListBucketInventoryCon***REMOVED***gurations(*s3.ListBucketInventoryCon***REMOVED***gurationsInput) (*s3.ListBucketInventoryCon***REMOVED***gurationsOutput, error)
-	ListBucketInventoryCon***REMOVED***gurationsWithContext(aws.Context, *s3.ListBucketInventoryCon***REMOVED***gurationsInput, ...request.Option) (*s3.ListBucketInventoryCon***REMOVED***gurationsOutput, error)
-	ListBucketInventoryCon***REMOVED***gurationsRequest(*s3.ListBucketInventoryCon***REMOVED***gurationsInput) (*request.Request, *s3.ListBucketInventoryCon***REMOVED***gurationsOutput)
+	ListBucketInventoryConfigurations(*s3.ListBucketInventoryConfigurationsInput) (*s3.ListBucketInventoryConfigurationsOutput, error)
+	ListBucketInventoryConfigurationsWithContext(aws.Context, *s3.ListBucketInventoryConfigurationsInput, ...request.Option) (*s3.ListBucketInventoryConfigurationsOutput, error)
+	ListBucketInventoryConfigurationsRequest(*s3.ListBucketInventoryConfigurationsInput) (*request.Request, *s3.ListBucketInventoryConfigurationsOutput)
 
-	ListBucketMetricsCon***REMOVED***gurations(*s3.ListBucketMetricsCon***REMOVED***gurationsInput) (*s3.ListBucketMetricsCon***REMOVED***gurationsOutput, error)
-	ListBucketMetricsCon***REMOVED***gurationsWithContext(aws.Context, *s3.ListBucketMetricsCon***REMOVED***gurationsInput, ...request.Option) (*s3.ListBucketMetricsCon***REMOVED***gurationsOutput, error)
-	ListBucketMetricsCon***REMOVED***gurationsRequest(*s3.ListBucketMetricsCon***REMOVED***gurationsInput) (*request.Request, *s3.ListBucketMetricsCon***REMOVED***gurationsOutput)
+	ListBucketMetricsConfigurations(*s3.ListBucketMetricsConfigurationsInput) (*s3.ListBucketMetricsConfigurationsOutput, error)
+	ListBucketMetricsConfigurationsWithContext(aws.Context, *s3.ListBucketMetricsConfigurationsInput, ...request.Option) (*s3.ListBucketMetricsConfigurationsOutput, error)
+	ListBucketMetricsConfigurationsRequest(*s3.ListBucketMetricsConfigurationsInput) (*request.Request, *s3.ListBucketMetricsConfigurationsOutput)
 
 	ListBuckets(*s3.ListBucketsInput) (*s3.ListBucketsOutput, error)
 	ListBucketsWithContext(aws.Context, *s3.ListBucketsInput, ...request.Option) (*s3.ListBucketsOutput, error)
@@ -311,17 +311,17 @@ type S3API interface {
 	ListPartsPages(*s3.ListPartsInput, func(*s3.ListPartsOutput, bool) bool) error
 	ListPartsPagesWithContext(aws.Context, *s3.ListPartsInput, func(*s3.ListPartsOutput, bool) bool, ...request.Option) error
 
-	PutBucketAccelerateCon***REMOVED***guration(*s3.PutBucketAccelerateCon***REMOVED***gurationInput) (*s3.PutBucketAccelerateCon***REMOVED***gurationOutput, error)
-	PutBucketAccelerateCon***REMOVED***gurationWithContext(aws.Context, *s3.PutBucketAccelerateCon***REMOVED***gurationInput, ...request.Option) (*s3.PutBucketAccelerateCon***REMOVED***gurationOutput, error)
-	PutBucketAccelerateCon***REMOVED***gurationRequest(*s3.PutBucketAccelerateCon***REMOVED***gurationInput) (*request.Request, *s3.PutBucketAccelerateCon***REMOVED***gurationOutput)
+	PutBucketAccelerateConfiguration(*s3.PutBucketAccelerateConfigurationInput) (*s3.PutBucketAccelerateConfigurationOutput, error)
+	PutBucketAccelerateConfigurationWithContext(aws.Context, *s3.PutBucketAccelerateConfigurationInput, ...request.Option) (*s3.PutBucketAccelerateConfigurationOutput, error)
+	PutBucketAccelerateConfigurationRequest(*s3.PutBucketAccelerateConfigurationInput) (*request.Request, *s3.PutBucketAccelerateConfigurationOutput)
 
 	PutBucketAcl(*s3.PutBucketAclInput) (*s3.PutBucketAclOutput, error)
 	PutBucketAclWithContext(aws.Context, *s3.PutBucketAclInput, ...request.Option) (*s3.PutBucketAclOutput, error)
 	PutBucketAclRequest(*s3.PutBucketAclInput) (*request.Request, *s3.PutBucketAclOutput)
 
-	PutBucketAnalyticsCon***REMOVED***guration(*s3.PutBucketAnalyticsCon***REMOVED***gurationInput) (*s3.PutBucketAnalyticsCon***REMOVED***gurationOutput, error)
-	PutBucketAnalyticsCon***REMOVED***gurationWithContext(aws.Context, *s3.PutBucketAnalyticsCon***REMOVED***gurationInput, ...request.Option) (*s3.PutBucketAnalyticsCon***REMOVED***gurationOutput, error)
-	PutBucketAnalyticsCon***REMOVED***gurationRequest(*s3.PutBucketAnalyticsCon***REMOVED***gurationInput) (*request.Request, *s3.PutBucketAnalyticsCon***REMOVED***gurationOutput)
+	PutBucketAnalyticsConfiguration(*s3.PutBucketAnalyticsConfigurationInput) (*s3.PutBucketAnalyticsConfigurationOutput, error)
+	PutBucketAnalyticsConfigurationWithContext(aws.Context, *s3.PutBucketAnalyticsConfigurationInput, ...request.Option) (*s3.PutBucketAnalyticsConfigurationOutput, error)
+	PutBucketAnalyticsConfigurationRequest(*s3.PutBucketAnalyticsConfigurationInput) (*request.Request, *s3.PutBucketAnalyticsConfigurationOutput)
 
 	PutBucketCors(*s3.PutBucketCorsInput) (*s3.PutBucketCorsOutput, error)
 	PutBucketCorsWithContext(aws.Context, *s3.PutBucketCorsInput, ...request.Option) (*s3.PutBucketCorsOutput, error)
@@ -331,33 +331,33 @@ type S3API interface {
 	PutBucketEncryptionWithContext(aws.Context, *s3.PutBucketEncryptionInput, ...request.Option) (*s3.PutBucketEncryptionOutput, error)
 	PutBucketEncryptionRequest(*s3.PutBucketEncryptionInput) (*request.Request, *s3.PutBucketEncryptionOutput)
 
-	PutBucketInventoryCon***REMOVED***guration(*s3.PutBucketInventoryCon***REMOVED***gurationInput) (*s3.PutBucketInventoryCon***REMOVED***gurationOutput, error)
-	PutBucketInventoryCon***REMOVED***gurationWithContext(aws.Context, *s3.PutBucketInventoryCon***REMOVED***gurationInput, ...request.Option) (*s3.PutBucketInventoryCon***REMOVED***gurationOutput, error)
-	PutBucketInventoryCon***REMOVED***gurationRequest(*s3.PutBucketInventoryCon***REMOVED***gurationInput) (*request.Request, *s3.PutBucketInventoryCon***REMOVED***gurationOutput)
+	PutBucketInventoryConfiguration(*s3.PutBucketInventoryConfigurationInput) (*s3.PutBucketInventoryConfigurationOutput, error)
+	PutBucketInventoryConfigurationWithContext(aws.Context, *s3.PutBucketInventoryConfigurationInput, ...request.Option) (*s3.PutBucketInventoryConfigurationOutput, error)
+	PutBucketInventoryConfigurationRequest(*s3.PutBucketInventoryConfigurationInput) (*request.Request, *s3.PutBucketInventoryConfigurationOutput)
 
 	PutBucketLifecycle(*s3.PutBucketLifecycleInput) (*s3.PutBucketLifecycleOutput, error)
 	PutBucketLifecycleWithContext(aws.Context, *s3.PutBucketLifecycleInput, ...request.Option) (*s3.PutBucketLifecycleOutput, error)
 	PutBucketLifecycleRequest(*s3.PutBucketLifecycleInput) (*request.Request, *s3.PutBucketLifecycleOutput)
 
-	PutBucketLifecycleCon***REMOVED***guration(*s3.PutBucketLifecycleCon***REMOVED***gurationInput) (*s3.PutBucketLifecycleCon***REMOVED***gurationOutput, error)
-	PutBucketLifecycleCon***REMOVED***gurationWithContext(aws.Context, *s3.PutBucketLifecycleCon***REMOVED***gurationInput, ...request.Option) (*s3.PutBucketLifecycleCon***REMOVED***gurationOutput, error)
-	PutBucketLifecycleCon***REMOVED***gurationRequest(*s3.PutBucketLifecycleCon***REMOVED***gurationInput) (*request.Request, *s3.PutBucketLifecycleCon***REMOVED***gurationOutput)
+	PutBucketLifecycleConfiguration(*s3.PutBucketLifecycleConfigurationInput) (*s3.PutBucketLifecycleConfigurationOutput, error)
+	PutBucketLifecycleConfigurationWithContext(aws.Context, *s3.PutBucketLifecycleConfigurationInput, ...request.Option) (*s3.PutBucketLifecycleConfigurationOutput, error)
+	PutBucketLifecycleConfigurationRequest(*s3.PutBucketLifecycleConfigurationInput) (*request.Request, *s3.PutBucketLifecycleConfigurationOutput)
 
 	PutBucketLogging(*s3.PutBucketLoggingInput) (*s3.PutBucketLoggingOutput, error)
 	PutBucketLoggingWithContext(aws.Context, *s3.PutBucketLoggingInput, ...request.Option) (*s3.PutBucketLoggingOutput, error)
 	PutBucketLoggingRequest(*s3.PutBucketLoggingInput) (*request.Request, *s3.PutBucketLoggingOutput)
 
-	PutBucketMetricsCon***REMOVED***guration(*s3.PutBucketMetricsCon***REMOVED***gurationInput) (*s3.PutBucketMetricsCon***REMOVED***gurationOutput, error)
-	PutBucketMetricsCon***REMOVED***gurationWithContext(aws.Context, *s3.PutBucketMetricsCon***REMOVED***gurationInput, ...request.Option) (*s3.PutBucketMetricsCon***REMOVED***gurationOutput, error)
-	PutBucketMetricsCon***REMOVED***gurationRequest(*s3.PutBucketMetricsCon***REMOVED***gurationInput) (*request.Request, *s3.PutBucketMetricsCon***REMOVED***gurationOutput)
+	PutBucketMetricsConfiguration(*s3.PutBucketMetricsConfigurationInput) (*s3.PutBucketMetricsConfigurationOutput, error)
+	PutBucketMetricsConfigurationWithContext(aws.Context, *s3.PutBucketMetricsConfigurationInput, ...request.Option) (*s3.PutBucketMetricsConfigurationOutput, error)
+	PutBucketMetricsConfigurationRequest(*s3.PutBucketMetricsConfigurationInput) (*request.Request, *s3.PutBucketMetricsConfigurationOutput)
 
-	PutBucketNoti***REMOVED***cation(*s3.PutBucketNoti***REMOVED***cationInput) (*s3.PutBucketNoti***REMOVED***cationOutput, error)
-	PutBucketNoti***REMOVED***cationWithContext(aws.Context, *s3.PutBucketNoti***REMOVED***cationInput, ...request.Option) (*s3.PutBucketNoti***REMOVED***cationOutput, error)
-	PutBucketNoti***REMOVED***cationRequest(*s3.PutBucketNoti***REMOVED***cationInput) (*request.Request, *s3.PutBucketNoti***REMOVED***cationOutput)
+	PutBucketNotification(*s3.PutBucketNotificationInput) (*s3.PutBucketNotificationOutput, error)
+	PutBucketNotificationWithContext(aws.Context, *s3.PutBucketNotificationInput, ...request.Option) (*s3.PutBucketNotificationOutput, error)
+	PutBucketNotificationRequest(*s3.PutBucketNotificationInput) (*request.Request, *s3.PutBucketNotificationOutput)
 
-	PutBucketNoti***REMOVED***cationCon***REMOVED***guration(*s3.PutBucketNoti***REMOVED***cationCon***REMOVED***gurationInput) (*s3.PutBucketNoti***REMOVED***cationCon***REMOVED***gurationOutput, error)
-	PutBucketNoti***REMOVED***cationCon***REMOVED***gurationWithContext(aws.Context, *s3.PutBucketNoti***REMOVED***cationCon***REMOVED***gurationInput, ...request.Option) (*s3.PutBucketNoti***REMOVED***cationCon***REMOVED***gurationOutput, error)
-	PutBucketNoti***REMOVED***cationCon***REMOVED***gurationRequest(*s3.PutBucketNoti***REMOVED***cationCon***REMOVED***gurationInput) (*request.Request, *s3.PutBucketNoti***REMOVED***cationCon***REMOVED***gurationOutput)
+	PutBucketNotificationConfiguration(*s3.PutBucketNotificationConfigurationInput) (*s3.PutBucketNotificationConfigurationOutput, error)
+	PutBucketNotificationConfigurationWithContext(aws.Context, *s3.PutBucketNotificationConfigurationInput, ...request.Option) (*s3.PutBucketNotificationConfigurationOutput, error)
+	PutBucketNotificationConfigurationRequest(*s3.PutBucketNotificationConfigurationInput) (*request.Request, *s3.PutBucketNotificationConfigurationOutput)
 
 	PutBucketPolicy(*s3.PutBucketPolicyInput) (*s3.PutBucketPolicyOutput, error)
 	PutBucketPolicyWithContext(aws.Context, *s3.PutBucketPolicyInput, ...request.Option) (*s3.PutBucketPolicyOutput, error)
@@ -395,9 +395,9 @@ type S3API interface {
 	PutObjectLegalHoldWithContext(aws.Context, *s3.PutObjectLegalHoldInput, ...request.Option) (*s3.PutObjectLegalHoldOutput, error)
 	PutObjectLegalHoldRequest(*s3.PutObjectLegalHoldInput) (*request.Request, *s3.PutObjectLegalHoldOutput)
 
-	PutObjectLockCon***REMOVED***guration(*s3.PutObjectLockCon***REMOVED***gurationInput) (*s3.PutObjectLockCon***REMOVED***gurationOutput, error)
-	PutObjectLockCon***REMOVED***gurationWithContext(aws.Context, *s3.PutObjectLockCon***REMOVED***gurationInput, ...request.Option) (*s3.PutObjectLockCon***REMOVED***gurationOutput, error)
-	PutObjectLockCon***REMOVED***gurationRequest(*s3.PutObjectLockCon***REMOVED***gurationInput) (*request.Request, *s3.PutObjectLockCon***REMOVED***gurationOutput)
+	PutObjectLockConfiguration(*s3.PutObjectLockConfigurationInput) (*s3.PutObjectLockConfigurationOutput, error)
+	PutObjectLockConfigurationWithContext(aws.Context, *s3.PutObjectLockConfigurationInput, ...request.Option) (*s3.PutObjectLockConfigurationOutput, error)
+	PutObjectLockConfigurationRequest(*s3.PutObjectLockConfigurationInput) (*request.Request, *s3.PutObjectLockConfigurationOutput)
 
 	PutObjectRetention(*s3.PutObjectRetentionInput) (*s3.PutObjectRetentionOutput, error)
 	PutObjectRetentionWithContext(aws.Context, *s3.PutObjectRetentionInput, ...request.Option) (*s3.PutObjectRetentionOutput, error)

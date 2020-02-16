@@ -5,7 +5,7 @@ Golang code-generators used to implement [Kubernetes-style API types](https://gi
 ## Purpose
 
 These code-generators can be used
-- in the context of [CustomResourceDe***REMOVED***nition](https://kubernetes.io/docs/tasks/access-kubernetes-api/extend-api-custom-resource-de***REMOVED***nitions/) to build native, versioned clients,
+- in the context of [CustomResourceDefinition](https://kubernetes.io/docs/tasks/access-kubernetes-api/extend-api-custom-resource-definitions/) to build native, versioned clients,
   informers and other helpers
 - in the context of [User-provider API Servers](https://github.com/kubernetes/apiserver) to build conversions between internal and versioned types, defaulters, protobuf codecs,
   internal and versioned clients and informers.

@@ -20,9 +20,9 @@ const (
 SERDE 'org.apache.hadoop.hive.serde2.lazy.LazySimpleSerDe'
 WITH SERDEPROPERTIES (
     "serialization.format" = ",",
-    "***REMOVED***eld.delim"          = ",",
-    "collection.delim"     = "unde***REMOVED***ned",
-    "mapkey.delim"         = "unde***REMOVED***ned",
+    "field.delim"          = ",",
+    "collection.delim"     = "undefined",
+    "mapkey.delim"         = "undefined",
     "timestamp.formats"    = "yyyy-MM-dd'T'HH:mm:ssZ"
 )
 `
@@ -39,8 +39,8 @@ var (
 )
 
 // CreateAWSUsageTable instantiates a new external HiveTable CR for AWS Billing/Usage reports stored in S3.
-func (op *Reporting) createAWSUsageHiveTableCR(logger logrus.FieldLogger, dataSource *metering.ReportDataSource, tableName, bucket, pre***REMOVED***x string, manifests []*aws.Manifest) (*metering.HiveTable, error) {
-	location, err := hive.S3Location(bucket, pre***REMOVED***x)
+func (op *Reporting) createAWSUsageHiveTableCR(logger logrus.FieldLogger, dataSource *metering.ReportDataSource, tableName, bucket, prefix string, manifests []*aws.Manifest) (*metering.HiveTable, error) {
+	location, err := hive.S3Location(bucket, prefix)
 	if err != nil {
 		return nil, err
 	}
@@ -71,14 +71,14 @@ func (op *Reporting) createAWSUsageHiveTableCR(logger logrus.FieldLogger, dataSo
 	if dataSource.Spec.AWSBilling.DatabaseName == "" {
 		hiveStorage, err := op.getHiveStorage(nil, dataSource.Namespace)
 		if err != nil {
-			return nil, fmt.Errorf("storage incorrectly con***REMOVED***gured for ReportDataSource %s, err: %s", dataSource.Name, err)
+			return nil, fmt.Errorf("storage incorrectly configured for ReportDataSource %s, err: %s", dataSource.Name, err)
 		}
 		if hiveStorage.Status.Hive.DatabaseName == "" {
 			op.enqueueStorageLocation(hiveStorage)
 			return nil, fmt.Errorf("StorageLocation %s Hive database %s does not exist yet", hiveStorage.Name, hiveStorage.Spec.Hive.DatabaseName)
 		}
 		dbName = hiveStorage.Status.Hive.DatabaseName
-	} ***REMOVED*** {
+	} else {
 		dbName = dataSource.Spec.AWSBilling.DatabaseName
 	}
 
@@ -92,7 +92,7 @@ func (op *Reporting) createAWSUsageHiveTableCR(logger logrus.FieldLogger, dataSo
 		Columns:       columns,
 		PartitionedBy: AWSUsageHivePartitions,
 		Location:      location,
-		FileFormat:    "text***REMOVED***le",
+		FileFormat:    "textfile",
 		RowFormat:     AWSUsageHiveRowFormat,
 		External:      true,
 	}
@@ -120,7 +120,7 @@ func (op *Reporting) updateAWSBillingPartitions(logger log.FieldLogger, dataSour
 	logger.Infof("updating partitions for Hive table %s", hiveTable.Name)
 	// Fetch the billing manifests
 	if len(manifests) == 0 {
-		logger.Warnf("HiveTable %q has no report manifests in its bucket, the ***REMOVED***rst report has likely not been generated yet", hiveTable.Name)
+		logger.Warnf("HiveTable %q has no report manifests in its bucket, the first report has likely not been generated yet", hiveTable.Name)
 		return nil
 	}
 
@@ -167,7 +167,7 @@ func getDesiredPartitions(bucket string, manifests []*aws.Manifest) ([]metering.
 // billing columns with characters allowed in hive SQL
 func SanetizeAWSColumnForHive(col aws.Column) string {
 	name := fmt.Sprintf("%s_%s", strings.TrimSpace(col.Category), strings.TrimSpace(col.Name))
-	// hive does not allow ':' or '.' in identi***REMOVED***ers
+	// hive does not allow ':' or '.' in identifiers
 	name = strings.Replace(name, ":", "_", -1)
 	name = strings.Replace(name, ".", "_", -1)
 	return strings.ToLower(name)

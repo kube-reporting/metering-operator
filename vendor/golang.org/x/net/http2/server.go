@@ -1,6 +1,6 @@
 // Copyright 2014 The Go Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE ***REMOVED***le.
+// license that can be found in the LICENSE file.
 
 // TODO: turn off the serve goroutine when idle, so
 // an idle conn only has the readFrames goroutine active. (which could
@@ -26,7 +26,7 @@
 package http2
 
 import (
-	"bu***REMOVED***o"
+	"bufio"
 	"bytes"
 	"crypto/tls"
 	"errors"
@@ -51,7 +51,7 @@ import (
 
 const (
 	prefaceTimeout        = 10 * time.Second
-	***REMOVED***rstSettingsTimeout  = 2 * time.Second // should be in-flight with preface anyway
+	firstSettingsTimeout  = 2 * time.Second // should be in-flight with preface anyway
 	handlerChunkWriteSize = 4 << 10
 	defaultMaxStreams     = 250 // TODO: make this 100 as the GFE seems to?
 )
@@ -66,7 +66,7 @@ var (
 var responseWriterStatePool = sync.Pool{
 	New: func() interface{} {
 		rws := &responseWriterState{}
-		rws.bw = bu***REMOVED***o.NewWriterSize(chunkWriter{rws}, handlerChunkWriteSize)
+		rws.bw = bufio.NewWriterSize(chunkWriter{rws}, handlerChunkWriteSize)
 		return rws
 	},
 }
@@ -87,7 +87,7 @@ type Server struct {
 	// TODO: implement
 	MaxHandlers int
 
-	// MaxConcurrentStreams optionally speci***REMOVED***es the number of
+	// MaxConcurrentStreams optionally specifies the number of
 	// concurrent streams that each client may have open at a
 	// time. This is unrelated to the number of http.Handler goroutines
 	// which may be active globally, which is MaxHandlers.
@@ -95,7 +95,7 @@ type Server struct {
 	// the HTTP/2 spec's recommendations.
 	MaxConcurrentStreams uint32
 
-	// MaxReadFrameSize optionally speci***REMOVED***es the largest frame
+	// MaxReadFrameSize optionally specifies the largest frame
 	// this server is willing to read. A valid value is between
 	// 16k and 16M, inclusive. If zero or otherwise invalid, a
 	// default value is used.
@@ -105,7 +105,7 @@ type Server struct {
 	// cipher suites prohibited by the HTTP/2 spec.
 	PermitProhibitedCipherSuites bool
 
-	// IdleTimeout speci***REMOVED***es how long until idle clients should be
+	// IdleTimeout specifies how long until idle clients should be
 	// closed with a GOAWAY frame. PING frames are not considered
 	// activity for the purposes of IdleTimeout.
 	IdleTimeout time.Duration
@@ -168,7 +168,7 @@ type serverInternalState struct {
 
 func (s *serverInternalState) registerConn(sc *serverConn) {
 	if s == nil {
-		return // if the Server was used without calling Con***REMOVED***gureServer
+		return // if the Server was used without calling ConfigureServer
 	}
 	s.mu.Lock()
 	s.activeConns[sc] = struct{}{}
@@ -177,7 +177,7 @@ func (s *serverInternalState) registerConn(sc *serverConn) {
 
 func (s *serverInternalState) unregisterConn(sc *serverConn) {
 	if s == nil {
-		return // if the Server was used without calling Con***REMOVED***gureServer
+		return // if the Server was used without calling ConfigureServer
 	}
 	s.mu.Lock()
 	delete(s.activeConns, sc)
@@ -186,7 +186,7 @@ func (s *serverInternalState) unregisterConn(sc *serverConn) {
 
 func (s *serverInternalState) startGracefulShutdown() {
 	if s == nil {
-		return // if the Server was used without calling Con***REMOVED***gureServer
+		return // if the Server was used without calling ConfigureServer
 	}
 	s.mu.Lock()
 	for sc := range s.activeConns {
@@ -195,12 +195,12 @@ func (s *serverInternalState) startGracefulShutdown() {
 	s.mu.Unlock()
 }
 
-// Con***REMOVED***gureServer adds HTTP/2 support to a net/http Server.
+// ConfigureServer adds HTTP/2 support to a net/http Server.
 //
-// The con***REMOVED***guration conf may be nil.
+// The configuration conf may be nil.
 //
-// Con***REMOVED***gureServer must be called before s begins serving.
-func Con***REMOVED***gureServer(s *http.Server, conf *Server) error {
+// ConfigureServer must be called before s begins serving.
+func ConfigureServer(s *http.Server, conf *Server) error {
 	if s == nil {
 		panic("nil *http.Server")
 	}
@@ -208,22 +208,22 @@ func Con***REMOVED***gureServer(s *http.Server, conf *Server) error {
 		conf = new(Server)
 	}
 	conf.state = &serverInternalState{activeConns: make(map[*serverConn]struct{})}
-	if err := con***REMOVED***gureServer18(s, conf); err != nil {
+	if err := configureServer18(s, conf); err != nil {
 		return err
 	}
-	if err := con***REMOVED***gureServer19(s, conf); err != nil {
+	if err := configureServer19(s, conf); err != nil {
 		return err
 	}
 
-	if s.TLSCon***REMOVED***g == nil {
-		s.TLSCon***REMOVED***g = new(tls.Con***REMOVED***g)
-	} ***REMOVED*** if s.TLSCon***REMOVED***g.CipherSuites != nil {
+	if s.TLSConfig == nil {
+		s.TLSConfig = new(tls.Config)
+	} else if s.TLSConfig.CipherSuites != nil {
 		// If they already provided a CipherSuite list, return
 		// an error if it has a bad order or is missing
 		// ECDHE_RSA_WITH_AES_128_GCM_SHA256 or ECDHE_ECDSA_WITH_AES_128_GCM_SHA256.
 		haveRequired := false
 		sawBad := false
-		for i, cs := range s.TLSCon***REMOVED***g.CipherSuites {
+		for i, cs := range s.TLSConfig.CipherSuites {
 			switch cs {
 			case tls.TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256,
 				// Alternative MTI cipher to not discourage ECDSA-only servers.
@@ -233,33 +233,33 @@ func Con***REMOVED***gureServer(s *http.Server, conf *Server) error {
 			}
 			if isBadCipher(cs) {
 				sawBad = true
-			} ***REMOVED*** if sawBad {
-				return fmt.Errorf("http2: TLSCon***REMOVED***g.CipherSuites index %d contains an HTTP/2-approved cipher suite (%#04x), but it comes after unapproved cipher suites. With this con***REMOVED***guration, clients that don't support previous, approved cipher suites may be given an unapproved one and reject the connection.", i, cs)
+			} else if sawBad {
+				return fmt.Errorf("http2: TLSConfig.CipherSuites index %d contains an HTTP/2-approved cipher suite (%#04x), but it comes after unapproved cipher suites. With this configuration, clients that don't support previous, approved cipher suites may be given an unapproved one and reject the connection.", i, cs)
 			}
 		}
 		if !haveRequired {
-			return fmt.Errorf("http2: TLSCon***REMOVED***g.CipherSuites is missing an HTTP/2-required AES_128_GCM_SHA256 cipher.")
+			return fmt.Errorf("http2: TLSConfig.CipherSuites is missing an HTTP/2-required AES_128_GCM_SHA256 cipher.")
 		}
 	}
 
 	// Note: not setting MinVersion to tls.VersionTLS12,
-	// as we don't want to interfere with HTTP/1.1 traf***REMOVED***c
+	// as we don't want to interfere with HTTP/1.1 traffic
 	// on the user's server. We enforce TLS 1.2 later once
 	// we accept a connection. Ideally this should be done
 	// during next-proto selection, but using TLS <1.2 with
 	// HTTP/2 is still the client's bug.
 
-	s.TLSCon***REMOVED***g.PreferServerCipherSuites = true
+	s.TLSConfig.PreferServerCipherSuites = true
 
 	haveNPN := false
-	for _, p := range s.TLSCon***REMOVED***g.NextProtos {
+	for _, p := range s.TLSConfig.NextProtos {
 		if p == NextProtoTLS {
 			haveNPN = true
 			break
 		}
 	}
 	if !haveNPN {
-		s.TLSCon***REMOVED***g.NextProtos = append(s.TLSCon***REMOVED***g.NextProtos, NextProtoTLS)
+		s.TLSConfig.NextProtos = append(s.TLSConfig.NextProtos, NextProtoTLS)
 	}
 
 	if s.TLSNextProto == nil {
@@ -271,7 +271,7 @@ func Con***REMOVED***gureServer(s *http.Server, conf *Server) error {
 		}
 		conf.ServeConn(c, &ServeConnOpts{
 			Handler:    h,
-			BaseCon***REMOVED***g: hs,
+			BaseConfig: hs,
 		})
 	}
 	s.TLSNextProto[NextProtoTLS] = protoHandler
@@ -280,19 +280,19 @@ func Con***REMOVED***gureServer(s *http.Server, conf *Server) error {
 
 // ServeConnOpts are options for the Server.ServeConn method.
 type ServeConnOpts struct {
-	// BaseCon***REMOVED***g optionally sets the base con***REMOVED***guration
+	// BaseConfig optionally sets the base configuration
 	// for values. If nil, defaults are used.
-	BaseCon***REMOVED***g *http.Server
+	BaseConfig *http.Server
 
-	// Handler speci***REMOVED***es which handler to use for processing
-	// requests. If nil, BaseCon***REMOVED***g.Handler is used. If BaseCon***REMOVED***g
-	// or BaseCon***REMOVED***g.Handler is nil, http.DefaultServeMux is used.
+	// Handler specifies which handler to use for processing
+	// requests. If nil, BaseConfig.Handler is used. If BaseConfig
+	// or BaseConfig.Handler is nil, http.DefaultServeMux is used.
 	Handler http.Handler
 }
 
-func (o *ServeConnOpts) baseCon***REMOVED***g() *http.Server {
-	if o != nil && o.BaseCon***REMOVED***g != nil {
-		return o.BaseCon***REMOVED***g
+func (o *ServeConnOpts) baseConfig() *http.Server {
+	if o != nil && o.BaseConfig != nil {
+		return o.BaseConfig
 	}
 	return new(http.Server)
 }
@@ -302,8 +302,8 @@ func (o *ServeConnOpts) handler() http.Handler {
 		if o.Handler != nil {
 			return o.Handler
 		}
-		if o.BaseCon***REMOVED***g != nil && o.BaseCon***REMOVED***g.Handler != nil {
-			return o.BaseCon***REMOVED***g.Handler
+		if o.BaseConfig != nil && o.BaseConfig.Handler != nil {
+			return o.BaseConfig.Handler
 		}
 	}
 	return http.DefaultServeMux
@@ -317,7 +317,7 @@ func (o *ServeConnOpts) handler() http.Handler {
 // to be able to read the preface and settings frame from the
 // client. If c has a ConnectionState method like a *tls.Conn, the
 // ConnectionState is used to verify the TLS ciphersuite and to set
-// the Request.TLS ***REMOVED***eld in Handlers.
+// the Request.TLS field in Handlers.
 //
 // ServeConn does not support h2c by itself. Any h2c support must be
 // implemented in terms of providing a suitably-behaving net.Conn.
@@ -329,7 +329,7 @@ func (s *Server) ServeConn(c net.Conn, opts *ServeConnOpts) {
 
 	sc := &serverConn{
 		srv:                         s,
-		hs:                          opts.baseCon***REMOVED***g(),
+		hs:                          opts.baseConfig(),
 		conn:                        c,
 		baseCtx:                     baseCtx,
 		remoteAddrStr:               c.RemoteAddr().String(),
@@ -365,12 +365,12 @@ func (s *Server) ServeConn(c net.Conn, opts *ServeConnOpts) {
 
 	if s.NewWriteScheduler != nil {
 		sc.writeSched = s.NewWriteScheduler()
-	} ***REMOVED*** {
+	} else {
 		sc.writeSched = NewRandomWriteScheduler()
 	}
 
-	// These start at the RFC-speci***REMOVED***ed defaults. If there is a higher
-	// con***REMOVED***gured value for inflow, that will be updated when we send a
+	// These start at the RFC-specified defaults. If there is a higher
+	// configured value for inflow, that will be updated when we send a
 	// WINDOW_UPDATE shortly after sending SETTINGS.
 	sc.flow.add(initialWindowSize)
 	sc.inflow.add(initialWindowSize)
@@ -422,7 +422,7 @@ func (s *Server) ServeConn(c net.Conn, opts *ServeConnOpts) {
 			// TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256 so there's no
 			// excuses here. If we really must, we could allow an
 			// "AllowInsecureWeakCiphers" option on the server later.
-			// Let's see how it plays out ***REMOVED***rst.
+			// Let's see how it plays out first.
 			sc.rejectConn(ErrCodeInadequateSecurity, fmt.Sprintf("Prohibited TLS 1.2 Cipher Suite: %x", sc.tlsState.CipherSuite))
 			return
 		}
@@ -457,7 +457,7 @@ type serverConn struct {
 	wroteFrameCh     chan frameWriteResult  // from writeFrameAsync -> serve, tickles more frame writes
 	bodyReadCh       chan bodyReadMsg       // from handlers -> serve
 	serveMsgCh       chan interface{}       // misc messages & code to send to / run on the serve loop
-	flow             flow                   // conn-wide (not stream-speci***REMOVED***c) outbound flow control
+	flow             flow                   // conn-wide (not stream-specific) outbound flow control
 	inflow           flow                   // conn-wide inbound flow control
 	tlsState         *tls.ConnectionState   // shared by all handlers, like net/http
 	remoteAddrStr    string
@@ -522,7 +522,7 @@ func (sc *serverConn) curOpenStreams() uint32 {
 // responseWriter's responseWriterState is recycled at the end of a
 // handler, this struct intentionally has no pointer to the
 // *responseWriter{,State} itself, as the Handler ending nils out the
-// responseWriter's state ***REMOVED***eld.
+// responseWriter's state field.
 type stream struct {
 	// immutable:
 	sc        *serverConn
@@ -563,17 +563,17 @@ func (sc *serverConn) state(streamID uint32) (streamState, *stream) {
 	if st, ok := sc.streams[streamID]; ok {
 		return st.state, st
 	}
-	// "The ***REMOVED***rst use of a new stream identi***REMOVED***er implicitly closes all
+	// "The first use of a new stream identifier implicitly closes all
 	// streams in the "idle" state that might have been initiated by
-	// that peer with a lower-valued stream identi***REMOVED***er. For example, if
+	// that peer with a lower-valued stream identifier. For example, if
 	// a client sends a HEADERS frame on stream 7 without ever sending a
 	// frame on stream 5, then stream 5 transitions to the "closed"
-	// state when the ***REMOVED***rst frame for stream 7 is sent or received."
+	// state when the first frame for stream 7 is sent or received."
 	if streamID%2 == 1 {
 		if streamID <= sc.maxClientStreamID {
 			return stateClosed, nil
 		}
-	} ***REMOVED*** {
+	} else {
 		if streamID <= sc.maxPushPromiseID {
 			return stateClosed, nil
 		}
@@ -581,7 +581,7 @@ func (sc *serverConn) state(streamID uint32) (streamState, *stream) {
 	return stateIdle, nil
 }
 
-// setConnState calls the net/http ConnState hook for this connection, if con***REMOVED***gured.
+// setConnState calls the net/http ConnState hook for this connection, if configured.
 // Note that the net/http package does StateNew and StateClosed for us.
 // There is currently no plan for StateHijacked or hijacking HTTP/2 connections.
 func (sc *serverConn) setConnState(state http.ConnState) {
@@ -599,12 +599,12 @@ func (sc *serverConn) vlogf(format string, args ...interface{}) {
 func (sc *serverConn) logf(format string, args ...interface{}) {
 	if lg := sc.hs.ErrorLog; lg != nil {
 		lg.Printf(format, args...)
-	} ***REMOVED*** {
+	} else {
 		log.Printf(format, args...)
 	}
 }
 
-// errno returns v's underlying uintptr, ***REMOVED*** 0.
+// errno returns v's underlying uintptr, else 0.
 //
 // TODO: remove this helper function once http2 can use build
 // tags. See comment in isClosedConnError.
@@ -630,9 +630,9 @@ func isClosedConnError(err error) bool {
 		return true
 	}
 
-	// TODO(brad***REMOVED***tz): x/tools/cmd/bundle doesn't really support
-	// build tags, so I can't make an http2_windows.go ***REMOVED***le with
-	// Windows-speci***REMOVED***c stuff. Fix that and move this, once we
+	// TODO(bradfitz): x/tools/cmd/bundle doesn't really support
+	// build tags, so I can't make an http2_windows.go file with
+	// Windows-specific stuff. Fix that and move this, once we
 	// have a way to bundle this into std's net/http somehow.
 	if runtime.GOOS == "windows" {
 		if oe, ok := err.(*net.OpError); ok && oe.Op == "read" {
@@ -655,7 +655,7 @@ func (sc *serverConn) condlogf(err error, format string, args ...interface{}) {
 	if err == io.EOF || err == io.ErrUnexpectedEOF || isClosedConnError(err) || err == errPrefaceTimeout {
 		// Boring, expected errors.
 		sc.vlogf(format, args...)
-	} ***REMOVED*** {
+	} else {
 		sc.logf(format, args...)
 	}
 }
@@ -780,7 +780,7 @@ func (sc *serverConn) serve() {
 	sc.unackedSettings++
 
 	// Each connection starts with intialWindowSize inflow tokens.
-	// If a higher value is con***REMOVED***gured, we add more tokens.
+	// If a higher value is configured, we add more tokens.
 	if diff := sc.srv.initialConnRecvWindowSize() - initialWindowSize; diff > 0 {
 		sc.sendWindowUpdate(nil, int(diff))
 	}
@@ -803,7 +803,7 @@ func (sc *serverConn) serve() {
 
 	go sc.readFrames() // closed by defer sc.conn.Close above
 
-	settingsTimer := time.AfterFunc(***REMOVED***rstSettingsTimeout, sc.onSettingsTimer)
+	settingsTimer := time.AfterFunc(firstSettingsTimeout, sc.onSettingsTimer)
 	defer settingsTimer.Stop()
 
 	loopNum := 0
@@ -842,7 +842,7 @@ func (sc *serverConn) serve() {
 					sc.vlogf("connection is idle")
 					sc.goAway(ErrCodeNo)
 				case shutdownTimerMsg:
-					sc.vlogf("GOAWAY close timer ***REMOVED***red; closing conn from %v", sc.conn.RemoteAddr())
+					sc.vlogf("GOAWAY close timer fired; closing conn from %v", sc.conn.RemoteAddr())
 					return
 				case gracefulShutdownMsg:
 					sc.startGracefulShutdownInternal()
@@ -909,13 +909,13 @@ func (sc *serverConn) readPreface() error {
 		buf := make([]byte, len(ClientPreface))
 		if _, err := io.ReadFull(sc.conn, buf); err != nil {
 			errc <- err
-		} ***REMOVED*** if !bytes.Equal(buf, clientPreface) {
+		} else if !bytes.Equal(buf, clientPreface) {
 			errc <- fmt.Errorf("bogus greeting %q", buf)
-		} ***REMOVED*** {
+		} else {
 			errc <- nil
 		}
 	}()
-	timer := time.NewTimer(prefaceTimeout) // TODO: con***REMOVED***gurable on *Server?
+	timer := time.NewTimer(prefaceTimeout) // TODO: configurable on *Server?
 	defer timer.Stop()
 	select {
 	case <-timer.C:
@@ -960,7 +960,7 @@ func (sc *serverConn) writeDataFromHandler(stream *stream, data []byte, endStrea
 		return errClientDisconnected
 	case <-stream.cw:
 		// If both ch and stream.cw were ready (as might
-		// happen on the ***REMOVED***nal Write after an http.Handler
+		// happen on the final Write after an http.Handler
 		// ends), prefer the write result. Otherwise this
 		// might just be us successfully closing the stream.
 		// The writeFrameAsync and serve goroutines guarantee
@@ -983,7 +983,7 @@ func (sc *serverConn) writeDataFromHandler(stream *stream, data []byte, endStrea
 // writeFrameFromHandler sends wr to sc.wantWriteFrameCh, but aborts
 // if the connection has gone away.
 //
-// This must not be run from the serve goroutine itself, ***REMOVED*** it might
+// This must not be run from the serve goroutine itself, else it might
 // deadlock writing to sc.wantWriteFrameCh (which is only mildly
 // buffered and is read by serve itself). If you're on the serve
 // goroutine, call writeFrame instead.
@@ -1022,7 +1022,7 @@ func (sc *serverConn) writeFrame(wr FrameWriteRequest) {
 	// is still running. For example, the server might close a stream when it
 	// receives bad data from the client. If this happens, the handler might
 	// attempt to write a frame after the stream has been closed (since the
-	// handler hasn't yet been noti***REMOVED***ed of the close). In this case, we simply
+	// handler hasn't yet been notified of the close). In this case, we simply
 	// ignore the frame. The handler will notice that the stream is closed when
 	// it waits for the frame to be written.
 	//
@@ -1100,7 +1100,7 @@ func (sc *serverConn) startFrameWrite(wr FrameWriteRequest) {
 		sc.writingFrameAsync = false
 		err := wr.write.writeFrame(sc)
 		sc.wroteFrame(frameWriteResult{wr, err})
-	} ***REMOVED*** {
+	} else {
 		sc.writingFrameAsync = true
 		go sc.writeFrameAsync(wr)
 	}
@@ -1135,7 +1135,7 @@ func (sc *serverConn) wroteFrame(res frameWriteResult) {
 			// the net/http package provides no mechanism
 			// for closing a ResponseWriter while still
 			// reading data (see possible TODO at top of
-			// this ***REMOVED***le), we go into closed state here
+			// this file), we go into closed state here
 			// anyway, after telling the peer we're
 			// hanging up on them. We'll transition to
 			// stateClosed after the RST_STREAM frame is
@@ -1149,7 +1149,7 @@ func (sc *serverConn) wroteFrame(res frameWriteResult) {
 		case stateHalfClosedRemote:
 			sc.closeStream(st, errHandlerComplete)
 		}
-	} ***REMOVED*** {
+	} else {
 		switch v := wr.write.(type) {
 		case StreamError:
 			// st may be unknown if the RST_STREAM was generated to reject bad input.
@@ -1173,11 +1173,11 @@ func (sc *serverConn) wroteFrame(res frameWriteResult) {
 // when the frame is done being written.
 //
 // If a frame isn't being written we need to send one, the best frame
-// to send is selected, preferring ***REMOVED***rst things that aren't
-// stream-speci***REMOVED***c (e.g. ACKing settings), and then ***REMOVED***nding the
+// to send is selected, preferring first things that aren't
+// stream-specific (e.g. ACKing settings), and then finding the
 // highest priority stream.
 //
-// If a frame isn't being written and there's nothing ***REMOVED*** to send, we
+// If a frame isn't being written and there's nothing else to send, we
 // flush the write buffer.
 func (sc *serverConn) scheduleFrameWrite() {
 	sc.serveG.check()
@@ -1242,7 +1242,7 @@ func (sc *serverConn) startGracefulShutdown() {
 // This is a var so it can be shorter in tests, where all requests uses the
 // loopback interface making the expected RTT very small.
 //
-// TODO: con***REMOVED***gurable?
+// TODO: configurable?
 var goAwayTimeout = 1 * time.Second
 
 func (sc *serverConn) startGracefulShutdownInternal() {
@@ -1291,12 +1291,12 @@ func (sc *serverConn) processFrameFromReader(res readFrameResult) bool {
 			// (e.g. CloseWrite) because they're done
 			// sending frames but they're still wanting
 			// our open replies?  Investigate.
-			// TODO: add CloseWrite to crypto/tls.Conn ***REMOVED***rst
+			// TODO: add CloseWrite to crypto/tls.Conn first
 			// so we have a way to test this? I suppose
 			// just for testing we could have a non-TLS mode.
 			return false
 		}
-	} ***REMOVED*** {
+	} else {
 		f := res.f
 		if VerboseLogs {
 			sc.vlogf("http2: server read frame %v", summarizeFrame(f))
@@ -1321,7 +1321,7 @@ func (sc *serverConn) processFrameFromReader(res readFrameResult) bool {
 	default:
 		if res.err != nil {
 			sc.vlogf("http2: server closing client connection; error reading frame from client %s: %v", sc.conn.RemoteAddr(), err)
-		} ***REMOVED*** {
+		} else {
 			sc.logf("http2: server closing client connection: %v", err)
 		}
 		return false
@@ -1376,7 +1376,7 @@ func (sc *serverConn) processPing(f *PingFrame) error {
 	if f.StreamID != 0 {
 		// "PING frames are not associated with any individual
 		// stream. If a PING frame is received with a stream
-		// identi***REMOVED***er ***REMOVED***eld value other than 0x0, the recipient MUST
+		// identifier field value other than 0x0, the recipient MUST
 		// respond with a connection error (Section 5.4.1) of type
 		// PROTOCOL_ERROR."
 		return ConnectionError(ErrCodeProtocol)
@@ -1450,7 +1450,7 @@ func (sc *serverConn) closeStream(st *stream, err error) {
 	}
 	if st.isPushed() {
 		sc.curPushedStreams--
-	} ***REMOVED*** {
+	} else {
 		sc.curClientStreams--
 	}
 	delete(sc.streams, st.id)
@@ -1470,7 +1470,7 @@ func (sc *serverConn) closeStream(st *stream, err error) {
 
 		p.CloseWithError(err)
 	}
-	st.cw.Close() // signals Handler's CloseNoti***REMOVED***er, unblocks writes, etc
+	st.cw.Close() // signals Handler's CloseNotifier, unblocks writes, etc
 	sc.writeSched.CloseStream(st.id)
 }
 
@@ -1518,7 +1518,7 @@ func (sc *serverConn) processSetting(s Setting) error {
 		sc.peerMaxHeaderListSize = s.Val
 	default:
 		// Unknown setting: "An endpoint that receives a SETTINGS
-		// frame with any unknown or unsupported identi***REMOVED***er MUST
+		// frame with any unknown or unsupported identifier MUST
 		// ignore that setting."
 		if VerboseLogs {
 			sc.vlogf("http2: server ignoring unknown setting %v", s)
@@ -1644,7 +1644,7 @@ func (sc *serverConn) processGoAway(f *GoAwayFrame) error {
 	sc.serveG.check()
 	if f.ErrCode != ErrCodeNo {
 		sc.logf("http2: received GOAWAY %+v, starting graceful shutdown", f)
-	} ***REMOVED*** {
+	} else {
 		sc.vlogf("http2: received GOAWAY %+v, starting graceful shutdown", f)
 	}
 	sc.startGracefulShutdownInternal()
@@ -1668,7 +1668,7 @@ func (st *stream) endStream() {
 	if st.declBodyBytes != -1 && st.declBodyBytes != st.bodyBytes {
 		st.body.CloseWithError(fmt.Errorf("request declared a Content-Length of %d but only wrote %d bytes",
 			st.declBodyBytes, st.bodyBytes))
-	} ***REMOVED*** {
+	} else {
 		st.body.closeWithErrorAndCode(io.EOF, st.copyTrailersToHandlerRequest)
 		st.body.CloseWithError(io.EOF)
 	}
@@ -1687,7 +1687,7 @@ func (st *stream) copyTrailersToHandlerRequest() {
 }
 
 // onWriteTimeout is run on its own goroutine (from time.AfterFunc)
-// when the stream's WriteTimeout has ***REMOVED***red.
+// when the stream's WriteTimeout has fired.
 func (st *stream) onWriteTimeout() {
 	st.sc.writeFrameFromHandler(FrameWriteRequest{write: streamError(st.id, ErrCodeInternal)})
 }
@@ -1701,8 +1701,8 @@ func (sc *serverConn) processHeaders(f *MetaHeadersFrame) error {
 	}
 	// http://tools.ietf.org/html/rfc7540#section-5.1.1
 	// Streams initiated by a client MUST use odd-numbered stream
-	// identi***REMOVED***ers. [...] An endpoint that receives an unexpected
-	// stream identi***REMOVED***er MUST respond with a connection error
+	// identifiers. [...] An endpoint that receives an unexpected
+	// stream identifier MUST respond with a connection error
 	// (Section 5.4.1) of type PROTOCOL_ERROR.
 	if id%2 != 1 {
 		return ConnectionError(ErrCodeProtocol)
@@ -1720,10 +1720,10 @@ func (sc *serverConn) processHeaders(f *MetaHeadersFrame) error {
 		return st.processTrailerHeaders(f)
 	}
 
-	// [...] The identi***REMOVED***er of a newly established stream MUST be
+	// [...] The identifier of a newly established stream MUST be
 	// numerically greater than all streams that the initiating
 	// endpoint has opened or reserved. [...]  An endpoint that
-	// receives an unexpected stream identi***REMOVED***er MUST respond with
+	// receives an unexpected stream identifier MUST respond with
 	// a connection error (Section 5.4.1) of type PROTOCOL_ERROR.
 	if id <= sc.maxClientStreamID {
 		return ConnectionError(ErrCodeProtocol)
@@ -1781,7 +1781,7 @@ func (sc *serverConn) processHeaders(f *MetaHeadersFrame) error {
 	if f.Truncated {
 		// Their header list was too long. Send a 431 error.
 		handler = handleHeaderListTooLong
-	} ***REMOVED*** if err := checkValidHTTP2RequestHeaders(req.Header); err != nil {
+	} else if err := checkValidHTTP2RequestHeaders(req.Header); err != nil {
 		handler = new400Handler(err)
 	}
 
@@ -1879,7 +1879,7 @@ func (sc *serverConn) newStream(id, pusherID uint32, state streamState) *stream 
 	sc.writeSched.OpenStream(st.id, OpenStreamOptions{PusherID: pusherID})
 	if st.isPushed() {
 		sc.curPushedStreams++
-	} ***REMOVED*** {
+	} else {
 		sc.curClientStreams++
 	}
 	if sc.curOpenStreams() == 1 {
@@ -1904,7 +1904,7 @@ func (sc *serverConn) newWriterAndRequest(st *stream, f *MetaHeadersFrame) (*res
 		if rp.path != "" || rp.scheme != "" || rp.authority == "" {
 			return nil, nil, streamError(f.StreamID, ErrCodeProtocol)
 		}
-	} ***REMOVED*** if rp.method == "" || rp.path == "" || (rp.scheme != "https" && rp.scheme != "http") {
+	} else if rp.method == "" || rp.path == "" || (rp.scheme != "https" && rp.scheme != "http") {
 		// See 8.1.2.6 Malformed Requests and Responses:
 		//
 		// Malformed requests or responses that are detected
@@ -1914,7 +1914,7 @@ func (sc *serverConn) newWriterAndRequest(st *stream, f *MetaHeadersFrame) (*res
 		// 8.1.2.3 Request Pseudo-Header Fields
 		// "All HTTP/2 requests MUST include exactly one valid
 		// value for the :method, :scheme, and :path
-		// pseudo-header ***REMOVED***elds"
+		// pseudo-header fields"
 		return nil, nil, streamError(f.StreamID, ErrCodeProtocol)
 	}
 
@@ -1939,7 +1939,7 @@ func (sc *serverConn) newWriterAndRequest(st *stream, f *MetaHeadersFrame) (*res
 	if bodyOpen {
 		if vv, ok := rp.header["Content-Length"]; ok {
 			req.ContentLength, _ = strconv.ParseInt(vv[0], 10, 64)
-		} ***REMOVED*** {
+		} else {
 			req.ContentLength = -1
 		}
 		req.Body.(*requestBody).pipe = &pipe{
@@ -1996,7 +1996,7 @@ func (sc *serverConn) newWriterAndRequestNoBody(st *stream, rp requestParam) (*r
 	if rp.method == "CONNECT" {
 		url_ = &url.URL{Host: rp.authority}
 		requestURI = rp.authority // mimic HTTP/1 server behavior
-	} ***REMOVED*** {
+	} else {
 		var err error
 		url_, err = url.ParseRequestURI(rp.path)
 		if err != nil {
@@ -2028,7 +2028,7 @@ func (sc *serverConn) newWriterAndRequestNoBody(st *stream, rp requestParam) (*r
 
 	rws := responseWriterStatePool.Get().(*responseWriterState)
 	bwSave := rws.bw
-	*rws = responseWriterState{} // zero all the ***REMOVED***elds
+	*rws = responseWriterState{} // zero all the fields
 	rws.conn = sc
 	rws.bw = bwSave
 	rws.bw.Reset(chunkWriter{rws})
@@ -2154,7 +2154,7 @@ func (sc *serverConn) sendWindowUpdate(st *stream, n int) {
 	// window is 1 to 2^31-1 (2,147,483,647) octets."
 	// A Go Read call on 64-bit machines could in theory read
 	// a larger Read than this. Very unlikely, but we handle it here
-	// rather than ***REMOVED***where for now.
+	// rather than elsewhere for now.
 	const maxUint31 = 1<<31 - 1
 	for n >= maxUint31 {
 		sc.sendWindowUpdate32(st, maxUint31)
@@ -2183,7 +2183,7 @@ func (sc *serverConn) sendWindowUpdate32(st *stream, n int32) {
 	var ok bool
 	if st == nil {
 		ok = sc.inflow.add(n)
-	} ***REMOVED*** {
+	} else {
 		ok = st.inflow.add(n)
 	}
 	if !ok {
@@ -2241,7 +2241,7 @@ type responseWriter struct {
 
 // Optional http.ResponseWriter interfaces implemented.
 var (
-	_ http.CloseNoti***REMOVED***er = (*responseWriter)(nil)
+	_ http.CloseNotifier = (*responseWriter)(nil)
 	_ http.Flusher       = (*responseWriter)(nil)
 	_ stringWriter       = (*responseWriter)(nil)
 )
@@ -2253,8 +2253,8 @@ type responseWriterState struct {
 	body   *requestBody // to close at end of request, if DATA frames didn't
 	conn   *serverConn
 
-	// TODO: adjust buffer writing sizes based on server con***REMOVED***g, frame size updates from peer, etc
-	bw *bu***REMOVED***o.Writer // writing to a chunkWriter{this *responseWriterState}
+	// TODO: adjust buffer writing sizes based on server config, frame size updates from peer, etc
+	bw *bufio.Writer // writing to a chunkWriter{this *responseWriterState}
 
 	// mutated by http.Handler goroutine:
 	handlerHeader http.Header // nil until called
@@ -2263,14 +2263,14 @@ type responseWriterState struct {
 	status        int         // status code passed to WriteHeader
 	wroteHeader   bool        // WriteHeader called (explicitly or implicitly). Not necessarily sent to user yet.
 	sentHeader    bool        // have we sent the header frame?
-	handlerDone   bool        // handler has ***REMOVED***nished
+	handlerDone   bool        // handler has finished
 	dirty         bool        // a Write failed; don't reuse this responseWriterState
 
 	sentContentLen int64 // non-zero if handler set a Content-Length header
 	wroteBytes     int64
 
-	closeNoti***REMOVED***erMu sync.Mutex // guards closeNoti***REMOVED***erCh
-	closeNoti***REMOVED***erCh chan bool  // nil until ***REMOVED***rst used
+	closeNotifierMu sync.Mutex // guards closeNotifierCh
+	closeNotifierCh chan bool  // nil until first used
 }
 
 type chunkWriter struct{ rws *responseWriterState }
@@ -2294,11 +2294,11 @@ func (rws *responseWriterState) declareTrailer(k string) {
 	}
 }
 
-// writeChunk writes chunks from the bu***REMOVED***o.Writer. But because
-// bu***REMOVED***o.Writer may bypass its chunking, sometimes p may be
+// writeChunk writes chunks from the bufio.Writer. But because
+// bufio.Writer may bypass its chunking, sometimes p may be
 // arbitrarily large.
 //
-// writeChunk is also responsible (on the ***REMOVED***rst chunk) for sending the
+// writeChunk is also responsible (on the first chunk) for sending the
 // HEADER response.
 func (rws *responseWriterState) writeChunk(p []byte) (n int, err error) {
 	if !rws.wroteHeader {
@@ -2314,7 +2314,7 @@ func (rws *responseWriterState) writeChunk(p []byte) (n int, err error) {
 			clen64, err := strconv.ParseInt(clen, 10, 64)
 			if err == nil && clen64 >= 0 {
 				rws.sentContentLen = clen64
-			} ***REMOVED*** {
+			} else {
 				clen = ""
 			}
 		}
@@ -2327,7 +2327,7 @@ func (rws *responseWriterState) writeChunk(p []byte) (n int, err error) {
 		}
 		var date string
 		if _, ok := rws.snapHeader["Date"]; !ok {
-			// TODO(brad***REMOVED***tz): be faster here, like net/http? measure.
+			// TODO(bradfitz): be faster here, like net/http? measure.
 			date = time.Now().UTC().Format(http.TimeFormat)
 		}
 
@@ -2388,19 +2388,19 @@ func (rws *responseWriterState) writeChunk(p []byte) (n int, err error) {
 	return len(p), nil
 }
 
-// TrailerPre***REMOVED***x is a magic pre***REMOVED***x for ResponseWriter.Header map keys
+// TrailerPrefix is a magic prefix for ResponseWriter.Header map keys
 // that, if present, signals that the map entry is actually for
-// the response trailers, and not the response headers. The pre***REMOVED***x
-// is stripped after the ServeHTTP call ***REMOVED***nishes and the values are
+// the response trailers, and not the response headers. The prefix
+// is stripped after the ServeHTTP call finishes and the values are
 // sent in the trailers.
 //
 // This mechanism is intended only for trailers that are not known
-// prior to the headers being written. If the set of trailers is ***REMOVED***xed
+// prior to the headers being written. If the set of trailers is fixed
 // or known before the header is written, the normal Go trailers mechanism
 // is preferred:
 //    https://golang.org/pkg/net/http/#ResponseWriter
 //    https://golang.org/pkg/net/http/#example_ResponseWriter_trailers
-const TrailerPre***REMOVED***x = "Trailer:"
+const TrailerPrefix = "Trailer:"
 
 // promoteUndeclaredTrailers permits http.Handlers to set trailers
 // after the header has already been flushed. Because the Go
@@ -2408,27 +2408,27 @@ const TrailerPre***REMOVED***x = "Trailer:"
 // Header), and because we didn't want to expand the ResponseWriter
 // interface, and because nobody used trailers, and because RFC 7230
 // says you SHOULD (but not must) predeclare any trailers in the
-// header, the of***REMOVED***cial ResponseWriter rules said trailers in Go must
+// header, the official ResponseWriter rules said trailers in Go must
 // be predeclared, and then we reuse the same ResponseWriter.Header()
 // map to mean both Headers and Trailers. When it's time to write the
-// Trailers, we pick out the ***REMOVED***elds of Headers that were declared as
-// trailers. That worked for a while, until we found the ***REMOVED***rst major
+// Trailers, we pick out the fields of Headers that were declared as
+// trailers. That worked for a while, until we found the first major
 // user of Trailers in the wild: gRPC (using them only over http2),
 // and gRPC libraries permit setting trailers mid-stream without
 // predeclarnig them. So: change of plans. We still permit the old
 // way, but we also permit this hack: if a Header() key begins with
-// "Trailer:", the suf***REMOVED***x of that key is a Trailer. Because ':' is an
+// "Trailer:", the suffix of that key is a Trailer. Because ':' is an
 // invalid token byte anyway, there is no ambiguity. (And it's already
-// ***REMOVED***ltered out) It's mildly hacky, but not terrible.
+// filtered out) It's mildly hacky, but not terrible.
 //
 // This method runs after the Handler is done and promotes any Header
-// ***REMOVED***elds to be trailers.
+// fields to be trailers.
 func (rws *responseWriterState) promoteUndeclaredTrailers() {
 	for k, vv := range rws.handlerHeader {
-		if !strings.HasPre***REMOVED***x(k, TrailerPre***REMOVED***x) {
+		if !strings.HasPrefix(k, TrailerPrefix) {
 			continue
 		}
-		trailerKey := strings.TrimPre***REMOVED***x(k, TrailerPre***REMOVED***x)
+		trailerKey := strings.TrimPrefix(k, TrailerPrefix)
 		rws.declareTrailer(trailerKey)
 		rws.handlerHeader[http.CanonicalHeaderKey(trailerKey)] = vv
 	}
@@ -2443,18 +2443,18 @@ func (rws *responseWriterState) promoteUndeclaredTrailers() {
 func (w *responseWriter) Flush() {
 	rws := w.rws
 	if rws == nil {
-		panic("Header called after Handler ***REMOVED***nished")
+		panic("Header called after Handler finished")
 	}
 	if rws.bw.Buffered() > 0 {
 		if err := rws.bw.Flush(); err != nil {
 			// Ignore the error. The frame writer already knows.
 			return
 		}
-	} ***REMOVED*** {
-		// The bu***REMOVED***o.Writer won't call chunkWriter.Write
+	} else {
+		// The bufio.Writer won't call chunkWriter.Write
 		// (writeChunk with zero bytes, so we have to do it
 		// ourselves to force the HTTP response header and/or
-		// ***REMOVED***nal DATA frame (with END_STREAM) to be sent.
+		// final DATA frame (with END_STREAM) to be sent.
 		rws.writeChunk(nil)
 	}
 }
@@ -2462,27 +2462,27 @@ func (w *responseWriter) Flush() {
 func (w *responseWriter) CloseNotify() <-chan bool {
 	rws := w.rws
 	if rws == nil {
-		panic("CloseNotify called after Handler ***REMOVED***nished")
+		panic("CloseNotify called after Handler finished")
 	}
-	rws.closeNoti***REMOVED***erMu.Lock()
-	ch := rws.closeNoti***REMOVED***erCh
+	rws.closeNotifierMu.Lock()
+	ch := rws.closeNotifierCh
 	if ch == nil {
 		ch = make(chan bool, 1)
-		rws.closeNoti***REMOVED***erCh = ch
+		rws.closeNotifierCh = ch
 		cw := rws.stream.cw
 		go func() {
 			cw.Wait() // wait for close
 			ch <- true
 		}()
 	}
-	rws.closeNoti***REMOVED***erMu.Unlock()
+	rws.closeNotifierMu.Unlock()
 	return ch
 }
 
 func (w *responseWriter) Header() http.Header {
 	rws := w.rws
 	if rws == nil {
-		panic("Header called after Handler ***REMOVED***nished")
+		panic("Header called after Handler finished")
 	}
 	if rws.handlerHeader == nil {
 		rws.handlerHeader = make(http.Header)
@@ -2494,14 +2494,14 @@ func (w *responseWriter) Header() http.Header {
 func checkWriteHeaderCode(code int) {
 	// Issue 22880: require valid WriteHeader status codes.
 	// For now we only enforce that it's three digits.
-	// In the future we might block things over 599 (600 and above aren't de***REMOVED***ned
+	// In the future we might block things over 599 (600 and above aren't defined
 	// at http://httpwg.org/specs/rfc7231.html#status.codes)
 	// and we might block under 200 (once we have more mature 1xx support).
 	// But for now any three digits.
 	//
 	// We used to send "HTTP/1.1 000 0" on the wire in responses but there's
 	// no equivalent bogus thing we can realistically send in HTTP/2,
-	// so we'll consistently panic instead and help people ***REMOVED***nd their bugs
+	// so we'll consistently panic instead and help people find their bugs
 	// early. (We can't return an error from WriteHeader even if we wanted to.)
 	if code < 100 || code > 999 {
 		panic(fmt.Sprintf("invalid WriteHeader code %v", code))
@@ -2511,7 +2511,7 @@ func checkWriteHeaderCode(code int) {
 func (w *responseWriter) WriteHeader(code int) {
 	rws := w.rws
 	if rws == nil {
-		panic("WriteHeader called after Handler ***REMOVED***nished")
+		panic("WriteHeader called after Handler finished")
 	}
 	rws.writeHeader(code)
 }
@@ -2540,7 +2540,7 @@ func cloneHeader(h http.Header) http.Header {
 // The Life Of A Write is like this:
 //
 // * Handler calls w.Write or w.WriteString ->
-// * -> rws.bw (*bu***REMOVED***o.Writer) ->
+// * -> rws.bw (*bufio.Writer) ->
 // * (Handler might call Flush)
 // * -> chunkWriter{rws}
 // * -> responseWriterState.writeChunk(p []byte)
@@ -2557,7 +2557,7 @@ func (w *responseWriter) WriteString(s string) (n int, err error) {
 func (w *responseWriter) write(lenData int, dataB []byte, dataS string) (n int, err error) {
 	rws := w.rws
 	if rws == nil {
-		panic("Write called after Handler ***REMOVED***nished")
+		panic("Write called after Handler finished")
 	}
 	if !rws.wroteHeader {
 		w.WriteHeader(200)
@@ -2573,7 +2573,7 @@ func (w *responseWriter) write(lenData int, dataB []byte, dataS string) (n int, 
 
 	if dataB != nil {
 		return rws.bw.Write(dataB)
-	} ***REMOVED*** {
+	} else {
 		return rws.bw.WriteString(dataS)
 	}
 }
@@ -2602,7 +2602,7 @@ var (
 )
 
 // pushOptions is the internal version of http.PushOptions, which we
-// cannot include here because it's only de***REMOVED***ned in Go 1.8 and later.
+// cannot include here because it's only defined in Go 1.8 and later.
 type pushOptions struct {
 	Method string
 	Header http.Header
@@ -2637,12 +2637,12 @@ func (w *responseWriter) push(target string, opts pushOptions) error {
 		return err
 	}
 	if u.Scheme == "" {
-		if !strings.HasPre***REMOVED***x(target, "/") {
+		if !strings.HasPrefix(target, "/") {
 			return fmt.Errorf("target must be an absolute URL or an absolute path: %q", target)
 		}
 		u.Scheme = wantScheme
 		u.Host = w.rws.req.Host
-	} ***REMOVED*** {
+	} else {
 		if u.Scheme != wantScheme {
 			return fmt.Errorf("cannot push URL with scheme %q from request with scheme %q", u.Scheme, wantScheme)
 		}
@@ -2651,7 +2651,7 @@ func (w *responseWriter) push(target string, opts pushOptions) error {
 		}
 	}
 	for k := range opts.Header {
-		if strings.HasPre***REMOVED***x(k, ":") {
+		if strings.HasPrefix(k, ":") {
 			return fmt.Errorf("promised request headers cannot include pseudo header %q", k)
 		}
 		// These headers are meaningful only if the request has a body,
@@ -2744,8 +2744,8 @@ func (sc *serverConn) startPush(msg *startPushRequest) {
 		}
 
 		// http://tools.ietf.org/html/rfc7540#section-5.1.1.
-		// Streams initiated by the server MUST use even-numbered identi***REMOVED***ers.
-		// A server that is unable to establish a new stream identi***REMOVED***er can send a GOAWAY
+		// Streams initiated by the server MUST use even-numbered identifiers.
+		// A server that is unable to establish a new stream identifier can send a GOAWAY
 		// frame so that the client is forced to open a new connection for new streams.
 		if sc.maxPushPromiseID+2 >= 1<<31 {
 			sc.startGracefulShutdownInternal()
@@ -2758,7 +2758,7 @@ func (sc *serverConn) startPush(msg *startPushRequest) {
 		// Strictly speaking, the new stream should start in "reserved (local)", then
 		// transition to "half closed (remote)" after sending the initial HEADERS, but
 		// we start in "half closed (remote)" for simplicity.
-		// See further comments at the de***REMOVED***nition of stateHalfClosedRemote.
+		// See further comments at the definition of stateHalfClosedRemote.
 		promised := sc.newStream(promisedID, msg.parent.id, stateHalfClosedRemote)
 		rw, req, err := sc.newWriterAndRequestNoBody(promised, requestParam{
 			method:    msg.method,
@@ -2838,12 +2838,12 @@ func new400Handler(err error) http.HandlerFunc {
 	}
 }
 
-// ValidTrailerHeader reports whether name is a valid header ***REMOVED***eld name to appear
+// ValidTrailerHeader reports whether name is a valid header field name to appear
 // in trailers.
 // See: http://tools.ietf.org/html/rfc7230#section-4.1.2
 func ValidTrailerHeader(name string) bool {
 	name = http.CanonicalHeaderKey(name)
-	if strings.HasPre***REMOVED***x(name, "If-") || badTrailer[name] {
+	if strings.HasPrefix(name, "If-") || badTrailer[name] {
 		return false
 	}
 	return true

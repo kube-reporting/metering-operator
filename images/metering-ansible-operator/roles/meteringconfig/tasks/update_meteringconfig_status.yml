@@ -1,14 +1,14 @@
 ---
 
-- name: Update the MeteringCon***REMOVED***g status
+- name: Update the MeteringConfig status
   k8s_status:
     api_version: metering.openshift.io/v1
-    kind: MeteringCon***REMOVED***g
+    kind: MeteringConfig
     name: "{{ meta.name }}"
     namespace: "{{ meta.namespace }}"
     conditions: "{{ [ current_conditions ] }}"
-  when: current_conditions is de***REMOVED***ned
+  when: current_conditions is defined
 
 - fail:
-    msg: "Failing role execution after updating the MeteringCon***REMOVED***g.Status"
-  when: end_play_after_updating_status is de***REMOVED***ned and end_play_after_updating_status
+    msg: "Failing role execution after updating the MeteringConfig.Status"
+  when: end_play_after_updating_status is defined and end_play_after_updating_status

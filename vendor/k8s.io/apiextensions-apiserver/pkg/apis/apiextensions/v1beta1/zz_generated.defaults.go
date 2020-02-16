@@ -4,7 +4,7 @@
 Copyright The Kubernetes Authors.
 
 Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this ***REMOVED***le except in compliance with the License.
+you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
 
     http://www.apache.org/licenses/LICENSE-2.0
@@ -12,7 +12,7 @@ You may obtain a copy of the License at
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the speci***REMOVED***c language governing permissions and
+See the License for the specific language governing permissions and
 limitations under the License.
 */
 
@@ -28,21 +28,21 @@ import (
 // Public to allow building arbitrary schemes.
 // All generated defaulters are covering - they call all nested defaulters.
 func RegisterDefaults(scheme *runtime.Scheme) error {
-	scheme.AddTypeDefaultingFunc(&CustomResourceDe***REMOVED***nition{}, func(obj interface{}) { SetObjectDefaults_CustomResourceDe***REMOVED***nition(obj.(*CustomResourceDe***REMOVED***nition)) })
-	scheme.AddTypeDefaultingFunc(&CustomResourceDe***REMOVED***nitionList{}, func(obj interface{}) {
-		SetObjectDefaults_CustomResourceDe***REMOVED***nitionList(obj.(*CustomResourceDe***REMOVED***nitionList))
+	scheme.AddTypeDefaultingFunc(&CustomResourceDefinition{}, func(obj interface{}) { SetObjectDefaults_CustomResourceDefinition(obj.(*CustomResourceDefinition)) })
+	scheme.AddTypeDefaultingFunc(&CustomResourceDefinitionList{}, func(obj interface{}) {
+		SetObjectDefaults_CustomResourceDefinitionList(obj.(*CustomResourceDefinitionList))
 	})
 	return nil
 }
 
-func SetObjectDefaults_CustomResourceDe***REMOVED***nition(in *CustomResourceDe***REMOVED***nition) {
-	SetDefaults_CustomResourceDe***REMOVED***nition(in)
-	SetDefaults_CustomResourceDe***REMOVED***nitionSpec(&in.Spec)
+func SetObjectDefaults_CustomResourceDefinition(in *CustomResourceDefinition) {
+	SetDefaults_CustomResourceDefinition(in)
+	SetDefaults_CustomResourceDefinitionSpec(&in.Spec)
 }
 
-func SetObjectDefaults_CustomResourceDe***REMOVED***nitionList(in *CustomResourceDe***REMOVED***nitionList) {
+func SetObjectDefaults_CustomResourceDefinitionList(in *CustomResourceDefinitionList) {
 	for i := range in.Items {
 		a := &in.Items[i]
-		SetObjectDefaults_CustomResourceDe***REMOVED***nition(a)
+		SetObjectDefaults_CustomResourceDefinition(a)
 	}
 }

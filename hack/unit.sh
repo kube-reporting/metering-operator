@@ -13,8 +13,8 @@ TMP_DIR="$(mktemp -d)"
 trap "rm -rf $TMP_DIR" exit
 
 mkdir -p "$TEST_OUTPUT_DIR"
-go test -v -coverpro***REMOVED***le="$COVERAGE_OUTFILE" ./pkg/... 2>&1 | tee "$TMP_DIR/metering-test-output.txt"
+go test -v -coverprofile="$COVERAGE_OUTFILE" ./pkg/... 2>&1 | tee "$TMP_DIR/metering-test-output.txt"
 if command -v go-junit-report >/dev/null 2>&1; then
     go-junit-report < "$TMP_DIR/metering-test-output.txt" > "${JUNIT_REPORT_OUTFILE}"
-***REMOVED***
+fi
 go test -c -o bin/e2e-tests ./test/e2e

@@ -1,6 +1,6 @@
 // Copyright 2009 The Go Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE ***REMOVED***le.
+// license that can be found in the LICENSE file.
 
 // +build ignore
 
@@ -14,9 +14,9 @@ Input to cgo -godefs.  See README.md
 package unix
 
 /*
-#de***REMOVED***ne __DARWIN_UNIX03 0
-#de***REMOVED***ne KERNEL
-#de***REMOVED***ne _DARWIN_USE_64_BIT_INODE
+#define __DARWIN_UNIX03 0
+#define KERNEL
+#define _DARWIN_USE_64_BIT_INODE
 #include <dirent.h>
 #include <fcntl.h>
 #include <poll.h>
@@ -55,7 +55,7 @@ enum {
 };
 
 union sockaddr_all {
-	struct sockaddr s1;	// this one gets used for ***REMOVED***elds
+	struct sockaddr s1;	// this one gets used for fields
 	struct sockaddr_in s2;	// these pad it out
 	struct sockaddr_in6 s3;
 	struct sockaddr_un s4;
@@ -159,7 +159,7 @@ type Inet6Pktinfo C.struct_in6_pktinfo
 
 type IPv6MTUInfo C.struct_ip6_mtuinfo
 
-type ICMPv6Filter C.struct_icmp6_***REMOVED***lter
+type ICMPv6Filter C.struct_icmp6_filter
 
 const (
 	SizeofSockaddrInet4    = C.sizeof_struct_sockaddr_in
@@ -175,7 +175,7 @@ const (
 	SizeofInet4Pktinfo     = C.sizeof_struct_in_pktinfo
 	SizeofInet6Pktinfo     = C.sizeof_struct_in6_pktinfo
 	SizeofIPv6MTUInfo      = C.sizeof_struct_ip6_mtuinfo
-	SizeofICMPv6Filter     = C.sizeof_struct_icmp6_***REMOVED***lter
+	SizeofICMPv6Filter     = C.sizeof_struct_icmp6_filter
 )
 
 // Ptrace requests
@@ -220,7 +220,7 @@ type RtMsghdr C.struct_rt_msghdr
 
 type RtMetrics C.struct_rt_metrics
 
-// Berkeley packet ***REMOVED***lter
+// Berkeley packet filter
 
 const (
 	SizeofBpfVersion = C.sizeof_struct_bpf_version

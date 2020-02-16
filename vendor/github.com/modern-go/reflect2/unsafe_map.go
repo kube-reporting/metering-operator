@@ -11,7 +11,7 @@ type UnsafeMapType struct {
 	pElemRType unsafe.Pointer
 }
 
-func newUnsafeMapType(cfg *frozenCon***REMOVED***g, type1 reflect.Type) MapType {
+func newUnsafeMapType(cfg *frozenConfig, type1 reflect.Type) MapType {
 	return &UnsafeMapType{
 		unsafeType: *newUnsafeType(cfg, type1),
 		pKeyRType:  unpackEFace(reflect.PtrTo(type1.Key())).data,

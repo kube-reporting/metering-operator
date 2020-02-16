@@ -4,7 +4,7 @@
 // https://github.com/golang/protobuf
 //
 // Redistribution and use in source and binary forms, with or without
-// modi***REMOVED***cation, are permitted provided that the following conditions are
+// modification, are permitted provided that the following conditions are
 // met:
 //
 //     * Redistributions of source code must retain the above copyright
@@ -15,7 +15,7 @@
 // distribution.
 //     * Neither the name of Google Inc. nor the names of its
 // contributors may be used to endorse or promote products derived from
-// this software without speci***REMOVED***c prior written permission.
+// this software without specific prior written permission.
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
 // "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
@@ -56,8 +56,8 @@ func Clone(src Message) Message {
 // Merger is the interface representing objects that can merge messages of the same type.
 type Merger interface {
 	// Merge merges src into this message.
-	// Required and optional ***REMOVED***elds that are set in src will be set to that value in dst.
-	// Elements of repeated ***REMOVED***elds will be appended.
+	// Required and optional fields that are set in src will be set to that value in dst.
+	// Elements of repeated fields will be appended.
 	//
 	// Merge may panic if called with a different argument type than the receiver.
 	Merge(src Message)
@@ -65,14 +65,14 @@ type Merger interface {
 
 // generatedMerger is the custom merge method that generated protos will have.
 // We must add this method since a generate Merge method will conflict with
-// many existing protos that have a Merge data ***REMOVED***eld already de***REMOVED***ned.
+// many existing protos that have a Merge data field already defined.
 type generatedMerger interface {
 	XXX_Merge(src Message)
 }
 
 // Merge merges src into dst.
-// Required and optional ***REMOVED***elds that are set in src will be set to that value in dst.
-// Elements of repeated ***REMOVED***elds will be appended.
+// Required and optional fields that are set in src will be set to that value in dst.
+// Elements of repeated fields will be appended.
 // Merge panics if src and dst are not the same type, or if dst is nil.
 func Merge(dst, src Message) {
 	if m, ok := dst.(Merger); ok {
@@ -102,7 +102,7 @@ func mergeStruct(out, in reflect.Value) {
 	sprop := GetProperties(in.Type())
 	for i := 0; i < in.NumField(); i++ {
 		f := in.Type().Field(i)
-		if strings.HasPre***REMOVED***x(f.Name, "XXX_") {
+		if strings.HasPrefix(f.Name, "XXX_") {
 			continue
 		}
 		mergeAny(out.Field(i), in.Field(i), false, sprop.Prop[i])
@@ -113,7 +113,7 @@ func mergeStruct(out, in reflect.Value) {
 		bIn := emIn.GetExtensions()
 		bOut := emOut.GetExtensions()
 		*bOut = append(*bOut, *bIn...)
-	} ***REMOVED*** if emIn, err := extendable(in.Addr().Interface()); err == nil {
+	} else if emIn, err := extendable(in.Addr().Interface()); err == nil {
 		emOut, _ := extendable(out.Addr().Interface())
 		mIn, muIn := emIn.extensionsRead()
 		if mIn != nil {
@@ -136,13 +136,13 @@ func mergeStruct(out, in reflect.Value) {
 
 // mergeAny performs a merge between two values of the same type.
 // viaPtr indicates whether the values were indirected through a pointer (implying proto2).
-// prop is set if this is a struct ***REMOVED***eld (it may be nil).
+// prop is set if this is a struct field (it may be nil).
 func mergeAny(out, in reflect.Value, viaPtr bool, prop *Properties) {
 	if in.Type() == protoMessageType {
 		if !in.IsNil() {
 			if out.IsNil() {
 				out.Set(reflect.ValueOf(Clone(in.Interface().(Message))))
-			} ***REMOVED*** {
+			} else {
 				Merge(out.Interface().(Message), in.Interface().(Message))
 			}
 		}
@@ -156,7 +156,7 @@ func mergeAny(out, in reflect.Value, viaPtr bool, prop *Properties) {
 		}
 		out.Set(in)
 	case reflect.Interface:
-		// Probably a oneof ***REMOVED***eld; copy non-nil values.
+		// Probably a oneof field; copy non-nil values.
 		if in.IsNil() {
 			return
 		}
@@ -202,10 +202,10 @@ func mergeAny(out, in reflect.Value, viaPtr bool, prop *Properties) {
 			return
 		}
 		if in.Type().Elem().Kind() == reflect.Uint8 {
-			// []byte is a scalar bytes ***REMOVED***eld, not a repeated ***REMOVED***eld.
+			// []byte is a scalar bytes field, not a repeated field.
 
 			// Edge case: if this is in a proto3 message, a zero length
-			// bytes ***REMOVED***eld is considered the zero value, and should not
+			// bytes field is considered the zero value, and should not
 			// be merged.
 			if prop != nil && prop.proto3 && in.Len() == 0 {
 				return

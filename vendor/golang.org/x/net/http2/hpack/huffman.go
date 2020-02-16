@@ -1,6 +1,6 @@
 // Copyright 2014 The Go Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE ***REMOVED***le.
+// license that can be found in the LICENSE file.
 
 package hpack
 
@@ -50,7 +50,7 @@ func huffmanDecode(buf *bytes.Buffer, maxLen int, v []byte) error {
 	n := rootHuffmanNode
 	// cur is the bit buffer that has not been fed into n.
 	// cbits is the number of low order bits in cur that are valid.
-	// sbits is the number of bits of the symbol pre***REMOVED***x being decoded.
+	// sbits is the number of bits of the symbol prefix being decoded.
 	cur, cbits, sbits := uint(0), uint8(0), uint8(0)
 	for _, b := range v {
 		cur = cur<<8 | uint(b)
@@ -70,7 +70,7 @@ func huffmanDecode(buf *bytes.Buffer, maxLen int, v []byte) error {
 				cbits -= n.codeLen
 				n = rootHuffmanNode
 				sbits = cbits
-			} ***REMOVED*** {
+			} else {
 				cbits -= 8
 			}
 		}
@@ -97,7 +97,7 @@ func huffmanDecode(buf *bytes.Buffer, maxLen int, v []byte) error {
 		return ErrInvalidHuffman
 	}
 	if mask := uint(1<<cbits - 1); cur&mask != mask {
-		// Trailing bits must be a pre***REMOVED***x of EOS per RFC 7541 section 5.2.
+		// Trailing bits must be a prefix of EOS per RFC 7541 section 5.2.
 		return ErrInvalidHuffman
 	}
 

@@ -27,7 +27,7 @@ func (current LinkedPageBase) NextPageURL() (string, error) {
 
 	if current.LinkPath == nil {
 		path = []string{"links", "next"}
-	} ***REMOVED*** {
+	} else {
 		path = current.LinkPath
 	}
 
@@ -55,7 +55,7 @@ func (current LinkedPageBase) NextPageURL() (string, error) {
 				err.Actual = fmt.Sprintf("%v", reflect.TypeOf(value))
 				return "", err
 			}
-		} ***REMOVED*** {
+		} else {
 			if value == nil {
 				// Actual null element.
 				return "", nil
@@ -74,7 +74,7 @@ func (current LinkedPageBase) NextPageURL() (string, error) {
 	}
 }
 
-// IsEmpty satisi***REMOVED***es the IsEmpty method of the Page interface
+// IsEmpty satisifies the IsEmpty method of the Page interface
 func (current LinkedPageBase) IsEmpty() (bool, error) {
 	if b, ok := current.Body.([]interface{}); ok {
 		return len(b) == 0, nil

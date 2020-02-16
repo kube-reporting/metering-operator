@@ -10,11 +10,11 @@ import (
 
 var (
 	// Sadly this is missing from crypto/ecdsa compared to crypto/rsa
-	ErrECDSAVeri***REMOVED***cation = errors.New("crypto/ecdsa: veri***REMOVED***cation error")
+	ErrECDSAVerification = errors.New("crypto/ecdsa: verification error")
 )
 
 // Implements the ECDSA family of signing methods signing methods
-// Expects *ecdsa.PrivateKey for signing and *ecdsa.PublicKey for veri***REMOVED***cation
+// Expects *ecdsa.PrivateKey for signing and *ecdsa.PublicKey for verification
 type SigningMethodECDSA struct {
 	Name      string
 	Hash      crypto.Hash
@@ -22,7 +22,7 @@ type SigningMethodECDSA struct {
 	CurveBits int
 }
 
-// Speci***REMOVED***c instances for EC256 and company
+// Specific instances for EC256 and company
 var (
 	SigningMethodES256 *SigningMethodECDSA
 	SigningMethodES384 *SigningMethodECDSA
@@ -74,7 +74,7 @@ func (m *SigningMethodECDSA) Verify(signingString, signature string, key interfa
 	}
 
 	if len(sig) != 2*m.KeySize {
-		return ErrECDSAVeri***REMOVED***cation
+		return ErrECDSAVerification
 	}
 
 	r := big.NewInt(0).SetBytes(sig[:m.KeySize])
@@ -90,8 +90,8 @@ func (m *SigningMethodECDSA) Verify(signingString, signature string, key interfa
 	// Verify the signature
 	if verifystatus := ecdsa.Verify(ecdsaKey, hasher.Sum(nil), r, s); verifystatus == true {
 		return nil
-	} ***REMOVED*** {
-		return ErrECDSAVeri***REMOVED***cation
+	} else {
+		return ErrECDSAVerification
 	}
 }
 
@@ -142,7 +142,7 @@ func (m *SigningMethodECDSA) Sign(signingString string, key interface{}) (string
 		out := append(rBytesPadded, sBytesPadded...)
 
 		return EncodeSegment(out), nil
-	} ***REMOVED*** {
+	} else {
 		return "", err
 	}
 }

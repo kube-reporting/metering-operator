@@ -38,12 +38,12 @@ var (
 
 //for v2 endpoints full
 func apiReportV2URLFull(namespace, reportName string) string {
-	return path.Join(APIV2ReportEndpointPre***REMOVED***x, namespace, reportName, "full")
+	return path.Join(APIV2ReportEndpointPrefix, namespace, reportName, "full")
 }
 
 //for v2 endpoints TableHidden
 func apiReportV2URLTable(namespace, reportName string) string {
-	return path.Join(APIV2ReportEndpointPre***REMOVED***x, namespace, reportName, "table")
+	return path.Join(APIV2ReportEndpointPrefix, namespace, reportName, "table")
 }
 
 type fakePrometheusMetricsRepo struct {
@@ -116,7 +116,7 @@ func TestAPIV1ReportsGet(t *testing.T) {
 		prometheusMetricsRepo prestostore.PrometheusMetricsRepo
 		reportResultsGetter   prestostore.ReportResultsGetter
 	}{
-		"report-***REMOVED***nished-no-results": {
+		"report-finished-no-results": {
 			reportName: testReportName,
 			report:     testhelpers.NewReport(testReportName, namespace, testQueryName, reportStart, reportEnd, metering.ReportStatus{}, nil, false),
 			query: testhelpers.NewReportQuery(testQueryName, namespace, []metering.ReportQueryColumn{
@@ -144,7 +144,7 @@ func TestAPIV1ReportsGet(t *testing.T) {
 			prometheusMetricsRepo: &fakePrometheusMetricsRepo{},
 			expectedStatusCode:    http.StatusOK,
 		},
-		"report-***REMOVED***nished-with-results": {
+		"report-finished-with-results": {
 			reportName: testReportName,
 			report:     testhelpers.NewReport(testReportName, namespace, testQueryName, reportStart, reportEnd, metering.ReportStatus{}, nil, false),
 			query: testhelpers.NewReportQuery(testQueryName, namespace, []metering.ReportQueryColumn{
@@ -185,7 +185,7 @@ func TestAPIV1ReportsGet(t *testing.T) {
 			prometheusMetricsRepo: &fakePrometheusMetricsRepo{},
 			expectedStatusCode:    http.StatusOK,
 		},
-		"report-***REMOVED***nished-db-errored": {
+		"report-finished-db-errored": {
 			reportName: testReportName,
 			report:     testhelpers.NewReport(testReportName, namespace, testQueryName, reportStart, reportEnd, metering.ReportStatus{}, nil, false),
 			query: testhelpers.NewReportQuery(testQueryName, namespace, []metering.ReportQueryColumn{
@@ -223,10 +223,10 @@ func TestAPIV1ReportsGet(t *testing.T) {
 			reportResultsGetter:   &fakeReportResultsGetter{},
 			prometheusMetricsRepo: &fakePrometheusMetricsRepo{},
 		},
-		"report-name-not-speci***REMOVED***ed": {
+		"report-name-not-specified": {
 			reportName:            "",
 			expectedStatusCode:    http.StatusBadRequest,
-			expectedAPIError:      "the following ***REMOVED***elds are missing or empty: name",
+			expectedAPIError:      "the following fields are missing or empty: name",
 			reportResultsGetter:   &fakeReportResultsGetter{},
 			prometheusMetricsRepo: &fakePrometheusMetricsRepo{},
 		},
@@ -293,7 +293,7 @@ func TestAPIV1ReportsGet(t *testing.T) {
 			reportDataSourceLister := listers.NewReportDataSourceLister(reportDataSourceIndexer)
 			prestoTableLister := listers.NewPrestoTableLister(prestoTableIndexer)
 
-			// add our test report if one is speci***REMOVED***ed
+			// add our test report if one is specified
 			if tt.report != nil {
 				reportIndexer.Add(tt.report)
 			}
@@ -328,11 +328,11 @@ func TestAPIV1ReportsGet(t *testing.T) {
 			require.NoError(t, err)
 			endpointURL.RawQuery = params.Encode()
 
-			// ***REMOVED***nal string URL
-			***REMOVED***nalURL := endpointURL.String()
+			// final string URL
+			finalURL := endpointURL.String()
 
 			// query the API
-			resp, err := server.Client().Get(***REMOVED***nalURL)
+			resp, err := server.Client().Get(finalURL)
 			require.NoError(t, err, "expected making http request to not return error")
 
 			// read the body from the response. it shouldn't be empty, even if
@@ -351,7 +351,7 @@ func TestAPIV1ReportsGet(t *testing.T) {
 				err = json.Unmarshal(body, &errResp)
 				assert.NoError(t, err, "expected unmarshal to not error")
 				assert.Contains(t, errResp.Error, tt.expectedAPIError, "expected error response to contain expected api error")
-			} ***REMOVED*** {
+			} else {
 				var results []presto.Row
 				err = json.Unmarshal(body, &results)
 				assert.NoError(t, err, "expected unmarshal to not error")
@@ -392,7 +392,7 @@ func TestAPIV2ReportsFull(t *testing.T) {
 		prometheusMetricsRepo prestostore.PrometheusMetricsRepo
 		reportResultsGetter   prestostore.ReportResultsGetter
 	}{
-		"report-***REMOVED***nished-with-results": {
+		"report-finished-with-results": {
 			reportName: testReportName,
 			report:     testhelpers.NewReport(testReportName, namespace, testQueryName, reportStart, reportEnd, metering.ReportStatus{}, nil, false),
 			apiPath:    apiReportV2URLFull(namespace, testReportName) + testFormat,
@@ -442,7 +442,7 @@ func TestAPIV2ReportsFull(t *testing.T) {
 				},
 			},
 		},
-		"report-***REMOVED***nished-no-results": {
+		"report-finished-no-results": {
 			reportName: testReportName,
 			report:     testhelpers.NewReport(testReportName, namespace, testQueryName, reportStart, reportEnd, metering.ReportStatus{}, nil, false),
 			apiPath:    apiReportV2URLFull(namespace, testReportName) + testFormat,
@@ -473,7 +473,7 @@ func TestAPIV2ReportsFull(t *testing.T) {
 			expectedResults:       &GetReportResults{},
 			expectedStatusCode:    http.StatusOK,
 		},
-		"report-***REMOVED***nished-db-errored": {
+		"report-finished-db-errored": {
 			reportName: testReportName,
 			report:     testhelpers.NewReport(testReportName, namespace, testQueryName, reportStart, reportEnd, metering.ReportStatus{}, nil, false),
 			apiPath:    apiReportV2URLFull(namespace, testReportName) + testFormat,
@@ -514,20 +514,20 @@ func TestAPIV2ReportsFull(t *testing.T) {
 			reportResultsGetter:   &fakeReportResultsGetter{},
 			prometheusMetricsRepo: &fakePrometheusMetricsRepo{},
 		},
-		"report-name-not-speci***REMOVED***ed": {
+		"report-name-not-specified": {
 			reportName:            "",
-			apiPath:               APIV2ReportEndpointPre***REMOVED***x + "/ " + namespace + "//full" + testFormat,
+			apiPath:               APIV2ReportEndpointPrefix + "/ " + namespace + "//full" + testFormat,
 			expectedStatusCode:    http.StatusBadRequest,
-			expectedAPIError:      "the following ***REMOVED***elds are missing or empty: name",
+			expectedAPIError:      "the following fields are missing or empty: name",
 			reportResultsGetter:   &fakeReportResultsGetter{},
 			prometheusMetricsRepo: &fakePrometheusMetricsRepo{},
 		},
-		"report-format-not-speci***REMOVED***ed": {
+		"report-format-not-specified": {
 			reportName:            testReportName,
 			report:                testhelpers.NewReport(testReportName, namespace, testQueryName, reportStart, reportEnd, metering.ReportStatus{}, nil, false),
 			apiPath:               apiReportV2URLFull(namespace, testReportName),
 			expectedStatusCode:    http.StatusBadRequest,
-			expectedAPIError:      "the following ***REMOVED***elds are missing or empty: format",
+			expectedAPIError:      "the following fields are missing or empty: format",
 			reportResultsGetter:   &fakeReportResultsGetter{},
 			prometheusMetricsRepo: &fakePrometheusMetricsRepo{},
 		},
@@ -599,7 +599,7 @@ func TestAPIV2ReportsFull(t *testing.T) {
 			reportDataSourceLister := listers.NewReportDataSourceLister(reportDataSourceIndexer)
 			prestoTableLister := listers.NewPrestoTableLister(prestoTableIndexer)
 
-			// add our test report if one is speci***REMOVED***ed
+			// add our test report if one is specified
 			if tt.report != nil {
 				reportIndexer.Add(tt.report)
 			}
@@ -618,9 +618,9 @@ func TestAPIV2ReportsFull(t *testing.T) {
 			server := httptest.NewServer(router)
 			defer server.Close()
 
-			// ***REMOVED***nal string URL
-			***REMOVED***nalURL := server.URL + tt.apiPath
-			resp, err := server.Client().Get(***REMOVED***nalURL)
+			// final string URL
+			finalURL := server.URL + tt.apiPath
+			resp, err := server.Client().Get(finalURL)
 			require.NoError(t, err, "expected making http request to not return error")
 
 			// read the body from the response. it shouldn't be empty, even if
@@ -639,7 +639,7 @@ func TestAPIV2ReportsFull(t *testing.T) {
 				err = json.Unmarshal(body, &errResp)
 				assert.NoError(t, err, "expected unmarshal to not error")
 				assert.Contains(t, errResp.Error, tt.expectedAPIError, "expected error response to contain expected api error")
-			} ***REMOVED*** {
+			} else {
 				var results GetReportResults
 				err = json.Unmarshal(body, &results)
 				assert.NoError(t, err, "expected unmarshal to not error")
@@ -680,7 +680,7 @@ func TestAPIV2ReportsTable(t *testing.T) {
 		prometheusMetricsRepo prestostore.PrometheusMetricsRepo
 		reportResultsGetter   prestostore.ReportResultsGetter
 	}{
-		"report-***REMOVED***nished-with-results": {
+		"report-finished-with-results": {
 			reportName: testReportName,
 			report:     testhelpers.NewReport(testReportName, namespace, testQueryName, reportStart, reportEnd, metering.ReportStatus{}, nil, false),
 			apiPath:    apiReportV2URLTable(namespace, testReportName) + testFormat,
@@ -732,7 +732,7 @@ func TestAPIV2ReportsTable(t *testing.T) {
 				},
 			},
 		},
-		"report-***REMOVED***nished-no-results": {
+		"report-finished-no-results": {
 			reportName: testReportName,
 			report:     testhelpers.NewReport(testReportName, namespace, testQueryName, reportStart, reportEnd, metering.ReportStatus{}, nil, false),
 			apiPath:    apiReportV2URLTable(namespace, testReportName) + testFormat,
@@ -763,7 +763,7 @@ func TestAPIV2ReportsTable(t *testing.T) {
 			expectedResults:       &GetReportResults{},
 			expectedStatusCode:    http.StatusOK,
 		},
-		"report-***REMOVED***nished-db-errored": {
+		"report-finished-db-errored": {
 			reportName: testReportName,
 			report:     testhelpers.NewReport(testReportName, namespace, testQueryName, reportStart, reportEnd, metering.ReportStatus{}, nil, false),
 			apiPath:    apiReportV2URLTable(namespace, testReportName) + testFormat,
@@ -804,20 +804,20 @@ func TestAPIV2ReportsTable(t *testing.T) {
 			reportResultsGetter:   &fakeReportResultsGetter{},
 			prometheusMetricsRepo: &fakePrometheusMetricsRepo{},
 		},
-		"report-name-not-speci***REMOVED***ed": {
+		"report-name-not-specified": {
 			reportName:            "",
-			apiPath:               APIV2ReportEndpointPre***REMOVED***x + "/ " + namespace + "//table" + testFormat,
+			apiPath:               APIV2ReportEndpointPrefix + "/ " + namespace + "//table" + testFormat,
 			expectedStatusCode:    http.StatusBadRequest,
-			expectedAPIError:      "the following ***REMOVED***elds are missing or empty: name",
+			expectedAPIError:      "the following fields are missing or empty: name",
 			reportResultsGetter:   &fakeReportResultsGetter{},
 			prometheusMetricsRepo: &fakePrometheusMetricsRepo{},
 		},
-		"report-format-not-speci***REMOVED***ed": {
+		"report-format-not-specified": {
 			reportName:            testReportName,
 			report:                testhelpers.NewReport(testReportName, namespace, testQueryName, reportStart, reportEnd, metering.ReportStatus{}, nil, false),
 			apiPath:               apiReportV2URLTable(namespace, testReportName),
 			expectedStatusCode:    http.StatusBadRequest,
-			expectedAPIError:      "the following ***REMOVED***elds are missing or empty: format",
+			expectedAPIError:      "the following fields are missing or empty: format",
 			reportResultsGetter:   &fakeReportResultsGetter{},
 			prometheusMetricsRepo: &fakePrometheusMetricsRepo{},
 		},
@@ -889,7 +889,7 @@ func TestAPIV2ReportsTable(t *testing.T) {
 			reportDataSourceLister := listers.NewReportDataSourceLister(reportDataSourceIndexer)
 			prestoTableLister := listers.NewPrestoTableLister(prestoTableIndexer)
 
-			// add our test report if one is speci***REMOVED***ed
+			// add our test report if one is specified
 			if tt.report != nil {
 				reportIndexer.Add(tt.report)
 			}
@@ -908,9 +908,9 @@ func TestAPIV2ReportsTable(t *testing.T) {
 			server := httptest.NewServer(router)
 			defer server.Close()
 
-			// ***REMOVED***nal string URL
-			***REMOVED***nalURL := server.URL + tt.apiPath
-			resp, err := server.Client().Get(***REMOVED***nalURL)
+			// final string URL
+			finalURL := server.URL + tt.apiPath
+			resp, err := server.Client().Get(finalURL)
 			require.NoError(t, err, "expected making http request to not return error")
 
 			// read the body from the response. it shouldn't be empty, even if
@@ -929,7 +929,7 @@ func TestAPIV2ReportsTable(t *testing.T) {
 				err = json.Unmarshal(body, &errResp)
 				assert.NoError(t, err, "expected unmarshal to not error")
 				assert.Contains(t, errResp.Error, tt.expectedAPIError, "expected error response to contain expected api error")
-			} ***REMOVED*** {
+			} else {
 				var results GetReportResults
 				err = json.Unmarshal(body, &results)
 				assert.NoError(t, err, "expected unmarshal to not error")

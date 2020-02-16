@@ -4,7 +4,7 @@
 // http://github.com/gogo/protobuf
 //
 // Redistribution and use in source and binary forms, with or without
-// modi***REMOVED***cation, are permitted provided that the following conditions are
+// modification, are permitted provided that the following conditions are
 // met:
 //
 //     * Redistributions of source code must retain the above copyright
@@ -46,9 +46,9 @@ func makeUnmarshalMessage(sub *unmarshalInfo, name string) unmarshaler {
 		if x > uint64(len(b)) {
 			return nil, io.ErrUnexpectedEOF
 		}
-		// First read the message ***REMOVED***eld to see if something is there.
+		// First read the message field to see if something is there.
 		// The semantics of multiple submessages are weird.  Instead of
-		// the last one winning (as it is for all other ***REMOVED***elds), multiple
+		// the last one winning (as it is for all other fields), multiple
 		// submessages are merged.
 		v := f // gogo: changed from v := f.getPointer()
 		if v.isNil() {
@@ -58,8 +58,8 @@ func makeUnmarshalMessage(sub *unmarshalInfo, name string) unmarshaler {
 		err := sub.unmarshal(v, b[:x])
 		if err != nil {
 			if r, ok := err.(*RequiredNotSetError); ok {
-				r.***REMOVED***eld = name + "." + r.***REMOVED***eld
-			} ***REMOVED*** {
+				r.field = name + "." + r.field
+			} else {
 				return nil, err
 			}
 		}
@@ -84,8 +84,8 @@ func makeUnmarshalMessageSlice(sub *unmarshalInfo, name string) unmarshaler {
 		err := sub.unmarshal(v, b[:x])
 		if err != nil {
 			if r, ok := err.(*RequiredNotSetError); ok {
-				r.***REMOVED***eld = name + "." + r.***REMOVED***eld
-			} ***REMOVED*** {
+				r.field = name + "." + r.field
+			} else {
 				return nil, err
 			}
 		}

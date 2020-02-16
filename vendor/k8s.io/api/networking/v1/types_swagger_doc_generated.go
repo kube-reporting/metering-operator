@@ -2,7 +2,7 @@
 Copyright The Kubernetes Authors.
 
 Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this ***REMOVED***le except in compliance with the License.
+you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
 
     http://www.apache.org/licenses/LICENSE-2.0
@@ -10,13 +10,13 @@ You may obtain a copy of the License at
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the speci***REMOVED***c language governing permissions and
+See the License for the specific language governing permissions and
 limitations under the License.
 */
 
 package v1
 
-// This ***REMOVED***le contains a collection of methods that can be used from go-restful to
+// This file contains a collection of methods that can be used from go-restful to
 // generate Swagger API documentation for its models. Please read this PR for more
 // information on the implementation: https://github.com/emicklei/go-restful/pull/215
 //
@@ -38,9 +38,9 @@ func (IPBlock) SwaggerDoc() map[string]string {
 }
 
 var map_NetworkPolicy = map[string]string{
-	"":         "NetworkPolicy describes what network traf***REMOVED***c is allowed for a set of Pods",
+	"":         "NetworkPolicy describes what network traffic is allowed for a set of Pods",
 	"metadata": "Standard object's metadata. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#metadata",
-	"spec":     "Speci***REMOVED***cation of the desired behavior for this NetworkPolicy.",
+	"spec":     "Specification of the desired behavior for this NetworkPolicy.",
 }
 
 func (NetworkPolicy) SwaggerDoc() map[string]string {
@@ -48,9 +48,9 @@ func (NetworkPolicy) SwaggerDoc() map[string]string {
 }
 
 var map_NetworkPolicyEgressRule = map[string]string{
-	"":      "NetworkPolicyEgressRule describes a particular set of traf***REMOVED***c that is allowed out of pods matched by a NetworkPolicySpec's podSelector. The traf***REMOVED***c must match both ports and to. This type is beta-level in 1.8",
-	"ports": "List of destination ports for outgoing traf***REMOVED***c. Each item in this list is combined using a logical OR. If this ***REMOVED***eld is empty or missing, this rule matches all ports (traf***REMOVED***c not restricted by port). If this ***REMOVED***eld is present and contains at least one item, then this rule allows traf***REMOVED***c only if the traf***REMOVED***c matches at least one port in the list.",
-	"to":    "List of destinations for outgoing traf***REMOVED***c of pods selected for this rule. Items in this list are combined using a logical OR operation. If this ***REMOVED***eld is empty or missing, this rule matches all destinations (traf***REMOVED***c not restricted by destination). If this ***REMOVED***eld is present and contains at least one item, this rule allows traf***REMOVED***c only if the traf***REMOVED***c matches at least one item in the to list.",
+	"":      "NetworkPolicyEgressRule describes a particular set of traffic that is allowed out of pods matched by a NetworkPolicySpec's podSelector. The traffic must match both ports and to. This type is beta-level in 1.8",
+	"ports": "List of destination ports for outgoing traffic. Each item in this list is combined using a logical OR. If this field is empty or missing, this rule matches all ports (traffic not restricted by port). If this field is present and contains at least one item, then this rule allows traffic only if the traffic matches at least one port in the list.",
+	"to":    "List of destinations for outgoing traffic of pods selected for this rule. Items in this list are combined using a logical OR operation. If this field is empty or missing, this rule matches all destinations (traffic not restricted by destination). If this field is present and contains at least one item, this rule allows traffic only if the traffic matches at least one item in the to list.",
 }
 
 func (NetworkPolicyEgressRule) SwaggerDoc() map[string]string {
@@ -58,9 +58,9 @@ func (NetworkPolicyEgressRule) SwaggerDoc() map[string]string {
 }
 
 var map_NetworkPolicyIngressRule = map[string]string{
-	"":      "NetworkPolicyIngressRule describes a particular set of traf***REMOVED***c that is allowed to the pods matched by a NetworkPolicySpec's podSelector. The traf***REMOVED***c must match both ports and from.",
-	"ports": "List of ports which should be made accessible on the pods selected for this rule. Each item in this list is combined using a logical OR. If this ***REMOVED***eld is empty or missing, this rule matches all ports (traf***REMOVED***c not restricted by port). If this ***REMOVED***eld is present and contains at least one item, then this rule allows traf***REMOVED***c only if the traf***REMOVED***c matches at least one port in the list.",
-	"from":  "List of sources which should be able to access the pods selected for this rule. Items in this list are combined using a logical OR operation. If this ***REMOVED***eld is empty or missing, this rule matches all sources (traf***REMOVED***c not restricted by source). If this ***REMOVED***eld is present and contains at least on item, this rule allows traf***REMOVED***c only if the traf***REMOVED***c matches at least one item in the from list.",
+	"":      "NetworkPolicyIngressRule describes a particular set of traffic that is allowed to the pods matched by a NetworkPolicySpec's podSelector. The traffic must match both ports and from.",
+	"ports": "List of ports which should be made accessible on the pods selected for this rule. Each item in this list is combined using a logical OR. If this field is empty or missing, this rule matches all ports (traffic not restricted by port). If this field is present and contains at least one item, then this rule allows traffic only if the traffic matches at least one port in the list.",
+	"from":  "List of sources which should be able to access the pods selected for this rule. Items in this list are combined using a logical OR operation. If this field is empty or missing, this rule matches all sources (traffic not restricted by source). If this field is present and contains at least on item, this rule allows traffic only if the traffic matches at least one item in the from list.",
 }
 
 func (NetworkPolicyIngressRule) SwaggerDoc() map[string]string {
@@ -78,10 +78,10 @@ func (NetworkPolicyList) SwaggerDoc() map[string]string {
 }
 
 var map_NetworkPolicyPeer = map[string]string{
-	"":                  "NetworkPolicyPeer describes a peer to allow traf***REMOVED***c from. Only certain combinations of ***REMOVED***elds are allowed",
-	"podSelector":       "This is a label selector which selects Pods. This ***REMOVED***eld follows standard label selector semantics; if present but empty, it selects all pods.\n\nIf NamespaceSelector is also set, then the NetworkPolicyPeer as a whole selects the Pods matching PodSelector in the Namespaces selected by NamespaceSelector. Otherwise it selects the Pods matching PodSelector in the policy's own Namespace.",
-	"namespaceSelector": "Selects Namespaces using cluster-scoped labels. This ***REMOVED***eld follows standard label selector semantics; if present but empty, it selects all namespaces.\n\nIf PodSelector is also set, then the NetworkPolicyPeer as a whole selects the Pods matching PodSelector in the Namespaces selected by NamespaceSelector. Otherwise it selects all Pods in the Namespaces selected by NamespaceSelector.",
-	"ipBlock":           "IPBlock de***REMOVED***nes policy on a particular IPBlock. If this ***REMOVED***eld is set then neither of the other ***REMOVED***elds can be.",
+	"":                  "NetworkPolicyPeer describes a peer to allow traffic from. Only certain combinations of fields are allowed",
+	"podSelector":       "This is a label selector which selects Pods. This field follows standard label selector semantics; if present but empty, it selects all pods.\n\nIf NamespaceSelector is also set, then the NetworkPolicyPeer as a whole selects the Pods matching PodSelector in the Namespaces selected by NamespaceSelector. Otherwise it selects the Pods matching PodSelector in the policy's own Namespace.",
+	"namespaceSelector": "Selects Namespaces using cluster-scoped labels. This field follows standard label selector semantics; if present but empty, it selects all namespaces.\n\nIf PodSelector is also set, then the NetworkPolicyPeer as a whole selects the Pods matching PodSelector in the Namespaces selected by NamespaceSelector. Otherwise it selects all Pods in the Namespaces selected by NamespaceSelector.",
+	"ipBlock":           "IPBlock defines policy on a particular IPBlock. If this field is set then neither of the other fields can be.",
 }
 
 func (NetworkPolicyPeer) SwaggerDoc() map[string]string {
@@ -89,9 +89,9 @@ func (NetworkPolicyPeer) SwaggerDoc() map[string]string {
 }
 
 var map_NetworkPolicyPort = map[string]string{
-	"":         "NetworkPolicyPort describes a port to allow traf***REMOVED***c on",
-	"protocol": "The protocol (TCP, UDP, or SCTP) which traf***REMOVED***c must match. If not speci***REMOVED***ed, this ***REMOVED***eld defaults to TCP.",
-	"port":     "The port on the given protocol. This can either be a numerical or named port on a pod. If this ***REMOVED***eld is not provided, this matches all port names and numbers.",
+	"":         "NetworkPolicyPort describes a port to allow traffic on",
+	"protocol": "The protocol (TCP, UDP, or SCTP) which traffic must match. If not specified, this field defaults to TCP.",
+	"port":     "The port on the given protocol. This can either be a numerical or named port on a pod. If this field is not provided, this matches all port names and numbers.",
 }
 
 func (NetworkPolicyPort) SwaggerDoc() map[string]string {
@@ -99,11 +99,11 @@ func (NetworkPolicyPort) SwaggerDoc() map[string]string {
 }
 
 var map_NetworkPolicySpec = map[string]string{
-	"":            "NetworkPolicySpec provides the speci***REMOVED***cation of a NetworkPolicy",
-	"podSelector": "Selects the pods to which this NetworkPolicy object applies. The array of ingress rules is applied to any pods selected by this ***REMOVED***eld. Multiple network policies can select the same set of pods. In this case, the ingress rules for each are combined additively. This ***REMOVED***eld is NOT optional and follows standard label selector semantics. An empty podSelector matches all pods in this namespace.",
-	"ingress":     "List of ingress rules to be applied to the selected pods. Traf***REMOVED***c is allowed to a pod if there are no NetworkPolicies selecting the pod (and cluster policy otherwise allows the traf***REMOVED***c), OR if the traf***REMOVED***c source is the pod's local node, OR if the traf***REMOVED***c matches at least one ingress rule across all of the NetworkPolicy objects whose podSelector matches the pod. If this ***REMOVED***eld is empty then this NetworkPolicy does not allow any traf***REMOVED***c (and serves solely to ensure that the pods it selects are isolated by default)",
-	"egress":      "List of egress rules to be applied to the selected pods. Outgoing traf***REMOVED***c is allowed if there are no NetworkPolicies selecting the pod (and cluster policy otherwise allows the traf***REMOVED***c), OR if the traf***REMOVED***c matches at least one egress rule across all of the NetworkPolicy objects whose podSelector matches the pod. If this ***REMOVED***eld is empty then this NetworkPolicy limits all outgoing traf***REMOVED***c (and serves solely to ensure that the pods it selects are isolated by default). This ***REMOVED***eld is beta-level in 1.8",
-	"policyTypes": "List of rule types that the NetworkPolicy relates to. Valid options are Ingress, Egress, or Ingress,Egress. If this ***REMOVED***eld is not speci***REMOVED***ed, it will default based on the existence of Ingress or Egress rules; policies that contain an Egress section are assumed to affect Egress, and all policies (whether or not they contain an Ingress section) are assumed to affect Ingress. If you want to write an egress-only policy, you must explicitly specify policyTypes [ \"Egress\" ]. Likewise, if you want to write a policy that speci***REMOVED***es that no egress is allowed, you must specify a policyTypes value that include \"Egress\" (since such a policy would not include an Egress section and would otherwise default to just [ \"Ingress\" ]). This ***REMOVED***eld is beta-level in 1.8",
+	"":            "NetworkPolicySpec provides the specification of a NetworkPolicy",
+	"podSelector": "Selects the pods to which this NetworkPolicy object applies. The array of ingress rules is applied to any pods selected by this field. Multiple network policies can select the same set of pods. In this case, the ingress rules for each are combined additively. This field is NOT optional and follows standard label selector semantics. An empty podSelector matches all pods in this namespace.",
+	"ingress":     "List of ingress rules to be applied to the selected pods. Traffic is allowed to a pod if there are no NetworkPolicies selecting the pod (and cluster policy otherwise allows the traffic), OR if the traffic source is the pod's local node, OR if the traffic matches at least one ingress rule across all of the NetworkPolicy objects whose podSelector matches the pod. If this field is empty then this NetworkPolicy does not allow any traffic (and serves solely to ensure that the pods it selects are isolated by default)",
+	"egress":      "List of egress rules to be applied to the selected pods. Outgoing traffic is allowed if there are no NetworkPolicies selecting the pod (and cluster policy otherwise allows the traffic), OR if the traffic matches at least one egress rule across all of the NetworkPolicy objects whose podSelector matches the pod. If this field is empty then this NetworkPolicy limits all outgoing traffic (and serves solely to ensure that the pods it selects are isolated by default). This field is beta-level in 1.8",
+	"policyTypes": "List of rule types that the NetworkPolicy relates to. Valid options are Ingress, Egress, or Ingress,Egress. If this field is not specified, it will default based on the existence of Ingress or Egress rules; policies that contain an Egress section are assumed to affect Egress, and all policies (whether or not they contain an Ingress section) are assumed to affect Ingress. If you want to write an egress-only policy, you must explicitly specify policyTypes [ \"Egress\" ]. Likewise, if you want to write a policy that specifies that no egress is allowed, you must specify a policyTypes value that include \"Egress\" (since such a policy would not include an Egress section and would otherwise default to just [ \"Ingress\" ]). This field is beta-level in 1.8",
 }
 
 func (NetworkPolicySpec) SwaggerDoc() map[string]string {

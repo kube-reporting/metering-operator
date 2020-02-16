@@ -53,13 +53,13 @@ func NewClient(endpoint string) (*gophercloud.ProviderClient, error) {
 
 /*
 AuthenticatedClient logs in to an OpenStack cloud found at the identity endpoint
-speci***REMOVED***ed by the options, acquires a token, and returns a Provider Client
+specified by the options, acquires a token, and returns a Provider Client
 instance that's ready to operate.
 
-If the full path to a versioned identity endpoint was speci***REMOVED***ed  (example:
+If the full path to a versioned identity endpoint was specified  (example:
 http://example.com:5000/v3), that path will be used as the endpoint to query.
 
-If a versionless endpoint was speci***REMOVED***ed (example: http://example.com:5000/),
+If a versionless endpoint was specified (example: http://example.com:5000/),
 the endpoint will be queried to determine which versions of the identity service
 are available, then chooses the most recent or most supported version.
 
@@ -88,8 +88,8 @@ func AuthenticatedClient(options gophercloud.AuthOptions) (*gophercloud.Provider
 // supported at the provided endpoint.
 func Authenticate(client *gophercloud.ProviderClient, options gophercloud.AuthOptions) error {
 	versions := []*utils.Version{
-		{ID: v2, Priority: 20, Suf***REMOVED***x: "/v2.0/"},
-		{ID: v3, Priority: 30, Suf***REMOVED***x: "/v3/"},
+		{ID: v2, Priority: 20, Suffix: "/v2.0/"},
+		{ID: v3, Priority: 30, Suffix: "/v3/"},
 	}
 
 	chosen, endpoint, err := utils.ChooseVersion(client, versions)
@@ -271,10 +271,10 @@ func NewIdentityV3(client *gophercloud.ProviderClient, eo gophercloud.EndpointOp
 		}
 	}
 
-	// Ensure endpoint still has a suf***REMOVED***x of v3.
+	// Ensure endpoint still has a suffix of v3.
 	// This is because EndpointLocator might have found a versionless
 	// endpoint or the published endpoint is still /v2.0. In both
-	// cases, we need to ***REMOVED***x the endpoint to point to /v3.
+	// cases, we need to fix the endpoint to point to /v3.
 	base, err := utils.BaseEndpoint(endpoint)
 	if err != nil {
 		return nil, err
@@ -353,7 +353,7 @@ func NewBlockStorageV3(client *gophercloud.ProviderClient, eo gophercloud.Endpoi
 	return initClientOpts(client, eo, "volumev3")
 }
 
-// NewSharedFileSystemV2 creates a ServiceClient that may be used to access the v2 shared ***REMOVED***le system service.
+// NewSharedFileSystemV2 creates a ServiceClient that may be used to access the v2 shared file system service.
 func NewSharedFileSystemV2(client *gophercloud.ProviderClient, eo gophercloud.EndpointOpts) (*gophercloud.ServiceClient, error) {
 	return initClientOpts(client, eo, "sharev2")
 }

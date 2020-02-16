@@ -1,6 +1,6 @@
 // Copyright 2016 The Go Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE ***REMOVED***le.
+// license that can be found in the LICENSE file.
 
 package http2
 
@@ -13,8 +13,8 @@ import (
 // RFC 7540, Section 5.3.5: the default weight is 16.
 const priorityDefaultWeight = 15 // 16 = 15 + 1
 
-// PriorityWriteSchedulerCon***REMOVED***g con***REMOVED***gures a priorityWriteScheduler.
-type PriorityWriteSchedulerCon***REMOVED***g struct {
+// PriorityWriteSchedulerConfig configures a priorityWriteScheduler.
+type PriorityWriteSchedulerConfig struct {
 	// MaxClosedNodesInTree controls the maximum number of closed streams to
 	// retain in the priority tree. Setting this to zero saves a small amount
 	// of memory at the cost of performance.
@@ -55,11 +55,11 @@ type PriorityWriteSchedulerCon***REMOVED***g struct {
 // NewPriorityWriteScheduler constructs a WriteScheduler that schedules
 // frames by following HTTP/2 priorities as described in RFC 7540 Section 5.3.
 // If cfg is nil, default options are used.
-func NewPriorityWriteScheduler(cfg *PriorityWriteSchedulerCon***REMOVED***g) WriteScheduler {
+func NewPriorityWriteScheduler(cfg *PriorityWriteSchedulerConfig) WriteScheduler {
 	if cfg == nil {
-		// For justi***REMOVED***cation of these defaults, see:
+		// For justification of these defaults, see:
 		// https://docs.google.com/document/d/1oLhNg1skaWD4_DtaoCxdSRN5erEXrH-KnLrMwEpOtFY
-		cfg = &PriorityWriteSchedulerCon***REMOVED***g{
+		cfg = &PriorityWriteSchedulerConfig{
 			MaxClosedNodesInTree:     10,
 			MaxIdleNodesInTree:       10,
 			ThrottleOutOfOrderWrites: false,
@@ -75,7 +75,7 @@ func NewPriorityWriteScheduler(cfg *PriorityWriteSchedulerCon***REMOVED***g) Wri
 	ws.nodes[0] = &ws.root
 	if cfg.ThrottleOutOfOrderWrites {
 		ws.writeThrottleLimit = 1024
-	} ***REMOVED*** {
+	} else {
 		ws.writeThrottleLimit = math.MaxInt32
 	}
 	return ws
@@ -117,7 +117,7 @@ func (n *priorityNode) setParent(parent *priorityNode) {
 	if parent := n.parent; parent != nil {
 		if n.prev == nil {
 			parent.kids = n.next
-		} ***REMOVED*** {
+		} else {
 			n.prev.next = n.next
 		}
 		if n.next != nil {
@@ -131,7 +131,7 @@ func (n *priorityNode) setParent(parent *priorityNode) {
 	if parent == nil {
 		n.next = nil
 		n.prev = nil
-	} ***REMOVED*** {
+	} else {
 		n.next = parent.kids
 		n.prev = nil
 		if n.next != nil {
@@ -241,7 +241,7 @@ type priorityWriteScheduler struct {
 	// maxClosedNodesInTree or maxIdleNodesInTree, old nodes are discarded.
 	closedNodes, idleNodes []*priorityNode
 
-	// From the con***REMOVED***g.
+	// From the config.
 	maxClosedNodesInTree int
 	maxIdleNodesInTree   int
 	writeThrottleLimit   int32
@@ -305,7 +305,7 @@ func (ws *priorityWriteScheduler) CloseStream(streamID uint32) {
 	n.q.s = nil
 	if ws.maxClosedNodesInTree > 0 {
 		ws.addClosedOrIdleNode(&ws.closedNodes, ws.maxClosedNodesInTree, n)
-	} ***REMOVED*** {
+	} else {
 		ws.removeNode(n)
 	}
 }
@@ -351,7 +351,7 @@ func (ws *priorityWriteScheduler) AdjustStream(streamID uint32, priority Priorit
 
 	// Section 5.3.3:
 	//   "If a stream is made dependent on one of its own dependencies, the
-	//   formerly dependent stream is ***REMOVED***rst moved to be dependent on the
+	//   formerly dependent stream is first moved to be dependent on the
 	//   reprioritized stream's previous parent. The moved dependency retains
 	//   its weight."
 	//
@@ -385,7 +385,7 @@ func (ws *priorityWriteScheduler) Push(wr FrameWriteRequest) {
 	var n *priorityNode
 	if id := wr.StreamID(); id == 0 {
 		n = &ws.root
-	} ***REMOVED*** {
+	} else {
 		n = ws.nodes[id]
 		if n == nil {
 			// id is an idle or closed stream. wr should not be a HEADERS or
@@ -421,7 +421,7 @@ func (ws *priorityWriteScheduler) Pop() (wr FrameWriteRequest, ok bool) {
 			if ws.writeThrottleLimit < 0 {
 				ws.writeThrottleLimit = math.MaxInt32
 			}
-		} ***REMOVED*** if ws.enableWriteThrottle {
+		} else if ws.enableWriteThrottle {
 			ws.writeThrottleLimit = 1024
 		}
 		return true

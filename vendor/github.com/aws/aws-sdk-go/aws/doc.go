@@ -14,7 +14,7 @@
 // The value to pointer functions will be named after the scalar type. So get a
 // *string from a string value use the "String" function. This makes it easy to
 // to get pointer of a literal string value, because getting the address of a
-// literal requires assigning the value to a variable ***REMOVED***rst.
+// literal requires assigning the value to a variable first.
 //
 //    var strPtr *string
 //
@@ -46,11 +46,11 @@
 //
 // The SDK will use the http.DefaultClient if a HTTP client is not provided to
 // the SDK's Session, or service client constructor. This means that if the
-// http.DefaultClient is modi***REMOVED***ed by other components of your application the
-// modi***REMOVED***cations will be picked up by the SDK as well.
+// http.DefaultClient is modified by other components of your application the
+// modifications will be picked up by the SDK as well.
 //
 // In some cases this might be intended, but it is a better practice to create
 // a custom HTTP Client to share explicitly through your application. You can
-// con***REMOVED***gure the SDK to use the custom HTTP Client by setting the HTTPClient
-// value of the SDK's Con***REMOVED***g type when creating a Session or service client.
+// configure the SDK to use the custom HTTP Client by setting the HTTPClient
+// value of the SDK's Config type when creating a Session or service client.
 package aws

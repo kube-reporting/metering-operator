@@ -1,14 +1,14 @@
 apiVersion: apiextensions.k8s.io/v1beta1
-kind: CustomResourceDe***REMOVED***nition
+kind: CustomResourceDefinition
 metadata:
-  name: meteringcon***REMOVED***gs.metering.openshift.io
+  name: meteringconfigs.metering.openshift.io
 spec:
   group: metering.openshift.io
   names:
-    kind: MeteringCon***REMOVED***g
-    listKind: MeteringCon***REMOVED***gList
-    plural: meteringcon***REMOVED***gs
-    singular: meteringcon***REMOVED***g
+    kind: MeteringConfig
+    listKind: MeteringConfigList
+    plural: meteringconfigs
+    singular: meteringconfig
   scope: Namespaced
   subresources:
     status: {}
@@ -385,7 +385,7 @@ spec:
               properties:
                 enabled:
                   type: boolean
-                certi***REMOVED***cate:
+                certificate:
                   type: string
                 key:
                   type: string
@@ -397,19 +397,19 @@ spec:
                 allOf:
                 - not:
                     required:
-                    - certi***REMOVED***cate
+                    - certificate
                 - not:
                     required:
                     - key
               - required:
                 - enabled
-                - certi***REMOVED***cate
+                - certificate
                 - key
                 properties:
                   enabled:
                     enum:
                     - false
-                  certi***REMOVED***cate:
+                  certificate:
                     minLength: 1
                   key:
                     minLength: 1
@@ -567,7 +567,7 @@ spec:
                           type: boolean
                         bucket:
                           type: string
-                        pre***REMOVED***x:
+                        prefix:
                           type: string
                         region:
                           type: string
@@ -615,7 +615,7 @@ spec:
                 spec:
                   type: object
                   properties:
-                    af***REMOVED***nity:
+                    affinity:
                       type: object
                     annotations:
                       type: object
@@ -793,7 +793,7 @@ spec:
                             policy:
                               type: string
                               minLength: 1
-                    con***REMOVED***g:
+                    config:
                       type: object
                       properties:
                         allNamespaces:
@@ -817,7 +817,7 @@ spec:
                             auth:
                               type: object
                               properties:
-                                certi***REMOVED***cate:
+                                certificate:
                                   type: string
                                 createSecret:
                                   type: boolean
@@ -837,7 +837,7 @@ spec:
                                 allOf:
                                 - not:
                                     required:
-                                    - certi***REMOVED***cate
+                                    - certificate
                                 - not:
                                     required:
                                     - key
@@ -859,17 +859,17 @@ spec:
                                 allOf:
                                 - not:
                                     required:
-                                    - certi***REMOVED***cate
+                                    - certificate
                                 - not:
                                     required:
                                     - key
                               - required:
-                                - certi***REMOVED***cate
+                                - certificate
                                 - key
                                 - createSecret
                                 - secretName
                                 properties:
-                                  certi***REMOVED***cate:
+                                  certificate:
                                     minLength: 1
                                   key:
                                     minLength: 1
@@ -886,7 +886,7 @@ spec:
                             tls:
                               type: object
                               properties:
-                                caCerti***REMOVED***cate:
+                                caCertificate:
                                   type: string
                                 createSecret:
                                   type: boolean
@@ -904,7 +904,7 @@ spec:
                                 allOf:
                                 - not:
                                     required:
-                                    - caCerti***REMOVED***cate
+                                    - caCertificate
                                 - not:
                                     required:
                                     - createSecret
@@ -923,13 +923,13 @@ spec:
                                 allOf:
                                 - not:
                                     required:
-                                    - caCerti***REMOVED***cate
+                                    - caCertificate
                               - required:
-                                - caCerti***REMOVED***cate
+                                - caCertificate
                                 - createSecret
                                 - secretName
                                 properties:
-                                  caCerti***REMOVED***cate:
+                                  caCertificate:
                                     minLength: 1
                                   createSecret:
                                     enum:
@@ -955,7 +955,7 @@ spec:
                             auth:
                               type: object
                               properties:
-                                certi***REMOVED***cate:
+                                certificate:
                                   type: string
                                 createSecret:
                                   type: boolean
@@ -975,7 +975,7 @@ spec:
                                 allOf:
                                 - not:
                                     required:
-                                    - certi***REMOVED***cate
+                                    - certificate
                                 - not:
                                     required:
                                     - key
@@ -997,17 +997,17 @@ spec:
                                 allOf:
                                 - not:
                                     required:
-                                    - certi***REMOVED***cate
+                                    - certificate
                                 - not:
                                     required:
                                     - key
                               - required:
-                                - certi***REMOVED***cate
+                                - certificate
                                 - key
                                 - createSecret
                                 - secretName
                                 properties:
-                                  certi***REMOVED***cate:
+                                  certificate:
                                     minLength: 1
                                   key:
                                     minLength: 1
@@ -1026,7 +1026,7 @@ spec:
                             tls:
                               type: object
                               properties:
-                                caCerti***REMOVED***cate:
+                                caCertificate:
                                   type: string
                                 createSecret:
                                   type: boolean
@@ -1044,7 +1044,7 @@ spec:
                                 allOf:
                                 - not:
                                     required:
-                                    - caCerti***REMOVED***cate
+                                    - caCertificate
                                 - not:
                                     required:
                                     - createSecret
@@ -1063,13 +1063,13 @@ spec:
                                 allOf:
                                 - not:
                                     required:
-                                    - caCerti***REMOVED***cate
+                                    - caCertificate
                               - required:
-                                - caCerti***REMOVED***cate
+                                - caCertificate
                                 - createSecret
                                 - secretName
                                 properties:
-                                  certi***REMOVED***cate:
+                                  certificate:
                                     minLength: 1
                                   enabled:
                                     enum:
@@ -1082,17 +1082,17 @@ spec:
                         prometheus:
                           type: object
                           properties:
-                            certi***REMOVED***cateAuthority:
+                            certificateAuthority:
                               type: object
                               properties:
-                                con***REMOVED***gMap:
+                                configMap:
                                   type: object
                                   properties:
                                     create:
                                       type: boolean
                                     enabled:
                                       type: boolean
-                                    ***REMOVED***lename:
+                                    filename:
                                       type: string
                                     name:
                                       type: string
@@ -1119,14 +1119,14 @@ spec:
                                           type: string
                                     useServiceAccountToken:
                                       type: boolean
-                                con***REMOVED***g:
+                                config:
                                   type: object
                                   properties:
                                     chunkSize:
                                       type: string
                                     importFrom:
                                       type: string
-                                    maxImportBack***REMOVED***llDuration:
+                                    maxImportBackfillDuration:
                                       type: string
                                     maxQueryRangeDuration:
                                       type: string
@@ -1144,9 +1144,9 @@ spec:
                             api:
                               type: object
                               properties:
-                                caCerti***REMOVED***cate:
+                                caCertificate:
                                   type: string
-                                certi***REMOVED***cate:
+                                certificate:
                                   type: string
                                 createSecret:
                                   type: boolean
@@ -1166,10 +1166,10 @@ spec:
                                 allOf:
                                 - not:
                                     required:
-                                    - caCerti***REMOVED***cate
+                                    - caCertificate
                                 - not:
                                     required:
-                                    - certi***REMOVED***cate
+                                    - certificate
                                 - not:
                                     required:
                                     - key
@@ -1191,23 +1191,23 @@ spec:
                                 allOf:
                                 - not:
                                     required:
-                                    - caCerti***REMOVED***cate
+                                    - caCertificate
                                 - not:
                                     required:
-                                    - certi***REMOVED***cate
+                                    - certificate
                                 - not:
                                     required:
                                     - key
                               - required:
-                                - caCerti***REMOVED***cate
-                                - certi***REMOVED***cate
+                                - caCertificate
+                                - certificate
                                 - key
                                 - createSecret
                                 - secretName
                                 properties:
-                                  caCerti***REMOVED***cate:
+                                  caCertificate:
                                     minLength: 1
-                                  certi***REMOVED***cate:
+                                  certificate:
                                     minLength: 1
                                   key:
                                     minLength: 1
@@ -1310,15 +1310,15 @@ spec:
                       type: object
                     terminationGracePeriodSeconds:
                       type: integer
-                    con***REMOVED***g:
+                    config:
                       type: object
                       properties:
                         auth:
                           type: object
                           properties:
-                            caCerti***REMOVED***cate:
+                            caCertificate:
                               type: string
-                            certi***REMOVED***cate:
+                            certificate:
                               type: string
                             createSecret:
                               type: boolean
@@ -1338,10 +1338,10 @@ spec:
                             allOf:
                             - not:
                                 required:
-                                - caCerti***REMOVED***cate
+                                - caCertificate
                             - not:
                                 required:
-                                - certi***REMOVED***cate
+                                - certificate
                             - not:
                                 required:
                                 - key
@@ -1363,23 +1363,23 @@ spec:
                             allOf:
                             - not:
                                 required:
-                                - caCerti***REMOVED***cate
+                                - caCertificate
                             - not:
                                 required:
-                                - certi***REMOVED***cate
+                                - certificate
                             - not:
                                 required:
                                 - key
                           - required:
-                            - caCerti***REMOVED***cate
-                            - certi***REMOVED***cate
+                            - caCertificate
+                            - certificate
                             - key
                             - createSecret
                             - secretName
                             properties:
-                              caCerti***REMOVED***cate:
+                              caCertificate:
                                 minLength: 1
-                              certi***REMOVED***cate:
+                              certificate:
                                 minLength: 1
                               key:
                                 minLength: 1
@@ -1457,9 +1457,9 @@ spec:
                             hive:
                               type: object
                               properties:
-                                useHadoopCon***REMOVED***g:
+                                useHadoopConfig:
                                   type: boolean
-                                hadoopCon***REMOVED***gSecretName:
+                                hadoopConfigSecretName:
                                   type: string
                                 metastoreTimeout:
                                   type: string
@@ -1468,9 +1468,9 @@ spec:
                                 tls:
                                   type: object
                                   properties:
-                                    caCerti***REMOVED***cate:
+                                    caCertificate:
                                       type: string
-                                    certi***REMOVED***cate:
+                                    certificate:
                                       type: string
                                     createSecret:
                                       type: boolean
@@ -1490,10 +1490,10 @@ spec:
                                     allOf:
                                     - not:
                                         required:
-                                        - caCerti***REMOVED***cate
+                                        - caCertificate
                                     - not:
                                         required:
-                                        - certi***REMOVED***cate
+                                        - certificate
                                     - not:
                                         required:
                                         - key
@@ -1515,23 +1515,23 @@ spec:
                                     allOf:
                                     - not:
                                         required:
-                                        - caCerti***REMOVED***cate
+                                        - caCertificate
                                     - not:
                                         required:
-                                        - certi***REMOVED***cate
+                                        - certificate
                                     - not:
                                         required:
                                         - key
                                   - required:
-                                    - caCerti***REMOVED***cate
-                                    - certi***REMOVED***cate
+                                    - caCertificate
+                                    - certificate
                                     - key
                                     - createSecret
                                     - secretName
                                     properties:
-                                      caCerti***REMOVED***cate:
+                                      caCertificate:
                                         minLength: 1
-                                      certi***REMOVED***cate:
+                                      certificate:
                                         minLength: 1
                                       key:
                                         minLength: 1
@@ -1570,7 +1570,7 @@ spec:
                                 enabled:
                                   description: Whether or not to enable the Presto-Prometheus connector.
                                   type: boolean
-                                con***REMOVED***g:
+                                config:
                                   type: object
                                   properties:
                                     uri:
@@ -1590,7 +1590,7 @@ spec:
                                   type: object
                                   properties:
                                     bearerTokenFile:
-                                      description: Path to token ***REMOVED***le for bearer authentication to Prometheus.
+                                      description: Path to token file for bearer authentication to Prometheus.
                                       type: string
                                     useServiceAccountToken:
                                       description: Whether to use the cluster service account token for the bearer token
@@ -1604,9 +1604,9 @@ spec:
                         tls:
                           type: object
                           properties:
-                            caCerti***REMOVED***cate:
+                            caCertificate:
                               type: string
-                            certi***REMOVED***cate:
+                            certificate:
                               type: string
                             createSecret:
                               type: boolean
@@ -1626,10 +1626,10 @@ spec:
                             allOf:
                             - not:
                                 required:
-                                - caCerti***REMOVED***cate
+                                - caCertificate
                             - not:
                                 required:
-                                - certi***REMOVED***cate
+                                - certificate
                             - not:
                                 required:
                                 - key
@@ -1651,13 +1651,13 @@ spec:
                             allOf:
                             - not:
                                 required:
-                                - caCerti***REMOVED***cate
+                                - caCertificate
                           - required:
-                            - caCerti***REMOVED***cate
+                            - caCertificate
                             - createSecret
                             - secretName
                             properties:
-                              certi***REMOVED***cate:
+                              certificate:
                                 minLength: 1
                               enabled:
                                 enum:
@@ -1670,10 +1670,10 @@ spec:
                     coordinator:
                       type: object
                       properties:
-                        af***REMOVED***nity:
+                        affinity:
                           type: object
                           properties:
-                            podAntiAf***REMOVED***nity:
+                            podAntiAffinity:
                               type: object
                               properties:
                                 requiredDuringSchedulingIgnoredDuringExecution:
@@ -1704,7 +1704,7 @@ spec:
                                                     type: string
                                       topologyKey:
                                         type: string
-                        con***REMOVED***g:
+                        config:
                           type: object
                           properties:
                             jvm:
@@ -1819,10 +1819,10 @@ spec:
                     worker:
                       type: object
                       properties:
-                        af***REMOVED***nity:
+                        affinity:
                           type: object
                           properties:
-                            podAntiAf***REMOVED***nity:
+                            podAntiAffinity:
                               type: object
                               properties:
                                 requiredDuringSchedulingIgnoredDuringExecution:
@@ -1855,7 +1855,7 @@ spec:
                                                     type: string
                                       topologyKey:
                                         type: string
-                        con***REMOVED***g:
+                        config:
                           type: object
                           properties:
                             jvm:
@@ -1956,7 +1956,7 @@ spec:
                   properties:
                     annotations:
                       type: object
-                    con***REMOVED***g:
+                    config:
                       type: object
                       properties:
                         aws:
@@ -2022,7 +2022,7 @@ spec:
                               type: boolean
                             driver:
                               type: string
-                            enableMetastoreSchemaVeri***REMOVED***cation:
+                            enableMetastoreSchemaVerification:
                               type: boolean
                             password:
                               type: string
@@ -2032,7 +2032,7 @@ spec:
                               type: string
                         defaultFileFormat:
                           type: string
-                        hadoopCon***REMOVED***gSecretName:
+                        hadoopConfigSecretName:
                           type: string
                         metastoreClientSocketTimeout:
                           type: string
@@ -2053,7 +2053,7 @@ spec:
                               type: string
                             storageClass:
                               type: string
-                        useHadoopCon***REMOVED***g:
+                        useHadoopConfig:
                           type: boolean
                     image:
                       type: object
@@ -2071,9 +2071,9 @@ spec:
                     metastore:
                       type: object
                       properties:
-                        af***REMOVED***nity:
+                        affinity:
                           type: object
-                        con***REMOVED***g:
+                        config:
                           type: object
                           properties:
                             auth:
@@ -2101,9 +2101,9 @@ spec:
                             tls:
                               type: object
                               properties:
-                                caCerti***REMOVED***cate:
+                                caCertificate:
                                   type: string
-                                certi***REMOVED***cate:
+                                certificate:
                                   type: string
                                 createSecret:
                                   type: boolean
@@ -2123,10 +2123,10 @@ spec:
                                 allOf:
                                 - not:
                                     required:
-                                    - caCerti***REMOVED***cate
+                                    - caCertificate
                                 - not:
                                     required:
-                                    - certi***REMOVED***cate
+                                    - certificate
                                 - not:
                                     required:
                                     - key
@@ -2148,23 +2148,23 @@ spec:
                                 allOf:
                                 - not:
                                     required:
-                                    - caCerti***REMOVED***cate
+                                    - caCertificate
                                 - not:
                                     required:
-                                    - certi***REMOVED***cate
+                                    - certificate
                                 - not:
                                     required:
                                     - key
                               - required:
-                                - caCerti***REMOVED***cate
-                                - certi***REMOVED***cate
+                                - caCertificate
+                                - certificate
                                 - key
                                 - createSecret
                                 - secretName
                                 properties:
-                                  caCerti***REMOVED***cate:
+                                  caCertificate:
                                     minLength: 1
-                                  certi***REMOVED***cate:
+                                  certificate:
                                     minLength: 1
                                   key:
                                     minLength: 1
@@ -2245,9 +2245,9 @@ spec:
                     server:
                       type: object
                       properties:
-                        af***REMOVED***nity:
+                        affinity:
                           type: object
-                        con***REMOVED***g:
+                        config:
                           type: object
                           properties:
                             auth:
@@ -2275,9 +2275,9 @@ spec:
                             metastoreTLS:
                               type: object
                               properties:
-                                caCerti***REMOVED***cate:
+                                caCertificate:
                                   type: string
-                                certi***REMOVED***cate:
+                                certificate:
                                   type: string
                                 createSecret:
                                   type: boolean
@@ -2297,10 +2297,10 @@ spec:
                                 allOf:
                                 - not:
                                     required:
-                                    - caCerti***REMOVED***cate
+                                    - caCertificate
                                 - not:
                                     required:
-                                    - certi***REMOVED***cate
+                                    - certificate
                                 - not:
                                     required:
                                     - key
@@ -2322,23 +2322,23 @@ spec:
                                 allOf:
                                 - not:
                                     required:
-                                    - caCerti***REMOVED***cate
+                                    - caCertificate
                                 - not:
                                     required:
-                                    - certi***REMOVED***cate
+                                    - certificate
                                 - not:
                                     required:
                                     - key
                               - required:
-                                - caCerti***REMOVED***cate
-                                - certi***REMOVED***cate
+                                - caCertificate
+                                - certificate
                                 - key
                                 - createSecret
                                 - secretName
                                 properties:
-                                  caCerti***REMOVED***cate:
+                                  caCertificate:
                                     minLength: 1
-                                  certi***REMOVED***cate:
+                                  certificate:
                                     minLength: 1
                                   key:
                                     minLength: 1
@@ -2353,9 +2353,9 @@ spec:
                             tls:
                               type: object
                               properties:
-                                caCerti***REMOVED***cate:
+                                caCertificate:
                                   type: string
-                                certi***REMOVED***cate:
+                                certificate:
                                   type: string
                                 createSecret:
                                   type: boolean
@@ -2375,10 +2375,10 @@ spec:
                                 allOf:
                                 - not:
                                     required:
-                                    - caCerti***REMOVED***cate
+                                    - caCertificate
                                 - not:
                                     required:
-                                    - certi***REMOVED***cate
+                                    - certificate
                                 - not:
                                     required:
                                     - key
@@ -2403,23 +2403,23 @@ spec:
                                 allOf:
                                 - not:
                                     required:
-                                    - caCerti***REMOVED***cate
+                                    - caCertificate
                                 - not:
                                     required:
-                                    - certi***REMOVED***cate
+                                    - certificate
                                 - not:
                                     required:
                                     - key
                               - required:
-                                - caCerti***REMOVED***cate
-                                - certi***REMOVED***cate
+                                - caCertificate
+                                - certificate
                                 - key
                                 - createSecret
                                 - secretName
                                 properties:
-                                  caCerti***REMOVED***cate:
+                                  caCertificate:
                                     minLength: 1
-                                  certi***REMOVED***cate:
+                                  certificate:
                                     minLength: 1
                                   key:
                                     minLength: 1
@@ -2498,7 +2498,7 @@ spec:
                 spec:
                   type: object
                   properties:
-                    con***REMOVED***g:
+                    config:
                       type: object
                       properties:
                         aws:
@@ -2559,14 +2559,14 @@ spec:
                                   minLength: 1
                         defaultFS:
                           type: string
-                    con***REMOVED***gSecretName:
+                    configSecretName:
                       type: string
                     hdfs:
                       type: object
                       properties:
                         enabled:
                           type: boolean
-                        con***REMOVED***g:
+                        config:
                           type: object
                           properties:
                             datanodeDataDirPerms:
@@ -2578,10 +2578,10 @@ spec:
                         datanode:
                           type: object
                           properties:
-                            af***REMOVED***nity:
+                            affinity:
                               type: object
                               properties:
-                                podAntiAf***REMOVED***nity:
+                                podAntiAffinity:
                                   type: object
                                   properties:
                                     requiredDuringSchedulingIgnoredDuringExecution:
@@ -2609,7 +2609,7 @@ spec:
                                             type: string
                             annotations:
                               type: object
-                            con***REMOVED***g:
+                            config:
                               type: object
                               properties:
                                 jvm:
@@ -2671,10 +2671,10 @@ spec:
                         namenode:
                           type: object
                           properties:
-                            af***REMOVED***nity:
+                            affinity:
                               type: object
                               properties:
-                                podAntiAf***REMOVED***nity:
+                                podAntiAffinity:
                                   type: object
                                   properties:
                                     requiredDuringSchedulingIgnoredDuringExecution:
@@ -2702,7 +2702,7 @@ spec:
                                             type: string
                             annotations:
                               type: object
-                            con***REMOVED***g:
+                            config:
                               type: object
                               properties:
                                 jvm:

@@ -1,11 +1,11 @@
 // Copyright 2013 The Go Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE ***REMOVED***le.
+// license that can be found in the LICENSE file.
 
 package cldr
 
 import (
-	"bu***REMOVED***o"
+	"bufio"
 	"encoding/xml"
 	"errors"
 	"fmt"
@@ -31,7 +31,7 @@ const (
 	cldrIndex = "\uFDD0"
 
 	// specialAnchor is the format in which to represent logical reset positions,
-	// such as "***REMOVED***rst tertiary ignorable".
+	// such as "first tertiary ignorable".
 	specialAnchor = "<%s/>"
 )
 
@@ -50,7 +50,7 @@ func (c Collation) Process(p RuleProcessor) (err error) {
 	return errors.New("no tailoring data")
 }
 
-// processRules parses rules in the Collation Rule Syntax de***REMOVED***ned in
+// processRules parses rules in the Collation Rule Syntax defined in
 // http://www.unicode.org/reports/tr35/tr35-collation.html#Collation_Tailorings.
 func processRules(p RuleProcessor, s string) (err error) {
 	chk := func(s string, e error) string {
@@ -60,7 +60,7 @@ func processRules(p RuleProcessor, s string) (err error) {
 		return s
 	}
 	i := 0 // Save the line number for use after the loop.
-	scanner := bu***REMOVED***o.NewScanner(strings.NewReader(s))
+	scanner := bufio.NewScanner(strings.NewReader(s))
 	for ; scanner.Scan() && err == nil; i++ {
 		for s := skipSpace(scanner.Text()); s != "" && s[0] != '#'; s = skipSpace(s) {
 			level := 5
@@ -69,7 +69,7 @@ func processRules(p RuleProcessor, s string) (err error) {
 			case '&': // followed by <anchor> or '[' <key> ']'
 				if s = skipSpace(s); consume(&s, '[') {
 					s = chk(parseSpecialAnchor(p, s))
-				} ***REMOVED*** {
+				} else {
 					s = chk(parseAnchor(p, 0, s))
 				}
 			case '<': // sort relation '<'{1,4}, optionally followed by '*'.
@@ -82,7 +82,7 @@ func processRules(p RuleProcessor, s string) (err error) {
 			case '=': // identity relation, optionally followed by *.
 				if consume(&s, '*') {
 					s = chk(parseSequence(p, level, s))
-				} ***REMOVED*** {
+				} else {
 					s = chk(parseOrder(p, level, s))
 				}
 			default:
@@ -109,7 +109,7 @@ func parseSpecialAnchor(p RuleProcessor, s string) (tail string, err error) {
 	}
 	a := strings.TrimSpace(s[:i])
 	s = s[i+1:]
-	if strings.HasPre***REMOVED***x(a, "before ") {
+	if strings.HasPrefix(a, "before ") {
 		l, err := strconv.ParseUint(skipSpace(a[len("before "):]), 10, 3)
 		if err != nil {
 			return s, err
@@ -132,7 +132,7 @@ func parseOrder(p RuleProcessor, level int, s string) (tail string, err error) {
 	if value, s, err = scanString(s); err != nil {
 		return s, err
 	}
-	if strings.HasPre***REMOVED***x(value, cldrIndex) {
+	if strings.HasPrefix(value, cldrIndex) {
 		p.Index(value[len(cldrIndex):])
 		return
 	}
@@ -164,7 +164,7 @@ func scanString(s string) (str, tail string, err error) {
 			}
 			if i == 0 {
 				value = append(value, '\'')
-			} ***REMOVED*** {
+			} else {
 				value = append(value, s[:i]...)
 			}
 			s = s[i+1:]
@@ -190,7 +190,7 @@ func parseSequence(p RuleProcessor, level int, s string) (tail string, err error
 		s = s[sz:]
 
 		if r == '-' {
-			// We have a range. The ***REMOVED***rst element was already written.
+			// We have a range. The first element was already written.
 			if last == 0 {
 				return s, errors.New("range without starter value")
 			}
@@ -275,7 +275,7 @@ func (r *rule) value() (string, error) {
 		}
 		r.Value = fmt.Sprintf(specialAnchor, r.Any[0].XMLName.Local)
 		r.Any = nil
-	} ***REMOVED*** if len(r.Any) != 0 {
+	} else if len(r.Any) != 0 {
 		return "", fmt.Errorf("cldr: XML elements found in collation rule: %v", r.Any)
 	}
 	return r.Value, nil
@@ -288,7 +288,7 @@ func (r rule) process(p RuleProcessor, name, context, extend string) error {
 	}
 	switch name {
 	case "p", "s", "t", "i":
-		if strings.HasPre***REMOVED***x(v, cldrIndex) {
+		if strings.HasPrefix(v, cldrIndex) {
 			p.Index(v[len(cldrIndex):])
 			return nil
 		}
@@ -310,7 +310,7 @@ func (r rule) process(p RuleProcessor, name, context, extend string) error {
 
 // processXML parses the format of CLDR versions 24 and older.
 func (c Collation) processXML(p RuleProcessor) (err error) {
-	// Collation is generated and de***REMOVED***ned in xml.go.
+	// Collation is generated and defined in xml.go.
 	var v string
 	for _, r := range c.Rules.Any {
 		switch r.XMLName.Local {

@@ -2,7 +2,7 @@
 Copyright The Kubernetes Authors.
 
 Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this ***REMOVED***le except in compliance with the License.
+you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
 
     http://www.apache.org/licenses/LICENSE-2.0
@@ -10,13 +10,13 @@ You may obtain a copy of the License at
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the speci***REMOVED***c language governing permissions and
+See the License for the specific language governing permissions and
 limitations under the License.
 */
 
 package v1beta1
 
-// This ***REMOVED***le contains a collection of methods that can be used from go-restful to
+// This file contains a collection of methods that can be used from go-restful to
 // generate Swagger API documentation for its models. Please read this PR for more
 // information on the implementation: https://github.com/emicklei/go-restful/pull/215
 //
@@ -37,9 +37,9 @@ func (AllowedFlexVolume) SwaggerDoc() map[string]string {
 }
 
 var map_AllowedHostPath = map[string]string{
-	"":           "AllowedHostPath de***REMOVED***nes the host volume conditions that will be enabled by a policy for pods to use. It requires the path pre***REMOVED***x to be de***REMOVED***ned.",
-	"pathPre***REMOVED***x": "pathPre***REMOVED***x is the path pre***REMOVED***x that the host volume must match. It does not support `*`. Trailing slashes are trimmed when validating the path pre***REMOVED***x with a host path.\n\nExamples: `/foo` would allow `/foo`, `/foo/` and `/foo/bar` `/foo` would not allow `/food` or `/etc/foo`",
-	"readOnly":   "when set to true, will allow host volumes matching the pathPre***REMOVED***x only if all volume mounts are readOnly.",
+	"":           "AllowedHostPath defines the host volume conditions that will be enabled by a policy for pods to use. It requires the path prefix to be defined.",
+	"pathPrefix": "pathPrefix is the path prefix that the host volume must match. It does not support `*`. Trailing slashes are trimmed when validating the path prefix with a host path.\n\nExamples: `/foo` would allow `/foo`, `/foo/` and `/foo/bar` `/foo` would not allow `/food` or `/etc/foo`",
+	"readOnly":   "when set to true, will allow host volumes matching the pathPrefix only if all volume mounts are readOnly.",
 }
 
 func (AllowedHostPath) SwaggerDoc() map[string]string {
@@ -57,7 +57,7 @@ func (Eviction) SwaggerDoc() map[string]string {
 }
 
 var map_FSGroupStrategyOptions = map[string]string{
-	"":       "FSGroupStrategyOptions de***REMOVED***nes the strategy type and options used to create the strategy.",
+	"":       "FSGroupStrategyOptions defines the strategy type and options used to create the strategy.",
 	"rule":   "rule is the strategy that will dictate what FSGroup is used in the SecurityContext.",
 	"ranges": "ranges are the allowed ranges of fs groups.  If you would like to force a single fs group then supply a single range with the same start and end. Required for MustRunAs.",
 }
@@ -67,7 +67,7 @@ func (FSGroupStrategyOptions) SwaggerDoc() map[string]string {
 }
 
 var map_HostPortRange = map[string]string{
-	"":    "HostPortRange de***REMOVED***nes a range of host ports that will be enabled by a policy for pods to use.  It requires both the start and end to be de***REMOVED***ned.",
+	"":    "HostPortRange defines a range of host ports that will be enabled by a policy for pods to use.  It requires both the start and end to be defined.",
 	"min": "min is the start of the range, inclusive.",
 	"max": "max is the end of the range, inclusive.",
 }
@@ -87,8 +87,8 @@ func (IDRange) SwaggerDoc() map[string]string {
 }
 
 var map_PodDisruptionBudget = map[string]string{
-	"":       "PodDisruptionBudget is an object to de***REMOVED***ne the max disruption that can be caused to a collection of pods",
-	"spec":   "Speci***REMOVED***cation of the desired behavior of the PodDisruptionBudget.",
+	"":       "PodDisruptionBudget is an object to define the max disruption that can be caused to a collection of pods",
+	"spec":   "Specification of the desired behavior of the PodDisruptionBudget.",
 	"status": "Most recently observed status of the PodDisruptionBudget.",
 }
 
@@ -132,7 +132,7 @@ func (PodDisruptionBudgetStatus) SwaggerDoc() map[string]string {
 var map_PodSecurityPolicy = map[string]string{
 	"":         "PodSecurityPolicy governs the ability to make requests that affect the Security Context that will be applied to a pod and container.",
 	"metadata": "Standard object's metadata. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#metadata",
-	"spec":     "spec de***REMOVED***nes the policy enforced.",
+	"spec":     "spec defines the policy enforced.",
 }
 
 func (PodSecurityPolicy) SwaggerDoc() map[string]string {
@@ -150,11 +150,11 @@ func (PodSecurityPolicyList) SwaggerDoc() map[string]string {
 }
 
 var map_PodSecurityPolicySpec = map[string]string{
-	"":                                "PodSecurityPolicySpec de***REMOVED***nes the policy enforced.",
+	"":                                "PodSecurityPolicySpec defines the policy enforced.",
 	"privileged":                      "privileged determines if a pod can request to be run as privileged.",
-	"defaultAddCapabilities":          "defaultAddCapabilities is the default set of capabilities that will be added to the container unless the pod spec speci***REMOVED***cally drops the capability.  You may not list a capability in both defaultAddCapabilities and requiredDropCapabilities. Capabilities added here are implicitly allowed, and need not be included in the allowedCapabilities list.",
+	"defaultAddCapabilities":          "defaultAddCapabilities is the default set of capabilities that will be added to the container unless the pod spec specifically drops the capability.  You may not list a capability in both defaultAddCapabilities and requiredDropCapabilities. Capabilities added here are implicitly allowed, and need not be included in the allowedCapabilities list.",
 	"requiredDropCapabilities":        "requiredDropCapabilities are the capabilities that will be dropped from the container.  These are required to be dropped and cannot be added.",
-	"allowedCapabilities":             "allowedCapabilities is a list of capabilities that can be requested to add to the container. Capabilities in this ***REMOVED***eld may be added at the pod author's discretion. You must not list a capability in both allowedCapabilities and requiredDropCapabilities.",
+	"allowedCapabilities":             "allowedCapabilities is a list of capabilities that can be requested to add to the container. Capabilities in this field may be added at the pod author's discretion. You must not list a capability in both allowedCapabilities and requiredDropCapabilities.",
 	"volumes":                         "volumes is a white list of allowed volume plugins. Empty indicates that no volumes may be used. To allow all volumes you may use '*'.",
 	"hostNetwork":                     "hostNetwork determines if the policy allows the use of HostNetwork in the pod spec.",
 	"hostPorts":                       "hostPorts determines which host port ranges are allowed to be exposed.",
@@ -162,16 +162,16 @@ var map_PodSecurityPolicySpec = map[string]string{
 	"hostIPC":                         "hostIPC determines if the policy allows the use of HostIPC in the pod spec.",
 	"seLinux":                         "seLinux is the strategy that will dictate the allowable labels that may be set.",
 	"runAsUser":                       "runAsUser is the strategy that will dictate the allowable RunAsUser values that may be set.",
-	"runAsGroup":                      "RunAsGroup is the strategy that will dictate the allowable RunAsGroup values that may be set. If this ***REMOVED***eld is omitted, the pod's RunAsGroup can take any value. This ***REMOVED***eld requires the RunAsGroup feature gate to be enabled.",
+	"runAsGroup":                      "RunAsGroup is the strategy that will dictate the allowable RunAsGroup values that may be set. If this field is omitted, the pod's RunAsGroup can take any value. This field requires the RunAsGroup feature gate to be enabled.",
 	"supplementalGroups":              "supplementalGroups is the strategy that will dictate what supplemental groups are used by the SecurityContext.",
 	"fsGroup":                         "fsGroup is the strategy that will dictate what fs group is used by the SecurityContext.",
-	"readOnlyRootFilesystem":          "readOnlyRootFilesystem when set to true will force containers to run with a read only root ***REMOVED***le system.  If the container speci***REMOVED***cally requests to run with a non-read only root ***REMOVED***le system the PSP should deny the pod. If set to false the container may run with a read only root ***REMOVED***le system if it wishes but it will not be forced to.",
+	"readOnlyRootFilesystem":          "readOnlyRootFilesystem when set to true will force containers to run with a read only root file system.  If the container specifically requests to run with a non-read only root file system the PSP should deny the pod. If set to false the container may run with a read only root file system if it wishes but it will not be forced to.",
 	"defaultAllowPrivilegeEscalation": "defaultAllowPrivilegeEscalation controls the default setting for whether a process can gain more privileges than its parent process.",
-	"allowPrivilegeEscalation":        "allowPrivilegeEscalation determines if a pod can request to allow privilege escalation. If unspeci***REMOVED***ed, defaults to true.",
+	"allowPrivilegeEscalation":        "allowPrivilegeEscalation determines if a pod can request to allow privilege escalation. If unspecified, defaults to true.",
 	"allowedHostPaths":                "allowedHostPaths is a white list of allowed host paths. Empty indicates that all host paths may be used.",
-	"allowedFlexVolumes":              "allowedFlexVolumes is a whitelist of allowed Flexvolumes.  Empty or nil indicates that all Flexvolumes may be used.  This parameter is effective only when the usage of the Flexvolumes is allowed in the \"volumes\" ***REMOVED***eld.",
-	"allowedUnsafeSysctls":            "allowedUnsafeSysctls is a list of explicitly allowed unsafe sysctls, defaults to none. Each entry is either a plain sysctl name or ends in \"*\" in which case it is considered as a pre***REMOVED***x of allowed sysctls. Single * means all unsafe sysctls are allowed. Kubelet has to whitelist all allowed unsafe sysctls explicitly to avoid rejection.\n\nExamples: e.g. \"foo/*\" allows \"foo/bar\", \"foo/baz\", etc. e.g. \"foo.*\" allows \"foo.bar\", \"foo.baz\", etc.",
-	"forbiddenSysctls":                "forbiddenSysctls is a list of explicitly forbidden sysctls, defaults to none. Each entry is either a plain sysctl name or ends in \"*\" in which case it is considered as a pre***REMOVED***x of forbidden sysctls. Single * means all sysctls are forbidden.\n\nExamples: e.g. \"foo/*\" forbids \"foo/bar\", \"foo/baz\", etc. e.g. \"foo.*\" forbids \"foo.bar\", \"foo.baz\", etc.",
+	"allowedFlexVolumes":              "allowedFlexVolumes is a whitelist of allowed Flexvolumes.  Empty or nil indicates that all Flexvolumes may be used.  This parameter is effective only when the usage of the Flexvolumes is allowed in the \"volumes\" field.",
+	"allowedUnsafeSysctls":            "allowedUnsafeSysctls is a list of explicitly allowed unsafe sysctls, defaults to none. Each entry is either a plain sysctl name or ends in \"*\" in which case it is considered as a prefix of allowed sysctls. Single * means all unsafe sysctls are allowed. Kubelet has to whitelist all allowed unsafe sysctls explicitly to avoid rejection.\n\nExamples: e.g. \"foo/*\" allows \"foo/bar\", \"foo/baz\", etc. e.g. \"foo.*\" allows \"foo.bar\", \"foo.baz\", etc.",
+	"forbiddenSysctls":                "forbiddenSysctls is a list of explicitly forbidden sysctls, defaults to none. Each entry is either a plain sysctl name or ends in \"*\" in which case it is considered as a prefix of forbidden sysctls. Single * means all sysctls are forbidden.\n\nExamples: e.g. \"foo/*\" forbids \"foo/bar\", \"foo/baz\", etc. e.g. \"foo.*\" forbids \"foo.bar\", \"foo.baz\", etc.",
 	"allowedProcMountTypes":           "AllowedProcMountTypes is a whitelist of allowed ProcMountTypes. Empty or nil indicates that only the DefaultProcMountType may be used. This requires the ProcMountType feature flag to be enabled.",
 }
 
@@ -180,7 +180,7 @@ func (PodSecurityPolicySpec) SwaggerDoc() map[string]string {
 }
 
 var map_RunAsGroupStrategyOptions = map[string]string{
-	"":       "RunAsGroupStrategyOptions de***REMOVED***nes the strategy type and any options used to create the strategy.",
+	"":       "RunAsGroupStrategyOptions defines the strategy type and any options used to create the strategy.",
 	"rule":   "rule is the strategy that will dictate the allowable RunAsGroup values that may be set.",
 	"ranges": "ranges are the allowed ranges of gids that may be used. If you would like to force a single gid then supply a single range with the same start and end. Required for MustRunAs.",
 }
@@ -190,7 +190,7 @@ func (RunAsGroupStrategyOptions) SwaggerDoc() map[string]string {
 }
 
 var map_RunAsUserStrategyOptions = map[string]string{
-	"":       "RunAsUserStrategyOptions de***REMOVED***nes the strategy type and any options used to create the strategy.",
+	"":       "RunAsUserStrategyOptions defines the strategy type and any options used to create the strategy.",
 	"rule":   "rule is the strategy that will dictate the allowable RunAsUser values that may be set.",
 	"ranges": "ranges are the allowed ranges of uids that may be used. If you would like to force a single uid then supply a single range with the same start and end. Required for MustRunAs.",
 }
@@ -200,9 +200,9 @@ func (RunAsUserStrategyOptions) SwaggerDoc() map[string]string {
 }
 
 var map_SELinuxStrategyOptions = map[string]string{
-	"":               "SELinuxStrategyOptions de***REMOVED***nes the strategy type and any options used to create the strategy.",
+	"":               "SELinuxStrategyOptions defines the strategy type and any options used to create the strategy.",
 	"rule":           "rule is the strategy that will dictate the allowable labels that may be set.",
-	"seLinuxOptions": "seLinuxOptions required to run as; required for MustRunAs More info: https://kubernetes.io/docs/tasks/con***REMOVED***gure-pod-container/security-context/",
+	"seLinuxOptions": "seLinuxOptions required to run as; required for MustRunAs More info: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/",
 }
 
 func (SELinuxStrategyOptions) SwaggerDoc() map[string]string {
@@ -210,7 +210,7 @@ func (SELinuxStrategyOptions) SwaggerDoc() map[string]string {
 }
 
 var map_SupplementalGroupsStrategyOptions = map[string]string{
-	"":       "SupplementalGroupsStrategyOptions de***REMOVED***nes the strategy type and options used to create the strategy.",
+	"":       "SupplementalGroupsStrategyOptions defines the strategy type and options used to create the strategy.",
 	"rule":   "rule is the strategy that will dictate what supplemental groups is used in the SecurityContext.",
 	"ranges": "ranges are the allowed ranges of supplemental groups.  If you would like to force a single supplemental group then supply a single range with the same start and end. Required for MustRunAs.",
 }

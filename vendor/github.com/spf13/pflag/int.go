@@ -35,7 +35,7 @@ func (f *FlagSet) GetInt(name string) (int, error) {
 	return val.(int), nil
 }
 
-// IntVar de***REMOVED***nes an int flag with speci***REMOVED***ed name, default value, and usage string.
+// IntVar defines an int flag with specified name, default value, and usage string.
 // The argument p points to an int variable in which to store the value of the flag.
 func (f *FlagSet) IntVar(p *int, name string, value int, usage string) {
 	f.VarP(newIntValue(value, p), name, "", usage)
@@ -46,7 +46,7 @@ func (f *FlagSet) IntVarP(p *int, name, shorthand string, value int, usage strin
 	f.VarP(newIntValue(value, p), name, shorthand, usage)
 }
 
-// IntVar de***REMOVED***nes an int flag with speci***REMOVED***ed name, default value, and usage string.
+// IntVar defines an int flag with specified name, default value, and usage string.
 // The argument p points to an int variable in which to store the value of the flag.
 func IntVar(p *int, name string, value int, usage string) {
 	CommandLine.VarP(newIntValue(value, p), name, "", usage)
@@ -57,7 +57,7 @@ func IntVarP(p *int, name, shorthand string, value int, usage string) {
 	CommandLine.VarP(newIntValue(value, p), name, shorthand, usage)
 }
 
-// Int de***REMOVED***nes an int flag with speci***REMOVED***ed name, default value, and usage string.
+// Int defines an int flag with specified name, default value, and usage string.
 // The return value is the address of an int variable that stores the value of the flag.
 func (f *FlagSet) Int(name string, value int, usage string) *int {
 	p := new(int)
@@ -72,7 +72,7 @@ func (f *FlagSet) IntP(name, shorthand string, value int, usage string) *int {
 	return p
 }
 
-// Int de***REMOVED***nes an int flag with speci***REMOVED***ed name, default value, and usage string.
+// Int defines an int flag with specified name, default value, and usage string.
 // The return value is the address of an int variable that stores the value of the flag.
 func Int(name string, value int, usage string) *int {
 	return CommandLine.IntP(name, "", value, usage)

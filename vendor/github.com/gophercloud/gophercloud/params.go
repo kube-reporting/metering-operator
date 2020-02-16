@@ -12,7 +12,7 @@ import (
 
 /*
 BuildRequestBody builds a map[string]interface from the given `struct`. If
-parent is not an empty string, the ***REMOVED***nal map[string]interface returned will
+parent is not an empty string, the final map[string]interface returned will
 encapsulate the built one. For example:
 
   disk := 1
@@ -29,7 +29,7 @@ encapsulate the built one. For example:
 
 The above example can be run as-is, however it is recommended to look at how
 BuildRequestBody is used within Gophercloud to more fully understand how it
-***REMOVED***ts within the request process as a whole rather than use it directly as shown
+fits within the request process as a whole rather than use it directly as shown
 above.
 */
 func BuildRequestBody(opts interface{}, parent string) (map[string]interface{}, error) {
@@ -51,21 +51,21 @@ func BuildRequestBody(opts interface{}, parent string) (map[string]interface{}, 
 			f := optsType.Field(i)
 
 			if f.Name != strings.Title(f.Name) {
-				//fmt.Printf("Skipping ***REMOVED***eld: %s...\n", f.Name)
+				//fmt.Printf("Skipping field: %s...\n", f.Name)
 				continue
 			}
 
-			//fmt.Printf("Starting on ***REMOVED***eld: %s...\n", f.Name)
+			//fmt.Printf("Starting on field: %s...\n", f.Name)
 
 			zero := isZero(v)
 			//fmt.Printf("v is zero?: %v\n", zero)
 
-			// if the ***REMOVED***eld has a required tag that's set to "true"
+			// if the field has a required tag that's set to "true"
 			if requiredTag := f.Tag.Get("required"); requiredTag == "true" {
-				//fmt.Printf("Checking required ***REMOVED***eld [%s]:\n\tv: %+v\n\tisZero:%v\n", f.Name, v.Interface(), zero)
-				// if the ***REMOVED***eld's value is zero, return a missing-argument error
+				//fmt.Printf("Checking required field [%s]:\n\tv: %+v\n\tisZero:%v\n", f.Name, v.Interface(), zero)
+				// if the field's value is zero, return a missing-argument error
 				if zero {
-					// if the ***REMOVED***eld has a 'required' tag, it can't have a zero-value
+					// if the field has a 'required' tag, it can't have a zero-value
 					err := ErrMissingInput{}
 					err.Argument = f.Name
 					return nil, err
@@ -73,12 +73,12 @@ func BuildRequestBody(opts interface{}, parent string) (map[string]interface{}, 
 			}
 
 			if xorTag := f.Tag.Get("xor"); xorTag != "" {
-				//fmt.Printf("Checking `xor` tag for ***REMOVED***eld [%s] with value %+v:\n\txorTag: %s\n", f.Name, v, xorTag)
+				//fmt.Printf("Checking `xor` tag for field [%s] with value %+v:\n\txorTag: %s\n", f.Name, v, xorTag)
 				xorField := optsValue.FieldByName(xorTag)
 				var xorFieldIsZero bool
 				if reflect.ValueOf(xorField.Interface()) == reflect.Zero(xorField.Type()) {
 					xorFieldIsZero = true
-				} ***REMOVED*** {
+				} else {
 					if xorField.Kind() == reflect.Ptr {
 						xorField = xorField.Elem()
 					}
@@ -93,14 +93,14 @@ func BuildRequestBody(opts interface{}, parent string) (map[string]interface{}, 
 			}
 
 			if orTag := f.Tag.Get("or"); orTag != "" {
-				//fmt.Printf("Checking `or` tag for ***REMOVED***eld with:\n\tname: %+v\n\torTag:%s\n", f.Name, orTag)
-				//fmt.Printf("***REMOVED***eld is zero?: %v\n", zero)
+				//fmt.Printf("Checking `or` tag for field with:\n\tname: %+v\n\torTag:%s\n", f.Name, orTag)
+				//fmt.Printf("field is zero?: %v\n", zero)
 				if zero {
 					orField := optsValue.FieldByName(orTag)
 					var orFieldIsZero bool
 					if reflect.ValueOf(orField.Interface()) == reflect.Zero(orField.Type()) {
 						orFieldIsZero = true
-					} ***REMOVED*** {
+					} else {
 						if orField.Kind() == reflect.Ptr {
 							orField = orField.Elem()
 						}
@@ -242,7 +242,7 @@ resource packages.
 
 Like MaybeString, it accepts an int that may or may not be a zero value, and
 returns either a pointer to its address or nil. It's intended to hint that the
-JSON serializer should omit its ***REMOVED***eld.
+JSON serializer should omit its field.
 */
 func MaybeInt(original int) *int {
 	if original != 0 {
@@ -318,7 +318,7 @@ converted into query parameters based on a "q" tag. For example:
 
 will be converted into "?x_bar=AAA&lorem_ipsum=BBB".
 
-The struct's ***REMOVED***elds may be strings, integers, or boolean values. Fields left at
+The struct's fields may be strings, integers, or boolean values. Fields left at
 their type's zero value will be omitted from the query.
 */
 func BuildQueryString(opts interface{}) (*url.URL, error) {
@@ -340,11 +340,11 @@ func BuildQueryString(opts interface{}) (*url.URL, error) {
 			f := optsType.Field(i)
 			qTag := f.Tag.Get("q")
 
-			// if the ***REMOVED***eld has a 'q' tag, it goes in the query string
+			// if the field has a 'q' tag, it goes in the query string
 			if qTag != "" {
 				tags := strings.Split(qTag, ",")
 
-				// if the ***REMOVED***eld is set, add it to the slice of query pieces
+				// if the field is set, add it to the slice of query pieces
 				if !isZero(v) {
 				loop:
 					switch v.Kind() {
@@ -378,8 +378,8 @@ func BuildQueryString(opts interface{}) (*url.URL, error) {
 							params.Add(tags[0], fmt.Sprintf("{%s}", strings.Join(s, ", ")))
 						}
 					}
-				} ***REMOVED*** {
-					// if the ***REMOVED***eld has a 'required' tag, it can't have a zero-value
+				} else {
+					// if the field has a 'required' tag, it can't have a zero-value
 					if requiredTag := f.Tag.Get("required"); requiredTag == "true" {
 						return &url.URL{}, fmt.Errorf("Required query parameter [%s] not set.", f.Name)
 					}
@@ -418,7 +418,7 @@ will be converted into:
     "lorem_ipsum": "BBB",
   }
 
-Untagged ***REMOVED***elds and ***REMOVED***elds left at their zero values are skipped. Integers,
+Untagged fields and fields left at their zero values are skipped. Integers,
 booleans and string values are supported.
 */
 func BuildHeaders(opts interface{}) (map[string]string, error) {
@@ -439,11 +439,11 @@ func BuildHeaders(opts interface{}) (map[string]string, error) {
 			f := optsType.Field(i)
 			hTag := f.Tag.Get("h")
 
-			// if the ***REMOVED***eld has a 'h' tag, it goes in the header
+			// if the field has a 'h' tag, it goes in the header
 			if hTag != "" {
 				tags := strings.Split(hTag, ",")
 
-				// if the ***REMOVED***eld is set, add it to the slice of query pieces
+				// if the field is set, add it to the slice of query pieces
 				if !isZero(v) {
 					switch v.Kind() {
 					case reflect.String:
@@ -453,8 +453,8 @@ func BuildHeaders(opts interface{}) (map[string]string, error) {
 					case reflect.Bool:
 						optsMap[tags[0]] = strconv.FormatBool(v.Bool())
 					}
-				} ***REMOVED*** {
-					// if the ***REMOVED***eld has a 'required' tag, it can't have a zero-value
+				} else {
+					// if the field has a 'required' tag, it can't have a zero-value
 					if requiredTag := f.Tag.Get("required"); requiredTag == "true" {
 						return optsMap, fmt.Errorf("Required header [%s] not set.", f.Name)
 					}
@@ -476,7 +476,7 @@ func IDSliceToQueryString(name string, ids []int) string {
 	for k, v := range ids {
 		if k == 0 {
 			str += "?"
-		} ***REMOVED*** {
+		} else {
 			str += "&"
 		}
 		str += fmt.Sprintf("%s=%s", name, strconv.Itoa(v))
@@ -484,7 +484,7 @@ func IDSliceToQueryString(name string, ids []int) string {
 	return str
 }
 
-// IntWithinRange returns TRUE if an integer falls within a de***REMOVED***ned range, and
+// IntWithinRange returns TRUE if an integer falls within a defined range, and
 // FALSE if not.
 func IntWithinRange(val, min, max int) bool {
 	return val > min && val < max

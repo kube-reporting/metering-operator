@@ -2,7 +2,7 @@
 Copyright 2014 The Kubernetes Authors.
 
 Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this ***REMOVED***le except in compliance with the License.
+you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
 
     http://www.apache.org/licenses/LICENSE-2.0
@@ -10,7 +10,7 @@ You may obtain a copy of the License at
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the speci***REMOVED***c language governing permissions and
+See the License for the specific language governing permissions and
 limitations under the License.
 */
 
@@ -55,11 +55,11 @@ type Queue interface {
 
 	// AddIfNotPresent adds a value previously
 	// returned by Pop back into the queue as long
-	// as nothing ***REMOVED*** (presumably more recent)
+	// as nothing else (presumably more recent)
 	// has since been added.
 	AddIfNotPresent(interface{}) error
 
-	// HasSynced returns true if the ***REMOVED***rst batch of items has been popped
+	// HasSynced returns true if the first batch of items has been popped
 	HasSynced() bool
 
 	// Close queue
@@ -97,10 +97,10 @@ type FIFO struct {
 	items map[string]interface{}
 	queue []string
 
-	// populated is true if the ***REMOVED***rst batch of items inserted by Replace() has been populated
-	// or Delete/Add/Update was called ***REMOVED***rst.
+	// populated is true if the first batch of items inserted by Replace() has been populated
+	// or Delete/Add/Update was called first.
 	populated bool
-	// initialPopulationCount is the number of items inserted by the ***REMOVED***rst call of Replace()
+	// initialPopulationCount is the number of items inserted by the first call of Replace()
 	initialPopulationCount int
 
 	// keyFunc is used to make the key used for queued item insertion and retrieval, and
@@ -126,8 +126,8 @@ func (f *FIFO) Close() {
 	f.cond.Broadcast()
 }
 
-// Return true if an Add/Update/Delete/AddIfNotPresent are called ***REMOVED***rst,
-// or an Update called ***REMOVED***rst but the ***REMOVED***rst batch of items inserted by Replace() has been popped
+// Return true if an Add/Update/Delete/AddIfNotPresent are called first,
+// or an Update called first but the first batch of items inserted by Replace() has been popped
 func (f *FIFO) HasSynced() bool {
 	f.lock.Lock()
 	defer f.lock.Unlock()
@@ -169,7 +169,7 @@ func (f *FIFO) AddIfNotPresent(obj interface{}) error {
 	return nil
 }
 
-// addIfNotPresent assumes the ***REMOVED***fo lock is already held and adds the provided
+// addIfNotPresent assumes the fifo lock is already held and adds the provided
 // item to the queue under id if it does not already exist.
 func (f *FIFO) addIfNotPresent(id string, obj interface{}) {
 	f.populated = true

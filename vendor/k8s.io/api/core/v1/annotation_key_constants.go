@@ -2,7 +2,7 @@
 Copyright 2017 The Kubernetes Authors.
 
 Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this ***REMOVED***le except in compliance with the License.
+you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
 
     http://www.apache.org/licenses/LICENSE-2.0
@@ -10,11 +10,11 @@ You may obtain a copy of the License at
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the speci***REMOVED***c language governing permissions and
+See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-// This ***REMOVED***le should be consistent with pkg/api/annotation_key_constants.go.
+// This file should be consistent with pkg/api/annotation_key_constants.go.
 
 package v1
 
@@ -27,7 +27,7 @@ const (
 	PodPresetOptOutAnnotationKey string = "podpreset.admission.kubernetes.io/exclude"
 
 	// MirrorAnnotationKey represents the annotation key set by kubelets when creating mirror pods
-	MirrorPodAnnotationKey string = "kubernetes.io/con***REMOVED***g.mirror"
+	MirrorPodAnnotationKey string = "kubernetes.io/config.mirror"
 
 	// TolerationsAnnotationKey represents the key of tolerations data (json serialized)
 	// in the Annotations of a Pod.
@@ -37,38 +37,38 @@ const (
 	// in the Annotations of a Node.
 	TaintsAnnotationKey string = "scheduler.alpha.kubernetes.io/taints"
 
-	// SeccompPodAnnotationKey represents the key of a seccomp pro***REMOVED***le applied
+	// SeccompPodAnnotationKey represents the key of a seccomp profile applied
 	// to all containers of a pod.
 	SeccompPodAnnotationKey string = "seccomp.security.alpha.kubernetes.io/pod"
 
-	// SeccompContainerAnnotationKeyPre***REMOVED***x represents the key of a seccomp pro***REMOVED***le applied
+	// SeccompContainerAnnotationKeyPrefix represents the key of a seccomp profile applied
 	// to one container of a pod.
-	SeccompContainerAnnotationKeyPre***REMOVED***x string = "container.seccomp.security.alpha.kubernetes.io/"
+	SeccompContainerAnnotationKeyPrefix string = "container.seccomp.security.alpha.kubernetes.io/"
 
-	// SeccompPro***REMOVED***leRuntimeDefault represents the default seccomp pro***REMOVED***le used by container runtime.
-	SeccompPro***REMOVED***leRuntimeDefault string = "runtime/default"
+	// SeccompProfileRuntimeDefault represents the default seccomp profile used by container runtime.
+	SeccompProfileRuntimeDefault string = "runtime/default"
 
-	// DeprecatedSeccompPro***REMOVED***leDockerDefault represents the default seccomp pro***REMOVED***le used by docker.
-	// This is now deprecated and should be replaced by SeccompPro***REMOVED***leRuntimeDefault.
-	DeprecatedSeccompPro***REMOVED***leDockerDefault string = "docker/default"
+	// DeprecatedSeccompProfileDockerDefault represents the default seccomp profile used by docker.
+	// This is now deprecated and should be replaced by SeccompProfileRuntimeDefault.
+	DeprecatedSeccompProfileDockerDefault string = "docker/default"
 
 	// PreferAvoidPodsAnnotationKey represents the key of preferAvoidPods data (json serialized)
 	// in the Annotations of a Node.
 	PreferAvoidPodsAnnotationKey string = "scheduler.alpha.kubernetes.io/preferAvoidPods"
 
 	// ObjectTTLAnnotations represents a suggestion for kubelet for how long it can cache
-	// an object (e.g. secret, con***REMOVED***g map) before fetching it again from apiserver.
+	// an object (e.g. secret, config map) before fetching it again from apiserver.
 	// This annotation can be attached to node.
 	ObjectTTLAnnotationKey string = "node.alpha.kubernetes.io/ttl"
 
-	// annotation key pre***REMOVED***x used to identify non-convertible json paths.
-	NonConvertibleAnnotationPre***REMOVED***x = "non-convertible.kubernetes.io"
+	// annotation key prefix used to identify non-convertible json paths.
+	NonConvertibleAnnotationPrefix = "non-convertible.kubernetes.io"
 
-	kubectlPre***REMOVED***x = "kubectl.kubernetes.io/"
+	kubectlPrefix = "kubectl.kubernetes.io/"
 
-	// LastAppliedCon***REMOVED***gAnnotation is the annotation used to store the previous
-	// con***REMOVED***guration of a resource for use in a three way diff by UpdateApplyAnnotation.
-	LastAppliedCon***REMOVED***gAnnotation = kubectlPre***REMOVED***x + "last-applied-con***REMOVED***guration"
+	// LastAppliedConfigAnnotation is the annotation used to store the previous
+	// configuration of a resource for use in a three way diff by UpdateApplyAnnotation.
+	LastAppliedConfigAnnotation = kubectlPrefix + "last-applied-configuration"
 
 	// AnnotationLoadBalancerSourceRangesKey is the key of the annotation on a service to set allowed ingress ranges on their LoadBalancers
 	//
@@ -89,7 +89,7 @@ const (
 	// The "endpoints change trigger" here means any Pod or Service change that resulted in the
 	// Endpoints object change.
 	//
-	// Given the de***REMOVED***nition of the "endpoints change trigger", please note that this annotation will
+	// Given the definition of the "endpoints change trigger", please note that this annotation will
 	// be set ONLY for endpoints object changes triggered by either Pod or Service change. If the
 	// Endpoints object changes due to other reasons, this annotation won't be set (or updated if it's
 	// already set).

@@ -36,7 +36,7 @@ func (a *xoauth2Client) Next(challenge []byte) ([]byte, error) {
 	xoauth2Err := &Xoauth2Error{}
 	if err := json.Unmarshal(challenge, xoauth2Err); err != nil {
 		return nil, err
-	} ***REMOVED*** {
+	} else {
 		return nil, xoauth2Err
 	}
 }

@@ -1,34 +1,34 @@
 ---
 
-- name: Con***REMOVED***gure TLS
+- name: Configure TLS
   block:
-  - include_tasks: update_meteringcon***REMOVED***g_status.yml
+  - include_tasks: update_meteringconfig_status.yml
     vars:
       current_conditions:
         type: "Running"
         status: "True"
-        message: "Con***REMOVED***guring TLS"
+        message: "Configuring TLS"
         lastTransitionTime: "{{ now(utc=False).isoformat() + 'Z' }}"
 
-  - name: Create temporary directory to store all the necessary certi***REMOVED***cates/keys
-    temp***REMOVED***le:
-      suf***REMOVED***x: certi***REMOVED***cates
+  - name: Create temporary directory to store all the necessary certificates/keys
+    tempfile:
+      suffix: certificates
       state: directory
-    register: certi***REMOVED***cates_dir
+    register: certificates_dir
 
-  - name: Generate the metering root certi***REMOVED***cate authority
-    include_tasks: con***REMOVED***gure_root_ca.yml
+  - name: Generate the metering root certificate authority
+    include_tasks: configure_root_ca.yml
 
-  - name: Con***REMOVED***gure TLS and client-side authentication in Presto
-    include_tasks: con***REMOVED***gure_presto_tls.yml
+  - name: Configure TLS and client-side authentication in Presto
+    include_tasks: configure_presto_tls.yml
 
-  - name: Con***REMOVED***gure TLS and authentication in Hive
-    include_tasks: con***REMOVED***gure_hive_tls.yml
+  - name: Configure TLS and authentication in Hive
+    include_tasks: configure_hive_tls.yml
 
-  - name: Con***REMOVED***gure TLS and authentication in the reporting-operator
-    include_tasks: con***REMOVED***gure_reporting_operator_tls.yml
+  - name: Configure TLS and authentication in the reporting-operator
+    include_tasks: configure_reporting_operator_tls.yml
   rescue:
-  - include_tasks: update_meteringcon***REMOVED***g_status.yml
+  - include_tasks: update_meteringconfig_status.yml
     vars:
       end_play_after_updating_status: true
       current_conditions:
@@ -39,17 +39,17 @@
           "Failed task message: {{ ansible_failed_result.msg }}"
         lastTransitionTime: "{{ now(utc=False).isoformat() + 'Z' }}"
   always:
-  - name: Cleanup the temporary directory which held the certi***REMOVED***cates and keys
-    ***REMOVED***le:
-      path: "{{ certi***REMOVED***cates_dir.path }}"
+  - name: Cleanup the temporary directory which held the certificates and keys
+    file:
+      path: "{{ certificates_dir.path }}"
       state: absent
 
-- include_tasks: update_meteringcon***REMOVED***g_status.yml
+- include_tasks: update_meteringconfig_status.yml
   vars:
     current_conditions:
       type: "Running"
       status: "True"
-      message: "Finished con***REMOVED***guring TLS"
+      message: "Finished configuring TLS"
       lastTransitionTime: "{{ now(utc=False).isoformat() + 'Z' }}"
 
 - name: Log Events for validating TLS
@@ -65,7 +65,7 @@
       component: Metering components
     involvedObject:
       apiVersion: metering.openshift.io
-      kind: MeteringCon***REMOVED***g
+      kind: MeteringConfig
       name: "{{ meta.name }}"
       namespace: "{{ meta.namespace }}"
 

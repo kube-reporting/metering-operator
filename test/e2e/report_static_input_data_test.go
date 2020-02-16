@@ -236,7 +236,7 @@ func testReportingProducesCorrectDataForInput(t *testing.T, testReportingFramewo
 	dataSourcesSubmitted := make(map[string]struct{})
 
 	// Inject all the dataSources we require for each test case
-	t.Logf("Pushing ***REMOVED***xture metrics required for tests into metering")
+	t.Logf("Pushing fixture metrics required for tests into metering")
 	for _, test := range testReportsProduceCorrectDataForInputTestCases {
 		for _, dataSource := range test.dataSources {
 			if _, alreadySubmitted := dataSourcesSubmitted[dataSource.DatasourceName]; !alreadySubmitted {
@@ -331,14 +331,14 @@ func testReportsProduceCorrectDataForInput(
 			report := testReportingFramework.NewSimpleReport(test.name, test.queryName, nil, &reportStart, &reportEnd)
 
 			reportRunTimeout := 10 * time.Minute
-			t.Logf("creating report %s and waiting %s to ***REMOVED***nish", report.Name, reportRunTimeout)
+			t.Logf("creating report %s and waiting %s to finish", report.Name, reportRunTimeout)
 			testReportingFramework.RequireReportSuccessfullyRuns(t, report, reportRunTimeout)
 
 			resultTimeout := time.Minute
 			t.Logf("waiting %s for report %s results", resultTimeout, report.Name)
 			actualResults := testReportingFramework.GetReportResults(t, report, resultTimeout)
 
-			// read expected results from a ***REMOVED***le
+			// read expected results from a file
 			expectedReportData, err := ioutil.ReadFile(test.expectedReportOutputFileName)
 			require.NoError(t, err)
 			// turn the expected results into a list of maps

@@ -2,18 +2,18 @@
 
 - name: Helm template resources
   block:
-  - shell: helm template {{ meteringcon***REMOVED***g_chart_path }} --name {{ meta.name }} --namespace {{ meta.namespace}} -x {{ resource.template_***REMOVED***le }} -f {{ values_***REMOVED***le }}
+  - shell: helm template {{ meteringconfig_chart_path }} --name {{ meta.name }} --namespace {{ meta.namespace}} -x {{ resource.template_file }} -f {{ values_file }}
     loop: "{{ resources }}"
     loop_control:
       loop_var: resource
-      label: "{{ resource.template_***REMOVED***le }}"
+      label: "{{ resource.template_file }}"
     when: resource.create | default(true)
-    no_log: "{{ not meteringcon***REMOVED***g_log_helm_template }}"
+    no_log: "{{ not meteringconfig_log_helm_template }}"
     register: template_results
   rescue:
-    - include_tasks: update_meteringcon***REMOVED***g_status.yml
+    - include_tasks: update_meteringconfig_status.yml
       vars:
-        failed_result: "{{ ansible_failed_result.results | ***REMOVED***rst }}"
+        failed_result: "{{ ansible_failed_result.results | first }}"
         end_play_after_updating_status: true
         current_conditions:
           type: "Invalid"
@@ -31,16 +31,16 @@
     template_result: "{{ template_results.results[index] }}"
     # Next we take the stdout returned by the shell command executing helm
     # template, which contains the list of resources produced by the given
-    # template ***REMOVED***le.
+    # template file.
     # After that, use `from_yaml_all` to parse the yaml, and use `list` to
     # put it into a list in case we got a single resource returned by helm
     # template.
-    # We use difference to ***REMOVED***lter out null items in the list, since
+    # We use difference to filter out null items in the list, since
     # sometimes there are empty resources templated.
     # Finally, once we have a list of resources, use map to run
     # the combine function on each resource, which adds the prune label to
     # each item in the list, storing the result in new_resources
-    new_resources: "{{ template_result.stdout | from_yaml_all | list | difference([None]) | map('combine', {'metadata':{'labels':{meteringcon***REMOVED***g_prune_label_key: resource.prune_label_value, meteringcon***REMOVED***g_prune_namespace_label_key: meta.namespace}}}, recursive=True) | list }}"
+    new_resources: "{{ template_result.stdout | from_yaml_all | list | difference([None]) | map('combine', {'metadata':{'labels':{meteringconfig_prune_label_key: resource.prune_label_value, meteringconfig_prune_namespace_label_key: meta.namespace}}}, recursive=True) | list }}"
   set_fact:
     # Create a new variable to contain the updated resources with prune
     # labels, and append the updated resources to it each iteration of this
@@ -50,7 +50,7 @@
   loop_control:
     index_var: index
     loop_var: resource
-    label: "{{ resource.template_***REMOVED***le }}"
+    label: "{{ resource.template_file }}"
   when: template_result.changed and resource is not none
   no_log: true
 
@@ -59,13 +59,13 @@
   - k8s:
       state: present
       namespace: "{{ meta.namespace }}"
-      de***REMOVED***nition: "{{ updated_template_results | flatten }}"
+      definition: "{{ updated_template_results | flatten }}"
       merge_type: ['merge', 'strategic-merge']
   rescue:
       # Note for ansible_failed_return:
-      # there's no guarantee that more ***REMOVED***elds besides msg will be available
+      # there's no guarantee that more fields besides msg will be available
       # as the return object varies depending on the type of error encountered
-    - include_tasks: update_meteringcon***REMOVED***g_status.yml
+    - include_tasks: update_meteringconfig_status.yml
       vars:
         end_play_after_updating_status: true
         current_conditions:
@@ -74,7 +74,7 @@
           message: |
             "{{ ansible_failed_result.msg }}"
           lastTransitionTime: "{{ now(utc=False).isoformat() + 'Z' }}"
-      when: ansible_failed_result is de***REMOVED***ned and (ansible_failed_result.msg | length > 0)
+      when: ansible_failed_result is defined and (ansible_failed_result.msg | length > 0)
   when: template_results.changed and resource is not none
 
 - name: Prune resources
@@ -85,9 +85,9 @@
     loop: "{{ resources }}"
     loop_control:
       loop_var: resource
-      label: "{{ resource.template_***REMOVED***le }}"
+      label: "{{ resource.template_file }}"
   rescue:
-    - include_tasks: update_meteringcon***REMOVED***g_status.yml
+    - include_tasks: update_meteringconfig_status.yml
       vars:
         end_play_after_updating_status: true
         current_conditions:

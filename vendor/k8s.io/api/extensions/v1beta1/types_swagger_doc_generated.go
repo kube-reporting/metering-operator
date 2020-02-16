@@ -2,7 +2,7 @@
 Copyright The Kubernetes Authors.
 
 Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this ***REMOVED***le except in compliance with the License.
+you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
 
     http://www.apache.org/licenses/LICENSE-2.0
@@ -10,13 +10,13 @@ You may obtain a copy of the License at
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the speci***REMOVED***c language governing permissions and
+See the License for the specific language governing permissions and
 limitations under the License.
 */
 
 package v1beta1
 
-// This ***REMOVED***le contains a collection of methods that can be used from go-restful to
+// This file contains a collection of methods that can be used from go-restful to
 // generate Swagger API documentation for its models. Please read this PR for more
 // information on the implementation: https://github.com/emicklei/go-restful/pull/215
 //
@@ -37,9 +37,9 @@ func (AllowedFlexVolume) SwaggerDoc() map[string]string {
 }
 
 var map_AllowedHostPath = map[string]string{
-	"":           "AllowedHostPath de***REMOVED***nes the host volume conditions that will be enabled by a policy for pods to use. It requires the path pre***REMOVED***x to be de***REMOVED***ned. Deprecated: use AllowedHostPath from policy API Group instead.",
-	"pathPre***REMOVED***x": "pathPre***REMOVED***x is the path pre***REMOVED***x that the host volume must match. It does not support `*`. Trailing slashes are trimmed when validating the path pre***REMOVED***x with a host path.\n\nExamples: `/foo` would allow `/foo`, `/foo/` and `/foo/bar` `/foo` would not allow `/food` or `/etc/foo`",
-	"readOnly":   "when set to true, will allow host volumes matching the pathPre***REMOVED***x only if all volume mounts are readOnly.",
+	"":           "AllowedHostPath defines the host volume conditions that will be enabled by a policy for pods to use. It requires the path prefix to be defined. Deprecated: use AllowedHostPath from policy API Group instead.",
+	"pathPrefix": "pathPrefix is the path prefix that the host volume must match. It does not support `*`. Trailing slashes are trimmed when validating the path prefix with a host path.\n\nExamples: `/foo` would allow `/foo`, `/foo/` and `/foo/bar` `/foo` would not allow `/food` or `/etc/foo`",
+	"readOnly":   "when set to true, will allow host volumes matching the pathPrefix only if all volume mounts are readOnly.",
 }
 
 func (AllowedHostPath) SwaggerDoc() map[string]string {
@@ -47,7 +47,7 @@ func (AllowedHostPath) SwaggerDoc() map[string]string {
 }
 
 var map_DaemonSet = map[string]string{
-	"":         "DEPRECATED - This group version of DaemonSet is deprecated by apps/v1beta2/DaemonSet. See the release notes for more information. DaemonSet represents the con***REMOVED***guration of a daemon set.",
+	"":         "DEPRECATED - This group version of DaemonSet is deprecated by apps/v1beta2/DaemonSet. See the release notes for more information. DaemonSet represents the configuration of a daemon set.",
 	"metadata": "Standard object's metadata. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#metadata",
 	"spec":     "The desired behavior of this daemon set. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#spec-and-status",
 	"status":   "The current status of this daemon set. This data may be out of date by some window of time. Populated by the system. Read-only. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#spec-and-status",
@@ -81,13 +81,13 @@ func (DaemonSetList) SwaggerDoc() map[string]string {
 }
 
 var map_DaemonSetSpec = map[string]string{
-	"":                     "DaemonSetSpec is the speci***REMOVED***cation of a daemon set.",
+	"":                     "DaemonSetSpec is the specification of a daemon set.",
 	"selector":             "A label query over pods that are managed by the daemon set. Must match in order to be controlled. If empty, defaulted to labels on Pod template. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/#label-selectors",
-	"template":             "An object that describes the pod that will be created. The DaemonSet will create exactly one copy of this pod on every node that matches the template's node selector (or on every node if no node selector is speci***REMOVED***ed). More info: https://kubernetes.io/docs/concepts/workloads/controllers/replicationcontroller#pod-template",
+	"template":             "An object that describes the pod that will be created. The DaemonSet will create exactly one copy of this pod on every node that matches the template's node selector (or on every node if no node selector is specified). More info: https://kubernetes.io/docs/concepts/workloads/controllers/replicationcontroller#pod-template",
 	"updateStrategy":       "An update strategy to replace existing DaemonSet pods with new pods.",
 	"minReadySeconds":      "The minimum number of seconds for which a newly created DaemonSet pod should be ready without any of its container crashing, for it to be considered available. Defaults to 0 (pod will be considered available as soon as it is ready).",
-	"templateGeneration":   "DEPRECATED. A sequence number representing a speci***REMOVED***c generation of the template. Populated by the system. It can be set only during the creation.",
-	"revisionHistoryLimit": "The number of old history to retain to allow rollback. This is a pointer to distinguish between explicit zero and not speci***REMOVED***ed. Defaults to 10.",
+	"templateGeneration":   "DEPRECATED. A sequence number representing a specific generation of the template. Populated by the system. It can be set only during the creation.",
+	"revisionHistoryLimit": "The number of old history to retain to allow rollback. This is a pointer to distinguish between explicit zero and not specified. Defaults to 10.",
 }
 
 func (DaemonSetSpec) SwaggerDoc() map[string]string {
@@ -104,7 +104,7 @@ var map_DaemonSetStatus = map[string]string{
 	"updatedNumberScheduled": "The total number of nodes that are running updated daemon pod",
 	"numberAvailable":        "The number of nodes that should be running the daemon pod and have one or more of the daemon pod running and available (ready for at least spec.minReadySeconds)",
 	"numberUnavailable":      "The number of nodes that should be running the daemon pod and have none of the daemon pod running and available (ready for at least spec.minReadySeconds)",
-	"collisionCount":         "Count of hash collisions for the DaemonSet. The DaemonSet controller uses this ***REMOVED***eld as a collision avoidance mechanism when it needs to create the name for the newest ControllerRevision.",
+	"collisionCount":         "Count of hash collisions for the DaemonSet. The DaemonSet controller uses this field as a collision avoidance mechanism when it needs to create the name for the newest ControllerRevision.",
 	"conditions":             "Represents the latest available observations of a DaemonSet's current state.",
 }
 
@@ -114,7 +114,7 @@ func (DaemonSetStatus) SwaggerDoc() map[string]string {
 
 var map_DaemonSetUpdateStrategy = map[string]string{
 	"type":          "Type of daemon set update. Can be \"RollingUpdate\" or \"OnDelete\". Default is OnDelete.",
-	"rollingUpdate": "Rolling update con***REMOVED***g params. Present only if type = \"RollingUpdate\".",
+	"rollingUpdate": "Rolling update config params. Present only if type = \"RollingUpdate\".",
 }
 
 func (DaemonSetUpdateStrategy) SwaggerDoc() map[string]string {
@@ -124,7 +124,7 @@ func (DaemonSetUpdateStrategy) SwaggerDoc() map[string]string {
 var map_Deployment = map[string]string{
 	"":         "DEPRECATED - This group version of Deployment is deprecated by apps/v1beta2/Deployment. See the release notes for more information. Deployment enables declarative updates for Pods and ReplicaSets.",
 	"metadata": "Standard object metadata.",
-	"spec":     "Speci***REMOVED***cation of the desired behavior of the Deployment.",
+	"spec":     "Specification of the desired behavior of the Deployment.",
 	"status":   "Most recently observed status of the Deployment.",
 }
 
@@ -160,7 +160,7 @@ var map_DeploymentRollback = map[string]string{
 	"":                   "DEPRECATED. DeploymentRollback stores the information required to rollback a deployment.",
 	"name":               "Required: This must match the Name of a deployment.",
 	"updatedAnnotations": "The annotations to be updated to a deployment",
-	"rollbackTo":         "The con***REMOVED***g of this deployment rollback.",
+	"rollbackTo":         "The config of this deployment rollback.",
 }
 
 func (DeploymentRollback) SwaggerDoc() map[string]string {
@@ -168,15 +168,15 @@ func (DeploymentRollback) SwaggerDoc() map[string]string {
 }
 
 var map_DeploymentSpec = map[string]string{
-	"":                        "DeploymentSpec is the speci***REMOVED***cation of the desired behavior of the Deployment.",
-	"replicas":                "Number of desired pods. This is a pointer to distinguish between explicit zero and not speci***REMOVED***ed. Defaults to 1.",
+	"":                        "DeploymentSpec is the specification of the desired behavior of the Deployment.",
+	"replicas":                "Number of desired pods. This is a pointer to distinguish between explicit zero and not specified. Defaults to 1.",
 	"selector":                "Label selector for pods. Existing ReplicaSets whose pods are selected by this will be the ones affected by this deployment.",
 	"template":                "Template describes the pods that will be created.",
 	"strategy":                "The deployment strategy to use to replace existing pods with new ones.",
 	"minReadySeconds":         "Minimum number of seconds for which a newly created pod should be ready without any of its container crashing, for it to be considered available. Defaults to 0 (pod will be considered available as soon as it is ready)",
-	"revisionHistoryLimit":    "The number of old ReplicaSets to retain to allow rollback. This is a pointer to distinguish between explicit zero and not speci***REMOVED***ed. This is set to the max value of int32 (i.e. 2147483647) by default, which means \"retaining all old RelicaSets\".",
+	"revisionHistoryLimit":    "The number of old ReplicaSets to retain to allow rollback. This is a pointer to distinguish between explicit zero and not specified. This is set to the max value of int32 (i.e. 2147483647) by default, which means \"retaining all old RelicaSets\".",
 	"paused":                  "Indicates that the deployment is paused and will not be processed by the deployment controller.",
-	"rollbackTo":              "DEPRECATED. The con***REMOVED***g this deployment is rolling back to. Will be cleared after rollback is done.",
+	"rollbackTo":              "DEPRECATED. The config this deployment is rolling back to. Will be cleared after rollback is done.",
 	"progressDeadlineSeconds": "The maximum time in seconds for a deployment to make progress before it is considered to be failed. The deployment controller will continue to process failed deployments and a condition with a ProgressDeadlineExceeded reason will be surfaced in the deployment status. Note that progress will not be estimated during the time a deployment is paused. This is set to the max value of int32 (i.e. 2147483647) by default, which means \"no deadline\".",
 }
 
@@ -193,7 +193,7 @@ var map_DeploymentStatus = map[string]string{
 	"availableReplicas":   "Total number of available pods (ready for at least minReadySeconds) targeted by this deployment.",
 	"unavailableReplicas": "Total number of unavailable pods targeted by this deployment. This is the total number of pods that are still required for the deployment to have 100% available capacity. They may either be pods that are running but not yet available or pods that still have not been created.",
 	"conditions":          "Represents the latest available observations of a deployment's current state.",
-	"collisionCount":      "Count of hash collisions for the Deployment. The Deployment controller uses this ***REMOVED***eld as a collision avoidance mechanism when it needs to create the name for the newest ReplicaSet.",
+	"collisionCount":      "Count of hash collisions for the Deployment. The Deployment controller uses this field as a collision avoidance mechanism when it needs to create the name for the newest ReplicaSet.",
 }
 
 func (DeploymentStatus) SwaggerDoc() map[string]string {
@@ -203,7 +203,7 @@ func (DeploymentStatus) SwaggerDoc() map[string]string {
 var map_DeploymentStrategy = map[string]string{
 	"":              "DeploymentStrategy describes how to replace existing pods with new ones.",
 	"type":          "Type of deployment. Can be \"Recreate\" or \"RollingUpdate\". Default is RollingUpdate.",
-	"rollingUpdate": "Rolling update con***REMOVED***g params. Present only if DeploymentStrategyType = RollingUpdate.",
+	"rollingUpdate": "Rolling update config params. Present only if DeploymentStrategyType = RollingUpdate.",
 }
 
 func (DeploymentStrategy) SwaggerDoc() map[string]string {
@@ -211,7 +211,7 @@ func (DeploymentStrategy) SwaggerDoc() map[string]string {
 }
 
 var map_FSGroupStrategyOptions = map[string]string{
-	"":       "FSGroupStrategyOptions de***REMOVED***nes the strategy type and options used to create the strategy. Deprecated: use FSGroupStrategyOptions from policy API Group instead.",
+	"":       "FSGroupStrategyOptions defines the strategy type and options used to create the strategy. Deprecated: use FSGroupStrategyOptions from policy API Group instead.",
 	"rule":   "rule is the strategy that will dictate what FSGroup is used in the SecurityContext.",
 	"ranges": "ranges are the allowed ranges of fs groups.  If you would like to force a single fs group then supply a single range with the same start and end. Required for MustRunAs.",
 }
@@ -222,8 +222,8 @@ func (FSGroupStrategyOptions) SwaggerDoc() map[string]string {
 
 var map_HTTPIngressPath = map[string]string{
 	"":        "HTTPIngressPath associates a path regex with a backend. Incoming urls matching the path are forwarded to the backend.",
-	"path":    "Path is an extended POSIX regex as de***REMOVED***ned by IEEE Std 1003.1, (i.e this follows the egrep/unix syntax, not the perl syntax) matched against the path of an incoming request. Currently it can contain characters disallowed from the conventional \"path\" part of a URL as de***REMOVED***ned by RFC 3986. Paths must begin with a '/'. If unspeci***REMOVED***ed, the path defaults to a catch all sending traf***REMOVED***c to the backend.",
-	"backend": "Backend de***REMOVED***nes the referenced service endpoint to which the traf***REMOVED***c will be forwarded to.",
+	"path":    "Path is an extended POSIX regex as defined by IEEE Std 1003.1, (i.e this follows the egrep/unix syntax, not the perl syntax) matched against the path of an incoming request. Currently it can contain characters disallowed from the conventional \"path\" part of a URL as defined by RFC 3986. Paths must begin with a '/'. If unspecified, the path defaults to a catch all sending traffic to the backend.",
+	"backend": "Backend defines the referenced service endpoint to which the traffic will be forwarded to.",
 }
 
 func (HTTPIngressPath) SwaggerDoc() map[string]string {
@@ -231,7 +231,7 @@ func (HTTPIngressPath) SwaggerDoc() map[string]string {
 }
 
 var map_HTTPIngressRuleValue = map[string]string{
-	"":      "HTTPIngressRuleValue is a list of http selectors pointing to backends. In the example: http://<host>/<path>?<searchpart> -> backend where where parts of the url correspond to RFC 3986, this resource will be used to match against everything after the last '/' and before the ***REMOVED***rst '?' or '#'.",
+	"":      "HTTPIngressRuleValue is a list of http selectors pointing to backends. In the example: http://<host>/<path>?<searchpart> -> backend where where parts of the url correspond to RFC 3986, this resource will be used to match against everything after the last '/' and before the first '?' or '#'.",
 	"paths": "A collection of paths that map requests to backends.",
 }
 
@@ -240,7 +240,7 @@ func (HTTPIngressRuleValue) SwaggerDoc() map[string]string {
 }
 
 var map_HostPortRange = map[string]string{
-	"":    "HostPortRange de***REMOVED***nes a range of host ports that will be enabled by a policy for pods to use.  It requires both the start and end to be de***REMOVED***ned. Deprecated: use HostPortRange from policy API Group instead.",
+	"":    "HostPortRange defines a range of host ports that will be enabled by a policy for pods to use.  It requires both the start and end to be defined. Deprecated: use HostPortRange from policy API Group instead.",
 	"min": "min is the start of the range, inclusive.",
 	"max": "max is the end of the range, inclusive.",
 }
@@ -270,7 +270,7 @@ func (IPBlock) SwaggerDoc() map[string]string {
 }
 
 var map_Ingress = map[string]string{
-	"":         "Ingress is a collection of rules that allow inbound connections to reach the endpoints de***REMOVED***ned by a backend. An Ingress can be con***REMOVED***gured to give services externally-reachable urls, load balance traf***REMOVED***c, terminate SSL, offer name based virtual hosting etc.",
+	"":         "Ingress is a collection of rules that allow inbound connections to reach the endpoints defined by a backend. An Ingress can be configured to give services externally-reachable urls, load balance traffic, terminate SSL, offer name based virtual hosting etc.",
 	"metadata": "Standard object's metadata. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#metadata",
 	"spec":     "Spec is the desired state of the Ingress. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#spec-and-status",
 	"status":   "Status is the current state of the Ingress. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#spec-and-status",
@@ -282,8 +282,8 @@ func (Ingress) SwaggerDoc() map[string]string {
 
 var map_IngressBackend = map[string]string{
 	"":            "IngressBackend describes all endpoints for a given service and port.",
-	"serviceName": "Speci***REMOVED***es the name of the referenced service.",
-	"servicePort": "Speci***REMOVED***es the port of the referenced service.",
+	"serviceName": "Specifies the name of the referenced service.",
+	"servicePort": "Specifies the port of the referenced service.",
 }
 
 func (IngressBackend) SwaggerDoc() map[string]string {
@@ -301,8 +301,8 @@ func (IngressList) SwaggerDoc() map[string]string {
 }
 
 var map_IngressRule = map[string]string{
-	"":     "IngressRule represents the rules mapping the paths under a speci***REMOVED***ed host to the related backend services. Incoming requests are ***REMOVED***rst evaluated for a host match, then routed to the backend associated with the matching IngressRuleValue.",
-	"host": "Host is the fully quali***REMOVED***ed domain name of a network host, as de***REMOVED***ned by RFC 3986. Note the following deviations from the \"host\" part of the URI as de***REMOVED***ned in the RFC: 1. IPs are not allowed. Currently an IngressRuleValue can only apply to the\n\t  IP in the Spec of the parent Ingress.\n2. The `:` delimiter is not respected because ports are not allowed.\n\t  Currently the port of an Ingress is implicitly :80 for http and\n\t  :443 for https.\nBoth these may change in the future. Incoming requests are matched against the host before the IngressRuleValue. If the host is unspeci***REMOVED***ed, the Ingress routes all traf***REMOVED***c based on the speci***REMOVED***ed IngressRuleValue.",
+	"":     "IngressRule represents the rules mapping the paths under a specified host to the related backend services. Incoming requests are first evaluated for a host match, then routed to the backend associated with the matching IngressRuleValue.",
+	"host": "Host is the fully qualified domain name of a network host, as defined by RFC 3986. Note the following deviations from the \"host\" part of the URI as defined in the RFC: 1. IPs are not allowed. Currently an IngressRuleValue can only apply to the\n\t  IP in the Spec of the parent Ingress.\n2. The `:` delimiter is not respected because ports are not allowed.\n\t  Currently the port of an Ingress is implicitly :80 for http and\n\t  :443 for https.\nBoth these may change in the future. Incoming requests are matched against the host before the IngressRuleValue. If the host is unspecified, the Ingress routes all traffic based on the specified IngressRuleValue.",
 }
 
 func (IngressRule) SwaggerDoc() map[string]string {
@@ -310,7 +310,7 @@ func (IngressRule) SwaggerDoc() map[string]string {
 }
 
 var map_IngressRuleValue = map[string]string{
-	"": "IngressRuleValue represents a rule to apply against incoming requests. If the rule is satis***REMOVED***ed, the request is routed to the speci***REMOVED***ed backend. Currently mixing different types of rules in a single Ingress is disallowed, so exactly one of the following must be set.",
+	"": "IngressRuleValue represents a rule to apply against incoming requests. If the rule is satisfied, the request is routed to the specified backend. Currently mixing different types of rules in a single Ingress is disallowed, so exactly one of the following must be set.",
 }
 
 func (IngressRuleValue) SwaggerDoc() map[string]string {
@@ -319,9 +319,9 @@ func (IngressRuleValue) SwaggerDoc() map[string]string {
 
 var map_IngressSpec = map[string]string{
 	"":        "IngressSpec describes the Ingress the user wishes to exist.",
-	"backend": "A default backend capable of servicing requests that don't match any rule. At least one of 'backend' or 'rules' must be speci***REMOVED***ed. This ***REMOVED***eld is optional to allow the loadbalancer controller or defaulting logic to specify a global default.",
-	"tls":     "TLS con***REMOVED***guration. Currently the Ingress only supports a single TLS port, 443. If multiple members of this list specify different hosts, they will be multiplexed on the same port according to the hostname speci***REMOVED***ed through the SNI TLS extension, if the ingress controller ful***REMOVED***lling the ingress supports SNI.",
-	"rules":   "A list of host rules used to con***REMOVED***gure the Ingress. If unspeci***REMOVED***ed, or no rule matches, all traf***REMOVED***c is sent to the default backend.",
+	"backend": "A default backend capable of servicing requests that don't match any rule. At least one of 'backend' or 'rules' must be specified. This field is optional to allow the loadbalancer controller or defaulting logic to specify a global default.",
+	"tls":     "TLS configuration. Currently the Ingress only supports a single TLS port, 443. If multiple members of this list specify different hosts, they will be multiplexed on the same port according to the hostname specified through the SNI TLS extension, if the ingress controller fulfilling the ingress supports SNI.",
+	"rules":   "A list of host rules used to configure the Ingress. If unspecified, or no rule matches, all traffic is sent to the default backend.",
 }
 
 func (IngressSpec) SwaggerDoc() map[string]string {
@@ -339,8 +339,8 @@ func (IngressStatus) SwaggerDoc() map[string]string {
 
 var map_IngressTLS = map[string]string{
 	"":           "IngressTLS describes the transport layer security associated with an Ingress.",
-	"hosts":      "Hosts are a list of hosts included in the TLS certi***REMOVED***cate. The values in this list must match the name/s used in the tlsSecret. Defaults to the wildcard host setting for the loadbalancer controller ful***REMOVED***lling this Ingress, if left unspeci***REMOVED***ed.",
-	"secretName": "SecretName is the name of the secret used to terminate SSL traf***REMOVED***c on 443. Field is left optional to allow SSL routing based on SNI hostname alone. If the SNI host in a listener conflicts with the \"Host\" header ***REMOVED***eld used by an IngressRule, the SNI host is used for termination and value of the Host header is used for routing.",
+	"hosts":      "Hosts are a list of hosts included in the TLS certificate. The values in this list must match the name/s used in the tlsSecret. Defaults to the wildcard host setting for the loadbalancer controller fulfilling this Ingress, if left unspecified.",
+	"secretName": "SecretName is the name of the secret used to terminate SSL traffic on 443. Field is left optional to allow SSL routing based on SNI hostname alone. If the SNI host in a listener conflicts with the \"Host\" header field used by an IngressRule, the SNI host is used for termination and value of the Host header is used for routing.",
 }
 
 func (IngressTLS) SwaggerDoc() map[string]string {
@@ -348,9 +348,9 @@ func (IngressTLS) SwaggerDoc() map[string]string {
 }
 
 var map_NetworkPolicy = map[string]string{
-	"":         "DEPRECATED 1.9 - This group version of NetworkPolicy is deprecated by networking/v1/NetworkPolicy. NetworkPolicy describes what network traf***REMOVED***c is allowed for a set of Pods",
+	"":         "DEPRECATED 1.9 - This group version of NetworkPolicy is deprecated by networking/v1/NetworkPolicy. NetworkPolicy describes what network traffic is allowed for a set of Pods",
 	"metadata": "Standard object's metadata. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#metadata",
-	"spec":     "Speci***REMOVED***cation of the desired behavior for this NetworkPolicy.",
+	"spec":     "Specification of the desired behavior for this NetworkPolicy.",
 }
 
 func (NetworkPolicy) SwaggerDoc() map[string]string {
@@ -358,9 +358,9 @@ func (NetworkPolicy) SwaggerDoc() map[string]string {
 }
 
 var map_NetworkPolicyEgressRule = map[string]string{
-	"":      "DEPRECATED 1.9 - This group version of NetworkPolicyEgressRule is deprecated by networking/v1/NetworkPolicyEgressRule. NetworkPolicyEgressRule describes a particular set of traf***REMOVED***c that is allowed out of pods matched by a NetworkPolicySpec's podSelector. The traf***REMOVED***c must match both ports and to. This type is beta-level in 1.8",
-	"ports": "List of destination ports for outgoing traf***REMOVED***c. Each item in this list is combined using a logical OR. If this ***REMOVED***eld is empty or missing, this rule matches all ports (traf***REMOVED***c not restricted by port). If this ***REMOVED***eld is present and contains at least one item, then this rule allows traf***REMOVED***c only if the traf***REMOVED***c matches at least one port in the list.",
-	"to":    "List of destinations for outgoing traf***REMOVED***c of pods selected for this rule. Items in this list are combined using a logical OR operation. If this ***REMOVED***eld is empty or missing, this rule matches all destinations (traf***REMOVED***c not restricted by destination). If this ***REMOVED***eld is present and contains at least one item, this rule allows traf***REMOVED***c only if the traf***REMOVED***c matches at least one item in the to list.",
+	"":      "DEPRECATED 1.9 - This group version of NetworkPolicyEgressRule is deprecated by networking/v1/NetworkPolicyEgressRule. NetworkPolicyEgressRule describes a particular set of traffic that is allowed out of pods matched by a NetworkPolicySpec's podSelector. The traffic must match both ports and to. This type is beta-level in 1.8",
+	"ports": "List of destination ports for outgoing traffic. Each item in this list is combined using a logical OR. If this field is empty or missing, this rule matches all ports (traffic not restricted by port). If this field is present and contains at least one item, then this rule allows traffic only if the traffic matches at least one port in the list.",
+	"to":    "List of destinations for outgoing traffic of pods selected for this rule. Items in this list are combined using a logical OR operation. If this field is empty or missing, this rule matches all destinations (traffic not restricted by destination). If this field is present and contains at least one item, this rule allows traffic only if the traffic matches at least one item in the to list.",
 }
 
 func (NetworkPolicyEgressRule) SwaggerDoc() map[string]string {
@@ -368,9 +368,9 @@ func (NetworkPolicyEgressRule) SwaggerDoc() map[string]string {
 }
 
 var map_NetworkPolicyIngressRule = map[string]string{
-	"":      "DEPRECATED 1.9 - This group version of NetworkPolicyIngressRule is deprecated by networking/v1/NetworkPolicyIngressRule. This NetworkPolicyIngressRule matches traf***REMOVED***c if and only if the traf***REMOVED***c matches both ports AND from.",
-	"ports": "List of ports which should be made accessible on the pods selected for this rule. Each item in this list is combined using a logical OR. If this ***REMOVED***eld is empty or missing, this rule matches all ports (traf***REMOVED***c not restricted by port). If this ***REMOVED***eld is present and contains at least one item, then this rule allows traf***REMOVED***c only if the traf***REMOVED***c matches at least one port in the list.",
-	"from":  "List of sources which should be able to access the pods selected for this rule. Items in this list are combined using a logical OR operation. If this ***REMOVED***eld is empty or missing, this rule matches all sources (traf***REMOVED***c not restricted by source). If this ***REMOVED***eld is present and contains at least on item, this rule allows traf***REMOVED***c only if the traf***REMOVED***c matches at least one item in the from list.",
+	"":      "DEPRECATED 1.9 - This group version of NetworkPolicyIngressRule is deprecated by networking/v1/NetworkPolicyIngressRule. This NetworkPolicyIngressRule matches traffic if and only if the traffic matches both ports AND from.",
+	"ports": "List of ports which should be made accessible on the pods selected for this rule. Each item in this list is combined using a logical OR. If this field is empty or missing, this rule matches all ports (traffic not restricted by port). If this field is present and contains at least one item, then this rule allows traffic only if the traffic matches at least one port in the list.",
+	"from":  "List of sources which should be able to access the pods selected for this rule. Items in this list are combined using a logical OR operation. If this field is empty or missing, this rule matches all sources (traffic not restricted by source). If this field is present and contains at least on item, this rule allows traffic only if the traffic matches at least one item in the from list.",
 }
 
 func (NetworkPolicyIngressRule) SwaggerDoc() map[string]string {
@@ -389,9 +389,9 @@ func (NetworkPolicyList) SwaggerDoc() map[string]string {
 
 var map_NetworkPolicyPeer = map[string]string{
 	"":                  "DEPRECATED 1.9 - This group version of NetworkPolicyPeer is deprecated by networking/v1/NetworkPolicyPeer.",
-	"podSelector":       "This is a label selector which selects Pods. This ***REMOVED***eld follows standard label selector semantics; if present but empty, it selects all pods.\n\nIf NamespaceSelector is also set, then the NetworkPolicyPeer as a whole selects the Pods matching PodSelector in the Namespaces selected by NamespaceSelector. Otherwise it selects the Pods matching PodSelector in the policy's own Namespace.",
-	"namespaceSelector": "Selects Namespaces using cluster-scoped labels. This ***REMOVED***eld follows standard label selector semantics; if present but empty, it selects all namespaces.\n\nIf PodSelector is also set, then the NetworkPolicyPeer as a whole selects the Pods matching PodSelector in the Namespaces selected by NamespaceSelector. Otherwise it selects all Pods in the Namespaces selected by NamespaceSelector.",
-	"ipBlock":           "IPBlock de***REMOVED***nes policy on a particular IPBlock. If this ***REMOVED***eld is set then neither of the other ***REMOVED***elds can be.",
+	"podSelector":       "This is a label selector which selects Pods. This field follows standard label selector semantics; if present but empty, it selects all pods.\n\nIf NamespaceSelector is also set, then the NetworkPolicyPeer as a whole selects the Pods matching PodSelector in the Namespaces selected by NamespaceSelector. Otherwise it selects the Pods matching PodSelector in the policy's own Namespace.",
+	"namespaceSelector": "Selects Namespaces using cluster-scoped labels. This field follows standard label selector semantics; if present but empty, it selects all namespaces.\n\nIf PodSelector is also set, then the NetworkPolicyPeer as a whole selects the Pods matching PodSelector in the Namespaces selected by NamespaceSelector. Otherwise it selects all Pods in the Namespaces selected by NamespaceSelector.",
+	"ipBlock":           "IPBlock defines policy on a particular IPBlock. If this field is set then neither of the other fields can be.",
 }
 
 func (NetworkPolicyPeer) SwaggerDoc() map[string]string {
@@ -400,8 +400,8 @@ func (NetworkPolicyPeer) SwaggerDoc() map[string]string {
 
 var map_NetworkPolicyPort = map[string]string{
 	"":         "DEPRECATED 1.9 - This group version of NetworkPolicyPort is deprecated by networking/v1/NetworkPolicyPort.",
-	"protocol": "Optional.  The protocol (TCP, UDP, or SCTP) which traf***REMOVED***c must match. If not speci***REMOVED***ed, this ***REMOVED***eld defaults to TCP.",
-	"port":     "If speci***REMOVED***ed, the port on the given protocol.  This can either be a numerical or named port on a pod.  If this ***REMOVED***eld is not provided, this matches all port names and numbers. If present, only traf***REMOVED***c on the speci***REMOVED***ed protocol AND port will be matched.",
+	"protocol": "Optional.  The protocol (TCP, UDP, or SCTP) which traffic must match. If not specified, this field defaults to TCP.",
+	"port":     "If specified, the port on the given protocol.  This can either be a numerical or named port on a pod.  If this field is not provided, this matches all port names and numbers. If present, only traffic on the specified protocol AND port will be matched.",
 }
 
 func (NetworkPolicyPort) SwaggerDoc() map[string]string {
@@ -410,10 +410,10 @@ func (NetworkPolicyPort) SwaggerDoc() map[string]string {
 
 var map_NetworkPolicySpec = map[string]string{
 	"":            "DEPRECATED 1.9 - This group version of NetworkPolicySpec is deprecated by networking/v1/NetworkPolicySpec.",
-	"podSelector": "Selects the pods to which this NetworkPolicy object applies.  The array of ingress rules is applied to any pods selected by this ***REMOVED***eld. Multiple network policies can select the same set of pods.  In this case, the ingress rules for each are combined additively. This ***REMOVED***eld is NOT optional and follows standard label selector semantics. An empty podSelector matches all pods in this namespace.",
-	"ingress":     "List of ingress rules to be applied to the selected pods. Traf***REMOVED***c is allowed to a pod if there are no NetworkPolicies selecting the pod OR if the traf***REMOVED***c source is the pod's local node, OR if the traf***REMOVED***c matches at least one ingress rule across all of the NetworkPolicy objects whose podSelector matches the pod. If this ***REMOVED***eld is empty then this NetworkPolicy does not allow any traf***REMOVED***c (and serves solely to ensure that the pods it selects are isolated by default).",
-	"egress":      "List of egress rules to be applied to the selected pods. Outgoing traf***REMOVED***c is allowed if there are no NetworkPolicies selecting the pod (and cluster policy otherwise allows the traf***REMOVED***c), OR if the traf***REMOVED***c matches at least one egress rule across all of the NetworkPolicy objects whose podSelector matches the pod. If this ***REMOVED***eld is empty then this NetworkPolicy limits all outgoing traf***REMOVED***c (and serves solely to ensure that the pods it selects are isolated by default). This ***REMOVED***eld is beta-level in 1.8",
-	"policyTypes": "List of rule types that the NetworkPolicy relates to. Valid options are Ingress, Egress, or Ingress,Egress. If this ***REMOVED***eld is not speci***REMOVED***ed, it will default based on the existence of Ingress or Egress rules; policies that contain an Egress section are assumed to affect Egress, and all policies (whether or not they contain an Ingress section) are assumed to affect Ingress. If you want to write an egress-only policy, you must explicitly specify policyTypes [ \"Egress\" ]. Likewise, if you want to write a policy that speci***REMOVED***es that no egress is allowed, you must specify a policyTypes value that include \"Egress\" (since such a policy would not include an Egress section and would otherwise default to just [ \"Ingress\" ]). This ***REMOVED***eld is beta-level in 1.8",
+	"podSelector": "Selects the pods to which this NetworkPolicy object applies.  The array of ingress rules is applied to any pods selected by this field. Multiple network policies can select the same set of pods.  In this case, the ingress rules for each are combined additively. This field is NOT optional and follows standard label selector semantics. An empty podSelector matches all pods in this namespace.",
+	"ingress":     "List of ingress rules to be applied to the selected pods. Traffic is allowed to a pod if there are no NetworkPolicies selecting the pod OR if the traffic source is the pod's local node, OR if the traffic matches at least one ingress rule across all of the NetworkPolicy objects whose podSelector matches the pod. If this field is empty then this NetworkPolicy does not allow any traffic (and serves solely to ensure that the pods it selects are isolated by default).",
+	"egress":      "List of egress rules to be applied to the selected pods. Outgoing traffic is allowed if there are no NetworkPolicies selecting the pod (and cluster policy otherwise allows the traffic), OR if the traffic matches at least one egress rule across all of the NetworkPolicy objects whose podSelector matches the pod. If this field is empty then this NetworkPolicy limits all outgoing traffic (and serves solely to ensure that the pods it selects are isolated by default). This field is beta-level in 1.8",
+	"policyTypes": "List of rule types that the NetworkPolicy relates to. Valid options are Ingress, Egress, or Ingress,Egress. If this field is not specified, it will default based on the existence of Ingress or Egress rules; policies that contain an Egress section are assumed to affect Egress, and all policies (whether or not they contain an Ingress section) are assumed to affect Ingress. If you want to write an egress-only policy, you must explicitly specify policyTypes [ \"Egress\" ]. Likewise, if you want to write a policy that specifies that no egress is allowed, you must specify a policyTypes value that include \"Egress\" (since such a policy would not include an Egress section and would otherwise default to just [ \"Ingress\" ]). This field is beta-level in 1.8",
 }
 
 func (NetworkPolicySpec) SwaggerDoc() map[string]string {
@@ -423,7 +423,7 @@ func (NetworkPolicySpec) SwaggerDoc() map[string]string {
 var map_PodSecurityPolicy = map[string]string{
 	"":         "PodSecurityPolicy governs the ability to make requests that affect the Security Context that will be applied to a pod and container. Deprecated: use PodSecurityPolicy from policy API Group instead.",
 	"metadata": "Standard object's metadata. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#metadata",
-	"spec":     "spec de***REMOVED***nes the policy enforced.",
+	"spec":     "spec defines the policy enforced.",
 }
 
 func (PodSecurityPolicy) SwaggerDoc() map[string]string {
@@ -441,11 +441,11 @@ func (PodSecurityPolicyList) SwaggerDoc() map[string]string {
 }
 
 var map_PodSecurityPolicySpec = map[string]string{
-	"":                                "PodSecurityPolicySpec de***REMOVED***nes the policy enforced. Deprecated: use PodSecurityPolicySpec from policy API Group instead.",
+	"":                                "PodSecurityPolicySpec defines the policy enforced. Deprecated: use PodSecurityPolicySpec from policy API Group instead.",
 	"privileged":                      "privileged determines if a pod can request to be run as privileged.",
-	"defaultAddCapabilities":          "defaultAddCapabilities is the default set of capabilities that will be added to the container unless the pod spec speci***REMOVED***cally drops the capability.  You may not list a capability in both defaultAddCapabilities and requiredDropCapabilities. Capabilities added here are implicitly allowed, and need not be included in the allowedCapabilities list.",
+	"defaultAddCapabilities":          "defaultAddCapabilities is the default set of capabilities that will be added to the container unless the pod spec specifically drops the capability.  You may not list a capability in both defaultAddCapabilities and requiredDropCapabilities. Capabilities added here are implicitly allowed, and need not be included in the allowedCapabilities list.",
 	"requiredDropCapabilities":        "requiredDropCapabilities are the capabilities that will be dropped from the container.  These are required to be dropped and cannot be added.",
-	"allowedCapabilities":             "allowedCapabilities is a list of capabilities that can be requested to add to the container. Capabilities in this ***REMOVED***eld may be added at the pod author's discretion. You must not list a capability in both allowedCapabilities and requiredDropCapabilities.",
+	"allowedCapabilities":             "allowedCapabilities is a list of capabilities that can be requested to add to the container. Capabilities in this field may be added at the pod author's discretion. You must not list a capability in both allowedCapabilities and requiredDropCapabilities.",
 	"volumes":                         "volumes is a white list of allowed volume plugins. Empty indicates that no volumes may be used. To allow all volumes you may use '*'.",
 	"hostNetwork":                     "hostNetwork determines if the policy allows the use of HostNetwork in the pod spec.",
 	"hostPorts":                       "hostPorts determines which host port ranges are allowed to be exposed.",
@@ -453,16 +453,16 @@ var map_PodSecurityPolicySpec = map[string]string{
 	"hostIPC":                         "hostIPC determines if the policy allows the use of HostIPC in the pod spec.",
 	"seLinux":                         "seLinux is the strategy that will dictate the allowable labels that may be set.",
 	"runAsUser":                       "runAsUser is the strategy that will dictate the allowable RunAsUser values that may be set.",
-	"runAsGroup":                      "RunAsGroup is the strategy that will dictate the allowable RunAsGroup values that may be set. If this ***REMOVED***eld is omitted, the pod's RunAsGroup can take any value. This ***REMOVED***eld requires the RunAsGroup feature gate to be enabled.",
+	"runAsGroup":                      "RunAsGroup is the strategy that will dictate the allowable RunAsGroup values that may be set. If this field is omitted, the pod's RunAsGroup can take any value. This field requires the RunAsGroup feature gate to be enabled.",
 	"supplementalGroups":              "supplementalGroups is the strategy that will dictate what supplemental groups are used by the SecurityContext.",
 	"fsGroup":                         "fsGroup is the strategy that will dictate what fs group is used by the SecurityContext.",
-	"readOnlyRootFilesystem":          "readOnlyRootFilesystem when set to true will force containers to run with a read only root ***REMOVED***le system.  If the container speci***REMOVED***cally requests to run with a non-read only root ***REMOVED***le system the PSP should deny the pod. If set to false the container may run with a read only root ***REMOVED***le system if it wishes but it will not be forced to.",
+	"readOnlyRootFilesystem":          "readOnlyRootFilesystem when set to true will force containers to run with a read only root file system.  If the container specifically requests to run with a non-read only root file system the PSP should deny the pod. If set to false the container may run with a read only root file system if it wishes but it will not be forced to.",
 	"defaultAllowPrivilegeEscalation": "defaultAllowPrivilegeEscalation controls the default setting for whether a process can gain more privileges than its parent process.",
-	"allowPrivilegeEscalation":        "allowPrivilegeEscalation determines if a pod can request to allow privilege escalation. If unspeci***REMOVED***ed, defaults to true.",
+	"allowPrivilegeEscalation":        "allowPrivilegeEscalation determines if a pod can request to allow privilege escalation. If unspecified, defaults to true.",
 	"allowedHostPaths":                "allowedHostPaths is a white list of allowed host paths. Empty indicates that all host paths may be used.",
-	"allowedFlexVolumes":              "allowedFlexVolumes is a whitelist of allowed Flexvolumes.  Empty or nil indicates that all Flexvolumes may be used.  This parameter is effective only when the usage of the Flexvolumes is allowed in the \"volumes\" ***REMOVED***eld.",
-	"allowedUnsafeSysctls":            "allowedUnsafeSysctls is a list of explicitly allowed unsafe sysctls, defaults to none. Each entry is either a plain sysctl name or ends in \"*\" in which case it is considered as a pre***REMOVED***x of allowed sysctls. Single * means all unsafe sysctls are allowed. Kubelet has to whitelist all allowed unsafe sysctls explicitly to avoid rejection.\n\nExamples: e.g. \"foo/*\" allows \"foo/bar\", \"foo/baz\", etc. e.g. \"foo.*\" allows \"foo.bar\", \"foo.baz\", etc.",
-	"forbiddenSysctls":                "forbiddenSysctls is a list of explicitly forbidden sysctls, defaults to none. Each entry is either a plain sysctl name or ends in \"*\" in which case it is considered as a pre***REMOVED***x of forbidden sysctls. Single * means all sysctls are forbidden.\n\nExamples: e.g. \"foo/*\" forbids \"foo/bar\", \"foo/baz\", etc. e.g. \"foo.*\" forbids \"foo.bar\", \"foo.baz\", etc.",
+	"allowedFlexVolumes":              "allowedFlexVolumes is a whitelist of allowed Flexvolumes.  Empty or nil indicates that all Flexvolumes may be used.  This parameter is effective only when the usage of the Flexvolumes is allowed in the \"volumes\" field.",
+	"allowedUnsafeSysctls":            "allowedUnsafeSysctls is a list of explicitly allowed unsafe sysctls, defaults to none. Each entry is either a plain sysctl name or ends in \"*\" in which case it is considered as a prefix of allowed sysctls. Single * means all unsafe sysctls are allowed. Kubelet has to whitelist all allowed unsafe sysctls explicitly to avoid rejection.\n\nExamples: e.g. \"foo/*\" allows \"foo/bar\", \"foo/baz\", etc. e.g. \"foo.*\" allows \"foo.bar\", \"foo.baz\", etc.",
+	"forbiddenSysctls":                "forbiddenSysctls is a list of explicitly forbidden sysctls, defaults to none. Each entry is either a plain sysctl name or ends in \"*\" in which case it is considered as a prefix of forbidden sysctls. Single * means all sysctls are forbidden.\n\nExamples: e.g. \"foo/*\" forbids \"foo/bar\", \"foo/baz\", etc. e.g. \"foo.*\" forbids \"foo.bar\", \"foo.baz\", etc.",
 	"allowedProcMountTypes":           "AllowedProcMountTypes is a whitelist of allowed ProcMountTypes. Empty or nil indicates that only the DefaultProcMountType may be used. This requires the ProcMountType feature flag to be enabled.",
 }
 
@@ -471,9 +471,9 @@ func (PodSecurityPolicySpec) SwaggerDoc() map[string]string {
 }
 
 var map_ReplicaSet = map[string]string{
-	"":         "DEPRECATED - This group version of ReplicaSet is deprecated by apps/v1beta2/ReplicaSet. See the release notes for more information. ReplicaSet ensures that a speci***REMOVED***ed number of pod replicas are running at any given time.",
+	"":         "DEPRECATED - This group version of ReplicaSet is deprecated by apps/v1beta2/ReplicaSet. See the release notes for more information. ReplicaSet ensures that a specified number of pod replicas are running at any given time.",
 	"metadata": "If the Labels of a ReplicaSet are empty, they are defaulted to be the same as the Pod(s) that the ReplicaSet manages. Standard object's metadata. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#metadata",
-	"spec":     "Spec de***REMOVED***nes the speci***REMOVED***cation of the desired behavior of the ReplicaSet. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#spec-and-status",
+	"spec":     "Spec defines the specification of the desired behavior of the ReplicaSet. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#spec-and-status",
 	"status":   "Status is the most recently observed status of the ReplicaSet. This data may be out of date by some window of time. Populated by the system. Read-only. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#spec-and-status",
 }
 
@@ -505,11 +505,11 @@ func (ReplicaSetList) SwaggerDoc() map[string]string {
 }
 
 var map_ReplicaSetSpec = map[string]string{
-	"":                "ReplicaSetSpec is the speci***REMOVED***cation of a ReplicaSet.",
-	"replicas":        "Replicas is the number of desired replicas. This is a pointer to distinguish between explicit zero and unspeci***REMOVED***ed. Defaults to 1. More info: https://kubernetes.io/docs/concepts/workloads/controllers/replicationcontroller/#what-is-a-replicationcontroller",
+	"":                "ReplicaSetSpec is the specification of a ReplicaSet.",
+	"replicas":        "Replicas is the number of desired replicas. This is a pointer to distinguish between explicit zero and unspecified. Defaults to 1. More info: https://kubernetes.io/docs/concepts/workloads/controllers/replicationcontroller/#what-is-a-replicationcontroller",
 	"minReadySeconds": "Minimum number of seconds for which a newly created pod should be ready without any of its container crashing, for it to be considered available. Defaults to 0 (pod will be considered available as soon as it is ready)",
 	"selector":        "Selector is a label query over pods that should match the replica count. If the selector is empty, it is defaulted to the labels present on the pod template. Label keys and values that must match in order to be controlled by this replica set. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/#label-selectors",
-	"template":        "Template is the object that describes the pod that will be created if insuf***REMOVED***cient replicas are detected. More info: https://kubernetes.io/docs/concepts/workloads/controllers/replicationcontroller#pod-template",
+	"template":        "Template is the object that describes the pod that will be created if insufficient replicas are detected. More info: https://kubernetes.io/docs/concepts/workloads/controllers/replicationcontroller#pod-template",
 }
 
 func (ReplicaSetSpec) SwaggerDoc() map[string]string {
@@ -531,20 +531,20 @@ func (ReplicaSetStatus) SwaggerDoc() map[string]string {
 }
 
 var map_ReplicationControllerDummy = map[string]string{
-	"": "Dummy de***REMOVED***nition",
+	"": "Dummy definition",
 }
 
 func (ReplicationControllerDummy) SwaggerDoc() map[string]string {
 	return map_ReplicationControllerDummy
 }
 
-var map_RollbackCon***REMOVED***g = map[string]string{
+var map_RollbackConfig = map[string]string{
 	"":         "DEPRECATED.",
 	"revision": "The revision to rollback to. If set to 0, rollback to the last revision.",
 }
 
-func (RollbackCon***REMOVED***g) SwaggerDoc() map[string]string {
-	return map_RollbackCon***REMOVED***g
+func (RollbackConfig) SwaggerDoc() map[string]string {
+	return map_RollbackConfig
 }
 
 var map_RollingUpdateDaemonSet = map[string]string{
@@ -558,7 +558,7 @@ func (RollingUpdateDaemonSet) SwaggerDoc() map[string]string {
 
 var map_RollingUpdateDeployment = map[string]string{
 	"":               "Spec to control the desired behavior of rolling update.",
-	"maxUnavailable": "The maximum number of pods that can be unavailable during the update. Value can be an absolute number (ex: 5) or a percentage of desired pods (ex: 10%). Absolute number is calculated from percentage by rounding down. This can not be 0 if MaxSurge is 0. By default, a ***REMOVED***xed value of 1 is used. Example: when this is set to 30%, the old RC can be scaled down to 70% of desired pods immediately when the rolling update starts. Once new pods are ready, old RC can be scaled down further, followed by scaling up the new RC, ensuring that the total number of pods available at all times during the update is at least 70% of desired pods.",
+	"maxUnavailable": "The maximum number of pods that can be unavailable during the update. Value can be an absolute number (ex: 5) or a percentage of desired pods (ex: 10%). Absolute number is calculated from percentage by rounding down. This can not be 0 if MaxSurge is 0. By default, a fixed value of 1 is used. Example: when this is set to 30%, the old RC can be scaled down to 70% of desired pods immediately when the rolling update starts. Once new pods are ready, old RC can be scaled down further, followed by scaling up the new RC, ensuring that the total number of pods available at all times during the update is at least 70% of desired pods.",
 	"maxSurge":       "The maximum number of pods that can be scheduled above the desired number of pods. Value can be an absolute number (ex: 5) or a percentage of desired pods (ex: 10%). This can not be 0 if MaxUnavailable is 0. Absolute number is calculated from percentage by rounding up. By default, a value of 1 is used. Example: when this is set to 30%, the new RC can be scaled up immediately when the rolling update starts, such that the total number of old and new pods do not exceed 130% of desired pods. Once old pods have been killed, new RC can be scaled up further, ensuring that total number of pods running at any time during the update is atmost 130% of desired pods.",
 }
 
@@ -567,7 +567,7 @@ func (RollingUpdateDeployment) SwaggerDoc() map[string]string {
 }
 
 var map_RunAsGroupStrategyOptions = map[string]string{
-	"":       "RunAsGroupStrategyOptions de***REMOVED***nes the strategy type and any options used to create the strategy. Deprecated: use RunAsGroupStrategyOptions from policy API Group instead.",
+	"":       "RunAsGroupStrategyOptions defines the strategy type and any options used to create the strategy. Deprecated: use RunAsGroupStrategyOptions from policy API Group instead.",
 	"rule":   "rule is the strategy that will dictate the allowable RunAsGroup values that may be set.",
 	"ranges": "ranges are the allowed ranges of gids that may be used. If you would like to force a single gid then supply a single range with the same start and end. Required for MustRunAs.",
 }
@@ -577,7 +577,7 @@ func (RunAsGroupStrategyOptions) SwaggerDoc() map[string]string {
 }
 
 var map_RunAsUserStrategyOptions = map[string]string{
-	"":       "RunAsUserStrategyOptions de***REMOVED***nes the strategy type and any options used to create the strategy. Deprecated: use RunAsUserStrategyOptions from policy API Group instead.",
+	"":       "RunAsUserStrategyOptions defines the strategy type and any options used to create the strategy. Deprecated: use RunAsUserStrategyOptions from policy API Group instead.",
 	"rule":   "rule is the strategy that will dictate the allowable RunAsUser values that may be set.",
 	"ranges": "ranges are the allowed ranges of uids that may be used. If you would like to force a single uid then supply a single range with the same start and end. Required for MustRunAs.",
 }
@@ -587,9 +587,9 @@ func (RunAsUserStrategyOptions) SwaggerDoc() map[string]string {
 }
 
 var map_SELinuxStrategyOptions = map[string]string{
-	"":               "SELinuxStrategyOptions de***REMOVED***nes the strategy type and any options used to create the strategy. Deprecated: use SELinuxStrategyOptions from policy API Group instead.",
+	"":               "SELinuxStrategyOptions defines the strategy type and any options used to create the strategy. Deprecated: use SELinuxStrategyOptions from policy API Group instead.",
 	"rule":           "rule is the strategy that will dictate the allowable labels that may be set.",
-	"seLinuxOptions": "seLinuxOptions required to run as; required for MustRunAs More info: https://kubernetes.io/docs/tasks/con***REMOVED***gure-pod-container/security-context/",
+	"seLinuxOptions": "seLinuxOptions required to run as; required for MustRunAs More info: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/",
 }
 
 func (SELinuxStrategyOptions) SwaggerDoc() map[string]string {
@@ -599,7 +599,7 @@ func (SELinuxStrategyOptions) SwaggerDoc() map[string]string {
 var map_Scale = map[string]string{
 	"":         "represents a scaling request for a resource.",
 	"metadata": "Standard object metadata; More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#metadata.",
-	"spec":     "de***REMOVED***nes the behavior of the scale. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#spec-and-status.",
+	"spec":     "defines the behavior of the scale. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#spec-and-status.",
 	"status":   "current status of the scale. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#spec-and-status. Read-only.",
 }
 
@@ -620,7 +620,7 @@ var map_ScaleStatus = map[string]string{
 	"":               "represents the current status of a scale subresource.",
 	"replicas":       "actual number of observed instances of the scaled object.",
 	"selector":       "label query over pods that should match the replicas count. More info: http://kubernetes.io/docs/user-guide/labels#label-selectors",
-	"targetSelector": "label selector for pods that should match the replicas count. This is a serializated version of both map-based and more expressive set-based selectors. This is done to avoid introspection in the clients. The string will be in the same format as the query-param syntax. If the target type only supports map-based selectors, both this ***REMOVED***eld and map-based selector ***REMOVED***eld are populated. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/#label-selectors",
+	"targetSelector": "label selector for pods that should match the replicas count. This is a serializated version of both map-based and more expressive set-based selectors. This is done to avoid introspection in the clients. The string will be in the same format as the query-param syntax. If the target type only supports map-based selectors, both this field and map-based selector field are populated. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/#label-selectors",
 }
 
 func (ScaleStatus) SwaggerDoc() map[string]string {
@@ -628,7 +628,7 @@ func (ScaleStatus) SwaggerDoc() map[string]string {
 }
 
 var map_SupplementalGroupsStrategyOptions = map[string]string{
-	"":       "SupplementalGroupsStrategyOptions de***REMOVED***nes the strategy type and options used to create the strategy. Deprecated: use SupplementalGroupsStrategyOptions from policy API Group instead.",
+	"":       "SupplementalGroupsStrategyOptions defines the strategy type and options used to create the strategy. Deprecated: use SupplementalGroupsStrategyOptions from policy API Group instead.",
 	"rule":   "rule is the strategy that will dictate what supplemental groups is used in the SecurityContext.",
 	"ranges": "ranges are the allowed ranges of supplemental groups.  If you would like to force a single supplemental group then supply a single range with the same start and end. Required for MustRunAs.",
 }

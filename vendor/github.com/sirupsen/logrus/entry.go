@@ -18,24 +18,24 @@ func init() {
 	}
 }
 
-// De***REMOVED***nes the key when adding errors using WithError.
+// Defines the key when adding errors using WithError.
 var ErrorKey = "error"
 
-// An entry is the ***REMOVED***nal or intermediate Logrus logging entry. It contains all
-// the ***REMOVED***elds passed with WithField{,s}. It's ***REMOVED***nally logged when Debug, Info,
+// An entry is the final or intermediate Logrus logging entry. It contains all
+// the fields passed with WithField{,s}. It's finally logged when Debug, Info,
 // Warn, Error, Fatal or Panic is called on it. These objects can be reused and
-// passed around as much as you wish to avoid ***REMOVED***eld duplication.
+// passed around as much as you wish to avoid field duplication.
 type Entry struct {
 	Logger *Logger
 
-	// Contains all the ***REMOVED***elds set by the user.
+	// Contains all the fields set by the user.
 	Data Fields
 
 	// Time at which the log entry was created
 	Time time.Time
 
 	// Level the log entry was logged at: Debug, Info, Warn, Error, Fatal or Panic
-	// This ***REMOVED***eld will be set on entry ***REMOVED***ring and the value will be equal to the one in Logger struct ***REMOVED***eld.
+	// This field will be set on entry firing and the value will be equal to the one in Logger struct field.
 	Level Level
 
 	// Message passed to Debug, Info, Warn, Error, Fatal or Panic
@@ -48,7 +48,7 @@ type Entry struct {
 func NewEntry(logger *Logger) *Entry {
 	return &Entry{
 		Logger: logger,
-		// Default is three ***REMOVED***elds, give a little extra room
+		// Default is three fields, give a little extra room
 		Data: make(Fields, 5),
 	}
 }
@@ -64,23 +64,23 @@ func (entry *Entry) String() (string, error) {
 	return str, nil
 }
 
-// Add an error as single ***REMOVED***eld (using the key de***REMOVED***ned in ErrorKey) to the Entry.
+// Add an error as single field (using the key defined in ErrorKey) to the Entry.
 func (entry *Entry) WithError(err error) *Entry {
 	return entry.WithField(ErrorKey, err)
 }
 
-// Add a single ***REMOVED***eld to the Entry.
+// Add a single field to the Entry.
 func (entry *Entry) WithField(key string, value interface{}) *Entry {
 	return entry.WithFields(Fields{key: value})
 }
 
-// Add a map of ***REMOVED***elds to the Entry.
-func (entry *Entry) WithFields(***REMOVED***elds Fields) *Entry {
-	data := make(Fields, len(entry.Data)+len(***REMOVED***elds))
+// Add a map of fields to the Entry.
+func (entry *Entry) WithFields(fields Fields) *Entry {
+	data := make(Fields, len(entry.Data)+len(fields))
 	for k, v := range entry.Data {
 		data[k] = v
 	}
-	for k, v := range ***REMOVED***elds {
+	for k, v := range fields {
 		data[k] = v
 	}
 	return &Entry{Logger: entry.Logger, Data: data}
@@ -94,7 +94,7 @@ func (entry Entry) log(level Level, msg string) {
 	entry.Level = level
 	entry.Message = msg
 
-	entry.***REMOVED***reHooks()
+	entry.fireHooks()
 
 	buffer = bufferPool.Get().(*bytes.Buffer)
 	buffer.Reset()
@@ -115,12 +115,12 @@ func (entry Entry) log(level Level, msg string) {
 
 // This function is not declared with a pointer value because otherwise
 // race conditions will occur when using multiple goroutines
-func (entry Entry) ***REMOVED***reHooks() {
+func (entry Entry) fireHooks() {
 	entry.Logger.mu.Lock()
 	defer entry.Logger.mu.Unlock()
 	err := entry.Logger.Hooks.Fire(entry.Level, &entry)
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "Failed to ***REMOVED***re hook: %v\n", err)
+		fmt.Fprintf(os.Stderr, "Failed to fire hook: %v\n", err)
 	}
 }
 
@@ -130,7 +130,7 @@ func (entry *Entry) write() {
 	defer entry.Logger.mu.Unlock()
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Failed to obtain reader, %v\n", err)
-	} ***REMOVED*** {
+	} else {
 		_, err = entry.Logger.Out.Write(serialized)
 		if err != nil {
 			fmt.Fprintf(os.Stderr, "Failed to write to log, %v\n", err)

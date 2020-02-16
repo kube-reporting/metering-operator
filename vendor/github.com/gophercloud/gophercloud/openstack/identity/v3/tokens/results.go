@@ -8,8 +8,8 @@ import (
 
 // Endpoint represents a single API endpoint offered by a service.
 // It matches either a public, internal or admin URL.
-// If supported, it contains a region speci***REMOVED***er, again if provided.
-// The signi***REMOVED***cance of the Region ***REMOVED***eld will depend upon your provider.
+// If supported, it contains a region specifier, again if provided.
+// The significance of the Region field will depend upon your provider.
 type Endpoint struct {
 	ID        string `json:"id"`
 	Region    string `json:"region"`
@@ -24,17 +24,17 @@ type Endpoint struct {
 // type, e.g public, admin or internal).
 //
 // Note: when looking for the desired service, try, whenever possible, to key
-// off the type ***REMOVED***eld. Otherwise, you'll tie the representation of the service
-// to a speci***REMOVED***c provider.
+// off the type field. Otherwise, you'll tie the representation of the service
+// to a specific provider.
 type CatalogEntry struct {
 	// Service ID
 	ID string `json:"id"`
 
-	// Name will contain the provider-speci***REMOVED***ed name for the service.
+	// Name will contain the provider-specified name for the service.
 	Name string `json:"name"`
 
-	// Type will contain a type string if OpenStack de***REMOVED***nes a type for the
-	// service. Otherwise, for provider-speci***REMOVED***c services, the provider may
+	// Type will contain a type string if OpenStack defines a type for the
+	// service. Otherwise, for provider-specific services, the provider may
 	// assign their own type strings.
 	Type string `json:"type"`
 
@@ -103,7 +103,7 @@ func (r commonResult) ExtractToken() (*Token, error) {
 }
 
 // ExtractTokenID implements the gophercloud.AuthResult interface. The returned
-// string is the same as the ID ***REMOVED***eld of the Token struct returned from
+// string is the same as the ID field of the Token struct returned from
 // ExtractToken().
 func (r CreateResult) ExtractTokenID() (string, error) {
 	return r.Header.Get("X-Subject-Token"), r.Err

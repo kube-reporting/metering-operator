@@ -36,7 +36,7 @@ func connectOptionsFromURL(u *url.URL) (ConnectOptions, error) {
 	if timeoutParam := queryParams.Get("connect_timeout"); timeoutParam != "" {
 		if timeoutSeconds, err := strconv.ParseInt(timeoutParam, 10, 0); err != nil {
 			return ConnectOptions{}, err
-		} ***REMOVED*** {
+		} else {
 			opts.Timeout = time.Duration(timeoutSeconds) * time.Second
 		}
 	}
@@ -48,7 +48,7 @@ func connectOptionsFromURL(u *url.URL) (ConnectOptions, error) {
 		}
 		if password, ok := u.User.Password(); ok {
 			opts.Password = password
-		} ***REMOVED*** {
+		} else {
 			return ConnectOptions{}, ErrNoPassword
 		}
 	}

@@ -39,7 +39,7 @@ func (f *FlagSet) GetInt16(name string) (int16, error) {
 	return val.(int16), nil
 }
 
-// Int16Var de***REMOVED***nes an int16 flag with speci***REMOVED***ed name, default value, and usage string.
+// Int16Var defines an int16 flag with specified name, default value, and usage string.
 // The argument p points to an int16 variable in which to store the value of the flag.
 func (f *FlagSet) Int16Var(p *int16, name string, value int16, usage string) {
 	f.VarP(newInt16Value(value, p), name, "", usage)
@@ -50,7 +50,7 @@ func (f *FlagSet) Int16VarP(p *int16, name, shorthand string, value int16, usage
 	f.VarP(newInt16Value(value, p), name, shorthand, usage)
 }
 
-// Int16Var de***REMOVED***nes an int16 flag with speci***REMOVED***ed name, default value, and usage string.
+// Int16Var defines an int16 flag with specified name, default value, and usage string.
 // The argument p points to an int16 variable in which to store the value of the flag.
 func Int16Var(p *int16, name string, value int16, usage string) {
 	CommandLine.VarP(newInt16Value(value, p), name, "", usage)
@@ -61,7 +61,7 @@ func Int16VarP(p *int16, name, shorthand string, value int16, usage string) {
 	CommandLine.VarP(newInt16Value(value, p), name, shorthand, usage)
 }
 
-// Int16 de***REMOVED***nes an int16 flag with speci***REMOVED***ed name, default value, and usage string.
+// Int16 defines an int16 flag with specified name, default value, and usage string.
 // The return value is the address of an int16 variable that stores the value of the flag.
 func (f *FlagSet) Int16(name string, value int16, usage string) *int16 {
 	p := new(int16)
@@ -76,7 +76,7 @@ func (f *FlagSet) Int16P(name, shorthand string, value int16, usage string) *int
 	return p
 }
 
-// Int16 de***REMOVED***nes an int16 flag with speci***REMOVED***ed name, default value, and usage string.
+// Int16 defines an int16 flag with specified name, default value, and usage string.
 // The return value is the address of an int16 variable that stores the value of the flag.
 func Int16(name string, value int16, usage string) *int16 {
 	return CommandLine.Int16P(name, "", value, usage)

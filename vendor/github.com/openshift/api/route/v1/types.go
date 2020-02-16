@@ -10,19 +10,19 @@ import (
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
 
 // A route allows developers to expose services through an HTTP(S) aware load balancing and proxy
-// layer via a public DNS entry. The route may further specify TLS options and a certi***REMOVED***cate, or
-// specify a public CNAME that the router should also accept for HTTP and HTTPS traf***REMOVED***c. An
-// administrator typically con***REMOVED***gures their router to be visible outside the cluster ***REMOVED***rewall, and
-// may also add additional security, caching, or traf***REMOVED***c controls on the service content. Routers
+// layer via a public DNS entry. The route may further specify TLS options and a certificate, or
+// specify a public CNAME that the router should also accept for HTTP and HTTPS traffic. An
+// administrator typically configures their router to be visible outside the cluster firewall, and
+// may also add additional security, caching, or traffic controls on the service content. Routers
 // usually talk directly to the service endpoints.
 //
-// Once a route is created, the `host` ***REMOVED***eld may not be changed. Generally, routers use the oldest
+// Once a route is created, the `host` field may not be changed. Generally, routers use the oldest
 // route with a given host when resolving conflicts.
 //
 // Routers are subject to additional customization and may support additional controls via the
-// annotations ***REMOVED***eld.
+// annotations field.
 //
-// Because administrators may con***REMOVED***gure multiple routers, the route status ***REMOVED***eld is used to
+// Because administrators may configure multiple routers, the route status field is used to
 // return information to clients about the names and states of the route under each router.
 // If a client chooses a duplicate name, for instance, the route status conditions are used
 // to indicate the route cannot be chosen.
@@ -59,45 +59,45 @@ type RouteList struct {
 // to the backend. If all weights are zero the route will be considered to have no backends
 // and return a standard 503 response.
 //
-// The `tls` ***REMOVED***eld is optional and allows speci***REMOVED***c certi***REMOVED***cates or behavior for the
-// route. Routers typically con***REMOVED***gure a default certi***REMOVED***cate on a wildcard domain to
-// terminate routes without explicit certi***REMOVED***cates, but custom hostnames usually must
-// choose passthrough (send traf***REMOVED***c directly to the backend via the TLS Server-Name-
-// Indication ***REMOVED***eld) or provide a certi***REMOVED***cate.
+// The `tls` field is optional and allows specific certificates or behavior for the
+// route. Routers typically configure a default certificate on a wildcard domain to
+// terminate routes without explicit certificates, but custom hostnames usually must
+// choose passthrough (send traffic directly to the backend via the TLS Server-Name-
+// Indication field) or provide a certificate.
 type RouteSpec struct {
 	// host is an alias/DNS that points to the service. Optional.
-	// If not speci***REMOVED***ed a route name will typically be automatically
+	// If not specified a route name will typically be automatically
 	// chosen.
 	// Must follow DNS952 subdomain conventions.
 	Host string `json:"host" protobuf:"bytes,1,opt,name=host"`
-	// Path that the router watches for, to route traf***REMOVED***c for to the service. Optional
+	// Path that the router watches for, to route traffic for to the service. Optional
 	Path string `json:"path,omitempty" protobuf:"bytes,2,opt,name=path"`
 
 	// to is an object the route should use as the primary backend. Only the Service kind
-	// is allowed, and it will be defaulted to Service. If the weight ***REMOVED***eld (0-256 default 1)
-	// is set to zero, no traf***REMOVED***c will be sent to this backend.
+	// is allowed, and it will be defaulted to Service. If the weight field (0-256 default 1)
+	// is set to zero, no traffic will be sent to this backend.
 	To RouteTargetReference `json:"to" protobuf:"bytes,3,opt,name=to"`
 
 	// alternateBackends allows up to 3 additional backends to be assigned to the route.
 	// Only the Service kind is allowed, and it will be defaulted to Service.
-	// Use the weight ***REMOVED***eld in RouteTargetReference object to specify relative preference.
+	// Use the weight field in RouteTargetReference object to specify relative preference.
 	AlternateBackends []RouteTargetReference `json:"alternateBackends,omitempty" protobuf:"bytes,4,rep,name=alternateBackends"`
 
-	// If speci***REMOVED***ed, the port to be used by the router. Most routers will use all
+	// If specified, the port to be used by the router. Most routers will use all
 	// endpoints exposed by the service by default - set this value to instruct routers
 	// which port to use.
 	Port *RoutePort `json:"port,omitempty" protobuf:"bytes,5,opt,name=port"`
 
-	// The tls ***REMOVED***eld provides the ability to con***REMOVED***gure certi***REMOVED***cates and termination for the route.
-	TLS *TLSCon***REMOVED***g `json:"tls,omitempty" protobuf:"bytes,6,opt,name=tls"`
+	// The tls field provides the ability to configure certificates and termination for the route.
+	TLS *TLSConfig `json:"tls,omitempty" protobuf:"bytes,6,opt,name=tls"`
 
 	// Wildcard policy if any for the route.
 	// Currently only 'Subdomain' or 'None' is allowed.
 	WildcardPolicy WildcardPolicyType `json:"wildcardPolicy,omitempty" protobuf:"bytes,7,opt,name=wildcardPolicy"`
 }
 
-// RouteTargetReference speci***REMOVED***es the target that resolve into endpoints. Only the 'Service'
-// kind is allowed. Use 'weight' ***REMOVED***eld to emphasize one over others.
+// RouteTargetReference specifies the target that resolve into endpoints. Only the 'Service'
+// kind is allowed. Use 'weight' field to emphasize one over others.
 type RouteTargetReference struct {
 	// The kind of target that the route is referring to. Currently, only 'Service' is allowed
 	Kind string `json:"kind" protobuf:"bytes,1,opt,name=kind"`
@@ -105,12 +105,12 @@ type RouteTargetReference struct {
 	// name of the service/target that is being referred to. e.g. name of the service
 	Name string `json:"name" protobuf:"bytes,2,opt,name=name"`
 
-	// weight as an integer between 0 and 256, default 1, that speci***REMOVED***es the target's relative weight
+	// weight as an integer between 0 and 256, default 1, that specifies the target's relative weight
 	// against other target reference objects. 0 suppresses requests to this backend.
 	Weight *int32 `json:"weight" protobuf:"varint,3,opt,name=weight"`
 }
 
-// RoutePort de***REMOVED***nes a port mapping from a router to an endpoint in the service endpoints.
+// RoutePort defines a port mapping from a router to an endpoint in the service endpoints.
 type RoutePort struct {
 	// The target port on pods selected by the service this route points to.
 	// If this is a string, it will be looked up as a named port in the target
@@ -172,44 +172,44 @@ type RouteIngressCondition struct {
 
 // RouterShard has information of a routing shard and is used to
 // generate host names and routing table entries when a routing shard is
-// allocated for a speci***REMOVED***c route.
-// Caveat: This is WIP and will likely undergo modi***REMOVED***cations when sharding
+// allocated for a specific route.
+// Caveat: This is WIP and will likely undergo modifications when sharding
 //         support is added.
 type RouterShard struct {
-	// shardName uniquely identi***REMOVED***es a router shard in the "set" of
-	// routers used for routing traf***REMOVED***c to the services.
+	// shardName uniquely identifies a router shard in the "set" of
+	// routers used for routing traffic to the services.
 	ShardName string `json:"shardName" protobuf:"bytes,1,opt,name=shardName"`
 
-	// dnsSuf***REMOVED***x for the shard ala: shard-1.v3.openshift.com
-	DNSSuf***REMOVED***x string `json:"dnsSuf***REMOVED***x" protobuf:"bytes,2,opt,name=dnsSuf***REMOVED***x"`
+	// dnsSuffix for the shard ala: shard-1.v3.openshift.com
+	DNSSuffix string `json:"dnsSuffix" protobuf:"bytes,2,opt,name=dnsSuffix"`
 }
 
-// TLSCon***REMOVED***g de***REMOVED***nes con***REMOVED***g used to secure a route and provide termination
-type TLSCon***REMOVED***g struct {
+// TLSConfig defines config used to secure a route and provide termination
+type TLSConfig struct {
 	// termination indicates termination type.
 	Termination TLSTerminationType `json:"termination" protobuf:"bytes,1,opt,name=termination,casttype=TLSTerminationType"`
 
-	// certi***REMOVED***cate provides certi***REMOVED***cate contents
-	Certi***REMOVED***cate string `json:"certi***REMOVED***cate,omitempty" protobuf:"bytes,2,opt,name=certi***REMOVED***cate"`
+	// certificate provides certificate contents
+	Certificate string `json:"certificate,omitempty" protobuf:"bytes,2,opt,name=certificate"`
 
-	// key provides key ***REMOVED***le contents
+	// key provides key file contents
 	Key string `json:"key,omitempty" protobuf:"bytes,3,opt,name=key"`
 
-	// caCerti***REMOVED***cate provides the cert authority certi***REMOVED***cate contents
-	CACerti***REMOVED***cate string `json:"caCerti***REMOVED***cate,omitempty" protobuf:"bytes,4,opt,name=caCerti***REMOVED***cate"`
+	// caCertificate provides the cert authority certificate contents
+	CACertificate string `json:"caCertificate,omitempty" protobuf:"bytes,4,opt,name=caCertificate"`
 
-	// destinationCACerti***REMOVED***cate provides the contents of the ca certi***REMOVED***cate of the ***REMOVED***nal destination.  When using reencrypt
-	// termination this ***REMOVED***le should be provided in order to have routers use it for health checks on the secure connection.
-	// If this ***REMOVED***eld is not speci***REMOVED***ed, the router may provide its own destination CA and perform hostname validation using
-	// the short service name (service.namespace.svc), which allows infrastructure generated certi***REMOVED***cates to automatically
+	// destinationCACertificate provides the contents of the ca certificate of the final destination.  When using reencrypt
+	// termination this file should be provided in order to have routers use it for health checks on the secure connection.
+	// If this field is not specified, the router may provide its own destination CA and perform hostname validation using
+	// the short service name (service.namespace.svc), which allows infrastructure generated certificates to automatically
 	// verify.
-	DestinationCACerti***REMOVED***cate string `json:"destinationCACerti***REMOVED***cate,omitempty" protobuf:"bytes,5,opt,name=destinationCACerti***REMOVED***cate"`
+	DestinationCACertificate string `json:"destinationCACertificate,omitempty" protobuf:"bytes,5,opt,name=destinationCACertificate"`
 
 	// insecureEdgeTerminationPolicy indicates the desired behavior for insecure connections to a route. While
 	// each router may make its own decisions on which ports to expose, this is normally port 80.
 	//
-	// * Allow - traf***REMOVED***c is sent to the server on the insecure port (default)
-	// * Disable - no traf***REMOVED***c is allowed on the insecure port.
+	// * Allow - traffic is sent to the server on the insecure port (default)
+	// * Disable - no traffic is allowed on the insecure port.
 	// * Redirect - clients are redirected to the secure port.
 	InsecureEdgeTerminationPolicy InsecureEdgeTerminationPolicyType `json:"insecureEdgeTerminationPolicy,omitempty" protobuf:"bytes,6,opt,name=insecureEdgeTerminationPolicy,casttype=InsecureEdgeTerminationPolicyType"`
 }
@@ -225,9 +225,9 @@ type InsecureEdgeTerminationPolicyType string
 const (
 	// TLSTerminationEdge terminate encryption at the edge router.
 	TLSTerminationEdge TLSTerminationType = "edge"
-	// TLSTerminationPassthrough terminate encryption at the destination, the destination is responsible for decrypting traf***REMOVED***c
+	// TLSTerminationPassthrough terminate encryption at the destination, the destination is responsible for decrypting traffic
 	TLSTerminationPassthrough TLSTerminationType = "passthrough"
-	// TLSTerminationReencrypt terminate encryption at the edge router and re-encrypt it with a new certi***REMOVED***cate supplied by the destination
+	// TLSTerminationReencrypt terminate encryption at the edge router and re-encrypt it with a new certificate supplied by the destination
 	TLSTerminationReencrypt TLSTerminationType = "reencrypt"
 
 	// InsecureEdgeTerminationPolicyNone disables insecure connections for an edge-terminated route.

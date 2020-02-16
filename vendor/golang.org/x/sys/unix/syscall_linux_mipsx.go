@@ -1,6 +1,6 @@
 // Copyright 2016 The Go Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE ***REMOVED***le.
+// license that can be found in the LICENSE file.
 
 // +build linux
 // +build mips mipsle
@@ -27,7 +27,7 @@ func Syscall9(trap, a1, a2, a3, a4, a5, a6, a7, a8, a9 uintptr) (r1, r2 uintptr,
 //sys	Pread(fd int, p []byte, offset int64) (n int, err error) = SYS_PREAD64
 //sys	Pwrite(fd int, p []byte, offset int64) (n int, err error) = SYS_PWRITE64
 //sys	Select(nfd int, r *FdSet, w *FdSet, e *FdSet, timeout *Timeval) (n int, err error) = SYS__NEWSELECT
-//sys	send***REMOVED***le(outfd int, infd int, offset *int64, count int) (written int, err error) = SYS_SENDFILE64
+//sys	sendfile(outfd int, infd int, offset *int64, count int) (written int, err error) = SYS_SENDFILE64
 //sys	Setfsgid(gid int) (err error)
 //sys	Setfsuid(uid int) (err error)
 //sysnb	Setregid(rgid int, egid int) (err error)
@@ -167,13 +167,13 @@ func Getrlimit(resource int, rlim *Rlimit) (err error) {
 
 	if rl.Cur == rlimInf32 {
 		rlim.Cur = rlimInf64
-	} ***REMOVED*** {
+	} else {
 		rlim.Cur = uint64(rl.Cur)
 	}
 
 	if rl.Max == rlimInf32 {
 		rlim.Max = rlimInf64
-	} ***REMOVED*** {
+	} else {
 		rlim.Max = uint64(rl.Max)
 	}
 	return
@@ -190,16 +190,16 @@ func Setrlimit(resource int, rlim *Rlimit) (err error) {
 	rl := rlimit32{}
 	if rlim.Cur == rlimInf64 {
 		rl.Cur = rlimInf32
-	} ***REMOVED*** if rlim.Cur < uint64(rlimInf32) {
+	} else if rlim.Cur < uint64(rlimInf32) {
 		rl.Cur = uint32(rlim.Cur)
-	} ***REMOVED*** {
+	} else {
 		return EINVAL
 	}
 	if rlim.Max == rlimInf64 {
 		rl.Max = rlimInf32
-	} ***REMOVED*** if rlim.Max < uint64(rlimInf32) {
+	} else if rlim.Max < uint64(rlimInf32) {
 		rl.Max = uint32(rlim.Max)
-	} ***REMOVED*** {
+	} else {
 		return EINVAL
 	}
 

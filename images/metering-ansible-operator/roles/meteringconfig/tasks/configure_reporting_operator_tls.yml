@@ -9,42 +9,42 @@
     k8s_facts:
       api_version: v1
       kind: Secret
-      name: "{{ meteringcon***REMOVED***g_spec['reporting-operator'].spec.con***REMOVED***g.presto.auth.secretName }}"
+      name: "{{ meteringconfig_spec['reporting-operator'].spec.config.presto.auth.secretName }}"
       namespace: "{{ meta.namespace }}"
     no_log: true
     register: reporting_operator_auth_secret_buf
 
-  - name: Con***REMOVED***gure the reporting-operator to use existing presto server TLS secret data
+  - name: Configure the reporting-operator to use existing presto server TLS secret data
     set_fact:
-      _meteringcon***REMOVED***g_reporting_operator_presto_server_ca_certi***REMOVED***cate: "{{ _meteringcon***REMOVED***g_tls_root_ca_certi***REMOVED***cate }}"
+      _meteringconfig_reporting_operator_presto_server_ca_certificate: "{{ _meteringconfig_tls_root_ca_certificate }}"
     no_log: true
 
-  - name: Con***REMOVED***gure the reporting-operator to use existing presto client TLS secret data
+  - name: Configure the reporting-operator to use existing presto client TLS secret data
     set_fact:
-      _meteringcon***REMOVED***g_reporting_operator_presto_client_ca_certi***REMOVED***cate: "{{ _meteringcon***REMOVED***g_tls_root_ca_certi***REMOVED***cate }}"
-      _meteringcon***REMOVED***g_reporting_operator_presto_client_cert: "{{ reporting_operator_auth_secret_buf.resources[0].data['tls.crt'] | b64decode }}"
-      _meteringcon***REMOVED***g_reporting_operator_presto_client_key: "{{ reporting_operator_auth_secret_buf.resources[0].data['tls.key'] | b64decode }}"
+      _meteringconfig_reporting_operator_presto_client_ca_certificate: "{{ _meteringconfig_tls_root_ca_certificate }}"
+      _meteringconfig_reporting_operator_presto_client_cert: "{{ reporting_operator_auth_secret_buf.resources[0].data['tls.crt'] | b64decode }}"
+      _meteringconfig_reporting_operator_presto_client_key: "{{ reporting_operator_auth_secret_buf.resources[0].data['tls.key'] | b64decode }}"
     no_log: true
     when: reporting_operator_auth_secret_exists
   vars:
-    reporting_operator_auth_secret_exists: "{{ reporting_operator_auth_secret_buf.resources is de***REMOVED***ned and reporting_operator_auth_secret_buf.resources | length > 0 }}"
-  when: meteringcon***REMOVED***g_tls_enabled
+    reporting_operator_auth_secret_exists: "{{ reporting_operator_auth_secret_buf.resources is defined and reporting_operator_auth_secret_buf.resources | length > 0 }}"
+  when: meteringconfig_tls_enabled
 
-- name: Con***REMOVED***gure TLS and authentication in the reporting-operator to Presto
+- name: Configure TLS and authentication in the reporting-operator to Presto
   block:
   - name: Generate the reporting-operator client certs as needed
-    include_tasks: con***REMOVED***gure_reporting_operator_openssl.yml
+    include_tasks: configure_reporting_operator_openssl.yml
 
-  - name: Con***REMOVED***gure the reporting-operator to use it's client own cert/key when communicating with Presto
+  - name: Configure the reporting-operator to use it's client own cert/key when communicating with Presto
     set_fact:
-      _meteringcon***REMOVED***g_reporting_operator_presto_client_ca_certi***REMOVED***cate: "{{ _meteringcon***REMOVED***g_tls_root_ca_certi***REMOVED***cate }}"
-      _meteringcon***REMOVED***g_reporting_operator_presto_client_cert: "{{ lookup('***REMOVED***le', '{{ certi***REMOVED***cates_dir.path }}/reporting_operator_client.crt') + '\n' }}"
-      _meteringcon***REMOVED***g_reporting_operator_presto_client_key: "{{ lookup('***REMOVED***le', '{{ certi***REMOVED***cates_dir.path }}/reporting_operator_client.key') + '\n' }}"
+      _meteringconfig_reporting_operator_presto_client_ca_certificate: "{{ _meteringconfig_tls_root_ca_certificate }}"
+      _meteringconfig_reporting_operator_presto_client_cert: "{{ lookup('file', '{{ certificates_dir.path }}/reporting_operator_client.crt') + '\n' }}"
+      _meteringconfig_reporting_operator_presto_client_key: "{{ lookup('file', '{{ certificates_dir.path }}/reporting_operator_client.key') + '\n' }}"
     no_log: true
     when: not reporting_operator_auth_secret_exists
   vars:
-    reporting_operator_auth_secret_exists: "{{ reporting_operator_auth_secret_buf.resources is de***REMOVED***ned and reporting_operator_auth_secret_buf.resources | length > 0 }}"
-  when: meteringcon***REMOVED***g_tls_enabled
+    reporting_operator_auth_secret_exists: "{{ reporting_operator_auth_secret_buf.resources is defined and reporting_operator_auth_secret_buf.resources | length > 0 }}"
+  when: meteringconfig_tls_enabled
 
 #
 # Reporting Operator Hive TLS/auth
@@ -55,39 +55,39 @@
     k8s_facts:
       api_version: v1
       kind: Secret
-      name: "{{ meteringcon***REMOVED***g_spec['reporting-operator'].spec.con***REMOVED***g.hive.auth.secretName }}"
+      name: "{{ meteringconfig_spec['reporting-operator'].spec.config.hive.auth.secretName }}"
       namespace: "{{ meta.namespace }}"
     no_log: true
     register: reporting_operator_hive_auth_secret_buf
 
-  - name: Con***REMOVED***gure the reporting-operator to use the Metering Root CA for Hive Server CA
+  - name: Configure the reporting-operator to use the Metering Root CA for Hive Server CA
     set_fact:
-      _meteringcon***REMOVED***g_reporting_operator_hive_server_ca_certi***REMOVED***cate: "{{ _meteringcon***REMOVED***g_tls_root_ca_certi***REMOVED***cate }}"
+      _meteringconfig_reporting_operator_hive_server_ca_certificate: "{{ _meteringconfig_tls_root_ca_certificate }}"
     no_log: true
 
-  - name: Con***REMOVED***gure the reporting-operator to use it's client own cert/key when communicating with Hive
+  - name: Configure the reporting-operator to use it's client own cert/key when communicating with Hive
     set_fact:
-      _meteringcon***REMOVED***g_reporting_operator_hive_client_certi***REMOVED***cate: "{{ lookup('***REMOVED***le', '{{ certi***REMOVED***cates_dir.path }}/reporting_operator_client.crt') + '\n' }}"
-      _meteringcon***REMOVED***g_reporting_operator_hive_client_key: "{{ lookup('***REMOVED***le', '{{ certi***REMOVED***cates_dir.path }}/reporting_operator_client.key') + '\n' }}"
+      _meteringconfig_reporting_operator_hive_client_certificate: "{{ lookup('file', '{{ certificates_dir.path }}/reporting_operator_client.crt') + '\n' }}"
+      _meteringconfig_reporting_operator_hive_client_key: "{{ lookup('file', '{{ certificates_dir.path }}/reporting_operator_client.key') + '\n' }}"
     no_log: true
     when: not reporting_operator_hive_auth_secret_exists
 
-  - name: Con***REMOVED***gure the reporting-operator to use the existing client cert/key
+  - name: Configure the reporting-operator to use the existing client cert/key
     set_fact:
-      _meteringcon***REMOVED***g_reporting_operator_hive_client_certi***REMOVED***cate: "{{ reporting_operator_hive_auth_secret_buf.resources[0].data['tls.crt'] | b64decode }}"
-      _meteringcon***REMOVED***g_reporting_operator_hive_client_key: "{{ reporting_operator_hive_auth_secret_buf.resources[0].data['tls.key'] | b64decode }}"
+      _meteringconfig_reporting_operator_hive_client_certificate: "{{ reporting_operator_hive_auth_secret_buf.resources[0].data['tls.crt'] | b64decode }}"
+      _meteringconfig_reporting_operator_hive_client_key: "{{ reporting_operator_hive_auth_secret_buf.resources[0].data['tls.key'] | b64decode }}"
     no_log: true
     when: reporting_operator_hive_auth_secret_exists
   vars:
-    reporting_operator_hive_auth_secret_exists: "{{ reporting_operator_hive_auth_secret_buf.resources is de***REMOVED***ned and reporting_operator_hive_auth_secret_buf.resources | length > 0 }}"
-  when: meteringcon***REMOVED***g_tls_enabled
+    reporting_operator_hive_auth_secret_exists: "{{ reporting_operator_hive_auth_secret_buf.resources is defined and reporting_operator_hive_auth_secret_buf.resources | length > 0 }}"
+  when: meteringconfig_tls_enabled
 
 #
 # Reporting Operator Openshift Auth-Proxy
 #
-- name: Validate the user-provided authProxy con***REMOVED***guration
+- name: Validate the user-provided authProxy configuration
   include_tasks: validate_reporting_operator_tls.yml
-  when: not meteringcon***REMOVED***g_tls_enabled
+  when: not meteringconfig_tls_enabled
 
 - name: Check for the existence of reporting-operator authProxy-related secret data
   block:
@@ -95,30 +95,30 @@
     k8s_facts:
       api_version: v1
       kind: Secret
-      name: "{{ meteringcon***REMOVED***g_spec['reporting-operator'].spec.authProxy.cookie.secretName }}"
+      name: "{{ meteringconfig_spec['reporting-operator'].spec.authProxy.cookie.secretName }}"
       namespace: "{{ meta.namespace }}"
     no_log: true
     register: reporting_operator_auth_proxy_cookie_secret_buf
-    when: meteringcon***REMOVED***g_tls_enabled
+    when: meteringconfig_tls_enabled
 
-  - name: Generate cookie seed and con***REMOVED***guring authProxy to use that generated seed value
+  - name: Generate cookie seed and configuring authProxy to use that generated seed value
     block:
     - name: Generate a 32-character random string
       command: openssl rand -base64 32
       register: cookie_seed_random_string
       when: not reporting_operator_auth_proxy_cookie_secret_exists
 
-    - name: Con***REMOVED***gure authProxy cookie seed secret
+    - name: Configure authProxy cookie seed secret
       set_fact:
-        _meteringcon***REMOVED***g_reporting_operator_auth_proxy_cookie_seed: "{{ cookie_seed_random_string.stdout }}"
+        _meteringconfig_reporting_operator_auth_proxy_cookie_seed: "{{ cookie_seed_random_string.stdout }}"
       no_log: true
     when: not reporting_operator_auth_proxy_cookie_secret_exists
 
-  - name: Con***REMOVED***gure authProxy cookie seed secret to use pre-existing secret data
+  - name: Configure authProxy cookie seed secret to use pre-existing secret data
     set_fact:
-      _meteringcon***REMOVED***g_reporting_operator_auth_proxy_cookie_seed: "{{ reporting_operator_auth_proxy_cookie_secret_buf.resources[0].data['cookie-secret-seed'] | b64decode }}"
+      _meteringconfig_reporting_operator_auth_proxy_cookie_seed: "{{ reporting_operator_auth_proxy_cookie_secret_buf.resources[0].data['cookie-secret-seed'] | b64decode }}"
     no_log: true
     when: reporting_operator_auth_proxy_cookie_secret_exists
   vars:
-    reporting_operator_auth_proxy_cookie_secret_exists: "{{ reporting_operator_auth_proxy_cookie_secret_buf.resources is de***REMOVED***ned and reporting_operator_auth_proxy_cookie_secret_buf.resources | length > 0 }}"
-  when: meteringcon***REMOVED***g_tls_enabled
+    reporting_operator_auth_proxy_cookie_secret_exists: "{{ reporting_operator_auth_proxy_cookie_secret_buf.resources is defined and reporting_operator_auth_proxy_cookie_secret_buf.resources | length > 0 }}"
+  when: meteringconfig_tls_enabled

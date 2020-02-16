@@ -12,7 +12,7 @@ var _ = proto.Marshal
 var _ = fmt.Errorf
 var _ = math.Inf
 
-// This is a compile-time assertion to ensure that this generated ***REMOVED***le
+// This is a compile-time assertion to ensure that this generated file
 // is compatible with the proto package it is being compiled against.
 // A compilation error at this line likely means your copy of the
 // proto package needs to be updated.
@@ -65,7 +65,7 @@ const _ = proto.ProtoPackageIsVersion2 // please upgrade the proto package
 //
 // The pack methods provided by protobuf library will by default use
 // 'type.googleapis.com/full.type.name' as the type URL and the unpack
-// methods only use the fully quali***REMOVED***ed type name after the last '/'
+// methods only use the fully qualified type name after the last '/'
 // in the type URL, for example "foo.bar.com/x/y.z" will yield type
 // name "y.z".
 //
@@ -74,24 +74,24 @@ const _ = proto.ProtoPackageIsVersion2 // please upgrade the proto package
 // ====
 // The JSON representation of an `Any` value uses the regular
 // representation of the deserialized, embedded message, with an
-// additional ***REMOVED***eld `@type` which contains the type URL. Example:
+// additional field `@type` which contains the type URL. Example:
 //
-//     package google.pro***REMOVED***le;
+//     package google.profile;
 //     message Person {
-//       string ***REMOVED***rst_name = 1;
+//       string first_name = 1;
 //       string last_name = 2;
 //     }
 //
 //     {
-//       "@type": "type.googleapis.com/google.pro***REMOVED***le.Person",
-//       "***REMOVED***rstName": <string>,
+//       "@type": "type.googleapis.com/google.profile.Person",
+//       "firstName": <string>,
 //       "lastName": <string>
 //     }
 //
 // If the embedded message type is well-known and has a custom JSON
-// representation, that representation will be embedded adding a ***REMOVED***eld
+// representation, that representation will be embedded adding a field
 // `value` which holds the custom JSON in addition to the `@type`
-// ***REMOVED***eld. Example (for message [google.protobuf.Duration][]):
+// field. Example (for message [google.protobuf.Duration][]):
 //
 //     {
 //       "@type": "type.googleapis.com/google.protobuf.Duration",
@@ -107,7 +107,7 @@ type Any struct {
 	//
 	// * If no scheme is provided, `https` is assumed.
 	// * The last segment of the URL's path must represent the fully
-	//   quali***REMOVED***ed name of the type (as in `path/google.protobuf.Duration`).
+	//   qualified name of the type (as in `path/google.protobuf.Duration`).
 	//   The name should be in a canonical form (e.g., leading "." is
 	//   not accepted).
 	// * An HTTP GET on the URL must yield a [google.protobuf.Type][]
@@ -119,10 +119,10 @@ type Any struct {
 	//   breaking changes.)
 	//
 	// Schemes other than `http`, `https` (or the empty scheme) might be
-	// used with implementation speci***REMOVED***c semantics.
+	// used with implementation specific semantics.
 	//
 	TypeUrl string `protobuf:"bytes,1,opt,name=type_url,json=typeUrl" json:"type_url,omitempty"`
-	// Must be a valid serialized protocol buffer of the above speci***REMOVED***ed type.
+	// Must be a valid serialized protocol buffer of the above specified type.
 	Value                []byte   `protobuf:"bytes,2,opt,name=value,proto3" json:"value,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
@@ -133,7 +133,7 @@ func (m *Any) Reset()         { *m = Any{} }
 func (m *Any) String() string { return proto.CompactTextString(m) }
 func (*Any) ProtoMessage()    {}
 func (*Any) Descriptor() ([]byte, []int) {
-	return ***REMOVED***leDescriptor_any_744b9ca530f228db, []int{0}
+	return fileDescriptor_any_744b9ca530f228db, []int{0}
 }
 func (*Any) XXX_WellKnownType() string { return "Any" }
 func (m *Any) XXX_Unmarshal(b []byte) error {
@@ -172,9 +172,9 @@ func init() {
 	proto.RegisterType((*Any)(nil), "google.protobuf.Any")
 }
 
-func init() { proto.RegisterFile("google/protobuf/any.proto", ***REMOVED***leDescriptor_any_744b9ca530f228db) }
+func init() { proto.RegisterFile("google/protobuf/any.proto", fileDescriptor_any_744b9ca530f228db) }
 
-var ***REMOVED***leDescriptor_any_744b9ca530f228db = []byte{
+var fileDescriptor_any_744b9ca530f228db = []byte{
 	// 185 bytes of a gzipped FileDescriptorProto
 	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xe2, 0x92, 0x4c, 0xcf, 0xcf, 0x4f,
 	0xcf, 0x49, 0xd5, 0x2f, 0x28, 0xca, 0x2f, 0xc9, 0x4f, 0x2a, 0x4d, 0xd3, 0x4f, 0xcc, 0xab, 0xd4,

@@ -2,7 +2,7 @@
 Copyright 2015 The Kubernetes Authors.
 
 Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this ***REMOVED***le except in compliance with the License.
+you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
 
     http://www.apache.org/licenses/LICENSE-2.0
@@ -10,7 +10,7 @@ You may obtain a copy of the License at
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the speci***REMOVED***c language governing permissions and
+See the License for the specific language governing permissions and
 limitations under the License.
 */
 
@@ -134,13 +134,13 @@ func assignGoTypeToProtoPackage(p *protobufPackage, t *types.Type, local, global
 		if namer.IsPrivateGoName(m.Name) {
 			continue
 		}
-		***REMOVED***eld := &protoField{}
+		field := &protoField{}
 		tag := reflect.StructTag(m.Tags).Get("protobuf")
 		if tag == "-" {
 			continue
 		}
-		if err := protobufTagToField(tag, ***REMOVED***eld, m, t, p.ProtoTypeName()); err == nil && ***REMOVED***eld.Type != nil {
-			assignGoTypeToProtoPackage(p, ***REMOVED***eld.Type, local, global, optional)
+		if err := protobufTagToField(tag, field, m, t, p.ProtoTypeName()); err == nil && field.Type != nil {
+			assignGoTypeToProtoPackage(p, field.Type, local, global, optional)
 			continue
 		}
 		assignGoTypeToProtoPackage(p, m.Type, local, global, optional)
@@ -161,7 +161,7 @@ func assignGoTypeToProtoPackage(p *protobufPackage, t *types.Type, local, global
 }
 
 // isTypeApplicableToProtobuf checks to see if a type is relevant for protobuf processing.
-// Currently, it ***REMOVED***lters out functions and private types.
+// Currently, it filters out functions and private types.
 func isTypeApplicableToProtobuf(t *types.Type) bool {
 	// skip functions -- we don't care about them for protobuf
 	if t.Kind == types.Func || (t.Kind == types.DeclarationOf && t.Underlying.Kind == types.Func) {

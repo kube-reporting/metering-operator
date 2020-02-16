@@ -1,6 +1,6 @@
 // Copyright 2012 The Go Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE ***REMOVED***le.
+// license that can be found in the LICENSE file.
 
 package colltab
 
@@ -44,7 +44,7 @@ func (t ContractTrieSet) scannerString(index, n int, str string) ctScannerString
 	return ctScannerString{s: str, states: t[index:], n: n}
 }
 
-// result returns the offset i and bytes consumed p so far.  If no suf***REMOVED***x
+// result returns the offset i and bytes consumed p so far.  If no suffix
 // matched, i and p will be 0.
 func (s *ctScanner) result() (i, p int) {
 	return s.index, s.pindex
@@ -55,11 +55,11 @@ func (s *ctScannerString) result() (i, p int) {
 }
 
 const (
-	***REMOVED***nal   = 0
+	final   = 0
 	noIndex = 0xFF
 )
 
-// scan matches the longest suf***REMOVED***x at the current location in the input
+// scan matches the longest suffix at the current location in the input
 // and returns the number of bytes consumed.
 func (s *ctScanner) scan(p int) int {
 	pr := p // the p at the rune start
@@ -68,7 +68,7 @@ func (s *ctScanner) scan(p int) int {
 	for i := 0; i < n && p < len(str); {
 		e := states[i]
 		c := str[p]
-		// TODO: a signi***REMOVED***cant number of contractions are of a form that
+		// TODO: a significant number of contractions are of a form that
 		// cannot match discontiguous UTF-8 in a normalized string. We could let
 		// a negative value of e.n mean that we can set s.done = true and avoid
 		// the need for additional matches.
@@ -79,17 +79,17 @@ func (s *ctScanner) scan(p int) int {
 					s.index = int(e.I)
 					s.pindex = p
 				}
-				if e.N != ***REMOVED***nal {
+				if e.N != final {
 					i, states, n = 0, states[int(e.H)+n:], int(e.N)
 					if p >= len(str) || utf8.RuneStart(str[p]) {
 						s.states, s.n, pr = states, n, p
 					}
-				} ***REMOVED*** {
+				} else {
 					s.done = true
 					return p
 				}
 				continue
-			} ***REMOVED*** if e.N == ***REMOVED***nal && c <= e.H {
+			} else if e.N == final && c <= e.H {
 				p++
 				s.done = true
 				s.index = int(c-e.L) + int(e.I)
@@ -110,7 +110,7 @@ func (s *ctScannerString) scan(p int) int {
 	for i := 0; i < n && p < len(str); {
 		e := states[i]
 		c := str[p]
-		// TODO: a signi***REMOVED***cant number of contractions are of a form that
+		// TODO: a significant number of contractions are of a form that
 		// cannot match discontiguous UTF-8 in a normalized string. We could let
 		// a negative value of e.n mean that we can set s.done = true and avoid
 		// the need for additional matches.
@@ -121,17 +121,17 @@ func (s *ctScannerString) scan(p int) int {
 					s.index = int(e.I)
 					s.pindex = p
 				}
-				if e.N != ***REMOVED***nal {
+				if e.N != final {
 					i, states, n = 0, states[int(e.H)+n:], int(e.N)
 					if p >= len(str) || utf8.RuneStart(str[p]) {
 						s.states, s.n, pr = states, n, p
 					}
-				} ***REMOVED*** {
+				} else {
 					s.done = true
 					return p
 				}
 				continue
-			} ***REMOVED*** if e.N == ***REMOVED***nal && c <= e.H {
+			} else if e.N == final && c <= e.H {
 				p++
 				s.done = true
 				s.index = int(c-e.L) + int(e.I)

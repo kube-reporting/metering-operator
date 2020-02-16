@@ -14,7 +14,7 @@ const (
 	// ErrCodeIDPCommunicationErrorException for service response error code
 	// "IDPCommunicationError".
 	//
-	// The request could not be ful***REMOVED***lled because the non-AWS identity provider
+	// The request could not be fulfilled because the non-AWS identity provider
 	// (IDP) that was asked to verify the incoming identity token could not be reached.
 	// This is often a transient error caused by network conditions. Retry the request
 	// a limited number of times so that you don't exceed the request rate. If the
@@ -50,7 +50,7 @@ const (
 	// "MalformedPolicyDocument".
 	//
 	// The request was rejected because the policy document was malformed. The error
-	// message describes the speci***REMOVED***c error.
+	// message describes the specific error.
 	ErrCodeMalformedPolicyDocumentException = "MalformedPolicyDocument"
 
 	// ErrCodePackedPolicyTooLargeException for service response error code

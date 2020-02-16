@@ -2,7 +2,7 @@
 Copyright 2016 The Kubernetes Authors.
 
 Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this ***REMOVED***le except in compliance with the License.
+you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
 
     http://www.apache.org/licenses/LICENSE-2.0
@@ -10,7 +10,7 @@ You may obtain a copy of the License at
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the speci***REMOVED***c language governing permissions and
+See the License for the specific language governing permissions and
 limitations under the License.
 */
 
@@ -27,8 +27,8 @@ type ObjectMetaAccessor interface {
 }
 
 // Object lets you work with object metadata from any of the versioned or
-// internal API objects. Attempting to set or retrieve a ***REMOVED***eld on an object that does
-// not support that ***REMOVED***eld (Name, UID, Namespace on lists) will be a no-op and return
+// internal API objects. Attempting to set or retrieve a field on an object that does
+// not support that field (Name, UID, Namespace on lists) will be a no-op and return
 // a default value.
 type Object interface {
 	GetNamespace() string
@@ -58,7 +58,7 @@ type Object interface {
 	GetInitializers() *Initializers
 	SetInitializers(initializers *Initializers)
 	GetFinalizers() []string
-	SetFinalizers(***REMOVED***nalizers []string)
+	SetFinalizers(finalizers []string)
 	GetOwnerReferences() []OwnerReference
 	SetOwnerReferences([]OwnerReference)
 	GetClusterName() string
@@ -71,8 +71,8 @@ type ListMetaAccessor interface {
 }
 
 // Common lets you work with core metadata from any of the versioned or
-// internal API objects. Attempting to set or retrieve a ***REMOVED***eld on an object that does
-// not support that ***REMOVED***eld will be a no-op and return a default value.
+// internal API objects. Attempting to set or retrieve a field on an object that does
+// not support that field will be a no-op and return a default value.
 // TODO: move this, and TypeMeta and ListMeta, to a different package
 type Common interface {
 	GetResourceVersion() string
@@ -82,8 +82,8 @@ type Common interface {
 }
 
 // ListInterface lets you work with list metadata from any of the versioned or
-// internal API objects. Attempting to set or retrieve a ***REMOVED***eld on an object that does
-// not support that ***REMOVED***eld will be a no-op and return a default value.
+// internal API objects. Attempting to set or retrieve a field on an object that does
+// not support that field will be a no-op and return a default value.
 // TODO: move this, and TypeMeta and ListMeta, to a different package
 type ListInterface interface {
 	GetResourceVersion() string
@@ -112,12 +112,12 @@ func (meta *ListMeta) SetContinue(c string)              { meta.Continue = c }
 
 func (obj *TypeMeta) GetObjectKind() schema.ObjectKind { return obj }
 
-// SetGroupVersionKind satis***REMOVED***es the ObjectKind interface for all objects that embed TypeMeta
+// SetGroupVersionKind satisfies the ObjectKind interface for all objects that embed TypeMeta
 func (obj *TypeMeta) SetGroupVersionKind(gvk schema.GroupVersionKind) {
 	obj.APIVersion, obj.Kind = gvk.ToAPIVersionAndKind()
 }
 
-// GroupVersionKind satis***REMOVED***es the ObjectKind interface for all objects that embed TypeMeta
+// GroupVersionKind satisfies the ObjectKind interface for all objects that embed TypeMeta
 func (obj *TypeMeta) GroupVersionKind() schema.GroupVersionKind {
 	return schema.FromAPIVersionAndKind(obj.APIVersion, obj.Kind)
 }
@@ -126,8 +126,8 @@ func (obj *ListMeta) GetListMeta() ListInterface { return obj }
 
 func (obj *ObjectMeta) GetObjectMeta() Object { return obj }
 
-// Namespace implements metav1.Object for any object with an ObjectMeta typed ***REMOVED***eld. Allows
-// fast, direct access to metadata ***REMOVED***elds for API objects.
+// Namespace implements metav1.Object for any object with an ObjectMeta typed field. Allows
+// fast, direct access to metadata fields for API objects.
 func (meta *ObjectMeta) GetNamespace() string                { return meta.Namespace }
 func (meta *ObjectMeta) SetNamespace(namespace string)       { meta.Namespace = namespace }
 func (meta *ObjectMeta) GetName() string                     { return meta.Name }
@@ -161,7 +161,7 @@ func (meta *ObjectMeta) SetAnnotations(annotations map[string]string) { meta.Ann
 func (meta *ObjectMeta) GetInitializers() *Initializers               { return meta.Initializers }
 func (meta *ObjectMeta) SetInitializers(initializers *Initializers)   { meta.Initializers = initializers }
 func (meta *ObjectMeta) GetFinalizers() []string                      { return meta.Finalizers }
-func (meta *ObjectMeta) SetFinalizers(***REMOVED***nalizers []string)            { meta.Finalizers = ***REMOVED***nalizers }
+func (meta *ObjectMeta) SetFinalizers(finalizers []string)            { meta.Finalizers = finalizers }
 func (meta *ObjectMeta) GetOwnerReferences() []OwnerReference         { return meta.OwnerReferences }
 func (meta *ObjectMeta) SetOwnerReferences(references []OwnerReference) {
 	meta.OwnerReferences = references

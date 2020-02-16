@@ -1,19 +1,19 @@
 apiVersion: v1
-kind: Con***REMOVED***gMap
+kind: ConfigMap
 metadata:
   name: hadoop-scripts
 data:
-  copy-hadoop-con***REMOVED***g.sh: |
+  copy-hadoop-config.sh: |
     #!/bin/bash
     set -ex
-    cp -v -L -r -f /hadoop-starting-con***REMOVED***g/* /hadoop-con***REMOVED***g/
-    cd /hadoop-con***REMOVED***g/
-    faq '.con***REMOVED***guration.property+=[{name: ("fs.azure.account.key." + env.AZURE_STORAGE_ACCOUNT_NAME + ".blob.core.windows.net"), value: env.AZURE_SECRET_ACCESS_KEY }]' core-site.xml > core-site.xml.temp
+    cp -v -L -r -f /hadoop-starting-config/* /hadoop-config/
+    cd /hadoop-config/
+    faq '.configuration.property+=[{name: ("fs.azure.account.key." + env.AZURE_STORAGE_ACCOUNT_NAME + ".blob.core.windows.net"), value: env.AZURE_SECRET_ACCESS_KEY }]' core-site.xml > core-site.xml.temp
     cp core-site.xml.temp core-site.xml
     if [ -a /gcs-json/gcs-service-account.json ]; then
-      faq '.con***REMOVED***guration.property+=[{name: "fs.gs.auth.service.account.json.key***REMOVED***le" , value: "/gcs-json/gcs-service-account.json" }]' core-site.xml > core-site.xml.temp.temp
+      faq '.configuration.property+=[{name: "fs.gs.auth.service.account.json.keyfile" , value: "/gcs-json/gcs-service-account.json" }]' core-site.xml > core-site.xml.temp.temp
       cp core-site.xml.temp.temp core-site.xml
-    ***REMOVED***
+    fi
 
   entrypoint.sh: |
     #!/bin/bash
@@ -21,10 +21,10 @@ data:
       PEM_FILE=$1
       PASSWORD=$2
       KEYSTORE=$3
-      # number of certs in the PEM ***REMOVED***le
+      # number of certs in the PEM file
       CERTS=$(grep 'END CERTIFICATE' $PEM_FILE| wc -l)
 
-      # For every cert in the PEM ***REMOVED***le, extract it and import into the JKS keystore
+      # For every cert in the PEM file, extract it and import into the JKS keystore
       # awk command: step 1, if line is in the desired cert, print the line
       #              step 2, increment counter when last line of cert is found
       for N in $(seq 0 $(($CERTS - 1))); do
@@ -41,12 +41,12 @@ data:
     if [ -a /s3-compatible-ca/ca-bundle.crt ]; then
       echo "Adding /s3-compatible-ca/ca-bundle.crt to $JAVA_HOME/lib/security/cacerts"
       importCert /s3-compatible-ca/ca-bundle.crt changeit $JAVA_HOME/lib/security/cacerts
-    ***REMOVED***
+    fi
     # always add the openshift service-ca.crt if it exists
     if [ -a /var/run/secrets/kubernetes.io/serviceaccount/service-ca.crt ]; then
       echo "Adding /var/run/secrets/kubernetes.io/serviceaccount/service-ca.crt to $JAVA_HOME/lib/security/cacerts"
       importCert /var/run/secrets/kubernetes.io/serviceaccount/service-ca.crt changeit $JAVA_HOME/lib/security/cacerts
-    ***REMOVED***
+    fi
 
     export HADOOP_LOG_DIR="${HADOOP_HOME}/logs"
     # Set garbage collection settings
@@ -56,17 +56,17 @@ data:
 
     if [ -n "$JVM_INITIAL_RAM_PERCENTAGE" ]; then
       VM_OPTIONS="$VM_OPTIONS -XX:InitialRAMPercentage=$JVM_INITIAL_RAM_PERCENTAGE"
-    ***REMOVED***
+    fi
     if [ -n "$JVM_MAX_RAM_PERCENTAGE" ]; then
       VM_OPTIONS="$VM_OPTIONS -XX:MaxRAMPercentage=$JVM_MAX_RAM_PERCENTAGE"
-    ***REMOVED***
+    fi
 
     if [ -n "$JVM_MIN_RAM_PERCENTAGE" ]; then
       VM_OPTIONS="$VM_OPTIONS -XX:MinRAMPercentage=$JVM_MIN_RAM_PERCENTAGE"
-    ***REMOVED***
+    fi
 
     # Set JMX options
-    export JMX_OPTIONS="-javaagent:/opt/jmx_exporter/jmx_exporter.jar=8082:/opt/jmx_exporter/con***REMOVED***g/con***REMOVED***g.yml -Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.local.only=false -Dcom.sun.management.jmxremote.ssl=false -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.port=8081 -Dcom.sun.management.jmxremote.rmi.port=8081 -Djava.rmi.server.hostname=127.0.0.1"
+    export JMX_OPTIONS="-javaagent:/opt/jmx_exporter/jmx_exporter.jar=8082:/opt/jmx_exporter/config/config.yml -Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.local.only=false -Dcom.sun.management.jmxremote.ssl=false -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.port=8081 -Dcom.sun.management.jmxremote.rmi.port=8081 -Djava.rmi.server.hostname=127.0.0.1"
 
     # Set garbage collection logs
     GC_SETTINGS="${GC_SETTINGS} -verbose:gc -XX:+PrintGCDetails -XX:+PrintGCTimeStamps -XX:+PrintGCDateStamps -Xloggc:${HADOOP_LOG_DIR}/gc.log"
@@ -81,22 +81,22 @@ data:
     if ! whoami &> /dev/null; then
         if [ -w /etc/passwd ]; then
             echo "Adding user ${USER_NAME:-hadoop} with current UID $(id -u) to /etc/passwd"
-            # Remove existing entry with user ***REMOVED***rst.
+            # Remove existing entry with user first.
             # cannot use sed -i because we do not have permission to write new
-            # ***REMOVED***les into /etc
+            # files into /etc
             sed  "/${USER_NAME:-hadoop}:x/d" /etc/passwd > /tmp/passwd
             # add our user with our current user ID into passwd
             echo "${USER_NAME:-hadoop}:x:$(id -u):0:${USER_NAME:-hadoop} user:${HOME}:/sbin/nologin" >> /tmp/passwd
             # overwrite existing contents with new contents (cannot replace the
-            # ***REMOVED***le due to permissions)
+            # file due to permissions)
             cat /tmp/passwd > /etc/passwd
             rm /tmp/passwd
-        ***REMOVED***
-    ***REMOVED***
+        fi
+    fi
 
-    # symlink our con***REMOVED***guration ***REMOVED***les to the correct location
-    ln -s -f /hadoop-con***REMOVED***g/core-site.xml /etc/hadoop/core-site.xml
-    ln -s -f /hadoop-con***REMOVED***g/hdfs-site.xml /etc/hadoop/hdfs-site.xml
+    # symlink our configuration files to the correct location
+    ln -s -f /hadoop-config/core-site.xml /etc/hadoop/core-site.xml
+    ln -s -f /hadoop-config/hdfs-site.xml /etc/hadoop/hdfs-site.xml
 
     exec $@
   namenode-entrypoint.sh: |
@@ -106,19 +106,19 @@ data:
     if [ ! -d "$namedir" ]; then
       echo "Namenode name directory not found: $namedir"
       exit 2
-    ***REMOVED***
+    fi
 
     if [ -z "$CLUSTER_NAME" ]; then
-      echo "Cluster name not speci***REMOVED***ed"
+      echo "Cluster name not specified"
       exit 2
-    ***REMOVED***
+    fi
 
     if [ "$(ls -A $namedir)" == "" ]; then
       echo "Formatting namenode name directory: $namedir"
-      hdfs --con***REMOVED***g "$HADOOP_CONF_DIR" namenode -format "$CLUSTER_NAME"
-    ***REMOVED***
+      hdfs --config "$HADOOP_CONF_DIR" namenode -format "$CLUSTER_NAME"
+    fi
 
-    exec hdfs --con***REMOVED***g "$HADOOP_CONF_DIR" namenode "$@"
+    exec hdfs --config "$HADOOP_CONF_DIR" namenode "$@"
   datanode-entrypoint.sh: |
     #!/bin/bash
 
@@ -126,9 +126,9 @@ data:
     if [ ! -d "$datadir" ]; then
       echo "Datanode data directory not found: $datadir"
       exit 2
-    ***REMOVED***
+    fi
 
-    exec hdfs --con***REMOVED***g "$HADOOP_CONF_DIR" datanode "$@"
+    exec hdfs --config "$HADOOP_CONF_DIR" datanode "$@"
 
 
   check-datanode-healthy.sh: |
@@ -142,74 +142,74 @@ data:
     if [ "$(curl "$DATANODE_ADDRESS/jmx?qry=Hadoop:service=DataNode,name=DataNodeInfo" | jq -r '.beans[0].NamenodeAddresses' | jq -r 'to_entries | reduce .[] as $item (true; . and ($item.value != null))')" == "true" ]; then
         echo "Name node addresses all have addresses, healthy"
         exit 0
-    ***REMOVED***
+    else
         echo "found null namenode addresses in JMX metrics, unhealthy"
         exit 1
-    ***REMOVED***
+    fi
 
-  topology-con***REMOVED***guration.sh: |
+  topology-configuration.sh: |
     #!/bin/bash
     # taken from https://hadoop.apache.org/docs/current/hadoop-project-dist/hadoop-common/RackAwareness.html
     # With this network topology, we are treating each datanode as a rack by using
     # the podIP as the rack name.
     # 1) 'echo $@' will echo all ARGV values to xargs.
     # 2) 'xargs' will enforce that we print a single argv value per line
-    # 3) 'printf' will add the '/rack-' pre***REMOVED***x to the podIP.
+    # 3) 'printf' will add the '/rack-' prefix to the podIP.
     echo $@ | xargs -n1 printf '/rack-%s\n'
 
-  ***REMOVED***x-under-replicated-***REMOVED***les.sh: |
+  fix-under-replicated-files.sh: |
     #!/bin/bash
     # based on
-    # https://community.hortonworks.com/articles/4427/***REMOVED***x-under-replicated-blocks-in-hdfs-manually.html
+    # https://community.hortonworks.com/articles/4427/fix-under-replicated-blocks-in-hdfs-manually.html
     #
     # this script is intended to be run manually after changing the
     # dfs.replication value or after scaling up hdfs datanodes and forcing
-    # under replicated ***REMOVED***les to have the correct replication value.
+    # under replicated files to have the correct replication value.
     # takes two arguments, the replication factor, and optionally true/false
-    # to indicate if it should wait for each ***REMOVED***le to replicate.
+    # to indicate if it should wait for each file to replicate.
     set -e
     REPLICATION_FACTOR="$1"
     WAIT="$2"
     if [ -z "$REPLICATION_FACTOR" ]; then
       echo "Usage: $0 replication_factor [wait=true/false]"
       exit 1
-    ***REMOVED***
-    rm -f /tmp/under_replicated_***REMOVED***les
-    touch /tmp/under_replicated_***REMOVED***les
-    echo "Running hdfs fsck to check for under replicated ***REMOVED***les"
+    fi
+    rm -f /tmp/under_replicated_files
+    touch /tmp/under_replicated_files
+    echo "Running hdfs fsck to check for under replicated files"
     hdfs fsck / > /tmp/fsck.log
     # example output:
     # /operator_metering/storage/datasource_node_allocatable_cpu_cores/20181016_210834_02359_srzkh_40207cb6-56fb-4aad-9428-acb203250be8:  Under replicated BP-27232867-172.16.2.102-1539711209651:blk_1073742397_1573. Target Replicas is 3 but found 1 live replica(s), 0 decommissioned replica(s), 0 decommissioning replica(s).
     # /operator_metering/storage/report_namespace_cpu_usage_daily/20181111_035359_00063_yihp2_885f5ff5-45dc-4a3e-acb1-0a39f7aff8ab:  Replica placement policy is violated for BP-27232867-172.16.2.102-1539711209651:blk_1073843950_103126. Block should be additionally replicated on 1 more rack(s). Total number of racks in the cluster: 3
     UNDER_REP_REGEX='^(.*):[[:space:]]+Under replicated.*Target Replicas is ([0-9]+) but found ([0-9]) live.*'
     NEEDS_REP_REGEX='^(.*):[[:space:]]+Replica placement policy is violated.*'
-    echo "Checking for ***REMOVED***les under replicated ***REMOVED***les. Replication factor: $REPLICATION_FACTOR"
+    echo "Checking for files under replicated files. Replication factor: $REPLICATION_FACTOR"
     while read line; do
       if [[ $line =~ $UNDER_REP_REGEX ]]; then
         HDFS_FILE="${BASH_REMATCH[1]}"
         FILE_REP="${BASH_REMATCH[2]}"
         LIVE_REPS="${BASH_REMATCH[3]}"
-        # ***REMOVED***rst check if the replication factor is set correct for the ***REMOVED***le
+        # first check if the replication factor is set correct for the file
         if [ "$FILE_REP" != "$REPLICATION_FACTOR" ]; then
-          echo "$HDFS_FILE" >> /tmp/under_replicated_***REMOVED***les
-        ***REMOVED***
-      # check for ***REMOVED***les which have replication set to the correct value but
+          echo "$HDFS_FILE" >> /tmp/under_replicated_files
+        fi
+      # check for files which have replication set to the correct value but
       # don't actually have the target number of replicas.
       elif [[ "$WAIT" == "true" && $line =~ $NEEDS_REP_REGEX ]]; then
           HDFS_FILE="${BASH_REMATCH[1]}"
-          echo "$HDFS_FILE" >> /tmp/under_replicated_***REMOVED***les
-      ***REMOVED***
+          echo "$HDFS_FILE" >> /tmp/under_replicated_files
+      fi
     done < /tmp/fsck.log
 
     # setup args for hdfs fs command
     ARGS=(-setrep)
     if [ "$WAIT" == "true" ]; then
       ARGS+=(-w)
-    ***REMOVED***
+    fi
     ARGS+=($REPLICATION_FACTOR)
     echo "Running hdfs fs to set replication"
-    while read hdfs***REMOVED***le; do
-      echo "Fixing $hdfs***REMOVED***le :"
-      hadoop fs "${ARGS[@]}" "$hdfs***REMOVED***le"
-    done < /tmp/under_replicated_***REMOVED***les
+    while read hdfsfile; do
+      echo "Fixing $hdfsfile :"
+      hadoop fs "${ARGS[@]}" "$hdfsfile"
+    done < /tmp/under_replicated_files
     echo "Done"

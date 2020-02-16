@@ -2,7 +2,7 @@
 Copyright 2017 The Kubernetes Authors.
 
 Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this ***REMOVED***le except in compliance with the License.
+you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
 
     http://www.apache.org/licenses/LICENSE-2.0
@@ -10,7 +10,7 @@ You may obtain a copy of the License at
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the speci***REMOVED***c language governing permissions and
+See the License for the specific language governing permissions and
 limitations under the License.
 */
 
@@ -22,7 +22,7 @@ import (
 	"k8s.io/apimachinery/pkg/runtime"
 )
 
-// TODO: Table does not generate to protobuf because of the interface{} - ***REMOVED***x protobuf
+// TODO: Table does not generate to protobuf because of the interface{} - fix protobuf
 //   generation to support a meta type that can accept any valid JSON.
 
 // Table is a tabular representation of a set of API resources. The server transforms the
@@ -36,28 +36,28 @@ type Table struct {
 	// +optional
 	v1.ListMeta `json:"metadata,omitempty"`
 
-	// columnDe***REMOVED***nitions describes each column in the returned items array. The number of cells per row
-	// will always match the number of column de***REMOVED***nitions.
-	ColumnDe***REMOVED***nitions []TableColumnDe***REMOVED***nition `json:"columnDe***REMOVED***nitions"`
+	// columnDefinitions describes each column in the returned items array. The number of cells per row
+	// will always match the number of column definitions.
+	ColumnDefinitions []TableColumnDefinition `json:"columnDefinitions"`
 	// rows is the list of items in the table.
 	Rows []TableRow `json:"rows"`
 }
 
-// TableColumnDe***REMOVED***nition contains information about a column returned in the Table.
+// TableColumnDefinition contains information about a column returned in the Table.
 // +protobuf=false
-type TableColumnDe***REMOVED***nition struct {
+type TableColumnDefinition struct {
 	// name is a human readable name for the column.
 	Name string `json:"name"`
-	// type is an OpenAPI type de***REMOVED***nition for this column.
-	// See https://github.com/OAI/OpenAPI-Speci***REMOVED***cation/blob/master/versions/2.0.md#data-types for more.
+	// type is an OpenAPI type definition for this column.
+	// See https://github.com/OAI/OpenAPI-Specification/blob/master/versions/2.0.md#data-types for more.
 	Type string `json:"type"`
-	// format is an optional OpenAPI type de***REMOVED***nition for this column. The 'name' format is applied
-	// to the primary identi***REMOVED***er column to assist in clients identifying column is the resource name.
-	// See https://github.com/OAI/OpenAPI-Speci***REMOVED***cation/blob/master/versions/2.0.md#data-types for more.
+	// format is an optional OpenAPI type definition for this column. The 'name' format is applied
+	// to the primary identifier column to assist in clients identifying column is the resource name.
+	// See https://github.com/OAI/OpenAPI-Specification/blob/master/versions/2.0.md#data-types for more.
 	Format string `json:"format"`
 	// description is a human readable description of this column.
 	Description string `json:"description"`
-	// priority is an integer de***REMOVED***ning the relative importance of this column compared to others. Lower
+	// priority is an integer defining the relative importance of this column compared to others. Lower
 	// numbers are considered higher priority. Columns that may be omitted in limited space scenarios
 	// should be given a higher priority.
 	Priority int32 `json:"priority"`
@@ -67,13 +67,13 @@ type TableColumnDe***REMOVED***nition struct {
 // +protobuf=false
 type TableRow struct {
 	// cells will be as wide as headers and may contain strings, numbers (float64 or int64), booleans, simple
-	// maps, or lists, or null. See the type ***REMOVED***eld of the column de***REMOVED***nition for a more detailed description.
+	// maps, or lists, or null. See the type field of the column definition for a more detailed description.
 	Cells []interface{} `json:"cells"`
 	// conditions describe additional status of a row that are relevant for a human user.
 	// +optional
 	Conditions []TableRowCondition `json:"conditions,omitempty"`
-	// This ***REMOVED***eld contains the requested additional information about each object based on the includeObject
-	// policy when requesting the Table. If "None", this ***REMOVED***eld is empty, if "Object" this will be the
+	// This field contains the requested additional information about each object based on the includeObject
+	// policy when requesting the Table. If "None", this field is empty, if "Object" this will be the
 	// default serialization of the object for the current API version, and if "Metadata" (the default) will
 	// contain the object metadata. Check the returned kind and apiVersion of the object before parsing.
 	// +optional
@@ -123,7 +123,7 @@ type IncludeObjectPolicy string
 const (
 	// IncludeNone returns no object.
 	IncludeNone IncludeObjectPolicy = "None"
-	// IncludeMetadata serializes the object containing only its metadata ***REMOVED***eld.
+	// IncludeMetadata serializes the object containing only its metadata field.
 	IncludeMetadata IncludeObjectPolicy = "Metadata"
 	// IncludeObject contains the full object.
 	IncludeObject IncludeObjectPolicy = "Object"

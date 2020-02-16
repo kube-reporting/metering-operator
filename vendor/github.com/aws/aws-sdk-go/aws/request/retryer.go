@@ -34,9 +34,9 @@ type Retryer interface {
 	MaxRetries() int
 }
 
-// WithRetryer sets a Retryer value to the given Con***REMOVED***g returning the Con***REMOVED***g
+// WithRetryer sets a Retryer value to the given Config returning the Config
 // value for chaining.
-func WithRetryer(cfg *aws.Con***REMOVED***g, retryer Retryer) *aws.Con***REMOVED***g {
+func WithRetryer(cfg *aws.Config, retryer Retryer) *aws.Config {
 	cfg.Retryer = retryer
 	return cfg
 }

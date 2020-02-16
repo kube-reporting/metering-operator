@@ -2,7 +2,7 @@
 Copyright 2018 The Kubernetes Authors.
 
 Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this ***REMOVED***le except in compliance with the License.
+you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
 
     http://www.apache.org/licenses/LICENSE-2.0
@@ -10,7 +10,7 @@ You may obtain a copy of the License at
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the speci***REMOVED***c language governing permissions and
+See the License for the specific language governing permissions and
 limitations under the License.
 */
 
@@ -54,19 +54,19 @@ func Packages(context *generator.Context, arguments *args.GeneratorArgs) generat
 		pkg := context.Universe.Package(inputDir)
 		internal, err := isInternal(pkg)
 		if err != nil {
-			klog.V(5).Infof("skipping the generation of %s ***REMOVED***le, due to err %v", arguments.OutputFileBaseName, err)
+			klog.V(5).Infof("skipping the generation of %s file, due to err %v", arguments.OutputFileBaseName, err)
 			continue
 		}
 		if internal {
-			klog.V(5).Infof("skipping the generation of %s ***REMOVED***le because %s package contains internal types, note that internal types don't have \"json\" tags", arguments.OutputFileBaseName, pkg.Name)
+			klog.V(5).Infof("skipping the generation of %s file because %s package contains internal types, note that internal types don't have \"json\" tags", arguments.OutputFileBaseName, pkg.Name)
 			continue
 		}
 		registerFileName := "register.go"
 		searchPath := path.Join(args.DefaultSourceTree(), inputDir, registerFileName)
 		if _, err := os.Stat(path.Join(searchPath)); err == nil {
-			klog.V(5).Infof("skipping the generation of %s ***REMOVED***le because %s already exists in the path %s", arguments.OutputFileBaseName, registerFileName, searchPath)
+			klog.V(5).Infof("skipping the generation of %s file because %s already exists in the path %s", arguments.OutputFileBaseName, registerFileName, searchPath)
 			continue
-		} ***REMOVED*** if err != nil && !os.IsNotExist(err) {
+		} else if err != nil && !os.IsNotExist(err) {
 			klog.Fatalf("an error %v has occurred while checking if %s exists", err, registerFileName)
 		}
 
@@ -81,7 +81,7 @@ func Packages(context *generator.Context, arguments *args.GeneratorArgs) generat
 			gv.Version = clientgentypes.Version(pathParts[len(pathParts)-1])
 
 			// if there is a comment of the form "// +groupName=somegroup" or "// +groupName=somegroup.foo.bar.io",
-			// extract the fully quali***REMOVED***ed API group name from it and overwrite the group inferred from the package path
+			// extract the fully qualified API group name from it and overwrite the group inferred from the package path
 			if override := types.ExtractCommentTags("+", pkg.DocComments)["groupName"]; override != nil {
 				groupName := override[0]
 				klog.V(5).Infof("overriding the group name with = %s", groupName)
@@ -133,5 +133,5 @@ func isInternal(p *types.Package) (bool, error) {
 			}
 		}
 	}
-	return false, fmt.Errorf("unable to ***REMOVED***nd TypeMeta for any types in package %s", p.Path)
+	return false, fmt.Errorf("unable to find TypeMeta for any types in package %s", p.Path)
 }

@@ -10,7 +10,7 @@ func decoderOfOptional(ctx *ctx, typ reflect2.Type) ValDecoder {
 	ptrType := typ.(*reflect2.UnsafePtrType)
 	elemType := ptrType.Elem()
 	decoder := decoderOfType(ctx, elemType)
-	if ctx.pre***REMOVED***x == "" && elemType.Kind() == reflect.Ptr {
+	if ctx.prefix == "" && elemType.Kind() == reflect.Ptr {
 		return &dereferenceDecoder{elemType, decoder}
 	}
 	return &OptionalDecoder{elemType, decoder}
@@ -32,13 +32,13 @@ type OptionalDecoder struct {
 func (decoder *OptionalDecoder) Decode(ptr unsafe.Pointer, iter *Iterator) {
 	if iter.ReadNil() {
 		*((*unsafe.Pointer)(ptr)) = nil
-	} ***REMOVED*** {
+	} else {
 		if *((*unsafe.Pointer)(ptr)) == nil {
 			//pointer to null, we have to allocate memory to hold the value
 			newPtr := decoder.ValueType.UnsafeNew()
 			decoder.ValueDecoder.Decode(newPtr, iter)
 			*((*unsafe.Pointer)(ptr)) = newPtr
-		} ***REMOVED*** {
+		} else {
 			//reuse existing instance
 			decoder.ValueDecoder.Decode(*((*unsafe.Pointer)(ptr)), iter)
 		}
@@ -57,7 +57,7 @@ func (decoder *dereferenceDecoder) Decode(ptr unsafe.Pointer, iter *Iterator) {
 		newPtr := decoder.valueType.UnsafeNew()
 		decoder.valueDecoder.Decode(newPtr, iter)
 		*((*unsafe.Pointer)(ptr)) = newPtr
-	} ***REMOVED*** {
+	} else {
 		//reuse existing instance
 		decoder.valueDecoder.Decode(*((*unsafe.Pointer)(ptr)), iter)
 	}
@@ -70,7 +70,7 @@ type OptionalEncoder struct {
 func (encoder *OptionalEncoder) Encode(ptr unsafe.Pointer, stream *Stream) {
 	if *((*unsafe.Pointer)(ptr)) == nil {
 		stream.WriteNil()
-	} ***REMOVED*** {
+	} else {
 		encoder.ValueEncoder.Encode(*((*unsafe.Pointer)(ptr)), stream)
 	}
 }
@@ -86,7 +86,7 @@ type dereferenceEncoder struct {
 func (encoder *dereferenceEncoder) Encode(ptr unsafe.Pointer, stream *Stream) {
 	if *((*unsafe.Pointer)(ptr)) == nil {
 		stream.WriteNil()
-	} ***REMOVED*** {
+	} else {
 		encoder.ValueEncoder.Encode(*((*unsafe.Pointer)(ptr)), stream)
 	}
 }
@@ -108,8 +108,8 @@ func (encoder *dereferenceEncoder) IsEmbeddedPtrNil(ptr unsafe.Pointer) bool {
 	if !converted {
 		return false
 	}
-	***REMOVED***eldPtr := unsafe.Pointer(deReferenced)
-	return isEmbeddedPtrNil.IsEmbeddedPtrNil(***REMOVED***eldPtr)
+	fieldPtr := unsafe.Pointer(deReferenced)
+	return isEmbeddedPtrNil.IsEmbeddedPtrNil(fieldPtr)
 }
 
 type referenceEncoder struct {

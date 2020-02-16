@@ -53,12 +53,12 @@ var LogHTTPRequestHandler = request.NamedHandler{
 }
 
 func logRequest(r *request.Request) {
-	logBody := r.Con***REMOVED***g.LogLevel.Matches(aws.LogDebugWithHTTPBody)
+	logBody := r.Config.LogLevel.Matches(aws.LogDebugWithHTTPBody)
 	bodySeekable := aws.IsReaderSeekable(r.Body)
 
 	b, err := httputil.DumpRequestOut(r.HTTPRequest, logBody)
 	if err != nil {
-		r.Con***REMOVED***g.Logger.Log(fmt.Sprintf(logReqErrMsg,
+		r.Config.Logger.Log(fmt.Sprintf(logReqErrMsg,
 			r.ClientInfo.ServiceName, r.Operation.Name, err))
 		return
 	}
@@ -71,13 +71,13 @@ func logRequest(r *request.Request) {
 		// r.HTTPRequest's Body as a NoOpCloser and will not be reset after
 		// read by the HTTP client reader.
 		if err := r.Error; err != nil {
-			r.Con***REMOVED***g.Logger.Log(fmt.Sprintf(logReqErrMsg,
+			r.Config.Logger.Log(fmt.Sprintf(logReqErrMsg,
 				r.ClientInfo.ServiceName, r.Operation.Name, err))
 			return
 		}
 	}
 
-	r.Con***REMOVED***g.Logger.Log(fmt.Sprintf(logReqMsg,
+	r.Config.Logger.Log(fmt.Sprintf(logReqMsg,
 		r.ClientInfo.ServiceName, r.Operation.Name, string(b)))
 }
 
@@ -92,12 +92,12 @@ var LogHTTPRequestHeaderHandler = request.NamedHandler{
 func logRequestHeader(r *request.Request) {
 	b, err := httputil.DumpRequestOut(r.HTTPRequest, false)
 	if err != nil {
-		r.Con***REMOVED***g.Logger.Log(fmt.Sprintf(logReqErrMsg,
+		r.Config.Logger.Log(fmt.Sprintf(logReqErrMsg,
 			r.ClientInfo.ServiceName, r.Operation.Name, err))
 		return
 	}
 
-	r.Con***REMOVED***g.Logger.Log(fmt.Sprintf(logReqMsg,
+	r.Config.Logger.Log(fmt.Sprintf(logReqMsg,
 		r.ClientInfo.ServiceName, r.Operation.Name, string(b)))
 }
 
@@ -120,7 +120,7 @@ var LogHTTPResponseHandler = request.NamedHandler{
 }
 
 func logResponse(r *request.Request) {
-	lw := &logWriter{r.Con***REMOVED***g.Logger, bytes.NewBuffer(nil)}
+	lw := &logWriter{r.Config.Logger, bytes.NewBuffer(nil)}
 
 	if r.HTTPResponse == nil {
 		lw.Logger.Log(fmt.Sprintf(logRespErrMsg,
@@ -128,7 +128,7 @@ func logResponse(r *request.Request) {
 		return
 	}
 
-	logBody := r.Con***REMOVED***g.LogLevel.Matches(aws.LogDebugWithHTTPBody)
+	logBody := r.Config.LogLevel.Matches(aws.LogDebugWithHTTPBody)
 	if logBody {
 		r.HTTPResponse.Body = &teeReaderCloser{
 			Reader: io.TeeReader(r.HTTPResponse.Body, lw),
@@ -178,17 +178,17 @@ var LogHTTPResponseHeaderHandler = request.NamedHandler{
 }
 
 func logResponseHeader(r *request.Request) {
-	if r.Con***REMOVED***g.Logger == nil {
+	if r.Config.Logger == nil {
 		return
 	}
 
 	b, err := httputil.DumpResponse(r.HTTPResponse, false)
 	if err != nil {
-		r.Con***REMOVED***g.Logger.Log(fmt.Sprintf(logRespErrMsg,
+		r.Config.Logger.Log(fmt.Sprintf(logRespErrMsg,
 			r.ClientInfo.ServiceName, r.Operation.Name, err))
 		return
 	}
 
-	r.Con***REMOVED***g.Logger.Log(fmt.Sprintf(logRespMsg,
+	r.Config.Logger.Log(fmt.Sprintf(logRespMsg,
 		r.ClientInfo.ServiceName, r.Operation.Name, string(b)))
 }

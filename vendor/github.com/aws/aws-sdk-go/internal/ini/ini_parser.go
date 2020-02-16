@@ -31,7 +31,7 @@ const (
 	// MarkComplete state will complete statements and move that
 	// to the completed AST list
 	MarkCompleteState
-	// TerminalState signi***REMOVED***es that the tokens have been fully parsed
+	// TerminalState signifies that the tokens have been fully parsed
 	TerminalState
 )
 
@@ -151,7 +151,7 @@ loop:
 			// but reduction of what's left on the stack needs to
 			// occur.
 			tok = emptyToken
-		} ***REMOVED*** {
+		} else {
 			tok = tokens[0]
 		}
 
@@ -275,7 +275,7 @@ loop:
 				// If there are multiple literals inside of a scope declaration,
 				// then the current token's raw value will be appended to the Name.
 				//
-				// This handles cases like [ pro***REMOVED***le default ]
+				// This handles cases like [ profile default ]
 				//
 				// k will represent a SectionStatement with the children representing
 				// the label of the section
@@ -304,7 +304,7 @@ loop:
 		case CommentState:
 			if k.Kind == ASTKindStart {
 				stack.Push(k)
-			} ***REMOVED*** {
+			} else {
 				stack.MarkComplete(k)
 			}
 

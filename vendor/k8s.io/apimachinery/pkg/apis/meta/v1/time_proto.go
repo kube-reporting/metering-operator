@@ -2,7 +2,7 @@
 Copyright 2015 The Kubernetes Authors.
 
 Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this ***REMOVED***le except in compliance with the License.
+you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
 
     http://www.apache.org/licenses/LICENSE-2.0
@@ -10,7 +10,7 @@ You may obtain a copy of the License at
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the speci***REMOVED***c language governing permissions and
+See the License for the specific language governing permissions and
 limitations under the License.
 */
 
@@ -31,7 +31,7 @@ type Timestamp struct {
 	// Non-negative fractions of a second at nanosecond resolution. Negative
 	// second values with fractions must still have non-negative nanos values
 	// that count forward in time. Must be from 0 to 999,999,999
-	// inclusive. This ***REMOVED***eld may be limited in precision depending on context.
+	// inclusive. This field may be limited in precision depending on context.
 	Nanos int32 `json:"nanos" protobuf:"varint,2,opt,name=nanos"`
 }
 
@@ -44,7 +44,7 @@ func (m *Time) ProtoTime() *Timestamp {
 		Seconds: m.Time.Unix(),
 		// leaving this here for the record.  our JSON only handled seconds, so this results in writes by
 		// protobuf clients storing values that aren't read by json clients, which results in unexpected
-		// ***REMOVED***eld mutation, which fails various validation and equality code.
+		// field mutation, which fails various validation and equality code.
 		// Nanos:   int32(m.Time.Nanosecond()),
 	}
 }
@@ -69,7 +69,7 @@ func (m *Time) Unmarshal(data []byte) error {
 	}
 	// leaving this here for the record.  our JSON only handled seconds, so this results in writes by
 	// protobuf clients storing values that aren't read by json clients, which results in unexpected
-	// ***REMOVED***eld mutation, which fails various validation and equality code.
+	// field mutation, which fails various validation and equality code.
 	// m.Time = time.Unix(p.Seconds, int64(p.Nanos)).Local()
 	m.Time = time.Unix(p.Seconds, int64(0)).Local()
 	return nil

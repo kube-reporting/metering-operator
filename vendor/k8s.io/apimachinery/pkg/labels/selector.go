@@ -2,7 +2,7 @@
 Copyright 2014 The Kubernetes Authors.
 
 Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this ***REMOVED***le except in compliance with the License.
+you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
 
     http://www.apache.org/licenses/LICENSE-2.0
@@ -10,7 +10,7 @@ You may obtain a copy of the License at
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the speci***REMOVED***c language governing permissions and
+See the License for the specific language governing permissions and
 limitations under the License.
 */
 
@@ -188,7 +188,7 @@ func (r *Requirement) hasValue(value string) bool {
 // (4) The operator is DoesNotExist or NotIn and Labels does not have the
 //     Requirement's key.
 // (5) The operator is GreaterThanOperator or LessThanOperator, and Labels has
-//     the Requirement's key and the corresponding value satis***REMOVED***es mathematical inequality.
+//     the Requirement's key and the corresponding value satisfies mathematical inequality.
 func (r *Requirement) Matches(ls Labels) bool {
 	switch r.operator {
 	case selection.In, selection.Equals, selection.DoubleEquals:
@@ -297,7 +297,7 @@ func (r *Requirement) String() string {
 	}
 	if len(r.strValues) == 1 {
 		buffer.WriteString(r.strValues[0])
-	} ***REMOVED*** { // only > 1 since == 0 prohibited by NewRequirement
+	} else { // only > 1 since == 0 prohibited by NewRequirement
 		// normalizes value order on output, without mutating the in-memory selector representation
 		// also avoids normalization when it is not required, and ensures we do not mutate shared data
 		buffer.WriteString(strings.Join(safeSort(r.strValues), ","))
@@ -310,7 +310,7 @@ func (r *Requirement) String() string {
 	return buffer.String()
 }
 
-// safeSort sort input strings without modi***REMOVED***cation
+// safeSort sort input strings without modification
 func safeSort(in []string) []string {
 	if sort.StringsAreSorted(in) {
 		return in
@@ -358,7 +358,7 @@ func (lsel internalSelector) String() string {
 	return strings.Join(reqs, ",")
 }
 
-// Token represents constant de***REMOVED***nition for lexer token
+// Token represents constant definition for lexer token
 type Token int
 
 const (
@@ -378,8 +378,8 @@ const (
 	EqualsToken
 	// GreaterThanToken represents greater than
 	GreaterThanToken
-	// Identi***REMOVED***erToken represents identi***REMOVED***er, e.g. keys and values
-	Identi***REMOVED***erToken
+	// IdentifierToken represents identifier, e.g. keys and values
+	IdentifierToken
 	// InToken represents in
 	InToken
 	// LessThanToken represents less than
@@ -393,7 +393,7 @@ const (
 )
 
 // string2token contains the mapping between lexer Token and token literal
-// (except Identi***REMOVED***erToken, EndOfStringToken and ErrorToken since it makes no sense)
+// (except IdentifierToken, EndOfStringToken and ErrorToken since it makes no sense)
 var string2token = map[string]Token{
 	")":     ClosedParToken,
 	",":     CommaToken,
@@ -453,17 +453,17 @@ func (l *Lexer) unread() {
 	l.pos--
 }
 
-// scanIDOrKeyword scans string to recognize literal token (for example 'in') or an identi***REMOVED***er.
+// scanIDOrKeyword scans string to recognize literal token (for example 'in') or an identifier.
 func (l *Lexer) scanIDOrKeyword() (tok Token, lit string) {
 	var buffer []byte
-Identi***REMOVED***erLoop:
+IdentifierLoop:
 	for {
 		switch ch := l.read(); {
 		case ch == 0:
-			break Identi***REMOVED***erLoop
+			break IdentifierLoop
 		case isSpecialSymbol(ch) || isWhitespace(ch):
 			l.unread()
-			break Identi***REMOVED***erLoop
+			break IdentifierLoop
 		default:
 			buffer = append(buffer, ch)
 		}
@@ -472,7 +472,7 @@ Identi***REMOVED***erLoop:
 	if val, ok := string2token[s]; ok { // is a literal token?
 		return val, s
 	}
-	return Identi***REMOVED***erToken, s // otherwise is an identi***REMOVED***er
+	return IdentifierToken, s // otherwise is an identifier
 }
 
 // scanSpecialSymbol scans string starting with special symbol.
@@ -489,7 +489,7 @@ SpecialSymbolLoop:
 			buffer = append(buffer, ch)
 			if token, ok := string2token[string(buffer)]; ok {
 				lastScannedItem = ScannedItem{tok: token, literal: string(buffer)}
-			} ***REMOVED*** if lastScannedItem.tok != 0 {
+			} else if lastScannedItem.tok != 0 {
 				l.unread()
 				break SpecialSymbolLoop
 			}
@@ -505,7 +505,7 @@ SpecialSymbolLoop:
 }
 
 // skipWhiteSpaces consumes all blank characters
-// returning the ***REMOVED***rst non blank character
+// returning the first non blank character
 func (l *Lexer) skipWhiteSpaces(ch byte) byte {
 	for {
 		if !isWhitespace(ch) {
@@ -516,7 +516,7 @@ func (l *Lexer) skipWhiteSpaces(ch byte) byte {
 }
 
 // Lex returns a pair of Token and the literal
-// literal is meaningfull only for Identi***REMOVED***erToken token
+// literal is meaningfull only for IdentifierToken token
 func (l *Lexer) Lex() (tok Token, lit string) {
 	switch ch := l.skipWhiteSpaces(l.read()); {
 	case ch == 0:
@@ -556,7 +556,7 @@ func (p *Parser) lookahead(context ParserContext) (Token, string) {
 	if context == Values {
 		switch tok {
 		case InToken, NotInToken:
-			tok = Identi***REMOVED***erToken
+			tok = IdentifierToken
 		}
 	}
 	return tok, lit
@@ -569,7 +569,7 @@ func (p *Parser) consume(context ParserContext) (Token, string) {
 	if context == Values {
 		switch tok {
 		case InToken, NotInToken:
-			tok = Identi***REMOVED***erToken
+			tok = IdentifierToken
 		}
 	}
 	return tok, lit
@@ -596,7 +596,7 @@ func (p *Parser) parse() (internalSelector, error) {
 	for {
 		tok, lit := p.lookahead(Values)
 		switch tok {
-		case Identi***REMOVED***erToken, DoesNotExistToken:
+		case IdentifierToken, DoesNotExistToken:
 			r, err := p.parseRequirement()
 			if err != nil {
 				return nil, fmt.Errorf("unable to parse requirement: %v", err)
@@ -608,8 +608,8 @@ func (p *Parser) parse() (internalSelector, error) {
 				return requirements, nil
 			case CommaToken:
 				t2, l2 := p.lookahead(Values)
-				if t2 != Identi***REMOVED***erToken && t2 != DoesNotExistToken {
-					return nil, fmt.Errorf("found '%s', expected: identi***REMOVED***er after ','", l2)
+				if t2 != IdentifierToken && t2 != DoesNotExistToken {
+					return nil, fmt.Errorf("found '%s', expected: identifier after ','", l2)
 				}
 			default:
 				return nil, fmt.Errorf("found '%s', expected: ',' or 'end of string'", l)
@@ -617,7 +617,7 @@ func (p *Parser) parse() (internalSelector, error) {
 		case EndOfStringToken:
 			return requirements, nil
 		default:
-			return nil, fmt.Errorf("found '%s', expected: !, identi***REMOVED***er, or 'end of string'", lit)
+			return nil, fmt.Errorf("found '%s', expected: !, identifier, or 'end of string'", lit)
 		}
 	}
 }
@@ -658,8 +658,8 @@ func (p *Parser) parseKeyAndInferOperator() (string, selection.Operator, error) 
 		operator = selection.DoesNotExist
 		tok, literal = p.consume(Values)
 	}
-	if tok != Identi***REMOVED***erToken {
-		err := fmt.Errorf("found '%s', expected: identi***REMOVED***er", literal)
+	if tok != IdentifierToken {
+		err := fmt.Errorf("found '%s', expected: identifier", literal)
 		return "", "", err
 	}
 	if err := validateLabelKey(literal); err != nil {
@@ -707,8 +707,8 @@ func (p *Parser) parseValues() (sets.String, error) {
 	}
 	tok, lit = p.lookahead(Values)
 	switch tok {
-	case Identi***REMOVED***erToken, CommaToken:
-		s, err := p.parseIdenti***REMOVED***ersList() // handles general cases
+	case IdentifierToken, CommaToken:
+		s, err := p.parseIdentifiersList() // handles general cases
 		if err != nil {
 			return s, err
 		}
@@ -720,18 +720,18 @@ func (p *Parser) parseValues() (sets.String, error) {
 		p.consume(Values)
 		return sets.NewString(""), nil
 	default:
-		return nil, fmt.Errorf("found '%s', expected: ',', ')' or identi***REMOVED***er", lit)
+		return nil, fmt.Errorf("found '%s', expected: ',', ')' or identifier", lit)
 	}
 }
 
-// parseIdenti***REMOVED***ersList parses a (possibly empty) list of
-// of comma separated (possibly empty) identi***REMOVED***ers
-func (p *Parser) parseIdenti***REMOVED***ersList() (sets.String, error) {
+// parseIdentifiersList parses a (possibly empty) list of
+// of comma separated (possibly empty) identifiers
+func (p *Parser) parseIdentifiersList() (sets.String, error) {
 	s := sets.NewString()
 	for {
 		tok, lit := p.consume(Values)
 		switch tok {
-		case Identi***REMOVED***erToken:
+		case IdentifierToken:
 			s.Insert(lit)
 			tok2, lit2 := p.lookahead(Values)
 			switch tok2 {
@@ -756,7 +756,7 @@ func (p *Parser) parseIdenti***REMOVED***ersList() (sets.String, error) {
 				s.Insert("") // to handle ,, Double "" removed by StringSet
 			}
 		default: // it can be operator
-			return s, fmt.Errorf("found '%s', expected: ',', or identi***REMOVED***er", lit)
+			return s, fmt.Errorf("found '%s', expected: ',', or identifier", lit)
 		}
 	}
 }
@@ -770,11 +770,11 @@ func (p *Parser) parseExactValue() (sets.String, error) {
 		return s, nil
 	}
 	tok, lit = p.consume(Values)
-	if tok == Identi***REMOVED***erToken {
+	if tok == IdentifierToken {
 		s.Insert(lit)
 		return s, nil
 	}
-	return nil, fmt.Errorf("found '%s', expected: identi***REMOVED***er", lit)
+	return nil, fmt.Errorf("found '%s', expected: identifier", lit)
 }
 
 // Parse takes a string representing a selector and returns a selector
@@ -831,7 +831,7 @@ func parse(selector string) (internalSelector, error) {
 }
 
 func validateLabelKey(k string) error {
-	if errs := validation.IsQuali***REMOVED***edName(k); len(errs) != 0 {
+	if errs := validation.IsQualifiedName(k); len(errs) != 0 {
 		return fmt.Errorf("invalid label key %q: %s", k, strings.Join(errs, "; "))
 	}
 	return nil
@@ -855,7 +855,7 @@ func SelectorFromSet(ls Set) Selector {
 		r, err := NewRequirement(label, selection.Equals, []string{value})
 		if err == nil {
 			requirements = append(requirements, *r)
-		} ***REMOVED*** {
+		} else {
 			//TODO: double check errors when input comes from serialization?
 			return internalSelector{}
 		}

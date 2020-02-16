@@ -1,6 +1,6 @@
 // Copyright 2013 The Go Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE ***REMOVED***le.
+// license that can be found in the LICENSE file.
 
 // +build ignore
 
@@ -10,7 +10,7 @@
 package main
 
 import (
-	"bu***REMOVED***o"
+	"bufio"
 	"flag"
 	"fmt"
 	"io"
@@ -34,18 +34,18 @@ var (
 		"test existing tables; can be used to compare web data with package data.")
 	outputFile = flag.String("output",
 		"tables.go",
-		"output ***REMOVED***le for generated tables")
+		"output file for generated tables")
 )
 
 var comment = []string{
 	`
-lang holds an alphabetically sorted list of ISO-639 language identi***REMOVED***ers.
-All entries are 4 bytes. The index of the identi***REMOVED***er (divided by 4) is the language tag.
-For 2-byte language identi***REMOVED***ers, the two successive bytes have the following meaning:
-    - if the ***REMOVED***rst letter of the 2- and 3-letter ISO codes are the same:
+lang holds an alphabetically sorted list of ISO-639 language identifiers.
+All entries are 4 bytes. The index of the identifier (divided by 4) is the language tag.
+For 2-byte language identifiers, the two successive bytes have the following meaning:
+    - if the first letter of the 2- and 3-letter ISO codes are the same:
       the second and third letter of the 3-letter ISO code.
     - otherwise: a 0 and a by 2 bits right-shifted index into altLangISO3.
-For 3-byte language identi***REMOVED***ers the 4th byte is 0.`,
+For 3-byte language identifiers the 4th byte is 0.`,
 	`
 langNoIndex is a bit vector of all 3-letter language codes that are not used as an index
 in lookup tables. The language ids for these language codes are derived directly
@@ -63,24 +63,24 @@ script is an alphabetically sorted list of ISO 15924 codes. The index
 of the script in the string, divided by 4, is the internal scriptID.`,
 	`
 isoRegionOffset needs to be added to the index of regionISO to obtain the regionID
-for 2-letter ISO codes. (The ***REMOVED***rst isoRegionOffset regionIDs are reserved for
+for 2-letter ISO codes. (The first isoRegionOffset regionIDs are reserved for
 the UN.M49 codes used for groups.)`,
 	`
 regionISO holds a list of alphabetically sorted 2-letter ISO region codes.
 Each 2-letter codes is followed by two bytes with the following meaning:
-    - [A-Z}{2}: the ***REMOVED***rst letter of the 2-letter code plus these two 
+    - [A-Z}{2}: the first letter of the 2-letter code plus these two 
                 letters form the 3-letter ISO code.
     - 0, n:     index into altRegionISO3.`,
 	`
-regionTypes de***REMOVED***nes the status of a region for various standards.`,
+regionTypes defines the status of a region for various standards.`,
 	`
-m49 maps regionIDs to UN.M49 codes. The ***REMOVED***rst isoRegionOffset entries are
+m49 maps regionIDs to UN.M49 codes. The first isoRegionOffset entries are
 codes indicating collections of regions.`,
 	`
-m49Index gives indexes into fromM49 based on the three most signi***REMOVED***cant bits
+m49Index gives indexes into fromM49 based on the three most significant bits
 of a 10-bit UN.M49 code. To search an UN.M49 code in fromM49, search in
    fromM49[m49Index[msb39(code)]:m49Index[msb3(code)+1]]
-for an entry where the ***REMOVED***rst 7 bits match the 7 lsb of the UN.M49 code.
+for an entry where the first 7 bits match the 7 lsb of the UN.M49 code.
 The region code is stored in the 9 lsb of the indexed value.`,
 	`
 fromM49 contains entries to map UN.M49 codes to regions. See m49Index for details.`,
@@ -107,7 +107,7 @@ likelyRegion is a lookup table, indexed by regionID, for the most likely
 languages and scripts given incomplete information. If more entries exist
 for a given regionID, lang and script are the index and size respectively
 of the list in likelyRegionList.
-TODO: exclude containers and user-de***REMOVED***nable regions from the list.`,
+TODO: exclude containers and user-definable regions from the list.`,
 	`
 likelyRegionList holds lists info associated with likelyRegion.`,
 	`
@@ -115,15 +115,15 @@ likelyScript is a lookup table, indexed by scriptID, for the most likely
 languages and regions given a script.`,
 	`
 matchLang holds pairs of langIDs of base languages that are typically
-mutually intelligible. Each pair is associated with a con***REMOVED***dence and
+mutually intelligible. Each pair is associated with a confidence and
 whether the intelligibility goes one or both ways.`,
 	`
 matchScript holds pairs of scriptIDs where readers of one script
-can typically also read the other. Each is associated with a con***REMOVED***dence.`,
+can typically also read the other. Each is associated with a confidence.`,
 	`
 nRegionGroups is the number of region groups.`,
 	`
-regionInclusion maps region identi***REMOVED***ers to sets of regions in regionInclusionBits,
+regionInclusion maps region identifiers to sets of regions in regionInclusionBits,
 where each set holds all groupings that are directly connected in a region
 containment graph.`,
 	`
@@ -177,8 +177,8 @@ func (ss *stringSet) setType(t setType) {
 // parse parses a whitespace-separated string and initializes ss with its
 // components.
 func (ss *stringSet) parse(s string) {
-	scan := bu***REMOVED***o.NewScanner(strings.NewReader(s))
-	scan.Split(bu***REMOVED***o.ScanWords)
+	scan := bufio.NewScanner(strings.NewReader(s))
+	scan.Split(bufio.ScanWords)
 	for scan.Scan() {
 		ss.add(scan.Text())
 	}
@@ -234,7 +234,7 @@ func (ss *stringSet) sortFunc(f func(a, b string) bool) {
 
 func (ss *stringSet) remove(s string) {
 	ss.assertChangeable()
-	if i, ok := ss.***REMOVED***nd(s); ok {
+	if i, ok := ss.find(s); ok {
 		copy(ss.s[i:], ss.s[i+1:])
 		ss.s = ss.s[:len(ss.s)-1]
 	}
@@ -247,18 +247,18 @@ func (ss *stringSet) replace(ol, nu string) {
 
 func (ss *stringSet) index(s string) int {
 	ss.setType(Indexed)
-	i, ok := ss.***REMOVED***nd(s)
+	i, ok := ss.find(s)
 	if !ok {
 		if i < len(ss.s) {
-			log.Panicf("***REMOVED***nd: item %q is not in list. Closest match is %q.", s, ss.s[i])
+			log.Panicf("find: item %q is not in list. Closest match is %q.", s, ss.s[i])
 		}
-		log.Panicf("***REMOVED***nd: item %q is not in list", s)
+		log.Panicf("find: item %q is not in list", s)
 
 	}
 	return i
 }
 
-func (ss *stringSet) ***REMOVED***nd(s string) (int, bool) {
+func (ss *stringSet) find(s string) (int, bool) {
 	ss.compact()
 	i := sort.SearchStrings(ss.s, s)
 	return i, i != len(ss.s) && ss.s[i] == s
@@ -292,7 +292,7 @@ func (ss *stringSet) join() string {
 // ianaEntry holds information for an entry in the IANA Language Subtag Repository.
 // All types use the same entry.
 // See http://tools.ietf.org/html/bcp47#section-5.1 for a description of the various
-// ***REMOVED***elds.
+// fields.
 type ianaEntry struct {
 	typ            string
 	description    []string
@@ -302,7 +302,7 @@ type ianaEntry struct {
 	deprecated     string
 	suppressScript string
 	macro          string
-	pre***REMOVED***x         []string
+	prefix         []string
 }
 
 type builder struct {
@@ -349,8 +349,8 @@ func (b *builder) parseRegistry() {
 	defer r.Close()
 	b.registry = make(map[string]*ianaEntry)
 
-	scan := bu***REMOVED***o.NewScanner(r)
-	scan.Split(bu***REMOVED***o.ScanWords)
+	scan := bufio.NewScanner(r)
+	scan.Split(bufio.ScanWords)
 	var record *ianaEntry
 	for more := scan.Scan(); more; {
 		key := scan.Text()
@@ -364,7 +364,7 @@ func (b *builder) parseRegistry() {
 				for a := s[0]; a <= s[1]; a = inc(a) {
 					b.addToRegistry(a, record)
 				}
-			} ***REMOVED*** {
+			} else {
 				b.addToRegistry(value, record)
 			}
 		case "Suppress-Script:":
@@ -377,8 +377,8 @@ func (b *builder) parseRegistry() {
 			record.macro = value
 		case "Preferred-Value:":
 			record.preferred = value
-		case "Pre***REMOVED***x:":
-			record.pre***REMOVED***x = append(record.pre***REMOVED***x, value)
+		case "Prefix:":
+			record.prefix = append(record.prefix, value)
 		case "Scope:":
 			record.scope = value
 		case "Description:":
@@ -408,7 +408,7 @@ func (b *builder) addToRegistry(key string, entry *ianaEntry) {
 		if info.typ != "language" || entry.typ != "extlang" {
 			log.Fatalf("parseRegistry: tag %q already exists", key)
 		}
-	} ***REMOVED*** {
+	} else {
 		b.registry[key] = entry
 	}
 }
@@ -425,7 +425,7 @@ func init() {
 func (b *builder) comment(name string) {
 	if s := commentIndex[name]; len(s) > 0 {
 		b.w.WriteComment(s)
-	} ***REMOVED*** {
+	} else {
 		fmt.Fprintln(b.w)
 	}
 }
@@ -566,7 +566,7 @@ func (b *builder) langIndex(s string) uint16 {
 	if s == "und" {
 		return 0
 	}
-	if i, ok := b.lang.***REMOVED***nd(s); ok {
+	if i, ok := b.lang.find(s); ok {
 		return uint16(i)
 	}
 	return uint16(strToInt(s)) + uint16(len(b.lang.s))
@@ -595,7 +595,7 @@ func (b *builder) parseIndices() {
 			if len(k) == 2 || v.suppressScript != "" || v.scope == "special" {
 				b.lang.add(k)
 				continue
-			} ***REMOVED*** {
+			} else {
 				ss = &b.langNoIndex
 			}
 		case "region":
@@ -669,7 +669,7 @@ func (b *builder) parseIndices() {
 	b.writeConst("numScripts", len(b.script.slice()))
 	b.writeConst("numRegions", len(b.region.slice()))
 
-	// Add dummy codes at the start of each list to represent "unspeci***REMOVED***ed".
+	// Add dummy codes at the start of each list to represent "unspecified".
 	b.lang.add("---")
 	b.script.add("----")
 	b.region.add("---")
@@ -706,13 +706,13 @@ func (b *builder) computeRegionGroups() {
 
 var langConsts = []string{
 	"af", "am", "ar", "az", "bg", "bn", "ca", "cs", "da", "de", "el", "en", "es",
-	"et", "fa", "***REMOVED***", "***REMOVED***l", "fr", "gu", "he", "hi", "hr", "hu", "hy", "id", "is",
+	"et", "fa", "fi", "fil", "fr", "gu", "he", "hi", "hr", "hu", "hy", "id", "is",
 	"it", "ja", "ka", "kk", "km", "kn", "ko", "ky", "lo", "lt", "lv", "mk", "ml",
 	"mn", "mo", "mr", "ms", "mul", "my", "nb", "ne", "nl", "no", "pa", "pl", "pt",
 	"ro", "ru", "sh", "si", "sk", "sl", "sq", "sr", "sv", "sw", "ta", "te", "th",
 	"tl", "tn", "tr", "uk", "ur", "uz", "vi", "zh", "zu",
 
-	// constants for grandfathered tags (if not already de***REMOVED***ned)
+	// constants for grandfathered tags (if not already defined)
 	"jbo", "ami", "bnn", "hak", "tlh", "lb", "nv", "pwn", "tao", "tay", "tsu",
 	"nn", "sfb", "vgt", "sgg", "cmn", "nan", "hsn",
 }
@@ -748,12 +748,12 @@ func (b *builder) writeLanguage() {
 			if len(a.Replacement) == 2 && len(a.Type) == 3 {
 				lang.updateLater(a.Replacement, a.Type)
 			}
-		} ***REMOVED*** if len(a.Type) <= 3 {
+		} else if len(a.Type) <= 3 {
 			switch a.Reason {
 			case "macrolanguage":
 				aliasTypeMap[a.Type] = langMacro
 			case "deprecated":
-				// handled ***REMOVED***where
+				// handled elsewhere
 				continue
 			case "bibliographic", "legacy":
 				if a.Type == "no" {
@@ -816,12 +816,12 @@ func (b *builder) writeLanguage() {
 		if s, ok := lang.update[v]; ok {
 			if s[0] == v[0] {
 				add = s[1:]
-			} ***REMOVED*** {
+			} else {
 				add = string([]byte{0, byte(altLangISO3.index(s))})
 			}
-		} ***REMOVED*** if len(v) == 3 {
+		} else if len(v) == 3 {
 			add = "\x00"
-		} ***REMOVED*** {
+		} else {
 			log.Panicf("no data for long form of %q", v)
 		}
 		lang.s[i] += add
@@ -830,7 +830,7 @@ func (b *builder) writeLanguage() {
 
 	b.writeConst("langNoIndexOffset", len(b.lang.s))
 
-	// space of all valid 3-letter language identi***REMOVED***ers.
+	// space of all valid 3-letter language identifiers.
 	b.writeBitVector("langNoIndex", b.langNoIndex.slice())
 
 	altLangIndex := []uint16{}
@@ -889,7 +889,7 @@ func parseM49(s string) int16 {
 
 var regionConsts = []string{
 	"001", "419", "BR", "CA", "ES", "GB", "MD", "PT", "UK", "US",
-	"ZZ", "XA", "XC", "XK", // Unof***REMOVED***cial tag for Kosovo.
+	"ZZ", "XA", "XC", "XK", // Unofficial tag for Kosovo.
 }
 
 func (b *builder) writeRegion() {
@@ -943,10 +943,10 @@ func (b *builder) writeRegion() {
 		if j, ok := iso3Set[iso3]; !ok && iso3[0] == iso2[0] {
 			regionISO.s[i] += iso3[1:]
 			iso3Set[iso3] = -1
-		} ***REMOVED*** {
+		} else {
 			if ok && j >= 0 {
 				regionISO.s[i] += string([]byte{0, byte(j)})
-			} ***REMOVED*** {
+			} else {
 				iso3Set[iso3] = len(altRegionISO3)
 				regionISO.s[i] += string([]byte{0, byte(len(altRegionISO3))})
 				altRegionISO3 += iso3
@@ -963,7 +963,7 @@ func (b *builder) writeRegion() {
 		m49map[i] = m49
 		if r := fromM49map[m49]; r == 0 {
 			fromM49map[m49] = i
-		} ***REMOVED*** if r != i {
+		} else if r != i {
 			dep := b.registry[regionISO.s[r-isoOffset]].deprecated
 			if t := b.registry[tc.Type]; t != nil && dep != "" && (t.deprecated == "" || t.deprecated > dep) {
 				fromM49map[m49] = i
@@ -1022,8 +1022,8 @@ func (b *builder) writeRegion() {
 		if len(reg.Type) == 2 && reg.Reason == "deprecated" && len(reg.Replacement) == 2 {
 			regionOldMap.add(reg.Type)
 			regionOldMap.updateLater(reg.Type, reg.Replacement)
-			i, _ := regionISO.***REMOVED***nd(reg.Type)
-			j, _ := regionISO.***REMOVED***nd(reg.Replacement)
+			i, _ := regionISO.find(reg.Type)
+			j, _ := regionISO.find(reg.Replacement)
 			if k := m49map[i+isoOffset]; k == 0 {
 				m49map[i+isoOffset] = m49map[j+isoOffset]
 			}
@@ -1065,7 +1065,7 @@ func (b *builder) writeRegion() {
 
 const (
 	// TODO: put these lists in regionTypes as user data? Could be used for
-	// various optimizations and re***REMOVED***nements and could be exposed in the API.
+	// various optimizations and refinements and could be exposed in the API.
 	iso3166Except = "AC CP DG EA EU FX IC SU TA UK"
 	iso3166Trans  = "AN BU CS NT TP YU ZR" // SF is not in our set of Regions.
 	// DY and RH are actually not deleted, but indeterminately reserved.
@@ -1078,7 +1078,7 @@ const (
 	bcp47Region
 )
 
-func ***REMOVED***nd(list []string, s string) int {
+func find(list []string, s string) int {
 	for i, t := range list {
 		if t == s {
 			return i
@@ -1098,15 +1098,15 @@ func ***REMOVED***nd(list []string, s string) int {
 // sorted alphabetically among themselves.
 // Specialized variants may also sort after other specialized variants. Such
 // variants will be ordered after any of the variants they may follow.
-// We assume that if a variant x is followed by a variant y, then for any pre***REMOVED***x
-// p of x, p-x is a pre***REMOVED***x of y. This allows us to order tags based on the
-// maximum of the length of any of its pre***REMOVED***xes.
-// TODO: it is possible to de***REMOVED***ne a set of Pre***REMOVED***x values on variants such that
-// a total order cannot be de***REMOVED***ned to the point that this algorithm breaks.
+// We assume that if a variant x is followed by a variant y, then for any prefix
+// p of x, p-x is a prefix of y. This allows us to order tags based on the
+// maximum of the length of any of its prefixes.
+// TODO: it is possible to define a set of Prefix values on variants such that
+// a total order cannot be defined to the point that this algorithm breaks.
 // In other words, we cannot guarantee the same order of variants for the
 // future using the same algorithm or for non-compliant combinations of
 // variants. For this reason, consider using simple alphabetic sorting
-// of variants and ignore Pre***REMOVED***x restrictions altogether.
+// of variants and ignore Prefix restrictions altogether.
 func (b *builder) writeVariant() {
 	generalized := stringSet{}
 	specialized := stringSet{}
@@ -1114,16 +1114,16 @@ func (b *builder) writeVariant() {
 	// Collate the variants by type and check assumptions.
 	for _, v := range b.variant.slice() {
 		e := b.registry[v]
-		if len(e.pre***REMOVED***x) == 0 {
+		if len(e.prefix) == 0 {
 			generalized.add(v)
 			continue
 		}
-		c := strings.Split(e.pre***REMOVED***x[0], "-")
+		c := strings.Split(e.prefix[0], "-")
 		hasScriptOrRegion := false
 		if len(c) > 1 {
-			_, hasScriptOrRegion = b.script.***REMOVED***nd(c[1])
+			_, hasScriptOrRegion = b.script.find(c[1])
 			if !hasScriptOrRegion {
-				_, hasScriptOrRegion = b.region.***REMOVED***nd(c[1])
+				_, hasScriptOrRegion = b.region.find(c[1])
 
 			}
 		}
@@ -1134,29 +1134,29 @@ func (b *builder) writeVariant() {
 		}
 		// Variant is preceded by another variant.
 		specializedExtend.add(v)
-		pre***REMOVED***x := c[0] + "-"
+		prefix := c[0] + "-"
 		if hasScriptOrRegion {
-			pre***REMOVED***x += c[1]
+			prefix += c[1]
 		}
-		for _, p := range e.pre***REMOVED***x {
-			// Verify that the pre***REMOVED***x minus the last element is a pre***REMOVED***x of the
+		for _, p := range e.prefix {
+			// Verify that the prefix minus the last element is a prefix of the
 			// predecessor element.
 			i := strings.LastIndex(p, "-")
 			pred := b.registry[p[i+1:]]
-			if ***REMOVED***nd(pred.pre***REMOVED***x, p[:i]) < 0 {
-				log.Fatalf("pre***REMOVED***x %q for variant %q not consistent with predecessor spec", p, v)
+			if find(pred.prefix, p[:i]) < 0 {
+				log.Fatalf("prefix %q for variant %q not consistent with predecessor spec", p, v)
 			}
 			// The sorting used below does not work in the general case. It works
 			// if we assume that variants that may be followed by others only have
-			// pre***REMOVED***xes of the same length. Verify this.
+			// prefixes of the same length. Verify this.
 			count := strings.Count(p[:i], "-")
-			for _, q := range pred.pre***REMOVED***x {
+			for _, q := range pred.prefix {
 				if c := strings.Count(q, "-"); c != count {
-					log.Fatalf("variant %q preceding %q has a pre***REMOVED***x %q of size %d; want %d", p[i+1:], v, q, c, count)
+					log.Fatalf("variant %q preceding %q has a prefix %q of size %d; want %d", p[i+1:], v, q, c, count)
 				}
 			}
-			if !strings.HasPre***REMOVED***x(p, pre***REMOVED***x) {
-				log.Fatalf("pre***REMOVED***x %q of variant %q should start with %q", p, v, pre***REMOVED***x)
+			if !strings.HasPrefix(p, prefix) {
+				log.Fatalf("prefix %q of variant %q should start with %q", p, v, prefix)
 			}
 		}
 	}
@@ -1166,7 +1166,7 @@ func (b *builder) writeVariant() {
 	less := func(v, w string) bool {
 		// Sort by the maximum number of elements.
 		maxCount := func(s string) (max int) {
-			for _, p := range b.registry[s].pre***REMOVED***x {
+			for _, p := range b.registry[s].prefix {
 				if c := strings.Count(p, "-"); c > max {
 					max = c
 				}
@@ -1203,7 +1203,7 @@ func (b *builder) writeVariant() {
 func (b *builder) writeLanguageInfo() {
 }
 
-// writeLikelyData writes tables that are used both for ***REMOVED***nding parent relations and for
+// writeLikelyData writes tables that are used both for finding parent relations and for
 // language matching.  Each entry contains additional bits to indicate the status of the
 // data to know when it cannot be used for parent relations.
 func (b *builder) writeLikelyData() {
@@ -1265,7 +1265,7 @@ func (b *builder) writeLikelyData() {
 				log.Fatalf("unexpected region change in expansion: %s -> %s", from, to)
 			}
 			if from[0] != "und" {
-				log.Fatalf("unexpected fully speci***REMOVED***ed from tag: %s -> %s", from, to)
+				log.Fatalf("unexpected fully specified from tag: %s -> %s", from, to)
 			}
 		}
 		if len(from) == 1 || from[0] != "und" {
@@ -1274,11 +1274,11 @@ func (b *builder) writeLikelyData() {
 				id = b.lang.index(from[0])
 			}
 			langToOther[id] = append(langToOther[id], fromTo{from, to})
-		} ***REMOVED*** if len(from) == 2 && len(from[1]) == 4 {
+		} else if len(from) == 2 && len(from[1]) == 4 {
 			sid := b.script.index(from[1])
 			likelyScript[sid].lang = uint16(b.langIndex(to[0]))
 			likelyScript[sid].region = uint16(b.region.index(to[2]))
-		} ***REMOVED*** {
+		} else {
 			r := b.region.index(from[len(from)-1])
 			if id, ok := b.groups[r]; ok {
 				if from[0] != "und" {
@@ -1287,7 +1287,7 @@ func (b *builder) writeLikelyData() {
 				likelyRegionGroup[id].lang = uint16(b.langIndex(to[0]))
 				likelyRegionGroup[id].script = uint8(b.script.index(to[1]))
 				likelyRegionGroup[id].region = uint16(b.region.index(to[2]))
-			} ***REMOVED*** {
+			} else {
 				regionToOther[r] = append(regionToOther[r], fromTo{from, to})
 			}
 		}
@@ -1300,7 +1300,7 @@ func (b *builder) writeLikelyData() {
 		if len(list) == 1 {
 			likelyLang[id].region = uint16(b.region.index(list[0].to[2]))
 			likelyLang[id].script = uint8(b.script.index(list[0].to[1]))
-		} ***REMOVED*** if len(list) > 1 {
+		} else if len(list) > 1 {
 			likelyLang[id].flags = isList
 			likelyLang[id].region = uint16(len(likelyLangList))
 			likelyLang[id].script = uint8(len(list))
@@ -1309,7 +1309,7 @@ func (b *builder) writeLikelyData() {
 				if len(x.from) > 1 {
 					if x.from[1] == x.to[2] {
 						flags = regionInFrom
-					} ***REMOVED*** {
+					} else {
 						flags = scriptInFrom
 					}
 				}
@@ -1334,13 +1334,13 @@ func (b *builder) writeLikelyData() {
 			if len(list[0].from) > 2 {
 				likelyRegion[id].flags = scriptInFrom
 			}
-		} ***REMOVED*** if len(list) > 1 {
+		} else if len(list) > 1 {
 			likelyRegion[id].flags = isList
 			likelyRegion[id].lang = uint16(len(likelyRegionList))
 			likelyRegion[id].script = uint8(len(list))
 			for i, x := range list {
 				if len(x.from) == 2 && i != 0 || i > 0 && len(x.from) != 3 {
-					log.Fatalf("unspeci***REMOVED***ed script must be ***REMOVED***rst in list: %v at %d", x.from, i)
+					log.Fatalf("unspecified script must be first in list: %v at %d", x.from, i)
 				}
 				x := likelyLangScript{
 					lang:   uint16(b.langIndex(x.to[0])),
@@ -1384,8 +1384,8 @@ type regionIntelligibility struct {
 
 // writeMatchData writes tables with languages and scripts for which there is
 // mutual intelligibility. The data is based on CLDR's languageMatching data.
-// Note that we use a different algorithm than the one de***REMOVED***ned by CLDR and that
-// we slightly modify the data. For example, we convert scores to con***REMOVED***dence levels.
+// Note that we use a different algorithm than the one defined by CLDR and that
+// we slightly modify the data. For example, we convert scores to confidence levels.
 // We also drop all region-related data as we use a different algorithm to
 // determine region equivalence.
 func (b *builder) writeMatchData() {
@@ -1486,7 +1486,7 @@ func (b *builder) writeMatchData() {
 				}
 				continue
 			}
-			// TODO: consider dropping oneway ***REMOVED***eld and just doubling the entry.
+			// TODO: consider dropping oneway field and just doubling the entry.
 			matchLang = append(matchLang, mutualIntelligibility{
 				want:     uint16(b.langIndex(d[0])),
 				have:     uint16(b.langIndex(s[0])),
@@ -1517,11 +1517,11 @@ func (b *builder) writeMatchData() {
 			switch {
 			case d[2] == "*":
 				ri.group = 0x80 // not contained in anything
-			case strings.HasPre***REMOVED***x(d[2], "$!"):
+			case strings.HasPrefix(d[2], "$!"):
 				ri.group = 0x80
 				d[2] = "$" + d[2][len("$!"):]
 				fallthrough
-			case strings.HasPre***REMOVED***x(d[2], "$"):
+			case strings.HasPrefix(d[2], "$"):
 				ri.group |= idToIndex[d[2]]
 			}
 			matchRegion = append(matchRegion, ri)
@@ -1591,7 +1591,7 @@ func (b *builder) writeRegionInclusionData() {
 
 	regionInclusion := make([]uint8, len(b.region.s))
 	bvs := make(map[uint64]index)
-	// Make the ***REMOVED***rst bitvector positions correspond with the groups.
+	// Make the first bitvector positions correspond with the groups.
 	for r, i := range b.groups {
 		bv := uint64(1 << i)
 		for _, g := range mm[r] {
@@ -1607,7 +1607,7 @@ func (b *builder) writeRegionInclusionData() {
 				bv |= 1 << g
 			}
 			if bv == 0 {
-				// Pick the world for unspeci***REMOVED***ed regions.
+				// Pick the world for unspecified regions.
 				bv = 1 << b.groups[b.region.index("001")]
 			}
 			if _, ok := bvs[bv]; !ok {
@@ -1621,7 +1621,7 @@ func (b *builder) writeRegionInclusionData() {
 	for k, v := range bvs {
 		regionInclusionBits[v] = uint64(k)
 	}
-	// Add bit vectors for increasingly large distances until a ***REMOVED***xed point is reached.
+	// Add bit vectors for increasingly large distances until a fixed point is reached.
 	regionInclusionNext := []uint8{}
 	for i := 0; i < len(regionInclusionBits); i++ {
 		bits := regionInclusionBits[i]
@@ -1665,11 +1665,11 @@ func (b *builder) writeParents() {
 		sub := strings.Split(p.Parent, "_")
 		parent := parentRel{lang: b.langIndex(sub[0])}
 		if len(sub) == 2 {
-			// TODO: check that all unde***REMOVED***ned scripts are indeed Latn in these
+			// TODO: check that all undefined scripts are indeed Latn in these
 			// cases.
 			parent.maxScript = uint8(b.script.index("Latn"))
 			parent.toRegion = uint16(b.region.index(sub[1]))
-		} ***REMOVED*** {
+		} else {
 			parent.script = uint8(b.script.index(sub[1]))
 			parent.maxScript = parent.script
 			parent.toRegion = uint16(b.region.index(sub[2]))

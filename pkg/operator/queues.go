@@ -119,7 +119,7 @@ func (op *Reporting) updateReportDataSource(prev, cur interface{}) {
 	// if they're not changed to ensure failed ones eventually get re-tried.
 	// however, if we know that it's a Prometheus ReportDataSource where the
 	// MetricImportStatus is all that changed, we can safely assume that this
-	// update came from the operator updating that ***REMOVED***eld and we can ignore this
+	// update came from the operator updating that field and we can ignore this
 	// update.
 	isProm := curReportDataSource.Spec.PrometheusMetricsImporter != nil
 	if isProm {
@@ -247,10 +247,10 @@ func (op *Reporting) deletePrestoTable(obj interface{}) {
 			return
 		}
 	}
-	// when ***REMOVED***nalizers aren't enabled, it's pretty likely by the time our
+	// when finalizers aren't enabled, it's pretty likely by the time our
 	// worker get the event from the queue that the resource will no longer
 	// exist in our store, so we eagerly drop the table upon seeing the delete
-	// event when ***REMOVED***nalizers are disabled
+	// event when finalizers are disabled
 	if !op.cfg.EnableFinalizers && prestoTable != nil {
 		err := op.dropPrestoTable(prestoTable)
 		if err != nil {
@@ -259,7 +259,7 @@ func (op *Reporting) deletePrestoTable(obj interface{}) {
 		}
 		_, err = op.removePrestoTableFinalizer(prestoTable)
 		if err != nil {
-			op.logger.WithFields(log.Fields{"prestoTable": prestoTable.Name, "namespace": prestoTable.Namespace}).WithError(err).Errorf("unable to remove ***REMOVED***nalizers from PrestoTable: %#v", prestoTable)
+			op.logger.WithFields(log.Fields{"prestoTable": prestoTable.Name, "namespace": prestoTable.Namespace}).WithError(err).Errorf("unable to remove finalizers from PrestoTable: %#v", prestoTable)
 			return
 		}
 	}
@@ -316,10 +316,10 @@ func (op *Reporting) deleteHiveTable(obj interface{}) {
 			return
 		}
 	}
-	// when ***REMOVED***nalizers aren't enabled, it's pretty likely by the time our
+	// when finalizers aren't enabled, it's pretty likely by the time our
 	// worker get the event from the queue that the resource will no longer
 	// exist in our store, so we eagerly drop the table upon seeing the delete
-	// event when ***REMOVED***nalizers are disabled
+	// event when finalizers are disabled
 	if !op.cfg.EnableFinalizers && hiveTable != nil {
 		err := op.dropHiveTable(hiveTable)
 		if err != nil {
@@ -328,7 +328,7 @@ func (op *Reporting) deleteHiveTable(obj interface{}) {
 		}
 		_, err = op.removeHiveTableFinalizer(hiveTable)
 		if err != nil {
-			op.logger.WithFields(log.Fields{"hiveTable": hiveTable.Name, "namespace": hiveTable.Namespace}).WithError(err).Errorf("unable to remove ***REMOVED***nalizers from HiveTable: %#v", hiveTable)
+			op.logger.WithFields(log.Fields{"hiveTable": hiveTable.Name, "namespace": hiveTable.Namespace}).WithError(err).Errorf("unable to remove finalizers from HiveTable: %#v", hiveTable)
 			return
 		}
 	}
@@ -385,10 +385,10 @@ func (op *Reporting) deleteStorageLocation(obj interface{}) {
 			return
 		}
 	}
-	// when ***REMOVED***nalizers aren't enabled, it's pretty likely by the time our
+	// when finalizers aren't enabled, it's pretty likely by the time our
 	// worker get the event from the queue that the resource will no longer
 	// exist in our store, so we eagerly drop the storageLocation upon seeing the delete
-	// event when ***REMOVED***nalizers are disabled
+	// event when finalizers are disabled
 	if !op.cfg.EnableFinalizers && storageLocation != nil {
 		err := op.deleteStorage(storageLocation)
 		if err != nil {
@@ -398,7 +398,7 @@ func (op *Reporting) deleteStorageLocation(obj interface{}) {
 
 		_, err = op.removeStorageLocationFinalizer(storageLocation)
 		if err != nil {
-			op.logger.WithFields(log.Fields{"storageLocation": storageLocation.Name, "namespace": storageLocation.Namespace}).WithError(err).Errorf("unable to remove ***REMOVED***nalizers for storageLocation: %#v", storageLocation)
+			op.logger.WithFields(log.Fields{"storageLocation": storageLocation.Name, "namespace": storageLocation.Namespace}).WithError(err).Errorf("unable to remove finalizers for storageLocation: %#v", storageLocation)
 			return
 		}
 	}
@@ -436,7 +436,7 @@ func (op *Reporting) processResource(logger log.FieldLogger, handlerFunc syncHan
 type syncHandler func(logger log.FieldLogger, key string) error
 
 func (op *Reporting) runHandler(logger log.FieldLogger, handlerFunc syncHandler, objType string, obj interface{}, queue workqueue.RateLimitingInterface, maxRequeues int) {
-	logger = logger.WithFields(newLogIdenti***REMOVED***er(op.rand))
+	logger = logger.WithFields(newLogIdentifier(op.rand))
 	if key, ok := op.getKeyFromQueueObj(logger, objType, obj, queue); ok {
 		logger.Infof("syncing %s %s", objType, key)
 		err := handlerFunc(logger, key)
@@ -525,7 +525,7 @@ func (handler *inTargetNamespaceResourceEventHandler) OnDelete(obj interface{}) 
 // newInTargetNamespaceEventHandler returns an
 // inTargetNamespaceResourceEventHandler to wrap the given handler. If
 // targetNamespaces is empty, then it returns the original eventHandler
-// unmodi***REMOVED***ed.
+// unmodified.
 func newInTargetNamespaceEventHandler(handler cache.ResourceEventHandler, targetNamespaces []string) cache.ResourceEventHandler {
 	if len(targetNamespaces) == 0 {
 		return handler

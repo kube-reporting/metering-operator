@@ -2,7 +2,7 @@
 Copyright The Kubernetes Authors.
 
 Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this ***REMOVED***le except in compliance with the License.
+you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
 
     http://www.apache.org/licenses/LICENSE-2.0
@@ -10,7 +10,7 @@ You may obtain a copy of the License at
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the speci***REMOVED***c language governing permissions and
+See the License for the specific language governing permissions and
 limitations under the License.
 */
 
@@ -20,7 +20,7 @@ limitations under the License.
 /*
 	Package v1beta1 is a generated protocol buffer package.
 
-	It is generated from these ***REMOVED***les:
+	It is generated from these files:
 		k8s.io/kubernetes/vendor/k8s.io/api/batch/v1beta1/generated.proto
 
 	It has these top-level messages:
@@ -50,7 +50,7 @@ var _ = proto.Marshal
 var _ = fmt.Errorf
 var _ = math.Inf
 
-// This is a compile-time assertion to ensure that this generated ***REMOVED***le
+// This is a compile-time assertion to ensure that this generated file
 // is compatible with the proto package it is being compiled against.
 // A compilation error at this line likely means your copy of the
 // proto package needs to be updated.
@@ -58,27 +58,27 @@ const _ = proto.GoGoProtoPackageIsVersion2 // please upgrade the proto package
 
 func (m *CronJob) Reset()                    { *m = CronJob{} }
 func (*CronJob) ProtoMessage()               {}
-func (*CronJob) Descriptor() ([]byte, []int) { return ***REMOVED***leDescriptorGenerated, []int{0} }
+func (*CronJob) Descriptor() ([]byte, []int) { return fileDescriptorGenerated, []int{0} }
 
 func (m *CronJobList) Reset()                    { *m = CronJobList{} }
 func (*CronJobList) ProtoMessage()               {}
-func (*CronJobList) Descriptor() ([]byte, []int) { return ***REMOVED***leDescriptorGenerated, []int{1} }
+func (*CronJobList) Descriptor() ([]byte, []int) { return fileDescriptorGenerated, []int{1} }
 
 func (m *CronJobSpec) Reset()                    { *m = CronJobSpec{} }
 func (*CronJobSpec) ProtoMessage()               {}
-func (*CronJobSpec) Descriptor() ([]byte, []int) { return ***REMOVED***leDescriptorGenerated, []int{2} }
+func (*CronJobSpec) Descriptor() ([]byte, []int) { return fileDescriptorGenerated, []int{2} }
 
 func (m *CronJobStatus) Reset()                    { *m = CronJobStatus{} }
 func (*CronJobStatus) ProtoMessage()               {}
-func (*CronJobStatus) Descriptor() ([]byte, []int) { return ***REMOVED***leDescriptorGenerated, []int{3} }
+func (*CronJobStatus) Descriptor() ([]byte, []int) { return fileDescriptorGenerated, []int{3} }
 
 func (m *JobTemplate) Reset()                    { *m = JobTemplate{} }
 func (*JobTemplate) ProtoMessage()               {}
-func (*JobTemplate) Descriptor() ([]byte, []int) { return ***REMOVED***leDescriptorGenerated, []int{4} }
+func (*JobTemplate) Descriptor() ([]byte, []int) { return fileDescriptorGenerated, []int{4} }
 
 func (m *JobTemplateSpec) Reset()                    { *m = JobTemplateSpec{} }
 func (*JobTemplateSpec) ProtoMessage()               {}
-func (*JobTemplateSpec) Descriptor() ([]byte, []int) { return ***REMOVED***leDescriptorGenerated, []int{5} }
+func (*JobTemplateSpec) Descriptor() ([]byte, []int) { return fileDescriptorGenerated, []int{5} }
 
 func init() {
 	proto.RegisterType((*CronJob)(nil), "k8s.io.api.batch.v1beta1.CronJob")
@@ -201,7 +201,7 @@ func (m *CronJobSpec) MarshalTo(dAtA []byte) (int, error) {
 		i++
 		if *m.Suspend {
 			dAtA[i] = 1
-		} ***REMOVED*** {
+		} else {
 			dAtA[i] = 0
 		}
 		i++
@@ -543,18 +543,18 @@ func (m *CronJob) Unmarshal(dAtA []byte) error {
 				break
 			}
 		}
-		***REMOVED***eldNum := int32(wire >> 3)
+		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
 			return fmt.Errorf("proto: CronJob: wiretype end group for non-group")
 		}
-		if ***REMOVED***eldNum <= 0 {
-			return fmt.Errorf("proto: CronJob: illegal tag %d (wire type %d)", ***REMOVED***eldNum, wire)
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: CronJob: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
-		switch ***REMOVED***eldNum {
+		switch fieldNum {
 		case 1:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for ***REMOVED***eld ObjectMeta", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field ObjectMeta", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -584,7 +584,7 @@ func (m *CronJob) Unmarshal(dAtA []byte) error {
 			iNdEx = postIndex
 		case 2:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for ***REMOVED***eld Spec", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field Spec", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -614,7 +614,7 @@ func (m *CronJob) Unmarshal(dAtA []byte) error {
 			iNdEx = postIndex
 		case 3:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for ***REMOVED***eld Status", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field Status", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -683,18 +683,18 @@ func (m *CronJobList) Unmarshal(dAtA []byte) error {
 				break
 			}
 		}
-		***REMOVED***eldNum := int32(wire >> 3)
+		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
 			return fmt.Errorf("proto: CronJobList: wiretype end group for non-group")
 		}
-		if ***REMOVED***eldNum <= 0 {
-			return fmt.Errorf("proto: CronJobList: illegal tag %d (wire type %d)", ***REMOVED***eldNum, wire)
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: CronJobList: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
-		switch ***REMOVED***eldNum {
+		switch fieldNum {
 		case 1:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for ***REMOVED***eld ListMeta", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field ListMeta", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -724,7 +724,7 @@ func (m *CronJobList) Unmarshal(dAtA []byte) error {
 			iNdEx = postIndex
 		case 2:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for ***REMOVED***eld Items", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field Items", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -794,18 +794,18 @@ func (m *CronJobSpec) Unmarshal(dAtA []byte) error {
 				break
 			}
 		}
-		***REMOVED***eldNum := int32(wire >> 3)
+		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
 			return fmt.Errorf("proto: CronJobSpec: wiretype end group for non-group")
 		}
-		if ***REMOVED***eldNum <= 0 {
-			return fmt.Errorf("proto: CronJobSpec: illegal tag %d (wire type %d)", ***REMOVED***eldNum, wire)
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: CronJobSpec: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
-		switch ***REMOVED***eldNum {
+		switch fieldNum {
 		case 1:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for ***REMOVED***eld Schedule", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field Schedule", wireType)
 			}
 			var stringLen uint64
 			for shift := uint(0); ; shift += 7 {
@@ -834,7 +834,7 @@ func (m *CronJobSpec) Unmarshal(dAtA []byte) error {
 			iNdEx = postIndex
 		case 2:
 			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for ***REMOVED***eld StartingDeadlineSeconds", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field StartingDeadlineSeconds", wireType)
 			}
 			var v int64
 			for shift := uint(0); ; shift += 7 {
@@ -854,7 +854,7 @@ func (m *CronJobSpec) Unmarshal(dAtA []byte) error {
 			m.StartingDeadlineSeconds = &v
 		case 3:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for ***REMOVED***eld ConcurrencyPolicy", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field ConcurrencyPolicy", wireType)
 			}
 			var stringLen uint64
 			for shift := uint(0); ; shift += 7 {
@@ -883,7 +883,7 @@ func (m *CronJobSpec) Unmarshal(dAtA []byte) error {
 			iNdEx = postIndex
 		case 4:
 			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for ***REMOVED***eld Suspend", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field Suspend", wireType)
 			}
 			var v int
 			for shift := uint(0); ; shift += 7 {
@@ -904,7 +904,7 @@ func (m *CronJobSpec) Unmarshal(dAtA []byte) error {
 			m.Suspend = &b
 		case 5:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for ***REMOVED***eld JobTemplate", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field JobTemplate", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -934,7 +934,7 @@ func (m *CronJobSpec) Unmarshal(dAtA []byte) error {
 			iNdEx = postIndex
 		case 6:
 			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for ***REMOVED***eld SuccessfulJobsHistoryLimit", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field SuccessfulJobsHistoryLimit", wireType)
 			}
 			var v int32
 			for shift := uint(0); ; shift += 7 {
@@ -954,7 +954,7 @@ func (m *CronJobSpec) Unmarshal(dAtA []byte) error {
 			m.SuccessfulJobsHistoryLimit = &v
 		case 7:
 			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for ***REMOVED***eld FailedJobsHistoryLimit", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field FailedJobsHistoryLimit", wireType)
 			}
 			var v int32
 			for shift := uint(0); ; shift += 7 {
@@ -1013,18 +1013,18 @@ func (m *CronJobStatus) Unmarshal(dAtA []byte) error {
 				break
 			}
 		}
-		***REMOVED***eldNum := int32(wire >> 3)
+		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
 			return fmt.Errorf("proto: CronJobStatus: wiretype end group for non-group")
 		}
-		if ***REMOVED***eldNum <= 0 {
-			return fmt.Errorf("proto: CronJobStatus: illegal tag %d (wire type %d)", ***REMOVED***eldNum, wire)
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: CronJobStatus: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
-		switch ***REMOVED***eldNum {
+		switch fieldNum {
 		case 1:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for ***REMOVED***eld Active", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field Active", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -1055,7 +1055,7 @@ func (m *CronJobStatus) Unmarshal(dAtA []byte) error {
 			iNdEx = postIndex
 		case 4:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for ***REMOVED***eld LastScheduleTime", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field LastScheduleTime", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -1127,18 +1127,18 @@ func (m *JobTemplate) Unmarshal(dAtA []byte) error {
 				break
 			}
 		}
-		***REMOVED***eldNum := int32(wire >> 3)
+		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
 			return fmt.Errorf("proto: JobTemplate: wiretype end group for non-group")
 		}
-		if ***REMOVED***eldNum <= 0 {
-			return fmt.Errorf("proto: JobTemplate: illegal tag %d (wire type %d)", ***REMOVED***eldNum, wire)
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: JobTemplate: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
-		switch ***REMOVED***eldNum {
+		switch fieldNum {
 		case 1:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for ***REMOVED***eld ObjectMeta", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field ObjectMeta", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -1168,7 +1168,7 @@ func (m *JobTemplate) Unmarshal(dAtA []byte) error {
 			iNdEx = postIndex
 		case 2:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for ***REMOVED***eld Template", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field Template", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -1237,18 +1237,18 @@ func (m *JobTemplateSpec) Unmarshal(dAtA []byte) error {
 				break
 			}
 		}
-		***REMOVED***eldNum := int32(wire >> 3)
+		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
 			return fmt.Errorf("proto: JobTemplateSpec: wiretype end group for non-group")
 		}
-		if ***REMOVED***eldNum <= 0 {
-			return fmt.Errorf("proto: JobTemplateSpec: illegal tag %d (wire type %d)", ***REMOVED***eldNum, wire)
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: JobTemplateSpec: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
-		switch ***REMOVED***eldNum {
+		switch fieldNum {
 		case 1:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for ***REMOVED***eld ObjectMeta", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field ObjectMeta", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -1278,7 +1278,7 @@ func (m *JobTemplateSpec) Unmarshal(dAtA []byte) error {
 			iNdEx = postIndex
 		case 2:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for ***REMOVED***eld Spec", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field Spec", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -1433,10 +1433,10 @@ var (
 )
 
 func init() {
-	proto.RegisterFile("k8s.io/kubernetes/vendor/k8s.io/api/batch/v1beta1/generated.proto", ***REMOVED***leDescriptorGenerated)
+	proto.RegisterFile("k8s.io/kubernetes/vendor/k8s.io/api/batch/v1beta1/generated.proto", fileDescriptorGenerated)
 }
 
-var ***REMOVED***leDescriptorGenerated = []byte{
+var fileDescriptorGenerated = []byte{
 	// 771 bytes of a gzipped FileDescriptorProto
 	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xbc, 0x94, 0xcf, 0x6f, 0xe3, 0x44,
 	0x14, 0xc7, 0xe3, 0x34, 0xbf, 0x76, 0xc2, 0x42, 0xd7, 0xa0, 0x5d, 0x2b, 0x20, 0x27, 0x64, 0xb5,

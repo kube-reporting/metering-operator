@@ -2,7 +2,7 @@
 Copyright 2015 The Kubernetes Authors.
 
 Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this ***REMOVED***le except in compliance with the License.
+you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
 
     http://www.apache.org/licenses/LICENSE-2.0
@@ -10,7 +10,7 @@ You may obtain a copy of the License at
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the speci***REMOVED***c language governing permissions and
+See the License for the specific language governing permissions and
 limitations under the License.
 */
 
@@ -42,7 +42,7 @@ const (
 	defaultAggregateIntervalInSeconds = 600
 
 	// by default, allow a source to send 25 events about an object
-	// but control the re***REMOVED***ll rate to 1 new event every 5 minutes
+	// but control the refill rate to 1 new event every 5 minutes
 	// this helps control the long-tail of events for things that are always
 	// unhealthy
 	defaultSpamBurst = 25
@@ -95,14 +95,14 @@ type EventSourceObjectSpamFilter struct {
 	// burst is the amount of events we allow per source + object
 	burst int
 
-	// qps is the re***REMOVED***ll rate of the token bucket in queries per second
+	// qps is the refill rate of the token bucket in queries per second
 	qps float32
 
 	// clock is used to allow for testing over a time interval
 	clock clock.Clock
 }
 
-// NewEventSourceObjectSpamFilter allows burst events from a source about an object with the speci***REMOVED***ed qps re***REMOVED***ll.
+// NewEventSourceObjectSpamFilter allows burst events from a source about an object with the specified qps refill.
 func NewEventSourceObjectSpamFilter(lruCacheSize, burst int, qps float32, clock clock.Clock) *EventSourceObjectSpamFilter {
 	return &EventSourceObjectSpamFilter{
 		cache: lru.New(lruCacheSize),
@@ -112,7 +112,7 @@ func NewEventSourceObjectSpamFilter(lruCacheSize, burst int, qps float32, clock 
 	}
 }
 
-// spamRecord holds data used to perform spam ***REMOVED***ltering decisions.
+// spamRecord holds data used to perform spam filtering decisions.
 type spamRecord struct {
 	// rateLimiter controls the rate of events about this object
 	rateLimiter flowcontrol.RateLimiter
@@ -139,17 +139,17 @@ func (f *EventSourceObjectSpamFilter) Filter(event *v1.Event) bool {
 	}
 
 	// ensure we have available rate
-	***REMOVED***lter := !record.rateLimiter.TryAccept()
+	filter := !record.rateLimiter.TryAccept()
 
 	// update the cache
 	f.cache.Add(eventKey, record)
 
-	return ***REMOVED***lter
+	return filter
 }
 
 // EventAggregatorKeyFunc is responsible for grouping events for aggregation
 // It returns a tuple of the following:
-// aggregateKey - key the identi***REMOVED***es the aggregate group to bucket this event
+// aggregateKey - key the identifies the aggregate group to bucket this event
 // localKey - key that makes this event in the local group
 type EventAggregatorKeyFunc func(event *v1.Event) (aggregateKey string, localKey string)
 
@@ -172,12 +172,12 @@ func EventAggregatorByReasonFunc(event *v1.Event) (string, string) {
 // EventAggregatorMessageFunc is responsible for producing an aggregation message
 type EventAggregatorMessageFunc func(event *v1.Event) string
 
-// EventAggregratorByReasonMessageFunc returns an aggregate message by pre***REMOVED***xing the incoming message
+// EventAggregratorByReasonMessageFunc returns an aggregate message by prefixing the incoming message
 func EventAggregatorByReasonMessageFunc(event *v1.Event) string {
 	return "(combined from similar events): " + event.Message
 }
 
-// EventAggregator identi***REMOVED***es similar events and aggregates them into a single event
+// EventAggregator identifies similar events and aggregates them into a single event
 type EventAggregator struct {
 	sync.RWMutex
 
@@ -190,7 +190,7 @@ type EventAggregator struct {
 	// The function that generates a message for an aggregate event
 	messageFunc EventAggregatorMessageFunc
 
-	// The maximum number of events in the speci***REMOVED***ed interval before aggregation occurs
+	// The maximum number of events in the specified interval before aggregation occurs
 	maxEvents uint
 
 	// The amount of time in seconds that must transpire since the last occurrence of a similar event before it's considered new
@@ -223,9 +223,9 @@ type aggregateRecord struct {
 }
 
 // EventAggregate checks if a similar event has been seen according to the
-// aggregation con***REMOVED***guration (max events, max interval, etc) and returns:
+// aggregation configuration (max events, max interval, etc) and returns:
 //
-// - The (potentially modi***REMOVED***ed) event that should be created
+// - The (potentially modified) event that should be created
 // - The cache key for the event, for correlation purposes. This will be set to
 //   the full key for normal events, and to the result of
 //   EventAggregatorMessageFunc for aggregate events.
@@ -246,7 +246,7 @@ func (e *EventAggregator) EventAggregate(newEvent *v1.Event) (*v1.Event, string)
 	}
 
 	// Is the previous record too old? If so, make a fresh one. Note: if we didn't
-	// ***REMOVED***nd a similar record, its lastTimestamp will be the zero value, so we
+	// find a similar record, its lastTimestamp will be the zero value, so we
 	// create a new one in that case.
 	maxInterval := time.Duration(e.maxIntervalInSeconds) * time.Second
 	interval := now.Time.Sub(record.lastTimestamp.Time)
@@ -288,13 +288,13 @@ func (e *EventAggregator) EventAggregate(newEvent *v1.Event) (*v1.Event, string)
 
 // eventLog records data about when an event was observed
 type eventLog struct {
-	// The number of times the event has occurred since ***REMOVED***rst occurrence.
+	// The number of times the event has occurred since first occurrence.
 	count uint
 
-	// The time at which the event was ***REMOVED***rst recorded.
-	***REMOVED***rstTimestamp metav1.Time
+	// The time at which the event was first recorded.
+	firstTimestamp metav1.Time
 
-	// The unique name of the ***REMOVED***rst occurrence of this event
+	// The unique name of the first occurrence of this event
 	name string
 
 	// Resource version returned from previous interaction with server
@@ -333,7 +333,7 @@ func (e *eventLogger) eventObserve(newEvent *v1.Event, key string) (*v1.Event, [
 		// update the event based on the last observation so patch will work as desired
 		event.Name = lastObservation.name
 		event.ResourceVersion = lastObservation.resourceVersion
-		event.FirstTimestamp = lastObservation.***REMOVED***rstTimestamp
+		event.FirstTimestamp = lastObservation.firstTimestamp
 		event.Count = int32(lastObservation.count) + 1
 
 		eventCopy2 := *event
@@ -351,7 +351,7 @@ func (e *eventLogger) eventObserve(newEvent *v1.Event, key string) (*v1.Event, [
 		key,
 		eventLog{
 			count:           uint(event.Count),
-			***REMOVED***rstTimestamp:  event.FirstTimestamp,
+			firstTimestamp:  event.FirstTimestamp,
 			name:            event.Name,
 			resourceVersion: event.ResourceVersion,
 		},
@@ -369,7 +369,7 @@ func (e *eventLogger) updateState(event *v1.Event) {
 		key,
 		eventLog{
 			count:           uint(event.Count),
-			***REMOVED***rstTimestamp:  event.FirstTimestamp,
+			firstTimestamp:  event.FirstTimestamp,
 			name:            event.Name,
 			resourceVersion: event.ResourceVersion,
 		},
@@ -388,13 +388,13 @@ func (e *eventLogger) lastEventObservationFromCache(key string) eventLog {
 	return eventLog{}
 }
 
-// EventCorrelator processes all incoming events and performs analysis to avoid overwhelming the system.  It can ***REMOVED***lter all
-// incoming events to see if the event should be ***REMOVED***ltered from further processing.  It can aggregate similar events that occur
-// frequently to protect the system from spamming events that are dif***REMOVED***cult for users to distinguish.  It performs de-duplication
+// EventCorrelator processes all incoming events and performs analysis to avoid overwhelming the system.  It can filter all
+// incoming events to see if the event should be filtered from further processing.  It can aggregate similar events that occur
+// frequently to protect the system from spamming events that are difficult for users to distinguish.  It performs de-duplication
 // to ensure events that are observed multiple times are compacted into a single event with increasing counts.
 type EventCorrelator struct {
-	// the function to ***REMOVED***lter the event
-	***REMOVED***lterFunc EventFilterFunc
+	// the function to filter the event
+	filterFunc EventFilterFunc
 	// the object that performs event aggregation
 	aggregator *EventAggregator
 	// the object that observes events as they come through
@@ -411,26 +411,26 @@ type EventCorrelateResult struct {
 	Skip bool
 }
 
-// NewEventCorrelator returns an EventCorrelator con***REMOVED***gured with default values.
+// NewEventCorrelator returns an EventCorrelator configured with default values.
 //
-// The EventCorrelator is responsible for event ***REMOVED***ltering, aggregating, and counting
+// The EventCorrelator is responsible for event filtering, aggregating, and counting
 // prior to interacting with the API server to record the event.
 //
 // The default behavior is as follows:
 //   * Aggregation is performed if a similar event is recorded 10 times in a
 //     in a 10 minute rolling interval.  A similar event is an event that varies only by
-//     the Event.Message ***REMOVED***eld.  Rather than recording the precise event, aggregation
+//     the Event.Message field.  Rather than recording the precise event, aggregation
 //     will create a new event whose message reports that it has combined events with
 //     the same reason.
 //   * Events are incrementally counted if the exact same event is encountered multiple
 //     times.
-//   * A source may burst 25 events about an object, but has a re***REMOVED***ll rate budget
+//   * A source may burst 25 events about an object, but has a refill rate budget
 //     per object of 1 event every 5 minutes to control long-tail of spam.
 func NewEventCorrelator(clock clock.Clock) *EventCorrelator {
 	cacheSize := maxLruCacheEntries
 	spamFilter := NewEventSourceObjectSpamFilter(cacheSize, defaultSpamBurst, defaultSpamQPS, clock)
 	return &EventCorrelator{
-		***REMOVED***lterFunc: spamFilter.Filter,
+		filterFunc: spamFilter.Filter,
 		aggregator: NewEventAggregator(
 			cacheSize,
 			EventAggregatorByReasonFunc,
@@ -443,14 +443,14 @@ func NewEventCorrelator(clock clock.Clock) *EventCorrelator {
 	}
 }
 
-// EventCorrelate ***REMOVED***lters, aggregates, counts, and de-duplicates all incoming events
+// EventCorrelate filters, aggregates, counts, and de-duplicates all incoming events
 func (c *EventCorrelator) EventCorrelate(newEvent *v1.Event) (*EventCorrelateResult, error) {
 	if newEvent == nil {
 		return nil, fmt.Errorf("event is nil")
 	}
 	aggregateEvent, ckey := c.aggregator.EventAggregate(newEvent)
 	observedEvent, patch, err := c.logger.eventObserve(aggregateEvent, ckey)
-	if c.***REMOVED***lterFunc(observedEvent) {
+	if c.filterFunc(observedEvent) {
 		return &EventCorrelateResult{Skip: true}, nil
 	}
 	return &EventCorrelateResult{Event: observedEvent, Patch: patch}, err

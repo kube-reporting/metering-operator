@@ -1,5 +1,5 @@
 // Package defaults is a collection of helpers to retrieve the SDK's default
-// con***REMOVED***guration and handlers.
+// configuration and handlers.
 //
 // Generally this package shouldn't be used directly, but session.Session
 // instead. This package is useful when you need to reset the defaults
@@ -29,31 +29,31 @@ import (
 
 // A Defaults provides a collection of default values for SDK clients.
 type Defaults struct {
-	Con***REMOVED***g   *aws.Con***REMOVED***g
+	Config   *aws.Config
 	Handlers request.Handlers
 }
 
-// Get returns the SDK's default values with Con***REMOVED***g and handlers pre-con***REMOVED***gured.
+// Get returns the SDK's default values with Config and handlers pre-configured.
 func Get() Defaults {
-	cfg := Con***REMOVED***g()
+	cfg := Config()
 	handlers := Handlers()
 	cfg.Credentials = CredChain(cfg, handlers)
 
 	return Defaults{
-		Con***REMOVED***g:   cfg,
+		Config:   cfg,
 		Handlers: handlers,
 	}
 }
 
-// Con***REMOVED***g returns the default con***REMOVED***guration without credentials.
-// To retrieve a con***REMOVED***g with credentials also included use
-// `defaults.Get().Con***REMOVED***g` instead.
+// Config returns the default configuration without credentials.
+// To retrieve a config with credentials also included use
+// `defaults.Get().Config` instead.
 //
 // Generally you shouldn't need to use this method directly, but
-// is available if you need to reset the con***REMOVED***guration of an
+// is available if you need to reset the configuration of an
 // existing service client or session.
-func Con***REMOVED***g() *aws.Con***REMOVED***g {
-	return aws.NewCon***REMOVED***g().
+func Config() *aws.Config {
+	return aws.NewConfig().
 		WithCredentials(credentials.AnonymousCredentials).
 		WithRegion(os.Getenv("AWS_REGION")).
 		WithHTTPClient(http.DefaultClient).
@@ -89,8 +89,8 @@ func Handlers() request.Handlers {
 //
 // Generally you shouldn't need to use this method directly, but
 // is available if you need to reset the credentials of an
-// existing service client or session's Con***REMOVED***g.
-func CredChain(cfg *aws.Con***REMOVED***g, handlers request.Handlers) *credentials.Credentials {
+// existing service client or session's Config.
+func CredChain(cfg *aws.Config, handlers request.Handlers) *credentials.Credentials {
 	return credentials.NewCredentials(&credentials.ChainProvider{
 		VerboseErrors: aws.BoolValue(cfg.CredentialsChainVerboseErrors),
 		Providers:     CredProviders(cfg, handlers),
@@ -104,10 +104,10 @@ func CredChain(cfg *aws.Con***REMOVED***g, handlers request.Handlers) *credentia
 // different  environment variables for legacy reasons) but still fall back
 // on the default chain of providers. This allows that default chaint to be
 // automatically updated
-func CredProviders(cfg *aws.Con***REMOVED***g, handlers request.Handlers) []credentials.Provider {
+func CredProviders(cfg *aws.Config, handlers request.Handlers) []credentials.Provider {
 	return []credentials.Provider{
 		&credentials.EnvProvider{},
-		&credentials.SharedCredentialsProvider{Filename: "", Pro***REMOVED***le: ""},
+		&credentials.SharedCredentialsProvider{Filename: "", Profile: ""},
 		RemoteCredProvider(*cfg, handlers),
 	}
 }
@@ -119,7 +119,7 @@ const (
 
 // RemoteCredProvider returns a credentials provider for the default remote
 // endpoints such as EC2 or ECS Roles.
-func RemoteCredProvider(cfg aws.Con***REMOVED***g, handlers request.Handlers) credentials.Provider {
+func RemoteCredProvider(cfg aws.Config, handlers request.Handlers) credentials.Provider {
 	if u := os.Getenv(httpProviderEnvVar); len(u) > 0 {
 		return localHTTPCredProvider(cfg, handlers, u)
 	}
@@ -154,19 +154,19 @@ func isLoopbackHost(host string) (bool, error) {
 	return true, nil
 }
 
-func localHTTPCredProvider(cfg aws.Con***REMOVED***g, handlers request.Handlers, u string) credentials.Provider {
+func localHTTPCredProvider(cfg aws.Config, handlers request.Handlers, u string) credentials.Provider {
 	var errMsg string
 
 	parsed, err := url.Parse(u)
 	if err != nil {
 		errMsg = fmt.Sprintf("invalid URL, %v", err)
-	} ***REMOVED*** {
+	} else {
 		host := aws.URLHostname(parsed)
 		if len(host) == 0 {
 			errMsg = "unable to parse host from local HTTP cred provider URL"
-		} ***REMOVED*** if isLoopback, loopbackErr := isLoopbackHost(host); loopbackErr != nil {
+		} else if isLoopback, loopbackErr := isLoopbackHost(host); loopbackErr != nil {
 			errMsg = fmt.Sprintf("failed to resolve host %q, %v", host, loopbackErr)
-		} ***REMOVED*** if !isLoopback {
+		} else if !isLoopback {
 			errMsg = fmt.Sprintf("invalid endpoint host, %q, only loopback hosts are allowed.", host)
 		}
 	}
@@ -184,7 +184,7 @@ func localHTTPCredProvider(cfg aws.Con***REMOVED***g, handlers request.Handlers,
 	return httpCredProvider(cfg, handlers, u)
 }
 
-func httpCredProvider(cfg aws.Con***REMOVED***g, handlers request.Handlers, u string) credentials.Provider {
+func httpCredProvider(cfg aws.Config, handlers request.Handlers, u string) credentials.Provider {
 	return endpointcreds.NewProviderClient(cfg, handlers, u,
 		func(p *endpointcreds.Provider) {
 			p.ExpiryWindow = 5 * time.Minute
@@ -193,7 +193,7 @@ func httpCredProvider(cfg aws.Con***REMOVED***g, handlers request.Handlers, u st
 	)
 }
 
-func ec2RoleProvider(cfg aws.Con***REMOVED***g, handlers request.Handlers) credentials.Provider {
+func ec2RoleProvider(cfg aws.Config, handlers request.Handlers) credentials.Provider {
 	resolver := cfg.EndpointResolver
 	if resolver == nil {
 		resolver = endpoints.DefaultResolver()

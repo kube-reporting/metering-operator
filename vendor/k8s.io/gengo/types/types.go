@@ -2,7 +2,7 @@
 Copyright 2015 The Kubernetes Authors.
 
 Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this ***REMOVED***le except in compliance with the License.
+you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
 
     http://www.apache.org/licenses/LICENSE-2.0
@@ -10,7 +10,7 @@ You may obtain a copy of the License at
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the speci***REMOVED***c language governing permissions and
+See the License for the specific language governing permissions and
 limitations under the License.
 */
 
@@ -27,13 +27,13 @@ func Ref(packageName, typeName string) *Type {
 	}}
 }
 
-// A type name may have a package quali***REMOVED***er.
+// A type name may have a package qualifier.
 type Name struct {
-	// Empty if embedded or builtin. This is the package path unless Path is speci***REMOVED***ed.
+	// Empty if embedded or builtin. This is the package path unless Path is specified.
 	Package string
 	// The type name.
 	Name string
-	// An optional location of the type de***REMOVED***nition for languages that can have disjoint
+	// An optional location of the type definition for languages that can have disjoint
 	// packages and paths.
 	Path string
 }
@@ -46,8 +46,8 @@ func (n Name) String() string {
 	return n.Package + "." + n.Name
 }
 
-// ParseFullyQuali***REMOVED***edName parses a name like k8s.io/kubernetes/pkg/api.Pod into a Name.
-func ParseFullyQuali***REMOVED***edName(fqn string) Name {
+// ParseFullyQualifiedName parses a name like k8s.io/kubernetes/pkg/api.Pod into a Name.
+func ParseFullyQualifiedName(fqn string) Name {
 	cs := strings.Split(fqn, ".")
 	pkg := ""
 	if len(cs) > 1 {
@@ -85,7 +85,7 @@ const (
 
 	// The remaining types are included for completeness, but are not well
 	// supported.
-	Array Kind = "Array" // Array is just like slice, but has a ***REMOVED***xed length.
+	Array Kind = "Array" // Array is just like slice, but has a fixed length.
 	Chan  Kind = "Chan"
 	Func  Kind = "Func"
 
@@ -147,8 +147,8 @@ func (p *Package) Has(name string) bool {
 }
 
 // Type gets the given Type in this Package.  If the Type is not already
-// de***REMOVED***ned, this will add it and return the new Type value.  The caller is
-// expected to ***REMOVED***nish initialization.
+// defined, this will add it and return the new Type value.  The caller is
+// expected to finish initialization.
 func (p *Package) Type(typeName string) *Type {
 	if t, ok := p.Types[typeName]; ok {
 		return t
@@ -166,8 +166,8 @@ func (p *Package) Type(typeName string) *Type {
 }
 
 // Function gets the given function Type in this Package. If the function is
-// not already de***REMOVED***ned, this will add it.  If a function is added, it's the
-// caller's responsibility to ***REMOVED***nish construction of the function by setting
+// not already defined, this will add it.  If a function is added, it's the
+// caller's responsibility to finish construction of the function by setting
 // Underlying to the correct type.
 func (p *Package) Function(funcName string) *Type {
 	if t, ok := p.Functions[funcName]; ok {
@@ -180,8 +180,8 @@ func (p *Package) Function(funcName string) *Type {
 }
 
 // Variable gets the given variable Type in this Package. If the variable is
-// not already de***REMOVED***ned, this will add it. If a variable is added, it's the caller's
-// responsibility to ***REMOVED***nish construction of the variable by setting Underlying
+// not already defined, this will add it. If a variable is added, it's the caller's
+// responsibility to finish construction of the variable by setting Underlying
 // to the correct type.
 func (p *Package) Variable(varName string) *Type {
 	if t, ok := p.Variables[varName]; ok {
@@ -205,7 +205,7 @@ func (p *Package) HasImport(packageName string) bool {
 // access.
 type Universe map[string]*Package
 
-// Type returns the canonical type for the given fully-quali***REMOVED***ed name. Builtin
+// Type returns the canonical type for the given fully-qualified name. Builtin
 // types will always be found, even if they haven't been explicitly added to
 // the map. If a non-existing type is requested, this will create (a marker for)
 // it.
@@ -213,17 +213,17 @@ func (u Universe) Type(n Name) *Type {
 	return u.Package(n.Package).Type(n.Name)
 }
 
-// Function returns the canonical function for the given fully-quali***REMOVED***ed name.
+// Function returns the canonical function for the given fully-qualified name.
 // If a non-existing function is requested, this will create (a marker for) it.
-// If a marker is created, it's the caller's responsibility to ***REMOVED***nish
+// If a marker is created, it's the caller's responsibility to finish
 // construction of the function by setting Underlying to the correct type.
 func (u Universe) Function(n Name) *Type {
 	return u.Package(n.Package).Function(n.Name)
 }
 
-// Variable returns the canonical variable for the given fully-quali***REMOVED***ed name.
+// Variable returns the canonical variable for the given fully-qualified name.
 // If a non-existing variable is requested, this will create (a marker for) it.
-// If a marker is created, it's the caller's responsibility to ***REMOVED***nish
+// If a marker is created, it's the caller's responsibility to finish
 // construction of the variable by setting Underlying to the correct type.
 func (u Universe) Variable(n Name) *Type {
 	return u.Package(n.Package).Variable(n.Name)
@@ -240,7 +240,7 @@ func (u Universe) AddImports(packagePath string, importPaths ...string) {
 
 // Package returns the Package for the given path.
 // If a non-existing package is requested, this will create (a marker for) it.
-// If a marker is created, it's the caller's responsibility to ***REMOVED***nish
+// If a marker is created, it's the caller's responsibility to finish
 // construction of the package.
 func (u Universe) Package(packagePath string) *Package {
 	if p, ok := u[packagePath]; ok {
@@ -261,7 +261,7 @@ func (u Universe) Package(packagePath string) *Package {
 type Type struct {
 	// There are two general categories of types, those explicitly named
 	// and those anonymous. Named ones will have a non-empty package in the
-	// name ***REMOVED***eld.
+	// name field.
 	//
 	// An exception: If Kind == DeclarationOf, then this name is the name of a
 	// top-level function, variable, or const, and the type can be found in Underlying.
@@ -272,7 +272,7 @@ type Type struct {
 	// The general kind of this type.
 	Kind Kind
 
-	// If there are comment lines immediately before the type de***REMOVED***nition,
+	// If there are comment lines immediately before the type definition,
 	// they will be recorded here.
 	CommentLines []string
 
@@ -282,14 +282,14 @@ type Type struct {
 	// SecondClosestCommentLines
 	// a blank line
 	// CommentLines
-	// type de***REMOVED***nition
+	// type definition
 	// ---
 	//
 	// or
 	// ---
 	// SecondClosestCommentLines
 	// a blank line
-	// type de***REMOVED***nition
+	// type definition
 	// ---
 	SecondClosestCommentLines []string
 
@@ -368,7 +368,7 @@ type Member struct {
 	Embedded bool
 
 	// If there are comment lines immediately before the member in the type
-	// de***REMOVED***nition, they will be recorded here.
+	// definition, they will be recorded here.
 	CommentLines []string
 
 	// If there are tags along with this member, they will be saved here.

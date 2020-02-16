@@ -5,7 +5,7 @@
 /*
 Package openapiextension_v1 is a generated protocol buffer package.
 
-It is generated from these ***REMOVED***les:
+It is generated from these files:
 	extension.proto
 
 It has these top-level messages:
@@ -26,7 +26,7 @@ var _ = proto.Marshal
 var _ = fmt.Errorf
 var _ = math.Inf
 
-// This is a compile-time assertion to ensure that this generated ***REMOVED***le
+// This is a compile-time assertion to ensure that this generated file
 // is compatible with the proto package it is being compiled against.
 // A compilation error at this line likely means your copy of the
 // proto package needs to be updated.
@@ -37,15 +37,15 @@ type Version struct {
 	Major int32 `protobuf:"varint,1,opt,name=major" json:"major,omitempty"`
 	Minor int32 `protobuf:"varint,2,opt,name=minor" json:"minor,omitempty"`
 	Patch int32 `protobuf:"varint,3,opt,name=patch" json:"patch,omitempty"`
-	// A suf***REMOVED***x for alpha, beta or rc release, e.g., "alpha-1", "rc2". It should
+	// A suffix for alpha, beta or rc release, e.g., "alpha-1", "rc2". It should
 	// be empty for mainline stable releases.
-	Suf***REMOVED***x string `protobuf:"bytes,4,opt,name=suf***REMOVED***x" json:"suf***REMOVED***x,omitempty"`
+	Suffix string `protobuf:"bytes,4,opt,name=suffix" json:"suffix,omitempty"`
 }
 
 func (m *Version) Reset()                    { *m = Version{} }
 func (m *Version) String() string            { return proto.CompactTextString(m) }
 func (*Version) ProtoMessage()               {}
-func (*Version) Descriptor() ([]byte, []int) { return ***REMOVED***leDescriptor0, []int{0} }
+func (*Version) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{0} }
 
 func (m *Version) GetMajor() int32 {
 	if m != nil {
@@ -68,9 +68,9 @@ func (m *Version) GetPatch() int32 {
 	return 0
 }
 
-func (m *Version) GetSuf***REMOVED***x() string {
+func (m *Version) GetSuffix() string {
 	if m != nil {
-		return m.Suf***REMOVED***x
+		return m.Suffix
 	}
 	return ""
 }
@@ -78,7 +78,7 @@ func (m *Version) GetSuf***REMOVED***x() string {
 // An encoded Request is written to the ExtensionHandler's stdin.
 type ExtensionHandlerRequest struct {
 	// The OpenAPI descriptions that were explicitly listed on the command line.
-	// The speci***REMOVED***cations will appear in the order they are speci***REMOVED***ed to openapic.
+	// The specifications will appear in the order they are specified to openapic.
 	Wrapper *Wrapper `protobuf:"bytes,1,opt,name=wrapper" json:"wrapper,omitempty"`
 	// The version number of openapi compiler.
 	CompilerVersion *Version `protobuf:"bytes,3,opt,name=compiler_version,json=compilerVersion" json:"compiler_version,omitempty"`
@@ -87,7 +87,7 @@ type ExtensionHandlerRequest struct {
 func (m *ExtensionHandlerRequest) Reset()                    { *m = ExtensionHandlerRequest{} }
 func (m *ExtensionHandlerRequest) String() string            { return proto.CompactTextString(m) }
 func (*ExtensionHandlerRequest) ProtoMessage()               {}
-func (*ExtensionHandlerRequest) Descriptor() ([]byte, []int) { return ***REMOVED***leDescriptor0, []int{1} }
+func (*ExtensionHandlerRequest) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{1} }
 
 func (m *ExtensionHandlerRequest) GetWrapper() *Wrapper {
 	if m != nil {
@@ -124,7 +124,7 @@ type ExtensionHandlerResponse struct {
 func (m *ExtensionHandlerResponse) Reset()                    { *m = ExtensionHandlerResponse{} }
 func (m *ExtensionHandlerResponse) String() string            { return proto.CompactTextString(m) }
 func (*ExtensionHandlerResponse) ProtoMessage()               {}
-func (*ExtensionHandlerResponse) Descriptor() ([]byte, []int) { return ***REMOVED***leDescriptor0, []int{2} }
+func (*ExtensionHandlerResponse) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{2} }
 
 func (m *ExtensionHandlerResponse) GetHandled() bool {
 	if m != nil {
@@ -148,7 +148,7 @@ func (m *ExtensionHandlerResponse) GetValue() *google_protobuf.Any {
 }
 
 type Wrapper struct {
-	// version of the OpenAPI speci***REMOVED***cation in which this extension was written.
+	// version of the OpenAPI specification in which this extension was written.
 	Version string `protobuf:"bytes,1,opt,name=version" json:"version,omitempty"`
 	// Name of the extension
 	ExtensionName string `protobuf:"bytes,2,opt,name=extension_name,json=extensionName" json:"extension_name,omitempty"`
@@ -159,7 +159,7 @@ type Wrapper struct {
 func (m *Wrapper) Reset()                    { *m = Wrapper{} }
 func (m *Wrapper) String() string            { return proto.CompactTextString(m) }
 func (*Wrapper) ProtoMessage()               {}
-func (*Wrapper) Descriptor() ([]byte, []int) { return ***REMOVED***leDescriptor0, []int{3} }
+func (*Wrapper) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{3} }
 
 func (m *Wrapper) GetVersion() string {
 	if m != nil {
@@ -189,9 +189,9 @@ func init() {
 	proto.RegisterType((*Wrapper)(nil), "openapiextension.v1.Wrapper")
 }
 
-func init() { proto.RegisterFile("extension.proto", ***REMOVED***leDescriptor0) }
+func init() { proto.RegisterFile("extension.proto", fileDescriptor0) }
 
-var ***REMOVED***leDescriptor0 = []byte{
+var fileDescriptor0 = []byte{
 	// 355 bytes of a gzipped FileDescriptorProto
 	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x74, 0x91, 0x4d, 0x4b, 0xf3, 0x40,
 	0x1c, 0xc4, 0x49, 0xdf, 0xf2, 0x64, 0x1f, 0xb4, 0xb2, 0x16, 0x8d, 0xe2, 0xa1, 0x04, 0x84, 0x22,

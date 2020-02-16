@@ -3,7 +3,7 @@
 // Copyright 2013 Google Inc. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this ***REMOVED***le except in compliance with the License.
+// you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 //
 //     http://www.apache.org/licenses/LICENSE-2.0
@@ -11,12 +11,12 @@
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the speci***REMOVED***c language governing permissions and
+// See the License for the specific language governing permissions and
 // limitations under the License.
 
 // Package klog implements logging analogous to the Google-internal C++ INFO/ERROR/V setup.
 // It provides functions Info, Warning, Error, Fatal, plus formatting variants such as
-// Infof. It also provides V-style logging controlled by the -v and -vmodule=***REMOVED***le=2 flags.
+// Infof. It also provides V-style logging controlled by the -v and -vmodule=file=2 flags.
 //
 // Basic examples:
 //
@@ -35,43 +35,43 @@
 // Log output is buffered and written periodically using Flush. Programs
 // should call Flush before exiting to guarantee all log output is written.
 //
-// By default, all log statements write to ***REMOVED***les in a temporary directory.
+// By default, all log statements write to files in a temporary directory.
 // This package provides several flags that modify this behavior.
 // As a result, flag.Parse must be called before any logging is done.
 //
 //	-logtostderr=false
-//		Logs are written to standard error instead of to ***REMOVED***les.
+//		Logs are written to standard error instead of to files.
 //	-alsologtostderr=false
-//		Logs are written to standard error as well as to ***REMOVED***les.
+//		Logs are written to standard error as well as to files.
 //	-stderrthreshold=INFO
 //		Log events at or above this severity are logged to standard
-//		error as well as to ***REMOVED***les.
+//		error as well as to files.
 //	-log_dir=""
-//		Log ***REMOVED***les will be written to this directory instead of the
+//		Log files will be written to this directory instead of the
 //		default temporary directory.
 //
 //	Other flags provide aids to debugging.
 //
 //	-log_backtrace_at=""
-//		When set to a ***REMOVED***le and line number holding a logging statement,
+//		When set to a file and line number holding a logging statement,
 //		such as
 //			-log_backtrace_at=gopherflakes.go:234
 //		a stack trace will be written to the Info log whenever execution
 //		hits that statement. (Unlike with -vmodule, the ".go" must be
 //		present.)
 //	-v=0
-//		Enable V-leveled logging at the speci***REMOVED***ed level.
+//		Enable V-leveled logging at the specified level.
 //	-vmodule=""
 //		The syntax of the argument is a comma-separated list of pattern=N,
-//		where pattern is a literal ***REMOVED***le name (minus the ".go" suf***REMOVED***x) or
+//		where pattern is a literal file name (minus the ".go" suffix) or
 //		"glob" pattern and N is a V level. For instance,
 //			-vmodule=gopher*=3
-//		sets the V level to 3 in all Go ***REMOVED***les whose names begin "gopher".
+//		sets the V level to 3 in all Go files whose names begin "gopher".
 //
 package klog
 
 import (
-	"bu***REMOVED***o"
+	"bufio"
 	"bytes"
 	"errors"
 	"flag"
@@ -79,7 +79,7 @@ import (
 	"io"
 	stdLog "log"
 	"os"
-	"path/***REMOVED***lepath"
+	"path/filepath"
 	"runtime"
 	"strconv"
 	"strings"
@@ -88,15 +88,15 @@ import (
 	"time"
 )
 
-// severity identi***REMOVED***es the sort of log: info, warning etc. It also implements
+// severity identifies the sort of log: info, warning etc. It also implements
 // the flag.Value interface. The -stderrthreshold flag is of type severity and
-// should be modi***REMOVED***ed only through the flag.Value interface. The values match
+// should be modified only through the flag.Value interface. The values match
 // the corresponding constants in C++.
 type severity int32 // sync/atomic int32
 
 // These constants identify the log levels in order of increasing severity.
-// A message written to a high-severity log ***REMOVED***le is also written to each
-// lower-severity log ***REMOVED***le.
+// A message written to a high-severity log file is also written to each
+// lower-severity log file.
 const (
 	infoLog severity = iota
 	warningLog
@@ -140,7 +140,7 @@ func (s *severity) Set(value string) error {
 	// Is it a known name?
 	if v, ok := severityByName(value); ok {
 		threshold = v
-	} ***REMOVED*** {
+	} else {
 		v, err := strconv.Atoi(value)
 		if err != nil {
 			return err
@@ -198,8 +198,8 @@ var severityStats = [numSeverity]*OutputStats{
 
 // Level is treated as a sync/atomic int32.
 
-// Level speci***REMOVED***es a level of verbosity for V logs. *Level implements
-// flag.Value; the -v flag is of type Level and should be modi***REMOVED***ed
+// Level specifies a level of verbosity for V logs. *Level implements
+// flag.Value; the -v flag is of type Level and should be modified
 // only through the flag.Value interface.
 type Level int32
 
@@ -231,30 +231,30 @@ func (l *Level) Set(value string) error {
 	}
 	logging.mu.Lock()
 	defer logging.mu.Unlock()
-	logging.setVState(Level(v), logging.vmodule.***REMOVED***lter, false)
+	logging.setVState(Level(v), logging.vmodule.filter, false)
 	return nil
 }
 
 // moduleSpec represents the setting of the -vmodule flag.
 type moduleSpec struct {
-	***REMOVED***lter []modulePat
+	filter []modulePat
 }
 
-// modulePat contains a ***REMOVED***lter for the -vmodule flag.
-// It holds a verbosity level and a ***REMOVED***le pattern to match.
+// modulePat contains a filter for the -vmodule flag.
+// It holds a verbosity level and a file pattern to match.
 type modulePat struct {
 	pattern string
 	literal bool // The pattern is a literal string
 	level   Level
 }
 
-// match reports whether the ***REMOVED***le matches the pattern. It uses a string
+// match reports whether the file matches the pattern. It uses a string
 // comparison if the pattern contains no metacharacters.
-func (m *modulePat) match(***REMOVED***le string) bool {
+func (m *modulePat) match(file string) bool {
 	if m.literal {
-		return ***REMOVED***le == m.pattern
+		return file == m.pattern
 	}
-	match, _ := ***REMOVED***lepath.Match(m.pattern, ***REMOVED***le)
+	match, _ := filepath.Match(m.pattern, file)
 	return match
 }
 
@@ -263,7 +263,7 @@ func (m *moduleSpec) String() string {
 	logging.mu.Lock()
 	defer logging.mu.Unlock()
 	var b bytes.Buffer
-	for i, f := range m.***REMOVED***lter {
+	for i, f := range m.filter {
 		if i > 0 {
 			b.WriteRune(',')
 		}
@@ -278,11 +278,11 @@ func (m *moduleSpec) Get() interface{} {
 	return nil
 }
 
-var errVmoduleSyntax = errors.New("syntax error: expect comma-separated list of ***REMOVED***lename=N")
+var errVmoduleSyntax = errors.New("syntax error: expect comma-separated list of filename=N")
 
-// Syntax: -vmodule=recordio=2,***REMOVED***le=1,gfs*=3
+// Syntax: -vmodule=recordio=2,file=1,gfs*=3
 func (m *moduleSpec) Set(value string) error {
-	var ***REMOVED***lter []modulePat
+	var filter []modulePat
 	for _, pat := range strings.Split(value, ",") {
 		if len(pat) == 0 {
 			// Empty strings such as from a trailing comma can be ignored.
@@ -295,7 +295,7 @@ func (m *moduleSpec) Set(value string) error {
 		pattern := patLev[0]
 		v, err := strconv.Atoi(patLev[1])
 		if err != nil {
-			return errors.New("syntax error: expect comma-separated list of ***REMOVED***lename=N")
+			return errors.New("syntax error: expect comma-separated list of filename=N")
 		}
 		if v < 0 {
 			return errors.New("negative value for vmodule level")
@@ -303,51 +303,51 @@ func (m *moduleSpec) Set(value string) error {
 		if v == 0 {
 			continue // Ignore. It's harmless but no point in paying the overhead.
 		}
-		// TODO: check syntax of ***REMOVED***lter?
-		***REMOVED***lter = append(***REMOVED***lter, modulePat{pattern, isLiteral(pattern), Level(v)})
+		// TODO: check syntax of filter?
+		filter = append(filter, modulePat{pattern, isLiteral(pattern), Level(v)})
 	}
 	logging.mu.Lock()
 	defer logging.mu.Unlock()
-	logging.setVState(logging.verbosity, ***REMOVED***lter, true)
+	logging.setVState(logging.verbosity, filter, true)
 	return nil
 }
 
 // isLiteral reports whether the pattern is a literal string, that is, has no metacharacters
-// that require ***REMOVED***lepath.Match to be called to match the pattern.
+// that require filepath.Match to be called to match the pattern.
 func isLiteral(pattern string) bool {
 	return !strings.ContainsAny(pattern, `\*?[]`)
 }
 
 // traceLocation represents the setting of the -log_backtrace_at flag.
 type traceLocation struct {
-	***REMOVED***le string
+	file string
 	line int
 }
 
-// isSet reports whether the trace location has been speci***REMOVED***ed.
+// isSet reports whether the trace location has been specified.
 // logging.mu is held.
 func (t *traceLocation) isSet() bool {
 	return t.line > 0
 }
 
-// match reports whether the speci***REMOVED***ed ***REMOVED***le and line matches the trace location.
-// The argument ***REMOVED***le name is the full path, not the basename speci***REMOVED***ed in the flag.
+// match reports whether the specified file and line matches the trace location.
+// The argument file name is the full path, not the basename specified in the flag.
 // logging.mu is held.
-func (t *traceLocation) match(***REMOVED***le string, line int) bool {
+func (t *traceLocation) match(file string, line int) bool {
 	if t.line != line {
 		return false
 	}
-	if i := strings.LastIndex(***REMOVED***le, "/"); i >= 0 {
-		***REMOVED***le = ***REMOVED***le[i+1:]
+	if i := strings.LastIndex(file, "/"); i >= 0 {
+		file = file[i+1:]
 	}
-	return t.***REMOVED***le == ***REMOVED***le
+	return t.file == file
 }
 
 func (t *traceLocation) String() string {
 	// Lock because the type is not atomic. TODO: clean this up.
 	logging.mu.Lock()
 	defer logging.mu.Unlock()
-	return fmt.Sprintf("%s:%d", t.***REMOVED***le, t.line)
+	return fmt.Sprintf("%s:%d", t.file, t.line)
 }
 
 // Get is part of the (Go 1.2) flag.Getter interface. It always returns nil for this flag type since the
@@ -356,22 +356,22 @@ func (t *traceLocation) Get() interface{} {
 	return nil
 }
 
-var errTraceSyntax = errors.New("syntax error: expect ***REMOVED***le.go:234")
+var errTraceSyntax = errors.New("syntax error: expect file.go:234")
 
 // Syntax: -log_backtrace_at=gopherflakes.go:234
-// Note that unlike vmodule the ***REMOVED***le extension is included here.
+// Note that unlike vmodule the file extension is included here.
 func (t *traceLocation) Set(value string) error {
 	if value == "" {
 		// Unset.
 		t.line = 0
-		t.***REMOVED***le = ""
+		t.file = ""
 	}
-	***REMOVED***elds := strings.Split(value, ":")
-	if len(***REMOVED***elds) != 2 {
+	fields := strings.Split(value, ":")
+	if len(fields) != 2 {
 		return errTraceSyntax
 	}
-	***REMOVED***le, line := ***REMOVED***elds[0], ***REMOVED***elds[1]
-	if !strings.Contains(***REMOVED***le, ".") {
+	file, line := fields[0], fields[1]
+	if !strings.Contains(file, ".") {
 		return errTraceSyntax
 	}
 	v, err := strconv.Atoi(line)
@@ -384,11 +384,11 @@ func (t *traceLocation) Set(value string) error {
 	logging.mu.Lock()
 	defer logging.mu.Unlock()
 	t.line = v
-	t.***REMOVED***le = ***REMOVED***le
+	t.file = file
 	return nil
 }
 
-// flushSyncWriter is the interface satis***REMOVED***ed by logging destinations.
+// flushSyncWriter is the interface satisfied by logging destinations.
 type flushSyncWriter interface {
 	Flush() error
 	Sync() error
@@ -408,15 +408,15 @@ func InitFlags(flagset *flag.FlagSet) {
 	if flagset == nil {
 		flagset = flag.CommandLine
 	}
-	flagset.StringVar(&logging.logDir, "log_dir", "", "If non-empty, write log ***REMOVED***les in this directory")
-	flagset.StringVar(&logging.logFile, "log_***REMOVED***le", "", "If non-empty, use this log ***REMOVED***le")
-	flagset.BoolVar(&logging.toStderr, "logtostderr", true, "log to standard error instead of ***REMOVED***les")
-	flagset.BoolVar(&logging.alsoToStderr, "alsologtostderr", false, "log to standard error as well as ***REMOVED***les")
+	flagset.StringVar(&logging.logDir, "log_dir", "", "If non-empty, write log files in this directory")
+	flagset.StringVar(&logging.logFile, "log_file", "", "If non-empty, use this log file")
+	flagset.BoolVar(&logging.toStderr, "logtostderr", true, "log to standard error instead of files")
+	flagset.BoolVar(&logging.alsoToStderr, "alsologtostderr", false, "log to standard error as well as files")
 	flagset.Var(&logging.verbosity, "v", "number for the log level verbosity")
-	flagset.BoolVar(&logging.skipHeaders, "skip_headers", false, "If true, avoid header pre***REMOVED***xes in the log messages")
+	flagset.BoolVar(&logging.skipHeaders, "skip_headers", false, "If true, avoid header prefixes in the log messages")
 	flagset.Var(&logging.stderrThreshold, "stderrthreshold", "logs at or above this threshold go to stderr")
-	flagset.Var(&logging.vmodule, "vmodule", "comma-separated list of pattern=N settings for ***REMOVED***le-***REMOVED***ltered logging")
-	flagset.Var(&logging.traceLocation, "log_backtrace_at", "when logging hits line ***REMOVED***le:N, emit a stack trace")
+	flagset.Var(&logging.vmodule, "vmodule", "comma-separated list of pattern=N settings for file-filtered logging")
+	flagset.Var(&logging.traceLocation, "log_backtrace_at", "when logging hits line file:N, emit a stack trace")
 }
 
 // Flush flushes all pending log I/O.
@@ -428,7 +428,7 @@ func Flush() {
 type loggingT struct {
 	// Boolean flags. Not handled atomically because the flag.Value interface
 	// does not let us avoid the =true, and that shorthand is necessary for
-	// compatibility. TODO: does this matter enough to ***REMOVED***x? Seems unlikely.
+	// compatibility. TODO: does this matter enough to fix? Seems unlikely.
 	toStderr     bool // The -logtostderr flag.
 	alsoToStderr bool // The -alsologtostderr flag.
 
@@ -445,20 +445,20 @@ type loggingT struct {
 	// mu protects the remaining elements of this structure and is
 	// used to synchronize logging.
 	mu sync.Mutex
-	// ***REMOVED***le holds writer for each of the log types.
-	***REMOVED***le [numSeverity]flushSyncWriter
+	// file holds writer for each of the log types.
+	file [numSeverity]flushSyncWriter
 	// pcs is used in V to avoid an allocation when computing the caller's PC.
 	pcs [1]uintptr
-	// vmap is a cache of the V Level for each V() call site, identi***REMOVED***ed by PC.
+	// vmap is a cache of the V Level for each V() call site, identified by PC.
 	// It is wiped whenever the vmodule flag changes state.
 	vmap map[uintptr]Level
-	// ***REMOVED***lterLength stores the length of the vmodule ***REMOVED***lter chain. If greater
+	// filterLength stores the length of the vmodule filter chain. If greater
 	// than zero, it means vmodule is enabled. It may be read safely
-	// using sync.LoadInt32, but is only modi***REMOVED***ed under mu.
-	***REMOVED***lterLength int32
+	// using sync.LoadInt32, but is only modified under mu.
+	filterLength int32
 	// traceLocation is the state of the -log_backtrace_at flag.
 	traceLocation traceLocation
-	// These flags are modi***REMOVED***ed only under lock, although verbosity may be fetched
+	// These flags are modified only under lock, although verbosity may be fetched
 	// safely using atomic.LoadInt32.
 	vmodule   moduleSpec // The state of the -vmodule flag.
 	verbosity Level      // V logging level, the value of the -v flag/
@@ -467,11 +467,11 @@ type loggingT struct {
 	// See createLogDirs for the full list of possible destinations.
 	logDir string
 
-	// If non-empty, speci***REMOVED***es the path of the ***REMOVED***le to write logs. mutually exclusive
+	// If non-empty, specifies the path of the file to write logs. mutually exclusive
 	// with the log-dir option.
 	logFile string
 
-	// If true, do not add the pre***REMOVED***x headers, useful when used with SetOutput
+	// If true, do not add the prefix headers, useful when used with SetOutput
 	skipHeaders bool
 }
 
@@ -486,21 +486,21 @@ var logging loggingT
 
 // setVState sets a consistent state for V logging.
 // l.mu is held.
-func (l *loggingT) setVState(verbosity Level, ***REMOVED***lter []modulePat, setFilter bool) {
-	// Turn verbosity off so V will not ***REMOVED***re while we are in transition.
+func (l *loggingT) setVState(verbosity Level, filter []modulePat, setFilter bool) {
+	// Turn verbosity off so V will not fire while we are in transition.
 	logging.verbosity.set(0)
-	// Ditto for ***REMOVED***lter length.
-	atomic.StoreInt32(&logging.***REMOVED***lterLength, 0)
+	// Ditto for filter length.
+	atomic.StoreInt32(&logging.filterLength, 0)
 
-	// Set the new ***REMOVED***lters and wipe the pc->Level map if the ***REMOVED***lter has changed.
+	// Set the new filters and wipe the pc->Level map if the filter has changed.
 	if setFilter {
-		logging.vmodule.***REMOVED***lter = ***REMOVED***lter
+		logging.vmodule.filter = filter
 		logging.vmap = make(map[uintptr]Level)
 	}
 
-	// Things are consistent now, so enable ***REMOVED***ltering and verbosity.
+	// Things are consistent now, so enable filtering and verbosity.
 	// They are enabled in order opposite to that in V.
-	atomic.StoreInt32(&logging.***REMOVED***lterLength, int32(len(***REMOVED***lter)))
+	atomic.StoreInt32(&logging.filterLength, int32(len(filter)))
 	logging.verbosity.set(verbosity)
 }
 
@@ -514,7 +514,7 @@ func (l *loggingT) getBuffer() *buffer {
 	l.freeListMu.Unlock()
 	if b == nil {
 		b = new(buffer)
-	} ***REMOVED*** {
+	} else {
 		b.next = nil
 		b.Reset()
 	}
@@ -536,38 +536,38 @@ func (l *loggingT) putBuffer(b *buffer) {
 var timeNow = time.Now // Stubbed out for testing.
 
 /*
-header formats a log header as de***REMOVED***ned by the C++ implementation.
-It returns a buffer containing the formatted header and the user's ***REMOVED***le and line number.
-The depth speci***REMOVED***es how many stack frames above lives the source line to be identi***REMOVED***ed in the log message.
+header formats a log header as defined by the C++ implementation.
+It returns a buffer containing the formatted header and the user's file and line number.
+The depth specifies how many stack frames above lives the source line to be identified in the log message.
 
 Log lines have this form:
-	Lmmdd hh:mm:ss.uuuuuu threadid ***REMOVED***le:line] msg...
-where the ***REMOVED***elds are de***REMOVED***ned as follows:
+	Lmmdd hh:mm:ss.uuuuuu threadid file:line] msg...
+where the fields are defined as follows:
 	L                A single character, representing the log level (eg 'I' for INFO)
 	mm               The month (zero padded; ie May is '05')
 	dd               The day (zero padded)
 	hh:mm:ss.uuuuuu  Time in hours, minutes and fractional seconds
 	threadid         The space-padded thread ID as returned by GetTID()
-	***REMOVED***le             The ***REMOVED***le name
+	file             The file name
 	line             The line number
 	msg              The user-supplied message
 */
 func (l *loggingT) header(s severity, depth int) (*buffer, string, int) {
-	_, ***REMOVED***le, line, ok := runtime.Caller(3 + depth)
+	_, file, line, ok := runtime.Caller(3 + depth)
 	if !ok {
-		***REMOVED***le = "???"
+		file = "???"
 		line = 1
-	} ***REMOVED*** {
-		slash := strings.LastIndex(***REMOVED***le, "/")
+	} else {
+		slash := strings.LastIndex(file, "/")
 		if slash >= 0 {
-			***REMOVED***le = ***REMOVED***le[slash+1:]
+			file = file[slash+1:]
 		}
 	}
-	return l.formatHeader(s, ***REMOVED***le, line), ***REMOVED***le, line
+	return l.formatHeader(s, file, line), file, line
 }
 
-// formatHeader formats a log header using the provided ***REMOVED***le name and line number.
-func (l *loggingT) formatHeader(s severity, ***REMOVED***le string, line int) *buffer {
+// formatHeader formats a log header using the provided file name and line number.
+func (l *loggingT) formatHeader(s severity, file string, line int) *buffer {
 	now := timeNow()
 	if line < 0 {
 		line = 0 // not a real line number, but acceptable to someDigits
@@ -584,7 +584,7 @@ func (l *loggingT) formatHeader(s severity, ***REMOVED***le string, line int) *b
 	// It's worth about 3X. Fprintf is hard.
 	_, month, day := now.Date()
 	hour, minute, second := now.Clock()
-	// Lmmdd hh:mm:ss.uuuuuu threadid ***REMOVED***le:line]
+	// Lmmdd hh:mm:ss.uuuuuu threadid file:line]
 	buf.tmp[0] = severityChar[s]
 	buf.twoDigits(1, int(month))
 	buf.twoDigits(3, day)
@@ -600,7 +600,7 @@ func (l *loggingT) formatHeader(s severity, ***REMOVED***le string, line int) *b
 	buf.nDigits(7, 22, pid, ' ') // TODO: should be TID
 	buf.tmp[29] = ' '
 	buf.Write(buf.tmp[:30])
-	buf.WriteString(***REMOVED***le)
+	buf.WriteString(file)
 	buf.tmp[0] = ':'
 	n := buf.someDigits(1, line)
 	buf.tmp[n+1] = ']'
@@ -609,11 +609,11 @@ func (l *loggingT) formatHeader(s severity, ***REMOVED***le string, line int) *b
 	return buf
 }
 
-// Some custom tiny helper functions to print the log header ef***REMOVED***ciently.
+// Some custom tiny helper functions to print the log header efficiently.
 
 const digits = "0123456789"
 
-// twoDigits formats a zero-pre***REMOVED***xed two-digit integer at buf.tmp[i].
+// twoDigits formats a zero-prefixed two-digit integer at buf.tmp[i].
 func (buf *buffer) twoDigits(i, d int) {
 	buf.tmp[i+1] = digits[d%10]
 	d /= 10
@@ -634,7 +634,7 @@ func (buf *buffer) nDigits(n, i, d int, pad byte) {
 	}
 }
 
-// someDigits formats a zero-pre***REMOVED***xed variable-width integer at buf.tmp[i].
+// someDigits formats a zero-prefixed variable-width integer at buf.tmp[i].
 func (buf *buffer) someDigits(i, d int) int {
 	// Print into the top, then copy down. We know there's space for at least
 	// a 10-digit number.
@@ -651,9 +651,9 @@ func (buf *buffer) someDigits(i, d int) int {
 }
 
 func (l *loggingT) println(s severity, args ...interface{}) {
-	buf, ***REMOVED***le, line := l.header(s, 0)
+	buf, file, line := l.header(s, 0)
 	fmt.Fprintln(buf, args...)
-	l.output(s, buf, ***REMOVED***le, line, false)
+	l.output(s, buf, file, line, false)
 }
 
 func (l *loggingT) print(s severity, args ...interface{}) {
@@ -661,33 +661,33 @@ func (l *loggingT) print(s severity, args ...interface{}) {
 }
 
 func (l *loggingT) printDepth(s severity, depth int, args ...interface{}) {
-	buf, ***REMOVED***le, line := l.header(s, depth)
+	buf, file, line := l.header(s, depth)
 	fmt.Fprint(buf, args...)
 	if buf.Bytes()[buf.Len()-1] != '\n' {
 		buf.WriteByte('\n')
 	}
-	l.output(s, buf, ***REMOVED***le, line, false)
+	l.output(s, buf, file, line, false)
 }
 
 func (l *loggingT) printf(s severity, format string, args ...interface{}) {
-	buf, ***REMOVED***le, line := l.header(s, 0)
+	buf, file, line := l.header(s, 0)
 	fmt.Fprintf(buf, format, args...)
 	if buf.Bytes()[buf.Len()-1] != '\n' {
 		buf.WriteByte('\n')
 	}
-	l.output(s, buf, ***REMOVED***le, line, false)
+	l.output(s, buf, file, line, false)
 }
 
-// printWithFileLine behaves like print but uses the provided ***REMOVED***le and line number.  If
+// printWithFileLine behaves like print but uses the provided file and line number.  If
 // alsoLogToStderr is true, the log message always appears on standard error; it
-// will also appear in the log ***REMOVED***le unless --logtostderr is set.
-func (l *loggingT) printWithFileLine(s severity, ***REMOVED***le string, line int, alsoToStderr bool, args ...interface{}) {
-	buf := l.formatHeader(s, ***REMOVED***le, line)
+// will also appear in the log file unless --logtostderr is set.
+func (l *loggingT) printWithFileLine(s severity, file string, line int, alsoToStderr bool, args ...interface{}) {
+	buf := l.formatHeader(s, file, line)
 	fmt.Fprint(buf, args...)
 	if buf.Bytes()[buf.Len()-1] != '\n' {
 		buf.WriteByte('\n')
 	}
-	l.output(s, buf, ***REMOVED***le, line, alsoToStderr)
+	l.output(s, buf, file, line, alsoToStderr)
 }
 
 // redirectBuffer is used to set an alternate destination for the logs
@@ -713,11 +713,11 @@ func SetOutput(w io.Writer) {
 		rb := &redirectBuffer{
 			w: w,
 		}
-		logging.***REMOVED***le[s] = rb
+		logging.file[s] = rb
 	}
 }
 
-// SetOutputBySeverity sets the output destination for speci***REMOVED***c severity
+// SetOutputBySeverity sets the output destination for specific severity
 func SetOutputBySeverity(name string, w io.Writer) {
 	sev, ok := severityByName(name)
 	if !ok {
@@ -726,14 +726,14 @@ func SetOutputBySeverity(name string, w io.Writer) {
 	rb := &redirectBuffer{
 		w: w,
 	}
-	logging.***REMOVED***le[sev] = rb
+	logging.file[sev] = rb
 }
 
-// output writes the data to the log ***REMOVED***les and releases the buffer.
-func (l *loggingT) output(s severity, buf *buffer, ***REMOVED***le string, line int, alsoToStderr bool) {
+// output writes the data to the log files and releases the buffer.
+func (l *loggingT) output(s severity, buf *buffer, file string, line int, alsoToStderr bool) {
 	l.mu.Lock()
 	if l.traceLocation.isSet() {
-		if l.traceLocation.match(***REMOVED***le, line) {
+		if l.traceLocation.match(file, line) {
 			buf.Write(stacks(false))
 		}
 	}
@@ -742,11 +742,11 @@ func (l *loggingT) output(s severity, buf *buffer, ***REMOVED***le string, line 
 		if s >= l.stderrThreshold.get() {
 			os.Stderr.Write(data)
 		}
-	} ***REMOVED*** {
+	} else {
 		if alsoToStderr || l.alsoToStderr || s >= l.stderrThreshold.get() {
 			os.Stderr.Write(data)
 		}
-		if l.***REMOVED***le[s] == nil {
+		if l.file[s] == nil {
 			if err := l.createFiles(s); err != nil {
 				os.Stderr.Write(data) // Make sure the message appears somewhere.
 				l.exit(err)
@@ -754,16 +754,16 @@ func (l *loggingT) output(s severity, buf *buffer, ***REMOVED***le string, line 
 		}
 		switch s {
 		case fatalLog:
-			l.***REMOVED***le[fatalLog].Write(data)
+			l.file[fatalLog].Write(data)
 			fallthrough
 		case errorLog:
-			l.***REMOVED***le[errorLog].Write(data)
+			l.file[errorLog].Write(data)
 			fallthrough
 		case warningLog:
-			l.***REMOVED***le[warningLog].Write(data)
+			l.file[warningLog].Write(data)
 			fallthrough
 		case infoLog:
-			l.***REMOVED***le[infoLog].Write(data)
+			l.file[infoLog].Write(data)
 		}
 	}
 	if s == fatalLog {
@@ -775,16 +775,16 @@ func (l *loggingT) output(s severity, buf *buffer, ***REMOVED***le string, line 
 		}
 		// Dump all goroutine stacks before exiting.
 		// First, make sure we see the trace for the current goroutine on standard error.
-		// If -logtostderr has been speci***REMOVED***ed, the loop below will do that anyway
-		// as the ***REMOVED***rst stack in the full dump.
+		// If -logtostderr has been specified, the loop below will do that anyway
+		// as the first stack in the full dump.
 		if !l.toStderr {
 			os.Stderr.Write(stacks(false))
 		}
-		// Write the stack trace for all goroutines to the ***REMOVED***les.
+		// Write the stack trace for all goroutines to the files.
 		trace := stacks(true)
 		logExitFunc = func(error) {} // If we get a write error, we'll still exit below.
 		for log := fatalLog; log >= infoLog; log-- {
-			if f := l.***REMOVED***le[log]; f != nil { // Can be nil if -logtostderr is set.
+			if f := l.file[log]; f != nil { // Can be nil if -logtostderr is set.
 				f.Write(trace)
 			}
 		}
@@ -801,7 +801,7 @@ func (l *loggingT) output(s severity, buf *buffer, ***REMOVED***le string, line 
 }
 
 // timeoutFlush calls Flush and returns when it completes or after timeout
-// elapses, whichever happens ***REMOVED***rst.  This is needed because the hooks invoked
+// elapses, whichever happens first.  This is needed because the hooks invoked
 // by Flush may deadlock when glog.Fatal is called from a hook that holds
 // a lock.
 func timeoutFlush(timeout time.Duration) {
@@ -819,7 +819,7 @@ func timeoutFlush(timeout time.Duration) {
 
 // stacks is a wrapper for runtime.Stack that attempts to recover the data for all goroutines.
 func stacks(all bool) []byte {
-	// We don't know how big the traces are, so grow a few times if they don't ***REMOVED***t. Start large, though.
+	// We don't know how big the traces are, so grow a few times if they don't fit. Start large, though.
 	n := 10000
 	if all {
 		n = 100000
@@ -842,7 +842,7 @@ func stacks(all bool) []byte {
 // would make its use clumsier.
 var logExitFunc func(error)
 
-// exit is called if there is trouble creating or writing log ***REMOVED***les.
+// exit is called if there is trouble creating or writing log files.
 // It flushes the logs and exits the program; there's no point in hanging around.
 // l.mu is held.
 func (l *loggingT) exit(err error) {
@@ -856,20 +856,20 @@ func (l *loggingT) exit(err error) {
 	os.Exit(2)
 }
 
-// syncBuffer joins a bu***REMOVED***o.Writer to its underlying ***REMOVED***le, providing access to the
-// ***REMOVED***le's Sync method and providing a wrapper for the Write method that provides log
-// ***REMOVED***le rotation. There are conflicting methods, so the ***REMOVED***le cannot be embedded.
+// syncBuffer joins a bufio.Writer to its underlying file, providing access to the
+// file's Sync method and providing a wrapper for the Write method that provides log
+// file rotation. There are conflicting methods, so the file cannot be embedded.
 // l.mu is held for all its methods.
 type syncBuffer struct {
 	logger *loggingT
-	*bu***REMOVED***o.Writer
-	***REMOVED***le   *os.File
+	*bufio.Writer
+	file   *os.File
 	sev    severity
-	nbytes uint64 // The number of bytes written to this ***REMOVED***le
+	nbytes uint64 // The number of bytes written to this file
 }
 
 func (sb *syncBuffer) Sync() error {
-	return sb.***REMOVED***le.Sync()
+	return sb.file.Sync()
 }
 
 func (sb *syncBuffer) Write(p []byte) (n int, err error) {
@@ -886,44 +886,44 @@ func (sb *syncBuffer) Write(p []byte) (n int, err error) {
 	return
 }
 
-// rotateFile closes the syncBuffer's ***REMOVED***le and starts a new one.
+// rotateFile closes the syncBuffer's file and starts a new one.
 func (sb *syncBuffer) rotateFile(now time.Time) error {
-	if sb.***REMOVED***le != nil {
+	if sb.file != nil {
 		sb.Flush()
-		sb.***REMOVED***le.Close()
+		sb.file.Close()
 	}
 	var err error
-	sb.***REMOVED***le, _, err = create(severityName[sb.sev], now)
+	sb.file, _, err = create(severityName[sb.sev], now)
 	sb.nbytes = 0
 	if err != nil {
 		return err
 	}
 
-	sb.Writer = bu***REMOVED***o.NewWriterSize(sb.***REMOVED***le, bufferSize)
+	sb.Writer = bufio.NewWriterSize(sb.file, bufferSize)
 
 	// Write header.
 	var buf bytes.Buffer
-	fmt.Fprintf(&buf, "Log ***REMOVED***le created at: %s\n", now.Format("2006/01/02 15:04:05"))
+	fmt.Fprintf(&buf, "Log file created at: %s\n", now.Format("2006/01/02 15:04:05"))
 	fmt.Fprintf(&buf, "Running on machine: %s\n", host)
 	fmt.Fprintf(&buf, "Binary: Built with %s %s for %s/%s\n", runtime.Compiler, runtime.Version(), runtime.GOOS, runtime.GOARCH)
-	fmt.Fprintf(&buf, "Log line format: [IWEF]mmdd hh:mm:ss.uuuuuu threadid ***REMOVED***le:line] msg\n")
-	n, err := sb.***REMOVED***le.Write(buf.Bytes())
+	fmt.Fprintf(&buf, "Log line format: [IWEF]mmdd hh:mm:ss.uuuuuu threadid file:line] msg\n")
+	n, err := sb.file.Write(buf.Bytes())
 	sb.nbytes += uint64(n)
 	return err
 }
 
-// bufferSize sizes the buffer associated with each log ***REMOVED***le. It's large
+// bufferSize sizes the buffer associated with each log file. It's large
 // so that log records can accumulate without the logging thread blocking
 // on disk I/O. The flushDaemon will block instead.
 const bufferSize = 256 * 1024
 
-// createFiles creates all the log ***REMOVED***les for severity from sev down to infoLog.
+// createFiles creates all the log files for severity from sev down to infoLog.
 // l.mu is held.
 func (l *loggingT) createFiles(sev severity) error {
 	now := time.Now()
-	// Files are created in decreasing severity order, so as soon as we ***REMOVED***nd one
+	// Files are created in decreasing severity order, so as soon as we find one
 	// has already been created, we can stop.
-	for s := sev; s >= infoLog && l.***REMOVED***le[s] == nil; s-- {
+	for s := sev; s >= infoLog && l.file[s] == nil; s-- {
 		sb := &syncBuffer{
 			logger: l,
 			sev:    s,
@@ -931,21 +931,21 @@ func (l *loggingT) createFiles(sev severity) error {
 		if err := sb.rotateFile(now); err != nil {
 			return err
 		}
-		l.***REMOVED***le[s] = sb
+		l.file[s] = sb
 	}
 	return nil
 }
 
 const flushInterval = 5 * time.Second
 
-// flushDaemon periodically flushes the log ***REMOVED***le buffers.
+// flushDaemon periodically flushes the log file buffers.
 func (l *loggingT) flushDaemon() {
 	for range time.NewTicker(flushInterval).C {
 		l.lockAndFlushAll()
 	}
 }
 
-// lockAndFlushAll is like flushAll but locks l.mu ***REMOVED***rst.
+// lockAndFlushAll is like flushAll but locks l.mu first.
 func (l *loggingT) lockAndFlushAll() {
 	l.mu.Lock()
 	l.flushAll()
@@ -957,10 +957,10 @@ func (l *loggingT) lockAndFlushAll() {
 func (l *loggingT) flushAll() {
 	// Flush from fatal down, in case there's trouble flushing.
 	for s := fatalLog; s >= infoLog; s-- {
-		***REMOVED***le := l.***REMOVED***le[s]
-		if ***REMOVED***le != nil {
-			***REMOVED***le.Flush() // ignore error
-			***REMOVED***le.Sync()  // ignore error
+		file := l.file[s]
+		if file != nil {
+			file.Flush() // ignore error
+			file.Sync()  // ignore error
 		}
 	}
 }
@@ -977,9 +977,9 @@ func CopyStandardLogTo(name string) {
 	if !ok {
 		panic(fmt.Sprintf("log.CopyStandardLogTo(%q): unrecognized severity name", name))
 	}
-	// Set a log format that captures the user's ***REMOVED***le and line:
+	// Set a log format that captures the user's file and line:
 	//   d.go:23: message
-	stdLog.SetFlags(stdLog.Lshort***REMOVED***le)
+	stdLog.SetFlags(stdLog.Lshortfile)
 	stdLog.SetOutput(logBridge(sev))
 }
 
@@ -991,15 +991,15 @@ type logBridge severity
 // logger for severity(lb).
 func (lb logBridge) Write(b []byte) (n int, err error) {
 	var (
-		***REMOVED***le = "???"
+		file = "???"
 		line = 1
 		text string
 	)
 	// Split "d.go:23: message" into "d.go", "23", and "message".
 	if parts := bytes.SplitN(b, []byte{':'}, 3); len(parts) != 3 || len(parts[0]) < 1 || len(parts[2]) < 1 {
 		text = fmt.Sprintf("bad log format: %s", b)
-	} ***REMOVED*** {
-		***REMOVED***le = string(parts[0])
+	} else {
+		file = string(parts[0])
 		text = string(parts[2][1:]) // skip leading space
 		line, err = strconv.Atoi(string(parts[1]))
 		if err != nil {
@@ -1009,30 +1009,30 @@ func (lb logBridge) Write(b []byte) (n int, err error) {
 	}
 	// printWithFileLine with alsoToStderr=true, so standard log messages
 	// always appear on standard error.
-	logging.printWithFileLine(severity(lb), ***REMOVED***le, line, true, text)
+	logging.printWithFileLine(severity(lb), file, line, true, text)
 	return len(b), nil
 }
 
 // setV computes and remembers the V level for a given PC
 // when vmodule is enabled.
-// File pattern matching takes the basename of the ***REMOVED***le, stripped
-// of its .go suf***REMOVED***x, and uses ***REMOVED***lepath.Match, which is a little more
+// File pattern matching takes the basename of the file, stripped
+// of its .go suffix, and uses filepath.Match, which is a little more
 // general than the *? matching used in C++.
 // l.mu is held.
 func (l *loggingT) setV(pc uintptr) Level {
 	fn := runtime.FuncForPC(pc)
-	***REMOVED***le, _ := fn.FileLine(pc)
-	// The ***REMOVED***le is something like /a/b/c/d.go. We want just the d.
-	if strings.HasSuf***REMOVED***x(***REMOVED***le, ".go") {
-		***REMOVED***le = ***REMOVED***le[:len(***REMOVED***le)-3]
+	file, _ := fn.FileLine(pc)
+	// The file is something like /a/b/c/d.go. We want just the d.
+	if strings.HasSuffix(file, ".go") {
+		file = file[:len(file)-3]
 	}
-	if slash := strings.LastIndex(***REMOVED***le, "/"); slash >= 0 {
-		***REMOVED***le = ***REMOVED***le[slash+1:]
+	if slash := strings.LastIndex(file, "/"); slash >= 0 {
+		file = file[slash+1:]
 	}
-	for _, ***REMOVED***lter := range l.vmodule.***REMOVED***lter {
-		if ***REMOVED***lter.match(***REMOVED***le) {
-			l.vmap[pc] = ***REMOVED***lter.level
-			return ***REMOVED***lter.level
+	for _, filter := range l.vmodule.filter {
+		if filter.match(file) {
+			l.vmap[pc] = filter.level
+			return filter.level
 		}
 	}
 	l.vmap[pc] = 0
@@ -1050,12 +1050,12 @@ type Verbose bool
 //	if glog.V(2) { glog.Info("log this") }
 // or
 //	glog.V(2).Info("log this")
-// The second form is shorter but the ***REMOVED***rst is cheaper if logging is off because it does
+// The second form is shorter but the first is cheaper if logging is off because it does
 // not evaluate its arguments.
 //
 // Whether an individual call to V generates a log record depends on the setting of
 // the -v and --vmodule flags; both are off by default. If the level in the call to
-// V is at least the value of -v, or of -vmodule for the source ***REMOVED***le containing the
+// V is at least the value of -v, or of -vmodule for the source file containing the
 // call, the V call will log.
 func V(level Level) Verbose {
 	// This function tries hard to be cheap unless there's work to do.
@@ -1068,8 +1068,8 @@ func V(level Level) Verbose {
 
 	// It's off globally but it vmodule may still be set.
 	// Here is another cheap but safe test to see if vmodule is enabled.
-	if atomic.LoadInt32(&logging.***REMOVED***lterLength) > 0 {
-		// Now we need a proper lock to use the logging structure. The pcs ***REMOVED***eld
+	if atomic.LoadInt32(&logging.filterLength) > 0 {
+		// Now we need a proper lock to use the logging structure. The pcs field
 		// is shared so we must lock before accessing it. This is fairly expensive,
 		// but if V logging is enabled we're slow anyway.
 		logging.mu.Lock()

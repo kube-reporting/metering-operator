@@ -2,7 +2,7 @@
 Copyright 2014 The Kubernetes Authors.
 
 Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this ***REMOVED***le except in compliance with the License.
+you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
 
     http://www.apache.org/licenses/LICENSE-2.0
@@ -10,11 +10,11 @@ You may obtain a copy of the License at
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the speci***REMOVED***c language governing permissions and
+See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-// TODO: move everything in this ***REMOVED***le to pkg/api/rest
+// TODO: move everything in this file to pkg/api/rest
 package meta
 
 import (
@@ -43,11 +43,11 @@ var RESTScopeRoot = &restScope{
 	name: RESTScopeNameRoot,
 }
 
-// DefaultRESTMapper exposes mappings between the types de***REMOVED***ned in a
-// runtime.Scheme. It assumes that all types de***REMOVED***ned the provided scheme
+// DefaultRESTMapper exposes mappings between the types defined in a
+// runtime.Scheme. It assumes that all types defined the provided scheme
 // can be mapped with the provided MetadataAccessor and Codec interfaces.
 //
-// The resource name of a Kind is de***REMOVED***ned as the lowercase,
+// The resource name of a Kind is defined as the lowercase,
 // English-plural version of the Kind string.
 // When converting from resource to Kind, the singular version of the
 // resource name is also accepted for convenience.
@@ -95,10 +95,10 @@ func NewDefaultRESTMapper(defaultGroupVersions []schema.GroupVersion) *DefaultRE
 
 func (m *DefaultRESTMapper) Add(kind schema.GroupVersionKind, scope RESTScope) {
 	plural, singular := UnsafeGuessKindToResource(kind)
-	m.AddSpeci***REMOVED***c(kind, plural, singular, scope)
+	m.AddSpecific(kind, plural, singular, scope)
 }
 
-func (m *DefaultRESTMapper) AddSpeci***REMOVED***c(kind schema.GroupVersionKind, plural, singular schema.GroupVersionResource, scope RESTScope) {
+func (m *DefaultRESTMapper) AddSpecific(kind schema.GroupVersionKind, plural, singular schema.GroupVersionResource, scope RESTScope) {
 	m.singularToPlural[singular] = plural
 	m.pluralToSingular[plural] = singular
 
@@ -109,11 +109,11 @@ func (m *DefaultRESTMapper) AddSpeci***REMOVED***c(kind schema.GroupVersionKind,
 	m.kindToScope[kind] = scope
 }
 
-// unpluralizedSuf***REMOVED***xes is a list of resource suf***REMOVED***xes that are the same plural and singular
+// unpluralizedSuffixes is a list of resource suffixes that are the same plural and singular
 // This is only is only necessary because some bits of code are lazy and don't actually use the RESTMapper like they should.
 // TODO eliminate this so that different callers can correctly map to resources.  This probably means updating all
 // callers to use the RESTMapper they mean.
-var unpluralizedSuf***REMOVED***xes = []string{
+var unpluralizedSuffixes = []string{
 	"endpoints",
 }
 
@@ -128,8 +128,8 @@ func UnsafeGuessKindToResource(kind schema.GroupVersionKind) ( /*plural*/ schema
 	singularName := strings.ToLower(kindName)
 	singular := kind.GroupVersion().WithResource(singularName)
 
-	for _, skip := range unpluralizedSuf***REMOVED***xes {
-		if strings.HasSuf***REMOVED***x(singularName, skip) {
+	for _, skip := range unpluralizedSuffixes {
+		if strings.HasSuffix(singularName, skip) {
 			return singular, singular
 		}
 	}
@@ -138,7 +138,7 @@ func UnsafeGuessKindToResource(kind schema.GroupVersionKind) ( /*plural*/ schema
 	case "s":
 		return kind.GroupVersion().WithResource(singularName + "es"), singular
 	case "y":
-		return kind.GroupVersion().WithResource(strings.TrimSuf***REMOVED***x(singularName, "y") + "ies"), singular
+		return kind.GroupVersion().WithResource(strings.TrimSuffix(singularName, "y") + "ies"), singular
 	}
 
 	return kind.GroupVersion().WithResource(singularName + "s"), singular
@@ -170,13 +170,13 @@ func (m *DefaultRESTMapper) ResourceSingularizer(resourceType string) (string, e
 	}
 
 	if singular.Empty() {
-		return resourceType, fmt.Errorf("no singular of resource %v has been de***REMOVED***ned", resourceType)
+		return resourceType, fmt.Errorf("no singular of resource %v has been defined", resourceType)
 	}
 
 	return singular.Resource, nil
 }
 
-// coerceResourceForMatching makes the resource lower case and converts internal versions to unspeci***REMOVED***ed (legacy behavior)
+// coerceResourceForMatching makes the resource lower case and converts internal versions to unspecified (legacy behavior)
 func coerceResourceForMatching(resource schema.GroupVersionResource) schema.GroupVersionResource {
 	resource.Resource = strings.ToLower(resource.Resource)
 	if resource.Version == runtime.APIVersionInternal {
@@ -200,7 +200,7 @@ func (m *DefaultRESTMapper) ResourcesFor(input schema.GroupVersionResource) ([]s
 	ret := []schema.GroupVersionResource{}
 	switch {
 	case hasGroup && hasVersion:
-		// fully quali***REMOVED***ed.  Find the exact match
+		// fully qualified.  Find the exact match
 		for plural, singular := range m.pluralToSingular {
 			if singular == resource {
 				ret = append(ret, plural)
@@ -213,7 +213,7 @@ func (m *DefaultRESTMapper) ResourcesFor(input schema.GroupVersionResource) ([]s
 		}
 
 	case hasGroup:
-		// given a group, prefer an exact match.  If you don't ***REMOVED***nd one, resort to a pre***REMOVED***x match on group
+		// given a group, prefer an exact match.  If you don't find one, resort to a prefix match on group
 		foundExactMatch := false
 		requestedGroupResource := resource.GroupResource()
 		for plural, singular := range m.pluralToSingular {
@@ -227,11 +227,11 @@ func (m *DefaultRESTMapper) ResourcesFor(input schema.GroupVersionResource) ([]s
 			}
 		}
 
-		// if you didn't ***REMOVED***nd an exact match, match on group pre***REMOVED***xing. This allows storageclass.storage to match
+		// if you didn't find an exact match, match on group prefixing. This allows storageclass.storage to match
 		// storageclass.storage.k8s.io
 		if !foundExactMatch {
 			for plural, singular := range m.pluralToSingular {
-				if !strings.HasPre***REMOVED***x(plural.Group, requestedGroupResource.Group) {
+				if !strings.HasPrefix(plural.Group, requestedGroupResource.Group) {
 					continue
 				}
 				if singular.Resource == requestedGroupResource.Resource {
@@ -298,7 +298,7 @@ func (m *DefaultRESTMapper) KindsFor(input schema.GroupVersionResource) ([]schem
 
 	ret := []schema.GroupVersionKind{}
 	switch {
-	// fully quali***REMOVED***ed.  Find the exact match
+	// fully qualified.  Find the exact match
 	case hasGroup && hasVersion:
 		kind, exists := m.resourceToKind[resource]
 		if exists {
@@ -315,11 +315,11 @@ func (m *DefaultRESTMapper) KindsFor(input schema.GroupVersionResource) ([]schem
 			}
 		}
 
-		// if you didn't ***REMOVED***nd an exact match, match on group pre***REMOVED***xing. This allows storageclass.storage to match
+		// if you didn't find an exact match, match on group prefixing. This allows storageclass.storage to match
 		// storageclass.storage.k8s.io
 		if !foundExactMatch {
 			for currResource, currKind := range m.resourceToKind {
-				if !strings.HasPre***REMOVED***x(currResource.Group, requestedGroupResource.Group) {
+				if !strings.HasPrefix(currResource.Group, requestedGroupResource.Group) {
 					continue
 				}
 				if currResource.Resource == requestedGroupResource.Resource {
@@ -453,7 +453,7 @@ func (m *DefaultRESTMapper) RESTMapping(gk schema.GroupKind, versions ...string)
 		return nil, &NoKindMatchError{GroupKind: gk, SearchedVersions: versions}
 	}
 	// since we rely on RESTMappings method
-	// take the ***REMOVED***rst match and return to the caller
+	// take the first match and return to the caller
 	// as this was the existing behavior.
 	return mappings[0], nil
 }

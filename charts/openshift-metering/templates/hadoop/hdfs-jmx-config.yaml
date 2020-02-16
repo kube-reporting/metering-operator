@@ -1,11 +1,11 @@
 apiVersion: v1
-kind: Con***REMOVED***gMap
+kind: ConfigMap
 metadata:
-  name: hdfs-jmx-con***REMOVED***g
+  name: hdfs-jmx-config
   labels:
     app: hdfs
 data:
-  con***REMOVED***g.yml: |
+  config.yml: |
     ---
     startDelaySeconds: 0
     ssl: false

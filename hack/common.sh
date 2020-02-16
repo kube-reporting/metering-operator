@@ -3,7 +3,7 @@ set -o errexit
 set -o nounset
 set -o pipefail
 
-# This will be overriden by init.sh, but is needed to properly ***REMOVED***nd init.sh and
+# This will be overriden by init.sh, but is needed to properly find init.sh and
 # source it
 ROOT_DIR=$(cd "$(dirname "${BASH_SOURCE[0]}")"/.. && pwd -P)
 

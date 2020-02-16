@@ -1,6 +1,6 @@
 // Copyright 2014 The Go Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE ***REMOVED***le.
+// license that can be found in the LICENSE file.
 
 package colltab
 
@@ -14,7 +14,7 @@ import (
 //
 // Weighter w must have a free primary weight after the primary weight for 9.
 // If this is not the case, numeric value will sort at the same primary level
-// as the ***REMOVED***rst primary sorting after 9.
+// as the first primary sorting after 9.
 func NewNumericWeighter(w Weighter) Weighter {
 	getElem := func(s string) Elem {
 		elems, _ := w.AppendNextString(nil, s)
@@ -48,12 +48,12 @@ func NewNumericWeighter(w Weighter) Weighter {
 type numericWeighter struct {
 	Weighter
 
-	// The Elems below all demarcate boundaries of speci***REMOVED***c ranges. With the
+	// The Elems below all demarcate boundaries of specific ranges. With the
 	// current element encoding digits are in two ranges: normal (default
 	// tertiary value) and special. For most languages, digits have collation
 	// elements in the normal range.
 	//
-	// Note: the range tests are very speci***REMOVED***c for the element encoding used by
+	// Note: the range tests are very specific for the element encoding used by
 	// this implementation. The tests in collate_test.go are designed to fail
 	// if this code is not updated when an encoding has changed.
 
@@ -134,7 +134,7 @@ func (nc *numberConverter) init(elems []Elem, oldLen int, isZero bool) {
 	// for the number of digits.
 	if isZero {
 		elems = append(elems[:oldLen], nc.w.numberStart, 0)
-	} ***REMOVED*** {
+	} else {
 		elems = append(elems, 0, 0)
 		copy(elems[oldLen+2:], elems[oldLen:])
 		elems[oldLen] = nc.w.numberStart
@@ -166,7 +166,7 @@ func (nc *numberConverter) checkNextDigit(bufNew []Elem) (isZero, ok bool) {
 			return false, false
 		}
 		isZero = e <= nc.w.zeroSpecialHi
-	} ***REMOVED*** {
+	} else {
 		// This is the common case if we encounter a digit.
 		isZero = e == nc.w.zero
 	}
@@ -185,7 +185,7 @@ func (nc *numberConverter) checkNextDigit(bufNew []Elem) (isZero, ok bool) {
 		// Unfortunately, this means we need to make this check for nearly all
 		// non-Latin digits.
 		//
-		// TODO: check the performance impact and ***REMOVED***nd something better if it is
+		// TODO: check the performance impact and find something better if it is
 		// an issue.
 		if !nc.isDigit() {
 			return false, false
@@ -205,9 +205,9 @@ func (nc *numberConverter) isDigit() bool {
 
 // We currently support a maximum of about 2M digits (the number of primary
 // values). Such numbers will compare correctly against small numbers, but their
-// comparison against other large numbers is unde***REMOVED***ned.
+// comparison against other large numbers is undefined.
 //
-// TODO: de***REMOVED***ne a proper fallback, such as comparing large numbers textually or
+// TODO: define a proper fallback, such as comparing large numbers textually or
 // actually allowing numbers of unlimited length.
 //
 // TODO: cap this to a lower number (like 100) and maybe allow a larger number
@@ -227,7 +227,7 @@ func (nc *numberConverter) update(elems []Elem) bool {
 	return nc.nDigits < maxDigits
 }
 
-// result ***REMOVED***lls in the length element for the digit sequence and returns the
+// result fills in the length element for the digit sequence and returns the
 // completed collation elements.
 func (nc *numberConverter) result() []Elem {
 	e, _ := MakeElem(nc.nDigits, defaultSecondary, defaultTertiary, 0)

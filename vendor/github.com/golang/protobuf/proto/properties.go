@@ -4,7 +4,7 @@
 // https://github.com/golang/protobuf
 //
 // Redistribution and use in source and binary forms, with or without
-// modi***REMOVED***cation, are permitted provided that the following conditions are
+// modification, are permitted provided that the following conditions are
 // met:
 //
 //     * Redistributions of source code must retain the above copyright
@@ -15,7 +15,7 @@
 // distribution.
 //     * Neither the name of Google Inc. nor the names of its
 // contributors may be used to endorse or promote products derived from
-// this software without speci***REMOVED***c prior written permission.
+// this software without specific prior written permission.
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
 // "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
@@ -75,49 +75,49 @@ func (p *tagMap) get(t int) (int, bool) {
 		if t >= len(p.fastTags) {
 			return 0, false
 		}
-		***REMOVED*** := p.fastTags[t]
-		return ***REMOVED***, ***REMOVED*** >= 0
+		fi := p.fastTags[t]
+		return fi, fi >= 0
 	}
-	***REMOVED***, ok := p.slowTags[t]
-	return ***REMOVED***, ok
+	fi, ok := p.slowTags[t]
+	return fi, ok
 }
 
-func (p *tagMap) put(t int, ***REMOVED*** int) {
+func (p *tagMap) put(t int, fi int) {
 	if t > 0 && t < tagMapFastLimit {
 		for len(p.fastTags) < t+1 {
 			p.fastTags = append(p.fastTags, -1)
 		}
-		p.fastTags[t] = ***REMOVED***
+		p.fastTags[t] = fi
 		return
 	}
 	if p.slowTags == nil {
 		p.slowTags = make(map[int]int)
 	}
-	p.slowTags[t] = ***REMOVED***
+	p.slowTags[t] = fi
 }
 
-// StructProperties represents properties for all the ***REMOVED***elds of a struct.
+// StructProperties represents properties for all the fields of a struct.
 // decoderTags and decoderOrigNames should only be used by the decoder.
 type StructProperties struct {
-	Prop             []*Properties  // properties for each ***REMOVED***eld
+	Prop             []*Properties  // properties for each field
 	reqCount         int            // required count
-	decoderTags      tagMap         // map from proto tag to struct ***REMOVED***eld number
-	decoderOrigNames map[string]int // map from original name to struct ***REMOVED***eld number
-	order            []int          // list of struct ***REMOVED***eld numbers in tag order
+	decoderTags      tagMap         // map from proto tag to struct field number
+	decoderOrigNames map[string]int // map from original name to struct field number
+	order            []int          // list of struct field numbers in tag order
 
-	// OneofTypes contains information about the oneof ***REMOVED***elds in this message.
-	// It is keyed by the original name of a ***REMOVED***eld.
+	// OneofTypes contains information about the oneof fields in this message.
+	// It is keyed by the original name of a field.
 	OneofTypes map[string]*OneofProperties
 }
 
-// OneofProperties represents information about a speci***REMOVED***c ***REMOVED***eld in a oneof.
+// OneofProperties represents information about a specific field in a oneof.
 type OneofProperties struct {
-	Type  reflect.Type // pointer to generated struct type for this oneof ***REMOVED***eld
-	Field int          // struct ***REMOVED***eld number of the containing oneof in the message
+	Type  reflect.Type // pointer to generated struct type for this oneof field
+	Field int          // struct field number of the containing oneof in the message
 	Prop  *Properties
 }
 
-// Implement the sorting interface so we can sort the ***REMOVED***elds in tag order, as recommended by the spec.
+// Implement the sorting interface so we can sort the fields in tag order, as recommended by the spec.
 // See encode.go, (*Buffer).enc_struct.
 
 func (sp *StructProperties) Len() int { return len(sp.order) }
@@ -126,9 +126,9 @@ func (sp *StructProperties) Less(i, j int) bool {
 }
 func (sp *StructProperties) Swap(i, j int) { sp.order[i], sp.order[j] = sp.order[j], sp.order[i] }
 
-// Properties represents the protocol-speci***REMOVED***c behavior of a single struct ***REMOVED***eld.
+// Properties represents the protocol-specific behavior of a single struct field.
 type Properties struct {
-	Name     string // name of the ***REMOVED***eld, for error messages
+	Name     string // name of the field, for error messages
 	OrigName string // original name before protocol compiler (always set)
 	JSONName string // name to use for JSON; determined by protoc
 	Wire     string
@@ -139,8 +139,8 @@ type Properties struct {
 	Repeated bool
 	Packed   bool   // relevant for repeated primitives only
 	Enum     string // set for enum types only
-	proto3   bool   // whether this is known to be a proto3 ***REMOVED***eld; set for []byte only
-	oneof    bool   // whether this is a oneof ***REMOVED***eld
+	proto3   bool   // whether this is known to be a proto3 field; set for []byte only
+	oneof    bool   // whether this is a oneof field
 
 	Default    string // default value
 	HasDefault bool   // whether an explicit default was provided
@@ -153,7 +153,7 @@ type Properties struct {
 	mvalprop *Properties  // set for map types only
 }
 
-// String formats the properties in the protobuf struct ***REMOVED***eld tag style.
+// String formats the properties in the protobuf struct field tag style.
 func (p *Properties) String() string {
 	s := p.Wire
 	s += ","
@@ -189,22 +189,22 @@ func (p *Properties) String() string {
 	return s
 }
 
-// Parse populates p by parsing a string in the protobuf struct ***REMOVED***eld tag style.
+// Parse populates p by parsing a string in the protobuf struct field tag style.
 func (p *Properties) Parse(s string) {
 	// "bytes,49,opt,name=foo,def=hello!"
-	***REMOVED***elds := strings.Split(s, ",") // breaks def=, but handled below.
-	if len(***REMOVED***elds) < 2 {
-		fmt.Fprintf(os.Stderr, "proto: tag has too few ***REMOVED***elds: %q\n", s)
+	fields := strings.Split(s, ",") // breaks def=, but handled below.
+	if len(fields) < 2 {
+		fmt.Fprintf(os.Stderr, "proto: tag has too few fields: %q\n", s)
 		return
 	}
 
-	p.Wire = ***REMOVED***elds[0]
+	p.Wire = fields[0]
 	switch p.Wire {
 	case "varint":
 		p.WireType = WireVarint
-	case "***REMOVED***xed32":
+	case "fixed32":
 		p.WireType = WireFixed32
-	case "***REMOVED***xed64":
+	case "fixed64":
 		p.WireType = WireFixed64
 	case "zigzag32":
 		p.WireType = WireVarint
@@ -219,14 +219,14 @@ func (p *Properties) Parse(s string) {
 	}
 
 	var err error
-	p.Tag, err = strconv.Atoi(***REMOVED***elds[1])
+	p.Tag, err = strconv.Atoi(fields[1])
 	if err != nil {
 		return
 	}
 
 outer:
-	for i := 2; i < len(***REMOVED***elds); i++ {
-		f := ***REMOVED***elds[i]
+	for i := 2; i < len(fields); i++ {
+		f := fields[i]
 		switch {
 		case f == "req":
 			p.Required = true
@@ -236,22 +236,22 @@ outer:
 			p.Repeated = true
 		case f == "packed":
 			p.Packed = true
-		case strings.HasPre***REMOVED***x(f, "name="):
+		case strings.HasPrefix(f, "name="):
 			p.OrigName = f[5:]
-		case strings.HasPre***REMOVED***x(f, "json="):
+		case strings.HasPrefix(f, "json="):
 			p.JSONName = f[5:]
-		case strings.HasPre***REMOVED***x(f, "enum="):
+		case strings.HasPrefix(f, "enum="):
 			p.Enum = f[5:]
 		case f == "proto3":
 			p.proto3 = true
 		case f == "oneof":
 			p.oneof = true
-		case strings.HasPre***REMOVED***x(f, "def="):
+		case strings.HasPrefix(f, "def="):
 			p.HasDefault = true
 			p.Default = f[4:] // rest of string
-			if i+1 < len(***REMOVED***elds) {
+			if i+1 < len(fields) {
 				// Commas aren't escaped, and def is always last.
-				p.Default += "," + strings.Join(***REMOVED***elds[i+1:], ",")
+				p.Default += "," + strings.Join(fields[i+1:], ",")
 				break outer
 			}
 		}
@@ -260,7 +260,7 @@ outer:
 
 var protoMessageType = reflect.TypeOf((*Message)(nil)).Elem()
 
-// setFieldProps initializes the ***REMOVED***eld properties for submessages and maps.
+// setFieldProps initializes the field properties for submessages and maps.
 func (p *Properties) setFieldProps(typ reflect.Type, f *reflect.StructField, lockGetProp bool) {
 	switch t1 := typ; t1.Kind() {
 	case reflect.Ptr:
@@ -290,7 +290,7 @@ func (p *Properties) setFieldProps(typ reflect.Type, f *reflect.StructField, loc
 	if p.stype != nil {
 		if lockGetProp {
 			p.sprop = GetProperties(p.stype)
-		} ***REMOVED*** {
+		} else {
 			p.sprop = getPropertiesLocked(p.stype)
 		}
 	}
@@ -359,7 +359,7 @@ func getPropertiesLocked(t reflect.Type) *StructProperties {
 	}
 
 	prop := new(StructProperties)
-	// in case of recursive protos, ***REMOVED***ll this in now.
+	// in case of recursive protos, fill this in now.
 	propertiesMap[t] = prop
 
 	// build properties
@@ -374,7 +374,7 @@ func getPropertiesLocked(t reflect.Type) *StructProperties {
 
 		oneof := f.Tag.Get("protobuf_oneof") // special case
 		if oneof != "" {
-			// Oneof ***REMOVED***elds don't use the traditional protobuf tag.
+			// Oneof fields don't use the traditional protobuf tag.
 			p.OrigName = oneof
 		}
 		prop.Prop[i] = p
@@ -408,7 +408,7 @@ func getPropertiesLocked(t reflect.Type) *StructProperties {
 			sft := oop.Type.Elem().Field(0)
 			oop.Prop.Name = sft.Name
 			oop.Prop.Parse(sft.Tag.Get("protobuf"))
-			// There will be exactly one interface ***REMOVED***eld that
+			// There will be exactly one interface field that
 			// this new value is assignable to.
 			for i := 0; i < t.NumField(); i++ {
 				f := t.Field(i)
@@ -430,8 +430,8 @@ func getPropertiesLocked(t reflect.Type) *StructProperties {
 	reqCount := 0
 	prop.decoderOrigNames = make(map[string]int)
 	for i, p := range prop.Prop {
-		if strings.HasPre***REMOVED***x(p.Name, "XXX_") {
-			// Internal ***REMOVED***elds should not appear in tags/origNames maps.
+		if strings.HasPrefix(p.Name, "XXX_") {
+			// Internal fields should not appear in tags/origNames maps.
 			// They are handled specially when encoding and decoding.
 			continue
 		}
@@ -467,14 +467,14 @@ func EnumValueMap(enumType string) map[string]int32 {
 }
 
 // A registry of all linked message types.
-// The string is a fully-quali***REMOVED***ed proto name ("pkg.Message").
+// The string is a fully-qualified proto name ("pkg.Message").
 var (
 	protoTypedNils = make(map[string]Message)      // a map from proto names to typed nil pointers
 	protoMapTypes  = make(map[string]reflect.Type) // a map from proto names to map types
 	revProtoTypes  = make(map[reflect.Type]string)
 )
 
-// RegisterType is called from generated code and maps from the fully quali***REMOVED***ed
+// RegisterType is called from generated code and maps from the fully qualified
 // proto name to the type (pointer to struct) of the protocol buffer.
 func RegisterType(x Message, name string) {
 	if _, ok := protoTypedNils[name]; ok {
@@ -487,14 +487,14 @@ func RegisterType(x Message, name string) {
 		// Generated code always calls RegisterType with nil x.
 		// This check is just for extra safety.
 		protoTypedNils[name] = x
-	} ***REMOVED*** {
+	} else {
 		protoTypedNils[name] = reflect.Zero(t).Interface().(Message)
 	}
 	revProtoTypes[t] = name
 }
 
-// RegisterMapType is called from generated code and maps from the fully quali***REMOVED***ed
-// proto name to the native map type of the proto map de***REMOVED***nition.
+// RegisterMapType is called from generated code and maps from the fully qualified
+// proto name to the native map type of the proto map definition.
 func RegisterMapType(x interface{}, name string) {
 	if reflect.TypeOf(x).Kind() != reflect.Map {
 		panic(fmt.Sprintf("RegisterMapType(%T, %q); want map", x, name))
@@ -508,7 +508,7 @@ func RegisterMapType(x interface{}, name string) {
 	revProtoTypes[t] = name
 }
 
-// MessageName returns the fully-quali***REMOVED***ed proto name for the given message type.
+// MessageName returns the fully-qualified proto name for the given message type.
 func MessageName(x Message) string {
 	type xname interface {
 		XXX_MessageName() string
@@ -529,16 +529,16 @@ func MessageType(name string) reflect.Type {
 	return protoMapTypes[name]
 }
 
-// A registry of all linked proto ***REMOVED***les.
+// A registry of all linked proto files.
 var (
-	protoFiles = make(map[string][]byte) // ***REMOVED***le name => ***REMOVED***leDescriptor
+	protoFiles = make(map[string][]byte) // file name => fileDescriptor
 )
 
 // RegisterFile is called from generated code and maps from the
-// full ***REMOVED***le name of a .proto ***REMOVED***le to its compressed FileDescriptorProto.
-func RegisterFile(***REMOVED***lename string, ***REMOVED***leDescriptor []byte) {
-	protoFiles[***REMOVED***lename] = ***REMOVED***leDescriptor
+// full file name of a .proto file to its compressed FileDescriptorProto.
+func RegisterFile(filename string, fileDescriptor []byte) {
+	protoFiles[filename] = fileDescriptor
 }
 
-// FileDescriptor returns the compressed FileDescriptorProto for a .proto ***REMOVED***le.
-func FileDescriptor(***REMOVED***lename string) []byte { return protoFiles[***REMOVED***lename] }
+// FileDescriptor returns the compressed FileDescriptorProto for a .proto file.
+func FileDescriptor(filename string) []byte { return protoFiles[filename] }

@@ -1,9 +1,9 @@
 // Copyright 2013 Dario Castañé. All rights reserved.
 // Copyright 2009 The Go Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE ***REMOVED***le.
+// license that can be found in the LICENSE file.
 
-// Based on src/pkg/reflect/deepequal.go from of***REMOVED***cial
+// Based on src/pkg/reflect/deepequal.go from official
 // golang's stdlib.
 
 package mergo
@@ -14,17 +14,17 @@ import (
 
 func hasExportedField(dst reflect.Value) (exported bool) {
 	for i, n := 0, dst.NumField(); i < n; i++ {
-		***REMOVED***eld := dst.Type().Field(i)
-		if ***REMOVED***eld.Anonymous && dst.Field(i).Kind() == reflect.Struct {
+		field := dst.Type().Field(i)
+		if field.Anonymous && dst.Field(i).Kind() == reflect.Struct {
 			exported = exported || hasExportedField(dst.Field(i))
-		} ***REMOVED*** {
-			exported = exported || len(***REMOVED***eld.PkgPath) == 0
+		} else {
+			exported = exported || len(field.PkgPath) == 0
 		}
 	}
 	return
 }
 
-type Con***REMOVED***g struct {
+type Config struct {
 	Overwrite    bool
 	AppendSlice  bool
 	Transformers Transformers
@@ -34,11 +34,11 @@ type Transformers interface {
 	Transformer(reflect.Type) func(dst, src reflect.Value) error
 }
 
-// Traverses recursively both values, assigning src's ***REMOVED***elds values to dst.
+// Traverses recursively both values, assigning src's fields values to dst.
 // The map argument tracks comparisons that have already been seen, which allows
 // short circuiting on recursive types.
-func deepMerge(dst, src reflect.Value, visited map[uintptr]*visit, depth int, con***REMOVED***g *Con***REMOVED***g) (err error) {
-	overwrite := con***REMOVED***g.Overwrite
+func deepMerge(dst, src reflect.Value, visited map[uintptr]*visit, depth int, config *Config) (err error) {
+	overwrite := config.Overwrite
 
 	if !src.IsValid() {
 		return
@@ -57,8 +57,8 @@ func deepMerge(dst, src reflect.Value, visited map[uintptr]*visit, depth int, co
 		visited[h] = &visit{addr, typ, seen}
 	}
 
-	if con***REMOVED***g.Transformers != nil && !isEmptyValue(dst) {
-		if fn := con***REMOVED***g.Transformers.Transformer(dst.Type()); fn != nil {
+	if config.Transformers != nil && !isEmptyValue(dst) {
+		if fn := config.Transformers.Transformer(dst.Type()); fn != nil {
 			err = fn(dst, src)
 			return
 		}
@@ -68,11 +68,11 @@ func deepMerge(dst, src reflect.Value, visited map[uintptr]*visit, depth int, co
 	case reflect.Struct:
 		if hasExportedField(dst) {
 			for i, n := 0, dst.NumField(); i < n; i++ {
-				if err = deepMerge(dst.Field(i), src.Field(i), visited, depth+1, con***REMOVED***g); err != nil {
+				if err = deepMerge(dst.Field(i), src.Field(i), visited, depth+1, config); err != nil {
 					return
 				}
 			}
-		} ***REMOVED*** {
+		} else {
 			if dst.CanSet() && !isEmptyValue(src) && (overwrite || isEmptyValue(dst)) {
 				dst.Set(src)
 			}
@@ -103,7 +103,7 @@ func deepMerge(dst, src reflect.Value, visited map[uintptr]*visit, depth int, co
 				case reflect.Ptr:
 					fallthrough
 				case reflect.Map:
-					if err = deepMerge(dstElement, srcElement, visited, depth+1, con***REMOVED***g); err != nil {
+					if err = deepMerge(dstElement, srcElement, visited, depth+1, config); err != nil {
 						return
 					}
 				case reflect.Slice:
@@ -112,7 +112,7 @@ func deepMerge(dst, src reflect.Value, visited map[uintptr]*visit, depth int, co
 					var dstSlice reflect.Value
 					if !dstElement.IsValid() || dstElement.IsNil() {
 						dstSlice = reflect.MakeSlice(srcSlice.Type(), 0, srcSlice.Len())
-					} ***REMOVED*** {
+					} else {
 						dstSlice = reflect.ValueOf(dstElement.Interface())
 					}
 
@@ -135,9 +135,9 @@ func deepMerge(dst, src reflect.Value, visited map[uintptr]*visit, depth int, co
 		if !dst.CanSet() {
 			break
 		}
-		if !isEmptyValue(src) && (overwrite || isEmptyValue(dst)) && !con***REMOVED***g.AppendSlice {
+		if !isEmptyValue(src) && (overwrite || isEmptyValue(dst)) && !config.AppendSlice {
 			dst.Set(src)
-		} ***REMOVED*** {
+		} else {
 			dst.Set(reflect.AppendSlice(dst, src))
 		}
 	case reflect.Ptr:
@@ -151,15 +151,15 @@ func deepMerge(dst, src reflect.Value, visited map[uintptr]*visit, depth int, co
 				if dst.CanSet() && (overwrite || isEmptyValue(dst)) {
 					dst.Set(src)
 				}
-			} ***REMOVED*** if src.Kind() == reflect.Ptr {
-				if err = deepMerge(dst.Elem(), src.Elem(), visited, depth+1, con***REMOVED***g); err != nil {
+			} else if src.Kind() == reflect.Ptr {
+				if err = deepMerge(dst.Elem(), src.Elem(), visited, depth+1, config); err != nil {
 					return
 				}
-			} ***REMOVED*** if dst.Elem().Type() == src.Type() {
-				if err = deepMerge(dst.Elem(), src, visited, depth+1, con***REMOVED***g); err != nil {
+			} else if dst.Elem().Type() == src.Type() {
+				if err = deepMerge(dst.Elem(), src, visited, depth+1, config); err != nil {
 					return
 				}
-			} ***REMOVED*** {
+			} else {
 				return ErrDifferentArgumentsTypes
 			}
 			break
@@ -168,7 +168,7 @@ func deepMerge(dst, src reflect.Value, visited map[uintptr]*visit, depth int, co
 			if dst.CanSet() && (overwrite || isEmptyValue(dst)) {
 				dst.Set(src)
 			}
-		} ***REMOVED*** if err = deepMerge(dst.Elem(), src.Elem(), visited, depth+1, con***REMOVED***g); err != nil {
+		} else if err = deepMerge(dst.Elem(), src.Elem(), visited, depth+1, config); err != nil {
 			return
 		}
 	default:
@@ -179,48 +179,48 @@ func deepMerge(dst, src reflect.Value, visited map[uintptr]*visit, depth int, co
 	return
 }
 
-// Merge will ***REMOVED***ll any empty for value type attributes on the dst struct using corresponding
+// Merge will fill any empty for value type attributes on the dst struct using corresponding
 // src attributes if they themselves are not empty. dst and src must be valid same-type structs
 // and dst must be a pointer to struct.
-// It won't merge unexported (private) ***REMOVED***elds and will do recursively any exported ***REMOVED***eld.
-func Merge(dst, src interface{}, opts ...func(*Con***REMOVED***g)) error {
+// It won't merge unexported (private) fields and will do recursively any exported field.
+func Merge(dst, src interface{}, opts ...func(*Config)) error {
 	return merge(dst, src, opts...)
 }
 
 // MergeWithOverwrite will do the same as Merge except that non-empty dst attributes will be overriden by
 // non-empty src attribute values.
 // Deprecated: use Merge(…) with WithOverride
-func MergeWithOverwrite(dst, src interface{}, opts ...func(*Con***REMOVED***g)) error {
+func MergeWithOverwrite(dst, src interface{}, opts ...func(*Config)) error {
 	return merge(dst, src, append(opts, WithOverride)...)
 }
 
 // WithTransformers adds transformers to merge, allowing to customize the merging of some types.
-func WithTransformers(transformers Transformers) func(*Con***REMOVED***g) {
-	return func(con***REMOVED***g *Con***REMOVED***g) {
-		con***REMOVED***g.Transformers = transformers
+func WithTransformers(transformers Transformers) func(*Config) {
+	return func(config *Config) {
+		config.Transformers = transformers
 	}
 }
 
 // WithOverride will make merge override non-empty dst attributes with non-empty src attributes values.
-func WithOverride(con***REMOVED***g *Con***REMOVED***g) {
-	con***REMOVED***g.Overwrite = true
+func WithOverride(config *Config) {
+	config.Overwrite = true
 }
 
 // WithAppendSlice will make merge append slices instead of overwriting it
-func WithAppendSlice(con***REMOVED***g *Con***REMOVED***g) {
-	con***REMOVED***g.AppendSlice = true
+func WithAppendSlice(config *Config) {
+	config.AppendSlice = true
 }
 
-func merge(dst, src interface{}, opts ...func(*Con***REMOVED***g)) error {
+func merge(dst, src interface{}, opts ...func(*Config)) error {
 	var (
 		vDst, vSrc reflect.Value
 		err        error
 	)
 
-	con***REMOVED***g := &Con***REMOVED***g{}
+	config := &Config{}
 
 	for _, opt := range opts {
-		opt(con***REMOVED***g)
+		opt(config)
 	}
 
 	if vDst, vSrc, err = resolveValues(dst, src); err != nil {
@@ -229,5 +229,5 @@ func merge(dst, src interface{}, opts ...func(*Con***REMOVED***g)) error {
 	if vDst.Type() != vSrc.Type() {
 		return ErrDifferentArgumentsTypes
 	}
-	return deepMerge(vDst, vSrc, make(map[uintptr]*visit), 0, con***REMOVED***g)
+	return deepMerge(vDst, vSrc, make(map[uintptr]*visit), 0, config)
 }

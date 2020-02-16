@@ -5,7 +5,7 @@ import (
 	"os"
 )
 
-// A LogLevelType de***REMOVED***nes the level logging should be performed at. Used to instruct
+// A LogLevelType defines the level logging should be performed at. Used to instruct
 // the SDK which statements should be logged.
 type LogLevelType uint
 
@@ -32,7 +32,7 @@ func (l *LogLevelType) Matches(v LogLevelType) bool {
 	return c&v == v
 }
 
-// AtLeast returns true if this LogLevel is at least high enough to satis***REMOVED***es v.
+// AtLeast returns true if this LogLevel is at least high enough to satisfies v.
 // Is safe to use on nil value LogLevelTypes. If LogLevel is nil, will default
 // to LogOff comparison.
 func (l *LogLevelType) AtLeast(v LogLevelType) bool {
@@ -89,7 +89,7 @@ type Logger interface {
 // list of arguments and wrap it so the Logger interface can be used.
 //
 // Example:
-//     s3.New(sess, &aws.Con***REMOVED***g{Logger: aws.LoggerFunc(func(args ...interface{}) {
+//     s3.New(sess, &aws.Config{Logger: aws.LoggerFunc(func(args ...interface{}) {
 //         fmt.Fprintln(os.Stdout, args...)
 //     })})
 type LoggerFunc func(...interface{})

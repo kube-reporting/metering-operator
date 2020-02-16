@@ -51,10 +51,10 @@ func (executor *UnboundedExecutor) Go(handler func(ctx context.Context)) {
 	pc := reflect.ValueOf(handler).Pointer()
 	f := runtime.FuncForPC(pc)
 	funcName := f.Name()
-	***REMOVED***le, line := f.FileLine(pc)
+	file, line := f.FileLine(pc)
 	executor.activeGoroutinesMutex.Lock()
 	defer executor.activeGoroutinesMutex.Unlock()
-	startFrom := fmt.Sprintf("%s:%d", ***REMOVED***le, line)
+	startFrom := fmt.Sprintf("%s:%d", file, line)
 	executor.activeGoroutines[startFrom] += 1
 	go func() {
 		defer func() {
@@ -64,7 +64,7 @@ func (executor *UnboundedExecutor) Go(handler func(ctx context.Context)) {
 			if recovered != nil {
 				if executor.HandlePanic == nil {
 					HandlePanic(recovered, funcName)
-				} ***REMOVED*** {
+				} else {
 					executor.HandlePanic(recovered, funcName)
 				}
 			}

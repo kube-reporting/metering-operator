@@ -49,7 +49,7 @@ func (f *FlagSet) GetIPNet(name string) (net.IPNet, error) {
 	return val.(net.IPNet), nil
 }
 
-// IPNetVar de***REMOVED***nes an net.IPNet flag with speci***REMOVED***ed name, default value, and usage string.
+// IPNetVar defines an net.IPNet flag with specified name, default value, and usage string.
 // The argument p points to an net.IPNet variable in which to store the value of the flag.
 func (f *FlagSet) IPNetVar(p *net.IPNet, name string, value net.IPNet, usage string) {
 	f.VarP(newIPNetValue(value, p), name, "", usage)
@@ -60,7 +60,7 @@ func (f *FlagSet) IPNetVarP(p *net.IPNet, name, shorthand string, value net.IPNe
 	f.VarP(newIPNetValue(value, p), name, shorthand, usage)
 }
 
-// IPNetVar de***REMOVED***nes an net.IPNet flag with speci***REMOVED***ed name, default value, and usage string.
+// IPNetVar defines an net.IPNet flag with specified name, default value, and usage string.
 // The argument p points to an net.IPNet variable in which to store the value of the flag.
 func IPNetVar(p *net.IPNet, name string, value net.IPNet, usage string) {
 	CommandLine.VarP(newIPNetValue(value, p), name, "", usage)
@@ -71,7 +71,7 @@ func IPNetVarP(p *net.IPNet, name, shorthand string, value net.IPNet, usage stri
 	CommandLine.VarP(newIPNetValue(value, p), name, shorthand, usage)
 }
 
-// IPNet de***REMOVED***nes an net.IPNet flag with speci***REMOVED***ed name, default value, and usage string.
+// IPNet defines an net.IPNet flag with specified name, default value, and usage string.
 // The return value is the address of an net.IPNet variable that stores the value of the flag.
 func (f *FlagSet) IPNet(name string, value net.IPNet, usage string) *net.IPNet {
 	p := new(net.IPNet)
@@ -86,7 +86,7 @@ func (f *FlagSet) IPNetP(name, shorthand string, value net.IPNet, usage string) 
 	return p
 }
 
-// IPNet de***REMOVED***nes an net.IPNet flag with speci***REMOVED***ed name, default value, and usage string.
+// IPNet defines an net.IPNet flag with specified name, default value, and usage string.
 // The return value is the address of an net.IPNet variable that stores the value of the flag.
 func IPNet(name string, value net.IPNet, usage string) *net.IPNet {
 	return CommandLine.IPNetP(name, "", value, usage)

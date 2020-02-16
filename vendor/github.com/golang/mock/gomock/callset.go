@@ -1,7 +1,7 @@
 // Copyright 2011 Google Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this ***REMOVED***le except in compliance with the License.
+// you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 //
 //     http://www.apache.org/licenses/LICENSE-2.0
@@ -9,7 +9,7 @@
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the speci***REMOVED***c language governing permissions and
+// See the License for the specific language governing permissions and
 // limitations under the License.
 
 package gomock
@@ -73,7 +73,7 @@ func (cs callSet) FindMatch(receiver interface{}, method string, args []interfac
 		err := call.matches(args)
 		if err != nil {
 			fmt.Fprintf(&callsErrors, "\n%v", err)
-		} ***REMOVED*** {
+		} else {
 			return call, nil
 		}
 	}
@@ -94,12 +94,12 @@ func (cs callSet) FindMatch(receiver interface{}, method string, args []interfac
 	return nil, fmt.Errorf(callsErrors.String())
 }
 
-// Failures returns the calls that are not satis***REMOVED***ed.
+// Failures returns the calls that are not satisfied.
 func (cs callSet) Failures() []*Call {
 	failures := make([]*Call, 0, len(cs.expected))
 	for _, calls := range cs.expected {
 		for _, call := range calls {
-			if !call.satis***REMOVED***ed() {
+			if !call.satisfied() {
 				failures = append(failures, call)
 			}
 		}

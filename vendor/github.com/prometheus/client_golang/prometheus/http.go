@@ -1,6 +1,6 @@
 // Copyright 2014 The Prometheus Authors
 // Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this ***REMOVED***le except in compliance with the License.
+// you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 //
 // http://www.apache.org/licenses/LICENSE-2.0
@@ -8,13 +8,13 @@
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the speci***REMOVED***c language governing permissions and
+// See the License for the specific language governing permissions and
 // limitations under the License.
 
 package prometheus
 
 import (
-	"bu***REMOVED***o"
+	"bufio"
 	"bytes"
 	"compress/gzip"
 	"fmt"
@@ -29,7 +29,7 @@ import (
 	"github.com/prometheus/common/expfmt"
 )
 
-// TODO(beorn7): Remove this whole ***REMOVED***le. It is a partial mirror of
+// TODO(beorn7): Remove this whole file. It is a partial mirror of
 // promhttp/http.go (to avoid circular import chains) where everything HTTP
 // related should live. The functions here are just for avoiding
 // breakage. Everything is deprecated.
@@ -117,7 +117,7 @@ func decorateWriter(request *http.Request, writer io.Writer) (io.Writer, string)
 	parts := strings.Split(header, ",")
 	for _, part := range parts {
 		part := strings.TrimSpace(part)
-		if part == "gzip" || strings.HasPre***REMOVED***x(part, "gzip;") {
+		if part == "gzip" || strings.HasPrefix(part, "gzip;") {
 			return gzip.NewWriter(writer), "gzip"
 		}
 	}
@@ -201,7 +201,7 @@ func InstrumentHandlerFunc(handlerName string, handlerFunc func(http.ResponseWri
 // issues) but provides more flexibility (at the cost of a more complex call
 // syntax). As InstrumentHandler, this function registers four metric
 // collectors, but it uses the provided SummaryOpts to create them. However, the
-// ***REMOVED***elds "Name" and "Help" in the SummaryOpts are ignored. "Name" is replaced
+// fields "Name" and "Help" in the SummaryOpts are ignored. "Name" is replaced
 // by "requests_total", "request_duration_microseconds", "request_size_bytes",
 // and "response_size_bytes", respectively. "Help" is replaced by an appropriate
 // help string. The names of the variable labels of the http_requests_total
@@ -220,7 +220,7 @@ func InstrumentHandlerFunc(handlerName string, handlerFunc func(http.ResponseWri
 //
 // Technical detail: "requests_total" is a CounterVec, not a SummaryVec, so it
 // cannot use SummaryOpts. Instead, a CounterOpts struct is created internally,
-// and all its ***REMOVED***elds are set to the equally named ***REMOVED***elds in the provided
+// and all its fields are set to the equally named fields in the provided
 // SummaryOpts.
 //
 // Deprecated: InstrumentHandlerWithOpts is deprecated for the same reasons as
@@ -250,7 +250,7 @@ func InstrumentHandlerFuncWithOpts(opts SummaryOpts, handlerFunc func(http.Respo
 	if err := Register(reqCnt); err != nil {
 		if are, ok := err.(AlreadyRegisteredError); ok {
 			reqCnt = are.ExistingCollector.(*CounterVec)
-		} ***REMOVED*** {
+		} else {
 			panic(err)
 		}
 	}
@@ -261,7 +261,7 @@ func InstrumentHandlerFuncWithOpts(opts SummaryOpts, handlerFunc func(http.Respo
 	if err := Register(reqDur); err != nil {
 		if are, ok := err.(AlreadyRegisteredError); ok {
 			reqDur = are.ExistingCollector.(Summary)
-		} ***REMOVED*** {
+		} else {
 			panic(err)
 		}
 	}
@@ -272,7 +272,7 @@ func InstrumentHandlerFuncWithOpts(opts SummaryOpts, handlerFunc func(http.Respo
 	if err := Register(reqSz); err != nil {
 		if are, ok := err.(AlreadyRegisteredError); ok {
 			reqSz = are.ExistingCollector.(Summary)
-		} ***REMOVED*** {
+		} else {
 			panic(err)
 		}
 	}
@@ -283,7 +283,7 @@ func InstrumentHandlerFuncWithOpts(opts SummaryOpts, handlerFunc func(http.Respo
 	if err := Register(resSz); err != nil {
 		if are, ok := err.(AlreadyRegisteredError); ok {
 			resSz = are.ExistingCollector.(Summary)
-		} ***REMOVED*** {
+		} else {
 			panic(err)
 		}
 	}
@@ -294,14 +294,14 @@ func InstrumentHandlerFuncWithOpts(opts SummaryOpts, handlerFunc func(http.Respo
 		delegate := &responseWriterDelegator{ResponseWriter: w}
 		out := computeApproximateRequestSize(r)
 
-		_, cn := w.(http.CloseNoti***REMOVED***er)
+		_, cn := w.(http.CloseNotifier)
 		_, fl := w.(http.Flusher)
 		_, hj := w.(http.Hijacker)
 		_, rf := w.(io.ReaderFrom)
 		var rw http.ResponseWriter
 		if cn && fl && hj && rf {
 			rw = &fancyResponseWriterDelegator{delegate}
-		} ***REMOVED*** {
+		} else {
 			rw = delegate
 		}
 		handlerFunc(rw, r)
@@ -379,14 +379,14 @@ type fancyResponseWriterDelegator struct {
 }
 
 func (f *fancyResponseWriterDelegator) CloseNotify() <-chan bool {
-	return f.ResponseWriter.(http.CloseNoti***REMOVED***er).CloseNotify()
+	return f.ResponseWriter.(http.CloseNotifier).CloseNotify()
 }
 
 func (f *fancyResponseWriterDelegator) Flush() {
 	f.ResponseWriter.(http.Flusher).Flush()
 }
 
-func (f *fancyResponseWriterDelegator) Hijack() (net.Conn, *bu***REMOVED***o.ReadWriter, error) {
+func (f *fancyResponseWriterDelegator) Hijack() (net.Conn, *bufio.ReadWriter, error) {
 	return f.ResponseWriter.(http.Hijacker).Hijack()
 }
 

@@ -1,6 +1,6 @@
 // Copyright 2011 The Go Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE ***REMOVED***le.
+// license that can be found in the LICENSE file.
 
 // +build darwin dragonfly freebsd linux netbsd openbsd solaris
 
@@ -22,7 +22,7 @@ func cmsgAlignOf(salen int) int {
 	return (salen + salign - 1) & ^(salign - 1)
 }
 
-// CmsgLen returns the value to store in the Len ***REMOVED***eld of the Cmsghdr
+// CmsgLen returns the value to store in the Len field of the Cmsghdr
 // structure, taking into account any necessary alignment.
 func CmsgLen(datalen int) int {
 	return cmsgAlignOf(SizeofCmsghdr) + datalen
@@ -69,7 +69,7 @@ func socketControlMessageHeaderAndData(b []byte) (*Cmsghdr, []byte, error) {
 	return h, b[cmsgAlignOf(SizeofCmsghdr):h.Len], nil
 }
 
-// UnixRights encodes a set of open ***REMOVED***le descriptors into a socket
+// UnixRights encodes a set of open file descriptors into a socket
 // control message for sending to another process.
 func UnixRights(fds ...int) []byte {
 	datalen := len(fds) * 4
@@ -87,7 +87,7 @@ func UnixRights(fds ...int) []byte {
 }
 
 // ParseUnixRights decodes a socket control message that contains an
-// integer array of open ***REMOVED***le descriptors from another process.
+// integer array of open file descriptors from another process.
 func ParseUnixRights(m *SocketControlMessage) ([]int, error) {
 	if m.Header.Level != SOL_SOCKET {
 		return nil, EINVAL

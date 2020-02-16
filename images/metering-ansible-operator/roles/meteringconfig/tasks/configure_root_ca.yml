@@ -10,7 +10,7 @@
     k8s_facts:
       api_version: v1
       kind: Secret
-      name: "{{ meteringcon***REMOVED***g_spec.tls.secretName }}"
+      name: "{{ meteringconfig_spec.tls.secretName }}"
       namespace: "{{ meta.namespace }}"
     no_log: true
     register: root_ca_secret_buf
@@ -19,58 +19,58 @@
   - name: Use pre-existing CA secret cert/key when secret already exists
     block:
     - set_fact:
-        _meteringcon***REMOVED***g_tls_root_ca_certi***REMOVED***cate: "{{ root_ca_secret_buf.resources[0].data['ca.crt'] | b64decode }}"
-        _meteringcon***REMOVED***g_tls_root_ca_key: "{{ root_ca_secret_buf.resources[0].data['ca.key'] | b64decode }}"
+        _meteringconfig_tls_root_ca_certificate: "{{ root_ca_secret_buf.resources[0].data['ca.crt'] | b64decode }}"
+        _meteringconfig_tls_root_ca_key: "{{ root_ca_secret_buf.resources[0].data['ca.key'] | b64decode }}"
       no_log: true
 
-    - name: Add root CA certi***REMOVED***cate to certi***REMOVED***cates directory
+    - name: Add root CA certificate to certificates directory
       copy:
-        content: "{{ _meteringcon***REMOVED***g_tls_root_ca_certi***REMOVED***cate }}"
-        dest: "{{ certi***REMOVED***cates_dir.path }}/ca.crt"
+        content: "{{ _meteringconfig_tls_root_ca_certificate }}"
+        dest: "{{ certificates_dir.path }}/ca.crt"
 
-    - name: Add root CA private key to certi***REMOVED***cates directory
+    - name: Add root CA private key to certificates directory
       copy:
-        content: "{{ _meteringcon***REMOVED***g_tls_root_ca_key }}"
-        dest: "{{ certi***REMOVED***cates_dir.path }}/ca.key"
+        content: "{{ _meteringconfig_tls_root_ca_key }}"
+        dest: "{{ certificates_dir.path }}/ca.key"
     when: root_ca_secret_exists
   vars:
-    root_ca_secret_exists: "{{ root_ca_secret_buf.resources is de***REMOVED***ned and root_ca_secret_buf.resources | length > 0 }}"
-  when: meteringcon***REMOVED***g_tls_enabled
+    root_ca_secret_exists: "{{ root_ca_secret_buf.resources is defined and root_ca_secret_buf.resources | length > 0 }}"
+  when: meteringconfig_tls_enabled
 
 #
-# Generate the metering root certi***REMOVED***cate authority
+# Generate the metering root certificate authority
 #
-- name: Setup the root certi***REMOVED***cate authority
+- name: Setup the root certificate authority
   block:
   - name: Generate a RSA private key for the CA
     openssl_privatekey:
       size: 2048
       type: RSA
-      path: "{{ certi***REMOVED***cates_dir.path }}/ca.key"
+      path: "{{ certificates_dir.path }}/ca.key"
 
   - name: Generate a CSR for the CA
     openssl_csr:
-      path: "{{ certi***REMOVED***cates_dir.path }}/ca.csr"
-      privatekey_path: "{{ certi***REMOVED***cates_dir.path }}/ca.key"
+      path: "{{ certificates_dir.path }}/ca.csr"
+      privatekey_path: "{{ certificates_dir.path }}/ca.key"
       common_name: Operator Metering Root CA
       use_common_name_for_san: false
       basicConstraints:
       - 'CA:TRUE'
       basicConstraints_critical: true
 
-  - name: Generate a certi***REMOVED***cate for the CA
-    openssl_certi***REMOVED***cate:
-      path: "{{ certi***REMOVED***cates_dir.path }}/ca.crt"
-      privatekey_path: "{{ certi***REMOVED***cates_dir.path }}/ca.key"
-      csr_path: "{{ certi***REMOVED***cates_dir.path }}/ca.csr"
+  - name: Generate a certificate for the CA
+    openssl_certificate:
+      path: "{{ certificates_dir.path }}/ca.crt"
+      privatekey_path: "{{ certificates_dir.path }}/ca.key"
+      csr_path: "{{ certificates_dir.path }}/ca.csr"
       provider: selfsigned
       selfsigned_digest: sha256
 
-  - name: Use the generated root certi***REMOVED***cate authority cert/key values
+  - name: Use the generated root certificate authority cert/key values
     set_fact:
-      _meteringcon***REMOVED***g_tls_root_ca_certi***REMOVED***cate: "{{ lookup('***REMOVED***le', '{{ certi***REMOVED***cates_dir.path }}/ca.crt') + '\n' }}"
-      _meteringcon***REMOVED***g_tls_root_ca_key: "{{ lookup('***REMOVED***le', '{{ certi***REMOVED***cates_dir.path }}/ca.key') + '\n' }}"
+      _meteringconfig_tls_root_ca_certificate: "{{ lookup('file', '{{ certificates_dir.path }}/ca.crt') + '\n' }}"
+      _meteringconfig_tls_root_ca_key: "{{ lookup('file', '{{ certificates_dir.path }}/ca.key') + '\n' }}"
     no_log: true
   vars:
-    root_ca_secret_exists: "{{ root_ca_secret_buf.resources is de***REMOVED***ned and root_ca_secret_buf.resources | length > 0 }}"
-  when: meteringcon***REMOVED***g_tls_enabled and not root_ca_secret_exists
+    root_ca_secret_exists: "{{ root_ca_secret_buf.resources is defined and root_ca_secret_buf.resources | length > 0 }}"
+  when: meteringconfig_tls_enabled and not root_ca_secret_exists

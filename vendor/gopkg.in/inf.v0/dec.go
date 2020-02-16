@@ -1,15 +1,15 @@
-// Package inf (type inf.Dec) implements "in***REMOVED***nite-precision" decimal
+// Package inf (type inf.Dec) implements "infinite-precision" decimal
 // arithmetic.
-// "In***REMOVED***nite precision" describes two characteristics: practically unlimited
+// "Infinite precision" describes two characteristics: practically unlimited
 // precision for decimal number representation and no support for calculating
-// with any speci***REMOVED***c ***REMOVED***xed precision.
+// with any specific fixed precision.
 // (Although there is no practical limit on precision, inf.Dec can only
-// represent ***REMOVED***nite decimals.)
+// represent finite decimals.)
 //
 // This package is currently in experimental stage and the API may change.
 //
 // This package does NOT support:
-//  - rounding to speci***REMOVED***c precisions (as opposed to speci***REMOVED***c decimal positions)
+//  - rounding to specific precisions (as opposed to specific decimal positions)
 //  - the notion of context (each rounding must be explicit)
 //  - NaN and Inf values, and distinguishing between positive and negative zero
 //  - conversions to and from float32/64 types
@@ -33,9 +33,9 @@ import (
 )
 
 // A Dec represents a signed arbitrary-precision decimal.
-// It is a combination of a sign, an arbitrary-precision integer coef***REMOVED***cient
-// value, and a signed ***REMOVED***xed-precision exponent value.
-// The sign and the coef***REMOVED***cient value are handled together as a signed value
+// It is a combination of a sign, an arbitrary-precision integer coefficient
+// value, and a signed fixed-precision exponent value.
+// The sign and the coefficient value are handled together as a signed value
 // and referred to as the unscaled value.
 // (Positive and negative zero values are not distinguished.)
 // Since the exponent is most commonly non-positive, it is handled in negated
@@ -61,7 +61,7 @@ import (
 //
 // Operations are typically performed through the *Dec type.
 // The semantics of the assignment operation "=" for "bare" Dec values is
-// unde***REMOVED***ned and should not be relied on.
+// undefined and should not be relied on.
 //
 // Methods are typically of the form:
 //
@@ -73,12 +73,12 @@ import (
 // returning a result other than *Dec take one of the operands as the receiver.
 //
 // A "bare" Quo method (quotient / division operation) is not provided, as the
-// result is not always a ***REMOVED***nite decimal and thus in general cannot be
+// result is not always a finite decimal and thus in general cannot be
 // represented as a Dec.
 // Instead, in the common case when rounding is (potentially) necessary,
 // QuoRound should be used with a Scale and a Rounder.
 // QuoExact or QuoRound with RoundExact can be used in the special cases when it
-// is known that the result is always a ***REMOVED***nite decimal.
+// is known that the result is always a finite decimal.
 //
 type Dec struct {
 	unscaled big.Int
@@ -129,7 +129,7 @@ func (x *Dec) Scale() Scale {
 }
 
 // Unscaled returns the unscaled value of x for u and true for ok when the
-// unscaled value can be represented as int64; otherwise it returns an unde***REMOVED***ned
+// unscaled value can be represented as int64; otherwise it returns an undefined
 // int64 value for u and false for ok. Use x.UnscaledBig().Int64() to avoid
 // checking the validity of the value when the check is known to be redundant.
 func (x *Dec) Unscaled() (u int64, ok bool) {
@@ -245,10 +245,10 @@ func (z *Dec) Round(x *Dec, s Scale, r Rounder) *Dec {
 }
 
 // QuoRound sets z to the quotient x/y, rounded using the given Rounder to the
-// speci***REMOVED***ed scale.
+// specified scale.
 //
 // If the rounder is RoundExact but the result can not be expressed exactly at
-// the speci***REMOVED***ed scale, QuoRound returns nil, and the value of z is unde***REMOVED***ned.
+// the specified scale, QuoRound returns nil, and the value of z is undefined.
 //
 // There is no corresponding Div method; the equivalent can be achieved through
 // the choice of Rounder used.
@@ -263,7 +263,7 @@ func (z *Dec) quo(x, y *Dec, s scaler, r Rounder) *Dec {
 	if r.UseRemainder() {
 		zz, rA, rB := new(Dec).quoRem(x, y, scl, true, new(big.Int), new(big.Int))
 		zzz = r.Round(new(Dec), zz, rA, rB)
-	} ***REMOVED*** {
+	} else {
 		zz, _, _ := new(Dec).quoRem(x, y, scl, false, nil, nil)
 		zzz = r.Round(new(Dec), zz, nil, nil)
 	}
@@ -273,11 +273,11 @@ func (z *Dec) quo(x, y *Dec, s scaler, r Rounder) *Dec {
 	return z.Set(zzz)
 }
 
-// QuoExact sets z to the quotient x/y and returns z when x/y is a ***REMOVED***nite
-// decimal. Otherwise it returns nil and the value of z is unde***REMOVED***ned.
+// QuoExact sets z to the quotient x/y and returns z when x/y is a finite
+// decimal. Otherwise it returns nil and the value of z is undefined.
 //
 // The scale of a non-nil result is "x.Scale() - y.Scale()" or greater; it is
-// calculated so that the remainder will be zero whenever x/y is a ***REMOVED***nite
+// calculated so that the remainder will be zero whenever x/y is a finite
 // decimal.
 func (z *Dec) QuoExact(x, y *Dec) *Dec {
 	return z.quo(x, y, scaleQuoExact{}, RoundExact)
@@ -327,7 +327,7 @@ func (z *Dec) quoRem(x, y *Dec, s Scale, useRem bool,
 		// set remainder
 		remNum.Set(intr)
 		remDen.Set(iy2)
-	} ***REMOVED*** {
+	} else {
 		z.UnscaledBig().Quo(ix, iy)
 	}
 	return z, remNum, remDen
@@ -347,7 +347,7 @@ func (sqe scaleQuoExact) Scale(x, y *Dec) Scale {
 	var f10 Scale
 	if f2 > f5 {
 		f10 = Scale(f2)
-	} ***REMOVED*** {
+	} else {
 		f10 = Scale(f5)
 	}
 	return x.Scale() - y.Scale() + f10
@@ -361,7 +361,7 @@ func factor(n *big.Int, p *big.Int) int {
 		if dm.Sign() == 0 {
 			f++
 			d = dd
-		} ***REMOVED*** {
+		} else {
 			break
 		}
 	}
@@ -416,7 +416,7 @@ func appendZeros(s []byte, n Scale) []byte {
 	for i := Scale(0); i < n; i += lzeros {
 		if n > i+lzeros {
 			s = append(s, zeros...)
-		} ***REMOVED*** {
+		} else {
 			s = append(s, zeros[0:n-i]...)
 		}
 	}
@@ -469,7 +469,7 @@ func (x *Dec) Format(s fmt.State, ch rune) {
 
 func (z *Dec) scan(r io.RuneScanner) (*Dec, error) {
 	unscaled := make([]byte, 0, 256) // collects chars of unscaled as bytes
-	dp, dg := -1, -1                 // indexes of decimal point, ***REMOVED***rst digit
+	dp, dg := -1, -1                 // indexes of decimal point, first digit
 loop:
 	for {
 		ch, _, err := r.ReadRune()
@@ -481,7 +481,7 @@ loop:
 		}
 		switch {
 		case ch == '+' || ch == '-':
-			if len(unscaled) > 0 || dp >= 0 { // must be ***REMOVED***rst character
+			if len(unscaled) > 0 || dp >= 0 { // must be first character
 				r.UnreadRune()
 				break loop
 			}
@@ -507,7 +507,7 @@ loop:
 	}
 	if dp >= 0 {
 		z.SetScale(Scale(len(unscaled) - dp))
-	} ***REMOVED*** {
+	} else {
 		z.SetScale(0)
 	}
 	_, ok := z.UnscaledBig().SetString(string(unscaled), 10)
@@ -521,7 +521,7 @@ loop:
 // and returns z and a boolean indicating success. The scale of z is the
 // number of digits after the decimal point (including any trailing 0s),
 // or 0 if there is no decimal point. If SetString fails, the value of z
-// is unde***REMOVED***ned but the returned value is nil.
+// is undefined but the returned value is nil.
 func (z *Dec) SetString(s string) (*Dec, bool) {
 	r := strings.NewReader(s)
 	_, err := z.scan(r)

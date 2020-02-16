@@ -23,20 +23,20 @@ import (
 	"os"
 )
 
-// Con***REMOVED***gState houses the con***REMOVED***guration options used by spew to format and
-// display values.  There is a global instance, Con***REMOVED***g, that is used to control
-// all top-level Formatter and Dump functionality.  Each Con***REMOVED***gState instance
+// ConfigState houses the configuration options used by spew to format and
+// display values.  There is a global instance, Config, that is used to control
+// all top-level Formatter and Dump functionality.  Each ConfigState instance
 // provides methods equivalent to the top-level functions.
 //
-// The zero value for Con***REMOVED***gState provides no indentation.  You would typically
+// The zero value for ConfigState provides no indentation.  You would typically
 // want to set it to a space or a tab.
 //
-// Alternatively, you can use NewDefaultCon***REMOVED***g to get a Con***REMOVED***gState instance
-// with default settings.  See the documentation of NewDefaultCon***REMOVED***g for default
+// Alternatively, you can use NewDefaultConfig to get a ConfigState instance
+// with default settings.  See the documentation of NewDefaultConfig for default
 // values.
-type Con***REMOVED***gState struct {
-	// Indent speci***REMOVED***es the string to use for each indentation level.  The
-	// global con***REMOVED***g instance that all top-level functions use set this to a
+type ConfigState struct {
+	// Indent specifies the string to use for each indentation level.  The
+	// global config instance that all top-level functions use set this to a
 	// single space by default.  If you would like more indentation, you might
 	// set this to a tab with "\t" or perhaps two spaces with "  ".
 	Indent string
@@ -45,15 +45,15 @@ type Con***REMOVED***gState struct {
 	// data structures.  The default, 0, means there is no limit.
 	//
 	// NOTE: Circular data structures are properly detected, so it is not
-	// necessary to set this value unless you speci***REMOVED***cally want to limit deeply
+	// necessary to set this value unless you specifically want to limit deeply
 	// nested data structures.
 	MaxDepth int
 
-	// DisableMethods speci***REMOVED***es whether or not error and Stringer interfaces are
+	// DisableMethods specifies whether or not error and Stringer interfaces are
 	// invoked for types that implement them.
 	DisableMethods bool
 
-	// DisablePointerMethods speci***REMOVED***es whether or not to check for and invoke
+	// DisablePointerMethods specifies whether or not to check for and invoke
 	// error and Stringer interfaces on types which only accept a pointer
 	// receiver when the current type is not a pointer.
 	//
@@ -64,19 +64,19 @@ type Con***REMOVED***gState struct {
 	// inside these interface methods.  As a result, this option relies on
 	// access to the unsafe package, so it will not have any effect when
 	// running in environments without access to the unsafe package such as
-	// Google App Engine or with the "safe" build tag speci***REMOVED***ed.
+	// Google App Engine or with the "safe" build tag specified.
 	DisablePointerMethods bool
 
-	// DisablePointerAddresses speci***REMOVED***es whether to disable the printing of
-	// pointer addresses. This is useful when dif***REMOVED***ng data structures in tests.
+	// DisablePointerAddresses specifies whether to disable the printing of
+	// pointer addresses. This is useful when diffing data structures in tests.
 	DisablePointerAddresses bool
 
-	// DisableCapacities speci***REMOVED***es whether to disable the printing of capacities
-	// for arrays, slices, maps and channels. This is useful when dif***REMOVED***ng
+	// DisableCapacities specifies whether to disable the printing of capacities
+	// for arrays, slices, maps and channels. This is useful when diffing
 	// data structures in tests.
 	DisableCapacities bool
 
-	// ContinueOnMethod speci***REMOVED***es whether or not recursion should continue once
+	// ContinueOnMethod specifies whether or not recursion should continue once
 	// a custom error or Stringer interface is invoked.  The default, false,
 	// means it will print the results of invoking the custom error or Stringer
 	// interface and return immediately instead of continuing to recurse into
@@ -86,7 +86,7 @@ type Con***REMOVED***gState struct {
 	// via the DisableMethods or DisablePointerMethods options.
 	ContinueOnMethod bool
 
-	// SortKeys speci***REMOVED***es map keys should be sorted before being printed. Use
+	// SortKeys specifies map keys should be sorted before being printed. Use
 	// this to have a more deterministic, diffable output.  Note that only
 	// native types (bool, int, uint, floats, uintptr and string) and types
 	// that support the error or Stringer interfaces (if methods are
@@ -94,25 +94,25 @@ type Con***REMOVED***gState struct {
 	// reflect.Value.String() output which guarantees display stability.
 	SortKeys bool
 
-	// SpewKeys speci***REMOVED***es that, as a last resort attempt, map keys should
+	// SpewKeys specifies that, as a last resort attempt, map keys should
 	// be spewed to strings and sorted by those strings.  This is only
 	// considered if SortKeys is true.
 	SpewKeys bool
 }
 
-// Con***REMOVED***g is the active con***REMOVED***guration of the top-level functions.
-// The con***REMOVED***guration can be changed by modifying the contents of spew.Con***REMOVED***g.
-var Con***REMOVED***g = Con***REMOVED***gState{Indent: " "}
+// Config is the active configuration of the top-level functions.
+// The configuration can be changed by modifying the contents of spew.Config.
+var Config = ConfigState{Indent: " "}
 
 // Errorf is a wrapper for fmt.Errorf that treats each argument as if it were
 // passed with a Formatter interface returned by c.NewFormatter.  It returns
-// the formatted string as a value that satis***REMOVED***es error.  See NewFormatter
+// the formatted string as a value that satisfies error.  See NewFormatter
 // for formatting details.
 //
 // This function is shorthand for the following syntax:
 //
 //	fmt.Errorf(format, c.NewFormatter(a), c.NewFormatter(b))
-func (c *Con***REMOVED***gState) Errorf(format string, a ...interface{}) (err error) {
+func (c *ConfigState) Errorf(format string, a ...interface{}) (err error) {
 	return fmt.Errorf(format, c.convertArgs(a)...)
 }
 
@@ -124,7 +124,7 @@ func (c *Con***REMOVED***gState) Errorf(format string, a ...interface{}) (err er
 // This function is shorthand for the following syntax:
 //
 //	fmt.Fprint(w, c.NewFormatter(a), c.NewFormatter(b))
-func (c *Con***REMOVED***gState) Fprint(w io.Writer, a ...interface{}) (n int, err error) {
+func (c *ConfigState) Fprint(w io.Writer, a ...interface{}) (n int, err error) {
 	return fmt.Fprint(w, c.convertArgs(a)...)
 }
 
@@ -136,7 +136,7 @@ func (c *Con***REMOVED***gState) Fprint(w io.Writer, a ...interface{}) (n int, e
 // This function is shorthand for the following syntax:
 //
 //	fmt.Fprintf(w, format, c.NewFormatter(a), c.NewFormatter(b))
-func (c *Con***REMOVED***gState) Fprintf(w io.Writer, format string, a ...interface{}) (n int, err error) {
+func (c *ConfigState) Fprintf(w io.Writer, format string, a ...interface{}) (n int, err error) {
 	return fmt.Fprintf(w, format, c.convertArgs(a)...)
 }
 
@@ -147,7 +147,7 @@ func (c *Con***REMOVED***gState) Fprintf(w io.Writer, format string, a ...interf
 // This function is shorthand for the following syntax:
 //
 //	fmt.Fprintln(w, c.NewFormatter(a), c.NewFormatter(b))
-func (c *Con***REMOVED***gState) Fprintln(w io.Writer, a ...interface{}) (n int, err error) {
+func (c *ConfigState) Fprintln(w io.Writer, a ...interface{}) (n int, err error) {
 	return fmt.Fprintln(w, c.convertArgs(a)...)
 }
 
@@ -159,7 +159,7 @@ func (c *Con***REMOVED***gState) Fprintln(w io.Writer, a ...interface{}) (n int,
 // This function is shorthand for the following syntax:
 //
 //	fmt.Print(c.NewFormatter(a), c.NewFormatter(b))
-func (c *Con***REMOVED***gState) Print(a ...interface{}) (n int, err error) {
+func (c *ConfigState) Print(a ...interface{}) (n int, err error) {
 	return fmt.Print(c.convertArgs(a)...)
 }
 
@@ -171,7 +171,7 @@ func (c *Con***REMOVED***gState) Print(a ...interface{}) (n int, err error) {
 // This function is shorthand for the following syntax:
 //
 //	fmt.Printf(format, c.NewFormatter(a), c.NewFormatter(b))
-func (c *Con***REMOVED***gState) Printf(format string, a ...interface{}) (n int, err error) {
+func (c *ConfigState) Printf(format string, a ...interface{}) (n int, err error) {
 	return fmt.Printf(format, c.convertArgs(a)...)
 }
 
@@ -183,7 +183,7 @@ func (c *Con***REMOVED***gState) Printf(format string, a ...interface{}) (n int,
 // This function is shorthand for the following syntax:
 //
 //	fmt.Println(c.NewFormatter(a), c.NewFormatter(b))
-func (c *Con***REMOVED***gState) Println(a ...interface{}) (n int, err error) {
+func (c *ConfigState) Println(a ...interface{}) (n int, err error) {
 	return fmt.Println(c.convertArgs(a)...)
 }
 
@@ -194,7 +194,7 @@ func (c *Con***REMOVED***gState) Println(a ...interface{}) (n int, err error) {
 // This function is shorthand for the following syntax:
 //
 //	fmt.Sprint(c.NewFormatter(a), c.NewFormatter(b))
-func (c *Con***REMOVED***gState) Sprint(a ...interface{}) string {
+func (c *ConfigState) Sprint(a ...interface{}) string {
 	return fmt.Sprint(c.convertArgs(a)...)
 }
 
@@ -205,7 +205,7 @@ func (c *Con***REMOVED***gState) Sprint(a ...interface{}) string {
 // This function is shorthand for the following syntax:
 //
 //	fmt.Sprintf(format, c.NewFormatter(a), c.NewFormatter(b))
-func (c *Con***REMOVED***gState) Sprintf(format string, a ...interface{}) string {
+func (c *ConfigState) Sprintf(format string, a ...interface{}) string {
 	return fmt.Sprintf(format, c.convertArgs(a)...)
 }
 
@@ -216,41 +216,41 @@ func (c *Con***REMOVED***gState) Sprintf(format string, a ...interface{}) string
 // This function is shorthand for the following syntax:
 //
 //	fmt.Sprintln(c.NewFormatter(a), c.NewFormatter(b))
-func (c *Con***REMOVED***gState) Sprintln(a ...interface{}) string {
+func (c *ConfigState) Sprintln(a ...interface{}) string {
 	return fmt.Sprintln(c.convertArgs(a)...)
 }
 
 /*
-NewFormatter returns a custom formatter that satis***REMOVED***es the fmt.Formatter
+NewFormatter returns a custom formatter that satisfies the fmt.Formatter
 interface.  As a result, it integrates cleanly with standard fmt package
 printing functions.  The formatter is useful for inline printing of smaller data
-types similar to the standard %v format speci***REMOVED***er.
+types similar to the standard %v format specifier.
 
 The custom formatter only responds to the %v (most compact), %+v (adds pointer
 addresses), %#v (adds types), and %#+v (adds types and pointer addresses) verb
 combinations.  Any other verbs such as %x and %q will be sent to the the
 standard fmt package for formatting.  In addition, the custom formatter ignores
 the width and precision arguments (however they will still work on the format
-speci***REMOVED***ers not handled by the custom formatter).
+specifiers not handled by the custom formatter).
 
 Typically this function shouldn't be called directly.  It is much easier to make
 use of the custom formatter by calling one of the convenience functions such as
 c.Printf, c.Println, or c.Printf.
 */
-func (c *Con***REMOVED***gState) NewFormatter(v interface{}) fmt.Formatter {
+func (c *ConfigState) NewFormatter(v interface{}) fmt.Formatter {
 	return newFormatter(c, v)
 }
 
 // Fdump formats and displays the passed arguments to io.Writer w.  It formats
 // exactly the same as Dump.
-func (c *Con***REMOVED***gState) Fdump(w io.Writer, a ...interface{}) {
+func (c *ConfigState) Fdump(w io.Writer, a ...interface{}) {
 	fdump(c, w, a...)
 }
 
 /*
 Dump displays the passed parameters to standard out with newlines, customizable
 indentation, and additional debug information such as complete types and all
-pointer addresses used to indirect to the ***REMOVED***nal value.  It provides the
+pointer addresses used to indirect to the final value.  It provides the
 following features over the built-in printing facilities provided by the fmt
 package:
 
@@ -264,19 +264,19 @@ package:
 	* Byte arrays and slices are dumped like the hexdump -C command which
 	  includes offsets, byte values in hex, and ASCII output
 
-The con***REMOVED***guration options are controlled by modifying the public members
-of c.  See Con***REMOVED***gState for options documentation.
+The configuration options are controlled by modifying the public members
+of c.  See ConfigState for options documentation.
 
 See Fdump if you would prefer dumping to an arbitrary io.Writer or Sdump to
 get the formatted result as a string.
 */
-func (c *Con***REMOVED***gState) Dump(a ...interface{}) {
+func (c *ConfigState) Dump(a ...interface{}) {
 	fdump(c, os.Stdout, a...)
 }
 
 // Sdump returns a string with the passed arguments formatted exactly the same
 // as Dump.
-func (c *Con***REMOVED***gState) Sdump(a ...interface{}) string {
+func (c *ConfigState) Sdump(a ...interface{}) string {
 	var buf bytes.Buffer
 	fdump(c, &buf, a...)
 	return buf.String()
@@ -284,8 +284,8 @@ func (c *Con***REMOVED***gState) Sdump(a ...interface{}) string {
 
 // convertArgs accepts a slice of arguments and returns a slice of the same
 // length with each argument converted to a spew Formatter interface using
-// the Con***REMOVED***gState associated with s.
-func (c *Con***REMOVED***gState) convertArgs(args []interface{}) (formatters []interface{}) {
+// the ConfigState associated with s.
+func (c *ConfigState) convertArgs(args []interface{}) (formatters []interface{}) {
 	formatters = make([]interface{}, len(args))
 	for index, arg := range args {
 		formatters[index] = newFormatter(c, arg)
@@ -293,7 +293,7 @@ func (c *Con***REMOVED***gState) convertArgs(args []interface{}) (formatters []i
 	return formatters
 }
 
-// NewDefaultCon***REMOVED***g returns a Con***REMOVED***gState with the following default settings.
+// NewDefaultConfig returns a ConfigState with the following default settings.
 //
 // 	Indent: " "
 // 	MaxDepth: 0
@@ -301,6 +301,6 @@ func (c *Con***REMOVED***gState) convertArgs(args []interface{}) (formatters []i
 // 	DisablePointerMethods: false
 // 	ContinueOnMethod: false
 // 	SortKeys: false
-func NewDefaultCon***REMOVED***g() *Con***REMOVED***gState {
-	return &Con***REMOVED***gState{Indent: " "}
+func NewDefaultConfig() *ConfigState {
+	return &ConfigState{Indent: " "}
 }

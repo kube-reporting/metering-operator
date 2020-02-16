@@ -2,7 +2,7 @@
 Copyright 2017 The Kubernetes Authors.
 
 Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this ***REMOVED***le except in compliance with the License.
+you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
 
     http://www.apache.org/licenses/LICENSE-2.0
@@ -10,7 +10,7 @@ You may obtain a copy of the License at
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the speci***REMOVED***c language governing permissions and
+See the License for the specific language governing permissions and
 limitations under the License.
 */
 
@@ -56,64 +56,64 @@ func VendorExtensionToMap(e []*openapi_v2.NamedAny) map[string]interface{} {
 	return values
 }
 
-// De***REMOVED***nitions is an implementation of `Models`. It looks for
+// Definitions is an implementation of `Models`. It looks for
 // models in an openapi Schema.
-type De***REMOVED***nitions struct {
+type Definitions struct {
 	models map[string]Schema
 }
 
-var _ Models = &De***REMOVED***nitions{}
+var _ Models = &Definitions{}
 
 // NewOpenAPIData creates a new `Models` out of the openapi document.
 func NewOpenAPIData(doc *openapi_v2.Document) (Models, error) {
-	de***REMOVED***nitions := De***REMOVED***nitions{
+	definitions := Definitions{
 		models: map[string]Schema{},
 	}
 
-	// Save the list of all models ***REMOVED***rst. This will allow us to
+	// Save the list of all models first. This will allow us to
 	// validate that we don't have any dangling reference.
-	for _, namedSchema := range doc.GetDe***REMOVED***nitions().GetAdditionalProperties() {
-		de***REMOVED***nitions.models[namedSchema.GetName()] = nil
+	for _, namedSchema := range doc.GetDefinitions().GetAdditionalProperties() {
+		definitions.models[namedSchema.GetName()] = nil
 	}
 
 	// Now, parse each model. We can validate that references exists.
-	for _, namedSchema := range doc.GetDe***REMOVED***nitions().GetAdditionalProperties() {
+	for _, namedSchema := range doc.GetDefinitions().GetAdditionalProperties() {
 		path := NewPath(namedSchema.GetName())
-		schema, err := de***REMOVED***nitions.ParseSchema(namedSchema.GetValue(), &path)
+		schema, err := definitions.ParseSchema(namedSchema.GetValue(), &path)
 		if err != nil {
 			return nil, err
 		}
-		de***REMOVED***nitions.models[namedSchema.GetName()] = schema
+		definitions.models[namedSchema.GetName()] = schema
 	}
 
-	return &de***REMOVED***nitions, nil
+	return &definitions, nil
 }
 
 // We believe the schema is a reference, verify that and returns a new
 // Schema
-func (d *De***REMOVED***nitions) parseReference(s *openapi_v2.Schema, path *Path) (Schema, error) {
+func (d *Definitions) parseReference(s *openapi_v2.Schema, path *Path) (Schema, error) {
 	if len(s.GetProperties().GetAdditionalProperties()) > 0 {
-		return nil, newSchemaError(path, "unallowed embedded type de***REMOVED***nition")
+		return nil, newSchemaError(path, "unallowed embedded type definition")
 	}
 	if len(s.GetType().GetValue()) > 0 {
-		return nil, newSchemaError(path, "de***REMOVED***nition reference can't have a type")
+		return nil, newSchemaError(path, "definition reference can't have a type")
 	}
 
-	if !strings.HasPre***REMOVED***x(s.GetXRef(), "#/de***REMOVED***nitions/") {
-		return nil, newSchemaError(path, "unallowed reference to non-de***REMOVED***nition %q", s.GetXRef())
+	if !strings.HasPrefix(s.GetXRef(), "#/definitions/") {
+		return nil, newSchemaError(path, "unallowed reference to non-definition %q", s.GetXRef())
 	}
-	reference := strings.TrimPre***REMOVED***x(s.GetXRef(), "#/de***REMOVED***nitions/")
+	reference := strings.TrimPrefix(s.GetXRef(), "#/definitions/")
 	if _, ok := d.models[reference]; !ok {
 		return nil, newSchemaError(path, "unknown model in reference: %q", reference)
 	}
 	return &Ref{
 		BaseSchema:  d.parseBaseSchema(s, path),
 		reference:   reference,
-		de***REMOVED***nitions: d,
+		definitions: d,
 	}, nil
 }
 
-func (d *De***REMOVED***nitions) parseBaseSchema(s *openapi_v2.Schema, path *Path) BaseSchema {
+func (d *Definitions) parseBaseSchema(s *openapi_v2.Schema, path *Path) BaseSchema {
 	return BaseSchema{
 		Description: s.GetDescription(),
 		Extensions:  VendorExtensionToMap(s.GetVendorExtension()),
@@ -122,7 +122,7 @@ func (d *De***REMOVED***nitions) parseBaseSchema(s *openapi_v2.Schema, path *Pat
 }
 
 // We believe the schema is a map, verify and return a new schema
-func (d *De***REMOVED***nitions) parseMap(s *openapi_v2.Schema, path *Path) (Schema, error) {
+func (d *Definitions) parseMap(s *openapi_v2.Schema, path *Path) (Schema, error) {
 	if len(s.GetType().GetValue()) != 0 && s.GetType().GetValue()[0] != object {
 		return nil, newSchemaError(path, "invalid object type")
 	}
@@ -139,7 +139,7 @@ func (d *De***REMOVED***nitions) parseMap(s *openapi_v2.Schema, path *Path) (Sch
 	}, nil
 }
 
-func (d *De***REMOVED***nitions) parsePrimitive(s *openapi_v2.Schema, path *Path) (Schema, error) {
+func (d *Definitions) parsePrimitive(s *openapi_v2.Schema, path *Path) (Schema, error) {
 	var t string
 	if len(s.GetType().GetValue()) > 1 {
 		return nil, newSchemaError(path, "primitive can't have more than 1 type")
@@ -164,7 +164,7 @@ func (d *De***REMOVED***nitions) parsePrimitive(s *openapi_v2.Schema, path *Path
 	}, nil
 }
 
-func (d *De***REMOVED***nitions) parseArray(s *openapi_v2.Schema, path *Path) (Schema, error) {
+func (d *Definitions) parseArray(s *openapi_v2.Schema, path *Path) (Schema, error) {
 	if len(s.GetType().GetValue()) != 1 {
 		return nil, newSchemaError(path, "array should have exactly one type")
 	}
@@ -184,7 +184,7 @@ func (d *De***REMOVED***nitions) parseArray(s *openapi_v2.Schema, path *Path) (S
 	}, nil
 }
 
-func (d *De***REMOVED***nitions) parseKind(s *openapi_v2.Schema, path *Path) (Schema, error) {
+func (d *Definitions) parseKind(s *openapi_v2.Schema, path *Path) (Schema, error) {
 	if len(s.GetType().GetValue()) != 0 && s.GetType().GetValue()[0] != object {
 		return nil, newSchemaError(path, "invalid object type")
 	}
@@ -192,12 +192,12 @@ func (d *De***REMOVED***nitions) parseKind(s *openapi_v2.Schema, path *Path) (Sc
 		return nil, newSchemaError(path, "object doesn't have properties")
 	}
 
-	***REMOVED***elds := map[string]Schema{}
+	fields := map[string]Schema{}
 
 	for _, namedSchema := range s.GetProperties().GetAdditionalProperties() {
 		var err error
 		path := path.FieldPath(namedSchema.GetName())
-		***REMOVED***elds[namedSchema.GetName()], err = d.ParseSchema(namedSchema.GetValue(), &path)
+		fields[namedSchema.GetName()], err = d.ParseSchema(namedSchema.GetValue(), &path)
 		if err != nil {
 			return nil, err
 		}
@@ -206,11 +206,11 @@ func (d *De***REMOVED***nitions) parseKind(s *openapi_v2.Schema, path *Path) (Sc
 	return &Kind{
 		BaseSchema:     d.parseBaseSchema(s, path),
 		RequiredFields: s.GetRequired(),
-		Fields:         ***REMOVED***elds,
+		Fields:         fields,
 	}, nil
 }
 
-func (d *De***REMOVED***nitions) parseArbitrary(s *openapi_v2.Schema, path *Path) (Schema, error) {
+func (d *Definitions) parseArbitrary(s *openapi_v2.Schema, path *Path) (Schema, error) {
 	return &Arbitrary{
 		BaseSchema: d.parseBaseSchema(s, path),
 	}, nil
@@ -218,7 +218,7 @@ func (d *De***REMOVED***nitions) parseArbitrary(s *openapi_v2.Schema, path *Path
 
 // ParseSchema creates a walkable Schema from an openapi schema. While
 // this function is public, it doesn't leak through the interface.
-func (d *De***REMOVED***nitions) ParseSchema(s *openapi_v2.Schema, path *Path) (Schema, error) {
+func (d *Definitions) ParseSchema(s *openapi_v2.Schema, path *Path) (Schema, error) {
 	objectTypes := s.GetType().GetValue()
 	if len(objectTypes) == 1 {
 		t := objectTypes[0]
@@ -244,11 +244,11 @@ func (d *De***REMOVED***nitions) ParseSchema(s *openapi_v2.Schema, path *Path) (
 
 // LookupModel is public through the interface of Models. It
 // returns a visitable schema from the given model name.
-func (d *De***REMOVED***nitions) LookupModel(model string) Schema {
+func (d *Definitions) LookupModel(model string) Schema {
 	return d.models[model]
 }
 
-func (d *De***REMOVED***nitions) ListModels() []string {
+func (d *Definitions) ListModels() []string {
 	models := []string{}
 
 	for model := range d.models {
@@ -263,7 +263,7 @@ type Ref struct {
 	BaseSchema
 
 	reference   string
-	de***REMOVED***nitions *De***REMOVED***nitions
+	definitions *Definitions
 }
 
 var _ Reference = &Ref{}
@@ -273,7 +273,7 @@ func (r *Ref) Reference() string {
 }
 
 func (r *Ref) SubSchema() Schema {
-	return r.de***REMOVED***nitions.models[r.reference]
+	return r.definitions.models[r.reference]
 }
 
 func (r *Ref) Accept(v SchemaVisitor) {

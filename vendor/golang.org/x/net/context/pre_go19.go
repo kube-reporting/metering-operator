@@ -1,6 +1,6 @@
 // Copyright 2014 The Go Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE ***REMOVED***le.
+// license that can be found in the LICENSE file.
 
 // +build !go1.9
 
@@ -51,7 +51,7 @@ type Context interface {
 
 	// Err returns a non-nil error value after Done is closed. Err returns
 	// Canceled if the context was canceled or DeadlineExceeded if the
-	// context's deadline passed. No other values for Err are de***REMOVED***ned.
+	// context's deadline passed. No other values for Err are defined.
 	// After Done is closed, successive calls to Err return the same value.
 	Err() error
 
@@ -63,17 +63,17 @@ type Context interface {
 	// processes and API boundaries, not for passing optional parameters to
 	// functions.
 	//
-	// A key identi***REMOVED***es a speci***REMOVED***c value in a Context. Functions that wish
+	// A key identifies a specific value in a Context. Functions that wish
 	// to store values in Context typically allocate a key in a global
 	// variable then use that key as the argument to context.WithValue and
 	// Context.Value. A key can be any type that supports equality;
-	// packages should de***REMOVED***ne keys as an unexported type to avoid
+	// packages should define keys as an unexported type to avoid
 	// collisions.
 	//
-	// Packages that de***REMOVED***ne a Context key should provide type-safe accessors
+	// Packages that define a Context key should provide type-safe accessors
 	// for the values stores using that key:
 	//
-	// 	// Package user de***REMOVED***nes a User type that's stored in Contexts.
+	// 	// Package user defines a User type that's stored in Contexts.
 	// 	package user
 	//
 	// 	import "golang.org/x/net/context"
@@ -81,8 +81,8 @@ type Context interface {
 	// 	// User is the type of value stored in the Contexts.
 	// 	type User struct {...}
 	//
-	// 	// key is an unexported type for keys de***REMOVED***ned in this package.
-	// 	// This prevents collisions with keys de***REMOVED***ned in other packages.
+	// 	// key is an unexported type for keys defined in this package.
+	// 	// This prevents collisions with keys defined in other packages.
 	// 	type key int
 	//
 	// 	// userKey is the key for user.User values in Contexts. It is
@@ -105,5 +105,5 @@ type Context interface {
 
 // A CancelFunc tells an operation to abandon its work.
 // A CancelFunc does not wait for the work to stop.
-// After the ***REMOVED***rst call, subsequent calls to a CancelFunc do nothing.
+// After the first call, subsequent calls to a CancelFunc do nothing.
 type CancelFunc func()

@@ -40,7 +40,7 @@ const (
 	SYS_DUP                  = 41  // { int|sys||dup(int fd); }
 	SYS_PIPE                 = 42  // { int|sys||pipe(void); }
 	SYS_GETEGID              = 43  // { gid_t|sys||getegid(void); }
-	SYS_PROFIL               = 44  // { int|sys||pro***REMOVED***l(char *samples, size_t size, u_long offset, u_int scale); }
+	SYS_PROFIL               = 44  // { int|sys||profil(char *samples, size_t size, u_long offset, u_int scale); }
 	SYS_KTRACE               = 45  // { int|sys||ktrace(const char *fname, int ops, int facs, pid_t pid); }
 	SYS_GETGID               = 47  // { gid_t|sys||getgid_with_egid(void); }
 	SYS___GETLOGIN           = 49  // { int|sys||__getlogin(char *namebuf, size_t namelen); }
@@ -83,7 +83,7 @@ const (
 	SYS_SETREGID             = 127 // { int|sys||setregid(gid_t rgid, gid_t egid); }
 	SYS_RENAME               = 128 // { int|sys||rename(const char *from, const char *to); }
 	SYS_FLOCK                = 131 // { int|sys||flock(int fd, int how); }
-	SYS_MKFIFO               = 132 // { int|sys||mk***REMOVED***fo(const char *path, mode_t mode); }
+	SYS_MKFIFO               = 132 // { int|sys||mkfifo(const char *path, mode_t mode); }
 	SYS_SENDTO               = 133 // { ssize_t|sys||sendto(int s, const void *buf, size_t len, int flags, const struct sockaddr *to, socklen_t tolen); }
 	SYS_SHUTDOWN             = 134 // { int|sys||shutdown(int s, int how); }
 	SYS_SOCKETPAIR           = 135 // { int|sys||socketpair(int domain, int type, int protocol, int *rsv); }
@@ -114,7 +114,7 @@ const (
 	SYS_POLL                 = 209 // { int|sys||poll(struct pollfd *fds, u_int nfds, int timeout); }
 	SYS_SEMGET               = 221 // { int|sys||semget(key_t key, int nsems, int semflg); }
 	SYS_SEMOP                = 222 // { int|sys||semop(int semid, struct sembuf *sops, size_t nsops); }
-	SYS_SEMCONFIG            = 223 // { int|sys||semcon***REMOVED***g(int flag); }
+	SYS_SEMCONFIG            = 223 // { int|sys||semconfig(int flag); }
 	SYS_MSGGET               = 225 // { int|sys||msgget(key_t key, int msgflg); }
 	SYS_MSGSND               = 226 // { int|sys||msgsnd(int msqid, const void *msgp, size_t msgsz, int msgflg); }
 	SYS_MSGRCV               = 227 // { ssize_t|sys||msgrcv(int msqid, void *msgp, size_t msgsz, long msgtyp, int msgflg); }
@@ -173,18 +173,18 @@ const (
 	SYS_KQUEUE               = 344 // { int|sys||kqueue(void); }
 	SYS__SCHED_SETPARAM      = 346 // { int|sys||_sched_setparam(pid_t pid, lwpid_t lid, int policy, const struct sched_param *params); }
 	SYS__SCHED_GETPARAM      = 347 // { int|sys||_sched_getparam(pid_t pid, lwpid_t lid, int *policy, struct sched_param *params); }
-	SYS__SCHED_SETAFFINITY   = 348 // { int|sys||_sched_setaf***REMOVED***nity(pid_t pid, lwpid_t lid, size_t size, const cpuset_t *cpuset); }
-	SYS__SCHED_GETAFFINITY   = 349 // { int|sys||_sched_getaf***REMOVED***nity(pid_t pid, lwpid_t lid, size_t size, cpuset_t *cpuset); }
+	SYS__SCHED_SETAFFINITY   = 348 // { int|sys||_sched_setaffinity(pid_t pid, lwpid_t lid, size_t size, const cpuset_t *cpuset); }
+	SYS__SCHED_GETAFFINITY   = 349 // { int|sys||_sched_getaffinity(pid_t pid, lwpid_t lid, size_t size, cpuset_t *cpuset); }
 	SYS_SCHED_YIELD          = 350 // { int|sys||sched_yield(void); }
 	SYS_FSYNC_RANGE          = 354 // { int|sys||fsync_range(int fd, int flags, off_t start, off_t length); }
 	SYS_UUIDGEN              = 355 // { int|sys||uuidgen(struct uuid *store, int count); }
 	SYS_GETVFSSTAT           = 356 // { int|sys||getvfsstat(struct statvfs *buf, size_t bufsize, int flags); }
 	SYS_STATVFS1             = 357 // { int|sys||statvfs1(const char *path, struct statvfs *buf, int flags); }
 	SYS_FSTATVFS1            = 358 // { int|sys||fstatvfs1(int fd, struct statvfs *buf, int flags); }
-	SYS_EXTATTRCTL           = 360 // { int|sys||extattrctl(const char *path, int cmd, const char ****REMOVED***lename, int attrnamespace, const char *attrname); }
-	SYS_EXTATTR_SET_FILE     = 361 // { int|sys||extattr_set_***REMOVED***le(const char *path, int attrnamespace, const char *attrname, const void *data, size_t nbytes); }
-	SYS_EXTATTR_GET_FILE     = 362 // { ssize_t|sys||extattr_get_***REMOVED***le(const char *path, int attrnamespace, const char *attrname, void *data, size_t nbytes); }
-	SYS_EXTATTR_DELETE_FILE  = 363 // { int|sys||extattr_delete_***REMOVED***le(const char *path, int attrnamespace, const char *attrname); }
+	SYS_EXTATTRCTL           = 360 // { int|sys||extattrctl(const char *path, int cmd, const char *filename, int attrnamespace, const char *attrname); }
+	SYS_EXTATTR_SET_FILE     = 361 // { int|sys||extattr_set_file(const char *path, int attrnamespace, const char *attrname, const void *data, size_t nbytes); }
+	SYS_EXTATTR_GET_FILE     = 362 // { ssize_t|sys||extattr_get_file(const char *path, int attrnamespace, const char *attrname, void *data, size_t nbytes); }
+	SYS_EXTATTR_DELETE_FILE  = 363 // { int|sys||extattr_delete_file(const char *path, int attrnamespace, const char *attrname); }
 	SYS_EXTATTR_SET_FD       = 364 // { int|sys||extattr_set_fd(int fd, int attrnamespace, const char *attrname, const void *data, size_t nbytes); }
 	SYS_EXTATTR_GET_FD       = 365 // { ssize_t|sys||extattr_get_fd(int fd, int attrnamespace, const char *attrname, void *data, size_t nbytes); }
 	SYS_EXTATTR_DELETE_FD    = 366 // { int|sys||extattr_delete_fd(int fd, int attrnamespace, const char *attrname); }
@@ -192,7 +192,7 @@ const (
 	SYS_EXTATTR_GET_LINK     = 368 // { ssize_t|sys||extattr_get_link(const char *path, int attrnamespace, const char *attrname, void *data, size_t nbytes); }
 	SYS_EXTATTR_DELETE_LINK  = 369 // { int|sys||extattr_delete_link(const char *path, int attrnamespace, const char *attrname); }
 	SYS_EXTATTR_LIST_FD      = 370 // { ssize_t|sys||extattr_list_fd(int fd, int attrnamespace, void *data, size_t nbytes); }
-	SYS_EXTATTR_LIST_FILE    = 371 // { ssize_t|sys||extattr_list_***REMOVED***le(const char *path, int attrnamespace, void *data, size_t nbytes); }
+	SYS_EXTATTR_LIST_FILE    = 371 // { ssize_t|sys||extattr_list_file(const char *path, int attrnamespace, void *data, size_t nbytes); }
 	SYS_EXTATTR_LIST_LINK    = 372 // { ssize_t|sys||extattr_list_link(const char *path, int attrnamespace, void *data, size_t nbytes); }
 	SYS_SETXATTR             = 375 // { int|sys||setxattr(const char *path, const char *name, const void *value, size_t size, int flags); }
 	SYS_LSETXATTR            = 376 // { int|sys||lsetxattr(const char *path, const char *name, const void *value, size_t size, int flags); }
@@ -214,7 +214,7 @@ const (
 	SYS_PSET_CREATE          = 412 // { int|sys||pset_create(psetid_t *psid); }
 	SYS_PSET_DESTROY         = 413 // { int|sys||pset_destroy(psetid_t psid); }
 	SYS_PSET_ASSIGN          = 414 // { int|sys||pset_assign(psetid_t psid, cpuid_t cpuid, psetid_t *opsid); }
-	SYS__PSET_BIND           = 415 // { int|sys||_pset_bind(idtype_t idtype, id_t ***REMOVED***rst_id, id_t second_id, psetid_t psid, psetid_t *opsid); }
+	SYS__PSET_BIND           = 415 // { int|sys||_pset_bind(idtype_t idtype, id_t first_id, id_t second_id, psetid_t psid, psetid_t *opsid); }
 	SYS_POSIX_FADVISE        = 416 // { int|sys|50|posix_fadvise(int fd, int PAD, off_t offset, off_t len, int advice); }
 	SYS_SELECT               = 417 // { int|sys|50|select(int nd, fd_set *in, fd_set *ou, fd_set *ex, struct timeval *tv); }
 	SYS_GETTIMEOFDAY         = 418 // { int|sys|50|gettimeofday(struct timeval *tp, void *tzp); }
@@ -247,13 +247,13 @@ const (
 	SYS_WAIT4                = 449 // { int|sys|50|wait4(pid_t pid, int *status, int options, struct rusage *rusage); }
 	SYS_MKNOD                = 450 // { int|sys|50|mknod(const char *path, mode_t mode, dev_t dev); }
 	SYS_FHSTAT               = 451 // { int|sys|50|fhstat(const void *fhp, size_t fh_size, struct stat *sb); }
-	SYS_PIPE2                = 453 // { int|sys||pipe2(int ****REMOVED***ldes, int flags); }
+	SYS_PIPE2                = 453 // { int|sys||pipe2(int *fildes, int flags); }
 	SYS_DUP3                 = 454 // { int|sys||dup3(int from, int to, int flags); }
 	SYS_KQUEUE1              = 455 // { int|sys||kqueue1(int flags); }
 	SYS_PACCEPT              = 456 // { int|sys||paccept(int s, struct sockaddr *name, socklen_t *anamelen, const sigset_t *mask, int flags); }
 	SYS_LINKAT               = 457 // { int|sys||linkat(int fd1, const char *name1, int fd2, const char *name2, int flags); }
 	SYS_RENAMEAT             = 458 // { int|sys||renameat(int fromfd, const char *from, int tofd, const char *to); }
-	SYS_MKFIFOAT             = 459 // { int|sys||mk***REMOVED***foat(int fd, const char *path, mode_t mode); }
+	SYS_MKFIFOAT             = 459 // { int|sys||mkfifoat(int fd, const char *path, mode_t mode); }
 	SYS_MKNODAT              = 460 // { int|sys||mknodat(int fd, const char *path, mode_t mode, uint32_t dev); }
 	SYS_MKDIRAT              = 461 // { int|sys||mkdirat(int fd, const char *path, mode_t mode); }
 	SYS_FACCESSAT            = 462 // { int|sys||faccessat(int fd, const char *path, int amode, int flag); }
@@ -268,7 +268,7 @@ const (
 	SYS_UNLINKAT             = 471 // { int|sys||unlinkat(int fd, const char *path, int flag); }
 	SYS_FUTIMENS             = 472 // { int|sys||futimens(int fd, const struct timespec *tptr); }
 	SYS___QUOTACTL           = 473 // { int|sys||__quotactl(const char *path, struct quotactl_args *args); }
-	SYS_POSIX_SPAWN          = 474 // { int|sys||posix_spawn(pid_t *pid, const char *path, const struct posix_spawn_***REMOVED***le_actions ****REMOVED***le_actions, const struct posix_spawnattr *attrp, char *const *argv, char *const *envp); }
+	SYS_POSIX_SPAWN          = 474 // { int|sys||posix_spawn(pid_t *pid, const char *path, const struct posix_spawn_file_actions *file_actions, const struct posix_spawnattr *attrp, char *const *argv, char *const *envp); }
 	SYS_RECVMMSG             = 475 // { int|sys||recvmmsg(int s, struct mmsghdr *mmsg, unsigned int vlen, unsigned int flags, struct timespec *timeout); }
 	SYS_SENDMMSG             = 476 // { int|sys||sendmmsg(int s, struct mmsghdr *mmsg, unsigned int vlen, unsigned int flags); }
 )

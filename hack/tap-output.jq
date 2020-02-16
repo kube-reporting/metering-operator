@@ -15,7 +15,7 @@
           [.[0] + 1, "ok \(.[0]) \($item.Test) # SKIP"]
         elif $item.Action == "output" then
           [.[0], ("# \($item.Output)" | rtrimstr("\n"))]
-        ***REMOVED***
+        else
           [.[0], empty]
         end;
     .[1]) | strings

@@ -42,7 +42,7 @@ func EncodeJSONValue(v aws.JSONValue, escape EscapeMode) (string, error) {
 }
 
 // DecodeJSONValue will attempt to decode the string input as a JSONValue.
-// Optionally decoding base64 the value ***REMOVED***rst before JSON unmarshaling.
+// Optionally decoding base64 the value first before JSON unmarshaling.
 //
 // Will panic if the escape mode is unknown.
 func DecodeJSONValue(v string, escape EscapeMode) (aws.JSONValue, error) {

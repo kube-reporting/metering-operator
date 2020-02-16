@@ -1,6 +1,6 @@
 // Copyright 2015 The Go Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE ***REMOVED***le.
+// license that can be found in the LICENSE file.
 
 // +build linux
 // +build mips64 mips64le
@@ -34,7 +34,7 @@ func Select(nfd int, r *FdSet, w *FdSet, e *FdSet, timeout *Timeval) (n int, err
 	return Pselect(nfd, r, w, e, ts, nil)
 }
 
-//sys	send***REMOVED***le(outfd int, infd int, offset *int64, count int) (written int, err error)
+//sys	sendfile(outfd int, infd int, offset *int64, count int) (written int, err error)
 //sys	Setfsgid(gid int) (err error)
 //sys	Setfsuid(uid int) (err error)
 //sysnb	Setregid(rgid int, egid int) (err error)
@@ -150,25 +150,25 @@ type stat_t struct {
 func Fstat(fd int, s *Stat_t) (err error) {
 	st := &stat_t{}
 	err = fstat(fd, st)
-	***REMOVED***llStat_t(s, st)
+	fillStat_t(s, st)
 	return
 }
 
 func Lstat(path string, s *Stat_t) (err error) {
 	st := &stat_t{}
 	err = lstat(path, st)
-	***REMOVED***llStat_t(s, st)
+	fillStat_t(s, st)
 	return
 }
 
 func Stat(path string, s *Stat_t) (err error) {
 	st := &stat_t{}
 	err = stat(path, st)
-	***REMOVED***llStat_t(s, st)
+	fillStat_t(s, st)
 	return
 }
 
-func ***REMOVED***llStat_t(s *Stat_t, st *stat_t) {
+func fillStat_t(s *Stat_t, st *stat_t) {
 	s.Dev = st.Dev
 	s.Ino = st.Ino
 	s.Mode = st.Mode

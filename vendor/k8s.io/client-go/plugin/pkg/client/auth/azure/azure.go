@@ -2,7 +2,7 @@
 Copyright 2017 The Kubernetes Authors.
 
 Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this ***REMOVED***le except in compliance with the License.
+you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
 
     http://www.apache.org/licenses/LICENSE-2.0
@@ -10,7 +10,7 @@ You may obtain a copy of the License at
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the speci***REMOVED***c language governing permissions and
+See the License for the specific language governing permissions and
 limitations under the License.
 */
 
@@ -77,7 +77,7 @@ func (c *azureTokenCache) setToken(tokenKey string, token *azureToken) {
 	c.cache[tokenKey] = token
 }
 
-func newAzureAuthProvider(_ string, cfg map[string]string, persister restclient.AuthProviderCon***REMOVED***gPersister) (restclient.AuthProvider, error) {
+func newAzureAuthProvider(_ string, cfg map[string]string, persister restclient.AuthProviderConfigPersister) (restclient.AuthProvider, error) {
 	var ts tokenSource
 
 	environment, err := azure.EnvironmentFromName(cfg[cfgEnvironment])
@@ -159,10 +159,10 @@ type azureTokenSource struct {
 	cache     *azureTokenCache
 	lock      sync.Mutex
 	cfg       map[string]string
-	persister restclient.AuthProviderCon***REMOVED***gPersister
+	persister restclient.AuthProviderConfigPersister
 }
 
-func newAzureTokenSource(source tokenSource, cache *azureTokenCache, cfg map[string]string, persister restclient.AuthProviderCon***REMOVED***gPersister) tokenSource {
+func newAzureTokenSource(source tokenSource, cache *azureTokenCache, cfg map[string]string, persister restclient.AuthProviderConfigPersister) tokenSource {
 	return &azureTokenSource{
 		source:    source,
 		cache:     cache,
@@ -171,8 +171,8 @@ func newAzureTokenSource(source tokenSource, cache *azureTokenCache, cfg map[str
 	}
 }
 
-// Token fetches a token from the cache of con***REMOVED***guration if present otherwise
-// acquires a new token from the con***REMOVED***gured source. Automatically refreshes
+// Token fetches a token from the cache of configuration if present otherwise
+// acquires a new token from the configured source. Automatically refreshes
 // the token if expired.
 func (ts *azureTokenSource) Token() (*azureToken, error) {
 	ts.lock.Lock()
@@ -192,7 +192,7 @@ func (ts *azureTokenSource) Token() (*azureToken, error) {
 			ts.cache.setToken(azureTokenKey, token)
 			err = ts.storeTokenInCfg(token)
 			if err != nil {
-				return nil, fmt.Errorf("storing the token in con***REMOVED***guration: %v", err)
+				return nil, fmt.Errorf("storing the token in configuration: %v", err)
 			}
 		}
 	}
@@ -204,7 +204,7 @@ func (ts *azureTokenSource) Token() (*azureToken, error) {
 		ts.cache.setToken(azureTokenKey, token)
 		err = ts.storeTokenInCfg(token)
 		if err != nil {
-			return nil, fmt.Errorf("storing the refreshed token in con***REMOVED***guration: %v", err)
+			return nil, fmt.Errorf("storing the refreshed token in configuration: %v", err)
 		}
 	}
 	return token, nil
@@ -268,23 +268,23 @@ func (ts *azureTokenSource) storeTokenInCfg(token *azureToken) error {
 
 	err := ts.persister.Persist(newCfg)
 	if err != nil {
-		return fmt.Errorf("persisting the con***REMOVED***guration: %v", err)
+		return fmt.Errorf("persisting the configuration: %v", err)
 	}
 	ts.cfg = newCfg
 	return nil
 }
 
 func (ts *azureTokenSource) refreshToken(token *azureToken) (*azureToken, error) {
-	oauthCon***REMOVED***g, err := adal.NewOAuthCon***REMOVED***g(azure.PublicCloud.ActiveDirectoryEndpoint, token.tenantID)
+	oauthConfig, err := adal.NewOAuthConfig(azure.PublicCloud.ActiveDirectoryEndpoint, token.tenantID)
 	if err != nil {
-		return nil, fmt.Errorf("building the OAuth con***REMOVED***guration for token refresh: %v", err)
+		return nil, fmt.Errorf("building the OAuth configuration for token refresh: %v", err)
 	}
 
 	callback := func(t adal.Token) error {
 		return nil
 	}
 	spt, err := adal.NewServicePrincipalTokenFromManualToken(
-		*oauthCon***REMOVED***g,
+		*oauthConfig,
 		token.clientID,
 		token.apiserverID,
 		token.token,
@@ -331,12 +331,12 @@ func newAzureTokenSourceDeviceCode(environment azure.Environment, clientID strin
 }
 
 func (ts *azureTokenSourceDeviceCode) Token() (*azureToken, error) {
-	oauthCon***REMOVED***g, err := adal.NewOAuthCon***REMOVED***g(ts.environment.ActiveDirectoryEndpoint, ts.tenantID)
+	oauthConfig, err := adal.NewOAuthConfig(ts.environment.ActiveDirectoryEndpoint, ts.tenantID)
 	if err != nil {
-		return nil, fmt.Errorf("building the OAuth con***REMOVED***guration for device code authentication: %v", err)
+		return nil, fmt.Errorf("building the OAuth configuration for device code authentication: %v", err)
 	}
 	client := &autorest.Client{}
-	deviceCode, err := adal.InitiateDeviceAuth(client, *oauthCon***REMOVED***g, ts.clientID, ts.apiserverID)
+	deviceCode, err := adal.InitiateDeviceAuth(client, *oauthConfig, ts.clientID, ts.apiserverID)
 	if err != nil {
 		return nil, fmt.Errorf("initialing the device code authentication: %v", err)
 	}

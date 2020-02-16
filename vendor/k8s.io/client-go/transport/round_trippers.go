@@ -2,7 +2,7 @@
 Copyright 2015 The Kubernetes Authors.
 
 Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this ***REMOVED***le except in compliance with the License.
+you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
 
     http://www.apache.org/licenses/LICENSE-2.0
@@ -10,7 +10,7 @@ You may obtain a copy of the License at
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the speci***REMOVED***c language governing permissions and
+See the License for the specific language governing permissions and
 limitations under the License.
 */
 
@@ -28,38 +28,38 @@ import (
 	utilnet "k8s.io/apimachinery/pkg/util/net"
 )
 
-// HTTPWrappersForCon***REMOVED***g wraps a round tripper with any relevant layered
-// behavior from the con***REMOVED***g. Exposed to allow more clients that need HTTP-like
+// HTTPWrappersForConfig wraps a round tripper with any relevant layered
+// behavior from the config. Exposed to allow more clients that need HTTP-like
 // behavior but then must hijack the underlying connection (like WebSocket or
 // HTTP2 clients). Pure HTTP clients should use the RoundTripper returned from
 // New.
-func HTTPWrappersForCon***REMOVED***g(con***REMOVED***g *Con***REMOVED***g, rt http.RoundTripper) (http.RoundTripper, error) {
-	if con***REMOVED***g.WrapTransport != nil {
-		rt = con***REMOVED***g.WrapTransport(rt)
+func HTTPWrappersForConfig(config *Config, rt http.RoundTripper) (http.RoundTripper, error) {
+	if config.WrapTransport != nil {
+		rt = config.WrapTransport(rt)
 	}
 
 	rt = DebugWrappers(rt)
 
 	// Set authentication wrappers
 	switch {
-	case con***REMOVED***g.HasBasicAuth() && con***REMOVED***g.HasTokenAuth():
+	case config.HasBasicAuth() && config.HasTokenAuth():
 		return nil, fmt.Errorf("username/password or bearer token may be set, but not both")
-	case con***REMOVED***g.HasTokenAuth():
+	case config.HasTokenAuth():
 		var err error
-		rt, err = NewBearerAuthWithRefreshRoundTripper(con***REMOVED***g.BearerToken, con***REMOVED***g.BearerTokenFile, rt)
+		rt, err = NewBearerAuthWithRefreshRoundTripper(config.BearerToken, config.BearerTokenFile, rt)
 		if err != nil {
 			return nil, err
 		}
-	case con***REMOVED***g.HasBasicAuth():
-		rt = NewBasicAuthRoundTripper(con***REMOVED***g.Username, con***REMOVED***g.Password, rt)
+	case config.HasBasicAuth():
+		rt = NewBasicAuthRoundTripper(config.Username, config.Password, rt)
 	}
-	if len(con***REMOVED***g.UserAgent) > 0 {
-		rt = NewUserAgentRoundTripper(con***REMOVED***g.UserAgent, rt)
+	if len(config.UserAgent) > 0 {
+		rt = NewUserAgentRoundTripper(config.UserAgent, rt)
 	}
-	if len(con***REMOVED***g.Impersonate.UserName) > 0 ||
-		len(con***REMOVED***g.Impersonate.Groups) > 0 ||
-		len(con***REMOVED***g.Impersonate.Extra) > 0 {
-		rt = NewImpersonatingRoundTripper(con***REMOVED***g.Impersonate, rt)
+	if len(config.Impersonate.UserName) > 0 ||
+		len(config.Impersonate.Groups) > 0 ||
+		len(config.Impersonate.Extra) > 0 {
+		rt = NewImpersonatingRoundTripper(config.Impersonate, rt)
 	}
 	return rt, nil
 }
@@ -92,7 +92,7 @@ type authProxyRoundTripper struct {
 	rt http.RoundTripper
 }
 
-// NewAuthProxyRoundTripper provides a roundtripper which will add auth proxy ***REMOVED***elds to requests for
+// NewAuthProxyRoundTripper provides a roundtripper which will add auth proxy fields to requests for
 // authentication terminating proxy cases
 // assuming you pull the user from the context:
 // username is the user.Info.GetName() of the user
@@ -118,12 +118,12 @@ func (rt *authProxyRoundTripper) RoundTrip(req *http.Request) (*http.Response, e
 	return rt.rt.RoundTrip(req)
 }
 
-// SetAuthProxyHeaders stomps the auth proxy header ***REMOVED***elds.  It mutates its argument.
+// SetAuthProxyHeaders stomps the auth proxy header fields.  It mutates its argument.
 func SetAuthProxyHeaders(req *http.Request, username string, groups []string, extra map[string][]string) {
 	req.Header.Del("X-Remote-User")
 	req.Header.Del("X-Remote-Group")
 	for key := range req.Header {
-		if strings.HasPre***REMOVED***x(strings.ToLower(key), strings.ToLower("X-Remote-Extra-")) {
+		if strings.HasPrefix(strings.ToLower(key), strings.ToLower("X-Remote-Extra-")) {
 			req.Header.Del(key)
 		}
 	}
@@ -142,7 +142,7 @@ func SetAuthProxyHeaders(req *http.Request, username string, groups []string, ex
 func (rt *authProxyRoundTripper) CancelRequest(req *http.Request) {
 	if canceler, ok := rt.rt.(requestCanceler); ok {
 		canceler.CancelRequest(req)
-	} ***REMOVED*** {
+	} else {
 		klog.Errorf("CancelRequest not implemented by %T", rt.rt)
 	}
 }
@@ -170,7 +170,7 @@ func (rt *userAgentRoundTripper) RoundTrip(req *http.Request) (*http.Response, e
 func (rt *userAgentRoundTripper) CancelRequest(req *http.Request) {
 	if canceler, ok := rt.rt.(requestCanceler); ok {
 		canceler.CancelRequest(req)
-	} ***REMOVED*** {
+	} else {
 		klog.Errorf("CancelRequest not implemented by %T", rt.rt)
 	}
 }
@@ -201,7 +201,7 @@ func (rt *basicAuthRoundTripper) RoundTrip(req *http.Request) (*http.Response, e
 func (rt *basicAuthRoundTripper) CancelRequest(req *http.Request) {
 	if canceler, ok := rt.rt.(requestCanceler); ok {
 		canceler.CancelRequest(req)
-	} ***REMOVED*** {
+	} else {
 		klog.Errorf("CancelRequest not implemented by %T", rt.rt)
 	}
 }
@@ -218,23 +218,23 @@ const (
 	// It can be repeated multiplied times for multiple groups.
 	ImpersonateGroupHeader = "Impersonate-Group"
 
-	// ImpersonateUserExtraHeaderPre***REMOVED***x is a pre***REMOVED***x for a header used to impersonate an entry in the
-	// extra map[string][]string for user.Info.  The key for the `extra` map is suf***REMOVED***x.
+	// ImpersonateUserExtraHeaderPrefix is a prefix for a header used to impersonate an entry in the
+	// extra map[string][]string for user.Info.  The key for the `extra` map is suffix.
 	// The same key can be repeated multiple times to have multiple elements in the slice under a single key.
 	// For instance:
 	// Impersonate-Extra-Foo: one
 	// Impersonate-Extra-Foo: two
 	// results in extra["Foo"] = []string{"one", "two"}
-	ImpersonateUserExtraHeaderPre***REMOVED***x = "Impersonate-Extra-"
+	ImpersonateUserExtraHeaderPrefix = "Impersonate-Extra-"
 )
 
 type impersonatingRoundTripper struct {
-	impersonate ImpersonationCon***REMOVED***g
+	impersonate ImpersonationConfig
 	delegate    http.RoundTripper
 }
 
 // NewImpersonatingRoundTripper will add an Act-As header to a request unless it has already been set.
-func NewImpersonatingRoundTripper(impersonate ImpersonationCon***REMOVED***g, delegate http.RoundTripper) http.RoundTripper {
+func NewImpersonatingRoundTripper(impersonate ImpersonationConfig, delegate http.RoundTripper) http.RoundTripper {
 	return &impersonatingRoundTripper{impersonate, delegate}
 }
 
@@ -251,7 +251,7 @@ func (rt *impersonatingRoundTripper) RoundTrip(req *http.Request) (*http.Respons
 	}
 	for k, vv := range rt.impersonate.Extra {
 		for _, v := range vv {
-			req.Header.Add(ImpersonateUserExtraHeaderPre***REMOVED***x+headerKeyEscape(k), v)
+			req.Header.Add(ImpersonateUserExtraHeaderPrefix+headerKeyEscape(k), v)
 		}
 	}
 
@@ -261,7 +261,7 @@ func (rt *impersonatingRoundTripper) RoundTrip(req *http.Request) (*http.Respons
 func (rt *impersonatingRoundTripper) CancelRequest(req *http.Request) {
 	if canceler, ok := rt.delegate.(requestCanceler); ok {
 		canceler.CancelRequest(req)
-	} ***REMOVED*** {
+	} else {
 		klog.Errorf("CancelRequest not implemented by %T", rt.delegate)
 	}
 }
@@ -320,7 +320,7 @@ func (rt *bearerAuthRoundTripper) RoundTrip(req *http.Request) (*http.Response, 
 func (rt *bearerAuthRoundTripper) CancelRequest(req *http.Request) {
 	if canceler, ok := rt.rt.(requestCanceler); ok {
 		canceler.CancelRequest(req)
-	} ***REMOVED*** {
+	} else {
 		klog.Errorf("CancelRequest not implemented by %T", rt.rt)
 	}
 }
@@ -372,7 +372,7 @@ func (r *requestInfo) toCurl() string {
 }
 
 // debuggingRoundTripper will display information about the requests passing
-// through it based on what is con***REMOVED***gured
+// through it based on what is configured
 type debuggingRoundTripper struct {
 	delegatedRoundTripper http.RoundTripper
 
@@ -404,7 +404,7 @@ func newDebuggingRoundTripper(rt http.RoundTripper, levels ...debugLevel) *debug
 func (rt *debuggingRoundTripper) CancelRequest(req *http.Request) {
 	if canceler, ok := rt.delegatedRoundTripper.(requestCanceler); ok {
 		canceler.CancelRequest(req)
-	} ***REMOVED*** {
+	} else {
 		klog.Errorf("CancelRequest not implemented by %T", rt.delegatedRoundTripper)
 	}
 }

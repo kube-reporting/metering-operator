@@ -2,7 +2,7 @@
 Copyright 2015 The Kubernetes Authors.
 
 Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this ***REMOVED***le except in compliance with the License.
+you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
 
     http://www.apache.org/licenses/LICENSE-2.0
@@ -10,7 +10,7 @@ You may obtain a copy of the License at
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the speci***REMOVED***c language governing permissions and
+See the License for the specific language governing permissions and
 limitations under the License.
 */
 
@@ -33,15 +33,15 @@ import (
 )
 
 var (
-	// protoEncodingPre***REMOVED***x serves as a magic number for an encoded protobuf message on this serializer. All
+	// protoEncodingPrefix serves as a magic number for an encoded protobuf message on this serializer. All
 	// proto messages serialized by this schema will be preceded by the bytes 0x6b 0x38 0x73, with the fourth
-	// byte being reserved for the encoding style. The only encoding style de***REMOVED***ned is 0x00, which means that
+	// byte being reserved for the encoding style. The only encoding style defined is 0x00, which means that
 	// the rest of the byte stream is a message of type k8s.io.kubernetes.pkg.runtime.Unknown (proto2).
 	//
 	// See k8s.io/apimachinery/pkg/runtime/generated.proto for details of the runtime.Unknown message.
 	//
 	// This encoding scheme is experimental, and is subject to change at any time.
-	protoEncodingPre***REMOVED***x = []byte{0x6b, 0x38, 0x73, 0x00}
+	protoEncodingPrefix = []byte{0x6b, 0x38, 0x73, 0x00}
 )
 
 type errNotMarshalable struct {
@@ -67,13 +67,13 @@ func IsNotMarshalable(err error) bool {
 }
 
 // NewSerializer creates a Protobuf serializer that handles encoding versioned objects into the proper wire form. If a typer
-// is passed, the encoded object will have group, version, and kind ***REMOVED***elds set. If typer is nil, the objects will be written
+// is passed, the encoded object will have group, version, and kind fields set. If typer is nil, the objects will be written
 // as-is (any type info passed with the object will be used).
 //
 // This encoding scheme is experimental, and is subject to change at any time.
 func NewSerializer(creater runtime.ObjectCreater, typer runtime.ObjectTyper, defaultContentType string) *Serializer {
 	return &Serializer{
-		pre***REMOVED***x:      protoEncodingPre***REMOVED***x,
+		prefix:      protoEncodingPrefix,
 		creater:     creater,
 		typer:       typer,
 		contentType: defaultContentType,
@@ -81,7 +81,7 @@ func NewSerializer(creater runtime.ObjectCreater, typer runtime.ObjectTyper, def
 }
 
 type Serializer struct {
-	pre***REMOVED***x      []byte
+	prefix      []byte
 	creater     runtime.ObjectCreater
 	typer       runtime.ObjectTyper
 	contentType string
@@ -94,7 +94,7 @@ var _ recognizer.RecognizingDecoder = &Serializer{}
 // gvk, and then load that data into an object matching the desired schema kind or the provided into. If into is *runtime.Unknown,
 // the raw data will be extracted and no decoding will be performed. If into is not registered with the typer, then the object will
 // be straight decoded using normal protobuf unmarshalling (the MarshalTo interface). If into is provided and the original data is
-// not fully quali***REMOVED***ed with kind/version/group, the type of the into will be used to alter the returned gvk. On success or most
+// not fully qualified with kind/version/group, the type of the into will be used to alter the returned gvk. On success or most
 // errors, the method will return the calculated schema kind.
 func (s *Serializer) Decode(originalData []byte, gvk *schema.GroupVersionKind, into runtime.Object) (runtime.Object, *schema.GroupVersionKind, error) {
 	if versioned, ok := into.(*runtime.VersionedObjects); ok {
@@ -104,29 +104,29 @@ func (s *Serializer) Decode(originalData []byte, gvk *schema.GroupVersionKind, i
 			return nil, actual, err
 		}
 		// the last item in versioned becomes into, so if versioned was not originally empty we reset the object
-		// array so the ***REMOVED***rst position is the decoded object and the second position is the outermost object.
+		// array so the first position is the decoded object and the second position is the outermost object.
 		// if there were no objects in the versioned list passed to us, only add ourselves.
 		if into != nil && into != obj {
 			versioned.Objects = []runtime.Object{obj, into}
-		} ***REMOVED*** {
+		} else {
 			versioned.Objects = []runtime.Object{obj}
 		}
 		return versioned, actual, err
 	}
 
-	pre***REMOVED***xLen := len(s.pre***REMOVED***x)
+	prefixLen := len(s.prefix)
 	switch {
 	case len(originalData) == 0:
 		// TODO: treat like decoding {} from JSON with defaulting
 		return nil, nil, fmt.Errorf("empty data")
-	case len(originalData) < pre***REMOVED***xLen || !bytes.Equal(s.pre***REMOVED***x, originalData[:pre***REMOVED***xLen]):
-		return nil, nil, fmt.Errorf("provided data does not appear to be a protobuf message, expected pre***REMOVED***x %v", s.pre***REMOVED***x)
-	case len(originalData) == pre***REMOVED***xLen:
+	case len(originalData) < prefixLen || !bytes.Equal(s.prefix, originalData[:prefixLen]):
+		return nil, nil, fmt.Errorf("provided data does not appear to be a protobuf message, expected prefix %v", s.prefix)
+	case len(originalData) == prefixLen:
 		// TODO: treat like decoding {} from JSON with defaulting
 		return nil, nil, fmt.Errorf("empty body")
 	}
 
-	data := originalData[pre***REMOVED***xLen:]
+	data := originalData[prefixLen:]
 	unk := runtime.Unknown{}
 	if err := unk.Unmarshal(data); err != nil {
 		return nil, nil, err
@@ -180,19 +180,19 @@ func (s *Serializer) Decode(originalData []byte, gvk *schema.GroupVersionKind, i
 
 // Encode serializes the provided object to the given writer.
 func (s *Serializer) Encode(obj runtime.Object, w io.Writer) error {
-	pre***REMOVED***xSize := uint64(len(s.pre***REMOVED***x))
+	prefixSize := uint64(len(s.prefix))
 
 	var unk runtime.Unknown
 	switch t := obj.(type) {
 	case *runtime.Unknown:
-		estimatedSize := pre***REMOVED***xSize + uint64(t.Size())
+		estimatedSize := prefixSize + uint64(t.Size())
 		data := make([]byte, estimatedSize)
-		i, err := t.MarshalTo(data[pre***REMOVED***xSize:])
+		i, err := t.MarshalTo(data[prefixSize:])
 		if err != nil {
 			return err
 		}
-		copy(data, s.pre***REMOVED***x)
-		_, err = w.Write(data[:pre***REMOVED***xSize+uint64(i)])
+		copy(data, s.prefix)
+		_, err = w.Write(data[:prefixSize+uint64(i)])
 		return err
 	default:
 		kind := obj.GetObjectKind().GroupVersionKind()
@@ -207,19 +207,19 @@ func (s *Serializer) Encode(obj runtime.Object, w io.Writer) error {
 	switch t := obj.(type) {
 	case bufferedMarshaller:
 		// this path performs a single allocation during write but requires the caller to implement
-		// the more ef***REMOVED***cient Size and MarshalTo methods
+		// the more efficient Size and MarshalTo methods
 		encodedSize := uint64(t.Size())
-		estimatedSize := pre***REMOVED***xSize + estimateUnknownSize(&unk, encodedSize)
+		estimatedSize := prefixSize + estimateUnknownSize(&unk, encodedSize)
 		data := make([]byte, estimatedSize)
 
-		i, err := unk.NestedMarshalTo(data[pre***REMOVED***xSize:], t, encodedSize)
+		i, err := unk.NestedMarshalTo(data[prefixSize:], t, encodedSize)
 		if err != nil {
 			return err
 		}
 
-		copy(data, s.pre***REMOVED***x)
+		copy(data, s.prefix)
 
-		_, err = w.Write(data[:pre***REMOVED***xSize+uint64(i)])
+		_, err = w.Write(data[:prefixSize+uint64(i)])
 		return err
 
 	case proto.Marshaler:
@@ -230,17 +230,17 @@ func (s *Serializer) Encode(obj runtime.Object, w io.Writer) error {
 		}
 		unk.Raw = data
 
-		estimatedSize := pre***REMOVED***xSize + uint64(unk.Size())
+		estimatedSize := prefixSize + uint64(unk.Size())
 		data = make([]byte, estimatedSize)
 
-		i, err := unk.MarshalTo(data[pre***REMOVED***xSize:])
+		i, err := unk.MarshalTo(data[prefixSize:])
 		if err != nil {
 			return err
 		}
 
-		copy(data, s.pre***REMOVED***x)
+		copy(data, s.prefix)
 
-		_, err = w.Write(data[:pre***REMOVED***xSize+uint64(i)])
+		_, err = w.Write(data[:prefixSize+uint64(i)])
 		return err
 
 	default:
@@ -251,8 +251,8 @@ func (s *Serializer) Encode(obj runtime.Object, w io.Writer) error {
 
 // RecognizesData implements the RecognizingDecoder interface.
 func (s *Serializer) RecognizesData(peek io.Reader) (bool, bool, error) {
-	pre***REMOVED***x := make([]byte, 4)
-	n, err := peek.Read(pre***REMOVED***x)
+	prefix := make([]byte, 4)
+	n, err := peek.Read(prefix)
 	if err != nil {
 		if err == io.EOF {
 			return false, false, nil
@@ -262,7 +262,7 @@ func (s *Serializer) RecognizesData(peek io.Reader) (bool, bool, error) {
 	if n != 4 {
 		return false, false, nil
 	}
-	return bytes.Equal(s.pre***REMOVED***x, pre***REMOVED***x), false, nil
+	return bytes.Equal(s.prefix, prefix), false, nil
 }
 
 // copyKindDefaults defaults dst to the value in src if dst does not have a value set.
@@ -280,8 +280,8 @@ func copyKindDefaults(dst, src *schema.GroupVersionKind) {
 	}
 }
 
-// bufferedMarshaller describes a more ef***REMOVED***cient marshalling interface that can avoid allocating multiple
-// byte buffers by pre-calculating the size of the ***REMOVED***nal buffer needed.
+// bufferedMarshaller describes a more efficient marshalling interface that can avoid allocating multiple
+// byte buffers by pre-calculating the size of the final buffer needed.
 type bufferedMarshaller interface {
 	proto.Sizer
 	runtime.ProtobufMarshaller
@@ -299,7 +299,7 @@ func estimateUnknownSize(unk *runtime.Unknown, byteSize uint64) uint64 {
 }
 
 // NewRawSerializer creates a Protobuf serializer that handles encoding versioned objects into the proper wire form. If typer
-// is not nil, the object has the group, version, and kind ***REMOVED***elds set. This serializer does not provide type information for the
+// is not nil, the object has the group, version, and kind fields set. This serializer does not provide type information for the
 // encoded object, and thus is not self describing (callers must know what type is being described in order to decode).
 //
 // This encoding scheme is experimental, and is subject to change at any time.
@@ -325,7 +325,7 @@ var _ runtime.Serializer = &RawSerializer{}
 // gvk, and then load that data into an object matching the desired schema kind or the provided into. If into is *runtime.Unknown,
 // the raw data will be extracted and no decoding will be performed. If into is not registered with the typer, then the object will
 // be straight decoded using normal protobuf unmarshalling (the MarshalTo interface). If into is provided and the original data is
-// not fully quali***REMOVED***ed with kind/version/group, the type of the into will be used to alter the returned gvk. On success or most
+// not fully qualified with kind/version/group, the type of the into will be used to alter the returned gvk. On success or most
 // errors, the method will return the calculated schema kind.
 func (s *RawSerializer) Decode(originalData []byte, gvk *schema.GroupVersionKind, into runtime.Object) (runtime.Object, *schema.GroupVersionKind, error) {
 	if into == nil {
@@ -340,7 +340,7 @@ func (s *RawSerializer) Decode(originalData []byte, gvk *schema.GroupVersionKind
 		}
 		if into != nil && into != obj {
 			versioned.Objects = []runtime.Object{obj, into}
-		} ***REMOVED*** {
+		} else {
 			versioned.Objects = []runtime.Object{obj}
 		}
 		return versioned, actual, err
@@ -419,7 +419,7 @@ func (s *RawSerializer) Encode(obj runtime.Object, w io.Writer) error {
 	switch t := obj.(type) {
 	case bufferedMarshaller:
 		// this path performs a single allocation during write but requires the caller to implement
-		// the more ef***REMOVED***cient Size and MarshalTo methods
+		// the more efficient Size and MarshalTo methods
 		encodedSize := uint64(t.Size())
 		data := make([]byte, encodedSize)
 

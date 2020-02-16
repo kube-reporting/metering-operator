@@ -1,7 +1,7 @@
 ---
-# task ***REMOVED***le for the MeteringCon***REMOVED***g role
+# task file for the MeteringConfig role
 
-- include_tasks: update_meteringcon***REMOVED***g_status.yml
+- include_tasks: update_meteringconfig_status.yml
   vars:
     current_conditions:
       type: "Running"
@@ -11,7 +11,7 @@
 
 - include_tasks: reconcile.yml
 
-- include_tasks: update_meteringcon***REMOVED***g_status.yml
+- include_tasks: update_meteringconfig_status.yml
   vars:
     current_conditions:
       type: "Running"

@@ -9,7 +9,7 @@ parameters:
   value: ""
 objects:
 - apiVersion: apiextensions.k8s.io/v1beta1
-  kind: CustomResourceDe***REMOVED***nition
+  kind: CustomResourceDefinition
   metadata:
     name: hivetables.metering.openshift.io
   spec:
@@ -28,7 +28,7 @@ objects:
         description: |
           HiveTable is a custom resource that represents a database table within Hive.
           When created, a HiveTable resource causes the reporting-operator to create a
-          table witin Hive according to the con***REMOVED***guration provided.
+          table witin Hive according to the configuration provided.
         properties:
           spec:
             anyOf:
@@ -89,15 +89,15 @@ objects:
                   enum:
                   - false
             description: |
-              HiveTableSpec is the desired speci***REMOVED***cation of a HiveTable custom resource.
-              Required ***REMOVED***elds: database, tableName, and columns.
+              HiveTableSpec is the desired specification of a HiveTable custom resource.
+              Required fields: database, tableName, and columns.
               More info: https://github.com/operator-framework/operator-metering/blob/master/Documentation/hivetables.md
             properties:
               clusteredBy:
                 description: |
                   A list of columns from "columns" to use for bucketed tables.
-                  This ***REMOVED***eld must be set if "numBuckets" is speci***REMOVED***ed.
-                  Note: this is an optional ***REMOVED***eld.
+                  This field must be set if "numBuckets" is specified.
+                  Note: this is an optional field.
                   More info: https://cwiki.apache.org/confluence/display/Hive/LanguageManual+DDL+BucketedTables
                 items:
                   type: string
@@ -106,8 +106,8 @@ objects:
               columns:
                 description: |
                   A list of columns that match the schema of the HiveTable.
-                  For each list item, you must specify a `name` ***REMOVED***eld, which is the name of an individual column for the Hive table,
-                  and a `type` ***REMOVED***eld, which corresponds to a valid type in Hive.
+                  For each list item, you must specify a `name` field, which is the name of an individual column for the Hive table,
+                  and a `type` field, which corresponds to a valid type in Hive.
                   Note: the only complex types supported are map's of primitive types.
                   More info: https://cwiki.apache.org/confluence/display/Hive/LanguageManual+Types
                 items:
@@ -130,7 +130,7 @@ objects:
               databaseName:
                 description: |
                   DatabaseName is the name of the Hive database to use.
-                  Generally, this ***REMOVED***eld should be set to "default", or the value of the "databaseName" in a Hive StorageLocation.
+                  Generally, this field should be set to "default", or the value of the "databaseName" in a Hive StorageLocation.
                   More info: https://github.com/operator-framework/operator-metering/blob/master/Documentation/storagelocations.md
                 minLength: 1
                 type: string
@@ -138,36 +138,36 @@ objects:
                 description: |
                   External controls whether an external table is created, instead of a managed table.
                   If external is set to true, this causes Hive to point to an existing location,
-                  as speci***REMOVED***ed by the "location" ***REMOVED***eld.
-                  Note: this is an optional ***REMOVED***eld.
+                  as specified by the "location" field.
+                  Note: this is an optional field.
                 type: boolean
-              ***REMOVED***leFormat:
+              fileFormat:
                 description: |
-                  FileFormat controls the ***REMOVED***le format used for storing ***REMOVED***les in the ***REMOVED***lesystem.
-                  Note: this is an optional ***REMOVED***eld.
+                  FileFormat controls the file format used for storing files in the filesystem.
+                  Note: this is an optional field.
                   More info: https://cwiki.apache.org/confluence/display/Hive/LanguageManual+DDL#LanguageManualDDL-StorageFormatsStorageFormatsRowFormat,StorageFormat,andSerDe
                 minLength: 1
                 type: string
               location:
                 description: |
-                  Location speci***REMOVED***es the HDFS path to store this Hive table.
-                  This ***REMOVED***eld can be set to any URI supported by Hive.
+                  Location specifies the HDFS path to store this Hive table.
+                  This field can be set to any URI supported by Hive.
                   Currently, `sda://`, `hdfs://`, and `/local/path` are supported based URIs.
-                  Note: this is an optional ***REMOVED***eld.
+                  Note: this is an optional field.
                 format: uri
                 minLength: 1
                 type: string
               managePartitions:
                 description: |
                   ManagePartitions controls whether the reporting-operator needs to check
-                  if the table partitions match the partitions listed in the "partitions" ***REMOVED***eld.
-                  Note: this is an optional ***REMOVED***eld.
+                  if the table partitions match the partitions listed in the "partitions" field.
+                  Note: this is an optional field.
                 type: boolean
               numBuckets:
                 description: |
                   The number of buckets to create for a bucketed table.
-                  If this ***REMOVED***eld is set, then "clusteredBy" also needs to be set.
-                  Note: this is an optional ***REMOVED***eld.
+                  If this field is set, then "clusteredBy" also needs to be set.
+                  Note: this is an optional field.
                   More info: https://cwiki.apache.org/confluence/display/Hive/LanguageManual+DDL+BucketedTables
                 format: int32
                 minimum: 0
@@ -176,8 +176,8 @@ objects:
                 description: |
                   A list of columns that are used as partition columns.
                   Columns in "partitionedBy" and "columns" must not overlap.
-                  For each list item, you must specify both a `name` and `type` ***REMOVED***eld.
-                  Note: this is an optional ***REMOVED***eld.
+                  For each list item, you must specify both a `name` and `type` field.
+                  Note: this is an optional field.
                 items:
                   properties:
                     name:
@@ -199,13 +199,13 @@ objects:
               partitions:
                 description: |
                   A list of partitions that this Hive table should contain.
-                  Note: this is an optional ***REMOVED***eld.
+                  Note: this is an optional field.
                 items:
                   properties:
                     location:
                       description: |
-                        Location speci***REMOVED***es where the data for this partition is stored.
-                        This should be a sub-directory of the "location" ***REMOVED***eld.
+                        Location specifies where the data for this partition is stored.
+                        This should be a sub-directory of the "location" field.
                       format: uri
                       minLength: 1
                       type: string
@@ -225,24 +225,24 @@ objects:
               rowFormat:
                 description: |
                   RowFormat controls how Hive serializes and deserializes rows.
-                  Note: this is an optional ***REMOVED***eld.
+                  Note: this is an optional field.
                   More info: https://cwiki.apache.org/confluence/display/Hive/LanguageManual+DDL#LanguageManualDDL-RowFormats&SerDe
                 minLength: 1
                 type: string
               sortedBy:
                 description: |
                   A list of column names from "columns" to use for bucketed tables.
-                  This ***REMOVED***eld must be set if "clusteredBy" and "numBuckets" are speci***REMOVED***ed.
-                  Note: this is an optional ***REMOVED***eld.
+                  This field must be set if "clusteredBy" and "numBuckets" are specified.
+                  Note: this is an optional field.
                   More info: https://cwiki.apache.org/confluence/display/Hive/LanguageManual+DDL+BucketedTables
                 items:
                   properties:
                     descending:
                       description: |
                         Descending controls whether the column is descending or ascending.
-                        If "descending" is true, then the column is descending, ***REMOVED*** ascending.
-                        If this ***REMOVED***eld is unspeci***REMOVED***ed, then it defaults to Hive's default behavior.
-                        Note: this is an optional ***REMOVED***eld.
+                        If "descending" is true, then the column is descending, else ascending.
+                        If this field is unspecified, then it defaults to Hive's default behavior.
+                        Note: this is an optional field.
                       type: boolean
                     name:
                       description: |
@@ -260,10 +260,10 @@ objects:
                 type: string
               tableProperties:
                 description: |
-                  TableProperties is an array and allows you to tag the table de***REMOVED***nition with your
-                  own metadata key/value pairs. Some prede***REMOVED***ned properties exist to control
+                  TableProperties is an array and allows you to tag the table definition with your
+                  own metadata key/value pairs. Some predefined properties exist to control
                   behavior of the table as well.
-                  Note: this is an optional ***REMOVED***eld.
+                  Note: this is an optional field.
                   More info: https://cwiki.apache.org/confluence/display/Hive/LanguageManual+DDL#LanguageManualDDL-listTableProperties
                 type: array
             required:
@@ -282,16 +282,16 @@ objects:
       served: true
       storage: false
 - apiVersion: apiextensions.k8s.io/v1beta1
-  kind: CustomResourceDe***REMOVED***nition
+  kind: CustomResourceDefinition
   metadata:
-    name: meteringcon***REMOVED***gs.metering.openshift.io
+    name: meteringconfigs.metering.openshift.io
   spec:
     group: metering.openshift.io
     names:
-      kind: MeteringCon***REMOVED***g
-      listKind: MeteringCon***REMOVED***gList
-      plural: meteringcon***REMOVED***gs
-      singular: meteringcon***REMOVED***g
+      kind: MeteringConfig
+      listKind: MeteringConfigList
+      plural: meteringconfigs
+      singular: meteringconfig
     scope: Namespaced
     subresources:
       status: {}
@@ -318,7 +318,7 @@ objects:
                 properties:
                   spec:
                     properties:
-                      con***REMOVED***g:
+                      config:
                         properties:
                           aws:
                             properties:
@@ -379,11 +379,11 @@ objects:
                                 type: string
                             type: object
                         type: object
-                      con***REMOVED***gSecretName:
+                      configSecretName:
                         type: string
                       hdfs:
                         properties:
-                          con***REMOVED***g:
+                          config:
                             properties:
                               datanodeDataDirPerms:
                                 type: string
@@ -394,9 +394,9 @@ objects:
                             type: object
                           datanode:
                             properties:
-                              af***REMOVED***nity:
+                              affinity:
                                 properties:
-                                  podAntiAf***REMOVED***nity:
+                                  podAntiAffinity:
                                     properties:
                                       requiredDuringSchedulingIgnoredDuringExecution:
                                         items:
@@ -425,7 +425,7 @@ objects:
                                 type: object
                               annotations:
                                 type: object
-                              con***REMOVED***g:
+                              config:
                                 properties:
                                   jvm:
                                     properties:
@@ -489,9 +489,9 @@ objects:
                             type: boolean
                           namenode:
                             properties:
-                              af***REMOVED***nity:
+                              affinity:
                                 properties:
-                                  podAntiAf***REMOVED***nity:
+                                  podAntiAffinity:
                                     properties:
                                       requiredDuringSchedulingIgnoredDuringExecution:
                                         items:
@@ -520,7 +520,7 @@ objects:
                                 type: object
                               annotations:
                                 type: object
-                              con***REMOVED***g:
+                              config:
                                 properties:
                                   jvm:
                                     properties:
@@ -611,7 +611,7 @@ objects:
                     properties:
                       annotations:
                         type: object
-                      con***REMOVED***g:
+                      config:
                         properties:
                           aws:
                             properties:
@@ -641,7 +641,7 @@ objects:
                                 type: boolean
                               driver:
                                 type: string
-                              enableMetastoreSchemaVeri***REMOVED***cation:
+                              enableMetastoreSchemaVerification:
                                 type: boolean
                               password:
                                 type: string
@@ -661,7 +661,7 @@ objects:
                               serviceAccountKeyJSON:
                                 type: string
                             type: object
-                          hadoopCon***REMOVED***gSecretName:
+                          hadoopConfigSecretName:
                             type: string
                           metastoreClientSocketTimeout:
                             type: string
@@ -707,7 +707,7 @@ objects:
                               storageClass:
                                 type: string
                             type: object
-                          useHadoopCon***REMOVED***g:
+                          useHadoopConfig:
                             type: boolean
                         type: object
                       image:
@@ -725,9 +725,9 @@ objects:
                         type: object
                       metastore:
                         properties:
-                          af***REMOVED***nity:
+                          affinity:
                             type: object
-                          con***REMOVED***g:
+                          config:
                             properties:
                               auth:
                                 properties:
@@ -756,10 +756,10 @@ objects:
                                 - allOf:
                                   - not:
                                       required:
-                                      - caCerti***REMOVED***cate
+                                      - caCertificate
                                   - not:
                                       required:
-                                      - certi***REMOVED***cate
+                                      - certificate
                                   - not:
                                       required:
                                       - key
@@ -778,10 +778,10 @@ objects:
                                 - allOf:
                                   - not:
                                       required:
-                                      - caCerti***REMOVED***cate
+                                      - caCertificate
                                   - not:
                                       required:
-                                      - certi***REMOVED***cate
+                                      - certificate
                                   - not:
                                       required:
                                       - key
@@ -795,9 +795,9 @@ objects:
                                   - createSecret
                                   - secretName
                                 - properties:
-                                    caCerti***REMOVED***cate:
+                                    caCertificate:
                                       minLength: 1
-                                    certi***REMOVED***cate:
+                                    certificate:
                                       minLength: 1
                                     createSecret:
                                       enum:
@@ -810,15 +810,15 @@ objects:
                                     secretName:
                                       minLength: 1
                                   required:
-                                  - caCerti***REMOVED***cate
-                                  - certi***REMOVED***cate
+                                  - caCertificate
+                                  - certificate
                                   - key
                                   - createSecret
                                   - secretName
                                 properties:
-                                  caCerti***REMOVED***cate:
+                                  caCertificate:
                                     type: string
-                                  certi***REMOVED***cate:
+                                  certificate:
                                     type: string
                                   createSecret:
                                     type: boolean
@@ -899,9 +899,9 @@ objects:
                         type: object
                       server:
                         properties:
-                          af***REMOVED***nity:
+                          affinity:
                             type: object
-                          con***REMOVED***g:
+                          config:
                             properties:
                               auth:
                                 properties:
@@ -930,10 +930,10 @@ objects:
                                 - allOf:
                                   - not:
                                       required:
-                                      - caCerti***REMOVED***cate
+                                      - caCertificate
                                   - not:
                                       required:
-                                      - certi***REMOVED***cate
+                                      - certificate
                                   - not:
                                       required:
                                       - key
@@ -952,10 +952,10 @@ objects:
                                 - allOf:
                                   - not:
                                       required:
-                                      - caCerti***REMOVED***cate
+                                      - caCertificate
                                   - not:
                                       required:
-                                      - certi***REMOVED***cate
+                                      - certificate
                                   - not:
                                       required:
                                       - key
@@ -969,9 +969,9 @@ objects:
                                   - createSecret
                                   - secretName
                                 - properties:
-                                    caCerti***REMOVED***cate:
+                                    caCertificate:
                                       minLength: 1
-                                    certi***REMOVED***cate:
+                                    certificate:
                                       minLength: 1
                                     createSecret:
                                       enum:
@@ -984,15 +984,15 @@ objects:
                                     secretName:
                                       minLength: 1
                                   required:
-                                  - caCerti***REMOVED***cate
-                                  - certi***REMOVED***cate
+                                  - caCertificate
+                                  - certificate
                                   - key
                                   - createSecret
                                   - secretName
                                 properties:
-                                  caCerti***REMOVED***cate:
+                                  caCertificate:
                                     type: string
-                                  certi***REMOVED***cate:
+                                  certificate:
                                     type: string
                                   createSecret:
                                     type: boolean
@@ -1008,10 +1008,10 @@ objects:
                                 - allOf:
                                   - not:
                                       required:
-                                      - caCerti***REMOVED***cate
+                                      - caCertificate
                                   - not:
                                       required:
-                                      - certi***REMOVED***cate
+                                      - certificate
                                   - not:
                                       required:
                                       - key
@@ -1030,10 +1030,10 @@ objects:
                                 - allOf:
                                   - not:
                                       required:
-                                      - caCerti***REMOVED***cate
+                                      - caCertificate
                                   - not:
                                       required:
-                                      - certi***REMOVED***cate
+                                      - certificate
                                   - not:
                                       required:
                                       - key
@@ -1050,9 +1050,9 @@ objects:
                                   - createSecret
                                   - secretName
                                 - properties:
-                                    caCerti***REMOVED***cate:
+                                    caCertificate:
                                       minLength: 1
-                                    certi***REMOVED***cate:
+                                    certificate:
                                       minLength: 1
                                     createSecret:
                                       enum:
@@ -1065,15 +1065,15 @@ objects:
                                     secretName:
                                       minLength: 1
                                   required:
-                                  - caCerti***REMOVED***cate
-                                  - certi***REMOVED***cate
+                                  - caCertificate
+                                  - certificate
                                   - key
                                   - createSecret
                                   - secretName
                                 properties:
-                                  caCerti***REMOVED***cate:
+                                  caCertificate:
                                     type: string
-                                  certi***REMOVED***cate:
+                                  certificate:
                                     type: string
                                   createSecret:
                                     type: boolean
@@ -1156,7 +1156,7 @@ objects:
                             type: string
                           enabled:
                             type: boolean
-                          pre***REMOVED***x:
+                          prefix:
                             type: string
                           region:
                             type: string
@@ -1333,17 +1333,17 @@ objects:
                     properties:
                       annotations:
                         type: object
-                      con***REMOVED***g:
+                      config:
                         properties:
                           auth:
                             oneOf:
                             - allOf:
                               - not:
                                   required:
-                                  - caCerti***REMOVED***cate
+                                  - caCertificate
                               - not:
                                   required:
-                                  - certi***REMOVED***cate
+                                  - certificate
                               - not:
                                   required:
                                   - key
@@ -1362,10 +1362,10 @@ objects:
                             - allOf:
                               - not:
                                   required:
-                                  - caCerti***REMOVED***cate
+                                  - caCertificate
                               - not:
                                   required:
-                                  - certi***REMOVED***cate
+                                  - certificate
                               - not:
                                   required:
                                   - key
@@ -1379,9 +1379,9 @@ objects:
                               - createSecret
                               - secretName
                             - properties:
-                                caCerti***REMOVED***cate:
+                                caCertificate:
                                   minLength: 1
-                                certi***REMOVED***cate:
+                                certificate:
                                   minLength: 1
                                 createSecret:
                                   enum:
@@ -1394,15 +1394,15 @@ objects:
                                 secretName:
                                   minLength: 1
                               required:
-                              - caCerti***REMOVED***cate
-                              - certi***REMOVED***cate
+                              - caCertificate
+                              - certificate
                               - key
                               - createSecret
                               - secretName
                             properties:
-                              caCerti***REMOVED***cate:
+                              caCertificate:
                                 type: string
-                              certi***REMOVED***cate:
+                              certificate:
                                 type: string
                               createSecret:
                                 type: boolean
@@ -1441,7 +1441,7 @@ objects:
                                 type: array
                               hive:
                                 properties:
-                                  hadoopCon***REMOVED***gSecretName:
+                                  hadoopConfigSecretName:
                                     type: string
                                   metastoreTimeout:
                                     type: string
@@ -1457,10 +1457,10 @@ objects:
                                     - allOf:
                                       - not:
                                           required:
-                                          - caCerti***REMOVED***cate
+                                          - caCertificate
                                       - not:
                                           required:
-                                          - certi***REMOVED***cate
+                                          - certificate
                                       - not:
                                           required:
                                           - key
@@ -1479,10 +1479,10 @@ objects:
                                     - allOf:
                                       - not:
                                           required:
-                                          - caCerti***REMOVED***cate
+                                          - caCertificate
                                       - not:
                                           required:
-                                          - certi***REMOVED***cate
+                                          - certificate
                                       - not:
                                           required:
                                           - key
@@ -1496,9 +1496,9 @@ objects:
                                       - createSecret
                                       - secretName
                                     - properties:
-                                        caCerti***REMOVED***cate:
+                                        caCertificate:
                                           minLength: 1
-                                        certi***REMOVED***cate:
+                                        certificate:
                                           minLength: 1
                                         createSecret:
                                           enum:
@@ -1511,15 +1511,15 @@ objects:
                                         secretName:
                                           minLength: 1
                                       required:
-                                      - caCerti***REMOVED***cate
-                                      - certi***REMOVED***cate
+                                      - caCertificate
+                                      - certificate
                                       - key
                                       - createSecret
                                       - secretName
                                     properties:
-                                      caCerti***REMOVED***cate:
+                                      caCertificate:
                                         type: string
-                                      certi***REMOVED***cate:
+                                      certificate:
                                         type: string
                                       createSecret:
                                         type: boolean
@@ -1530,7 +1530,7 @@ objects:
                                       secretName:
                                         type: string
                                     type: object
-                                  useHadoopCon***REMOVED***g:
+                                  useHadoopConfig:
                                     type: boolean
                                 type: object
                               prometheus:
@@ -1554,7 +1554,7 @@ objects:
                                   auth:
                                     properties:
                                       bearerTokenFile:
-                                        description: Path to token ***REMOVED***le for bearer
+                                        description: Path to token file for bearer
                                           authentication to Prometheus.
                                         type: string
                                       useServiceAccountToken:
@@ -1562,7 +1562,7 @@ objects:
                                           account token for the bearer token
                                         type: boolean
                                     type: object
-                                  con***REMOVED***g:
+                                  config:
                                     properties:
                                       cacheDuration:
                                         description: Time to live for Presto checking
@@ -1632,10 +1632,10 @@ objects:
                             - allOf:
                               - not:
                                   required:
-                                  - caCerti***REMOVED***cate
+                                  - caCertificate
                               - not:
                                   required:
-                                  - certi***REMOVED***cate
+                                  - certificate
                               - not:
                                   required:
                                   - key
@@ -1654,7 +1654,7 @@ objects:
                             - allOf:
                               - not:
                                   required:
-                                  - caCerti***REMOVED***cate
+                                  - caCertificate
                               properties:
                                 createSecret:
                                   enum:
@@ -1665,7 +1665,7 @@ objects:
                               - createSecret
                               - secretName
                             - properties:
-                                certi***REMOVED***cate:
+                                certificate:
                                   minLength: 1
                                 createSecret:
                                   enum:
@@ -1676,13 +1676,13 @@ objects:
                                 secretName:
                                   minLength: 1
                               required:
-                              - caCerti***REMOVED***cate
+                              - caCertificate
                               - createSecret
                               - secretName
                             properties:
-                              caCerti***REMOVED***cate:
+                              caCertificate:
                                 type: string
-                              certi***REMOVED***cate:
+                              certificate:
                                 type: string
                               createSecret:
                                 type: boolean
@@ -1696,9 +1696,9 @@ objects:
                         type: object
                       coordinator:
                         properties:
-                          af***REMOVED***nity:
+                          affinity:
                             properties:
-                              podAntiAf***REMOVED***nity:
+                              podAntiAffinity:
                                 properties:
                                   requiredDuringSchedulingIgnoredDuringExecution:
                                     items:
@@ -1730,7 +1730,7 @@ objects:
                                     type: array
                                 type: object
                             type: object
-                          con***REMOVED***g:
+                          config:
                             properties:
                               jvm:
                                 properties:
@@ -1847,9 +1847,9 @@ objects:
                         type: integer
                       worker:
                         properties:
-                          af***REMOVED***nity:
+                          affinity:
                             properties:
-                              podAntiAf***REMOVED***nity:
+                              podAntiAffinity:
                                 properties:
                                   requiredDuringSchedulingIgnoredDuringExecution:
                                     items:
@@ -1883,7 +1883,7 @@ objects:
                                     type: array
                                 type: object
                             type: object
-                          con***REMOVED***g:
+                          config:
                             properties:
                               jvm:
                                 properties:
@@ -1982,7 +1982,7 @@ objects:
                 properties:
                   spec:
                     properties:
-                      af***REMOVED***nity:
+                      affinity:
                         type: object
                       annotations:
                         type: object
@@ -2160,7 +2160,7 @@ objects:
                             - enabled
                             type: object
                         type: object
-                      con***REMOVED***g:
+                      config:
                         properties:
                           allNamespaces:
                             type: boolean
@@ -2184,7 +2184,7 @@ objects:
                                 - allOf:
                                   - not:
                                       required:
-                                      - certi***REMOVED***cate
+                                      - certificate
                                   - not:
                                       required:
                                       - key
@@ -2203,7 +2203,7 @@ objects:
                                 - allOf:
                                   - not:
                                       required:
-                                      - certi***REMOVED***cate
+                                      - certificate
                                   - not:
                                       required:
                                       - key
@@ -2217,7 +2217,7 @@ objects:
                                   - createSecret
                                   - secretName
                                 - properties:
-                                    certi***REMOVED***cate:
+                                    certificate:
                                       minLength: 1
                                     createSecret:
                                       enum:
@@ -2230,12 +2230,12 @@ objects:
                                     secretName:
                                       minLength: 1
                                   required:
-                                  - certi***REMOVED***cate
+                                  - certificate
                                   - key
                                   - createSecret
                                   - secretName
                                 properties:
-                                  certi***REMOVED***cate:
+                                  certificate:
                                     type: string
                                   createSecret:
                                     type: boolean
@@ -2253,7 +2253,7 @@ objects:
                                 - allOf:
                                   - not:
                                       required:
-                                      - caCerti***REMOVED***cate
+                                      - caCertificate
                                   - not:
                                       required:
                                       - createSecret
@@ -2269,7 +2269,7 @@ objects:
                                 - allOf:
                                   - not:
                                       required:
-                                      - caCerti***REMOVED***cate
+                                      - caCertificate
                                   properties:
                                     createSecret:
                                       enum:
@@ -2280,7 +2280,7 @@ objects:
                                   - createSecret
                                   - secretName
                                 - properties:
-                                    caCerti***REMOVED***cate:
+                                    caCertificate:
                                       minLength: 1
                                     createSecret:
                                       enum:
@@ -2291,11 +2291,11 @@ objects:
                                     secretName:
                                       minLength: 1
                                   required:
-                                  - caCerti***REMOVED***cate
+                                  - caCertificate
                                   - createSecret
                                   - secretName
                                 properties:
-                                  caCerti***REMOVED***cate:
+                                  caCertificate:
                                     type: string
                                   createSecret:
                                     type: boolean
@@ -2322,7 +2322,7 @@ objects:
                                 - allOf:
                                   - not:
                                       required:
-                                      - certi***REMOVED***cate
+                                      - certificate
                                   - not:
                                       required:
                                       - key
@@ -2341,7 +2341,7 @@ objects:
                                 - allOf:
                                   - not:
                                       required:
-                                      - certi***REMOVED***cate
+                                      - certificate
                                   - not:
                                       required:
                                       - key
@@ -2355,7 +2355,7 @@ objects:
                                   - createSecret
                                   - secretName
                                 - properties:
-                                    certi***REMOVED***cate:
+                                    certificate:
                                       minLength: 1
                                     createSecret:
                                       enum:
@@ -2368,12 +2368,12 @@ objects:
                                     secretName:
                                       minLength: 1
                                   required:
-                                  - certi***REMOVED***cate
+                                  - certificate
                                   - key
                                   - createSecret
                                   - secretName
                                 properties:
-                                  certi***REMOVED***cate:
+                                  certificate:
                                     type: string
                                   createSecret:
                                     type: boolean
@@ -2393,7 +2393,7 @@ objects:
                                 - allOf:
                                   - not:
                                       required:
-                                      - caCerti***REMOVED***cate
+                                      - caCertificate
                                   - not:
                                       required:
                                       - createSecret
@@ -2409,7 +2409,7 @@ objects:
                                 - allOf:
                                   - not:
                                       required:
-                                      - caCerti***REMOVED***cate
+                                      - caCertificate
                                   properties:
                                     createSecret:
                                       enum:
@@ -2420,7 +2420,7 @@ objects:
                                   - createSecret
                                   - secretName
                                 - properties:
-                                    certi***REMOVED***cate:
+                                    certificate:
                                       minLength: 1
                                     createSecret:
                                       enum:
@@ -2431,11 +2431,11 @@ objects:
                                     secretName:
                                       minLength: 1
                                   required:
-                                  - caCerti***REMOVED***cate
+                                  - caCertificate
                                   - createSecret
                                   - secretName
                                 properties:
-                                  caCerti***REMOVED***cate:
+                                  caCertificate:
                                     type: string
                                   createSecret:
                                     type: boolean
@@ -2447,15 +2447,15 @@ objects:
                             type: object
                           prometheus:
                             properties:
-                              certi***REMOVED***cateAuthority:
+                              certificateAuthority:
                                 properties:
-                                  con***REMOVED***gMap:
+                                  configMap:
                                     properties:
                                       create:
                                         type: boolean
                                       enabled:
                                         type: boolean
-                                      ***REMOVED***lename:
+                                      filename:
                                         type: string
                                       name:
                                         type: string
@@ -2483,13 +2483,13 @@ objects:
                                       useServiceAccountToken:
                                         type: boolean
                                     type: object
-                                  con***REMOVED***g:
+                                  config:
                                     properties:
                                       chunkSize:
                                         type: string
                                       importFrom:
                                         type: string
-                                      maxImportBack***REMOVED***llDuration:
+                                      maxImportBackfillDuration:
                                         type: string
                                       maxQueryRangeDuration:
                                         type: string
@@ -2511,10 +2511,10 @@ objects:
                                 - allOf:
                                   - not:
                                       required:
-                                      - caCerti***REMOVED***cate
+                                      - caCertificate
                                   - not:
                                       required:
-                                      - certi***REMOVED***cate
+                                      - certificate
                                   - not:
                                       required:
                                       - key
@@ -2533,10 +2533,10 @@ objects:
                                 - allOf:
                                   - not:
                                       required:
-                                      - caCerti***REMOVED***cate
+                                      - caCertificate
                                   - not:
                                       required:
-                                      - certi***REMOVED***cate
+                                      - certificate
                                   - not:
                                       required:
                                       - key
@@ -2550,9 +2550,9 @@ objects:
                                   - createSecret
                                   - secretName
                                 - properties:
-                                    caCerti***REMOVED***cate:
+                                    caCertificate:
                                       minLength: 1
-                                    certi***REMOVED***cate:
+                                    certificate:
                                       minLength: 1
                                     createSecret:
                                       enum:
@@ -2565,15 +2565,15 @@ objects:
                                     secretName:
                                       minLength: 1
                                   required:
-                                  - caCerti***REMOVED***cate
-                                  - certi***REMOVED***cate
+                                  - caCertificate
+                                  - certificate
                                   - key
                                   - createSecret
                                   - secretName
                                 properties:
-                                  caCerti***REMOVED***cate:
+                                  caCertificate:
                                     type: string
-                                  certi***REMOVED***cate:
+                                  certificate:
                                     type: string
                                   createSecret:
                                     type: boolean
@@ -3009,14 +3009,14 @@ objects:
                 - allOf:
                   - not:
                       required:
-                      - certi***REMOVED***cate
+                      - certificate
                   - not:
                       required:
                       - key
                   required:
                   - enabled
                 - properties:
-                    certi***REMOVED***cate:
+                    certificate:
                       minLength: 1
                     enabled:
                       enum:
@@ -3025,10 +3025,10 @@ objects:
                       minLength: 1
                   required:
                   - enabled
-                  - certi***REMOVED***cate
+                  - certificate
                   - key
                 properties:
-                  certi***REMOVED***cate:
+                  certificate:
                     type: string
                   enabled:
                     type: boolean
@@ -3056,7 +3056,7 @@ objects:
       served: true
       storage: false
 - apiVersion: apiextensions.k8s.io/v1beta1
-  kind: CustomResourceDe***REMOVED***nition
+  kind: CustomResourceDefinition
   metadata:
     name: prestotables.metering.openshift.io
   spec:
@@ -3075,19 +3075,19 @@ objects:
         description: |
           PrestoTable is a custom resource that represents a database table accessible from within Presto.
           When a PrestoTable resource is created, the reporting-operator creates a table within Presto according
-          to the con***REMOVED***guration provided, or exposes an existing table.
+          to the configuration provided, or exposes an existing table.
           More info: https://prestosql.io/docs/current/index.html
         properties:
           spec:
             description: |
-              PrestoTableSpec is the desired speci***REMOVED***cation of a PrestoTable custom resource.
-              Required ***REMOVED***elds: unmanaged, catalog, schema, tableName. Note: columns is required when unmanaged is set to false.
-              Optional ***REMOVED***elds: query, view, createTableAs, properties, and comment.
+              PrestoTableSpec is the desired specification of a PrestoTable custom resource.
+              Required fields: unmanaged, catalog, schema, tableName. Note: columns is required when unmanaged is set to false.
+              Optional fields: query, view, createTableAs, properties, and comment.
               More info: https://github.com/operator-framework/operator-metering/blob/master/Documentation/prestotables.md
             properties:
               catalog:
                 description: |
-                  Catalog speci***REMOVED***es which catalog the Presto table is to be created within.
+                  Catalog specifies which catalog the Presto table is to be created within.
                   In many cases, the catalog will be set to "hive".
                   More info: https://prestosql.io/docs/current/overview/concepts.html#catalog
                 minLength: 1
@@ -3095,8 +3095,8 @@ objects:
               columns:
                 description: |
                   A list of columns that match the schema of the PrestoTable.
-                  For each list item, you must specify a `name` ***REMOVED***eld, which is the name of an individual column for the Presto table,
-                  and a `type` ***REMOVED***eld, which corresponds to a valid type in Presto.
+                  For each list item, you must specify a `name` field, which is the name of an individual column for the Presto table,
+                  and a `type` field, which corresponds to a valid type in Presto.
                   More info: https://prestosql.io/docs/current/language/types.html
                 items:
                   properties:
@@ -3115,25 +3115,25 @@ objects:
                 description: |
                   Sets a comment on the Presto table. Comments are just arbitrary strings that have no meaning to Presto,
                   but can be used to store arbitrary information about a table.
-                  Note: this is an optional ***REMOVED***eld.
+                  Note: this is an optional field.
                 minLength: 1
                 type: string
               createTableAs:
                 description: |
                   CreateTableAs controls whether the reporting-operator needs to create a table within Presto.
-                  If true, the reporting-operator uses the "query" ***REMOVED***eld as the SELECT statemtnt for creating the table.
-                  Note: this is an optional ***REMOVED***eld.
+                  If true, the reporting-operator uses the "query" field as the SELECT statemtnt for creating the table.
+                  Note: this is an optional field.
                 type: boolean
               properties:
                 description: |
                   Properties is a map containing string key and value pairs. Each key-value pair is a table property for
-                  con***REMOVED***guring the table. The available properties depend on the "catalog" being used.
-                  Note: this is an optional ***REMOVED***eld.
+                  configuring the table. The available properties depend on the "catalog" being used.
+                  Note: this is an optional field.
                 type: array
               query:
                 description: |
                   Query is a string containing a SQL SELECT query used for creating a table or view.
-                  Note: this is an optional ***REMOVED***eld.
+                  Note: this is an optional field.
                   More info: https://prestosql.io/docs/current/overview/concepts.html#query
                 minLength: 1
                 type: string
@@ -3160,8 +3160,8 @@ objects:
               view:
                 description: |
                   View controls whether the reporting-operator needs to create a view within Presto.
-                  If true, the reporting-operator uses the "query" ***REMOVED***eld as the SELECT statement for creating the view.
-                  Note: this is an optional ***REMOVED***eld.
+                  If true, the reporting-operator uses the "query" field as the SELECT statement for creating the view.
+                  Note: this is an optional field.
                 type: boolean
             required:
             - unmanaged
@@ -3180,7 +3180,7 @@ objects:
       served: true
       storage: false
 - apiVersion: apiextensions.k8s.io/v1beta1
-  kind: CustomResourceDe***REMOVED***nition
+  kind: CustomResourceDefinition
   metadata:
     name: reports.metering.openshift.io
   spec:
@@ -3455,7 +3455,7 @@ objects:
       served: true
       storage: false
 - apiVersion: apiextensions.k8s.io/v1beta1
-  kind: CustomResourceDe***REMOVED***nition
+  kind: CustomResourceDefinition
   metadata:
     name: reportdatasources.metering.openshift.io
   spec:
@@ -3510,7 +3510,7 @@ objects:
                       bucket:
                         minLength: 1
                         type: string
-                      pre***REMOVED***x:
+                      prefix:
                         type: string
                       region:
                         minLength: 1
@@ -3545,7 +3545,7 @@ objects:
                 type: object
               prometheusMetricsImporter:
                 properties:
-                  prometheusCon***REMOVED***g:
+                  prometheusConfig:
                     properties:
                       url:
                         format: uri
@@ -3609,7 +3609,7 @@ objects:
       served: true
       storage: false
 - apiVersion: apiextensions.k8s.io/v1beta1
-  kind: CustomResourceDe***REMOVED***nition
+  kind: CustomResourceDefinition
   metadata:
     name: reportqueries.metering.openshift.io
   spec:
@@ -3762,7 +3762,7 @@ objects:
       served: true
       storage: false
 - apiVersion: apiextensions.k8s.io/v1beta1
-  kind: CustomResourceDe***REMOVED***nition
+  kind: CustomResourceDefinition
   metadata:
     name: storagelocations.metering.openshift.io
   spec:
@@ -3774,22 +3774,22 @@ objects:
     validation:
       openAPIV3Schema:
         description: |
-          StorageLocation is a custom resource that con***REMOVED***gures where data will
+          StorageLocation is a custom resource that configures where data will
           be stored by the reporting-operator. This included the data collected
           from Prometheus, and the results produced by generating a `Report` custom
           resources.
         properties:
           spec:
             description: |
-              StorageLocationSpec is the desired speci***REMOVED***cation of a StorageLocation custom resource.
-              Required ***REMOVED***elds: databaseName, unmanagedDatabase, and location.
+              StorageLocationSpec is the desired specification of a StorageLocation custom resource.
+              Required fields: databaseName, unmanagedDatabase, and location.
               More info: https://github.com/operator-framework/operator-metering/blob/master/Documentation/storagelocations.md
             properties:
               hive:
                 description: |
-                  Con***REMOVED***gures the StorageLocation to store data in Presto by creating
+                  Configures the StorageLocation to store data in Presto by creating
                   the table using Hive Server.
-                  Note: databaseName and unmanagedDatabase are required ***REMOVED***elds.
+                  Note: databaseName and unmanagedDatabase are required fields.
                 properties:
                   databaseName:
                     description: |
@@ -3798,33 +3798,33 @@ objects:
                     type: string
                   defaultTableProperties:
                     description: |
-                      DefaultTableProperties contains the con***REMOVED***guration options for creating table
+                      DefaultTableProperties contains the configuration options for creating table
                       using Hive.
-                      Note: this is an optional ***REMOVED***eld.
+                      Note: this is an optional field.
                     properties:
-                      ***REMOVED***leFormat:
+                      fileFormat:
                         description: |
-                          FileFormat speci***REMOVED***es the ***REMOVED***le format used for storing ***REMOVED***les in the ***REMOVED***le system.
-                          Note: this is an optional ***REMOVED***eld.
+                          FileFormat specifies the file format used for storing files in the file system.
+                          Note: this is an optional field.
                           More info: https://cwiki.apache.org/confluence/display/Hive/LanguageManual+DDL#LanguageManualDDL-StorageFormatsStorageFormatsRowFormat,StorageFormat,andSerDe
                         minLength: 1
                         type: string
                       rowFormat:
                         description: |
-                          RowFormat speci***REMOVED***es the Hive row format, which is how Hive serializes and
+                          RowFormat specifies the Hive row format, which is how Hive serializes and
                           deserializes rows.
-                          Note: this is an optional ***REMOVED***eld.
+                          Note: this is an optional field.
                           More info: https://cwiki.apache.org/confluence/display/Hive/LanguageManual+DDL#LanguageManualDDL-StorageFormatsStorageFormatsRowFormat,StorageFormat,andSerDe
                         minLength: 1
                         type: string
                     type: object
                   location:
                     description: |
-                      Location is the ***REMOVED***lesystem URL for Presto and Hive to use for the
-                      database. This can be in the form of `hdfs://` or `sda://` ***REMOVED***lesystem URL.
-                      If this ***REMOVED***eld is unset, or set to an empty string, then the default
-                      ***REMOVED***lesystem URL for Hive is used.
-                      Note: this is an optional ***REMOVED***eld.
+                      Location is the filesystem URL for Presto and Hive to use for the
+                      database. This can be in the form of `hdfs://` or `sda://` filesystem URL.
+                      If this field is unset, or set to an empty string, then the default
+                      filesystem URL for Hive is used.
+                      Note: this is an optional field.
                     format: uri
                     type: string
                   unmanagedDatabase:
@@ -3835,7 +3835,7 @@ objects:
                     type: boolean
                   useLocalStorage:
                     description: |
-                      UseLocalStorage determines whether or not to use a ***REMOVED***le-based metastore
+                      UseLocalStorage determines whether or not to use a file-based metastore
                       mounted in Presto
                     type: boolean
                 required:
@@ -3866,7 +3866,7 @@ objects:
     - get
     - list
   - apiGroups:
-    - con***REMOVED***g.openshift.io
+    - config.openshift.io
     resources:
     - networks
     verbs:
@@ -3940,12 +3940,12 @@ objects:
             value: "false"
           - name: WATCH_NAMESPACE
             valueFrom:
-              ***REMOVED***eldRef:
-                ***REMOVED***eldPath: metadata.namespace
+              fieldRef:
+                fieldPath: metadata.namespace
           - name: POD_NAME
             valueFrom:
-              ***REMOVED***eldRef:
-                ***REMOVED***eldPath: metadata.name
+              fieldRef:
+                fieldPath: metadata.name
           - name: METERING_ANSIBLE_OPERATOR_IMAGE
             value: quay.io/openshift/origin-metering-ansible-operator:4.4
           - name: METERING_REPORTING_OPERATOR_IMAGE
@@ -3982,7 +3982,7 @@ objects:
         - emptyDir: {}
           name: runner
 - apiVersion: metering.openshift.io/v1
-  kind: MeteringCon***REMOVED***g
+  kind: MeteringConfig
   metadata:
     name: operator-metering
   spec: {}
@@ -4016,7 +4016,7 @@ objects:
   - apiGroups:
     - ""
     resources:
-    - con***REMOVED***gmaps
+    - configmaps
     - endpoints
     - persistentvolumeclaims
     - secrets
@@ -4057,7 +4057,7 @@ objects:
     resources:
     - daemonsets
     - deployments
-    - deployments/***REMOVED***nalizers
+    - deployments/finalizers
     - deployments/rollback
     - deployments/scale
     - replicasets

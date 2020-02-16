@@ -2,7 +2,7 @@
 Copyright 2015 The Kubernetes Authors.
 
 Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this ***REMOVED***le except in compliance with the License.
+you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
 
     http://www.apache.org/licenses/LICENSE-2.0
@@ -10,7 +10,7 @@ You may obtain a copy of the License at
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the speci***REMOVED***c language governing permissions and
+See the License for the specific language governing permissions and
 limitations under the License.
 */
 
@@ -51,7 +51,7 @@ func ParseKindArg(arg string) (*GroupVersionKind, GroupKind) {
 	return gvk, ParseGroupKind(arg)
 }
 
-// GroupResource speci***REMOVED***es a Group and a Resource, but does not force a version.  This is useful for identifying
+// GroupResource specifies a Group and a Resource, but does not force a version.  This is useful for identifying
 // concepts during lookup stages without having partially valid types
 type GroupResource struct {
 	Group    string
@@ -83,7 +83,7 @@ func ParseGroupKind(gk string) GroupKind {
 }
 
 // ParseGroupResource turns "resource.group" string into a GroupResource struct.  Empty strings are allowed
-// for each ***REMOVED***eld.
+// for each field.
 func ParseGroupResource(gr string) GroupResource {
 	if i := strings.Index(gr, "."); i >= 0 {
 		return GroupResource{Group: gr[i+1:], Resource: gr[:i]}
@@ -91,7 +91,7 @@ func ParseGroupResource(gr string) GroupResource {
 	return GroupResource{Resource: gr}
 }
 
-// GroupVersionResource unambiguously identi***REMOVED***es a resource.  It doesn't anonymously include GroupVersion
+// GroupVersionResource unambiguously identifies a resource.  It doesn't anonymously include GroupVersion
 // to avoid automatic coercion.  It doesn't use a GroupVersion to avoid custom marshalling
 type GroupVersionResource struct {
 	Group    string
@@ -115,7 +115,7 @@ func (gvr GroupVersionResource) String() string {
 	return strings.Join([]string{gvr.Group, "/", gvr.Version, ", Resource=", gvr.Resource}, "")
 }
 
-// GroupKind speci***REMOVED***es a Group and a Kind, but does not force a version.  This is useful for identifying
+// GroupKind specifies a Group and a Kind, but does not force a version.  This is useful for identifying
 // concepts during lookup stages without having partially valid types
 type GroupKind struct {
 	Group string
@@ -137,7 +137,7 @@ func (gk GroupKind) String() string {
 	return gk.Kind + "." + gk.Group
 }
 
-// GroupVersionKind unambiguously identi***REMOVED***es a kind.  It doesn't anonymously include GroupVersion
+// GroupVersionKind unambiguously identifies a kind.  It doesn't anonymously include GroupVersion
 // to avoid automatic coercion.  It doesn't use a GroupVersion to avoid custom marshalling
 type GroupVersionKind struct {
 	Group   string
@@ -162,7 +162,7 @@ func (gvk GroupVersionKind) String() string {
 	return gvk.Group + "/" + gvk.Version + ", Kind=" + gvk.Kind
 }
 
-// GroupVersion contains the "group" and the "version", which uniquely identi***REMOVED***es the API.
+// GroupVersion contains the "group" and the "version", which uniquely identifies the API.
 type GroupVersion struct {
 	Group   string
 	Version string
@@ -191,7 +191,7 @@ func (gv GroupVersion) String() string {
 	return gv.Version
 }
 
-// KindForGroupVersionKinds identi***REMOVED***es the preferred GroupVersionKind out of a list. It returns ok false
+// KindForGroupVersionKinds identifies the preferred GroupVersionKind out of a list. It returns ok false
 // if none of the options match the group. It prefers a match to group and version over just group.
 // TODO: Move GroupVersion to a package under pkg/runtime, since it's used by scheme.
 // TODO: Introduce an adapter type between GroupVersion and runtime.GroupVersioner, and use LegacyCodec(GroupVersion)
@@ -246,7 +246,7 @@ func (gv GroupVersion) WithResource(resource string) GroupVersionResource {
 //   in fewer places.
 type GroupVersions []GroupVersion
 
-// KindForGroupVersionKinds identi***REMOVED***es the preferred GroupVersionKind out of a list. It returns ok false
+// KindForGroupVersionKinds identifies the preferred GroupVersionKind out of a list. It returns ok false
 // if none of the options match the group.
 func (gvs GroupVersions) KindForGroupVersionKinds(kinds []GroupVersionKind) (GroupVersionKind, bool) {
 	var targets []GroupVersionKind
@@ -266,7 +266,7 @@ func (gvs GroupVersions) KindForGroupVersionKinds(kinds []GroupVersionKind) (Gro
 	return GroupVersionKind{}, false
 }
 
-// bestMatch tries to pick best matching GroupVersionKind and falls back to the ***REMOVED***rst
+// bestMatch tries to pick best matching GroupVersionKind and falls back to the first
 // found if no exact match exists.
 func bestMatch(kinds []GroupVersionKind, targets []GroupVersionKind) GroupVersionKind {
 	for _, gvk := range targets {
@@ -288,7 +288,7 @@ func (gvk GroupVersionKind) ToAPIVersionAndKind() (string, string) {
 	return gvk.GroupVersion().String(), gvk.Kind
 }
 
-// FromAPIVersionAndKind returns a GVK representing the provided ***REMOVED***elds for types that
+// FromAPIVersionAndKind returns a GVK representing the provided fields for types that
 // do not use TypeMeta. This method exists to support test types and legacy serializations
 // that have a distinct group and kind.
 // TODO: further reduce usage of this method.

@@ -12,8 +12,8 @@ func init() {
 }
 
 func defaultInitClientFn(c *client.Client) {
-	// Support building custom endpoints based on con***REMOVED***g
-	c.Handlers.Build.PushFront(updateEndpointForS3Con***REMOVED***g)
+	// Support building custom endpoints based on config
+	c.Handlers.Build.PushFront(updateEndpointForS3Config)
 
 	// Require SSL when using SSE keys
 	c.Handlers.Validate.PushBack(validateSSERequiresSSL)
@@ -27,14 +27,14 @@ func defaultInitClientFn(c *client.Client) {
 }
 
 func defaultInitRequestFn(r *request.Request) {
-	// Add reuest handlers for speci***REMOVED***c platforms.
+	// Add reuest handlers for specific platforms.
 	// e.g. 100-continue support for PUT requests using Go 1.6
 	platformRequestHandlers(r)
 
 	switch r.Operation.Name {
 	case opPutBucketCors, opPutBucketLifecycle, opPutBucketPolicy,
-		opPutBucketTagging, opDeleteObjects, opPutBucketLifecycleCon***REMOVED***guration,
-		opPutObjectLegalHold, opPutObjectRetention, opPutObjectLockCon***REMOVED***guration,
+		opPutBucketTagging, opDeleteObjects, opPutBucketLifecycleConfiguration,
+		opPutObjectLegalHold, opPutObjectRetention, opPutObjectLockConfiguration,
 		opPutBucketReplication:
 		// These S3 operations require Content-MD5 to be set
 		r.Handlers.Build.PushBack(contentMD5)
@@ -56,20 +56,20 @@ func defaultInitRequestFn(r *request.Request) {
 	}
 }
 
-// bucketGetter is an accessor interface to grab the "Bucket" ***REMOVED***eld from
+// bucketGetter is an accessor interface to grab the "Bucket" field from
 // an S3 type.
 type bucketGetter interface {
 	getBucket() string
 }
 
 // sseCustomerKeyGetter is an accessor interface to grab the "SSECustomerKey"
-// ***REMOVED***eld from an S3 type.
+// field from an S3 type.
 type sseCustomerKeyGetter interface {
 	getSSECustomerKey() string
 }
 
 // copySourceSSECustomerKeyGetter is an accessor interface to grab the
-// "CopySourceSSECustomerKey" ***REMOVED***eld from an S3 type.
+// "CopySourceSSECustomerKey" field from an S3 type.
 type copySourceSSECustomerKeyGetter interface {
 	getCopySourceSSECustomerKey() string
 }

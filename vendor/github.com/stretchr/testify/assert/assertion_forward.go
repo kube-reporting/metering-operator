@@ -27,8 +27,8 @@ func (a *Assertions) Conditionf(comp Comparison, msg string, args ...interface{}
 	return Conditionf(a.t, comp, msg, args...)
 }
 
-// Contains asserts that the speci***REMOVED***ed string, list(array, slice...) or map contains the
-// speci***REMOVED***ed substring or element.
+// Contains asserts that the specified string, list(array, slice...) or map contains the
+// specified substring or element.
 //
 //    a.Contains("Hello World", "World")
 //    a.Contains(["Hello", "World"], "World")
@@ -40,8 +40,8 @@ func (a *Assertions) Contains(s interface{}, contains interface{}, msgAndArgs ..
 	return Contains(a.t, s, contains, msgAndArgs...)
 }
 
-// Containsf asserts that the speci***REMOVED***ed string, list(array, slice...) or map contains the
-// speci***REMOVED***ed substring or element.
+// Containsf asserts that the specified string, list(array, slice...) or map contains the
+// specified substring or element.
 //
 //    a.Containsf("Hello World", "World", "error message %s", "formatted")
 //    a.Containsf(["Hello", "World"], "World", "error message %s", "formatted")
@@ -53,7 +53,7 @@ func (a *Assertions) Containsf(s interface{}, contains interface{}, msg string, 
 	return Containsf(a.t, s, contains, msg, args...)
 }
 
-// DirExists checks whether a directory exists in the given path. It also fails if the path is a ***REMOVED***le rather a directory or there is an error checking whether it exists.
+// DirExists checks whether a directory exists in the given path. It also fails if the path is a file rather a directory or there is an error checking whether it exists.
 func (a *Assertions) DirExists(path string, msgAndArgs ...interface{}) bool {
 	if h, ok := a.t.(tHelper); ok {
 		h.Helper()
@@ -61,7 +61,7 @@ func (a *Assertions) DirExists(path string, msgAndArgs ...interface{}) bool {
 	return DirExists(a.t, path, msgAndArgs...)
 }
 
-// DirExistsf checks whether a directory exists in the given path. It also fails if the path is a ***REMOVED***le rather a directory or there is an error checking whether it exists.
+// DirExistsf checks whether a directory exists in the given path. It also fails if the path is a file rather a directory or there is an error checking whether it exists.
 func (a *Assertions) DirExistsf(path string, msg string, args ...interface{}) bool {
 	if h, ok := a.t.(tHelper); ok {
 		h.Helper()
@@ -69,7 +69,7 @@ func (a *Assertions) DirExistsf(path string, msg string, args ...interface{}) bo
 	return DirExistsf(a.t, path, msg, args...)
 }
 
-// ElementsMatch asserts that the speci***REMOVED***ed listA(array, slice...) is equal to speci***REMOVED***ed
+// ElementsMatch asserts that the specified listA(array, slice...) is equal to specified
 // listB(array, slice...) ignoring the order of the elements. If there are duplicate elements,
 // the number of appearances of each of them in both lists should match.
 //
@@ -81,7 +81,7 @@ func (a *Assertions) ElementsMatch(listA interface{}, listB interface{}, msgAndA
 	return ElementsMatch(a.t, listA, listB, msgAndArgs...)
 }
 
-// ElementsMatchf asserts that the speci***REMOVED***ed listA(array, slice...) is equal to speci***REMOVED***ed
+// ElementsMatchf asserts that the specified listA(array, slice...) is equal to specified
 // listB(array, slice...) ignoring the order of the elements. If there are duplicate elements,
 // the number of appearances of each of them in both lists should match.
 //
@@ -93,7 +93,7 @@ func (a *Assertions) ElementsMatchf(listA interface{}, listB interface{}, msg st
 	return ElementsMatchf(a.t, listA, listB, msg, args...)
 }
 
-// Empty asserts that the speci***REMOVED***ed object is empty.  I.e. nil, "", false, 0 or either
+// Empty asserts that the specified object is empty.  I.e. nil, "", false, 0 or either
 // a slice or a channel with len == 0.
 //
 //  a.Empty(obj)
@@ -104,7 +104,7 @@ func (a *Assertions) Empty(object interface{}, msgAndArgs ...interface{}) bool {
 	return Empty(a.t, object, msgAndArgs...)
 }
 
-// Emptyf asserts that the speci***REMOVED***ed object is empty.  I.e. nil, "", false, 0 or either
+// Emptyf asserts that the specified object is empty.  I.e. nil, "", false, 0 or either
 // a slice or a channel with len == 0.
 //
 //  a.Emptyf(obj, "error message %s", "formatted")
@@ -267,7 +267,7 @@ func (a *Assertions) Failf(failureMessage string, msg string, args ...interface{
 	return Failf(a.t, failureMessage, msg, args...)
 }
 
-// False asserts that the speci***REMOVED***ed value is false.
+// False asserts that the specified value is false.
 //
 //    a.False(myBool)
 func (a *Assertions) False(value bool, msgAndArgs ...interface{}) bool {
@@ -277,7 +277,7 @@ func (a *Assertions) False(value bool, msgAndArgs ...interface{}) bool {
 	return False(a.t, value, msgAndArgs...)
 }
 
-// Falsef asserts that the speci***REMOVED***ed value is false.
+// Falsef asserts that the specified value is false.
 //
 //    a.Falsef(myBool, "error message %s", "formatted")
 func (a *Assertions) Falsef(value bool, msg string, args ...interface{}) bool {
@@ -287,7 +287,7 @@ func (a *Assertions) Falsef(value bool, msg string, args ...interface{}) bool {
 	return Falsef(a.t, value, msg, args...)
 }
 
-// FileExists checks whether a ***REMOVED***le exists in the given path. It also fails if the path points to a directory or there is an error when trying to check the ***REMOVED***le.
+// FileExists checks whether a file exists in the given path. It also fails if the path points to a directory or there is an error when trying to check the file.
 func (a *Assertions) FileExists(path string, msgAndArgs ...interface{}) bool {
 	if h, ok := a.t.(tHelper); ok {
 		h.Helper()
@@ -295,7 +295,7 @@ func (a *Assertions) FileExists(path string, msgAndArgs ...interface{}) bool {
 	return FileExists(a.t, path, msgAndArgs...)
 }
 
-// FileExistsf checks whether a ***REMOVED***le exists in the given path. It also fails if the path points to a directory or there is an error when trying to check the ***REMOVED***le.
+// FileExistsf checks whether a file exists in the given path. It also fails if the path points to a directory or there is an error when trying to check the file.
 func (a *Assertions) FileExistsf(path string, msg string, args ...interface{}) bool {
 	if h, ok := a.t.(tHelper); ok {
 		h.Helper()
@@ -303,7 +303,7 @@ func (a *Assertions) FileExistsf(path string, msg string, args ...interface{}) b
 	return FileExistsf(a.t, path, msg, args...)
 }
 
-// HTTPBodyContains asserts that a speci***REMOVED***ed handler returns a
+// HTTPBodyContains asserts that a specified handler returns a
 // body that contains a string.
 //
 //  a.HTTPBodyContains(myHandler, "GET", "www.google.com", nil, "I'm Feeling Lucky")
@@ -316,7 +316,7 @@ func (a *Assertions) HTTPBodyContains(handler http.HandlerFunc, method string, u
 	return HTTPBodyContains(a.t, handler, method, url, values, str, msgAndArgs...)
 }
 
-// HTTPBodyContainsf asserts that a speci***REMOVED***ed handler returns a
+// HTTPBodyContainsf asserts that a specified handler returns a
 // body that contains a string.
 //
 //  a.HTTPBodyContainsf(myHandler, "GET", "www.google.com", nil, "I'm Feeling Lucky", "error message %s", "formatted")
@@ -329,7 +329,7 @@ func (a *Assertions) HTTPBodyContainsf(handler http.HandlerFunc, method string, 
 	return HTTPBodyContainsf(a.t, handler, method, url, values, str, msg, args...)
 }
 
-// HTTPBodyNotContains asserts that a speci***REMOVED***ed handler returns a
+// HTTPBodyNotContains asserts that a specified handler returns a
 // body that does not contain a string.
 //
 //  a.HTTPBodyNotContains(myHandler, "GET", "www.google.com", nil, "I'm Feeling Lucky")
@@ -342,7 +342,7 @@ func (a *Assertions) HTTPBodyNotContains(handler http.HandlerFunc, method string
 	return HTTPBodyNotContains(a.t, handler, method, url, values, str, msgAndArgs...)
 }
 
-// HTTPBodyNotContainsf asserts that a speci***REMOVED***ed handler returns a
+// HTTPBodyNotContainsf asserts that a specified handler returns a
 // body that does not contain a string.
 //
 //  a.HTTPBodyNotContainsf(myHandler, "GET", "www.google.com", nil, "I'm Feeling Lucky", "error message %s", "formatted")
@@ -355,7 +355,7 @@ func (a *Assertions) HTTPBodyNotContainsf(handler http.HandlerFunc, method strin
 	return HTTPBodyNotContainsf(a.t, handler, method, url, values, str, msg, args...)
 }
 
-// HTTPError asserts that a speci***REMOVED***ed handler returns an error status code.
+// HTTPError asserts that a specified handler returns an error status code.
 //
 //  a.HTTPError(myHandler, "POST", "/a/b/c", url.Values{"a": []string{"b", "c"}}
 //
@@ -367,7 +367,7 @@ func (a *Assertions) HTTPError(handler http.HandlerFunc, method string, url stri
 	return HTTPError(a.t, handler, method, url, values, msgAndArgs...)
 }
 
-// HTTPErrorf asserts that a speci***REMOVED***ed handler returns an error status code.
+// HTTPErrorf asserts that a specified handler returns an error status code.
 //
 //  a.HTTPErrorf(myHandler, "POST", "/a/b/c", url.Values{"a": []string{"b", "c"}}
 //
@@ -379,7 +379,7 @@ func (a *Assertions) HTTPErrorf(handler http.HandlerFunc, method string, url str
 	return HTTPErrorf(a.t, handler, method, url, values, msg, args...)
 }
 
-// HTTPRedirect asserts that a speci***REMOVED***ed handler returns a redirect status code.
+// HTTPRedirect asserts that a specified handler returns a redirect status code.
 //
 //  a.HTTPRedirect(myHandler, "GET", "/a/b/c", url.Values{"a": []string{"b", "c"}}
 //
@@ -391,7 +391,7 @@ func (a *Assertions) HTTPRedirect(handler http.HandlerFunc, method string, url s
 	return HTTPRedirect(a.t, handler, method, url, values, msgAndArgs...)
 }
 
-// HTTPRedirectf asserts that a speci***REMOVED***ed handler returns a redirect status code.
+// HTTPRedirectf asserts that a specified handler returns a redirect status code.
 //
 //  a.HTTPRedirectf(myHandler, "GET", "/a/b/c", url.Values{"a": []string{"b", "c"}}
 //
@@ -403,7 +403,7 @@ func (a *Assertions) HTTPRedirectf(handler http.HandlerFunc, method string, url 
 	return HTTPRedirectf(a.t, handler, method, url, values, msg, args...)
 }
 
-// HTTPSuccess asserts that a speci***REMOVED***ed handler returns a success status code.
+// HTTPSuccess asserts that a specified handler returns a success status code.
 //
 //  a.HTTPSuccess(myHandler, "POST", "http://www.google.com", nil)
 //
@@ -415,7 +415,7 @@ func (a *Assertions) HTTPSuccess(handler http.HandlerFunc, method string, url st
 	return HTTPSuccess(a.t, handler, method, url, values, msgAndArgs...)
 }
 
-// HTTPSuccessf asserts that a speci***REMOVED***ed handler returns a success status code.
+// HTTPSuccessf asserts that a specified handler returns a success status code.
 //
 //  a.HTTPSuccessf(myHandler, "POST", "http://www.google.com", nil, "error message %s", "formatted")
 //
@@ -427,7 +427,7 @@ func (a *Assertions) HTTPSuccessf(handler http.HandlerFunc, method string, url s
 	return HTTPSuccessf(a.t, handler, method, url, values, msg, args...)
 }
 
-// Implements asserts that an object is implemented by the speci***REMOVED***ed interface.
+// Implements asserts that an object is implemented by the specified interface.
 //
 //    a.Implements((*MyInterface)(nil), new(MyObject))
 func (a *Assertions) Implements(interfaceObject interface{}, object interface{}, msgAndArgs ...interface{}) bool {
@@ -437,7 +437,7 @@ func (a *Assertions) Implements(interfaceObject interface{}, object interface{},
 	return Implements(a.t, interfaceObject, object, msgAndArgs...)
 }
 
-// Implementsf asserts that an object is implemented by the speci***REMOVED***ed interface.
+// Implementsf asserts that an object is implemented by the specified interface.
 //
 //    a.Implementsf((*MyInterface, "error message %s", "formatted")(nil), new(MyObject))
 func (a *Assertions) Implementsf(interfaceObject interface{}, object interface{}, msg string, args ...interface{}) bool {
@@ -531,7 +531,7 @@ func (a *Assertions) InEpsilonf(expected interface{}, actual interface{}, epsilo
 	return InEpsilonf(a.t, expected, actual, epsilon, msg, args...)
 }
 
-// IsType asserts that the speci***REMOVED***ed objects are of the same type.
+// IsType asserts that the specified objects are of the same type.
 func (a *Assertions) IsType(expectedType interface{}, object interface{}, msgAndArgs ...interface{}) bool {
 	if h, ok := a.t.(tHelper); ok {
 		h.Helper()
@@ -539,7 +539,7 @@ func (a *Assertions) IsType(expectedType interface{}, object interface{}, msgAnd
 	return IsType(a.t, expectedType, object, msgAndArgs...)
 }
 
-// IsTypef asserts that the speci***REMOVED***ed objects are of the same type.
+// IsTypef asserts that the specified objects are of the same type.
 func (a *Assertions) IsTypef(expectedType interface{}, object interface{}, msg string, args ...interface{}) bool {
 	if h, ok := a.t.(tHelper); ok {
 		h.Helper()
@@ -567,7 +567,7 @@ func (a *Assertions) JSONEqf(expected string, actual string, msg string, args ..
 	return JSONEqf(a.t, expected, actual, msg, args...)
 }
 
-// Len asserts that the speci***REMOVED***ed object has speci***REMOVED***c length.
+// Len asserts that the specified object has specific length.
 // Len also fails if the object has a type that len() not accept.
 //
 //    a.Len(mySlice, 3)
@@ -578,7 +578,7 @@ func (a *Assertions) Len(object interface{}, length int, msgAndArgs ...interface
 	return Len(a.t, object, length, msgAndArgs...)
 }
 
-// Lenf asserts that the speci***REMOVED***ed object has speci***REMOVED***c length.
+// Lenf asserts that the specified object has specific length.
 // Lenf also fails if the object has a type that len() not accept.
 //
 //    a.Lenf(mySlice, 3, "error message %s", "formatted")
@@ -589,7 +589,7 @@ func (a *Assertions) Lenf(object interface{}, length int, msg string, args ...in
 	return Lenf(a.t, object, length, msg, args...)
 }
 
-// Nil asserts that the speci***REMOVED***ed object is nil.
+// Nil asserts that the specified object is nil.
 //
 //    a.Nil(err)
 func (a *Assertions) Nil(object interface{}, msgAndArgs ...interface{}) bool {
@@ -599,7 +599,7 @@ func (a *Assertions) Nil(object interface{}, msgAndArgs ...interface{}) bool {
 	return Nil(a.t, object, msgAndArgs...)
 }
 
-// Nilf asserts that the speci***REMOVED***ed object is nil.
+// Nilf asserts that the specified object is nil.
 //
 //    a.Nilf(err, "error message %s", "formatted")
 func (a *Assertions) Nilf(object interface{}, msg string, args ...interface{}) bool {
@@ -635,8 +635,8 @@ func (a *Assertions) NoErrorf(err error, msg string, args ...interface{}) bool {
 	return NoErrorf(a.t, err, msg, args...)
 }
 
-// NotContains asserts that the speci***REMOVED***ed string, list(array, slice...) or map does NOT contain the
-// speci***REMOVED***ed substring or element.
+// NotContains asserts that the specified string, list(array, slice...) or map does NOT contain the
+// specified substring or element.
 //
 //    a.NotContains("Hello World", "Earth")
 //    a.NotContains(["Hello", "World"], "Earth")
@@ -648,8 +648,8 @@ func (a *Assertions) NotContains(s interface{}, contains interface{}, msgAndArgs
 	return NotContains(a.t, s, contains, msgAndArgs...)
 }
 
-// NotContainsf asserts that the speci***REMOVED***ed string, list(array, slice...) or map does NOT contain the
-// speci***REMOVED***ed substring or element.
+// NotContainsf asserts that the specified string, list(array, slice...) or map does NOT contain the
+// specified substring or element.
 //
 //    a.NotContainsf("Hello World", "Earth", "error message %s", "formatted")
 //    a.NotContainsf(["Hello", "World"], "Earth", "error message %s", "formatted")
@@ -661,7 +661,7 @@ func (a *Assertions) NotContainsf(s interface{}, contains interface{}, msg strin
 	return NotContainsf(a.t, s, contains, msg, args...)
 }
 
-// NotEmpty asserts that the speci***REMOVED***ed object is NOT empty.  I.e. not nil, "", false, 0 or either
+// NotEmpty asserts that the specified object is NOT empty.  I.e. not nil, "", false, 0 or either
 // a slice or a channel with len == 0.
 //
 //  if a.NotEmpty(obj) {
@@ -674,7 +674,7 @@ func (a *Assertions) NotEmpty(object interface{}, msgAndArgs ...interface{}) boo
 	return NotEmpty(a.t, object, msgAndArgs...)
 }
 
-// NotEmptyf asserts that the speci***REMOVED***ed object is NOT empty.  I.e. not nil, "", false, 0 or either
+// NotEmptyf asserts that the specified object is NOT empty.  I.e. not nil, "", false, 0 or either
 // a slice or a channel with len == 0.
 //
 //  if a.NotEmptyf(obj, "error message %s", "formatted") {
@@ -687,7 +687,7 @@ func (a *Assertions) NotEmptyf(object interface{}, msg string, args ...interface
 	return NotEmptyf(a.t, object, msg, args...)
 }
 
-// NotEqual asserts that the speci***REMOVED***ed values are NOT equal.
+// NotEqual asserts that the specified values are NOT equal.
 //
 //    a.NotEqual(obj1, obj2)
 //
@@ -700,7 +700,7 @@ func (a *Assertions) NotEqual(expected interface{}, actual interface{}, msgAndAr
 	return NotEqual(a.t, expected, actual, msgAndArgs...)
 }
 
-// NotEqualf asserts that the speci***REMOVED***ed values are NOT equal.
+// NotEqualf asserts that the specified values are NOT equal.
 //
 //    a.NotEqualf(obj1, obj2, "error message %s", "formatted")
 //
@@ -713,7 +713,7 @@ func (a *Assertions) NotEqualf(expected interface{}, actual interface{}, msg str
 	return NotEqualf(a.t, expected, actual, msg, args...)
 }
 
-// NotNil asserts that the speci***REMOVED***ed object is not nil.
+// NotNil asserts that the specified object is not nil.
 //
 //    a.NotNil(err)
 func (a *Assertions) NotNil(object interface{}, msgAndArgs ...interface{}) bool {
@@ -723,7 +723,7 @@ func (a *Assertions) NotNil(object interface{}, msgAndArgs ...interface{}) bool 
 	return NotNil(a.t, object, msgAndArgs...)
 }
 
-// NotNilf asserts that the speci***REMOVED***ed object is not nil.
+// NotNilf asserts that the specified object is not nil.
 //
 //    a.NotNilf(err, "error message %s", "formatted")
 func (a *Assertions) NotNilf(object interface{}, msg string, args ...interface{}) bool {
@@ -733,7 +733,7 @@ func (a *Assertions) NotNilf(object interface{}, msg string, args ...interface{}
 	return NotNilf(a.t, object, msg, args...)
 }
 
-// NotPanics asserts that the code inside the speci***REMOVED***ed PanicTestFunc does NOT panic.
+// NotPanics asserts that the code inside the specified PanicTestFunc does NOT panic.
 //
 //   a.NotPanics(func(){ RemainCalm() })
 func (a *Assertions) NotPanics(f PanicTestFunc, msgAndArgs ...interface{}) bool {
@@ -743,7 +743,7 @@ func (a *Assertions) NotPanics(f PanicTestFunc, msgAndArgs ...interface{}) bool 
 	return NotPanics(a.t, f, msgAndArgs...)
 }
 
-// NotPanicsf asserts that the code inside the speci***REMOVED***ed PanicTestFunc does NOT panic.
+// NotPanicsf asserts that the code inside the specified PanicTestFunc does NOT panic.
 //
 //   a.NotPanicsf(func(){ RemainCalm() }, "error message %s", "formatted")
 func (a *Assertions) NotPanicsf(f PanicTestFunc, msg string, args ...interface{}) bool {
@@ -753,7 +753,7 @@ func (a *Assertions) NotPanicsf(f PanicTestFunc, msg string, args ...interface{}
 	return NotPanicsf(a.t, f, msg, args...)
 }
 
-// NotRegexp asserts that a speci***REMOVED***ed regexp does not match a string.
+// NotRegexp asserts that a specified regexp does not match a string.
 //
 //  a.NotRegexp(regexp.MustCompile("starts"), "it's starting")
 //  a.NotRegexp("^start", "it's not starting")
@@ -764,7 +764,7 @@ func (a *Assertions) NotRegexp(rx interface{}, str interface{}, msgAndArgs ...in
 	return NotRegexp(a.t, rx, str, msgAndArgs...)
 }
 
-// NotRegexpf asserts that a speci***REMOVED***ed regexp does not match a string.
+// NotRegexpf asserts that a specified regexp does not match a string.
 //
 //  a.NotRegexpf(regexp.MustCompile("starts", "error message %s", "formatted"), "it's starting")
 //  a.NotRegexpf("^start", "it's not starting", "error message %s", "formatted")
@@ -775,8 +775,8 @@ func (a *Assertions) NotRegexpf(rx interface{}, str interface{}, msg string, arg
 	return NotRegexpf(a.t, rx, str, msg, args...)
 }
 
-// NotSubset asserts that the speci***REMOVED***ed list(array, slice...) contains not all
-// elements given in the speci***REMOVED***ed subset(array, slice...).
+// NotSubset asserts that the specified list(array, slice...) contains not all
+// elements given in the specified subset(array, slice...).
 //
 //    a.NotSubset([1, 3, 4], [1, 2], "But [1, 3, 4] does not contain [1, 2]")
 func (a *Assertions) NotSubset(list interface{}, subset interface{}, msgAndArgs ...interface{}) bool {
@@ -786,8 +786,8 @@ func (a *Assertions) NotSubset(list interface{}, subset interface{}, msgAndArgs 
 	return NotSubset(a.t, list, subset, msgAndArgs...)
 }
 
-// NotSubsetf asserts that the speci***REMOVED***ed list(array, slice...) contains not all
-// elements given in the speci***REMOVED***ed subset(array, slice...).
+// NotSubsetf asserts that the specified list(array, slice...) contains not all
+// elements given in the specified subset(array, slice...).
 //
 //    a.NotSubsetf([1, 3, 4], [1, 2], "But [1, 3, 4] does not contain [1, 2]", "error message %s", "formatted")
 func (a *Assertions) NotSubsetf(list interface{}, subset interface{}, msg string, args ...interface{}) bool {
@@ -813,7 +813,7 @@ func (a *Assertions) NotZerof(i interface{}, msg string, args ...interface{}) bo
 	return NotZerof(a.t, i, msg, args...)
 }
 
-// Panics asserts that the code inside the speci***REMOVED***ed PanicTestFunc panics.
+// Panics asserts that the code inside the specified PanicTestFunc panics.
 //
 //   a.Panics(func(){ GoCrazy() })
 func (a *Assertions) Panics(f PanicTestFunc, msgAndArgs ...interface{}) bool {
@@ -823,7 +823,7 @@ func (a *Assertions) Panics(f PanicTestFunc, msgAndArgs ...interface{}) bool {
 	return Panics(a.t, f, msgAndArgs...)
 }
 
-// PanicsWithValue asserts that the code inside the speci***REMOVED***ed PanicTestFunc panics, and that
+// PanicsWithValue asserts that the code inside the specified PanicTestFunc panics, and that
 // the recovered panic value equals the expected panic value.
 //
 //   a.PanicsWithValue("crazy error", func(){ GoCrazy() })
@@ -834,7 +834,7 @@ func (a *Assertions) PanicsWithValue(expected interface{}, f PanicTestFunc, msgA
 	return PanicsWithValue(a.t, expected, f, msgAndArgs...)
 }
 
-// PanicsWithValuef asserts that the code inside the speci***REMOVED***ed PanicTestFunc panics, and that
+// PanicsWithValuef asserts that the code inside the specified PanicTestFunc panics, and that
 // the recovered panic value equals the expected panic value.
 //
 //   a.PanicsWithValuef("crazy error", func(){ GoCrazy() }, "error message %s", "formatted")
@@ -845,7 +845,7 @@ func (a *Assertions) PanicsWithValuef(expected interface{}, f PanicTestFunc, msg
 	return PanicsWithValuef(a.t, expected, f, msg, args...)
 }
 
-// Panicsf asserts that the code inside the speci***REMOVED***ed PanicTestFunc panics.
+// Panicsf asserts that the code inside the specified PanicTestFunc panics.
 //
 //   a.Panicsf(func(){ GoCrazy() }, "error message %s", "formatted")
 func (a *Assertions) Panicsf(f PanicTestFunc, msg string, args ...interface{}) bool {
@@ -855,7 +855,7 @@ func (a *Assertions) Panicsf(f PanicTestFunc, msg string, args ...interface{}) b
 	return Panicsf(a.t, f, msg, args...)
 }
 
-// Regexp asserts that a speci***REMOVED***ed regexp matches a string.
+// Regexp asserts that a specified regexp matches a string.
 //
 //  a.Regexp(regexp.MustCompile("start"), "it's starting")
 //  a.Regexp("start...$", "it's not starting")
@@ -866,7 +866,7 @@ func (a *Assertions) Regexp(rx interface{}, str interface{}, msgAndArgs ...inter
 	return Regexp(a.t, rx, str, msgAndArgs...)
 }
 
-// Regexpf asserts that a speci***REMOVED***ed regexp matches a string.
+// Regexpf asserts that a specified regexp matches a string.
 //
 //  a.Regexpf(regexp.MustCompile("start", "error message %s", "formatted"), "it's starting")
 //  a.Regexpf("start...$", "it's not starting", "error message %s", "formatted")
@@ -877,8 +877,8 @@ func (a *Assertions) Regexpf(rx interface{}, str interface{}, msg string, args .
 	return Regexpf(a.t, rx, str, msg, args...)
 }
 
-// Subset asserts that the speci***REMOVED***ed list(array, slice...) contains all
-// elements given in the speci***REMOVED***ed subset(array, slice...).
+// Subset asserts that the specified list(array, slice...) contains all
+// elements given in the specified subset(array, slice...).
 //
 //    a.Subset([1, 2, 3], [1, 2], "But [1, 2, 3] does contain [1, 2]")
 func (a *Assertions) Subset(list interface{}, subset interface{}, msgAndArgs ...interface{}) bool {
@@ -888,8 +888,8 @@ func (a *Assertions) Subset(list interface{}, subset interface{}, msgAndArgs ...
 	return Subset(a.t, list, subset, msgAndArgs...)
 }
 
-// Subsetf asserts that the speci***REMOVED***ed list(array, slice...) contains all
-// elements given in the speci***REMOVED***ed subset(array, slice...).
+// Subsetf asserts that the specified list(array, slice...) contains all
+// elements given in the specified subset(array, slice...).
 //
 //    a.Subsetf([1, 2, 3], [1, 2], "But [1, 2, 3] does contain [1, 2]", "error message %s", "formatted")
 func (a *Assertions) Subsetf(list interface{}, subset interface{}, msg string, args ...interface{}) bool {
@@ -899,7 +899,7 @@ func (a *Assertions) Subsetf(list interface{}, subset interface{}, msg string, a
 	return Subsetf(a.t, list, subset, msg, args...)
 }
 
-// True asserts that the speci***REMOVED***ed value is true.
+// True asserts that the specified value is true.
 //
 //    a.True(myBool)
 func (a *Assertions) True(value bool, msgAndArgs ...interface{}) bool {
@@ -909,7 +909,7 @@ func (a *Assertions) True(value bool, msgAndArgs ...interface{}) bool {
 	return True(a.t, value, msgAndArgs...)
 }
 
-// Truef asserts that the speci***REMOVED***ed value is true.
+// Truef asserts that the specified value is true.
 //
 //    a.Truef(myBool, "error message %s", "formatted")
 func (a *Assertions) Truef(value bool, msg string, args ...interface{}) bool {

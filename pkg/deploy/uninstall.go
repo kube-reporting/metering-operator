@@ -8,25 +8,25 @@ import (
 )
 
 func (deploy *Deployer) uninstallNamespace() error {
-	err := deploy.client.CoreV1().Namespaces().Delete(deploy.con***REMOVED***g.Namespace, &metav1.DeleteOptions{})
+	err := deploy.client.CoreV1().Namespaces().Delete(deploy.config.Namespace, &metav1.DeleteOptions{})
 	if apierrors.IsNotFound(err) {
-		deploy.logger.Warnf("The %s namespace doesn't exist", deploy.con***REMOVED***g.Namespace)
-	} ***REMOVED*** if err == nil {
-		deploy.logger.Infof("Deleted the %s namespace", deploy.con***REMOVED***g.Namespace)
-	} ***REMOVED*** {
+		deploy.logger.Warnf("The %s namespace doesn't exist", deploy.config.Namespace)
+	} else if err == nil {
+		deploy.logger.Infof("Deleted the %s namespace", deploy.config.Namespace)
+	} else {
 		return err
 	}
 
 	return nil
 }
 
-func (deploy *Deployer) uninstallMeteringCon***REMOVED***g() error {
-	err := deploy.meteringClient.MeteringCon***REMOVED***gs(deploy.con***REMOVED***g.Namespace).Delete(deploy.con***REMOVED***g.MeteringCon***REMOVED***g.Name, &metav1.DeleteOptions{})
+func (deploy *Deployer) uninstallMeteringConfig() error {
+	err := deploy.meteringClient.MeteringConfigs(deploy.config.Namespace).Delete(deploy.config.MeteringConfig.Name, &metav1.DeleteOptions{})
 	if apierrors.IsNotFound(err) {
-		deploy.logger.Warnf("The MeteringCon***REMOVED***g resource doesn't exist")
-	} ***REMOVED*** if err == nil {
-		deploy.logger.Infof("Deleted the MeteringCon***REMOVED***g resource")
-	} ***REMOVED*** {
+		deploy.logger.Warnf("The MeteringConfig resource doesn't exist")
+	} else if err == nil {
+		deploy.logger.Infof("Deleted the MeteringConfig resource")
+	} else {
 		return err
 	}
 
@@ -54,7 +54,7 @@ func (deploy *Deployer) uninstallMeteringResources() error {
 		return fmt.Errorf("failed to delete the metering role binding: %v", err)
 	}
 
-	if deploy.con***REMOVED***g.DeleteCRB {
+	if deploy.config.DeleteCRB {
 		err = deploy.uninstallMeteringClusterRole()
 		if err != nil {
 			return fmt.Errorf("failed to delete the metering cluster role: %v", err)
@@ -64,16 +64,16 @@ func (deploy *Deployer) uninstallMeteringResources() error {
 		if err != nil {
 			return fmt.Errorf("failed to delete the metering cluster role binding: %v", err)
 		}
-	} ***REMOVED*** {
+	} else {
 		deploy.logger.Infof("Skipped deleting the metering cluster role resources")
 	}
 
-	if deploy.con***REMOVED***g.DeletePVCs {
+	if deploy.config.DeletePVCs {
 		err = deploy.uninstallMeteringPVCs()
 		if err != nil {
 			return fmt.Errorf("failed to delete the metering PVCs: %v", err)
 		}
-	} ***REMOVED*** {
+	} else {
 		deploy.logger.Infof("Skipped deleting the metering PVCs")
 	}
 
@@ -84,11 +84,11 @@ func (deploy *Deployer) uninstallMeteringResources() error {
 // pods in the $METERING_NAMESPACE namespace, and attempts to delete all the PVCs that match that list criteria
 func (deploy *Deployer) uninstallMeteringPVCs() error {
 	// Attempt to get a list of PVCs that match the hdfs or hive labels
-	pvcs, err := deploy.client.CoreV1().PersistentVolumeClaims(deploy.con***REMOVED***g.Namespace).List(metav1.ListOptions{
+	pvcs, err := deploy.client.CoreV1().PersistentVolumeClaims(deploy.config.Namespace).List(metav1.ListOptions{
 		LabelSelector: "app in (hdfs,hive)",
 	})
 	if err != nil {
-		return fmt.Errorf("failed to list all the metering PVCs in the %s namespace: %v", deploy.con***REMOVED***g.Namespace, err)
+		return fmt.Errorf("failed to list all the metering PVCs in the %s namespace: %v", deploy.config.Namespace, err)
 	}
 
 	if len(pvcs.Items) == 0 {
@@ -97,7 +97,7 @@ func (deploy *Deployer) uninstallMeteringPVCs() error {
 	}
 
 	for _, pvc := range pvcs.Items {
-		err = deploy.client.CoreV1().PersistentVolumeClaims(deploy.con***REMOVED***g.Namespace).Delete(pvc.Name, &metav1.DeleteOptions{})
+		err = deploy.client.CoreV1().PersistentVolumeClaims(deploy.config.Namespace).Delete(pvc.Name, &metav1.DeleteOptions{})
 		if err != nil {
 			return fmt.Errorf("failed to delete the %s PVC: %v", pvc.Name, err)
 		}
@@ -109,12 +109,12 @@ func (deploy *Deployer) uninstallMeteringPVCs() error {
 }
 
 func (deploy *Deployer) uninstallMeteringDeployment() error {
-	err := deploy.client.AppsV1().Deployments(deploy.con***REMOVED***g.Namespace).Delete(deploy.con***REMOVED***g.OperatorResources.Deployment.Name, &metav1.DeleteOptions{})
+	err := deploy.client.AppsV1().Deployments(deploy.config.Namespace).Delete(deploy.config.OperatorResources.Deployment.Name, &metav1.DeleteOptions{})
 	if apierrors.IsNotFound(err) {
 		deploy.logger.Warnf("The metering deployment doesn't exist")
-	} ***REMOVED*** if err == nil {
+	} else if err == nil {
 		deploy.logger.Infof("Deleted the metering deployment")
-	} ***REMOVED*** {
+	} else {
 		return err
 	}
 
@@ -122,12 +122,12 @@ func (deploy *Deployer) uninstallMeteringDeployment() error {
 }
 
 func (deploy *Deployer) uninstallMeteringServiceAccount() error {
-	err := deploy.client.CoreV1().ServiceAccounts(deploy.con***REMOVED***g.Namespace).Delete(deploy.con***REMOVED***g.OperatorResources.ServiceAccount.Name, &metav1.DeleteOptions{})
+	err := deploy.client.CoreV1().ServiceAccounts(deploy.config.Namespace).Delete(deploy.config.OperatorResources.ServiceAccount.Name, &metav1.DeleteOptions{})
 	if apierrors.IsNotFound(err) {
 		deploy.logger.Warnf("The metering service account doesn't exist")
-	} ***REMOVED*** if err == nil {
+	} else if err == nil {
 		deploy.logger.Infof("Deleted the metering serviceaccount")
-	} ***REMOVED*** {
+	} else {
 		return err
 	}
 
@@ -135,22 +135,22 @@ func (deploy *Deployer) uninstallMeteringServiceAccount() error {
 }
 
 func (deploy *Deployer) uninstallMeteringRoleBinding() error {
-	res := deploy.con***REMOVED***g.OperatorResources.RoleBinding
+	res := deploy.config.OperatorResources.RoleBinding
 
-	res.Name = deploy.con***REMOVED***g.Namespace + "-" + res.Name
+	res.Name = deploy.config.Namespace + "-" + res.Name
 	res.RoleRef.Name = res.Name
-	res.Namespace = deploy.con***REMOVED***g.Namespace
+	res.Namespace = deploy.config.Namespace
 
 	for index := range res.Subjects {
-		res.Subjects[index].Namespace = deploy.con***REMOVED***g.Namespace
+		res.Subjects[index].Namespace = deploy.config.Namespace
 	}
 
-	err := deploy.client.RbacV1().RoleBindings(deploy.con***REMOVED***g.Namespace).Delete(res.Name, &metav1.DeleteOptions{})
+	err := deploy.client.RbacV1().RoleBindings(deploy.config.Namespace).Delete(res.Name, &metav1.DeleteOptions{})
 	if apierrors.IsNotFound(err) {
 		deploy.logger.Warnf("The metering role binding doesn't exist")
-	} ***REMOVED*** if err == nil {
+	} else if err == nil {
 		deploy.logger.Infof("Deleted the metering role binding")
-	} ***REMOVED*** {
+	} else {
 		return err
 	}
 
@@ -158,17 +158,17 @@ func (deploy *Deployer) uninstallMeteringRoleBinding() error {
 }
 
 func (deploy *Deployer) uninstallMeteringRole() error {
-	res := deploy.con***REMOVED***g.OperatorResources.Role
+	res := deploy.config.OperatorResources.Role
 
-	res.Name = deploy.con***REMOVED***g.Namespace + "-" + res.Name
-	res.Namespace = deploy.con***REMOVED***g.Namespace
+	res.Name = deploy.config.Namespace + "-" + res.Name
+	res.Namespace = deploy.config.Namespace
 
-	err := deploy.client.RbacV1().Roles(deploy.con***REMOVED***g.Namespace).Delete(res.Name, &metav1.DeleteOptions{})
+	err := deploy.client.RbacV1().Roles(deploy.config.Namespace).Delete(res.Name, &metav1.DeleteOptions{})
 	if apierrors.IsNotFound(err) {
 		deploy.logger.Warnf("The metering role doesn't exist")
-	} ***REMOVED*** if err == nil {
+	} else if err == nil {
 		deploy.logger.Infof("Deleted the metering role")
-	} ***REMOVED*** {
+	} else {
 		return err
 	}
 
@@ -176,16 +176,16 @@ func (deploy *Deployer) uninstallMeteringRole() error {
 }
 
 func (deploy *Deployer) uninstallMeteringClusterRole() error {
-	res := deploy.con***REMOVED***g.OperatorResources.ClusterRole
+	res := deploy.config.OperatorResources.ClusterRole
 
-	res.Name = deploy.con***REMOVED***g.Namespace + "-" + res.Name
+	res.Name = deploy.config.Namespace + "-" + res.Name
 
 	err := deploy.client.RbacV1().ClusterRoles().Delete(res.Name, &metav1.DeleteOptions{})
 	if apierrors.IsNotFound(err) {
 		deploy.logger.Warnf("The metering cluster role doesn't exist")
-	} ***REMOVED*** if err == nil {
+	} else if err == nil {
 		deploy.logger.Infof("Deleted the metering cluster role")
-	} ***REMOVED*** {
+	} else {
 		return err
 	}
 
@@ -193,21 +193,21 @@ func (deploy *Deployer) uninstallMeteringClusterRole() error {
 }
 
 func (deploy *Deployer) uninstallMeteringClusterRoleBinding() error {
-	res := deploy.con***REMOVED***g.OperatorResources.ClusterRoleBinding
+	res := deploy.config.OperatorResources.ClusterRoleBinding
 
-	res.Name = deploy.con***REMOVED***g.Namespace + "-" + res.Name
+	res.Name = deploy.config.Namespace + "-" + res.Name
 	res.RoleRef.Name = res.Name
 
 	for index := range res.Subjects {
-		res.Subjects[index].Namespace = deploy.con***REMOVED***g.Namespace
+		res.Subjects[index].Namespace = deploy.config.Namespace
 	}
 
 	err := deploy.client.RbacV1().ClusterRoleBindings().Delete(res.Name, &metav1.DeleteOptions{})
 	if apierrors.IsNotFound(err) {
 		deploy.logger.Warnf("The metering cluster role binding doesn't exist")
-	} ***REMOVED*** if err == nil {
+	} else if err == nil {
 		deploy.logger.Infof("Deleted the metering cluster role binding")
-	} ***REMOVED*** {
+	} else {
 		return err
 	}
 
@@ -215,7 +215,7 @@ func (deploy *Deployer) uninstallMeteringClusterRoleBinding() error {
 }
 
 func (deploy *Deployer) uninstallMeteringCRDs() error {
-	for _, crd := range deploy.con***REMOVED***g.OperatorResources.CRDs {
+	for _, crd := range deploy.config.OperatorResources.CRDs {
 		err := deploy.uninstallMeteringCRD(crd)
 		if err != nil {
 			return fmt.Errorf("failed to delete a CRD while looping: %v", err)
@@ -226,12 +226,12 @@ func (deploy *Deployer) uninstallMeteringCRDs() error {
 }
 
 func (deploy *Deployer) uninstallMeteringCRD(resource CRD) error {
-	err := deploy.apiExtClient.CustomResourceDe***REMOVED***nitions().Delete(resource.Name, &metav1.DeleteOptions{})
+	err := deploy.apiExtClient.CustomResourceDefinitions().Delete(resource.Name, &metav1.DeleteOptions{})
 	if apierrors.IsNotFound(err) {
 		deploy.logger.Warnf("The %s CRD doesn't exist", resource.Name)
-	} ***REMOVED*** if err == nil {
+	} else if err == nil {
 		deploy.logger.Infof("Deleted the %s CRD", resource.Name)
-	} ***REMOVED*** {
+	} else {
 		return fmt.Errorf("failed to remove the %s CRD: %v", resource.Name, err)
 	}
 

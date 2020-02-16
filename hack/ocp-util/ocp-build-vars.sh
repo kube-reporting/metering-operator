@@ -7,7 +7,7 @@ _readlink() {
         readlink "$@"
     elif [[ "$OSTYPE" == "darwin"* ]]; then
         greadlink "$@"
-    ***REMOVED***
+    fi
 }
 
 SUB_MGR_FILE="$(_readlink -f "$DIR/subscription-manager.conf")"

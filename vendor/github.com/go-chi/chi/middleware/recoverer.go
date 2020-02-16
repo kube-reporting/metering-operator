@@ -23,7 +23,7 @@ func Recoverer(next http.Handler) http.Handler {
 				logEntry := GetLogEntry(r)
 				if logEntry != nil {
 					logEntry.Panic(rvr, debug.Stack())
-				} ***REMOVED*** {
+				} else {
 					fmt.Fprintf(os.Stderr, "Panic: %+v\n", rvr)
 					debug.PrintStack()
 				}

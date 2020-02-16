@@ -35,24 +35,24 @@ type checkIsEmpty interface {
 }
 
 type ctx struct {
-	*frozenCon***REMOVED***g
-	pre***REMOVED***x   string
+	*frozenConfig
+	prefix   string
 	encoders map[reflect2.Type]ValEncoder
 	decoders map[reflect2.Type]ValDecoder
 }
 
 func (b *ctx) caseSensitive() bool {
-	if b.frozenCon***REMOVED***g == nil {
+	if b.frozenConfig == nil {
 		// default is case-insensitive
 		return false
 	}
-	return b.frozenCon***REMOVED***g.caseSensitive
+	return b.frozenConfig.caseSensitive
 }
 
-func (b *ctx) append(pre***REMOVED***x string) *ctx {
+func (b *ctx) append(prefix string) *ctx {
 	return &ctx{
-		frozenCon***REMOVED***g: b.frozenCon***REMOVED***g,
-		pre***REMOVED***x:       b.pre***REMOVED***x + " " + pre***REMOVED***x,
+		frozenConfig: b.frozenConfig,
+		prefix:       b.prefix + " " + prefix,
 		encoders:     b.encoders,
 		decoders:     b.decoders,
 	}
@@ -93,15 +93,15 @@ func (stream *Stream) WriteVal(val interface{}) {
 	encoder.Encode(reflect2.PtrOf(val), stream)
 }
 
-func (cfg *frozenCon***REMOVED***g) DecoderOf(typ reflect2.Type) ValDecoder {
+func (cfg *frozenConfig) DecoderOf(typ reflect2.Type) ValDecoder {
 	cacheKey := typ.RType()
 	decoder := cfg.getDecoderFromCache(cacheKey)
 	if decoder != nil {
 		return decoder
 	}
 	ctx := &ctx{
-		frozenCon***REMOVED***g: cfg,
-		pre***REMOVED***x:       "",
+		frozenConfig: cfg,
+		prefix:       "",
 		decoders:     map[reflect2.Type]ValDecoder{},
 		encoders:     map[reflect2.Type]ValEncoder{},
 	}
@@ -178,19 +178,19 @@ func _createDecoderOfType(ctx *ctx, typ reflect2.Type) ValDecoder {
 	case reflect.Ptr:
 		return decoderOfOptional(ctx, typ)
 	default:
-		return &lazyErrorDecoder{err: fmt.Errorf("%s%s is unsupported type", ctx.pre***REMOVED***x, typ.String())}
+		return &lazyErrorDecoder{err: fmt.Errorf("%s%s is unsupported type", ctx.prefix, typ.String())}
 	}
 }
 
-func (cfg *frozenCon***REMOVED***g) EncoderOf(typ reflect2.Type) ValEncoder {
+func (cfg *frozenConfig) EncoderOf(typ reflect2.Type) ValEncoder {
 	cacheKey := typ.RType()
 	encoder := cfg.getEncoderFromCache(cacheKey)
 	if encoder != nil {
 		return encoder
 	}
 	ctx := &ctx{
-		frozenCon***REMOVED***g: cfg,
-		pre***REMOVED***x:       "",
+		frozenConfig: cfg,
+		prefix:       "",
 		decoders:     map[reflect2.Type]ValDecoder{},
 		encoders:     map[reflect2.Type]ValEncoder{},
 	}
@@ -277,7 +277,7 @@ func _createEncoderOfType(ctx *ctx, typ reflect2.Type) ValEncoder {
 	case reflect.Ptr:
 		return encoderOfOptional(ctx, typ)
 	default:
-		return &lazyErrorEncoder{err: fmt.Errorf("%s%s is unsupported type", ctx.pre***REMOVED***x, typ.String())}
+		return &lazyErrorEncoder{err: fmt.Errorf("%s%s is unsupported type", ctx.prefix, typ.String())}
 	}
 }
 
@@ -290,7 +290,7 @@ func (decoder *lazyErrorDecoder) Decode(ptr unsafe.Pointer, iter *Iterator) {
 		if iter.Error == nil {
 			iter.Error = decoder.err
 		}
-	} ***REMOVED*** {
+	} else {
 		iter.Skip()
 	}
 }
@@ -302,7 +302,7 @@ type lazyErrorEncoder struct {
 func (encoder *lazyErrorEncoder) Encode(ptr unsafe.Pointer, stream *Stream) {
 	if ptr == nil {
 		stream.WriteNil()
-	} ***REMOVED*** if stream.Error == nil {
+	} else if stream.Error == nil {
 		stream.Error = encoder.err
 	}
 }

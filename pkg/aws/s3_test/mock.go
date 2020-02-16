@@ -74,7 +74,7 @@ func (m *MockS3) ListObjectsV2(in *s3.ListObjectsV2Input) (*s3.ListObjectsV2Outp
 
 	var objects []*s3.Object
 	for key := range bucket {
-		if strings.HasPre***REMOVED***x(key, *in.Pre***REMOVED***x) {
+		if strings.HasPrefix(key, *in.Prefix) {
 			objKey := key
 			obj := &s3.Object{Key: &objKey}
 			objects = append(objects, obj)

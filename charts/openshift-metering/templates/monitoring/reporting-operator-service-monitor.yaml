@@ -11,7 +11,7 @@ spec:
   - port: metrics
     scheme: "https"
     interval: 30s
-    tlsCon***REMOVED***g:
+    tlsConfig:
       caFile: /var/run/secrets/kubernetes.io/serviceaccount/service-ca.crt
       serverName: reporting-operator.{{ .Release.Namespace }}.svc
     bearerTokenFile: /var/run/secrets/kubernetes.io/serviceaccount/token

@@ -1,6 +1,6 @@
 // Copyright 2018 The Prometheus Authors
 // Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this ***REMOVED***le except in compliance with the License.
+// you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 //
 // http://www.apache.org/licenses/LICENSE-2.0
@@ -8,7 +8,7 @@
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the speci***REMOVED***c language governing permissions and
+// See the License for the specific language governing permissions and
 // limitations under the License.
 
 package procfs
@@ -21,7 +21,7 @@ package procfs
 // various statistics available for NFS.
 
 import (
-	"bu***REMOVED***o"
+	"bufio"
 	"fmt"
 	"io"
 	"strconv"
@@ -33,17 +33,17 @@ import (
 const (
 	deviceEntryLen = 8
 
-	***REMOVED***eldBytesLen  = 8
-	***REMOVED***eldEventsLen = 27
+	fieldBytesLen  = 8
+	fieldEventsLen = 27
 
 	statVersion10 = "1.0"
 	statVersion11 = "1.1"
 
-	***REMOVED***eldTransport10TCPLen = 10
-	***REMOVED***eldTransport10UDPLen = 7
+	fieldTransport10TCPLen = 10
+	fieldTransport10UDPLen = 7
 
-	***REMOVED***eldTransport11TCPLen = 13
-	***REMOVED***eldTransport11UDPLen = 10
+	fieldTransport11TCPLen = 13
+	fieldTransport11UDPLen = 10
 )
 
 // A Mount is a device mount parsed from /proc/[pid]/mountstats.
@@ -52,14 +52,14 @@ type Mount struct {
 	Device string
 	// The mount point of the device.
 	Mount string
-	// The ***REMOVED***lesystem type used by the device.
+	// The filesystem type used by the device.
 	Type string
 	// If available additional statistics related to this Mount.
 	// Use a type assertion to determine if additional statistics are available.
 	Stats MountStats
 }
 
-// A MountStats is a type which contains detailed statistics for a speci***REMOVED***c
+// A MountStats is a type which contains detailed statistics for a specific
 // type of Mount.
 type MountStats interface {
 	mountStats()
@@ -75,7 +75,7 @@ type MountStatsNFS struct {
 	Bytes NFSBytesStats
 	// Statistics related to various NFS event occurrences.
 	Events NFSEventsStats
-	// Statistics broken down by ***REMOVED***lesystem operation.
+	// Statistics broken down by filesystem operation.
 	Operations []NFSOperationStats
 	// Statistics about the NFS RPC transport.
 	Transport NFSTransportStats
@@ -99,9 +99,9 @@ type NFSBytesStats struct {
 	ReadTotal uint64
 	// Number of bytes written to the NFS server, in total.
 	WriteTotal uint64
-	// Number of pages read directly via mmap()'d ***REMOVED***les.
+	// Number of pages read directly via mmap()'d files.
 	ReadPages uint64
-	// Number of pages written directly via mmap()'d ***REMOVED***les.
+	// Number of pages written directly via mmap()'d files.
 	WritePages uint64
 }
 
@@ -115,7 +115,7 @@ type NFSEventsStats struct {
 	DataInvalidate uint64
 	// Number of times cached inode attributes are invalidated.
 	AttributeInvalidate uint64
-	// Number of times ***REMOVED***les or directories have been open()'d.
+	// Number of times files or directories have been open()'d.
 	VFSOpen uint64
 	// Number of times a directory lookup has occurred.
 	VFSLookup uint64
@@ -123,11 +123,11 @@ type NFSEventsStats struct {
 	VFSAccess uint64
 	// Number of updates (and potential writes) to pages.
 	VFSUpdatePage uint64
-	// Number of pages read directly via mmap()'d ***REMOVED***les.
+	// Number of pages read directly via mmap()'d files.
 	VFSReadPage uint64
 	// Number of times a group of pages have been read.
 	VFSReadPages uint64
-	// Number of pages written directly via mmap()'d ***REMOVED***les.
+	// Number of pages written directly via mmap()'d files.
 	VFSWritePage uint64
 	// Number of times a group of pages have been written.
 	VFSWritePages uint64
@@ -137,19 +137,19 @@ type NFSEventsStats struct {
 	VFSSetattr uint64
 	// Number of pending writes that have been forcefully flushed to the server.
 	VFSFlush uint64
-	// Number of times fsync() has been called on directories and ***REMOVED***les.
+	// Number of times fsync() has been called on directories and files.
 	VFSFsync uint64
-	// Number of times locking has been attempted on a ***REMOVED***le.
+	// Number of times locking has been attempted on a file.
 	VFSLock uint64
-	// Number of times ***REMOVED***les have been closed and released.
+	// Number of times files have been closed and released.
 	VFSFileRelease uint64
 	// Unknown.  Possibly unused.
 	CongestionWait uint64
-	// Number of times ***REMOVED***les have been truncated.
+	// Number of times files have been truncated.
 	Truncation uint64
-	// Number of times a ***REMOVED***le has been grown due to writes beyond its existing end.
+	// Number of times a file has been grown due to writes beyond its existing end.
 	WriteExtension uint64
-	// Number of times a ***REMOVED***le was removed while still open by another process.
+	// Number of times a file was removed while still open by another process.
 	SillyRename uint64
 	// Number of times the NFS server gave less data than expected while reading.
 	ShortRead uint64
@@ -198,10 +198,10 @@ type NFSTransportStats struct {
 	Bind uint64
 	// Number of times the client has made a TCP connection to the NFS server.
 	Connect uint64
-	// Duration (in jif***REMOVED***es, a kernel internal unit of time) the NFS mount has
+	// Duration (in jiffies, a kernel internal unit of time) the NFS mount has
 	// spent waiting for connections to the server to be established.
 	ConnectIdleTime uint64
-	// Duration since the NFS mount last saw any RPC traf***REMOVED***c.
+	// Duration since the NFS mount last saw any RPC traffic.
 	IdleTime time.Duration
 	// Number of RPC requests for this mount sent to the NFS server.
 	Sends uint64
@@ -229,13 +229,13 @@ type NFSTransportStats struct {
 	CumulativePendingQueue uint64
 }
 
-// parseMountStats parses a /proc/[pid]/mountstats ***REMOVED***le and returns a slice
+// parseMountStats parses a /proc/[pid]/mountstats file and returns a slice
 // of Mount structures containing detailed information about each mount.
 // If available, statistics for each mount are parsed as well.
 func parseMountStats(r io.Reader) ([]*Mount, error) {
 	const (
 		device            = "device"
-		statVersionPre***REMOVED***x = "statvers="
+		statVersionPrefix = "statvers="
 
 		nfs3Type = "nfs"
 		nfs4Type = "nfs4"
@@ -243,7 +243,7 @@ func parseMountStats(r io.Reader) ([]*Mount, error) {
 
 	var mounts []*Mount
 
-	s := bu***REMOVED***o.NewScanner(r)
+	s := bufio.NewScanner(r)
 	for s.Scan() {
 		// Only look for device entries in this function
 		ss := strings.Fields(string(s.Bytes()))
@@ -263,7 +263,7 @@ func parseMountStats(r io.Reader) ([]*Mount, error) {
 				return nil, fmt.Errorf("cannot parse MountStats for fstype %q", m.Type)
 			}
 
-			statVersion := strings.TrimPre***REMOVED***x(ss[8], statVersionPre***REMOVED***x)
+			statVersion := strings.TrimPrefix(ss[8], statVersionPrefix)
 
 			stats, err := parseMountStatsNFS(s, statVersion)
 			if err != nil {
@@ -286,7 +286,7 @@ func parseMount(ss []string) (*Mount, error) {
 		return nil, fmt.Errorf("invalid device entry: %v", ss)
 	}
 
-	// Check for speci***REMOVED***c words appearing at speci***REMOVED***c indices to ensure
+	// Check for specific words appearing at specific indices to ensure
 	// the format is consistent with what we expect
 	format := []struct {
 		i int
@@ -314,14 +314,14 @@ func parseMount(ss []string) (*Mount, error) {
 
 // parseMountStatsNFS parses a MountStatsNFS by scanning additional information
 // related to NFS statistics.
-func parseMountStatsNFS(s *bu***REMOVED***o.Scanner, statVersion string) (*MountStatsNFS, error) {
-	// Field indicators for parsing speci***REMOVED***c types of data
+func parseMountStatsNFS(s *bufio.Scanner, statVersion string) (*MountStatsNFS, error) {
+	// Field indicators for parsing specific types of data
 	const (
-		***REMOVED***eldAge        = "age:"
-		***REMOVED***eldBytes      = "bytes:"
-		***REMOVED***eldEvents     = "events:"
-		***REMOVED***eldPerOpStats = "per-op"
-		***REMOVED***eldTransport  = "xprt:"
+		fieldAge        = "age:"
+		fieldBytes      = "bytes:"
+		fieldEvents     = "events:"
+		fieldPerOpStats = "per-op"
+		fieldTransport  = "xprt:"
 	)
 
 	stats := &MountStatsNFS{
@@ -338,7 +338,7 @@ func parseMountStatsNFS(s *bu***REMOVED***o.Scanner, statVersion string) (*Mount
 		}
 
 		switch ss[0] {
-		case ***REMOVED***eldAge:
+		case fieldAge:
 			// Age integer is in seconds
 			d, err := time.ParseDuration(ss[1] + "s")
 			if err != nil {
@@ -346,21 +346,21 @@ func parseMountStatsNFS(s *bu***REMOVED***o.Scanner, statVersion string) (*Mount
 			}
 
 			stats.Age = d
-		case ***REMOVED***eldBytes:
+		case fieldBytes:
 			bstats, err := parseNFSBytesStats(ss[1:])
 			if err != nil {
 				return nil, err
 			}
 
 			stats.Bytes = *bstats
-		case ***REMOVED***eldEvents:
+		case fieldEvents:
 			estats, err := parseNFSEventsStats(ss[1:])
 			if err != nil {
 				return nil, err
 			}
 
 			stats.Events = *estats
-		case ***REMOVED***eldTransport:
+		case fieldTransport:
 			if len(ss) < 3 {
 				return nil, fmt.Errorf("not enough information for NFS transport stats: %v", ss)
 			}
@@ -377,7 +377,7 @@ func parseMountStatsNFS(s *bu***REMOVED***o.Scanner, statVersion string) (*Mount
 		// loop and parse them separately to ensure we can terminate parsing
 		// before reaching another device entry; hence why this 'if' statement
 		// is not just another switch case
-		if ss[0] == ***REMOVED***eldPerOpStats {
+		if ss[0] == fieldPerOpStats {
 			break
 		}
 	}
@@ -398,13 +398,13 @@ func parseMountStatsNFS(s *bu***REMOVED***o.Scanner, statVersion string) (*Mount
 }
 
 // parseNFSBytesStats parses a NFSBytesStats line using an input set of
-// integer ***REMOVED***elds.
+// integer fields.
 func parseNFSBytesStats(ss []string) (*NFSBytesStats, error) {
-	if len(ss) != ***REMOVED***eldBytesLen {
+	if len(ss) != fieldBytesLen {
 		return nil, fmt.Errorf("invalid NFS bytes stats: %v", ss)
 	}
 
-	ns := make([]uint64, 0, ***REMOVED***eldBytesLen)
+	ns := make([]uint64, 0, fieldBytesLen)
 	for _, s := range ss {
 		n, err := strconv.ParseUint(s, 10, 64)
 		if err != nil {
@@ -427,13 +427,13 @@ func parseNFSBytesStats(ss []string) (*NFSBytesStats, error) {
 }
 
 // parseNFSEventsStats parses a NFSEventsStats line using an input set of
-// integer ***REMOVED***elds.
+// integer fields.
 func parseNFSEventsStats(ss []string) (*NFSEventsStats, error) {
-	if len(ss) != ***REMOVED***eldEventsLen {
+	if len(ss) != fieldEventsLen {
 		return nil, fmt.Errorf("invalid NFS events stats: %v", ss)
 	}
 
-	ns := make([]uint64, 0, ***REMOVED***eldEventsLen)
+	ns := make([]uint64, 0, fieldEventsLen)
 	for _, s := range ss {
 		n, err := strconv.ParseUint(s, 10, 64)
 		if err != nil {
@@ -477,9 +477,9 @@ func parseNFSEventsStats(ss []string) (*NFSEventsStats, error) {
 // parseNFSOperationStats parses a slice of NFSOperationStats by scanning
 // additional information about per-operation statistics until an empty
 // line is reached.
-func parseNFSOperationStats(s *bu***REMOVED***o.Scanner) ([]NFSOperationStats, error) {
+func parseNFSOperationStats(s *bufio.Scanner) ([]NFSOperationStats, error) {
 	const (
-		// Number of expected ***REMOVED***elds in each per-operation statistics set
+		// Number of expected fields in each per-operation statistics set
 		numFields = 9
 	)
 
@@ -509,7 +509,7 @@ func parseNFSOperationStats(s *bu***REMOVED***o.Scanner) ([]NFSOperationStats, e
 		}
 
 		ops = append(ops, NFSOperationStats{
-			Operation:                   strings.TrimSuf***REMOVED***x(ss[0], ":"),
+			Operation:                   strings.TrimSuffix(ss[0], ":"),
 			Requests:                    ns[0],
 			Transmissions:               ns[1],
 			MajorTimeouts:               ns[2],
@@ -525,9 +525,9 @@ func parseNFSOperationStats(s *bu***REMOVED***o.Scanner) ([]NFSOperationStats, e
 }
 
 // parseNFSTransportStats parses a NFSTransportStats line using an input set of
-// integer ***REMOVED***elds matched to a speci***REMOVED***c stats version.
+// integer fields matched to a specific stats version.
 func parseNFSTransportStats(ss []string, statVersion string) (*NFSTransportStats, error) {
-	// Extract the protocol ***REMOVED***eld. It is the only string value in the line
+	// Extract the protocol field. It is the only string value in the line
 	protocol := ss[0]
 	ss = ss[1:]
 
@@ -535,10 +535,10 @@ func parseNFSTransportStats(ss []string, statVersion string) (*NFSTransportStats
 	case statVersion10:
 		var expectedLength int
 		if protocol == "tcp" {
-			expectedLength = ***REMOVED***eldTransport10TCPLen
-		} ***REMOVED*** if protocol == "udp" {
-			expectedLength = ***REMOVED***eldTransport10UDPLen
-		} ***REMOVED*** {
+			expectedLength = fieldTransport10TCPLen
+		} else if protocol == "udp" {
+			expectedLength = fieldTransport10UDPLen
+		} else {
 			return nil, fmt.Errorf("invalid NFS protocol \"%s\" in stats 1.0 statement: %v", protocol, ss)
 		}
 		if len(ss) != expectedLength {
@@ -547,10 +547,10 @@ func parseNFSTransportStats(ss []string, statVersion string) (*NFSTransportStats
 	case statVersion11:
 		var expectedLength int
 		if protocol == "tcp" {
-			expectedLength = ***REMOVED***eldTransport11TCPLen
-		} ***REMOVED*** if protocol == "udp" {
-			expectedLength = ***REMOVED***eldTransport11UDPLen
-		} ***REMOVED*** {
+			expectedLength = fieldTransport11TCPLen
+		} else if protocol == "udp" {
+			expectedLength = fieldTransport11UDPLen
+		} else {
 			return nil, fmt.Errorf("invalid NFS protocol \"%s\" in stats 1.1 statement: %v", protocol, ss)
 		}
 		if len(ss) != expectedLength {
@@ -567,7 +567,7 @@ func parseNFSTransportStats(ss []string, statVersion string) (*NFSTransportStats
 	// Note: slice length must be set to length of v1.1 stats to avoid a panic when
 	// only v1.0 stats are present.
 	// See: https://github.com/prometheus/node_exporter/issues/571.
-	ns := make([]uint64, ***REMOVED***eldTransport11TCPLen)
+	ns := make([]uint64, fieldTransport11TCPLen)
 	for i, s := range ss {
 		n, err := strconv.ParseUint(s, 10, 64)
 		if err != nil {
@@ -577,11 +577,11 @@ func parseNFSTransportStats(ss []string, statVersion string) (*NFSTransportStats
 		ns[i] = n
 	}
 
-	// The ***REMOVED***elds differ depending on the transport protocol (TCP or UDP)
+	// The fields differ depending on the transport protocol (TCP or UDP)
 	// From https://utcc.utoronto.ca/%7Ecks/space/blog/linux/NFSMountstatsXprt
 	//
 	// For the udp RPC transport there is no connection count, connect idle time,
-	// or idle time (***REMOVED***elds #3, #4, and #5); all other ***REMOVED***elds are the same. So
+	// or idle time (fields #3, #4, and #5); all other fields are the same. So
 	// we set them to 0 here.
 	if protocol == "udp" {
 		ns = append(ns[:2], append(make([]uint64, 3), ns[2:]...)...)

@@ -2,7 +2,7 @@
 Copyright 2014 Alexander Okoli
 
 Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this ***REMOVED***le except in compliance with the License.
+you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
 
     http://www.apache.org/licenses/LICENSE-2.0
@@ -10,7 +10,7 @@ You may obtain a copy of the License at
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the speci***REMOVED***c language governing permissions and
+See the License for the specific language governing permissions and
 limitations under the License.
 */
 
@@ -29,7 +29,7 @@ const INDEX_NOT_FOUND = -1
 /*
 Abbreviate abbreviates a string using ellipses. This will turn  the string "Now is the time for all good men" into "Now is the time for..."
 
-Speci***REMOVED***cally, the algorithm is as follows:
+Specifically, the algorithm is as follows:
 
     - If str is less than maxWidth characters long, return it.
     - Else abbreviate it to (str[0:maxWidth - 3] + "...").
@@ -51,7 +51,7 @@ func Abbreviate(str string, maxWidth int) (string, error) {
 /*
 AbbreviateFull abbreviates a string using ellipses. This will turn the string "Now is the time for all good men" into "...is the time for..."
 This function works like Abbreviate(string, int), but allows you to specify a "left edge" offset. Note that this left edge is not
-necessarily going to be the leftmost character in the result, or the ***REMOVED***rst character following the ellipses, but it will appear
+necessarily going to be the leftmost character in the result, or the first character following the ellipses, but it will appear
 somewhere in the result.
 In no case will it return a string of length greater than maxWidth.
 
@@ -97,7 +97,7 @@ func AbbreviateFull(str string, offset int, maxWidth int) (string, error) {
 }
 
 /*
-DeleteWhiteSpace deletes all whitespaces from a string as de***REMOVED***ned by unicode.IsSpace(rune).
+DeleteWhiteSpace deletes all whitespaces from a string as defined by unicode.IsSpace(rune).
 It returns the string without whitespaces.
 
 Parameter:
@@ -130,7 +130,7 @@ func DeleteWhiteSpace(str string) string {
 IndexOfDifference compares two strings, and returns the index at which the strings begin to differ.
 
 Parameters:
-    str1 - the ***REMOVED***rst string
+    str1 - the first string
     str2 - the second string
 
 Returns:
@@ -183,19 +183,19 @@ func IsBlank(str string) bool {
 }
 
 /*
-IndexOf returns the index of the ***REMOVED***rst instance of sub in str, with the search beginning from the
-index start point speci***REMOVED***ed. -1 is returned if sub is not present in str.
+IndexOf returns the index of the first instance of sub in str, with the search beginning from the
+index start point specified. -1 is returned if sub is not present in str.
 
 An empty string ("") will return -1 (INDEX_NOT_FOUND). A negative start position is treated as zero.
 A start position greater than the string length returns -1.
 
 Parameters:
     str - the string to check
-    sub - the substring to ***REMOVED***nd
+    sub - the substring to find
     start - the start position; negative treated as zero
 
 Returns:
-    the ***REMOVED***rst index where the sub string was found  (always >= start)
+    the first index where the sub string was found  (always >= start)
 */
 func IndexOf(str string, sub string, start int) int {
 

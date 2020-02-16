@@ -1,5 +1,5 @@
 apiVersion: apiextensions.k8s.io/v1beta1
-kind: CustomResourceDe***REMOVED***nition
+kind: CustomResourceDefinition
 metadata:
   name: storagelocations.metering.openshift.io
 spec:
@@ -19,7 +19,7 @@ spec:
   validation:
     openAPIV3Schema:
       description: |
-        StorageLocation is a custom resource that con***REMOVED***gures where data will
+        StorageLocation is a custom resource that configures where data will
         be stored by the reporting-operator. This included the data collected
         from Prometheus, and the results produced by generating a `Report` custom
         resources.
@@ -29,16 +29,16 @@ spec:
         spec:
           type: object
           description: |
-            StorageLocationSpec is the desired speci***REMOVED***cation of a StorageLocation custom resource.
-            Required ***REMOVED***elds: databaseName, unmanagedDatabase, and location.
+            StorageLocationSpec is the desired specification of a StorageLocation custom resource.
+            Required fields: databaseName, unmanagedDatabase, and location.
             More info: https://github.com/operator-framework/operator-metering/blob/master/Documentation/storagelocations.md
           properties:
             hive:
               type: object
               description: |
-                Con***REMOVED***gures the StorageLocation to store data in Presto by creating
+                Configures the StorageLocation to store data in Presto by creating
                 the table using Hive Server.
-                Note: databaseName and unmanagedDatabase are required ***REMOVED***elds.
+                Note: databaseName and unmanagedDatabase are required fields.
               required:
               - databaseName
               - unmanagedDatabase
@@ -57,37 +57,37 @@ spec:
                 location:
                   type: string
                   description: |
-                    Location is the ***REMOVED***lesystem URL for Presto and Hive to use for the
-                    database. This can be in the form of `hdfs://` or `sda://` ***REMOVED***lesystem URL.
-                    If this ***REMOVED***eld is unset, or set to an empty string, then the default
-                    ***REMOVED***lesystem URL for Hive is used.
-                    Note: this is an optional ***REMOVED***eld.
+                    Location is the filesystem URL for Presto and Hive to use for the
+                    database. This can be in the form of `hdfs://` or `sda://` filesystem URL.
+                    If this field is unset, or set to an empty string, then the default
+                    filesystem URL for Hive is used.
+                    Note: this is an optional field.
                   format: uri
                 useLocalStorage:
                   type: boolean
                   description: |
-                    UseLocalStorage determines whether or not to use a ***REMOVED***le-based metastore
+                    UseLocalStorage determines whether or not to use a file-based metastore
                     mounted in Presto
                 defaultTableProperties:
                   type: object
                   description: |
-                    DefaultTableProperties contains the con***REMOVED***guration options for creating table
+                    DefaultTableProperties contains the configuration options for creating table
                     using Hive.
-                    Note: this is an optional ***REMOVED***eld.
+                    Note: this is an optional field.
                   properties:
-                    ***REMOVED***leFormat:
+                    fileFormat:
                       type: string
                       description: |
-                        FileFormat speci***REMOVED***es the ***REMOVED***le format used for storing ***REMOVED***les in the ***REMOVED***le system.
-                        Note: this is an optional ***REMOVED***eld.
+                        FileFormat specifies the file format used for storing files in the file system.
+                        Note: this is an optional field.
                         More info: https://cwiki.apache.org/confluence/display/Hive/LanguageManual+DDL#LanguageManualDDL-StorageFormatsStorageFormatsRowFormat,StorageFormat,andSerDe
                       minLength: 1
                     rowFormat:
                       type: string
                       description: |
-                        RowFormat speci***REMOVED***es the Hive row format, which is how Hive serializes and
+                        RowFormat specifies the Hive row format, which is how Hive serializes and
                         deserializes rows.
-                        Note: this is an optional ***REMOVED***eld.
+                        Note: this is an optional field.
                         More info: https://cwiki.apache.org/confluence/display/Hive/LanguageManual+DDL#LanguageManualDDL-StorageFormatsStorageFormatsRowFormat,StorageFormat,andSerDe
                       minLength: 1
 

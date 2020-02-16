@@ -12,15 +12,15 @@ const (
 	InvalidParameterErrCode = "InvalidParameter"
 	// ParamRequiredErrCode is the error code for required parameter errors
 	ParamRequiredErrCode = "ParamRequiredError"
-	// ParamMinValueErrCode is the error code for ***REMOVED***elds with too low of a
+	// ParamMinValueErrCode is the error code for fields with too low of a
 	// number value.
 	ParamMinValueErrCode = "ParamMinValueError"
-	// ParamMinLenErrCode is the error code for ***REMOVED***elds without enough elements.
+	// ParamMinLenErrCode is the error code for fields without enough elements.
 	ParamMinLenErrCode = "ParamMinLenError"
 	// ParamMaxLenErrCode is the error code for value being too long.
 	ParamMaxLenErrCode = "ParamMaxLenError"
 
-	// ParamFormatErrCode is the error code for a ***REMOVED***eld with invalid
+	// ParamFormatErrCode is the error code for a field with invalid
 	// format or characters.
 	ParamFormatErrCode = "ParamFormatInvalidError"
 )
@@ -121,7 +121,7 @@ type ErrInvalidParam interface {
 type errInvalidParam struct {
 	context       string
 	nestedContext string
-	***REMOVED***eld         string
+	field         string
 	code          string
 	msg           string
 }
@@ -146,18 +146,18 @@ func (e *errInvalidParam) OrigErr() error {
 	return nil
 }
 
-// Field Returns the ***REMOVED***eld and context the error occurred.
+// Field Returns the field and context the error occurred.
 func (e *errInvalidParam) Field() string {
-	***REMOVED***eld := e.context
-	if len(***REMOVED***eld) > 0 {
-		***REMOVED***eld += "."
+	field := e.context
+	if len(field) > 0 {
+		field += "."
 	}
 	if len(e.nestedContext) > 0 {
-		***REMOVED***eld += fmt.Sprintf("%s.", e.nestedContext)
+		field += fmt.Sprintf("%s.", e.nestedContext)
 	}
-	***REMOVED***eld += e.***REMOVED***eld
+	field += e.field
 
-	return ***REMOVED***eld
+	return field
 }
 
 // SetContext updates the base context of the error.
@@ -165,11 +165,11 @@ func (e *errInvalidParam) SetContext(ctx string) {
 	e.context = ctx
 }
 
-// AddNestedContext prepends a context to the ***REMOVED***eld's path.
+// AddNestedContext prepends a context to the field's path.
 func (e *errInvalidParam) AddNestedContext(ctx string) {
 	if len(e.nestedContext) == 0 {
 		e.nestedContext = ctx
-	} ***REMOVED*** {
+	} else {
 		e.nestedContext = fmt.Sprintf("%s.%s", ctx, e.nestedContext)
 	}
 
@@ -181,12 +181,12 @@ type ErrParamRequired struct {
 }
 
 // NewErrParamRequired creates a new required parameter error.
-func NewErrParamRequired(***REMOVED***eld string) *ErrParamRequired {
+func NewErrParamRequired(field string) *ErrParamRequired {
 	return &ErrParamRequired{
 		errInvalidParam{
 			code:  ParamRequiredErrCode,
-			***REMOVED***eld: ***REMOVED***eld,
-			msg:   fmt.Sprintf("missing required ***REMOVED***eld"),
+			field: field,
+			msg:   fmt.Sprintf("missing required field"),
 		},
 	}
 }
@@ -198,18 +198,18 @@ type ErrParamMinValue struct {
 }
 
 // NewErrParamMinValue creates a new minimum value parameter error.
-func NewErrParamMinValue(***REMOVED***eld string, min float64) *ErrParamMinValue {
+func NewErrParamMinValue(field string, min float64) *ErrParamMinValue {
 	return &ErrParamMinValue{
 		errInvalidParam: errInvalidParam{
 			code:  ParamMinValueErrCode,
-			***REMOVED***eld: ***REMOVED***eld,
-			msg:   fmt.Sprintf("minimum ***REMOVED***eld value of %v", min),
+			field: field,
+			msg:   fmt.Sprintf("minimum field value of %v", min),
 		},
 		min: min,
 	}
 }
 
-// MinValue returns the ***REMOVED***eld's require minimum value.
+// MinValue returns the field's require minimum value.
 //
 // float64 is returned for both int and float min values.
 func (e *ErrParamMinValue) MinValue() float64 {
@@ -223,18 +223,18 @@ type ErrParamMinLen struct {
 }
 
 // NewErrParamMinLen creates a new minimum length parameter error.
-func NewErrParamMinLen(***REMOVED***eld string, min int) *ErrParamMinLen {
+func NewErrParamMinLen(field string, min int) *ErrParamMinLen {
 	return &ErrParamMinLen{
 		errInvalidParam: errInvalidParam{
 			code:  ParamMinLenErrCode,
-			***REMOVED***eld: ***REMOVED***eld,
-			msg:   fmt.Sprintf("minimum ***REMOVED***eld size of %v", min),
+			field: field,
+			msg:   fmt.Sprintf("minimum field size of %v", min),
 		},
 		min: min,
 	}
 }
 
-// MinLen returns the ***REMOVED***eld's required minimum length.
+// MinLen returns the field's required minimum length.
 func (e *ErrParamMinLen) MinLen() int {
 	return e.min
 }
@@ -246,18 +246,18 @@ type ErrParamMaxLen struct {
 }
 
 // NewErrParamMaxLen creates a new maximum length parameter error.
-func NewErrParamMaxLen(***REMOVED***eld string, max int, value string) *ErrParamMaxLen {
+func NewErrParamMaxLen(field string, max int, value string) *ErrParamMaxLen {
 	return &ErrParamMaxLen{
 		errInvalidParam: errInvalidParam{
 			code:  ParamMaxLenErrCode,
-			***REMOVED***eld: ***REMOVED***eld,
+			field: field,
 			msg:   fmt.Sprintf("maximum size of %v, %v", max, value),
 		},
 		max: max,
 	}
 }
 
-// MaxLen returns the ***REMOVED***eld's required minimum length.
+// MaxLen returns the field's required minimum length.
 func (e *ErrParamMaxLen) MaxLen() int {
 	return e.max
 }
@@ -269,18 +269,18 @@ type ErrParamFormat struct {
 }
 
 // NewErrParamFormat creates a new invalid format parameter error.
-func NewErrParamFormat(***REMOVED***eld string, format, value string) *ErrParamFormat {
+func NewErrParamFormat(field string, format, value string) *ErrParamFormat {
 	return &ErrParamFormat{
 		errInvalidParam: errInvalidParam{
 			code:  ParamFormatErrCode,
-			***REMOVED***eld: ***REMOVED***eld,
+			field: field,
 			msg:   fmt.Sprintf("format %v, %v", format, value),
 		},
 		format: format,
 	}
 }
 
-// Format returns the ***REMOVED***eld's required format.
+// Format returns the field's required format.
 func (e *ErrParamFormat) Format() string {
 	return e.format
 }

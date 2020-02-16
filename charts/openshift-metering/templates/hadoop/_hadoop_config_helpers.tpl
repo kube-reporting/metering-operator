@@ -1,5 +1,5 @@
-{{- de***REMOVED***ne "hdfs-site-xml" -}}
-<con***REMOVED***guration>
+{{- define "hdfs-site-xml" -}}
+<configuration>
   <property>
     <name>dfs.permissions.enabled</name>
     <value>false</value>
@@ -10,7 +10,7 @@
   </property>
   <property>
     <name>dfs.namenode.name.dir</name>
-    <value>***REMOVED***le:///hadoop/dfs/name</value>
+    <value>file:///hadoop/dfs/name</value>
   </property>
   <property>
     <name>dfs.namenode.rpc-bind-host</name>
@@ -38,32 +38,32 @@
   </property>
   <property>
     <name>dfs.datanode.data.dir</name>
-    <value>***REMOVED***le:///hadoop/dfs/data</value>
+    <value>file:///hadoop/dfs/data</value>
   </property>
   <property>
     <name>dfs.datanode.data.dir.perm</name>
-    <value>{{ .Values.hadoop.spec.hdfs.con***REMOVED***g.datanodeDataDirPerms }}</value>
+    <value>{{ .Values.hadoop.spec.hdfs.config.datanodeDataDirPerms }}</value>
   </property>
   <property>
     <name>dfs.replication</name>
-    <value>{{ .Values.hadoop.spec.hdfs.con***REMOVED***g.replicationFactor }}</value>
+    <value>{{ .Values.hadoop.spec.hdfs.config.replicationFactor }}</value>
   </property>
   <property>
-    <name>net.topology.script.***REMOVED***le.name</name>
-    <value>/hadoop-scripts/topology-con***REMOVED***guration.sh</value>
+    <name>net.topology.script.file.name</name>
+    <value>/hadoop-scripts/topology-configuration.sh</value>
   </property>
-</con***REMOVED***guration>
+</configuration>
 {{- end }}
-{{- de***REMOVED***ne "core-site-xml" -}}
-<con***REMOVED***guration>
+{{- define "core-site-xml" -}}
+<configuration>
   <property>
     <name>fs.defaultFS</name>
-    <value>{{ .Values.hadoop.spec.con***REMOVED***g.defaultFS }}</value>
+    <value>{{ .Values.hadoop.spec.config.defaultFS }}</value>
   </property>
-{{- if and .Values.hadoop.spec.con***REMOVED***g.aws.region .Values.useIPV6Networking }}
+{{- if and .Values.hadoop.spec.config.aws.region .Values.useIPV6Networking }}
   <property>
     <name>fs.s3a.endpoint</name>
-    <value>https://s3.dualstack.{{ .Values.hadoop.spec.con***REMOVED***g.aws.region }}.amazonaws.com</value>
+    <value>https://s3.dualstack.{{ .Values.hadoop.spec.config.aws.region }}.amazonaws.com</value>
   </property>
   <property>
     <name>fs.s3a.path.style.access</name>
@@ -71,7 +71,7 @@
     <description>Enable S3 path style access.</description>
   </property>
 {{- end }}
-{{- if .Values.hadoop.spec.con***REMOVED***g.s3Compatible.endpoint }}
+{{- if .Values.hadoop.spec.config.s3Compatible.endpoint }}
   <property>
     <name>fs.s3a.impl</name>
     <value>org.apache.hadoop.fs.s3a.S3AFileSystem</value>
@@ -85,7 +85,7 @@
   <property>
     <name>fs.s3a.endpoint</name>
     <description>AWS S3 endpoint to connect to.</description>
-    <value>{{ .Values.hadoop.spec.con***REMOVED***g.s3Compatible.endpoint }}</value>
+    <value>{{ .Values.hadoop.spec.config.s3Compatible.endpoint }}</value>
   </property>
 {{- end }}
   <property>
@@ -108,5 +108,5 @@
       <name>fs.gs.reported.permissions</name>
       <value>733</value>
   </property>
-</con***REMOVED***guration>
+</configuration>
 {{- end }}

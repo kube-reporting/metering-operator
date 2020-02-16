@@ -31,16 +31,16 @@ func mergeDocs(doc, patch *partialDoc, mergeMerge bool) {
 		if v == nil {
 			if mergeMerge {
 				(*doc)[k] = nil
-			} ***REMOVED*** {
+			} else {
 				delete(*doc, k)
 			}
-		} ***REMOVED*** {
+		} else {
 			cur, ok := (*doc)[k]
 
 			if !ok || cur == nil {
 				pruneNulls(v)
 				(*doc)[k] = v
-			} ***REMOVED*** {
+			} else {
 				(*doc)[k] = merge(cur, v, mergeMerge)
 			}
 		}
@@ -52,7 +52,7 @@ func pruneNulls(n *lazyNode) {
 
 	if err == nil {
 		pruneDocNulls(sub)
-	} ***REMOVED*** {
+	} else {
 		ary, err := n.intoAry()
 
 		if err == nil {
@@ -65,7 +65,7 @@ func pruneDocNulls(doc *partialDoc) *partialDoc {
 	for k, v := range *doc {
 		if v == nil {
 			delete(*doc, k)
-		} ***REMOVED*** {
+		} else {
 			pruneNulls(v)
 		}
 	}
@@ -134,10 +134,10 @@ func doMergePatch(docData, patchData []byte, mergeMerge bool) ([]byte, error) {
 		if patchErr == nil {
 			if mergeMerge {
 				doc = patch
-			} ***REMOVED*** {
+			} else {
 				doc = pruneDocNulls(patch)
 			}
-		} ***REMOVED*** {
+		} else {
 			patchAry := &partialArray{}
 			patchErr = json.Unmarshal(patchData, patchAry)
 
@@ -155,7 +155,7 @@ func doMergePatch(docData, patchData []byte, mergeMerge bool) ([]byte, error) {
 
 			return out, nil
 		}
-	} ***REMOVED*** {
+	} else {
 		mergeDocs(doc, patch, mergeMerge)
 	}
 
@@ -170,29 +170,29 @@ func doMergePatch(docData, patchData []byte, mergeMerge bool) ([]byte, error) {
 func resemblesJSONArray(input []byte) bool {
 	input = bytes.TrimSpace(input)
 
-	hasPre***REMOVED***x := bytes.HasPre***REMOVED***x(input, []byte("["))
-	hasSuf***REMOVED***x := bytes.HasSuf***REMOVED***x(input, []byte("]"))
+	hasPrefix := bytes.HasPrefix(input, []byte("["))
+	hasSuffix := bytes.HasSuffix(input, []byte("]"))
 
-	return hasPre***REMOVED***x && hasSuf***REMOVED***x
+	return hasPrefix && hasSuffix
 }
 
 // CreateMergePatch will return a merge patch document capable of converting
-// the original document(s) to the modi***REMOVED***ed document(s).
+// the original document(s) to the modified document(s).
 // The parameters can be bytes of either two JSON Documents, or two arrays of
 // JSON documents.
-// The merge patch returned follows the speci***REMOVED***cation de***REMOVED***ned at http://tools.ietf.org/html/draft-ietf-appsawg-json-merge-patch-07
-func CreateMergePatch(originalJSON, modi***REMOVED***edJSON []byte) ([]byte, error) {
+// The merge patch returned follows the specification defined at http://tools.ietf.org/html/draft-ietf-appsawg-json-merge-patch-07
+func CreateMergePatch(originalJSON, modifiedJSON []byte) ([]byte, error) {
 	originalResemblesArray := resemblesJSONArray(originalJSON)
-	modi***REMOVED***edResemblesArray := resemblesJSONArray(modi***REMOVED***edJSON)
+	modifiedResemblesArray := resemblesJSONArray(modifiedJSON)
 
 	// Do both byte-slices seem like JSON arrays?
-	if originalResemblesArray && modi***REMOVED***edResemblesArray {
-		return createArrayMergePatch(originalJSON, modi***REMOVED***edJSON)
+	if originalResemblesArray && modifiedResemblesArray {
+		return createArrayMergePatch(originalJSON, modifiedJSON)
 	}
 
 	// Are both byte-slices are not arrays? Then they are likely JSON objects...
-	if !originalResemblesArray && !modi***REMOVED***edResemblesArray {
-		return createObjectMergePatch(originalJSON, modi***REMOVED***edJSON)
+	if !originalResemblesArray && !modifiedResemblesArray {
+		return createObjectMergePatch(originalJSON, modifiedJSON)
 	}
 
 	// None of the above? Then return an error because of mismatched types.
@@ -200,22 +200,22 @@ func CreateMergePatch(originalJSON, modi***REMOVED***edJSON []byte) ([]byte, err
 }
 
 // createObjectMergePatch will return a merge-patch document capable of
-// converting the original document to the modi***REMOVED***ed document.
-func createObjectMergePatch(originalJSON, modi***REMOVED***edJSON []byte) ([]byte, error) {
+// converting the original document to the modified document.
+func createObjectMergePatch(originalJSON, modifiedJSON []byte) ([]byte, error) {
 	originalDoc := map[string]interface{}{}
-	modi***REMOVED***edDoc := map[string]interface{}{}
+	modifiedDoc := map[string]interface{}{}
 
 	err := json.Unmarshal(originalJSON, &originalDoc)
 	if err != nil {
 		return nil, errBadJSONDoc
 	}
 
-	err = json.Unmarshal(modi***REMOVED***edJSON, &modi***REMOVED***edDoc)
+	err = json.Unmarshal(modifiedJSON, &modifiedDoc)
 	if err != nil {
 		return nil, errBadJSONDoc
 	}
 
-	dest, err := getDiff(originalDoc, modi***REMOVED***edDoc)
+	dest, err := getDiff(originalDoc, modifiedDoc)
 	if err != nil {
 		return nil, err
 	}
@@ -224,34 +224,34 @@ func createObjectMergePatch(originalJSON, modi***REMOVED***edJSON []byte) ([]byt
 }
 
 // createArrayMergePatch will return an array of merge-patch documents capable
-// of converting the original document to the modi***REMOVED***ed document for each
+// of converting the original document to the modified document for each
 // pair of JSON documents provided in the arrays.
 // Arrays of mismatched sizes will result in an error.
-func createArrayMergePatch(originalJSON, modi***REMOVED***edJSON []byte) ([]byte, error) {
+func createArrayMergePatch(originalJSON, modifiedJSON []byte) ([]byte, error) {
 	originalDocs := []json.RawMessage{}
-	modi***REMOVED***edDocs := []json.RawMessage{}
+	modifiedDocs := []json.RawMessage{}
 
 	err := json.Unmarshal(originalJSON, &originalDocs)
 	if err != nil {
 		return nil, errBadJSONDoc
 	}
 
-	err = json.Unmarshal(modi***REMOVED***edJSON, &modi***REMOVED***edDocs)
+	err = json.Unmarshal(modifiedJSON, &modifiedDocs)
 	if err != nil {
 		return nil, errBadJSONDoc
 	}
 
 	total := len(originalDocs)
-	if len(modi***REMOVED***edDocs) != total {
+	if len(modifiedDocs) != total {
 		return nil, errBadJSONDoc
 	}
 
 	result := []json.RawMessage{}
 	for i := 0; i < len(originalDocs); i++ {
 		original := originalDocs[i]
-		modi***REMOVED***ed := modi***REMOVED***edDocs[i]
+		modified := modifiedDocs[i]
 
-		patch, err := createObjectMergePatch(original, modi***REMOVED***ed)
+		patch, err := createObjectMergePatch(original, modified)
 		if err != nil {
 			return nil, err
 		}
@@ -303,7 +303,7 @@ func matchesValue(av, bv interface{}) bool {
 			return true
 		}
 	case nil:
-		// Both nil, ***REMOVED***ne.
+		// Both nil, fine.
 		return true
 	case map[string]interface{}:
 		bt := bv.(map[string]interface{})
@@ -364,7 +364,7 @@ func getDiff(a, b map[string]interface{}) (map[string]interface{}, error) {
 		case nil:
 			switch bv.(type) {
 			case nil:
-				// Both nil, ***REMOVED***ne.
+				// Both nil, fine.
 			default:
 				into[key] = bv
 			}

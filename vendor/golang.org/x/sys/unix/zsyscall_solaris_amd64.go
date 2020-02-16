@@ -73,8 +73,8 @@ import (
 //go:cgo_import_dynamic libc_madvise madvise "libc.so"
 //go:cgo_import_dynamic libc_mkdir mkdir "libc.so"
 //go:cgo_import_dynamic libc_mkdirat mkdirat "libc.so"
-//go:cgo_import_dynamic libc_mk***REMOVED***fo mk***REMOVED***fo "libc.so"
-//go:cgo_import_dynamic libc_mk***REMOVED***foat mk***REMOVED***foat "libc.so"
+//go:cgo_import_dynamic libc_mkfifo mkfifo "libc.so"
+//go:cgo_import_dynamic libc_mkfifoat mkfifoat "libc.so"
 //go:cgo_import_dynamic libc_mknod mknod "libc.so"
 //go:cgo_import_dynamic libc_mknodat mknodat "libc.so"
 //go:cgo_import_dynamic libc_mlock mlock "libc.so"
@@ -128,7 +128,7 @@ import (
 //go:cgo_import_dynamic libc___xnet_connect __xnet_connect "libsocket.so"
 //go:cgo_import_dynamic libc_mmap mmap "libc.so"
 //go:cgo_import_dynamic libc_munmap munmap "libc.so"
-//go:cgo_import_dynamic libc_send***REMOVED***le send***REMOVED***le "libsend***REMOVED***le.so"
+//go:cgo_import_dynamic libc_sendfile sendfile "libsendfile.so"
 //go:cgo_import_dynamic libc___xnet_sendto __xnet_sendto "libsocket.so"
 //go:cgo_import_dynamic libc___xnet_socket __xnet_socket "libsocket.so"
 //go:cgo_import_dynamic libc___xnet_socketpair __xnet_socketpair "libsocket.so"
@@ -201,8 +201,8 @@ import (
 //go:linkname procMadvise libc_madvise
 //go:linkname procMkdir libc_mkdir
 //go:linkname procMkdirat libc_mkdirat
-//go:linkname procMk***REMOVED***fo libc_mk***REMOVED***fo
-//go:linkname procMk***REMOVED***foat libc_mk***REMOVED***foat
+//go:linkname procMkfifo libc_mkfifo
+//go:linkname procMkfifoat libc_mkfifoat
 //go:linkname procMknod libc_mknod
 //go:linkname procMknodat libc_mknodat
 //go:linkname procMlock libc_mlock
@@ -256,7 +256,7 @@ import (
 //go:linkname proc__xnet_connect libc___xnet_connect
 //go:linkname procmmap libc_mmap
 //go:linkname procmunmap libc_munmap
-//go:linkname procsend***REMOVED***le libc_send***REMOVED***le
+//go:linkname procsendfile libc_sendfile
 //go:linkname proc__xnet_sendto libc___xnet_sendto
 //go:linkname proc__xnet_socket libc___xnet_socket
 //go:linkname proc__xnet_socketpair libc___xnet_socketpair
@@ -330,8 +330,8 @@ var (
 	procMadvise,
 	procMkdir,
 	procMkdirat,
-	procMk***REMOVED***fo,
-	procMk***REMOVED***foat,
+	procMkfifo,
+	procMkfifoat,
 	procMknod,
 	procMknodat,
 	procMlock,
@@ -385,7 +385,7 @@ var (
 	proc__xnet_connect,
 	procmmap,
 	procmunmap,
-	procsend***REMOVED***le,
+	procsendfile,
 	proc__xnet_sendto,
 	proc__xnet_socket,
 	proc__xnet_socketpair,
@@ -500,8 +500,8 @@ func fcntl(fd int, cmd int, arg int) (val int, err error) {
 	return
 }
 
-func futimesat(***REMOVED***ldes int, path *byte, times *[2]Timeval) (err error) {
-	_, _, e1 := sysvicall6(uintptr(unsafe.Pointer(&procfutimesat)), 3, uintptr(***REMOVED***ldes), uintptr(unsafe.Pointer(path)), uintptr(unsafe.Pointer(times)), 0, 0, 0)
+func futimesat(fildes int, path *byte, times *[2]Timeval) (err error) {
+	_, _, e1 := sysvicall6(uintptr(unsafe.Pointer(&procfutimesat)), 3, uintptr(fildes), uintptr(unsafe.Pointer(path)), uintptr(unsafe.Pointer(times)), 0, 0, 0)
 	if e1 != 0 {
 		err = e1
 	}
@@ -997,26 +997,26 @@ func Mkdirat(dirfd int, path string, mode uint32) (err error) {
 	return
 }
 
-func Mk***REMOVED***fo(path string, mode uint32) (err error) {
+func Mkfifo(path string, mode uint32) (err error) {
 	var _p0 *byte
 	_p0, err = BytePtrFromString(path)
 	if err != nil {
 		return
 	}
-	_, _, e1 := sysvicall6(uintptr(unsafe.Pointer(&procMk***REMOVED***fo)), 2, uintptr(unsafe.Pointer(_p0)), uintptr(mode), 0, 0, 0, 0)
+	_, _, e1 := sysvicall6(uintptr(unsafe.Pointer(&procMkfifo)), 2, uintptr(unsafe.Pointer(_p0)), uintptr(mode), 0, 0, 0, 0)
 	if e1 != 0 {
 		err = e1
 	}
 	return
 }
 
-func Mk***REMOVED***foat(dirfd int, path string, mode uint32) (err error) {
+func Mkfifoat(dirfd int, path string, mode uint32) (err error) {
 	var _p0 *byte
 	_p0, err = BytePtrFromString(path)
 	if err != nil {
 		return
 	}
-	_, _, e1 := sysvicall6(uintptr(unsafe.Pointer(&procMk***REMOVED***foat)), 3, uintptr(dirfd), uintptr(unsafe.Pointer(_p0)), uintptr(mode), 0, 0, 0)
+	_, _, e1 := sysvicall6(uintptr(unsafe.Pointer(&procMkfifoat)), 3, uintptr(dirfd), uintptr(unsafe.Pointer(_p0)), uintptr(mode), 0, 0, 0)
 	if e1 != 0 {
 		err = e1
 	}
@@ -1592,8 +1592,8 @@ func munmap(addr uintptr, length uintptr) (err error) {
 	return
 }
 
-func send***REMOVED***le(outfd int, infd int, offset *int64, count int) (written int, err error) {
-	r0, _, e1 := sysvicall6(uintptr(unsafe.Pointer(&procsend***REMOVED***le)), 4, uintptr(outfd), uintptr(infd), uintptr(unsafe.Pointer(offset)), uintptr(count), 0, 0)
+func sendfile(outfd int, infd int, offset *int64, count int) (written int, err error) {
+	r0, _, e1 := sysvicall6(uintptr(unsafe.Pointer(&procsendfile)), 4, uintptr(outfd), uintptr(infd), uintptr(unsafe.Pointer(offset)), uintptr(count), 0, 0)
 	written = int(r0)
 	if e1 != 0 {
 		err = e1

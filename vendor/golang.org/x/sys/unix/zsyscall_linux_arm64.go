@@ -95,7 +95,7 @@ func Readlinkat(dirfd int, path string, buf []byte) (n int, err error) {
 	var _p1 unsafe.Pointer
 	if len(buf) > 0 {
 		_p1 = unsafe.Pointer(&buf[0])
-	} ***REMOVED*** {
+	} else {
 		_p1 = unsafe.Pointer(&_zero)
 	}
 	r0, _, e1 := Syscall6(SYS_READLINKAT, uintptr(dirfd), uintptr(unsafe.Pointer(_p0)), uintptr(_p1), uintptr(len(buf)), 0, 0)
@@ -187,7 +187,7 @@ func Getcwd(buf []byte) (n int, err error) {
 	var _p0 unsafe.Pointer
 	if len(buf) > 0 {
 		_p0 = unsafe.Pointer(&buf[0])
-	} ***REMOVED*** {
+	} else {
 		_p0 = unsafe.Pointer(&_zero)
 	}
 	r0, _, e1 := Syscall(SYS_GETCWD, uintptr(_p0), uintptr(len(buf)), 0)
@@ -226,7 +226,7 @@ func KeyctlBuffer(cmd int, arg2 int, buf []byte, arg5 int) (ret int, err error) 
 	var _p0 unsafe.Pointer
 	if len(buf) > 0 {
 		_p0 = unsafe.Pointer(&buf[0])
-	} ***REMOVED*** {
+	} else {
 		_p0 = unsafe.Pointer(&_zero)
 	}
 	r0, _, e1 := Syscall6(SYS_KEYCTL, uintptr(cmd), uintptr(arg2), uintptr(_p0), uintptr(len(buf)), uintptr(arg5), 0)
@@ -280,7 +280,7 @@ func keyctlIOV(cmd int, arg2 int, payload []Iovec, arg5 int) (err error) {
 	var _p0 unsafe.Pointer
 	if len(payload) > 0 {
 		_p0 = unsafe.Pointer(&payload[0])
-	} ***REMOVED*** {
+	} else {
 		_p0 = unsafe.Pointer(&_zero)
 	}
 	_, _, e1 := Syscall6(SYS_KEYCTL, uintptr(cmd), uintptr(arg2), uintptr(_p0), uintptr(len(payload)), uintptr(arg5), 0)
@@ -296,7 +296,7 @@ func keyctlDH(cmd int, arg2 *KeyctlDHParams, buf []byte) (ret int, err error) {
 	var _p0 unsafe.Pointer
 	if len(buf) > 0 {
 		_p0 = unsafe.Pointer(&buf[0])
-	} ***REMOVED*** {
+	} else {
 		_p0 = unsafe.Pointer(&_zero)
 	}
 	r0, _, e1 := Syscall6(SYS_KEYCTL, uintptr(cmd), uintptr(unsafe.Pointer(arg2)), uintptr(_p0), uintptr(len(buf)), 0, 0)
@@ -388,7 +388,7 @@ func AddKey(keyType string, description string, payload []byte, ringid int) (id 
 	var _p2 unsafe.Pointer
 	if len(payload) > 0 {
 		_p2 = unsafe.Pointer(&payload[0])
-	} ***REMOVED*** {
+	} else {
 		_p2 = unsafe.Pointer(&_zero)
 	}
 	r0, _, e1 := Syscall6(SYS_ADD_KEY, uintptr(unsafe.Pointer(_p0)), uintptr(unsafe.Pointer(_p1)), uintptr(_p2), uintptr(len(payload)), uintptr(ringid), 0)
@@ -649,7 +649,7 @@ func Getdents(fd int, buf []byte) (n int, err error) {
 	var _p0 unsafe.Pointer
 	if len(buf) > 0 {
 		_p0 = unsafe.Pointer(&buf[0])
-	} ***REMOVED*** {
+	} else {
 		_p0 = unsafe.Pointer(&_zero)
 	}
 	r0, _, e1 := Syscall(SYS_GETDENTS64, uintptr(fd), uintptr(_p0), uintptr(len(buf)))
@@ -704,7 +704,7 @@ func Getrandom(buf []byte, flags int) (n int, err error) {
 	var _p0 unsafe.Pointer
 	if len(buf) > 0 {
 		_p0 = unsafe.Pointer(&buf[0])
-	} ***REMOVED*** {
+	} else {
 		_p0 = unsafe.Pointer(&_zero)
 	}
 	r0, _, e1 := Syscall(SYS_GETRANDOM, uintptr(_p0), uintptr(len(buf)), uintptr(flags))
@@ -760,7 +760,7 @@ func Getxattr(path string, attr string, dest []byte) (sz int, err error) {
 	var _p2 unsafe.Pointer
 	if len(dest) > 0 {
 		_p2 = unsafe.Pointer(&dest[0])
-	} ***REMOVED*** {
+	} else {
 		_p2 = unsafe.Pointer(&_zero)
 	}
 	r0, _, e1 := Syscall6(SYS_GETXATTR, uintptr(unsafe.Pointer(_p0)), uintptr(unsafe.Pointer(_p1)), uintptr(_p2), uintptr(len(dest)), 0, 0)
@@ -825,7 +825,7 @@ func Klogctl(typ int, buf []byte) (n int, err error) {
 	var _p0 unsafe.Pointer
 	if len(buf) > 0 {
 		_p0 = unsafe.Pointer(&buf[0])
-	} ***REMOVED*** {
+	} else {
 		_p0 = unsafe.Pointer(&_zero)
 	}
 	r0, _, e1 := Syscall(SYS_SYSLOG, uintptr(typ), uintptr(_p0), uintptr(len(buf)))
@@ -852,7 +852,7 @@ func Lgetxattr(path string, attr string, dest []byte) (sz int, err error) {
 	var _p2 unsafe.Pointer
 	if len(dest) > 0 {
 		_p2 = unsafe.Pointer(&dest[0])
-	} ***REMOVED*** {
+	} else {
 		_p2 = unsafe.Pointer(&_zero)
 	}
 	r0, _, e1 := Syscall6(SYS_LGETXATTR, uintptr(unsafe.Pointer(_p0)), uintptr(unsafe.Pointer(_p1)), uintptr(_p2), uintptr(len(dest)), 0, 0)
@@ -874,7 +874,7 @@ func Listxattr(path string, dest []byte) (sz int, err error) {
 	var _p1 unsafe.Pointer
 	if len(dest) > 0 {
 		_p1 = unsafe.Pointer(&dest[0])
-	} ***REMOVED*** {
+	} else {
 		_p1 = unsafe.Pointer(&_zero)
 	}
 	r0, _, e1 := Syscall(SYS_LISTXATTR, uintptr(unsafe.Pointer(_p0)), uintptr(_p1), uintptr(len(dest)))
@@ -896,7 +896,7 @@ func Llistxattr(path string, dest []byte) (sz int, err error) {
 	var _p1 unsafe.Pointer
 	if len(dest) > 0 {
 		_p1 = unsafe.Pointer(&dest[0])
-	} ***REMOVED*** {
+	} else {
 		_p1 = unsafe.Pointer(&_zero)
 	}
 	r0, _, e1 := Syscall(SYS_LLISTXATTR, uintptr(unsafe.Pointer(_p0)), uintptr(_p1), uintptr(len(dest)))
@@ -943,7 +943,7 @@ func Lsetxattr(path string, attr string, data []byte, flags int) (err error) {
 	var _p2 unsafe.Pointer
 	if len(data) > 0 {
 		_p2 = unsafe.Pointer(&data[0])
-	} ***REMOVED*** {
+	} else {
 		_p2 = unsafe.Pointer(&_zero)
 	}
 	_, _, e1 := Syscall6(SYS_LSETXATTR, uintptr(unsafe.Pointer(_p0)), uintptr(unsafe.Pointer(_p1)), uintptr(_p2), uintptr(len(data)), uintptr(flags), 0)
@@ -1050,7 +1050,7 @@ func read(fd int, p []byte) (n int, err error) {
 	var _p0 unsafe.Pointer
 	if len(p) > 0 {
 		_p0 = unsafe.Pointer(&p[0])
-	} ***REMOVED*** {
+	} else {
 		_p0 = unsafe.Pointer(&_zero)
 	}
 	r0, _, e1 := Syscall(SYS_READ, uintptr(fd), uintptr(_p0), uintptr(len(p)))
@@ -1133,7 +1133,7 @@ func Setdomainname(p []byte) (err error) {
 	var _p0 unsafe.Pointer
 	if len(p) > 0 {
 		_p0 = unsafe.Pointer(&p[0])
-	} ***REMOVED*** {
+	} else {
 		_p0 = unsafe.Pointer(&_zero)
 	}
 	_, _, e1 := Syscall(SYS_SETDOMAINNAME, uintptr(_p0), uintptr(len(p)), 0)
@@ -1149,7 +1149,7 @@ func Sethostname(p []byte) (err error) {
 	var _p0 unsafe.Pointer
 	if len(p) > 0 {
 		_p0 = unsafe.Pointer(&p[0])
-	} ***REMOVED*** {
+	} else {
 		_p0 = unsafe.Pointer(&_zero)
 	}
 	_, _, e1 := Syscall(SYS_SETHOSTNAME, uintptr(_p0), uintptr(len(p)), 0)
@@ -1226,7 +1226,7 @@ func Setxattr(path string, attr string, data []byte, flags int) (err error) {
 	var _p2 unsafe.Pointer
 	if len(data) > 0 {
 		_p2 = unsafe.Pointer(&data[0])
-	} ***REMOVED*** {
+	} else {
 		_p2 = unsafe.Pointer(&_zero)
 	}
 	_, _, e1 := Syscall6(SYS_SETXATTR, uintptr(unsafe.Pointer(_p0)), uintptr(unsafe.Pointer(_p1)), uintptr(_p2), uintptr(len(data)), uintptr(flags), 0)
@@ -1369,7 +1369,7 @@ func write(fd int, p []byte) (n int, err error) {
 	var _p0 unsafe.Pointer
 	if len(p) > 0 {
 		_p0 = unsafe.Pointer(&p[0])
-	} ***REMOVED*** {
+	} else {
 		_p0 = unsafe.Pointer(&_zero)
 	}
 	r0, _, e1 := Syscall(SYS_WRITE, uintptr(fd), uintptr(_p0), uintptr(len(p)))
@@ -1428,7 +1428,7 @@ func Madvise(b []byte, advice int) (err error) {
 	var _p0 unsafe.Pointer
 	if len(b) > 0 {
 		_p0 = unsafe.Pointer(&b[0])
-	} ***REMOVED*** {
+	} else {
 		_p0 = unsafe.Pointer(&_zero)
 	}
 	_, _, e1 := Syscall(SYS_MADVISE, uintptr(_p0), uintptr(len(b)), uintptr(advice))
@@ -1444,7 +1444,7 @@ func Mprotect(b []byte, prot int) (err error) {
 	var _p0 unsafe.Pointer
 	if len(b) > 0 {
 		_p0 = unsafe.Pointer(&b[0])
-	} ***REMOVED*** {
+	} else {
 		_p0 = unsafe.Pointer(&_zero)
 	}
 	_, _, e1 := Syscall(SYS_MPROTECT, uintptr(_p0), uintptr(len(b)), uintptr(prot))
@@ -1460,7 +1460,7 @@ func Mlock(b []byte) (err error) {
 	var _p0 unsafe.Pointer
 	if len(b) > 0 {
 		_p0 = unsafe.Pointer(&b[0])
-	} ***REMOVED*** {
+	} else {
 		_p0 = unsafe.Pointer(&_zero)
 	}
 	_, _, e1 := Syscall(SYS_MLOCK, uintptr(_p0), uintptr(len(b)), 0)
@@ -1486,7 +1486,7 @@ func Msync(b []byte, flags int) (err error) {
 	var _p0 unsafe.Pointer
 	if len(b) > 0 {
 		_p0 = unsafe.Pointer(&b[0])
-	} ***REMOVED*** {
+	} else {
 		_p0 = unsafe.Pointer(&_zero)
 	}
 	_, _, e1 := Syscall(SYS_MSYNC, uintptr(_p0), uintptr(len(b)), uintptr(flags))
@@ -1502,7 +1502,7 @@ func Munlock(b []byte) (err error) {
 	var _p0 unsafe.Pointer
 	if len(b) > 0 {
 		_p0 = unsafe.Pointer(&b[0])
-	} ***REMOVED*** {
+	} else {
 		_p0 = unsafe.Pointer(&_zero)
 	}
 	_, _, e1 := Syscall(SYS_MUNLOCK, uintptr(_p0), uintptr(len(b)), 0)
@@ -1528,7 +1528,7 @@ func EpollWait(epfd int, events []EpollEvent, msec int) (n int, err error) {
 	var _p0 unsafe.Pointer
 	if len(events) > 0 {
 		_p0 = unsafe.Pointer(&events[0])
-	} ***REMOVED*** {
+	} else {
 		_p0 = unsafe.Pointer(&_zero)
 	}
 	r0, _, e1 := Syscall6(SYS_EPOLL_PWAIT, uintptr(epfd), uintptr(_p0), uintptr(len(events)), uintptr(msec), 0, 0)
@@ -1662,7 +1662,7 @@ func Pread(fd int, p []byte, offset int64) (n int, err error) {
 	var _p0 unsafe.Pointer
 	if len(p) > 0 {
 		_p0 = unsafe.Pointer(&p[0])
-	} ***REMOVED*** {
+	} else {
 		_p0 = unsafe.Pointer(&_zero)
 	}
 	r0, _, e1 := Syscall6(SYS_PREAD64, uintptr(fd), uintptr(_p0), uintptr(len(p)), uintptr(offset), 0, 0)
@@ -1679,7 +1679,7 @@ func Pwrite(fd int, p []byte, offset int64) (n int, err error) {
 	var _p0 unsafe.Pointer
 	if len(p) > 0 {
 		_p0 = unsafe.Pointer(&p[0])
-	} ***REMOVED*** {
+	} else {
 		_p0 = unsafe.Pointer(&_zero)
 	}
 	r0, _, e1 := Syscall6(SYS_PWRITE64, uintptr(fd), uintptr(_p0), uintptr(len(p)), uintptr(offset), 0, 0)
@@ -1703,7 +1703,7 @@ func Seek(fd int, offset int64, whence int) (off int64, err error) {
 
 // THIS FILE IS GENERATED BY THE COMMAND AT THE TOP; DO NOT EDIT
 
-func send***REMOVED***le(outfd int, infd int, offset *int64, count int) (written int, err error) {
+func sendfile(outfd int, infd int, offset *int64, count int) (written int, err error) {
 	r0, _, e1 := Syscall6(SYS_SENDFILE, uintptr(outfd), uintptr(infd), uintptr(unsafe.Pointer(offset)), uintptr(count), 0, 0)
 	written = int(r0)
 	if e1 != 0 {
@@ -1973,7 +1973,7 @@ func recvfrom(fd int, p []byte, flags int, from *RawSockaddrAny, fromlen *_Sockl
 	var _p0 unsafe.Pointer
 	if len(p) > 0 {
 		_p0 = unsafe.Pointer(&p[0])
-	} ***REMOVED*** {
+	} else {
 		_p0 = unsafe.Pointer(&_zero)
 	}
 	r0, _, e1 := Syscall6(SYS_RECVFROM, uintptr(fd), uintptr(_p0), uintptr(len(p)), uintptr(flags), uintptr(unsafe.Pointer(from)), uintptr(unsafe.Pointer(fromlen)))
@@ -1990,7 +1990,7 @@ func sendto(s int, buf []byte, flags int, to unsafe.Pointer, addrlen _Socklen) (
 	var _p0 unsafe.Pointer
 	if len(buf) > 0 {
 		_p0 = unsafe.Pointer(&buf[0])
-	} ***REMOVED*** {
+	} else {
 		_p0 = unsafe.Pointer(&_zero)
 	}
 	_, _, e1 := Syscall6(SYS_SENDTO, uintptr(s), uintptr(_p0), uintptr(len(buf)), uintptr(flags), uintptr(to), uintptr(addrlen))

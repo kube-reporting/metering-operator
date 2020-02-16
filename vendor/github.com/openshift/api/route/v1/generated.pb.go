@@ -5,7 +5,7 @@
 /*
 	Package v1 is a generated protocol buffer package.
 
-	It is generated from these ***REMOVED***les:
+	It is generated from these files:
 		github.com/openshift/api/route/v1/generated.proto
 
 	It has these top-level messages:
@@ -18,7 +18,7 @@
 		RouteStatus
 		RouteTargetReference
 		RouterShard
-		TLSCon***REMOVED***g
+		TLSConfig
 */
 package v1
 
@@ -40,7 +40,7 @@ var _ = proto.Marshal
 var _ = fmt.Errorf
 var _ = math.Inf
 
-// This is a compile-time assertion to ensure that this generated ***REMOVED***le
+// This is a compile-time assertion to ensure that this generated file
 // is compatible with the proto package it is being compiled against.
 // A compilation error at this line likely means your copy of the
 // proto package needs to be updated.
@@ -48,43 +48,43 @@ const _ = proto.GoGoProtoPackageIsVersion2 // please upgrade the proto package
 
 func (m *Route) Reset()                    { *m = Route{} }
 func (*Route) ProtoMessage()               {}
-func (*Route) Descriptor() ([]byte, []int) { return ***REMOVED***leDescriptorGenerated, []int{0} }
+func (*Route) Descriptor() ([]byte, []int) { return fileDescriptorGenerated, []int{0} }
 
 func (m *RouteIngress) Reset()                    { *m = RouteIngress{} }
 func (*RouteIngress) ProtoMessage()               {}
-func (*RouteIngress) Descriptor() ([]byte, []int) { return ***REMOVED***leDescriptorGenerated, []int{1} }
+func (*RouteIngress) Descriptor() ([]byte, []int) { return fileDescriptorGenerated, []int{1} }
 
 func (m *RouteIngressCondition) Reset()                    { *m = RouteIngressCondition{} }
 func (*RouteIngressCondition) ProtoMessage()               {}
-func (*RouteIngressCondition) Descriptor() ([]byte, []int) { return ***REMOVED***leDescriptorGenerated, []int{2} }
+func (*RouteIngressCondition) Descriptor() ([]byte, []int) { return fileDescriptorGenerated, []int{2} }
 
 func (m *RouteList) Reset()                    { *m = RouteList{} }
 func (*RouteList) ProtoMessage()               {}
-func (*RouteList) Descriptor() ([]byte, []int) { return ***REMOVED***leDescriptorGenerated, []int{3} }
+func (*RouteList) Descriptor() ([]byte, []int) { return fileDescriptorGenerated, []int{3} }
 
 func (m *RoutePort) Reset()                    { *m = RoutePort{} }
 func (*RoutePort) ProtoMessage()               {}
-func (*RoutePort) Descriptor() ([]byte, []int) { return ***REMOVED***leDescriptorGenerated, []int{4} }
+func (*RoutePort) Descriptor() ([]byte, []int) { return fileDescriptorGenerated, []int{4} }
 
 func (m *RouteSpec) Reset()                    { *m = RouteSpec{} }
 func (*RouteSpec) ProtoMessage()               {}
-func (*RouteSpec) Descriptor() ([]byte, []int) { return ***REMOVED***leDescriptorGenerated, []int{5} }
+func (*RouteSpec) Descriptor() ([]byte, []int) { return fileDescriptorGenerated, []int{5} }
 
 func (m *RouteStatus) Reset()                    { *m = RouteStatus{} }
 func (*RouteStatus) ProtoMessage()               {}
-func (*RouteStatus) Descriptor() ([]byte, []int) { return ***REMOVED***leDescriptorGenerated, []int{6} }
+func (*RouteStatus) Descriptor() ([]byte, []int) { return fileDescriptorGenerated, []int{6} }
 
 func (m *RouteTargetReference) Reset()                    { *m = RouteTargetReference{} }
 func (*RouteTargetReference) ProtoMessage()               {}
-func (*RouteTargetReference) Descriptor() ([]byte, []int) { return ***REMOVED***leDescriptorGenerated, []int{7} }
+func (*RouteTargetReference) Descriptor() ([]byte, []int) { return fileDescriptorGenerated, []int{7} }
 
 func (m *RouterShard) Reset()                    { *m = RouterShard{} }
 func (*RouterShard) ProtoMessage()               {}
-func (*RouterShard) Descriptor() ([]byte, []int) { return ***REMOVED***leDescriptorGenerated, []int{8} }
+func (*RouterShard) Descriptor() ([]byte, []int) { return fileDescriptorGenerated, []int{8} }
 
-func (m *TLSCon***REMOVED***g) Reset()                    { *m = TLSCon***REMOVED***g{} }
-func (*TLSCon***REMOVED***g) ProtoMessage()               {}
-func (*TLSCon***REMOVED***g) Descriptor() ([]byte, []int) { return ***REMOVED***leDescriptorGenerated, []int{9} }
+func (m *TLSConfig) Reset()                    { *m = TLSConfig{} }
+func (*TLSConfig) ProtoMessage()               {}
+func (*TLSConfig) Descriptor() ([]byte, []int) { return fileDescriptorGenerated, []int{9} }
 
 func init() {
 	proto.RegisterType((*Route)(nil), "github.com.openshift.api.route.v1.Route")
@@ -96,7 +96,7 @@ func init() {
 	proto.RegisterType((*RouteStatus)(nil), "github.com.openshift.api.route.v1.RouteStatus")
 	proto.RegisterType((*RouteTargetReference)(nil), "github.com.openshift.api.route.v1.RouteTargetReference")
 	proto.RegisterType((*RouterShard)(nil), "github.com.openshift.api.route.v1.RouterShard")
-	proto.RegisterType((*TLSCon***REMOVED***g)(nil), "github.com.openshift.api.route.v1.TLSCon***REMOVED***g")
+	proto.RegisterType((*TLSConfig)(nil), "github.com.openshift.api.route.v1.TLSConfig")
 }
 func (m *Route) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
@@ -446,12 +446,12 @@ func (m *RouterShard) MarshalTo(dAtA []byte) (int, error) {
 	i += copy(dAtA[i:], m.ShardName)
 	dAtA[i] = 0x12
 	i++
-	i = encodeVarintGenerated(dAtA, i, uint64(len(m.DNSSuf***REMOVED***x)))
-	i += copy(dAtA[i:], m.DNSSuf***REMOVED***x)
+	i = encodeVarintGenerated(dAtA, i, uint64(len(m.DNSSuffix)))
+	i += copy(dAtA[i:], m.DNSSuffix)
 	return i, nil
 }
 
-func (m *TLSCon***REMOVED***g) Marshal() (dAtA []byte, err error) {
+func (m *TLSConfig) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalTo(dAtA)
@@ -461,7 +461,7 @@ func (m *TLSCon***REMOVED***g) Marshal() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *TLSCon***REMOVED***g) MarshalTo(dAtA []byte) (int, error) {
+func (m *TLSConfig) MarshalTo(dAtA []byte) (int, error) {
 	var i int
 	_ = i
 	var l int
@@ -472,20 +472,20 @@ func (m *TLSCon***REMOVED***g) MarshalTo(dAtA []byte) (int, error) {
 	i += copy(dAtA[i:], m.Termination)
 	dAtA[i] = 0x12
 	i++
-	i = encodeVarintGenerated(dAtA, i, uint64(len(m.Certi***REMOVED***cate)))
-	i += copy(dAtA[i:], m.Certi***REMOVED***cate)
+	i = encodeVarintGenerated(dAtA, i, uint64(len(m.Certificate)))
+	i += copy(dAtA[i:], m.Certificate)
 	dAtA[i] = 0x1a
 	i++
 	i = encodeVarintGenerated(dAtA, i, uint64(len(m.Key)))
 	i += copy(dAtA[i:], m.Key)
 	dAtA[i] = 0x22
 	i++
-	i = encodeVarintGenerated(dAtA, i, uint64(len(m.CACerti***REMOVED***cate)))
-	i += copy(dAtA[i:], m.CACerti***REMOVED***cate)
+	i = encodeVarintGenerated(dAtA, i, uint64(len(m.CACertificate)))
+	i += copy(dAtA[i:], m.CACertificate)
 	dAtA[i] = 0x2a
 	i++
-	i = encodeVarintGenerated(dAtA, i, uint64(len(m.DestinationCACerti***REMOVED***cate)))
-	i += copy(dAtA[i:], m.DestinationCACerti***REMOVED***cate)
+	i = encodeVarintGenerated(dAtA, i, uint64(len(m.DestinationCACertificate)))
+	i += copy(dAtA[i:], m.DestinationCACertificate)
 	dAtA[i] = 0x32
 	i++
 	i = encodeVarintGenerated(dAtA, i, uint64(len(m.InsecureEdgeTerminationPolicy)))
@@ -650,23 +650,23 @@ func (m *RouterShard) Size() (n int) {
 	_ = l
 	l = len(m.ShardName)
 	n += 1 + l + sovGenerated(uint64(l))
-	l = len(m.DNSSuf***REMOVED***x)
+	l = len(m.DNSSuffix)
 	n += 1 + l + sovGenerated(uint64(l))
 	return n
 }
 
-func (m *TLSCon***REMOVED***g) Size() (n int) {
+func (m *TLSConfig) Size() (n int) {
 	var l int
 	_ = l
 	l = len(m.Termination)
 	n += 1 + l + sovGenerated(uint64(l))
-	l = len(m.Certi***REMOVED***cate)
+	l = len(m.Certificate)
 	n += 1 + l + sovGenerated(uint64(l))
 	l = len(m.Key)
 	n += 1 + l + sovGenerated(uint64(l))
-	l = len(m.CACerti***REMOVED***cate)
+	l = len(m.CACertificate)
 	n += 1 + l + sovGenerated(uint64(l))
-	l = len(m.DestinationCACerti***REMOVED***cate)
+	l = len(m.DestinationCACertificate)
 	n += 1 + l + sovGenerated(uint64(l))
 	l = len(m.InsecureEdgeTerminationPolicy)
 	n += 1 + l + sovGenerated(uint64(l))
@@ -757,7 +757,7 @@ func (this *RouteSpec) String() string {
 		`To:` + strings.Replace(strings.Replace(this.To.String(), "RouteTargetReference", "RouteTargetReference", 1), `&`, ``, 1) + `,`,
 		`AlternateBackends:` + strings.Replace(strings.Replace(fmt.Sprintf("%v", this.AlternateBackends), "RouteTargetReference", "RouteTargetReference", 1), `&`, ``, 1) + `,`,
 		`Port:` + strings.Replace(fmt.Sprintf("%v", this.Port), "RoutePort", "RoutePort", 1) + `,`,
-		`TLS:` + strings.Replace(fmt.Sprintf("%v", this.TLS), "TLSCon***REMOVED***g", "TLSCon***REMOVED***g", 1) + `,`,
+		`TLS:` + strings.Replace(fmt.Sprintf("%v", this.TLS), "TLSConfig", "TLSConfig", 1) + `,`,
 		`WildcardPolicy:` + fmt.Sprintf("%v", this.WildcardPolicy) + `,`,
 		`}`,
 	}, "")
@@ -791,21 +791,21 @@ func (this *RouterShard) String() string {
 	}
 	s := strings.Join([]string{`&RouterShard{`,
 		`ShardName:` + fmt.Sprintf("%v", this.ShardName) + `,`,
-		`DNSSuf***REMOVED***x:` + fmt.Sprintf("%v", this.DNSSuf***REMOVED***x) + `,`,
+		`DNSSuffix:` + fmt.Sprintf("%v", this.DNSSuffix) + `,`,
 		`}`,
 	}, "")
 	return s
 }
-func (this *TLSCon***REMOVED***g) String() string {
+func (this *TLSConfig) String() string {
 	if this == nil {
 		return "nil"
 	}
-	s := strings.Join([]string{`&TLSCon***REMOVED***g{`,
+	s := strings.Join([]string{`&TLSConfig{`,
 		`Termination:` + fmt.Sprintf("%v", this.Termination) + `,`,
-		`Certi***REMOVED***cate:` + fmt.Sprintf("%v", this.Certi***REMOVED***cate) + `,`,
+		`Certificate:` + fmt.Sprintf("%v", this.Certificate) + `,`,
 		`Key:` + fmt.Sprintf("%v", this.Key) + `,`,
-		`CACerti***REMOVED***cate:` + fmt.Sprintf("%v", this.CACerti***REMOVED***cate) + `,`,
-		`DestinationCACerti***REMOVED***cate:` + fmt.Sprintf("%v", this.DestinationCACerti***REMOVED***cate) + `,`,
+		`CACertificate:` + fmt.Sprintf("%v", this.CACertificate) + `,`,
+		`DestinationCACertificate:` + fmt.Sprintf("%v", this.DestinationCACertificate) + `,`,
 		`InsecureEdgeTerminationPolicy:` + fmt.Sprintf("%v", this.InsecureEdgeTerminationPolicy) + `,`,
 		`}`,
 	}, "")
@@ -839,18 +839,18 @@ func (m *Route) Unmarshal(dAtA []byte) error {
 				break
 			}
 		}
-		***REMOVED***eldNum := int32(wire >> 3)
+		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
 			return fmt.Errorf("proto: Route: wiretype end group for non-group")
 		}
-		if ***REMOVED***eldNum <= 0 {
-			return fmt.Errorf("proto: Route: illegal tag %d (wire type %d)", ***REMOVED***eldNum, wire)
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: Route: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
-		switch ***REMOVED***eldNum {
+		switch fieldNum {
 		case 1:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for ***REMOVED***eld ObjectMeta", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field ObjectMeta", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -880,7 +880,7 @@ func (m *Route) Unmarshal(dAtA []byte) error {
 			iNdEx = postIndex
 		case 2:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for ***REMOVED***eld Spec", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field Spec", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -910,7 +910,7 @@ func (m *Route) Unmarshal(dAtA []byte) error {
 			iNdEx = postIndex
 		case 3:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for ***REMOVED***eld Status", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field Status", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -979,18 +979,18 @@ func (m *RouteIngress) Unmarshal(dAtA []byte) error {
 				break
 			}
 		}
-		***REMOVED***eldNum := int32(wire >> 3)
+		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
 			return fmt.Errorf("proto: RouteIngress: wiretype end group for non-group")
 		}
-		if ***REMOVED***eldNum <= 0 {
-			return fmt.Errorf("proto: RouteIngress: illegal tag %d (wire type %d)", ***REMOVED***eldNum, wire)
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: RouteIngress: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
-		switch ***REMOVED***eldNum {
+		switch fieldNum {
 		case 1:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for ***REMOVED***eld Host", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field Host", wireType)
 			}
 			var stringLen uint64
 			for shift := uint(0); ; shift += 7 {
@@ -1019,7 +1019,7 @@ func (m *RouteIngress) Unmarshal(dAtA []byte) error {
 			iNdEx = postIndex
 		case 2:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for ***REMOVED***eld RouterName", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field RouterName", wireType)
 			}
 			var stringLen uint64
 			for shift := uint(0); ; shift += 7 {
@@ -1048,7 +1048,7 @@ func (m *RouteIngress) Unmarshal(dAtA []byte) error {
 			iNdEx = postIndex
 		case 3:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for ***REMOVED***eld Conditions", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field Conditions", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -1079,7 +1079,7 @@ func (m *RouteIngress) Unmarshal(dAtA []byte) error {
 			iNdEx = postIndex
 		case 4:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for ***REMOVED***eld WildcardPolicy", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field WildcardPolicy", wireType)
 			}
 			var stringLen uint64
 			for shift := uint(0); ; shift += 7 {
@@ -1108,7 +1108,7 @@ func (m *RouteIngress) Unmarshal(dAtA []byte) error {
 			iNdEx = postIndex
 		case 5:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for ***REMOVED***eld RouterCanonicalHostname", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field RouterCanonicalHostname", wireType)
 			}
 			var stringLen uint64
 			for shift := uint(0); ; shift += 7 {
@@ -1176,18 +1176,18 @@ func (m *RouteIngressCondition) Unmarshal(dAtA []byte) error {
 				break
 			}
 		}
-		***REMOVED***eldNum := int32(wire >> 3)
+		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
 			return fmt.Errorf("proto: RouteIngressCondition: wiretype end group for non-group")
 		}
-		if ***REMOVED***eldNum <= 0 {
-			return fmt.Errorf("proto: RouteIngressCondition: illegal tag %d (wire type %d)", ***REMOVED***eldNum, wire)
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: RouteIngressCondition: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
-		switch ***REMOVED***eldNum {
+		switch fieldNum {
 		case 1:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for ***REMOVED***eld Type", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field Type", wireType)
 			}
 			var stringLen uint64
 			for shift := uint(0); ; shift += 7 {
@@ -1216,7 +1216,7 @@ func (m *RouteIngressCondition) Unmarshal(dAtA []byte) error {
 			iNdEx = postIndex
 		case 2:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for ***REMOVED***eld Status", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field Status", wireType)
 			}
 			var stringLen uint64
 			for shift := uint(0); ; shift += 7 {
@@ -1245,7 +1245,7 @@ func (m *RouteIngressCondition) Unmarshal(dAtA []byte) error {
 			iNdEx = postIndex
 		case 3:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for ***REMOVED***eld Reason", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field Reason", wireType)
 			}
 			var stringLen uint64
 			for shift := uint(0); ; shift += 7 {
@@ -1274,7 +1274,7 @@ func (m *RouteIngressCondition) Unmarshal(dAtA []byte) error {
 			iNdEx = postIndex
 		case 4:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for ***REMOVED***eld Message", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field Message", wireType)
 			}
 			var stringLen uint64
 			for shift := uint(0); ; shift += 7 {
@@ -1303,7 +1303,7 @@ func (m *RouteIngressCondition) Unmarshal(dAtA []byte) error {
 			iNdEx = postIndex
 		case 5:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for ***REMOVED***eld LastTransitionTime", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field LastTransitionTime", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -1375,18 +1375,18 @@ func (m *RouteList) Unmarshal(dAtA []byte) error {
 				break
 			}
 		}
-		***REMOVED***eldNum := int32(wire >> 3)
+		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
 			return fmt.Errorf("proto: RouteList: wiretype end group for non-group")
 		}
-		if ***REMOVED***eldNum <= 0 {
-			return fmt.Errorf("proto: RouteList: illegal tag %d (wire type %d)", ***REMOVED***eldNum, wire)
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: RouteList: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
-		switch ***REMOVED***eldNum {
+		switch fieldNum {
 		case 1:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for ***REMOVED***eld ListMeta", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field ListMeta", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -1416,7 +1416,7 @@ func (m *RouteList) Unmarshal(dAtA []byte) error {
 			iNdEx = postIndex
 		case 2:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for ***REMOVED***eld Items", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field Items", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -1486,18 +1486,18 @@ func (m *RoutePort) Unmarshal(dAtA []byte) error {
 				break
 			}
 		}
-		***REMOVED***eldNum := int32(wire >> 3)
+		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
 			return fmt.Errorf("proto: RoutePort: wiretype end group for non-group")
 		}
-		if ***REMOVED***eldNum <= 0 {
-			return fmt.Errorf("proto: RoutePort: illegal tag %d (wire type %d)", ***REMOVED***eldNum, wire)
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: RoutePort: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
-		switch ***REMOVED***eldNum {
+		switch fieldNum {
 		case 1:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for ***REMOVED***eld TargetPort", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field TargetPort", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -1566,18 +1566,18 @@ func (m *RouteSpec) Unmarshal(dAtA []byte) error {
 				break
 			}
 		}
-		***REMOVED***eldNum := int32(wire >> 3)
+		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
 			return fmt.Errorf("proto: RouteSpec: wiretype end group for non-group")
 		}
-		if ***REMOVED***eldNum <= 0 {
-			return fmt.Errorf("proto: RouteSpec: illegal tag %d (wire type %d)", ***REMOVED***eldNum, wire)
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: RouteSpec: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
-		switch ***REMOVED***eldNum {
+		switch fieldNum {
 		case 1:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for ***REMOVED***eld Host", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field Host", wireType)
 			}
 			var stringLen uint64
 			for shift := uint(0); ; shift += 7 {
@@ -1606,7 +1606,7 @@ func (m *RouteSpec) Unmarshal(dAtA []byte) error {
 			iNdEx = postIndex
 		case 2:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for ***REMOVED***eld Path", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field Path", wireType)
 			}
 			var stringLen uint64
 			for shift := uint(0); ; shift += 7 {
@@ -1635,7 +1635,7 @@ func (m *RouteSpec) Unmarshal(dAtA []byte) error {
 			iNdEx = postIndex
 		case 3:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for ***REMOVED***eld To", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field To", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -1665,7 +1665,7 @@ func (m *RouteSpec) Unmarshal(dAtA []byte) error {
 			iNdEx = postIndex
 		case 4:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for ***REMOVED***eld AlternateBackends", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field AlternateBackends", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -1696,7 +1696,7 @@ func (m *RouteSpec) Unmarshal(dAtA []byte) error {
 			iNdEx = postIndex
 		case 5:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for ***REMOVED***eld Port", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field Port", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -1729,7 +1729,7 @@ func (m *RouteSpec) Unmarshal(dAtA []byte) error {
 			iNdEx = postIndex
 		case 6:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for ***REMOVED***eld TLS", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field TLS", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -1754,7 +1754,7 @@ func (m *RouteSpec) Unmarshal(dAtA []byte) error {
 				return io.ErrUnexpectedEOF
 			}
 			if m.TLS == nil {
-				m.TLS = &TLSCon***REMOVED***g{}
+				m.TLS = &TLSConfig{}
 			}
 			if err := m.TLS.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
@@ -1762,7 +1762,7 @@ func (m *RouteSpec) Unmarshal(dAtA []byte) error {
 			iNdEx = postIndex
 		case 7:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for ***REMOVED***eld WildcardPolicy", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field WildcardPolicy", wireType)
 			}
 			var stringLen uint64
 			for shift := uint(0); ; shift += 7 {
@@ -1830,18 +1830,18 @@ func (m *RouteStatus) Unmarshal(dAtA []byte) error {
 				break
 			}
 		}
-		***REMOVED***eldNum := int32(wire >> 3)
+		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
 			return fmt.Errorf("proto: RouteStatus: wiretype end group for non-group")
 		}
-		if ***REMOVED***eldNum <= 0 {
-			return fmt.Errorf("proto: RouteStatus: illegal tag %d (wire type %d)", ***REMOVED***eldNum, wire)
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: RouteStatus: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
-		switch ***REMOVED***eldNum {
+		switch fieldNum {
 		case 1:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for ***REMOVED***eld Ingress", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field Ingress", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -1911,18 +1911,18 @@ func (m *RouteTargetReference) Unmarshal(dAtA []byte) error {
 				break
 			}
 		}
-		***REMOVED***eldNum := int32(wire >> 3)
+		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
 			return fmt.Errorf("proto: RouteTargetReference: wiretype end group for non-group")
 		}
-		if ***REMOVED***eldNum <= 0 {
-			return fmt.Errorf("proto: RouteTargetReference: illegal tag %d (wire type %d)", ***REMOVED***eldNum, wire)
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: RouteTargetReference: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
-		switch ***REMOVED***eldNum {
+		switch fieldNum {
 		case 1:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for ***REMOVED***eld Kind", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field Kind", wireType)
 			}
 			var stringLen uint64
 			for shift := uint(0); ; shift += 7 {
@@ -1951,7 +1951,7 @@ func (m *RouteTargetReference) Unmarshal(dAtA []byte) error {
 			iNdEx = postIndex
 		case 2:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for ***REMOVED***eld Name", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field Name", wireType)
 			}
 			var stringLen uint64
 			for shift := uint(0); ; shift += 7 {
@@ -1980,7 +1980,7 @@ func (m *RouteTargetReference) Unmarshal(dAtA []byte) error {
 			iNdEx = postIndex
 		case 3:
 			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for ***REMOVED***eld Weight", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field Weight", wireType)
 			}
 			var v int32
 			for shift := uint(0); ; shift += 7 {
@@ -2039,18 +2039,18 @@ func (m *RouterShard) Unmarshal(dAtA []byte) error {
 				break
 			}
 		}
-		***REMOVED***eldNum := int32(wire >> 3)
+		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
 			return fmt.Errorf("proto: RouterShard: wiretype end group for non-group")
 		}
-		if ***REMOVED***eldNum <= 0 {
-			return fmt.Errorf("proto: RouterShard: illegal tag %d (wire type %d)", ***REMOVED***eldNum, wire)
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: RouterShard: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
-		switch ***REMOVED***eldNum {
+		switch fieldNum {
 		case 1:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for ***REMOVED***eld ShardName", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field ShardName", wireType)
 			}
 			var stringLen uint64
 			for shift := uint(0); ; shift += 7 {
@@ -2079,7 +2079,7 @@ func (m *RouterShard) Unmarshal(dAtA []byte) error {
 			iNdEx = postIndex
 		case 2:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for ***REMOVED***eld DNSSuf***REMOVED***x", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field DNSSuffix", wireType)
 			}
 			var stringLen uint64
 			for shift := uint(0); ; shift += 7 {
@@ -2104,7 +2104,7 @@ func (m *RouterShard) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.DNSSuf***REMOVED***x = string(dAtA[iNdEx:postIndex])
+			m.DNSSuffix = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
@@ -2127,7 +2127,7 @@ func (m *RouterShard) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *TLSCon***REMOVED***g) Unmarshal(dAtA []byte) error {
+func (m *TLSConfig) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -2147,18 +2147,18 @@ func (m *TLSCon***REMOVED***g) Unmarshal(dAtA []byte) error {
 				break
 			}
 		}
-		***REMOVED***eldNum := int32(wire >> 3)
+		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: TLSCon***REMOVED***g: wiretype end group for non-group")
+			return fmt.Errorf("proto: TLSConfig: wiretype end group for non-group")
 		}
-		if ***REMOVED***eldNum <= 0 {
-			return fmt.Errorf("proto: TLSCon***REMOVED***g: illegal tag %d (wire type %d)", ***REMOVED***eldNum, wire)
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: TLSConfig: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
-		switch ***REMOVED***eldNum {
+		switch fieldNum {
 		case 1:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for ***REMOVED***eld Termination", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field Termination", wireType)
 			}
 			var stringLen uint64
 			for shift := uint(0); ; shift += 7 {
@@ -2187,7 +2187,7 @@ func (m *TLSCon***REMOVED***g) Unmarshal(dAtA []byte) error {
 			iNdEx = postIndex
 		case 2:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for ***REMOVED***eld Certi***REMOVED***cate", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field Certificate", wireType)
 			}
 			var stringLen uint64
 			for shift := uint(0); ; shift += 7 {
@@ -2212,11 +2212,11 @@ func (m *TLSCon***REMOVED***g) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.Certi***REMOVED***cate = string(dAtA[iNdEx:postIndex])
+			m.Certificate = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		case 3:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for ***REMOVED***eld Key", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field Key", wireType)
 			}
 			var stringLen uint64
 			for shift := uint(0); ; shift += 7 {
@@ -2245,7 +2245,7 @@ func (m *TLSCon***REMOVED***g) Unmarshal(dAtA []byte) error {
 			iNdEx = postIndex
 		case 4:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for ***REMOVED***eld CACerti***REMOVED***cate", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field CACertificate", wireType)
 			}
 			var stringLen uint64
 			for shift := uint(0); ; shift += 7 {
@@ -2270,11 +2270,11 @@ func (m *TLSCon***REMOVED***g) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.CACerti***REMOVED***cate = string(dAtA[iNdEx:postIndex])
+			m.CACertificate = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		case 5:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for ***REMOVED***eld DestinationCACerti***REMOVED***cate", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field DestinationCACertificate", wireType)
 			}
 			var stringLen uint64
 			for shift := uint(0); ; shift += 7 {
@@ -2299,11 +2299,11 @@ func (m *TLSCon***REMOVED***g) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.DestinationCACerti***REMOVED***cate = string(dAtA[iNdEx:postIndex])
+			m.DestinationCACertificate = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		case 6:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for ***REMOVED***eld InsecureEdgeTerminationPolicy", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field InsecureEdgeTerminationPolicy", wireType)
 			}
 			var stringLen uint64
 			for shift := uint(0); ; shift += 7 {
@@ -2457,10 +2457,10 @@ var (
 )
 
 func init() {
-	proto.RegisterFile("github.com/openshift/api/route/v1/generated.proto", ***REMOVED***leDescriptorGenerated)
+	proto.RegisterFile("github.com/openshift/api/route/v1/generated.proto", fileDescriptorGenerated)
 }
 
-var ***REMOVED***leDescriptorGenerated = []byte{
+var fileDescriptorGenerated = []byte{
 	// 1150 bytes of a gzipped FileDescriptorProto
 	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xa4, 0x55, 0x4f, 0x6f, 0x1b, 0x45,
 	0x14, 0x8f, 0xff, 0x26, 0x1e, 0x37, 0x81, 0x0c, 0x94, 0xba, 0x91, 0x62, 0xa7, 0x7b, 0x40, 0x29,

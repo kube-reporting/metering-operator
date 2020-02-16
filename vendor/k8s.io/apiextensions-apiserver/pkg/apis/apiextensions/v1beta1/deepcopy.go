@@ -2,7 +2,7 @@
 Copyright 2017 The Kubernetes Authors.
 
 Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this ***REMOVED***le except in compliance with the License.
+you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
 
     http://www.apache.org/licenses/LICENSE-2.0
@@ -10,13 +10,13 @@ You may obtain a copy of the License at
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the speci***REMOVED***c language governing permissions and
+See the License for the specific language governing permissions and
 limitations under the License.
 */
 
 package v1beta1
 
-// TODO: Update this after a tag is created for interface ***REMOVED***elds in DeepCopy
+// TODO: Update this after a tag is created for interface fields in DeepCopy
 func (in *JSONSchemaProps) DeepCopy() *JSONSchemaProps {
 	if in == nil {
 		return nil
@@ -28,7 +28,7 @@ func (in *JSONSchemaProps) DeepCopy() *JSONSchemaProps {
 		in, out := &in.Ref, &out.Ref
 		if *in == nil {
 			*out = nil
-		} ***REMOVED*** {
+		} else {
 			*out = new(string)
 			**out = **in
 		}
@@ -38,7 +38,7 @@ func (in *JSONSchemaProps) DeepCopy() *JSONSchemaProps {
 		in, out := &in.Maximum, &out.Maximum
 		if *in == nil {
 			*out = nil
-		} ***REMOVED*** {
+		} else {
 			*out = new(float64)
 			**out = **in
 		}
@@ -48,7 +48,7 @@ func (in *JSONSchemaProps) DeepCopy() *JSONSchemaProps {
 		in, out := &in.Minimum, &out.Minimum
 		if *in == nil {
 			*out = nil
-		} ***REMOVED*** {
+		} else {
 			*out = new(float64)
 			**out = **in
 		}
@@ -58,7 +58,7 @@ func (in *JSONSchemaProps) DeepCopy() *JSONSchemaProps {
 		in, out := &in.MaxLength, &out.MaxLength
 		if *in == nil {
 			*out = nil
-		} ***REMOVED*** {
+		} else {
 			*out = new(int64)
 			**out = **in
 		}
@@ -68,7 +68,7 @@ func (in *JSONSchemaProps) DeepCopy() *JSONSchemaProps {
 		in, out := &in.MinLength, &out.MinLength
 		if *in == nil {
 			*out = nil
-		} ***REMOVED*** {
+		} else {
 			*out = new(int64)
 			**out = **in
 		}
@@ -77,7 +77,7 @@ func (in *JSONSchemaProps) DeepCopy() *JSONSchemaProps {
 		in, out := &in.MaxItems, &out.MaxItems
 		if *in == nil {
 			*out = nil
-		} ***REMOVED*** {
+		} else {
 			*out = new(int64)
 			**out = **in
 		}
@@ -87,7 +87,7 @@ func (in *JSONSchemaProps) DeepCopy() *JSONSchemaProps {
 		in, out := &in.MinItems, &out.MinItems
 		if *in == nil {
 			*out = nil
-		} ***REMOVED*** {
+		} else {
 			*out = new(int64)
 			**out = **in
 		}
@@ -97,7 +97,7 @@ func (in *JSONSchemaProps) DeepCopy() *JSONSchemaProps {
 		in, out := &in.MultipleOf, &out.MultipleOf
 		if *in == nil {
 			*out = nil
-		} ***REMOVED*** {
+		} else {
 			*out = new(float64)
 			**out = **in
 		}
@@ -107,7 +107,7 @@ func (in *JSONSchemaProps) DeepCopy() *JSONSchemaProps {
 		in, out := &in.MaxProperties, &out.MaxProperties
 		if *in == nil {
 			*out = nil
-		} ***REMOVED*** {
+		} else {
 			*out = new(int64)
 			**out = **in
 		}
@@ -117,7 +117,7 @@ func (in *JSONSchemaProps) DeepCopy() *JSONSchemaProps {
 		in, out := &in.MinProperties, &out.MinProperties
 		if *in == nil {
 			*out = nil
-		} ***REMOVED*** {
+		} else {
 			*out = new(int64)
 			**out = **in
 		}
@@ -133,7 +133,7 @@ func (in *JSONSchemaProps) DeepCopy() *JSONSchemaProps {
 		in, out := &in.Items, &out.Items
 		if *in == nil {
 			*out = nil
-		} ***REMOVED*** {
+		} else {
 			*out = new(JSONSchemaPropsOrArray)
 			(*in).DeepCopyInto(*out)
 		}
@@ -166,7 +166,7 @@ func (in *JSONSchemaProps) DeepCopy() *JSONSchemaProps {
 		in, out := &in.Not, &out.Not
 		if *in == nil {
 			*out = nil
-		} ***REMOVED*** {
+		} else {
 			*out = new(JSONSchemaProps)
 			(*in).DeepCopyInto(*out)
 		}
@@ -184,7 +184,7 @@ func (in *JSONSchemaProps) DeepCopy() *JSONSchemaProps {
 		in, out := &in.AdditionalProperties, &out.AdditionalProperties
 		if *in == nil {
 			*out = nil
-		} ***REMOVED*** {
+		} else {
 			*out = new(JSONSchemaPropsOrBool)
 			(*in).DeepCopyInto(*out)
 		}
@@ -210,15 +210,15 @@ func (in *JSONSchemaProps) DeepCopy() *JSONSchemaProps {
 		in, out := &in.AdditionalItems, &out.AdditionalItems
 		if *in == nil {
 			*out = nil
-		} ***REMOVED*** {
+		} else {
 			*out = new(JSONSchemaPropsOrBool)
 			(*in).DeepCopyInto(*out)
 		}
 	}
 
-	if in.De***REMOVED***nitions != nil {
-		in, out := &in.De***REMOVED***nitions, &out.De***REMOVED***nitions
-		*out = make(JSONSchemaDe***REMOVED***nitions, len(*in))
+	if in.Definitions != nil {
+		in, out := &in.Definitions, &out.Definitions
+		*out = make(JSONSchemaDefinitions, len(*in))
 		for key, val := range *in {
 			(*out)[key] = *val.DeepCopy()
 		}
@@ -228,7 +228,7 @@ func (in *JSONSchemaProps) DeepCopy() *JSONSchemaProps {
 		in, out := &in.ExternalDocs, &out.ExternalDocs
 		if *in == nil {
 			*out = nil
-		} ***REMOVED*** {
+		} else {
 			*out = new(ExternalDocumentation)
 			(*in).DeepCopyInto(*out)
 		}

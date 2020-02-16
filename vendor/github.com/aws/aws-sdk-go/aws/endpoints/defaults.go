@@ -6,7 +6,7 @@ import (
 	"regexp"
 )
 
-// Partition identi***REMOVED***ers
+// Partition identifiers
 const (
 	AwsPartitionID      = "aws"        // AWS Standard partition.
 	AwsCnPartitionID    = "aws-cn"     // AWS China partition.
@@ -17,12 +17,12 @@ const (
 
 // AWS Standard partition's regions.
 const (
-	ApEast1RegionID      = "ap-east-1"      // Asia Paci***REMOVED***c (Hong Kong).
-	ApNortheast1RegionID = "ap-northeast-1" // Asia Paci***REMOVED***c (Tokyo).
-	ApNortheast2RegionID = "ap-northeast-2" // Asia Paci***REMOVED***c (Seoul).
-	ApSouth1RegionID     = "ap-south-1"     // Asia Paci***REMOVED***c (Mumbai).
-	ApSoutheast1RegionID = "ap-southeast-1" // Asia Paci***REMOVED***c (Singapore).
-	ApSoutheast2RegionID = "ap-southeast-2" // Asia Paci***REMOVED***c (Sydney).
+	ApEast1RegionID      = "ap-east-1"      // Asia Pacific (Hong Kong).
+	ApNortheast1RegionID = "ap-northeast-1" // Asia Pacific (Tokyo).
+	ApNortheast2RegionID = "ap-northeast-2" // Asia Pacific (Seoul).
+	ApSouth1RegionID     = "ap-south-1"     // Asia Pacific (Mumbai).
+	ApSoutheast1RegionID = "ap-southeast-1" // Asia Pacific (Singapore).
+	ApSoutheast2RegionID = "ap-southeast-2" // Asia Pacific (Sydney).
 	CaCentral1RegionID   = "ca-central-1"   // Canada (Central).
 	EuCentral1RegionID   = "eu-central-1"   // EU (Frankfurt).
 	EuNorth1RegionID     = "eu-north-1"     // EU (Stockholm).
@@ -94,7 +94,7 @@ func AwsPartition() Partition {
 var awsPartition = partition{
 	ID:        "aws",
 	Name:      "AWS Standard",
-	DNSSuf***REMOVED***x: "amazonaws.com",
+	DNSSuffix: "amazonaws.com",
 	RegionRegex: regionRegex{
 		Regexp: func() *regexp.Regexp {
 			reg, _ := regexp.Compile("^(us|eu|ap|sa|ca|me)\\-\\w+\\-\\d+$")
@@ -102,28 +102,28 @@ var awsPartition = partition{
 		}(),
 	},
 	Defaults: endpoint{
-		Hostname:          "{service}.{region}.{dnsSuf***REMOVED***x}",
+		Hostname:          "{service}.{region}.{dnsSuffix}",
 		Protocols:         []string{"https"},
 		SignatureVersions: []string{"v4"},
 	},
 	Regions: regions{
 		"ap-east-1": region{
-			Description: "Asia Paci***REMOVED***c (Hong Kong)",
+			Description: "Asia Pacific (Hong Kong)",
 		},
 		"ap-northeast-1": region{
-			Description: "Asia Paci***REMOVED***c (Tokyo)",
+			Description: "Asia Pacific (Tokyo)",
 		},
 		"ap-northeast-2": region{
-			Description: "Asia Paci***REMOVED***c (Seoul)",
+			Description: "Asia Pacific (Seoul)",
 		},
 		"ap-south-1": region{
-			Description: "Asia Paci***REMOVED***c (Mumbai)",
+			Description: "Asia Pacific (Mumbai)",
 		},
 		"ap-southeast-1": region{
-			Description: "Asia Paci***REMOVED***c (Singapore)",
+			Description: "Asia Pacific (Singapore)",
 		},
 		"ap-southeast-2": region{
-			Description: "Asia Paci***REMOVED***c (Sydney)",
+			Description: "Asia Pacific (Sydney)",
 		},
 		"ca-central-1": region{
 			Description: "Canada (Central)",
@@ -370,29 +370,29 @@ var awsPartition = partition{
 				"me-south-1":     endpoint{},
 				"sa-east-1":      endpoint{},
 				"us-east-1":      endpoint{},
-				"us-east-1-***REMOVED***ps": endpoint{
-					Hostname: "api-***REMOVED***ps.sagemaker.us-east-1.amazonaws.com",
+				"us-east-1-fips": endpoint{
+					Hostname: "api-fips.sagemaker.us-east-1.amazonaws.com",
 					CredentialScope: credentialScope{
 						Region: "us-east-1",
 					},
 				},
 				"us-east-2": endpoint{},
-				"us-east-2-***REMOVED***ps": endpoint{
-					Hostname: "api-***REMOVED***ps.sagemaker.us-east-2.amazonaws.com",
+				"us-east-2-fips": endpoint{
+					Hostname: "api-fips.sagemaker.us-east-2.amazonaws.com",
 					CredentialScope: credentialScope{
 						Region: "us-east-2",
 					},
 				},
 				"us-west-1": endpoint{},
-				"us-west-1-***REMOVED***ps": endpoint{
-					Hostname: "api-***REMOVED***ps.sagemaker.us-west-1.amazonaws.com",
+				"us-west-1-fips": endpoint{
+					Hostname: "api-fips.sagemaker.us-west-1.amazonaws.com",
 					CredentialScope: credentialScope{
 						Region: "us-west-1",
 					},
 				},
 				"us-west-2": endpoint{},
-				"us-west-2-***REMOVED***ps": endpoint{
-					Hostname: "api-***REMOVED***ps.sagemaker.us-west-2.amazonaws.com",
+				"us-west-2-fips": endpoint{
+					Hostname: "api-fips.sagemaker.us-west-2.amazonaws.com",
 					CredentialScope: credentialScope{
 						Region: "us-west-2",
 					},
@@ -483,8 +483,8 @@ var awsPartition = partition{
 				"ap-southeast-2": endpoint{},
 				"eu-central-1":   endpoint{},
 				"eu-west-1":      endpoint{},
-				"***REMOVED***ps": endpoint{
-					Hostname: "appstream2-***REMOVED***ps.us-west-2.amazonaws.com",
+				"fips": endpoint{
+					Hostname: "appstream2-fips.us-west-2.amazonaws.com",
 					CredentialScope: credentialScope{
 						Region: "us-west-2",
 					},
@@ -821,29 +821,29 @@ var awsPartition = partition{
 				"me-south-1":     endpoint{},
 				"sa-east-1":      endpoint{},
 				"us-east-1":      endpoint{},
-				"us-east-1-***REMOVED***ps": endpoint{
-					Hostname: "codebuild-***REMOVED***ps.us-east-1.amazonaws.com",
+				"us-east-1-fips": endpoint{
+					Hostname: "codebuild-fips.us-east-1.amazonaws.com",
 					CredentialScope: credentialScope{
 						Region: "us-east-1",
 					},
 				},
 				"us-east-2": endpoint{},
-				"us-east-2-***REMOVED***ps": endpoint{
-					Hostname: "codebuild-***REMOVED***ps.us-east-2.amazonaws.com",
+				"us-east-2-fips": endpoint{
+					Hostname: "codebuild-fips.us-east-2.amazonaws.com",
 					CredentialScope: credentialScope{
 						Region: "us-east-2",
 					},
 				},
 				"us-west-1": endpoint{},
-				"us-west-1-***REMOVED***ps": endpoint{
-					Hostname: "codebuild-***REMOVED***ps.us-west-1.amazonaws.com",
+				"us-west-1-fips": endpoint{
+					Hostname: "codebuild-fips.us-west-1.amazonaws.com",
 					CredentialScope: credentialScope{
 						Region: "us-west-1",
 					},
 				},
 				"us-west-2": endpoint{},
-				"us-west-2-***REMOVED***ps": endpoint{
-					Hostname: "codebuild-***REMOVED***ps.us-west-2.amazonaws.com",
+				"us-west-2-fips": endpoint{
+					Hostname: "codebuild-fips.us-west-2.amazonaws.com",
 					CredentialScope: credentialScope{
 						Region: "us-west-2",
 					},
@@ -864,8 +864,8 @@ var awsPartition = partition{
 				"eu-west-1":      endpoint{},
 				"eu-west-2":      endpoint{},
 				"eu-west-3":      endpoint{},
-				"***REMOVED***ps": endpoint{
-					Hostname: "codecommit-***REMOVED***ps.ca-central-1.amazonaws.com",
+				"fips": endpoint{
+					Hostname: "codecommit-fips.ca-central-1.amazonaws.com",
 					CredentialScope: credentialScope{
 						Region: "ca-central-1",
 					},
@@ -895,29 +895,29 @@ var awsPartition = partition{
 				"me-south-1":     endpoint{},
 				"sa-east-1":      endpoint{},
 				"us-east-1":      endpoint{},
-				"us-east-1-***REMOVED***ps": endpoint{
-					Hostname: "codedeploy-***REMOVED***ps.us-east-1.amazonaws.com",
+				"us-east-1-fips": endpoint{
+					Hostname: "codedeploy-fips.us-east-1.amazonaws.com",
 					CredentialScope: credentialScope{
 						Region: "us-east-1",
 					},
 				},
 				"us-east-2": endpoint{},
-				"us-east-2-***REMOVED***ps": endpoint{
-					Hostname: "codedeploy-***REMOVED***ps.us-east-2.amazonaws.com",
+				"us-east-2-fips": endpoint{
+					Hostname: "codedeploy-fips.us-east-2.amazonaws.com",
 					CredentialScope: credentialScope{
 						Region: "us-east-2",
 					},
 				},
 				"us-west-1": endpoint{},
-				"us-west-1-***REMOVED***ps": endpoint{
-					Hostname: "codedeploy-***REMOVED***ps.us-west-1.amazonaws.com",
+				"us-west-1-fips": endpoint{
+					Hostname: "codedeploy-fips.us-west-1.amazonaws.com",
 					CredentialScope: credentialScope{
 						Region: "us-west-1",
 					},
 				},
 				"us-west-2": endpoint{},
-				"us-west-2-***REMOVED***ps": endpoint{
-					Hostname: "codedeploy-***REMOVED***ps.us-west-2.amazonaws.com",
+				"us-west-2-fips": endpoint{
+					Hostname: "codedeploy-fips.us-west-2.amazonaws.com",
 					CredentialScope: credentialScope{
 						Region: "us-west-2",
 					},
@@ -1040,7 +1040,7 @@ var awsPartition = partition{
 				"us-west-2":      endpoint{},
 			},
 		},
-		"con***REMOVED***g": service{
+		"config": service{
 
 			Endpoints: endpoints{
 				"ap-east-1":      endpoint{},
@@ -1114,26 +1114,26 @@ var awsPartition = partition{
 				"eu-west-1":      endpoint{},
 				"eu-west-2":      endpoint{},
 				"eu-west-3":      endpoint{},
-				"***REMOVED***ps-us-east-1": endpoint{
-					Hostname: "datasync-***REMOVED***ps.us-east-1.amazonaws.com",
+				"fips-us-east-1": endpoint{
+					Hostname: "datasync-fips.us-east-1.amazonaws.com",
 					CredentialScope: credentialScope{
 						Region: "us-east-1",
 					},
 				},
-				"***REMOVED***ps-us-east-2": endpoint{
-					Hostname: "datasync-***REMOVED***ps.us-east-2.amazonaws.com",
+				"fips-us-east-2": endpoint{
+					Hostname: "datasync-fips.us-east-2.amazonaws.com",
 					CredentialScope: credentialScope{
 						Region: "us-east-2",
 					},
 				},
-				"***REMOVED***ps-us-west-1": endpoint{
-					Hostname: "datasync-***REMOVED***ps.us-west-1.amazonaws.com",
+				"fips-us-west-1": endpoint{
+					Hostname: "datasync-fips.us-west-1.amazonaws.com",
 					CredentialScope: credentialScope{
 						Region: "us-west-1",
 					},
 				},
-				"***REMOVED***ps-us-west-2": endpoint{
-					Hostname: "datasync-***REMOVED***ps.us-west-2.amazonaws.com",
+				"fips-us-west-2": endpoint{
+					Hostname: "datasync-fips.us-west-2.amazonaws.com",
 					CredentialScope: credentialScope{
 						Region: "us-west-2",
 					},
@@ -1322,8 +1322,8 @@ var awsPartition = partition{
 				"ap-southeast-1": endpoint{},
 				"ap-southeast-2": endpoint{},
 				"ca-central-1":   endpoint{},
-				"ca-central-1-***REMOVED***ps": endpoint{
-					Hostname: "dynamodb-***REMOVED***ps.ca-central-1.amazonaws.com",
+				"ca-central-1-fips": endpoint{
+					Hostname: "dynamodb-fips.ca-central-1.amazonaws.com",
 					CredentialScope: credentialScope{
 						Region: "ca-central-1",
 					},
@@ -1343,29 +1343,29 @@ var awsPartition = partition{
 				"me-south-1": endpoint{},
 				"sa-east-1":  endpoint{},
 				"us-east-1":  endpoint{},
-				"us-east-1-***REMOVED***ps": endpoint{
-					Hostname: "dynamodb-***REMOVED***ps.us-east-1.amazonaws.com",
+				"us-east-1-fips": endpoint{
+					Hostname: "dynamodb-fips.us-east-1.amazonaws.com",
 					CredentialScope: credentialScope{
 						Region: "us-east-1",
 					},
 				},
 				"us-east-2": endpoint{},
-				"us-east-2-***REMOVED***ps": endpoint{
-					Hostname: "dynamodb-***REMOVED***ps.us-east-2.amazonaws.com",
+				"us-east-2-fips": endpoint{
+					Hostname: "dynamodb-fips.us-east-2.amazonaws.com",
 					CredentialScope: credentialScope{
 						Region: "us-east-2",
 					},
 				},
 				"us-west-1": endpoint{},
-				"us-west-1-***REMOVED***ps": endpoint{
-					Hostname: "dynamodb-***REMOVED***ps.us-west-1.amazonaws.com",
+				"us-west-1-fips": endpoint{
+					Hostname: "dynamodb-fips.us-west-1.amazonaws.com",
 					CredentialScope: credentialScope{
 						Region: "us-west-1",
 					},
 				},
 				"us-west-2": endpoint{},
-				"us-west-2-***REMOVED***ps": endpoint{
-					Hostname: "dynamodb-***REMOVED***ps.us-west-2.amazonaws.com",
+				"us-west-2-fips": endpoint{
+					Hostname: "dynamodb-fips.us-west-2.amazonaws.com",
 					CredentialScope: credentialScope{
 						Region: "us-west-2",
 					},
@@ -1446,8 +1446,8 @@ var awsPartition = partition{
 				"eu-west-1":      endpoint{},
 				"eu-west-2":      endpoint{},
 				"eu-west-3":      endpoint{},
-				"***REMOVED***ps": endpoint{
-					Hostname: "elasticache-***REMOVED***ps.us-west-1.amazonaws.com",
+				"fips": endpoint{
+					Hostname: "elasticache-fips.us-west-1.amazonaws.com",
 					CredentialScope: credentialScope{
 						Region: "us-west-1",
 					},
@@ -1483,7 +1483,7 @@ var awsPartition = partition{
 				"us-west-2":      endpoint{},
 			},
 		},
-		"elastic***REMOVED***lesystem": service{
+		"elasticfilesystem": service{
 
 			Endpoints: endpoints{
 				"ap-northeast-1": endpoint{},
@@ -1529,7 +1529,7 @@ var awsPartition = partition{
 		},
 		"elasticmapreduce": service{
 			Defaults: endpoint{
-				SSLCommonName: "{region}.{service}.{dnsSuf***REMOVED***x}",
+				SSLCommonName: "{region}.{service}.{dnsSuffix}",
 				Protocols:     []string{"https"},
 			},
 			Endpoints: endpoints{
@@ -1541,7 +1541,7 @@ var awsPartition = partition{
 				"ap-southeast-2": endpoint{},
 				"ca-central-1":   endpoint{},
 				"eu-central-1": endpoint{
-					SSLCommonName: "{service}.{region}.{dnsSuf***REMOVED***x}",
+					SSLCommonName: "{service}.{region}.{dnsSuffix}",
 				},
 				"eu-north-1": endpoint{},
 				"eu-west-1":  endpoint{},
@@ -1550,7 +1550,7 @@ var awsPartition = partition{
 				"me-south-1": endpoint{},
 				"sa-east-1":  endpoint{},
 				"us-east-1": endpoint{
-					SSLCommonName: "{service}.{region}.{dnsSuf***REMOVED***x}",
+					SSLCommonName: "{service}.{region}.{dnsSuffix}",
 				},
 				"us-east-2": endpoint{},
 				"us-west-1": endpoint{},
@@ -1606,8 +1606,8 @@ var awsPartition = partition{
 				"eu-west-1":      endpoint{},
 				"eu-west-2":      endpoint{},
 				"eu-west-3":      endpoint{},
-				"***REMOVED***ps": endpoint{
-					Hostname: "es-***REMOVED***ps.us-west-1.amazonaws.com",
+				"fips": endpoint{
+					Hostname: "es-fips.us-west-1.amazonaws.com",
 					CredentialScope: credentialScope{
 						Region: "us-west-1",
 					},
@@ -1643,7 +1643,7 @@ var awsPartition = partition{
 				"us-west-2":      endpoint{},
 			},
 		},
-		"***REMOVED***rehose": service{
+		"firehose": service{
 
 			Endpoints: endpoints{
 				"ap-east-1":      endpoint{},
@@ -1813,29 +1813,29 @@ var awsPartition = partition{
 				"me-south-1":     endpoint{},
 				"sa-east-1":      endpoint{},
 				"us-east-1":      endpoint{},
-				"us-east-1-***REMOVED***ps": endpoint{
-					Hostname: "guardduty-***REMOVED***ps.us-east-1.amazonaws.com",
+				"us-east-1-fips": endpoint{
+					Hostname: "guardduty-fips.us-east-1.amazonaws.com",
 					CredentialScope: credentialScope{
 						Region: "us-east-1",
 					},
 				},
 				"us-east-2": endpoint{},
-				"us-east-2-***REMOVED***ps": endpoint{
-					Hostname: "guardduty-***REMOVED***ps.us-east-2.amazonaws.com",
+				"us-east-2-fips": endpoint{
+					Hostname: "guardduty-fips.us-east-2.amazonaws.com",
 					CredentialScope: credentialScope{
 						Region: "us-east-2",
 					},
 				},
 				"us-west-1": endpoint{},
-				"us-west-1-***REMOVED***ps": endpoint{
-					Hostname: "guardduty-***REMOVED***ps.us-west-1.amazonaws.com",
+				"us-west-1-fips": endpoint{
+					Hostname: "guardduty-fips.us-west-1.amazonaws.com",
 					CredentialScope: credentialScope{
 						Region: "us-west-1",
 					},
 				},
 				"us-west-2": endpoint{},
-				"us-west-2-***REMOVED***ps": endpoint{
-					Hostname: "guardduty-***REMOVED***ps.us-west-2.amazonaws.com",
+				"us-west-2-fips": endpoint{
+					Hostname: "guardduty-fips.us-west-2.amazonaws.com",
 					CredentialScope: credentialScope{
 						Region: "us-west-2",
 					},
@@ -2412,26 +2412,26 @@ var awsPartition = partition{
 				"eu-west-1":      endpoint{},
 				"eu-west-2":      endpoint{},
 				"eu-west-3":      endpoint{},
-				"***REMOVED***ps-us-east-1": endpoint{
-					Hostname: "mq-***REMOVED***ps.us-east-1.amazonaws.com",
+				"fips-us-east-1": endpoint{
+					Hostname: "mq-fips.us-east-1.amazonaws.com",
 					CredentialScope: credentialScope{
 						Region: "us-east-1",
 					},
 				},
-				"***REMOVED***ps-us-east-2": endpoint{
-					Hostname: "mq-***REMOVED***ps.us-east-2.amazonaws.com",
+				"fips-us-east-2": endpoint{
+					Hostname: "mq-fips.us-east-2.amazonaws.com",
 					CredentialScope: credentialScope{
 						Region: "us-east-2",
 					},
 				},
-				"***REMOVED***ps-us-west-1": endpoint{
-					Hostname: "mq-***REMOVED***ps.us-west-1.amazonaws.com",
+				"fips-us-west-1": endpoint{
+					Hostname: "mq-fips.us-west-1.amazonaws.com",
 					CredentialScope: credentialScope{
 						Region: "us-west-1",
 					},
 				},
-				"***REMOVED***ps-us-west-2": endpoint{
-					Hostname: "mq-***REMOVED***ps.us-west-2.amazonaws.com",
+				"fips-us-west-2": endpoint{
+					Hostname: "mq-fips.us-west-2.amazonaws.com",
 					CredentialScope: credentialScope{
 						Region: "us-west-2",
 					},
@@ -2672,7 +2672,7 @@ var awsPartition = partition{
 				"me-south-1":     endpoint{},
 				"sa-east-1":      endpoint{},
 				"us-east-1": endpoint{
-					SSLCommonName: "{service}.{dnsSuf***REMOVED***x}",
+					SSLCommonName: "{service}.{dnsSuffix}",
 				},
 				"us-east-2": endpoint{},
 				"us-west-1": endpoint{},
@@ -2734,26 +2734,26 @@ var awsPartition = partition{
 				"eu-west-1":      endpoint{},
 				"eu-west-2":      endpoint{},
 				"eu-west-3":      endpoint{},
-				"***REMOVED***ps-us-east-1": endpoint{
-					Hostname: "resource-groups-***REMOVED***ps.us-east-1.amazonaws.com",
+				"fips-us-east-1": endpoint{
+					Hostname: "resource-groups-fips.us-east-1.amazonaws.com",
 					CredentialScope: credentialScope{
 						Region: "us-east-1",
 					},
 				},
-				"***REMOVED***ps-us-east-2": endpoint{
-					Hostname: "resource-groups-***REMOVED***ps.us-east-2.amazonaws.com",
+				"fips-us-east-2": endpoint{
+					Hostname: "resource-groups-fips.us-east-2.amazonaws.com",
 					CredentialScope: credentialScope{
 						Region: "us-east-2",
 					},
 				},
-				"***REMOVED***ps-us-west-1": endpoint{
-					Hostname: "resource-groups-***REMOVED***ps.us-west-1.amazonaws.com",
+				"fips-us-west-1": endpoint{
+					Hostname: "resource-groups-fips.us-west-1.amazonaws.com",
 					CredentialScope: credentialScope{
 						Region: "us-west-1",
 					},
 				},
-				"***REMOVED***ps-us-west-2": endpoint{
-					Hostname: "resource-groups-***REMOVED***ps.us-west-2.amazonaws.com",
+				"fips-us-west-2": endpoint{
+					Hostname: "resource-groups-fips.us-west-2.amazonaws.com",
 					CredentialScope: credentialScope{
 						Region: "us-west-2",
 					},
@@ -2848,29 +2848,29 @@ var awsPartition = partition{
 				"me-south-1":     endpoint{},
 				"sa-east-1":      endpoint{},
 				"us-east-1":      endpoint{},
-				"us-east-1-***REMOVED***ps": endpoint{
-					Hostname: "runtime-***REMOVED***ps.sagemaker.us-east-1.amazonaws.com",
+				"us-east-1-fips": endpoint{
+					Hostname: "runtime-fips.sagemaker.us-east-1.amazonaws.com",
 					CredentialScope: credentialScope{
 						Region: "us-east-1",
 					},
 				},
 				"us-east-2": endpoint{},
-				"us-east-2-***REMOVED***ps": endpoint{
-					Hostname: "runtime-***REMOVED***ps.sagemaker.us-east-2.amazonaws.com",
+				"us-east-2-fips": endpoint{
+					Hostname: "runtime-fips.sagemaker.us-east-2.amazonaws.com",
 					CredentialScope: credentialScope{
 						Region: "us-east-2",
 					},
 				},
 				"us-west-1": endpoint{},
-				"us-west-1-***REMOVED***ps": endpoint{
-					Hostname: "runtime-***REMOVED***ps.sagemaker.us-west-1.amazonaws.com",
+				"us-west-1-fips": endpoint{
+					Hostname: "runtime-fips.sagemaker.us-west-1.amazonaws.com",
 					CredentialScope: credentialScope{
 						Region: "us-west-1",
 					},
 				},
 				"us-west-2": endpoint{},
-				"us-west-2-***REMOVED***ps": endpoint{
-					Hostname: "runtime-***REMOVED***ps.sagemaker.us-west-2.amazonaws.com",
+				"us-west-2-fips": endpoint{
+					Hostname: "runtime-fips.sagemaker.us-west-2.amazonaws.com",
 					CredentialScope: credentialScope{
 						Region: "us-west-2",
 					},
@@ -2885,7 +2885,7 @@ var awsPartition = partition{
 				SignatureVersions: []string{"s3v4"},
 
 				HasDualStack:      boxedTrue,
-				DualStackHostname: "{service}.dualstack.{region}.{dnsSuf***REMOVED***x}",
+				DualStackHostname: "{service}.dualstack.{region}.{dnsSuffix}",
 			},
 			Endpoints: endpoints{
 				"ap-east-1": endpoint{},
@@ -2945,7 +2945,7 @@ var awsPartition = partition{
 				SignatureVersions: []string{"s3v4"},
 
 				HasDualStack:      boxedTrue,
-				DualStackHostname: "{service}.dualstack.{region}.{dnsSuf***REMOVED***x}",
+				DualStackHostname: "{service}.dualstack.{region}.{dnsSuffix}",
 			},
 			Endpoints: endpoints{
 				"ap-northeast-1": endpoint{
@@ -3039,8 +3039,8 @@ var awsPartition = partition{
 						Region: "us-east-1",
 					},
 				},
-				"us-east-1-***REMOVED***ps": endpoint{
-					Hostname:          "s3-control-***REMOVED***ps.us-east-1.amazonaws.com",
+				"us-east-1-fips": endpoint{
+					Hostname:          "s3-control-fips.us-east-1.amazonaws.com",
 					SignatureVersions: []string{"s3v4"},
 					CredentialScope: credentialScope{
 						Region: "us-east-1",
@@ -3053,8 +3053,8 @@ var awsPartition = partition{
 						Region: "us-east-2",
 					},
 				},
-				"us-east-2-***REMOVED***ps": endpoint{
-					Hostname:          "s3-control-***REMOVED***ps.us-east-2.amazonaws.com",
+				"us-east-2-fips": endpoint{
+					Hostname:          "s3-control-fips.us-east-2.amazonaws.com",
 					SignatureVersions: []string{"s3v4"},
 					CredentialScope: credentialScope{
 						Region: "us-east-2",
@@ -3067,8 +3067,8 @@ var awsPartition = partition{
 						Region: "us-west-1",
 					},
 				},
-				"us-west-1-***REMOVED***ps": endpoint{
-					Hostname:          "s3-control-***REMOVED***ps.us-west-1.amazonaws.com",
+				"us-west-1-fips": endpoint{
+					Hostname:          "s3-control-fips.us-west-1.amazonaws.com",
 					SignatureVersions: []string{"s3v4"},
 					CredentialScope: credentialScope{
 						Region: "us-west-1",
@@ -3081,8 +3081,8 @@ var awsPartition = partition{
 						Region: "us-west-2",
 					},
 				},
-				"us-west-2-***REMOVED***ps": endpoint{
-					Hostname:          "s3-control-***REMOVED***ps.us-west-2.amazonaws.com",
+				"us-west-2-fips": endpoint{
+					Hostname:          "s3-control-fips.us-west-2.amazonaws.com",
 					SignatureVersions: []string{"s3v4"},
 					CredentialScope: credentialScope{
 						Region: "us-west-2",
@@ -3125,29 +3125,29 @@ var awsPartition = partition{
 				"eu-west-3":      endpoint{},
 				"sa-east-1":      endpoint{},
 				"us-east-1":      endpoint{},
-				"us-east-1-***REMOVED***ps": endpoint{
-					Hostname: "secretsmanager-***REMOVED***ps.us-east-1.amazonaws.com",
+				"us-east-1-fips": endpoint{
+					Hostname: "secretsmanager-fips.us-east-1.amazonaws.com",
 					CredentialScope: credentialScope{
 						Region: "us-east-1",
 					},
 				},
 				"us-east-2": endpoint{},
-				"us-east-2-***REMOVED***ps": endpoint{
-					Hostname: "secretsmanager-***REMOVED***ps.us-east-2.amazonaws.com",
+				"us-east-2-fips": endpoint{
+					Hostname: "secretsmanager-fips.us-east-2.amazonaws.com",
 					CredentialScope: credentialScope{
 						Region: "us-east-2",
 					},
 				},
 				"us-west-1": endpoint{},
-				"us-west-1-***REMOVED***ps": endpoint{
-					Hostname: "secretsmanager-***REMOVED***ps.us-west-1.amazonaws.com",
+				"us-west-1-fips": endpoint{
+					Hostname: "secretsmanager-fips.us-west-1.amazonaws.com",
 					CredentialScope: credentialScope{
 						Region: "us-west-1",
 					},
 				},
 				"us-west-2": endpoint{},
-				"us-west-2-***REMOVED***ps": endpoint{
-					Hostname: "secretsmanager-***REMOVED***ps.us-west-2.amazonaws.com",
+				"us-west-2-fips": endpoint{
+					Hostname: "secretsmanager-fips.us-west-2.amazonaws.com",
 					CredentialScope: credentialScope{
 						Region: "us-west-2",
 					},
@@ -3251,29 +3251,29 @@ var awsPartition = partition{
 				"eu-west-3":      endpoint{},
 				"sa-east-1":      endpoint{},
 				"us-east-1":      endpoint{},
-				"us-east-1-***REMOVED***ps": endpoint{
-					Hostname: "servicecatalog-***REMOVED***ps.us-east-1.amazonaws.com",
+				"us-east-1-fips": endpoint{
+					Hostname: "servicecatalog-fips.us-east-1.amazonaws.com",
 					CredentialScope: credentialScope{
 						Region: "us-east-1",
 					},
 				},
 				"us-east-2": endpoint{},
-				"us-east-2-***REMOVED***ps": endpoint{
-					Hostname: "servicecatalog-***REMOVED***ps.us-east-2.amazonaws.com",
+				"us-east-2-fips": endpoint{
+					Hostname: "servicecatalog-fips.us-east-2.amazonaws.com",
 					CredentialScope: credentialScope{
 						Region: "us-east-2",
 					},
 				},
 				"us-west-1": endpoint{},
-				"us-west-1-***REMOVED***ps": endpoint{
-					Hostname: "servicecatalog-***REMOVED***ps.us-west-1.amazonaws.com",
+				"us-west-1-fips": endpoint{
+					Hostname: "servicecatalog-fips.us-west-1.amazonaws.com",
 					CredentialScope: credentialScope{
 						Region: "us-west-1",
 					},
 				},
 				"us-west-2": endpoint{},
-				"us-west-2-***REMOVED***ps": endpoint{
-					Hostname: "servicecatalog-***REMOVED***ps.us-west-2.amazonaws.com",
+				"us-west-2-fips": endpoint{
+					Hostname: "servicecatalog-fips.us-west-2.amazonaws.com",
 					CredentialScope: credentialScope{
 						Region: "us-west-2",
 					},
@@ -3393,7 +3393,7 @@ var awsPartition = partition{
 		},
 		"sqs": service{
 			Defaults: endpoint{
-				SSLCommonName: "{region}.queue.{dnsSuf***REMOVED***x}",
+				SSLCommonName: "{region}.queue.{dnsSuffix}",
 				Protocols:     []string{"http", "https"},
 			},
 			Endpoints: endpoints{
@@ -3409,26 +3409,26 @@ var awsPartition = partition{
 				"eu-west-1":      endpoint{},
 				"eu-west-2":      endpoint{},
 				"eu-west-3":      endpoint{},
-				"***REMOVED***ps-us-east-1": endpoint{
-					Hostname: "sqs-***REMOVED***ps.us-east-1.amazonaws.com",
+				"fips-us-east-1": endpoint{
+					Hostname: "sqs-fips.us-east-1.amazonaws.com",
 					CredentialScope: credentialScope{
 						Region: "us-east-1",
 					},
 				},
-				"***REMOVED***ps-us-east-2": endpoint{
-					Hostname: "sqs-***REMOVED***ps.us-east-2.amazonaws.com",
+				"fips-us-east-2": endpoint{
+					Hostname: "sqs-fips.us-east-2.amazonaws.com",
 					CredentialScope: credentialScope{
 						Region: "us-east-2",
 					},
 				},
-				"***REMOVED***ps-us-west-1": endpoint{
-					Hostname: "sqs-***REMOVED***ps.us-west-1.amazonaws.com",
+				"fips-us-west-1": endpoint{
+					Hostname: "sqs-fips.us-west-1.amazonaws.com",
 					CredentialScope: credentialScope{
 						Region: "us-west-1",
 					},
 				},
-				"***REMOVED***ps-us-west-2": endpoint{
-					Hostname: "sqs-***REMOVED***ps.us-west-2.amazonaws.com",
+				"fips-us-west-2": endpoint{
+					Hostname: "sqs-fips.us-west-2.amazonaws.com",
 					CredentialScope: credentialScope{
 						Region: "us-west-2",
 					},
@@ -3436,7 +3436,7 @@ var awsPartition = partition{
 				"me-south-1": endpoint{},
 				"sa-east-1":  endpoint{},
 				"us-east-1": endpoint{
-					SSLCommonName: "queue.{dnsSuf***REMOVED***x}",
+					SSLCommonName: "queue.{dnsSuffix}",
 				},
 				"us-east-2": endpoint{},
 				"us-west-1": endpoint{},
@@ -3526,8 +3526,8 @@ var awsPartition = partition{
 				"ap-southeast-1": endpoint{},
 				"ap-southeast-2": endpoint{},
 				"ca-central-1":   endpoint{},
-				"ca-central-1-***REMOVED***ps": endpoint{
-					Hostname: "dynamodb-***REMOVED***ps.ca-central-1.amazonaws.com",
+				"ca-central-1-fips": endpoint{
+					Hostname: "dynamodb-fips.ca-central-1.amazonaws.com",
 					CredentialScope: credentialScope{
 						Region: "ca-central-1",
 					},
@@ -3547,29 +3547,29 @@ var awsPartition = partition{
 				"me-south-1": endpoint{},
 				"sa-east-1":  endpoint{},
 				"us-east-1":  endpoint{},
-				"us-east-1-***REMOVED***ps": endpoint{
-					Hostname: "dynamodb-***REMOVED***ps.us-east-1.amazonaws.com",
+				"us-east-1-fips": endpoint{
+					Hostname: "dynamodb-fips.us-east-1.amazonaws.com",
 					CredentialScope: credentialScope{
 						Region: "us-east-1",
 					},
 				},
 				"us-east-2": endpoint{},
-				"us-east-2-***REMOVED***ps": endpoint{
-					Hostname: "dynamodb-***REMOVED***ps.us-east-2.amazonaws.com",
+				"us-east-2-fips": endpoint{
+					Hostname: "dynamodb-fips.us-east-2.amazonaws.com",
 					CredentialScope: credentialScope{
 						Region: "us-east-2",
 					},
 				},
 				"us-west-1": endpoint{},
-				"us-west-1-***REMOVED***ps": endpoint{
-					Hostname: "dynamodb-***REMOVED***ps.us-west-1.amazonaws.com",
+				"us-west-1-fips": endpoint{
+					Hostname: "dynamodb-fips.us-west-1.amazonaws.com",
 					CredentialScope: credentialScope{
 						Region: "us-west-1",
 					},
 				},
 				"us-west-2": endpoint{},
-				"us-west-2-***REMOVED***ps": endpoint{
-					Hostname: "dynamodb-***REMOVED***ps.us-west-2.amazonaws.com",
+				"us-west-2-fips": endpoint{
+					Hostname: "dynamodb-fips.us-west-2.amazonaws.com",
 					CredentialScope: credentialScope{
 						Region: "us-west-2",
 					},
@@ -3601,29 +3601,29 @@ var awsPartition = partition{
 				"me-south-1":   endpoint{},
 				"sa-east-1":    endpoint{},
 				"us-east-1":    endpoint{},
-				"us-east-1-***REMOVED***ps": endpoint{
-					Hostname: "sts-***REMOVED***ps.us-east-1.amazonaws.com",
+				"us-east-1-fips": endpoint{
+					Hostname: "sts-fips.us-east-1.amazonaws.com",
 					CredentialScope: credentialScope{
 						Region: "us-east-1",
 					},
 				},
 				"us-east-2": endpoint{},
-				"us-east-2-***REMOVED***ps": endpoint{
-					Hostname: "sts-***REMOVED***ps.us-east-2.amazonaws.com",
+				"us-east-2-fips": endpoint{
+					Hostname: "sts-fips.us-east-2.amazonaws.com",
 					CredentialScope: credentialScope{
 						Region: "us-east-2",
 					},
 				},
 				"us-west-1": endpoint{},
-				"us-west-1-***REMOVED***ps": endpoint{
-					Hostname: "sts-***REMOVED***ps.us-west-1.amazonaws.com",
+				"us-west-1-fips": endpoint{
+					Hostname: "sts-fips.us-west-1.amazonaws.com",
 					CredentialScope: credentialScope{
 						Region: "us-west-1",
 					},
 				},
 				"us-west-2": endpoint{},
-				"us-west-2-***REMOVED***ps": endpoint{
-					Hostname: "sts-***REMOVED***ps.us-west-2.amazonaws.com",
+				"us-west-2-fips": endpoint{
+					Hostname: "sts-fips.us-west-2.amazonaws.com",
 					CredentialScope: credentialScope{
 						Region: "us-west-2",
 					},
@@ -3743,22 +3743,22 @@ var awsPartition = partition{
 				"eu-central-1":   endpoint{},
 				"eu-west-1":      endpoint{},
 				"us-east-1":      endpoint{},
-				"us-east-1-***REMOVED***ps": endpoint{
-					Hostname: "translate-***REMOVED***ps.us-east-1.amazonaws.com",
+				"us-east-1-fips": endpoint{
+					Hostname: "translate-fips.us-east-1.amazonaws.com",
 					CredentialScope: credentialScope{
 						Region: "us-east-1",
 					},
 				},
 				"us-east-2": endpoint{},
-				"us-east-2-***REMOVED***ps": endpoint{
-					Hostname: "translate-***REMOVED***ps.us-east-2.amazonaws.com",
+				"us-east-2-fips": endpoint{
+					Hostname: "translate-fips.us-east-2.amazonaws.com",
 					CredentialScope: credentialScope{
 						Region: "us-east-2",
 					},
 				},
 				"us-west-2": endpoint{},
-				"us-west-2-***REMOVED***ps": endpoint{
-					Hostname: "translate-***REMOVED***ps.us-west-2.amazonaws.com",
+				"us-west-2-fips": endpoint{
+					Hostname: "translate-fips.us-west-2.amazonaws.com",
 					CredentialScope: credentialScope{
 						Region: "us-west-2",
 					},
@@ -3870,7 +3870,7 @@ func AwsCnPartition() Partition {
 var awscnPartition = partition{
 	ID:        "aws-cn",
 	Name:      "AWS China",
-	DNSSuf***REMOVED***x: "amazonaws.com.cn",
+	DNSSuffix: "amazonaws.com.cn",
 	RegionRegex: regionRegex{
 		Regexp: func() *regexp.Regexp {
 			reg, _ := regexp.Compile("^cn\\-\\w+\\-\\d+$")
@@ -3878,7 +3878,7 @@ var awscnPartition = partition{
 		}(),
 	},
 	Defaults: endpoint{
-		Hostname:          "{service}.{region}.{dnsSuf***REMOVED***x}",
+		Hostname:          "{service}.{region}.{dnsSuffix}",
 		Protocols:         []string{"https"},
 		SignatureVersions: []string{"v4"},
 	},
@@ -3992,7 +3992,7 @@ var awscnPartition = partition{
 				"cn-north-1": endpoint{},
 			},
 		},
-		"con***REMOVED***g": service{
+		"config": service{
 
 			Endpoints: endpoints{
 				"cn-north-1":     endpoint{},
@@ -4102,7 +4102,7 @@ var awscnPartition = partition{
 				"cn-northwest-1": endpoint{},
 			},
 		},
-		"***REMOVED***rehose": service{
+		"firehose": service{
 
 			Endpoints: endpoints{
 				"cn-north-1":     endpoint{},
@@ -4288,7 +4288,7 @@ var awscnPartition = partition{
 		},
 		"sqs": service{
 			Defaults: endpoint{
-				SSLCommonName: "{region}.queue.{dnsSuf***REMOVED***x}",
+				SSLCommonName: "{region}.queue.{dnsSuffix}",
 				Protocols:     []string{"http", "https"},
 			},
 			Endpoints: endpoints{
@@ -4391,7 +4391,7 @@ func AwsUsGovPartition() Partition {
 var awsusgovPartition = partition{
 	ID:        "aws-us-gov",
 	Name:      "AWS GovCloud (US)",
-	DNSSuf***REMOVED***x: "amazonaws.com",
+	DNSSuffix: "amazonaws.com",
 	RegionRegex: regionRegex{
 		Regexp: func() *regexp.Regexp {
 			reg, _ := regexp.Compile("^us\\-gov\\-\\w+\\-\\d+$")
@@ -4399,7 +4399,7 @@ var awsusgovPartition = partition{
 		}(),
 	},
 	Defaults: endpoint{
-		Hostname:          "{service}.{region}.{dnsSuf***REMOVED***x}",
+		Hostname:          "{service}.{region}.{dnsSuffix}",
 		Protocols:         []string{"https"},
 		SignatureVersions: []string{"v4"},
 	},
@@ -4478,8 +4478,8 @@ var awsusgovPartition = partition{
 				},
 			},
 			Endpoints: endpoints{
-				"***REMOVED***ps": endpoint{
-					Hostname: "appstream2-***REMOVED***ps.us-gov-west-1.amazonaws.com",
+				"fips": endpoint{
+					Hostname: "appstream2-fips.us-gov-west-1.amazonaws.com",
 					CredentialScope: credentialScope{
 						Region: "us-gov-west-1",
 					},
@@ -4558,15 +4558,15 @@ var awsusgovPartition = partition{
 
 			Endpoints: endpoints{
 				"us-gov-east-1": endpoint{},
-				"us-gov-east-1-***REMOVED***ps": endpoint{
-					Hostname: "codedeploy-***REMOVED***ps.us-gov-east-1.amazonaws.com",
+				"us-gov-east-1-fips": endpoint{
+					Hostname: "codedeploy-fips.us-gov-east-1.amazonaws.com",
 					CredentialScope: credentialScope{
 						Region: "us-gov-east-1",
 					},
 				},
 				"us-gov-west-1": endpoint{},
-				"us-gov-west-1-***REMOVED***ps": endpoint{
-					Hostname: "codedeploy-***REMOVED***ps.us-gov-west-1.amazonaws.com",
+				"us-gov-west-1-fips": endpoint{
+					Hostname: "codedeploy-fips.us-gov-west-1.amazonaws.com",
 					CredentialScope: credentialScope{
 						Region: "us-gov-west-1",
 					},
@@ -4581,7 +4581,7 @@ var awsusgovPartition = partition{
 				"us-gov-west-1": endpoint{},
 			},
 		},
-		"con***REMOVED***g": service{
+		"config": service{
 
 			Endpoints: endpoints{
 				"us-gov-east-1": endpoint{},
@@ -4591,8 +4591,8 @@ var awsusgovPartition = partition{
 		"datasync": service{
 
 			Endpoints: endpoints{
-				"***REMOVED***ps-us-gov-west-1": endpoint{
-					Hostname: "datasync-***REMOVED***ps.us-gov-west-1.amazonaws.com",
+				"fips-us-gov-west-1": endpoint{
+					Hostname: "datasync-fips.us-gov-west-1.amazonaws.com",
 					CredentialScope: credentialScope{
 						Region: "us-gov-west-1",
 					},
@@ -4625,14 +4625,14 @@ var awsusgovPartition = partition{
 
 			Endpoints: endpoints{
 				"us-gov-east-1": endpoint{},
-				"us-gov-east-1-***REMOVED***ps": endpoint{
+				"us-gov-east-1-fips": endpoint{
 					Hostname: "dynamodb.us-gov-east-1.amazonaws.com",
 					CredentialScope: credentialScope{
 						Region: "us-gov-east-1",
 					},
 				},
 				"us-gov-west-1": endpoint{},
-				"us-gov-west-1-***REMOVED***ps": endpoint{
+				"us-gov-west-1-fips": endpoint{
 					Hostname: "dynamodb.us-gov-west-1.amazonaws.com",
 					CredentialScope: credentialScope{
 						Region: "us-gov-west-1",
@@ -4668,8 +4668,8 @@ var awsusgovPartition = partition{
 		"elasticache": service{
 
 			Endpoints: endpoints{
-				"***REMOVED***ps": endpoint{
-					Hostname: "elasticache-***REMOVED***ps.us-gov-west-1.amazonaws.com",
+				"fips": endpoint{
+					Hostname: "elasticache-fips.us-gov-west-1.amazonaws.com",
 					CredentialScope: credentialScope{
 						Region: "us-gov-west-1",
 					},
@@ -4685,7 +4685,7 @@ var awsusgovPartition = partition{
 				"us-gov-west-1": endpoint{},
 			},
 		},
-		"elastic***REMOVED***lesystem": service{
+		"elasticfilesystem": service{
 
 			Endpoints: endpoints{
 				"us-gov-west-1": endpoint{},
@@ -4712,8 +4712,8 @@ var awsusgovPartition = partition{
 		"es": service{
 
 			Endpoints: endpoints{
-				"***REMOVED***ps": endpoint{
-					Hostname: "es-***REMOVED***ps.us-gov-west-1.amazonaws.com",
+				"fips": endpoint{
+					Hostname: "es-fips.us-gov-west-1.amazonaws.com",
 					CredentialScope: credentialScope{
 						Region: "us-gov-west-1",
 					},
@@ -4729,7 +4729,7 @@ var awsusgovPartition = partition{
 				"us-gov-west-1": endpoint{},
 			},
 		},
-		"***REMOVED***rehose": service{
+		"firehose": service{
 
 			Endpoints: endpoints{
 				"us-gov-east-1": endpoint{},
@@ -4817,7 +4817,7 @@ var awsusgovPartition = partition{
 
 			Endpoints: endpoints{
 				"ProdFips": endpoint{
-					Hostname: "kms-***REMOVED***ps.us-gov-west-1.amazonaws.com",
+					Hostname: "kms-fips.us-gov-west-1.amazonaws.com",
 					CredentialScope: credentialScope{
 						Region: "us-gov-west-1",
 					},
@@ -4937,13 +4937,13 @@ var awsusgovPartition = partition{
 		"resource-groups": service{
 
 			Endpoints: endpoints{
-				"***REMOVED***ps-us-gov-east-1": endpoint{
+				"fips-us-gov-east-1": endpoint{
 					Hostname: "resource-groups.us-gov-east-1.amazonaws.com",
 					CredentialScope: credentialScope{
 						Region: "us-gov-east-1",
 					},
 				},
-				"***REMOVED***ps-us-gov-west-1": endpoint{
+				"fips-us-gov-west-1": endpoint{
 					Hostname: "resource-groups.us-gov-west-1.amazonaws.com",
 					CredentialScope: credentialScope{
 						Region: "us-gov-west-1",
@@ -4984,8 +4984,8 @@ var awsusgovPartition = partition{
 				SignatureVersions: []string{"s3", "s3v4"},
 			},
 			Endpoints: endpoints{
-				"***REMOVED***ps-us-gov-west-1": endpoint{
-					Hostname: "s3-***REMOVED***ps-us-gov-west-1.amazonaws.com",
+				"fips-us-gov-west-1": endpoint{
+					Hostname: "s3-fips-us-gov-west-1.amazonaws.com",
 					CredentialScope: credentialScope{
 						Region: "us-gov-west-1",
 					},
@@ -5013,8 +5013,8 @@ var awsusgovPartition = partition{
 						Region: "us-gov-east-1",
 					},
 				},
-				"us-gov-east-1-***REMOVED***ps": endpoint{
-					Hostname:          "s3-control-***REMOVED***ps.us-gov-east-1.amazonaws.com",
+				"us-gov-east-1-fips": endpoint{
+					Hostname:          "s3-control-fips.us-gov-east-1.amazonaws.com",
 					SignatureVersions: []string{"s3v4"},
 					CredentialScope: credentialScope{
 						Region: "us-gov-east-1",
@@ -5027,8 +5027,8 @@ var awsusgovPartition = partition{
 						Region: "us-gov-west-1",
 					},
 				},
-				"us-gov-west-1-***REMOVED***ps": endpoint{
-					Hostname:          "s3-control-***REMOVED***ps.us-gov-west-1.amazonaws.com",
+				"us-gov-west-1-fips": endpoint{
+					Hostname:          "s3-control-fips.us-gov-west-1.amazonaws.com",
 					SignatureVersions: []string{"s3v4"},
 					CredentialScope: credentialScope{
 						Region: "us-gov-west-1",
@@ -5040,15 +5040,15 @@ var awsusgovPartition = partition{
 
 			Endpoints: endpoints{
 				"us-gov-east-1": endpoint{},
-				"us-gov-east-1-***REMOVED***ps": endpoint{
-					Hostname: "secretsmanager-***REMOVED***ps.us-gov-east-1.amazonaws.com",
+				"us-gov-east-1-fips": endpoint{
+					Hostname: "secretsmanager-fips.us-gov-east-1.amazonaws.com",
 					CredentialScope: credentialScope{
 						Region: "us-gov-east-1",
 					},
 				},
 				"us-gov-west-1": endpoint{},
-				"us-gov-west-1-***REMOVED***ps": endpoint{
-					Hostname: "secretsmanager-***REMOVED***ps.us-gov-west-1.amazonaws.com",
+				"us-gov-west-1-fips": endpoint{
+					Hostname: "secretsmanager-fips.us-gov-west-1.amazonaws.com",
 					CredentialScope: credentialScope{
 						Region: "us-gov-west-1",
 					},
@@ -5072,8 +5072,8 @@ var awsusgovPartition = partition{
 
 			Endpoints: endpoints{
 				"us-gov-west-1": endpoint{},
-				"us-gov-west-1-***REMOVED***ps": endpoint{
-					Hostname: "servicecatalog-***REMOVED***ps.us-gov-west-1.amazonaws.com",
+				"us-gov-west-1-fips": endpoint{
+					Hostname: "servicecatalog-fips.us-gov-west-1.amazonaws.com",
 					CredentialScope: credentialScope{
 						Region: "us-gov-west-1",
 					},
@@ -5108,7 +5108,7 @@ var awsusgovPartition = partition{
 			Endpoints: endpoints{
 				"us-gov-east-1": endpoint{},
 				"us-gov-west-1": endpoint{
-					SSLCommonName: "{region}.queue.{dnsSuf***REMOVED***x}",
+					SSLCommonName: "{region}.queue.{dnsSuffix}",
 					Protocols:     []string{"http", "https"},
 				},
 			},
@@ -5141,14 +5141,14 @@ var awsusgovPartition = partition{
 			},
 			Endpoints: endpoints{
 				"us-gov-east-1": endpoint{},
-				"us-gov-east-1-***REMOVED***ps": endpoint{
+				"us-gov-east-1-fips": endpoint{
 					Hostname: "dynamodb.us-gov-east-1.amazonaws.com",
 					CredentialScope: credentialScope{
 						Region: "us-gov-east-1",
 					},
 				},
 				"us-gov-west-1": endpoint{},
-				"us-gov-west-1-***REMOVED***ps": endpoint{
+				"us-gov-west-1-fips": endpoint{
 					Hostname: "dynamodb.us-gov-west-1.amazonaws.com",
 					CredentialScope: credentialScope{
 						Region: "us-gov-west-1",
@@ -5191,8 +5191,8 @@ var awsusgovPartition = partition{
 			},
 			Endpoints: endpoints{
 				"us-gov-west-1": endpoint{},
-				"us-gov-west-1-***REMOVED***ps": endpoint{
-					Hostname: "translate-***REMOVED***ps.us-gov-west-1.amazonaws.com",
+				"us-gov-west-1-fips": endpoint{
+					Hostname: "translate-fips.us-gov-west-1.amazonaws.com",
 					CredentialScope: credentialScope{
 						Region: "us-gov-west-1",
 					},
@@ -5222,7 +5222,7 @@ func AwsIsoPartition() Partition {
 var awsisoPartition = partition{
 	ID:        "aws-iso",
 	Name:      "AWS ISO (US)",
-	DNSSuf***REMOVED***x: "c2s.ic.gov",
+	DNSSuffix: "c2s.ic.gov",
 	RegionRegex: regionRegex{
 		Regexp: func() *regexp.Regexp {
 			reg, _ := regexp.Compile("^us\\-iso\\-\\w+\\-\\d+$")
@@ -5230,7 +5230,7 @@ var awsisoPartition = partition{
 		}(),
 	},
 	Defaults: endpoint{
-		Hostname:          "{service}.{region}.{dnsSuf***REMOVED***x}",
+		Hostname:          "{service}.{region}.{dnsSuffix}",
 		Protocols:         []string{"https"},
 		SignatureVersions: []string{"v4"},
 	},
@@ -5301,7 +5301,7 @@ var awsisoPartition = partition{
 				"us-iso-east-1": endpoint{},
 			},
 		},
-		"con***REMOVED***g": service{
+		"config": service{
 
 			Endpoints: endpoints{
 				"us-iso-east-1": endpoint{},
@@ -5427,7 +5427,7 @@ var awsisoPartition = partition{
 
 			Endpoints: endpoints{
 				"ProdFips": endpoint{
-					Hostname: "kms-***REMOVED***ps.us-iso-east-1.c2s.ic.gov",
+					Hostname: "kms-fips.us-iso-east-1.c2s.ic.gov",
 					CredentialScope: credentialScope{
 						Region: "us-iso-east-1",
 					},
@@ -5577,7 +5577,7 @@ func AwsIsoBPartition() Partition {
 var awsisobPartition = partition{
 	ID:        "aws-iso-b",
 	Name:      "AWS ISOB (US)",
-	DNSSuf***REMOVED***x: "sc2s.sgov.gov",
+	DNSSuffix: "sc2s.sgov.gov",
 	RegionRegex: regionRegex{
 		Regexp: func() *regexp.Regexp {
 			reg, _ := regexp.Compile("^us\\-isob\\-\\w+\\-\\d+$")
@@ -5585,7 +5585,7 @@ var awsisobPartition = partition{
 		}(),
 	},
 	Defaults: endpoint{
-		Hostname:          "{service}.{region}.{dnsSuf***REMOVED***x}",
+		Hostname:          "{service}.{region}.{dnsSuffix}",
 		Protocols:         []string{"https"},
 		SignatureVersions: []string{"v4"},
 	},
@@ -5627,7 +5627,7 @@ var awsisobPartition = partition{
 				"us-isob-east-1": endpoint{},
 			},
 		},
-		"con***REMOVED***g": service{
+		"config": service{
 
 			Endpoints: endpoints{
 				"us-isob-east-1": endpoint{},
@@ -5733,7 +5733,7 @@ var awsisobPartition = partition{
 
 			Endpoints: endpoints{
 				"ProdFips": endpoint{
-					Hostname: "kms-***REMOVED***ps.us-isob-east-1.sc2s.sgov.gov",
+					Hostname: "kms-fips.us-isob-east-1.sc2s.sgov.gov",
 					CredentialScope: credentialScope{
 						Region: "us-isob-east-1",
 					},
@@ -5790,7 +5790,7 @@ var awsisobPartition = partition{
 		},
 		"sqs": service{
 			Defaults: endpoint{
-				SSLCommonName: "{region}.queue.{dnsSuf***REMOVED***x}",
+				SSLCommonName: "{region}.queue.{dnsSuffix}",
 				Protocols:     []string{"http", "https"},
 			},
 			Endpoints: endpoints{

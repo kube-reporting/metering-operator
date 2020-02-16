@@ -1,6 +1,6 @@
 // Copyright 2012 The Go Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE ***REMOVED***le.
+// license that can be found in the LICENSE file.
 
 package windows
 
@@ -19,7 +19,7 @@ const (
 
 const (
 	NameUnknown          = 0
-	NameFullyQuali***REMOVED***edDN = 1
+	NameFullyQualifiedDN = 1
 	NameSamCompatible    = 2
 	NameDisplay          = 3
 	NameUniqueId         = 6
@@ -91,18 +91,18 @@ const (
 	SidTypeLabel
 )
 
-type SidIdenti***REMOVED***erAuthority struct {
+type SidIdentifierAuthority struct {
 	Value [6]byte
 }
 
 var (
-	SECURITY_NULL_SID_AUTHORITY        = SidIdenti***REMOVED***erAuthority{[6]byte{0, 0, 0, 0, 0, 0}}
-	SECURITY_WORLD_SID_AUTHORITY       = SidIdenti***REMOVED***erAuthority{[6]byte{0, 0, 0, 0, 0, 1}}
-	SECURITY_LOCAL_SID_AUTHORITY       = SidIdenti***REMOVED***erAuthority{[6]byte{0, 0, 0, 0, 0, 2}}
-	SECURITY_CREATOR_SID_AUTHORITY     = SidIdenti***REMOVED***erAuthority{[6]byte{0, 0, 0, 0, 0, 3}}
-	SECURITY_NON_UNIQUE_AUTHORITY      = SidIdenti***REMOVED***erAuthority{[6]byte{0, 0, 0, 0, 0, 4}}
-	SECURITY_NT_AUTHORITY              = SidIdenti***REMOVED***erAuthority{[6]byte{0, 0, 0, 0, 0, 5}}
-	SECURITY_MANDATORY_LABEL_AUTHORITY = SidIdenti***REMOVED***erAuthority{[6]byte{0, 0, 0, 0, 0, 16}}
+	SECURITY_NULL_SID_AUTHORITY        = SidIdentifierAuthority{[6]byte{0, 0, 0, 0, 0, 0}}
+	SECURITY_WORLD_SID_AUTHORITY       = SidIdentifierAuthority{[6]byte{0, 0, 0, 0, 0, 1}}
+	SECURITY_LOCAL_SID_AUTHORITY       = SidIdentifierAuthority{[6]byte{0, 0, 0, 0, 0, 2}}
+	SECURITY_CREATOR_SID_AUTHORITY     = SidIdentifierAuthority{[6]byte{0, 0, 0, 0, 0, 3}}
+	SECURITY_NON_UNIQUE_AUTHORITY      = SidIdentifierAuthority{[6]byte{0, 0, 0, 0, 0, 4}}
+	SECURITY_NT_AUTHORITY              = SidIdentifierAuthority{[6]byte{0, 0, 0, 0, 0, 5}}
+	SECURITY_MANDATORY_LABEL_AUTHORITY = SidIdentifierAuthority{[6]byte{0, 0, 0, 0, 0, 16}}
 )
 
 const (
@@ -132,7 +132,7 @@ const (
 	SECURITY_NT_NON_UNIQUE_RID          = 0x15
 )
 
-// Prede***REMOVED***ned domain-relative RIDs for local groups.
+// Predefined domain-relative RIDs for local groups.
 // See https://msdn.microsoft.com/en-us/library/windows/desktop/aa379649(v=vs.85).aspx
 const (
 	DOMAIN_ALIAS_RID_ADMINS                         = 0x220
@@ -168,15 +168,15 @@ const (
 //sys	ConvertStringSidToSid(stringSid *uint16, sid **SID) (err error) = advapi32.ConvertStringSidToSidW
 //sys	GetLengthSid(sid *SID) (len uint32) = advapi32.GetLengthSid
 //sys	CopySid(destSidLen uint32, destSid *SID, srcSid *SID) (err error) = advapi32.CopySid
-//sys	AllocateAndInitializeSid(identAuth *SidIdenti***REMOVED***erAuthority, subAuth byte, subAuth0 uint32, subAuth1 uint32, subAuth2 uint32, subAuth3 uint32, subAuth4 uint32, subAuth5 uint32, subAuth6 uint32, subAuth7 uint32, sid **SID) (err error) = advapi32.AllocateAndInitializeSid
+//sys	AllocateAndInitializeSid(identAuth *SidIdentifierAuthority, subAuth byte, subAuth0 uint32, subAuth1 uint32, subAuth2 uint32, subAuth3 uint32, subAuth4 uint32, subAuth5 uint32, subAuth6 uint32, subAuth7 uint32, sid **SID) (err error) = advapi32.AllocateAndInitializeSid
 //sys	FreeSid(sid *SID) (err error) [failretval!=0] = advapi32.FreeSid
 //sys	EqualSid(sid1 *SID, sid2 *SID) (isEqual bool) = advapi32.EqualSid
 
-// The security identi***REMOVED***er (SID) structure is a variable-length
+// The security identifier (SID) structure is a variable-length
 // structure used to uniquely identify users or groups.
 type SID struct{}
 
-// StringToSid converts a string-format security identi***REMOVED***er
+// StringToSid converts a string-format security identifier
 // sid into a valid, functional sid.
 func StringToSid(s string) (*SID, error) {
 	var sid *SID
@@ -192,7 +192,7 @@ func StringToSid(s string) (*SID, error) {
 	return sid.Copy()
 }
 
-// LookupSID retrieves a security identi***REMOVED***er sid for the account
+// LookupSID retrieves a security identifier sid for the account
 // and the name of the domain on which the account was found.
 // System specify target computer to search.
 func LookupSID(system, account string) (sid *SID, domain string, accType uint32, err error) {
@@ -241,12 +241,12 @@ func (sid *SID) String() (string, error) {
 	return UTF16ToString((*[256]uint16)(unsafe.Pointer(s))[:]), nil
 }
 
-// Len returns the length, in bytes, of a valid security identi***REMOVED***er sid.
+// Len returns the length, in bytes, of a valid security identifier sid.
 func (sid *SID) Len() int {
 	return int(GetLengthSid(sid))
 }
 
-// Copy creates a duplicate of security identi***REMOVED***er sid.
+// Copy creates a duplicate of security identifier sid.
 func (sid *SID) Copy() (*SID, error) {
 	b := make([]byte, sid.Len())
 	sid2 := (*SID)(unsafe.Pointer(&b[0]))
@@ -258,7 +258,7 @@ func (sid *SID) Copy() (*SID, error) {
 }
 
 // LookupAccount retrieves the name of the account for this sid
-// and the name of the ***REMOVED***rst domain on which this sid is found.
+// and the name of the first domain on which this sid is found.
 // System specify target computer to search for.
 func (sid *SID) LookupAccount(system string) (account, domain string, accType uint32, err error) {
 	var sys *uint16
@@ -369,12 +369,12 @@ type Tokengroups struct {
 //sys checkTokenMembership(tokenHandle Token, sidToCheck *SID, isMember *int32) (err error) = advapi32.CheckTokenMembership
 //sys	OpenProcessToken(h Handle, access uint32, token *Token) (err error) = advapi32.OpenProcessToken
 //sys	GetTokenInformation(t Token, infoClass uint32, info *byte, infoLen uint32, returnedLen *uint32) (err error) = advapi32.GetTokenInformation
-//sys	GetUserPro***REMOVED***leDirectory(t Token, dir *uint16, dirLen *uint32) (err error) = userenv.GetUserPro***REMOVED***leDirectoryW
+//sys	GetUserProfileDirectory(t Token, dir *uint16, dirLen *uint32) (err error) = userenv.GetUserProfileDirectoryW
 
 // An access token contains the security information for a logon session.
 // The system creates an access token when a user logs on, and every
 // process executed on behalf of the user has a copy of the token.
-// The token identi***REMOVED***es the user, the user's groups, and the user's
+// The token identifies the user, the user's groups, and the user's
 // privileges. The system uses the token to control access to securable
 // objects and to control the ability of the user to perform various
 // system-related operations on the local computer.
@@ -400,7 +400,7 @@ func (t Token) Close() error {
 	return CloseHandle(Handle(t))
 }
 
-// getInfo retrieves a speci***REMOVED***ed type of information about an access token.
+// getInfo retrieves a specified type of information about an access token.
 func (t Token) getInfo(class uint32, initSize int) (unsafe.Pointer, error) {
 	n := uint32(initSize)
 	for {
@@ -447,13 +447,13 @@ func (t Token) GetTokenPrimaryGroup() (*Tokenprimarygroup, error) {
 	return (*Tokenprimarygroup)(i), nil
 }
 
-// GetUserPro***REMOVED***leDirectory retrieves path to the
-// root directory of the access token t user's pro***REMOVED***le.
-func (t Token) GetUserPro***REMOVED***leDirectory() (string, error) {
+// GetUserProfileDirectory retrieves path to the
+// root directory of the access token t user's profile.
+func (t Token) GetUserProfileDirectory() (string, error) {
 	n := uint32(100)
 	for {
 		b := make([]uint16, n)
-		e := GetUserPro***REMOVED***leDirectory(t, &b[0], &n)
+		e := GetUserProfileDirectory(t, &b[0], &n)
 		if e == nil {
 			return UTF16ToString(b), nil
 		}

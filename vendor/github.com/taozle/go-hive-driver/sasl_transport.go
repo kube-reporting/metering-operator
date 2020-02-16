@@ -1,7 +1,7 @@
 package hive
 
 import (
-	"bu***REMOVED***o"
+	"bufio"
 	"bytes"
 	"encoding/binary"
 	"fmt"
@@ -25,7 +25,7 @@ type TSaslClientTransport struct {
 
 	client    sasl.Client
 	buf       bytes.Buffer
-	reader    *bu***REMOVED***o.Reader
+	reader    *bufio.Reader
 	frameSize uint32 //Current remaining size of the frame. if ==0 read next frame header
 	buffer    [4]byte
 	maxLength uint32
@@ -36,7 +36,7 @@ func NewTSaslClientTransport(transport thrift.TTransport, factory func() sasl.Cl
 		transport:     transport,
 		clientFactory: factory,
 
-		reader:    bu***REMOVED***o.NewReader(transport),
+		reader:    bufio.NewReader(transport),
 		maxLength: thrift.DEFAULT_MAX_LENGTH,
 	}
 }

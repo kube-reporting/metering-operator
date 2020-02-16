@@ -1,6 +1,6 @@
 // Copyright 2011 The Go Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE ***REMOVED***le.
+// license that can be found in the LICENSE file.
 
 package terminal
 
@@ -67,7 +67,7 @@ type Terminal struct {
 	pasteActive bool
 
 	// cursorX contains the current X value of the cursor where the left
-	// edge is 0. cursorY contains the row number where the ***REMOVED***rst row of
+	// edge is 0. cursorY contains the row number where the first row of
 	// the current line is 0.
 	cursorX, cursorY int
 	// maxLine is the greatest value of cursorY so far.
@@ -95,7 +95,7 @@ type Terminal struct {
 }
 
 // NewTerminal runs a VT100 terminal on the given ReadWriter. If the ReadWriter is
-// a local terminal, that terminal must ***REMOVED***rst have been put into raw mode.
+// a local terminal, that terminal must first have been put into raw mode.
 // prompt is a string that is written at the start of each input line (i.e.
 // "> ").
 func NewTerminal(c io.ReadWriter, prompt string) *Terminal {
@@ -205,7 +205,7 @@ func bytesToKey(b []byte, pasteActive bool) (rune, []byte) {
 	}
 
 	// If we get here then we have a key that we don't recognise, or a
-	// partial sequence. It's not clear how one should ***REMOVED***nd the end of a
+	// partial sequence. It's not clear how one should find the end of a
 	// sequence without knowing them all, but it seems that [a-zA-Z~] only
 	// appears at the end of a sequence.
 	for i, c := range b[0:] {
@@ -542,11 +542,11 @@ func (t *Terminal) handleKey(key rune) (line string, ok bool) {
 		t.setLine(t.line, t.pos)
 	default:
 		if t.AutoCompleteCallback != nil {
-			pre***REMOVED***x := string(t.line[:t.pos])
-			suf***REMOVED***x := string(t.line[t.pos:])
+			prefix := string(t.line[:t.pos])
+			suffix := string(t.line[t.pos:])
 
 			t.lock.Unlock()
-			newLine, newPos, completeOk := t.AutoCompleteCallback(pre***REMOVED***x+suf***REMOVED***x, len(pre***REMOVED***x), key)
+			newLine, newPos, completeOk := t.AutoCompleteCallback(prefix+suffix, len(prefix), key)
 			t.lock.Lock()
 
 			if completeOk {
@@ -636,7 +636,7 @@ func (t *Terminal) Write(buf []byte) (n int, err error) {
 	}
 
 	// We have a prompt and possibly user input on the screen. We
-	// have to clear it ***REMOVED***rst.
+	// have to clear it first.
 	t.move(0 /* up */, 0 /* down */, t.cursorX /* left */, 0 /* right */)
 	t.cursorX = 0
 	t.clearLineToRight()
@@ -729,7 +729,7 @@ func (t *Terminal) readLine() (line string, err error) {
 					}
 					continue
 				}
-			} ***REMOVED*** if key == keyPasteEnd {
+			} else if key == keyPasteEnd {
 				t.pasteActive = false
 				continue
 			}
@@ -741,7 +741,7 @@ func (t *Terminal) readLine() (line string, err error) {
 		if len(rest) > 0 {
 			n := copy(t.inBuf[:], rest)
 			t.remainder = t.inBuf[:n]
-		} ***REMOVED*** {
+		} else {
 			t.remainder = nil
 		}
 		t.c.Write(t.outBuf)
@@ -816,7 +816,7 @@ func (t *Terminal) SetSize(width, height int) error {
 
 	switch {
 	case width == oldWidth:
-		// If the width didn't change then nothing ***REMOVED*** needs to be
+		// If the width didn't change then nothing else needs to be
 		// done.
 		return nil
 	case len(t.line) == 0 && t.cursorX == 0 && t.cursorY == 0:
@@ -876,7 +876,7 @@ var ErrPasteIndicator = pasteIndicatorError{}
 func (t *Terminal) SetBracketedPasteMode(on bool) {
 	if on {
 		io.WriteString(t.c, "\x1b[?2004h")
-	} ***REMOVED*** {
+	} else {
 		io.WriteString(t.c, "\x1b[?2004l")
 	}
 }
@@ -921,9 +921,9 @@ func (s *stRingBuffer) NthPreviousEntry(n int) (value string, ok bool) {
 	return s.entries[index], true
 }
 
-// readPasswordLine reads from reader until it ***REMOVED***nds \n or io.EOF.
+// readPasswordLine reads from reader until it finds \n or io.EOF.
 // The slice returned does not include the \n.
-// readPasswordLine also ignores any \r it ***REMOVED***nds.
+// readPasswordLine also ignores any \r it finds.
 func readPasswordLine(reader io.Reader) ([]byte, error) {
 	var buf [1]byte
 	var ret []byte

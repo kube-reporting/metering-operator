@@ -230,14 +230,14 @@ type Cmsghdr struct {
 }
 
 type Inet4Pktinfo struct {
-	I***REMOVED***ndex  uint32
+	Ifindex  uint32
 	Spec_dst [4]byte /* in_addr */
 	Addr     [4]byte /* in_addr */
 }
 
 type Inet6Pktinfo struct {
 	Addr    [16]byte /* in6_addr */
-	I***REMOVED***ndex uint32
+	Ifindex uint32
 }
 
 type IPv6MTUInfo struct {

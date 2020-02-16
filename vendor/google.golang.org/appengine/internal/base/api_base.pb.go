@@ -5,7 +5,7 @@
 /*
 Package base is a generated protocol buffer package.
 
-It is generated from these ***REMOVED***les:
+It is generated from these files:
 	google.golang.org/appengine/internal/base/api_base.proto
 
 It has these top-level messages:
@@ -93,7 +93,7 @@ func (m *BoolProto) GetValue() bool {
 }
 
 type DoubleProto struct {
-	Value            *float64 `protobuf:"***REMOVED***xed64,1,req,name=value" json:"value,omitempty"`
+	Value            *float64 `protobuf:"fixed64,1,req,name=value" json:"value,omitempty"`
 	XXX_unrecognized []byte   `json:"-"`
 }
 

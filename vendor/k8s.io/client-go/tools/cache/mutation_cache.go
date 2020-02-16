@@ -2,7 +2,7 @@
 Copyright 2017 The Kubernetes Authors.
 
 Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this ***REMOVED***le except in compliance with the License.
+you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
 
     http://www.apache.org/licenses/LICENSE-2.0
@@ -10,7 +10,7 @@ You may obtain a copy of the License at
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the speci***REMOVED***c language governing permissions and
+See the License for the specific language governing permissions and
 limitations under the License.
 */
 
@@ -35,7 +35,7 @@ import (
 // that can be used to provide a more current view of a requested object.  It requires interpreting
 // resourceVersions for comparisons.
 // Implementations must be thread-safe.
-// TODO ***REMOVED***nd a way to layer this into an informer/lister
+// TODO find a way to layer this into an informer/lister
 type MutationCache interface {
 	GetByKey(key string) (interface{}, bool, error)
 	ByIndex(indexName, indexKey string) ([]interface{}, error)
@@ -138,7 +138,7 @@ func (c *mutationCache) ByIndex(name string, indexKey string) ([]interface{}, er
 		}
 		if objRuntime, ok := obj.(runtime.Object); ok {
 			items = append(items, c.newerObject(key, objRuntime))
-		} ***REMOVED*** {
+		} else {
 			items = append(items, obj)
 		}
 	}
@@ -192,7 +192,7 @@ func (c *mutationCache) newerObject(key string, backing runtime.Object) runtime.
 }
 
 // Mutation adds a change to the cache that can be returned in GetByKey if it is newer than the backingCache
-// copy.  If you call Mutation twice with the same object on different threads, one will win, but its not de***REMOVED***ned
+// copy.  If you call Mutation twice with the same object on different threads, one will win, but its not defined
 // which one.  This doesn't affect correctness, since the GetByKey guaranteed of "later of these two caches" is
 // preserved, but you may not get the version of the object you want.  The object you get is only guaranteed to
 // "one that was valid at some point in time", not "the one that I want".
@@ -220,7 +220,7 @@ func (c *mutationCache) Mutation(obj interface{}) {
 }
 
 // etcdObjectVersioner implements versioning and extracting etcd node information
-// for objects that have an embedded ObjectMeta or ListMeta ***REMOVED***eld.
+// for objects that have an embedded ObjectMeta or ListMeta field.
 type etcdObjectVersioner struct{}
 
 // ObjectResourceVersion implements Versioner

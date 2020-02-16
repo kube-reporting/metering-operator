@@ -18,7 +18,7 @@ func DeepEqual(a, b interface{}) bool {
 		// If the elements are both nil, and of the same type they are equal
 		// If they are of different types they are not equal
 		return reflect.TypeOf(a) == reflect.TypeOf(b)
-	} ***REMOVED*** if raValid != rbValid {
+	} else if raValid != rbValid {
 		// Both values must be valid to be equal
 		return false
 	}

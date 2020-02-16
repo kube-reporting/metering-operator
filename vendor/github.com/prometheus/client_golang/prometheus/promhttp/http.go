@@ -1,6 +1,6 @@
 // Copyright 2016 The Prometheus Authors
 // Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this ***REMOVED***le except in compliance with the License.
+// you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 //
 // http://www.apache.org/licenses/LICENSE-2.0
@@ -8,7 +8,7 @@
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the speci***REMOVED***c language governing permissions and
+// See the License for the specific language governing permissions and
 // limitations under the License.
 
 // Package promhttp provides tooling around HTTP servers and clients.
@@ -23,12 +23,12 @@
 // Second, the package provides tooling to instrument instances of http.Handler
 // via middleware. Middleware wrappers follow the naming scheme
 // InstrumentHandlerX, where X describes the intended use of the middleware.
-// See each function's doc comment for speci***REMOVED***c details.
+// See each function's doc comment for specific details.
 //
 // Finally, the package allows for an http.RoundTripper to be instrumented via
 // middleware. Middleware wrappers follow the naming scheme
 // InstrumentRoundTripperX, where X describes the intended use of the
-// middleware. See each function's doc comment for speci***REMOVED***c details.
+// middleware. See each function's doc comment for specific details.
 package promhttp
 
 import (
@@ -68,7 +68,7 @@ func giveBuf(buf *bytes.Buffer) {
 }
 
 // Handler returns an HTTP handler for the prometheus.DefaultGatherer. The
-// Handler uses the default HandlerOpts, i.e. report the ***REMOVED***rst error as an HTTP
+// Handler uses the default HandlerOpts, i.e. report the first error as an HTTP
 // error, no error logging, and compression if requested by the client.
 //
 // If you want to create a Handler for the DefaultGatherer with different
@@ -79,7 +79,7 @@ func Handler() http.Handler {
 }
 
 // HandlerFor returns an http.Handler for the provided Gatherer. The behavior
-// of the Handler is de***REMOVED***ned by the provided HandlerOpts.
+// of the Handler is defined by the provided HandlerOpts.
 func HandlerFor(reg prometheus.Gatherer, opts HandlerOpts) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
 		mfs, err := reg.Gather()
@@ -142,14 +142,14 @@ func HandlerFor(reg prometheus.Gatherer, opts HandlerOpts) http.Handler {
 	})
 }
 
-// HandlerErrorHandling de***REMOVED***nes how a Handler serving metrics will handle
+// HandlerErrorHandling defines how a Handler serving metrics will handle
 // errors.
 type HandlerErrorHandling int
 
 // These constants cause handlers serving metrics to behave as described if
 // errors are encountered.
 const (
-	// Serve an HTTP status code 500 upon the ***REMOVED***rst error
+	// Serve an HTTP status code 500 upon the first error
 	// encountered. Report the error message in the body.
 	HTTPErrorOnError HandlerErrorHandling = iota
 	// Ignore errors and try to serve as many metrics as possible.  However,
@@ -159,7 +159,7 @@ const (
 	// log errors (by providing an ErrorLog in HandlerOpts) to not mask
 	// errors completely.
 	ContinueOnError
-	// Panic upon the ***REMOVED***rst error encountered (useful for "crash only" apps).
+	// Panic upon the first error encountered (useful for "crash only" apps).
 	PanicOnError
 )
 
@@ -170,14 +170,14 @@ type Logger interface {
 	Println(v ...interface{})
 }
 
-// HandlerOpts speci***REMOVED***es options how to serve metrics via an http.Handler. The
+// HandlerOpts specifies options how to serve metrics via an http.Handler. The
 // zero value of HandlerOpts is a reasonable default.
 type HandlerOpts struct {
-	// ErrorLog speci***REMOVED***es an optional logger for errors collecting and
+	// ErrorLog specifies an optional logger for errors collecting and
 	// serving metrics. If nil, errors are not logged at all.
 	ErrorLog Logger
-	// ErrorHandling de***REMOVED***nes how errors are handled. Note that errors are
-	// logged regardless of the con***REMOVED***gured ErrorHandling provided ErrorLog
+	// ErrorHandling defines how errors are handled. Note that errors are
+	// logged regardless of the configured ErrorHandling provided ErrorLog
 	// is not nil.
 	ErrorHandling HandlerErrorHandling
 	// If DisableCompression is true, the handler will never compress the
@@ -196,7 +196,7 @@ func decorateWriter(request *http.Request, writer io.Writer, compressionDisabled
 	parts := strings.Split(header, ",")
 	for _, part := range parts {
 		part := strings.TrimSpace(part)
-		if part == "gzip" || strings.HasPre***REMOVED***x(part, "gzip;") {
+		if part == "gzip" || strings.HasPrefix(part, "gzip;") {
 			return gzip.NewWriter(writer), "gzip"
 		}
 	}

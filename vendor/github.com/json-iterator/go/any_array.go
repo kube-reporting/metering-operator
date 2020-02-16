@@ -7,7 +7,7 @@ import (
 
 type arrayLazyAny struct {
 	baseAny
-	cfg *frozenCon***REMOVED***g
+	cfg *frozenConfig
 	buf []byte
 	err error
 }
@@ -100,18 +100,18 @@ func (any *arrayLazyAny) Get(path ...interface{}) Any {
 	if len(path) == 0 {
 		return any
 	}
-	switch ***REMOVED***rstPath := path[0].(type) {
+	switch firstPath := path[0].(type) {
 	case int:
 		iter := any.cfg.BorrowIterator(any.buf)
 		defer any.cfg.ReturnIterator(iter)
-		valueBytes := locateArrayElement(iter, ***REMOVED***rstPath)
+		valueBytes := locateArrayElement(iter, firstPath)
 		if valueBytes == nil {
 			return newInvalidAny(path)
 		}
 		iter.ResetBytes(valueBytes)
 		return locatePath(iter, path[1:])
 	case int32:
-		if '*' == ***REMOVED***rstPath {
+		if '*' == firstPath {
 			iter := any.cfg.BorrowIterator(any.buf)
 			defer any.cfg.ReturnIterator(iter)
 			arr := make([]Any, 0)
@@ -242,14 +242,14 @@ func (any *arrayAny) Get(path ...interface{}) Any {
 	if len(path) == 0 {
 		return any
 	}
-	switch ***REMOVED***rstPath := path[0].(type) {
+	switch firstPath := path[0].(type) {
 	case int:
-		if ***REMOVED***rstPath < 0 || ***REMOVED***rstPath >= any.val.Len() {
+		if firstPath < 0 || firstPath >= any.val.Len() {
 			return newInvalidAny(path)
 		}
-		return Wrap(any.val.Index(***REMOVED***rstPath).Interface())
+		return Wrap(any.val.Index(firstPath).Interface())
 	case int32:
-		if '*' == ***REMOVED***rstPath {
+		if '*' == firstPath {
 			mappedAll := make([]Any, 0)
 			for i := 0; i < any.val.Len(); i++ {
 				mapped := Wrap(any.val.Index(i).Interface()).Get(path[1:]...)

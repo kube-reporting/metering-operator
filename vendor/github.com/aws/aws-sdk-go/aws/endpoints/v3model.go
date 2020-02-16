@@ -21,7 +21,7 @@ func (ps partitions) EndpointFor(service, region string, opts ...func(*Options))
 		return ps[i].EndpointFor(service, region, opts...)
 	}
 
-	// If loose matching fallback to ***REMOVED***rst partition format to use
+	// If loose matching fallback to first partition format to use
 	// when resolving the endpoint.
 	if !opt.StrictMatching && len(ps) > 0 {
 		return ps[0].EndpointFor(service, region, opts...)
@@ -30,7 +30,7 @@ func (ps partitions) EndpointFor(service, region string, opts ...func(*Options))
 	return ResolvedEndpoint{}, NewUnknownEndpointError("all partitions", service, region, []string{})
 }
 
-// Partitions satis***REMOVED***es the EnumPartitions interface and returns a list
+// Partitions satisfies the EnumPartitions interface and returns a list
 // of Partitions representing each partition represented in the SDK's
 // endpoints model.
 func (ps partitions) Partitions() []Partition {
@@ -45,7 +45,7 @@ func (ps partitions) Partitions() []Partition {
 type partition struct {
 	ID          string      `json:"partition"`
 	Name        string      `json:"partitionName"`
-	DNSSuf***REMOVED***x   string      `json:"dnsSuf***REMOVED***x"`
+	DNSSuffix   string      `json:"dnsSuffix"`
 	RegionRegex regionRegex `json:"regionRegex"`
 	Defaults    endpoint    `json:"defaults"`
 	Regions     regions     `json:"regions"`
@@ -54,7 +54,7 @@ type partition struct {
 
 func (p partition) Partition() Partition {
 	return Partition{
-		dnsSuf***REMOVED***x: p.DNSSuf***REMOVED***x,
+		dnsSuffix: p.DNSSuffix,
 		id:        p.ID,
 		p:         &p,
 	}
@@ -99,7 +99,7 @@ func (p partition) EndpointFor(service, region string, opts ...func(*Options)) (
 
 	defs := []endpoint{p.Defaults, s.Defaults}
 
-	return e.resolve(service, region, p.DNSSuf***REMOVED***x, defs, opt), nil
+	return e.resolve(service, region, p.DNSSuffix, defs, opt), nil
 }
 
 func serviceList(ss services) []string {
@@ -159,7 +159,7 @@ func (s *service) endpointForRegion(region string) (endpoint, bool) {
 		return e, true
 	}
 
-	// Unable to ***REMOVED***nd any matching endpoint, return
+	// Unable to find any matching endpoint, return
 	// blank that will be used for generic endpoint creation.
 	return endpoint{}, false
 }
@@ -171,7 +171,7 @@ type endpoint struct {
 	Protocols       []string        `json:"protocols"`
 	CredentialScope credentialScope `json:"credentialScope"`
 
-	// Custom ***REMOVED***elds not modeled
+	// Custom fields not modeled
 	HasDualStack      boxedBool `json:"-"`
 	DualStackHostname string    `json:"-"`
 
@@ -208,7 +208,7 @@ func getByPriority(s []string, p []string, def string) string {
 	return s[0]
 }
 
-func (e endpoint) resolve(service, region, dnsSuf***REMOVED***x string, defs []endpoint, opts Options) ResolvedEndpoint {
+func (e endpoint) resolve(service, region, dnsSuffix string, defs []endpoint, opts Options) ResolvedEndpoint {
 	var merged endpoint
 	for _, def := range defs {
 		merged.mergeIn(def)
@@ -225,7 +225,7 @@ func (e endpoint) resolve(service, region, dnsSuf***REMOVED***x string, defs []e
 
 	u := strings.Replace(hostname, "{service}", service, 1)
 	u = strings.Replace(u, "{region}", region, 1)
-	u = strings.Replace(u, "{dnsSuf***REMOVED***x}", dnsSuf***REMOVED***x, 1)
+	u = strings.Replace(u, "{dnsSuffix}", dnsSuffix, 1)
 
 	scheme := getEndpointScheme(e.Protocols, opts.DisableSSL)
 	u = fmt.Sprintf("%s://%s", scheme, u)
@@ -301,7 +301,7 @@ func (b *boxedBool) UnmarshalJSON(buf []byte) error {
 
 	if v {
 		*b = boxedTrue
-	} ***REMOVED*** {
+	} else {
 		*b = boxedFalse
 	}
 

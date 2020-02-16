@@ -27,7 +27,7 @@ func TestOrderedMap(t *testing.T) {
 	})
 	v, _ = o.Get("strings")
 	if v.([]string)[0] != "t" {
-		t.Error("Set strings ***REMOVED***rst index")
+		t.Error("Set strings first index")
 	}
 	if v.([]string)[1] != "u" {
 		t.Error("Set strings second index")

@@ -1,6 +1,6 @@
 Mozilla Public License, version 2.0
 
-1. De***REMOVED***nitions
+1. Definitions
 
 1.1. "Contributor"
 
@@ -20,7 +20,7 @@ Mozilla Public License, version 2.0
 
      means Source Code Form to which the initial Contributor has attached the
      notice in Exhibit A, the Executable Form of such Source Code Form, and
-     Modi***REMOVED***cations of such Source Code Form, in each case including portions
+     Modifications of such Source Code Form, in each case including portions
      thereof.
 
 1.5. "Incompatible With Secondary Licenses"
@@ -40,7 +40,7 @@ Mozilla Public License, version 2.0
 1.7. "Larger Work"
 
      means a work that combines Covered Software with other material, in a
-     separate ***REMOVED***le or ***REMOVED***les, that is not Covered Software.
+     separate file or files, that is not Covered Software.
 
 1.8. "License"
 
@@ -52,14 +52,14 @@ Mozilla Public License, version 2.0
      at the time of the initial grant or subsequently, any and all of the
      rights conveyed by this License.
 
-1.10. "Modi***REMOVED***cations"
+1.10. "Modifications"
 
      means any of the following:
 
-     a. any ***REMOVED***le in Source Code Form that results from an addition to,
-        deletion from, or modi***REMOVED***cation of the contents of Covered Software; or
+     a. any file in Source Code Form that results from an addition to,
+        deletion from, or modification of the contents of Covered Software; or
 
-     b. any new ***REMOVED***le in Source Code Form that contains any Covered Software.
+     b. any new file in Source Code Form that contains any Covered Software.
 
 1.11. "Patent Claims" of a Contributor
 
@@ -77,17 +77,17 @@ Mozilla Public License, version 2.0
 
 1.13. "Source Code Form"
 
-      means the form of the work preferred for making modi***REMOVED***cations.
+      means the form of the work preferred for making modifications.
 
 1.14. "You" (or "Your")
 
       means an individual or a legal entity exercising rights under this
       License. For legal entities, "You" includes any entity that controls, is
       controlled by, or is under common control with You. For purposes of this
-      de***REMOVED***nition, "control" means (a) the power, direct or indirect, to cause
+      definition, "control" means (a) the power, direct or indirect, to cause
       the direction or management of such entity, whether by contract or
-      otherwise, or (b) ownership of more than ***REMOVED***fty percent (50%) of the
-      outstanding shares or bene***REMOVED***cial ownership of such entity.
+      otherwise, or (b) ownership of more than fifty percent (50%) of the
+      outstanding shares or beneficial ownership of such entity.
 
 
 2. License Grants and Conditions
@@ -100,7 +100,7 @@ Mozilla Public License, version 2.0
      a. under intellectual property rights (other than patent or trademark)
         Licensable by such Contributor to use, reproduce, make available,
         modify, display, perform, distribute, and otherwise exploit its
-        Contributions, either on an unmodi***REMOVED***ed basis, with Modi***REMOVED***cations, or
+        Contributions, either on an unmodified basis, with Modifications, or
         as part of a Larger Work; and
 
      b. under Patent Claims of such Contributor to make, use, sell, offer for
@@ -110,7 +110,7 @@ Mozilla Public License, version 2.0
 2.2. Effective Date
 
      The licenses granted in Section 2.1 with respect to any Contribution
-     become effective for each Contribution on the date the Contributor ***REMOVED***rst
+     become effective for each Contribution on the date the Contributor first
      distributes such Contribution.
 
 2.3. Limitations on Grant Scope
@@ -124,7 +124,7 @@ Mozilla Public License, version 2.0
      a. for any code that a Contributor has removed from Covered Software; or
 
      b. for infringements caused by: (i) Your and any other third party's
-        modi***REMOVED***cations of Covered Software, or (ii) the combination of its
+        modifications of Covered Software, or (ii) the combination of its
         Contributions with other software (except as part of its Contributor
         Version); or
 
@@ -145,7 +145,7 @@ Mozilla Public License, version 2.0
 2.5. Representation
 
      Each Contributor represents that the Contributor believes its
-     Contributions are its original creation(s) or it has suf***REMOVED***cient rights to
+     Contributions are its original creation(s) or it has sufficient rights to
      grant the rights to its Contributions conveyed by this License.
 
 2.6. Fair Use
@@ -165,7 +165,7 @@ Mozilla Public License, version 2.0
 3.1. Distribution of Source Form
 
      All distribution of Covered Software in Source Code Form, including any
-     Modi***REMOVED***cations that You create or to which You contribute, must be under
+     Modifications that You create or to which You contribute, must be under
      the terms of this License. You must inform recipients that the Source
      Code Form of the Covered Software is governed by the terms of this
      License, and how they can obtain a copy of this License. You may not
@@ -218,7 +218,7 @@ Mozilla Public License, version 2.0
      You alone, and You hereby agree to indemnify every Contributor for any
      liability incurred by such Contributor as a result of warranty, support,
      indemnity or liability terms You offer. You may include additional
-     disclaimers of warranty and limitations of liability speci***REMOVED***c to any
+     disclaimers of warranty and limitations of liability specific to any
      jurisdiction.
 
 4. Inability to Comply Due to Statute or Regulation
@@ -228,9 +228,9 @@ Mozilla Public License, version 2.0
    judicial order, or regulation then You must: (a) comply with the terms of
    this License to the maximum extent possible; and (b) describe the
    limitations and the code they affect. Such description must be placed in a
-   text ***REMOVED***le included with all distributions of the Covered Software under
+   text file included with all distributions of the Covered Software under
    this License. Except to the extent prohibited by statute or regulation,
-   such description must be suf***REMOVED***ciently detailed for a recipient of ordinary
+   such description must be sufficiently detailed for a recipient of ordinary
    skill to be able to understand it.
 
 5. Termination
@@ -239,12 +239,12 @@ Mozilla Public License, version 2.0
      fail to comply with any of its terms. However, if You become compliant,
      then the rights granted under this License from a particular Contributor
      are reinstated (a) provisionally, unless and until such Contributor
-     explicitly and ***REMOVED***nally terminates Your grants, and (b) on an ongoing
+     explicitly and finally terminates Your grants, and (b) on an ongoing
      basis, if such Contributor fails to notify You of the non-compliance by
      some reasonable means prior to 60 days after You have come back into
      compliance. Moreover, Your grants from a particular Contributor are
-     reinstated on an ongoing basis if such Contributor noti***REMOVED***es You of the
-     non-compliance by some reasonable means, this is the ***REMOVED***rst time You have
+     reinstated on an ongoing basis if such Contributor notifies You of the
+     non-compliance by some reasonable means, this is the first time You have
      received notice of non-compliance with this License from such
      Contributor, and You become compliant prior to 30 days after Your receipt
      of the notice.
@@ -266,7 +266,7 @@ Mozilla Public License, version 2.0
    Covered Software is provided under this License on an "as is" basis,
    without warranty of any kind, either expressed, implied, or statutory,
    including, without limitation, warranties that the Covered Software is free
-   of defects, merchantable, ***REMOVED***t for a particular purpose or non-infringing.
+   of defects, merchantable, fit for a particular purpose or non-infringing.
    The entire risk as to the quality and performance of the Covered Software
    is with You. Should any Covered Software prove defective in any respect,
    You (not any Contributor) assume the cost of any necessary servicing,
@@ -280,7 +280,7 @@ Mozilla Public License, version 2.0
    negligence), contract, or otherwise, shall any Contributor, or anyone who
    distributes Covered Software as permitted above, be liable to You for any
    direct, indirect, special, incidental, or consequential damages of any
-   character including, without limitation, damages for lost pro***REMOVED***ts, loss of
+   character including, without limitation, damages for lost profits, loss of
    goodwill, work stoppage, computer failure or malfunction, or any and all
    other commercial damages or losses, even if such party shall have been
    informed of the possibility of such damages. This limitation of liability
@@ -325,13 +325,13 @@ Mozilla Public License, version 2.0
       or under the terms of any subsequent version published by the license
       steward.
 
-10.3. Modi***REMOVED***ed Versions
+10.3. Modified Versions
 
       If you create software not governed by this License, and you want to
       create a new license for such software, you may create and use a
-      modi***REMOVED***ed version of this License if you rename the license and remove
+      modified version of this License if you rename the license and remove
       any references to the name of the license steward (except to note that
-      such modi***REMOVED***ed license differs from this License).
+      such modified license differs from this License).
 
 10.4. Distributing Source Code Form that is Incompatible With Secondary
       Licenses If You choose to distribute Source Code Form that is
@@ -344,12 +344,12 @@ Exhibit A - Source Code Form License Notice
       This Source Code Form is subject to the
       terms of the Mozilla Public License, v.
       2.0. If a copy of the MPL was not
-      distributed with this ***REMOVED***le, You can
+      distributed with this file, You can
       obtain one at
       http://mozilla.org/MPL/2.0/.
 
-If it is not possible or desirable to put the notice in a particular ***REMOVED***le,
-then You may include the notice in a location (such as a LICENSE ***REMOVED***le in a
+If it is not possible or desirable to put the notice in a particular file,
+then You may include the notice in a location (such as a LICENSE file in a
 relevant directory) where a recipient would be likely to look for such a
 notice.
 
@@ -358,5 +358,5 @@ You may add additional accurate notices of copyright ownership.
 Exhibit B - "Incompatible With Secondary Licenses" Notice
 
       This Source Code Form is "Incompatible
-      With Secondary Licenses", as de***REMOVED***ned by
+      With Secondary Licenses", as defined by
       the Mozilla Public License, v. 2.0.

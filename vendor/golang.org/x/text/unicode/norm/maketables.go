@@ -1,6 +1,6 @@
 // Copyright 2011 The Go Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE ***REMOVED***le.
+// license that can be found in the LICENSE file.
 
 // +build ignore
 
@@ -150,7 +150,7 @@ func (c Char) isValid() bool {
 
 type FormInfo struct {
 	quickCheck [MNumberOfModes]QCResult // index: MComposed or MDecomposed
-	veri***REMOVED***ed   [MNumberOfModes]bool     // index: MComposed or MDecomposed
+	verified   [MNumberOfModes]bool     // index: MComposed or MDecomposed
 
 	combinesForward  bool // May combine with rune on the right
 	combinesBackward bool // May combine with rune on the left
@@ -177,9 +177,9 @@ func (f FormInfo) String() string {
 
 type Decomposition []rune
 
-func parseDecomposition(s string, skip***REMOVED***rst bool) (a []rune, err error) {
+func parseDecomposition(s string, skipfirst bool) (a []rune, err error) {
 	decomp := strings.Split(s, " ")
-	if len(decomp) > 0 && skip***REMOVED***rst {
+	if len(decomp) > 0 && skipfirst {
 		decomp = decomp[1:]
 	}
 	for _, d := range decomp {
@@ -220,7 +220,7 @@ func loadUnicodeData() {
 		char.forms[FCompatibility].decomp = exp
 		if !isCompat {
 			char.forms[FCanonical].decomp = exp
-		} ***REMOVED*** {
+		} else {
 			char.compatDecomp = true
 		}
 		if len(decmap) > 0 {
@@ -375,7 +375,7 @@ func completeCharFields(form int) {
 		c := &chars[i]
 		f := &c.forms[form]
 
-		// Marks script-speci***REMOVED***c exclusions and version restricted.
+		// Marks script-specific exclusions and version restricted.
 		f.isOneWay = c.excludeInComp
 
 		// Singletons
@@ -483,7 +483,7 @@ func computeNonStarterCounts() {
 			c.nTrailingNonStarters++
 		}
 		if c.nTrailingNonStarters > 3 {
-			log.Fatalf("%U: Decomposition with more than 3 (%d) trailing modi***REMOVED***ers (%U)", i, c.nTrailingNonStarters, runes)
+			log.Fatalf("%U: Decomposition with more than 3 (%d) trailing modifiers (%U)", i, c.nTrailingNonStarters, runes)
 		}
 
 		if isHangul(rune(i)) {
@@ -548,16 +548,16 @@ type decompSet [7]map[string]bool
 
 const (
 	normalDecomp = iota
-	***REMOVED***rstMulti
-	***REMOVED***rstCCC
+	firstMulti
+	firstCCC
 	endMulti
-	***REMOVED***rstLeadingCCC
-	***REMOVED***rstCCCZeroExcept
-	***REMOVED***rstStarterWithNLead
+	firstLeadingCCC
+	firstCCCZeroExcept
+	firstStarterWithNLead
 	lastDecomp
 )
 
-var cname = []string{"***REMOVED***rstMulti", "***REMOVED***rstCCC", "endMulti", "***REMOVED***rstLeadingCCC", "***REMOVED***rstCCCZeroExcept", "***REMOVED***rstStarterWithNLead", "lastDecomp"}
+var cname = []string{"firstMulti", "firstCCC", "endMulti", "firstLeadingCCC", "firstCCCZeroExcept", "firstStarterWithNLead", "lastDecomp"}
 
 func makeDecompSet() decompSet {
 	m := decompSet{}
@@ -607,31 +607,31 @@ func printCharInfoTables(w io.Writer) int {
 			index = endMulti
 			for _, r := range d[1:] {
 				if ccc(r) == 0 {
-					index = ***REMOVED***rstCCC
+					index = firstCCC
 				}
 			}
 			if lccc > 0 || nLead > 0 {
 				s += string([]byte{lccc})
-				if index == ***REMOVED***rstCCC {
+				if index == firstCCC {
 					log.Fatalf("%U: multi-segment decomposition not supported for decompositions with leading CCC != 0", r)
 				}
-				index = ***REMOVED***rstLeadingCCC
+				index = firstLeadingCCC
 			}
 			if cc != lccc {
 				if cc != 0 {
 					log.Fatalf("%U: for lccc != ccc, expected ccc to be 0; was %d", r, cc)
 				}
-				index = ***REMOVED***rstCCCZeroExcept
+				index = firstCCCZeroExcept
 			}
-		} ***REMOVED*** if len(d) > 1 {
-			index = ***REMOVED***rstMulti
+		} else if len(d) > 1 {
+			index = firstMulti
 		}
 		return index, s
 	}
 
 	decompSet := makeDecompSet()
 	const nLeadStr = "\x00\x01" // 0-byte length and tccc with nTrail.
-	decompSet.insert(***REMOVED***rstStarterWithNLead, nLeadStr)
+	decompSet.insert(firstStarterWithNLead, nLeadStr)
 
 	// Store the uniqued decompositions in a byte buffer,
 	// preceded by their byte length.
@@ -690,11 +690,11 @@ func printCharInfoTables(w io.Writer) int {
 						log.Fatalf("Expected leading CCC to be non-zero; ccc is %d", c.ccc)
 					}
 				}
-			} ***REMOVED*** if c.nLeadingNonStarters > 0 && len(f.expandedDecomp) == 0 && c.ccc == 0 && !f.combinesBackward {
+			} else if c.nLeadingNonStarters > 0 && len(f.expandedDecomp) == 0 && c.ccc == 0 && !f.combinesBackward {
 				// Handle cases where it can't be detected that the nLead should be equal
 				// to nTrail.
 				trie.Insert(c.codePoint, uint64(positionMap[nLeadStr]))
-			} ***REMOVED*** if v := makeEntry(&f, &c)<<8 | uint16(c.ccc); v != 0 {
+			} else if v := makeEntry(&f, &c)<<8 | uint16(c.ccc); v != 0 {
 				trie.Insert(c.codePoint, uint64(0x8000|v))
 			}
 		}
@@ -894,16 +894,16 @@ func testDerived() {
 		if got := c.forms[ftype].quickCheck[mode]; got != qr {
 			log.Printf("%U: FAILED %s (was %v need %v)\n", r, qt, got, qr)
 		}
-		c.forms[ftype].veri***REMOVED***ed[mode] = true
+		c.forms[ftype].verified[mode] = true
 	}
 	if err := p.Err(); err != nil {
 		log.Fatal(err)
 	}
-	// Any unspeci***REMOVED***ed value must be QCYes. Verify this.
+	// Any unspecified value must be QCYes. Verify this.
 	for i, c := range chars {
 		for j, fd := range c.forms {
 			for k, qr := range fd.quickCheck {
-				if !fd.veri***REMOVED***ed[k] && qr != QCYes {
+				if !fd.verified[k] && qr != QCYes {
 					m := "%U: FAIL F:%d M:%d (was %v need Yes) %s\n"
 					log.Printf(m, i, j, k, qr, c.name)
 				}
@@ -962,7 +962,7 @@ func printTestdata() {
 		s := ""
 		if d == dk && qc == qck && cf == cfk {
 			s = fmt.Sprintf("f(%s, %v, %q)", qc, cf, d)
-		} ***REMOVED*** {
+		} else {
 			s = fmt.Sprintf("g(%s, %s, %v, %v, %q, %q)", qc, qck, cf, cfk, d, dk)
 		}
 		current := lastInfo{c.ccc, c.nLeadingNonStarters, c.nTrailingNonStarters, s}

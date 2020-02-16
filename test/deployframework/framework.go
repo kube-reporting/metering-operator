@@ -3,7 +3,7 @@ package deployframework
 import (
 	"fmt"
 	"os"
-	"path/***REMOVED***lepath"
+	"path/filepath"
 
 	"github.com/sirupsen/logrus"
 	apiextclientv1beta1 "k8s.io/apiextensions-apiserver/pkg/client/clientset/clientset/typed/apiextensions/v1beta1"
@@ -20,7 +20,7 @@ import (
 const (
 	reportResultsDir                    = "report_results"
 	logDir                              = "logs"
-	meteringcon***REMOVED***gDir                   = "meteringcon***REMOVED***gs"
+	meteringconfigDir                   = "meteringconfigs"
 	reportsDir                          = "reports"
 	datasourcesDir                      = "reportdatasources"
 	reportqueriesDir                    = "reportqueries"
@@ -28,7 +28,7 @@ const (
 	prestotablesDir                     = "prestotables"
 	storagelocationsDir                 = "storagelocations"
 	testNamespaceLabel                  = "metering-testing-ns"
-	meteringcon***REMOVED***gMetadataName          = "operator-metering"
+	meteringconfigMetadataName          = "operator-metering"
 	reportingOperatorServiceAccountName = "reporting-operator"
 	defaultPlatform                     = "openshift"
 	defaultDeleteNamespace              = true
@@ -45,39 +45,39 @@ const (
 type DeployFramework struct {
 	RunLocal          bool
 	RunDevSetup       bool
-	KubeCon***REMOVED***gPath    string
+	KubeConfigPath    string
 	RepoDir           string
 	OperatorResources *deploy.OperatorResources
 	Logger            logrus.FieldLogger
-	Con***REMOVED***g            *rest.Con***REMOVED***g
+	Config            *rest.Config
 	Client            kubernetes.Interface
-	APIExtClient      apiextclientv1beta1.CustomResourceDe***REMOVED***nitionsGetter
+	APIExtClient      apiextclientv1beta1.CustomResourceDefinitionsGetter
 	MeteringClient    meteringclient.MeteringV1Interface
 }
 
 // New is the constructor function that creates and returns a new DeployFramework object
-func New(logger logrus.FieldLogger, runLocal, runDevSetup bool, nsPre***REMOVED***x, repoDir, kubecon***REMOVED***g string) (*DeployFramework, error) {
-	con***REMOVED***g, err := clientcmd.BuildCon***REMOVED***gFromFlags("", kubecon***REMOVED***g)
+func New(logger logrus.FieldLogger, runLocal, runDevSetup bool, nsPrefix, repoDir, kubeconfig string) (*DeployFramework, error) {
+	config, err := clientcmd.BuildConfigFromFlags("", kubeconfig)
 	if err != nil {
-		return nil, fmt.Errorf("failed to build a kube con***REMOVED***g from %s: %v", kubecon***REMOVED***g, err)
+		return nil, fmt.Errorf("failed to build a kube config from %s: %v", kubeconfig, err)
 	}
 
-	client, err := kubernetes.NewForCon***REMOVED***g(con***REMOVED***g)
+	client, err := kubernetes.NewForConfig(config)
 	if err != nil {
 		return nil, fmt.Errorf("failed to initialize the k8s clientset: %v", err)
 	}
 
-	apiextClient, err := apiextclientv1beta1.NewForCon***REMOVED***g(con***REMOVED***g)
+	apiextClient, err := apiextclientv1beta1.NewForConfig(config)
 	if err != nil {
 		return nil, fmt.Errorf("failed to initialize the apiextensions clientset: %v", err)
 	}
 
-	meteringClient, err := meteringclient.NewForCon***REMOVED***g(con***REMOVED***g)
+	meteringClient, err := meteringclient.NewForConfig(config)
 	if err != nil {
 		return nil, fmt.Errorf("failed to initialize the metering clientset: %v", err)
 	}
 
-	manifestsDir, err := ***REMOVED***lepath.Abs(***REMOVED***lepath.Join(repoDir, manifestsDeployDir))
+	manifestsDir, err := filepath.Abs(filepath.Join(repoDir, manifestsDeployDir))
 	if err != nil {
 		return nil, fmt.Errorf("failed to get the absolute path to the manifest/deploy directory: %v", err)
 	}
@@ -93,12 +93,12 @@ func New(logger logrus.FieldLogger, runLocal, runDevSetup bool, nsPre***REMOVED*
 
 	deployFramework := &DeployFramework{
 		OperatorResources: operatorResources,
-		KubeCon***REMOVED***gPath:    kubecon***REMOVED***g,
+		KubeConfigPath:    kubeconfig,
 		RepoDir:           repoDir,
 		RunLocal:          runLocal,
 		RunDevSetup:       runDevSetup,
 		Logger:            logger,
-		Con***REMOVED***g:            con***REMOVED***g,
+		Config:            config,
 		Client:            client,
 		APIExtClient:      apiextClient,
 		MeteringClient:    meteringClient,
@@ -107,19 +107,19 @@ func New(logger logrus.FieldLogger, runLocal, runDevSetup bool, nsPre***REMOVED*
 	return deployFramework, nil
 }
 
-// NewDeployerCon***REMOVED***g handles the process of validating inputs before returning
-// an initialized Deploy.Con***REMOVED***g object, or an error if there is any.
-func (df *DeployFramework) NewDeployerCon***REMOVED***g(
+// NewDeployerConfig handles the process of validating inputs before returning
+// an initialized Deploy.Config object, or an error if there is any.
+func (df *DeployFramework) NewDeployerConfig(
 	namespace,
 	meteringOperatorImageRepo,
 	meteringOperatorImageTag,
 	reportingOperatorImageRepo,
 	reportingOperatorImageTag string,
-	spec metering.MeteringCon***REMOVED***gSpec,
-) (*deploy.Con***REMOVED***g, error) {
-	meteringCon***REMOVED***g := &metering.MeteringCon***REMOVED***g{
+	spec metering.MeteringConfigSpec,
+) (*deploy.Config, error) {
+	meteringConfig := &metering.MeteringConfig{
 		ObjectMeta: meta.ObjectMeta{
-			Name:      meteringcon***REMOVED***gMetadataName,
+			Name:      meteringconfigMetadataName,
 			Namespace: namespace,
 		},
 		Spec: spec,
@@ -127,37 +127,37 @@ func (df *DeployFramework) NewDeployerCon***REMOVED***g(
 
 	// validate the reporting-operator image is non-empty when overrided
 	if reportingOperatorImageRepo != "" || reportingOperatorImageTag != "" {
-		reportingOperatorImageCon***REMOVED***g := &metering.ImageCon***REMOVED***g{
+		reportingOperatorImageConfig := &metering.ImageConfig{
 			Repository: reportingOperatorImageRepo,
 			Tag:        reportingOperatorImageTag,
 		}
-		err := validateImageCon***REMOVED***g(*reportingOperatorImageCon***REMOVED***g)
+		err := validateImageConfig(*reportingOperatorImageConfig)
 		if err != nil {
-			return nil, fmt.Errorf("invalid reporting-operator image con***REMOVED***g: %v", err)
+			return nil, fmt.Errorf("invalid reporting-operator image config: %v", err)
 		}
-		// Ensure the repo/tag values are set on the MeteringCon***REMOVED***g
-		if meteringCon***REMOVED***g.Spec.ReportingOperator == nil {
-			meteringCon***REMOVED***g.Spec.ReportingOperator = &metering.ReportingOperator{}
+		// Ensure the repo/tag values are set on the MeteringConfig
+		if meteringConfig.Spec.ReportingOperator == nil {
+			meteringConfig.Spec.ReportingOperator = &metering.ReportingOperator{}
 		}
-		if meteringCon***REMOVED***g.Spec.ReportingOperator.Spec == nil {
-			meteringCon***REMOVED***g.Spec.ReportingOperator.Spec = &metering.ReportingOperatorSpec{}
+		if meteringConfig.Spec.ReportingOperator.Spec == nil {
+			meteringConfig.Spec.ReportingOperator.Spec = &metering.ReportingOperatorSpec{}
 		}
-		meteringCon***REMOVED***g.Spec.ReportingOperator.Spec.Image = reportingOperatorImageCon***REMOVED***g
+		meteringConfig.Spec.ReportingOperator.Spec.Image = reportingOperatorImageConfig
 
 	}
 	if meteringOperatorImageRepo != "" || meteringOperatorImageTag != "" {
-		// validate both the metering operator image ***REMOVED***elds are non-empty
-		meteringOperatorImageCon***REMOVED***g := &metering.ImageCon***REMOVED***g{
+		// validate both the metering operator image fields are non-empty
+		meteringOperatorImageConfig := &metering.ImageConfig{
 			Repository: meteringOperatorImageRepo,
 			Tag:        meteringOperatorImageTag,
 		}
-		err := validateImageCon***REMOVED***g(*meteringOperatorImageCon***REMOVED***g)
+		err := validateImageConfig(*meteringOperatorImageConfig)
 		if err != nil {
-			return nil, fmt.Errorf("invalid metering-operator image con***REMOVED***g: %v", err)
+			return nil, fmt.Errorf("invalid metering-operator image config: %v", err)
 		}
 	}
 
-	return &deploy.Con***REMOVED***g{
+	return &deploy.Config{
 		Namespace:                namespace,
 		Repo:                     meteringOperatorImageRepo,
 		RunMeteringOperatorLocal: df.RunLocal,
@@ -168,6 +168,6 @@ func (df *DeployFramework) NewDeployerCon***REMOVED***g(
 			"name": testNamespaceLabel,
 		},
 		OperatorResources: df.OperatorResources,
-		MeteringCon***REMOVED***g:    meteringCon***REMOVED***g,
+		MeteringConfig:    meteringConfig,
 	}, nil
 }

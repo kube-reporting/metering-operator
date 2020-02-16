@@ -22,7 +22,7 @@ var LessEqual = le
 var Less = lt
 var NotEqual = ne
 
-// FuncMap is the type of the map de***REMOVED***ning the mapping from names to functions.
+// FuncMap is the type of the map defining the mapping from names to functions.
 // Each function must have either a single return value, or two return values of
 // which the second has type error. In that case, if the second (error)
 // return value evaluates to non-nil during execution, execution terminates and
@@ -76,7 +76,7 @@ func addValueFuncs(out map[string]reflect.Value, in FuncMap) {
 }
 
 // AddFuncs adds to values the functions in funcs. It does no checking of the input -
-// call addValueFuncs ***REMOVED***rst.
+// call addValueFuncs first.
 func addFuncs(out, in FuncMap) {
 	for name, fn := range in {
 		out[name] = fn
@@ -95,8 +95,8 @@ func goodFunc(typ reflect.Type) bool {
 	return false
 }
 
-// ***REMOVED***ndFunction looks for a function in the template, and global map.
-func ***REMOVED***ndFunction(name string) (reflect.Value, bool) {
+// findFunction looks for a function in the template, and global map.
+func findFunction(name string) (reflect.Value, bool) {
 	if fn := builtinFuncs[name]; fn.IsValid() {
 		return fn, true
 	}
@@ -105,7 +105,7 @@ func ***REMOVED***ndFunction(name string) (reflect.Value, bool) {
 
 // Indexing.
 
-// index returns the result of indexing its ***REMOVED***rst argument by the following
+// index returns the result of indexing its first argument by the following
 // arguments.  Thus "index x 1 2 3" is, in Go syntax, x[1][2][3]. Each
 // indexed item must be a map, slice, or array.
 func index(item interface{}, indices ...interface{}) (interface{}, error) {
@@ -140,7 +140,7 @@ func index(item interface{}, indices ...interface{}) (interface{}, error) {
 			}
 			if x := v.MapIndex(index); x.IsValid() {
 				v = x
-			} ***REMOVED*** {
+			} else {
 				v = reflect.Zero(v.Type().Elem())
 			}
 		default:
@@ -152,7 +152,7 @@ func index(item interface{}, indices ...interface{}) (interface{}, error) {
 
 // Length
 
-// length returns the length of the item, with an error if it has no de***REMOVED***ned length.
+// length returns the length of the item, with an error if it has no defined length.
 func length(item interface{}) (int, error) {
 	v, isNil := indirect(reflect.ValueOf(item))
 	if isNil {
@@ -167,7 +167,7 @@ func length(item interface{}) (int, error) {
 
 // Function invocation
 
-// call returns the result of evaluating the ***REMOVED***rst argument as a function.
+// call returns the result of evaluating the first argument as a function.
 // The function must return 1 result, or 2 results, the second of which is an error.
 func call(fn interface{}, args ...interface{}) (interface{}, error) {
 	v := reflect.ValueOf(fn)
@@ -185,7 +185,7 @@ func call(fn interface{}, args ...interface{}) (interface{}, error) {
 			return nil, fmt.Errorf("wrong number of args: got %d want at least %d", len(args), numIn-1)
 		}
 		dddType = typ.In(numIn - 1).Elem()
-	} ***REMOVED*** {
+	} else {
 		if len(args) != numIn {
 			return nil, fmt.Errorf("wrong number of args: got %d want %d", len(args), numIn)
 		}
@@ -197,7 +197,7 @@ func call(fn interface{}, args ...interface{}) (interface{}, error) {
 		var argType reflect.Type
 		if !typ.IsVariadic() || i < numIn-1 {
 			argType = typ.In(i)
-		} ***REMOVED*** {
+		} else {
 			argType = dddType
 		}
 		if !value.IsValid() && canBeNil(argType) {
@@ -223,7 +223,7 @@ func truth(a interface{}) bool {
 }
 
 // and computes the Boolean AND of its arguments, returning
-// the ***REMOVED***rst false argument it encounters, or the last argument.
+// the first false argument it encounters, or the last argument.
 func and(arg0 interface{}, args ...interface{}) interface{} {
 	if !truth(arg0) {
 		return arg0
@@ -238,7 +238,7 @@ func and(arg0 interface{}, args ...interface{}) interface{} {
 }
 
 // or computes the Boolean OR of its arguments, returning
-// the ***REMOVED***rst true argument it encounters, or the last argument.
+// the first true argument it encounters, or the last argument.
 func or(arg0 interface{}, args ...interface{}) interface{} {
 	if truth(arg0) {
 		return arg0
@@ -326,7 +326,7 @@ func eq(arg1 interface{}, arg2 ...interface{}) (bool, error) {
 			default:
 				return false, errBadComparison
 			}
-		} ***REMOVED*** {
+		} else {
 			switch k1 {
 			case boolKind:
 				truth = v1.Bool() == v2.Bool()
@@ -381,7 +381,7 @@ func lt(arg1, arg2 interface{}) (bool, error) {
 		default:
 			return false, errBadComparison
 		}
-	} ***REMOVED*** {
+	} else {
 		switch k1 {
 		case boolKind, complexKind:
 			return false, errBadComparisonType
@@ -528,12 +528,12 @@ func JSEscape(w io.Writer, b []byte) {
 				w.Write(hex[t : t+1])
 				w.Write(hex[b : b+1])
 			}
-		} ***REMOVED*** {
+		} else {
 			// Unicode rune.
 			r, size := utf8.DecodeRune(b[i:])
 			if unicode.IsPrint(r) {
 				w.Write(b[i : i+size])
-			} ***REMOVED*** {
+			} else {
 				fmt.Fprintf(w, "\\u%04X", r)
 			}
 			i += size - 1
@@ -591,7 +591,7 @@ func evalArgs(args []interface{}) string {
 			a, ok := printableValue(reflect.ValueOf(arg))
 			if ok {
 				args[i] = a
-			} // ***REMOVED*** left fmt do its thing
+			} // else left fmt do its thing
 		}
 		s = fmt.Sprint(args...)
 	}

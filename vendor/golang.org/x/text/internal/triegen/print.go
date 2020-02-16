@@ -1,6 +1,6 @@
 // Copyright 2014 The Go Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE ***REMOVED***le.
+// license that can be found in the LICENSE file.
 
 package triegen
 
@@ -27,7 +27,7 @@ func (b *builder) print(w io.Writer) error {
 		// At this point we cannot refer to the generated tables directly.
 		b.ASCIIBlock = b.Name + "Values"
 		b.StarterBlock = b.Name + "Index"
-	} ***REMOVED*** {
+	} else {
 		// Otherwise we need to have explicit starter indexes in the trie
 		// structure.
 		b.ASCIIBlock = "t.ascii"
@@ -135,14 +135,14 @@ type {{.Name}}TrieHandle struct {
 // {{.Name}}TrieHandles: {{len .Trie}} handles, {{.Stats.NHandleBytes}} bytes
 var {{.Name}}TrieHandles = [{{len .Trie}}]{{.Name}}TrieHandle{
 {{range .Trie}}	{ {{.ASCIIIndex}}, {{.StarterIndex}} }, // {{printf "%08x" .Checksum}}: {{.Name}}
-{{end}}}{{***REMOVED***}}
+{{end}}}{{else}}
 	return &{{.Name}}Trie{}
 }
 {{end}}
 // lookupValue determines the type of block n and looks up the value for b.
 func (t *{{.Name}}Trie) lookupValue(n uint32, b byte) {{.ValueType}}{{$last := dec (len .Compactions)}} {
 	switch { {{range $i, $c := .Compactions}}
-		{{if eq $i $last}}default{{***REMOVED***}}case n < {{$c.Cutoff}}{{end}}:{{if ne $i 0}}
+		{{if eq $i $last}}default{{else}}case n < {{$c.Cutoff}}{{end}}:{{if ne $i 0}}
 			n -= {{$c.Offset}}{{end}}
 			return {{print $b.ValueType}}({{$c.Handler}}){{end}}
 	}
@@ -164,7 +164,7 @@ var {{.Name}}Index = [{{.Stats.NIndexEntries}}]{{.IndexType}} {
 // TODO: consider allowing zero-length strings after evaluating performance with
 // unicode/norm.
 const lookupTemplate = `
-// lookup{{if eq .SourceType "string"}}String{{end}} returns the trie value for the ***REMOVED***rst UTF-8 encoding in s and
+// lookup{{if eq .SourceType "string"}}String{{end}} returns the trie value for the first UTF-8 encoding in s and
 // the width in bytes of this encoding. The size will be 0 if s does not
 // hold enough bytes to complete the encoding. len(s) must be greater than 0.
 func (t *{{.Name}}Trie) lookup{{if eq .SourceType "string"}}String{{end}}(s {{.SourceType}}) (v {{.ValueType}}, sz int) {
@@ -227,7 +227,7 @@ func (t *{{.Name}}Trie) lookup{{if eq .SourceType "string"}}String{{end}}(s {{.S
 	return 0, 1
 }
 
-// lookup{{if eq .SourceType "string"}}String{{end}}Unsafe returns the trie value for the ***REMOVED***rst UTF-8 encoding in s.
+// lookup{{if eq .SourceType "string"}}String{{end}}Unsafe returns the trie value for the first UTF-8 encoding in s.
 // s must start with a full and valid UTF-8 encoded rune.
 func (t *{{.Name}}Trie) lookup{{if eq .SourceType "string"}}String{{end}}Unsafe(s {{.SourceType}}) {{.ValueType}} {
 	c0 := s[0]

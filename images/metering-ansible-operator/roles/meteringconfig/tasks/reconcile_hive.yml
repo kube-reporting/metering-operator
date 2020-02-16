@@ -1,6 +1,6 @@
 ---
 
-- include_tasks: update_meteringcon***REMOVED***g_status.yml
+- include_tasks: update_meteringconfig_status.yml
   vars:
     current_conditions:
       type: "Running"
@@ -11,74 +11,74 @@
 - name: Deploy hive resources
   include_tasks: deploy_resources.yml
   vars:
-    values_***REMOVED***le: /tmp/metering-values.yaml
+    values_file: /tmp/metering-values.yaml
     resources:
-      - template_***REMOVED***le: templates/hive/hive-metastore-pvc.yaml
+      - template_file: templates/hive/hive-metastore-pvc.yaml
         apis: [ {kind: persistentvolumeclaim} ]
         prune_label_value: hive-metastore-pvc
-        create: "{{ meteringcon***REMOVED***g_create_hive_metastore_pvc }}"
-      - template_***REMOVED***le: templates/hive/hive-shared-volume-pvc.yaml
+        create: "{{ meteringconfig_create_hive_metastore_pvc }}"
+      - template_file: templates/hive/hive-shared-volume-pvc.yaml
         apis: [ {kind: persistentvolumeclaim} ]
         prune_label_value: hive-shared-volume-pvc
-        create: "{{ meteringcon***REMOVED***g_create_hive_shared_volume_pvc }}"
-      - template_***REMOVED***le: templates/hive/hive-aws-credentials-secret.yaml
+        create: "{{ meteringconfig_create_hive_shared_volume_pvc }}"
+      - template_file: templates/hive/hive-aws-credentials-secret.yaml
         apis: [ {kind: secret} ]
         prune_label_value: hive-aws-credentials-secret
-        create: "{{ meteringcon***REMOVED***g_create_hive_aws_credentials }}"
-      - template_***REMOVED***le: templates/hive/hive-gcs-credentials-secret.yaml
+        create: "{{ meteringconfig_create_hive_aws_credentials }}"
+      - template_file: templates/hive/hive-gcs-credentials-secret.yaml
         apis: [ {kind: secret} ]
         prune_label_value: hive-gcs-credentials-secret
-        create: "{{ meteringcon***REMOVED***g_create_hive_gcs_credentials }}"
-      - template_***REMOVED***le: templates/hive/hive-s3-compatible-credentials-secret.yaml
+        create: "{{ meteringconfig_create_hive_gcs_credentials }}"
+      - template_file: templates/hive/hive-s3-compatible-credentials-secret.yaml
         apis: [ {kind: secret} ]
         prune_label_value: hive-s3-compatible-credentials-secret
-        create: "{{ meteringcon***REMOVED***g_create_hive_s3_compatible_credentials }}"
-      - template_***REMOVED***le: templates/hive/hive-s3-compatible-ca-secret.yaml
+        create: "{{ meteringconfig_create_hive_s3_compatible_credentials }}"
+      - template_file: templates/hive/hive-s3-compatible-ca-secret.yaml
         apis: [ {kind: secret} ]
         prune_label_value: hive-s3-compatible-ca-secret
-        create: "{{ meteringcon***REMOVED***g_create_presto_s3_compatible_ca }}"
-      - template_***REMOVED***le: templates/hive/hive-azure-credentials-secret.yaml
+        create: "{{ meteringconfig_create_presto_s3_compatible_ca }}"
+      - template_file: templates/hive/hive-azure-credentials-secret.yaml
         apis: [ {kind: secret} ]
         prune_label_value: hive-azure-credentials-secret
-        create: "{{ meteringcon***REMOVED***g_create_hive_azure_credentials }}"
-      - template_***REMOVED***le: templates/hive/hive-metastore-tls-secrets.yaml
+        create: "{{ meteringconfig_create_hive_azure_credentials }}"
+      - template_file: templates/hive/hive-metastore-tls-secrets.yaml
         apis: [ {kind: secret} ]
         prune_label_value: hive-metastore-tls-secrets
-        create: "{{ meteringcon***REMOVED***g_create_hive_metastore_tls_secrets }}"
-      - template_***REMOVED***le: templates/hive/hive-server-metastore-tls-secrets.yaml
+        create: "{{ meteringconfig_create_hive_metastore_tls_secrets }}"
+      - template_file: templates/hive/hive-server-metastore-tls-secrets.yaml
         apis: [ {kind: secret} ]
         prune_label_value: hive-server-metastore-tls-secrets
-        create: "{{ meteringcon***REMOVED***g_create_hive_server_metastore_tls_secrets }}"
-      - template_***REMOVED***le: templates/hive/hive-server-tls-secrets.yaml
+        create: "{{ meteringconfig_create_hive_server_metastore_tls_secrets }}"
+      - template_file: templates/hive/hive-server-tls-secrets.yaml
         apis: [ {kind: secret} ]
         prune_label_value: hive-server-tls-secrets
-        create: "{{ meteringcon***REMOVED***g_create_hive_server_tls_secrets }}"
-      - template_***REMOVED***le: templates/hive/hive-con***REMOVED***gmap.yaml
-        apis: [ {kind: con***REMOVED***gmap} ]
-        prune_label_value: hive-con***REMOVED***gmap
-      - template_***REMOVED***le: templates/hive/hive-scripts-con***REMOVED***gmap.yaml
-        apis: [ {kind: con***REMOVED***gmap} ]
-        prune_label_value: hive-scripts-con***REMOVED***gmap
-      - template_***REMOVED***le: templates/hive/hive-jmx-con***REMOVED***g.yaml
-        apis: [ {kind: con***REMOVED***gmap} ]
-        prune_label_value: hive-jmx-con***REMOVED***g
-      - template_***REMOVED***le: templates/hive/hive-metastore-service.yaml
+        create: "{{ meteringconfig_create_hive_server_tls_secrets }}"
+      - template_file: templates/hive/hive-configmap.yaml
+        apis: [ {kind: configmap} ]
+        prune_label_value: hive-configmap
+      - template_file: templates/hive/hive-scripts-configmap.yaml
+        apis: [ {kind: configmap} ]
+        prune_label_value: hive-scripts-configmap
+      - template_file: templates/hive/hive-jmx-config.yaml
+        apis: [ {kind: configmap} ]
+        prune_label_value: hive-jmx-config
+      - template_file: templates/hive/hive-metastore-service.yaml
         apis: [ {kind: service} ]
         prune_label_value: hive-metastore-service
-      - template_***REMOVED***le: templates/hive/hive-metastore-statefulset.yaml
+      - template_file: templates/hive/hive-metastore-statefulset.yaml
         apis: [ {kind: statefulset, api_version: 'apps/v1'} ]
         prune_label_value: hive-metastore-statefulset
-      - template_***REMOVED***le: templates/hive/hive-server-service.yaml
+      - template_file: templates/hive/hive-server-service.yaml
         apis: [ {kind: service} ]
         prune_label_value: hive-server-service
-      - template_***REMOVED***le: templates/hive/hive-serviceaccount.yaml
+      - template_file: templates/hive/hive-serviceaccount.yaml
         apis: [ {kind: serviceaccount} ]
         prune_label_value: hive-serviceaccount
-      - template_***REMOVED***le: templates/hive/hive-server-statefulset.yaml
+      - template_file: templates/hive/hive-server-statefulset.yaml
         apis: [ {kind: statefulset, api_version: 'apps/v1'} ]
         prune_label_value: hive-server-statefulset
 
-- include_tasks: update_meteringcon***REMOVED***g_status.yml
+- include_tasks: update_meteringconfig_status.yml
   vars:
     current_conditions:
       type: "Running"
@@ -99,6 +99,6 @@
       component: Metering components
     involvedObject:
       apiVersion: metering.openshift.io
-      kind: MeteringCon***REMOVED***g
+      kind: MeteringConfig
       name: "{{ meta.name }}"
       namespace: "{{ meta.namespace }}"

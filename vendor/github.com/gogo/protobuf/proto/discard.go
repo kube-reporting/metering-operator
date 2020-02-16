@@ -4,7 +4,7 @@
 // https://github.com/golang/protobuf
 //
 // Redistribution and use in source and binary forms, with or without
-// modi***REMOVED***cation, are permitted provided that the following conditions are
+// modification, are permitted provided that the following conditions are
 // met:
 //
 //     * Redistributions of source code must retain the above copyright
@@ -15,7 +15,7 @@
 // distribution.
 //     * Neither the name of Google Inc. nor the names of its
 // contributors may be used to endorse or promote products derived from
-// this software without speci***REMOVED***c prior written permission.
+// this software without specific prior written permission.
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
 // "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
@@ -43,16 +43,16 @@ type generatedDiscarder interface {
 	XXX_DiscardUnknown()
 }
 
-// DiscardUnknown recursively discards all unknown ***REMOVED***elds from this message
+// DiscardUnknown recursively discards all unknown fields from this message
 // and all embedded messages.
 //
-// When unmarshaling a message with unrecognized ***REMOVED***elds, the tags and values
-// of such ***REMOVED***elds are preserved in the Message. This allows a later call to
+// When unmarshaling a message with unrecognized fields, the tags and values
+// of such fields are preserved in the Message. This allows a later call to
 // marshal to be able to produce a message that continues to have those
-// unrecognized ***REMOVED***elds. To avoid this, DiscardUnknown is used to
-// explicitly clear the unknown ***REMOVED***elds after unmarshaling.
+// unrecognized fields. To avoid this, DiscardUnknown is used to
+// explicitly clear the unknown fields after unmarshaling.
 //
-// For proto2 messages, the unknown ***REMOVED***elds of message extensions are only
+// For proto2 messages, the unknown fields of message extensions are only
 // discarded from messages that have been accessed via GetExtension.
 func DiscardUnknown(m Message) {
 	if m, ok := m.(generatedDiscarder); ok {
@@ -65,7 +65,7 @@ func DiscardUnknown(m Message) {
 	discardLegacy(m)
 }
 
-// DiscardUnknown recursively discards all unknown ***REMOVED***elds.
+// DiscardUnknown recursively discards all unknown fields.
 func (a *InternalMessageInfo) DiscardUnknown(m Message) {
 	di := atomicLoadDiscardInfo(&a.discard)
 	if di == nil {
@@ -81,12 +81,12 @@ type discardInfo struct {
 	initialized int32 // 0: only typ is valid, 1: everything is valid
 	lock        sync.Mutex
 
-	***REMOVED***elds       []discardFieldInfo
-	unrecognized ***REMOVED***eld
+	fields       []discardFieldInfo
+	unrecognized field
 }
 
 type discardFieldInfo struct {
-	***REMOVED***eld   ***REMOVED***eld // Offset of ***REMOVED***eld, guaranteed to be valid
+	field   field // Offset of field, guaranteed to be valid
 	discard func(src pointer)
 }
 
@@ -115,12 +115,12 @@ func (di *discardInfo) discard(src pointer) {
 		di.computeDiscardInfo()
 	}
 
-	for _, ***REMOVED*** := range di.***REMOVED***elds {
-		sfp := src.offset(***REMOVED***.***REMOVED***eld)
-		***REMOVED***.discard(sfp)
+	for _, fi := range di.fields {
+		sfp := src.offset(fi.field)
+		fi.discard(sfp)
 	}
 
-	// For proto2 messages, only discard unknown ***REMOVED***elds in message extensions
+	// For proto2 messages, only discard unknown fields in message extensions
 	// that have been accessed via GetExtension.
 	if em, err := extendable(src.asPointerTo(di.typ).Interface()); err == nil {
 		// Ignore lock since DiscardUnknown is not concurrency safe.
@@ -148,11 +148,11 @@ func (di *discardInfo) computeDiscardInfo() {
 
 	for i := 0; i < n; i++ {
 		f := t.Field(i)
-		if strings.HasPre***REMOVED***x(f.Name, "XXX_") {
+		if strings.HasPrefix(f.Name, "XXX_") {
 			continue
 		}
 
-		d***REMOVED*** := discardFieldInfo{***REMOVED***eld: toField(&f)}
+		dfi := discardFieldInfo{field: toField(&f)}
 		tf := f.Type
 
 		// Unwrap tf to get its most basic type.
@@ -176,7 +176,7 @@ func (di *discardInfo) computeDiscardInfo() {
 				panic(fmt.Sprintf("%v.%s cannot be a direct struct value", t, f.Name))
 			case isSlice: // E.g., []*pb.T
 				discardInfo := getDiscardInfo(tf)
-				d***REMOVED***.discard = func(src pointer) {
+				dfi.discard = func(src pointer) {
 					sps := src.getPointerSlice()
 					for _, sp := range sps {
 						if !sp.isNil() {
@@ -186,7 +186,7 @@ func (di *discardInfo) computeDiscardInfo() {
 				}
 			default: // E.g., *pb.T
 				discardInfo := getDiscardInfo(tf)
-				d***REMOVED***.discard = func(src pointer) {
+				dfi.discard = func(src pointer) {
 					sp := src.getPointer()
 					if !sp.isNil() {
 						discardInfo.discard(sp)
@@ -199,7 +199,7 @@ func (di *discardInfo) computeDiscardInfo() {
 				panic(fmt.Sprintf("%v.%s cannot be a pointer to a map or a slice of map values", t, f.Name))
 			default: // E.g., map[K]V
 				if tf.Elem().Kind() == reflect.Ptr { // Proto struct (e.g., *T)
-					d***REMOVED***.discard = func(src pointer) {
+					dfi.discard = func(src pointer) {
 						sm := src.asPointerTo(tf).Elem()
 						if sm.Len() == 0 {
 							return
@@ -209,18 +209,18 @@ func (di *discardInfo) computeDiscardInfo() {
 							DiscardUnknown(val.Interface().(Message))
 						}
 					}
-				} ***REMOVED*** {
-					d***REMOVED***.discard = func(pointer) {} // Noop
+				} else {
+					dfi.discard = func(pointer) {} // Noop
 				}
 			}
 		case reflect.Interface:
-			// Must be oneof ***REMOVED***eld.
+			// Must be oneof field.
 			switch {
 			case isPointer || isSlice:
 				panic(fmt.Sprintf("%v.%s cannot be a pointer to a interface or a slice of interface values", t, f.Name))
 			default: // E.g., interface{}
 				// TODO: Make this faster?
-				d***REMOVED***.discard = func(src pointer) {
+				dfi.discard = func(src pointer) {
 					su := src.asPointerTo(tf).Elem()
 					if !su.IsNil() {
 						sv := su.Elem().Elem().Field(0)
@@ -237,7 +237,7 @@ func (di *discardInfo) computeDiscardInfo() {
 		default:
 			continue
 		}
-		di.***REMOVED***elds = append(di.***REMOVED***elds, d***REMOVED***)
+		di.fields = append(di.fields, dfi)
 	}
 
 	di.unrecognized = invalidField
@@ -264,7 +264,7 @@ func discardLegacy(m Message) {
 
 	for i := 0; i < v.NumField(); i++ {
 		f := t.Field(i)
-		if strings.HasPre***REMOVED***x(f.Name, "XXX_") {
+		if strings.HasPrefix(f.Name, "XXX_") {
 			continue
 		}
 		vf := v.Field(i)
@@ -310,7 +310,7 @@ func discardLegacy(m Message) {
 				}
 			}
 		case reflect.Interface:
-			// Must be oneof ***REMOVED***eld.
+			// Must be oneof field.
 			switch {
 			case isPointer || isSlice:
 				panic(fmt.Sprintf("%T.%s cannot be a pointer to a interface or a slice of interface values", m, f.Name))
@@ -336,7 +336,7 @@ func discardLegacy(m Message) {
 		vf.Set(reflect.ValueOf([]byte(nil)))
 	}
 
-	// For proto2 messages, only discard unknown ***REMOVED***elds in message extensions
+	// For proto2 messages, only discard unknown fields in message extensions
 	// that have been accessed via GetExtension.
 	if em, err := extendable(m); err == nil {
 		// Ignore lock since discardLegacy is not concurrency safe.

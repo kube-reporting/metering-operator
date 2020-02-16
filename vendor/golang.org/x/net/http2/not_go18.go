@@ -1,6 +1,6 @@
 // Copyright 2016 The Go Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE ***REMOVED***le.
+// license that can be found in the LICENSE file.
 
 // +build !go1.8
 
@@ -11,7 +11,7 @@ import (
 	"net/http"
 )
 
-func con***REMOVED***gureServer18(h1 *http.Server, h2 *Server) error {
+func configureServer18(h1 *http.Server, h2 *Server) error {
 	// No IdleTimeout to sync prior to Go 1.8.
 	return nil
 }

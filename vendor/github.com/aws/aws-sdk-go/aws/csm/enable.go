@@ -11,10 +11,10 @@ var (
 )
 
 const (
-	// DefaultPort is used when no port is speci***REMOVED***ed.
+	// DefaultPort is used when no port is specified.
 	DefaultPort = "31000"
 
-	// DefaultHost is the host that will be used when none is speci***REMOVED***ed.
+	// DefaultHost is the host that will be used when none is specified.
 	DefaultHost = "127.0.0.1"
 )
 
@@ -61,7 +61,7 @@ func Start(clientID string, url string) (*Reporter, error) {
 
 	if sender == nil {
 		sender = newReporter(clientID, url)
-	} ***REMOVED*** {
+	} else {
 		if sender.clientID != clientID {
 			panic(fmt.Errorf("inconsistent client IDs. %q was expected, but received %q", sender.clientID, clientID))
 		}

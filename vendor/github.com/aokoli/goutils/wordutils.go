@@ -2,7 +2,7 @@
 Copyright 2014 Alexander Okoli
 
 Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this ***REMOVED***le except in compliance with the License.
+you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
 
     http://www.apache.org/licenses/LICENSE-2.0
@@ -10,7 +10,7 @@ You may obtain a copy of the License at
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the speci***REMOVED***c language governing permissions and
+See the License for the specific language governing permissions and
 limitations under the License.
 */
 
@@ -39,8 +39,8 @@ Example:
         rand1, err1 := goutils.Random (-1, 0, 0, true, true)
 
         if err1 != nil {
-            fmt.Println(err1) // Prints out error message because -1 was entered as the ***REMOVED***rst parameter in goutils.Random(...)
-        } ***REMOVED*** {
+            fmt.Println(err1) // Prints out error message because -1 was entered as the first parameter in goutils.Random(...)
+        } else {
             fmt.Println(rand1)
         }
     }
@@ -63,7 +63,7 @@ Leading spaces on a new line are stripped. Trailing spaces are not stripped.
 
 Parameters:
     str - the string to be word wrapped
-    wrapLength - the column (a column can ***REMOVED***t only one character) to wrap the words at, less than 1 is treated as 1
+    wrapLength - the column (a column can fit only one character) to wrap the words at, less than 1 is treated as 1
 
 Returns:
     a line with newlines inserted
@@ -78,7 +78,7 @@ Leading spaces on a new line are stripped. Trailing spaces are not stripped.
 
 Parameters:
     str - the string to be word wrapped
-    wrapLength - the column number (a column can ***REMOVED***t only one character) to wrap the words at, less than 1 is treated as 1
+    wrapLength - the column number (a column can fit only one character) to wrap the words at, less than 1 is treated as 1
     newLineStr - the string to insert for a new line, "" uses '\n'
     wrapLongWords - true if long words (such as URLs) should be wrapped
 
@@ -118,7 +118,7 @@ func WrapCustom(str string, wrapLength int, newLineStr string, wrapLongWords boo
 			wrappedLine.WriteString(newLineStr)
 			offset = spaceToWrapAt + 1
 
-		} ***REMOVED*** {
+		} else {
 			// long word or URL
 			if wrapLongWords {
 				end := wrapLength + offset
@@ -126,7 +126,7 @@ func WrapCustom(str string, wrapLength int, newLineStr string, wrapLongWords boo
 				wrappedLine.WriteString(str[offset:end])
 				wrappedLine.WriteString(newLineStr)
 				offset += wrapLength
-			} ***REMOVED*** {
+			} else {
 				// long words aren't wrapped, just extended beyond limit
 				end := wrapLength + offset
 				spaceToWrapAt = strings.IndexRune(str[end:len(str)], ' ') + end
@@ -134,7 +134,7 @@ func WrapCustom(str string, wrapLength int, newLineStr string, wrapLongWords boo
 					wrappedLine.WriteString(str[offset:spaceToWrapAt])
 					wrappedLine.WriteString(newLineStr)
 					offset = spaceToWrapAt + 1
-				} ***REMOVED*** {
+				} else {
 					wrappedLine.WriteString(str[offset:len(str)])
 					offset = inputLineLength
 				}
@@ -149,10 +149,10 @@ func WrapCustom(str string, wrapLength int, newLineStr string, wrapLongWords boo
 }
 
 /*
-Capitalize capitalizes all the delimiter separated words in a string. Only the ***REMOVED***rst letter of each word is changed.
+Capitalize capitalizes all the delimiter separated words in a string. Only the first letter of each word is changed.
 To convert the rest of each word to lowercase at the same time, use CapitalizeFully(str string, delimiters ...rune).
-The delimiters represent a set of characters understood to separate words. The ***REMOVED***rst string character
-and the ***REMOVED***rst non-delimiter character after a delimiter will be capitalized. A "" input string returns "".
+The delimiters represent a set of characters understood to separate words. The first string character
+and the first non-delimiter character after a delimiter will be capitalized. A "" input string returns "".
 Capitalization uses the Unicode title case, normally equivalent to upper case.
 
 Parameters:
@@ -168,7 +168,7 @@ func Capitalize(str string, delimiters ...rune) string {
 
 	if delimiters == nil {
 		delimLen = -1
-	} ***REMOVED*** {
+	} else {
 		delimLen = len(delimiters)
 	}
 
@@ -182,7 +182,7 @@ func Capitalize(str string, delimiters ...rune) string {
 		ch := buffer[i]
 		if isDelimiter(ch, delimiters...) {
 			capitalizeNext = true
-		} ***REMOVED*** if capitalizeNext {
+		} else if capitalizeNext {
 			buffer[i] = unicode.ToTitle(ch)
 			capitalizeNext = false
 		}
@@ -194,7 +194,7 @@ func Capitalize(str string, delimiters ...rune) string {
 /*
 CapitalizeFully converts all the delimiter separated words in a string into capitalized words, that is each word is made up of a
 titlecase character and then a series of lowercase characters. The delimiters represent a set of characters understood
-to separate words. The ***REMOVED***rst string character and the ***REMOVED***rst non-delimiter character after a delimiter will be capitalized.
+to separate words. The first string character and the first non-delimiter character after a delimiter will be capitalized.
 Capitalization uses the Unicode title case, normally equivalent to upper case.
 
 Parameters:
@@ -210,7 +210,7 @@ func CapitalizeFully(str string, delimiters ...rune) string {
 
 	if delimiters == nil {
 		delimLen = -1
-	} ***REMOVED*** {
+	} else {
 		delimLen = len(delimiters)
 	}
 
@@ -222,9 +222,9 @@ func CapitalizeFully(str string, delimiters ...rune) string {
 }
 
 /*
-Uncapitalize uncapitalizes all the whitespace separated words in a string. Only the ***REMOVED***rst letter of each word is changed.
-The delimiters represent a set of characters understood to separate words. The ***REMOVED***rst string character and the ***REMOVED***rst non-delimiter
-character after a delimiter will be uncapitalized. Whitespace is de***REMOVED***ned by unicode.IsSpace(char).
+Uncapitalize uncapitalizes all the whitespace separated words in a string. Only the first letter of each word is changed.
+The delimiters represent a set of characters understood to separate words. The first string character and the first non-delimiter
+character after a delimiter will be uncapitalized. Whitespace is defined by unicode.IsSpace(char).
 
 Parameters:
     str - the string to uncapitalize fully
@@ -239,7 +239,7 @@ func Uncapitalize(str string, delimiters ...rune) string {
 
 	if delimiters == nil {
 		delimLen = -1
-	} ***REMOVED*** {
+	} else {
 		delimLen = len(delimiters)
 	}
 
@@ -248,12 +248,12 @@ func Uncapitalize(str string, delimiters ...rune) string {
 	}
 
 	buffer := []rune(str)
-	uncapitalizeNext := true // TODO Always makes capitalize/un apply to ***REMOVED***rst char.
+	uncapitalizeNext := true // TODO Always makes capitalize/un apply to first char.
 	for i := 0; i < len(buffer); i++ {
 		ch := buffer[i]
 		if isDelimiter(ch, delimiters...) {
 			uncapitalizeNext = true
-		} ***REMOVED*** if uncapitalizeNext {
+		} else if uncapitalizeNext {
 			buffer[i] = unicode.ToLower(ch)
 			uncapitalizeNext = false
 		}
@@ -270,7 +270,7 @@ Conversion algorithm:
     Title case character converts to Lower case
     Lower case character after Whitespace or at start converts to Title case
     Other Lower case character converts to Upper case
-    Whitespace is de***REMOVED***ned by unicode.IsSpace(char).
+    Whitespace is defined by unicode.IsSpace(char).
 
 Parameters:
     str - the string to swap case
@@ -291,17 +291,17 @@ func SwapCase(str string) string {
 		if unicode.IsUpper(ch) {
 			buffer[i] = unicode.ToLower(ch)
 			whitespace = false
-		} ***REMOVED*** if unicode.IsTitle(ch) {
+		} else if unicode.IsTitle(ch) {
 			buffer[i] = unicode.ToLower(ch)
 			whitespace = false
-		} ***REMOVED*** if unicode.IsLower(ch) {
+		} else if unicode.IsLower(ch) {
 			if whitespace {
 				buffer[i] = unicode.ToTitle(ch)
 				whitespace = false
-			} ***REMOVED*** {
+			} else {
 				buffer[i] = unicode.ToUpper(ch)
 			}
-		} ***REMOVED*** {
+		} else {
 			whitespace = unicode.IsSpace(ch)
 		}
 	}
@@ -309,9 +309,9 @@ func SwapCase(str string) string {
 }
 
 /*
-Initials extracts the initial letters from each word in the string. The ***REMOVED***rst letter of the string and all ***REMOVED***rst
-letters after the de***REMOVED***ned delimiters are returned as a new string. Their case is not changed. If the delimiters
-parameter is excluded, then Whitespace is used. Whitespace is de***REMOVED***ned by unicode.IsSpacea(char). An empty delimiter array returns an empty string.
+Initials extracts the initial letters from each word in the string. The first letter of the string and all first
+letters after the defined delimiters are returned as a new string. Their case is not changed. If the delimiters
+parameter is excluded, then Whitespace is used. Whitespace is defined by unicode.IsSpacea(char). An empty delimiter array returns an empty string.
 
 Parameters:
     str - the string to get initials from
@@ -334,7 +334,7 @@ func Initials(str string, delimiters ...rune) string {
 
 		if isDelimiter(ch, delimiters...) {
 			lastWasGap = true
-		} ***REMOVED*** if lastWasGap {
+		} else if lastWasGap {
 			buf.WriteRune(ch)
 			lastWasGap = false
 		}

@@ -1,10 +1,10 @@
 // Copyright 2011 The Go Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE ***REMOVED***le.
+// license that can be found in the LICENSE file.
 
 package norm
 
-// This ***REMOVED***le contains Form-speci***REMOVED***c logic and wrappers for data in tables.go.
+// This file contains Form-specific logic and wrappers for data in tables.go.
 
 // Rune info is stored in a separate trie per composing form. A composing form
 // and its corresponding decomposing form share the same trie.  Each trie maps
@@ -18,14 +18,14 @@ package norm
 // has the form:
 //    <header> <decomp_byte>* [<tccc> [<lccc>]]
 // The header contains the number of bytes in the decomposition (excluding this
-// length byte). The two most signi***REMOVED***cant bits of this length byte correspond
+// length byte). The two most significant bits of this length byte correspond
 // to bit 5 and 4 of qcInfo (see below).  The byte sequence itself starts at v+1.
 // The byte sequence is followed by a trailing and leading CCC if the values
 // for these are not zero.  The value of v determines which ccc are appended
-// to the sequences.  For v < ***REMOVED***rstCCC, there are none, for v >= ***REMOVED***rstCCC,
-// the sequence is followed by a trailing ccc, and for v >= ***REMOVED***rstLeadingCC
+// to the sequences.  For v < firstCCC, there are none, for v >= firstCCC,
+// the sequence is followed by a trailing ccc, and for v >= firstLeadingCC
 // there is an additional leading ccc. The value of tccc itself is the
-// trailing CCC shifted left 2 bits. The two least-signi***REMOVED***cant bits of tccc
+// trailing CCC shifted left 2 bits. The two least-significant bits of tccc
 // are the number of trailing non-starters.
 
 const (
@@ -48,7 +48,7 @@ type Properties struct {
 // functions dispatchable per form
 type lookupFunc func(b input, i int) Properties
 
-// formInfo holds Form-speci***REMOVED***c functions and tables.
+// formInfo holds Form-specific functions and tables.
 type formInfo struct {
 	form                     Form
 	composing, compatibility bool // form type
@@ -84,7 +84,7 @@ var formTable = []*formInfo{{
 
 // We do not distinguish between boundaries for NFC, NFD, etc. to avoid
 // unexpected behavior for the user.  For example, in NFD, there is a boundary
-// after 'a'.  However, 'a' might combine with modi***REMOVED***ers, so from the application's
+// after 'a'.  However, 'a' might combine with modifiers, so from the application's
 // perspective it is not a good boundary. We will therefore always use the
 // boundaries for the combining variants.
 
@@ -94,9 +94,9 @@ func (p Properties) BoundaryBefore() bool {
 	if p.ccc == 0 && !p.combinesBackward() {
 		return true
 	}
-	// We assume that the CCC of the ***REMOVED***rst character in a decomposition
+	// We assume that the CCC of the first character in a decomposition
 	// is always non-zero if different from info.ccc and that we can return
-	// false at this point. This is veri***REMOVED***ed by maketables.
+	// false at this point. This is verified by maketables.
 	return false
 }
 
@@ -129,7 +129,7 @@ func (p Properties) isInert() bool {
 }
 
 func (p Properties) multiSegment() bool {
-	return p.index >= ***REMOVED***rstMulti && p.index < endMulti
+	return p.index >= firstMulti && p.index < endMulti
 }
 
 func (p Properties) nLeadingNonStarters() uint8 {
@@ -160,13 +160,13 @@ func (p Properties) Size() int {
 
 // CCC returns the canonical combining class of the underlying rune.
 func (p Properties) CCC() uint8 {
-	if p.index >= ***REMOVED***rstCCCZeroExcept {
+	if p.index >= firstCCCZeroExcept {
 		return 0
 	}
 	return ccc[p.ccc]
 }
 
-// LeadCCC returns the CCC of the ***REMOVED***rst rune in the decomposition.
+// LeadCCC returns the CCC of the first rune in the decomposition.
 // If there is no decomposition, LeadCCC equals CCC.
 func (p Properties) LeadCCC() uint8 {
 	return ccc[p.ccc]
@@ -201,7 +201,7 @@ func lookupInfoNFKC(b input, i int) Properties {
 	return compInfo(v, sz)
 }
 
-// Properties returns properties for the ***REMOVED***rst rune in s.
+// Properties returns properties for the first rune in s.
 func (f Form) Properties(s []byte) Properties {
 	if f == NFC || f == NFD {
 		return compInfo(nfcData.lookup(s))
@@ -209,7 +209,7 @@ func (f Form) Properties(s []byte) Properties {
 	return compInfo(nfkcData.lookup(s))
 }
 
-// PropertiesString returns properties for the ***REMOVED***rst rune in s.
+// PropertiesString returns properties for the first rune in s.
 func (f Form) PropertiesString(s string) Properties {
 	if f == NFC || f == NFD {
 		return compInfo(nfcData.lookupString(s))
@@ -218,12 +218,12 @@ func (f Form) PropertiesString(s string) Properties {
 }
 
 // compInfo converts the information contained in v and sz
-// to a Properties.  See the comment at the top of the ***REMOVED***le
+// to a Properties.  See the comment at the top of the file
 // for more information on the format.
 func compInfo(v uint16, sz int) Properties {
 	if v == 0 {
 		return Properties{size: uint8(sz)}
-	} ***REMOVED*** if v >= 0x8000 {
+	} else if v >= 0x8000 {
 		p := Properties{
 			size:  uint8(sz),
 			ccc:   uint8(v),
@@ -239,14 +239,14 @@ func compInfo(v uint16, sz int) Properties {
 	h := decomps[v]
 	f := (qcInfo(h&headerFlagsMask) >> 2) | 0x4
 	p := Properties{size: uint8(sz), flags: f, index: v}
-	if v >= ***REMOVED***rstCCC {
+	if v >= firstCCC {
 		v += uint16(h&headerLenMask) + 1
 		c := decomps[v]
 		p.tccc = c >> 2
 		p.flags |= qcInfo(c & 0x3)
-		if v >= ***REMOVED***rstLeadingCCC {
+		if v >= firstLeadingCCC {
 			p.nLead = c & 0x3
-			if v >= ***REMOVED***rstStarterWithNLead {
+			if v >= firstStarterWithNLead {
 				// We were tricked. Remove the decomposition.
 				p.flags &= 0x03
 				p.index = 0

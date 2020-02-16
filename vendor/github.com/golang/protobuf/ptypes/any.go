@@ -4,7 +4,7 @@
 // https://github.com/golang/protobuf
 //
 // Redistribution and use in source and binary forms, with or without
-// modi***REMOVED***cation, are permitted provided that the following conditions are
+// modification, are permitted provided that the following conditions are
 // met:
 //
 //     * Redistributions of source code must retain the above copyright
@@ -15,7 +15,7 @@
 // distribution.
 //     * Neither the name of Google Inc. nor the names of its
 // contributors may be used to endorse or promote products derived from
-// this software without speci***REMOVED***c prior written permission.
+// this software without specific prior written permission.
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
 // "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
@@ -31,7 +31,7 @@
 
 package ptypes
 
-// This ***REMOVED***le implements functions to marshal proto.Message to/from
+// This file implements functions to marshal proto.Message to/from
 // google.protobuf.Any message.
 
 import (
@@ -48,7 +48,7 @@ const googleApis = "type.googleapis.com/"
 // AnyMessageName returns the name of the message contained in a google.protobuf.Any message.
 //
 // Note that regular type assertions should be done using the Is
-// function. AnyMessageName is provided for less common use cases like ***REMOVED***ltering a
+// function. AnyMessageName is provided for less common use cases like filtering a
 // sequence of Any messages based on a set of allowed message type names.
 func AnyMessageName(any *any.Any) (string, error) {
 	if any == nil {
@@ -71,7 +71,7 @@ func MarshalAny(pb proto.Message) (*any.Any, error) {
 }
 
 // DynamicAny is a value that can be passed to UnmarshalAny to automatically
-// allocate a proto.Message for the type speci***REMOVED***ed in a google.protobuf.Any
+// allocate a proto.Message for the type specified in a google.protobuf.Any
 // message. The allocated message is stored in the embedded proto.Message.
 //
 // Example:
@@ -83,7 +83,7 @@ type DynamicAny struct {
 	proto.Message
 }
 
-// Empty returns a new proto.Message of the type speci***REMOVED***ed in a
+// Empty returns a new proto.Message of the type specified in a
 // google.protobuf.Any message. It returns an error if corresponding message
 // type isn't linked in.
 func Empty(any *any.Any) (proto.Message, error) {

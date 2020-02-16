@@ -37,7 +37,7 @@ type formatState struct {
 	depth          int
 	pointers       map[uintptr]int
 	ignoreNextType bool
-	cs             *Con***REMOVED***gState
+	cs             *ConfigState
 }
 
 // buildDefaultFormat recreates the original format string without precision
@@ -159,7 +159,7 @@ func (f *formatState) formatPtr(v reflect.Value) {
 		f.fs.Write(bytes.Repeat(asteriskBytes, indirects))
 		f.fs.Write([]byte(ve.Type().String()))
 		f.fs.Write(closeParenBytes)
-	} ***REMOVED*** {
+	} else {
 		if nilFound || cycleFound {
 			indirects += strings.Count(ve.Type().String(), "*")
 		}
@@ -195,7 +195,7 @@ func (f *formatState) formatPtr(v reflect.Value) {
 }
 
 // format is the main workhorse for providing the Formatter interface.  It
-// uses the passed reflect value to ***REMOVED***gure out what kind of object we are
+// uses the passed reflect value to figure out what kind of object we are
 // dealing with and formats it appropriately.  It is a recursive function,
 // however circular data structures are detected and handled properly.
 func (f *formatState) format(v reflect.Value) {
@@ -212,7 +212,7 @@ func (f *formatState) format(v reflect.Value) {
 		return
 	}
 
-	// Print type information unless already handled ***REMOVED***where.
+	// Print type information unless already handled elsewhere.
 	if !f.ignoreNextType && f.fs.Flag('#') {
 		f.fs.Write(openParenBytes)
 		f.fs.Write([]byte(v.Type().String()))
@@ -268,7 +268,7 @@ func (f *formatState) format(v reflect.Value) {
 		f.depth++
 		if (f.cs.MaxDepth != 0) && (f.depth > f.cs.MaxDepth) {
 			f.fs.Write(maxShortBytes)
-		} ***REMOVED*** {
+		} else {
 			numEntries := v.Len()
 			for i := 0; i < numEntries; i++ {
 				if i > 0 {
@@ -306,7 +306,7 @@ func (f *formatState) format(v reflect.Value) {
 		f.depth++
 		if (f.cs.MaxDepth != 0) && (f.depth > f.cs.MaxDepth) {
 			f.fs.Write(maxShortBytes)
-		} ***REMOVED*** {
+		} else {
 			keys := v.MapKeys()
 			if f.cs.SortKeys {
 				sortValues(keys, f.cs)
@@ -331,7 +331,7 @@ func (f *formatState) format(v reflect.Value) {
 		f.depth++
 		if (f.cs.MaxDepth != 0) && (f.depth > f.cs.MaxDepth) {
 			f.fs.Write(maxShortBytes)
-		} ***REMOVED*** {
+		} else {
 			vt := v.Type()
 			for i := 0; i < numFields; i++ {
 				if i > 0 {
@@ -360,13 +360,13 @@ func (f *formatState) format(v reflect.Value) {
 		format := f.buildDefaultFormat()
 		if v.CanInterface() {
 			fmt.Fprintf(f.fs, format, v.Interface())
-		} ***REMOVED*** {
+		} else {
 			fmt.Fprintf(f.fs, format, v.String())
 		}
 	}
 }
 
-// Format satis***REMOVED***es the fmt.Formatter interface. See NewFormatter for usage
+// Format satisfies the fmt.Formatter interface. See NewFormatter for usage
 // details.
 func (f *formatState) Format(fs fmt.State, verb rune) {
 	f.fs = fs
@@ -390,30 +390,30 @@ func (f *formatState) Format(fs fmt.State, verb rune) {
 }
 
 // newFormatter is a helper function to consolidate the logic from the various
-// public methods which take varying con***REMOVED***g states.
-func newFormatter(cs *Con***REMOVED***gState, v interface{}) fmt.Formatter {
+// public methods which take varying config states.
+func newFormatter(cs *ConfigState, v interface{}) fmt.Formatter {
 	fs := &formatState{value: v, cs: cs}
 	fs.pointers = make(map[uintptr]int)
 	return fs
 }
 
 /*
-NewFormatter returns a custom formatter that satis***REMOVED***es the fmt.Formatter
+NewFormatter returns a custom formatter that satisfies the fmt.Formatter
 interface.  As a result, it integrates cleanly with standard fmt package
 printing functions.  The formatter is useful for inline printing of smaller data
-types similar to the standard %v format speci***REMOVED***er.
+types similar to the standard %v format specifier.
 
 The custom formatter only responds to the %v (most compact), %+v (adds pointer
 addresses), %#v (adds types), or %#+v (adds types and pointer addresses) verb
 combinations.  Any other verbs such as %x and %q will be sent to the the
 standard fmt package for formatting.  In addition, the custom formatter ignores
 the width and precision arguments (however they will still work on the format
-speci***REMOVED***ers not handled by the custom formatter).
+specifiers not handled by the custom formatter).
 
 Typically this function shouldn't be called directly.  It is much easier to make
 use of the custom formatter by calling one of the convenience functions such as
 Printf, Println, or Fprintf.
 */
 func NewFormatter(v interface{}) fmt.Formatter {
-	return newFormatter(&Con***REMOVED***g, v)
+	return newFormatter(&Config, v)
 }

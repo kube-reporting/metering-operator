@@ -29,7 +29,7 @@ func (c *EC2Metadata) GetMetadata(p string) (string, error) {
 	return output.Content, err
 }
 
-// GetUserData returns the userdata that was con***REMOVED***gured for the service. If
+// GetUserData returns the userdata that was configured for the service. If
 // there is no user-data setup for the EC2 instance a "NotFoundError" error
 // code will be returned.
 func (c *EC2Metadata) GetUserData() (string, error) {
@@ -125,7 +125,7 @@ func (c *EC2Metadata) Region() (string, error) {
 		return "", awserr.New("EC2MetadataError", "invalid Region response", nil)
 	}
 
-	// returns region without the suf***REMOVED***x. Eg: us-west-2a becomes us-west-2
+	// returns region without the suffix. Eg: us-west-2a becomes us-west-2
 	return resp[:len(resp)-1], nil
 }
 
@@ -145,8 +145,8 @@ func (c *EC2Metadata) Available() bool {
 type EC2IAMInfo struct {
 	Code               string
 	LastUpdated        time.Time
-	InstancePro***REMOVED***leArn string
-	InstancePro***REMOVED***leID  string
+	InstanceProfileArn string
+	InstanceProfileID  string
 }
 
 // An EC2InstanceIdentityDocument provides the shape for unmarshaling

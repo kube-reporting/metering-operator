@@ -1,10 +1,10 @@
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements. See the NOTICE ***REMOVED***le
+ * or more contributor license agreements. See the NOTICE file
  * distributed with this work for additional information
- * regarding copyright ownership. The ASF licenses this ***REMOVED***le
+ * regarding copyright ownership. The ASF licenses this file
  * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this ***REMOVED***le except in compliance
+ * "License"); you may not use this file except in compliance
  * with the License. You may obtain a copy of the License at
  *
  *   http://www.apache.org/licenses/LICENSE-2.0
@@ -13,14 +13,14 @@
  * software distributed under the License is distributed on an
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
  * KIND, either express or implied. See the License for the
- * speci***REMOVED***c language governing permissions and limitations
+ * specific language governing permissions and limitations
  * under the License.
  */
 
 package thrift
 
 import (
-	"bu***REMOVED***o"
+	"bufio"
 	"io"
 )
 
@@ -77,19 +77,19 @@ func NewStreamTransportFactory(reader io.Reader, writer io.Writer, isReadWriter 
 }
 
 func NewStreamTransport(r io.Reader, w io.Writer) *StreamTransport {
-	return &StreamTransport{Reader: bu***REMOVED***o.NewReader(r), Writer: bu***REMOVED***o.NewWriter(w)}
+	return &StreamTransport{Reader: bufio.NewReader(r), Writer: bufio.NewWriter(w)}
 }
 
 func NewStreamTransportR(r io.Reader) *StreamTransport {
-	return &StreamTransport{Reader: bu***REMOVED***o.NewReader(r)}
+	return &StreamTransport{Reader: bufio.NewReader(r)}
 }
 
 func NewStreamTransportW(w io.Writer) *StreamTransport {
-	return &StreamTransport{Writer: bu***REMOVED***o.NewWriter(w)}
+	return &StreamTransport{Writer: bufio.NewWriter(w)}
 }
 
 func NewStreamTransportRW(rw io.ReadWriter) *StreamTransport {
-	bufrw := bu***REMOVED***o.NewReadWriter(bu***REMOVED***o.NewReader(rw), bu***REMOVED***o.NewWriter(rw))
+	bufrw := bufio.NewReadWriter(bufio.NewReader(rw), bufio.NewWriter(rw))
 	return &StreamTransport{Reader: bufrw, Writer: bufrw, isReadWriter: true}
 }
 
@@ -101,7 +101,7 @@ func (p *StreamTransport) IsOpen() bool {
 func (p *StreamTransport) Open() error {
 	if !p.closed {
 		return NewTTransportException(ALREADY_OPEN, "StreamTransport already open.")
-	} ***REMOVED*** {
+	} else {
 		return NewTTransportException(NOT_OPEN, "cannot reopen StreamTransport.")
 	}
 }
@@ -164,7 +164,7 @@ func (p *StreamTransport) ReadByte() (c byte, err error) {
 	f, ok := p.Reader.(io.ByteReader)
 	if ok {
 		c, err = f.ReadByte()
-	} ***REMOVED*** {
+	} else {
 		c, err = readByte(p.Reader)
 	}
 	if err != nil {
@@ -185,7 +185,7 @@ func (p *StreamTransport) WriteByte(c byte) (err error) {
 	f, ok := p.Writer.(io.ByteWriter)
 	if ok {
 		err = f.WriteByte(c)
-	} ***REMOVED*** {
+	} else {
 		err = writeByte(p.Writer, c)
 	}
 	if err != nil {
@@ -198,7 +198,7 @@ func (p *StreamTransport) WriteString(s string) (n int, err error) {
 	f, ok := p.Writer.(stringWriter)
 	if ok {
 		n, err = f.WriteString(s)
-	} ***REMOVED*** {
+	} else {
 		n, err = p.Writer.Write([]byte(s))
 	}
 	if err != nil {

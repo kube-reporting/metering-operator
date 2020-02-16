@@ -67,7 +67,7 @@ spec:
     FROM {| .Report.Inputs.ClusterCpuUtilizationReportName | reportTableName |}
     WHERE period_start  >= timestamp '{| default .Report.ReportingStart .Report.Inputs.ReportingStart | prestoTimestamp |}'
     AND period_end <= timestamp '{| default .Report.ReportingEnd .Report.Inputs.ReportingEnd | prestoTimestamp |}'
-    {|- ***REMOVED*** -|}
+    {|- else -|}
     {|- if or (and (not .Report.Inputs.ClusterCpuCapacityReportName) .Report.Inputs.ClusterCpuUsageReportName) (and (not .Report.Inputs.ClusterCpuUsageReportName) .Report.Inputs.ClusterCpuCapacityReportName) -|}
     {|- fail "input ClusterCpuCapacityReportName and ClusterCpuUsageReportName must both be set" -|}
     {|- end -|}
@@ -161,8 +161,8 @@ spec:
     FROM {| .Report.Inputs.ClusterMemoryUtilizationReportName | reportTableName |}
     WHERE period_start  >= timestamp '{| default .Report.ReportingStart .Report.Inputs.ReportingStart | prestoTimestamp |}'
     AND period_end <= timestamp '{| default .Report.ReportingEnd .Report.Inputs.ReportingEnd | prestoTimestamp |}'
-    {|- ***REMOVED*** -|}
-    {|/* Validate both inputs are speci***REMOVED***ed if only one is speci***REMOVED***ed*/|}
+    {|- else -|}
+    {|/* Validate both inputs are specified if only one is specified*/|}
     {|- if or (and (not .Report.Inputs.ClusterMemoryCapacityReportName) .Report.Inputs.ClusterMemoryUsageReportName) (and (not .Report.Inputs.ClusterMemoryUsageReportName) .Report.Inputs.ClusterMemoryCapacityReportName) -|}
     {|- fail "input ClusterMemoryCapacityReportName and ClusterMemoryUsageReportName must both be set" -|}
     {|- end -|}

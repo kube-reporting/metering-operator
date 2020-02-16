@@ -1,6 +1,6 @@
 // Copyright 2014 The Prometheus Authors
 // Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this ***REMOVED***le except in compliance with the License.
+// you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 //
 // http://www.apache.org/licenses/LICENSE-2.0
@@ -8,7 +8,7 @@
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the speci***REMOVED***c language governing permissions and
+// See the License for the specific language governing permissions and
 // limitations under the License.
 
 package prometheus
@@ -43,7 +43,7 @@ type Metric interface {
 	// While populating dto.Metric, it is the responsibility of the
 	// implementation to ensure validity of the Metric protobuf (like valid
 	// UTF-8 strings or syntactically valid metric and label names). It is
-	// recommended to sort labels lexicographically. (Implementers may ***REMOVED***nd
+	// recommended to sort labels lexicographically. (Implementers may find
 	// LabelPairSorter useful for that.) Callers of Write should still make
 	// sure of sorting if they depend on it.
 	Write(*dto.Metric) error
@@ -57,13 +57,13 @@ type Metric interface {
 // implementation XXX has its own XXXOpts type, but in most cases, it is just be
 // an alias of this type (which might change when the requirement arises.)
 //
-// It is mandatory to set Name and Help to a non-empty string. All other ***REMOVED***elds
+// It is mandatory to set Name and Help to a non-empty string. All other fields
 // are optional and can safely be left at their zero value.
 type Opts struct {
-	// Namespace, Subsystem, and Name are components of the fully-quali***REMOVED***ed
+	// Namespace, Subsystem, and Name are components of the fully-qualified
 	// name of the Metric (created by joining these components with
 	// "_"). Only Name is mandatory, the others merely help structuring the
-	// name. Note that the fully-quali***REMOVED***ed name of the metric must be a
+	// name. Note that the fully-qualified name of the metric must be a
 	// valid Prometheus metric name.
 	Namespace string
 	Subsystem string
@@ -71,12 +71,12 @@ type Opts struct {
 
 	// Help provides information about this metric. Mandatory!
 	//
-	// Metrics with the same fully-quali***REMOVED***ed name must have the same Help
+	// Metrics with the same fully-qualified name must have the same Help
 	// string.
 	Help string
 
-	// ConstLabels are used to attach ***REMOVED***xed labels to this metric. Metrics
-	// with the same fully-quali***REMOVED***ed name must have the same label names in
+	// ConstLabels are used to attach fixed labels to this metric. Metrics
+	// with the same fully-qualified name must have the same label names in
 	// their ConstLabels.
 	//
 	// Note that in most cases, labels have a value that varies during the
@@ -86,7 +86,7 @@ type Opts struct {
 	// value of a label does not change during the lifetime of a process,
 	// e.g. if the revision of the running binary is put into a
 	// label. Another, more advanced purpose is if more than one Collector
-	// needs to collect Metrics with the same fully-quali***REMOVED***ed name. In that
+	// needs to collect Metrics with the same fully-qualified name. In that
 	// case, those Metrics must differ in the values of their
 	// ConstLabels. See the Collector examples.
 	//
@@ -99,7 +99,7 @@ type Opts struct {
 // BuildFQName joins the given three name components by "_". Empty name
 // components are ignored. If the name parameter itself is empty, an empty
 // string is returned, no matter what. Metric implementations included in this
-// library use this function internally to generate the fully-quali***REMOVED***ed metric
+// library use this function internally to generate the fully-qualified metric
 // name from the name component in their Opts. Users of the library will only
 // need this function if they implement their own Metric or instantiate a Desc
 // (with NewDesc) directly.
@@ -155,7 +155,7 @@ type invalidMetric struct {
 }
 
 // NewInvalidMetric returns a metric whose Write method always returns the
-// provided error. It is useful if a Collector ***REMOVED***nds itself unable to collect
+// provided error. It is useful if a Collector finds itself unable to collect
 // a metric and wishes to report an error to the registry.
 func NewInvalidMetric(desc *Desc, err error) Metric {
 	return &invalidMetric{desc, err}

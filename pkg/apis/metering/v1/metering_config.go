@@ -6,37 +6,37 @@ import (
 	meta "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
-var MeteringCon***REMOVED***gGVK = SchemeGroupVersion.WithKind("MeteringCon***REMOVED***g")
+var MeteringConfigGVK = SchemeGroupVersion.WithKind("MeteringConfig")
 
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
 
-type MeteringCon***REMOVED***gList struct {
+type MeteringConfigList struct {
 	meta.TypeMeta `json:",inline"`
 	meta.ListMeta `json:"metadata,omitempty"`
-	Items         []*MeteringCon***REMOVED***g `json:"items"`
+	Items         []*MeteringConfig `json:"items"`
 }
 
 // +genclient
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
 
-type MeteringCon***REMOVED***g struct {
+type MeteringConfig struct {
 	meta.TypeMeta   `json:",inline"`
 	meta.ObjectMeta `json:"metadata,omitempty"`
 
-	Spec   MeteringCon***REMOVED***gSpec   `json:"spec"`
-	Status MeteringCon***REMOVED***gStatus `json:"status"`
+	Spec   MeteringConfigSpec   `json:"spec"`
+	Status MeteringConfigStatus `json:"status"`
 }
 
-type MeteringCon***REMOVED***gStatus struct {
+type MeteringConfigStatus struct {
 	DisableOCPFeatures *bool `json:"disableOCPFeatures,omitempty"`
 	LogHelmTemplate    *bool `json:"logHelmTemplate,omitempty"`
 
-	Storage             *StorageCon***REMOVED***g             `json:"storage,omitempty"`
-	UnsupportedFeatures *UnsupportedFeaturesCon***REMOVED***g `json:"unsupportedFeatures,omitempty"`
-	TLS                 *MeteringCon***REMOVED***gTLSCon***REMOVED***g   `json:"tls,omitempty"`
-	Monitoring          *MonitoringCon***REMOVED***g          `json:"monitoring,omitempty"`
-	Permissions         *MeteringPermissionCon***REMOVED***g  `json:"permissions,omitempty"`
-	OpenshiftReporting  *OpenshiftReportingCon***REMOVED***g  `json:"openshift-reporting,omitempty"`
+	Storage             *StorageConfig             `json:"storage,omitempty"`
+	UnsupportedFeatures *UnsupportedFeaturesConfig `json:"unsupportedFeatures,omitempty"`
+	TLS                 *MeteringConfigTLSConfig   `json:"tls,omitempty"`
+	Monitoring          *MonitoringConfig          `json:"monitoring,omitempty"`
+	Permissions         *MeteringPermissionConfig  `json:"permissions,omitempty"`
+	OpenshiftReporting  *OpenshiftReportingConfig  `json:"openshift-reporting,omitempty"`
 
 	Ghostunnel        *Ghostunnel        `json:"__ghostunnel,omitempty"`
 	Hive              *Hive              `json:"hive,omitempty"`
@@ -45,16 +45,16 @@ type MeteringCon***REMOVED***gStatus struct {
 	ReportingOperator *ReportingOperator `json:"reporting-operator,omitempty"`
 }
 
-type MeteringCon***REMOVED***gSpec struct {
+type MeteringConfigSpec struct {
 	DisableOCPFeatures *bool `json:"disableOCPFeatures,omitempty"`
 	LogHelmTemplate    *bool `json:"logHelmTemplate,omitempty"`
 
-	Storage             *StorageCon***REMOVED***g             `json:"storage,omitempty"`
-	UnsupportedFeatures *UnsupportedFeaturesCon***REMOVED***g `json:"unsupportedFeatures,omitempty"`
-	TLS                 *MeteringCon***REMOVED***gTLSCon***REMOVED***g   `json:"tls,omitempty"`
-	Monitoring          *MonitoringCon***REMOVED***g          `json:"monitoring,omitempty"`
-	Permissions         *MeteringPermissionCon***REMOVED***g  `json:"permissions,omitempty"`
-	OpenshiftReporting  *OpenshiftReportingCon***REMOVED***g  `json:"openshift-reporting,omitempty"`
+	Storage             *StorageConfig             `json:"storage,omitempty"`
+	UnsupportedFeatures *UnsupportedFeaturesConfig `json:"unsupportedFeatures,omitempty"`
+	TLS                 *MeteringConfigTLSConfig   `json:"tls,omitempty"`
+	Monitoring          *MonitoringConfig          `json:"monitoring,omitempty"`
+	Permissions         *MeteringPermissionConfig  `json:"permissions,omitempty"`
+	OpenshiftReporting  *OpenshiftReportingConfig  `json:"openshift-reporting,omitempty"`
 
 	Ghostunnel        *Ghostunnel        `json:"__ghostunnel,omitempty"`
 	Hive              *Hive              `json:"hive,omitempty"`
@@ -67,20 +67,20 @@ type MeteringCon***REMOVED***gSpec struct {
 Start of structures re-used throughout the top-level keys
 */
 
-type ImageCon***REMOVED***g struct {
+type ImageConfig struct {
 	PullPolicy string `json:"pullPolicy,omitempty"`
 	Repository string `json:"repository,omitempty"`
 	Tag        string `json:"tag,omitempty"`
 }
-type TLSCon***REMOVED***g struct {
+type TLSConfig struct {
 	Enabled       *bool  `json:"enabled,omitempty"`
 	CreateSecret  *bool  `json:"createSecret,omitempty"`
-	Certi***REMOVED***cate   string `json:"certi***REMOVED***cate,omitempty"`
+	Certificate   string `json:"certificate,omitempty"`
 	Key           string `json:"key,omitempty"`
-	CaCerti***REMOVED***cate string `json:"caCerti***REMOVED***cate,omitempty"`
+	CaCertificate string `json:"caCertificate,omitempty"`
 	SecretName    string `json:"secretName,omitempty"`
 }
-type JVMCon***REMOVED***g struct {
+type JVMConfig struct {
 	G1HeapRegionSize               int    `json:"G1HeapRegionSize,omitempty"`
 	ConcGCThreads                  int    `json:"concGCThreads,omitempty"`
 	InitiatingHeapOccupancyPercent int    `json:"initiatingHeapOccupancyPercent,omitempty"`
@@ -107,16 +107,16 @@ type ReportingOperatorSpec struct {
 	Annotations    map[string]string                  `json:"annotations,omitempty"`
 	Labels         map[string]string                  `json:"labels,omitempty"`
 	NodeSelector   map[string]string                  `json:"nodeSelector,omitempty"`
-	Af***REMOVED***nity       *corev1.Af***REMOVED***nity                   `json:"af***REMOVED***nity,omitempty"`
+	Affinity       *corev1.Affinity                   `json:"affinity,omitempty"`
 	Resources      *corev1.ResourceRequirements       `json:"resources,omitempty"`
 	UpdateStrategy *appsv1.DeploymentStrategy         `json:"updateStrategy,omitempty"`
-	Image          *ImageCon***REMOVED***g                       `json:"image,omitempty"`
-	Con***REMOVED***g         *ReportingOperatorCon***REMOVED***g           `json:"con***REMOVED***g,omitempty"`
-	APIService     *ReportingOperatorAPIServiceCon***REMOVED***g `json:"apiService,omitempty"`
-	Route          *ReportingOperatorRouteCon***REMOVED***g      `json:"route,omitempty"`
-	AuthProxy      *ReportingOperatorAuthProxyCon***REMOVED***g  `json:"authProxy,omitempty"`
+	Image          *ImageConfig                       `json:"image,omitempty"`
+	Config         *ReportingOperatorConfig           `json:"config,omitempty"`
+	APIService     *ReportingOperatorAPIServiceConfig `json:"apiService,omitempty"`
+	Route          *ReportingOperatorRouteConfig      `json:"route,omitempty"`
+	AuthProxy      *ReportingOperatorAuthProxyConfig  `json:"authProxy,omitempty"`
 }
-type ReportingOperatorCon***REMOVED***g struct {
+type ReportingOperatorConfig struct {
 	AllNamespaces       *bool                              `json:"allNamespaces,omitempty"`
 	EnableFinalizers    *bool                              `json:"enableFinalizers,omitempty"`
 	LogDDLQueries       *bool                              `json:"logDDLQueries,omitempty"`
@@ -124,130 +124,130 @@ type ReportingOperatorCon***REMOVED***g struct {
 	LogReports          *bool                              `json:"logReports,omitempty"`
 	LogLevel            string                             `json:"logLevel,omitempty"`
 	LeaderLeaseDuration *meta.Duration                     `json:"leaderLeaseDuration,omitempty"`
-	AWS                 *AWSCon***REMOVED***g                         `json:"aws,omitempty"`
-	Prometheus          *ReportingOperatorPrometheusCon***REMOVED***g `json:"prometheus,omitempty"`
-	Hive                *ReportingOperatorHiveCon***REMOVED***g       `json:"hive,omitempty"`
-	Presto              *ReportingOperatorPrestoCon***REMOVED***g     `json:"presto,omitempty"`
-	TLS                 *ReportingOperatorTLSCon***REMOVED***g        `json:"tls,omitempty"`
+	AWS                 *AWSConfig                         `json:"aws,omitempty"`
+	Prometheus          *ReportingOperatorPrometheusConfig `json:"prometheus,omitempty"`
+	Hive                *ReportingOperatorHiveConfig       `json:"hive,omitempty"`
+	Presto              *ReportingOperatorPrestoConfig     `json:"presto,omitempty"`
+	TLS                 *ReportingOperatorTLSConfig        `json:"tls,omitempty"`
 }
 
-type ReportingOperatorAuthProxyCon***REMOVED***g struct {
+type ReportingOperatorAuthProxyConfig struct {
 	Enabled             *bool                                       `json:"enabled,omitempty"`
 	Resources           *corev1.ResourceRequirements                `json:"resources,omitempty"`
-	Image               *ImageCon***REMOVED***g                                `json:"image,omitempty"`
-	AuthenticatedEmails *ReportingOperatorAuthenticatedEmailCon***REMOVED***g  `json:"authenticatedEmails,omitempty"`
-	Cookie              *ReportingOperatorCookieCon***REMOVED***g              `json:"cookie,omitempty"`
-	DelegateURLs        *ReportingOperatorDelegateURLCon***REMOVED***g         `json:"delegateURLs,omitempty"`
-	SubjectAccessReview *ReportingOperatorSubjectAccessReviewCon***REMOVED***g `json:"subjectAccessReview,omitempty"`
-	Htpasswd            *ReportingOperatorHtpasswdCon***REMOVED***g            `json:"htpasswd,omitempty"`
-	Rbac                *ReportingOperatorRBACCon***REMOVED***g                `json:"rbac,omitempty"`
+	Image               *ImageConfig                                `json:"image,omitempty"`
+	AuthenticatedEmails *ReportingOperatorAuthenticatedEmailConfig  `json:"authenticatedEmails,omitempty"`
+	Cookie              *ReportingOperatorCookieConfig              `json:"cookie,omitempty"`
+	DelegateURLs        *ReportingOperatorDelegateURLConfig         `json:"delegateURLs,omitempty"`
+	SubjectAccessReview *ReportingOperatorSubjectAccessReviewConfig `json:"subjectAccessReview,omitempty"`
+	Htpasswd            *ReportingOperatorHtpasswdConfig            `json:"htpasswd,omitempty"`
+	Rbac                *ReportingOperatorRBACConfig                `json:"rbac,omitempty"`
 }
-type ReportingOperatorAuthenticatedEmailCon***REMOVED***g struct {
+type ReportingOperatorAuthenticatedEmailConfig struct {
 	Enabled      *bool  `json:"enabled,omitempty"`
 	CreateSecret *bool  `json:"createSecret,omitempty"`
 	Data         string `json:"data,omitempty"`
 	SecretName   string `json:"secretName,omitempty"`
 }
-type ReportingOperatorCookieCon***REMOVED***g struct {
+type ReportingOperatorCookieConfig struct {
 	CreateSecret *bool  `json:"createSecret,omitempty"`
 	Seed         string `json:"seed,omitempty"`
 	SecretName   string `json:"secretName,omitempty"`
 }
-type ReportingOperatorDelegateURLCon***REMOVED***g struct {
+type ReportingOperatorDelegateURLConfig struct {
 	Enabled *bool  `json:"enabled,omitempty"`
 	Policy  string `json:"policy,omitempty"`
 }
-type ReportingOperatorSubjectAccessReviewCon***REMOVED***g struct {
+type ReportingOperatorSubjectAccessReviewConfig struct {
 	Enabled *bool  `json:"enabled,omitempty"`
 	Policy  string `json:"policy,omitempty"`
 }
-type ReportingOperatorHtpasswdCon***REMOVED***g struct {
+type ReportingOperatorHtpasswdConfig struct {
 	CreateSecret *bool  `json:"createSecret,omitempty"`
 	Data         string `json:"data,omitempty"`
 	SecretName   string `json:"secretName,omitempty"`
 }
 
-type ReportingOperatorRBACCon***REMOVED***g struct {
+type ReportingOperatorRBACConfig struct {
 	CreateAuthProxyClusterRole *bool `json:"createAuthProxyClusterRole,omitempty"`
 }
 
-type ReportingOperatorPrestoCon***REMOVED***g struct {
+type ReportingOperatorPrestoConfig struct {
 	MaxQueryLength int                                `json:"maxQueryLength,omitempty"`
 	Host           string                             `json:"host,omitempty"`
-	TLS            *ReportingOperatorCon***REMOVED***gTLSCon***REMOVED***g  `json:"tls,omitempty"`
-	Auth           *ReportingOperatorCon***REMOVED***gAuthCon***REMOVED***g `json:"auth,omitempty"`
+	TLS            *ReportingOperatorConfigTLSConfig  `json:"tls,omitempty"`
+	Auth           *ReportingOperatorConfigAuthConfig `json:"auth,omitempty"`
 }
-type ReportingOperatorHiveCon***REMOVED***g struct {
+type ReportingOperatorHiveConfig struct {
 	Host string                             `json:"host,omitempty"`
-	TLS  *ReportingOperatorCon***REMOVED***gTLSCon***REMOVED***g  `json:"tls,omitempty"`
-	Auth *ReportingOperatorCon***REMOVED***gAuthCon***REMOVED***g `json:"auth,omitempty"`
+	TLS  *ReportingOperatorConfigTLSConfig  `json:"tls,omitempty"`
+	Auth *ReportingOperatorConfigAuthConfig `json:"auth,omitempty"`
 }
 
-// ReportingOperatorCon***REMOVED***gTLSCon***REMOVED***g contains TLS-related ***REMOVED***elds for Presto/Hive
-type ReportingOperatorCon***REMOVED***gTLSCon***REMOVED***g struct {
-	CaCerti***REMOVED***cate string `json:"caCerti***REMOVED***cate,omitempty"`
+// ReportingOperatorConfigTLSConfig contains TLS-related fields for Presto/Hive
+type ReportingOperatorConfigTLSConfig struct {
+	CaCertificate string `json:"caCertificate,omitempty"`
 	CreateSecret  *bool  `json:"createSecret,omitempty"`
 	Enabled       *bool  `json:"enabled,omitempty"`
 	SecretName    string `json:"secretName,omitempty"`
 }
 
-//ReportingOperatorCon***REMOVED***gAuthCon***REMOVED***g contains auth-related ***REMOVED***elds for Presto/Hive
-type ReportingOperatorCon***REMOVED***gAuthCon***REMOVED***g struct {
-	Certi***REMOVED***cate  string `json:"certi***REMOVED***cate,omitempty"`
+//ReportingOperatorConfigAuthConfig contains auth-related fields for Presto/Hive
+type ReportingOperatorConfigAuthConfig struct {
+	Certificate  string `json:"certificate,omitempty"`
 	Key          string `json:"key,omitempty"`
 	CreateSecret *bool  `json:"createSecret,omitempty"`
 	Enabled      *bool  `json:"enabled,omitempty"`
 	SecretName   string `json:"secretName,omitempty"`
 }
 
-type ReportingOperatorPrometheusCon***REMOVED***g struct {
+type ReportingOperatorPrometheusConfig struct {
 	URL                  string                                                 `json:"url,omitempty"`
-	Certi***REMOVED***cateAuthority *ReportingOperatorPrometheusCerti***REMOVED***cateAuthorityCon***REMOVED***g `json:"certi***REMOVED***cateAuthority,omitempty"`
-	MetricsImporter      *ReportingOperatorPrometheusMetricsImporterCon***REMOVED***g      `json:"metricsImporter,omitempty"`
+	CertificateAuthority *ReportingOperatorPrometheusCertificateAuthorityConfig `json:"certificateAuthority,omitempty"`
+	MetricsImporter      *ReportingOperatorPrometheusMetricsImporterConfig      `json:"metricsImporter,omitempty"`
 }
-type ReportingOperatorPrometheusMetricsImporterCon***REMOVED***g struct {
+type ReportingOperatorPrometheusMetricsImporterConfig struct {
 	Enabled *bool                                                 `json:"enabled,omitempty"`
-	Con***REMOVED***g  *ReportingOperatorPrometheusMetricsImporterCon***REMOVED***gSpec `json:"con***REMOVED***g,omitempty"`
-	Auth    *ReportingOperatorPrometheusAuthCon***REMOVED***g                `json:"auth,omitempty"`
+	Config  *ReportingOperatorPrometheusMetricsImporterConfigSpec `json:"config,omitempty"`
+	Auth    *ReportingOperatorPrometheusAuthConfig                `json:"auth,omitempty"`
 }
-type ReportingOperatorPrometheusMetricsImporterCon***REMOVED***gSpec struct {
+type ReportingOperatorPrometheusMetricsImporterConfigSpec struct {
 	ChunkSize                 *meta.Duration `json:"chunkSize,omitempty"`
 	PollInterval              *meta.Duration `json:"pollInterval,omitempty"`
 	StepSize                  *meta.Duration `json:"stepSize,omitempty"`
 	ImportFrom                *meta.Time     `json:"importFrom,omitempty"`
-	MaxImportBack***REMOVED***llDuration *meta.Duration `json:"maxImportBack***REMOVED***llDuration,omitempty"`
+	MaxImportBackfillDuration *meta.Duration `json:"maxImportBackfillDuration,omitempty"`
 	MaxQueryRangeDuration     *meta.Duration `json:"maxQueryRangeDuration,omitempty"`
 }
-type ReportingOperatorPrometheusCon***REMOVED***gMapCon***REMOVED***g struct {
+type ReportingOperatorPrometheusConfigMapConfig struct {
 	Create   *bool  `json:"create,omitempty"`
 	Enabled  *bool  `json:"enabled,omitempty"`
-	Filename string `json:"***REMOVED***lename,omitempty"`
+	Filename string `json:"filename,omitempty"`
 	Name     string `json:"name,omitempty"`
 	Value    string `json:"value,omitempty"`
 }
-type ReportingOperatorPrometheusCerti***REMOVED***cateAuthorityCon***REMOVED***g struct {
+type ReportingOperatorPrometheusCertificateAuthorityConfig struct {
 	UseServiceAccountCA *bool                                       `json:"useServiceAccountCA,omitempty"`
-	Con***REMOVED***gMap           *ReportingOperatorPrometheusCon***REMOVED***gMapCon***REMOVED***g `json:"con***REMOVED***gMap,omitempty"`
+	ConfigMap           *ReportingOperatorPrometheusConfigMapConfig `json:"configMap,omitempty"`
 }
-type ReportingOperatorPrometheusTokenSecretCon***REMOVED***g struct {
+type ReportingOperatorPrometheusTokenSecretConfig struct {
 	Create  *bool  `json:"create,omitempty"`
 	Enabled *bool  `json:"enabled,omitempty"`
 	Name    string `json:"name,omitempty"`
 	Value   string `json:"value,omitempty"`
 }
-type ReportingOperatorPrometheusAuthCon***REMOVED***g struct {
+type ReportingOperatorPrometheusAuthConfig struct {
 	UseServiceAccountToken *bool                                         `json:"useServiceAccountToken,omitempty"`
-	TokenSecret            *ReportingOperatorPrometheusTokenSecretCon***REMOVED***g `json:"tokenSecret,omitempty"`
+	TokenSecret            *ReportingOperatorPrometheusTokenSecretConfig `json:"tokenSecret,omitempty"`
 }
-type ReportingOperatorTLSCon***REMOVED***g struct {
-	API *TLSCon***REMOVED***g `json:"api,omitempty"`
+type ReportingOperatorTLSConfig struct {
+	API *TLSConfig `json:"api,omitempty"`
 }
-type ReportingOperatorAPIServiceCon***REMOVED***g struct {
+type ReportingOperatorAPIServiceConfig struct {
 	Annotations map[string]string `json:"annotations,omitempty"`
 	NodePort    string            `json:"nodePort,omitempty"`
 	Type        string            `json:"type,omitempty"`
 }
-type ReportingOperatorRouteCon***REMOVED***g struct {
+type ReportingOperatorRouteConfig struct {
 	Enabled *bool  `json:"enabled,omitempty"`
 	Name    string `json:"name,omitempty"`
 }
@@ -256,35 +256,35 @@ type ReportingOperatorRouteCon***REMOVED***g struct {
 End of Reporting Operator section
 */
 
-type MonitoringCon***REMOVED***g struct {
+type MonitoringConfig struct {
 	CreateRBAC *bool  `json:"createRBAC,omitempty"`
 	Enabled    *bool  `json:"enabled,omitempty"`
 	Namespace  string `json:"namespace,omitempty"`
 }
 
-type MeteringPermissionCon***REMOVED***g struct {
-	MeteringAdmins  []MeteringPermissionCon***REMOVED***gSpec `json:"meteringAdmins,omitempty"`
-	MeteringViewers []MeteringPermissionCon***REMOVED***gSpec `json:"meteringViewers,omitempty"`
-	ReportExporters []MeteringPermissionCon***REMOVED***gSpec `json:"reportExporters,omitempty"`
-	ReportAdmins    []MeteringPermissionCon***REMOVED***gSpec `json:"reportingAdmins,omitempty"`
-	ReportViewers   []MeteringPermissionCon***REMOVED***gSpec `json:"reportingViewers,omitempty"`
+type MeteringPermissionConfig struct {
+	MeteringAdmins  []MeteringPermissionConfigSpec `json:"meteringAdmins,omitempty"`
+	MeteringViewers []MeteringPermissionConfigSpec `json:"meteringViewers,omitempty"`
+	ReportExporters []MeteringPermissionConfigSpec `json:"reportExporters,omitempty"`
+	ReportAdmins    []MeteringPermissionConfigSpec `json:"reportingAdmins,omitempty"`
+	ReportViewers   []MeteringPermissionConfigSpec `json:"reportingViewers,omitempty"`
 }
-type MeteringPermissionCon***REMOVED***gSpec struct {
+type MeteringPermissionConfigSpec struct {
 	Kind      string `json:"kind,omitempty"`
 	Name      string `json:"name,omitempty"`
 	Namespace string `json:"namespace,omitempty"`
 	APIGroup  string `json:"apiGroup,omitempty"`
 }
 
-type OpenshiftReportingCon***REMOVED***g struct {
-	Spec *OpenshiftReportingCon***REMOVED***gSpec `json:"spec,omitempty"`
+type OpenshiftReportingConfig struct {
+	Spec *OpenshiftReportingConfigSpec `json:"spec,omitempty"`
 }
-type OpenshiftReportingCon***REMOVED***gSpec struct {
-	OpenshiftReportingDefaultStorageLocation     *OpenshiftReportingDefaultStorageLocationCon***REMOVED***g     `json:"defaultStorageLocation,omitempty"`
-	OpenshiftReportingAWSBillingReportDataSource *OpenshiftReportingAWSBillingReportDataSourceCon***REMOVED***g `json:"awsBillingReportDataSource,omitempty"`
-	OpenshiftReportingDefaultReportDataSources   *OpenshiftReportingDefaultReportDataSourcesCon***REMOVED***g   `json:"defaultReportDataSources,omitempty"`
+type OpenshiftReportingConfigSpec struct {
+	OpenshiftReportingDefaultStorageLocation     *OpenshiftReportingDefaultStorageLocationConfig     `json:"defaultStorageLocation,omitempty"`
+	OpenshiftReportingAWSBillingReportDataSource *OpenshiftReportingAWSBillingReportDataSourceConfig `json:"awsBillingReportDataSource,omitempty"`
+	OpenshiftReportingDefaultReportDataSources   *OpenshiftReportingDefaultReportDataSourcesConfig   `json:"defaultReportDataSources,omitempty"`
 }
-type OpenshiftReportingDefaultStorageLocationCon***REMOVED***g struct {
+type OpenshiftReportingDefaultStorageLocationConfig struct {
 	Enabled   *bool                                  `json:"enabled,omitempty"`
 	IsDefault *bool                                  `json:"isDefault,omitempty"`
 	Name      string                                 `json:"name,omitempty"`
@@ -296,63 +296,63 @@ type OpenshiftReportingHiveStorageLocation struct {
 	DatabaseName      string `json:"databaseName,omitempty"`
 	Location          string `json:"location,omitempty"`
 }
-type OpenshiftReportingAWSBillingReportDataSourceCon***REMOVED***g struct {
+type OpenshiftReportingAWSBillingReportDataSourceConfig struct {
 	Enabled *bool  `json:"enabled,omitempty"`
 	Bucket  string `json:"bucket,omitempty"`
-	Pre***REMOVED***x  string `json:"pre***REMOVED***x,omitempty"`
+	Prefix  string `json:"prefix,omitempty"`
 	Region  string `json:"region,omitempty"`
 }
-type OpenshiftReportingDefaultReportDataSourcesCon***REMOVED***g struct {
-	Base            *OpenshiftReportingDefaultReportDataSourcesBaseCon***REMOVED***g `json:"base,omitempty"`
-	PostKubeVersion *OpenshiftReportingPostKubeVersionCon***REMOVED***g              `json:"postKube_1_14,omitempty"`
+type OpenshiftReportingDefaultReportDataSourcesConfig struct {
+	Base            *OpenshiftReportingDefaultReportDataSourcesBaseConfig `json:"base,omitempty"`
+	PostKubeVersion *OpenshiftReportingPostKubeVersionConfig              `json:"postKube_1_14,omitempty"`
 }
-type OpenshiftReportingPostKubeVersionCon***REMOVED***g struct {
+type OpenshiftReportingPostKubeVersionConfig struct {
 	Enabled *bool `json:"enabled,omitempty"`
 }
-type OpenshiftReportingDefaultReportDataSourcesBaseCon***REMOVED***g struct {
+type OpenshiftReportingDefaultReportDataSourcesBaseConfig struct {
 	Enabled *bool                                 `json:"enabled,omitempty"`
-	Items   []OpenshiftReportingReportQueryCon***REMOVED***g `json:"items,omitempty"`
+	Items   []OpenshiftReportingReportQueryConfig `json:"items,omitempty"`
 }
-type OpenshiftReportingReportQueryCon***REMOVED***g struct {
+type OpenshiftReportingReportQueryConfig struct {
 	Name string                                   `json:"name,omitempty"`
-	Spec *OpenshiftReportingReportQueryCon***REMOVED***gSpec `json:"spec,omitempty"`
+	Spec *OpenshiftReportingReportQueryConfigSpec `json:"spec,omitempty"`
 }
-type OpenshiftReportingReportQueryCon***REMOVED***gSpec struct {
+type OpenshiftReportingReportQueryConfigSpec struct {
 	OpenshiftReportingReportQueryView *OpenshiftReportingReportQueryView `json:"reportQueryView,omitempty"`
 }
 type OpenshiftReportingReportQueryView struct {
 	QueryName string `json:"queryName,omitempty"`
 }
 
-type MeteringCon***REMOVED***gTLSCon***REMOVED***g struct {
+type MeteringConfigTLSConfig struct {
 	Enabled     *bool  `json:"enabled,omitempty"`
-	Certi***REMOVED***cate string `json:"certi***REMOVED***cate,omitempty"`
+	Certificate string `json:"certificate,omitempty"`
 	Key         string `json:"key,omitempty"`
 	SecretName  string `json:"secretName,omitempty"`
 }
 
-type UnsupportedFeaturesCon***REMOVED***g struct {
+type UnsupportedFeaturesConfig struct {
 	EnableHDFS *bool `json:"enableHDFS,omitempty"`
 }
 
 type Ghostunnel struct {
-	Image *ImageCon***REMOVED***g `json:"image,omitempty"`
+	Image *ImageConfig `json:"image,omitempty"`
 }
 
-type StorageCon***REMOVED***g struct {
+type StorageConfig struct {
 	Type string             `json:"type,omitempty"`
-	Hive *HiveStorageCon***REMOVED***g `json:"hive,omitempty"`
+	Hive *HiveStorageConfig `json:"hive,omitempty"`
 }
-type HiveStorageCon***REMOVED***g struct {
+type HiveStorageConfig struct {
 	Type         string              `json:"type,omitempty"`
-	Azure        *AzureCon***REMOVED***g        `json:"azure,omitempty"`
-	Gcs          *GCSCon***REMOVED***g          `json:"gcs,omitempty"`
-	Hdfs         *HiveHDFSCon***REMOVED***g     `json:"hdfs,omitempty"`
-	S3           *S3Con***REMOVED***g           `json:"s3,omitempty"`
-	S3Compatible *S3CompatibleCon***REMOVED***g `json:"s3Compatible,omitempty"`
-	SharedPVC    *SharedPVCCon***REMOVED***g    `json:"sharedPVC,omitempty"`
+	Azure        *AzureConfig        `json:"azure,omitempty"`
+	Gcs          *GCSConfig          `json:"gcs,omitempty"`
+	Hdfs         *HiveHDFSConfig     `json:"hdfs,omitempty"`
+	S3           *S3Config           `json:"s3,omitempty"`
+	S3Compatible *S3CompatibleConfig `json:"s3Compatible,omitempty"`
+	SharedPVC    *SharedPVCConfig    `json:"sharedPVC,omitempty"`
 }
-type AzureCon***REMOVED***g struct {
+type AzureConfig struct {
 	CreateSecret       *bool  `json:"createSecret,omitempty"`
 	Container          string `json:"container,omitempty"`
 	RootDirectory      string `json:"rootDirectory,omitempty"`
@@ -360,28 +360,28 @@ type AzureCon***REMOVED***g struct {
 	SecretName         string `json:"secretName,omitempty"`
 	StorageAccountName string `json:"storageAccountName,omitempty"`
 }
-type GCSCon***REMOVED***g struct {
+type GCSConfig struct {
 	CreateSecret          *bool  `json:"createSecret,omitempty"`
 	Bucket                string `json:"bucket,omitempty"`
 	SecretName            string `json:"secretName,omitempty"`
 	ServiceAccountKeyJSON string `json:"serviceAccountKeyJSON,omitempty"`
 }
-type HiveHDFSCon***REMOVED***g struct {
+type HiveHDFSConfig struct {
 	Namenode string `json:"namenode,omitempty"`
 }
-type S3Con***REMOVED***g struct {
+type S3Config struct {
 	CreateBucket *bool  `json:"createBucket,omitempty"`
 	Bucket       string `json:"bucket,omitempty"`
 	Region       string `json:"region,omitempty"`
 	SecretName   string `json:"secretName,omitempty"`
 }
-type AWSCon***REMOVED***g struct {
+type AWSConfig struct {
 	CreateSecret    *bool  `json:"createSecret,omitempty"`
 	AccessKeyID     string `json:"accessKeyID,omitempty"`
 	SecretAccessKey string `json:"secretAccessKey,omitempty"`
 	SecretName      string `json:"secretName,omitempty"`
 }
-type S3CompatibleCon***REMOVED***g struct {
+type S3CompatibleConfig struct {
 	CreateSecret    *bool  `json:"createSecret,omitempty"`
 	AccessKeyID     string `json:"accessKeyID,omitempty"`
 	Bucket          string `json:"bucket,omitempty"`
@@ -389,7 +389,7 @@ type S3CompatibleCon***REMOVED***g struct {
 	SecretAccessKey string `json:"secretAccessKey,omitempty"`
 	SecretName      string `json:"secretName,omitempty"`
 }
-type SharedPVCCon***REMOVED***g struct {
+type SharedPVCConfig struct {
 	CreatePVC    *bool  `json:"createPVC,omitempty"`
 	ClaimName    string `json:"claimName,omitempty"`
 	MountPath    string `json:"mountPath,omitempty"`
@@ -407,53 +407,53 @@ type Presto struct {
 type PrestoSpec struct {
 	Labels          map[string]string       `json:"labels,omitempty"`
 	SecurityContext *corev1.SecurityContext `json:"securityContext,omitempty"`
-	Image           *ImageCon***REMOVED***g            `json:"image,omitempty"`
-	Con***REMOVED***g          *PrestoCon***REMOVED***g           `json:"con***REMOVED***g,omitempty"`
+	Image           *ImageConfig            `json:"image,omitempty"`
+	Config          *PrestoConfig           `json:"config,omitempty"`
 	Coordinator     *PrestoCoordinatorSpec  `json:"coordinator,omitempty"`
 	Worker          *PrestoWorkerSpec       `json:"worker,omitempty"`
 }
-type PrestoCon***REMOVED***g struct {
+type PrestoConfig struct {
 	NodeSchedulerIncludeCoordinator *bool                  `json:"nodeSchedulerIncludeCoordinator,omitempty"`
 	Environment                     string                 `json:"environment,omitempty"`
 	MaxQueryLength                  string                 `json:"maxQueryLength,omitempty"`
-	AWS                             *AWSCon***REMOVED***g             `json:"aws,omitempty"`
-	Azure                           *AzureCon***REMOVED***g           `json:"azure,omitempty"`
-	Gcs                             *GCSCon***REMOVED***g             `json:"gcs,omitempty"`
-	S3Compatible                    *S3CompatibleCon***REMOVED***g    `json:"s3Compatible,omitempty"`
-	TLS                             *TLSCon***REMOVED***g             `json:"tls,omitempty"`
-	Auth                            *TLSCon***REMOVED***g             `json:"auth,omitempty"`
-	Connectors                      *PrestoConnectorCon***REMOVED***g `json:"connectors,omitempty"`
+	AWS                             *AWSConfig             `json:"aws,omitempty"`
+	Azure                           *AzureConfig           `json:"azure,omitempty"`
+	Gcs                             *GCSConfig             `json:"gcs,omitempty"`
+	S3Compatible                    *S3CompatibleConfig    `json:"s3Compatible,omitempty"`
+	TLS                             *TLSConfig             `json:"tls,omitempty"`
+	Auth                            *TLSConfig             `json:"auth,omitempty"`
+	Connectors                      *PrestoConnectorConfig `json:"connectors,omitempty"`
 }
 type PrestoCoordinatorSpec struct {
 	TerminationGracePeriodSeconds *int64                       `json:"terminationGracePeriodSeconds,omitempty"`
 	NodeSelector                  map[string]string            `json:"nodeSelector,omitempty"`
-	Af***REMOVED***nity                      *corev1.Af***REMOVED***nity             `json:"af***REMOVED***nity,omitempty"`
+	Affinity                      *corev1.Affinity             `json:"affinity,omitempty"`
 	Resources                     *corev1.ResourceRequirements `json:"resources,omitempty"`
 	Tolerations                   []corev1.Toleration          `json:"tolerations,omitempty"`
-	Con***REMOVED***g                        *PrestoServerCon***REMOVED***g          `json:"con***REMOVED***g,omitempty"`
+	Config                        *PrestoServerConfig          `json:"config,omitempty"`
 }
 type PrestoWorkerSpec struct {
 	Replicas                      *int32                       `json:"replicas,omitempty"`
 	TerminationGracePeriodSeconds *int64                       `json:"terminationGracePeriodSeconds,omitempty"`
 	NodeSelector                  map[string]string            `json:"nodeSelector,omitempty"`
-	Af***REMOVED***nity                      *corev1.Af***REMOVED***nity             `json:"af***REMOVED***nity,omitempty"`
+	Affinity                      *corev1.Affinity             `json:"affinity,omitempty"`
 	Resources                     *corev1.ResourceRequirements `json:"resources,omitempty"`
 	Tolerations                   []corev1.Toleration          `json:"tolerations,omitempty"`
-	Con***REMOVED***g                        *PrestoServerCon***REMOVED***g          `json:"con***REMOVED***g,omitempty"`
+	Config                        *PrestoServerConfig          `json:"config,omitempty"`
 }
-type PrestoConnectorCon***REMOVED***g struct {
-	Hive              *PrestoConnectorHiveCon***REMOVED***g       `json:"hive,omitempty"`
-	Prometheus        *PrestoConnectorPrometheusCon***REMOVED***g `json:"prometheus,omitempty"`
+type PrestoConnectorConfig struct {
+	Hive              *PrestoConnectorHiveConfig       `json:"hive,omitempty"`
+	Prometheus        *PrestoConnectorPrometheusConfig `json:"prometheus,omitempty"`
 	ConnectorFileList *PrestoConnectorFileList         `json:"extraConnectorFiles,omitempty"`
 }
-type PrestoConnectorHiveCon***REMOVED***g struct {
-	UseHadoopCon***REMOVED***g        *bool      `json:"useHadoopCon***REMOVED***g,omitempty"`
-	HadoopCon***REMOVED***gSecretName string     `json:"hadoopCon***REMOVED***gSecretName,omitempty"`
+type PrestoConnectorHiveConfig struct {
+	UseHadoopConfig        *bool      `json:"useHadoopConfig,omitempty"`
+	HadoopConfigSecretName string     `json:"hadoopConfigSecretName,omitempty"`
 	MetastoreURI           string     `json:"metastoreURI,omitempty"`
 	MetastoreTimeout       string     `json:"metastoreTimeout,omitempty"`
-	TLS                    *TLSCon***REMOVED***g `json:"tls,omitempty"`
+	TLS                    *TLSConfig `json:"tls,omitempty"`
 }
-type PrestoConnectorPrometheusCon***REMOVED***g struct {
+type PrestoConnectorPrometheusConfig struct {
 	Enabled *bool `json:"enabled,omitempty"`
 }
 type PrestoConnectorFileList struct {
@@ -461,12 +461,12 @@ type PrestoConnectorFileList struct {
 	Content string `json:"content,omitempty"`
 }
 
-// PrestoServerCon***REMOVED***g handles the con***REMOVED***guration of the Presto coordinator/worker
-type PrestoServerCon***REMOVED***g struct {
+// PrestoServerConfig handles the configuration of the Presto coordinator/worker
+type PrestoServerConfig struct {
 	TaskMaxWorkerThreads int        `json:"taskMaxWorkerThreads,omitempty"`
 	TaskMinDrivers       int        `json:"taskMinDrivers,omitempty"`
 	LogLevel             string     `json:"logLevel,omitempty"`
-	Jvm                  *JVMCon***REMOVED***g `json:"jvm,omitempty"`
+	Jvm                  *JVMConfig `json:"jvm,omitempty"`
 }
 
 /*
@@ -481,34 +481,34 @@ type HiveSpec struct {
 	Labels                        map[string]string       `json:"labels,omitempty"`
 	Annotations                   map[string]string       `json:"annotations,omitempty"`
 	SecurityContext               *corev1.SecurityContext `json:"securityContext,omitempty"`
-	Image                         *ImageCon***REMOVED***g            `json:"image,omitempty"`
-	Con***REMOVED***g                        *HiveSpecCon***REMOVED***g         `json:"con***REMOVED***g,omitempty"`
+	Image                         *ImageConfig            `json:"image,omitempty"`
+	Config                        *HiveSpecConfig         `json:"config,omitempty"`
 	Metastore                     *HiveMetastoreSpec      `json:"metastore,omitempty"`
 	Server                        *HiveServerSpec         `json:"server,omitempty"`
 }
-type HiveSpecCon***REMOVED***g struct {
-	UseHadoopCon***REMOVED***g              *bool                   `json:"useHadoopCon***REMOVED***g,omitempty"`
+type HiveSpecConfig struct {
+	UseHadoopConfig              *bool                   `json:"useHadoopConfig,omitempty"`
 	MetastoreClientSocketTimeout string                  `json:"metastoreClientSocketTimeout,omitempty"`
 	MetastoreWarehouseDir        string                  `json:"metastoreWarehouseDir,omitempty"`
 	DefaultCompression           string                  `json:"defaultCompression,omitempty"`
 	DefaultFileFormat            string                  `json:"defaultFileFormat,omitempty"`
-	HadoopCon***REMOVED***gSecretName       string                  `json:"hadoopCon***REMOVED***gSecretName,omitempty"`
-	AWS                          *AWSCon***REMOVED***g              `json:"aws,omitempty"`
-	Azure                        *AzureCon***REMOVED***g            `json:"azure,omitempty"`
-	Gcs                          *GCSCon***REMOVED***g              `json:"gcs,omitempty"`
-	S3Compatible                 *S3CompatibleCon***REMOVED***g     `json:"s3Compatible,omitempty"`
-	DB                           *HiveDBCon***REMOVED***g           `json:"db,omitempty"`
-	SharedVolume                 *HiveSharedVolumeCon***REMOVED***g `json:"sharedVolume,omitempty"`
+	HadoopConfigSecretName       string                  `json:"hadoopConfigSecretName,omitempty"`
+	AWS                          *AWSConfig              `json:"aws,omitempty"`
+	Azure                        *AzureConfig            `json:"azure,omitempty"`
+	Gcs                          *GCSConfig              `json:"gcs,omitempty"`
+	S3Compatible                 *S3CompatibleConfig     `json:"s3Compatible,omitempty"`
+	DB                           *HiveDBConfig           `json:"db,omitempty"`
+	SharedVolume                 *HiveSharedVolumeConfig `json:"sharedVolume,omitempty"`
 }
-type HiveDBCon***REMOVED***g struct {
+type HiveDBConfig struct {
 	AutoCreateMetastoreSchema         *bool  `json:"autoCreateMetastoreSchema,omitempty"`
-	EnableMetastoreSchemaVeri***REMOVED***cation *bool  `json:"enableMetastoreSchemaVeri***REMOVED***cation,omitempty"`
+	EnableMetastoreSchemaVerification *bool  `json:"enableMetastoreSchemaVerification,omitempty"`
 	Driver                            string `json:"driver,omitempty"`
 	Password                          string `json:"password,omitempty"`
 	URL                               string `json:"url,omitempty"`
 	Username                          string `json:"username,omitempty"`
 }
-type HiveSharedVolumeCon***REMOVED***g struct {
+type HiveSharedVolumeConfig struct {
 	CreatePVC    *bool  `json:"createPVC,omitempty"`
 	Enabled      *bool  `json:"enabled,omitempty"`
 	ClaimName    string `json:"claimName,omitempty"`
@@ -518,43 +518,43 @@ type HiveSharedVolumeCon***REMOVED***g struct {
 }
 type HiveMetastoreSpec struct {
 	NodeSelector   map[string]string            `json:"nodeSelector,omitempty"`
-	Af***REMOVED***nity       *corev1.Af***REMOVED***nity             `json:"af***REMOVED***nity,omitempty"`
+	Affinity       *corev1.Affinity             `json:"affinity,omitempty"`
 	LivenessProbe  *corev1.Probe                `json:"livenessProbe,omitempty"`
 	ReadinessProbe *corev1.Probe                `json:"readinessProbe,omitempty"`
 	Resources      *corev1.ResourceRequirements `json:"resources,omitempty"`
 	Tolerations    []corev1.Toleration          `json:"tolerations,omitempty"`
-	Con***REMOVED***g         *HiveMetastoreSpecCon***REMOVED***g     `json:"con***REMOVED***g,omitempty"`
-	Storage        *HiveMetastoreStorageCon***REMOVED***g  `json:"storage,omitempty"`
+	Config         *HiveMetastoreSpecConfig     `json:"config,omitempty"`
+	Storage        *HiveMetastoreStorageConfig  `json:"storage,omitempty"`
 }
-type HiveMetastoreSpecCon***REMOVED***g struct {
+type HiveMetastoreSpecConfig struct {
 	LogLevel string                  `json:"logLevel,omitempty"`
-	Jvm      *JVMCon***REMOVED***g              `json:"jvm,omitempty"`
-	TLS      *TLSCon***REMOVED***g              `json:"tls,omitempty"`
-	Auth     *HiveResourceAuthCon***REMOVED***g `json:"auth,omitempty"`
+	Jvm      *JVMConfig              `json:"jvm,omitempty"`
+	TLS      *TLSConfig              `json:"tls,omitempty"`
+	Auth     *HiveResourceAuthConfig `json:"auth,omitempty"`
 }
-type HiveResourceAuthCon***REMOVED***g struct {
+type HiveResourceAuthConfig struct {
 	Enabled *bool `json:"enabled,omitempty"`
 }
-type HiveMetastoreStorageCon***REMOVED***g struct {
+type HiveMetastoreStorageConfig struct {
 	Create *bool  `json:"create,omitempty"`
 	Class  string `json:"class,omitempty"`
 	Size   string `json:"size,omitempty"`
 }
 type HiveServerSpec struct {
 	NodeSelector   map[string]string            `json:"nodeSelector,omitempty"`
-	Af***REMOVED***nity       *corev1.Af***REMOVED***nity             `json:"af***REMOVED***nity,omitempty"`
+	Affinity       *corev1.Affinity             `json:"affinity,omitempty"`
 	LivenessProbe  *corev1.Probe                `json:"livenessProbe,omitempty"`
 	ReadinessProbe *corev1.Probe                `json:"readinessProbe,omitempty"`
 	Resources      *corev1.ResourceRequirements `json:"resources,omitempty"`
 	Tolerations    []corev1.Toleration          `json:"tolerations,omitempty"`
-	Con***REMOVED***g         *HiveServerSpecCon***REMOVED***g        `json:"con***REMOVED***g,omitempty"`
+	Config         *HiveServerSpecConfig        `json:"config,omitempty"`
 }
-type HiveServerSpecCon***REMOVED***g struct {
+type HiveServerSpecConfig struct {
 	LogLevel     string                  `json:"logLevel,omitempty"`
-	Jvm          *JVMCon***REMOVED***g              `json:"jvm,omitempty"`
-	TLS          *TLSCon***REMOVED***g              `json:"tls,omitempty"`
-	MetastoreTLS *TLSCon***REMOVED***g              `json:"metastoreTLS,omitempty"`
-	Auth         *HiveResourceAuthCon***REMOVED***g `json:"auth,omitempty"`
+	Jvm          *JVMConfig              `json:"jvm,omitempty"`
+	TLS          *TLSConfig              `json:"tls,omitempty"`
+	MetastoreTLS *TLSConfig              `json:"metastoreTLS,omitempty"`
+	Auth         *HiveResourceAuthConfig `json:"auth,omitempty"`
 }
 
 /*
@@ -565,26 +565,26 @@ type Hadoop struct {
 	Spec *HadoopSpec `json:"spec,omitempty"`
 }
 type HadoopSpec struct {
-	Con***REMOVED***gSecretName string            `json:"con***REMOVED***gSecretName,omitempty"`
-	Image            *ImageCon***REMOVED***g      `json:"image,omitempty"`
+	ConfigSecretName string            `json:"configSecretName,omitempty"`
+	Image            *ImageConfig      `json:"image,omitempty"`
 	HDFS             *HadoopHDFS       `json:"hdfs,omitempty"`
-	Con***REMOVED***g           *HadoopSpecCon***REMOVED***g `json:"con***REMOVED***g,omitempty"`
+	Config           *HadoopSpecConfig `json:"config,omitempty"`
 }
 type HadoopHDFS struct {
 	Enabled         *bool                   `json:"enabled,omitempty"`
 	SecurityContext *corev1.SecurityContext `json:"securityContext,omitempty"`
-	Con***REMOVED***g          *HadoopHDFSCon***REMOVED***g       `json:"con***REMOVED***g,omitempty"`
+	Config          *HadoopHDFSConfig       `json:"config,omitempty"`
 	Datanode        *HadoopHDFSDatanodeSpec `json:"datanode,omitempty"`
 	Namenode        *HadoopHDFSNamenodeSpec `json:"namenode,omitempty"`
 }
-type HadoopSpecCon***REMOVED***g struct {
+type HadoopSpecConfig struct {
 	DefaultFS    string              `json:"defaultFS,omitempty"`
-	AWS          *AWSCon***REMOVED***g          `json:"aws,omitempty"`
-	Azure        *AzureCon***REMOVED***g        `json:"azure,omitempty"`
-	Gcs          *GCSCon***REMOVED***g          `json:"gcs,omitempty"`
-	S3Compatible *S3CompatibleCon***REMOVED***g `json:"s3Compatible,omitempty"`
+	AWS          *AWSConfig          `json:"aws,omitempty"`
+	Azure        *AzureConfig        `json:"azure,omitempty"`
+	Gcs          *GCSConfig          `json:"gcs,omitempty"`
+	S3Compatible *S3CompatibleConfig `json:"s3Compatible,omitempty"`
 }
-type HadoopHDFSCon***REMOVED***g struct {
+type HadoopHDFSConfig struct {
 	ReplicationFactor    *int32 `json:"replicationFactor,omitempty"`
 	DatanodeDataDirPerms string `json:"datanodeDataDirPerms,omitempty"`
 	LogLevel             string `json:"logLevel,omitempty"`
@@ -595,18 +595,18 @@ type HadoopHDFSDatanodeSpec struct {
 	Annotations                   map[string]string            `json:"annotations,omitempty"`
 	Labels                        map[string]string            `json:"labels,omitempty"`
 	NodeSelector                  map[string]string            `json:"nodeSelector,omitempty"`
-	Af***REMOVED***nity                      *corev1.Af***REMOVED***nity             `json:"af***REMOVED***nity,omitempty"`
+	Affinity                      *corev1.Affinity             `json:"affinity,omitempty"`
 	Resources                     *corev1.ResourceRequirements `json:"resources,omitempty"`
 	Tolerations                   []corev1.Toleration          `json:"tolerations,omitempty"`
-	Con***REMOVED***g                        *HadoopHDFSNodeCon***REMOVED***g        `json:"con***REMOVED***g,omitempty"`
-	Storage                       *HadoopHDFSStorageCon***REMOVED***g     `json:"storage,omitempty"`
+	Config                        *HadoopHDFSNodeConfig        `json:"config,omitempty"`
+	Storage                       *HadoopHDFSStorageConfig     `json:"storage,omitempty"`
 }
-type HadoopHDFSStorageCon***REMOVED***g struct {
+type HadoopHDFSStorageConfig struct {
 	Class string `json:"class,omitempty"`
 	Size  string `json:"size,omitempty"`
 }
-type HadoopHDFSNodeCon***REMOVED***g struct {
-	Jvm *JVMCon***REMOVED***g `json:"jvm,omitempty"`
+type HadoopHDFSNodeConfig struct {
+	Jvm *JVMConfig `json:"jvm,omitempty"`
 }
 type HadoopHDFSNamenodeSpec struct {
 	Replicas                      *int32                       `json:"replicas,omitempty"`
@@ -614,11 +614,11 @@ type HadoopHDFSNamenodeSpec struct {
 	Annotations                   map[string]string            `json:"annotations,omitempty"`
 	Labels                        map[string]string            `json:"labels,omitempty"`
 	NodeSelector                  map[string]string            `json:"nodeSelector,omitempty"`
-	Af***REMOVED***nity                      *corev1.Af***REMOVED***nity             `json:"af***REMOVED***nity,omitempty"`
+	Affinity                      *corev1.Affinity             `json:"affinity,omitempty"`
 	Resources                     *corev1.ResourceRequirements `json:"resources,omitempty"`
 	Tolerations                   []corev1.Toleration          `json:"tolerations,omitempty"`
-	Con***REMOVED***g                        *HadoopHDFSNodeCon***REMOVED***g        `json:"con***REMOVED***g,omitempty"`
-	Storage                       *HadoopHDFSStorageCon***REMOVED***g     `json:"storage,omitempty"`
+	Config                        *HadoopHDFSNodeConfig        `json:"config,omitempty"`
+	Storage                       *HadoopHDFSStorageConfig     `json:"storage,omitempty"`
 }
 
 /*

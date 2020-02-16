@@ -2,7 +2,7 @@
 Copyright 2014 The Kubernetes Authors.
 
 Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this ***REMOVED***le except in compliance with the License.
+you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
 
     http://www.apache.org/licenses/LICENSE-2.0
@@ -10,7 +10,7 @@ You may obtain a copy of the License at
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the speci***REMOVED***c language governing permissions and
+See the License for the specific language governing permissions and
 limitations under the License.
 */
 
@@ -34,10 +34,10 @@ const (
 	PrivateKeyBlockType = "PRIVATE KEY"
 	// PublicKeyBlockType is a possible value for pem.Block.Type.
 	PublicKeyBlockType = "PUBLIC KEY"
-	// Certi***REMOVED***cateBlockType is a possible value for pem.Block.Type.
-	Certi***REMOVED***cateBlockType = "CERTIFICATE"
-	// Certi***REMOVED***cateRequestBlockType is a possible value for pem.Block.Type.
-	Certi***REMOVED***cateRequestBlockType = "CERTIFICATE REQUEST"
+	// CertificateBlockType is a possible value for pem.Block.Type.
+	CertificateBlockType = "CERTIFICATE"
+	// CertificateRequestBlockType is a possible value for pem.Block.Type.
+	CertificateRequestBlockType = "CERTIFICATE REQUEST"
 )
 
 // EncodePublicKeyPEM returns PEM-encoded public data
@@ -62,10 +62,10 @@ func EncodePrivateKeyPEM(key *rsa.PrivateKey) []byte {
 	return pem.EncodeToMemory(&block)
 }
 
-// EncodeCertPEM returns PEM-endcoded certi***REMOVED***cate data
-func EncodeCertPEM(cert *x509.Certi***REMOVED***cate) []byte {
+// EncodeCertPEM returns PEM-endcoded certificate data
+func EncodeCertPEM(cert *x509.Certificate) []byte {
 	block := pem.Block{
-		Type:  Certi***REMOVED***cateBlockType,
+		Type:  CertificateBlockType,
 		Bytes: cert.Raw,
 	}
 	return pem.EncodeToMemory(&block)
@@ -100,7 +100,7 @@ func ParsePrivateKeyPEM(keyData []byte) (interface{}, error) {
 		}
 
 		// tolerate non-key PEM blocks for compatibility with things like "EC PARAMETERS" blocks
-		// originally, only the ***REMOVED***rst PEM block was parsed and expected to be a key block
+		// originally, only the first PEM block was parsed and expected to be a key block
 	}
 
 	// we read all the PEM blocks and didn't recognize one
@@ -108,7 +108,7 @@ func ParsePrivateKeyPEM(keyData []byte) (interface{}, error) {
 }
 
 // ParsePublicKeysPEM is a helper function for reading an array of rsa.PublicKey or ecdsa.PublicKey from a PEM-encoded byte array.
-// Reads public keys from both public and private key ***REMOVED***les.
+// Reads public keys from both public and private key files.
 func ParsePublicKeysPEM(keyData []byte) ([]interface{}, error) {
 	var block *pem.Block
 	keys := []interface{}{}
@@ -138,7 +138,7 @@ func ParsePublicKeysPEM(keyData []byte) ([]interface{}, error) {
 		}
 
 		// tolerate non-key PEM blocks for backwards compatibility
-		// originally, only the ***REMOVED***rst PEM block was parsed and expected to be a key block
+		// originally, only the first PEM block was parsed and expected to be a key block
 	}
 
 	if len(keys) == 0 {
@@ -147,11 +147,11 @@ func ParsePublicKeysPEM(keyData []byte) ([]interface{}, error) {
 	return keys, nil
 }
 
-// ParseCertsPEM returns the x509.Certi***REMOVED***cates contained in the given PEM-encoded byte array
-// Returns an error if a certi***REMOVED***cate could not be parsed, or if the data does not contain any certi***REMOVED***cates
-func ParseCertsPEM(pemCerts []byte) ([]*x509.Certi***REMOVED***cate, error) {
+// ParseCertsPEM returns the x509.Certificates contained in the given PEM-encoded byte array
+// Returns an error if a certificate could not be parsed, or if the data does not contain any certificates
+func ParseCertsPEM(pemCerts []byte) ([]*x509.Certificate, error) {
 	ok := false
-	certs := []*x509.Certi***REMOVED***cate{}
+	certs := []*x509.Certificate{}
 	for len(pemCerts) > 0 {
 		var block *pem.Block
 		block, pemCerts = pem.Decode(pemCerts)
@@ -159,11 +159,11 @@ func ParseCertsPEM(pemCerts []byte) ([]*x509.Certi***REMOVED***cate, error) {
 			break
 		}
 		// Only use PEM "CERTIFICATE" blocks without extra headers
-		if block.Type != Certi***REMOVED***cateBlockType || len(block.Headers) != 0 {
+		if block.Type != CertificateBlockType || len(block.Headers) != 0 {
 			continue
 		}
 
-		cert, err := x509.ParseCerti***REMOVED***cate(block.Bytes)
+		cert, err := x509.ParseCertificate(block.Bytes)
 		if err != nil {
 			return certs, err
 		}
@@ -173,7 +173,7 @@ func ParseCertsPEM(pemCerts []byte) ([]*x509.Certi***REMOVED***cate, error) {
 	}
 
 	if !ok {
-		return certs, errors.New("data does not contain any valid RSA or ECDSA certi***REMOVED***cates")
+		return certs, errors.New("data does not contain any valid RSA or ECDSA certificates")
 	}
 	return certs, nil
 }
@@ -185,9 +185,9 @@ func parseRSAPublicKey(data []byte) (*rsa.PublicKey, error) {
 	// Parse the key
 	var parsedKey interface{}
 	if parsedKey, err = x509.ParsePKIXPublicKey(data); err != nil {
-		if cert, err := x509.ParseCerti***REMOVED***cate(data); err == nil {
+		if cert, err := x509.ParseCertificate(data); err == nil {
 			parsedKey = cert.PublicKey
-		} ***REMOVED*** {
+		} else {
 			return nil, err
 		}
 	}
@@ -231,9 +231,9 @@ func parseECPublicKey(data []byte) (*ecdsa.PublicKey, error) {
 	// Parse the key
 	var parsedKey interface{}
 	if parsedKey, err = x509.ParsePKIXPublicKey(data); err != nil {
-		if cert, err := x509.ParseCerti***REMOVED***cate(data); err == nil {
+		if cert, err := x509.ParseCertificate(data); err == nil {
 			parsedKey = cert.PublicKey
-		} ***REMOVED*** {
+		} else {
 			return nil, err
 		}
 	}

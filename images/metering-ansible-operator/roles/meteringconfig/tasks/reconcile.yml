@@ -1,22 +1,22 @@
 ---
 
-- name: Validate Con***REMOVED***gurations
+- name: Validate Configurations
   include_tasks: validate.yml
 
-- name: Con***REMOVED***gure Storage
-  include_tasks: con***REMOVED***gure_storage.yml
+- name: Configure Storage
+  include_tasks: configure_storage.yml
 
-- name: Con***REMOVED***gure TLS
-  include_tasks: con***REMOVED***gure_tls.yml
+- name: Configure TLS
+  include_tasks: configure_tls.yml
 
-- name: Con***REMOVED***gure Networking
-  include_tasks: con***REMOVED***gure_networking.yml
+- name: Configure Networking
+  include_tasks: configure_networking.yml
 
-- name: Con***REMOVED***gure Reporting
-  include_tasks: con***REMOVED***gure_reporting.yml
+- name: Configure Reporting
+  include_tasks: configure_reporting.yml
 
-- name: Store MeteringCon***REMOVED***g spec into values ***REMOVED***le
-  copy: content="{{ meteringcon***REMOVED***g_spec }}" dest=/tmp/metering-values.yaml
+- name: Store MeteringConfig spec into values file
+  copy: content="{{ meteringconfig_spec }}" dest=/tmp/metering-values.yaml
 
 - include_tasks: "{{ item }}"
   loop:

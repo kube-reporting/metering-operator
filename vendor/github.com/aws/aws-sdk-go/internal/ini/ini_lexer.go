@@ -9,7 +9,7 @@ import (
 )
 
 const (
-	// ErrCodeUnableToReadFile is used when a ***REMOVED***le is failed to be
+	// ErrCodeUnableToReadFile is used when a file is failed to be
 	// opened or read from.
 	ErrCodeUnableToReadFile = "FailedRead"
 )
@@ -59,7 +59,7 @@ type iniLexer struct{}
 func (l *iniLexer) Tokenize(r io.Reader) ([]Token, error) {
 	b, err := ioutil.ReadAll(r)
 	if err != nil {
-		return nil, awserr.New(ErrCodeUnableToReadFile, "unable to read ***REMOVED***le", err)
+		return nil, awserr.New(ErrCodeUnableToReadFile, "unable to read file", err)
 	}
 
 	return l.tokenize(b)

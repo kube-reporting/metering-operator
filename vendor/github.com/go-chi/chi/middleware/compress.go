@@ -1,7 +1,7 @@
 package middleware
 
 import (
-	"bu***REMOVED***o"
+	"bufio"
 	"compress/flate"
 	"compress/gzip"
 	"errors"
@@ -32,7 +32,7 @@ var defaultContentTypes = map[string]struct{}{
 }
 
 // DefaultCompress is a middleware that compresses response
-// body of prede***REMOVED***ned content types to a data format based
+// body of predefined content types to a data format based
 // on Accept-Encoding request header. It uses a default
 // compression level.
 func DefaultCompress(next http.Handler) http.Handler {
@@ -92,7 +92,7 @@ func selectEncoding(h http.Header) encoding {
 		// But.. some old browsers (MSIE, Safari 5.1) incorrectly expect
 		// raw DEFLATE data only, without the mentioned zlib wrapper.
 		// Because of this major confusion, most modern browsers try it
-		// both ways, ***REMOVED***rst looking for zlib headers.
+		// both ways, first looking for zlib headers.
 		// Quote by Mark Adler: http://stackoverflow.com/a/9186091/385548
 		//
 		// The list of browsers having problems is quite big, see:
@@ -100,7 +100,7 @@ func selectEncoding(h http.Header) encoding {
 		// https://web.archive.org/web/20120321182910/http://www.vervestudios.co/projects/compression-tests/results
 		//
 		// That's why we prefer gzip over deflate. It's just more reliable
-		// and not signi***REMOVED***cantly slower than gzip.
+		// and not significantly slower than gzip.
 		return encodingDeflate
 
 		// NOTE: Not implemented, intentionally:
@@ -136,7 +136,7 @@ func (w *maybeCompressResponseWriter) WriteHeader(code int) {
 	// The content-length after compression is unknown
 	w.ResponseWriter.Header().Del("Content-Length")
 
-	// Parse the ***REMOVED***rst part of the Content-Type response header.
+	// Parse the first part of the Content-Type response header.
 	contentType := ""
 	parts := strings.Split(w.ResponseWriter.Header().Get("Content-Type"), ";")
 	if len(parts) > 0 {
@@ -184,7 +184,7 @@ func (w *maybeCompressResponseWriter) Flush() {
 	}
 }
 
-func (w *maybeCompressResponseWriter) Hijack() (net.Conn, *bu***REMOVED***o.ReadWriter, error) {
+func (w *maybeCompressResponseWriter) Hijack() (net.Conn, *bufio.ReadWriter, error) {
 	if hj, ok := w.w.(http.Hijacker); ok {
 		return hj.Hijack()
 	}
@@ -192,11 +192,11 @@ func (w *maybeCompressResponseWriter) Hijack() (net.Conn, *bu***REMOVED***o.Read
 }
 
 func (w *maybeCompressResponseWriter) CloseNotify() <-chan bool {
-	if cn, ok := w.w.(http.CloseNoti***REMOVED***er); ok {
+	if cn, ok := w.w.(http.CloseNotifier); ok {
 		return cn.CloseNotify()
 	}
 
-	// If the underlying writer does not implement http.CloseNoti***REMOVED***er, return
+	// If the underlying writer does not implement http.CloseNotifier, return
 	// a channel that never receives a value. The semantics here is that the
 	// client never disconnnects before the request is processed by the
 	// http.Handler, which is close enough to the default behavior (when

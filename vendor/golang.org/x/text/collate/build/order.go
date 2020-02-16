@@ -1,6 +1,6 @@
 // Copyright 2012 The Go Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE ***REMOVED***le.
+// license that can be found in the LICENSE file.
 
 package build
 
@@ -18,7 +18,7 @@ import (
 type logicalAnchor int
 
 const (
-	***REMOVED***rstAnchor logicalAnchor = -1
+	firstAnchor logicalAnchor = -1
 	noAnchor                  = 0
 	lastAnchor                = 1
 )
@@ -43,7 +43,7 @@ type entry struct {
 	decompose bool // can use NFKD decomposition to generate elems
 	exclude   bool // do not include in table
 	implicit  bool // derived, is not included in the list
-	modi***REMOVED***ed  bool // entry was modi***REMOVED***ed in tailoring
+	modified  bool // entry was modified in tailoring
 	logical   logicalAnchor
 
 	expansionIndex    int // used to store index into expansion table
@@ -152,7 +152,7 @@ func (e *entry) encodeBase() (ce uint32, err error) {
 		ce, err = makeExpandIndex(e.expansionIndex)
 	default:
 		if e.decompose {
-			log.Fatal("decompose should be handled ***REMOVED***where")
+			log.Fatal("decompose should be handled elsewhere")
 		}
 		ce, err = makeCE(e.elems[0])
 	}
@@ -188,7 +188,7 @@ func entryLess(a, b *entry) bool {
 		return res == -1
 	}
 	if a.logical != noAnchor {
-		return a.logical == ***REMOVED***rstAnchor
+		return a.logical == firstAnchor
 	}
 	if b.logical != noAnchor {
 		return b.logical == lastAnchor
@@ -223,7 +223,7 @@ type ordering struct {
 func (o *ordering) insert(e *entry) {
 	if e.logical == noAnchor {
 		o.entryMap[e.str] = e
-	} ***REMOVED*** {
+	} else {
 		// Use key format as used in UCA rules.
 		o.entryMap[fmt.Sprintf("[%s]", e.str)] = e
 		// Also add index entry for XML format.
@@ -244,26 +244,26 @@ func (o *ordering) newEntry(s string, ces []rawCE) *entry {
 	return e
 }
 
-// ***REMOVED***nd looks up and returns the entry for the given string.
+// find looks up and returns the entry for the given string.
 // It returns nil if str is not in the index and if an implicit value
 // cannot be derived, that is, if str represents more than one rune.
-func (o *ordering) ***REMOVED***nd(str string) *entry {
+func (o *ordering) find(str string) *entry {
 	e := o.entryMap[str]
 	if e == nil {
 		r := []rune(str)
 		if len(r) == 1 {
 			const (
-				***REMOVED***rstHangul = 0xAC00
+				firstHangul = 0xAC00
 				lastHangul  = 0xD7A3
 			)
-			if r[0] >= ***REMOVED***rstHangul && r[0] <= lastHangul {
+			if r[0] >= firstHangul && r[0] <= lastHangul {
 				ce := []rawCE{}
 				nfd := norm.NFD.String(str)
 				for _, r := range nfd {
-					ce = append(ce, o.***REMOVED***nd(string(r)).elems...)
+					ce = append(ce, o.find(string(r)).elems...)
 				}
 				e = o.newEntry(nfd, ce)
-			} ***REMOVED*** {
+			} else {
 				e = o.newEntry(string(r[0]), []rawCE{
 					{w: []int{
 						implicitPrimary(r[0]),
@@ -273,7 +273,7 @@ func (o *ordering) ***REMOVED***nd(str string) *entry {
 					},
 					},
 				})
-				e.modi***REMOVED***ed = true
+				e.modified = true
 			}
 			e.exclude = true // do not index implicits
 		}
@@ -283,7 +283,7 @@ func (o *ordering) ***REMOVED***nd(str string) *entry {
 
 // makeRootOrdering returns a newly initialized ordering value and populates
 // it with a set of logical reset points that can be used as anchors.
-// The anchors ***REMOVED***rst_tertiary_ignorable and __END__ will always sort at
+// The anchors first_tertiary_ignorable and __END__ will always sort at
 // the beginning and end, respectively. This means that prev and next are non-nil
 // for any indexed entry.
 func makeRootOrdering() ordering {
@@ -300,7 +300,7 @@ func makeRootOrdering() ordering {
 		}
 		o.insert(e)
 	}
-	insert(***REMOVED***rstAnchor, "***REMOVED***rst tertiary ignorable", []int{0, 0, 0, 0})
+	insert(firstAnchor, "first tertiary ignorable", []int{0, 0, 0, 0})
 	insert(lastAnchor, "last tertiary ignorable", []int{0, 0, 0, max})
 	insert(lastAnchor, "last primary ignorable", []int{0, defaultSecondary, defaultTertiary, max})
 	insert(lastAnchor, "last non ignorable", []int{maxPrimary, defaultSecondary, defaultTertiary, max})
@@ -309,7 +309,7 @@ func makeRootOrdering() ordering {
 }
 
 // patchForInsert eleminates entries from the list with more than one collation element.
-// The next and prev ***REMOVED***elds of the eliminated entries still point to appropriate
+// The next and prev fields of the eliminated entries still point to appropriate
 // values in the newly created list.
 // It requires that sort has been called.
 func (o *ordering) patchForInsert() {
@@ -353,20 +353,20 @@ func (o *ordering) clone() *ordering {
 	return &oo
 }
 
-// front returns the ***REMOVED***rst entry to be indexed.
+// front returns the first entry to be indexed.
 // It assumes that sort() has been called.
 func (o *ordering) front() *entry {
 	e := o.ordered[0]
 	if e.prev != nil {
-		log.Panicf("unexpected ***REMOVED***rst entry: %v", e)
+		log.Panicf("unexpected first entry: %v", e)
 	}
-	// The ***REMOVED***rst entry is always a logical position, which should not be indexed.
+	// The first entry is always a logical position, which should not be indexed.
 	e, _ = e.nextIndexed()
 	return e
 }
 
 // sort sorts all ordering based on their collation elements and initializes
-// the prev, next, and level ***REMOVED***elds accordingly.
+// the prev, next, and level fields accordingly.
 func (o *ordering) sort() {
 	sort.Sort(sortedEntries(o.ordered))
 	l := o.ordered
@@ -383,7 +383,7 @@ func (o *ordering) sort() {
 func (o *ordering) genColElems(str string) []rawCE {
 	elems := []rawCE{}
 	for _, r := range []rune(str) {
-		for _, ce := range o.***REMOVED***nd(string(r)).elems {
+		for _, ce := range o.find(string(r)).elems {
 			if ce.w[0] != 0 || ce.w[1] != 0 || ce.w[2] != 0 {
 				elems = append(elems, ce)
 			}

@@ -2,7 +2,7 @@
 Copyright 2016 The Kubernetes Authors.
 
 Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this ***REMOVED***le except in compliance with the License.
+you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
 
     http://www.apache.org/licenses/LICENSE-2.0
@@ -10,7 +10,7 @@ You may obtain a copy of the License at
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the speci***REMOVED***c language governing permissions and
+See the License for the specific language governing permissions and
 limitations under the License.
 */
 
@@ -52,9 +52,9 @@ func (m PriorityRESTMapper) String() string {
 	return fmt.Sprintf("PriorityRESTMapper{\n\t%v\n\t%v\n\t%v\n}", m.ResourcePriority, m.KindPriority, m.Delegate)
 }
 
-// ResourceFor ***REMOVED***nds all resources, then passes them through the ResourcePriority patterns to ***REMOVED***nd a single matching hit.
-func (m PriorityRESTMapper) ResourceFor(partiallySpeci***REMOVED***edResource schema.GroupVersionResource) (schema.GroupVersionResource, error) {
-	originalGVRs, originalErr := m.Delegate.ResourcesFor(partiallySpeci***REMOVED***edResource)
+// ResourceFor finds all resources, then passes them through the ResourcePriority patterns to find a single matching hit.
+func (m PriorityRESTMapper) ResourceFor(partiallySpecifiedResource schema.GroupVersionResource) (schema.GroupVersionResource, error) {
+	originalGVRs, originalErr := m.Delegate.ResourcesFor(partiallySpecifiedResource)
 	if originalErr != nil && len(originalGVRs) == 0 {
 		return schema.GroupVersionResource{}, originalErr
 	}
@@ -85,12 +85,12 @@ func (m PriorityRESTMapper) ResourceFor(partiallySpeci***REMOVED***edResource sc
 		}
 	}
 
-	return schema.GroupVersionResource{}, &AmbiguousResourceError{PartialResource: partiallySpeci***REMOVED***edResource, MatchingResources: originalGVRs}
+	return schema.GroupVersionResource{}, &AmbiguousResourceError{PartialResource: partiallySpecifiedResource, MatchingResources: originalGVRs}
 }
 
-// KindFor ***REMOVED***nds all kinds, then passes them through the KindPriority patterns to ***REMOVED***nd a single matching hit.
-func (m PriorityRESTMapper) KindFor(partiallySpeci***REMOVED***edResource schema.GroupVersionResource) (schema.GroupVersionKind, error) {
-	originalGVKs, originalErr := m.Delegate.KindsFor(partiallySpeci***REMOVED***edResource)
+// KindFor finds all kinds, then passes them through the KindPriority patterns to find a single matching hit.
+func (m PriorityRESTMapper) KindFor(partiallySpecifiedResource schema.GroupVersionResource) (schema.GroupVersionKind, error) {
+	originalGVKs, originalErr := m.Delegate.KindsFor(partiallySpecifiedResource)
 	if originalErr != nil && len(originalGVKs) == 0 {
 		return schema.GroupVersionKind{}, originalErr
 	}
@@ -121,7 +121,7 @@ func (m PriorityRESTMapper) KindFor(partiallySpeci***REMOVED***edResource schema
 		}
 	}
 
-	return schema.GroupVersionKind{}, &AmbiguousResourceError{PartialResource: partiallySpeci***REMOVED***edResource, MatchingKinds: originalGVKs}
+	return schema.GroupVersionKind{}, &AmbiguousResourceError{PartialResource: partiallySpecifiedResource, MatchingKinds: originalGVKs}
 }
 
 func resourceMatches(pattern schema.GroupVersionResource, resource schema.GroupVersionResource) bool {
@@ -213,10 +213,10 @@ func (m PriorityRESTMapper) ResourceSingularizer(resource string) (singular stri
 	return m.Delegate.ResourceSingularizer(resource)
 }
 
-func (m PriorityRESTMapper) ResourcesFor(partiallySpeci***REMOVED***edResource schema.GroupVersionResource) ([]schema.GroupVersionResource, error) {
-	return m.Delegate.ResourcesFor(partiallySpeci***REMOVED***edResource)
+func (m PriorityRESTMapper) ResourcesFor(partiallySpecifiedResource schema.GroupVersionResource) ([]schema.GroupVersionResource, error) {
+	return m.Delegate.ResourcesFor(partiallySpecifiedResource)
 }
 
-func (m PriorityRESTMapper) KindsFor(partiallySpeci***REMOVED***edResource schema.GroupVersionResource) (gvk []schema.GroupVersionKind, err error) {
-	return m.Delegate.KindsFor(partiallySpeci***REMOVED***edResource)
+func (m PriorityRESTMapper) KindsFor(partiallySpecifiedResource schema.GroupVersionResource) (gvk []schema.GroupVersionKind, err error) {
+	return m.Delegate.KindsFor(partiallySpecifiedResource)
 }

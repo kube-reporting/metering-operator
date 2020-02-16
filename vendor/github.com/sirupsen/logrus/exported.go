@@ -48,13 +48,13 @@ func AddHook(hook Hook) {
 	std.Hooks.Add(hook)
 }
 
-// WithError creates an entry from the standard logger and adds an error to it, using the value de***REMOVED***ned in ErrorKey as key.
+// WithError creates an entry from the standard logger and adds an error to it, using the value defined in ErrorKey as key.
 func WithError(err error) *Entry {
 	return std.WithField(ErrorKey, err)
 }
 
-// WithField creates an entry from the standard logger and adds a ***REMOVED***eld to
-// it. If you want multiple ***REMOVED***elds, use `WithFields`.
+// WithField creates an entry from the standard logger and adds a field to
+// it. If you want multiple fields, use `WithFields`.
 //
 // Note that it doesn't log until you call Debug, Print, Info, Warn, Fatal
 // or Panic on the Entry it returns.
@@ -63,13 +63,13 @@ func WithField(key string, value interface{}) *Entry {
 }
 
 // WithFields creates an entry from the standard logger and adds multiple
-// ***REMOVED***elds to it. This is simply a helper for `WithField`, invoking it
-// once for each ***REMOVED***eld.
+// fields to it. This is simply a helper for `WithField`, invoking it
+// once for each field.
 //
 // Note that it doesn't log until you call Debug, Print, Info, Warn, Fatal
 // or Panic on the Entry it returns.
-func WithFields(***REMOVED***elds Fields) *Entry {
-	return std.WithFields(***REMOVED***elds)
+func WithFields(fields Fields) *Entry {
+	return std.WithFields(fields)
 }
 
 // Debug logs a message at level Debug on the standard logger.

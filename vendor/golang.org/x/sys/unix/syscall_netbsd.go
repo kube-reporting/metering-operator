@@ -1,9 +1,9 @@
 // Copyright 2009,2010 The Go Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE ***REMOVED***le.
+// license that can be found in the LICENSE file.
 
 // NetBSD system calls.
-// This ***REMOVED***le is compiled as ordinary Go code,
+// This file is compiled as ordinary Go code,
 // but it is also input to mksyscall,
 // which parses the //sys lines and generates system call stubs.
 // Note that sometimes we use a lowercase //sys name and wrap
@@ -125,7 +125,7 @@ func Getwd() (string, error) {
 }
 
 // TODO
-func send***REMOVED***le(outfd int, infd int, offset *int64, count int) (written int, err error) {
+func sendfile(outfd int, infd int, offset *int64, count int) (written int, err error) {
 	return -1, ENOSYS
 }
 
@@ -137,10 +137,10 @@ func setattrlistTimes(path string, times []Timespec, flags int) error {
 //sys	ioctl(fd int, req uint, arg uintptr) (err error)
 
 // ioctl itself should not be exposed directly, but additional get/set
-// functions for speci***REMOVED***c types are permissible.
+// functions for specific types are permissible.
 
 // IoctlSetInt performs an ioctl operation which sets an integer value
-// on fd, using the speci***REMOVED***ed request number.
+// on fd, using the specified request number.
 func IoctlSetInt(fd int, req uint, value int) error {
 	return ioctl(fd, req, uintptr(value))
 }
@@ -154,7 +154,7 @@ func IoctlSetTermios(fd int, req uint, value *Termios) error {
 }
 
 // IoctlGetInt performs an ioctl operation which gets an integer value
-// from fd, using the speci***REMOVED***ed request number.
+// from fd, using the specified request number.
 func IoctlGetInt(fd int, req uint) (int, error) {
 	var value int
 	err := ioctl(fd, req, uintptr(unsafe.Pointer(&value)))
@@ -204,7 +204,7 @@ func Uname(uname *Utsname) error {
 		if b == '\n' || b == '\t' {
 			if i == len(uname.Version)-1 {
 				uname.Version[i] = 0
-			} ***REMOVED*** {
+			} else {
 				uname.Version[i] = ' '
 			}
 		}
@@ -266,7 +266,7 @@ func Uname(uname *Utsname) error {
 //sys	Listen(s int, backlog int) (err error)
 //sys	Lstat(path string, stat *Stat_t) (err error)
 //sys	Mkdir(path string, mode uint32) (err error)
-//sys	Mk***REMOVED***fo(path string, mode uint32) (err error)
+//sys	Mkfifo(path string, mode uint32) (err error)
 //sys	Mknod(path string, mode uint32, dev int) (err error)
 //sys	Nanosleep(time *Timespec, leftover *Timespec) (err error)
 //sys	Open(path string, mode int, perm uint32) (fd int, err error)
@@ -364,9 +364,9 @@ func Uname(uname *Utsname) error {
 // _lwp_wait
 // _lwp_wakeup
 // _pset_bind
-// _sched_getaf***REMOVED***nity
+// _sched_getaffinity
 // _sched_getparam
-// _sched_setaf***REMOVED***nity
+// _sched_setaffinity
 // _sched_setparam
 // acct
 // aio_cancel
@@ -455,16 +455,16 @@ func Uname(uname *Utsname) error {
 // compat_43_stat43
 // execve
 // extattr_delete_fd
-// extattr_delete_***REMOVED***le
+// extattr_delete_file
 // extattr_delete_link
 // extattr_get_fd
-// extattr_get_***REMOVED***le
+// extattr_get_file
 // extattr_get_link
 // extattr_list_fd
-// extattr_list_***REMOVED***le
+// extattr_list_file
 // extattr_list_link
 // extattr_set_fd
-// extattr_set_***REMOVED***le
+// extattr_set_file
 // extattr_set_link
 // extattrctl
 // fchroot
@@ -520,7 +520,7 @@ func Uname(uname *Utsname) error {
 // pmc_get_info
 // pollts
 // preadv
-// pro***REMOVED***l
+// profil
 // pselect
 // pset_assign
 // pset_create
@@ -540,7 +540,7 @@ func Uname(uname *Utsname) error {
 // sa_yield
 // sbrk
 // sched_yield
-// semcon***REMOVED***g
+// semconfig
 // semget
 // semop
 // setcontext

@@ -2,7 +2,7 @@
 Copyright 2017 The Kubernetes Authors.
 
 Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this ***REMOVED***le except in compliance with the License.
+you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
 
     http://www.apache.org/licenses/LICENSE-2.0
@@ -10,7 +10,7 @@ You may obtain a copy of the License at
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the speci***REMOVED***c language governing permissions and
+See the License for the specific language governing permissions and
 limitations under the License.
 */
 
@@ -24,7 +24,7 @@ import (
 // +genclient
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
 
-// PodPreset is a policy resource that de***REMOVED***nes additional runtime
+// PodPreset is a policy resource that defines additional runtime
 // requirements for a Pod.
 type PodPreset struct {
 	metav1.TypeMeta `json:",inline"`
@@ -41,16 +41,16 @@ type PodPresetSpec struct {
 	// Required.
 	Selector metav1.LabelSelector `json:"selector,omitempty" protobuf:"bytes,1,opt,name=selector"`
 
-	// Env de***REMOVED***nes the collection of EnvVar to inject into containers.
+	// Env defines the collection of EnvVar to inject into containers.
 	// +optional
 	Env []v1.EnvVar `json:"env,omitempty" protobuf:"bytes,2,rep,name=env"`
-	// EnvFrom de***REMOVED***nes the collection of EnvFromSource to inject into containers.
+	// EnvFrom defines the collection of EnvFromSource to inject into containers.
 	// +optional
 	EnvFrom []v1.EnvFromSource `json:"envFrom,omitempty" protobuf:"bytes,3,rep,name=envFrom"`
-	// Volumes de***REMOVED***nes the collection of Volume to inject into the pod.
+	// Volumes defines the collection of Volume to inject into the pod.
 	// +optional
 	Volumes []v1.Volume `json:"volumes,omitempty" protobuf:"bytes,4,rep,name=volumes"`
-	// VolumeMounts de***REMOVED***nes the collection of VolumeMount to inject into containers.
+	// VolumeMounts defines the collection of VolumeMount to inject into containers.
 	// +optional
 	VolumeMounts []v1.VolumeMount `json:"volumeMounts,omitempty" protobuf:"bytes,5,rep,name=volumeMounts"`
 }

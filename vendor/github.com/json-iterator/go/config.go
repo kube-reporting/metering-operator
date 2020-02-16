@@ -11,9 +11,9 @@ import (
 	"github.com/modern-go/reflect2"
 )
 
-// Con***REMOVED***g customize how the API should behave.
-// The API is created from Con***REMOVED***g by Froze.
-type Con***REMOVED***g struct {
+// Config customize how the API should behave.
+// The API is created from Config by Froze.
+type Config struct {
 	IndentionStep                 int
 	MarshalFloatWith6Digits       bool
 	EscapeHTML                    bool
@@ -34,7 +34,7 @@ type API interface {
 	StreamPool
 	MarshalToString(v interface{}) (string, error)
 	Marshal(v interface{}) ([]byte, error)
-	MarshalIndent(v interface{}, pre***REMOVED***x, indent string) ([]byte, error)
+	MarshalIndent(v interface{}, prefix, indent string) ([]byte, error)
 	UnmarshalFromString(str string, v interface{}) error
 	Unmarshal(data []byte, v interface{}) error
 	Get(data []byte, path ...interface{}) Any
@@ -46,27 +46,27 @@ type API interface {
 	EncoderOf(typ reflect2.Type) ValEncoder
 }
 
-// Con***REMOVED***gDefault the default API
-var Con***REMOVED***gDefault = Con***REMOVED***g{
+// ConfigDefault the default API
+var ConfigDefault = Config{
 	EscapeHTML: true,
 }.Froze()
 
-// Con***REMOVED***gCompatibleWithStandardLibrary tries to be 100% compatible with standard library behavior
-var Con***REMOVED***gCompatibleWithStandardLibrary = Con***REMOVED***g{
+// ConfigCompatibleWithStandardLibrary tries to be 100% compatible with standard library behavior
+var ConfigCompatibleWithStandardLibrary = Config{
 	EscapeHTML:             true,
 	SortMapKeys:            true,
 	ValidateJsonRawMessage: true,
 }.Froze()
 
-// Con***REMOVED***gFastest marshals float with only 6 digits precision
-var Con***REMOVED***gFastest = Con***REMOVED***g{
+// ConfigFastest marshals float with only 6 digits precision
+var ConfigFastest = Config{
 	EscapeHTML:                    false,
 	MarshalFloatWith6Digits:       true, // will lose precession
-	ObjectFieldMustBeSimpleString: true, // do not unescape object ***REMOVED***eld
+	ObjectFieldMustBeSimpleString: true, // do not unescape object field
 }.Froze()
 
-type frozenCon***REMOVED***g struct {
-	con***REMOVED***gBeforeFrozen            Con***REMOVED***g
+type frozenConfig struct {
+	configBeforeFrozen            Config
 	sortMapKeys                   bool
 	indentionStep                 int
 	objectFieldMustBeSimpleString bool
@@ -82,20 +82,20 @@ type frozenCon***REMOVED***g struct {
 	caseSensitive                 bool
 }
 
-func (cfg *frozenCon***REMOVED***g) initCache() {
+func (cfg *frozenConfig) initCache() {
 	cfg.decoderCache = concurrent.NewMap()
 	cfg.encoderCache = concurrent.NewMap()
 }
 
-func (cfg *frozenCon***REMOVED***g) addDecoderToCache(cacheKey uintptr, decoder ValDecoder) {
+func (cfg *frozenConfig) addDecoderToCache(cacheKey uintptr, decoder ValDecoder) {
 	cfg.decoderCache.Store(cacheKey, decoder)
 }
 
-func (cfg *frozenCon***REMOVED***g) addEncoderToCache(cacheKey uintptr, encoder ValEncoder) {
+func (cfg *frozenConfig) addEncoderToCache(cacheKey uintptr, encoder ValEncoder) {
 	cfg.encoderCache.Store(cacheKey, encoder)
 }
 
-func (cfg *frozenCon***REMOVED***g) getDecoderFromCache(cacheKey uintptr) ValDecoder {
+func (cfg *frozenConfig) getDecoderFromCache(cacheKey uintptr) ValDecoder {
 	decoder, found := cfg.decoderCache.Load(cacheKey)
 	if found {
 		return decoder.(ValDecoder)
@@ -103,7 +103,7 @@ func (cfg *frozenCon***REMOVED***g) getDecoderFromCache(cacheKey uintptr) ValDec
 	return nil
 }
 
-func (cfg *frozenCon***REMOVED***g) getEncoderFromCache(cacheKey uintptr) ValEncoder {
+func (cfg *frozenConfig) getEncoderFromCache(cacheKey uintptr) ValEncoder {
 	encoder, found := cfg.encoderCache.Load(cacheKey)
 	if found {
 		return encoder.(ValEncoder)
@@ -113,21 +113,21 @@ func (cfg *frozenCon***REMOVED***g) getEncoderFromCache(cacheKey uintptr) ValEnc
 
 var cfgCache = concurrent.NewMap()
 
-func getFrozenCon***REMOVED***gFromCache(cfg Con***REMOVED***g) *frozenCon***REMOVED***g {
+func getFrozenConfigFromCache(cfg Config) *frozenConfig {
 	obj, found := cfgCache.Load(cfg)
 	if found {
-		return obj.(*frozenCon***REMOVED***g)
+		return obj.(*frozenConfig)
 	}
 	return nil
 }
 
-func addFrozenCon***REMOVED***gToCache(cfg Con***REMOVED***g, frozenCon***REMOVED***g *frozenCon***REMOVED***g) {
-	cfgCache.Store(cfg, frozenCon***REMOVED***g)
+func addFrozenConfigToCache(cfg Config, frozenConfig *frozenConfig) {
+	cfgCache.Store(cfg, frozenConfig)
 }
 
-// Froze forge API from con***REMOVED***g
-func (cfg Con***REMOVED***g) Froze() API {
-	api := &frozenCon***REMOVED***g{
+// Froze forge API from config
+func (cfg Config) Froze() API {
+	api := &frozenConfig{
 		sortMapKeys:                   cfg.SortMapKeys,
 		indentionStep:                 cfg.IndentionStep,
 		objectFieldMustBeSimpleString: cfg.ObjectFieldMustBeSimpleString,
@@ -162,31 +162,31 @@ func (cfg Con***REMOVED***g) Froze() API {
 	}
 	api.encoderExtension = encoderExtension
 	api.decoderExtension = decoderExtension
-	api.con***REMOVED***gBeforeFrozen = cfg
+	api.configBeforeFrozen = cfg
 	return api
 }
 
-func (cfg Con***REMOVED***g) frozeWithCacheReuse(extraExtensions []Extension) *frozenCon***REMOVED***g {
-	api := getFrozenCon***REMOVED***gFromCache(cfg)
+func (cfg Config) frozeWithCacheReuse(extraExtensions []Extension) *frozenConfig {
+	api := getFrozenConfigFromCache(cfg)
 	if api != nil {
 		return api
 	}
-	api = cfg.Froze().(*frozenCon***REMOVED***g)
+	api = cfg.Froze().(*frozenConfig)
 	for _, extension := range extraExtensions {
 		api.RegisterExtension(extension)
 	}
-	addFrozenCon***REMOVED***gToCache(cfg, api)
+	addFrozenConfigToCache(cfg, api)
 	return api
 }
 
-func (cfg *frozenCon***REMOVED***g) validateJsonRawMessage(extension EncoderExtension) {
+func (cfg *frozenConfig) validateJsonRawMessage(extension EncoderExtension) {
 	encoder := &funcEncoder{func(ptr unsafe.Pointer, stream *Stream) {
 		rawMessage := *(*json.RawMessage)(ptr)
 		iter := cfg.BorrowIterator([]byte(rawMessage))
 		iter.Read()
 		if iter.Error != nil {
 			stream.WriteRaw("null")
-		} ***REMOVED*** {
+		} else {
 			cfg.ReturnIterator(iter)
 			stream.WriteRaw(string(rawMessage))
 		}
@@ -197,7 +197,7 @@ func (cfg *frozenCon***REMOVED***g) validateJsonRawMessage(extension EncoderExte
 	extension[reflect2.TypeOfPtr((*RawMessage)(nil)).Elem()] = encoder
 }
 
-func (cfg *frozenCon***REMOVED***g) useNumber(extension DecoderExtension) {
+func (cfg *frozenConfig) useNumber(extension DecoderExtension) {
 	extension[reflect2.TypeOfPtr((*interface{})(nil)).Elem()] = &funcDecoder{func(ptr unsafe.Pointer, iter *Iterator) {
 		exitingValue := *((*interface{})(ptr))
 		if exitingValue != nil && reflect.TypeOf(exitingValue).Kind() == reflect.Ptr {
@@ -206,23 +206,23 @@ func (cfg *frozenCon***REMOVED***g) useNumber(extension DecoderExtension) {
 		}
 		if iter.WhatIsNext() == NumberValue {
 			*((*interface{})(ptr)) = json.Number(iter.readNumberAsString())
-		} ***REMOVED*** {
+		} else {
 			*((*interface{})(ptr)) = iter.Read()
 		}
 	}}
 }
-func (cfg *frozenCon***REMOVED***g) getTagKey() string {
-	tagKey := cfg.con***REMOVED***gBeforeFrozen.TagKey
+func (cfg *frozenConfig) getTagKey() string {
+	tagKey := cfg.configBeforeFrozen.TagKey
 	if tagKey == "" {
 		return "json"
 	}
 	return tagKey
 }
 
-func (cfg *frozenCon***REMOVED***g) RegisterExtension(extension Extension) {
+func (cfg *frozenConfig) RegisterExtension(extension Extension) {
 	cfg.extraExtensions = append(cfg.extraExtensions, extension)
-	copied := cfg.con***REMOVED***gBeforeFrozen
-	cfg.con***REMOVED***gBeforeFrozen = copied
+	copied := cfg.configBeforeFrozen
+	cfg.configBeforeFrozen = copied
 }
 
 type lossyFloat32Encoder struct {
@@ -249,7 +249,7 @@ func (encoder *lossyFloat64Encoder) IsEmpty(ptr unsafe.Pointer) bool {
 
 // EnableLossyFloatMarshalling keeps 10**(-6) precision
 // for float variables for better performance.
-func (cfg *frozenCon***REMOVED***g) marshalFloatWith6Digits(extension EncoderExtension) {
+func (cfg *frozenConfig) marshalFloatWith6Digits(extension EncoderExtension) {
 	// for better performance
 	extension[reflect2.TypeOfPtr((*float32)(nil)).Elem()] = &lossyFloat32Encoder{}
 	extension[reflect2.TypeOfPtr((*float64)(nil)).Elem()] = &lossyFloat64Encoder{}
@@ -267,23 +267,23 @@ func (encoder *htmlEscapedStringEncoder) IsEmpty(ptr unsafe.Pointer) bool {
 	return *((*string)(ptr)) == ""
 }
 
-func (cfg *frozenCon***REMOVED***g) escapeHTML(encoderExtension EncoderExtension) {
+func (cfg *frozenConfig) escapeHTML(encoderExtension EncoderExtension) {
 	encoderExtension[reflect2.TypeOfPtr((*string)(nil)).Elem()] = &htmlEscapedStringEncoder{}
 }
 
-func (cfg *frozenCon***REMOVED***g) cleanDecoders() {
+func (cfg *frozenConfig) cleanDecoders() {
 	typeDecoders = map[string]ValDecoder{}
-	***REMOVED***eldDecoders = map[string]ValDecoder{}
-	*cfg = *(cfg.con***REMOVED***gBeforeFrozen.Froze().(*frozenCon***REMOVED***g))
+	fieldDecoders = map[string]ValDecoder{}
+	*cfg = *(cfg.configBeforeFrozen.Froze().(*frozenConfig))
 }
 
-func (cfg *frozenCon***REMOVED***g) cleanEncoders() {
+func (cfg *frozenConfig) cleanEncoders() {
 	typeEncoders = map[string]ValEncoder{}
-	***REMOVED***eldEncoders = map[string]ValEncoder{}
-	*cfg = *(cfg.con***REMOVED***gBeforeFrozen.Froze().(*frozenCon***REMOVED***g))
+	fieldEncoders = map[string]ValEncoder{}
+	*cfg = *(cfg.configBeforeFrozen.Froze().(*frozenConfig))
 }
 
-func (cfg *frozenCon***REMOVED***g) MarshalToString(v interface{}) (string, error) {
+func (cfg *frozenConfig) MarshalToString(v interface{}) (string, error) {
 	stream := cfg.BorrowStream(nil)
 	defer cfg.ReturnStream(stream)
 	stream.WriteVal(v)
@@ -293,7 +293,7 @@ func (cfg *frozenCon***REMOVED***g) MarshalToString(v interface{}) (string, erro
 	return string(stream.Buffer()), nil
 }
 
-func (cfg *frozenCon***REMOVED***g) Marshal(v interface{}) ([]byte, error) {
+func (cfg *frozenConfig) Marshal(v interface{}) ([]byte, error) {
 	stream := cfg.BorrowStream(nil)
 	defer cfg.ReturnStream(stream)
 	stream.WriteVal(v)
@@ -306,21 +306,21 @@ func (cfg *frozenCon***REMOVED***g) Marshal(v interface{}) ([]byte, error) {
 	return copied, nil
 }
 
-func (cfg *frozenCon***REMOVED***g) MarshalIndent(v interface{}, pre***REMOVED***x, indent string) ([]byte, error) {
-	if pre***REMOVED***x != "" {
-		panic("pre***REMOVED***x is not supported")
+func (cfg *frozenConfig) MarshalIndent(v interface{}, prefix, indent string) ([]byte, error) {
+	if prefix != "" {
+		panic("prefix is not supported")
 	}
 	for _, r := range indent {
 		if r != ' ' {
 			panic("indent can only be space")
 		}
 	}
-	newCfg := cfg.con***REMOVED***gBeforeFrozen
+	newCfg := cfg.configBeforeFrozen
 	newCfg.IndentionStep = len(indent)
 	return newCfg.frozeWithCacheReuse(cfg.extraExtensions).Marshal(v)
 }
 
-func (cfg *frozenCon***REMOVED***g) UnmarshalFromString(str string, v interface{}) error {
+func (cfg *frozenConfig) UnmarshalFromString(str string, v interface{}) error {
 	data := []byte(str)
 	iter := cfg.BorrowIterator(data)
 	defer cfg.ReturnIterator(iter)
@@ -336,13 +336,13 @@ func (cfg *frozenCon***REMOVED***g) UnmarshalFromString(str string, v interface{
 	return iter.Error
 }
 
-func (cfg *frozenCon***REMOVED***g) Get(data []byte, path ...interface{}) Any {
+func (cfg *frozenConfig) Get(data []byte, path ...interface{}) Any {
 	iter := cfg.BorrowIterator(data)
 	defer cfg.ReturnIterator(iter)
 	return locatePath(iter, path)
 }
 
-func (cfg *frozenCon***REMOVED***g) Unmarshal(data []byte, v interface{}) error {
+func (cfg *frozenConfig) Unmarshal(data []byte, v interface{}) error {
 	iter := cfg.BorrowIterator(data)
 	defer cfg.ReturnIterator(iter)
 	iter.ReadVal(v)
@@ -357,17 +357,17 @@ func (cfg *frozenCon***REMOVED***g) Unmarshal(data []byte, v interface{}) error 
 	return iter.Error
 }
 
-func (cfg *frozenCon***REMOVED***g) NewEncoder(writer io.Writer) *Encoder {
+func (cfg *frozenConfig) NewEncoder(writer io.Writer) *Encoder {
 	stream := NewStream(cfg, writer, 512)
 	return &Encoder{stream}
 }
 
-func (cfg *frozenCon***REMOVED***g) NewDecoder(reader io.Reader) *Decoder {
+func (cfg *frozenConfig) NewDecoder(reader io.Reader) *Decoder {
 	iter := Parse(cfg, reader, 512)
 	return &Decoder{iter}
 }
 
-func (cfg *frozenCon***REMOVED***g) Valid(data []byte) bool {
+func (cfg *frozenConfig) Valid(data []byte) bool {
 	iter := cfg.BorrowIterator(data)
 	defer cfg.ReturnIterator(iter)
 	iter.Skip()

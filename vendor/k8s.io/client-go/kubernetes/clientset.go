@@ -2,7 +2,7 @@
 Copyright The Kubernetes Authors.
 
 Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this ***REMOVED***le except in compliance with the License.
+you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
 
     http://www.apache.org/licenses/LICENSE-2.0
@@ -10,7 +10,7 @@ You may obtain a copy of the License at
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the speci***REMOVED***c language governing permissions and
+See the License for the specific language governing permissions and
 limitations under the License.
 */
 
@@ -36,7 +36,7 @@ import (
 	batchv1 "k8s.io/client-go/kubernetes/typed/batch/v1"
 	batchv1beta1 "k8s.io/client-go/kubernetes/typed/batch/v1beta1"
 	batchv2alpha1 "k8s.io/client-go/kubernetes/typed/batch/v2alpha1"
-	certi***REMOVED***catesv1beta1 "k8s.io/client-go/kubernetes/typed/certi***REMOVED***cates/v1beta1"
+	certificatesv1beta1 "k8s.io/client-go/kubernetes/typed/certificates/v1beta1"
 	coordinationv1beta1 "k8s.io/client-go/kubernetes/typed/coordination/v1beta1"
 	corev1 "k8s.io/client-go/kubernetes/typed/core/v1"
 	eventsv1beta1 "k8s.io/client-go/kubernetes/typed/events/v1beta1"
@@ -88,9 +88,9 @@ type Interface interface {
 	Batch() batchv1.BatchV1Interface
 	BatchV1beta1() batchv1beta1.BatchV1beta1Interface
 	BatchV2alpha1() batchv2alpha1.BatchV2alpha1Interface
-	Certi***REMOVED***catesV1beta1() certi***REMOVED***catesv1beta1.Certi***REMOVED***catesV1beta1Interface
+	CertificatesV1beta1() certificatesv1beta1.CertificatesV1beta1Interface
 	// Deprecated: please explicitly pick a version if possible.
-	Certi***REMOVED***cates() certi***REMOVED***catesv1beta1.Certi***REMOVED***catesV1beta1Interface
+	Certificates() certificatesv1beta1.CertificatesV1beta1Interface
 	CoordinationV1beta1() coordinationv1beta1.CoordinationV1beta1Interface
 	// Deprecated: please explicitly pick a version if possible.
 	Coordination() coordinationv1beta1.CoordinationV1beta1Interface
@@ -148,7 +148,7 @@ type Clientset struct {
 	batchV1                       *batchv1.BatchV1Client
 	batchV1beta1                  *batchv1beta1.BatchV1beta1Client
 	batchV2alpha1                 *batchv2alpha1.BatchV2alpha1Client
-	certi***REMOVED***catesV1beta1           *certi***REMOVED***catesv1beta1.Certi***REMOVED***catesV1beta1Client
+	certificatesV1beta1           *certificatesv1beta1.CertificatesV1beta1Client
 	coordinationV1beta1           *coordinationv1beta1.CoordinationV1beta1Client
 	coreV1                        *corev1.CoreV1Client
 	eventsV1beta1                 *eventsv1beta1.EventsV1beta1Client
@@ -288,15 +288,15 @@ func (c *Clientset) BatchV2alpha1() batchv2alpha1.BatchV2alpha1Interface {
 	return c.batchV2alpha1
 }
 
-// Certi***REMOVED***catesV1beta1 retrieves the Certi***REMOVED***catesV1beta1Client
-func (c *Clientset) Certi***REMOVED***catesV1beta1() certi***REMOVED***catesv1beta1.Certi***REMOVED***catesV1beta1Interface {
-	return c.certi***REMOVED***catesV1beta1
+// CertificatesV1beta1 retrieves the CertificatesV1beta1Client
+func (c *Clientset) CertificatesV1beta1() certificatesv1beta1.CertificatesV1beta1Interface {
+	return c.certificatesV1beta1
 }
 
-// Deprecated: Certi***REMOVED***cates retrieves the default version of Certi***REMOVED***catesClient.
+// Deprecated: Certificates retrieves the default version of CertificatesClient.
 // Please explicitly pick a version.
-func (c *Clientset) Certi***REMOVED***cates() certi***REMOVED***catesv1beta1.Certi***REMOVED***catesV1beta1Interface {
-	return c.certi***REMOVED***catesV1beta1
+func (c *Clientset) Certificates() certificatesv1beta1.CertificatesV1beta1Interface {
+	return c.certificatesV1beta1
 }
 
 // CoordinationV1beta1 retrieves the CoordinationV1beta1Client
@@ -442,188 +442,188 @@ func (c *Clientset) Discovery() discovery.DiscoveryInterface {
 	return c.DiscoveryClient
 }
 
-// NewForCon***REMOVED***g creates a new Clientset for the given con***REMOVED***g.
-func NewForCon***REMOVED***g(c *rest.Con***REMOVED***g) (*Clientset, error) {
-	con***REMOVED***gShallowCopy := *c
-	if con***REMOVED***gShallowCopy.RateLimiter == nil && con***REMOVED***gShallowCopy.QPS > 0 {
-		con***REMOVED***gShallowCopy.RateLimiter = flowcontrol.NewTokenBucketRateLimiter(con***REMOVED***gShallowCopy.QPS, con***REMOVED***gShallowCopy.Burst)
+// NewForConfig creates a new Clientset for the given config.
+func NewForConfig(c *rest.Config) (*Clientset, error) {
+	configShallowCopy := *c
+	if configShallowCopy.RateLimiter == nil && configShallowCopy.QPS > 0 {
+		configShallowCopy.RateLimiter = flowcontrol.NewTokenBucketRateLimiter(configShallowCopy.QPS, configShallowCopy.Burst)
 	}
 	var cs Clientset
 	var err error
-	cs.admissionregistrationV1alpha1, err = admissionregistrationv1alpha1.NewForCon***REMOVED***g(&con***REMOVED***gShallowCopy)
+	cs.admissionregistrationV1alpha1, err = admissionregistrationv1alpha1.NewForConfig(&configShallowCopy)
 	if err != nil {
 		return nil, err
 	}
-	cs.admissionregistrationV1beta1, err = admissionregistrationv1beta1.NewForCon***REMOVED***g(&con***REMOVED***gShallowCopy)
+	cs.admissionregistrationV1beta1, err = admissionregistrationv1beta1.NewForConfig(&configShallowCopy)
 	if err != nil {
 		return nil, err
 	}
-	cs.appsV1beta1, err = appsv1beta1.NewForCon***REMOVED***g(&con***REMOVED***gShallowCopy)
+	cs.appsV1beta1, err = appsv1beta1.NewForConfig(&configShallowCopy)
 	if err != nil {
 		return nil, err
 	}
-	cs.appsV1beta2, err = appsv1beta2.NewForCon***REMOVED***g(&con***REMOVED***gShallowCopy)
+	cs.appsV1beta2, err = appsv1beta2.NewForConfig(&configShallowCopy)
 	if err != nil {
 		return nil, err
 	}
-	cs.appsV1, err = appsv1.NewForCon***REMOVED***g(&con***REMOVED***gShallowCopy)
+	cs.appsV1, err = appsv1.NewForConfig(&configShallowCopy)
 	if err != nil {
 		return nil, err
 	}
-	cs.auditregistrationV1alpha1, err = auditregistrationv1alpha1.NewForCon***REMOVED***g(&con***REMOVED***gShallowCopy)
+	cs.auditregistrationV1alpha1, err = auditregistrationv1alpha1.NewForConfig(&configShallowCopy)
 	if err != nil {
 		return nil, err
 	}
-	cs.authenticationV1, err = authenticationv1.NewForCon***REMOVED***g(&con***REMOVED***gShallowCopy)
+	cs.authenticationV1, err = authenticationv1.NewForConfig(&configShallowCopy)
 	if err != nil {
 		return nil, err
 	}
-	cs.authenticationV1beta1, err = authenticationv1beta1.NewForCon***REMOVED***g(&con***REMOVED***gShallowCopy)
+	cs.authenticationV1beta1, err = authenticationv1beta1.NewForConfig(&configShallowCopy)
 	if err != nil {
 		return nil, err
 	}
-	cs.authorizationV1, err = authorizationv1.NewForCon***REMOVED***g(&con***REMOVED***gShallowCopy)
+	cs.authorizationV1, err = authorizationv1.NewForConfig(&configShallowCopy)
 	if err != nil {
 		return nil, err
 	}
-	cs.authorizationV1beta1, err = authorizationv1beta1.NewForCon***REMOVED***g(&con***REMOVED***gShallowCopy)
+	cs.authorizationV1beta1, err = authorizationv1beta1.NewForConfig(&configShallowCopy)
 	if err != nil {
 		return nil, err
 	}
-	cs.autoscalingV1, err = autoscalingv1.NewForCon***REMOVED***g(&con***REMOVED***gShallowCopy)
+	cs.autoscalingV1, err = autoscalingv1.NewForConfig(&configShallowCopy)
 	if err != nil {
 		return nil, err
 	}
-	cs.autoscalingV2beta1, err = autoscalingv2beta1.NewForCon***REMOVED***g(&con***REMOVED***gShallowCopy)
+	cs.autoscalingV2beta1, err = autoscalingv2beta1.NewForConfig(&configShallowCopy)
 	if err != nil {
 		return nil, err
 	}
-	cs.autoscalingV2beta2, err = autoscalingv2beta2.NewForCon***REMOVED***g(&con***REMOVED***gShallowCopy)
+	cs.autoscalingV2beta2, err = autoscalingv2beta2.NewForConfig(&configShallowCopy)
 	if err != nil {
 		return nil, err
 	}
-	cs.batchV1, err = batchv1.NewForCon***REMOVED***g(&con***REMOVED***gShallowCopy)
+	cs.batchV1, err = batchv1.NewForConfig(&configShallowCopy)
 	if err != nil {
 		return nil, err
 	}
-	cs.batchV1beta1, err = batchv1beta1.NewForCon***REMOVED***g(&con***REMOVED***gShallowCopy)
+	cs.batchV1beta1, err = batchv1beta1.NewForConfig(&configShallowCopy)
 	if err != nil {
 		return nil, err
 	}
-	cs.batchV2alpha1, err = batchv2alpha1.NewForCon***REMOVED***g(&con***REMOVED***gShallowCopy)
+	cs.batchV2alpha1, err = batchv2alpha1.NewForConfig(&configShallowCopy)
 	if err != nil {
 		return nil, err
 	}
-	cs.certi***REMOVED***catesV1beta1, err = certi***REMOVED***catesv1beta1.NewForCon***REMOVED***g(&con***REMOVED***gShallowCopy)
+	cs.certificatesV1beta1, err = certificatesv1beta1.NewForConfig(&configShallowCopy)
 	if err != nil {
 		return nil, err
 	}
-	cs.coordinationV1beta1, err = coordinationv1beta1.NewForCon***REMOVED***g(&con***REMOVED***gShallowCopy)
+	cs.coordinationV1beta1, err = coordinationv1beta1.NewForConfig(&configShallowCopy)
 	if err != nil {
 		return nil, err
 	}
-	cs.coreV1, err = corev1.NewForCon***REMOVED***g(&con***REMOVED***gShallowCopy)
+	cs.coreV1, err = corev1.NewForConfig(&configShallowCopy)
 	if err != nil {
 		return nil, err
 	}
-	cs.eventsV1beta1, err = eventsv1beta1.NewForCon***REMOVED***g(&con***REMOVED***gShallowCopy)
+	cs.eventsV1beta1, err = eventsv1beta1.NewForConfig(&configShallowCopy)
 	if err != nil {
 		return nil, err
 	}
-	cs.extensionsV1beta1, err = extensionsv1beta1.NewForCon***REMOVED***g(&con***REMOVED***gShallowCopy)
+	cs.extensionsV1beta1, err = extensionsv1beta1.NewForConfig(&configShallowCopy)
 	if err != nil {
 		return nil, err
 	}
-	cs.networkingV1, err = networkingv1.NewForCon***REMOVED***g(&con***REMOVED***gShallowCopy)
+	cs.networkingV1, err = networkingv1.NewForConfig(&configShallowCopy)
 	if err != nil {
 		return nil, err
 	}
-	cs.policyV1beta1, err = policyv1beta1.NewForCon***REMOVED***g(&con***REMOVED***gShallowCopy)
+	cs.policyV1beta1, err = policyv1beta1.NewForConfig(&configShallowCopy)
 	if err != nil {
 		return nil, err
 	}
-	cs.rbacV1, err = rbacv1.NewForCon***REMOVED***g(&con***REMOVED***gShallowCopy)
+	cs.rbacV1, err = rbacv1.NewForConfig(&configShallowCopy)
 	if err != nil {
 		return nil, err
 	}
-	cs.rbacV1beta1, err = rbacv1beta1.NewForCon***REMOVED***g(&con***REMOVED***gShallowCopy)
+	cs.rbacV1beta1, err = rbacv1beta1.NewForConfig(&configShallowCopy)
 	if err != nil {
 		return nil, err
 	}
-	cs.rbacV1alpha1, err = rbacv1alpha1.NewForCon***REMOVED***g(&con***REMOVED***gShallowCopy)
+	cs.rbacV1alpha1, err = rbacv1alpha1.NewForConfig(&configShallowCopy)
 	if err != nil {
 		return nil, err
 	}
-	cs.schedulingV1alpha1, err = schedulingv1alpha1.NewForCon***REMOVED***g(&con***REMOVED***gShallowCopy)
+	cs.schedulingV1alpha1, err = schedulingv1alpha1.NewForConfig(&configShallowCopy)
 	if err != nil {
 		return nil, err
 	}
-	cs.schedulingV1beta1, err = schedulingv1beta1.NewForCon***REMOVED***g(&con***REMOVED***gShallowCopy)
+	cs.schedulingV1beta1, err = schedulingv1beta1.NewForConfig(&configShallowCopy)
 	if err != nil {
 		return nil, err
 	}
-	cs.settingsV1alpha1, err = settingsv1alpha1.NewForCon***REMOVED***g(&con***REMOVED***gShallowCopy)
+	cs.settingsV1alpha1, err = settingsv1alpha1.NewForConfig(&configShallowCopy)
 	if err != nil {
 		return nil, err
 	}
-	cs.storageV1beta1, err = storagev1beta1.NewForCon***REMOVED***g(&con***REMOVED***gShallowCopy)
+	cs.storageV1beta1, err = storagev1beta1.NewForConfig(&configShallowCopy)
 	if err != nil {
 		return nil, err
 	}
-	cs.storageV1, err = storagev1.NewForCon***REMOVED***g(&con***REMOVED***gShallowCopy)
+	cs.storageV1, err = storagev1.NewForConfig(&configShallowCopy)
 	if err != nil {
 		return nil, err
 	}
-	cs.storageV1alpha1, err = storagev1alpha1.NewForCon***REMOVED***g(&con***REMOVED***gShallowCopy)
+	cs.storageV1alpha1, err = storagev1alpha1.NewForConfig(&configShallowCopy)
 	if err != nil {
 		return nil, err
 	}
 
-	cs.DiscoveryClient, err = discovery.NewDiscoveryClientForCon***REMOVED***g(&con***REMOVED***gShallowCopy)
+	cs.DiscoveryClient, err = discovery.NewDiscoveryClientForConfig(&configShallowCopy)
 	if err != nil {
 		return nil, err
 	}
 	return &cs, nil
 }
 
-// NewForCon***REMOVED***gOrDie creates a new Clientset for the given con***REMOVED***g and
-// panics if there is an error in the con***REMOVED***g.
-func NewForCon***REMOVED***gOrDie(c *rest.Con***REMOVED***g) *Clientset {
+// NewForConfigOrDie creates a new Clientset for the given config and
+// panics if there is an error in the config.
+func NewForConfigOrDie(c *rest.Config) *Clientset {
 	var cs Clientset
-	cs.admissionregistrationV1alpha1 = admissionregistrationv1alpha1.NewForCon***REMOVED***gOrDie(c)
-	cs.admissionregistrationV1beta1 = admissionregistrationv1beta1.NewForCon***REMOVED***gOrDie(c)
-	cs.appsV1beta1 = appsv1beta1.NewForCon***REMOVED***gOrDie(c)
-	cs.appsV1beta2 = appsv1beta2.NewForCon***REMOVED***gOrDie(c)
-	cs.appsV1 = appsv1.NewForCon***REMOVED***gOrDie(c)
-	cs.auditregistrationV1alpha1 = auditregistrationv1alpha1.NewForCon***REMOVED***gOrDie(c)
-	cs.authenticationV1 = authenticationv1.NewForCon***REMOVED***gOrDie(c)
-	cs.authenticationV1beta1 = authenticationv1beta1.NewForCon***REMOVED***gOrDie(c)
-	cs.authorizationV1 = authorizationv1.NewForCon***REMOVED***gOrDie(c)
-	cs.authorizationV1beta1 = authorizationv1beta1.NewForCon***REMOVED***gOrDie(c)
-	cs.autoscalingV1 = autoscalingv1.NewForCon***REMOVED***gOrDie(c)
-	cs.autoscalingV2beta1 = autoscalingv2beta1.NewForCon***REMOVED***gOrDie(c)
-	cs.autoscalingV2beta2 = autoscalingv2beta2.NewForCon***REMOVED***gOrDie(c)
-	cs.batchV1 = batchv1.NewForCon***REMOVED***gOrDie(c)
-	cs.batchV1beta1 = batchv1beta1.NewForCon***REMOVED***gOrDie(c)
-	cs.batchV2alpha1 = batchv2alpha1.NewForCon***REMOVED***gOrDie(c)
-	cs.certi***REMOVED***catesV1beta1 = certi***REMOVED***catesv1beta1.NewForCon***REMOVED***gOrDie(c)
-	cs.coordinationV1beta1 = coordinationv1beta1.NewForCon***REMOVED***gOrDie(c)
-	cs.coreV1 = corev1.NewForCon***REMOVED***gOrDie(c)
-	cs.eventsV1beta1 = eventsv1beta1.NewForCon***REMOVED***gOrDie(c)
-	cs.extensionsV1beta1 = extensionsv1beta1.NewForCon***REMOVED***gOrDie(c)
-	cs.networkingV1 = networkingv1.NewForCon***REMOVED***gOrDie(c)
-	cs.policyV1beta1 = policyv1beta1.NewForCon***REMOVED***gOrDie(c)
-	cs.rbacV1 = rbacv1.NewForCon***REMOVED***gOrDie(c)
-	cs.rbacV1beta1 = rbacv1beta1.NewForCon***REMOVED***gOrDie(c)
-	cs.rbacV1alpha1 = rbacv1alpha1.NewForCon***REMOVED***gOrDie(c)
-	cs.schedulingV1alpha1 = schedulingv1alpha1.NewForCon***REMOVED***gOrDie(c)
-	cs.schedulingV1beta1 = schedulingv1beta1.NewForCon***REMOVED***gOrDie(c)
-	cs.settingsV1alpha1 = settingsv1alpha1.NewForCon***REMOVED***gOrDie(c)
-	cs.storageV1beta1 = storagev1beta1.NewForCon***REMOVED***gOrDie(c)
-	cs.storageV1 = storagev1.NewForCon***REMOVED***gOrDie(c)
-	cs.storageV1alpha1 = storagev1alpha1.NewForCon***REMOVED***gOrDie(c)
+	cs.admissionregistrationV1alpha1 = admissionregistrationv1alpha1.NewForConfigOrDie(c)
+	cs.admissionregistrationV1beta1 = admissionregistrationv1beta1.NewForConfigOrDie(c)
+	cs.appsV1beta1 = appsv1beta1.NewForConfigOrDie(c)
+	cs.appsV1beta2 = appsv1beta2.NewForConfigOrDie(c)
+	cs.appsV1 = appsv1.NewForConfigOrDie(c)
+	cs.auditregistrationV1alpha1 = auditregistrationv1alpha1.NewForConfigOrDie(c)
+	cs.authenticationV1 = authenticationv1.NewForConfigOrDie(c)
+	cs.authenticationV1beta1 = authenticationv1beta1.NewForConfigOrDie(c)
+	cs.authorizationV1 = authorizationv1.NewForConfigOrDie(c)
+	cs.authorizationV1beta1 = authorizationv1beta1.NewForConfigOrDie(c)
+	cs.autoscalingV1 = autoscalingv1.NewForConfigOrDie(c)
+	cs.autoscalingV2beta1 = autoscalingv2beta1.NewForConfigOrDie(c)
+	cs.autoscalingV2beta2 = autoscalingv2beta2.NewForConfigOrDie(c)
+	cs.batchV1 = batchv1.NewForConfigOrDie(c)
+	cs.batchV1beta1 = batchv1beta1.NewForConfigOrDie(c)
+	cs.batchV2alpha1 = batchv2alpha1.NewForConfigOrDie(c)
+	cs.certificatesV1beta1 = certificatesv1beta1.NewForConfigOrDie(c)
+	cs.coordinationV1beta1 = coordinationv1beta1.NewForConfigOrDie(c)
+	cs.coreV1 = corev1.NewForConfigOrDie(c)
+	cs.eventsV1beta1 = eventsv1beta1.NewForConfigOrDie(c)
+	cs.extensionsV1beta1 = extensionsv1beta1.NewForConfigOrDie(c)
+	cs.networkingV1 = networkingv1.NewForConfigOrDie(c)
+	cs.policyV1beta1 = policyv1beta1.NewForConfigOrDie(c)
+	cs.rbacV1 = rbacv1.NewForConfigOrDie(c)
+	cs.rbacV1beta1 = rbacv1beta1.NewForConfigOrDie(c)
+	cs.rbacV1alpha1 = rbacv1alpha1.NewForConfigOrDie(c)
+	cs.schedulingV1alpha1 = schedulingv1alpha1.NewForConfigOrDie(c)
+	cs.schedulingV1beta1 = schedulingv1beta1.NewForConfigOrDie(c)
+	cs.settingsV1alpha1 = settingsv1alpha1.NewForConfigOrDie(c)
+	cs.storageV1beta1 = storagev1beta1.NewForConfigOrDie(c)
+	cs.storageV1 = storagev1.NewForConfigOrDie(c)
+	cs.storageV1alpha1 = storagev1alpha1.NewForConfigOrDie(c)
 
-	cs.DiscoveryClient = discovery.NewDiscoveryClientForCon***REMOVED***gOrDie(c)
+	cs.DiscoveryClient = discovery.NewDiscoveryClientForConfigOrDie(c)
 	return &cs
 }
 
@@ -646,7 +646,7 @@ func New(c rest.Interface) *Clientset {
 	cs.batchV1 = batchv1.New(c)
 	cs.batchV1beta1 = batchv1beta1.New(c)
 	cs.batchV2alpha1 = batchv2alpha1.New(c)
-	cs.certi***REMOVED***catesV1beta1 = certi***REMOVED***catesv1beta1.New(c)
+	cs.certificatesV1beta1 = certificatesv1beta1.New(c)
 	cs.coordinationV1beta1 = coordinationv1beta1.New(c)
 	cs.coreV1 = corev1.New(c)
 	cs.eventsV1beta1 = eventsv1beta1.New(c)

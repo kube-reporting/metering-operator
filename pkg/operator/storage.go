@@ -36,7 +36,7 @@ func (op *Reporting) getDefaultStorageLocation(lister cbListers.StorageLocationL
 }
 
 func (op *Reporting) getStorage(storage *metering.StorageLocationRef, namespace string) (*metering.StorageLocation, error) {
-	// Nothing speci***REMOVED***ed, try to use default storage location
+	// Nothing specified, try to use default storage location
 	if storage == nil || storage.StorageLocationName == "" {
 		storageLocation, err := op.getDefaultStorageLocation(op.storageLocationLister, namespace)
 		if err != nil {
@@ -46,7 +46,7 @@ func (op *Reporting) getStorage(storage *metering.StorageLocationRef, namespace 
 			return storageLocation, fmt.Errorf("storage spec or storageLocationName not set and namespace %s has no default StorageLocation", namespace)
 		}
 		return storageLocation, nil
-	} ***REMOVED*** if storage.StorageLocationName != "" { // Speci***REMOVED***c storage location speci***REMOVED***ed
+	} else if storage.StorageLocationName != "" { // Specific storage location specified
 		return op.storageLocationLister.StorageLocations(namespace).Get(storage.StorageLocationName)
 	}
 	return nil, fmt.Errorf("no default storageLocation and storageLocationName is empty")
@@ -59,7 +59,7 @@ func (op *Reporting) getHiveStorage(storageRef *metering.StorageLocationRef, nam
 	}
 
 	if storageLocation.Spec.Hive == nil {
-		return nil, fmt.Errorf("incorrect storage con***REMOVED***guration, has no Hive storage con***REMOVED***guration")
+		return nil, fmt.Errorf("incorrect storage configuration, has no Hive storage configuration")
 	}
 	return storageLocation, nil
 }

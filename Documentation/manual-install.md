@@ -1,17 +1,17 @@
 # Manual Installation
 
-If you want to install metering without OLM, using what's currently in master, ***REMOVED***rst start by cloning the repo.
+If you want to install metering without OLM, using what's currently in master, first start by cloning the repo.
 Next, decide which namespace you want to install Metering into, and set the `METERING_NAMESPACE` environment variable to the namespace you want to use.
 By default, if it's unset, it will use the `metering` namespace.
 
 ## Versioning
 
 By default, a manual install will deploy the latest build of master.
-If you want to use a speci***REMOVED***c version, checkout a git tag for the version you want to use before installing, or follow the instructions for [installing with a custom metering operator image](#install-with-a-custom-metering-operator-image).
+If you want to use a specific version, checkout a git tag for the version you want to use before installing, or follow the instructions for [installing with a custom metering operator image](#install-with-a-custom-metering-operator-image).
 
 ## Requirements
 
-Our installation scripts are written in bash, and utilize a few non-standard tools to interact with yaml and json ***REMOVED***les.
+Our installation scripts are written in bash, and utilize a few non-standard tools to interact with yaml and json files.
 Please ensure you have the following tools installed before running the install scripts:
 
 - bash
@@ -59,19 +59,19 @@ $ ./hack/openshift-uninstall.sh
 ## Customize installation
 
 
-If you wish to customize the installation, such as to modify con***REMOVED***guration
+If you wish to customize the installation, such as to modify configuration
 options, change the image tag or repository, then you can use a custom
 `metering` resource. To start, copy the default metering resource to a
-separate ***REMOVED***le that we can modify:
+separate file that we can modify:
 
 ```
-$ cp manifests/metering-con***REMOVED***g/default.yaml metering-custom.yaml
+$ cp manifests/metering-config/default.yaml metering-custom.yaml
 ```
 
-For developers, the most common change is modifying the image tag, con***REMOVED***g, and resource limits.
-Take a look at the [common con***REMOVED***guration docs](common-con***REMOVED***guration.md) to get an
-idea of what you can modify that relates to con***REMOVED***guration and resource limits, and
-`manifests/metering-con***REMOVED***g/latest-versions.yaml` to see how to change the
+For developers, the most common change is modifying the image tag, config, and resource limits.
+Take a look at the [common configuration docs](common-configuration.md) to get an
+idea of what you can modify that relates to configuration and resource limits, and
+`manifests/metering-config/latest-versions.yaml` to see how to change the
 image tag of each component.
 
 ```
@@ -84,7 +84,7 @@ Then run the installation script for your platform:
 - `./hack/install.sh`
 - `./hack/openshift-install.sh`
 
-For more details on con***REMOVED***guration options, most are documented in the [con***REMOVED***guring metering document][con***REMOVED***guring-metering].
+For more details on configuration options, most are documented in the [configuring metering document][configuring-metering].
 
 ## Install with a custom metering operator image
 
@@ -110,7 +110,7 @@ METERING_OPERATOR_IMAGE_TAG=pr-123 ./hack/openshift-install.sh
 ## Run reporting operator locally
 
 It's also possible to run the operator locally.
-To simplify this, we've got a few `Make***REMOVED***le` targets to handle the building and running of the operator.
+To simplify this, we've got a few `Makefile` targets to handle the building and running of the operator.
 
 First, we still need to run Presto, Hive, and HDFS in the cluster, and also set reporting-operator replicas to 0 so that our local operator can obtain the leader election lease when we start it.
 
@@ -124,10 +124,10 @@ spec:
 
 Next, run the install script for your platform (see above).
 
-After running the install script, ***REMOVED***gure out where your Prometheus pod is running.
-By default the `run-reporting-operator-local` Make***REMOVED***le target assumes that the pod is in the `openshift-monitoring` namespace and can be queried using the label selector `app=prometheus`.
+After running the install script, figure out where your Prometheus pod is running.
+By default the `run-reporting-operator-local` Makefile target assumes that the pod is in the `openshift-monitoring` namespace and can be queried using the label selector `app=prometheus`.
 
-If your Prometheus is located somewhere ***REMOVED***, you can override the defaults using the environment variables `METERING_PROMETHEUS_NAMESPACE` and `METERING_PROMTHEUS_LABEL_SELECTOR` to the namespace your Prometheus pod is in, and the label selector for querying Prometheus. Alternatively, if you wish to specify your Prometheus with a host, set `METERING_PROMETHEUS_PORT_FORWARD` to false and `METERING_PROMETHEUS_HOST` to the host/port of your instance.
+If your Prometheus is located somewhere else, you can override the defaults using the environment variables `METERING_PROMETHEUS_NAMESPACE` and `METERING_PROMTHEUS_LABEL_SELECTOR` to the namespace your Prometheus pod is in, and the label selector for querying Prometheus. Alternatively, if you wish to specify your Prometheus with a host, set `METERING_PROMETHEUS_PORT_FORWARD` to false and `METERING_PROMETHEUS_HOST` to the host/port of your instance.
 
 Ex (these are the defaults):
 ```
@@ -141,7 +141,7 @@ Finally, use the following command to build & run the operator:
 make run-reporting-operator-local
 ```
 
-The above command builds the operator for your local OS (by default it only builds for Linux), uses kubectl port-forward to make Prometheus, Presto, and Hive available locally for your operator to communicate with, and then starts the operator with con***REMOVED***guration set to use these local port-forwards.
+The above command builds the operator for your local OS (by default it only builds for Linux), uses kubectl port-forward to make Prometheus, Presto, and Hive available locally for your operator to communicate with, and then starts the operator with configuration set to use these local port-forwards.
 Lastly, the operator automatically uses your `$KUBECONFIG` to connect and authenticate to your cluster and perform Kubernetes API calls.
 
 ## Run metering operator locally
@@ -155,7 +155,7 @@ To run it locally you need to have the following:
 - Your `$KUBECONFIG` environment variable must be set and accessible to your Docker daemon.
 - Your `$METERING_NAMESPACE` environment variable must be set, and unless `$LOCAL_METERING_OPERATOR_RUN_INSTALL` to `true`, the namespace must already exist.
 
-This will just build and run the metering-operator docker image, which will watch for `Metering` resources in the namespace speci***REMOVED***ed by `$METERING_NAMESPACE`, using your `$KUBECONFIG` to communicate with the API server.
+This will just build and run the metering-operator docker image, which will watch for `Metering` resources in the namespace specified by `$METERING_NAMESPACE`, using your `$KUBECONFIG` to communicate with the API server.
 
 ```
 make run-metering-operator-local
@@ -182,5 +182,5 @@ To uninstall:
 
 For more details on what this is doing, see the [OLM install guide][olm-install]
 
-[con***REMOVED***guring-metering]: metering-con***REMOVED***g.md
+[configuring-metering]: metering-config.md
 [olm-install]: olm-install.md

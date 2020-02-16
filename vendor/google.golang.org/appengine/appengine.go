@@ -1,6 +1,6 @@
 // Copyright 2011 Google Inc. All rights reserved.
 // Use of this source code is governed by the Apache 2.0
-// license that can be found in the LICENSE ***REMOVED***le.
+// license that can be found in the LICENSE file.
 
 // Package appengine provides basic functionality for Google App Engine.
 //
@@ -91,7 +91,7 @@ func (g GeoPoint) Valid() bool {
 	return -90 <= g.Lat && g.Lat <= 90 && -180 <= g.Lng && g.Lng <= 180
 }
 
-// APICallFunc de***REMOVED***nes a function type for handling an API call.
+// APICallFunc defines a function type for handling an API call.
 // See WithCallOverride.
 type APICallFunc func(ctx context.Context, service, method string, in, out proto.Message) error
 

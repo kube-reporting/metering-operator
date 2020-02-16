@@ -1,6 +1,6 @@
 // Copyright 2013 The Go Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE ***REMOVED***le.
+// license that can be found in the LICENSE file.
 
 package norm
 
@@ -40,7 +40,7 @@ func (f Form) Transform(dst, src []byte, atEOF bool) (nDst, nSrc int, err error)
 }
 
 func flushTransform(rb *reorderBuffer) bool {
-	// Write out (must fully ***REMOVED***t in dst, or ***REMOVED*** it is an ErrShortDst).
+	// Write out (must fully fit in dst, or else it is an ErrShortDst).
 	if len(rb.out) < rb.nrune*utf8.UTFMax {
 		return false
 	}

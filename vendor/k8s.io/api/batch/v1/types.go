@@ -2,7 +2,7 @@
 Copyright 2016 The Kubernetes Authors.
 
 Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this ***REMOVED***le except in compliance with the License.
+you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
 
     http://www.apache.org/licenses/LICENSE-2.0
@@ -10,7 +10,7 @@ You may obtain a copy of the License at
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the speci***REMOVED***c language governing permissions and
+See the License for the specific language governing permissions and
 limitations under the License.
 */
 
@@ -24,7 +24,7 @@ import (
 // +genclient
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
 
-// Job represents the con***REMOVED***guration of a single job.
+// Job represents the configuration of a single job.
 type Job struct {
 	metav1.TypeMeta `json:",inline"`
 	// Standard object's metadata.
@@ -32,7 +32,7 @@ type Job struct {
 	// +optional
 	metav1.ObjectMeta `json:"metadata,omitempty" protobuf:"bytes,1,opt,name=metadata"`
 
-	// Speci***REMOVED***cation of the desired behavior of a job.
+	// Specification of the desired behavior of a job.
 	// More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#spec-and-status
 	// +optional
 	Spec JobSpec `json:"spec,omitempty" protobuf:"bytes,2,opt,name=spec"`
@@ -60,7 +60,7 @@ type JobList struct {
 // JobSpec describes how the job execution will look like.
 type JobSpec struct {
 
-	// Speci***REMOVED***es the maximum desired number of pods the job should
+	// Specifies the maximum desired number of pods the job should
 	// run at any given time. The actual number of pods running in steady state will
 	// be less than this number when ((.spec.completions - .status.successful) < .spec.parallelism),
 	// i.e. when the work left to do is less than max parallelism.
@@ -68,7 +68,7 @@ type JobSpec struct {
 	// +optional
 	Parallelism *int32 `json:"parallelism,omitempty" protobuf:"varint,1,opt,name=parallelism"`
 
-	// Speci***REMOVED***es the desired number of successfully ***REMOVED***nished pods the
+	// Specifies the desired number of successfully finished pods the
 	// job should be run with.  Setting to nil means that the success of any
 	// pod signals the success of all pods, and allows parallelism to have any positive
 	// value.  Setting to 1 means that parallelism is limited to 1 and the success of that
@@ -77,23 +77,23 @@ type JobSpec struct {
 	// +optional
 	Completions *int32 `json:"completions,omitempty" protobuf:"varint,2,opt,name=completions"`
 
-	// Speci***REMOVED***es the duration in seconds relative to the startTime that the job may be active
+	// Specifies the duration in seconds relative to the startTime that the job may be active
 	// before the system tries to terminate it; value must be positive integer
 	// +optional
 	ActiveDeadlineSeconds *int64 `json:"activeDeadlineSeconds,omitempty" protobuf:"varint,3,opt,name=activeDeadlineSeconds"`
 
-	// Speci***REMOVED***es the number of retries before marking this job failed.
+	// Specifies the number of retries before marking this job failed.
 	// Defaults to 6
 	// +optional
 	BackoffLimit *int32 `json:"backoffLimit,omitempty" protobuf:"varint,7,opt,name=backoffLimit"`
 
-	// TODO enabled it when https://github.com/kubernetes/kubernetes/issues/28486 has been ***REMOVED***xed
+	// TODO enabled it when https://github.com/kubernetes/kubernetes/issues/28486 has been fixed
 	// Optional number of failed pods to retain.
 	// +optional
 	// FailedPodsLimit *int32 `json:"failedPodsLimit,omitempty" protobuf:"varint,9,opt,name=failedPodsLimit"`
 
 	// A label query over pods that should match the pod count.
-	// Normally, the system sets this ***REMOVED***eld for you.
+	// Normally, the system sets this field for you.
 	// More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/#label-selectors
 	// +optional
 	Selector *metav1.LabelSelector `json:"selector,omitempty" protobuf:"bytes,4,opt,name=selector"`
@@ -115,14 +115,14 @@ type JobSpec struct {
 	// More info: https://kubernetes.io/docs/concepts/workloads/controllers/jobs-run-to-completion/
 	Template v1.PodTemplateSpec `json:"template" protobuf:"bytes,6,opt,name=template"`
 
-	// ttlSecondsAfterFinished limits the lifetime of a Job that has ***REMOVED***nished
-	// execution (either Complete or Failed). If this ***REMOVED***eld is set,
-	// ttlSecondsAfterFinished after the Job ***REMOVED***nishes, it is eligible to be
+	// ttlSecondsAfterFinished limits the lifetime of a Job that has finished
+	// execution (either Complete or Failed). If this field is set,
+	// ttlSecondsAfterFinished after the Job finishes, it is eligible to be
 	// automatically deleted. When the Job is being deleted, its lifecycle
-	// guarantees (e.g. ***REMOVED***nalizers) will be honored. If this ***REMOVED***eld is unset,
-	// the Job won't be automatically deleted. If this ***REMOVED***eld is set to zero,
-	// the Job becomes eligible to be deleted immediately after it ***REMOVED***nishes.
-	// This ***REMOVED***eld is alpha-level and is only honored by servers that enable the
+	// guarantees (e.g. finalizers) will be honored. If this field is unset,
+	// the Job won't be automatically deleted. If this field is set to zero,
+	// the Job becomes eligible to be deleted immediately after it finishes.
+	// This field is alpha-level and is only honored by servers that enable the
 	// TTLAfterFinished feature.
 	// +optional
 	TTLSecondsAfterFinished *int32 `json:"ttlSecondsAfterFinished,omitempty" protobuf:"varint,8,opt,name=ttlSecondsAfterFinished"`

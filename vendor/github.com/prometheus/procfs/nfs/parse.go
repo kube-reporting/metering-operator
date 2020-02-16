@@ -1,6 +1,6 @@
 // Copyright 2018 The Prometheus Authors
 // Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this ***REMOVED***le except in compliance with the License.
+// you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 //
 // http://www.apache.org/licenses/LICENSE-2.0
@@ -8,7 +8,7 @@
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the speci***REMOVED***c language governing permissions and
+// See the License for the specific language governing permissions and
 // limitations under the License.
 
 package nfs
@@ -197,7 +197,7 @@ func parseClientV4Stats(v []uint64) (ClientV4Stats, error) {
 		Write:              v[3],
 		Commit:             v[4],
 		Open:               v[5],
-		OpenCon***REMOVED***rm:        v[6],
+		OpenConfirm:        v[6],
 		OpenNoattr:         v[7],
 		OpenDowngrade:      v[8],
 		Close:              v[9],
@@ -205,7 +205,7 @@ func parseClientV4Stats(v []uint64) (ClientV4Stats, error) {
 		FsInfo:             v[11],
 		Renew:              v[12],
 		SetClientID:        v[13],
-		SetClientIDCon***REMOVED***rm: v[14],
+		SetClientIDConfirm: v[14],
 		Lock:               v[15],
 		Lockt:              v[16],
 		Locku:              v[17],
@@ -293,7 +293,7 @@ func parseV4Ops(v []uint64) (V4Ops, error) {
 		Nverify:      v[18],
 		Open:         v[19],
 		OpenAttr:     v[20],
-		OpenCon***REMOVED***rm:  v[21],
+		OpenConfirm:  v[21],
 		OpenDgrd:     v[22],
 		PutFH:        v[23],
 		PutPubFH:     v[24],

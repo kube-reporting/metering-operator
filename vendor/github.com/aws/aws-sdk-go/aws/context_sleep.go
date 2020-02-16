@@ -5,7 +5,7 @@ import (
 )
 
 // SleepWithContext will wait for the timer duration to expire, or the context
-// is canceled. Which ever happens ***REMOVED***rst. If the context is canceled the Context's
+// is canceled. Which ever happens first. If the context is canceled the Context's
 // error will be returned.
 //
 // Expects Context to always return a non-nil error if the Done channel is closed.

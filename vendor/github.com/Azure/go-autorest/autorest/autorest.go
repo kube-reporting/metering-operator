@@ -19,8 +19,8 @@ and Responding. A typical pattern is:
     ByDiscardingBody(),
     ByClosing())
 
-Each phase relies on decorators to modify and / or manage processing. Decorators may ***REMOVED***rst modify
-and then pass the data along, pass the data ***REMOVED***rst and then modify the result, or wrap themselves
+Each phase relies on decorators to modify and / or manage processing. Decorators may first modify
+and then pass the data along, pass the data first and then modify the result, or wrap themselves
 around passing the data (such as a logger might do). Decorators run in the order provided. For
 example, the following:
 
@@ -42,11 +42,11 @@ all bound together by means of input / output channels.
 Decorators hold their passed state within a closure (such as the path components in the example
 above). Be careful to share Preparers and Responders only in a context where such held state
 applies. For example, it may not make sense to share a Preparer that applies a query string from a
-***REMOVED***xed set of values. Similarly, sharing a Responder that reads the response body into a passed
+fixed set of values. Similarly, sharing a Responder that reads the response body into a passed
 struct (e.g., ByUnmarshallingJson) is likely incorrect.
 
-Lastly, the Swagger speci***REMOVED***cation (https://swagger.io) that drives AutoRest
-(https://github.com/Azure/autorest/) precisely de***REMOVED***nes two date forms: date and date-time. The
+Lastly, the Swagger specification (https://swagger.io) that drives AutoRest
+(https://github.com/Azure/autorest/) precisely defines two date forms: date and date-time. The
 github.com/Azure/go-autorest/autorest/date package provides time.Time derivations to ensure
 correct parsing and formatting.
 
@@ -60,7 +60,7 @@ package autorest
 // Copyright 2017 Microsoft Corporation
 //
 //  Licensed under the Apache License, Version 2.0 (the "License");
-//  you may not use this ***REMOVED***le except in compliance with the License.
+//  you may not use this file except in compliance with the License.
 //  You may obtain a copy of the License at
 //
 //      http://www.apache.org/licenses/LICENSE-2.0
@@ -68,7 +68,7 @@ package autorest
 //  Unless required by applicable law or agreed to in writing, software
 //  distributed under the License is distributed on an "AS IS" BASIS,
 //  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-//  See the License for the speci***REMOVED***c language governing permissions and
+//  See the License for the specific language governing permissions and
 //  limitations under the License.
 
 import (
@@ -78,10 +78,10 @@ import (
 )
 
 const (
-	// HeaderLocation speci***REMOVED***es the HTTP Location header.
+	// HeaderLocation specifies the HTTP Location header.
 	HeaderLocation = "Location"
 
-	// HeaderRetryAfter speci***REMOVED***es the HTTP Retry-After header.
+	// HeaderRetryAfter specifies the HTTP Retry-After header.
 	HeaderRetryAfter = "Retry-After"
 )
 
@@ -132,7 +132,7 @@ func NewPollingRequest(resp *http.Response, cancel <-chan struct{}) (*http.Reque
 	return req, nil
 }
 
-// NewPollingRequestWithContext allocates and returns a new http.Request with the speci***REMOVED***ed context to poll for the passed response.
+// NewPollingRequestWithContext allocates and returns a new http.Request with the specified context to poll for the passed response.
 func NewPollingRequestWithContext(ctx context.Context, resp *http.Response) (*http.Request, error) {
 	location := GetLocation(resp)
 	if location == "" {

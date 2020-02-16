@@ -57,5 +57,5 @@ spec:
         - name: {{ .Values.operator.name }}
           spec:
 {{ include "cluster-service-version-deployment-spec" . | indent 12 }}
-  customresourcede***REMOVED***nitions:
-{{ toYaml .Values.olm.csv.customresourcede***REMOVED***nitions | indent 4 }}
+  customresourcedefinitions:
+{{ toYaml .Values.olm.csv.customresourcedefinitions | indent 4 }}

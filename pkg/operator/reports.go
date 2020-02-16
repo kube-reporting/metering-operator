@@ -8,7 +8,7 @@ import (
 	"time"
 
 	"github.com/prometheus/client_golang/prometheus"
-	"github.com/rob***REMOVED***g/cron"
+	"github.com/robfig/cron"
 	log "github.com/sirupsen/logrus"
 	v1 "k8s.io/api/core/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
@@ -18,7 +18,7 @@ import (
 
 	metering "github.com/operator-framework/operator-metering/pkg/apis/metering/v1"
 	meteringUtil "github.com/operator-framework/operator-metering/pkg/apis/metering/v1/util"
-	"github.com/operator-framework/operator-metering/pkg/hive"
+	// "github.com/operator-framework/operator-metering/pkg/hive"
 	"github.com/operator-framework/operator-metering/pkg/operator/reporting"
 	"github.com/operator-framework/operator-metering/pkg/operator/reportingutil"
 	"github.com/operator-framework/operator-metering/pkg/util/slice"
@@ -111,7 +111,7 @@ func getSchedule(reportSched *metering.ReportSchedule) (reportSchedule, error) {
 	switch reportSched.Period {
 	case metering.ReportPeriodCron:
 		if reportSched.Cron == nil || reportSched.Cron.Expression == "" {
-			return nil, fmt.Errorf("spec.schedule.cron.expression must be speci***REMOVED***ed")
+			return nil, fmt.Errorf("spec.schedule.cron.expression must be specified")
 		}
 		return cron.ParseStandard(reportSched.Cron.Expression)
 	case metering.ReportPeriodHourly:
@@ -211,30 +211,30 @@ type reportPeriod struct {
 
 // isReportFinished checks the running condition of the report parameter and returns true if the report has previously run
 func isReportFinished(logger log.FieldLogger, report *metering.Report) bool {
-	// check if this report was previously ***REMOVED***nished
+	// check if this report was previously finished
 	runningCond := meteringUtil.GetReportCondition(report.Status, metering.ReportRunning)
 
 	if runningCond == nil {
 		logger.Infof("new report, validating report")
-	} ***REMOVED*** if runningCond.Reason == meteringUtil.ReportFinishedReason && runningCond.Status != v1.ConditionTrue {
-		// Found an already ***REMOVED***nished runOnce report. Log that we're not
-		// re-processing runOnce reports after they're previously ***REMOVED***nished
+	} else if runningCond.Reason == meteringUtil.ReportFinishedReason && runningCond.Status != v1.ConditionTrue {
+		// Found an already finished runOnce report. Log that we're not
+		// re-processing runOnce reports after they're previously finished
 		if report.Spec.Schedule == nil {
-			logger.Infof("Report %s is a previously ***REMOVED***nished run-once report, not re-processing", report.Name)
+			logger.Infof("Report %s is a previously finished run-once report, not re-processing", report.Name)
 			return true
 		}
-		// log some messages to indicate we're processing what was a previously ***REMOVED***nished report
+		// log some messages to indicate we're processing what was a previously finished report
 
 		// if the report's reportingEnd is unset or after the lastReportTime
-		// then the report was updated since it last ***REMOVED***nished and we should
+		// then the report was updated since it last finished and we should
 		// consider it something to be reprocessed
 		if report.Spec.ReportingEnd == nil {
-			logger.Infof("previously ***REMOVED***nished report's spec.reportingEnd is unset: beginning processing of report")
-		} ***REMOVED*** if report.Status.LastReportTime != nil && report.Spec.ReportingEnd.Time.After(report.Status.LastReportTime.Time) {
-			logger.Infof("previously ***REMOVED***nished report's spec.reportingEnd (%s) is now after lastReportTime (%s): beginning processing of report", report.Spec.ReportingEnd.Time, report.Status.LastReportTime.Time)
-		} ***REMOVED*** {
+			logger.Infof("previously finished report's spec.reportingEnd is unset: beginning processing of report")
+		} else if report.Status.LastReportTime != nil && report.Spec.ReportingEnd.Time.After(report.Status.LastReportTime.Time) {
+			logger.Infof("previously finished report's spec.reportingEnd (%s) is now after lastReportTime (%s): beginning processing of report", report.Spec.ReportingEnd.Time, report.Status.LastReportTime.Time)
+		} else {
 			// return without processing because the report is complete
-			logger.Infof("Report %s is already ***REMOVED***nished: %s", report.Name, runningCond.Message)
+			logger.Infof("Report %s is already finished: %s", report.Name, runningCond.Message)
 			return true
 		}
 	}
@@ -242,7 +242,7 @@ func isReportFinished(logger log.FieldLogger, report *metering.Report) bool {
 	return false
 }
 
-// validateReport takes a Report structure and checks if it contains valid ***REMOVED***elds
+// validateReport takes a Report structure and checks if it contains valid fields
 func validateReport(
 	report *metering.Report,
 	queryGetter reporting.ReportQueryGetter,
@@ -288,8 +288,8 @@ func validateReport(
 	return query, dependencyResult, nil
 }
 
-// getReportPeriod determines a Report's reporting period based off the report parameter's ***REMOVED***elds.
-// Returns a pointer to a reportPeriod structure if no error was encountered, ***REMOVED*** panic or return an error.
+// getReportPeriod determines a Report's reporting period based off the report parameter's fields.
+// Returns a pointer to a reportPeriod structure if no error was encountered, else panic or return an error.
 func getReportPeriod(now time.Time, logger log.FieldLogger, report *metering.Report) (*reportPeriod, error) {
 	var reportPeriod *reportPeriod
 
@@ -302,14 +302,14 @@ func getReportPeriod(now time.Time, logger log.FieldLogger, report *metering.Rep
 
 		if report.Status.LastReportTime != nil {
 			reportPeriod = getNextReportPeriod(reportSchedule, report.Spec.Schedule.Period, report.Status.LastReportTime.Time)
-		} ***REMOVED*** {
+		} else {
 			if report.Spec.ReportingStart != nil {
 				logger.Infof("no last report time for report, using spec.reportingStart %s as starting point", report.Spec.ReportingStart.Time)
 				reportPeriod = getNextReportPeriod(reportSchedule, report.Spec.Schedule.Period, report.Spec.ReportingStart.Time)
-			} ***REMOVED*** if report.Status.NextReportTime != nil {
+			} else if report.Status.NextReportTime != nil {
 				logger.Infof("no last report time for report, using status.nextReportTime %s as starting point", report.Status.NextReportTime.Time)
 				reportPeriod = getNextReportPeriod(reportSchedule, report.Spec.Schedule.Period, report.Status.NextReportTime.Time)
-			} ***REMOVED*** {
+			} else {
 				// the current period, [now, nextScheduledTime]
 				currentPeriod := getNextReportPeriod(reportSchedule, report.Spec.Schedule.Period, now)
 				// the next full report period from [nextScheduledTime, nextScheduledTime+1]
@@ -317,9 +317,9 @@ func getReportPeriod(now time.Time, logger log.FieldLogger, report *metering.Rep
 				report.Status.NextReportTime = &metav1.Time{Time: reportPeriod.periodStart}
 			}
 		}
-	} ***REMOVED*** {
+	} else {
 		var err error
-		// if there's the Spec.Schedule ***REMOVED***eld is unset, then the report must be a run-once report
+		// if there's the Spec.Schedule field is unset, then the report must be a run-once report
 		reportPeriod, err = getRunOnceReportPeriod(report)
 		if err != nil {
 			return nil, err
@@ -344,7 +344,7 @@ func getReportPeriod(now time.Time, logger log.FieldLogger, report *metering.Rep
 // hasn't elapsed, runReport will requeue the resource for a time when
 // the period has elapsed.
 func (op *Reporting) runReport(logger log.FieldLogger, report *metering.Report) error {
-	// check if the report was previously ***REMOVED***nished; store result in bool
+	// check if the report was previously finished; store result in bool
 	if reportFinished := isReportFinished(logger, report); reportFinished {
 		return nil
 	}
@@ -352,7 +352,7 @@ func (op *Reporting) runReport(logger log.FieldLogger, report *metering.Report) 
 	runningCond := meteringUtil.GetReportCondition(report.Status, metering.ReportRunning)
 	queryGetter := reporting.NewReportQueryListerGetter(op.reportQueryLister)
 
-	// validate that Report contains valid Spec ***REMOVED***elds
+	// validate that Report contains valid Spec fields
 	reportQuery, dependencyResult, err := validateReport(report, queryGetter, op.dependencyResolver, op.uninitialiedDependendenciesHandler())
 	if err != nil {
 		return op.setReportStatusInvalidReport(report, err.Error())
@@ -382,54 +382,101 @@ func (op *Reporting) runReport(logger log.FieldLogger, report *metering.Report) 
 		if err != nil {
 			return fmt.Errorf("unable to get PrestoTable %s for Report %s, %s", report.Status.TableRef, report.Name, err)
 		}
-		tableName, err := reportingutil.FullyQuali***REMOVED***edTableName(prestoTable)
+		tableName, err := reportingutil.FullyQualifiedTableName(prestoTable)
 		if err != nil {
 			return err
 		}
 		logger.Infof("Report %s table already exists, tableName: %s", report.Name, tableName)
-	} ***REMOVED*** {
+	} else {
 		tableName := reportingutil.ReportTableName(report.Namespace, report.Name)
 		hiveStorage, err := op.getHiveStorage(report.Spec.Output, report.Namespace)
 		if err != nil {
-			return fmt.Errorf("storage incorrectly con***REMOVED***gured for Report %s, err: %v", report.Name, err)
+			return fmt.Errorf("storage incorrectly configured for Report %s, err: %v", report.Name, err)
 		}
 		if hiveStorage.Status.Hive.DatabaseName == "" {
 			op.enqueueStorageLocation(hiveStorage)
 			return fmt.Errorf("StorageLocation %s Hive database %s does not exist yet", hiveStorage.Name, hiveStorage.Spec.Hive.DatabaseName)
 		}
 
-		cols, err := reportingutil.PrestoColumnsToHiveColumns(reportingutil.GeneratePrestoColumns(reportQuery))
+		reportQuery, err := op.meteringClient.MeteringV1().ReportQueries(report.Namespace).Get(report.Spec.QueryName, metav1.GetOptions{})
 		if err != nil {
-			return fmt.Errorf("unable to convert Presto columns to Hive columns: %s", err)
+			return fmt.Errorf("failed to find the %s ReportQuery when handling the %s Report: %v", report.Spec.QueryName, report.Name, err)
 		}
 
-		params := hive.TableParameters{
-			Database: hiveStorage.Status.Hive.DatabaseName,
-			Name:     tableName,
-			Columns:  cols,
-		}
-		if hiveStorage.Spec.Hive.DefaultTableProperties != nil {
-			params.RowFormat = hiveStorage.Spec.Hive.DefaultTableProperties.RowFormat
-			params.FileFormat = hiveStorage.Spec.Hive.DefaultTableProperties.FileFormat
+		cols := reportingutil.GeneratePrestoColumns(reportQuery)
+		logger.Infof("Here are the ReportQuery columns: %+v", cols)
+
+		catalog := "hive"
+		schema := "metering"
+
+		dependencyResult, err := op.dependencyResolver.ResolveDependencies(reportQuery.Namespace, reportQuery.Spec.Inputs, nil)
+		if err != nil {
+			return err
 		}
 
-		logger.Infof("creating Hive table %s in database %s", tableName, hiveStorage.Status.Hive.DatabaseName)
-		hiveTable, err := op.createHiveTableCR(report, metering.ReportGVK, params, false, nil)
+		err = reporting.ValidateQueryDependencies(dependencyResult.Dependencies, op.uninitialiedDependendenciesHandler())
 		if err != nil {
-			return fmt.Errorf("error creating table for Report %s: %s", report.Name, err)
-		}
-		hiveTable, err = op.waitForHiveTable(hiveTable.Namespace, hiveTable.Name, time.Second, 20*time.Second)
-		if err != nil {
-			return fmt.Errorf("error creating table for Report %s: %s", report.Name, err)
-		}
-		prestoTable, err = op.waitForPrestoTable(hiveTable.Namespace, hiveTable.Name, time.Second, 20*time.Second)
-		if err != nil {
-			return fmt.Errorf("error creating table for Report %s: %s", report.Name, err)
+			if reporting.IsUninitializedDependencyError(err) {
+				logger.Warnf("unable to validate ReportQuery %s, has uninitialized dependencies: %v", reportQuery.Name, err)
+				// We do not return an error because we do not need to requeue this
+				// query. Instead we can wait until this queries uninitialized
+				// dependencies become initialized. After they're initialized they
+				// will queue anything that depends on them, including this query.
+				return nil
+			} else if reporting.IsInvalidDependencyError(err) {
+				logger.WithError(err).Errorf("unable to validate ReportQuery %s, has invalid dependencies, dropping off queue", reportQuery.Name)
+				// Invalid dependency means it will not resolve itself, so do not
+				// return an error since we do not want to be requeued unless the
+				// resource is modified, or it's dependencies are modified.
+				return nil
+			} else {
+				// The error occurred when getting the dependencies or for an
+				// unknown reason so we want to retry up to a limit. This most
+				// commonly occurs when fetching a dependency from the API fails,
+				// or if there is a cyclic dependency.
+				return fmt.Errorf("unable to get or validate ReportQuery dependencies %s: %v", reportQuery.Name, err)
+			}
 		}
 
-		logger.Infof("created Hive table %s in database %s", tableName, hiveStorage.Status.Hive.DatabaseName)
+		// TODO: need to template the ReportQuery's query first
+		ptList, err := op.prestoTableLister.PrestoTables("openshift-metering").List(labels.Everything())
+		if err != nil {
+			return err
+		}
 
-		tableName, err = reportingutil.FullyQuali***REMOVED***edTableName(prestoTable)
+		requiredInputs := reportingutil.ConvertInputDefinitionsIntoInputList(reportQuery.Spec.Inputs)
+		queryCtx := &reporting.ReportQueryTemplateContext{
+			Namespace:         "openshift-metering",
+			Query:             reportQuery.Spec.Query,
+			RequiredInputs:    requiredInputs,
+			Reports:           dependencyResult.Dependencies.Reports,
+			ReportQueries:     dependencyResult.Dependencies.ReportQueries,
+			ReportDataSources: dependencyResult.Dependencies.ReportDataSources,
+			PrestoTables:      ptList,
+		}
+		renderedQuery, err := reporting.RenderQuery(queryCtx, reporting.TemplateContext{
+			Report: reporting.ReportTemplateInfo{
+				Inputs: dependencyResult.InputValues,
+			},
+		})
+		if err != nil {
+			return err
+		}
+
+		// create a ReportDataSource.Spec.ExistingPrestoTable
+		prestoTable, err := op.createPrestoTableCR(report, metering.ReportGVK, catalog, schema, tableName, cols, false, false, true, renderedQuery)
+		if err != nil {
+			return fmt.Errorf("failed to create a PrestoTable for the %s Report: %v", report.Name, err)
+		}
+
+		// logger.Infof("created the %s PrestoTable from the %s Report", prestoTable.Name, report.Name)
+
+		prestoTable, err = op.waitForPrestoTable("openshift-metering", prestoTable.Name, time.Second, 15*time.Second)
+		if err != nil {
+			return fmt.Errorf("failed to process the %s PrestoTable for the %s Report: %v", "test", "report_test", err)
+		}
+
+		tableName, err = reportingutil.FullyQualifiedTableName(prestoTable)
 		if err != nil {
 			return err
 		}
@@ -462,13 +509,13 @@ func (op *Reporting) runReport(logger log.FieldLogger, report *metering.Report) 
 		if err != nil {
 			if apierrors.IsAlreadyExists(err) {
 				logger.Infof("ReportDataSource %s already exists", dataSourceName)
-			} ***REMOVED*** {
+			} else {
 				return fmt.Errorf("error creating PrestoTable ReportDataSource %s: %s", dataSourceName, err)
 			}
 		}
 		logger.Infof("created PrestoTable ReportDataSource %s", dataSourceName)
 
-		report.Status.TableRef = v1.LocalObjectReference{Name: hiveTable.Name}
+		report.Status.TableRef = v1.LocalObjectReference{Name: prestoTable.Name}
 		report, err = op.meteringClient.MeteringV1().Reports(report.Namespace).Update(report)
 		if err != nil {
 			logger.WithError(err).Errorf("unable to update Report status with tableName")
@@ -482,13 +529,97 @@ func (op *Reporting) runReport(logger log.FieldLogger, report *metering.Report) 
 		if err := op.queueDependentReportsForReport(report); err != nil {
 			logger.WithError(err).Errorf("error queuing Report dependents of Report %s", report.Name)
 		}
+		// cols, err := reportingutil.PrestoColumnsToHiveColumns(reportingutil.GeneratePrestoColumns(reportQuery))
+		// if err != nil {
+		// 	return fmt.Errorf("unable to convert Presto columns to Hive columns: %s", err)
+		// }
+
+		// params := hive.TableParameters{
+		// 	Database: hiveStorage.Status.Hive.DatabaseName,
+		// 	Name:     tableName,
+		// 	Columns:  cols,
+		// }
+		// if hiveStorage.Spec.Hive.DefaultTableProperties != nil {
+		// 	params.RowFormat = hiveStorage.Spec.Hive.DefaultTableProperties.RowFormat
+		// 	params.FileFormat = hiveStorage.Spec.Hive.DefaultTableProperties.FileFormat
+		// }
+
+		// logger.Infof("creating Hive table %s in database %s", tableName, hiveStorage.Status.Hive.DatabaseName)
+		// hiveTable, err := op.createHiveTableCR(report, metering.ReportGVK, params, false, nil)
+		// if err != nil {
+		// 	return fmt.Errorf("error creating table for Report %s: %s", report.Name, err)
+		// }
+		// hiveTable, err = op.waitForHiveTable(hiveTable.Namespace, hiveTable.Name, time.Second, 20*time.Second)
+		// if err != nil {
+		// 	return fmt.Errorf("error creating table for Report %s: %s", report.Name, err)
+		// }
+		// prestoTable, err = op.waitForPrestoTable(hiveTable.Namespace, hiveTable.Name, time.Second, 20*time.Second)
+		// if err != nil {
+		// 	return fmt.Errorf("error creating table for Report %s: %s", report.Name, err)
+		// }
+
+		// logger.Infof("created Hive table %s in database %s", tableName, hiveStorage.Status.Hive.DatabaseName)
+
+		// tableName, err = reportingutil.FullyQualifiedTableName(prestoTable)
+		// if err != nil {
+		// 	return err
+		// }
+		// dataSourceName := fmt.Sprintf("report-%s", report.Name)
+
+		// logger.Infof("creating PrestoTable ReportDataSource %s pointing at report table %s", dataSourceName, tableName)
+		// ownerRef := metav1.NewControllerRef(prestoTable, metering.PrestoTableGVK)
+		// newReportDataSource := &metering.ReportDataSource{
+		// 	TypeMeta: metav1.TypeMeta{
+		// 		Kind:       "ReportDataSource",
+		// 		APIVersion: metering.ReportDataSourceGVK.GroupVersion().String(),
+		// 	},
+		// 	ObjectMeta: metav1.ObjectMeta{
+		// 		Name:      dataSourceName,
+		// 		Namespace: prestoTable.Namespace,
+		// 		Labels:    prestoTable.ObjectMeta.Labels,
+		// 		OwnerReferences: []metav1.OwnerReference{
+		// 			*ownerRef,
+		// 		},
+		// 	},
+		// 	Spec: metering.ReportDataSourceSpec{
+		// 		PrestoTable: &metering.PrestoTableDataSource{
+		// 			TableRef: v1.LocalObjectReference{
+		// 				Name: prestoTable.Name,
+		// 			},
+		// 		},
+		// 	},
+		// }
+		// _, err = op.meteringClient.MeteringV1().ReportDataSources(report.Namespace).Create(newReportDataSource)
+		// if err != nil {
+		// 	if apierrors.IsAlreadyExists(err) {
+		// 		logger.Infof("ReportDataSource %s already exists", dataSourceName)
+		// 	} else {
+		// 		return fmt.Errorf("error creating PrestoTable ReportDataSource %s: %s", dataSourceName, err)
+		// 	}
+		// }
+		// logger.Infof("created PrestoTable ReportDataSource %s", dataSourceName)
+
+		// report.Status.TableRef = v1.LocalObjectReference{Name: hiveTable.Name}
+		// report, err = op.meteringClient.MeteringV1().Reports(report.Namespace).Update(report)
+		// if err != nil {
+		// 	logger.WithError(err).Errorf("unable to update Report status with tableName")
+		// 	return err
+		// }
+
+		// // queue dependents so that they're aware the table now exists
+		// if err := op.queueDependentReportQueriesForReport(report); err != nil {
+		// 	logger.WithError(err).Errorf("error queuing ReportQuery dependents of Report %s", report.Name)
+		// }
+		// if err := op.queueDependentReportsForReport(report); err != nil {
+		// 	logger.WithError(err).Errorf("error queuing Report dependents of Report %s", report.Name)
+		// }
 	}
 
 	var runningMsg, runningReason string
 	if report.Spec.RunImmediately {
 		runningReason = meteringUtil.RunImmediatelyReason
 		runningMsg = fmt.Sprintf("Report %s scheduled: runImmediately=true bypassing reporting period [%s to %s].", report.Name, reportPeriod.periodStart, reportPeriod.periodEnd)
-	} ***REMOVED*** {
+	} else {
 		// Check if it's time to generate the report
 		if reportPeriod.periodEnd.After(now) {
 			waitTime := reportPeriod.periodEnd.Sub(now)
@@ -527,7 +658,7 @@ func (op *Reporting) runReport(logger log.FieldLogger, report *metering.Report) 
 				if dataSource.Status.PrometheusMetricsImportStatus == nil {
 					unstartedDataSourceDependencies = append(unmetDataStartDataSourceDependendencies, dataSource.Name)
 					queue = true
-				} ***REMOVED*** {
+				} else {
 					// reportPeriod lower bound not covered
 					if dataSource.Status.PrometheusMetricsImportStatus.ImportDataStartTime == nil || reportPeriod.periodStart.Before(dataSource.Status.PrometheusMetricsImportStatus.ImportDataStartTime.Time) {
 						queue = true
@@ -620,7 +751,7 @@ func (op *Reporting) runReport(logger log.FieldLogger, report *metering.Report) 
 		return err
 	}
 
-	requiredInputs := reportingutil.ConvertInputDe***REMOVED***nitionsIntoInputList(reportQuery.Spec.Inputs)
+	requiredInputs := reportingutil.ConvertInputDefinitionsIntoInputList(reportQuery.Spec.Inputs)
 	queryCtx := &reporting.ReportQueryTemplateContext{
 		Namespace:         report.Namespace,
 		Query:             reportQuery.Spec.Query,
@@ -644,7 +775,7 @@ func (op *Reporting) runReport(logger log.FieldLogger, report *metering.Report) 
 		return err
 	}
 
-	tableName, err := reportingutil.FullyQuali***REMOVED***edTableName(prestoTable)
+	tableName, err := reportingutil.FullyQualifiedTableName(prestoTable)
 	if err != nil {
 		return err
 	}
@@ -685,14 +816,14 @@ func (op *Reporting) runReport(logger log.FieldLogger, report *metering.Report) 
 	// Update the LastReportTime on the report status
 	report.Status.LastReportTime = &metav1.Time{Time: reportPeriod.periodEnd}
 
-	// check if we've reached the con***REMOVED***gured ReportingEnd, and if so, update
-	// the status to indicate the report has ***REMOVED***nished
+	// check if we've reached the configured ReportingEnd, and if so, update
+	// the status to indicate the report has finished
 	if report.Spec.ReportingEnd != nil && report.Status.LastReportTime.Time.Equal(report.Spec.ReportingEnd.Time) {
-		msg := fmt.Sprintf("Report has ***REMOVED***nished reporting. Report has reached the con***REMOVED***gured spec.reportingEnd: %s", report.Spec.ReportingEnd.Time)
+		msg := fmt.Sprintf("Report has finished reporting. Report has reached the configured spec.reportingEnd: %s", report.Spec.ReportingEnd.Time)
 		runningCond := meteringUtil.NewReportCondition(metering.ReportRunning, v1.ConditionFalse, meteringUtil.ReportFinishedReason, msg)
 		meteringUtil.SetReportCondition(&report.Status, *runningCond)
 		logger.Infof(msg)
-	} ***REMOVED*** if report.Spec.Schedule != nil {
+	} else if report.Spec.Schedule != nil {
 		// determine the next reportTime, if it's not a run-once report and then
 		// queue the report for that time
 		reportSchedule, err := getSchedule(report.Spec.Schedule)
@@ -778,10 +909,10 @@ func (op *Reporting) addReportFinalizer(report *metering.Report) (*metering.Repo
 	newReport, err := op.meteringClient.MeteringV1().Reports(report.Namespace).Update(report)
 	logger := op.logger.WithFields(log.Fields{"report": report.Name, "namespace": report.Namespace})
 	if err != nil {
-		logger.WithError(err).Errorf("error adding %s ***REMOVED***nalizer to Report: %s/%s", reportFinalizer, report.Namespace, report.Name)
+		logger.WithError(err).Errorf("error adding %s finalizer to Report: %s/%s", reportFinalizer, report.Namespace, report.Name)
 		return nil, err
 	}
-	logger.Infof("added %s ***REMOVED***nalizer to Report: %s/%s", reportFinalizer, report.Namespace, report.Name)
+	logger.Infof("added %s finalizer to Report: %s/%s", reportFinalizer, report.Namespace, report.Name)
 	return newReport, nil
 }
 
@@ -793,10 +924,10 @@ func (op *Reporting) removeReportFinalizer(report *metering.Report) (*metering.R
 	newReport, err := op.meteringClient.MeteringV1().Reports(report.Namespace).Update(report)
 	logger := op.logger.WithFields(log.Fields{"report": report.Name, "namespace": report.Namespace})
 	if err != nil {
-		logger.WithError(err).Errorf("error removing %s ***REMOVED***nalizer from Report: %s/%s", reportFinalizer, report.Namespace, report.Name)
+		logger.WithError(err).Errorf("error removing %s finalizer from Report: %s/%s", reportFinalizer, report.Namespace, report.Name)
 		return nil, err
 	}
-	logger.Infof("removed %s ***REMOVED***nalizer from Report: %s/%s", reportFinalizer, report.Namespace, report.Name)
+	logger.Infof("removed %s finalizer from Report: %s/%s", reportFinalizer, report.Namespace, report.Name)
 	return newReport, nil
 }
 
@@ -839,7 +970,7 @@ func (op *Reporting) queueDependentReportsForReport(report *metering.Report) err
 		return err
 	}
 
-	// for each report in the namespace, ***REMOVED***nd ones that depend on the report
+	// for each report in the namespace, find ones that depend on the report
 	// passed into the function.
 	for _, otherReport := range reports {
 		deps, err := op.getReportDependencies(otherReport)

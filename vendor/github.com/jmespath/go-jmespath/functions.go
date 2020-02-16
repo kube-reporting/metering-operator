@@ -54,13 +54,13 @@ func (a *byExprString) Swap(i, j int) {
 	a.items[i], a.items[j] = a.items[j], a.items[i]
 }
 func (a *byExprString) Less(i, j int) bool {
-	***REMOVED***rst, err := a.intr.Execute(a.node, a.items[i])
+	first, err := a.intr.Execute(a.node, a.items[i])
 	if err != nil {
 		a.hasError = true
 		// Return a dummy value.
 		return true
 	}
-	ith, ok := ***REMOVED***rst.(string)
+	ith, ok := first.(string)
 	if !ok {
 		a.hasError = true
 		return true
@@ -93,13 +93,13 @@ func (a *byExprFloat) Swap(i, j int) {
 	a.items[i], a.items[j] = a.items[j], a.items[i]
 }
 func (a *byExprFloat) Less(i, j int) bool {
-	***REMOVED***rst, err := a.intr.Execute(a.node, a.items[i])
+	first, err := a.intr.Execute(a.node, a.items[i])
 	if err != nil {
 		a.hasError = true
 		// Return a dummy value.
 		return true
 	}
-	ith, ok := ***REMOVED***rst.(float64)
+	ith, ok := first.(float64)
 	if !ok {
 		a.hasError = true
 		return true
@@ -410,10 +410,10 @@ func jpfLength(arguments []interface{}) (interface{}, error) {
 	arg := arguments[0]
 	if c, ok := arg.(string); ok {
 		return float64(utf8.RuneCountInString(c)), nil
-	} ***REMOVED*** if isSliceType(arg) {
+	} else if isSliceType(arg) {
 		v := reflect.ValueOf(arg)
 		return float64(v.Len()), nil
-	} ***REMOVED*** if c, ok := arg.(map[string]interface{}); ok {
+	} else if c, ok := arg.(map[string]interface{}); ok {
 		return float64(len(c)), nil
 	}
 	return nil, errors.New("could not compute length()")
@@ -421,8 +421,8 @@ func jpfLength(arguments []interface{}) (interface{}, error) {
 
 func jpfStartsWith(arguments []interface{}) (interface{}, error) {
 	search := arguments[0].(string)
-	pre***REMOVED***x := arguments[1].(string)
-	return strings.HasPre***REMOVED***x(search, pre***REMOVED***x), nil
+	prefix := arguments[1].(string)
+	return strings.HasPrefix(search, prefix), nil
 }
 
 func jpfAvg(arguments []interface{}) (interface{}, error) {
@@ -460,8 +460,8 @@ func jpfContains(arguments []interface{}) (interface{}, error) {
 }
 func jpfEndsWith(arguments []interface{}) (interface{}, error) {
 	search := arguments[0].(string)
-	suf***REMOVED***x := arguments[1].(string)
-	return strings.HasSuf***REMOVED***x(search, suf***REMOVED***x), nil
+	suffix := arguments[1].(string)
+	return strings.HasSuffix(search, suffix), nil
 }
 func jpfFloor(arguments []interface{}) (interface{}, error) {
 	val := arguments[0].(float64)
@@ -515,14 +515,14 @@ func jpfMax(arguments []interface{}) (interface{}, error) {
 	return best, nil
 }
 func jpfMerge(arguments []interface{}) (interface{}, error) {
-	***REMOVED***nal := make(map[string]interface{})
+	final := make(map[string]interface{})
 	for _, m := range arguments {
 		mapped := m.(map[string]interface{})
 		for key, value := range mapped {
-			***REMOVED***nal[key] = value
+			final[key] = value
 		}
 	}
-	return ***REMOVED***nal, nil
+	return final, nil
 }
 func jpfMaxBy(arguments []interface{}) (interface{}, error) {
 	intr := arguments[0].(*treeInterpreter)
@@ -531,7 +531,7 @@ func jpfMaxBy(arguments []interface{}) (interface{}, error) {
 	node := exp.ref
 	if len(arr) == 0 {
 		return nil, nil
-	} ***REMOVED*** if len(arr) == 1 {
+	} else if len(arr) == 1 {
 		return arr[0], nil
 	}
 	start, err := intr.Execute(node, arr[0])
@@ -627,7 +627,7 @@ func jpfMinBy(arguments []interface{}) (interface{}, error) {
 	node := exp.ref
 	if len(arr) == 0 {
 		return nil, nil
-	} ***REMOVED*** if len(arr) == 1 {
+	} else if len(arr) == 1 {
 		return arr[0], nil
 	}
 	start, err := intr.Execute(node, arr[0])
@@ -652,7 +652,7 @@ func jpfMinBy(arguments []interface{}) (interface{}, error) {
 			}
 		}
 		return bestItem, nil
-	} ***REMOVED*** if t, ok := start.(string); ok {
+	} else if t, ok := start.(string); ok {
 		bestVal := t
 		bestItem := arr[0]
 		for _, item := range arr[1:] {
@@ -670,7 +670,7 @@ func jpfMinBy(arguments []interface{}) (interface{}, error) {
 			}
 		}
 		return bestItem, nil
-	} ***REMOVED*** {
+	} else {
 		return nil, errors.New("invalid type, must be number of string")
 	}
 }
@@ -716,21 +716,21 @@ func jpfSort(arguments []interface{}) (interface{}, error) {
 	if items, ok := toArrayNum(arguments[0]); ok {
 		d := sort.Float64Slice(items)
 		sort.Stable(d)
-		***REMOVED***nal := make([]interface{}, len(d))
+		final := make([]interface{}, len(d))
 		for i, val := range d {
-			***REMOVED***nal[i] = val
+			final[i] = val
 		}
-		return ***REMOVED***nal, nil
+		return final, nil
 	}
 	// Otherwise we're dealing with sort()'ing strings.
 	items, _ := toArrayStr(arguments[0])
 	d := sort.StringSlice(items)
 	sort.Stable(d)
-	***REMOVED***nal := make([]interface{}, len(d))
+	final := make([]interface{}, len(d))
 	for i, val := range d {
-		***REMOVED***nal[i] = val
+		final[i] = val
 	}
-	return ***REMOVED***nal, nil
+	return final, nil
 }
 func jpfSortBy(arguments []interface{}) (interface{}, error) {
 	intr := arguments[0].(*treeInterpreter)
@@ -739,7 +739,7 @@ func jpfSortBy(arguments []interface{}) (interface{}, error) {
 	node := exp.ref
 	if len(arr) == 0 {
 		return arr, nil
-	} ***REMOVED*** if len(arr) == 1 {
+	} else if len(arr) == 1 {
 		return arr, nil
 	}
 	start, err := intr.Execute(node, arr[0])
@@ -753,14 +753,14 @@ func jpfSortBy(arguments []interface{}) (interface{}, error) {
 			return nil, errors.New("error in sort_by comparison")
 		}
 		return arr, nil
-	} ***REMOVED*** if _, ok := start.(string); ok {
+	} else if _, ok := start.(string); ok {
 		sortable := &byExprString{intr, node, arr, false}
 		sort.Stable(sortable)
 		if sortable.hasError {
 			return nil, errors.New("error in sort_by comparison")
 		}
 		return arr, nil
-	} ***REMOVED*** {
+	} else {
 		return nil, errors.New("invalid type, must be number of string")
 	}
 }

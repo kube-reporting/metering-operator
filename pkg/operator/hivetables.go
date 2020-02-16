@@ -106,7 +106,7 @@ func (op *Reporting) handleHiveTable(logger log.FieldLogger, hiveTable *metering
 
 	if hiveTable.Status.TableName != "" {
 		logger.Infof("HiveTable %s already created", hiveTable.Name)
-	} ***REMOVED*** {
+	} else {
 		logger.Infof("creating table %s in Hive", hiveTable.Spec.TableName)
 
 		var newSortedBy []hive.SortColumn
@@ -187,7 +187,7 @@ func (op *Reporting) handleHiveTable(logger log.FieldLogger, hiveTable *metering
 		if err != nil {
 			if apierrors.IsAlreadyExists(err) && prestoTable.Status.TableName != "" {
 				logger.Infof("PrestoTable %s already exists", prestoTable.Name)
-			} ***REMOVED*** {
+			} else {
 				return fmt.Errorf("couldn't create PrestoTable resource %s: %v", hiveTable.Name, err)
 			}
 		}
@@ -228,7 +228,7 @@ func (op *Reporting) handleHiveTable(logger log.FieldLogger, hiveTable *metering
 		logger.Debugf("partitions to update: [%s]", strings.Join(toUpdatePartitionsList, ", "))
 
 		// We append toUpdatePartitions to both slices because we process an
-		// update by removing it ***REMOVED***rst, then adding it back with the new
+		// update by removing it first, then adding it back with the new
 		// values.
 		toRemove := append(changes.toRemovePartitions, changes.toUpdatePartitions...)
 		toAdd := append(changes.toAddPartitions, changes.toUpdatePartitions...)
@@ -279,10 +279,10 @@ func (op *Reporting) addHiveTableFinalizer(hiveTable *metering.HiveTable) (*mete
 	newHiveTable, err := op.meteringClient.MeteringV1().HiveTables(hiveTable.Namespace).Update(hiveTable)
 	logger := op.logger.WithFields(log.Fields{"hiveTable": hiveTable.Name, "namespace": hiveTable.Namespace})
 	if err != nil {
-		logger.WithError(err).Errorf("error adding %s ***REMOVED***nalizer to HiveTable: %s/%s", hiveTableFinalizer, hiveTable.Namespace, hiveTable.Name)
+		logger.WithError(err).Errorf("error adding %s finalizer to HiveTable: %s/%s", hiveTableFinalizer, hiveTable.Namespace, hiveTable.Name)
 		return nil, err
 	}
-	logger.Infof("added %s ***REMOVED***nalizer to HiveTable: %s/%s", hiveTableFinalizer, hiveTable.Namespace, hiveTable.Name)
+	logger.Infof("added %s finalizer to HiveTable: %s/%s", hiveTableFinalizer, hiveTable.Namespace, hiveTable.Name)
 	return newHiveTable, nil
 }
 
@@ -294,10 +294,10 @@ func (op *Reporting) removeHiveTableFinalizer(hiveTable *metering.HiveTable) (*m
 	logger := op.logger.WithFields(log.Fields{"hiveTable": hiveTable.Name, "namespace": hiveTable.Namespace})
 	newHiveTable, err := op.meteringClient.MeteringV1().HiveTables(hiveTable.Namespace).Update(hiveTable)
 	if err != nil {
-		logger.WithError(err).Errorf("error removing %s ***REMOVED***nalizer from HiveTable: %s/%s", hiveTableFinalizer, hiveTable.Namespace, hiveTable.Name)
+		logger.WithError(err).Errorf("error removing %s finalizer from HiveTable: %s/%s", hiveTableFinalizer, hiveTable.Namespace, hiveTable.Name)
 		return nil, err
 	}
-	logger.Infof("removed %s ***REMOVED***nalizer from HiveTable: %s/%s", hiveTableFinalizer, hiveTable.Namespace, hiveTable.Name)
+	logger.Infof("removed %s finalizer from HiveTable: %s/%s", hiveTableFinalizer, hiveTable.Namespace, hiveTable.Name)
 	return newHiveTable, nil
 }
 
@@ -313,9 +313,9 @@ func (op *Reporting) createHiveTableCR(obj metav1.Object, gvk schema.GroupVersio
 	objLabels := obj.GetLabels()
 	ownerRef := metav1.NewControllerRef(obj, gvk)
 
-	var ***REMOVED***nalizers []string
+	var finalizers []string
 	if op.cfg.EnableFinalizers {
-		***REMOVED***nalizers = []string{hiveTableFinalizer}
+		finalizers = []string{hiveTableFinalizer}
 	}
 
 	var newPartitions []metering.HiveTablePartition
@@ -343,7 +343,7 @@ func (op *Reporting) createHiveTableCR(obj metav1.Object, gvk schema.GroupVersio
 			OwnerReferences: []metav1.OwnerReference{
 				*ownerRef,
 			},
-			Finalizers: ***REMOVED***nalizers,
+			Finalizers: finalizers,
 		},
 		Spec: metering.HiveTableSpec{
 			DatabaseName:     params.Database,

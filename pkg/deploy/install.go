@@ -10,22 +10,22 @@ import (
 )
 
 func (deploy *Deployer) installNamespace() error {
-	namespace, err := deploy.client.CoreV1().Namespaces().Get(deploy.con***REMOVED***g.Namespace, metav1.GetOptions{})
+	namespace, err := deploy.client.CoreV1().Namespaces().Get(deploy.config.Namespace, metav1.GetOptions{})
 	if apierrors.IsNotFound(err) {
 		namespaceObjectMeta := metav1.ObjectMeta{
-			Name: deploy.con***REMOVED***g.Namespace,
+			Name: deploy.config.Namespace,
 		}
 
 		labels := make(map[string]string)
 
-		for key, val := range deploy.con***REMOVED***g.ExtraNamespaceLabels {
+		for key, val := range deploy.config.ExtraNamespaceLabels {
 			labels[key] = val
-			deploy.logger.Infof("Labeling the %s namespace with '%s=%s'", deploy.con***REMOVED***g.Namespace, key, val)
+			deploy.logger.Infof("Labeling the %s namespace with '%s=%s'", deploy.config.Namespace, key, val)
 		}
 
-		if deploy.con***REMOVED***g.Platform == "openshift" {
+		if deploy.config.Platform == "openshift" {
 			labels["openshift.io/cluster-monitoring"] = "true"
-			deploy.logger.Infof("Labeling the %s namespace with 'openshift.io/cluster-monitoring=true'", deploy.con***REMOVED***g.Namespace)
+			deploy.logger.Infof("Labeling the %s namespace with 'openshift.io/cluster-monitoring=true'", deploy.config.Namespace)
 		}
 
 		namespaceObjectMeta.Labels = labels
@@ -37,51 +37,51 @@ func (deploy *Deployer) installNamespace() error {
 		if err != nil {
 			return err
 		}
-		deploy.logger.Infof("Created the %s namespace", deploy.con***REMOVED***g.Namespace)
-	} ***REMOVED*** if err == nil {
+		deploy.logger.Infof("Created the %s namespace", deploy.config.Namespace)
+	} else if err == nil {
 		// check if we need to add/update the cluster-monitoring label for Openshift installs.
-		if deploy.con***REMOVED***g.Platform == "openshift" {
+		if deploy.config.Platform == "openshift" {
 			if namespace.ObjectMeta.Labels != nil {
 				namespace.ObjectMeta.Labels["openshift.io/cluster-monitoring"] = "true"
-				deploy.logger.Infof("Updated the 'openshift.io/cluster-monitoring' label to the %s namespace", deploy.con***REMOVED***g.Namespace)
-			} ***REMOVED*** {
+				deploy.logger.Infof("Updated the 'openshift.io/cluster-monitoring' label to the %s namespace", deploy.config.Namespace)
+			} else {
 				namespace.ObjectMeta.Labels = map[string]string{
 					"openshift.io/cluster-monitoring": "true",
 				}
-				deploy.logger.Infof("Added the 'openshift.io/cluster-monitoring' label to the %s namespace", deploy.con***REMOVED***g.Namespace)
+				deploy.logger.Infof("Added the 'openshift.io/cluster-monitoring' label to the %s namespace", deploy.config.Namespace)
 			}
 
 			_, err := deploy.client.CoreV1().Namespaces().Update(namespace)
 			if err != nil {
-				return fmt.Errorf("failed to add the 'openshift.io/cluster-monitoring' label to the %s namespace: %v", deploy.con***REMOVED***g.Namespace, err)
+				return fmt.Errorf("failed to add the 'openshift.io/cluster-monitoring' label to the %s namespace: %v", deploy.config.Namespace, err)
 			}
-		} ***REMOVED*** {
-			deploy.logger.Infof("The %s namespace already exists", deploy.con***REMOVED***g.Namespace)
+		} else {
+			deploy.logger.Infof("The %s namespace already exists", deploy.config.Namespace)
 		}
-	} ***REMOVED*** {
+	} else {
 		return err
 	}
 
 	return nil
 }
 
-func (deploy *Deployer) installMeteringCon***REMOVED***g() error {
-	mc, err := deploy.meteringClient.MeteringCon***REMOVED***gs(deploy.con***REMOVED***g.Namespace).Get(deploy.con***REMOVED***g.MeteringCon***REMOVED***g.Name, metav1.GetOptions{})
+func (deploy *Deployer) installMeteringConfig() error {
+	mc, err := deploy.meteringClient.MeteringConfigs(deploy.config.Namespace).Get(deploy.config.MeteringConfig.Name, metav1.GetOptions{})
 	if apierrors.IsNotFound(err) {
-		_, err = deploy.meteringClient.MeteringCon***REMOVED***gs(deploy.con***REMOVED***g.Namespace).Create(deploy.con***REMOVED***g.MeteringCon***REMOVED***g)
+		_, err = deploy.meteringClient.MeteringConfigs(deploy.config.Namespace).Create(deploy.config.MeteringConfig)
 		if err != nil {
 			return err
 		}
-		deploy.logger.Infof("Created the MeteringCon***REMOVED***g resource")
-	} ***REMOVED*** if err == nil {
-		mc.Spec = deploy.con***REMOVED***g.MeteringCon***REMOVED***g.Spec
+		deploy.logger.Infof("Created the MeteringConfig resource")
+	} else if err == nil {
+		mc.Spec = deploy.config.MeteringConfig.Spec
 
-		_, err = deploy.meteringClient.MeteringCon***REMOVED***gs(deploy.con***REMOVED***g.Namespace).Update(mc)
+		_, err = deploy.meteringClient.MeteringConfigs(deploy.config.Namespace).Update(mc)
 		if err != nil {
-			return fmt.Errorf("failed to update the MeteringCon***REMOVED***g: %v", err)
+			return fmt.Errorf("failed to update the MeteringConfig: %v", err)
 		}
-		deploy.logger.Infof("The MeteringCon***REMOVED***g resource has been updated")
-	} ***REMOVED*** {
+		deploy.logger.Infof("The MeteringConfig resource has been updated")
+	} else {
 		return err
 	}
 
@@ -89,7 +89,7 @@ func (deploy *Deployer) installMeteringCon***REMOVED***g() error {
 }
 
 func (deploy *Deployer) installMeteringResources() error {
-	if !deploy.con***REMOVED***g.RunMeteringOperatorLocal {
+	if !deploy.config.RunMeteringOperatorLocal {
 		err := deploy.installMeteringDeployment()
 		if err != nil {
 			return fmt.Errorf("failed to create the metering deployment: %v", err)
@@ -125,12 +125,12 @@ func (deploy *Deployer) installMeteringResources() error {
 }
 
 func (deploy *Deployer) installMeteringDeployment() error {
-	res := deploy.con***REMOVED***g.OperatorResources.Deployment
+	res := deploy.config.OperatorResources.Deployment
 
 	// check if the metering operator image needs to be updated
 	// TODO: implement support for METERING_OPERATOR_ALL_NAMESPACES and METERING_OPERATOR_TARGET_NAMESPACES
-	if deploy.con***REMOVED***g.Repo != "" && deploy.con***REMOVED***g.Tag != "" {
-		newImage := deploy.con***REMOVED***g.Repo + ":" + deploy.con***REMOVED***g.Tag
+	if deploy.config.Repo != "" && deploy.config.Tag != "" {
+		newImage := deploy.config.Repo + ":" + deploy.config.Tag
 
 		for index := range res.Spec.Template.Spec.Containers {
 			res.Spec.Template.Spec.Containers[index].Image = newImage
@@ -139,22 +139,22 @@ func (deploy *Deployer) installMeteringDeployment() error {
 		deploy.logger.Infof("Overriding the default image with %s", newImage)
 	}
 
-	deployment, err := deploy.client.AppsV1().Deployments(deploy.con***REMOVED***g.Namespace).Get(res.Name, metav1.GetOptions{})
+	deployment, err := deploy.client.AppsV1().Deployments(deploy.config.Namespace).Get(res.Name, metav1.GetOptions{})
 	if apierrors.IsNotFound(err) {
-		_, err := deploy.client.AppsV1().Deployments(deploy.con***REMOVED***g.Namespace).Create(res)
+		_, err := deploy.client.AppsV1().Deployments(deploy.config.Namespace).Create(res)
 		if err != nil {
 			return err
 		}
 		deploy.logger.Infof("Created the metering deployment")
-	} ***REMOVED*** if err == nil {
+	} else if err == nil {
 		deployment.Spec = res.Spec
 
-		_, err = deploy.client.AppsV1().Deployments(deploy.con***REMOVED***g.Namespace).Update(deployment)
+		_, err = deploy.client.AppsV1().Deployments(deploy.config.Namespace).Update(deployment)
 		if err != nil {
 			return fmt.Errorf("failed to update the metering deployment: %v", err)
 		}
 		deploy.logger.Infof("The metering deployment resource has been updated")
-	} ***REMOVED*** {
+	} else {
 		return err
 	}
 
@@ -162,16 +162,16 @@ func (deploy *Deployer) installMeteringDeployment() error {
 }
 
 func (deploy *Deployer) installMeteringServiceAccount() error {
-	_, err := deploy.client.CoreV1().ServiceAccounts(deploy.con***REMOVED***g.Namespace).Get(deploy.con***REMOVED***g.OperatorResources.ServiceAccount.Name, metav1.GetOptions{})
+	_, err := deploy.client.CoreV1().ServiceAccounts(deploy.config.Namespace).Get(deploy.config.OperatorResources.ServiceAccount.Name, metav1.GetOptions{})
 	if apierrors.IsNotFound(err) {
-		_, err := deploy.client.CoreV1().ServiceAccounts(deploy.con***REMOVED***g.Namespace).Create(deploy.con***REMOVED***g.OperatorResources.ServiceAccount)
+		_, err := deploy.client.CoreV1().ServiceAccounts(deploy.config.Namespace).Create(deploy.config.OperatorResources.ServiceAccount)
 		if err != nil {
 			return err
 		}
 		deploy.logger.Infof("Created the metering serviceaccount")
-	} ***REMOVED*** if err == nil {
+	} else if err == nil {
 		deploy.logger.Infof("The metering service account already exists")
-	} ***REMOVED*** {
+	} else {
 		return err
 	}
 
@@ -179,27 +179,27 @@ func (deploy *Deployer) installMeteringServiceAccount() error {
 }
 
 func (deploy *Deployer) installMeteringRoleBinding() error {
-	res := deploy.con***REMOVED***g.OperatorResources.RoleBinding
+	res := deploy.config.OperatorResources.RoleBinding
 
 	// TODO: implement support for METERING_OPERATOR_TARGET_NAMESPACES
-	res.Name = deploy.con***REMOVED***g.Namespace + "-" + res.Name
+	res.Name = deploy.config.Namespace + "-" + res.Name
 	res.RoleRef.Name = res.Name
-	res.Namespace = deploy.con***REMOVED***g.Namespace
+	res.Namespace = deploy.config.Namespace
 
 	for index := range res.Subjects {
-		res.Subjects[index].Namespace = deploy.con***REMOVED***g.Namespace
+		res.Subjects[index].Namespace = deploy.config.Namespace
 	}
 
-	_, err := deploy.client.RbacV1().RoleBindings(deploy.con***REMOVED***g.Namespace).Get(res.Name, metav1.GetOptions{})
+	_, err := deploy.client.RbacV1().RoleBindings(deploy.config.Namespace).Get(res.Name, metav1.GetOptions{})
 	if apierrors.IsNotFound(err) {
-		_, err := deploy.client.RbacV1().RoleBindings(deploy.con***REMOVED***g.Namespace).Create(res)
+		_, err := deploy.client.RbacV1().RoleBindings(deploy.config.Namespace).Create(res)
 		if err != nil {
 			return err
 		}
 		deploy.logger.Infof("Created the metering role binding")
-	} ***REMOVED*** if err == nil {
+	} else if err == nil {
 		deploy.logger.Infof("The metering role binding already exists")
-	} ***REMOVED*** {
+	} else {
 		return err
 	}
 
@@ -207,21 +207,21 @@ func (deploy *Deployer) installMeteringRoleBinding() error {
 }
 
 func (deploy *Deployer) installMeteringRole() error {
-	res := deploy.con***REMOVED***g.OperatorResources.Role
+	res := deploy.config.OperatorResources.Role
 
-	res.Name = deploy.con***REMOVED***g.Namespace + "-" + res.Name
-	res.Namespace = deploy.con***REMOVED***g.Namespace
+	res.Name = deploy.config.Namespace + "-" + res.Name
+	res.Namespace = deploy.config.Namespace
 
-	_, err := deploy.client.RbacV1().Roles(deploy.con***REMOVED***g.Namespace).Get(res.Name, metav1.GetOptions{})
+	_, err := deploy.client.RbacV1().Roles(deploy.config.Namespace).Get(res.Name, metav1.GetOptions{})
 	if apierrors.IsNotFound(err) {
-		_, err := deploy.client.RbacV1().Roles(deploy.con***REMOVED***g.Namespace).Create(res)
+		_, err := deploy.client.RbacV1().Roles(deploy.config.Namespace).Create(res)
 		if err != nil {
 			return err
 		}
 		deploy.logger.Infof("Created the metering role")
-	} ***REMOVED*** if err == nil {
+	} else if err == nil {
 		deploy.logger.Infof("The metering role already exists")
-	} ***REMOVED*** {
+	} else {
 		return err
 	}
 
@@ -229,13 +229,13 @@ func (deploy *Deployer) installMeteringRole() error {
 }
 
 func (deploy *Deployer) installMeteringClusterRoleBinding() error {
-	res := deploy.con***REMOVED***g.OperatorResources.ClusterRoleBinding
+	res := deploy.config.OperatorResources.ClusterRoleBinding
 
-	res.Name = deploy.con***REMOVED***g.Namespace + "-" + res.Name
+	res.Name = deploy.config.Namespace + "-" + res.Name
 	res.RoleRef.Name = res.Name
 
 	for index := range res.Subjects {
-		res.Subjects[index].Namespace = deploy.con***REMOVED***g.Namespace
+		res.Subjects[index].Namespace = deploy.config.Namespace
 	}
 
 	_, err := deploy.client.RbacV1().ClusterRoleBindings().Get(res.Name, metav1.GetOptions{})
@@ -245,9 +245,9 @@ func (deploy *Deployer) installMeteringClusterRoleBinding() error {
 			return err
 		}
 		deploy.logger.Infof("Created the metering cluster role binding")
-	} ***REMOVED*** if err == nil {
+	} else if err == nil {
 		deploy.logger.Infof("The metering cluster role binding already exists")
-	} ***REMOVED*** {
+	} else {
 		return err
 	}
 
@@ -255,9 +255,9 @@ func (deploy *Deployer) installMeteringClusterRoleBinding() error {
 }
 
 func (deploy *Deployer) installMeteringClusterRole() error {
-	res := deploy.con***REMOVED***g.OperatorResources.ClusterRole
+	res := deploy.config.OperatorResources.ClusterRole
 
-	res.Name = deploy.con***REMOVED***g.Namespace + "-" + res.Name
+	res.Name = deploy.config.Namespace + "-" + res.Name
 
 	_, err := deploy.client.RbacV1().ClusterRoles().Get(res.Name, metav1.GetOptions{})
 	if apierrors.IsNotFound(err) {
@@ -266,9 +266,9 @@ func (deploy *Deployer) installMeteringClusterRole() error {
 			return err
 		}
 		deploy.logger.Infof("Created the metering cluster role")
-	} ***REMOVED*** if err == nil {
+	} else if err == nil {
 		deploy.logger.Infof("The metering cluster role already exists")
-	} ***REMOVED*** {
+	} else {
 		return err
 	}
 
@@ -276,7 +276,7 @@ func (deploy *Deployer) installMeteringClusterRole() error {
 }
 
 func (deploy *Deployer) installMeteringCRDs() error {
-	for _, crd := range deploy.con***REMOVED***g.OperatorResources.CRDs {
+	for _, crd := range deploy.config.OperatorResources.CRDs {
 		err := deploy.installMeteringCRD(crd)
 		if err != nil {
 			return fmt.Errorf("failed to create a CRD while looping: %v", err)
@@ -287,22 +287,22 @@ func (deploy *Deployer) installMeteringCRDs() error {
 }
 
 func (deploy *Deployer) installMeteringCRD(resource CRD) error {
-	crd, err := deploy.apiExtClient.CustomResourceDe***REMOVED***nitions().Get(resource.Name, metav1.GetOptions{})
+	crd, err := deploy.apiExtClient.CustomResourceDefinitions().Get(resource.Name, metav1.GetOptions{})
 	if apierrors.IsNotFound(err) {
-		_, err := deploy.apiExtClient.CustomResourceDe***REMOVED***nitions().Create(resource.CRD)
+		_, err := deploy.apiExtClient.CustomResourceDefinitions().Create(resource.CRD)
 		if err != nil {
 			return err
 		}
 		deploy.logger.Infof("Created the %s CRD", resource.Name)
-	} ***REMOVED*** if err == nil {
+	} else if err == nil {
 		crd.Spec = resource.CRD.Spec
 
-		_, err := deploy.apiExtClient.CustomResourceDe***REMOVED***nitions().Update(crd)
+		_, err := deploy.apiExtClient.CustomResourceDefinitions().Update(crd)
 		if err != nil {
 			return fmt.Errorf("failed to update the %s CRD: %v", resource.CRD.Name, err)
 		}
 		deploy.logger.Infof("Updated the %s CRD", resource.CRD.Name)
-	} ***REMOVED*** {
+	} else {
 		return err
 	}
 

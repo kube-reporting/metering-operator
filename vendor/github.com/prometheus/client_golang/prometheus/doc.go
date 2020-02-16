@@ -1,6 +1,6 @@
 // Copyright 2014 The Prometheus Authors
 // Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this ***REMOVED***le except in compliance with the License.
+// you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 //
 // http://www.apache.org/licenses/LICENSE-2.0
@@ -8,7 +8,7 @@
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the speci***REMOVED***c language governing permissions and
+// See the License for the specific language governing permissions and
 // limitations under the License.
 
 // Package prometheus provides metrics primitives to instrument code for
@@ -17,7 +17,7 @@
 // Pushgateway (package push).
 //
 // All exported functions and methods are safe to be used concurrently unless
-// speci***REMOVED***ed otherwise.
+// specified otherwise.
 //
 // A Basic Example
 //
@@ -69,7 +69,7 @@
 //
 // Metrics
 //
-// The number of exported identi***REMOVED***ers in this package might appear a bit
+// The number of exported identifiers in this package might appear a bit
 // overwhelming. However, in addition to the basic plumbing shown in the example
 // above, you only need to understand the different metric types and their
 // vector versions for basic usage.
@@ -79,7 +79,7 @@
 // of those four metric types can be found in the Prometheus docs:
 // https://prometheus.io/docs/concepts/metric_types/
 //
-// A ***REMOVED***fth "type" of metric is Untyped. It behaves like a Gauge, but signals the
+// A fifth "type" of metric is Untyped. It behaves like a Gauge, but signals the
 // Prometheus server not to assume anything about its type.
 //
 // In addition to the fundamental metric types Gauge, Counter, Summary,
@@ -102,7 +102,7 @@
 // Custom Collectors and constant Metrics
 //
 // While you could create your own implementations of Metric, most likely you
-// will only ever implement the Collector interface on your own. At a ***REMOVED***rst
+// will only ever implement the Collector interface on your own. At a first
 // glance, a custom Collector seems handy to bundle Metrics for common
 // registration (with the prime example of the different metric vectors above,
 // which bundle all the metrics of the same name but with different labels).
@@ -140,7 +140,7 @@
 // Inconsistencies are ideally detected at registration time, not at collect
 // time. The former will usually be detected at start-up time of a program,
 // while the latter will only happen at scrape time, possibly not even on the
-// ***REMOVED***rst scrape if the inconsistency only becomes relevant later. That is the
+// first scrape if the inconsistency only becomes relevant later. That is the
 // main reason why a Collector and a Metric have to describe themselves to the
 // registry.
 //

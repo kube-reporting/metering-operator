@@ -8,13 +8,13 @@ customizeMeteringOperatorDeployment() {
     if [[ -n "${METERING_OPERATOR_IMAGE_REPO:-}" && -n "${METERING_OPERATOR_IMAGE_TAG:-}" ]]; then
         echo "using \$METERING_OPERATOR_IMAGE_REPO=$METERING_OPERATOR_IMAGE_REPO to override metering-operator image"
         echo "using \$METERING_OPERATOR_IMAGE_TAG=$METERING_OPERATOR_IMAGE_TAG to override metering-operator image tag"
-    ***REMOVED***
+    fi
     if [[ -n "${METERING_OPERATOR_ALL_NAMESPACES:-}" ]]; then
         echo "using \$METERING_OPERATOR_ALL_NAMESPACES=$METERING_OPERATOR_ALL_NAMESPACES"
-    ***REMOVED***
+    fi
     if [[ -n "${METERING_OPERATOR_TARGET_NAMESPACES:-}" ]]; then
         echo "using \$METERING_OPERATOR_TARGET_NAMESPACES=$METERING_OPERATOR_TARGET_NAMESPACES"
-    ***REMOVED***
+    fi
 
     export METERING_NAMESPACE METERING_OPERATOR_IMAGE_REPO METERING_OPERATOR_IMAGE_TAG METERING_OPERATOR_ALL_NAMESPACES METERING_OPERATOR_TARGET_NAMESPACES
     "$FAQ_BIN" -f yaml -o yaml -M -c -r \
@@ -69,11 +69,11 @@ customizeMeteringInstallManifests() {
 
     if [ -n "${METERING_OPERATOR_TARGET_NAMESPACES:-}" ]; then
         echo "using \$METERING_OPERATOR_TARGET_NAMESPACES=$METERING_OPERATOR_TARGET_NAMESPACES as target namespaces for metering-operator"
-    ***REMOVED***
+    fi
     customizeMeteringOperatorRolebinding "$OUTPUT_DIR"
 
     if [[ "${METERING_INSTALL_CLUSTERROLEBINDING}" == "true" || "${METERING_UNINSTALL_CLUSTERROLEBINDING}" == "true" ]]; then
         echo "Updating Metering ClusterRole and ClusterRoleBinding"
-    ***REMOVED***
+    fi
     customizeMeteringOperatorClusterRolebinding "$OUTPUT_DIR"
 }

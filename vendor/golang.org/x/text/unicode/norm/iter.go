@@ -1,6 +1,6 @@
 // Copyright 2011 The Go Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE ***REMOVED***le.
+// license that can be found in the LICENSE file.
 
 package norm
 
@@ -18,7 +18,7 @@ const MaxSegmentSize = maxByteBufferSize
 type Iter struct {
 	rb     reorderBuffer
 	buf    [maxByteBufferSize]byte
-	info   Properties // ***REMOVED***rst character saved from previous iteration
+	info   Properties // first character saved from previous iteration
 	next   iterFunc   // implementation of next depends on form
 	asciiF iterFunc
 
@@ -41,7 +41,7 @@ func (i *Iter) Init(f Form, src []byte) {
 	i.next = i.rb.f.nextMain
 	i.asciiF = nextASCIIBytes
 	i.info = i.rb.f.info(i.rb.src, i.p)
-	i.rb.ss.***REMOVED***rst(i.info)
+	i.rb.ss.first(i.info)
 }
 
 // InitString initializes i to iterate over src after normalizing it to Form f.
@@ -57,7 +57,7 @@ func (i *Iter) InitString(f Form, src string) {
 	i.next = i.rb.f.nextMain
 	i.asciiF = nextASCIIString
 	i.info = i.rb.f.info(i.rb.src, i.p)
-	i.rb.ss.***REMOVED***rst(i.info)
+	i.rb.ss.first(i.info)
 }
 
 // Seek sets the segment to be returned by the next call to Next to start
@@ -86,7 +86,7 @@ func (i *Iter) Seek(offset int64, whence int) (int64, error) {
 	i.multiSeg = nil
 	i.next = i.rb.f.nextMain
 	i.info = i.rb.f.info(i.rb.src, i.p)
-	i.rb.ss.***REMOVED***rst(i.info)
+	i.rb.ss.first(i.info)
 	return abs, nil
 }
 
@@ -163,7 +163,7 @@ func nextHangul(i *Iter) []byte {
 	next := p + hangulUTF8Size
 	if next >= i.rb.nsrc {
 		i.setDone()
-	} ***REMOVED*** if i.rb.src.hangul(next) == 0 {
+	} else if i.rb.src.hangul(next) == 0 {
 		i.rb.ss.next(i.info)
 		i.info = i.rb.f.info(i.rb.src, i.p)
 		i.next = i.rb.f.nextMain
@@ -182,7 +182,7 @@ func nextDone(i *Iter) []byte {
 func nextMulti(i *Iter) []byte {
 	j := 0
 	d := i.multiSeg
-	// skip ***REMOVED***rst rune
+	// skip first rune
 	for j = 1; j < len(d) && !utf8.RuneStart(d[j]); j++ {
 	}
 	for j < len(d) {
@@ -232,15 +232,15 @@ func nextDecomposed(i *Iter) (next []byte) {
 			if i.p >= i.rb.nsrc {
 				i.setDone()
 				return i.returnSlice(p, i.p)
-			} ***REMOVED*** if i.rb.src._byte(i.p) < utf8.RuneSelf {
+			} else if i.rb.src._byte(i.p) < utf8.RuneSelf {
 				i.next = i.asciiF
 				return i.returnSlice(p, i.p)
 			}
 			outp++
-		} ***REMOVED*** if d := i.info.Decomposition(); d != nil {
+		} else if d := i.info.Decomposition(); d != nil {
 			// Note: If leading CCC != 0, then len(d) == 2 and last is also non-zero.
 			// Case 1: there is a leftover to copy.  In this case the decomposition
-			// must begin with a modi***REMOVED***er and should always be appended.
+			// must begin with a modifier and should always be appended.
 			// Case 2: no leftover. Simply return d if followed by a ccc == 0 value.
 			p := outp + len(d)
 			if outp > 0 {
@@ -250,7 +250,7 @@ func nextDecomposed(i *Iter) (next []byte) {
 				if p > len(i.buf) {
 					return i.buf[:outp]
 				}
-			} ***REMOVED*** if i.info.multiSegment() {
+			} else if i.info.multiSegment() {
 				// outp must be 0 as multi-segment decompositions always
 				// start a new segment.
 				if i.multiSeg == nil {
@@ -267,7 +267,7 @@ func nextDecomposed(i *Iter) (next []byte) {
 			if i.p += sz; i.p >= i.rb.nsrc {
 				i.setDone()
 				i.info = Properties{} // Force BoundaryBefore to succeed.
-			} ***REMOVED*** {
+			} else {
 				i.info = i.rb.f.info(i.rb.src, i.p)
 			}
 			switch i.rb.ss.next(i.info) {
@@ -288,18 +288,18 @@ func nextDecomposed(i *Iter) (next []byte) {
 				goto doNorm
 			}
 			continue
-		} ***REMOVED*** if r := i.rb.src.hangul(i.p); r != 0 {
+		} else if r := i.rb.src.hangul(i.p); r != 0 {
 			outp = decomposeHangul(i.buf[:], r)
 			i.p += hangulUTF8Size
 			inCopyStart, outCopyStart = i.p, outp
 			if i.p >= i.rb.nsrc {
 				i.setDone()
 				break
-			} ***REMOVED*** if i.rb.src.hangul(i.p) != 0 {
+			} else if i.rb.src.hangul(i.p) != 0 {
 				i.next = nextHangul
 				return i.buf[:outp]
 			}
-		} ***REMOVED*** {
+		} else {
 			p := outp + sz
 			if p > len(i.buf) {
 				break
@@ -315,7 +315,7 @@ func nextDecomposed(i *Iter) (next []byte) {
 		i.info = i.rb.f.info(i.rb.src, i.p)
 		if v := i.rb.ss.next(i.info); v == ssStarter {
 			break
-		} ***REMOVED*** if v == ssOverflow {
+		} else if v == ssOverflow {
 			i.next = nextCGJDecompose
 			break
 		}
@@ -325,7 +325,7 @@ func nextDecomposed(i *Iter) (next []byte) {
 	}
 	if outCopyStart == 0 {
 		return i.returnSlice(inCopyStart, i.p)
-	} ***REMOVED*** if inCopyStart < i.p {
+	} else if inCopyStart < i.p {
 		i.rb.src.copySlice(i.buf[outCopyStart:], inCopyStart, i.p)
 	}
 	return i.buf[:outp]
@@ -361,7 +361,7 @@ func nextCGJDecompose(i *Iter) []byte {
 	i.rb.ss = 0
 	i.rb.insertCGJ()
 	i.next = nextDecomposed
-	i.rb.ss.***REMOVED***rst(i.info)
+	i.rb.ss.first(i.info)
 	buf := doNormDecomposed(i)
 	return buf
 }
@@ -388,7 +388,7 @@ func nextComposed(i *Iter) []byte {
 		if i.p >= i.rb.nsrc {
 			i.setDone()
 			break
-		} ***REMOVED*** if i.rb.src._byte(i.p) < utf8.RuneSelf {
+		} else if i.rb.src._byte(i.p) < utf8.RuneSelf {
 			i.rb.ss = 0
 			i.next = i.asciiF
 			break
@@ -396,7 +396,7 @@ func nextComposed(i *Iter) []byte {
 		i.info = i.rb.f.info(i.rb.src, i.p)
 		if v := i.rb.ss.next(i.info); v == ssStarter {
 			break
-		} ***REMOVED*** if v == ssOverflow {
+		} else if v == ssOverflow {
 			i.next = nextCGJCompose
 			break
 		}
@@ -409,7 +409,7 @@ doNorm:
 	// reset to start position
 	i.p = startp
 	i.info = i.rb.f.info(i.rb.src, i.p)
-	i.rb.ss.***REMOVED***rst(i.info)
+	i.rb.ss.first(i.info)
 	if i.info.multiSegment() {
 		d := i.info.Decomposition()
 		info := i.rb.f.info(input{bytes: d}, 0)
@@ -418,7 +418,7 @@ doNorm:
 		i.next = nextMultiNorm
 		return nextMultiNorm(i)
 	}
-	i.rb.ss.***REMOVED***rst(i.info)
+	i.rb.ss.first(i.info)
 	i.rb.insertUnsafe(i.rb.src, i.p, i.info)
 	return doNormComposed(i)
 }
@@ -433,7 +433,7 @@ func doNormComposed(i *Iter) []byte {
 		i.info = i.rb.f.info(i.rb.src, i.p)
 		if s := i.rb.ss.next(i.info); s == ssStarter {
 			break
-		} ***REMOVED*** if s == ssOverflow {
+		} else if s == ssOverflow {
 			i.next = nextCGJCompose
 			break
 		}
@@ -445,13 +445,13 @@ func doNormComposed(i *Iter) []byte {
 }
 
 func nextCGJCompose(i *Iter) []byte {
-	i.rb.ss = 0 // instead of ***REMOVED***rst
+	i.rb.ss = 0 // instead of first
 	i.rb.insertCGJ()
 	i.next = nextComposed
 	// Note that we treat any rune with nLeadingNonStarters > 0 as a non-starter,
 	// even if they are not. This is particularly dubious for U+FF9E and UFF9A.
 	// If we ever change that, insert a check here.
-	i.rb.ss.***REMOVED***rst(i.info)
+	i.rb.ss.first(i.info)
 	i.rb.insertUnsafe(i.rb.src, i.p, i.info)
 	return doNormComposed(i)
 }

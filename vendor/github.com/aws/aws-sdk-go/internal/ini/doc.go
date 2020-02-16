@@ -1,15 +1,15 @@
-// Package ini is an LL(1) parser for con***REMOVED***guration ***REMOVED***les.
+// Package ini is an LL(1) parser for configuration files.
 //
 //	Example:
-//	sections, err := ini.OpenFile("/path/to/***REMOVED***le")
+//	sections, err := ini.OpenFile("/path/to/file")
 //	if err != nil {
 //		panic(err)
 //	}
 //
-//	pro***REMOVED***le := "foo"
-//	section, ok := sections.GetSection(pro***REMOVED***le)
+//	profile := "foo"
+//	section, ok := sections.GetSection(profile)
 //	if !ok {
-//		fmt.Printf("section %q could not be found", pro***REMOVED***le)
+//		fmt.Printf("section %q could not be found", profile)
 //	}
 //
 // Below is the BNF that describes this parser

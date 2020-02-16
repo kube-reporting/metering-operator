@@ -11,7 +11,7 @@ import (
 // data. Writer takes a destination io.Writer and returns a WriteCloser that
 // compresses all data written through it. Reader takes a source io.Reader and
 // returns a ReadCloser that decompresses all data read through it. You may
-// de***REMOVED***ne these methods on your own type, or use one of the NewCompression
+// define these methods on your own type, or use one of the NewCompression
 // helpers.
 type Compression interface {
 	Writer(dst io.Writer) (io.WriteCloser, error)

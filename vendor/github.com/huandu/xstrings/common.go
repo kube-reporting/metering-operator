@@ -1,5 +1,5 @@
 // Copyright 2015 Huan Du. All rights reserved.
-// Licensed under the MIT license that can be found in the LICENSE ***REMOVED***le.
+// Licensed under the MIT license that can be found in the LICENSE file.
 
 package xstrings
 

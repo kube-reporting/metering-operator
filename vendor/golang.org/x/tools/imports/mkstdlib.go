@@ -1,12 +1,12 @@
 // +build ignore
 
-// mkstdlib generates the zstdlib.go ***REMOVED***le, containing the Go standard
+// mkstdlib generates the zstdlib.go file, containing the Go standard
 // library API symbols. It's baked into the binary to avoid scanning
 // GOPATH in the common case.
 package main
 
 import (
-	"bu***REMOVED***o"
+	"bufio"
 	"bytes"
 	"fmt"
 	"go/format"
@@ -15,7 +15,7 @@ import (
 	"log"
 	"os"
 	"path"
-	"path/***REMOVED***lepath"
+	"path/filepath"
 	"regexp"
 	"runtime"
 	"sort"
@@ -31,7 +31,7 @@ func mustOpen(name string) io.Reader {
 }
 
 func api(base string) string {
-	return ***REMOVED***lepath.Join(runtime.GOROOT(), "api", base)
+	return filepath.Join(runtime.GOROOT(), "api", base)
 }
 
 var sym = regexp.MustCompile(`^pkg (\S+).*?, (?:var|func|type|const) ([A-Z]\w*)`)
@@ -57,7 +57,7 @@ func main() {
 		mustOpen(api("go1.9.txt")),
 		mustOpen(api("go1.10.txt")),
 	)
-	sc := bu***REMOVED***o.NewScanner(f)
+	sc := bufio.NewScanner(f)
 	fullImport := map[string]string{} // "zip.NewReader" => "archive/zip"
 	ambiguous := map[string]bool{}
 	var keys []string
@@ -74,7 +74,7 @@ func main() {
 				if exist != full {
 					ambiguous[key] = true
 				}
-			} ***REMOVED*** {
+			} else {
 				fullImport[key] = full
 				keys = append(keys, key)
 			}
@@ -87,7 +87,7 @@ func main() {
 	for _, key := range keys {
 		if ambiguous[key] {
 			outf("\t// %q is ambiguous\n", key)
-		} ***REMOVED*** {
+		} else {
 			outf("\t%q: %q,\n", key, fullImport[key])
 		}
 	}

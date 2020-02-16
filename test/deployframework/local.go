@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
-	"path/***REMOVED***lepath"
+	"path/filepath"
 	"strconv"
 	"strings"
 
@@ -16,7 +16,7 @@ const (
 	meteringOperatorName                = "metering-ansible-operator"
 	meteringOperatorLogName             = "metering-operator.log"
 	reportingOperatorLogName            = "reporting-operator.log"
-	destKubeCon***REMOVED***gPath                  = "/kubecon***REMOVED***g"
+	destKubeConfigPath                  = "/kubeconfig"
 	runReportingOperatorLocalScriptName = "run-reporting-operator-local.sh"
 	cleanupScriptName                   = "run-test-cleanup.sh"
 
@@ -28,7 +28,7 @@ const (
 type LocalCtx struct {
 	Namespace                      string
 	BasePath                       string
-	KubeCon***REMOVED***gPath                 string
+	KubeConfigPath                 string
 	HackScriptPath                 string
 	MeteringOperatorImage          string
 	ReportingAPIURL                string
@@ -46,8 +46,8 @@ func (lc *LocalCtx) RunMeteringOperatorLocal() error {
 		"-u", "0:0",
 		"--name", meteringOperatorContainerName,
 		"-v", ansibleRunnerPath,
-		"-v", fmt.Sprintf("%s:%s", lc.KubeCon***REMOVED***gPath, destKubeCon***REMOVED***gPath),
-		"-e", "KUBECONFIG="+destKubeCon***REMOVED***gPath,
+		"-v", fmt.Sprintf("%s:%s", lc.KubeConfigPath, destKubeConfigPath),
+		"-e", "KUBECONFIG="+destKubeConfigPath,
 		"-e", "OPERATOR_NAME="+meteringOperatorName,
 		"-e", "POD_NAME="+meteringOperatorName,
 		"-e", "WATCH_NAMESPACE="+lc.Namespace,
@@ -58,9 +58,9 @@ func (lc *LocalCtx) RunMeteringOperatorLocal() error {
 
 	lc.Logger.Debugf("The metering-operator container was run with the following args: %v", cmd.Args)
 
-	logFile, err := os.Create(***REMOVED***lepath.Join(lc.BasePath, meteringOperatorLogName))
+	logFile, err := os.Create(filepath.Join(lc.BasePath, meteringOperatorLogName))
 	if err != nil {
-		return fmt.Errorf("failed to create the metering-operator container output log ***REMOVED***le: %v", err)
+		return fmt.Errorf("failed to create the metering-operator container output log file: %v", err)
 	}
 	defer logFile.Close()
 
@@ -94,8 +94,8 @@ func (lc *LocalCtx) RunReportingOperatorLocal(apiListenPort, metricsListenPort, 
 
 	envVarArr = append(envVarArr, lc.ExtraReportingOperatorEnvVars...)
 
-	relPath := ***REMOVED***lepath.Join(lc.HackScriptPath, runReportingOperatorLocalScriptName)
-	targetScriptDir, err := ***REMOVED***lepath.Abs(relPath)
+	relPath := filepath.Join(lc.HackScriptPath, runReportingOperatorLocalScriptName)
+	targetScriptDir, err := filepath.Abs(relPath)
 	if err != nil {
 		return fmt.Errorf("failed to get the absolute path for the '%s' path: %v", relPath, err)
 	}
@@ -110,9 +110,9 @@ func (lc *LocalCtx) RunReportingOperatorLocal(apiListenPort, metricsListenPort, 
 
 	lc.Logger.Debugf("The reporting-operator-local script was run with the following args: %v", cmd.Args)
 
-	logFile, err := os.Create(***REMOVED***lepath.Join(lc.BasePath, reportingOperatorLogName))
+	logFile, err := os.Create(filepath.Join(lc.BasePath, reportingOperatorLogName))
 	if err != nil {
-		return fmt.Errorf("failed to create the local reporting-operator log ***REMOVED***le: %v", err)
+		return fmt.Errorf("failed to create the local reporting-operator log file: %v", err)
 	}
 	defer logFile.Close()
 

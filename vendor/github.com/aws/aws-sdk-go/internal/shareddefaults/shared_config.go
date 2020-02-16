@@ -2,30 +2,30 @@ package shareddefaults
 
 import (
 	"os"
-	"path/***REMOVED***lepath"
+	"path/filepath"
 	"runtime"
 )
 
-// SharedCredentialsFilename returns the SDK's default ***REMOVED***le path
-// for the shared credentials ***REMOVED***le.
+// SharedCredentialsFilename returns the SDK's default file path
+// for the shared credentials file.
 //
-// Builds the shared con***REMOVED***g ***REMOVED***le path based on the OS's platform.
+// Builds the shared config file path based on the OS's platform.
 //
 //   - Linux/Unix: $HOME/.aws/credentials
 //   - Windows: %USERPROFILE%\.aws\credentials
 func SharedCredentialsFilename() string {
-	return ***REMOVED***lepath.Join(UserHomeDir(), ".aws", "credentials")
+	return filepath.Join(UserHomeDir(), ".aws", "credentials")
 }
 
-// SharedCon***REMOVED***gFilename returns the SDK's default ***REMOVED***le path for
-// the shared con***REMOVED***g ***REMOVED***le.
+// SharedConfigFilename returns the SDK's default file path for
+// the shared config file.
 //
-// Builds the shared con***REMOVED***g ***REMOVED***le path based on the OS's platform.
+// Builds the shared config file path based on the OS's platform.
 //
-//   - Linux/Unix: $HOME/.aws/con***REMOVED***g
-//   - Windows: %USERPROFILE%\.aws\con***REMOVED***g
-func SharedCon***REMOVED***gFilename() string {
-	return ***REMOVED***lepath.Join(UserHomeDir(), ".aws", "con***REMOVED***g")
+//   - Linux/Unix: $HOME/.aws/config
+//   - Windows: %USERPROFILE%\.aws\config
+func SharedConfigFilename() string {
+	return filepath.Join(UserHomeDir(), ".aws", "config")
 }
 
 // UserHomeDir returns the home directory for the user the process is

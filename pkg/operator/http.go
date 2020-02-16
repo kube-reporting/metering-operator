@@ -39,8 +39,8 @@ var prometheusMiddleware = chiprometheus.NewMiddleware("reporting-operator")
 
 const (
 	APIV1ReportGetEndpoint         = "/api/v1/reports/get"
-	APIV2ReportEndpointPre***REMOVED***x      = "/api/v2/reports"
-	APIV2ReportQueryEndpointPre***REMOVED***x = "/api/v2/reportqueries"
+	APIV2ReportEndpointPrefix      = "/api/v2/reports"
+	APIV2ReportQueryEndpointPrefix = "/api/v2/reportqueries"
 )
 
 type server struct {
@@ -98,9 +98,9 @@ func newRouter(
 		prestoTableLister:      prestoTableLister,
 	}
 
-	router.HandleFunc(APIV2ReportEndpointPre***REMOVED***x+"/{namespace}/{name}/full", srv.getReportV2FullHandler)
-	router.HandleFunc(APIV2ReportEndpointPre***REMOVED***x+"/{namespace}/{name}/table", srv.getReportV2TableHandler)
-	router.HandleFunc(APIV2ReportQueryEndpointPre***REMOVED***x+"/{namespace}/{name}/render", srv.renderReportQueryV2Handler)
+	router.HandleFunc(APIV2ReportEndpointPrefix+"/{namespace}/{name}/full", srv.getReportV2FullHandler)
+	router.HandleFunc(APIV2ReportEndpointPrefix+"/{namespace}/{name}/table", srv.getReportV2TableHandler)
+	router.HandleFunc(APIV2ReportQueryEndpointPrefix+"/{namespace}/{name}/render", srv.renderReportQueryV2Handler)
 	router.HandleFunc(APIV1ReportGetEndpoint, srv.getReportV1Handler)
 	router.HandleFunc("/api/v1/datasources/prometheus/collect/{namespace}", srv.collectPrometheusMetricsDataHandler)
 	router.HandleFunc("/api/v1/datasources/prometheus/collect/{namespace}/{datasourceName}", srv.collectPrometheusMetricsDataHandler)
@@ -147,7 +147,7 @@ func (srv *server) getReportV2FullHandler(w http.ResponseWriter, r *http.Request
 	name := chi.URLParam(r, "name")
 	namespace := chi.URLParam(r, "namespace")
 	if name == "" {
-		writeErrorResponse(logger, w, r, http.StatusBadRequest, "the following ***REMOVED***elds are missing or empty: name")
+		writeErrorResponse(logger, w, r, http.StatusBadRequest, "the following fields are missing or empty: name")
 		return
 	}
 	if !srv.validateGetReportReq(logger, []string{"format"}, w, r) {
@@ -161,7 +161,7 @@ func (srv *server) getReportV2TableHandler(w http.ResponseWriter, r *http.Reques
 	name := chi.URLParam(r, "name")
 	namespace := chi.URLParam(r, "namespace")
 	if name == "" {
-		writeErrorResponse(logger, w, r, http.StatusBadRequest, "the following ***REMOVED***elds are missing or empty: name")
+		writeErrorResponse(logger, w, r, http.StatusBadRequest, "the following fields are missing or empty: name")
 		return
 	}
 	if !srv.validateGetReportReq(logger, []string{"format"}, w, r) {
@@ -170,15 +170,15 @@ func (srv *server) getReportV2TableHandler(w http.ResponseWriter, r *http.Reques
 	srv.getReport(logger, name, namespace, r.Form["format"][0], true, false, w, r)
 }
 
-func checkForFields(***REMOVED***elds []string, vals url.Values) error {
+func checkForFields(fields []string, vals url.Values) error {
 	var missingFields []string
-	for _, f := range ***REMOVED***elds {
+	for _, f := range fields {
 		if len(vals[f]) == 0 || vals[f][0] == "" {
 			missingFields = append(missingFields, f)
 		}
 	}
 	if len(missingFields) != 0 {
-		return fmt.Errorf("the following ***REMOVED***elds are missing or empty: %s", strings.Join(missingFields, ","))
+		return fmt.Errorf("the following fields are missing or empty: %s", strings.Join(missingFields, ","))
 	}
 	return nil
 }
@@ -237,10 +237,10 @@ func (srv *server) getReport(logger log.FieldLogger, name, namespace, format str
 		logger.Debugf("mismatched columns, PrestoTable columns: %v, ReportQuery columns: %v", prestoColumns, queryPrestoColumns)
 	}
 
-	tableName, err := reportingutil.FullyQuali***REMOVED***edTableName(prestoTable)
+	tableName, err := reportingutil.FullyQualifiedTableName(prestoTable)
 	if err != nil {
-		logger.WithError(err).Errorf("prestoTable contains invalid Status ***REMOVED***elds")
-		writeErrorResponse(logger, w, r, http.StatusInternalServerError, "invalid prestoTable.Status ***REMOVED***elds: %v", err)
+		logger.WithError(err).Errorf("prestoTable contains invalid Status fields")
+		writeErrorResponse(logger, w, r, http.StatusInternalServerError, "invalid prestoTable.Status fields: %v", err)
 		return
 	}
 	results, err := srv.reportResultsGetter.GetReportResults(tableName, prestoColumns)
@@ -258,14 +258,14 @@ func (srv *server) getReport(logger log.FieldLogger, name, namespace, format str
 
 	if useNewFormat {
 		writeResultsResponseV2(logger, full, format, reportQuery.Name, reportQuery.Spec.Columns, results, w, r)
-	} ***REMOVED*** {
+	} else {
 		writeResultsResponseV1(logger, format, reportQuery.Name, reportQuery.Spec.Columns, results, w, r)
 	}
 }
 
 func writeResultsResponseAsCSV(logger log.FieldLogger, name string, columns []metering.ReportQueryColumn, results []presto.Row, w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "text/csv")
-	w.Header().Set("Content-Disposition", fmt.Sprintf("attachment;***REMOVED***lename=%s.csv", name))
+	w.Header().Set("Content-Disposition", fmt.Sprintf("attachment;filename=%s.csv", name))
 	err := writeResultsAsCSV(columns, results, w, ',')
 	if err != nil {
 		writeErrorResponse(logger, w, r, http.StatusInternalServerError, err.Error())
@@ -329,7 +329,7 @@ func writeResultsAsCSV(columns []metering.ReportQueryColumn, results []presto.Ro
 
 func writeResultsResponseAsTabular(logger log.FieldLogger, name string, columns []metering.ReportQueryColumn, results []presto.Row, w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "text/tab-separated-values")
-	w.Header().Set("Content-Disposition", fmt.Sprintf("attachment;***REMOVED***lename=%s.tsv", name))
+	w.Header().Set("Content-Disposition", fmt.Sprintf("attachment;filename=%s.tsv", name))
 	padding := 2
 	paddingStr := r.FormValue("padding")
 	if paddingStr != "" {
@@ -355,7 +355,7 @@ func writeResultsResponseAsTabular(logger log.FieldLogger, name string, columns 
 }
 
 func writeResultsResponseAsJSON(logger log.FieldLogger, name string, columns []metering.ReportQueryColumn, results []presto.Row, w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Disposition", fmt.Sprintf("attachment;***REMOVED***lename=%s.json", name))
+	w.Header().Set("Content-Disposition", fmt.Sprintf("attachment;filename=%s.json", name))
 	newResults := make([]*orderedmap.OrderedMap, len(results))
 	for i, item := range results {
 		var err error
@@ -422,20 +422,20 @@ func convertsToGetReportResults(input []presto.Row, columns []metering.ReportQue
 
 func writeResultsResponseV1(logger log.FieldLogger, format string, name string, columns []metering.ReportQueryColumn, results []presto.Row, w http.ResponseWriter, r *http.Request) {
 	columnsMap := make(map[string]metering.ReportQueryColumn)
-	var ***REMOVED***lteredColumns []metering.ReportQueryColumn
+	var filteredColumns []metering.ReportQueryColumn
 
 	// remove tableHidden columns and their values if the format is tabular or CSV
 
-	// ***REMOVED***lter columns
+	// filter columns
 	for _, column := range columns {
 		columnsMap[column.Name] = column
 		showColumn := !columnsMap[column.Name].TableHidden
 		if showColumn {
-			***REMOVED***lteredColumns = append(***REMOVED***lteredColumns, column)
+			filteredColumns = append(filteredColumns, column)
 		}
 	}
 
-	// ***REMOVED***lter rows
+	// filter rows
 	for _, row := range results {
 		for _, column := range columnsMap {
 			if columnsMap[column.Name].TableHidden {
@@ -444,20 +444,20 @@ func writeResultsResponseV1(logger log.FieldLogger, format string, name string, 
 		}
 	}
 
-	writeResultsResponse(logger, format, name, ***REMOVED***lteredColumns, results, w, r)
+	writeResultsResponse(logger, format, name, filteredColumns, results, w, r)
 }
 
 func writeResultsResponseV2(logger log.FieldLogger, full bool, format string, name string, columns []metering.ReportQueryColumn, results []presto.Row, w http.ResponseWriter, r *http.Request) {
 	format = strings.ToLower(format)
 	isTableFormat := format == "csv" || format == "tab" || format == "tabular"
 	columnsMap := make(map[string]metering.ReportQueryColumn)
-	var ***REMOVED***lteredColumns []metering.ReportQueryColumn
+	var filteredColumns []metering.ReportQueryColumn
 
 	// Remove columns and their values from `results` if full is false and the
 	// column's TableHidden is true or if TableHidden is true and we're
 	// outputting tabular or CSV
 
-	// ***REMOVED***lter the columns
+	// filter the columns
 	for _, column := range columns {
 		columnsMap[column.Name] = column
 		tableHidden := columnsMap[column.Name].TableHidden
@@ -466,10 +466,10 @@ func writeResultsResponseV2(logger log.FieldLogger, full bool, format string, na
 		if tableHidden && (isTableFormat || !full) {
 			continue
 		}
-		***REMOVED***lteredColumns = append(***REMOVED***lteredColumns, column)
+		filteredColumns = append(filteredColumns, column)
 	}
 
-	// ***REMOVED***lter the rows
+	// filter the rows
 	for _, row := range results {
 		for _, column := range columnsMap {
 			tableHidden := columnsMap[column.Name].TableHidden
@@ -480,12 +480,12 @@ func writeResultsResponseV2(logger log.FieldLogger, full bool, format string, na
 	}
 
 	if format == "json" {
-		w.Header().Set("Content-Disposition", fmt.Sprintf("attachment;***REMOVED***lename=%s.json", name))
-		writeResponseAsJSON(logger, w, http.StatusOK, convertsToGetReportResults(results, ***REMOVED***lteredColumns))
+		w.Header().Set("Content-Disposition", fmt.Sprintf("attachment;filename=%s.json", name))
+		writeResponseAsJSON(logger, w, http.StatusOK, convertsToGetReportResults(results, filteredColumns))
 		return
 	}
 
-	writeResultsResponse(logger, format, name, ***REMOVED***lteredColumns, results, w, r)
+	writeResultsResponse(logger, format, name, filteredColumns, results, w, r)
 }
 
 func (srv *server) runReport(logger log.FieldLogger, query, start, end string, w http.ResponseWriter) {
@@ -592,7 +592,7 @@ func (srv *server) storePrometheusMetricsDataHandler(w http.ResponseWriter, r *h
 		return
 	}
 
-	tableName, err := reportingutil.FullyQuali***REMOVED***edTableName(prestoTable)
+	tableName, err := reportingutil.FullyQualifiedTableName(prestoTable)
 	if err != nil {
 		logger.WithError(err).Errorf("invalid PrestoTable %s: %v", prestoTable.Name, err)
 		writeErrorResponse(logger, w, r, http.StatusInternalServerError, "invalid PrestoTable %s: %v", prestoTable.Name, err)
@@ -661,7 +661,7 @@ func (srv *server) fetchPrometheusMetricsDataHandler(w http.ResponseWriter, r *h
 		writeErrorResponse(logger, w, r, http.StatusInternalServerError, "PrestoTable %s table %s not created yet", prestoTable.Name, prestoTable.Spec.TableName)
 		return
 	}
-	tableName, err := reportingutil.FullyQuali***REMOVED***edTableName(prestoTable)
+	tableName, err := reportingutil.FullyQualifiedTableName(prestoTable)
 	if err != nil {
 		logger.WithError(err).Errorf("invalid PrestoTable %s: %v", prestoTable.Name, err)
 		writeErrorResponse(logger, w, r, http.StatusInternalServerError, "invalid PrestoTable %s: %v", prestoTable.Name, err)
@@ -750,7 +750,7 @@ func (srv *server) renderReportQueryV2Handler(w http.ResponseWriter, r *http.Req
 
 	}
 
-	requiredInputs := reportingutil.ConvertInputDe***REMOVED***nitionsIntoInputList(reportQuery.Spec.Inputs)
+	requiredInputs := reportingutil.ConvertInputDefinitionsIntoInputList(reportQuery.Spec.Inputs)
 	queryCtx := &reporting.ReportQueryTemplateContext{
 		Namespace:         namespace,
 		Query:             reportQuery.Spec.Query,

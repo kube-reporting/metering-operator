@@ -62,7 +62,7 @@ func yaml_parser_set_input_string(parser *yaml_parser_t, input []byte) {
 	parser.input_pos = 0
 }
 
-// Set a ***REMOVED***le input.
+// Set a file input.
 func yaml_parser_set_input_reader(parser *yaml_parser_t, r io.Reader) {
 	if parser.read_handler != nil {
 		panic("must set the input source only once")
@@ -116,7 +116,7 @@ func yaml_emitter_set_output_string(emitter *yaml_emitter_t, output_buffer *[]by
 	emitter.output_buffer = output_buffer
 }
 
-// Set a ***REMOVED***le output.
+// Set a file output.
 func yaml_emitter_set_output_writer(emitter *yaml_emitter_t, w io.Writer) {
 	if emitter.write_handler != nil {
 		panic("must set the output target only once")
@@ -177,7 +177,7 @@ func yaml_emitter_set_break(emitter *yaml_emitter_t, line_break yaml_break_t) {
 //    {
 //        case YAML_TAG_DIRECTIVE_TOKEN:
 //            yaml_free(token.data.tag_directive.handle);
-//            yaml_free(token.data.tag_directive.pre***REMOVED***x);
+//            yaml_free(token.data.tag_directive.prefix);
 //            break;
 //
 //        case YAML_ALIAS_TOKEN:
@@ -190,7 +190,7 @@ func yaml_emitter_set_break(emitter *yaml_emitter_t, line_break yaml_break_t) {
 //
 //        case YAML_TAG_TOKEN:
 //            yaml_free(token.data.tag.handle);
-//            yaml_free(token.data.tag.suf***REMOVED***x);
+//            yaml_free(token.data.tag.suffix);
 //            break;
 //
 //        case YAML_SCALAR_TOKEN:
@@ -418,20 +418,20 @@ func yaml_event_delete(event *yaml_event_t) {
 //        for (tag_directive = tag_directives_start
 //                tag_directive != tag_directives_end; tag_directive ++) {
 //            assert(tag_directive.handle)
-//            assert(tag_directive.pre***REMOVED***x)
+//            assert(tag_directive.prefix)
 //            if (!yaml_check_utf8(tag_directive.handle,
 //                        strlen((char *)tag_directive.handle)))
 //                goto error
-//            if (!yaml_check_utf8(tag_directive.pre***REMOVED***x,
-//                        strlen((char *)tag_directive.pre***REMOVED***x)))
+//            if (!yaml_check_utf8(tag_directive.prefix,
+//                        strlen((char *)tag_directive.prefix)))
 //                goto error
 //            value.handle = yaml_strdup(tag_directive.handle)
-//            value.pre***REMOVED***x = yaml_strdup(tag_directive.pre***REMOVED***x)
-//            if (!value.handle || !value.pre***REMOVED***x) goto error
+//            value.prefix = yaml_strdup(tag_directive.prefix)
+//            if (!value.handle || !value.prefix) goto error
 //            if (!PUSH(&context, tag_directives_copy, value))
 //                goto error
 //            value.handle = NULL
-//            value.pre***REMOVED***x = NULL
+//            value.prefix = NULL
 //        }
 //    }
 //
@@ -447,11 +447,11 @@ func yaml_event_delete(event *yaml_event_t) {
 //    while (!STACK_EMPTY(&context, tag_directives_copy)) {
 //        value yaml_tag_directive_t = POP(&context, tag_directives_copy)
 //        yaml_free(value.handle)
-//        yaml_free(value.pre***REMOVED***x)
+//        yaml_free(value.prefix)
 //    }
 //    STACK_DEL(&context, tag_directives_copy)
 //    yaml_free(value.handle)
-//    yaml_free(value.pre***REMOVED***x)
+//    yaml_free(value.prefix)
 //
 //    return 0
 //}
@@ -496,7 +496,7 @@ func yaml_event_delete(event *yaml_event_t) {
 //            tag_directive != document.tag_directives.end
 //            tag_directive++) {
 //        yaml_free(tag_directive.handle)
-//        yaml_free(tag_directive.pre***REMOVED***x)
+//        yaml_free(tag_directive.prefix)
 //    }
 //    yaml_free(document.tag_directives.start)
 //

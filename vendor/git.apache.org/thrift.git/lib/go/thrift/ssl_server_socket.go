@@ -1,10 +1,10 @@
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements. See the NOTICE ***REMOVED***le
+ * or more contributor license agreements. See the NOTICE file
  * distributed with this work for additional information
- * regarding copyright ownership. The ASF licenses this ***REMOVED***le
+ * regarding copyright ownership. The ASF licenses this file
  * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this ***REMOVED***le except in compliance
+ * "License"); you may not use this file except in compliance
  * with the License. You may obtain a copy of the License at
  *
  *   http://www.apache.org/licenses/LICENSE-2.0
@@ -13,7 +13,7 @@
  * software distributed under the License is distributed on an
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
  * KIND, either express or implied. See the License for the
- * speci***REMOVED***c language governing permissions and limitations
+ * specific language governing permissions and limitations
  * under the License.
  */
 
@@ -30,14 +30,14 @@ type TSSLServerSocket struct {
 	addr          net.Addr
 	clientTimeout time.Duration
 	interrupted   bool
-	cfg           *tls.Con***REMOVED***g
+	cfg           *tls.Config
 }
 
-func NewTSSLServerSocket(listenAddr string, cfg *tls.Con***REMOVED***g) (*TSSLServerSocket, error) {
+func NewTSSLServerSocket(listenAddr string, cfg *tls.Config) (*TSSLServerSocket, error) {
 	return NewTSSLServerSocketTimeout(listenAddr, cfg, 0)
 }
 
-func NewTSSLServerSocketTimeout(listenAddr string, cfg *tls.Con***REMOVED***g, clientTimeout time.Duration) (*TSSLServerSocket, error) {
+func NewTSSLServerSocketTimeout(listenAddr string, cfg *tls.Config, clientTimeout time.Duration) (*TSSLServerSocket, error) {
 	if cfg.MinVersion == 0 {
 		cfg.MinVersion = tls.VersionTLS10
 	}
@@ -86,7 +86,7 @@ func (p *TSSLServerSocket) Open() error {
 	}
 	if l, err := tls.Listen(p.addr.Network(), p.addr.String(), p.cfg); err != nil {
 		return err
-	} ***REMOVED*** {
+	} else {
 		p.listener = l
 	}
 	return nil

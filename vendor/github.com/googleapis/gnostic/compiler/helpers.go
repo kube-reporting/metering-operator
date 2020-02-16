@@ -1,7 +1,7 @@
 // Copyright 2017 Google Inc. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this ***REMOVED***le except in compliance with the License.
+// you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 //
 //    http://www.apache.org/licenses/LICENSE-2.0
@@ -9,7 +9,7 @@
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the speci***REMOVED***c language governing permissions and
+// See the License for the specific language governing permissions and
 // limitations under the License.
 
 package compiler
@@ -49,7 +49,7 @@ func SortedKeysForMap(m yaml.MapSlice) []string {
 	return keys
 }
 
-// MapHasKey returns true if a yaml.MapSlice contains a speci***REMOVED***ed key.
+// MapHasKey returns true if a yaml.MapSlice contains a specified key.
 func MapHasKey(m yaml.MapSlice, key string) bool {
 	for _, item := range m {
 		itemKey, ok := item.Key.(string)
@@ -60,7 +60,7 @@ func MapHasKey(m yaml.MapSlice, key string) bool {
 	return false
 }
 
-// MapValueForKey gets the value of a map value for a speci***REMOVED***ed key.
+// MapValueForKey gets the value of a map value for a specified key.
 func MapValueForKey(m yaml.MapSlice, key string) interface{} {
 	for _, item := range m {
 		itemKey, ok := item.Key.(string)
@@ -83,7 +83,7 @@ func ConvertInterfaceArrayToStringArray(interfaceArray []interface{}) []string {
 	return stringArray
 }
 
-// MissingKeysInMap identi***REMOVED***es which keys from a list of required keys are not in a map.
+// MissingKeysInMap identifies which keys from a list of required keys are not in a map.
 func MissingKeysInMap(m yaml.MapSlice, requiredKeys []string) []string {
 	missingKeys := make([]string, 0)
 	for _, k := range requiredKeys {
@@ -163,7 +163,7 @@ func PluralProperties(count int) string {
 	return "properties"
 }
 
-// StringArrayContainsValue returns true if a string array contains a speci***REMOVED***ed value.
+// StringArrayContainsValue returns true if a string array contains a specified value.
 func StringArrayContainsValue(array []string, value string) bool {
 	for _, item := range array {
 		if item == value {
@@ -173,7 +173,7 @@ func StringArrayContainsValue(array []string, value string) bool {
 	return false
 }
 
-// StringArrayContainsValues returns true if a string array contains all of a list of speci***REMOVED***ed values.
+// StringArrayContainsValues returns true if a string array contains all of a list of specified values.
 func StringArrayContainsValues(array []string, values []string) bool {
 	for _, value := range values {
 		if !StringArrayContainsValue(array, value) {

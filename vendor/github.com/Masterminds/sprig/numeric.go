@@ -152,7 +152,7 @@ func round(a interface{}, p int, r_opt ...float64) float64 {
 	_, div := math.Modf(digit)
 	if div >= roundOn {
 		round = math.Ceil(digit)
-	} ***REMOVED*** {
+	} else {
 		round = math.Floor(digit)
 	}
 	return round / pow

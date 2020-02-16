@@ -61,9 +61,9 @@ func (iter *Iterator) trySkipString() bool {
 		if c == '"' {
 			iter.head = i + 1
 			return true // valid
-		} ***REMOVED*** if c == '\\' {
+		} else if c == '\\' {
 			return false
-		} ***REMOVED*** if c < ' ' {
+		} else if c < ' ' {
 			iter.ReportError("trySkipString",
 				fmt.Sprintf(`invalid control character found: %d`, c))
 			return true // already failed
@@ -74,7 +74,7 @@ func (iter *Iterator) trySkipString() bool {
 
 func (iter *Iterator) skipObject() {
 	iter.unreadByte()
-	iter.ReadObjectCB(func(iter *Iterator, ***REMOVED***eld string) bool {
+	iter.ReadObjectCB(func(iter *Iterator, field string) bool {
 		iter.Skip()
 		return true
 	})

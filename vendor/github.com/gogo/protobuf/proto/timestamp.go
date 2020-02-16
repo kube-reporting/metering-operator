@@ -4,7 +4,7 @@
 // https://github.com/golang/protobuf
 //
 // Redistribution and use in source and binary forms, with or without
-// modi***REMOVED***cation, are permitted provided that the following conditions are
+// modification, are permitted provided that the following conditions are
 // met:
 //
 //     * Redistributions of source code must retain the above copyright
@@ -15,7 +15,7 @@
 // distribution.
 //     * Neither the name of Google Inc. nor the names of its
 // contributors may be used to endorse or promote products derived from
-// this software without speci***REMOVED***c prior written permission.
+// this software without specific prior written permission.
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
 // "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
@@ -31,7 +31,7 @@
 
 package proto
 
-// This ***REMOVED***le implements operations on google.protobuf.Timestamp.
+// This file implements operations on google.protobuf.Timestamp.
 
 import (
 	"errors"
@@ -40,17 +40,17 @@ import (
 )
 
 const (
-	// Seconds ***REMOVED***eld of the earliest valid Timestamp.
+	// Seconds field of the earliest valid Timestamp.
 	// This is time.Date(1, 1, 1, 0, 0, 0, 0, time.UTC).Unix().
 	minValidSeconds = -62135596800
-	// Seconds ***REMOVED***eld just after the latest valid Timestamp.
+	// Seconds field just after the latest valid Timestamp.
 	// This is time.Date(10000, 1, 1, 0, 0, 0, 0, time.UTC).Unix().
 	maxValidSeconds = 253402300800
 )
 
 // validateTimestamp determines whether a Timestamp is valid.
 // A valid timestamp represents a time in the range
-// [0001-01-01, 10000-01-01) and has a Nanos ***REMOVED***eld
+// [0001-01-01, 10000-01-01) and has a Nanos field
 // in the range [0, 1e9).
 //
 // If the Timestamp is valid, validateTimestamp returns nil.
@@ -77,21 +77,21 @@ func validateTimestamp(ts *timestamp) error {
 // TimestampFromProto converts a google.protobuf.Timestamp proto to a time.Time.
 // It returns an error if the argument is invalid.
 //
-// Unlike most Go functions, if Timestamp returns an error, the ***REMOVED***rst return value
+// Unlike most Go functions, if Timestamp returns an error, the first return value
 // is not the zero time.Time. Instead, it is the value obtained from the
 // time.Unix function when passed the contents of the Timestamp, in the UTC
 // locale. This may or may not be a meaningful time; many invalid Timestamps
 // do map to valid time.Times.
 //
-// A nil Timestamp returns an error. The ***REMOVED***rst return value in that case is
-// unde***REMOVED***ned.
+// A nil Timestamp returns an error. The first return value in that case is
+// undefined.
 func timestampFromProto(ts *timestamp) (time.Time, error) {
 	// Don't return the zero value on error, because corresponds to a valid
 	// timestamp. Instead return whatever time.Unix gives us.
 	var t time.Time
 	if ts == nil {
 		t = time.Unix(0, 0).UTC() // treat nil like the empty Timestamp
-	} ***REMOVED*** {
+	} else {
 		t = time.Unix(ts.Seconds, int64(ts.Nanos)).UTC()
 	}
 	return t, validateTimestamp(ts)

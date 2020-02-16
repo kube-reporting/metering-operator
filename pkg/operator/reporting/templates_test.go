@@ -51,8 +51,8 @@ func TestRenderQuery(t *testing.T) {
 		},
 		Spec: metering.ReportQuerySpec{
 			Query: "SELECT * FROM test_table",
-			Inputs: []metering.ReportQueryInputDe***REMOVED***nition{
-				metering.ReportQueryInputDe***REMOVED***nition{
+			Inputs: []metering.ReportQueryInputDefinition{
+				metering.ReportQueryInputDefinition{
 					Name:     "ValidRenderReportQuery",
 					Type:     "ReportQuery",
 					Required: true,
@@ -95,7 +95,7 @@ func TestRenderQuery(t *testing.T) {
 			expectOutput: fmt.Sprintf("SELECT * FROM %s.%s.%s", testCatalogName, testSchemaName, ds1.Status.TableRef.Name),
 		},
 		{
-			name: "invalid report query with invalid templating (missing Inputs ***REMOVED***eld) returns error",
+			name: "invalid report query with invalid templating (missing Inputs field) returns error",
 			reportTemplate: &ReportQueryTemplateContext{
 				Query: "SELECT * FROM {| dataSourceTableName .Report.Inputs. |}",
 			},
@@ -104,7 +104,7 @@ func TestRenderQuery(t *testing.T) {
 			expectErrMsg:    "error parsing query: template: reportQueryTemplate:1: unexpected <.> in operand",
 		},
 		{
-			name: "valid report query with valid templating but unde***REMOVED***ned data source table ref returns error",
+			name: "valid report query with valid templating but undefined data source table ref returns error",
 			reportTemplate: &ReportQueryTemplateContext{
 				Query:             "SELECT * FROM {| dataSourceTableName .Report.Inputs.MissingDataSourceTableRef |}",
 				RequiredInputs:    []string{"MissingDataSourceTableRef"},
@@ -457,7 +457,7 @@ func TestRenderQuery(t *testing.T) {
 			expectOutput: "SELECT timestamp 2019-05-01 15:00:05.000 AS period_start",
 		},
 		{
-			name: "prestoTimestamp input is missing but default is de***REMOVED***ned returns nil and the expected query output",
+			name: "prestoTimestamp input is missing but default is defined returns nil and the expected query output",
 			reportTemplate: &ReportQueryTemplateContext{
 				Query:          "SELECT timestamp {| default .Report.ReportingStart .Report.Inputs.ReportingStart | prestoTimestamp |} AS period_start",
 				RequiredInputs: []string{},
@@ -511,7 +511,7 @@ func TestRenderQuery(t *testing.T) {
 			expectOutput: fmt.Sprintf("SELECT timestamp %s AS period_start WHERE dt >= %s", reportStart.Format(presto.TimestampFormat), reportStart.Format(prestostore.PrometheusMetricTimestampPartitionFormat)),
 		},
 		{
-			name: "query containing missing inputs but defaults are de***REMOVED***ned templating results in nil and the expected query output",
+			name: "query containing missing inputs but defaults are defined templating results in nil and the expected query output",
 			reportTemplate: &ReportQueryTemplateContext{
 				Query:          "SELECT timestamp {| default .Report.ReportingStart .Report.Inputs.ReportingStart | prestoTimestamp |} AS period_start WHERE dt >= {| default .Report.Inputs.TestTime .Report.Inputs.ReportingStart | prometheusMetricPartitionFormat |}",
 				RequiredInputs: []string{},
@@ -569,7 +569,7 @@ func TestRenderQuery(t *testing.T) {
 
 			if testCase.expectErr {
 				assert.EqualErrorf(t, err, testCase.expectErrMsg, "expected that RenderQuery would return the correct error message")
-			} ***REMOVED*** {
+			} else {
 				assert.NoErrorf(t, err, "expected the report would return no error, but got an error.")
 				assert.EqualValuesf(t, testCase.expectOutput, output, "expected that RenderQuery would return the expected output")
 			}
@@ -599,8 +599,8 @@ func newTestPrestoTable(name, namespace, schema, catalog string, columns []prest
 	}
 }
 
-// newReportQueryCustomQuery helps create a ReportQuery with a custom ReportDataSource and adds a Query ***REMOVED***eld
-func newTestReportQuery(testReportName, testNamespace, query string, inputs []metering.ReportQueryInputDe***REMOVED***nition) *metering.ReportQuery {
+// newReportQueryCustomQuery helps create a ReportQuery with a custom ReportDataSource and adds a Query field
+func newTestReportQuery(testReportName, testNamespace, query string, inputs []metering.ReportQueryInputDefinition) *metering.ReportQuery {
 	return &metering.ReportQuery{
 		ObjectMeta: meta.ObjectMeta{
 			Name:      testReportName,

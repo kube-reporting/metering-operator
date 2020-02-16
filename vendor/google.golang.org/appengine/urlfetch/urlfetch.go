@@ -1,6 +1,6 @@
 // Copyright 2011 Google Inc. All rights reserved.
 // Use of this source code is governed by the Apache 2.0
-// license that can be found in the LICENSE ***REMOVED***le.
+// license that can be found in the LICENSE file.
 
 // Package urlfetch provides an http.RoundTripper implementation
 // for fetching URLs via App Engine's urlfetch service.
@@ -31,13 +31,13 @@ import (
 type Transport struct {
 	Context context.Context
 
-	// Controls whether the application checks the validity of SSL certi***REMOVED***cates
+	// Controls whether the application checks the validity of SSL certificates
 	// over HTTPS connections. A value of false (the default) instructs the
-	// application to send a request to the server only if the certi***REMOVED***cate is
-	// valid and signed by a trusted certi***REMOVED***cate authority (CA), and also
-	// includes a hostname that matches the certi***REMOVED***cate. A value of true
-	// instructs the application to perform no certi***REMOVED***cate validation.
-	AllowInvalidServerCerti***REMOVED***cate bool
+	// application to send a request to the server only if the certificate is
+	// valid and signed by a trusted certificate authority (CA), and also
+	// includes a hostname that matches the certificate. A value of true
+	// instructs the application to perform no certificate validation.
+	AllowInvalidServerCertificate bool
 }
 
 // Verify statically that *Transport implements http.RoundTripper.
@@ -45,7 +45,7 @@ var _ http.RoundTripper = (*Transport)(nil)
 
 // Client returns an *http.Client using a default urlfetch Transport. This
 // client will have the default deadline of 5 seconds, and will check the
-// validity of SSL certi***REMOVED***cates.
+// validity of SSL certificates.
 //
 // Any deadline of the provided context will be used for requests through this client;
 // if the client does not have a deadline then a 5 second default is used.
@@ -63,7 +63,7 @@ type bodyReader struct {
 	closed    bool
 }
 
-// ErrTruncatedBody is the error returned after the ***REMOVED***nal Read() from a
+// ErrTruncatedBody is the error returned after the final Read() from a
 // response's Body if the body has been truncated by App Engine's proxy.
 var ErrTruncatedBody = errors.New("urlfetch: truncated body")
 
@@ -110,7 +110,7 @@ var methodAcceptsRequestBody = map[string]bool{
 // the String method of URL doesn't correctly handle URLs with non-empty Opaque values.
 // See http://code.google.com/p/go/issues/detail?id=4860.
 func urlString(u *url.URL) string {
-	if u.Opaque == "" || strings.HasPre***REMOVED***x(u.Opaque, "//") {
+	if u.Opaque == "" || strings.HasPrefix(u.Opaque, "//") {
 		return u.String()
 	}
 	aux := *u
@@ -136,7 +136,7 @@ func (t *Transport) RoundTrip(req *http.Request) (res *http.Response, err error)
 		Method:                        &method,
 		Url:                           proto.String(urlString(req.URL)),
 		FollowRedirects:               proto.Bool(false), // http.Client's responsibility
-		MustValidateServerCerti***REMOVED***cate: proto.Bool(!t.AllowInvalidServerCerti***REMOVED***cate),
+		MustValidateServerCertificate: proto.Bool(!t.AllowInvalidServerCertificate),
 	}
 	if deadline, ok := t.Context.Deadline(); ok {
 		freq.Deadline = proto.Float64(deadline.Sub(time.Now()).Seconds())
@@ -186,7 +186,7 @@ func (t *Transport) RoundTrip(req *http.Request) (res *http.Response, err error)
 		hkey := http.CanonicalHeaderKey(*h.Key)
 		hval := *h.Value
 		if hkey == "Content-Length" {
-			// Will get ***REMOVED***lled in below for all but HEAD requests.
+			// Will get filled in below for all but HEAD requests.
 			if req.Method == "HEAD" {
 				res.ContentLength, _ = strconv.ParseInt(hval, 10, 64)
 			}

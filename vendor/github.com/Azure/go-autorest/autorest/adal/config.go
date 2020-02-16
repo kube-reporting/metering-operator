@@ -3,7 +3,7 @@ package adal
 // Copyright 2017 Microsoft Corporation
 //
 //  Licensed under the Apache License, Version 2.0 (the "License");
-//  you may not use this ***REMOVED***le except in compliance with the License.
+//  you may not use this file except in compliance with the License.
 //  You may obtain a copy of the License at
 //
 //      http://www.apache.org/licenses/LICENSE-2.0
@@ -11,7 +11,7 @@ package adal
 //  Unless required by applicable law or agreed to in writing, software
 //  distributed under the License is distributed on an "AS IS" BASIS,
 //  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-//  See the License for the speci***REMOVED***c language governing permissions and
+//  See the License for the specific language governing permissions and
 //  limitations under the License.
 
 import (
@@ -24,18 +24,18 @@ const (
 	activeDirectoryEndpointTemplate = "%s/oauth2/%s%s"
 )
 
-// OAuthCon***REMOVED***g represents the endpoints needed
+// OAuthConfig represents the endpoints needed
 // in OAuth operations
-type OAuthCon***REMOVED***g struct {
+type OAuthConfig struct {
 	AuthorityEndpoint  url.URL `json:"authorityEndpoint"`
 	AuthorizeEndpoint  url.URL `json:"authorizeEndpoint"`
 	TokenEndpoint      url.URL `json:"tokenEndpoint"`
 	DeviceCodeEndpoint url.URL `json:"deviceCodeEndpoint"`
 }
 
-// IsZero returns true if the OAuthCon***REMOVED***g object is zero-initialized.
-func (oac OAuthCon***REMOVED***g) IsZero() bool {
-	return oac == OAuthCon***REMOVED***g{}
+// IsZero returns true if the OAuthConfig object is zero-initialized.
+func (oac OAuthConfig) IsZero() bool {
+	return oac == OAuthConfig{}
 }
 
 func validateStringParam(param, name string) error {
@@ -45,15 +45,15 @@ func validateStringParam(param, name string) error {
 	return nil
 }
 
-// NewOAuthCon***REMOVED***g returns an OAuthCon***REMOVED***g with tenant speci***REMOVED***c urls
-func NewOAuthCon***REMOVED***g(activeDirectoryEndpoint, tenantID string) (*OAuthCon***REMOVED***g, error) {
+// NewOAuthConfig returns an OAuthConfig with tenant specific urls
+func NewOAuthConfig(activeDirectoryEndpoint, tenantID string) (*OAuthConfig, error) {
 	apiVer := "1.0"
-	return NewOAuthCon***REMOVED***gWithAPIVersion(activeDirectoryEndpoint, tenantID, &apiVer)
+	return NewOAuthConfigWithAPIVersion(activeDirectoryEndpoint, tenantID, &apiVer)
 }
 
-// NewOAuthCon***REMOVED***gWithAPIVersion returns an OAuthCon***REMOVED***g with tenant speci***REMOVED***c urls.
-// If apiVersion is not nil the "api-version" query parameter will be appended to the endpoint URLs with the speci***REMOVED***ed value.
-func NewOAuthCon***REMOVED***gWithAPIVersion(activeDirectoryEndpoint, tenantID string, apiVersion *string) (*OAuthCon***REMOVED***g, error) {
+// NewOAuthConfigWithAPIVersion returns an OAuthConfig with tenant specific urls.
+// If apiVersion is not nil the "api-version" query parameter will be appended to the endpoint URLs with the specified value.
+func NewOAuthConfigWithAPIVersion(activeDirectoryEndpoint, tenantID string, apiVersion *string) (*OAuthConfig, error) {
 	if err := validateStringParam(activeDirectoryEndpoint, "activeDirectoryEndpoint"); err != nil {
 		return nil, err
 	}
@@ -86,7 +86,7 @@ func NewOAuthCon***REMOVED***gWithAPIVersion(activeDirectoryEndpoint, tenantID s
 		return nil, err
 	}
 
-	return &OAuthCon***REMOVED***g{
+	return &OAuthConfig{
 		AuthorityEndpoint:  *authorityURL,
 		AuthorizeEndpoint:  *authorizeURL,
 		TokenEndpoint:      *tokenURL,
@@ -94,13 +94,13 @@ func NewOAuthCon***REMOVED***gWithAPIVersion(activeDirectoryEndpoint, tenantID s
 	}, nil
 }
 
-// MultiTenantOAuthCon***REMOVED***g provides endpoints for primary and aulixiary tenant IDs.
-type MultiTenantOAuthCon***REMOVED***g interface {
-	PrimaryTenant() *OAuthCon***REMOVED***g
-	AuxiliaryTenants() []*OAuthCon***REMOVED***g
+// MultiTenantOAuthConfig provides endpoints for primary and aulixiary tenant IDs.
+type MultiTenantOAuthConfig interface {
+	PrimaryTenant() *OAuthConfig
+	AuxiliaryTenants() []*OAuthConfig
 }
 
-// OAuthOptions contains optional OAuthCon***REMOVED***g creation arguments.
+// OAuthOptions contains optional OAuthConfig creation arguments.
 type OAuthOptions struct {
 	APIVersion string
 }
@@ -112,40 +112,40 @@ func (c OAuthOptions) apiVersion() string {
 	return "1.0"
 }
 
-// NewMultiTenantOAuthCon***REMOVED***g creates an object that support multitenant OAuth con***REMOVED***guration.
+// NewMultiTenantOAuthConfig creates an object that support multitenant OAuth configuration.
 // See https://docs.microsoft.com/en-us/azure/azure-resource-manager/authenticate-multi-tenant for more information.
-func NewMultiTenantOAuthCon***REMOVED***g(activeDirectoryEndpoint, primaryTenantID string, auxiliaryTenantIDs []string, options OAuthOptions) (MultiTenantOAuthCon***REMOVED***g, error) {
+func NewMultiTenantOAuthConfig(activeDirectoryEndpoint, primaryTenantID string, auxiliaryTenantIDs []string, options OAuthOptions) (MultiTenantOAuthConfig, error) {
 	if len(auxiliaryTenantIDs) == 0 || len(auxiliaryTenantIDs) > 3 {
 		return nil, errors.New("must specify one to three auxiliary tenants")
 	}
-	mtCfg := multiTenantOAuthCon***REMOVED***g{
-		cfgs: make([]*OAuthCon***REMOVED***g, len(auxiliaryTenantIDs)+1),
+	mtCfg := multiTenantOAuthConfig{
+		cfgs: make([]*OAuthConfig, len(auxiliaryTenantIDs)+1),
 	}
 	apiVer := options.apiVersion()
-	pri, err := NewOAuthCon***REMOVED***gWithAPIVersion(activeDirectoryEndpoint, primaryTenantID, &apiVer)
+	pri, err := NewOAuthConfigWithAPIVersion(activeDirectoryEndpoint, primaryTenantID, &apiVer)
 	if err != nil {
-		return nil, fmt.Errorf("failed to create OAuthCon***REMOVED***g for primary tenant: %v", err)
+		return nil, fmt.Errorf("failed to create OAuthConfig for primary tenant: %v", err)
 	}
 	mtCfg.cfgs[0] = pri
 	for i := range auxiliaryTenantIDs {
-		aux, err := NewOAuthCon***REMOVED***g(activeDirectoryEndpoint, auxiliaryTenantIDs[i])
+		aux, err := NewOAuthConfig(activeDirectoryEndpoint, auxiliaryTenantIDs[i])
 		if err != nil {
-			return nil, fmt.Errorf("failed to create OAuthCon***REMOVED***g for tenant '%s': %v", auxiliaryTenantIDs[i], err)
+			return nil, fmt.Errorf("failed to create OAuthConfig for tenant '%s': %v", auxiliaryTenantIDs[i], err)
 		}
 		mtCfg.cfgs[i+1] = aux
 	}
 	return mtCfg, nil
 }
 
-type multiTenantOAuthCon***REMOVED***g struct {
-	// ***REMOVED***rst con***REMOVED***g in the slice is the primary tenant
-	cfgs []*OAuthCon***REMOVED***g
+type multiTenantOAuthConfig struct {
+	// first config in the slice is the primary tenant
+	cfgs []*OAuthConfig
 }
 
-func (m multiTenantOAuthCon***REMOVED***g) PrimaryTenant() *OAuthCon***REMOVED***g {
+func (m multiTenantOAuthConfig) PrimaryTenant() *OAuthConfig {
 	return m.cfgs[0]
 }
 
-func (m multiTenantOAuthCon***REMOVED***g) AuxiliaryTenants() []*OAuthCon***REMOVED***g {
+func (m multiTenantOAuthConfig) AuxiliaryTenants() []*OAuthConfig {
 	return m.cfgs[1:]
 }

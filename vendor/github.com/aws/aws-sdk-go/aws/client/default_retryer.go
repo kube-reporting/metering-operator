@@ -116,7 +116,7 @@ func (d DefaultRetryer) RetryRules(r *request.Request) time.Duration {
 		if delay > maxDelay {
 			delay = getJitterDelay(maxDelay / 2)
 		}
-	} ***REMOVED*** {
+	} else {
 		delay = getJitterDelay(maxDelay / 2)
 	}
 	return delay + initialDelay

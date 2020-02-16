@@ -8,29 +8,29 @@ import (
 	"github.com/aws/aws-sdk-go/aws/endpoints"
 )
 
-// UseServiceDefaultRetries instructs the con***REMOVED***g to use the service's own
+// UseServiceDefaultRetries instructs the config to use the service's own
 // default number of retries. This will be the default action if
-// Con***REMOVED***g.MaxRetries is nil also.
+// Config.MaxRetries is nil also.
 const UseServiceDefaultRetries = -1
 
 // RequestRetryer is an alias for a type that implements the request.Retryer
 // interface.
 type RequestRetryer interface{}
 
-// A Con***REMOVED***g provides service con***REMOVED***guration for service clients. By default,
-// all clients will use the defaults.DefaultCon***REMOVED***g structure.
+// A Config provides service configuration for service clients. By default,
+// all clients will use the defaults.DefaultConfig structure.
 //
-//     // Create Session with MaxRetries con***REMOVED***guration to be shared by multiple
+//     // Create Session with MaxRetries configuration to be shared by multiple
 //     // service clients.
-//     sess := session.Must(session.NewSession(&aws.Con***REMOVED***g{
+//     sess := session.Must(session.NewSession(&aws.Config{
 //         MaxRetries: aws.Int(3),
 //     }))
 //
-//     // Create S3 service client with a speci***REMOVED***c Region.
-//     svc := s3.New(sess, &aws.Con***REMOVED***g{
+//     // Create S3 service client with a specific Region.
+//     svc := s3.New(sess, &aws.Config{
 //         Region: aws.String("us-west-2"),
 //     })
-type Con***REMOVED***g struct {
+type Config struct {
 	// Enables verbose error printing of all credential chain errors.
 	// Should be used when wanting to see all errors while attempting to
 	// retrieve credentials.
@@ -38,10 +38,10 @@ type Con***REMOVED***g struct {
 
 	// The credentials object to use when signing requests. Defaults to a
 	// chain of credential providers to search for credentials in environment
-	// variables, shared credential ***REMOVED***le, and EC2 Instance Roles.
+	// variables, shared credential file, and EC2 Instance Roles.
 	Credentials *credentials.Credentials
 
-	// An optional endpoint URL (hostname only or fully quali***REMOVED***ed URI)
+	// An optional endpoint URL (hostname only or fully qualified URI)
 	// that overrides the default generated endpoint for a client. Set this
 	// to `""` to use the default generated endpoint.
 	//
@@ -57,11 +57,11 @@ type Con***REMOVED***g struct {
 	// ShouldRetry regardless of whether or not if request.Retryable is set.
 	// This will utilize ShouldRetry method of custom retryers. If EnforceShouldRetryCheck
 	// is not set, then ShouldRetry will only be called if request.Retryable is nil.
-	// Proper handling of the request.Retryable ***REMOVED***eld is important when setting this ***REMOVED***eld.
+	// Proper handling of the request.Retryable field is important when setting this field.
 	EnforceShouldRetryCheck *bool
 
 	// The region to send requests to. This parameter is required and must
-	// be con***REMOVED***gured globally or on a per-client basis unless otherwise
+	// be configured globally or on a per-client basis unless otherwise
 	// noted. A full list of regions is found in the "Regions and Endpoints"
 	// document.
 	//
@@ -88,7 +88,7 @@ type Con***REMOVED***g struct {
 
 	// The maximum number of times that a request will be retried for failures.
 	// Defaults to -1, which defers the max retry setting to the service
-	// speci***REMOVED***c con***REMOVED***guration.
+	// specific configuration.
 	MaxRetries *int
 
 	// Retryer guides how HTTP requests should be retried in case of
@@ -100,15 +100,15 @@ type Con***REMOVED***g struct {
 	// When both Retryer and MaxRetries are non-nil, the former is used and
 	// the latter ignored.
 	//
-	// To set the Retryer ***REMOVED***eld in a type-safe manner and with chaining, use
+	// To set the Retryer field in a type-safe manner and with chaining, use
 	// the request.WithRetryer helper function:
 	//
-	//   cfg := request.WithRetryer(aws.NewCon***REMOVED***g(), myRetryer)
+	//   cfg := request.WithRetryer(aws.NewConfig(), myRetryer)
 	//
 	Retryer RequestRetryer
 
 	// Disables semantic parameter validation, which validates input for
-	// missing required ***REMOVED***elds and/or other semantic request input errors.
+	// missing required fields and/or other semantic request input errors.
 	DisableParamValidation *bool
 
 	// Disables the computation of request and response checksums, e.g.,
@@ -120,7 +120,7 @@ type Con***REMOVED***g struct {
 	// will use virtual hosted bucket addressing when possible
 	// (`http://BUCKET.s3.amazonaws.com/KEY`).
 	//
-	// Note: This con***REMOVED***guration option is speci***REMOVED***c to the Amazon S3 service.
+	// Note: This configuration option is specific to the Amazon S3 service.
 	//
 	// See http://docs.aws.amazon.com/AmazonS3/latest/dev/VirtualHosting.html
 	// for Amazon S3: Virtual Hosting of Buckets
@@ -152,7 +152,7 @@ type Con***REMOVED***g struct {
 	// with accelerate.
 	S3UseAccelerate *bool
 
-	// S3DisableContentMD5Validation con***REMOVED***g option is temporarily disabled,
+	// S3DisableContentMD5Validation config option is temporarily disabled,
 	// For S3 GetObject API calls, #1837.
 	//
 	// Set this to `true` to disable the S3 service client from automatically
@@ -171,7 +171,7 @@ type Con***REMOVED***g struct {
 	// the EC2Metadata overriding the timeout for default credentials chain.
 	//
 	// Example:
-	//    sess := session.Must(session.NewSession(aws.NewCon***REMOVED***g()
+	//    sess := session.Must(session.NewSession(aws.NewConfig()
 	//       .WithEC2MetadataDiableTimeoutOverride(true)))
 	//
 	//    svc := s3.New(sess)
@@ -187,20 +187,20 @@ type Con***REMOVED***g struct {
 	// as it will apply to all service clients created with the session. Even
 	// services which don't support dual stack endpoints.
 	//
-	// If the Endpoint con***REMOVED***g value is also provided the UseDualStack flag
+	// If the Endpoint config value is also provided the UseDualStack flag
 	// will be ignored.
 	//
 	// Only supported with.
 	//
 	//     sess := session.Must(session.NewSession())
 	//
-	//     svc := s3.New(sess, &aws.Con***REMOVED***g{
+	//     svc := s3.New(sess, &aws.Config{
 	//         UseDualStack: aws.Bool(true),
 	//     })
 	UseDualStack *bool
 
 	// SleepDelay is an override for the func the SDK will call when sleeping
-	// during the lifecycle of a request. Speci***REMOVED***cally this will be used for
+	// during the lifecycle of a request. Specifically this will be used for
 	// request delays. This value should only be used for testing. To adjust
 	// the delay of a request see the aws/client.DefaultRetryer and
 	// aws/request.Retryer.
@@ -214,7 +214,7 @@ type Con***REMOVED***g struct {
 	// Will default to false. This would only be used for empty directory names in s3 requests.
 	//
 	// Example:
-	//    sess := session.Must(session.NewSession(&aws.Con***REMOVED***g{
+	//    sess := session.Must(session.NewSession(&aws.Config{
 	//         DisableRestProtocolURICleaning: aws.Bool(true),
 	//    }))
 	//
@@ -226,10 +226,10 @@ type Con***REMOVED***g struct {
 	DisableRestProtocolURICleaning *bool
 
 	// EnableEndpointDiscovery will allow for endpoint discovery on operations that
-	// have the de***REMOVED***nition in its model. By default, endpoint discovery is off.
+	// have the definition in its model. By default, endpoint discovery is off.
 	//
 	// Example:
-	//    sess := session.Must(session.NewSession(&aws.Con***REMOVED***g{
+	//    sess := session.Must(session.NewSession(&aws.Config{
 	//         EnableEndpointDiscovery: aws.Bool(true),
 	//    }))
 	//
@@ -240,197 +240,197 @@ type Con***REMOVED***g struct {
 	//    })
 	EnableEndpointDiscovery *bool
 
-	// DisableEndpointHostPre***REMOVED***x will disable the SDK's behavior of pre***REMOVED***xing
+	// DisableEndpointHostPrefix will disable the SDK's behavior of prefixing
 	// request endpoint hosts with modeled information.
 	//
 	// Disabling this feature is useful when you want to use local endpoints
-	// for testing that do not support the modeled host pre***REMOVED***x pattern.
-	DisableEndpointHostPre***REMOVED***x *bool
+	// for testing that do not support the modeled host prefix pattern.
+	DisableEndpointHostPrefix *bool
 
 	// STSRegionalEndpoint will enable regional or legacy endpoint resolving
 	STSRegionalEndpoint endpoints.STSRegionalEndpoint
 }
 
-// NewCon***REMOVED***g returns a new Con***REMOVED***g pointer that can be chained with builder
-// methods to set multiple con***REMOVED***guration values inline without using pointers.
+// NewConfig returns a new Config pointer that can be chained with builder
+// methods to set multiple configuration values inline without using pointers.
 //
-//     // Create Session with MaxRetries con***REMOVED***guration to be shared by multiple
+//     // Create Session with MaxRetries configuration to be shared by multiple
 //     // service clients.
-//     sess := session.Must(session.NewSession(aws.NewCon***REMOVED***g().
+//     sess := session.Must(session.NewSession(aws.NewConfig().
 //         WithMaxRetries(3),
 //     ))
 //
-//     // Create S3 service client with a speci***REMOVED***c Region.
-//     svc := s3.New(sess, aws.NewCon***REMOVED***g().
+//     // Create S3 service client with a specific Region.
+//     svc := s3.New(sess, aws.NewConfig().
 //         WithRegion("us-west-2"),
 //     )
-func NewCon***REMOVED***g() *Con***REMOVED***g {
-	return &Con***REMOVED***g{}
+func NewConfig() *Config {
+	return &Config{}
 }
 
-// WithCredentialsChainVerboseErrors sets a con***REMOVED***g verbose errors boolean and returning
-// a Con***REMOVED***g pointer.
-func (c *Con***REMOVED***g) WithCredentialsChainVerboseErrors(verboseErrs bool) *Con***REMOVED***g {
+// WithCredentialsChainVerboseErrors sets a config verbose errors boolean and returning
+// a Config pointer.
+func (c *Config) WithCredentialsChainVerboseErrors(verboseErrs bool) *Config {
 	c.CredentialsChainVerboseErrors = &verboseErrs
 	return c
 }
 
-// WithCredentials sets a con***REMOVED***g Credentials value returning a Con***REMOVED***g pointer
+// WithCredentials sets a config Credentials value returning a Config pointer
 // for chaining.
-func (c *Con***REMOVED***g) WithCredentials(creds *credentials.Credentials) *Con***REMOVED***g {
+func (c *Config) WithCredentials(creds *credentials.Credentials) *Config {
 	c.Credentials = creds
 	return c
 }
 
-// WithEndpoint sets a con***REMOVED***g Endpoint value returning a Con***REMOVED***g pointer for
+// WithEndpoint sets a config Endpoint value returning a Config pointer for
 // chaining.
-func (c *Con***REMOVED***g) WithEndpoint(endpoint string) *Con***REMOVED***g {
+func (c *Config) WithEndpoint(endpoint string) *Config {
 	c.Endpoint = &endpoint
 	return c
 }
 
-// WithEndpointResolver sets a con***REMOVED***g EndpointResolver value returning a
-// Con***REMOVED***g pointer for chaining.
-func (c *Con***REMOVED***g) WithEndpointResolver(resolver endpoints.Resolver) *Con***REMOVED***g {
+// WithEndpointResolver sets a config EndpointResolver value returning a
+// Config pointer for chaining.
+func (c *Config) WithEndpointResolver(resolver endpoints.Resolver) *Config {
 	c.EndpointResolver = resolver
 	return c
 }
 
-// WithRegion sets a con***REMOVED***g Region value returning a Con***REMOVED***g pointer for
+// WithRegion sets a config Region value returning a Config pointer for
 // chaining.
-func (c *Con***REMOVED***g) WithRegion(region string) *Con***REMOVED***g {
+func (c *Config) WithRegion(region string) *Config {
 	c.Region = &region
 	return c
 }
 
-// WithDisableSSL sets a con***REMOVED***g DisableSSL value returning a Con***REMOVED***g pointer
+// WithDisableSSL sets a config DisableSSL value returning a Config pointer
 // for chaining.
-func (c *Con***REMOVED***g) WithDisableSSL(disable bool) *Con***REMOVED***g {
+func (c *Config) WithDisableSSL(disable bool) *Config {
 	c.DisableSSL = &disable
 	return c
 }
 
-// WithHTTPClient sets a con***REMOVED***g HTTPClient value returning a Con***REMOVED***g pointer
+// WithHTTPClient sets a config HTTPClient value returning a Config pointer
 // for chaining.
-func (c *Con***REMOVED***g) WithHTTPClient(client *http.Client) *Con***REMOVED***g {
+func (c *Config) WithHTTPClient(client *http.Client) *Config {
 	c.HTTPClient = client
 	return c
 }
 
-// WithMaxRetries sets a con***REMOVED***g MaxRetries value returning a Con***REMOVED***g pointer
+// WithMaxRetries sets a config MaxRetries value returning a Config pointer
 // for chaining.
-func (c *Con***REMOVED***g) WithMaxRetries(max int) *Con***REMOVED***g {
+func (c *Config) WithMaxRetries(max int) *Config {
 	c.MaxRetries = &max
 	return c
 }
 
-// WithDisableParamValidation sets a con***REMOVED***g DisableParamValidation value
-// returning a Con***REMOVED***g pointer for chaining.
-func (c *Con***REMOVED***g) WithDisableParamValidation(disable bool) *Con***REMOVED***g {
+// WithDisableParamValidation sets a config DisableParamValidation value
+// returning a Config pointer for chaining.
+func (c *Config) WithDisableParamValidation(disable bool) *Config {
 	c.DisableParamValidation = &disable
 	return c
 }
 
-// WithDisableComputeChecksums sets a con***REMOVED***g DisableComputeChecksums value
-// returning a Con***REMOVED***g pointer for chaining.
-func (c *Con***REMOVED***g) WithDisableComputeChecksums(disable bool) *Con***REMOVED***g {
+// WithDisableComputeChecksums sets a config DisableComputeChecksums value
+// returning a Config pointer for chaining.
+func (c *Config) WithDisableComputeChecksums(disable bool) *Config {
 	c.DisableComputeChecksums = &disable
 	return c
 }
 
-// WithLogLevel sets a con***REMOVED***g LogLevel value returning a Con***REMOVED***g pointer for
+// WithLogLevel sets a config LogLevel value returning a Config pointer for
 // chaining.
-func (c *Con***REMOVED***g) WithLogLevel(level LogLevelType) *Con***REMOVED***g {
+func (c *Config) WithLogLevel(level LogLevelType) *Config {
 	c.LogLevel = &level
 	return c
 }
 
-// WithLogger sets a con***REMOVED***g Logger value returning a Con***REMOVED***g pointer for
+// WithLogger sets a config Logger value returning a Config pointer for
 // chaining.
-func (c *Con***REMOVED***g) WithLogger(logger Logger) *Con***REMOVED***g {
+func (c *Config) WithLogger(logger Logger) *Config {
 	c.Logger = logger
 	return c
 }
 
-// WithS3ForcePathStyle sets a con***REMOVED***g S3ForcePathStyle value returning a Con***REMOVED***g
+// WithS3ForcePathStyle sets a config S3ForcePathStyle value returning a Config
 // pointer for chaining.
-func (c *Con***REMOVED***g) WithS3ForcePathStyle(force bool) *Con***REMOVED***g {
+func (c *Config) WithS3ForcePathStyle(force bool) *Config {
 	c.S3ForcePathStyle = &force
 	return c
 }
 
-// WithS3Disable100Continue sets a con***REMOVED***g S3Disable100Continue value returning
-// a Con***REMOVED***g pointer for chaining.
-func (c *Con***REMOVED***g) WithS3Disable100Continue(disable bool) *Con***REMOVED***g {
+// WithS3Disable100Continue sets a config S3Disable100Continue value returning
+// a Config pointer for chaining.
+func (c *Config) WithS3Disable100Continue(disable bool) *Config {
 	c.S3Disable100Continue = &disable
 	return c
 }
 
-// WithS3UseAccelerate sets a con***REMOVED***g S3UseAccelerate value returning a Con***REMOVED***g
+// WithS3UseAccelerate sets a config S3UseAccelerate value returning a Config
 // pointer for chaining.
-func (c *Con***REMOVED***g) WithS3UseAccelerate(enable bool) *Con***REMOVED***g {
+func (c *Config) WithS3UseAccelerate(enable bool) *Config {
 	c.S3UseAccelerate = &enable
 	return c
 
 }
 
-// WithS3DisableContentMD5Validation sets a con***REMOVED***g
-// S3DisableContentMD5Validation value returning a Con***REMOVED***g pointer for chaining.
-func (c *Con***REMOVED***g) WithS3DisableContentMD5Validation(enable bool) *Con***REMOVED***g {
+// WithS3DisableContentMD5Validation sets a config
+// S3DisableContentMD5Validation value returning a Config pointer for chaining.
+func (c *Config) WithS3DisableContentMD5Validation(enable bool) *Config {
 	c.S3DisableContentMD5Validation = &enable
 	return c
 
 }
 
-// WithUseDualStack sets a con***REMOVED***g UseDualStack value returning a Con***REMOVED***g
+// WithUseDualStack sets a config UseDualStack value returning a Config
 // pointer for chaining.
-func (c *Con***REMOVED***g) WithUseDualStack(enable bool) *Con***REMOVED***g {
+func (c *Config) WithUseDualStack(enable bool) *Config {
 	c.UseDualStack = &enable
 	return c
 }
 
-// WithEC2MetadataDisableTimeoutOverride sets a con***REMOVED***g EC2MetadataDisableTimeoutOverride value
-// returning a Con***REMOVED***g pointer for chaining.
-func (c *Con***REMOVED***g) WithEC2MetadataDisableTimeoutOverride(enable bool) *Con***REMOVED***g {
+// WithEC2MetadataDisableTimeoutOverride sets a config EC2MetadataDisableTimeoutOverride value
+// returning a Config pointer for chaining.
+func (c *Config) WithEC2MetadataDisableTimeoutOverride(enable bool) *Config {
 	c.EC2MetadataDisableTimeoutOverride = &enable
 	return c
 }
 
 // WithSleepDelay overrides the function used to sleep while waiting for the
 // next retry. Defaults to time.Sleep.
-func (c *Con***REMOVED***g) WithSleepDelay(fn func(time.Duration)) *Con***REMOVED***g {
+func (c *Config) WithSleepDelay(fn func(time.Duration)) *Config {
 	c.SleepDelay = fn
 	return c
 }
 
 // WithEndpointDiscovery will set whether or not to use endpoint discovery.
-func (c *Con***REMOVED***g) WithEndpointDiscovery(t bool) *Con***REMOVED***g {
+func (c *Config) WithEndpointDiscovery(t bool) *Config {
 	c.EnableEndpointDiscovery = &t
 	return c
 }
 
-// WithDisableEndpointHostPre***REMOVED***x will set whether or not to use modeled host pre***REMOVED***x
+// WithDisableEndpointHostPrefix will set whether or not to use modeled host prefix
 // when making requests.
-func (c *Con***REMOVED***g) WithDisableEndpointHostPre***REMOVED***x(t bool) *Con***REMOVED***g {
-	c.DisableEndpointHostPre***REMOVED***x = &t
+func (c *Config) WithDisableEndpointHostPrefix(t bool) *Config {
+	c.DisableEndpointHostPrefix = &t
 	return c
 }
 
-// MergeIn merges the passed in con***REMOVED***gs into the existing con***REMOVED***g object.
-func (c *Con***REMOVED***g) MergeIn(cfgs ...*Con***REMOVED***g) {
+// MergeIn merges the passed in configs into the existing config object.
+func (c *Config) MergeIn(cfgs ...*Config) {
 	for _, other := range cfgs {
-		mergeInCon***REMOVED***g(c, other)
+		mergeInConfig(c, other)
 	}
 }
 
 // WithSTSRegionalEndpoint will set whether or not to use regional endpoint flag
 // when resolving the endpoint for a service
-func (c *Con***REMOVED***g) WithSTSRegionalEndpoint(sre endpoints.STSRegionalEndpoint) *Con***REMOVED***g {
+func (c *Config) WithSTSRegionalEndpoint(sre endpoints.STSRegionalEndpoint) *Config {
 	c.STSRegionalEndpoint = sre
 	return c
 }
 
-func mergeInCon***REMOVED***g(dst *Con***REMOVED***g, other *Con***REMOVED***g) {
+func mergeInConfig(dst *Config, other *Config) {
 	if other == nil {
 		return
 	}
@@ -527,8 +527,8 @@ func mergeInCon***REMOVED***g(dst *Con***REMOVED***g, other *Con***REMOVED***g) 
 		dst.EnableEndpointDiscovery = other.EnableEndpointDiscovery
 	}
 
-	if other.DisableEndpointHostPre***REMOVED***x != nil {
-		dst.DisableEndpointHostPre***REMOVED***x = other.DisableEndpointHostPre***REMOVED***x
+	if other.DisableEndpointHostPrefix != nil {
+		dst.DisableEndpointHostPrefix = other.DisableEndpointHostPrefix
 	}
 
 	if other.STSRegionalEndpoint != endpoints.UnsetSTSEndpoint {
@@ -536,10 +536,10 @@ func mergeInCon***REMOVED***g(dst *Con***REMOVED***g, other *Con***REMOVED***g) 
 	}
 }
 
-// Copy will return a shallow copy of the Con***REMOVED***g object. If any additional
-// con***REMOVED***gurations are provided they will be merged into the new con***REMOVED***g returned.
-func (c *Con***REMOVED***g) Copy(cfgs ...*Con***REMOVED***g) *Con***REMOVED***g {
-	dst := &Con***REMOVED***g{}
+// Copy will return a shallow copy of the Config object. If any additional
+// configurations are provided they will be merged into the new config returned.
+func (c *Config) Copy(cfgs ...*Config) *Config {
+	dst := &Config{}
 	dst.MergeIn(c)
 
 	for _, cfg := range cfgs {

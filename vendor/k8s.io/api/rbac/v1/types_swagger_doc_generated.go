@@ -2,7 +2,7 @@
 Copyright The Kubernetes Authors.
 
 Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this ***REMOVED***le except in compliance with the License.
+you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
 
     http://www.apache.org/licenses/LICENSE-2.0
@@ -10,13 +10,13 @@ You may obtain a copy of the License at
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the speci***REMOVED***c language governing permissions and
+See the License for the specific language governing permissions and
 limitations under the License.
 */
 
 package v1
 
-// This ***REMOVED***le contains a collection of methods that can be used from go-restful to
+// This file contains a collection of methods that can be used from go-restful to
 // generate Swagger API documentation for its models. Please read this PR for more
 // information on the implementation: https://github.com/emicklei/go-restful/pull/215
 //
@@ -29,7 +29,7 @@ package v1
 // AUTO-GENERATED FUNCTIONS START HERE. DO NOT EDIT.
 var map_AggregationRule = map[string]string{
 	"":                     "AggregationRule describes how to locate ClusterRoles to aggregate into the ClusterRole",
-	"clusterRoleSelectors": "ClusterRoleSelectors holds a list of selectors which will be used to ***REMOVED***nd ClusterRoles and create the rules. If any of the selectors match, then the ClusterRole's permissions will be added",
+	"clusterRoleSelectors": "ClusterRoleSelectors holds a list of selectors which will be used to find ClusterRoles and create the rules. If any of the selectors match, then the ClusterRole's permissions will be added",
 }
 
 func (AggregationRule) SwaggerDoc() map[string]string {
@@ -40,7 +40,7 @@ var map_ClusterRole = map[string]string{
 	"":                "ClusterRole is a cluster level, logical grouping of PolicyRules that can be referenced as a unit by a RoleBinding or ClusterRoleBinding.",
 	"metadata":        "Standard object's metadata.",
 	"rules":           "Rules holds all the PolicyRules for this ClusterRole",
-	"aggregationRule": "AggregationRule is an optional ***REMOVED***eld that describes how to build the Rules for this ClusterRole. If AggregationRule is set, then the Rules are controller managed and direct changes to Rules will be stomped by the controller.",
+	"aggregationRule": "AggregationRule is an optional field that describes how to build the Rules for this ClusterRole. If AggregationRule is set, then the Rules are controller managed and direct changes to Rules will be stomped by the controller.",
 }
 
 func (ClusterRole) SwaggerDoc() map[string]string {
@@ -81,10 +81,10 @@ func (ClusterRoleList) SwaggerDoc() map[string]string {
 var map_PolicyRule = map[string]string{
 	"":                "PolicyRule holds information that describes a policy rule, but does not contain information about who the rule applies to or which namespace the rule applies to.",
 	"verbs":           "Verbs is a list of Verbs that apply to ALL the ResourceKinds and AttributeRestrictions contained in this rule.  VerbAll represents all kinds.",
-	"apiGroups":       "APIGroups is the name of the APIGroup that contains the resources.  If multiple API groups are speci***REMOVED***ed, any action requested against one of the enumerated resources in any API group will be allowed.",
+	"apiGroups":       "APIGroups is the name of the APIGroup that contains the resources.  If multiple API groups are specified, any action requested against one of the enumerated resources in any API group will be allowed.",
 	"resources":       "Resources is a list of resources this rule applies to.  ResourceAll represents all resources.",
 	"resourceNames":   "ResourceNames is an optional white list of names that the rule applies to.  An empty set means that everything is allowed.",
-	"nonResourceURLs": "NonResourceURLs is a set of partial urls that a user should have access to.  *s are allowed, but only as the full, ***REMOVED***nal step in the path Since non-resource URLs are not namespaced, this ***REMOVED***eld is only applicable for ClusterRoles referenced from a ClusterRoleBinding. Rules can either apply to API resources (such as \"pods\" or \"secrets\") or non-resource URL paths (such as \"/api\"),  but not both.",
+	"nonResourceURLs": "NonResourceURLs is a set of partial urls that a user should have access to.  *s are allowed, but only as the full, final step in the path Since non-resource URLs are not namespaced, this field is only applicable for ClusterRoles referenced from a ClusterRoleBinding. Rules can either apply to API resources (such as \"pods\" or \"secrets\") or non-resource URL paths (such as \"/api\"),  but not both.",
 }
 
 func (PolicyRule) SwaggerDoc() map[string]string {
@@ -145,7 +145,7 @@ func (RoleRef) SwaggerDoc() map[string]string {
 
 var map_Subject = map[string]string{
 	"":          "Subject contains a reference to the object or user identities a role binding applies to.  This can either hold a direct API object reference, or a value for non-objects such as user and group names.",
-	"kind":      "Kind of object being referenced. Values de***REMOVED***ned by this API group are \"User\", \"Group\", and \"ServiceAccount\". If the Authorizer does not recognized the kind value, the Authorizer should report an error.",
+	"kind":      "Kind of object being referenced. Values defined by this API group are \"User\", \"Group\", and \"ServiceAccount\". If the Authorizer does not recognized the kind value, the Authorizer should report an error.",
 	"apiGroup":  "APIGroup holds the API group of the referenced subject. Defaults to \"\" for ServiceAccount subjects. Defaults to \"rbac.authorization.k8s.io\" for User and Group subjects.",
 	"name":      "Name of the object being referenced.",
 	"namespace": "Namespace of the referenced object.  If the object kind is non-namespace, such as \"User\" or \"Group\", and this value is not empty the Authorizer should report an error.",

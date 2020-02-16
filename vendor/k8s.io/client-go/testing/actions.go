@@ -2,7 +2,7 @@
 Copyright 2015 The Kubernetes Authors.
 
 Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this ***REMOVED***le except in compliance with the License.
+you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
 
     http://www.apache.org/licenses/LICENSE-2.0
@@ -10,7 +10,7 @@ You may obtain a copy of the License at
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the speci***REMOVED***c language governing permissions and
+See the License for the specific language governing permissions and
 limitations under the License.
 */
 
@@ -22,7 +22,7 @@ import (
 	"strings"
 
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/apimachinery/pkg/***REMOVED***elds"
+	"k8s.io/apimachinery/pkg/fields"
 	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/schema"
@@ -74,8 +74,8 @@ func NewRootListAction(resource schema.GroupVersionResource, kind schema.GroupVe
 	action.Verb = "list"
 	action.Resource = resource
 	action.Kind = kind
-	labelSelector, ***REMOVED***eldSelector, _ := ExtractFromListOptions(opts)
-	action.ListRestrictions = ListRestrictions{labelSelector, ***REMOVED***eldSelector}
+	labelSelector, fieldSelector, _ := ExtractFromListOptions(opts)
+	action.ListRestrictions = ListRestrictions{labelSelector, fieldSelector}
 
 	return action
 }
@@ -86,8 +86,8 @@ func NewListAction(resource schema.GroupVersionResource, kind schema.GroupVersio
 	action.Resource = resource
 	action.Kind = kind
 	action.Namespace = namespace
-	labelSelector, ***REMOVED***eldSelector, _ := ExtractFromListOptions(opts)
-	action.ListRestrictions = ListRestrictions{labelSelector, ***REMOVED***eldSelector}
+	labelSelector, fieldSelector, _ := ExtractFromListOptions(opts)
+	action.ListRestrictions = ListRestrictions{labelSelector, fieldSelector}
 
 	return action
 }
@@ -265,8 +265,8 @@ func NewRootDeleteCollectionAction(resource schema.GroupVersionResource, opts in
 	action := DeleteCollectionActionImpl{}
 	action.Verb = "delete-collection"
 	action.Resource = resource
-	labelSelector, ***REMOVED***eldSelector, _ := ExtractFromListOptions(opts)
-	action.ListRestrictions = ListRestrictions{labelSelector, ***REMOVED***eldSelector}
+	labelSelector, fieldSelector, _ := ExtractFromListOptions(opts)
+	action.ListRestrictions = ListRestrictions{labelSelector, fieldSelector}
 
 	return action
 }
@@ -276,8 +276,8 @@ func NewDeleteCollectionAction(resource schema.GroupVersionResource, namespace s
 	action.Verb = "delete-collection"
 	action.Resource = resource
 	action.Namespace = namespace
-	labelSelector, ***REMOVED***eldSelector, _ := ExtractFromListOptions(opts)
-	action.ListRestrictions = ListRestrictions{labelSelector, ***REMOVED***eldSelector}
+	labelSelector, fieldSelector, _ := ExtractFromListOptions(opts)
+	action.ListRestrictions = ListRestrictions{labelSelector, fieldSelector}
 
 	return action
 }
@@ -286,13 +286,13 @@ func NewRootWatchAction(resource schema.GroupVersionResource, opts interface{}) 
 	action := WatchActionImpl{}
 	action.Verb = "watch"
 	action.Resource = resource
-	labelSelector, ***REMOVED***eldSelector, resourceVersion := ExtractFromListOptions(opts)
-	action.WatchRestrictions = WatchRestrictions{labelSelector, ***REMOVED***eldSelector, resourceVersion}
+	labelSelector, fieldSelector, resourceVersion := ExtractFromListOptions(opts)
+	action.WatchRestrictions = WatchRestrictions{labelSelector, fieldSelector, resourceVersion}
 
 	return action
 }
 
-func ExtractFromListOptions(opts interface{}) (labelSelector labels.Selector, ***REMOVED***eldSelector ***REMOVED***elds.Selector, resourceVersion string) {
+func ExtractFromListOptions(opts interface{}) (labelSelector labels.Selector, fieldSelector fields.Selector, resourceVersion string) {
 	var err error
 	switch t := opts.(type) {
 	case metav1.ListOptions:
@@ -300,7 +300,7 @@ func ExtractFromListOptions(opts interface{}) (labelSelector labels.Selector, **
 		if err != nil {
 			panic(fmt.Errorf("invalid selector %q: %v", t.LabelSelector, err))
 		}
-		***REMOVED***eldSelector, err = ***REMOVED***elds.ParseSelector(t.FieldSelector)
+		fieldSelector, err = fields.ParseSelector(t.FieldSelector)
 		if err != nil {
 			panic(fmt.Errorf("invalid selector %q: %v", t.FieldSelector, err))
 		}
@@ -311,10 +311,10 @@ func ExtractFromListOptions(opts interface{}) (labelSelector labels.Selector, **
 	if labelSelector == nil {
 		labelSelector = labels.Everything()
 	}
-	if ***REMOVED***eldSelector == nil {
-		***REMOVED***eldSelector = ***REMOVED***elds.Everything()
+	if fieldSelector == nil {
+		fieldSelector = fields.Everything()
 	}
-	return labelSelector, ***REMOVED***eldSelector, resourceVersion
+	return labelSelector, fieldSelector, resourceVersion
 }
 
 func NewWatchAction(resource schema.GroupVersionResource, namespace string, opts interface{}) WatchActionImpl {
@@ -322,8 +322,8 @@ func NewWatchAction(resource schema.GroupVersionResource, namespace string, opts
 	action.Verb = "watch"
 	action.Resource = resource
 	action.Namespace = namespace
-	labelSelector, ***REMOVED***eldSelector, resourceVersion := ExtractFromListOptions(opts)
-	action.WatchRestrictions = WatchRestrictions{labelSelector, ***REMOVED***eldSelector, resourceVersion}
+	labelSelector, fieldSelector, resourceVersion := ExtractFromListOptions(opts)
+	action.WatchRestrictions = WatchRestrictions{labelSelector, fieldSelector, resourceVersion}
 
 	return action
 }
@@ -343,11 +343,11 @@ func NewProxyGetAction(resource schema.GroupVersionResource, namespace, scheme, 
 
 type ListRestrictions struct {
 	Labels labels.Selector
-	Fields ***REMOVED***elds.Selector
+	Fields fields.Selector
 }
 type WatchRestrictions struct {
 	Labels          labels.Selector
-	Fields          ***REMOVED***elds.Selector
+	Fields          fields.Selector
 	ResourceVersion string
 }
 

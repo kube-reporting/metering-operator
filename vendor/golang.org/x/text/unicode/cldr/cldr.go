@@ -1,6 +1,6 @@
 // Copyright 2013 The Go Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE ***REMOVED***le.
+// license that can be found in the LICENSE file.
 
 //go:generate go run makexml.go -output xml.go
 
@@ -12,7 +12,7 @@
 // This mostly means that data may appear and disappear between versions.
 // That is, old code should keep compiling for newer versions, but data
 // may have moved or changed.
-// CLDR version 22 is the ***REMOVED***rst version supported by this package.
+// CLDR version 22 is the first version supported by this package.
 // Older versions may not work.
 package cldr // import "golang.org/x/text/unicode/cldr"
 
@@ -52,10 +52,10 @@ const (
 	Approved Draft = iota
 	Contributed
 	Provisional
-	Uncon***REMOVED***rmed
+	Unconfirmed
 )
 
-var drafts = []string{"uncon***REMOVED***rmed", "provisional", "contributed", "approved", ""}
+var drafts = []string{"unconfirmed", "provisional", "contributed", "approved", ""}
 
 // ParseDraft returns the Draft value corresponding to the given string. The
 // empty string corresponds to Approved.
@@ -65,7 +65,7 @@ func ParseDraft(level string) (Draft, error) {
 	}
 	for i, s := range drafts {
 		if level == s {
-			return Uncon***REMOVED***rmed - Draft(i), nil
+			return Unconfirmed - Draft(i), nil
 		}
 	}
 	return Approved, fmt.Errorf("cldr: unknown draft level %q", level)
@@ -104,9 +104,9 @@ func (cldr *CLDR) Supplemental() *SupplementalData {
 	return cldr.supp
 }
 
-// Locales returns the locales for which there exist ***REMOVED***les.
-// Valid sublocales for which there is no ***REMOVED***le are not included.
-// The root locale is always sorted ***REMOVED***rst.
+// Locales returns the locales for which there exist files.
+// Valid sublocales for which there is no file are not included.
+// The root locale is always sorted first.
 func (cldr *CLDR) Locales() []string {
 	loc := []string{"root"}
 	hasRoot := false
@@ -124,7 +124,7 @@ func (cldr *CLDR) Locales() []string {
 	return loc
 }
 
-// Get ***REMOVED***lls in the ***REMOVED***elds of x based on the XPath path.
+// Get fills in the fields of x based on the XPath path.
 func Get(e Elem, path string) (res Elem, err error) {
 	return walkXPath(e, path)
 }

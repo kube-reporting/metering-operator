@@ -26,7 +26,7 @@ type timeoutReadCloser struct {
 }
 
 // Read will spin off a goroutine to call the reader's Read method. We will
-// select on the timer's channel or the read's channel. Whoever completes ***REMOVED***rst
+// select on the timer's channel or the read's channel. Whoever completes first
 // will be returned.
 func (r *timeoutReadCloser) Read(b []byte) (int, error) {
 	timer := time.NewTimer(r.duration)

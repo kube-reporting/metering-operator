@@ -2,7 +2,7 @@
 Copyright 2014 The Kubernetes Authors.
 
 Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this ***REMOVED***le except in compliance with the License.
+you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
 
     http://www.apache.org/licenses/LICENSE-2.0
@@ -10,7 +10,7 @@ You may obtain a copy of the License at
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the speci***REMOVED***c language governing permissions and
+See the License for the specific language governing permissions and
 limitations under the License.
 */
 
@@ -23,7 +23,7 @@ import (
 
 	"k8s.io/apimachinery/pkg/api/resource"
 	"k8s.io/apimachinery/pkg/conversion"
-	"k8s.io/apimachinery/pkg/***REMOVED***elds"
+	"k8s.io/apimachinery/pkg/fields"
 	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/util/intstr"
@@ -50,8 +50,8 @@ func AddConversionFuncs(scheme *runtime.Scheme) error {
 		Convert_string_To_labels_Selector,
 		Convert_labels_Selector_To_string,
 
-		Convert_string_To_***REMOVED***elds_Selector,
-		Convert_***REMOVED***elds_Selector_To_string,
+		Convert_string_To_fields_Selector,
+		Convert_fields_Selector_To_string,
 
 		Convert_Pointer_bool_To_bool,
 		Convert_bool_To_Pointer_bool,
@@ -200,14 +200,14 @@ func Convert_intstr_IntOrString_To_intstr_IntOrString(in, out *intstr.IntOrStrin
 
 // +k8s:conversion-fn=copy-only
 func Convert_v1_Time_To_v1_Time(in *Time, out *Time, s conversion.Scope) error {
-	// Cannot deep copy these, because time.Time has unexported ***REMOVED***elds.
+	// Cannot deep copy these, because time.Time has unexported fields.
 	*out = *in
 	return nil
 }
 
 // +k8s:conversion-fn=copy-only
 func Convert_v1_MicroTime_To_v1_MicroTime(in *MicroTime, out *MicroTime, s conversion.Scope) error {
-	// Cannot deep copy these, because time.Time has unexported ***REMOVED***elds.
+	// Cannot deep copy these, because time.Time has unexported fields.
 	*out = *in
 	return nil
 }
@@ -245,8 +245,8 @@ func Convert_string_To_labels_Selector(in *string, out *labels.Selector, s conve
 	return nil
 }
 
-func Convert_string_To_***REMOVED***elds_Selector(in *string, out ****REMOVED***elds.Selector, s conversion.Scope) error {
-	selector, err := ***REMOVED***elds.ParseSelector(*in)
+func Convert_string_To_fields_Selector(in *string, out *fields.Selector, s conversion.Scope) error {
+	selector, err := fields.ParseSelector(*in)
 	if err != nil {
 		return err
 	}
@@ -262,7 +262,7 @@ func Convert_labels_Selector_To_string(in *labels.Selector, out *string, s conve
 	return nil
 }
 
-func Convert_***REMOVED***elds_Selector_To_string(in ****REMOVED***elds.Selector, out *string, s conversion.Scope) error {
+func Convert_fields_Selector_To_string(in *fields.Selector, out *string, s conversion.Scope) error {
 	if *in == nil {
 		return nil
 	}
@@ -312,7 +312,7 @@ func Convert_Slice_string_To_Slice_int32(in *[]string, out *[]int32, s conversio
 func Convert_Slice_string_To_v1_DeletionPropagation(input *[]string, out *DeletionPropagation, s conversion.Scope) error {
 	if len(*input) > 0 {
 		*out = DeletionPropagation((*input)[0])
-	} ***REMOVED*** {
+	} else {
 		*out = ""
 	}
 	return nil

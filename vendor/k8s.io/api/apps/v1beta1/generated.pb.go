@@ -2,7 +2,7 @@
 Copyright The Kubernetes Authors.
 
 Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this ***REMOVED***le except in compliance with the License.
+you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
 
     http://www.apache.org/licenses/LICENSE-2.0
@@ -10,7 +10,7 @@ You may obtain a copy of the License at
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the speci***REMOVED***c language governing permissions and
+See the License for the specific language governing permissions and
 limitations under the License.
 */
 
@@ -20,7 +20,7 @@ limitations under the License.
 /*
 	Package v1beta1 is a generated protocol buffer package.
 
-	It is generated from these ***REMOVED***les:
+	It is generated from these files:
 		k8s.io/kubernetes/vendor/k8s.io/api/apps/v1beta1/generated.proto
 
 	It has these top-level messages:
@@ -33,7 +33,7 @@ limitations under the License.
 		DeploymentSpec
 		DeploymentStatus
 		DeploymentStrategy
-		RollbackCon***REMOVED***g
+		RollbackConfig
 		RollingUpdateDeployment
 		RollingUpdateStatefulSetStrategy
 		Scale
@@ -69,7 +69,7 @@ var _ = proto.Marshal
 var _ = fmt.Errorf
 var _ = math.Inf
 
-// This is a compile-time assertion to ensure that this generated ***REMOVED***le
+// This is a compile-time assertion to ensure that this generated file
 // is compatible with the proto package it is being compiled against.
 // A compilation error at this line likely means your copy of the
 // proto package needs to be updated.
@@ -77,92 +77,92 @@ const _ = proto.GoGoProtoPackageIsVersion2 // please upgrade the proto package
 
 func (m *ControllerRevision) Reset()                    { *m = ControllerRevision{} }
 func (*ControllerRevision) ProtoMessage()               {}
-func (*ControllerRevision) Descriptor() ([]byte, []int) { return ***REMOVED***leDescriptorGenerated, []int{0} }
+func (*ControllerRevision) Descriptor() ([]byte, []int) { return fileDescriptorGenerated, []int{0} }
 
 func (m *ControllerRevisionList) Reset()                    { *m = ControllerRevisionList{} }
 func (*ControllerRevisionList) ProtoMessage()               {}
-func (*ControllerRevisionList) Descriptor() ([]byte, []int) { return ***REMOVED***leDescriptorGenerated, []int{1} }
+func (*ControllerRevisionList) Descriptor() ([]byte, []int) { return fileDescriptorGenerated, []int{1} }
 
 func (m *Deployment) Reset()                    { *m = Deployment{} }
 func (*Deployment) ProtoMessage()               {}
-func (*Deployment) Descriptor() ([]byte, []int) { return ***REMOVED***leDescriptorGenerated, []int{2} }
+func (*Deployment) Descriptor() ([]byte, []int) { return fileDescriptorGenerated, []int{2} }
 
 func (m *DeploymentCondition) Reset()                    { *m = DeploymentCondition{} }
 func (*DeploymentCondition) ProtoMessage()               {}
-func (*DeploymentCondition) Descriptor() ([]byte, []int) { return ***REMOVED***leDescriptorGenerated, []int{3} }
+func (*DeploymentCondition) Descriptor() ([]byte, []int) { return fileDescriptorGenerated, []int{3} }
 
 func (m *DeploymentList) Reset()                    { *m = DeploymentList{} }
 func (*DeploymentList) ProtoMessage()               {}
-func (*DeploymentList) Descriptor() ([]byte, []int) { return ***REMOVED***leDescriptorGenerated, []int{4} }
+func (*DeploymentList) Descriptor() ([]byte, []int) { return fileDescriptorGenerated, []int{4} }
 
 func (m *DeploymentRollback) Reset()                    { *m = DeploymentRollback{} }
 func (*DeploymentRollback) ProtoMessage()               {}
-func (*DeploymentRollback) Descriptor() ([]byte, []int) { return ***REMOVED***leDescriptorGenerated, []int{5} }
+func (*DeploymentRollback) Descriptor() ([]byte, []int) { return fileDescriptorGenerated, []int{5} }
 
 func (m *DeploymentSpec) Reset()                    { *m = DeploymentSpec{} }
 func (*DeploymentSpec) ProtoMessage()               {}
-func (*DeploymentSpec) Descriptor() ([]byte, []int) { return ***REMOVED***leDescriptorGenerated, []int{6} }
+func (*DeploymentSpec) Descriptor() ([]byte, []int) { return fileDescriptorGenerated, []int{6} }
 
 func (m *DeploymentStatus) Reset()                    { *m = DeploymentStatus{} }
 func (*DeploymentStatus) ProtoMessage()               {}
-func (*DeploymentStatus) Descriptor() ([]byte, []int) { return ***REMOVED***leDescriptorGenerated, []int{7} }
+func (*DeploymentStatus) Descriptor() ([]byte, []int) { return fileDescriptorGenerated, []int{7} }
 
 func (m *DeploymentStrategy) Reset()                    { *m = DeploymentStrategy{} }
 func (*DeploymentStrategy) ProtoMessage()               {}
-func (*DeploymentStrategy) Descriptor() ([]byte, []int) { return ***REMOVED***leDescriptorGenerated, []int{8} }
+func (*DeploymentStrategy) Descriptor() ([]byte, []int) { return fileDescriptorGenerated, []int{8} }
 
-func (m *RollbackCon***REMOVED***g) Reset()                    { *m = RollbackCon***REMOVED***g{} }
-func (*RollbackCon***REMOVED***g) ProtoMessage()               {}
-func (*RollbackCon***REMOVED***g) Descriptor() ([]byte, []int) { return ***REMOVED***leDescriptorGenerated, []int{9} }
+func (m *RollbackConfig) Reset()                    { *m = RollbackConfig{} }
+func (*RollbackConfig) ProtoMessage()               {}
+func (*RollbackConfig) Descriptor() ([]byte, []int) { return fileDescriptorGenerated, []int{9} }
 
 func (m *RollingUpdateDeployment) Reset()      { *m = RollingUpdateDeployment{} }
 func (*RollingUpdateDeployment) ProtoMessage() {}
 func (*RollingUpdateDeployment) Descriptor() ([]byte, []int) {
-	return ***REMOVED***leDescriptorGenerated, []int{10}
+	return fileDescriptorGenerated, []int{10}
 }
 
 func (m *RollingUpdateStatefulSetStrategy) Reset()      { *m = RollingUpdateStatefulSetStrategy{} }
 func (*RollingUpdateStatefulSetStrategy) ProtoMessage() {}
 func (*RollingUpdateStatefulSetStrategy) Descriptor() ([]byte, []int) {
-	return ***REMOVED***leDescriptorGenerated, []int{11}
+	return fileDescriptorGenerated, []int{11}
 }
 
 func (m *Scale) Reset()                    { *m = Scale{} }
 func (*Scale) ProtoMessage()               {}
-func (*Scale) Descriptor() ([]byte, []int) { return ***REMOVED***leDescriptorGenerated, []int{12} }
+func (*Scale) Descriptor() ([]byte, []int) { return fileDescriptorGenerated, []int{12} }
 
 func (m *ScaleSpec) Reset()                    { *m = ScaleSpec{} }
 func (*ScaleSpec) ProtoMessage()               {}
-func (*ScaleSpec) Descriptor() ([]byte, []int) { return ***REMOVED***leDescriptorGenerated, []int{13} }
+func (*ScaleSpec) Descriptor() ([]byte, []int) { return fileDescriptorGenerated, []int{13} }
 
 func (m *ScaleStatus) Reset()                    { *m = ScaleStatus{} }
 func (*ScaleStatus) ProtoMessage()               {}
-func (*ScaleStatus) Descriptor() ([]byte, []int) { return ***REMOVED***leDescriptorGenerated, []int{14} }
+func (*ScaleStatus) Descriptor() ([]byte, []int) { return fileDescriptorGenerated, []int{14} }
 
 func (m *StatefulSet) Reset()                    { *m = StatefulSet{} }
 func (*StatefulSet) ProtoMessage()               {}
-func (*StatefulSet) Descriptor() ([]byte, []int) { return ***REMOVED***leDescriptorGenerated, []int{15} }
+func (*StatefulSet) Descriptor() ([]byte, []int) { return fileDescriptorGenerated, []int{15} }
 
 func (m *StatefulSetCondition) Reset()                    { *m = StatefulSetCondition{} }
 func (*StatefulSetCondition) ProtoMessage()               {}
-func (*StatefulSetCondition) Descriptor() ([]byte, []int) { return ***REMOVED***leDescriptorGenerated, []int{16} }
+func (*StatefulSetCondition) Descriptor() ([]byte, []int) { return fileDescriptorGenerated, []int{16} }
 
 func (m *StatefulSetList) Reset()                    { *m = StatefulSetList{} }
 func (*StatefulSetList) ProtoMessage()               {}
-func (*StatefulSetList) Descriptor() ([]byte, []int) { return ***REMOVED***leDescriptorGenerated, []int{17} }
+func (*StatefulSetList) Descriptor() ([]byte, []int) { return fileDescriptorGenerated, []int{17} }
 
 func (m *StatefulSetSpec) Reset()                    { *m = StatefulSetSpec{} }
 func (*StatefulSetSpec) ProtoMessage()               {}
-func (*StatefulSetSpec) Descriptor() ([]byte, []int) { return ***REMOVED***leDescriptorGenerated, []int{18} }
+func (*StatefulSetSpec) Descriptor() ([]byte, []int) { return fileDescriptorGenerated, []int{18} }
 
 func (m *StatefulSetStatus) Reset()                    { *m = StatefulSetStatus{} }
 func (*StatefulSetStatus) ProtoMessage()               {}
-func (*StatefulSetStatus) Descriptor() ([]byte, []int) { return ***REMOVED***leDescriptorGenerated, []int{19} }
+func (*StatefulSetStatus) Descriptor() ([]byte, []int) { return fileDescriptorGenerated, []int{19} }
 
 func (m *StatefulSetUpdateStrategy) Reset()      { *m = StatefulSetUpdateStrategy{} }
 func (*StatefulSetUpdateStrategy) ProtoMessage() {}
 func (*StatefulSetUpdateStrategy) Descriptor() ([]byte, []int) {
-	return ***REMOVED***leDescriptorGenerated, []int{20}
+	return fileDescriptorGenerated, []int{20}
 }
 
 func init() {
@@ -175,7 +175,7 @@ func init() {
 	proto.RegisterType((*DeploymentSpec)(nil), "k8s.io.api.apps.v1beta1.DeploymentSpec")
 	proto.RegisterType((*DeploymentStatus)(nil), "k8s.io.api.apps.v1beta1.DeploymentStatus")
 	proto.RegisterType((*DeploymentStrategy)(nil), "k8s.io.api.apps.v1beta1.DeploymentStrategy")
-	proto.RegisterType((*RollbackCon***REMOVED***g)(nil), "k8s.io.api.apps.v1beta1.RollbackCon***REMOVED***g")
+	proto.RegisterType((*RollbackConfig)(nil), "k8s.io.api.apps.v1beta1.RollbackConfig")
 	proto.RegisterType((*RollingUpdateDeployment)(nil), "k8s.io.api.apps.v1beta1.RollingUpdateDeployment")
 	proto.RegisterType((*RollingUpdateStatefulSetStrategy)(nil), "k8s.io.api.apps.v1beta1.RollingUpdateStatefulSetStrategy")
 	proto.RegisterType((*Scale)(nil), "k8s.io.api.apps.v1beta1.Scale")
@@ -503,7 +503,7 @@ func (m *DeploymentSpec) MarshalTo(dAtA []byte) (int, error) {
 	i++
 	if m.Paused {
 		dAtA[i] = 1
-	} ***REMOVED*** {
+	} else {
 		dAtA[i] = 0
 	}
 	i++
@@ -610,7 +610,7 @@ func (m *DeploymentStrategy) MarshalTo(dAtA []byte) (int, error) {
 	return i, nil
 }
 
-func (m *RollbackCon***REMOVED***g) Marshal() (dAtA []byte, err error) {
+func (m *RollbackConfig) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalTo(dAtA)
@@ -620,7 +620,7 @@ func (m *RollbackCon***REMOVED***g) Marshal() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *RollbackCon***REMOVED***g) MarshalTo(dAtA []byte) (int, error) {
+func (m *RollbackConfig) MarshalTo(dAtA []byte) (int, error) {
 	var i int
 	_ = i
 	var l int
@@ -1248,7 +1248,7 @@ func (m *DeploymentStrategy) Size() (n int) {
 	return n
 }
 
-func (m *RollbackCon***REMOVED***g) Size() (n int) {
+func (m *RollbackConfig) Size() (n int) {
 	var l int
 	_ = l
 	n += 1 + sovGenerated(uint64(m.Revision))
@@ -1515,7 +1515,7 @@ func (this *DeploymentRollback) String() string {
 	s := strings.Join([]string{`&DeploymentRollback{`,
 		`Name:` + fmt.Sprintf("%v", this.Name) + `,`,
 		`UpdatedAnnotations:` + mapStringForUpdatedAnnotations + `,`,
-		`RollbackTo:` + strings.Replace(strings.Replace(this.RollbackTo.String(), "RollbackCon***REMOVED***g", "RollbackCon***REMOVED***g", 1), `&`, ``, 1) + `,`,
+		`RollbackTo:` + strings.Replace(strings.Replace(this.RollbackTo.String(), "RollbackConfig", "RollbackConfig", 1), `&`, ``, 1) + `,`,
 		`}`,
 	}, "")
 	return s
@@ -1532,7 +1532,7 @@ func (this *DeploymentSpec) String() string {
 		`MinReadySeconds:` + fmt.Sprintf("%v", this.MinReadySeconds) + `,`,
 		`RevisionHistoryLimit:` + valueToStringGenerated(this.RevisionHistoryLimit) + `,`,
 		`Paused:` + fmt.Sprintf("%v", this.Paused) + `,`,
-		`RollbackTo:` + strings.Replace(fmt.Sprintf("%v", this.RollbackTo), "RollbackCon***REMOVED***g", "RollbackCon***REMOVED***g", 1) + `,`,
+		`RollbackTo:` + strings.Replace(fmt.Sprintf("%v", this.RollbackTo), "RollbackConfig", "RollbackConfig", 1) + `,`,
 		`ProgressDeadlineSeconds:` + valueToStringGenerated(this.ProgressDeadlineSeconds) + `,`,
 		`}`,
 	}, "")
@@ -1566,11 +1566,11 @@ func (this *DeploymentStrategy) String() string {
 	}, "")
 	return s
 }
-func (this *RollbackCon***REMOVED***g) String() string {
+func (this *RollbackConfig) String() string {
 	if this == nil {
 		return "nil"
 	}
-	s := strings.Join([]string{`&RollbackCon***REMOVED***g{`,
+	s := strings.Join([]string{`&RollbackConfig{`,
 		`Revision:` + fmt.Sprintf("%v", this.Revision) + `,`,
 		`}`,
 	}, "")
@@ -1752,18 +1752,18 @@ func (m *ControllerRevision) Unmarshal(dAtA []byte) error {
 				break
 			}
 		}
-		***REMOVED***eldNum := int32(wire >> 3)
+		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
 			return fmt.Errorf("proto: ControllerRevision: wiretype end group for non-group")
 		}
-		if ***REMOVED***eldNum <= 0 {
-			return fmt.Errorf("proto: ControllerRevision: illegal tag %d (wire type %d)", ***REMOVED***eldNum, wire)
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: ControllerRevision: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
-		switch ***REMOVED***eldNum {
+		switch fieldNum {
 		case 1:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for ***REMOVED***eld ObjectMeta", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field ObjectMeta", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -1793,7 +1793,7 @@ func (m *ControllerRevision) Unmarshal(dAtA []byte) error {
 			iNdEx = postIndex
 		case 2:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for ***REMOVED***eld Data", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field Data", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -1823,7 +1823,7 @@ func (m *ControllerRevision) Unmarshal(dAtA []byte) error {
 			iNdEx = postIndex
 		case 3:
 			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for ***REMOVED***eld Revision", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field Revision", wireType)
 			}
 			m.Revision = 0
 			for shift := uint(0); ; shift += 7 {
@@ -1881,18 +1881,18 @@ func (m *ControllerRevisionList) Unmarshal(dAtA []byte) error {
 				break
 			}
 		}
-		***REMOVED***eldNum := int32(wire >> 3)
+		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
 			return fmt.Errorf("proto: ControllerRevisionList: wiretype end group for non-group")
 		}
-		if ***REMOVED***eldNum <= 0 {
-			return fmt.Errorf("proto: ControllerRevisionList: illegal tag %d (wire type %d)", ***REMOVED***eldNum, wire)
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: ControllerRevisionList: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
-		switch ***REMOVED***eldNum {
+		switch fieldNum {
 		case 1:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for ***REMOVED***eld ListMeta", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field ListMeta", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -1922,7 +1922,7 @@ func (m *ControllerRevisionList) Unmarshal(dAtA []byte) error {
 			iNdEx = postIndex
 		case 2:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for ***REMOVED***eld Items", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field Items", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -1992,18 +1992,18 @@ func (m *Deployment) Unmarshal(dAtA []byte) error {
 				break
 			}
 		}
-		***REMOVED***eldNum := int32(wire >> 3)
+		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
 			return fmt.Errorf("proto: Deployment: wiretype end group for non-group")
 		}
-		if ***REMOVED***eldNum <= 0 {
-			return fmt.Errorf("proto: Deployment: illegal tag %d (wire type %d)", ***REMOVED***eldNum, wire)
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: Deployment: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
-		switch ***REMOVED***eldNum {
+		switch fieldNum {
 		case 1:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for ***REMOVED***eld ObjectMeta", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field ObjectMeta", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -2033,7 +2033,7 @@ func (m *Deployment) Unmarshal(dAtA []byte) error {
 			iNdEx = postIndex
 		case 2:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for ***REMOVED***eld Spec", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field Spec", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -2063,7 +2063,7 @@ func (m *Deployment) Unmarshal(dAtA []byte) error {
 			iNdEx = postIndex
 		case 3:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for ***REMOVED***eld Status", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field Status", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -2132,18 +2132,18 @@ func (m *DeploymentCondition) Unmarshal(dAtA []byte) error {
 				break
 			}
 		}
-		***REMOVED***eldNum := int32(wire >> 3)
+		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
 			return fmt.Errorf("proto: DeploymentCondition: wiretype end group for non-group")
 		}
-		if ***REMOVED***eldNum <= 0 {
-			return fmt.Errorf("proto: DeploymentCondition: illegal tag %d (wire type %d)", ***REMOVED***eldNum, wire)
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: DeploymentCondition: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
-		switch ***REMOVED***eldNum {
+		switch fieldNum {
 		case 1:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for ***REMOVED***eld Type", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field Type", wireType)
 			}
 			var stringLen uint64
 			for shift := uint(0); ; shift += 7 {
@@ -2172,7 +2172,7 @@ func (m *DeploymentCondition) Unmarshal(dAtA []byte) error {
 			iNdEx = postIndex
 		case 2:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for ***REMOVED***eld Status", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field Status", wireType)
 			}
 			var stringLen uint64
 			for shift := uint(0); ; shift += 7 {
@@ -2201,7 +2201,7 @@ func (m *DeploymentCondition) Unmarshal(dAtA []byte) error {
 			iNdEx = postIndex
 		case 4:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for ***REMOVED***eld Reason", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field Reason", wireType)
 			}
 			var stringLen uint64
 			for shift := uint(0); ; shift += 7 {
@@ -2230,7 +2230,7 @@ func (m *DeploymentCondition) Unmarshal(dAtA []byte) error {
 			iNdEx = postIndex
 		case 5:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for ***REMOVED***eld Message", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field Message", wireType)
 			}
 			var stringLen uint64
 			for shift := uint(0); ; shift += 7 {
@@ -2259,7 +2259,7 @@ func (m *DeploymentCondition) Unmarshal(dAtA []byte) error {
 			iNdEx = postIndex
 		case 6:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for ***REMOVED***eld LastUpdateTime", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field LastUpdateTime", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -2289,7 +2289,7 @@ func (m *DeploymentCondition) Unmarshal(dAtA []byte) error {
 			iNdEx = postIndex
 		case 7:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for ***REMOVED***eld LastTransitionTime", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field LastTransitionTime", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -2358,18 +2358,18 @@ func (m *DeploymentList) Unmarshal(dAtA []byte) error {
 				break
 			}
 		}
-		***REMOVED***eldNum := int32(wire >> 3)
+		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
 			return fmt.Errorf("proto: DeploymentList: wiretype end group for non-group")
 		}
-		if ***REMOVED***eldNum <= 0 {
-			return fmt.Errorf("proto: DeploymentList: illegal tag %d (wire type %d)", ***REMOVED***eldNum, wire)
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: DeploymentList: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
-		switch ***REMOVED***eldNum {
+		switch fieldNum {
 		case 1:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for ***REMOVED***eld ListMeta", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field ListMeta", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -2399,7 +2399,7 @@ func (m *DeploymentList) Unmarshal(dAtA []byte) error {
 			iNdEx = postIndex
 		case 2:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for ***REMOVED***eld Items", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field Items", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -2469,18 +2469,18 @@ func (m *DeploymentRollback) Unmarshal(dAtA []byte) error {
 				break
 			}
 		}
-		***REMOVED***eldNum := int32(wire >> 3)
+		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
 			return fmt.Errorf("proto: DeploymentRollback: wiretype end group for non-group")
 		}
-		if ***REMOVED***eldNum <= 0 {
-			return fmt.Errorf("proto: DeploymentRollback: illegal tag %d (wire type %d)", ***REMOVED***eldNum, wire)
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: DeploymentRollback: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
-		switch ***REMOVED***eldNum {
+		switch fieldNum {
 		case 1:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for ***REMOVED***eld Name", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field Name", wireType)
 			}
 			var stringLen uint64
 			for shift := uint(0); ; shift += 7 {
@@ -2509,7 +2509,7 @@ func (m *DeploymentRollback) Unmarshal(dAtA []byte) error {
 			iNdEx = postIndex
 		case 2:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for ***REMOVED***eld UpdatedAnnotations", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field UpdatedAnnotations", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -2555,8 +2555,8 @@ func (m *DeploymentRollback) Unmarshal(dAtA []byte) error {
 						break
 					}
 				}
-				***REMOVED***eldNum := int32(wire >> 3)
-				if ***REMOVED***eldNum == 1 {
+				fieldNum := int32(wire >> 3)
+				if fieldNum == 1 {
 					var stringLenmapkey uint64
 					for shift := uint(0); ; shift += 7 {
 						if shift >= 64 {
@@ -2582,7 +2582,7 @@ func (m *DeploymentRollback) Unmarshal(dAtA []byte) error {
 					}
 					mapkey = string(dAtA[iNdEx:postStringIndexmapkey])
 					iNdEx = postStringIndexmapkey
-				} ***REMOVED*** if ***REMOVED***eldNum == 2 {
+				} else if fieldNum == 2 {
 					var stringLenmapvalue uint64
 					for shift := uint(0); ; shift += 7 {
 						if shift >= 64 {
@@ -2608,7 +2608,7 @@ func (m *DeploymentRollback) Unmarshal(dAtA []byte) error {
 					}
 					mapvalue = string(dAtA[iNdEx:postStringIndexmapvalue])
 					iNdEx = postStringIndexmapvalue
-				} ***REMOVED*** {
+				} else {
 					iNdEx = entryPreIndex
 					skippy, err := skipGenerated(dAtA[iNdEx:])
 					if err != nil {
@@ -2627,7 +2627,7 @@ func (m *DeploymentRollback) Unmarshal(dAtA []byte) error {
 			iNdEx = postIndex
 		case 3:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for ***REMOVED***eld RollbackTo", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field RollbackTo", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -2696,18 +2696,18 @@ func (m *DeploymentSpec) Unmarshal(dAtA []byte) error {
 				break
 			}
 		}
-		***REMOVED***eldNum := int32(wire >> 3)
+		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
 			return fmt.Errorf("proto: DeploymentSpec: wiretype end group for non-group")
 		}
-		if ***REMOVED***eldNum <= 0 {
-			return fmt.Errorf("proto: DeploymentSpec: illegal tag %d (wire type %d)", ***REMOVED***eldNum, wire)
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: DeploymentSpec: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
-		switch ***REMOVED***eldNum {
+		switch fieldNum {
 		case 1:
 			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for ***REMOVED***eld Replicas", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field Replicas", wireType)
 			}
 			var v int32
 			for shift := uint(0); ; shift += 7 {
@@ -2727,7 +2727,7 @@ func (m *DeploymentSpec) Unmarshal(dAtA []byte) error {
 			m.Replicas = &v
 		case 2:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for ***REMOVED***eld Selector", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field Selector", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -2760,7 +2760,7 @@ func (m *DeploymentSpec) Unmarshal(dAtA []byte) error {
 			iNdEx = postIndex
 		case 3:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for ***REMOVED***eld Template", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field Template", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -2790,7 +2790,7 @@ func (m *DeploymentSpec) Unmarshal(dAtA []byte) error {
 			iNdEx = postIndex
 		case 4:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for ***REMOVED***eld Strategy", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field Strategy", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -2820,7 +2820,7 @@ func (m *DeploymentSpec) Unmarshal(dAtA []byte) error {
 			iNdEx = postIndex
 		case 5:
 			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for ***REMOVED***eld MinReadySeconds", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field MinReadySeconds", wireType)
 			}
 			m.MinReadySeconds = 0
 			for shift := uint(0); ; shift += 7 {
@@ -2839,7 +2839,7 @@ func (m *DeploymentSpec) Unmarshal(dAtA []byte) error {
 			}
 		case 6:
 			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for ***REMOVED***eld RevisionHistoryLimit", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field RevisionHistoryLimit", wireType)
 			}
 			var v int32
 			for shift := uint(0); ; shift += 7 {
@@ -2859,7 +2859,7 @@ func (m *DeploymentSpec) Unmarshal(dAtA []byte) error {
 			m.RevisionHistoryLimit = &v
 		case 7:
 			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for ***REMOVED***eld Paused", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field Paused", wireType)
 			}
 			var v int
 			for shift := uint(0); ; shift += 7 {
@@ -2879,7 +2879,7 @@ func (m *DeploymentSpec) Unmarshal(dAtA []byte) error {
 			m.Paused = bool(v != 0)
 		case 8:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for ***REMOVED***eld RollbackTo", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field RollbackTo", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -2904,7 +2904,7 @@ func (m *DeploymentSpec) Unmarshal(dAtA []byte) error {
 				return io.ErrUnexpectedEOF
 			}
 			if m.RollbackTo == nil {
-				m.RollbackTo = &RollbackCon***REMOVED***g{}
+				m.RollbackTo = &RollbackConfig{}
 			}
 			if err := m.RollbackTo.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
@@ -2912,7 +2912,7 @@ func (m *DeploymentSpec) Unmarshal(dAtA []byte) error {
 			iNdEx = postIndex
 		case 9:
 			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for ***REMOVED***eld ProgressDeadlineSeconds", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field ProgressDeadlineSeconds", wireType)
 			}
 			var v int32
 			for shift := uint(0); ; shift += 7 {
@@ -2971,18 +2971,18 @@ func (m *DeploymentStatus) Unmarshal(dAtA []byte) error {
 				break
 			}
 		}
-		***REMOVED***eldNum := int32(wire >> 3)
+		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
 			return fmt.Errorf("proto: DeploymentStatus: wiretype end group for non-group")
 		}
-		if ***REMOVED***eldNum <= 0 {
-			return fmt.Errorf("proto: DeploymentStatus: illegal tag %d (wire type %d)", ***REMOVED***eldNum, wire)
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: DeploymentStatus: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
-		switch ***REMOVED***eldNum {
+		switch fieldNum {
 		case 1:
 			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for ***REMOVED***eld ObservedGeneration", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field ObservedGeneration", wireType)
 			}
 			m.ObservedGeneration = 0
 			for shift := uint(0); ; shift += 7 {
@@ -3001,7 +3001,7 @@ func (m *DeploymentStatus) Unmarshal(dAtA []byte) error {
 			}
 		case 2:
 			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for ***REMOVED***eld Replicas", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field Replicas", wireType)
 			}
 			m.Replicas = 0
 			for shift := uint(0); ; shift += 7 {
@@ -3020,7 +3020,7 @@ func (m *DeploymentStatus) Unmarshal(dAtA []byte) error {
 			}
 		case 3:
 			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for ***REMOVED***eld UpdatedReplicas", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field UpdatedReplicas", wireType)
 			}
 			m.UpdatedReplicas = 0
 			for shift := uint(0); ; shift += 7 {
@@ -3039,7 +3039,7 @@ func (m *DeploymentStatus) Unmarshal(dAtA []byte) error {
 			}
 		case 4:
 			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for ***REMOVED***eld AvailableReplicas", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field AvailableReplicas", wireType)
 			}
 			m.AvailableReplicas = 0
 			for shift := uint(0); ; shift += 7 {
@@ -3058,7 +3058,7 @@ func (m *DeploymentStatus) Unmarshal(dAtA []byte) error {
 			}
 		case 5:
 			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for ***REMOVED***eld UnavailableReplicas", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field UnavailableReplicas", wireType)
 			}
 			m.UnavailableReplicas = 0
 			for shift := uint(0); ; shift += 7 {
@@ -3077,7 +3077,7 @@ func (m *DeploymentStatus) Unmarshal(dAtA []byte) error {
 			}
 		case 6:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for ***REMOVED***eld Conditions", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field Conditions", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -3108,7 +3108,7 @@ func (m *DeploymentStatus) Unmarshal(dAtA []byte) error {
 			iNdEx = postIndex
 		case 7:
 			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for ***REMOVED***eld ReadyReplicas", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field ReadyReplicas", wireType)
 			}
 			m.ReadyReplicas = 0
 			for shift := uint(0); ; shift += 7 {
@@ -3127,7 +3127,7 @@ func (m *DeploymentStatus) Unmarshal(dAtA []byte) error {
 			}
 		case 8:
 			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for ***REMOVED***eld CollisionCount", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field CollisionCount", wireType)
 			}
 			var v int32
 			for shift := uint(0); ; shift += 7 {
@@ -3186,18 +3186,18 @@ func (m *DeploymentStrategy) Unmarshal(dAtA []byte) error {
 				break
 			}
 		}
-		***REMOVED***eldNum := int32(wire >> 3)
+		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
 			return fmt.Errorf("proto: DeploymentStrategy: wiretype end group for non-group")
 		}
-		if ***REMOVED***eldNum <= 0 {
-			return fmt.Errorf("proto: DeploymentStrategy: illegal tag %d (wire type %d)", ***REMOVED***eldNum, wire)
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: DeploymentStrategy: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
-		switch ***REMOVED***eldNum {
+		switch fieldNum {
 		case 1:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for ***REMOVED***eld Type", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field Type", wireType)
 			}
 			var stringLen uint64
 			for shift := uint(0); ; shift += 7 {
@@ -3226,7 +3226,7 @@ func (m *DeploymentStrategy) Unmarshal(dAtA []byte) error {
 			iNdEx = postIndex
 		case 2:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for ***REMOVED***eld RollingUpdate", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field RollingUpdate", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -3278,7 +3278,7 @@ func (m *DeploymentStrategy) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *RollbackCon***REMOVED***g) Unmarshal(dAtA []byte) error {
+func (m *RollbackConfig) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -3298,18 +3298,18 @@ func (m *RollbackCon***REMOVED***g) Unmarshal(dAtA []byte) error {
 				break
 			}
 		}
-		***REMOVED***eldNum := int32(wire >> 3)
+		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: RollbackCon***REMOVED***g: wiretype end group for non-group")
+			return fmt.Errorf("proto: RollbackConfig: wiretype end group for non-group")
 		}
-		if ***REMOVED***eldNum <= 0 {
-			return fmt.Errorf("proto: RollbackCon***REMOVED***g: illegal tag %d (wire type %d)", ***REMOVED***eldNum, wire)
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: RollbackConfig: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
-		switch ***REMOVED***eldNum {
+		switch fieldNum {
 		case 1:
 			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for ***REMOVED***eld Revision", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field Revision", wireType)
 			}
 			m.Revision = 0
 			for shift := uint(0); ; shift += 7 {
@@ -3367,18 +3367,18 @@ func (m *RollingUpdateDeployment) Unmarshal(dAtA []byte) error {
 				break
 			}
 		}
-		***REMOVED***eldNum := int32(wire >> 3)
+		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
 			return fmt.Errorf("proto: RollingUpdateDeployment: wiretype end group for non-group")
 		}
-		if ***REMOVED***eldNum <= 0 {
-			return fmt.Errorf("proto: RollingUpdateDeployment: illegal tag %d (wire type %d)", ***REMOVED***eldNum, wire)
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: RollingUpdateDeployment: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
-		switch ***REMOVED***eldNum {
+		switch fieldNum {
 		case 1:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for ***REMOVED***eld MaxUnavailable", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field MaxUnavailable", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -3411,7 +3411,7 @@ func (m *RollingUpdateDeployment) Unmarshal(dAtA []byte) error {
 			iNdEx = postIndex
 		case 2:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for ***REMOVED***eld MaxSurge", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field MaxSurge", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -3483,18 +3483,18 @@ func (m *RollingUpdateStatefulSetStrategy) Unmarshal(dAtA []byte) error {
 				break
 			}
 		}
-		***REMOVED***eldNum := int32(wire >> 3)
+		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
 			return fmt.Errorf("proto: RollingUpdateStatefulSetStrategy: wiretype end group for non-group")
 		}
-		if ***REMOVED***eldNum <= 0 {
-			return fmt.Errorf("proto: RollingUpdateStatefulSetStrategy: illegal tag %d (wire type %d)", ***REMOVED***eldNum, wire)
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: RollingUpdateStatefulSetStrategy: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
-		switch ***REMOVED***eldNum {
+		switch fieldNum {
 		case 1:
 			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for ***REMOVED***eld Partition", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field Partition", wireType)
 			}
 			var v int32
 			for shift := uint(0); ; shift += 7 {
@@ -3553,18 +3553,18 @@ func (m *Scale) Unmarshal(dAtA []byte) error {
 				break
 			}
 		}
-		***REMOVED***eldNum := int32(wire >> 3)
+		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
 			return fmt.Errorf("proto: Scale: wiretype end group for non-group")
 		}
-		if ***REMOVED***eldNum <= 0 {
-			return fmt.Errorf("proto: Scale: illegal tag %d (wire type %d)", ***REMOVED***eldNum, wire)
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: Scale: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
-		switch ***REMOVED***eldNum {
+		switch fieldNum {
 		case 1:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for ***REMOVED***eld ObjectMeta", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field ObjectMeta", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -3594,7 +3594,7 @@ func (m *Scale) Unmarshal(dAtA []byte) error {
 			iNdEx = postIndex
 		case 2:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for ***REMOVED***eld Spec", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field Spec", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -3624,7 +3624,7 @@ func (m *Scale) Unmarshal(dAtA []byte) error {
 			iNdEx = postIndex
 		case 3:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for ***REMOVED***eld Status", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field Status", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -3693,18 +3693,18 @@ func (m *ScaleSpec) Unmarshal(dAtA []byte) error {
 				break
 			}
 		}
-		***REMOVED***eldNum := int32(wire >> 3)
+		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
 			return fmt.Errorf("proto: ScaleSpec: wiretype end group for non-group")
 		}
-		if ***REMOVED***eldNum <= 0 {
-			return fmt.Errorf("proto: ScaleSpec: illegal tag %d (wire type %d)", ***REMOVED***eldNum, wire)
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: ScaleSpec: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
-		switch ***REMOVED***eldNum {
+		switch fieldNum {
 		case 1:
 			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for ***REMOVED***eld Replicas", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field Replicas", wireType)
 			}
 			m.Replicas = 0
 			for shift := uint(0); ; shift += 7 {
@@ -3762,18 +3762,18 @@ func (m *ScaleStatus) Unmarshal(dAtA []byte) error {
 				break
 			}
 		}
-		***REMOVED***eldNum := int32(wire >> 3)
+		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
 			return fmt.Errorf("proto: ScaleStatus: wiretype end group for non-group")
 		}
-		if ***REMOVED***eldNum <= 0 {
-			return fmt.Errorf("proto: ScaleStatus: illegal tag %d (wire type %d)", ***REMOVED***eldNum, wire)
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: ScaleStatus: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
-		switch ***REMOVED***eldNum {
+		switch fieldNum {
 		case 1:
 			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for ***REMOVED***eld Replicas", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field Replicas", wireType)
 			}
 			m.Replicas = 0
 			for shift := uint(0); ; shift += 7 {
@@ -3792,7 +3792,7 @@ func (m *ScaleStatus) Unmarshal(dAtA []byte) error {
 			}
 		case 2:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for ***REMOVED***eld Selector", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field Selector", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -3838,8 +3838,8 @@ func (m *ScaleStatus) Unmarshal(dAtA []byte) error {
 						break
 					}
 				}
-				***REMOVED***eldNum := int32(wire >> 3)
-				if ***REMOVED***eldNum == 1 {
+				fieldNum := int32(wire >> 3)
+				if fieldNum == 1 {
 					var stringLenmapkey uint64
 					for shift := uint(0); ; shift += 7 {
 						if shift >= 64 {
@@ -3865,7 +3865,7 @@ func (m *ScaleStatus) Unmarshal(dAtA []byte) error {
 					}
 					mapkey = string(dAtA[iNdEx:postStringIndexmapkey])
 					iNdEx = postStringIndexmapkey
-				} ***REMOVED*** if ***REMOVED***eldNum == 2 {
+				} else if fieldNum == 2 {
 					var stringLenmapvalue uint64
 					for shift := uint(0); ; shift += 7 {
 						if shift >= 64 {
@@ -3891,7 +3891,7 @@ func (m *ScaleStatus) Unmarshal(dAtA []byte) error {
 					}
 					mapvalue = string(dAtA[iNdEx:postStringIndexmapvalue])
 					iNdEx = postStringIndexmapvalue
-				} ***REMOVED*** {
+				} else {
 					iNdEx = entryPreIndex
 					skippy, err := skipGenerated(dAtA[iNdEx:])
 					if err != nil {
@@ -3910,7 +3910,7 @@ func (m *ScaleStatus) Unmarshal(dAtA []byte) error {
 			iNdEx = postIndex
 		case 3:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for ***REMOVED***eld TargetSelector", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field TargetSelector", wireType)
 			}
 			var stringLen uint64
 			for shift := uint(0); ; shift += 7 {
@@ -3978,18 +3978,18 @@ func (m *StatefulSet) Unmarshal(dAtA []byte) error {
 				break
 			}
 		}
-		***REMOVED***eldNum := int32(wire >> 3)
+		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
 			return fmt.Errorf("proto: StatefulSet: wiretype end group for non-group")
 		}
-		if ***REMOVED***eldNum <= 0 {
-			return fmt.Errorf("proto: StatefulSet: illegal tag %d (wire type %d)", ***REMOVED***eldNum, wire)
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: StatefulSet: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
-		switch ***REMOVED***eldNum {
+		switch fieldNum {
 		case 1:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for ***REMOVED***eld ObjectMeta", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field ObjectMeta", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -4019,7 +4019,7 @@ func (m *StatefulSet) Unmarshal(dAtA []byte) error {
 			iNdEx = postIndex
 		case 2:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for ***REMOVED***eld Spec", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field Spec", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -4049,7 +4049,7 @@ func (m *StatefulSet) Unmarshal(dAtA []byte) error {
 			iNdEx = postIndex
 		case 3:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for ***REMOVED***eld Status", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field Status", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -4118,18 +4118,18 @@ func (m *StatefulSetCondition) Unmarshal(dAtA []byte) error {
 				break
 			}
 		}
-		***REMOVED***eldNum := int32(wire >> 3)
+		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
 			return fmt.Errorf("proto: StatefulSetCondition: wiretype end group for non-group")
 		}
-		if ***REMOVED***eldNum <= 0 {
-			return fmt.Errorf("proto: StatefulSetCondition: illegal tag %d (wire type %d)", ***REMOVED***eldNum, wire)
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: StatefulSetCondition: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
-		switch ***REMOVED***eldNum {
+		switch fieldNum {
 		case 1:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for ***REMOVED***eld Type", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field Type", wireType)
 			}
 			var stringLen uint64
 			for shift := uint(0); ; shift += 7 {
@@ -4158,7 +4158,7 @@ func (m *StatefulSetCondition) Unmarshal(dAtA []byte) error {
 			iNdEx = postIndex
 		case 2:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for ***REMOVED***eld Status", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field Status", wireType)
 			}
 			var stringLen uint64
 			for shift := uint(0); ; shift += 7 {
@@ -4187,7 +4187,7 @@ func (m *StatefulSetCondition) Unmarshal(dAtA []byte) error {
 			iNdEx = postIndex
 		case 3:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for ***REMOVED***eld LastTransitionTime", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field LastTransitionTime", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -4217,7 +4217,7 @@ func (m *StatefulSetCondition) Unmarshal(dAtA []byte) error {
 			iNdEx = postIndex
 		case 4:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for ***REMOVED***eld Reason", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field Reason", wireType)
 			}
 			var stringLen uint64
 			for shift := uint(0); ; shift += 7 {
@@ -4246,7 +4246,7 @@ func (m *StatefulSetCondition) Unmarshal(dAtA []byte) error {
 			iNdEx = postIndex
 		case 5:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for ***REMOVED***eld Message", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field Message", wireType)
 			}
 			var stringLen uint64
 			for shift := uint(0); ; shift += 7 {
@@ -4314,18 +4314,18 @@ func (m *StatefulSetList) Unmarshal(dAtA []byte) error {
 				break
 			}
 		}
-		***REMOVED***eldNum := int32(wire >> 3)
+		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
 			return fmt.Errorf("proto: StatefulSetList: wiretype end group for non-group")
 		}
-		if ***REMOVED***eldNum <= 0 {
-			return fmt.Errorf("proto: StatefulSetList: illegal tag %d (wire type %d)", ***REMOVED***eldNum, wire)
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: StatefulSetList: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
-		switch ***REMOVED***eldNum {
+		switch fieldNum {
 		case 1:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for ***REMOVED***eld ListMeta", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field ListMeta", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -4355,7 +4355,7 @@ func (m *StatefulSetList) Unmarshal(dAtA []byte) error {
 			iNdEx = postIndex
 		case 2:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for ***REMOVED***eld Items", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field Items", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -4425,18 +4425,18 @@ func (m *StatefulSetSpec) Unmarshal(dAtA []byte) error {
 				break
 			}
 		}
-		***REMOVED***eldNum := int32(wire >> 3)
+		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
 			return fmt.Errorf("proto: StatefulSetSpec: wiretype end group for non-group")
 		}
-		if ***REMOVED***eldNum <= 0 {
-			return fmt.Errorf("proto: StatefulSetSpec: illegal tag %d (wire type %d)", ***REMOVED***eldNum, wire)
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: StatefulSetSpec: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
-		switch ***REMOVED***eldNum {
+		switch fieldNum {
 		case 1:
 			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for ***REMOVED***eld Replicas", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field Replicas", wireType)
 			}
 			var v int32
 			for shift := uint(0); ; shift += 7 {
@@ -4456,7 +4456,7 @@ func (m *StatefulSetSpec) Unmarshal(dAtA []byte) error {
 			m.Replicas = &v
 		case 2:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for ***REMOVED***eld Selector", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field Selector", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -4489,7 +4489,7 @@ func (m *StatefulSetSpec) Unmarshal(dAtA []byte) error {
 			iNdEx = postIndex
 		case 3:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for ***REMOVED***eld Template", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field Template", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -4519,7 +4519,7 @@ func (m *StatefulSetSpec) Unmarshal(dAtA []byte) error {
 			iNdEx = postIndex
 		case 4:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for ***REMOVED***eld VolumeClaimTemplates", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field VolumeClaimTemplates", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -4550,7 +4550,7 @@ func (m *StatefulSetSpec) Unmarshal(dAtA []byte) error {
 			iNdEx = postIndex
 		case 5:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for ***REMOVED***eld ServiceName", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field ServiceName", wireType)
 			}
 			var stringLen uint64
 			for shift := uint(0); ; shift += 7 {
@@ -4579,7 +4579,7 @@ func (m *StatefulSetSpec) Unmarshal(dAtA []byte) error {
 			iNdEx = postIndex
 		case 6:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for ***REMOVED***eld PodManagementPolicy", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field PodManagementPolicy", wireType)
 			}
 			var stringLen uint64
 			for shift := uint(0); ; shift += 7 {
@@ -4608,7 +4608,7 @@ func (m *StatefulSetSpec) Unmarshal(dAtA []byte) error {
 			iNdEx = postIndex
 		case 7:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for ***REMOVED***eld UpdateStrategy", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field UpdateStrategy", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -4638,7 +4638,7 @@ func (m *StatefulSetSpec) Unmarshal(dAtA []byte) error {
 			iNdEx = postIndex
 		case 8:
 			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for ***REMOVED***eld RevisionHistoryLimit", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field RevisionHistoryLimit", wireType)
 			}
 			var v int32
 			for shift := uint(0); ; shift += 7 {
@@ -4697,18 +4697,18 @@ func (m *StatefulSetStatus) Unmarshal(dAtA []byte) error {
 				break
 			}
 		}
-		***REMOVED***eldNum := int32(wire >> 3)
+		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
 			return fmt.Errorf("proto: StatefulSetStatus: wiretype end group for non-group")
 		}
-		if ***REMOVED***eldNum <= 0 {
-			return fmt.Errorf("proto: StatefulSetStatus: illegal tag %d (wire type %d)", ***REMOVED***eldNum, wire)
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: StatefulSetStatus: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
-		switch ***REMOVED***eldNum {
+		switch fieldNum {
 		case 1:
 			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for ***REMOVED***eld ObservedGeneration", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field ObservedGeneration", wireType)
 			}
 			var v int64
 			for shift := uint(0); ; shift += 7 {
@@ -4728,7 +4728,7 @@ func (m *StatefulSetStatus) Unmarshal(dAtA []byte) error {
 			m.ObservedGeneration = &v
 		case 2:
 			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for ***REMOVED***eld Replicas", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field Replicas", wireType)
 			}
 			m.Replicas = 0
 			for shift := uint(0); ; shift += 7 {
@@ -4747,7 +4747,7 @@ func (m *StatefulSetStatus) Unmarshal(dAtA []byte) error {
 			}
 		case 3:
 			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for ***REMOVED***eld ReadyReplicas", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field ReadyReplicas", wireType)
 			}
 			m.ReadyReplicas = 0
 			for shift := uint(0); ; shift += 7 {
@@ -4766,7 +4766,7 @@ func (m *StatefulSetStatus) Unmarshal(dAtA []byte) error {
 			}
 		case 4:
 			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for ***REMOVED***eld CurrentReplicas", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field CurrentReplicas", wireType)
 			}
 			m.CurrentReplicas = 0
 			for shift := uint(0); ; shift += 7 {
@@ -4785,7 +4785,7 @@ func (m *StatefulSetStatus) Unmarshal(dAtA []byte) error {
 			}
 		case 5:
 			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for ***REMOVED***eld UpdatedReplicas", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field UpdatedReplicas", wireType)
 			}
 			m.UpdatedReplicas = 0
 			for shift := uint(0); ; shift += 7 {
@@ -4804,7 +4804,7 @@ func (m *StatefulSetStatus) Unmarshal(dAtA []byte) error {
 			}
 		case 6:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for ***REMOVED***eld CurrentRevision", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field CurrentRevision", wireType)
 			}
 			var stringLen uint64
 			for shift := uint(0); ; shift += 7 {
@@ -4833,7 +4833,7 @@ func (m *StatefulSetStatus) Unmarshal(dAtA []byte) error {
 			iNdEx = postIndex
 		case 7:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for ***REMOVED***eld UpdateRevision", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field UpdateRevision", wireType)
 			}
 			var stringLen uint64
 			for shift := uint(0); ; shift += 7 {
@@ -4862,7 +4862,7 @@ func (m *StatefulSetStatus) Unmarshal(dAtA []byte) error {
 			iNdEx = postIndex
 		case 9:
 			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for ***REMOVED***eld CollisionCount", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field CollisionCount", wireType)
 			}
 			var v int32
 			for shift := uint(0); ; shift += 7 {
@@ -4882,7 +4882,7 @@ func (m *StatefulSetStatus) Unmarshal(dAtA []byte) error {
 			m.CollisionCount = &v
 		case 10:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for ***REMOVED***eld Conditions", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field Conditions", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -4952,18 +4952,18 @@ func (m *StatefulSetUpdateStrategy) Unmarshal(dAtA []byte) error {
 				break
 			}
 		}
-		***REMOVED***eldNum := int32(wire >> 3)
+		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
 			return fmt.Errorf("proto: StatefulSetUpdateStrategy: wiretype end group for non-group")
 		}
-		if ***REMOVED***eldNum <= 0 {
-			return fmt.Errorf("proto: StatefulSetUpdateStrategy: illegal tag %d (wire type %d)", ***REMOVED***eldNum, wire)
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: StatefulSetUpdateStrategy: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
-		switch ***REMOVED***eldNum {
+		switch fieldNum {
 		case 1:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for ***REMOVED***eld Type", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field Type", wireType)
 			}
 			var stringLen uint64
 			for shift := uint(0); ; shift += 7 {
@@ -4992,7 +4992,7 @@ func (m *StatefulSetUpdateStrategy) Unmarshal(dAtA []byte) error {
 			iNdEx = postIndex
 		case 2:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for ***REMOVED***eld RollingUpdate", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field RollingUpdate", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -5150,10 +5150,10 @@ var (
 )
 
 func init() {
-	proto.RegisterFile("k8s.io/kubernetes/vendor/k8s.io/api/apps/v1beta1/generated.proto", ***REMOVED***leDescriptorGenerated)
+	proto.RegisterFile("k8s.io/kubernetes/vendor/k8s.io/api/apps/v1beta1/generated.proto", fileDescriptorGenerated)
 }
 
-var ***REMOVED***leDescriptorGenerated = []byte{
+var fileDescriptorGenerated = []byte{
 	// 1859 bytes of a gzipped FileDescriptorProto
 	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xdc, 0x58, 0xcd, 0x6f, 0x24, 0x47,
 	0x15, 0x77, 0x8f, 0x67, 0xec, 0xf1, 0x73, 0x3c, 0xde, 0x2d, 0x9b, 0xf5, 0xc4, 0x81, 0xb1, 0xd5,

@@ -1,5 +1,5 @@
 apiVersion: operators.coreos.com/v1
-kind: CatalogSourceCon***REMOVED***g
+kind: CatalogSourceConfig
 metadata:
   name: installed-redhat-metering-operators-openshift-metering
   namespace: openshift-marketplace

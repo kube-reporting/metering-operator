@@ -13,46 +13,46 @@ import (
 	rest "k8s.io/client-go/rest"
 )
 
-// MeteringCon***REMOVED***gsGetter has a method to return a MeteringCon***REMOVED***gInterface.
+// MeteringConfigsGetter has a method to return a MeteringConfigInterface.
 // A group's client should implement this interface.
-type MeteringCon***REMOVED***gsGetter interface {
-	MeteringCon***REMOVED***gs(namespace string) MeteringCon***REMOVED***gInterface
+type MeteringConfigsGetter interface {
+	MeteringConfigs(namespace string) MeteringConfigInterface
 }
 
-// MeteringCon***REMOVED***gInterface has methods to work with MeteringCon***REMOVED***g resources.
-type MeteringCon***REMOVED***gInterface interface {
-	Create(*v1.MeteringCon***REMOVED***g) (*v1.MeteringCon***REMOVED***g, error)
-	Update(*v1.MeteringCon***REMOVED***g) (*v1.MeteringCon***REMOVED***g, error)
-	UpdateStatus(*v1.MeteringCon***REMOVED***g) (*v1.MeteringCon***REMOVED***g, error)
+// MeteringConfigInterface has methods to work with MeteringConfig resources.
+type MeteringConfigInterface interface {
+	Create(*v1.MeteringConfig) (*v1.MeteringConfig, error)
+	Update(*v1.MeteringConfig) (*v1.MeteringConfig, error)
+	UpdateStatus(*v1.MeteringConfig) (*v1.MeteringConfig, error)
 	Delete(name string, options *metav1.DeleteOptions) error
 	DeleteCollection(options *metav1.DeleteOptions, listOptions metav1.ListOptions) error
-	Get(name string, options metav1.GetOptions) (*v1.MeteringCon***REMOVED***g, error)
-	List(opts metav1.ListOptions) (*v1.MeteringCon***REMOVED***gList, error)
+	Get(name string, options metav1.GetOptions) (*v1.MeteringConfig, error)
+	List(opts metav1.ListOptions) (*v1.MeteringConfigList, error)
 	Watch(opts metav1.ListOptions) (watch.Interface, error)
-	Patch(name string, pt types.PatchType, data []byte, subresources ...string) (result *v1.MeteringCon***REMOVED***g, err error)
-	MeteringCon***REMOVED***gExpansion
+	Patch(name string, pt types.PatchType, data []byte, subresources ...string) (result *v1.MeteringConfig, err error)
+	MeteringConfigExpansion
 }
 
-// meteringCon***REMOVED***gs implements MeteringCon***REMOVED***gInterface
-type meteringCon***REMOVED***gs struct {
+// meteringConfigs implements MeteringConfigInterface
+type meteringConfigs struct {
 	client rest.Interface
 	ns     string
 }
 
-// newMeteringCon***REMOVED***gs returns a MeteringCon***REMOVED***gs
-func newMeteringCon***REMOVED***gs(c *MeteringV1Client, namespace string) *meteringCon***REMOVED***gs {
-	return &meteringCon***REMOVED***gs{
+// newMeteringConfigs returns a MeteringConfigs
+func newMeteringConfigs(c *MeteringV1Client, namespace string) *meteringConfigs {
+	return &meteringConfigs{
 		client: c.RESTClient(),
 		ns:     namespace,
 	}
 }
 
-// Get takes name of the meteringCon***REMOVED***g, and returns the corresponding meteringCon***REMOVED***g object, and an error if there is any.
-func (c *meteringCon***REMOVED***gs) Get(name string, options metav1.GetOptions) (result *v1.MeteringCon***REMOVED***g, err error) {
-	result = &v1.MeteringCon***REMOVED***g{}
+// Get takes name of the meteringConfig, and returns the corresponding meteringConfig object, and an error if there is any.
+func (c *meteringConfigs) Get(name string, options metav1.GetOptions) (result *v1.MeteringConfig, err error) {
+	result = &v1.MeteringConfig{}
 	err = c.client.Get().
 		Namespace(c.ns).
-		Resource("meteringcon***REMOVED***gs").
+		Resource("meteringconfigs").
 		Name(name).
 		VersionedParams(&options, scheme.ParameterCodec).
 		Do().
@@ -60,16 +60,16 @@ func (c *meteringCon***REMOVED***gs) Get(name string, options metav1.GetOptions)
 	return
 }
 
-// List takes label and ***REMOVED***eld selectors, and returns the list of MeteringCon***REMOVED***gs that match those selectors.
-func (c *meteringCon***REMOVED***gs) List(opts metav1.ListOptions) (result *v1.MeteringCon***REMOVED***gList, err error) {
+// List takes label and field selectors, and returns the list of MeteringConfigs that match those selectors.
+func (c *meteringConfigs) List(opts metav1.ListOptions) (result *v1.MeteringConfigList, err error) {
 	var timeout time.Duration
 	if opts.TimeoutSeconds != nil {
 		timeout = time.Duration(*opts.TimeoutSeconds) * time.Second
 	}
-	result = &v1.MeteringCon***REMOVED***gList{}
+	result = &v1.MeteringConfigList{}
 	err = c.client.Get().
 		Namespace(c.ns).
-		Resource("meteringcon***REMOVED***gs").
+		Resource("meteringconfigs").
 		VersionedParams(&opts, scheme.ParameterCodec).
 		Timeout(timeout).
 		Do().
@@ -77,8 +77,8 @@ func (c *meteringCon***REMOVED***gs) List(opts metav1.ListOptions) (result *v1.M
 	return
 }
 
-// Watch returns a watch.Interface that watches the requested meteringCon***REMOVED***gs.
-func (c *meteringCon***REMOVED***gs) Watch(opts metav1.ListOptions) (watch.Interface, error) {
+// Watch returns a watch.Interface that watches the requested meteringConfigs.
+func (c *meteringConfigs) Watch(opts metav1.ListOptions) (watch.Interface, error) {
 	var timeout time.Duration
 	if opts.TimeoutSeconds != nil {
 		timeout = time.Duration(*opts.TimeoutSeconds) * time.Second
@@ -86,32 +86,32 @@ func (c *meteringCon***REMOVED***gs) Watch(opts metav1.ListOptions) (watch.Inter
 	opts.Watch = true
 	return c.client.Get().
 		Namespace(c.ns).
-		Resource("meteringcon***REMOVED***gs").
+		Resource("meteringconfigs").
 		VersionedParams(&opts, scheme.ParameterCodec).
 		Timeout(timeout).
 		Watch()
 }
 
-// Create takes the representation of a meteringCon***REMOVED***g and creates it.  Returns the server's representation of the meteringCon***REMOVED***g, and an error, if there is any.
-func (c *meteringCon***REMOVED***gs) Create(meteringCon***REMOVED***g *v1.MeteringCon***REMOVED***g) (result *v1.MeteringCon***REMOVED***g, err error) {
-	result = &v1.MeteringCon***REMOVED***g{}
+// Create takes the representation of a meteringConfig and creates it.  Returns the server's representation of the meteringConfig, and an error, if there is any.
+func (c *meteringConfigs) Create(meteringConfig *v1.MeteringConfig) (result *v1.MeteringConfig, err error) {
+	result = &v1.MeteringConfig{}
 	err = c.client.Post().
 		Namespace(c.ns).
-		Resource("meteringcon***REMOVED***gs").
-		Body(meteringCon***REMOVED***g).
+		Resource("meteringconfigs").
+		Body(meteringConfig).
 		Do().
 		Into(result)
 	return
 }
 
-// Update takes the representation of a meteringCon***REMOVED***g and updates it. Returns the server's representation of the meteringCon***REMOVED***g, and an error, if there is any.
-func (c *meteringCon***REMOVED***gs) Update(meteringCon***REMOVED***g *v1.MeteringCon***REMOVED***g) (result *v1.MeteringCon***REMOVED***g, err error) {
-	result = &v1.MeteringCon***REMOVED***g{}
+// Update takes the representation of a meteringConfig and updates it. Returns the server's representation of the meteringConfig, and an error, if there is any.
+func (c *meteringConfigs) Update(meteringConfig *v1.MeteringConfig) (result *v1.MeteringConfig, err error) {
+	result = &v1.MeteringConfig{}
 	err = c.client.Put().
 		Namespace(c.ns).
-		Resource("meteringcon***REMOVED***gs").
-		Name(meteringCon***REMOVED***g.Name).
-		Body(meteringCon***REMOVED***g).
+		Resource("meteringconfigs").
+		Name(meteringConfig.Name).
+		Body(meteringConfig).
 		Do().
 		Into(result)
 	return
@@ -120,24 +120,24 @@ func (c *meteringCon***REMOVED***gs) Update(meteringCon***REMOVED***g *v1.Meteri
 // UpdateStatus was generated because the type contains a Status member.
 // Add a +genclient:noStatus comment above the type to avoid generating UpdateStatus().
 
-func (c *meteringCon***REMOVED***gs) UpdateStatus(meteringCon***REMOVED***g *v1.MeteringCon***REMOVED***g) (result *v1.MeteringCon***REMOVED***g, err error) {
-	result = &v1.MeteringCon***REMOVED***g{}
+func (c *meteringConfigs) UpdateStatus(meteringConfig *v1.MeteringConfig) (result *v1.MeteringConfig, err error) {
+	result = &v1.MeteringConfig{}
 	err = c.client.Put().
 		Namespace(c.ns).
-		Resource("meteringcon***REMOVED***gs").
-		Name(meteringCon***REMOVED***g.Name).
+		Resource("meteringconfigs").
+		Name(meteringConfig.Name).
 		SubResource("status").
-		Body(meteringCon***REMOVED***g).
+		Body(meteringConfig).
 		Do().
 		Into(result)
 	return
 }
 
-// Delete takes name of the meteringCon***REMOVED***g and deletes it. Returns an error if one occurs.
-func (c *meteringCon***REMOVED***gs) Delete(name string, options *metav1.DeleteOptions) error {
+// Delete takes name of the meteringConfig and deletes it. Returns an error if one occurs.
+func (c *meteringConfigs) Delete(name string, options *metav1.DeleteOptions) error {
 	return c.client.Delete().
 		Namespace(c.ns).
-		Resource("meteringcon***REMOVED***gs").
+		Resource("meteringconfigs").
 		Name(name).
 		Body(options).
 		Do().
@@ -145,14 +145,14 @@ func (c *meteringCon***REMOVED***gs) Delete(name string, options *metav1.DeleteO
 }
 
 // DeleteCollection deletes a collection of objects.
-func (c *meteringCon***REMOVED***gs) DeleteCollection(options *metav1.DeleteOptions, listOptions metav1.ListOptions) error {
+func (c *meteringConfigs) DeleteCollection(options *metav1.DeleteOptions, listOptions metav1.ListOptions) error {
 	var timeout time.Duration
 	if listOptions.TimeoutSeconds != nil {
 		timeout = time.Duration(*listOptions.TimeoutSeconds) * time.Second
 	}
 	return c.client.Delete().
 		Namespace(c.ns).
-		Resource("meteringcon***REMOVED***gs").
+		Resource("meteringconfigs").
 		VersionedParams(&listOptions, scheme.ParameterCodec).
 		Timeout(timeout).
 		Body(options).
@@ -160,12 +160,12 @@ func (c *meteringCon***REMOVED***gs) DeleteCollection(options *metav1.DeleteOpti
 		Error()
 }
 
-// Patch applies the patch and returns the patched meteringCon***REMOVED***g.
-func (c *meteringCon***REMOVED***gs) Patch(name string, pt types.PatchType, data []byte, subresources ...string) (result *v1.MeteringCon***REMOVED***g, err error) {
-	result = &v1.MeteringCon***REMOVED***g{}
+// Patch applies the patch and returns the patched meteringConfig.
+func (c *meteringConfigs) Patch(name string, pt types.PatchType, data []byte, subresources ...string) (result *v1.MeteringConfig, err error) {
+	result = &v1.MeteringConfig{}
 	err = c.client.Patch(pt).
 		Namespace(c.ns).
-		Resource("meteringcon***REMOVED***gs").
+		Resource("meteringconfigs").
 		SubResource(subresources...).
 		Name(name).
 		Body(data).

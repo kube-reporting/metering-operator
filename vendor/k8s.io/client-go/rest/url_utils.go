@@ -2,7 +2,7 @@
 Copyright 2016 The Kubernetes Authors.
 
 Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this ***REMOVED***le except in compliance with the License.
+you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
 
     http://www.apache.org/licenses/LICENSE-2.0
@@ -10,7 +10,7 @@ You may obtain a copy of the License at
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the speci***REMOVED***c language governing permissions and
+See the License for the specific language governing permissions and
 limitations under the License.
 */
 
@@ -47,7 +47,7 @@ func DefaultServerURL(host, apiPath string, groupVersion schema.GroupVersion, de
 		}
 	}
 
-	// hostURL.Path is optional; a non-empty Path is treated as a pre***REMOVED***x that is to be applied to
+	// hostURL.Path is optional; a non-empty Path is treated as a prefix that is to be applied to
 	// all URIs used to access the host. this is useful when there's a proxy in front of the
 	// apiserver that has relocated the apiserver endpoints, forwarding all requests from, for
 	// example, /a/b/c to the apiserver. in this case the Path should be /a/b/c.
@@ -70,28 +70,28 @@ func DefaultVersionedAPIPath(apiPath string, groupVersion schema.GroupVersion) s
 	if len(groupVersion.Group) > 0 {
 		versionedAPIPath = path.Join(versionedAPIPath, groupVersion.Group, groupVersion.Version)
 
-	} ***REMOVED*** {
+	} else {
 		versionedAPIPath = path.Join(versionedAPIPath, groupVersion.Version)
 	}
 
 	return versionedAPIPath
 }
 
-// defaultServerUrlFor is shared between IsCon***REMOVED***gTransportTLS and RESTClientFor. It
+// defaultServerUrlFor is shared between IsConfigTransportTLS and RESTClientFor. It
 // requires Host and Version to be set prior to being called.
-func defaultServerUrlFor(con***REMOVED***g *Con***REMOVED***g) (*url.URL, string, error) {
+func defaultServerUrlFor(config *Config) (*url.URL, string, error) {
 	// TODO: move the default to secure when the apiserver supports TLS by default
-	// con***REMOVED***g.Insecure is taken to mean "I want HTTPS but don't bother checking the certs against a CA."
-	hasCA := len(con***REMOVED***g.CAFile) != 0 || len(con***REMOVED***g.CAData) != 0
-	hasCert := len(con***REMOVED***g.CertFile) != 0 || len(con***REMOVED***g.CertData) != 0
-	defaultTLS := hasCA || hasCert || con***REMOVED***g.Insecure
-	host := con***REMOVED***g.Host
+	// config.Insecure is taken to mean "I want HTTPS but don't bother checking the certs against a CA."
+	hasCA := len(config.CAFile) != 0 || len(config.CAData) != 0
+	hasCert := len(config.CertFile) != 0 || len(config.CertData) != 0
+	defaultTLS := hasCA || hasCert || config.Insecure
+	host := config.Host
 	if host == "" {
 		host = "localhost"
 	}
 
-	if con***REMOVED***g.GroupVersion != nil {
-		return DefaultServerURL(host, con***REMOVED***g.APIPath, *con***REMOVED***g.GroupVersion, defaultTLS)
+	if config.GroupVersion != nil {
+		return DefaultServerURL(host, config.APIPath, *config.GroupVersion, defaultTLS)
 	}
-	return DefaultServerURL(host, con***REMOVED***g.APIPath, schema.GroupVersion{}, defaultTLS)
+	return DefaultServerURL(host, config.APIPath, schema.GroupVersion{}, defaultTLS)
 }

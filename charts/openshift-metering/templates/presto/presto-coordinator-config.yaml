@@ -1,23 +1,23 @@
 apiVersion: v1
-kind: Con***REMOVED***gMap
+kind: ConfigMap
 metadata:
-  name: presto-coordinator-con***REMOVED***g
+  name: presto-coordinator-config
   labels:
     app: presto
 data:
   log.properties: |
-    com.facebook.presto={{ upper .Values.presto.spec.coordinator.con***REMOVED***g.logLevel }}
+    com.facebook.presto={{ upper .Values.presto.spec.coordinator.config.logLevel }}
 
   node.properties: |
     node.data-dir=/var/presto/data
     node.environment=production
 
-  con***REMOVED***g.properties: |
+  config.properties: |
     coordinator=true
-    node-scheduler.include-coordinator={{ .Values.presto.spec.con***REMOVED***g.nodeSchedulerIncludeCoordinator }}
+    node-scheduler.include-coordinator={{ .Values.presto.spec.config.nodeSchedulerIncludeCoordinator }}
     discovery-server.enabled=true
 
-{{- if .Values.presto.spec.con***REMOVED***g.tls.enabled }}
+{{- if .Values.presto.spec.config.tls.enabled }}
     http-server.http.enabled=false
     http-server.https.enabled=true
     http-server.https.port=8080
@@ -28,78 +28,78 @@ data:
     internal-communication.https.required=true
     internal-communication.https.keystore.path=/opt/presto/tls/keystore.pem
     internal-communication.https.truststore.path=/opt/presto/tls/truststore.pem
-{{- ***REMOVED*** }}
+{{- else }}
     http-server.http.port=8080
     discovery.uri=http://presto:8080
 {{- end }}
-{{- if .Values.presto.spec.con***REMOVED***g.auth.enabled }}
+{{- if .Values.presto.spec.config.auth.enabled }}
     http-server.authentication.type=CERTIFICATE
 {{- end }}
 
     jmx.rmiserver.port=8081
     jmx.rmiregistry.port=8081
 
-{{- if .Values.presto.spec.con***REMOVED***g.maxQueryLength }}
-    query.max-length={{ .Values.presto.spec.con***REMOVED***g.maxQueryLength }}
+{{- if .Values.presto.spec.config.maxQueryLength }}
+    query.max-length={{ .Values.presto.spec.config.maxQueryLength }}
 {{- end }}
-{{- if .Values.presto.spec.coordinator.con***REMOVED***g.taskConcurrency }}
-    task.concurrency={{ .Values.presto.spec.coordinator.con***REMOVED***g.taskConcurrency }}
+{{- if .Values.presto.spec.coordinator.config.taskConcurrency }}
+    task.concurrency={{ .Values.presto.spec.coordinator.config.taskConcurrency }}
 {{- end }}
-{{- if .Values.presto.spec.coordinator.con***REMOVED***g.taskMaxWorkerThreads }}
-    task.max-worker-threads: {{ .Values.presto.spec.coordinator.con***REMOVED***g.taskMaxWorkerThreads }}
+{{- if .Values.presto.spec.coordinator.config.taskMaxWorkerThreads }}
+    task.max-worker-threads: {{ .Values.presto.spec.coordinator.config.taskMaxWorkerThreads }}
 {{- end }}
-{{- if .Values.presto.spec.coordinator.con***REMOVED***g.taskMinDrivers }}
-    task.min-drivers: {{ .Values.presto.spec.coordinator.con***REMOVED***g.taskMinDrivers }}
-{{- end }}
-
-{{- if .Values.presto.spec.con***REMOVED***g.connectors.prometheus.auth.useServiceAccountToken }}
-  prometheus-connector-bearer-token-***REMOVED***le: "/var/run/secrets/kubernetes.io/serviceaccount/token"
-{{ ***REMOVED*** }}
-  prometheus-connector-bearer-token-***REMOVED***le: {{ .Values.presto.spec.con***REMOVED***g.connectors.prometheus.auth.bearerTokenFile }}
+{{- if .Values.presto.spec.coordinator.config.taskMinDrivers }}
+    task.min-drivers: {{ .Values.presto.spec.coordinator.config.taskMinDrivers }}
 {{- end }}
 
-  jvm.con***REMOVED***g: |
+{{- if .Values.presto.spec.config.connectors.prometheus.auth.useServiceAccountToken }}
+  prometheus-connector-bearer-token-file: "/var/run/secrets/kubernetes.io/serviceaccount/token"
+{{ else }}
+  prometheus-connector-bearer-token-file: {{ .Values.presto.spec.config.connectors.prometheus.auth.bearerTokenFile }}
+{{- end }}
+
+  jvm.config: |
     -server
     -XX:+UseContainerSupport
     -XX:+UseG1GC
     -XX:+UseGCOverheadLimit
-{{- if .Values.presto.spec.coordinator.con***REMOVED***g.jvm.G1HeapRegionSize }}
-    -XX:G1HeapRegionSize={{ .Values.presto.spec.coordinator.con***REMOVED***g.jvm.G1HeapRegionSize }}
+{{- if .Values.presto.spec.coordinator.config.jvm.G1HeapRegionSize }}
+    -XX:G1HeapRegionSize={{ .Values.presto.spec.coordinator.config.jvm.G1HeapRegionSize }}
 {{- end }}
-{{- if .Values.presto.spec.coordinator.con***REMOVED***g.jvm.parallelGCThreads }}
-    -XX:ParallelGCThreads={{ .Values.presto.spec.coordinator.con***REMOVED***g.jvm.parallelGCThreads }}
+{{- if .Values.presto.spec.coordinator.config.jvm.parallelGCThreads }}
+    -XX:ParallelGCThreads={{ .Values.presto.spec.coordinator.config.jvm.parallelGCThreads }}
 {{- end }}
-{{- if .Values.presto.spec.coordinator.con***REMOVED***g.jvm.concGCThreads }}
-    -XX:ConcGCThreads={{ .Values.presto.spec.coordinator.con***REMOVED***g.jvm.concGCThreads }}
+{{- if .Values.presto.spec.coordinator.config.jvm.concGCThreads }}
+    -XX:ConcGCThreads={{ .Values.presto.spec.coordinator.config.jvm.concGCThreads }}
 {{- end }}
-{{- if .Values.presto.spec.coordinator.con***REMOVED***g.jvm.permSize }}
-    -XX:PermSize={{ .Values.presto.spec.coordinator.con***REMOVED***g.jvm.permSize }}
+{{- if .Values.presto.spec.coordinator.config.jvm.permSize }}
+    -XX:PermSize={{ .Values.presto.spec.coordinator.config.jvm.permSize }}
 {{- end }}
-{{- if .Values.presto.spec.coordinator.con***REMOVED***g.jvm.maxGcPauseMillis }}
-    -XX:MaxGCPauseMillis={{ .Values.presto.spec.coordinator.con***REMOVED***g.jvm.maxGcPauseMillis }}
+{{- if .Values.presto.spec.coordinator.config.jvm.maxGcPauseMillis }}
+    -XX:MaxGCPauseMillis={{ .Values.presto.spec.coordinator.config.jvm.maxGcPauseMillis }}
 {{- end }}
-{{- if .Values.presto.spec.coordinator.con***REMOVED***g.jvm.initiatingHeapOccupancyPercent }}
-    -XX:InitiatingHeapOccupancyPercent={{ .Values.presto.spec.coordinator.con***REMOVED***g.jvm.initiatingHeapOccupancyPercent }}
+{{- if .Values.presto.spec.coordinator.config.jvm.initiatingHeapOccupancyPercent }}
+    -XX:InitiatingHeapOccupancyPercent={{ .Values.presto.spec.coordinator.config.jvm.initiatingHeapOccupancyPercent }}
 {{- end }}
-{{- if .Values.presto.spec.coordinator.con***REMOVED***g.jvm.initialRAMPercentage }}
-    -XX:InitialRAMPercentage={{ .Values.presto.spec.coordinator.con***REMOVED***g.jvm.initialRAMPercentage }}
+{{- if .Values.presto.spec.coordinator.config.jvm.initialRAMPercentage }}
+    -XX:InitialRAMPercentage={{ .Values.presto.spec.coordinator.config.jvm.initialRAMPercentage }}
 {{- end }}
-{{- if .Values.presto.spec.coordinator.con***REMOVED***g.jvm.maxRAMPercentage }}
-    -XX:MaxRAMPercentage={{ .Values.presto.spec.coordinator.con***REMOVED***g.jvm.maxRAMPercentage }}
+{{- if .Values.presto.spec.coordinator.config.jvm.maxRAMPercentage }}
+    -XX:MaxRAMPercentage={{ .Values.presto.spec.coordinator.config.jvm.maxRAMPercentage }}
 {{- end }}
-{{- if .Values.presto.spec.coordinator.con***REMOVED***g.jvm.minRAMPercentage }}
-    -XX:MinRAMPercentage={{ .Values.presto.spec.coordinator.con***REMOVED***g.jvm.minRAMPercentage }}
+{{- if .Values.presto.spec.coordinator.config.jvm.minRAMPercentage }}
+    -XX:MinRAMPercentage={{ .Values.presto.spec.coordinator.config.jvm.minRAMPercentage }}
 {{- end }}
-{{- if .Values.presto.spec.coordinator.con***REMOVED***g.jvm.reservedCodeCacheSize }}
-    -XX:ReservedCodeCacheSize={{ .Values.presto.spec.coordinator.con***REMOVED***g.jvm.reservedCodeCacheSize }}
+{{- if .Values.presto.spec.coordinator.config.jvm.reservedCodeCacheSize }}
+    -XX:ReservedCodeCacheSize={{ .Values.presto.spec.coordinator.config.jvm.reservedCodeCacheSize }}
 {{- end }}
-{{- if .Values.presto.spec.coordinator.con***REMOVED***g.jvm.maxCachedBufferSize }}
-    -Djdk.nio.maxCachedBufferSize={{ .Values.presto.spec.coordinator.con***REMOVED***g.jvm.maxCachedBufferSize }}
+{{- if .Values.presto.spec.coordinator.config.jvm.maxCachedBufferSize }}
+    -Djdk.nio.maxCachedBufferSize={{ .Values.presto.spec.coordinator.config.jvm.maxCachedBufferSize }}
 {{- end }}
-{{- if .Values.presto.spec.coordinator.con***REMOVED***g.jvm.maxDirectMemorySize }}
-    -XX:MaxDirectMemorySize={{ .Values.presto.spec.coordinator.con***REMOVED***g.jvm.maxDirectMemorySize  }}
+{{- if .Values.presto.spec.coordinator.config.jvm.maxDirectMemorySize }}
+    -XX:MaxDirectMemorySize={{ .Values.presto.spec.coordinator.config.jvm.maxDirectMemorySize  }}
 {{- end }}
-{{- range .Values.presto.spec.coordinator.con***REMOVED***g.jvm.extraFlags }}
+{{- range .Values.presto.spec.coordinator.config.jvm.extraFlags }}
     {{ . }}
 {{- end }}
     -XX:+ExplicitGCInvokesConcurrent
@@ -115,7 +115,7 @@ data:
     -XX:+UseGCLogFileRotation
     -XX:NumberOfGCLogFiles=5
     -XX:GCLogFileSize=3M
-    -javaagent:/opt/jmx_exporter/jmx_exporter.jar=8082:/opt/jmx_exporter/con***REMOVED***g/con***REMOVED***g.yml
+    -javaagent:/opt/jmx_exporter/jmx_exporter.jar=8082:/opt/jmx_exporter/config/config.yml
     -Dcom.sun.management.jmxremote
     -Dcom.sun.management.jmxremote.local.only=false
     -Dcom.sun.management.jmxremote.ssl=false

@@ -2,7 +2,7 @@
 Copyright 2017 The Kubernetes Authors.
 
 Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this ***REMOVED***le except in compliance with the License.
+you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
 
     http://www.apache.org/licenses/LICENSE-2.0
@@ -10,7 +10,7 @@ You may obtain a copy of the License at
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the speci***REMOVED***c language governing permissions and
+See the License for the specific language governing permissions and
 limitations under the License.
 */
 
@@ -61,13 +61,13 @@ func (t *tokenGetter) Token() (string, error) {
 	var options gophercloud.AuthOptions
 	var err error
 	if t.authOpt == nil {
-		// reads the con***REMOVED***g from the environment
-		klog.V(4).Info("reading openstack con***REMOVED***g from the environment variables")
+		// reads the config from the environment
+		klog.V(4).Info("reading openstack config from the environment variables")
 		options, err = openstack.AuthOptionsFromEnv()
 		if err != nil {
 			return "", fmt.Errorf("failed to read openstack env vars: %s", err)
 		}
-	} ***REMOVED*** {
+	} else {
 		options = *t.authOpt
 	}
 	client, err := openstack.AuthenticatedClient(options)
@@ -125,7 +125,7 @@ func (t *tokenRoundTripper) RoundTrip(req *http.Request) (*http.Response, error)
 	token, err := t.tokenGetter.Token()
 	if err == nil {
 		req.Header.Set("Authorization", "Bearer "+token)
-	} ***REMOVED*** {
+	} else {
 		klog.V(4).Infof("failed to get token: %s", err)
 	}
 
@@ -136,40 +136,40 @@ func (t *tokenRoundTripper) WrappedRoundTripper() http.RoundTripper { return t.R
 
 // newOpenstackAuthProvider creates an auth provider which works with openstack
 // environment.
-func newOpenstackAuthProvider(_ string, con***REMOVED***g map[string]string, persister restclient.AuthProviderCon***REMOVED***gPersister) (restclient.AuthProvider, error) {
+func newOpenstackAuthProvider(_ string, config map[string]string, persister restclient.AuthProviderConfigPersister) (restclient.AuthProvider, error) {
 	var ttlDuration time.Duration
 	var err error
 
 	klog.Warningf("WARNING: in-tree openstack auth plugin is now deprecated. please use the \"client-keystone-auth\" kubectl/client-go credential plugin instead")
-	ttl, found := con***REMOVED***g["ttl"]
+	ttl, found := config["ttl"]
 	if !found {
 		ttlDuration = DefaultTTLDuration
-		// persist to con***REMOVED***g
-		con***REMOVED***g["ttl"] = ttlDuration.String()
-		if err = persister.Persist(con***REMOVED***g); err != nil {
-			return nil, fmt.Errorf("failed to persist con***REMOVED***g: %s", err)
+		// persist to config
+		config["ttl"] = ttlDuration.String()
+		if err = persister.Persist(config); err != nil {
+			return nil, fmt.Errorf("failed to persist config: %s", err)
 		}
-	} ***REMOVED*** {
+	} else {
 		ttlDuration, err = time.ParseDuration(ttl)
 		if err != nil {
-			return nil, fmt.Errorf("failed to parse ttl con***REMOVED***g: %s", err)
+			return nil, fmt.Errorf("failed to parse ttl config: %s", err)
 		}
 	}
 
 	authOpt := gophercloud.AuthOptions{
-		IdentityEndpoint: con***REMOVED***g["identityEndpoint"],
-		Username:         con***REMOVED***g["username"],
-		Password:         con***REMOVED***g["password"],
-		DomainName:       con***REMOVED***g["name"],
-		TenantID:         con***REMOVED***g["tenantId"],
-		TenantName:       con***REMOVED***g["tenantName"],
+		IdentityEndpoint: config["identityEndpoint"],
+		Username:         config["username"],
+		Password:         config["password"],
+		DomainName:       config["name"],
+		TenantID:         config["tenantId"],
+		TenantName:       config["tenantName"],
 	}
 
 	getter := tokenGetter{}
 	// not empty
 	if (authOpt != gophercloud.AuthOptions{}) {
 		if len(authOpt.IdentityEndpoint) == 0 {
-			return nil, fmt.Errorf("empty %q in the con***REMOVED***g for openstack auth provider", "identityEndpoint")
+			return nil, fmt.Errorf("empty %q in the config for openstack auth provider", "identityEndpoint")
 		}
 		getter.authOpt = &authOpt
 	}

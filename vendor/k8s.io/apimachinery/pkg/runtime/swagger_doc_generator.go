@@ -2,7 +2,7 @@
 Copyright 2015 The Kubernetes Authors.
 
 Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this ***REMOVED***le except in compliance with the License.
+you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
 
     http://www.apache.org/licenses/LICENSE-2.0
@@ -10,7 +10,7 @@ You may obtain a copy of the License at
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the speci***REMOVED***c language governing permissions and
+See the License for the specific language governing permissions and
 limitations under the License.
 */
 
@@ -28,25 +28,25 @@ import (
 	"strings"
 )
 
-// Pair of strings. We keed the name of ***REMOVED***elds and the doc
+// Pair of strings. We keed the name of fields and the doc
 type Pair struct {
 	Name, Doc string
 }
 
-// KubeTypes is an array to represent all available types in a parsed ***REMOVED***le. [0] is for the type itself
+// KubeTypes is an array to represent all available types in a parsed file. [0] is for the type itself
 type KubeTypes []Pair
 
-func astFrom(***REMOVED***lePath string) *doc.Package {
+func astFrom(filePath string) *doc.Package {
 	fset := token.NewFileSet()
 	m := make(map[string]*ast.File)
 
-	f, err := parser.ParseFile(fset, ***REMOVED***lePath, nil, parser.ParseComments)
+	f, err := parser.ParseFile(fset, filePath, nil, parser.ParseComments)
 	if err != nil {
 		fmt.Println(err)
 		return nil
 	}
 
-	m[***REMOVED***lePath] = f
+	m[filePath] = f
 	apkg, _ := ast.NewPackage(fset, m, nil, nil)
 
 	return doc.New(apkg, "", 0)
@@ -70,13 +70,13 @@ func fmtRawDoc(rawDoc string) string {
 		case len(line) == 0: // Keep paragraphs
 			delPrevChar()
 			buffer.WriteString("\n\n")
-		case strings.HasPre***REMOVED***x(leading, "TODO"): // Ignore one line TODOs
-		case strings.HasPre***REMOVED***x(leading, "+"): // Ignore instructions to the generators
+		case strings.HasPrefix(leading, "TODO"): // Ignore one line TODOs
+		case strings.HasPrefix(leading, "+"): // Ignore instructions to the generators
 		default:
-			if strings.HasPre***REMOVED***x(line, " ") || strings.HasPre***REMOVED***x(line, "\t") {
+			if strings.HasPrefix(line, " ") || strings.HasPrefix(line, "\t") {
 				delPrevChar()
 				line = "\n" + line + "\n" // Replace it with newline. This is useful when we have a line with: "Example:\n\tJSON-someting..."
-			} ***REMOVED*** {
+			} else {
 				line += " "
 			}
 			buffer.WriteString(line)
@@ -92,12 +92,12 @@ func fmtRawDoc(rawDoc string) string {
 	return postDoc
 }
 
-// ***REMOVED***eldName returns the name of the ***REMOVED***eld as it should appear in JSON format
-// "-" indicates that this ***REMOVED***eld is not part of the JSON representation
-func ***REMOVED***eldName(***REMOVED***eld *ast.Field) string {
+// fieldName returns the name of the field as it should appear in JSON format
+// "-" indicates that this field is not part of the JSON representation
+func fieldName(field *ast.Field) string {
 	jsonTag := ""
-	if ***REMOVED***eld.Tag != nil {
-		jsonTag = reflect.StructTag(***REMOVED***eld.Tag.Value[1 : len(***REMOVED***eld.Tag.Value)-1]).Get("json") // Delete ***REMOVED***rst and last quotation
+	if field.Tag != nil {
+		jsonTag = reflect.StructTag(field.Tag.Value[1 : len(field.Tag.Value)-1]).Get("json") // Delete first and last quotation
 		if strings.Contains(jsonTag, "inline") {
 			return "-"
 		}
@@ -105,10 +105,10 @@ func ***REMOVED***eldName(***REMOVED***eld *ast.Field) string {
 
 	jsonTag = strings.Split(jsonTag, ",")[0] // This can return "-"
 	if jsonTag == "" {
-		if ***REMOVED***eld.Names != nil {
-			return ***REMOVED***eld.Names[0].Name
+		if field.Names != nil {
+			return field.Names[0].Name
 		}
-		return ***REMOVED***eld.Type.(*ast.Ident).Name
+		return field.Type.(*ast.Ident).Name
 	}
 	return jsonTag
 }
@@ -150,13 +150,13 @@ func writeFuncHeader(b *buffer, structName string, indent int) {
 }
 
 func writeFuncFooter(b *buffer, structName string, indent int) {
-	b.addLine("}\n", indent) // Closes the map de***REMOVED***nition
+	b.addLine("}\n", indent) // Closes the map definition
 
 	s := fmt.Sprintf("func (%s) SwaggerDoc() map[string]string {\n", structName)
 	b.addLine(s, indent)
 	s = fmt.Sprintf("return map_%s\n", structName)
 	b.addLine(s, indent+1)
-	b.addLine("}\n", indent) // Closes the function de***REMOVED***nition
+	b.addLine("}\n", indent) // Closes the function definition
 }
 
 func writeMapBody(b *buffer, kubeType []Pair, indent int) {
@@ -169,8 +169,8 @@ func writeMapBody(b *buffer, kubeType []Pair, indent int) {
 
 // ParseDocumentationFrom gets all types' documentation and returns them as an
 // array. Each type is again represented as an array (we have to use arrays as we
-// need to be sure for the order of the ***REMOVED***elds). This function returns ***REMOVED***elds and
-// struct de***REMOVED***nitions that have no documentation as {name, ""}.
+// need to be sure for the order of the fields). This function returns fields and
+// struct definitions that have no documentation as {name, ""}.
 func ParseDocumentationFrom(src string) []KubeTypes {
 	var docForTypes []KubeTypes
 
@@ -181,10 +181,10 @@ func ParseDocumentationFrom(src string) []KubeTypes {
 			var ks KubeTypes
 			ks = append(ks, Pair{kubType.Name, fmtRawDoc(kubType.Doc)})
 
-			for _, ***REMOVED***eld := range structType.Fields.List {
-				if n := ***REMOVED***eldName(***REMOVED***eld); n != "-" {
-					***REMOVED***eldDoc := fmtRawDoc(***REMOVED***eld.Doc.Text())
-					ks = append(ks, Pair{n, ***REMOVED***eldDoc})
+			for _, field := range structType.Fields.List {
+				if n := fieldName(field); n != "-" {
+					fieldDoc := fmtRawDoc(field.Doc.Text())
+					ks = append(ks, Pair{n, fieldDoc})
 				}
 			}
 			docForTypes = append(docForTypes, ks)
@@ -195,7 +195,7 @@ func ParseDocumentationFrom(src string) []KubeTypes {
 }
 
 // WriteSwaggerDocFunc writes a declaration of a function as a string. This function is used in
-// Swagger as a documentation source for structs and theirs ***REMOVED***elds
+// Swagger as a documentation source for structs and theirs fields
 func WriteSwaggerDocFunc(kubeTypes []KubeTypes, w io.Writer) error {
 	for _, kubeType := range kubeTypes {
 		structName := kubeType[0].Name
@@ -210,7 +210,7 @@ func WriteSwaggerDocFunc(kubeTypes []KubeTypes, w io.Writer) error {
 		}
 
 		if len(docfulTypes) == 0 {
-			continue // If no ***REMOVED***elds and the struct have documentation, skip the function de***REMOVED***nition
+			continue // If no fields and the struct have documentation, skip the function definition
 		}
 
 		indent := 0
@@ -229,7 +229,7 @@ func WriteSwaggerDocFunc(kubeTypes []KubeTypes, w io.Writer) error {
 	return nil
 }
 
-// VerifySwaggerDocsExist writes in a io.Writer a list of structs and ***REMOVED***elds that
+// VerifySwaggerDocsExist writes in a io.Writer a list of structs and fields that
 // are missing of documentation.
 func VerifySwaggerDocsExist(kubeTypes []KubeTypes, w io.Writer) (int, error) {
 	missingDocs := 0
@@ -243,11 +243,11 @@ func VerifySwaggerDocsExist(kubeTypes []KubeTypes, w io.Writer) (int, error) {
 			buffer.addLine(s, 0)
 			missingDocs++
 		}
-		kubeType = kubeType[1:] // Skip struct de***REMOVED***nition
+		kubeType = kubeType[1:] // Skip struct definition
 
-		for _, pair := range kubeType { // Iterate only the ***REMOVED***elds
+		for _, pair := range kubeType { // Iterate only the fields
 			if pair.Doc == "" {
-				format := "In struct: %s, ***REMOVED***eld documentation is missing: %s\n"
+				format := "In struct: %s, field documentation is missing: %s\n"
 				s := fmt.Sprintf(format, structName, pair.Name)
 				buffer.addLine(s, 0)
 				missingDocs++

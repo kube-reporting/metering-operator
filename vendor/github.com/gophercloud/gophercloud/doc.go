@@ -9,18 +9,18 @@ Provider structs represent the cloud providers that offer and manage a
 collection of services. You will generally want to create one Provider
 client per OpenStack cloud.
 
-	It is now recommended to use the `clientcon***REMOVED***g` package found at
-	https://github.com/gophercloud/utils/tree/master/openstack/clientcon***REMOVED***g
+	It is now recommended to use the `clientconfig` package found at
+	https://github.com/gophercloud/utils/tree/master/openstack/clientconfig
 	for all authentication purposes.
 
-	The below documentation is still relevant. clientcon***REMOVED***g simply implements
+	The below documentation is still relevant. clientconfig simply implements
 	the below and presents it in an easier and more flexible way.
 
 Use your OpenStack credentials to create a Provider client.  The
 IdentityEndpoint is typically refered to as "auth_url" or "OS_AUTH_URL" in
 information provided by the cloud operator. Additionally, the cloud may refer to
 TenantID or TenantName as project_id and project_name. Credentials are
-speci***REMOVED***ed like so:
+specified like so:
 
 	opts := gophercloud.AuthOptions{
 		IdentityEndpoint: "https://openstack.example.com:5000/v2.0",
@@ -43,7 +43,7 @@ You can authenticate with a token by doing:
 
 You may also use the openstack.AuthOptionsFromEnv() helper function. This
 function reads in standard environment variables frequently found in an
-OpenStack `openrc` ***REMOVED***le. Again note that Gophercloud currently uses "tenant"
+OpenStack `openrc` file. Again note that Gophercloud currently uses "tenant"
 instead of "project".
 
 	opts, err := openstack.AuthOptionsFromEnv()
@@ -51,9 +51,9 @@ instead of "project".
 
 Service Clients
 
-Service structs are speci***REMOVED***c to a provider and handle all of the logic and
+Service structs are specific to a provider and handle all of the logic and
 operations for a particular OpenStack service. Examples of services include:
-Compute, Object Storage, Block Storage. In order to de***REMOVED***ne one, you need to
+Compute, Object Storage, Block Storage. In order to define one, you need to
 pass in the parent provider, like so:
 
 	opts := gophercloud.EndpointOpts{Region: "RegionOne"}
@@ -75,9 +75,9 @@ Extract function from an applicable extension:
 
 	result := servers.Get(client, "{serverId}")
 
-	// Attempt to extract the disk con***REMOVED***guration from the OS-DCF disk con***REMOVED***g
+	// Attempt to extract the disk configuration from the OS-DCF disk config
 	// extension:
-	con***REMOVED***g, err := diskcon***REMOVED***g.ExtractGet(result)
+	config, err := diskconfig.ExtractGet(result)
 
 All requests that enumerate a collection return a Pager struct that is used to
 iterate through the results one page at a time. Use the EachPage method on that

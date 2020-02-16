@@ -19,7 +19,7 @@ func decoderOfStruct(ctx *ctx, typ reflect2.Type) ValDecoder {
 				bindings[fromName] = binding
 				continue
 			}
-			ignoreOld, ignoreNew := resolveConflictBinding(ctx.frozenCon***REMOVED***g, old, binding)
+			ignoreOld, ignoreNew := resolveConflictBinding(ctx.frozenConfig, old, binding)
 			if ignoreOld {
 				delete(bindings, fromName)
 			}
@@ -28,471 +28,471 @@ func decoderOfStruct(ctx *ctx, typ reflect2.Type) ValDecoder {
 			}
 		}
 	}
-	***REMOVED***elds := map[string]*structFieldDecoder{}
+	fields := map[string]*structFieldDecoder{}
 	for k, binding := range bindings {
-		***REMOVED***elds[k] = binding.Decoder.(*structFieldDecoder)
+		fields[k] = binding.Decoder.(*structFieldDecoder)
 	}
 
 	if !ctx.caseSensitive() {
 		for k, binding := range bindings {
-			if _, found := ***REMOVED***elds[strings.ToLower(k)]; !found {
-				***REMOVED***elds[strings.ToLower(k)] = binding.Decoder.(*structFieldDecoder)
+			if _, found := fields[strings.ToLower(k)]; !found {
+				fields[strings.ToLower(k)] = binding.Decoder.(*structFieldDecoder)
 			}
 		}
 	}
 
-	return createStructDecoder(ctx, typ, ***REMOVED***elds)
+	return createStructDecoder(ctx, typ, fields)
 }
 
-func createStructDecoder(ctx *ctx, typ reflect2.Type, ***REMOVED***elds map[string]*structFieldDecoder) ValDecoder {
+func createStructDecoder(ctx *ctx, typ reflect2.Type, fields map[string]*structFieldDecoder) ValDecoder {
 	if ctx.disallowUnknownFields {
-		return &generalStructDecoder{typ: typ, ***REMOVED***elds: ***REMOVED***elds, disallowUnknownFields: true}
+		return &generalStructDecoder{typ: typ, fields: fields, disallowUnknownFields: true}
 	}
 	knownHash := map[int64]struct{}{
 		0: {},
 	}
 
-	switch len(***REMOVED***elds) {
+	switch len(fields) {
 	case 0:
 		return &skipObjectDecoder{typ}
 	case 1:
-		for ***REMOVED***eldName, ***REMOVED***eldDecoder := range ***REMOVED***elds {
-			***REMOVED***eldHash := calcHash(***REMOVED***eldName, ctx.caseSensitive())
-			_, known := knownHash[***REMOVED***eldHash]
+		for fieldName, fieldDecoder := range fields {
+			fieldHash := calcHash(fieldName, ctx.caseSensitive())
+			_, known := knownHash[fieldHash]
 			if known {
-				return &generalStructDecoder{typ, ***REMOVED***elds, false}
+				return &generalStructDecoder{typ, fields, false}
 			}
-			knownHash[***REMOVED***eldHash] = struct{}{}
-			return &oneFieldStructDecoder{typ, ***REMOVED***eldHash, ***REMOVED***eldDecoder}
+			knownHash[fieldHash] = struct{}{}
+			return &oneFieldStructDecoder{typ, fieldHash, fieldDecoder}
 		}
 	case 2:
-		var ***REMOVED***eldHash1 int64
-		var ***REMOVED***eldHash2 int64
-		var ***REMOVED***eldDecoder1 *structFieldDecoder
-		var ***REMOVED***eldDecoder2 *structFieldDecoder
-		for ***REMOVED***eldName, ***REMOVED***eldDecoder := range ***REMOVED***elds {
-			***REMOVED***eldHash := calcHash(***REMOVED***eldName, ctx.caseSensitive())
-			_, known := knownHash[***REMOVED***eldHash]
+		var fieldHash1 int64
+		var fieldHash2 int64
+		var fieldDecoder1 *structFieldDecoder
+		var fieldDecoder2 *structFieldDecoder
+		for fieldName, fieldDecoder := range fields {
+			fieldHash := calcHash(fieldName, ctx.caseSensitive())
+			_, known := knownHash[fieldHash]
 			if known {
-				return &generalStructDecoder{typ, ***REMOVED***elds, false}
+				return &generalStructDecoder{typ, fields, false}
 			}
-			knownHash[***REMOVED***eldHash] = struct{}{}
-			if ***REMOVED***eldHash1 == 0 {
-				***REMOVED***eldHash1 = ***REMOVED***eldHash
-				***REMOVED***eldDecoder1 = ***REMOVED***eldDecoder
-			} ***REMOVED*** {
-				***REMOVED***eldHash2 = ***REMOVED***eldHash
-				***REMOVED***eldDecoder2 = ***REMOVED***eldDecoder
+			knownHash[fieldHash] = struct{}{}
+			if fieldHash1 == 0 {
+				fieldHash1 = fieldHash
+				fieldDecoder1 = fieldDecoder
+			} else {
+				fieldHash2 = fieldHash
+				fieldDecoder2 = fieldDecoder
 			}
 		}
-		return &twoFieldsStructDecoder{typ, ***REMOVED***eldHash1, ***REMOVED***eldDecoder1, ***REMOVED***eldHash2, ***REMOVED***eldDecoder2}
+		return &twoFieldsStructDecoder{typ, fieldHash1, fieldDecoder1, fieldHash2, fieldDecoder2}
 	case 3:
-		var ***REMOVED***eldName1 int64
-		var ***REMOVED***eldName2 int64
-		var ***REMOVED***eldName3 int64
-		var ***REMOVED***eldDecoder1 *structFieldDecoder
-		var ***REMOVED***eldDecoder2 *structFieldDecoder
-		var ***REMOVED***eldDecoder3 *structFieldDecoder
-		for ***REMOVED***eldName, ***REMOVED***eldDecoder := range ***REMOVED***elds {
-			***REMOVED***eldHash := calcHash(***REMOVED***eldName, ctx.caseSensitive())
-			_, known := knownHash[***REMOVED***eldHash]
+		var fieldName1 int64
+		var fieldName2 int64
+		var fieldName3 int64
+		var fieldDecoder1 *structFieldDecoder
+		var fieldDecoder2 *structFieldDecoder
+		var fieldDecoder3 *structFieldDecoder
+		for fieldName, fieldDecoder := range fields {
+			fieldHash := calcHash(fieldName, ctx.caseSensitive())
+			_, known := knownHash[fieldHash]
 			if known {
-				return &generalStructDecoder{typ, ***REMOVED***elds, false}
+				return &generalStructDecoder{typ, fields, false}
 			}
-			knownHash[***REMOVED***eldHash] = struct{}{}
-			if ***REMOVED***eldName1 == 0 {
-				***REMOVED***eldName1 = ***REMOVED***eldHash
-				***REMOVED***eldDecoder1 = ***REMOVED***eldDecoder
-			} ***REMOVED*** if ***REMOVED***eldName2 == 0 {
-				***REMOVED***eldName2 = ***REMOVED***eldHash
-				***REMOVED***eldDecoder2 = ***REMOVED***eldDecoder
-			} ***REMOVED*** {
-				***REMOVED***eldName3 = ***REMOVED***eldHash
-				***REMOVED***eldDecoder3 = ***REMOVED***eldDecoder
+			knownHash[fieldHash] = struct{}{}
+			if fieldName1 == 0 {
+				fieldName1 = fieldHash
+				fieldDecoder1 = fieldDecoder
+			} else if fieldName2 == 0 {
+				fieldName2 = fieldHash
+				fieldDecoder2 = fieldDecoder
+			} else {
+				fieldName3 = fieldHash
+				fieldDecoder3 = fieldDecoder
 			}
 		}
 		return &threeFieldsStructDecoder{typ,
-			***REMOVED***eldName1, ***REMOVED***eldDecoder1,
-			***REMOVED***eldName2, ***REMOVED***eldDecoder2,
-			***REMOVED***eldName3, ***REMOVED***eldDecoder3}
+			fieldName1, fieldDecoder1,
+			fieldName2, fieldDecoder2,
+			fieldName3, fieldDecoder3}
 	case 4:
-		var ***REMOVED***eldName1 int64
-		var ***REMOVED***eldName2 int64
-		var ***REMOVED***eldName3 int64
-		var ***REMOVED***eldName4 int64
-		var ***REMOVED***eldDecoder1 *structFieldDecoder
-		var ***REMOVED***eldDecoder2 *structFieldDecoder
-		var ***REMOVED***eldDecoder3 *structFieldDecoder
-		var ***REMOVED***eldDecoder4 *structFieldDecoder
-		for ***REMOVED***eldName, ***REMOVED***eldDecoder := range ***REMOVED***elds {
-			***REMOVED***eldHash := calcHash(***REMOVED***eldName, ctx.caseSensitive())
-			_, known := knownHash[***REMOVED***eldHash]
+		var fieldName1 int64
+		var fieldName2 int64
+		var fieldName3 int64
+		var fieldName4 int64
+		var fieldDecoder1 *structFieldDecoder
+		var fieldDecoder2 *structFieldDecoder
+		var fieldDecoder3 *structFieldDecoder
+		var fieldDecoder4 *structFieldDecoder
+		for fieldName, fieldDecoder := range fields {
+			fieldHash := calcHash(fieldName, ctx.caseSensitive())
+			_, known := knownHash[fieldHash]
 			if known {
-				return &generalStructDecoder{typ, ***REMOVED***elds, false}
+				return &generalStructDecoder{typ, fields, false}
 			}
-			knownHash[***REMOVED***eldHash] = struct{}{}
-			if ***REMOVED***eldName1 == 0 {
-				***REMOVED***eldName1 = ***REMOVED***eldHash
-				***REMOVED***eldDecoder1 = ***REMOVED***eldDecoder
-			} ***REMOVED*** if ***REMOVED***eldName2 == 0 {
-				***REMOVED***eldName2 = ***REMOVED***eldHash
-				***REMOVED***eldDecoder2 = ***REMOVED***eldDecoder
-			} ***REMOVED*** if ***REMOVED***eldName3 == 0 {
-				***REMOVED***eldName3 = ***REMOVED***eldHash
-				***REMOVED***eldDecoder3 = ***REMOVED***eldDecoder
-			} ***REMOVED*** {
-				***REMOVED***eldName4 = ***REMOVED***eldHash
-				***REMOVED***eldDecoder4 = ***REMOVED***eldDecoder
+			knownHash[fieldHash] = struct{}{}
+			if fieldName1 == 0 {
+				fieldName1 = fieldHash
+				fieldDecoder1 = fieldDecoder
+			} else if fieldName2 == 0 {
+				fieldName2 = fieldHash
+				fieldDecoder2 = fieldDecoder
+			} else if fieldName3 == 0 {
+				fieldName3 = fieldHash
+				fieldDecoder3 = fieldDecoder
+			} else {
+				fieldName4 = fieldHash
+				fieldDecoder4 = fieldDecoder
 			}
 		}
 		return &fourFieldsStructDecoder{typ,
-			***REMOVED***eldName1, ***REMOVED***eldDecoder1,
-			***REMOVED***eldName2, ***REMOVED***eldDecoder2,
-			***REMOVED***eldName3, ***REMOVED***eldDecoder3,
-			***REMOVED***eldName4, ***REMOVED***eldDecoder4}
+			fieldName1, fieldDecoder1,
+			fieldName2, fieldDecoder2,
+			fieldName3, fieldDecoder3,
+			fieldName4, fieldDecoder4}
 	case 5:
-		var ***REMOVED***eldName1 int64
-		var ***REMOVED***eldName2 int64
-		var ***REMOVED***eldName3 int64
-		var ***REMOVED***eldName4 int64
-		var ***REMOVED***eldName5 int64
-		var ***REMOVED***eldDecoder1 *structFieldDecoder
-		var ***REMOVED***eldDecoder2 *structFieldDecoder
-		var ***REMOVED***eldDecoder3 *structFieldDecoder
-		var ***REMOVED***eldDecoder4 *structFieldDecoder
-		var ***REMOVED***eldDecoder5 *structFieldDecoder
-		for ***REMOVED***eldName, ***REMOVED***eldDecoder := range ***REMOVED***elds {
-			***REMOVED***eldHash := calcHash(***REMOVED***eldName, ctx.caseSensitive())
-			_, known := knownHash[***REMOVED***eldHash]
+		var fieldName1 int64
+		var fieldName2 int64
+		var fieldName3 int64
+		var fieldName4 int64
+		var fieldName5 int64
+		var fieldDecoder1 *structFieldDecoder
+		var fieldDecoder2 *structFieldDecoder
+		var fieldDecoder3 *structFieldDecoder
+		var fieldDecoder4 *structFieldDecoder
+		var fieldDecoder5 *structFieldDecoder
+		for fieldName, fieldDecoder := range fields {
+			fieldHash := calcHash(fieldName, ctx.caseSensitive())
+			_, known := knownHash[fieldHash]
 			if known {
-				return &generalStructDecoder{typ, ***REMOVED***elds, false}
+				return &generalStructDecoder{typ, fields, false}
 			}
-			knownHash[***REMOVED***eldHash] = struct{}{}
-			if ***REMOVED***eldName1 == 0 {
-				***REMOVED***eldName1 = ***REMOVED***eldHash
-				***REMOVED***eldDecoder1 = ***REMOVED***eldDecoder
-			} ***REMOVED*** if ***REMOVED***eldName2 == 0 {
-				***REMOVED***eldName2 = ***REMOVED***eldHash
-				***REMOVED***eldDecoder2 = ***REMOVED***eldDecoder
-			} ***REMOVED*** if ***REMOVED***eldName3 == 0 {
-				***REMOVED***eldName3 = ***REMOVED***eldHash
-				***REMOVED***eldDecoder3 = ***REMOVED***eldDecoder
-			} ***REMOVED*** if ***REMOVED***eldName4 == 0 {
-				***REMOVED***eldName4 = ***REMOVED***eldHash
-				***REMOVED***eldDecoder4 = ***REMOVED***eldDecoder
-			} ***REMOVED*** {
-				***REMOVED***eldName5 = ***REMOVED***eldHash
-				***REMOVED***eldDecoder5 = ***REMOVED***eldDecoder
+			knownHash[fieldHash] = struct{}{}
+			if fieldName1 == 0 {
+				fieldName1 = fieldHash
+				fieldDecoder1 = fieldDecoder
+			} else if fieldName2 == 0 {
+				fieldName2 = fieldHash
+				fieldDecoder2 = fieldDecoder
+			} else if fieldName3 == 0 {
+				fieldName3 = fieldHash
+				fieldDecoder3 = fieldDecoder
+			} else if fieldName4 == 0 {
+				fieldName4 = fieldHash
+				fieldDecoder4 = fieldDecoder
+			} else {
+				fieldName5 = fieldHash
+				fieldDecoder5 = fieldDecoder
 			}
 		}
-		return &***REMOVED***veFieldsStructDecoder{typ,
-			***REMOVED***eldName1, ***REMOVED***eldDecoder1,
-			***REMOVED***eldName2, ***REMOVED***eldDecoder2,
-			***REMOVED***eldName3, ***REMOVED***eldDecoder3,
-			***REMOVED***eldName4, ***REMOVED***eldDecoder4,
-			***REMOVED***eldName5, ***REMOVED***eldDecoder5}
+		return &fiveFieldsStructDecoder{typ,
+			fieldName1, fieldDecoder1,
+			fieldName2, fieldDecoder2,
+			fieldName3, fieldDecoder3,
+			fieldName4, fieldDecoder4,
+			fieldName5, fieldDecoder5}
 	case 6:
-		var ***REMOVED***eldName1 int64
-		var ***REMOVED***eldName2 int64
-		var ***REMOVED***eldName3 int64
-		var ***REMOVED***eldName4 int64
-		var ***REMOVED***eldName5 int64
-		var ***REMOVED***eldName6 int64
-		var ***REMOVED***eldDecoder1 *structFieldDecoder
-		var ***REMOVED***eldDecoder2 *structFieldDecoder
-		var ***REMOVED***eldDecoder3 *structFieldDecoder
-		var ***REMOVED***eldDecoder4 *structFieldDecoder
-		var ***REMOVED***eldDecoder5 *structFieldDecoder
-		var ***REMOVED***eldDecoder6 *structFieldDecoder
-		for ***REMOVED***eldName, ***REMOVED***eldDecoder := range ***REMOVED***elds {
-			***REMOVED***eldHash := calcHash(***REMOVED***eldName, ctx.caseSensitive())
-			_, known := knownHash[***REMOVED***eldHash]
+		var fieldName1 int64
+		var fieldName2 int64
+		var fieldName3 int64
+		var fieldName4 int64
+		var fieldName5 int64
+		var fieldName6 int64
+		var fieldDecoder1 *structFieldDecoder
+		var fieldDecoder2 *structFieldDecoder
+		var fieldDecoder3 *structFieldDecoder
+		var fieldDecoder4 *structFieldDecoder
+		var fieldDecoder5 *structFieldDecoder
+		var fieldDecoder6 *structFieldDecoder
+		for fieldName, fieldDecoder := range fields {
+			fieldHash := calcHash(fieldName, ctx.caseSensitive())
+			_, known := knownHash[fieldHash]
 			if known {
-				return &generalStructDecoder{typ, ***REMOVED***elds, false}
+				return &generalStructDecoder{typ, fields, false}
 			}
-			knownHash[***REMOVED***eldHash] = struct{}{}
-			if ***REMOVED***eldName1 == 0 {
-				***REMOVED***eldName1 = ***REMOVED***eldHash
-				***REMOVED***eldDecoder1 = ***REMOVED***eldDecoder
-			} ***REMOVED*** if ***REMOVED***eldName2 == 0 {
-				***REMOVED***eldName2 = ***REMOVED***eldHash
-				***REMOVED***eldDecoder2 = ***REMOVED***eldDecoder
-			} ***REMOVED*** if ***REMOVED***eldName3 == 0 {
-				***REMOVED***eldName3 = ***REMOVED***eldHash
-				***REMOVED***eldDecoder3 = ***REMOVED***eldDecoder
-			} ***REMOVED*** if ***REMOVED***eldName4 == 0 {
-				***REMOVED***eldName4 = ***REMOVED***eldHash
-				***REMOVED***eldDecoder4 = ***REMOVED***eldDecoder
-			} ***REMOVED*** if ***REMOVED***eldName5 == 0 {
-				***REMOVED***eldName5 = ***REMOVED***eldHash
-				***REMOVED***eldDecoder5 = ***REMOVED***eldDecoder
-			} ***REMOVED*** {
-				***REMOVED***eldName6 = ***REMOVED***eldHash
-				***REMOVED***eldDecoder6 = ***REMOVED***eldDecoder
+			knownHash[fieldHash] = struct{}{}
+			if fieldName1 == 0 {
+				fieldName1 = fieldHash
+				fieldDecoder1 = fieldDecoder
+			} else if fieldName2 == 0 {
+				fieldName2 = fieldHash
+				fieldDecoder2 = fieldDecoder
+			} else if fieldName3 == 0 {
+				fieldName3 = fieldHash
+				fieldDecoder3 = fieldDecoder
+			} else if fieldName4 == 0 {
+				fieldName4 = fieldHash
+				fieldDecoder4 = fieldDecoder
+			} else if fieldName5 == 0 {
+				fieldName5 = fieldHash
+				fieldDecoder5 = fieldDecoder
+			} else {
+				fieldName6 = fieldHash
+				fieldDecoder6 = fieldDecoder
 			}
 		}
 		return &sixFieldsStructDecoder{typ,
-			***REMOVED***eldName1, ***REMOVED***eldDecoder1,
-			***REMOVED***eldName2, ***REMOVED***eldDecoder2,
-			***REMOVED***eldName3, ***REMOVED***eldDecoder3,
-			***REMOVED***eldName4, ***REMOVED***eldDecoder4,
-			***REMOVED***eldName5, ***REMOVED***eldDecoder5,
-			***REMOVED***eldName6, ***REMOVED***eldDecoder6}
+			fieldName1, fieldDecoder1,
+			fieldName2, fieldDecoder2,
+			fieldName3, fieldDecoder3,
+			fieldName4, fieldDecoder4,
+			fieldName5, fieldDecoder5,
+			fieldName6, fieldDecoder6}
 	case 7:
-		var ***REMOVED***eldName1 int64
-		var ***REMOVED***eldName2 int64
-		var ***REMOVED***eldName3 int64
-		var ***REMOVED***eldName4 int64
-		var ***REMOVED***eldName5 int64
-		var ***REMOVED***eldName6 int64
-		var ***REMOVED***eldName7 int64
-		var ***REMOVED***eldDecoder1 *structFieldDecoder
-		var ***REMOVED***eldDecoder2 *structFieldDecoder
-		var ***REMOVED***eldDecoder3 *structFieldDecoder
-		var ***REMOVED***eldDecoder4 *structFieldDecoder
-		var ***REMOVED***eldDecoder5 *structFieldDecoder
-		var ***REMOVED***eldDecoder6 *structFieldDecoder
-		var ***REMOVED***eldDecoder7 *structFieldDecoder
-		for ***REMOVED***eldName, ***REMOVED***eldDecoder := range ***REMOVED***elds {
-			***REMOVED***eldHash := calcHash(***REMOVED***eldName, ctx.caseSensitive())
-			_, known := knownHash[***REMOVED***eldHash]
+		var fieldName1 int64
+		var fieldName2 int64
+		var fieldName3 int64
+		var fieldName4 int64
+		var fieldName5 int64
+		var fieldName6 int64
+		var fieldName7 int64
+		var fieldDecoder1 *structFieldDecoder
+		var fieldDecoder2 *structFieldDecoder
+		var fieldDecoder3 *structFieldDecoder
+		var fieldDecoder4 *structFieldDecoder
+		var fieldDecoder5 *structFieldDecoder
+		var fieldDecoder6 *structFieldDecoder
+		var fieldDecoder7 *structFieldDecoder
+		for fieldName, fieldDecoder := range fields {
+			fieldHash := calcHash(fieldName, ctx.caseSensitive())
+			_, known := knownHash[fieldHash]
 			if known {
-				return &generalStructDecoder{typ, ***REMOVED***elds, false}
+				return &generalStructDecoder{typ, fields, false}
 			}
-			knownHash[***REMOVED***eldHash] = struct{}{}
-			if ***REMOVED***eldName1 == 0 {
-				***REMOVED***eldName1 = ***REMOVED***eldHash
-				***REMOVED***eldDecoder1 = ***REMOVED***eldDecoder
-			} ***REMOVED*** if ***REMOVED***eldName2 == 0 {
-				***REMOVED***eldName2 = ***REMOVED***eldHash
-				***REMOVED***eldDecoder2 = ***REMOVED***eldDecoder
-			} ***REMOVED*** if ***REMOVED***eldName3 == 0 {
-				***REMOVED***eldName3 = ***REMOVED***eldHash
-				***REMOVED***eldDecoder3 = ***REMOVED***eldDecoder
-			} ***REMOVED*** if ***REMOVED***eldName4 == 0 {
-				***REMOVED***eldName4 = ***REMOVED***eldHash
-				***REMOVED***eldDecoder4 = ***REMOVED***eldDecoder
-			} ***REMOVED*** if ***REMOVED***eldName5 == 0 {
-				***REMOVED***eldName5 = ***REMOVED***eldHash
-				***REMOVED***eldDecoder5 = ***REMOVED***eldDecoder
-			} ***REMOVED*** if ***REMOVED***eldName6 == 0 {
-				***REMOVED***eldName6 = ***REMOVED***eldHash
-				***REMOVED***eldDecoder6 = ***REMOVED***eldDecoder
-			} ***REMOVED*** {
-				***REMOVED***eldName7 = ***REMOVED***eldHash
-				***REMOVED***eldDecoder7 = ***REMOVED***eldDecoder
+			knownHash[fieldHash] = struct{}{}
+			if fieldName1 == 0 {
+				fieldName1 = fieldHash
+				fieldDecoder1 = fieldDecoder
+			} else if fieldName2 == 0 {
+				fieldName2 = fieldHash
+				fieldDecoder2 = fieldDecoder
+			} else if fieldName3 == 0 {
+				fieldName3 = fieldHash
+				fieldDecoder3 = fieldDecoder
+			} else if fieldName4 == 0 {
+				fieldName4 = fieldHash
+				fieldDecoder4 = fieldDecoder
+			} else if fieldName5 == 0 {
+				fieldName5 = fieldHash
+				fieldDecoder5 = fieldDecoder
+			} else if fieldName6 == 0 {
+				fieldName6 = fieldHash
+				fieldDecoder6 = fieldDecoder
+			} else {
+				fieldName7 = fieldHash
+				fieldDecoder7 = fieldDecoder
 			}
 		}
 		return &sevenFieldsStructDecoder{typ,
-			***REMOVED***eldName1, ***REMOVED***eldDecoder1,
-			***REMOVED***eldName2, ***REMOVED***eldDecoder2,
-			***REMOVED***eldName3, ***REMOVED***eldDecoder3,
-			***REMOVED***eldName4, ***REMOVED***eldDecoder4,
-			***REMOVED***eldName5, ***REMOVED***eldDecoder5,
-			***REMOVED***eldName6, ***REMOVED***eldDecoder6,
-			***REMOVED***eldName7, ***REMOVED***eldDecoder7}
+			fieldName1, fieldDecoder1,
+			fieldName2, fieldDecoder2,
+			fieldName3, fieldDecoder3,
+			fieldName4, fieldDecoder4,
+			fieldName5, fieldDecoder5,
+			fieldName6, fieldDecoder6,
+			fieldName7, fieldDecoder7}
 	case 8:
-		var ***REMOVED***eldName1 int64
-		var ***REMOVED***eldName2 int64
-		var ***REMOVED***eldName3 int64
-		var ***REMOVED***eldName4 int64
-		var ***REMOVED***eldName5 int64
-		var ***REMOVED***eldName6 int64
-		var ***REMOVED***eldName7 int64
-		var ***REMOVED***eldName8 int64
-		var ***REMOVED***eldDecoder1 *structFieldDecoder
-		var ***REMOVED***eldDecoder2 *structFieldDecoder
-		var ***REMOVED***eldDecoder3 *structFieldDecoder
-		var ***REMOVED***eldDecoder4 *structFieldDecoder
-		var ***REMOVED***eldDecoder5 *structFieldDecoder
-		var ***REMOVED***eldDecoder6 *structFieldDecoder
-		var ***REMOVED***eldDecoder7 *structFieldDecoder
-		var ***REMOVED***eldDecoder8 *structFieldDecoder
-		for ***REMOVED***eldName, ***REMOVED***eldDecoder := range ***REMOVED***elds {
-			***REMOVED***eldHash := calcHash(***REMOVED***eldName, ctx.caseSensitive())
-			_, known := knownHash[***REMOVED***eldHash]
+		var fieldName1 int64
+		var fieldName2 int64
+		var fieldName3 int64
+		var fieldName4 int64
+		var fieldName5 int64
+		var fieldName6 int64
+		var fieldName7 int64
+		var fieldName8 int64
+		var fieldDecoder1 *structFieldDecoder
+		var fieldDecoder2 *structFieldDecoder
+		var fieldDecoder3 *structFieldDecoder
+		var fieldDecoder4 *structFieldDecoder
+		var fieldDecoder5 *structFieldDecoder
+		var fieldDecoder6 *structFieldDecoder
+		var fieldDecoder7 *structFieldDecoder
+		var fieldDecoder8 *structFieldDecoder
+		for fieldName, fieldDecoder := range fields {
+			fieldHash := calcHash(fieldName, ctx.caseSensitive())
+			_, known := knownHash[fieldHash]
 			if known {
-				return &generalStructDecoder{typ, ***REMOVED***elds, false}
+				return &generalStructDecoder{typ, fields, false}
 			}
-			knownHash[***REMOVED***eldHash] = struct{}{}
-			if ***REMOVED***eldName1 == 0 {
-				***REMOVED***eldName1 = ***REMOVED***eldHash
-				***REMOVED***eldDecoder1 = ***REMOVED***eldDecoder
-			} ***REMOVED*** if ***REMOVED***eldName2 == 0 {
-				***REMOVED***eldName2 = ***REMOVED***eldHash
-				***REMOVED***eldDecoder2 = ***REMOVED***eldDecoder
-			} ***REMOVED*** if ***REMOVED***eldName3 == 0 {
-				***REMOVED***eldName3 = ***REMOVED***eldHash
-				***REMOVED***eldDecoder3 = ***REMOVED***eldDecoder
-			} ***REMOVED*** if ***REMOVED***eldName4 == 0 {
-				***REMOVED***eldName4 = ***REMOVED***eldHash
-				***REMOVED***eldDecoder4 = ***REMOVED***eldDecoder
-			} ***REMOVED*** if ***REMOVED***eldName5 == 0 {
-				***REMOVED***eldName5 = ***REMOVED***eldHash
-				***REMOVED***eldDecoder5 = ***REMOVED***eldDecoder
-			} ***REMOVED*** if ***REMOVED***eldName6 == 0 {
-				***REMOVED***eldName6 = ***REMOVED***eldHash
-				***REMOVED***eldDecoder6 = ***REMOVED***eldDecoder
-			} ***REMOVED*** if ***REMOVED***eldName7 == 0 {
-				***REMOVED***eldName7 = ***REMOVED***eldHash
-				***REMOVED***eldDecoder7 = ***REMOVED***eldDecoder
-			} ***REMOVED*** {
-				***REMOVED***eldName8 = ***REMOVED***eldHash
-				***REMOVED***eldDecoder8 = ***REMOVED***eldDecoder
+			knownHash[fieldHash] = struct{}{}
+			if fieldName1 == 0 {
+				fieldName1 = fieldHash
+				fieldDecoder1 = fieldDecoder
+			} else if fieldName2 == 0 {
+				fieldName2 = fieldHash
+				fieldDecoder2 = fieldDecoder
+			} else if fieldName3 == 0 {
+				fieldName3 = fieldHash
+				fieldDecoder3 = fieldDecoder
+			} else if fieldName4 == 0 {
+				fieldName4 = fieldHash
+				fieldDecoder4 = fieldDecoder
+			} else if fieldName5 == 0 {
+				fieldName5 = fieldHash
+				fieldDecoder5 = fieldDecoder
+			} else if fieldName6 == 0 {
+				fieldName6 = fieldHash
+				fieldDecoder6 = fieldDecoder
+			} else if fieldName7 == 0 {
+				fieldName7 = fieldHash
+				fieldDecoder7 = fieldDecoder
+			} else {
+				fieldName8 = fieldHash
+				fieldDecoder8 = fieldDecoder
 			}
 		}
 		return &eightFieldsStructDecoder{typ,
-			***REMOVED***eldName1, ***REMOVED***eldDecoder1,
-			***REMOVED***eldName2, ***REMOVED***eldDecoder2,
-			***REMOVED***eldName3, ***REMOVED***eldDecoder3,
-			***REMOVED***eldName4, ***REMOVED***eldDecoder4,
-			***REMOVED***eldName5, ***REMOVED***eldDecoder5,
-			***REMOVED***eldName6, ***REMOVED***eldDecoder6,
-			***REMOVED***eldName7, ***REMOVED***eldDecoder7,
-			***REMOVED***eldName8, ***REMOVED***eldDecoder8}
+			fieldName1, fieldDecoder1,
+			fieldName2, fieldDecoder2,
+			fieldName3, fieldDecoder3,
+			fieldName4, fieldDecoder4,
+			fieldName5, fieldDecoder5,
+			fieldName6, fieldDecoder6,
+			fieldName7, fieldDecoder7,
+			fieldName8, fieldDecoder8}
 	case 9:
-		var ***REMOVED***eldName1 int64
-		var ***REMOVED***eldName2 int64
-		var ***REMOVED***eldName3 int64
-		var ***REMOVED***eldName4 int64
-		var ***REMOVED***eldName5 int64
-		var ***REMOVED***eldName6 int64
-		var ***REMOVED***eldName7 int64
-		var ***REMOVED***eldName8 int64
-		var ***REMOVED***eldName9 int64
-		var ***REMOVED***eldDecoder1 *structFieldDecoder
-		var ***REMOVED***eldDecoder2 *structFieldDecoder
-		var ***REMOVED***eldDecoder3 *structFieldDecoder
-		var ***REMOVED***eldDecoder4 *structFieldDecoder
-		var ***REMOVED***eldDecoder5 *structFieldDecoder
-		var ***REMOVED***eldDecoder6 *structFieldDecoder
-		var ***REMOVED***eldDecoder7 *structFieldDecoder
-		var ***REMOVED***eldDecoder8 *structFieldDecoder
-		var ***REMOVED***eldDecoder9 *structFieldDecoder
-		for ***REMOVED***eldName, ***REMOVED***eldDecoder := range ***REMOVED***elds {
-			***REMOVED***eldHash := calcHash(***REMOVED***eldName, ctx.caseSensitive())
-			_, known := knownHash[***REMOVED***eldHash]
+		var fieldName1 int64
+		var fieldName2 int64
+		var fieldName3 int64
+		var fieldName4 int64
+		var fieldName5 int64
+		var fieldName6 int64
+		var fieldName7 int64
+		var fieldName8 int64
+		var fieldName9 int64
+		var fieldDecoder1 *structFieldDecoder
+		var fieldDecoder2 *structFieldDecoder
+		var fieldDecoder3 *structFieldDecoder
+		var fieldDecoder4 *structFieldDecoder
+		var fieldDecoder5 *structFieldDecoder
+		var fieldDecoder6 *structFieldDecoder
+		var fieldDecoder7 *structFieldDecoder
+		var fieldDecoder8 *structFieldDecoder
+		var fieldDecoder9 *structFieldDecoder
+		for fieldName, fieldDecoder := range fields {
+			fieldHash := calcHash(fieldName, ctx.caseSensitive())
+			_, known := knownHash[fieldHash]
 			if known {
-				return &generalStructDecoder{typ, ***REMOVED***elds, false}
+				return &generalStructDecoder{typ, fields, false}
 			}
-			knownHash[***REMOVED***eldHash] = struct{}{}
-			if ***REMOVED***eldName1 == 0 {
-				***REMOVED***eldName1 = ***REMOVED***eldHash
-				***REMOVED***eldDecoder1 = ***REMOVED***eldDecoder
-			} ***REMOVED*** if ***REMOVED***eldName2 == 0 {
-				***REMOVED***eldName2 = ***REMOVED***eldHash
-				***REMOVED***eldDecoder2 = ***REMOVED***eldDecoder
-			} ***REMOVED*** if ***REMOVED***eldName3 == 0 {
-				***REMOVED***eldName3 = ***REMOVED***eldHash
-				***REMOVED***eldDecoder3 = ***REMOVED***eldDecoder
-			} ***REMOVED*** if ***REMOVED***eldName4 == 0 {
-				***REMOVED***eldName4 = ***REMOVED***eldHash
-				***REMOVED***eldDecoder4 = ***REMOVED***eldDecoder
-			} ***REMOVED*** if ***REMOVED***eldName5 == 0 {
-				***REMOVED***eldName5 = ***REMOVED***eldHash
-				***REMOVED***eldDecoder5 = ***REMOVED***eldDecoder
-			} ***REMOVED*** if ***REMOVED***eldName6 == 0 {
-				***REMOVED***eldName6 = ***REMOVED***eldHash
-				***REMOVED***eldDecoder6 = ***REMOVED***eldDecoder
-			} ***REMOVED*** if ***REMOVED***eldName7 == 0 {
-				***REMOVED***eldName7 = ***REMOVED***eldHash
-				***REMOVED***eldDecoder7 = ***REMOVED***eldDecoder
-			} ***REMOVED*** if ***REMOVED***eldName8 == 0 {
-				***REMOVED***eldName8 = ***REMOVED***eldHash
-				***REMOVED***eldDecoder8 = ***REMOVED***eldDecoder
-			} ***REMOVED*** {
-				***REMOVED***eldName9 = ***REMOVED***eldHash
-				***REMOVED***eldDecoder9 = ***REMOVED***eldDecoder
+			knownHash[fieldHash] = struct{}{}
+			if fieldName1 == 0 {
+				fieldName1 = fieldHash
+				fieldDecoder1 = fieldDecoder
+			} else if fieldName2 == 0 {
+				fieldName2 = fieldHash
+				fieldDecoder2 = fieldDecoder
+			} else if fieldName3 == 0 {
+				fieldName3 = fieldHash
+				fieldDecoder3 = fieldDecoder
+			} else if fieldName4 == 0 {
+				fieldName4 = fieldHash
+				fieldDecoder4 = fieldDecoder
+			} else if fieldName5 == 0 {
+				fieldName5 = fieldHash
+				fieldDecoder5 = fieldDecoder
+			} else if fieldName6 == 0 {
+				fieldName6 = fieldHash
+				fieldDecoder6 = fieldDecoder
+			} else if fieldName7 == 0 {
+				fieldName7 = fieldHash
+				fieldDecoder7 = fieldDecoder
+			} else if fieldName8 == 0 {
+				fieldName8 = fieldHash
+				fieldDecoder8 = fieldDecoder
+			} else {
+				fieldName9 = fieldHash
+				fieldDecoder9 = fieldDecoder
 			}
 		}
 		return &nineFieldsStructDecoder{typ,
-			***REMOVED***eldName1, ***REMOVED***eldDecoder1,
-			***REMOVED***eldName2, ***REMOVED***eldDecoder2,
-			***REMOVED***eldName3, ***REMOVED***eldDecoder3,
-			***REMOVED***eldName4, ***REMOVED***eldDecoder4,
-			***REMOVED***eldName5, ***REMOVED***eldDecoder5,
-			***REMOVED***eldName6, ***REMOVED***eldDecoder6,
-			***REMOVED***eldName7, ***REMOVED***eldDecoder7,
-			***REMOVED***eldName8, ***REMOVED***eldDecoder8,
-			***REMOVED***eldName9, ***REMOVED***eldDecoder9}
+			fieldName1, fieldDecoder1,
+			fieldName2, fieldDecoder2,
+			fieldName3, fieldDecoder3,
+			fieldName4, fieldDecoder4,
+			fieldName5, fieldDecoder5,
+			fieldName6, fieldDecoder6,
+			fieldName7, fieldDecoder7,
+			fieldName8, fieldDecoder8,
+			fieldName9, fieldDecoder9}
 	case 10:
-		var ***REMOVED***eldName1 int64
-		var ***REMOVED***eldName2 int64
-		var ***REMOVED***eldName3 int64
-		var ***REMOVED***eldName4 int64
-		var ***REMOVED***eldName5 int64
-		var ***REMOVED***eldName6 int64
-		var ***REMOVED***eldName7 int64
-		var ***REMOVED***eldName8 int64
-		var ***REMOVED***eldName9 int64
-		var ***REMOVED***eldName10 int64
-		var ***REMOVED***eldDecoder1 *structFieldDecoder
-		var ***REMOVED***eldDecoder2 *structFieldDecoder
-		var ***REMOVED***eldDecoder3 *structFieldDecoder
-		var ***REMOVED***eldDecoder4 *structFieldDecoder
-		var ***REMOVED***eldDecoder5 *structFieldDecoder
-		var ***REMOVED***eldDecoder6 *structFieldDecoder
-		var ***REMOVED***eldDecoder7 *structFieldDecoder
-		var ***REMOVED***eldDecoder8 *structFieldDecoder
-		var ***REMOVED***eldDecoder9 *structFieldDecoder
-		var ***REMOVED***eldDecoder10 *structFieldDecoder
-		for ***REMOVED***eldName, ***REMOVED***eldDecoder := range ***REMOVED***elds {
-			***REMOVED***eldHash := calcHash(***REMOVED***eldName, ctx.caseSensitive())
-			_, known := knownHash[***REMOVED***eldHash]
+		var fieldName1 int64
+		var fieldName2 int64
+		var fieldName3 int64
+		var fieldName4 int64
+		var fieldName5 int64
+		var fieldName6 int64
+		var fieldName7 int64
+		var fieldName8 int64
+		var fieldName9 int64
+		var fieldName10 int64
+		var fieldDecoder1 *structFieldDecoder
+		var fieldDecoder2 *structFieldDecoder
+		var fieldDecoder3 *structFieldDecoder
+		var fieldDecoder4 *structFieldDecoder
+		var fieldDecoder5 *structFieldDecoder
+		var fieldDecoder6 *structFieldDecoder
+		var fieldDecoder7 *structFieldDecoder
+		var fieldDecoder8 *structFieldDecoder
+		var fieldDecoder9 *structFieldDecoder
+		var fieldDecoder10 *structFieldDecoder
+		for fieldName, fieldDecoder := range fields {
+			fieldHash := calcHash(fieldName, ctx.caseSensitive())
+			_, known := knownHash[fieldHash]
 			if known {
-				return &generalStructDecoder{typ, ***REMOVED***elds, false}
+				return &generalStructDecoder{typ, fields, false}
 			}
-			knownHash[***REMOVED***eldHash] = struct{}{}
-			if ***REMOVED***eldName1 == 0 {
-				***REMOVED***eldName1 = ***REMOVED***eldHash
-				***REMOVED***eldDecoder1 = ***REMOVED***eldDecoder
-			} ***REMOVED*** if ***REMOVED***eldName2 == 0 {
-				***REMOVED***eldName2 = ***REMOVED***eldHash
-				***REMOVED***eldDecoder2 = ***REMOVED***eldDecoder
-			} ***REMOVED*** if ***REMOVED***eldName3 == 0 {
-				***REMOVED***eldName3 = ***REMOVED***eldHash
-				***REMOVED***eldDecoder3 = ***REMOVED***eldDecoder
-			} ***REMOVED*** if ***REMOVED***eldName4 == 0 {
-				***REMOVED***eldName4 = ***REMOVED***eldHash
-				***REMOVED***eldDecoder4 = ***REMOVED***eldDecoder
-			} ***REMOVED*** if ***REMOVED***eldName5 == 0 {
-				***REMOVED***eldName5 = ***REMOVED***eldHash
-				***REMOVED***eldDecoder5 = ***REMOVED***eldDecoder
-			} ***REMOVED*** if ***REMOVED***eldName6 == 0 {
-				***REMOVED***eldName6 = ***REMOVED***eldHash
-				***REMOVED***eldDecoder6 = ***REMOVED***eldDecoder
-			} ***REMOVED*** if ***REMOVED***eldName7 == 0 {
-				***REMOVED***eldName7 = ***REMOVED***eldHash
-				***REMOVED***eldDecoder7 = ***REMOVED***eldDecoder
-			} ***REMOVED*** if ***REMOVED***eldName8 == 0 {
-				***REMOVED***eldName8 = ***REMOVED***eldHash
-				***REMOVED***eldDecoder8 = ***REMOVED***eldDecoder
-			} ***REMOVED*** if ***REMOVED***eldName9 == 0 {
-				***REMOVED***eldName9 = ***REMOVED***eldHash
-				***REMOVED***eldDecoder9 = ***REMOVED***eldDecoder
-			} ***REMOVED*** {
-				***REMOVED***eldName10 = ***REMOVED***eldHash
-				***REMOVED***eldDecoder10 = ***REMOVED***eldDecoder
+			knownHash[fieldHash] = struct{}{}
+			if fieldName1 == 0 {
+				fieldName1 = fieldHash
+				fieldDecoder1 = fieldDecoder
+			} else if fieldName2 == 0 {
+				fieldName2 = fieldHash
+				fieldDecoder2 = fieldDecoder
+			} else if fieldName3 == 0 {
+				fieldName3 = fieldHash
+				fieldDecoder3 = fieldDecoder
+			} else if fieldName4 == 0 {
+				fieldName4 = fieldHash
+				fieldDecoder4 = fieldDecoder
+			} else if fieldName5 == 0 {
+				fieldName5 = fieldHash
+				fieldDecoder5 = fieldDecoder
+			} else if fieldName6 == 0 {
+				fieldName6 = fieldHash
+				fieldDecoder6 = fieldDecoder
+			} else if fieldName7 == 0 {
+				fieldName7 = fieldHash
+				fieldDecoder7 = fieldDecoder
+			} else if fieldName8 == 0 {
+				fieldName8 = fieldHash
+				fieldDecoder8 = fieldDecoder
+			} else if fieldName9 == 0 {
+				fieldName9 = fieldHash
+				fieldDecoder9 = fieldDecoder
+			} else {
+				fieldName10 = fieldHash
+				fieldDecoder10 = fieldDecoder
 			}
 		}
 		return &tenFieldsStructDecoder{typ,
-			***REMOVED***eldName1, ***REMOVED***eldDecoder1,
-			***REMOVED***eldName2, ***REMOVED***eldDecoder2,
-			***REMOVED***eldName3, ***REMOVED***eldDecoder3,
-			***REMOVED***eldName4, ***REMOVED***eldDecoder4,
-			***REMOVED***eldName5, ***REMOVED***eldDecoder5,
-			***REMOVED***eldName6, ***REMOVED***eldDecoder6,
-			***REMOVED***eldName7, ***REMOVED***eldDecoder7,
-			***REMOVED***eldName8, ***REMOVED***eldDecoder8,
-			***REMOVED***eldName9, ***REMOVED***eldDecoder9,
-			***REMOVED***eldName10, ***REMOVED***eldDecoder10}
+			fieldName1, fieldDecoder1,
+			fieldName2, fieldDecoder2,
+			fieldName3, fieldDecoder3,
+			fieldName4, fieldDecoder4,
+			fieldName5, fieldDecoder5,
+			fieldName6, fieldDecoder6,
+			fieldName7, fieldDecoder7,
+			fieldName8, fieldDecoder8,
+			fieldName9, fieldDecoder9,
+			fieldName10, fieldDecoder10}
 	}
-	return &generalStructDecoder{typ, ***REMOVED***elds, false}
+	return &generalStructDecoder{typ, fields, false}
 }
 
 type generalStructDecoder struct {
 	typ                   reflect2.Type
-	***REMOVED***elds                map[string]*structFieldDecoder
+	fields                map[string]*structFieldDecoder
 	disallowUnknownFields bool
 }
 
@@ -513,39 +513,39 @@ func (decoder *generalStructDecoder) Decode(ptr unsafe.Pointer, iter *Iterator) 
 }
 
 func (decoder *generalStructDecoder) decodeOneField(ptr unsafe.Pointer, iter *Iterator) {
-	var ***REMOVED***eld string
-	var ***REMOVED***eldDecoder *structFieldDecoder
+	var field string
+	var fieldDecoder *structFieldDecoder
 	if iter.cfg.objectFieldMustBeSimpleString {
-		***REMOVED***eldBytes := iter.ReadStringAsSlice()
-		***REMOVED***eld = *(*string)(unsafe.Pointer(&***REMOVED***eldBytes))
-		***REMOVED***eldDecoder = decoder.***REMOVED***elds[***REMOVED***eld]
-		if ***REMOVED***eldDecoder == nil && !iter.cfg.caseSensitive {
-			***REMOVED***eldDecoder = decoder.***REMOVED***elds[strings.ToLower(***REMOVED***eld)]
+		fieldBytes := iter.ReadStringAsSlice()
+		field = *(*string)(unsafe.Pointer(&fieldBytes))
+		fieldDecoder = decoder.fields[field]
+		if fieldDecoder == nil && !iter.cfg.caseSensitive {
+			fieldDecoder = decoder.fields[strings.ToLower(field)]
 		}
-	} ***REMOVED*** {
-		***REMOVED***eld = iter.ReadString()
-		***REMOVED***eldDecoder = decoder.***REMOVED***elds[***REMOVED***eld]
-		if ***REMOVED***eldDecoder == nil && !iter.cfg.caseSensitive {
-			***REMOVED***eldDecoder = decoder.***REMOVED***elds[strings.ToLower(***REMOVED***eld)]
+	} else {
+		field = iter.ReadString()
+		fieldDecoder = decoder.fields[field]
+		if fieldDecoder == nil && !iter.cfg.caseSensitive {
+			fieldDecoder = decoder.fields[strings.ToLower(field)]
 		}
 	}
-	if ***REMOVED***eldDecoder == nil {
-		msg := "found unknown ***REMOVED***eld: " + ***REMOVED***eld
+	if fieldDecoder == nil {
+		msg := "found unknown field: " + field
 		if decoder.disallowUnknownFields {
 			iter.ReportError("ReadObject", msg)
 		}
 		c := iter.nextToken()
 		if c != ':' {
-			iter.ReportError("ReadObject", "expect : after object ***REMOVED***eld, but found "+string([]byte{c}))
+			iter.ReportError("ReadObject", "expect : after object field, but found "+string([]byte{c}))
 		}
 		iter.Skip()
 		return
 	}
 	c := iter.nextToken()
 	if c != ':' {
-		iter.ReportError("ReadObject", "expect : after object ***REMOVED***eld, but found "+string([]byte{c}))
+		iter.ReportError("ReadObject", "expect : after object field, but found "+string([]byte{c}))
 	}
-	***REMOVED***eldDecoder.Decode(ptr, iter)
+	fieldDecoder.Decode(ptr, iter)
 }
 
 type skipObjectDecoder struct {
@@ -563,8 +563,8 @@ func (decoder *skipObjectDecoder) Decode(ptr unsafe.Pointer, iter *Iterator) {
 
 type oneFieldStructDecoder struct {
 	typ          reflect2.Type
-	***REMOVED***eldHash    int64
-	***REMOVED***eldDecoder *structFieldDecoder
+	fieldHash    int64
+	fieldDecoder *structFieldDecoder
 }
 
 func (decoder *oneFieldStructDecoder) Decode(ptr unsafe.Pointer, iter *Iterator) {
@@ -572,9 +572,9 @@ func (decoder *oneFieldStructDecoder) Decode(ptr unsafe.Pointer, iter *Iterator)
 		return
 	}
 	for {
-		if iter.readFieldHash() == decoder.***REMOVED***eldHash {
-			decoder.***REMOVED***eldDecoder.Decode(ptr, iter)
-		} ***REMOVED*** {
+		if iter.readFieldHash() == decoder.fieldHash {
+			decoder.fieldDecoder.Decode(ptr, iter)
+		} else {
 			iter.Skip()
 		}
 		if iter.isObjectEnd() {
@@ -588,10 +588,10 @@ func (decoder *oneFieldStructDecoder) Decode(ptr unsafe.Pointer, iter *Iterator)
 
 type twoFieldsStructDecoder struct {
 	typ           reflect2.Type
-	***REMOVED***eldHash1    int64
-	***REMOVED***eldDecoder1 *structFieldDecoder
-	***REMOVED***eldHash2    int64
-	***REMOVED***eldDecoder2 *structFieldDecoder
+	fieldHash1    int64
+	fieldDecoder1 *structFieldDecoder
+	fieldHash2    int64
+	fieldDecoder2 *structFieldDecoder
 }
 
 func (decoder *twoFieldsStructDecoder) Decode(ptr unsafe.Pointer, iter *Iterator) {
@@ -600,10 +600,10 @@ func (decoder *twoFieldsStructDecoder) Decode(ptr unsafe.Pointer, iter *Iterator
 	}
 	for {
 		switch iter.readFieldHash() {
-		case decoder.***REMOVED***eldHash1:
-			decoder.***REMOVED***eldDecoder1.Decode(ptr, iter)
-		case decoder.***REMOVED***eldHash2:
-			decoder.***REMOVED***eldDecoder2.Decode(ptr, iter)
+		case decoder.fieldHash1:
+			decoder.fieldDecoder1.Decode(ptr, iter)
+		case decoder.fieldHash2:
+			decoder.fieldDecoder2.Decode(ptr, iter)
 		default:
 			iter.Skip()
 		}
@@ -618,12 +618,12 @@ func (decoder *twoFieldsStructDecoder) Decode(ptr unsafe.Pointer, iter *Iterator
 
 type threeFieldsStructDecoder struct {
 	typ           reflect2.Type
-	***REMOVED***eldHash1    int64
-	***REMOVED***eldDecoder1 *structFieldDecoder
-	***REMOVED***eldHash2    int64
-	***REMOVED***eldDecoder2 *structFieldDecoder
-	***REMOVED***eldHash3    int64
-	***REMOVED***eldDecoder3 *structFieldDecoder
+	fieldHash1    int64
+	fieldDecoder1 *structFieldDecoder
+	fieldHash2    int64
+	fieldDecoder2 *structFieldDecoder
+	fieldHash3    int64
+	fieldDecoder3 *structFieldDecoder
 }
 
 func (decoder *threeFieldsStructDecoder) Decode(ptr unsafe.Pointer, iter *Iterator) {
@@ -632,12 +632,12 @@ func (decoder *threeFieldsStructDecoder) Decode(ptr unsafe.Pointer, iter *Iterat
 	}
 	for {
 		switch iter.readFieldHash() {
-		case decoder.***REMOVED***eldHash1:
-			decoder.***REMOVED***eldDecoder1.Decode(ptr, iter)
-		case decoder.***REMOVED***eldHash2:
-			decoder.***REMOVED***eldDecoder2.Decode(ptr, iter)
-		case decoder.***REMOVED***eldHash3:
-			decoder.***REMOVED***eldDecoder3.Decode(ptr, iter)
+		case decoder.fieldHash1:
+			decoder.fieldDecoder1.Decode(ptr, iter)
+		case decoder.fieldHash2:
+			decoder.fieldDecoder2.Decode(ptr, iter)
+		case decoder.fieldHash3:
+			decoder.fieldDecoder3.Decode(ptr, iter)
 		default:
 			iter.Skip()
 		}
@@ -652,14 +652,14 @@ func (decoder *threeFieldsStructDecoder) Decode(ptr unsafe.Pointer, iter *Iterat
 
 type fourFieldsStructDecoder struct {
 	typ           reflect2.Type
-	***REMOVED***eldHash1    int64
-	***REMOVED***eldDecoder1 *structFieldDecoder
-	***REMOVED***eldHash2    int64
-	***REMOVED***eldDecoder2 *structFieldDecoder
-	***REMOVED***eldHash3    int64
-	***REMOVED***eldDecoder3 *structFieldDecoder
-	***REMOVED***eldHash4    int64
-	***REMOVED***eldDecoder4 *structFieldDecoder
+	fieldHash1    int64
+	fieldDecoder1 *structFieldDecoder
+	fieldHash2    int64
+	fieldDecoder2 *structFieldDecoder
+	fieldHash3    int64
+	fieldDecoder3 *structFieldDecoder
+	fieldHash4    int64
+	fieldDecoder4 *structFieldDecoder
 }
 
 func (decoder *fourFieldsStructDecoder) Decode(ptr unsafe.Pointer, iter *Iterator) {
@@ -668,14 +668,14 @@ func (decoder *fourFieldsStructDecoder) Decode(ptr unsafe.Pointer, iter *Iterato
 	}
 	for {
 		switch iter.readFieldHash() {
-		case decoder.***REMOVED***eldHash1:
-			decoder.***REMOVED***eldDecoder1.Decode(ptr, iter)
-		case decoder.***REMOVED***eldHash2:
-			decoder.***REMOVED***eldDecoder2.Decode(ptr, iter)
-		case decoder.***REMOVED***eldHash3:
-			decoder.***REMOVED***eldDecoder3.Decode(ptr, iter)
-		case decoder.***REMOVED***eldHash4:
-			decoder.***REMOVED***eldDecoder4.Decode(ptr, iter)
+		case decoder.fieldHash1:
+			decoder.fieldDecoder1.Decode(ptr, iter)
+		case decoder.fieldHash2:
+			decoder.fieldDecoder2.Decode(ptr, iter)
+		case decoder.fieldHash3:
+			decoder.fieldDecoder3.Decode(ptr, iter)
+		case decoder.fieldHash4:
+			decoder.fieldDecoder4.Decode(ptr, iter)
 		default:
 			iter.Skip()
 		}
@@ -688,36 +688,36 @@ func (decoder *fourFieldsStructDecoder) Decode(ptr unsafe.Pointer, iter *Iterato
 	}
 }
 
-type ***REMOVED***veFieldsStructDecoder struct {
+type fiveFieldsStructDecoder struct {
 	typ           reflect2.Type
-	***REMOVED***eldHash1    int64
-	***REMOVED***eldDecoder1 *structFieldDecoder
-	***REMOVED***eldHash2    int64
-	***REMOVED***eldDecoder2 *structFieldDecoder
-	***REMOVED***eldHash3    int64
-	***REMOVED***eldDecoder3 *structFieldDecoder
-	***REMOVED***eldHash4    int64
-	***REMOVED***eldDecoder4 *structFieldDecoder
-	***REMOVED***eldHash5    int64
-	***REMOVED***eldDecoder5 *structFieldDecoder
+	fieldHash1    int64
+	fieldDecoder1 *structFieldDecoder
+	fieldHash2    int64
+	fieldDecoder2 *structFieldDecoder
+	fieldHash3    int64
+	fieldDecoder3 *structFieldDecoder
+	fieldHash4    int64
+	fieldDecoder4 *structFieldDecoder
+	fieldHash5    int64
+	fieldDecoder5 *structFieldDecoder
 }
 
-func (decoder ****REMOVED***veFieldsStructDecoder) Decode(ptr unsafe.Pointer, iter *Iterator) {
+func (decoder *fiveFieldsStructDecoder) Decode(ptr unsafe.Pointer, iter *Iterator) {
 	if !iter.readObjectStart() {
 		return
 	}
 	for {
 		switch iter.readFieldHash() {
-		case decoder.***REMOVED***eldHash1:
-			decoder.***REMOVED***eldDecoder1.Decode(ptr, iter)
-		case decoder.***REMOVED***eldHash2:
-			decoder.***REMOVED***eldDecoder2.Decode(ptr, iter)
-		case decoder.***REMOVED***eldHash3:
-			decoder.***REMOVED***eldDecoder3.Decode(ptr, iter)
-		case decoder.***REMOVED***eldHash4:
-			decoder.***REMOVED***eldDecoder4.Decode(ptr, iter)
-		case decoder.***REMOVED***eldHash5:
-			decoder.***REMOVED***eldDecoder5.Decode(ptr, iter)
+		case decoder.fieldHash1:
+			decoder.fieldDecoder1.Decode(ptr, iter)
+		case decoder.fieldHash2:
+			decoder.fieldDecoder2.Decode(ptr, iter)
+		case decoder.fieldHash3:
+			decoder.fieldDecoder3.Decode(ptr, iter)
+		case decoder.fieldHash4:
+			decoder.fieldDecoder4.Decode(ptr, iter)
+		case decoder.fieldHash5:
+			decoder.fieldDecoder5.Decode(ptr, iter)
 		default:
 			iter.Skip()
 		}
@@ -732,18 +732,18 @@ func (decoder ****REMOVED***veFieldsStructDecoder) Decode(ptr unsafe.Pointer, it
 
 type sixFieldsStructDecoder struct {
 	typ           reflect2.Type
-	***REMOVED***eldHash1    int64
-	***REMOVED***eldDecoder1 *structFieldDecoder
-	***REMOVED***eldHash2    int64
-	***REMOVED***eldDecoder2 *structFieldDecoder
-	***REMOVED***eldHash3    int64
-	***REMOVED***eldDecoder3 *structFieldDecoder
-	***REMOVED***eldHash4    int64
-	***REMOVED***eldDecoder4 *structFieldDecoder
-	***REMOVED***eldHash5    int64
-	***REMOVED***eldDecoder5 *structFieldDecoder
-	***REMOVED***eldHash6    int64
-	***REMOVED***eldDecoder6 *structFieldDecoder
+	fieldHash1    int64
+	fieldDecoder1 *structFieldDecoder
+	fieldHash2    int64
+	fieldDecoder2 *structFieldDecoder
+	fieldHash3    int64
+	fieldDecoder3 *structFieldDecoder
+	fieldHash4    int64
+	fieldDecoder4 *structFieldDecoder
+	fieldHash5    int64
+	fieldDecoder5 *structFieldDecoder
+	fieldHash6    int64
+	fieldDecoder6 *structFieldDecoder
 }
 
 func (decoder *sixFieldsStructDecoder) Decode(ptr unsafe.Pointer, iter *Iterator) {
@@ -752,18 +752,18 @@ func (decoder *sixFieldsStructDecoder) Decode(ptr unsafe.Pointer, iter *Iterator
 	}
 	for {
 		switch iter.readFieldHash() {
-		case decoder.***REMOVED***eldHash1:
-			decoder.***REMOVED***eldDecoder1.Decode(ptr, iter)
-		case decoder.***REMOVED***eldHash2:
-			decoder.***REMOVED***eldDecoder2.Decode(ptr, iter)
-		case decoder.***REMOVED***eldHash3:
-			decoder.***REMOVED***eldDecoder3.Decode(ptr, iter)
-		case decoder.***REMOVED***eldHash4:
-			decoder.***REMOVED***eldDecoder4.Decode(ptr, iter)
-		case decoder.***REMOVED***eldHash5:
-			decoder.***REMOVED***eldDecoder5.Decode(ptr, iter)
-		case decoder.***REMOVED***eldHash6:
-			decoder.***REMOVED***eldDecoder6.Decode(ptr, iter)
+		case decoder.fieldHash1:
+			decoder.fieldDecoder1.Decode(ptr, iter)
+		case decoder.fieldHash2:
+			decoder.fieldDecoder2.Decode(ptr, iter)
+		case decoder.fieldHash3:
+			decoder.fieldDecoder3.Decode(ptr, iter)
+		case decoder.fieldHash4:
+			decoder.fieldDecoder4.Decode(ptr, iter)
+		case decoder.fieldHash5:
+			decoder.fieldDecoder5.Decode(ptr, iter)
+		case decoder.fieldHash6:
+			decoder.fieldDecoder6.Decode(ptr, iter)
 		default:
 			iter.Skip()
 		}
@@ -778,20 +778,20 @@ func (decoder *sixFieldsStructDecoder) Decode(ptr unsafe.Pointer, iter *Iterator
 
 type sevenFieldsStructDecoder struct {
 	typ           reflect2.Type
-	***REMOVED***eldHash1    int64
-	***REMOVED***eldDecoder1 *structFieldDecoder
-	***REMOVED***eldHash2    int64
-	***REMOVED***eldDecoder2 *structFieldDecoder
-	***REMOVED***eldHash3    int64
-	***REMOVED***eldDecoder3 *structFieldDecoder
-	***REMOVED***eldHash4    int64
-	***REMOVED***eldDecoder4 *structFieldDecoder
-	***REMOVED***eldHash5    int64
-	***REMOVED***eldDecoder5 *structFieldDecoder
-	***REMOVED***eldHash6    int64
-	***REMOVED***eldDecoder6 *structFieldDecoder
-	***REMOVED***eldHash7    int64
-	***REMOVED***eldDecoder7 *structFieldDecoder
+	fieldHash1    int64
+	fieldDecoder1 *structFieldDecoder
+	fieldHash2    int64
+	fieldDecoder2 *structFieldDecoder
+	fieldHash3    int64
+	fieldDecoder3 *structFieldDecoder
+	fieldHash4    int64
+	fieldDecoder4 *structFieldDecoder
+	fieldHash5    int64
+	fieldDecoder5 *structFieldDecoder
+	fieldHash6    int64
+	fieldDecoder6 *structFieldDecoder
+	fieldHash7    int64
+	fieldDecoder7 *structFieldDecoder
 }
 
 func (decoder *sevenFieldsStructDecoder) Decode(ptr unsafe.Pointer, iter *Iterator) {
@@ -800,20 +800,20 @@ func (decoder *sevenFieldsStructDecoder) Decode(ptr unsafe.Pointer, iter *Iterat
 	}
 	for {
 		switch iter.readFieldHash() {
-		case decoder.***REMOVED***eldHash1:
-			decoder.***REMOVED***eldDecoder1.Decode(ptr, iter)
-		case decoder.***REMOVED***eldHash2:
-			decoder.***REMOVED***eldDecoder2.Decode(ptr, iter)
-		case decoder.***REMOVED***eldHash3:
-			decoder.***REMOVED***eldDecoder3.Decode(ptr, iter)
-		case decoder.***REMOVED***eldHash4:
-			decoder.***REMOVED***eldDecoder4.Decode(ptr, iter)
-		case decoder.***REMOVED***eldHash5:
-			decoder.***REMOVED***eldDecoder5.Decode(ptr, iter)
-		case decoder.***REMOVED***eldHash6:
-			decoder.***REMOVED***eldDecoder6.Decode(ptr, iter)
-		case decoder.***REMOVED***eldHash7:
-			decoder.***REMOVED***eldDecoder7.Decode(ptr, iter)
+		case decoder.fieldHash1:
+			decoder.fieldDecoder1.Decode(ptr, iter)
+		case decoder.fieldHash2:
+			decoder.fieldDecoder2.Decode(ptr, iter)
+		case decoder.fieldHash3:
+			decoder.fieldDecoder3.Decode(ptr, iter)
+		case decoder.fieldHash4:
+			decoder.fieldDecoder4.Decode(ptr, iter)
+		case decoder.fieldHash5:
+			decoder.fieldDecoder5.Decode(ptr, iter)
+		case decoder.fieldHash6:
+			decoder.fieldDecoder6.Decode(ptr, iter)
+		case decoder.fieldHash7:
+			decoder.fieldDecoder7.Decode(ptr, iter)
 		default:
 			iter.Skip()
 		}
@@ -828,22 +828,22 @@ func (decoder *sevenFieldsStructDecoder) Decode(ptr unsafe.Pointer, iter *Iterat
 
 type eightFieldsStructDecoder struct {
 	typ           reflect2.Type
-	***REMOVED***eldHash1    int64
-	***REMOVED***eldDecoder1 *structFieldDecoder
-	***REMOVED***eldHash2    int64
-	***REMOVED***eldDecoder2 *structFieldDecoder
-	***REMOVED***eldHash3    int64
-	***REMOVED***eldDecoder3 *structFieldDecoder
-	***REMOVED***eldHash4    int64
-	***REMOVED***eldDecoder4 *structFieldDecoder
-	***REMOVED***eldHash5    int64
-	***REMOVED***eldDecoder5 *structFieldDecoder
-	***REMOVED***eldHash6    int64
-	***REMOVED***eldDecoder6 *structFieldDecoder
-	***REMOVED***eldHash7    int64
-	***REMOVED***eldDecoder7 *structFieldDecoder
-	***REMOVED***eldHash8    int64
-	***REMOVED***eldDecoder8 *structFieldDecoder
+	fieldHash1    int64
+	fieldDecoder1 *structFieldDecoder
+	fieldHash2    int64
+	fieldDecoder2 *structFieldDecoder
+	fieldHash3    int64
+	fieldDecoder3 *structFieldDecoder
+	fieldHash4    int64
+	fieldDecoder4 *structFieldDecoder
+	fieldHash5    int64
+	fieldDecoder5 *structFieldDecoder
+	fieldHash6    int64
+	fieldDecoder6 *structFieldDecoder
+	fieldHash7    int64
+	fieldDecoder7 *structFieldDecoder
+	fieldHash8    int64
+	fieldDecoder8 *structFieldDecoder
 }
 
 func (decoder *eightFieldsStructDecoder) Decode(ptr unsafe.Pointer, iter *Iterator) {
@@ -852,22 +852,22 @@ func (decoder *eightFieldsStructDecoder) Decode(ptr unsafe.Pointer, iter *Iterat
 	}
 	for {
 		switch iter.readFieldHash() {
-		case decoder.***REMOVED***eldHash1:
-			decoder.***REMOVED***eldDecoder1.Decode(ptr, iter)
-		case decoder.***REMOVED***eldHash2:
-			decoder.***REMOVED***eldDecoder2.Decode(ptr, iter)
-		case decoder.***REMOVED***eldHash3:
-			decoder.***REMOVED***eldDecoder3.Decode(ptr, iter)
-		case decoder.***REMOVED***eldHash4:
-			decoder.***REMOVED***eldDecoder4.Decode(ptr, iter)
-		case decoder.***REMOVED***eldHash5:
-			decoder.***REMOVED***eldDecoder5.Decode(ptr, iter)
-		case decoder.***REMOVED***eldHash6:
-			decoder.***REMOVED***eldDecoder6.Decode(ptr, iter)
-		case decoder.***REMOVED***eldHash7:
-			decoder.***REMOVED***eldDecoder7.Decode(ptr, iter)
-		case decoder.***REMOVED***eldHash8:
-			decoder.***REMOVED***eldDecoder8.Decode(ptr, iter)
+		case decoder.fieldHash1:
+			decoder.fieldDecoder1.Decode(ptr, iter)
+		case decoder.fieldHash2:
+			decoder.fieldDecoder2.Decode(ptr, iter)
+		case decoder.fieldHash3:
+			decoder.fieldDecoder3.Decode(ptr, iter)
+		case decoder.fieldHash4:
+			decoder.fieldDecoder4.Decode(ptr, iter)
+		case decoder.fieldHash5:
+			decoder.fieldDecoder5.Decode(ptr, iter)
+		case decoder.fieldHash6:
+			decoder.fieldDecoder6.Decode(ptr, iter)
+		case decoder.fieldHash7:
+			decoder.fieldDecoder7.Decode(ptr, iter)
+		case decoder.fieldHash8:
+			decoder.fieldDecoder8.Decode(ptr, iter)
 		default:
 			iter.Skip()
 		}
@@ -882,24 +882,24 @@ func (decoder *eightFieldsStructDecoder) Decode(ptr unsafe.Pointer, iter *Iterat
 
 type nineFieldsStructDecoder struct {
 	typ           reflect2.Type
-	***REMOVED***eldHash1    int64
-	***REMOVED***eldDecoder1 *structFieldDecoder
-	***REMOVED***eldHash2    int64
-	***REMOVED***eldDecoder2 *structFieldDecoder
-	***REMOVED***eldHash3    int64
-	***REMOVED***eldDecoder3 *structFieldDecoder
-	***REMOVED***eldHash4    int64
-	***REMOVED***eldDecoder4 *structFieldDecoder
-	***REMOVED***eldHash5    int64
-	***REMOVED***eldDecoder5 *structFieldDecoder
-	***REMOVED***eldHash6    int64
-	***REMOVED***eldDecoder6 *structFieldDecoder
-	***REMOVED***eldHash7    int64
-	***REMOVED***eldDecoder7 *structFieldDecoder
-	***REMOVED***eldHash8    int64
-	***REMOVED***eldDecoder8 *structFieldDecoder
-	***REMOVED***eldHash9    int64
-	***REMOVED***eldDecoder9 *structFieldDecoder
+	fieldHash1    int64
+	fieldDecoder1 *structFieldDecoder
+	fieldHash2    int64
+	fieldDecoder2 *structFieldDecoder
+	fieldHash3    int64
+	fieldDecoder3 *structFieldDecoder
+	fieldHash4    int64
+	fieldDecoder4 *structFieldDecoder
+	fieldHash5    int64
+	fieldDecoder5 *structFieldDecoder
+	fieldHash6    int64
+	fieldDecoder6 *structFieldDecoder
+	fieldHash7    int64
+	fieldDecoder7 *structFieldDecoder
+	fieldHash8    int64
+	fieldDecoder8 *structFieldDecoder
+	fieldHash9    int64
+	fieldDecoder9 *structFieldDecoder
 }
 
 func (decoder *nineFieldsStructDecoder) Decode(ptr unsafe.Pointer, iter *Iterator) {
@@ -908,24 +908,24 @@ func (decoder *nineFieldsStructDecoder) Decode(ptr unsafe.Pointer, iter *Iterato
 	}
 	for {
 		switch iter.readFieldHash() {
-		case decoder.***REMOVED***eldHash1:
-			decoder.***REMOVED***eldDecoder1.Decode(ptr, iter)
-		case decoder.***REMOVED***eldHash2:
-			decoder.***REMOVED***eldDecoder2.Decode(ptr, iter)
-		case decoder.***REMOVED***eldHash3:
-			decoder.***REMOVED***eldDecoder3.Decode(ptr, iter)
-		case decoder.***REMOVED***eldHash4:
-			decoder.***REMOVED***eldDecoder4.Decode(ptr, iter)
-		case decoder.***REMOVED***eldHash5:
-			decoder.***REMOVED***eldDecoder5.Decode(ptr, iter)
-		case decoder.***REMOVED***eldHash6:
-			decoder.***REMOVED***eldDecoder6.Decode(ptr, iter)
-		case decoder.***REMOVED***eldHash7:
-			decoder.***REMOVED***eldDecoder7.Decode(ptr, iter)
-		case decoder.***REMOVED***eldHash8:
-			decoder.***REMOVED***eldDecoder8.Decode(ptr, iter)
-		case decoder.***REMOVED***eldHash9:
-			decoder.***REMOVED***eldDecoder9.Decode(ptr, iter)
+		case decoder.fieldHash1:
+			decoder.fieldDecoder1.Decode(ptr, iter)
+		case decoder.fieldHash2:
+			decoder.fieldDecoder2.Decode(ptr, iter)
+		case decoder.fieldHash3:
+			decoder.fieldDecoder3.Decode(ptr, iter)
+		case decoder.fieldHash4:
+			decoder.fieldDecoder4.Decode(ptr, iter)
+		case decoder.fieldHash5:
+			decoder.fieldDecoder5.Decode(ptr, iter)
+		case decoder.fieldHash6:
+			decoder.fieldDecoder6.Decode(ptr, iter)
+		case decoder.fieldHash7:
+			decoder.fieldDecoder7.Decode(ptr, iter)
+		case decoder.fieldHash8:
+			decoder.fieldDecoder8.Decode(ptr, iter)
+		case decoder.fieldHash9:
+			decoder.fieldDecoder9.Decode(ptr, iter)
 		default:
 			iter.Skip()
 		}
@@ -940,26 +940,26 @@ func (decoder *nineFieldsStructDecoder) Decode(ptr unsafe.Pointer, iter *Iterato
 
 type tenFieldsStructDecoder struct {
 	typ            reflect2.Type
-	***REMOVED***eldHash1     int64
-	***REMOVED***eldDecoder1  *structFieldDecoder
-	***REMOVED***eldHash2     int64
-	***REMOVED***eldDecoder2  *structFieldDecoder
-	***REMOVED***eldHash3     int64
-	***REMOVED***eldDecoder3  *structFieldDecoder
-	***REMOVED***eldHash4     int64
-	***REMOVED***eldDecoder4  *structFieldDecoder
-	***REMOVED***eldHash5     int64
-	***REMOVED***eldDecoder5  *structFieldDecoder
-	***REMOVED***eldHash6     int64
-	***REMOVED***eldDecoder6  *structFieldDecoder
-	***REMOVED***eldHash7     int64
-	***REMOVED***eldDecoder7  *structFieldDecoder
-	***REMOVED***eldHash8     int64
-	***REMOVED***eldDecoder8  *structFieldDecoder
-	***REMOVED***eldHash9     int64
-	***REMOVED***eldDecoder9  *structFieldDecoder
-	***REMOVED***eldHash10    int64
-	***REMOVED***eldDecoder10 *structFieldDecoder
+	fieldHash1     int64
+	fieldDecoder1  *structFieldDecoder
+	fieldHash2     int64
+	fieldDecoder2  *structFieldDecoder
+	fieldHash3     int64
+	fieldDecoder3  *structFieldDecoder
+	fieldHash4     int64
+	fieldDecoder4  *structFieldDecoder
+	fieldHash5     int64
+	fieldDecoder5  *structFieldDecoder
+	fieldHash6     int64
+	fieldDecoder6  *structFieldDecoder
+	fieldHash7     int64
+	fieldDecoder7  *structFieldDecoder
+	fieldHash8     int64
+	fieldDecoder8  *structFieldDecoder
+	fieldHash9     int64
+	fieldDecoder9  *structFieldDecoder
+	fieldHash10    int64
+	fieldDecoder10 *structFieldDecoder
 }
 
 func (decoder *tenFieldsStructDecoder) Decode(ptr unsafe.Pointer, iter *Iterator) {
@@ -968,26 +968,26 @@ func (decoder *tenFieldsStructDecoder) Decode(ptr unsafe.Pointer, iter *Iterator
 	}
 	for {
 		switch iter.readFieldHash() {
-		case decoder.***REMOVED***eldHash1:
-			decoder.***REMOVED***eldDecoder1.Decode(ptr, iter)
-		case decoder.***REMOVED***eldHash2:
-			decoder.***REMOVED***eldDecoder2.Decode(ptr, iter)
-		case decoder.***REMOVED***eldHash3:
-			decoder.***REMOVED***eldDecoder3.Decode(ptr, iter)
-		case decoder.***REMOVED***eldHash4:
-			decoder.***REMOVED***eldDecoder4.Decode(ptr, iter)
-		case decoder.***REMOVED***eldHash5:
-			decoder.***REMOVED***eldDecoder5.Decode(ptr, iter)
-		case decoder.***REMOVED***eldHash6:
-			decoder.***REMOVED***eldDecoder6.Decode(ptr, iter)
-		case decoder.***REMOVED***eldHash7:
-			decoder.***REMOVED***eldDecoder7.Decode(ptr, iter)
-		case decoder.***REMOVED***eldHash8:
-			decoder.***REMOVED***eldDecoder8.Decode(ptr, iter)
-		case decoder.***REMOVED***eldHash9:
-			decoder.***REMOVED***eldDecoder9.Decode(ptr, iter)
-		case decoder.***REMOVED***eldHash10:
-			decoder.***REMOVED***eldDecoder10.Decode(ptr, iter)
+		case decoder.fieldHash1:
+			decoder.fieldDecoder1.Decode(ptr, iter)
+		case decoder.fieldHash2:
+			decoder.fieldDecoder2.Decode(ptr, iter)
+		case decoder.fieldHash3:
+			decoder.fieldDecoder3.Decode(ptr, iter)
+		case decoder.fieldHash4:
+			decoder.fieldDecoder4.Decode(ptr, iter)
+		case decoder.fieldHash5:
+			decoder.fieldDecoder5.Decode(ptr, iter)
+		case decoder.fieldHash6:
+			decoder.fieldDecoder6.Decode(ptr, iter)
+		case decoder.fieldHash7:
+			decoder.fieldDecoder7.Decode(ptr, iter)
+		case decoder.fieldHash8:
+			decoder.fieldDecoder8.Decode(ptr, iter)
+		case decoder.fieldHash9:
+			decoder.fieldDecoder9.Decode(ptr, iter)
+		case decoder.fieldHash10:
+			decoder.fieldDecoder10.Decode(ptr, iter)
 		default:
 			iter.Skip()
 		}
@@ -1001,21 +1001,21 @@ func (decoder *tenFieldsStructDecoder) Decode(ptr unsafe.Pointer, iter *Iterator
 }
 
 type structFieldDecoder struct {
-	***REMOVED***eld        reflect2.StructField
-	***REMOVED***eldDecoder ValDecoder
+	field        reflect2.StructField
+	fieldDecoder ValDecoder
 }
 
 func (decoder *structFieldDecoder) Decode(ptr unsafe.Pointer, iter *Iterator) {
-	***REMOVED***eldPtr := decoder.***REMOVED***eld.UnsafeGet(ptr)
-	decoder.***REMOVED***eldDecoder.Decode(***REMOVED***eldPtr, iter)
+	fieldPtr := decoder.field.UnsafeGet(ptr)
+	decoder.fieldDecoder.Decode(fieldPtr, iter)
 	if iter.Error != nil && iter.Error != io.EOF {
-		iter.Error = fmt.Errorf("%s: %s", decoder.***REMOVED***eld.Name(), iter.Error.Error())
+		iter.Error = fmt.Errorf("%s: %s", decoder.field.Name(), iter.Error.Error())
 	}
 }
 
 type stringModeStringDecoder struct {
 	elemDecoder ValDecoder
-	cfg         *frozenCon***REMOVED***g
+	cfg         *frozenConfig
 }
 
 func (decoder *stringModeStringDecoder) Decode(ptr unsafe.Pointer, iter *Iterator) {

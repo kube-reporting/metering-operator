@@ -30,7 +30,7 @@ func testPrometheusConnectorWorks(t *testing.T, rf *reportingframework.Reporting
 
 	// we know the output is going to be of the form `pod/<presto coordinator pod name>` so split by '/'
 	tmp := strings.Split(string(prestoHostResults.Bytes()), "/")[1]
-	host := strings.TrimSuf***REMOVED***x(tmp, "\n")
+	host := strings.TrimSuffix(tmp, "\n")
 	t.Logf("host found for presto from prep phase: %s", host)
 
 	cmdTest := exec.Command(

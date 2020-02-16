@@ -20,7 +20,7 @@ func getStringValue(b []rune) (int, error) {
 		if escaped := isEscaped(b[:i], b[i]); b[i] == '"' && !escaped {
 			endQuote = true
 			break
-		} ***REMOVED*** if escaped {
+		} else if escaped {
 			/*c, err := getEscapedByte(b[i])
 			if err != nil {
 				return 0, err
@@ -136,7 +136,7 @@ loop:
 				if !(helper.numberFormat == hex && isHexByte(b[i])) {
 					if i+2 < len(b) && !isNewline(b[i:i+2]) {
 						return 0, 0, NewParseError("invalid numerical character")
-					} ***REMOVED*** if !isNewline([]rune{b[i]}) {
+					} else if !isNewline([]rune{b[i]}) {
 						return 0, 0, NewParseError("invalid numerical character")
 					}
 

@@ -1,5 +1,5 @@
 {{/* When using TLS set probes to use the ghostunnel server port */}}
-{{- if .Values.hive.spec.metastore.con***REMOVED***g.tls.enabled -}}
+{{- if .Values.hive.spec.metastore.config.tls.enabled -}}
 {{- $_ := set .Values.hive.spec.metastore.readinessProbe.tcpSocket "port" 9084 -}}
 {{- $_ := set .Values.hive.spec.metastore.livenessProbe.tcpSocket "port" 9084 -}}
 {{- end }}
@@ -31,26 +31,26 @@ spec:
 {{ toYaml .Values.hive.spec.labels | indent 8 }}
 {{- end }}
       annotations:
-        hive-con***REMOVED***gmap-hash: {{ include (print $.Template.BasePath "/hive/hive-con***REMOVED***gmap.yaml") . | sha256sum }}
-        hive-scripts-hash: {{ include (print $.Template.BasePath "/hive/hive-scripts-con***REMOVED***gmap.yaml") . | sha256sum }}
-        hive-jmx-con***REMOVED***g-hash: {{ include (print $.Template.BasePath "/hive/hive-jmx-con***REMOVED***g.yaml") . | sha256sum }}
-{{- if .Values.hive.spec.con***REMOVED***g.aws.createSecret }}
+        hive-configmap-hash: {{ include (print $.Template.BasePath "/hive/hive-configmap.yaml") . | sha256sum }}
+        hive-scripts-hash: {{ include (print $.Template.BasePath "/hive/hive-scripts-configmap.yaml") . | sha256sum }}
+        hive-jmx-config-hash: {{ include (print $.Template.BasePath "/hive/hive-jmx-config.yaml") . | sha256sum }}
+{{- if .Values.hive.spec.config.aws.createSecret }}
         hive-aws-credentials-secret-hash: {{ include (print $.Template.BasePath "/hive/hive-aws-credentials-secret.yaml") . | sha256sum }}
 {{- end }}
-{{- if .Values.hive.spec.con***REMOVED***g.azure.createSecret }}
+{{- if .Values.hive.spec.config.azure.createSecret }}
         hive-azure-credentials-secret-hash: {{ include (print $.Template.BasePath "/hive/hive-azure-credentials-secret.yaml") . | sha256sum }}
 {{- end }}
-{{- if .Values.hive.spec.con***REMOVED***g.gcs.createSecret }}
+{{- if .Values.hive.spec.config.gcs.createSecret }}
         hive-gcs-credentials-secret-hash: {{ include (print $.Template.BasePath "/hive/hive-gcs-credentials-secret.yaml") . | sha256sum }}
 {{- end }}
-{{- if .Values.hive.spec.con***REMOVED***g.s3Compatible.createSecret }}
+{{- if .Values.hive.spec.config.s3Compatible.createSecret }}
         hive-s3-compatible-credentials-secret-hash: {{ include (print $.Template.BasePath "/hive/hive-s3-compatible-credentials-secret.yaml") . | sha256sum }}
 {{- end }}
-{{- if .Values.hive.spec.con***REMOVED***g.s3Compatible.ca.createSecret }}
+{{- if .Values.hive.spec.config.s3Compatible.ca.createSecret }}
         hive-s3-compatible-ca-secret-hash: {{ include (print $.Template.BasePath "/hive/hive-s3-compatible-ca-secret.yaml") . | sha256sum }}
 {{- end }}
-{{- if .Values.hive.spec.con***REMOVED***g.useHadoopCon***REMOVED***g }}
-        hadoop-con***REMOVED***g-hash: {{ include (print $.Template.BasePath "/hadoop/hadoop-con***REMOVED***g.yaml") . | sha256sum }}
+{{- if .Values.hive.spec.config.useHadoopConfig }}
+        hadoop-config-hash: {{ include (print $.Template.BasePath "/hadoop/hadoop-config.yaml") . | sha256sum }}
 {{- end }}
 {{- if .Values.hive.spec.annotations }}
 {{ toYaml .Values.hive.spec.annotations | indent 8 }}
@@ -66,42 +66,42 @@ spec:
       tolerations:
 {{ toYaml .Values.hive.spec.metastore.tolerations | indent 8 }}
 {{- end }}
-{{- if .Values.hive.spec.metastore.af***REMOVED***nity }}
-      af***REMOVED***nity:
-{{ toYaml .Values.hive.spec.metastore.af***REMOVED***nity | indent 8 }}
+{{- if .Values.hive.spec.metastore.affinity }}
+      affinity:
+{{ toYaml .Values.hive.spec.metastore.affinity | indent 8 }}
 {{- end }}
       initContainers:
       - name: copy-starter-hive
         image: "{{ include "hive-image" . }}"
         imagePullPolicy: {{ .Values.hive.spec.image.pullPolicy }}
-        command: ["/hive-scripts/copy-hadoop-con***REMOVED***g.sh"]
-{{- if or .Values.hive.spec.con***REMOVED***g.azure.secretName .Values.hive.spec.con***REMOVED***g.azure.createSecret }}
+        command: ["/hive-scripts/copy-hadoop-config.sh"]
+{{- if or .Values.hive.spec.config.azure.secretName .Values.hive.spec.config.azure.createSecret }}
         env:
         - name: AZURE_STORAGE_ACCOUNT_NAME
           valueFrom:
             secretKeyRef:
-              name: "{{ .Values.hive.spec.con***REMOVED***g.azure.secretName | default "hive-azure-credentials" }}"
+              name: "{{ .Values.hive.spec.config.azure.secretName | default "hive-azure-credentials" }}"
               key: azure-storage-account-name
         - name: AZURE_SECRET_ACCESS_KEY
           valueFrom:
             secretKeyRef:
-              name: "{{ .Values.hive.spec.con***REMOVED***g.azure.secretName | default "hive-azure-credentials" }}"
+              name: "{{ .Values.hive.spec.config.azure.secretName | default "hive-azure-credentials" }}"
               key: azure-secret-access-key
 {{- end }}
         volumeMounts:
-        - name: hadoop-con***REMOVED***g
-          mountPath: /hadoop-con***REMOVED***g
-        - name: hadoop-starting-con***REMOVED***g
-          mountPath: /hadoop-starting-con***REMOVED***g
+        - name: hadoop-config
+          mountPath: /hadoop-config
+        - name: hadoop-starting-config
+          mountPath: /hadoop-starting-config
         - name: hive-scripts
           mountPath: /hive-scripts
-{{- if or .Values.hive.spec.con***REMOVED***g.gcs.secretName .Values.hive.spec.con***REMOVED***g.gcs.createSecret }}
+{{- if or .Values.hive.spec.config.gcs.secretName .Values.hive.spec.config.gcs.createSecret }}
         - name: gcs-json
           mountPath: /gcs-json
 {{- end }}
       volumes:
       - name: hive-scripts
-        con***REMOVED***gMap:
+        configMap:
           name: hive-scripts
           defaultMode: 0775
       containers:
@@ -111,13 +111,13 @@ spec:
         image: "{{ include "hive-image" . }}"
         imagePullPolicy: {{ .Values.hive.spec.image.pullPolicy }}
         ports:
-{{- if not .Values.hive.spec.metastore.con***REMOVED***g.tls.enabled }}
+{{- if not .Values.hive.spec.metastore.config.tls.enabled }}
         - name: meta
           containerPort: 9083
 {{- end }}
         - containerPort: 8082
           name: metrics
-{{- if not .Values.hive.spec.metastore.con***REMOVED***g.tls.enabled }}
+{{- if not .Values.hive.spec.metastore.config.tls.enabled }}
 {{- if .Values.hive.spec.metastore.readinessProbe }}
         readinessProbe:
 {{ toYaml .Values.hive.spec.metastore.readinessProbe | indent 10 }}
@@ -129,18 +129,18 @@ spec:
 {{- end }}
         env:
         - name: HIVE_LOGLEVEL
-          value: {{ upper .Values.hive.spec.metastore.con***REMOVED***g.logLevel | quote}}
-{{- if .Values.hive.spec.metastore.con***REMOVED***g.jvm.initialRAMPercentage }}
+          value: {{ upper .Values.hive.spec.metastore.config.logLevel | quote}}
+{{- if .Values.hive.spec.metastore.config.jvm.initialRAMPercentage }}
         - name: JVM_INITIAL_RAM_PERCENTAGE
-          value: "{{ .Values.hive.spec.metastore.con***REMOVED***g.jvm.initialRAMPercentage }}"
+          value: "{{ .Values.hive.spec.metastore.config.jvm.initialRAMPercentage }}"
 {{- end }}
-{{- if .Values.hive.spec.metastore.con***REMOVED***g.jvm.maxRAMPercentage }}
+{{- if .Values.hive.spec.metastore.config.jvm.maxRAMPercentage }}
         - name: JVM_MAX_RAM_PERCENTAGE
-          value: "{{ .Values.hive.spec.metastore.con***REMOVED***g.jvm.maxRAMPercentage }}"
+          value: "{{ .Values.hive.spec.metastore.config.jvm.maxRAMPercentage }}"
 {{- end }}
-{{- if .Values.hive.spec.metastore.con***REMOVED***g.jvm.maxRAMPercentage }}
+{{- if .Values.hive.spec.metastore.config.jvm.maxRAMPercentage }}
         - name: JVM_MIN_RAM_PERCENTAGE
-          value: "{{ .Values.hive.spec.metastore.con***REMOVED***g.jvm.minRAMPercentage }}"
+          value: "{{ .Values.hive.spec.metastore.config.jvm.minRAMPercentage }}"
 {{- end }}
 {{ include "hive-env" . | indent 8 }}
         - name: MY_MEM_REQUEST
@@ -154,42 +154,42 @@ spec:
               containerName: metastore
               resource: limits.memory
         volumeMounts:
-        - name: hive-con***REMOVED***g
-          mountPath: /hive-con***REMOVED***g
+        - name: hive-config
+          mountPath: /hive-config
         - name: hive-scripts
           mountPath: /hive-scripts
-{{- if .Values.hive.spec.con***REMOVED***g.useHadoopCon***REMOVED***g }}
-        - name: hadoop-con***REMOVED***g
-          mountPath: /hadoop-con***REMOVED***g
-        - name: hadoop-starting-con***REMOVED***g
-          mountPath: /hadoop-starting-con***REMOVED***g
+{{- if .Values.hive.spec.config.useHadoopConfig }}
+        - name: hadoop-config
+          mountPath: /hadoop-config
+        - name: hadoop-starting-config
+          mountPath: /hadoop-starting-config
 {{- end }}
-{{- if or .Values.hive.spec.con***REMOVED***g.gcs.secretName .Values.hive.spec.con***REMOVED***g.gcs.createSecret }}
+{{- if or .Values.hive.spec.config.gcs.secretName .Values.hive.spec.config.gcs.createSecret }}
         - name: gcs-json
           mountPath: /gcs-json
 {{- end }}
-{{- if or .Values.hive.spec.con***REMOVED***g.s3Compatible.ca.secretName .Values.hive.spec.con***REMOVED***g.s3Compatible.ca.createSecret }}
+{{- if or .Values.hive.spec.config.s3Compatible.ca.secretName .Values.hive.spec.config.s3Compatible.ca.createSecret }}
         - name: s3-compatible-ca
           mountPath: /s3-compatible-ca
 {{- end }}
-        - name: hive-jmx-con***REMOVED***g
-          mountPath: /opt/jmx_exporter/con***REMOVED***g
+        - name: hive-jmx-config
+          mountPath: /opt/jmx_exporter/config
         - name: hive-metastore-db-data
           mountPath: /var/lib/hive
-        # openshift requires volumeMounts for VOLUMEs in a Docker***REMOVED***le
+        # openshift requires volumeMounts for VOLUMEs in a Dockerfile
         - name: namenode-empty
           mountPath: /hadoop/dfs/name
         - name: datanode-empty
           mountPath: /hadoop/dfs/data
         - name: hadoop-logs
           mountPath: /opt/hadoop/logs
-{{- if .Values.hive.spec.con***REMOVED***g.sharedVolume.enabled }}
+{{- if .Values.hive.spec.config.sharedVolume.enabled }}
         - name: hive-warehouse-data
-          mountPath: {{ .Values.hive.spec.con***REMOVED***g.sharedVolume.mountPath }}
+          mountPath: {{ .Values.hive.spec.config.sharedVolume.mountPath }}
 {{- end }}
         resources:
 {{ toYaml .Values.hive.spec.metastore.resources | indent 10 }}
-{{- if .Values.hive.spec.metastore.con***REMOVED***g.tls.enabled }}
+{{- if .Values.hive.spec.metastore.config.tls.enabled }}
       - name: ghostunnel-server
         image: "{{ include "ghostunnel-image" . }}"
         imagePullPolicy: {{ .Values.__ghostunnel.image.pullPolicy }}
@@ -213,12 +213,12 @@ spec:
         - $(HIVE_METASTORE_CRTFILE)
         - --cacert
         -  $(HIVE_METASTORE_CA_CRTFILE)
-{{- if .Values.hive.spec.metastore.con***REMOVED***g.auth.enabled }}
+{{- if .Values.hive.spec.metastore.config.auth.enabled }}
         - --allow-cn
         - hive-server
         - --allow-cn
         - presto-clients
-{{- ***REMOVED*** }}
+{{- else }}
         - --disable-authentication
 {{- end }}
         ports:
@@ -246,35 +246,35 @@ spec:
 {{ toYaml .Values.hive.spec.imagePullSecrets | indent 8 }}
 {{- end }}
       volumes:
-      - name: hive-con***REMOVED***g
-        con***REMOVED***gMap:
-          name: hive-con***REMOVED***g
+      - name: hive-config
+        configMap:
+          name: hive-config
       - name: hive-scripts
-        con***REMOVED***gMap:
+        configMap:
           name: hive-scripts
           defaultMode: 0775
-{{- if .Values.hive.spec.con***REMOVED***g.useHadoopCon***REMOVED***g }}
-      - name: hadoop-con***REMOVED***g
+{{- if .Values.hive.spec.config.useHadoopConfig }}
+      - name: hadoop-config
         emptyDir: {}
-      - name: hadoop-starting-con***REMOVED***g
+      - name: hadoop-starting-config
         secret:
-          secretName: {{ .Values.hive.spec.con***REMOVED***g.hadoopCon***REMOVED***gSecretName  }}
+          secretName: {{ .Values.hive.spec.config.hadoopConfigSecretName  }}
 {{- end }}
-{{- if or .Values.hive.spec.con***REMOVED***g.gcs.secretName .Values.hive.spec.con***REMOVED***g.gcs.createSecret }}
+{{- if or .Values.hive.spec.config.gcs.secretName .Values.hive.spec.config.gcs.createSecret }}
       - name: gcs-json
         secret:
-          secretName: {{ .Values.hive.spec.con***REMOVED***g.gcs.secretName | default "hive-gcs-credentials" }}
+          secretName: {{ .Values.hive.spec.config.gcs.secretName | default "hive-gcs-credentials" }}
 {{- end }}
-{{- if or .Values.hive.spec.con***REMOVED***g.s3Compatible.ca.secretName .Values.hive.spec.con***REMOVED***g.s3Compatible.ca.createSecret }}
+{{- if or .Values.hive.spec.config.s3Compatible.ca.secretName .Values.hive.spec.config.s3Compatible.ca.createSecret }}
       - name: s3-compatible-ca
         secret:
-          secretName: {{ .Values.hive.spec.con***REMOVED***g.s3Compatible.ca.secretName | default "hive-s3-compatible-ca" }}
+          secretName: {{ .Values.hive.spec.config.s3Compatible.ca.secretName | default "hive-s3-compatible-ca" }}
 {{- end }}
-      - name: hive-jmx-con***REMOVED***g
-        con***REMOVED***gMap:
-          name: hive-jmx-con***REMOVED***g
+      - name: hive-jmx-config
+        configMap:
+          name: hive-jmx-config
       # these emptyDir volumes are necessary because Openshift requires VOLUMEs
-      # in a Docker***REMOVED***le have a corresponding volumeMount
+      # in a Dockerfile have a corresponding volumeMount
       - name: namenode-empty
         emptyDir: {}
       - name: datanode-empty
@@ -285,16 +285,16 @@ spec:
 {{- if .Values.hive.spec.metastore.storage.create }}
         persistentVolumeClaim:
           claimName: hive-metastore-db-data
-{{- ***REMOVED*** }}
+{{- else }}
         emptyDir: {}
 {{- end }}
-{{- if .Values.hive.spec.con***REMOVED***g.sharedVolume.enabled }}
+{{- if .Values.hive.spec.config.sharedVolume.enabled }}
       - name: hive-warehouse-data
         persistentVolumeClaim:
-          claimName: {{ .Values.hive.spec.con***REMOVED***g.sharedVolume.claimName }}
+          claimName: {{ .Values.hive.spec.config.sharedVolume.claimName }}
 {{- end}}
-{{- if .Values.hive.spec.metastore.con***REMOVED***g.tls.enabled }}
+{{- if .Values.hive.spec.metastore.config.tls.enabled }}
       - name: hive-metastore-tls-secret
         secret:
-          secretName: {{ .Values.hive.spec.metastore.con***REMOVED***g.tls.secretName }}
+          secretName: {{ .Values.hive.spec.metastore.config.tls.secretName }}
 {{- end }}

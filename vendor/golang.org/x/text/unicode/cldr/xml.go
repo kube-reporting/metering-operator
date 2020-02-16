@@ -129,7 +129,7 @@ type SupplementalData struct {
 				LiteracyPercent   string `xml:"literacyPercent,attr"`
 				WritingPercent    string `xml:"writingPercent,attr"`
 				PopulationPercent string `xml:"populationPercent,attr"`
-				Of***REMOVED***cialStatus    string `xml:"of***REMOVED***cialStatus,attr"`
+				OfficialStatus    string `xml:"officialStatus,attr"`
 			} `xml:"languagePopulation"`
 		} `xml:"territory"`
 	} `xml:"territoryInfo"`
@@ -175,7 +175,7 @@ type SupplementalData struct {
 			Common
 			Day         string `xml:"day,attr"`
 			Territories string `xml:"territories,attr"`
-		} `xml:"***REMOVED***rstDay"`
+		} `xml:"firstDay"`
 		WeekendStart []*struct {
 			Common
 			Day         string `xml:"day,attr"`
@@ -403,7 +403,7 @@ type SupplementalData struct {
 			Common
 			Numeric  string `xml:"numeric,attr"`
 			Alpha3   string `xml:"alpha3,attr"`
-			Fips10   string `xml:"***REMOVED***ps10,attr"`
+			Fips10   string `xml:"fips10,attr"`
 			Internet string `xml:"internet,attr"`
 		} `xml:"territoryCodes"`
 		CurrencyCodes []*struct {
@@ -645,7 +645,7 @@ type SupplementalData struct {
 	} `xml:"languageGroups"`
 }
 
-// LDML is the top-level type for locale-speci***REMOVED***c data.
+// LDML is the top-level type for locale-specific data.
 type LDML struct {
 	Common
 	Version  string `xml:"version,attr"`
@@ -764,8 +764,8 @@ type LDML struct {
 					} `xml:"relativeTimePattern"`
 				} `xml:"relativeTime"`
 				RelativePeriod []*Common `xml:"relativePeriod"`
-			} `xml:"***REMOVED***eld"`
-		} `xml:"***REMOVED***elds"`
+			} `xml:"field"`
+		} `xml:"fields"`
 		TimeZoneNames *TimeZoneNames `xml:"timeZoneNames"`
 	} `xml:"dates"`
 	Numbers *Numbers `xml:"numbers"`
@@ -948,9 +948,9 @@ type Collation struct {
 	rulesElem
 }
 
-// Calendar speci***REMOVED***es the ***REMOVED***elds used for formatting and parsing dates and times.
-// The month and quarter names are identi***REMOVED***ed numerically, starting at 1.
-// The day (of the week) names are identi***REMOVED***ed with short strings, since there is
+// Calendar specifies the fields used for formatting and parsing dates and times.
+// The month and quarter names are identified numerically, starting at 1.
+// The day (of the week) names are identified with short strings, since there is
 // no universally-accepted numeric designation.
 type Calendar struct {
 	Common
@@ -1028,7 +1028,7 @@ type Calendar struct {
 		FirstDay []*struct {
 			Common
 			Day string `xml:"day,attr"`
-		} `xml:"***REMOVED***rstDay"`
+		} `xml:"firstDay"`
 		WeekendStart []*struct {
 			Common
 			Day  string `xml:"day,attr"`
@@ -1178,8 +1178,8 @@ type Calendar struct {
 				} `xml:"relativeTimePattern"`
 			} `xml:"relativeTime"`
 			RelativePeriod []*Common `xml:"relativePeriod"`
-		} `xml:"***REMOVED***eld"`
-	} `xml:"***REMOVED***elds"`
+		} `xml:"field"`
+	} `xml:"fields"`
 }
 type TimeZoneNames struct {
 	Common
@@ -1237,7 +1237,7 @@ type TimeZoneNames struct {
 	} `xml:"metazone"`
 }
 
-// LocaleDisplayNames speci***REMOVED***es localized display names for for scripts, languages,
+// LocaleDisplayNames specifies localized display names for for scripts, languages,
 // countries, currencies, and variants.
 type LocaleDisplayNames struct {
 	Common
@@ -1300,7 +1300,7 @@ type Numbers struct {
 		Common
 		Native      []*Common `xml:"native"`
 		Traditional []*Common `xml:"traditional"`
-		Finance     []*Common `xml:"***REMOVED***nance"`
+		Finance     []*Common `xml:"finance"`
 	} `xml:"otherNumberingSystems"`
 	MinimumGroupingDigits []*Common `xml:"minimumGroupingDigits"`
 	Symbols               []*struct {
@@ -1347,10 +1347,10 @@ type Numbers struct {
 			Common
 			NumberSystem string `xml:"numberSystem,attr"`
 		} `xml:"perMille"`
-		In***REMOVED***nity []*struct {
+		Infinity []*struct {
 			Common
 			NumberSystem string `xml:"numberSystem,attr"`
-		} `xml:"in***REMOVED***nity"`
+		} `xml:"infinity"`
 		Nan []*struct {
 			Common
 			NumberSystem string `xml:"numberSystem,attr"`
@@ -1380,21 +1380,21 @@ type Numbers struct {
 			} `xml:"decimalFormat"`
 		} `xml:"decimalFormatLength"`
 	} `xml:"decimalFormats"`
-	Scienti***REMOVED***cFormats []*struct {
+	ScientificFormats []*struct {
 		Common
 		NumberSystem           string `xml:"numberSystem,attr"`
-		Scienti***REMOVED***cFormatLength []*struct {
+		ScientificFormatLength []*struct {
 			Common
-			Scienti***REMOVED***cFormat []*struct {
+			ScientificFormat []*struct {
 				Common
 				Pattern []*struct {
 					Common
 					Numbers string `xml:"numbers,attr"`
 					Count   string `xml:"count,attr"`
 				} `xml:"pattern"`
-			} `xml:"scienti***REMOVED***cFormat"`
-		} `xml:"scienti***REMOVED***cFormatLength"`
-	} `xml:"scienti***REMOVED***cFormats"`
+			} `xml:"scientificFormat"`
+		} `xml:"scientificFormatLength"`
+	} `xml:"scientificFormats"`
 	PercentFormats []*struct {
 		Common
 		NumberSystem        string `xml:"numberSystem,attr"`
@@ -1490,5 +1490,5 @@ type Numbers struct {
 	} `xml:"minimalPairs"`
 }
 
-// Version is the version of CLDR from which the XML de***REMOVED***nitions are generated.
+// Version is the version of CLDR from which the XML definitions are generated.
 const Version = "32"

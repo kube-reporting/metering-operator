@@ -1,6 +1,6 @@
 // Copyright 2014 The Go Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE ***REMOVED***le.
+// license that can be found in the LICENSE file.
 
 package http2
 
@@ -13,7 +13,7 @@ import (
 // Buffer chunks are allocated from a pool to reduce pressure on GC.
 // The maximum wasted space per dataBuffer is 2x the largest size class,
 // which happens when the dataBuffer has multiple chunks and there is
-// one unread byte in both the ***REMOVED***rst and last chunks. We use a few size
+// one unread byte in both the first and last chunks. We use a few size
 // classes to minimize overheads for servers that typically receive very
 // small request bodies.
 //
@@ -86,7 +86,7 @@ func (b *dataBuffer) Read(p []byte) (int, error) {
 		ntotal += n
 		b.r += n
 		b.size -= n
-		// If the ***REMOVED***rst chunk has been consumed, advance to the next chunk.
+		// If the first chunk has been consumed, advance to the next chunk.
 		if b.r == len(b.chunks[0]) {
 			putDataBufferChunk(b.chunks[0])
 			end := len(b.chunks) - 1

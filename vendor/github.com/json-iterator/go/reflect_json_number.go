@@ -74,7 +74,7 @@ func (codec *jsonNumberCodec) Encode(ptr unsafe.Pointer, stream *Stream) {
 	number := *((*json.Number)(ptr))
 	if len(number) == 0 {
 		stream.writeByte('0')
-	} ***REMOVED*** {
+	} else {
 		stream.WriteRaw(string(number))
 	}
 }
@@ -102,7 +102,7 @@ func (codec *jsoniterNumberCodec) Encode(ptr unsafe.Pointer, stream *Stream) {
 	number := *((*Number)(ptr))
 	if len(number) == 0 {
 		stream.writeByte('0')
-	} ***REMOVED*** {
+	} else {
 		stream.WriteRaw(string(number))
 	}
 }

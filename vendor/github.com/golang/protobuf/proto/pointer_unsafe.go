@@ -4,7 +4,7 @@
 // https://github.com/golang/protobuf
 //
 // Redistribution and use in source and binary forms, with or without
-// modi***REMOVED***cation, are permitted provided that the following conditions are
+// modification, are permitted provided that the following conditions are
 // met:
 //
 //     * Redistributions of source code must retain the above copyright
@@ -15,7 +15,7 @@
 // distribution.
 //     * Neither the name of Google Inc. nor the names of its
 // contributors may be used to endorse or promote products derived from
-// this software without speci***REMOVED***c prior written permission.
+// this software without specific prior written permission.
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
 // "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
@@ -31,7 +31,7 @@
 
 // +build !purego,!appengine,!js
 
-// This ***REMOVED***le contains the implementation of the proto ***REMOVED***eld accesses using package unsafe.
+// This file contains the implementation of the proto field accesses using package unsafe.
 
 package proto
 
@@ -43,23 +43,23 @@ import (
 
 const unsafeAllowed = true
 
-// A ***REMOVED***eld identi***REMOVED***es a ***REMOVED***eld in a struct, accessible from a pointer.
-// In this implementation, a ***REMOVED***eld is identi***REMOVED***ed by its byte offset from the start of the struct.
-type ***REMOVED***eld uintptr
+// A field identifies a field in a struct, accessible from a pointer.
+// In this implementation, a field is identified by its byte offset from the start of the struct.
+type field uintptr
 
-// toField returns a ***REMOVED***eld equivalent to the given reflect ***REMOVED***eld.
-func toField(f *reflect.StructField) ***REMOVED***eld {
-	return ***REMOVED***eld(f.Offset)
+// toField returns a field equivalent to the given reflect field.
+func toField(f *reflect.StructField) field {
+	return field(f.Offset)
 }
 
-// invalidField is an invalid ***REMOVED***eld identi***REMOVED***er.
-const invalidField = ^***REMOVED***eld(0)
+// invalidField is an invalid field identifier.
+const invalidField = ^field(0)
 
 // zeroField is a noop when calling pointer.offset.
-const zeroField = ***REMOVED***eld(0)
+const zeroField = field(0)
 
-// IsValid reports whether the ***REMOVED***eld identi***REMOVED***er is valid.
-func (f ***REMOVED***eld) IsValid() bool {
+// IsValid reports whether the field identifier is valid.
+func (f field) IsValid() bool {
 	return f != invalidField
 }
 
@@ -103,13 +103,13 @@ func valToPointer(v reflect.Value) pointer {
 }
 
 // offset converts from a pointer to a structure to a pointer to
-// one of its ***REMOVED***elds.
-func (p pointer) offset(f ***REMOVED***eld) pointer {
+// one of its fields.
+func (p pointer) offset(f field) pointer {
 	// For safety, we should panic if !f.IsValid, however calling panic causes
 	// this to no longer be inlineable, which is a serious performance cost.
 	/*
 		if !f.IsValid() {
-			panic("invalid ***REMOVED***eld")
+			panic("invalid field")
 		}
 	*/
 	return pointer{p: unsafe.Pointer(uintptr(p.p) + uintptr(f))}

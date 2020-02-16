@@ -94,13 +94,13 @@ func buildGetBucketLocation(r *request.Request) {
 }
 
 func populateLocationConstraint(r *request.Request) {
-	if r.ParamsFilled() && aws.StringValue(r.Con***REMOVED***g.Region) != "us-east-1" {
+	if r.ParamsFilled() && aws.StringValue(r.Config.Region) != "us-east-1" {
 		in := r.Params.(*CreateBucketInput)
-		if in.CreateBucketCon***REMOVED***guration == nil {
+		if in.CreateBucketConfiguration == nil {
 			r.Params = awsutil.CopyOf(r.Params)
 			in = r.Params.(*CreateBucketInput)
-			in.CreateBucketCon***REMOVED***guration = &CreateBucketCon***REMOVED***guration{
-				LocationConstraint: r.Con***REMOVED***g.Region,
+			in.CreateBucketConfiguration = &CreateBucketConfiguration{
+				LocationConstraint: r.Config.Region,
 			}
 		}
 	}

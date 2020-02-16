@@ -2,7 +2,7 @@
 Copyright 2016 The Kubernetes Authors.
 
 Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this ***REMOVED***le except in compliance with the License.
+you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
 
     http://www.apache.org/licenses/LICENSE-2.0
@@ -10,7 +10,7 @@ You may obtain a copy of the License at
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the speci***REMOVED***c language governing permissions and
+See the License for the specific language governing permissions and
 limitations under the License.
 */
 
@@ -27,12 +27,12 @@ import (
 const (
 	LeaderElectionRecordAnnotationKey = "control-plane.alpha.kubernetes.io/leader"
 	EndpointsResourceLock             = "endpoints"
-	Con***REMOVED***gMapsResourceLock            = "con***REMOVED***gmaps"
+	ConfigMapsResourceLock            = "configmaps"
 )
 
 // LeaderElectionRecord is the record that is stored in the leader election annotation.
 // This information should be used for observational purposes only and could be replaced
-// with a random string (e.g. UUID) with only slight modi***REMOVED***cation of this code.
+// with a random string (e.g. UUID) with only slight modification of this code.
 // TODO(mikedanese): this should potentially be versioned
 type LeaderElectionRecord struct {
 	HolderIdentity       string      `json:"holderIdentity"`
@@ -42,16 +42,16 @@ type LeaderElectionRecord struct {
 	LeaderTransitions    int         `json:"leaderTransitions"`
 }
 
-// ResourceLockCon***REMOVED***g common data that exists across different
+// ResourceLockConfig common data that exists across different
 // resource locks
-type ResourceLockCon***REMOVED***g struct {
+type ResourceLockConfig struct {
 	Identity      string
 	EventRecorder record.EventRecorder
 }
 
 // Interface offers a common interface for locking on arbitrary
 // resources used in leader election.  The Interface is used
-// to hide the details on speci***REMOVED***c implementations in order to allow
+// to hide the details on specific implementations in order to allow
 // them to change over time.  This interface is strictly for use
 // by the leaderelection code.
 type Interface interface {
@@ -76,7 +76,7 @@ type Interface interface {
 }
 
 // Manufacture will create a lock of a given type according to the input parameters
-func New(lockType string, ns string, name string, client corev1.CoreV1Interface, rlc ResourceLockCon***REMOVED***g) (Interface, error) {
+func New(lockType string, ns string, name string, client corev1.CoreV1Interface, rlc ResourceLockConfig) (Interface, error) {
 	switch lockType {
 	case EndpointsResourceLock:
 		return &EndpointsLock{
@@ -85,16 +85,16 @@ func New(lockType string, ns string, name string, client corev1.CoreV1Interface,
 				Name:      name,
 			},
 			Client:     client,
-			LockCon***REMOVED***g: rlc,
+			LockConfig: rlc,
 		}, nil
-	case Con***REMOVED***gMapsResourceLock:
-		return &Con***REMOVED***gMapLock{
-			Con***REMOVED***gMapMeta: metav1.ObjectMeta{
+	case ConfigMapsResourceLock:
+		return &ConfigMapLock{
+			ConfigMapMeta: metav1.ObjectMeta{
 				Namespace: ns,
 				Name:      name,
 			},
 			Client:     client,
-			LockCon***REMOVED***g: rlc,
+			LockConfig: rlc,
 		}, nil
 	default:
 		return nil, fmt.Errorf("Invalid lock-type %s", lockType)

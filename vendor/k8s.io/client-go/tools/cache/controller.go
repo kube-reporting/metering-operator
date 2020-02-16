@@ -2,7 +2,7 @@
 Copyright 2015 The Kubernetes Authors.
 
 Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this ***REMOVED***le except in compliance with the License.
+you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
 
     http://www.apache.org/licenses/LICENSE-2.0
@@ -10,7 +10,7 @@ You may obtain a copy of the License at
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the speci***REMOVED***c language governing permissions and
+See the License for the specific language governing permissions and
 limitations under the License.
 */
 
@@ -26,8 +26,8 @@ import (
 	"k8s.io/apimachinery/pkg/util/wait"
 )
 
-// Con***REMOVED***g contains all the settings for a Controller.
-type Con***REMOVED***g struct {
+// Config contains all the settings for a Controller.
+type Config struct {
 	// The queue for your objects; either a FIFO or
 	// a DeltaFIFO. Your Process() function should accept
 	// the output of this Queue's Pop() method.
@@ -51,7 +51,7 @@ type Con***REMOVED***g struct {
 	// queue.
 	FullResyncPeriod time.Duration
 
-	// ShouldResync, if speci***REMOVED***ed, is invoked when the controller's reflector determines the next
+	// ShouldResync, if specified, is invoked when the controller's reflector determines the next
 	// periodic sync should occur. If this returns true, it means the reflector should proceed with
 	// the resync.
 	ShouldResync ShouldResyncFunc
@@ -73,7 +73,7 @@ type ProcessFunc func(obj interface{}) error
 
 // Controller is a generic controller framework.
 type controller struct {
-	con***REMOVED***g         Con***REMOVED***g
+	config         Config
 	reflector      *Reflector
 	reflectorMutex sync.RWMutex
 	clock          clock.Clock
@@ -85,10 +85,10 @@ type Controller interface {
 	LastSyncResourceVersion() string
 }
 
-// New makes a new Controller from the given Con***REMOVED***g.
-func New(c *Con***REMOVED***g) Controller {
+// New makes a new Controller from the given Config.
+func New(c *Config) Controller {
 	ctlr := &controller{
-		con***REMOVED***g: *c,
+		config: *c,
 		clock:  &clock.RealClock{},
 	}
 	return ctlr
@@ -101,15 +101,15 @@ func (c *controller) Run(stopCh <-chan struct{}) {
 	defer utilruntime.HandleCrash()
 	go func() {
 		<-stopCh
-		c.con***REMOVED***g.Queue.Close()
+		c.config.Queue.Close()
 	}()
 	r := NewReflector(
-		c.con***REMOVED***g.ListerWatcher,
-		c.con***REMOVED***g.ObjectType,
-		c.con***REMOVED***g.Queue,
-		c.con***REMOVED***g.FullResyncPeriod,
+		c.config.ListerWatcher,
+		c.config.ObjectType,
+		c.config.Queue,
+		c.config.FullResyncPeriod,
 	)
-	r.ShouldResync = c.con***REMOVED***g.ShouldResync
+	r.ShouldResync = c.config.ShouldResync
 	r.clock = c.clock
 
 	c.reflectorMutex.Lock()
@@ -126,7 +126,7 @@ func (c *controller) Run(stopCh <-chan struct{}) {
 
 // Returns true once this controller has completed an initial resource listing
 func (c *controller) HasSynced() bool {
-	return c.con***REMOVED***g.Queue.HasSynced()
+	return c.config.Queue.HasSynced()
 }
 
 func (c *controller) LastSyncResourceVersion() string {
@@ -147,30 +147,30 @@ func (c *controller) LastSyncResourceVersion() string {
 // also be helpful.
 func (c *controller) processLoop() {
 	for {
-		obj, err := c.con***REMOVED***g.Queue.Pop(PopProcessFunc(c.con***REMOVED***g.Process))
+		obj, err := c.config.Queue.Pop(PopProcessFunc(c.config.Process))
 		if err != nil {
 			if err == FIFOClosedError {
 				return
 			}
-			if c.con***REMOVED***g.RetryOnError {
+			if c.config.RetryOnError {
 				// This is the safe way to re-enqueue.
-				c.con***REMOVED***g.Queue.AddIfNotPresent(obj)
+				c.config.Queue.AddIfNotPresent(obj)
 			}
 		}
 	}
 }
 
-// ResourceEventHandler can handle noti***REMOVED***cations for events that happen to a
+// ResourceEventHandler can handle notifications for events that happen to a
 // resource. The events are informational only, so you can't return an
 // error.
 //  * OnAdd is called when an object is added.
-//  * OnUpdate is called when an object is modi***REMOVED***ed. Note that oldObj is the
+//  * OnUpdate is called when an object is modified. Note that oldObj is the
 //      last known state of the object-- it is possible that several changes
 //      were combined together, so you can't use this to see every single
 //      change. OnUpdate is also called when a re-list happens, and it will
 //      get called even if nothing changed. This is useful for periodically
 //      evaluating or syncing something.
-//  * OnDelete will get the ***REMOVED***nal state of the item if it is known, otherwise
+//  * OnDelete will get the final state of the item if it is known, otherwise
 //      it will get an object of type DeletedFinalStateUnknown. This can
 //      happen if the watch is closed and misses the delete event and we don't
 //      notice the deletion until the subsequent re-list.
@@ -181,7 +181,7 @@ type ResourceEventHandler interface {
 }
 
 // ResourceEventHandlerFuncs is an adaptor to let you easily specify as many or
-// as few of the noti***REMOVED***cation functions as you want while still implementing
+// as few of the notification functions as you want while still implementing
 // ResourceEventHandler.
 type ResourceEventHandlerFuncs struct {
 	AddFunc    func(obj interface{})
@@ -210,16 +210,16 @@ func (r ResourceEventHandlerFuncs) OnDelete(obj interface{}) {
 	}
 }
 
-// FilteringResourceEventHandler applies the provided ***REMOVED***lter to all events coming
+// FilteringResourceEventHandler applies the provided filter to all events coming
 // in, ensuring the appropriate nested handler method is invoked. An object
-// that starts passing the ***REMOVED***lter after an update is considered an add, and an
-// object that stops passing the ***REMOVED***lter after an update is considered a delete.
+// that starts passing the filter after an update is considered an add, and an
+// object that stops passing the filter after an update is considered a delete.
 type FilteringResourceEventHandler struct {
 	FilterFunc func(obj interface{}) bool
 	Handler    ResourceEventHandler
 }
 
-// OnAdd calls the nested handler only if the ***REMOVED***lter succeeds
+// OnAdd calls the nested handler only if the filter succeeds
 func (r FilteringResourceEventHandler) OnAdd(obj interface{}) {
 	if !r.FilterFunc(obj) {
 		return
@@ -227,7 +227,7 @@ func (r FilteringResourceEventHandler) OnAdd(obj interface{}) {
 	r.Handler.OnAdd(obj)
 }
 
-// OnUpdate ensures the proper handler is called depending on whether the ***REMOVED***lter matches
+// OnUpdate ensures the proper handler is called depending on whether the filter matches
 func (r FilteringResourceEventHandler) OnUpdate(oldObj, newObj interface{}) {
 	newer := r.FilterFunc(newObj)
 	older := r.FilterFunc(oldObj)
@@ -243,7 +243,7 @@ func (r FilteringResourceEventHandler) OnUpdate(oldObj, newObj interface{}) {
 	}
 }
 
-// OnDelete calls the nested handler only if the ***REMOVED***lter succeeds
+// OnDelete calls the nested handler only if the filter succeeds
 func (r FilteringResourceEventHandler) OnDelete(obj interface{}) {
 	if !r.FilterFunc(obj) {
 		return
@@ -262,9 +262,9 @@ func DeletionHandlingMetaNamespaceKeyFunc(obj interface{}) (string, error) {
 }
 
 // NewInformer returns a Store and a controller for populating the store
-// while also providing event noti***REMOVED***cations. You should only used the returned
+// while also providing event notifications. You should only used the returned
 // Store for Get/List operations; Add/Modify/Deletes will cause the event
-// noti***REMOVED***cations to be faulty.
+// notifications to be faulty.
 //
 // Parameters:
 //  * lw is list and watch functions for the source of the resource you want to
@@ -274,7 +274,7 @@ func DeletionHandlingMetaNamespaceKeyFunc(obj interface{}) (string, error) {
 //    calls, even if nothing changed). Otherwise, re-list will be delayed as
 //    long as possible (until the upstream source closes the watch or times out,
 //    or you stop the controller).
-//  * h is the object you want noti***REMOVED***cations sent to.
+//  * h is the object you want notifications sent to.
 //
 func NewInformer(
 	lw ListerWatcher,
@@ -288,10 +288,10 @@ func NewInformer(
 	// This will hold incoming changes. Note how we pass clientState in as a
 	// KeyLister, that way resync operations will result in the correct set
 	// of update/delete deltas.
-	***REMOVED***fo := NewDeltaFIFO(MetaNamespaceKeyFunc, clientState)
+	fifo := NewDeltaFIFO(MetaNamespaceKeyFunc, clientState)
 
-	cfg := &Con***REMOVED***g{
-		Queue:            ***REMOVED***fo,
+	cfg := &Config{
+		Queue:            fifo,
 		ListerWatcher:    lw,
 		ObjectType:       objType,
 		FullResyncPeriod: resyncPeriod,
@@ -307,7 +307,7 @@ func NewInformer(
 							return err
 						}
 						h.OnUpdate(old, d.Object)
-					} ***REMOVED*** {
+					} else {
 						if err := clientState.Add(d.Object); err != nil {
 							return err
 						}
@@ -327,9 +327,9 @@ func NewInformer(
 }
 
 // NewIndexerInformer returns a Indexer and a controller for populating the index
-// while also providing event noti***REMOVED***cations. You should only used the returned
+// while also providing event notifications. You should only used the returned
 // Index for Get/List operations; Add/Modify/Deletes will cause the event
-// noti***REMOVED***cations to be faulty.
+// notifications to be faulty.
 //
 // Parameters:
 //  * lw is list and watch functions for the source of the resource you want to
@@ -339,7 +339,7 @@ func NewInformer(
 //    calls, even if nothing changed). Otherwise, re-list will be delayed as
 //    long as possible (until the upstream source closes the watch or times out,
 //    or you stop the controller).
-//  * h is the object you want noti***REMOVED***cations sent to.
+//  * h is the object you want notifications sent to.
 //  * indexers is the indexer for the received object type.
 //
 func NewIndexerInformer(
@@ -355,10 +355,10 @@ func NewIndexerInformer(
 	// This will hold incoming changes. Note how we pass clientState in as a
 	// KeyLister, that way resync operations will result in the correct set
 	// of update/delete deltas.
-	***REMOVED***fo := NewDeltaFIFO(MetaNamespaceKeyFunc, clientState)
+	fifo := NewDeltaFIFO(MetaNamespaceKeyFunc, clientState)
 
-	cfg := &Con***REMOVED***g{
-		Queue:            ***REMOVED***fo,
+	cfg := &Config{
+		Queue:            fifo,
 		ListerWatcher:    lw,
 		ObjectType:       objType,
 		FullResyncPeriod: resyncPeriod,
@@ -374,7 +374,7 @@ func NewIndexerInformer(
 							return err
 						}
 						h.OnUpdate(old, d.Object)
-					} ***REMOVED*** {
+					} else {
 						if err := clientState.Add(d.Object); err != nil {
 							return err
 						}

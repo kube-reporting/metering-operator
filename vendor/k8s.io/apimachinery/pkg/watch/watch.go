@@ -2,7 +2,7 @@
 Copyright 2014 The Kubernetes Authors.
 
 Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this ***REMOVED***le except in compliance with the License.
+you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
 
     http://www.apache.org/licenses/LICENSE-2.0
@@ -10,7 +10,7 @@ You may obtain a copy of the License at
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the speci***REMOVED***c language governing permissions and
+See the License for the specific language governing permissions and
 limitations under the License.
 */
 
@@ -37,12 +37,12 @@ type Interface interface {
 	ResultChan() <-chan Event
 }
 
-// EventType de***REMOVED***nes the possible types of events.
+// EventType defines the possible types of events.
 type EventType string
 
 const (
 	Added    EventType = "ADDED"
-	Modi***REMOVED***ed EventType = "MODIFIED"
+	Modified EventType = "MODIFIED"
 	Deleted  EventType = "DELETED"
 	Error    EventType = "ERROR"
 
@@ -55,7 +55,7 @@ type Event struct {
 	Type EventType
 
 	// Object is:
-	//  * If Type is Added or Modi***REMOVED***ed: the new state of the object.
+	//  * If Type is Added or Modified: the new state of the object.
 	//  * If Type is Deleted: the state of the object immediately before deletion.
 	//  * If Type is Error: *api.Status is recommended; other types may make sense
 	//    depending on context.
@@ -137,7 +137,7 @@ func (f *FakeWatcher) Add(obj runtime.Object) {
 
 // Modify sends a modify event.
 func (f *FakeWatcher) Modify(obj runtime.Object) {
-	f.result <- Event{Modi***REMOVED***ed, obj}
+	f.result <- Event{Modified, obj}
 }
 
 // Delete sends a delete event.
@@ -219,7 +219,7 @@ func (f *RaceFreeFakeWatcher) Modify(obj runtime.Object) {
 	defer f.Unlock()
 	if !f.Stopped {
 		select {
-		case f.result <- Event{Modi***REMOVED***ed, obj}:
+		case f.result <- Event{Modified, obj}:
 			return
 		default:
 			panic(fmt.Errorf("channel full"))

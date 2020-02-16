@@ -2,7 +2,7 @@
 Copyright 2015 The Kubernetes Authors.
 
 Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this ***REMOVED***le except in compliance with the License.
+you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
 
     http://www.apache.org/licenses/LICENSE-2.0
@@ -10,7 +10,7 @@ You may obtain a copy of the License at
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the speci***REMOVED***c language governing permissions and
+See the License for the specific language governing permissions and
 limitations under the License.
 */
 
@@ -118,7 +118,7 @@ func (p *Parser) backup() {
 
 func (p *Parser) parseText(cur *ListNode) error {
 	for {
-		if strings.HasPre***REMOVED***x(p.input[p.pos:], leftDelim) {
+		if strings.HasPrefix(p.input[p.pos:], leftDelim) {
 			if p.pos > p.start {
 				cur.append(newText(p.consumeText()))
 			}
@@ -146,13 +146,13 @@ func (p *Parser) parseLeftDelim(cur *ListNode) error {
 }
 
 func (p *Parser) parseInsideAction(cur *ListNode) error {
-	pre***REMOVED***xMap := map[string]func(*ListNode) error{
+	prefixMap := map[string]func(*ListNode) error{
 		rightDelim: p.parseRightDelim,
 		"[?(":      p.parseFilter,
 		"..":       p.parseRecursive,
 	}
-	for pre***REMOVED***x, parseFunc := range pre***REMOVED***xMap {
-		if strings.HasPre***REMOVED***x(p.input[p.pos:], pre***REMOVED***x) {
+	for prefix, parseFunc := range prefixMap {
+		if strings.HasPrefix(p.input[p.pos:], prefix) {
 			return parseFunc(cur)
 		}
 	}
@@ -175,7 +175,7 @@ func (p *Parser) parseInsideAction(cur *ListNode) error {
 		return p.parseNumber(cur)
 	case isAlphaNumeric(r):
 		p.backup()
-		return p.parseIdenti***REMOVED***er(cur)
+		return p.parseIdentifier(cur)
 	default:
 		return fmt.Errorf("unrecognized character in action: %#U", r)
 	}
@@ -190,8 +190,8 @@ func (p *Parser) parseRightDelim(cur *ListNode) error {
 	return p.parseText(cur)
 }
 
-// parseIdenti***REMOVED***er scans build-in keywords, like "range" "end"
-func (p *Parser) parseIdenti***REMOVED***er(cur *ListNode) error {
+// parseIdentifier scans build-in keywords, like "range" "end"
+func (p *Parser) parseIdentifier(cur *ListNode) error {
 	var r rune
 	for {
 		r = p.next()
@@ -209,8 +209,8 @@ func (p *Parser) parseIdenti***REMOVED***er(cur *ListNode) error {
 		}
 
 		cur.append(newBool(v))
-	} ***REMOVED*** {
-		cur.append(newIdenti***REMOVED***er(value))
+	} else {
+		cur.append(newIdentifier(value))
 	}
 
 	return p.parseInsideAction(cur)
@@ -313,7 +313,7 @@ Loop:
 			}
 			if i > 0 && value[i] == "" {
 				params[i].Known = false
-			} ***REMOVED*** {
+			} else {
 				var err error
 				params[i].Known = true
 				params[i].Value, err = strconv.Atoi(value[i])
@@ -321,11 +321,11 @@ Loop:
 					return fmt.Errorf("array index %s is not a number", value[i])
 				}
 			}
-		} ***REMOVED*** {
+		} else {
 			if i == 1 {
 				params[i].Known = true
 				params[i].Value = params[0].Value + 1
-			} ***REMOVED*** {
+			} else {
 				params[i].Known = false
 				params[i].Value = 0
 			}
@@ -335,7 +335,7 @@ Loop:
 	return p.parseInsideAction(cur)
 }
 
-// parseFilter scans ***REMOVED***lter inside array selection
+// parseFilter scans filter inside array selection
 func (p *Parser) parseFilter(cur *ListNode) error {
 	p.pos += len("[?(")
 	p.consumeText()
@@ -348,7 +348,7 @@ Loop:
 		r := p.next()
 		switch r {
 		case eof, '\n':
-			return fmt.Errorf("unterminated ***REMOVED***lter")
+			return fmt.Errorf("unterminated filter")
 		case '"', '\'':
 			if begin == false {
 				//save the paired rune
@@ -381,7 +381,7 @@ Loop:
 			return err
 		}
 		cur.append(newFilter(parser.Root, newList(), "exists"))
-	} ***REMOVED*** {
+	} else {
 		leftParser, err := parseAction("left", value[1])
 		if err != nil {
 			return err
@@ -418,7 +418,7 @@ Loop:
 	return p.parseInsideAction(cur)
 }
 
-// parseField scans a ***REMOVED***eld until a terminator
+// parseField scans a field until a terminator
 func (p *Parser) parseField(cur *ListNode) error {
 	p.consumeText()
 	for p.advance() {
@@ -426,7 +426,7 @@ func (p *Parser) parseField(cur *ListNode) error {
 	value := p.consumeText()
 	if value == "*" {
 		cur.append(newWildcard())
-	} ***REMOVED*** {
+	} else {
 		cur.append(newField(strings.Replace(value, "\\", "", -1)))
 	}
 	return p.parseInsideAction(cur)
@@ -437,14 +437,14 @@ func (p *Parser) advance() bool {
 	r := p.next()
 	if r == '\\' {
 		p.next()
-	} ***REMOVED*** if isTerminator(r) {
+	} else if isTerminator(r) {
 		p.backup()
 		return false
 	}
 	return true
 }
 
-// isTerminator reports whether the input is at valid termination character to appear after an identi***REMOVED***er.
+// isTerminator reports whether the input is at valid termination character to appear after an identifier.
 func isTerminator(r rune) bool {
 	if isSpace(r) || isEndOfLine(r) {
 		return true
@@ -507,7 +507,7 @@ func UnquoteExtend(s string) (string, error) {
 		s = ss
 		if c < utf8.RuneSelf || !multibyte {
 			buf = append(buf, byte(c))
-		} ***REMOVED*** {
+		} else {
 			n := utf8.EncodeRune(runeTmp[:], c)
 			buf = append(buf, runeTmp[:n]...)
 		}

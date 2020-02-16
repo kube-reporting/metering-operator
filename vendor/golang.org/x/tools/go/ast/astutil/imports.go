@@ -1,6 +1,6 @@
 // Copyright 2013 The Go Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE ***REMOVED***le.
+// license that can be found in the LICENSE file.
 
 // Package astutil contains common utilities for working with the Go AST.
 package astutil // import "golang.org/x/tools/go/ast/astutil"
@@ -13,12 +13,12 @@ import (
 	"strings"
 )
 
-// AddImport adds the import path to the ***REMOVED***le f, if absent.
+// AddImport adds the import path to the file f, if absent.
 func AddImport(fset *token.FileSet, f *ast.File, ipath string) (added bool) {
 	return AddNamedImport(fset, f, "", ipath)
 }
 
-// AddNamedImport adds the import path to the ***REMOVED***le f, if absent.
+// AddNamedImport adds the import path to the file f, if absent.
 // If name is not empty, it is used to rename the import.
 //
 // For example, calling
@@ -41,12 +41,12 @@ func AddNamedImport(fset *token.FileSet, f *ast.File, name, ipath string) (added
 	}
 
 	// Find an import decl to add to.
-	// The goal is to ***REMOVED***nd an existing import
+	// The goal is to find an existing import
 	// whose import path has the longest shared
-	// pre***REMOVED***x with ipath.
+	// prefix with ipath.
 	var (
-		bestMatch  = -1         // length of longest shared pre***REMOVED***x
-		lastImport = -1         // index in f.Decls of the ***REMOVED***le's ***REMOVED***nal import decl
+		bestMatch  = -1         // length of longest shared prefix
+		lastImport = -1         // index in f.Decls of the file's final import decl
 		impDecl    *ast.GenDecl // import decl containing the best match
 		impIndex   = -1         // spec index in impDecl containing the best match
 
@@ -67,12 +67,12 @@ func AddNamedImport(fset *token.FileSet, f *ast.File, name, ipath string) (added
 				impDecl = gen
 			}
 
-			// Compute longest shared pre***REMOVED***x with imports in this group and ***REMOVED***nd best
+			// Compute longest shared prefix with imports in this group and find best
 			// matched import spec.
-			// 1. Always prefer import spec with longest shared pre***REMOVED***x.
+			// 1. Always prefer import spec with longest shared prefix.
 			// 2. While match length is 0,
-			// - for stdlib package: prefer ***REMOVED***rst import spec.
-			// - for third party package: prefer ***REMOVED***rst third party import spec.
+			// - for stdlib package: prefer first import spec.
+			// - for third party package: prefer first third party import spec.
 			// We cannot use last import spec as best match for third party package
 			// because grouped imports are usually placed last by goimports -local
 			// flag.
@@ -99,17 +99,17 @@ func AddNamedImport(fset *token.FileSet, f *ast.File, name, ipath string) (added
 		}
 		if lastImport >= 0 {
 			impDecl.TokPos = f.Decls[lastImport].End()
-		} ***REMOVED*** {
+		} else {
 			// There are no existing imports.
 			// Our new import goes after the package declaration and after
 			// the comment, if any, that starts on the same line as the
 			// package declaration.
 			impDecl.TokPos = f.Package
 
-			***REMOVED***le := fset.File(f.Package)
-			pkgLine := ***REMOVED***le.Line(f.Package)
+			file := fset.File(f.Package)
+			pkgLine := file.Line(f.Package)
 			for _, c := range f.Comments {
-				if ***REMOVED***le.Line(c.Pos()) > pkgLine {
+				if file.Line(c.Pos()) > pkgLine {
 					break
 				}
 				impDecl.TokPos = c.End()
@@ -135,7 +135,7 @@ func AddNamedImport(fset *token.FileSet, f *ast.File, name, ipath string) (added
 		// position by adding the new import after the comment.
 		if spec, ok := impDecl.Specs[insertAt-1].(*ast.ImportSpec); ok && spec.Comment != nil {
 			pos = spec.Comment.End()
-		} ***REMOVED*** {
+		} else {
 			// Assign same position as the previous import,
 			// so that the sorter sees it as being in the same block.
 			pos = impDecl.Specs[insertAt-1].Pos()
@@ -151,7 +151,7 @@ func AddNamedImport(fset *token.FileSet, f *ast.File, name, ipath string) (added
 	if len(impDecl.Specs) == 1 {
 		// Remove unneeded parens.
 		impDecl.Lparen = token.NoPos
-	} ***REMOVED*** if !impDecl.Lparen.IsValid() {
+	} else if !impDecl.Lparen.IsValid() {
 		// impDecl needs parens added.
 		impDecl.Lparen = impDecl.Specs[0].Pos()
 	}
@@ -162,25 +162,25 @@ func AddNamedImport(fset *token.FileSet, f *ast.File, name, ipath string) (added
 		return true
 	}
 
-	// Merge all the import declarations into the ***REMOVED***rst one.
-	var ***REMOVED***rst *ast.GenDecl
+	// Merge all the import declarations into the first one.
+	var first *ast.GenDecl
 	for i := 0; i < len(f.Decls); i++ {
 		decl := f.Decls[i]
 		gen, ok := decl.(*ast.GenDecl)
 		if !ok || gen.Tok != token.IMPORT || declImports(gen, "C") {
 			continue
 		}
-		if ***REMOVED***rst == nil {
-			***REMOVED***rst = gen
-			continue // Don't touch the ***REMOVED***rst one.
+		if first == nil {
+			first = gen
+			continue // Don't touch the first one.
 		}
 		// We now know there is more than one package in this import
 		// declaration. Ensure that it ends up parenthesized.
-		***REMOVED***rst.Lparen = ***REMOVED***rst.Pos()
-		// Move the imports of the other import declaration to the ***REMOVED***rst one.
+		first.Lparen = first.Pos()
+		// Move the imports of the other import declaration to the first one.
 		for _, spec := range gen.Specs {
-			spec.(*ast.ImportSpec).Path.ValuePos = ***REMOVED***rst.Pos()
-			***REMOVED***rst.Specs = append(***REMOVED***rst.Specs, spec)
+			spec.(*ast.ImportSpec).Path.ValuePos = first.Pos()
+			first.Specs = append(first.Specs, spec)
 		}
 		f.Decls = append(f.Decls[:i], f.Decls[i+1:]...)
 		i--
@@ -195,12 +195,12 @@ func isThirdParty(importPath string) bool {
 	return strings.Contains(importPath, ".")
 }
 
-// DeleteImport deletes the import path from the ***REMOVED***le f, if present.
+// DeleteImport deletes the import path from the file f, if present.
 func DeleteImport(fset *token.FileSet, f *ast.File, path string) (deleted bool) {
 	return DeleteNamedImport(fset, f, "", path)
 }
 
-// DeleteNamedImport deletes the import with the given name and path from the ***REMOVED***le f, if present.
+// DeleteNamedImport deletes the import with the given name and path from the file f, if present.
 func DeleteNamedImport(fset *token.FileSet, f *ast.File, name, path string) (deleted bool) {
 	var delspecs []*ast.ImportSpec
 	var delcomments []*ast.CommentGroup
@@ -239,7 +239,7 @@ func DeleteNamedImport(fset *token.FileSet, f *ast.File, name, path string) (del
 				f.Decls = f.Decls[:len(f.Decls)-1]
 				i--
 				break
-			} ***REMOVED*** if len(gen.Specs) == 1 {
+			} else if len(gen.Specs) == 1 {
 				if impspec.Doc != nil {
 					delcomments = append(delcomments, impspec.Doc)
 				}
@@ -282,7 +282,7 @@ func DeleteNamedImport(fset *token.FileSet, f *ast.File, name, path string) (del
 					// There was a blank line immediately preceding the deleted import,
 					// so there's no need to close the hole.
 					// Do nothing.
-				} ***REMOVED*** if line != fset.File(gen.Rparen).LineCount() {
+				} else if line != fset.File(gen.Rparen).LineCount() {
 					// There was no blank line. Close the hole.
 					fset.File(gen.Rparen).MergeLine(line)
 				}
@@ -352,12 +352,12 @@ func UsesImport(f *ast.File, path string) (used bool) {
 	name := spec.Name.String()
 	switch name {
 	case "<nil>":
-		// If the package name is not explicitly speci***REMOVED***ed,
+		// If the package name is not explicitly specified,
 		// make an educated guess. This is not guaranteed to be correct.
 		lastSlash := strings.LastIndex(path, "/")
 		if lastSlash == -1 {
 			name = path
-		} ***REMOVED*** {
+		} else {
 			name = path[lastSlash+1:]
 		}
 	case "_", ".":
@@ -422,7 +422,7 @@ func declImports(gen *ast.GenDecl, path string) bool {
 	return false
 }
 
-// matchLen returns the length of the longest path segment pre***REMOVED***x shared by x and y.
+// matchLen returns the length of the longest path segment prefix shared by x and y.
 func matchLen(x, y string) int {
 	n := 0
 	for i := 0; i < len(x) && i < len(y) && x[i] == y[i]; i++ {
@@ -433,13 +433,13 @@ func matchLen(x, y string) int {
 	return n
 }
 
-// isTopName returns true if n is a top-level unresolved identi***REMOVED***er with the given name.
+// isTopName returns true if n is a top-level unresolved identifier with the given name.
 func isTopName(n ast.Expr, name string) bool {
 	id, ok := n.(*ast.Ident)
 	return ok && id.Name == name && id.Obj == nil
 }
 
-// Imports returns the ***REMOVED***le imports grouped by paragraph.
+// Imports returns the file imports grouped by paragraph.
 func Imports(fset *token.FileSet, f *ast.File) [][]*ast.ImportSpec {
 	var groups [][]*ast.ImportSpec
 

@@ -2,7 +2,7 @@
 Copyright 2015 The Kubernetes Authors.
 
 Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this ***REMOVED***le except in compliance with the License.
+you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
 
     http://www.apache.org/licenses/LICENSE-2.0
@@ -10,7 +10,7 @@ You may obtain a copy of the License at
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the speci***REMOVED***c language governing permissions and
+See the License for the specific language governing permissions and
 limitations under the License.
 */
 
@@ -88,7 +88,7 @@ func NewSnippetWriter(w io.Writer, c *Context, left, right string) *SnippetWrite
 //
 // sw.Do(`The public type name is: $.|public$`, t)
 //
-// You may or may not ***REMOVED***nd it more readable to use the map with a descriptive
+// You may or may not find it more readable to use the map with a descriptive
 // key, but if you want to pass more than one arg, the map or a custom struct
 // becomes a requirement. You can do arbitrary logic inside these templates,
 // but you should consider doing the logic in go and stitching them together
@@ -100,11 +100,11 @@ func (s *SnippetWriter) Do(format string, args interface{}) *SnippetWriter {
 	if s.err != nil {
 		return s
 	}
-	// Name the template by source ***REMOVED***le:line so it can be found when
+	// Name the template by source file:line so it can be found when
 	// there's an error.
-	_, ***REMOVED***le, line, _ := runtime.Caller(1)
+	_, file, line, _ := runtime.Caller(1)
 	tmpl, err := template.
-		New(fmt.Sprintf("%s:%d", ***REMOVED***le, line)).
+		New(fmt.Sprintf("%s:%d", file, line)).
 		Delims(s.left, s.right).
 		Funcs(s.funcMap).
 		Parse(format)

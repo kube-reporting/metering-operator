@@ -1,6 +1,6 @@
 // Copyright 2013 The Go Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE ***REMOVED***le.
+// license that can be found in the LICENSE file.
 
 package cldr
 
@@ -48,14 +48,14 @@ type Common struct {
 }
 
 // Default returns the default type to select from the enclosed list
-// or "" if no default value is speci***REMOVED***ed.
+// or "" if no default value is specified.
 func (e *Common) Default() string {
 	if e.Def == nil {
 		return ""
 	}
 	if e.Def.Choice != "" {
 		return e.Def.Choice
-	} ***REMOVED*** if e.Def.Type != "" {
+	} else if e.Def.Type != "" {
 		// Type is still used by the default element in collation.
 		return e.Def.Type
 	}

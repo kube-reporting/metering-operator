@@ -20,9 +20,9 @@ var (
 // A SharedCredentialsProvider retrieves credentials from the current user's home
 // directory, and keeps track if those credentials are expired.
 //
-// Pro***REMOVED***le ini ***REMOVED***le example: $HOME/.aws/credentials
+// Profile ini file example: $HOME/.aws/credentials
 type SharedCredentialsProvider struct {
-	// Path to the shared credentials ***REMOVED***le.
+	// Path to the shared credentials file.
 	//
 	// If empty will look for "AWS_SHARED_CREDENTIALS_FILE" env variable. If the
 	// env value is empty will default to current user's home directory.
@@ -30,21 +30,21 @@ type SharedCredentialsProvider struct {
 	// Windows:   "%USERPROFILE%\.aws\credentials"
 	Filename string
 
-	// AWS Pro***REMOVED***le to extract credentials from the shared credentials ***REMOVED***le. If empty
+	// AWS Profile to extract credentials from the shared credentials file. If empty
 	// will default to environment variable "AWS_PROFILE" or "default" if
 	// environment variable is also not set.
-	Pro***REMOVED***le string
+	Profile string
 
 	// retrieved states if the credentials have been successfully retrieved.
 	retrieved bool
 }
 
 // NewSharedCredentials returns a pointer to a new Credentials object
-// wrapping the Pro***REMOVED***le ***REMOVED***le provider.
-func NewSharedCredentials(***REMOVED***lename, pro***REMOVED***le string) *Credentials {
+// wrapping the Profile file provider.
+func NewSharedCredentials(filename, profile string) *Credentials {
 	return NewCredentials(&SharedCredentialsProvider{
-		Filename: ***REMOVED***lename,
-		Pro***REMOVED***le:  pro***REMOVED***le,
+		Filename: filename,
+		Profile:  profile,
 	})
 }
 
@@ -53,12 +53,12 @@ func NewSharedCredentials(***REMOVED***lename, pro***REMOVED***le string) *Crede
 func (p *SharedCredentialsProvider) Retrieve() (Value, error) {
 	p.retrieved = false
 
-	***REMOVED***lename, err := p.***REMOVED***lename()
+	filename, err := p.filename()
 	if err != nil {
 		return Value{ProviderName: SharedCredsProviderName}, err
 	}
 
-	creds, err := loadPro***REMOVED***le(***REMOVED***lename, p.pro***REMOVED***le())
+	creds, err := loadProfile(filename, p.profile())
 	if err != nil {
 		return Value{ProviderName: SharedCredsProviderName}, err
 	}
@@ -72,36 +72,36 @@ func (p *SharedCredentialsProvider) IsExpired() bool {
 	return !p.retrieved
 }
 
-// loadPro***REMOVED***les loads from the ***REMOVED***le pointed to by shared credentials ***REMOVED***lename for pro***REMOVED***le.
-// The credentials retrieved from the pro***REMOVED***le will be returned or error. Error will be
-// returned if it fails to read from the ***REMOVED***le, or the data is invalid.
-func loadPro***REMOVED***le(***REMOVED***lename, pro***REMOVED***le string) (Value, error) {
-	con***REMOVED***g, err := ini.OpenFile(***REMOVED***lename)
+// loadProfiles loads from the file pointed to by shared credentials filename for profile.
+// The credentials retrieved from the profile will be returned or error. Error will be
+// returned if it fails to read from the file, or the data is invalid.
+func loadProfile(filename, profile string) (Value, error) {
+	config, err := ini.OpenFile(filename)
 	if err != nil {
-		return Value{ProviderName: SharedCredsProviderName}, awserr.New("SharedCredsLoad", "failed to load shared credentials ***REMOVED***le", err)
+		return Value{ProviderName: SharedCredsProviderName}, awserr.New("SharedCredsLoad", "failed to load shared credentials file", err)
 	}
 
-	iniPro***REMOVED***le, ok := con***REMOVED***g.GetSection(pro***REMOVED***le)
+	iniProfile, ok := config.GetSection(profile)
 	if !ok {
-		return Value{ProviderName: SharedCredsProviderName}, awserr.New("SharedCredsLoad", "failed to get pro***REMOVED***le", nil)
+		return Value{ProviderName: SharedCredsProviderName}, awserr.New("SharedCredsLoad", "failed to get profile", nil)
 	}
 
-	id := iniPro***REMOVED***le.String("aws_access_key_id")
+	id := iniProfile.String("aws_access_key_id")
 	if len(id) == 0 {
 		return Value{ProviderName: SharedCredsProviderName}, awserr.New("SharedCredsAccessKey",
-			fmt.Sprintf("shared credentials %s in %s did not contain aws_access_key_id", pro***REMOVED***le, ***REMOVED***lename),
+			fmt.Sprintf("shared credentials %s in %s did not contain aws_access_key_id", profile, filename),
 			nil)
 	}
 
-	secret := iniPro***REMOVED***le.String("aws_secret_access_key")
+	secret := iniProfile.String("aws_secret_access_key")
 	if len(secret) == 0 {
 		return Value{ProviderName: SharedCredsProviderName}, awserr.New("SharedCredsSecret",
-			fmt.Sprintf("shared credentials %s in %s did not contain aws_secret_access_key", pro***REMOVED***le, ***REMOVED***lename),
+			fmt.Sprintf("shared credentials %s in %s did not contain aws_secret_access_key", profile, filename),
 			nil)
 	}
 
 	// Default to empty string if not found
-	token := iniPro***REMOVED***le.String("aws_session_token")
+	token := iniProfile.String("aws_session_token")
 
 	return Value{
 		AccessKeyID:     id,
@@ -111,10 +111,10 @@ func loadPro***REMOVED***le(***REMOVED***lename, pro***REMOVED***le string) (Val
 	}, nil
 }
 
-// ***REMOVED***lename returns the ***REMOVED***lename to use to read AWS shared credentials.
+// filename returns the filename to use to read AWS shared credentials.
 //
 // Will return an error if the user's home directory path cannot be found.
-func (p *SharedCredentialsProvider) ***REMOVED***lename() (string, error) {
+func (p *SharedCredentialsProvider) filename() (string, error) {
 	if len(p.Filename) != 0 {
 		return p.Filename, nil
 	}
@@ -125,7 +125,7 @@ func (p *SharedCredentialsProvider) ***REMOVED***lename() (string, error) {
 
 	if home := shareddefaults.UserHomeDir(); len(home) == 0 {
 		// Backwards compatibility of home directly not found error being returned.
-		// This error is too verbose, failure when opening the ***REMOVED***le would of been
+		// This error is too verbose, failure when opening the file would of been
 		// a better error to return.
 		return "", ErrSharedCredentialsHomeNotFound
 	}
@@ -135,16 +135,16 @@ func (p *SharedCredentialsProvider) ***REMOVED***lename() (string, error) {
 	return p.Filename, nil
 }
 
-// pro***REMOVED***le returns the AWS shared credentials pro***REMOVED***le.  If empty will read
-// environment variable "AWS_PROFILE". If that is not set pro***REMOVED***le will
+// profile returns the AWS shared credentials profile.  If empty will read
+// environment variable "AWS_PROFILE". If that is not set profile will
 // return "default".
-func (p *SharedCredentialsProvider) pro***REMOVED***le() string {
-	if p.Pro***REMOVED***le == "" {
-		p.Pro***REMOVED***le = os.Getenv("AWS_PROFILE")
+func (p *SharedCredentialsProvider) profile() string {
+	if p.Profile == "" {
+		p.Profile = os.Getenv("AWS_PROFILE")
 	}
-	if p.Pro***REMOVED***le == "" {
-		p.Pro***REMOVED***le = "default"
+	if p.Profile == "" {
+		p.Profile = "default"
 	}
 
-	return p.Pro***REMOVED***le
+	return p.Profile
 }

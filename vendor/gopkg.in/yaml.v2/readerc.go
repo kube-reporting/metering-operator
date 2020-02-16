@@ -38,15 +38,15 @@ func yaml_parser_determine_encoding(parser *yaml_parser_t) bool {
 		parser.encoding = yaml_UTF16LE_ENCODING
 		parser.raw_buffer_pos += 2
 		parser.offset += 2
-	} ***REMOVED*** if avail >= 2 && buf[pos] == bom_UTF16BE[0] && buf[pos+1] == bom_UTF16BE[1] {
+	} else if avail >= 2 && buf[pos] == bom_UTF16BE[0] && buf[pos+1] == bom_UTF16BE[1] {
 		parser.encoding = yaml_UTF16BE_ENCODING
 		parser.raw_buffer_pos += 2
 		parser.offset += 2
-	} ***REMOVED*** if avail >= 3 && buf[pos] == bom_UTF8[0] && buf[pos+1] == bom_UTF8[1] && buf[pos+2] == bom_UTF8[2] {
+	} else if avail >= 3 && buf[pos] == bom_UTF8[0] && buf[pos+1] == bom_UTF8[1] && buf[pos+2] == bom_UTF8[2] {
 		parser.encoding = yaml_UTF8_ENCODING
 		parser.raw_buffer_pos += 3
 		parser.offset += 3
-	} ***REMOVED*** {
+	} else {
 		parser.encoding = yaml_UTF8_ENCODING
 	}
 	return true
@@ -73,12 +73,12 @@ func yaml_parser_update_raw_buffer(parser *yaml_parser_t) bool {
 	parser.raw_buffer = parser.raw_buffer[:len(parser.raw_buffer)-parser.raw_buffer_pos]
 	parser.raw_buffer_pos = 0
 
-	// Call the read handler to ***REMOVED***ll the buffer.
+	// Call the read handler to fill the buffer.
 	size_read, err := parser.read_handler(parser, parser.raw_buffer[len(parser.raw_buffer):cap(parser.raw_buffer)])
 	parser.raw_buffer = parser.raw_buffer[:len(parser.raw_buffer)+size_read]
 	if err == io.EOF {
 		parser.eof = true
-	} ***REMOVED*** if err != nil {
+	} else if err != nil {
 		return yaml_parser_set_reader_error(parser, "input error: "+err.Error(), parser.offset, -1)
 	}
 	return true
@@ -87,7 +87,7 @@ func yaml_parser_update_raw_buffer(parser *yaml_parser_t) bool {
 // Ensure that the buffer contains at least `length` characters.
 // Return true on success, false on failure.
 //
-// The length is supposed to be signi***REMOVED***cantly less that the buffer size.
+// The length is supposed to be significantly less that the buffer size.
 func yaml_parser_update_buffer(parser *yaml_parser_t, length int) bool {
 	if parser.read_handler == nil {
 		panic("read handler must be set")
@@ -125,7 +125,7 @@ func yaml_parser_update_buffer(parser *yaml_parser_t, length int) bool {
 		copy(parser.buffer, parser.buffer[parser.buffer_pos:])
 		buffer_len -= parser.buffer_pos
 		parser.buffer_pos = 0
-	} ***REMOVED*** if parser.buffer_pos == buffer_len {
+	} else if parser.buffer_pos == buffer_len {
 		buffer_len = 0
 		parser.buffer_pos = 0
 	}
@@ -134,17 +134,17 @@ func yaml_parser_update_buffer(parser *yaml_parser_t, length int) bool {
 	parser.buffer = parser.buffer[:cap(parser.buffer)]
 
 	// Fill the buffer until it has enough characters.
-	***REMOVED***rst := true
+	first := true
 	for parser.unread < length {
 
 		// Fill the raw buffer if necessary.
-		if !***REMOVED***rst || parser.raw_buffer_pos == len(parser.raw_buffer) {
+		if !first || parser.raw_buffer_pos == len(parser.raw_buffer) {
 			if !yaml_parser_update_raw_buffer(parser) {
 				parser.buffer = parser.buffer[:buffer_len]
 				return false
 			}
 		}
-		***REMOVED***rst = false
+		first = false
 
 		// Decode the raw buffer.
 	inner:
@@ -255,7 +255,7 @@ func yaml_parser_update_buffer(parser *yaml_parser_t, length int) bool {
 				var low, high int
 				if parser.encoding == yaml_UTF16LE_ENCODING {
 					low, high = 0, 1
-				} ***REMOVED*** {
+				} else {
 					low, high = 1, 0
 				}
 
@@ -331,7 +331,7 @@ func yaml_parser_update_buffer(parser *yaml_parser_t, length int) bool {
 
 					// Generate the value of the surrogate pair.
 					value = 0x10000 + ((value & 0x3FF) << 10) + (value2 & 0x3FF)
-				} ***REMOVED*** {
+				} else {
 					width = 2
 				}
 
@@ -367,18 +367,18 @@ func yaml_parser_update_buffer(parser *yaml_parser_t, length int) bool {
 				// 0000 0000-0000 007F . 0xxxxxxx
 				parser.buffer[buffer_len+0] = byte(value)
 				buffer_len += 1
-			} ***REMOVED*** if value <= 0x7FF {
+			} else if value <= 0x7FF {
 				// 0000 0080-0000 07FF . 110xxxxx 10xxxxxx
 				parser.buffer[buffer_len+0] = byte(0xC0 + (value >> 6))
 				parser.buffer[buffer_len+1] = byte(0x80 + (value & 0x3F))
 				buffer_len += 2
-			} ***REMOVED*** if value <= 0xFFFF {
+			} else if value <= 0xFFFF {
 				// 0000 0800-0000 FFFF . 1110xxxx 10xxxxxx 10xxxxxx
 				parser.buffer[buffer_len+0] = byte(0xE0 + (value >> 12))
 				parser.buffer[buffer_len+1] = byte(0x80 + ((value >> 6) & 0x3F))
 				parser.buffer[buffer_len+2] = byte(0x80 + (value & 0x3F))
 				buffer_len += 3
-			} ***REMOVED*** {
+			} else {
 				// 0001 0000-0010 FFFF . 11110xxx 10xxxxxx 10xxxxxx 10xxxxxx
 				parser.buffer[buffer_len+0] = byte(0xF0 + (value >> 18))
 				parser.buffer[buffer_len+1] = byte(0x80 + ((value >> 12) & 0x3F))

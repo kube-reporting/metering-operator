@@ -54,7 +54,7 @@ type dumpState struct {
 	pointers         map[uintptr]int
 	ignoreNextType   bool
 	ignoreNextIndent bool
-	cs               *Con***REMOVED***gState
+	cs               *ConfigState
 }
 
 // indent performs indentation according to the depth level and cs.Indent
@@ -161,7 +161,7 @@ func (d *dumpState) dumpPtr(v reflect.Value) {
 func (d *dumpState) dumpSlice(v reflect.Value) {
 	// Determine whether this type should be hex dumped or not.  Also,
 	// for types which should be hexdumped, try to use the underlying data
-	// ***REMOVED***rst, then fall back to trying to convert them to a uint8 slice.
+	// first, then fall back to trying to convert them to a uint8 slice.
 	var buf []uint8
 	doConvert := false
 	doHexDump := false
@@ -184,7 +184,7 @@ func (d *dumpState) dumpSlice(v reflect.Value) {
 			// We need an addressable interface to convert the type
 			// to a byte slice.  However, the reflect package won't
 			// give us an interface on certain things like
-			// unexported struct ***REMOVED***elds in order to enforce
+			// unexported struct fields in order to enforce
 			// visibility rules.  We use unsafe, when available, to
 			// bypass these restrictions since this package does not
 			// mutate the values.
@@ -238,14 +238,14 @@ func (d *dumpState) dumpSlice(v reflect.Value) {
 		d.dump(d.unpackValue(v.Index(i)))
 		if i < (numEntries - 1) {
 			d.w.Write(commaNewlineBytes)
-		} ***REMOVED*** {
+		} else {
 			d.w.Write(newlineBytes)
 		}
 	}
 }
 
 // dump is the main workhorse for dumping a value.  It uses the passed reflect
-// value to ***REMOVED***gure out what kind of object we are dealing with and formats it
+// value to figure out what kind of object we are dealing with and formats it
 // appropriately.  It is a recursive function, however circular data structures
 // are detected and handled properly.
 func (d *dumpState) dump(v reflect.Value) {
@@ -263,7 +263,7 @@ func (d *dumpState) dump(v reflect.Value) {
 		return
 	}
 
-	// Print type information unless already handled ***REMOVED***where.
+	// Print type information unless already handled elsewhere.
 	if !d.ignoreNextType {
 		d.indent()
 		d.w.Write(openParenBytes)
@@ -348,7 +348,7 @@ func (d *dumpState) dump(v reflect.Value) {
 		if (d.cs.MaxDepth != 0) && (d.depth > d.cs.MaxDepth) {
 			d.indent()
 			d.w.Write(maxNewlineBytes)
-		} ***REMOVED*** {
+		} else {
 			d.dumpSlice(v)
 		}
 		d.depth--
@@ -381,7 +381,7 @@ func (d *dumpState) dump(v reflect.Value) {
 		if (d.cs.MaxDepth != 0) && (d.depth > d.cs.MaxDepth) {
 			d.indent()
 			d.w.Write(maxNewlineBytes)
-		} ***REMOVED*** {
+		} else {
 			numEntries := v.Len()
 			keys := v.MapKeys()
 			if d.cs.SortKeys {
@@ -394,7 +394,7 @@ func (d *dumpState) dump(v reflect.Value) {
 				d.dump(d.unpackValue(v.MapIndex(key)))
 				if i < (numEntries - 1) {
 					d.w.Write(commaNewlineBytes)
-				} ***REMOVED*** {
+				} else {
 					d.w.Write(newlineBytes)
 				}
 			}
@@ -409,7 +409,7 @@ func (d *dumpState) dump(v reflect.Value) {
 		if (d.cs.MaxDepth != 0) && (d.depth > d.cs.MaxDepth) {
 			d.indent()
 			d.w.Write(maxNewlineBytes)
-		} ***REMOVED*** {
+		} else {
 			vt := v.Type()
 			numFields := v.NumField()
 			for i := 0; i < numFields; i++ {
@@ -421,7 +421,7 @@ func (d *dumpState) dump(v reflect.Value) {
 				d.dump(d.unpackValue(v.Field(i)))
 				if i < (numFields - 1) {
 					d.w.Write(commaNewlineBytes)
-				} ***REMOVED*** {
+				} else {
 					d.w.Write(newlineBytes)
 				}
 			}
@@ -442,15 +442,15 @@ func (d *dumpState) dump(v reflect.Value) {
 	default:
 		if v.CanInterface() {
 			fmt.Fprintf(d.w, "%v", v.Interface())
-		} ***REMOVED*** {
+		} else {
 			fmt.Fprintf(d.w, "%v", v.String())
 		}
 	}
 }
 
 // fdump is a helper function to consolidate the logic from the various public
-// methods which take varying writers and con***REMOVED***g states.
-func fdump(cs *Con***REMOVED***gState, w io.Writer, a ...interface{}) {
+// methods which take varying writers and config states.
+func fdump(cs *ConfigState, w io.Writer, a ...interface{}) {
 	for _, arg := range a {
 		if arg == nil {
 			w.Write(interfaceBytes)
@@ -470,21 +470,21 @@ func fdump(cs *Con***REMOVED***gState, w io.Writer, a ...interface{}) {
 // Fdump formats and displays the passed arguments to io.Writer w.  It formats
 // exactly the same as Dump.
 func Fdump(w io.Writer, a ...interface{}) {
-	fdump(&Con***REMOVED***g, w, a...)
+	fdump(&Config, w, a...)
 }
 
 // Sdump returns a string with the passed arguments formatted exactly the same
 // as Dump.
 func Sdump(a ...interface{}) string {
 	var buf bytes.Buffer
-	fdump(&Con***REMOVED***g, &buf, a...)
+	fdump(&Config, &buf, a...)
 	return buf.String()
 }
 
 /*
 Dump displays the passed parameters to standard out with newlines, customizable
 indentation, and additional debug information such as complete types and all
-pointer addresses used to indirect to the ***REMOVED***nal value.  It provides the
+pointer addresses used to indirect to the final value.  It provides the
 following features over the built-in printing facilities provided by the fmt
 package:
 
@@ -498,12 +498,12 @@ package:
 	* Byte arrays and slices are dumped like the hexdump -C command which
 	  includes offsets, byte values in hex, and ASCII output
 
-The con***REMOVED***guration options are controlled by an exported package global,
-spew.Con***REMOVED***g.  See Con***REMOVED***gState for options documentation.
+The configuration options are controlled by an exported package global,
+spew.Config.  See ConfigState for options documentation.
 
 See Fdump if you would prefer dumping to an arbitrary io.Writer or Sdump to
 get the formatted result as a string.
 */
 func Dump(a ...interface{}) {
-	fdump(&Con***REMOVED***g, os.Stdout, a...)
+	fdump(&Config, os.Stdout, a...)
 }

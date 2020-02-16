@@ -1,11 +1,11 @@
 // Copyright 2013 The Go Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE ***REMOVED***le.
+// license that can be found in the LICENSE file.
 
 package imports
 
 import (
-	"bu***REMOVED***o"
+	"bufio"
 	"bytes"
 	"fmt"
 	"go/ast"
@@ -16,7 +16,7 @@ import (
 	"log"
 	"os"
 	"path"
-	"path/***REMOVED***lepath"
+	"path/filepath"
 	"sort"
 	"strings"
 	"sync"
@@ -28,18 +28,18 @@ import (
 var Debug = false
 
 var (
-	inTests = false      // set true by ***REMOVED***x_test.go; if false, no need to use testMu
+	inTests = false      // set true by fix_test.go; if false, no need to use testMu
 	testMu  sync.RWMutex // guards globals reset by tests; used only if inTests
 )
 
-// LocalPre***REMOVED***x is a comma-separated string of import path pre***REMOVED***xes, which, if
-// set, instructs Process to sort the import paths with the given pre***REMOVED***xes
+// LocalPrefix is a comma-separated string of import path prefixes, which, if
+// set, instructs Process to sort the import paths with the given prefixes
 // into another group after 3rd-party packages.
-var LocalPre***REMOVED***x string
+var LocalPrefix string
 
-func localPre***REMOVED***xes() []string {
-	if LocalPre***REMOVED***x != "" {
-		return strings.Split(LocalPre***REMOVED***x, ",")
+func localPrefixes() []string {
+	if LocalPrefix != "" {
+		return strings.Split(LocalPrefix, ",")
 	}
 	return nil
 }
@@ -48,15 +48,15 @@ func localPre***REMOVED***xes() []string {
 // a group number.
 var importToGroup = []func(importPath string) (num int, ok bool){
 	func(importPath string) (num int, ok bool) {
-		for _, p := range localPre***REMOVED***xes() {
-			if strings.HasPre***REMOVED***x(importPath, p) || strings.TrimSuf***REMOVED***x(p, "/") == importPath {
+		for _, p := range localPrefixes() {
+			if strings.HasPrefix(importPath, p) || strings.TrimSuffix(p, "/") == importPath {
 				return 3, true
 			}
 		}
 		return
 	},
 	func(importPath string) (num int, ok bool) {
-		if strings.HasPre***REMOVED***x(importPath, "appengine") {
+		if strings.HasPrefix(importPath, "appengine") {
 			return 2, true
 		}
 		return
@@ -88,8 +88,8 @@ type importInfo struct {
 type packageInfo struct {
 	Globals map[string]bool       // symbol => true
 	Imports map[string]importInfo // pkg base name or alias => info
-	// refs are a set of package references currently satis***REMOVED***ed by imports.
-	// ***REMOVED***rst key: either base package (e.g. "fmt") or renamed package
+	// refs are a set of package references currently satisfied by imports.
+	// first key: either base package (e.g. "fmt") or renamed package
 	// second key: referenced package symbol (e.g. "Println")
 	Refs map[string]map[string]bool
 }
@@ -97,11 +97,11 @@ type packageInfo struct {
 // dirPackageInfo exposes the dirPackageInfoFile function so that it can be overridden.
 var dirPackageInfo = dirPackageInfoFile
 
-// dirPackageInfoFile gets information from other ***REMOVED***les in the package.
-func dirPackageInfoFile(pkgName, srcDir, ***REMOVED***lename string) (*packageInfo, error) {
-	considerTests := strings.HasSuf***REMOVED***x(***REMOVED***lename, "_test.go")
+// dirPackageInfoFile gets information from other files in the package.
+func dirPackageInfoFile(pkgName, srcDir, filename string) (*packageInfo, error) {
+	considerTests := strings.HasSuffix(filename, "_test.go")
 
-	***REMOVED***leBase := ***REMOVED***lepath.Base(***REMOVED***lename)
+	fileBase := filepath.Base(filename)
 	packageFileInfos, err := ioutil.ReadDir(srcDir)
 	if err != nil {
 		return nil, err
@@ -114,16 +114,16 @@ func dirPackageInfoFile(pkgName, srcDir, ***REMOVED***lename string) (*packageIn
 	}
 
 	visitor := collectReferences(info.Refs)
-	for _, ***REMOVED*** := range packageFileInfos {
-		if ***REMOVED***.Name() == ***REMOVED***leBase || !strings.HasSuf***REMOVED***x(***REMOVED***.Name(), ".go") {
+	for _, fi := range packageFileInfos {
+		if fi.Name() == fileBase || !strings.HasSuffix(fi.Name(), ".go") {
 			continue
 		}
-		if !considerTests && strings.HasSuf***REMOVED***x(***REMOVED***.Name(), "_test.go") {
+		if !considerTests && strings.HasSuffix(fi.Name(), "_test.go") {
 			continue
 		}
 
-		***REMOVED***leSet := token.NewFileSet()
-		root, err := parser.ParseFile(***REMOVED***leSet, ***REMOVED***lepath.Join(srcDir, ***REMOVED***.Name()), nil, 0)
+		fileSet := token.NewFileSet()
+		root, err := parser.ParseFile(fileSet, filepath.Join(srcDir, fi.Name()), nil, 0)
 		if err != nil {
 			continue
 		}
@@ -191,22 +191,22 @@ func collectReferences(refs map[string]map[string]bool) visitFn {
 	return visitor
 }
 
-func ***REMOVED***xImports(fset *token.FileSet, f *ast.File, ***REMOVED***lename string) (added []string, err error) {
-	// refs are a set of possible package references currently unsatis***REMOVED***ed by imports.
-	// ***REMOVED***rst key: either base package (e.g. "fmt") or renamed package
+func fixImports(fset *token.FileSet, f *ast.File, filename string) (added []string, err error) {
+	// refs are a set of possible package references currently unsatisfied by imports.
+	// first key: either base package (e.g. "fmt") or renamed package
 	// second key: referenced package symbol (e.g. "Println")
 	refs := make(map[string]map[string]bool)
 
 	// decls are the current package imports. key is base package or renamed package.
 	decls := make(map[string]*ast.ImportSpec)
 
-	abs, err := ***REMOVED***lepath.Abs(***REMOVED***lename)
+	abs, err := filepath.Abs(filename)
 	if err != nil {
 		return nil, err
 	}
-	srcDir := ***REMOVED***lepath.Dir(abs)
+	srcDir := filepath.Dir(abs)
 	if Debug {
-		log.Printf("***REMOVED***xImports(***REMOVED***lename=%q), abs=%q, srcDir=%q ...", ***REMOVED***lename, abs, srcDir)
+		log.Printf("fixImports(filename=%q), abs=%q, srcDir=%q ...", filename, abs, srcDir)
 	}
 
 	var packageInfo *packageInfo
@@ -245,7 +245,7 @@ func ***REMOVED***xImports(fset *token.FileSet, f *ast.File, ***REMOVED***lename
 			}
 			if !loadedPackageInfo {
 				loadedPackageInfo = true
-				packageInfo, _ = dirPackageInfo(f.Name.Name, srcDir, ***REMOVED***lename)
+				packageInfo, _ = dirPackageInfo(f.Name.Name, srcDir, filename)
 			}
 			if decls[pkgName] == nil && (packageInfo == nil || !packageInfo.Globals[pkgName]) {
 				refs[pkgName][v.Sel.Name] = true
@@ -288,7 +288,7 @@ func ***REMOVED***xImports(fset *token.FileSet, f *ast.File, ***REMOVED***lename
 
 	// Can assume this will be necessary in all cases now.
 	if !loadedPackageInfo {
-		packageInfo, _ = dirPackageInfo(f.Name.Name, srcDir, ***REMOVED***lename)
+		packageInfo, _ = dirPackageInfo(f.Name.Name, srcDir, filename)
 	}
 
 	// Search for imports matching potential package references.
@@ -313,7 +313,7 @@ func ***REMOVED***xImports(fset *token.FileSet, f *ast.File, ***REMOVED***lename
 					}
 				}
 			}
-			ipath, rename, err := ***REMOVED***ndImport(pkgName, symbols, ***REMOVED***lename)
+			ipath, rename, err := findImport(pkgName, symbols, filename)
 			r := result{ipath: ipath, err: err}
 			if rename {
 				r.name = pkgName
@@ -330,7 +330,7 @@ func ***REMOVED***xImports(fset *token.FileSet, f *ast.File, ***REMOVED***lename
 		if result.ipath != "" {
 			if result.name != "" {
 				astutil.AddNamedImport(fset, f, result.name, result.ipath)
-			} ***REMOVED*** {
+			} else {
 				astutil.AddImport(fset, f, result.ipath)
 			}
 			added = append(added, result.ipath)
@@ -348,7 +348,7 @@ func importPathToNameBasic(importPath, srcDir string) (packageName string) {
 	return path.Base(importPath)
 }
 
-// importPathToNameGoPath ***REMOVED***nds out the actual package name, as declared in its .go ***REMOVED***les.
+// importPathToNameGoPath finds out the actual package name, as declared in its .go files.
 // If there's a problem, it falls back to using importPathToNameBasic.
 func importPathToNameGoPath(importPath, srcDir string) (packageName string) {
 	// Fast path for standard library without going to disk.
@@ -368,8 +368,8 @@ func importPathToNameGoPath(importPath, srcDir string) (packageName string) {
 
 // importPathToNameGoPathParse is a faster version of build.Import if
 // the only thing desired is the package name. It uses build.FindOnly
-// to ***REMOVED***nd the directory and then only parses one ***REMOVED***le in the package,
-// trusting that the ***REMOVED***les in the directory are consistent.
+// to find the directory and then only parses one file in the package,
+// trusting that the files in the directory are consistent.
 func importPathToNameGoPathParse(importPath, srcDir string) (packageName string, err error) {
 	buildPkg, err := build.Import(importPath, srcDir, build.FindOnly)
 	if err != nil {
@@ -386,16 +386,16 @@ func importPathToNameGoPathParse(importPath, srcDir string) (packageName string,
 	}
 	sort.Strings(names) // to have predictable behavior
 	var lastErr error
-	var n***REMOVED***le int
+	var nfile int
 	for _, name := range names {
-		if !strings.HasSuf***REMOVED***x(name, ".go") {
+		if !strings.HasSuffix(name, ".go") {
 			continue
 		}
-		if strings.HasSuf***REMOVED***x(name, "_test.go") {
+		if strings.HasSuffix(name, "_test.go") {
 			continue
 		}
-		n***REMOVED***le++
-		fullFile := ***REMOVED***lepath.Join(buildPkg.Dir, name)
+		nfile++
+		fullFile := filepath.Join(buildPkg.Dir, name)
 
 		fset := token.NewFileSet()
 		f, err := parser.ParseFile(fset, fullFile, nil, parser.PackageClauseOnly)
@@ -419,7 +419,7 @@ func importPathToNameGoPathParse(importPath, srcDir string) (packageName string,
 	if lastErr != nil {
 		return "", lastErr
 	}
-	return "", fmt.Errorf("no importable package found in %d Go ***REMOVED***les", n***REMOVED***le)
+	return "", fmt.Errorf("no importable package found in %d Go files", nfile)
 }
 
 var stdImportPackage = map[string]string{} // "net/http" => "http"
@@ -450,7 +450,7 @@ var (
 )
 
 type pkg struct {
-	dir             string // absolute ***REMOVED***le path to pkg directory ("/usr/lib/go/src/net/http")
+	dir             string // absolute file path to pkg directory ("/usr/lib/go/src/net/http")
 	importPath      string // full pkg import path ("net/http", "foo/bar/vendor/a/b")
 	importPathShort string // vendorless import path ("net/http", "a/b")
 	distance        int    // relative distance to target
@@ -482,75 +482,75 @@ func (s byDistanceOrImportPathShortLength) Less(i, j int) bool {
 func (s byDistanceOrImportPathShortLength) Swap(i, j int) { s[i], s[j] = s[j], s[i] }
 
 func distance(basepath, targetpath string) int {
-	p, err := ***REMOVED***lepath.Rel(basepath, targetpath)
+	p, err := filepath.Rel(basepath, targetpath)
 	if err != nil {
 		return -1
 	}
 	if p == "." {
 		return 0
 	}
-	return strings.Count(p, string(***REMOVED***lepath.Separator)) + 1
+	return strings.Count(p, string(filepath.Separator)) + 1
 }
 
 // guarded by populateIgnoreOnce; populates ignoredDirs.
 func populateIgnore() {
 	for _, srcDir := range build.Default.SrcDirs() {
-		if srcDir == ***REMOVED***lepath.Join(build.Default.GOROOT, "src") {
+		if srcDir == filepath.Join(build.Default.GOROOT, "src") {
 			continue
 		}
 		populateIgnoredDirs(srcDir)
 	}
 }
 
-// populateIgnoredDirs reads an optional con***REMOVED***g ***REMOVED***le at <path>/.goimportsignore
-// of relative directories to ignore when scanning for go ***REMOVED***les.
+// populateIgnoredDirs reads an optional config file at <path>/.goimportsignore
+// of relative directories to ignore when scanning for go files.
 // The provided path is one of the $GOPATH entries with "src" appended.
 func populateIgnoredDirs(path string) {
-	***REMOVED***le := ***REMOVED***lepath.Join(path, ".goimportsignore")
-	slurp, err := ioutil.ReadFile(***REMOVED***le)
+	file := filepath.Join(path, ".goimportsignore")
+	slurp, err := ioutil.ReadFile(file)
 	if Debug {
 		if err != nil {
 			log.Print(err)
-		} ***REMOVED*** {
-			log.Printf("Read %s", ***REMOVED***le)
+		} else {
+			log.Printf("Read %s", file)
 		}
 	}
 	if err != nil {
 		return
 	}
-	bs := bu***REMOVED***o.NewScanner(bytes.NewReader(slurp))
+	bs := bufio.NewScanner(bytes.NewReader(slurp))
 	for bs.Scan() {
 		line := strings.TrimSpace(bs.Text())
-		if line == "" || strings.HasPre***REMOVED***x(line, "#") {
+		if line == "" || strings.HasPrefix(line, "#") {
 			continue
 		}
-		full := ***REMOVED***lepath.Join(path, line)
-		if ***REMOVED***, err := os.Stat(full); err == nil {
-			ignoredDirs = append(ignoredDirs, ***REMOVED***)
+		full := filepath.Join(path, line)
+		if fi, err := os.Stat(full); err == nil {
+			ignoredDirs = append(ignoredDirs, fi)
 			if Debug {
 				log.Printf("Directory added to ignore list: %s", full)
 			}
-		} ***REMOVED*** if Debug {
+		} else if Debug {
 			log.Printf("Error statting entry in .goimportsignore: %v", err)
 		}
 	}
 }
 
-func skipDir(***REMOVED*** os.FileInfo) bool {
+func skipDir(fi os.FileInfo) bool {
 	for _, ignoredDir := range ignoredDirs {
-		if os.SameFile(***REMOVED***, ignoredDir) {
+		if os.SameFile(fi, ignoredDir) {
 			return true
 		}
 	}
 	return false
 }
 
-// shouldTraverse reports whether the symlink ***REMOVED*** should, found in dir,
+// shouldTraverse reports whether the symlink fi should, found in dir,
 // should be followed.  It makes sure symlinks were never visited
 // before to avoid symlink loops.
-func shouldTraverse(dir string, ***REMOVED*** os.FileInfo) bool {
-	path := ***REMOVED***lepath.Join(dir, ***REMOVED***.Name())
-	target, err := ***REMOVED***lepath.EvalSymlinks(path)
+func shouldTraverse(dir string, fi os.FileInfo) bool {
+	path := filepath.Join(dir, fi.Name())
+	target, err := filepath.EvalSymlinks(path)
 	if err != nil {
 		if !os.IsNotExist(err) {
 			fmt.Fprintln(os.Stderr, err)
@@ -569,9 +569,9 @@ func shouldTraverse(dir string, ***REMOVED*** os.FileInfo) bool {
 		return false
 	}
 	// Check for symlink loops by statting each directory component
-	// and seeing if any are the same ***REMOVED***le as ts.
+	// and seeing if any are the same file as ts.
 	for {
-		parent := ***REMOVED***lepath.Dir(path)
+		parent := filepath.Dir(path)
 		if parent == path {
 			// Made it to the root without seeing a cycle.
 			// Use this symlink.
@@ -619,25 +619,25 @@ func scanGoDirs(goRoot bool) {
 	dirScanMu.Unlock()
 
 	for _, srcDir := range build.Default.SrcDirs() {
-		isGoroot := srcDir == ***REMOVED***lepath.Join(build.Default.GOROOT, "src")
+		isGoroot := srcDir == filepath.Join(build.Default.GOROOT, "src")
 		if isGoroot != goRoot {
 			continue
 		}
 		testHookScanDir(srcDir)
 		walkFn := func(path string, typ os.FileMode) error {
-			dir := ***REMOVED***lepath.Dir(path)
+			dir := filepath.Dir(path)
 			if typ.IsRegular() {
 				if dir == srcDir {
-					// Doesn't make sense to have regular ***REMOVED***les
+					// Doesn't make sense to have regular files
 					// directly in your $GOPATH/src or $GOROOT/src.
 					return nil
 				}
-				if !strings.HasSuf***REMOVED***x(path, ".go") {
+				if !strings.HasSuffix(path, ".go") {
 					return nil
 				}
 				dirScanMu.Lock()
 				if _, dup := dirScan[dir]; !dup {
-					importpath := ***REMOVED***lepath.ToSlash(dir[len(srcDir)+len("/"):])
+					importpath := filepath.ToSlash(dir[len(srcDir)+len("/"):])
 					dirScan[dir] = &pkg{
 						importPath:      importpath,
 						importPathShort: vendorlessImportPath(importpath),
@@ -648,32 +648,32 @@ func scanGoDirs(goRoot bool) {
 				return nil
 			}
 			if typ == os.ModeDir {
-				base := ***REMOVED***lepath.Base(path)
+				base := filepath.Base(path)
 				if base == "" || base[0] == '.' || base[0] == '_' ||
 					base == "testdata" || base == "node_modules" {
-					return ***REMOVED***lepath.SkipDir
+					return filepath.SkipDir
 				}
-				***REMOVED***, err := os.Lstat(path)
-				if err == nil && skipDir(***REMOVED***) {
+				fi, err := os.Lstat(path)
+				if err == nil && skipDir(fi) {
 					if Debug {
-						log.Printf("skipping directory %q under %s", ***REMOVED***.Name(), dir)
+						log.Printf("skipping directory %q under %s", fi.Name(), dir)
 					}
-					return ***REMOVED***lepath.SkipDir
+					return filepath.SkipDir
 				}
 				return nil
 			}
 			if typ == os.ModeSymlink {
-				base := ***REMOVED***lepath.Base(path)
-				if strings.HasPre***REMOVED***x(base, ".#") {
+				base := filepath.Base(path)
+				if strings.HasPrefix(base, ".#") {
 					// Emacs noise.
 					return nil
 				}
-				***REMOVED***, err := os.Lstat(path)
+				fi, err := os.Lstat(path)
 				if err != nil {
 					// Just ignore it.
 					return nil
 				}
-				if shouldTraverse(dir, ***REMOVED***) {
+				if shouldTraverse(dir, fi) {
 					return traverseLink
 				}
 			}
@@ -692,7 +692,7 @@ func vendorlessImportPath(ipath string) string {
 	if i := strings.LastIndex(ipath, "/vendor/"); i >= 0 {
 		return ipath[i+len("/vendor/"):]
 	}
-	if strings.HasPre***REMOVED***x(ipath, "vendor/") {
+	if strings.HasPrefix(ipath, "vendor/") {
 		return ipath[len("vendor/"):]
 	}
 	return ipath
@@ -710,8 +710,8 @@ func loadExportsGoPath(expectPackage, dir string) map[string]bool {
 
 	ctx := build.Default
 
-	// ReadDir is like ioutil.ReadDir, but only returns *.go ***REMOVED***les
-	// and ***REMOVED***lters out _test.go ***REMOVED***les since they're not relevant
+	// ReadDir is like ioutil.ReadDir, but only returns *.go files
+	// and filters out _test.go files since they're not relevant
 	// and only slow things down.
 	ctx.ReadDir = func(dir string) (notTests []os.FileInfo, err error) {
 		all, err := ioutil.ReadDir(dir)
@@ -719,16 +719,16 @@ func loadExportsGoPath(expectPackage, dir string) map[string]bool {
 			return nil, err
 		}
 		notTests = all[:0]
-		for _, ***REMOVED*** := range all {
-			name := ***REMOVED***.Name()
-			if strings.HasSuf***REMOVED***x(name, ".go") && !strings.HasSuf***REMOVED***x(name, "_test.go") {
-				notTests = append(notTests, ***REMOVED***)
+		for _, fi := range all {
+			name := fi.Name()
+			if strings.HasSuffix(name, ".go") && !strings.HasSuffix(name, "_test.go") {
+				notTests = append(notTests, fi)
 			}
 		}
 		return notTests, nil
 	}
 
-	***REMOVED***les, err := ctx.ReadDir(dir)
+	files, err := ctx.ReadDir(dir)
 	if err != nil {
 		log.Print(err)
 		return nil
@@ -736,12 +736,12 @@ func loadExportsGoPath(expectPackage, dir string) map[string]bool {
 
 	fset := token.NewFileSet()
 
-	for _, ***REMOVED*** := range ***REMOVED***les {
-		match, err := ctx.MatchFile(dir, ***REMOVED***.Name())
+	for _, fi := range files {
+		match, err := ctx.MatchFile(dir, fi.Name())
 		if err != nil || !match {
 			continue
 		}
-		fullFile := ***REMOVED***lepath.Join(dir, ***REMOVED***.Name())
+		fullFile := filepath.Join(dir, fi.Name())
 		f, err := parser.ParseFile(fset, fullFile, nil, 0)
 		if err != nil {
 			if Debug {
@@ -779,75 +779,75 @@ func loadExportsGoPath(expectPackage, dir string) map[string]bool {
 	return exports
 }
 
-// ***REMOVED***ndImport searches for a package with the given symbols.
-// If no package is found, ***REMOVED***ndImport returns ("", false, nil)
+// findImport searches for a package with the given symbols.
+// If no package is found, findImport returns ("", false, nil)
 //
 // This is declared as a variable rather than a function so goimports
-// can be easily extended by adding a ***REMOVED***le with an init function.
+// can be easily extended by adding a file with an init function.
 //
 // The rename value tells goimports whether to use the package name as
-// a local quali***REMOVED***er in an import. For example, if ***REMOVED***ndImports("pkg",
+// a local qualifier in an import. For example, if findImports("pkg",
 // "X") returns ("foo/bar", rename=true), then goimports adds the
 // import line:
 // 	import pkg "foo/bar"
-// to satisfy uses of pkg.X in the ***REMOVED***le.
-var ***REMOVED***ndImport func(pkgName string, symbols map[string]bool, ***REMOVED***lename string) (foundPkg string, rename bool, err error) = ***REMOVED***ndImportGoPath
+// to satisfy uses of pkg.X in the file.
+var findImport func(pkgName string, symbols map[string]bool, filename string) (foundPkg string, rename bool, err error) = findImportGoPath
 
-// ***REMOVED***ndImportGoPath is the normal implementation of ***REMOVED***ndImport.
+// findImportGoPath is the normal implementation of findImport.
 // (Some companies have their own internally.)
-func ***REMOVED***ndImportGoPath(pkgName string, symbols map[string]bool, ***REMOVED***lename string) (foundPkg string, rename bool, err error) {
+func findImportGoPath(pkgName string, symbols map[string]bool, filename string) (foundPkg string, rename bool, err error) {
 	if inTests {
 		testMu.RLock()
 		defer testMu.RUnlock()
 	}
 
-	pkgDir, err := ***REMOVED***lepath.Abs(***REMOVED***lename)
+	pkgDir, err := filepath.Abs(filename)
 	if err != nil {
 		return "", false, err
 	}
-	pkgDir = ***REMOVED***lepath.Dir(pkgDir)
+	pkgDir = filepath.Dir(pkgDir)
 
 	// Fast path for the standard library.
 	// In the common case we hopefully never have to scan the GOPATH, which can
 	// be slow with moving disks.
-	if pkg, ok := ***REMOVED***ndImportStdlib(pkgName, symbols); ok {
+	if pkg, ok := findImportStdlib(pkgName, symbols); ok {
 		return pkg, false, nil
 	}
 	if pkgName == "rand" && symbols["Read"] {
 		// Special-case rand.Read.
 		//
-		// If ***REMOVED***ndImportStdlib didn't ***REMOVED***nd it above, don't go
-		// searching for it, lest it ***REMOVED***nd and pick math/rand
+		// If findImportStdlib didn't find it above, don't go
+		// searching for it, lest it find and pick math/rand
 		// in GOROOT (new as of Go 1.6)
 		//
 		// crypto/rand is the safer choice.
 		return "", false, nil
 	}
 
-	// TODO(sameer): look at the import lines for other Go ***REMOVED***les in the
+	// TODO(sameer): look at the import lines for other Go files in the
 	// local directory, since the user is likely to import the same packages
-	// in the current Go ***REMOVED***le.  Return rename=true when the other Go ***REMOVED***les
-	// use a renamed package that's also used in the current ***REMOVED***le.
+	// in the current Go file.  Return rename=true when the other Go files
+	// use a renamed package that's also used in the current file.
 
-	// Read all the $GOPATH/src/.goimportsignore ***REMOVED***les before scanning directories.
+	// Read all the $GOPATH/src/.goimportsignore files before scanning directories.
 	populateIgnoreOnce.Do(populateIgnore)
 
 	// Start scanning the $GOROOT asynchronously, then run the
 	// GOPATH scan synchronously if needed, and then wait for the
-	// $GOROOT to ***REMOVED***nish.
+	// $GOROOT to finish.
 	//
-	// TODO(brad***REMOVED***tz): run each $GOPATH entry async. But nobody
+	// TODO(bradfitz): run each $GOPATH entry async. But nobody
 	// really has more than one anyway, so low priority.
 	scanGoRootOnce.Do(scanGoRoot) // async
-	if !***REMOVED***leInDir(***REMOVED***lename, build.Default.GOROOT) {
+	if !fileInDir(filename, build.Default.GOROOT) {
 		scanGoPathOnce.Do(scanGoPath) // blocking
 	}
 	<-scanGoRootDone
 
-	// Find candidate packages, looking only at their directory names ***REMOVED***rst.
+	// Find candidate packages, looking only at their directory names first.
 	var candidates []*pkg
 	for _, pkg := range dirScan {
-		if pkgIsCandidate(***REMOVED***lename, pkgName, pkg) {
+		if pkgIsCandidate(filename, pkgName, pkg) {
 			pkg.distance = distance(pkgDir, pkg.dir)
 			candidates = append(candidates, pkg)
 		}
@@ -866,7 +866,7 @@ func ***REMOVED***ndImportGoPath(pkgName string, symbols map[string]bool, ***REM
 
 	// Collect exports for packages with matching names.
 
-	done := make(chan struct{}) // closed when we ***REMOVED***nd the answer
+	done := make(chan struct{}) // closed when we find the answer
 	defer close(done)
 
 	rescv := make([]chan *pkg, len(candidates))
@@ -927,20 +927,20 @@ func ***REMOVED***ndImportGoPath(pkgName string, symbols map[string]bool, ***REM
 }
 
 // pkgIsCandidate reports whether pkg is a candidate for satisfying the
-// ***REMOVED***nding which package pkgIdent in the ***REMOVED***le named by ***REMOVED***lename is trying
+// finding which package pkgIdent in the file named by filename is trying
 // to refer to.
 //
 // This check is purely lexical and is meant to be as fast as possible
-// because it's run over all $GOPATH directories to ***REMOVED***lter out poor
+// because it's run over all $GOPATH directories to filter out poor
 // candidates in order to limit the CPU and I/O later parsing the
 // exports in candidate packages.
 //
-// ***REMOVED***lename is the ***REMOVED***le being formatted.
+// filename is the file being formatted.
 // pkgIdent is the package being searched for, like "client" (if
 // searching for "client.New")
-func pkgIsCandidate(***REMOVED***lename, pkgIdent string, pkg *pkg) bool {
+func pkgIsCandidate(filename, pkgIdent string, pkg *pkg) bool {
 	// Check "internal" and "vendor" visibility:
-	if !canUse(***REMOVED***lename, pkg.dir) {
+	if !canUse(filename, pkg.dir) {
 		return false
 	}
 
@@ -996,9 +996,9 @@ func lowerASCIIAndRemoveHyphen(s string) (ret string) {
 	return string(buf)
 }
 
-// canUse reports whether the package in dir is usable from ***REMOVED***lename,
+// canUse reports whether the package in dir is usable from filename,
 // respecting the Go "internal" and "vendor" visibility rules.
-func canUse(***REMOVED***lename, dir string) bool {
+func canUse(filename, dir string) bool {
 	// Fast path check, before any allocations. If it doesn't contain vendor
 	// or internal, it's not tricky:
 	// Note that this can false-negative on directories like "notinternal",
@@ -1007,8 +1007,8 @@ func canUse(***REMOVED***lename, dir string) bool {
 		return true
 	}
 
-	dirSlash := ***REMOVED***lepath.ToSlash(dir)
-	if !strings.Contains(dirSlash, "/vendor/") && !strings.Contains(dirSlash, "/internal/") && !strings.HasSuf***REMOVED***x(dirSlash, "/internal") {
+	dirSlash := filepath.ToSlash(dir)
+	if !strings.Contains(dirSlash, "/vendor/") && !strings.Contains(dirSlash, "/internal/") && !strings.HasSuffix(dirSlash, "/internal") {
 		return true
 	}
 	// Vendor or internal directory only visible from children of parent.
@@ -1017,23 +1017,23 @@ func canUse(***REMOVED***lename, dir string) bool {
 	// or bar/vendor or bar/internal.
 	// After stripping all the leading ../, the only okay place to see vendor or internal
 	// is at the very beginning of the path.
-	abs***REMOVED***le, err := ***REMOVED***lepath.Abs(***REMOVED***lename)
+	absfile, err := filepath.Abs(filename)
 	if err != nil {
 		return false
 	}
-	absdir, err := ***REMOVED***lepath.Abs(dir)
+	absdir, err := filepath.Abs(dir)
 	if err != nil {
 		return false
 	}
-	rel, err := ***REMOVED***lepath.Rel(abs***REMOVED***le, absdir)
+	rel, err := filepath.Rel(absfile, absdir)
 	if err != nil {
 		return false
 	}
-	relSlash := ***REMOVED***lepath.ToSlash(rel)
+	relSlash := filepath.ToSlash(rel)
 	if i := strings.LastIndex(relSlash, "../"); i >= 0 {
 		relSlash = relSlash[i+len("../"):]
 	}
-	return !strings.Contains(relSlash, "/vendor/") && !strings.Contains(relSlash, "/internal/") && !strings.HasSuf***REMOVED***x(relSlash, "/internal")
+	return !strings.Contains(relSlash, "/vendor/") && !strings.Contains(relSlash, "/internal/") && !strings.HasSuffix(relSlash, "/internal")
 }
 
 // lastTwoComponents returns at most the last two path components
@@ -1057,7 +1057,7 @@ func (fn visitFn) Visit(node ast.Node) ast.Visitor {
 	return fn(node)
 }
 
-func ***REMOVED***ndImportStdlib(shortPkg string, symbols map[string]bool) (importPath string, ok bool) {
+func findImportStdlib(shortPkg string, symbols map[string]bool) (importPath string, ok bool) {
 	for symbol := range symbols {
 		key := shortPkg + "." + symbol
 		path := stdlib[key]
@@ -1079,14 +1079,14 @@ func ***REMOVED***ndImportStdlib(shortPkg string, symbols map[string]bool) (impo
 	return importPath, importPath != ""
 }
 
-// ***REMOVED***leInDir reports whether the provided ***REMOVED***le path looks like
-// it's in dir. (without hitting the ***REMOVED***lesystem)
-func ***REMOVED***leInDir(***REMOVED***le, dir string) bool {
-	rest := strings.TrimPre***REMOVED***x(***REMOVED***le, dir)
-	if len(rest) == len(***REMOVED***le) {
-		// dir is not a pre***REMOVED***x of ***REMOVED***le.
+// fileInDir reports whether the provided file path looks like
+// it's in dir. (without hitting the filesystem)
+func fileInDir(file, dir string) bool {
+	rest := strings.TrimPrefix(file, dir)
+	if len(rest) == len(file) {
+		// dir is not a prefix of file.
 		return false
 	}
-	// Check for boundary: either nothing (***REMOVED***le == dir), or a slash.
+	// Check for boundary: either nothing (file == dir), or a slash.
 	return len(rest) == 0 || rest[0] == '/' || rest[0] == '\\'
 }

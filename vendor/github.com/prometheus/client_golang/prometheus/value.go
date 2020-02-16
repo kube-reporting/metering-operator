@@ -1,6 +1,6 @@
 // Copyright 2014 The Prometheus Authors
 // Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this ***REMOVED***le except in compliance with the License.
+// you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 //
 // http://www.apache.org/licenses/LICENSE-2.0
@@ -8,7 +8,7 @@
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the speci***REMOVED***c language governing permissions and
+// See the License for the specific language governing permissions and
 // limitations under the License.
 
 package prometheus
@@ -42,7 +42,7 @@ const (
 // implementations of Counter, Gauge, and Untyped.
 type value struct {
 	// valBits contains the bits of the represented float64 value. It has
-	// to go ***REMOVED***rst in the struct to guarantee alignment for atomic
+	// to go first in the struct to guarantee alignment for atomic
 	// operations.  http://golang.org/pkg/sync/atomic/#pkg-note-BUG
 	valBits uint64
 
@@ -148,7 +148,7 @@ func (v *valueFunc) Write(out *dto.Metric) error {
 	return populateMetric(v.valType, v.function(), v.labelPairs, out)
 }
 
-// NewConstMetric returns a metric with one ***REMOVED***xed value that cannot be
+// NewConstMetric returns a metric with one fixed value that cannot be
 // changed. Users of this package will not have much use for it in regular
 // operations. However, when implementing custom Collectors, it is useful as a
 // throw-away metric that is generated on the fly to send it to Prometheus in

@@ -5,16 +5,16 @@
 /*
 Package app_identity is a generated protocol buffer package.
 
-It is generated from these ***REMOVED***les:
+It is generated from these files:
 	google.golang.org/appengine/internal/app_identity/app_identity_service.proto
 
 It has these top-level messages:
 	AppIdentityServiceError
 	SignForAppRequest
 	SignForAppResponse
-	GetPublicCerti***REMOVED***cateForAppRequest
-	PublicCerti***REMOVED***cate
-	GetPublicCerti***REMOVED***cateForAppResponse
+	GetPublicCertificateForAppRequest
+	PublicCertificate
+	GetPublicCertificateForAppResponse
 	GetServiceAccountNameRequest
 	GetServiceAccountNameResponse
 	GetAccessTokenRequest
@@ -132,56 +132,56 @@ func (m *SignForAppResponse) GetSignatureBytes() []byte {
 	return nil
 }
 
-type GetPublicCerti***REMOVED***cateForAppRequest struct {
+type GetPublicCertificateForAppRequest struct {
 	XXX_unrecognized []byte `json:"-"`
 }
 
-func (m *GetPublicCerti***REMOVED***cateForAppRequest) Reset()         { *m = GetPublicCerti***REMOVED***cateForAppRequest{} }
-func (m *GetPublicCerti***REMOVED***cateForAppRequest) String() string { return proto.CompactTextString(m) }
-func (*GetPublicCerti***REMOVED***cateForAppRequest) ProtoMessage()    {}
+func (m *GetPublicCertificateForAppRequest) Reset()         { *m = GetPublicCertificateForAppRequest{} }
+func (m *GetPublicCertificateForAppRequest) String() string { return proto.CompactTextString(m) }
+func (*GetPublicCertificateForAppRequest) ProtoMessage()    {}
 
-type PublicCerti***REMOVED***cate struct {
+type PublicCertificate struct {
 	KeyName            *string `protobuf:"bytes,1,opt,name=key_name" json:"key_name,omitempty"`
-	X509Certi***REMOVED***catePem *string `protobuf:"bytes,2,opt,name=x509_certi***REMOVED***cate_pem" json:"x509_certi***REMOVED***cate_pem,omitempty"`
+	X509CertificatePem *string `protobuf:"bytes,2,opt,name=x509_certificate_pem" json:"x509_certificate_pem,omitempty"`
 	XXX_unrecognized   []byte  `json:"-"`
 }
 
-func (m *PublicCerti***REMOVED***cate) Reset()         { *m = PublicCerti***REMOVED***cate{} }
-func (m *PublicCerti***REMOVED***cate) String() string { return proto.CompactTextString(m) }
-func (*PublicCerti***REMOVED***cate) ProtoMessage()    {}
+func (m *PublicCertificate) Reset()         { *m = PublicCertificate{} }
+func (m *PublicCertificate) String() string { return proto.CompactTextString(m) }
+func (*PublicCertificate) ProtoMessage()    {}
 
-func (m *PublicCerti***REMOVED***cate) GetKeyName() string {
+func (m *PublicCertificate) GetKeyName() string {
 	if m != nil && m.KeyName != nil {
 		return *m.KeyName
 	}
 	return ""
 }
 
-func (m *PublicCerti***REMOVED***cate) GetX509Certi***REMOVED***catePem() string {
-	if m != nil && m.X509Certi***REMOVED***catePem != nil {
-		return *m.X509Certi***REMOVED***catePem
+func (m *PublicCertificate) GetX509CertificatePem() string {
+	if m != nil && m.X509CertificatePem != nil {
+		return *m.X509CertificatePem
 	}
 	return ""
 }
 
-type GetPublicCerti***REMOVED***cateForAppResponse struct {
-	PublicCerti***REMOVED***cateList      []*PublicCerti***REMOVED***cate `protobuf:"bytes,1,rep,name=public_certi***REMOVED***cate_list" json:"public_certi***REMOVED***cate_list,omitempty"`
+type GetPublicCertificateForAppResponse struct {
+	PublicCertificateList      []*PublicCertificate `protobuf:"bytes,1,rep,name=public_certificate_list" json:"public_certificate_list,omitempty"`
 	MaxClientCacheTimeInSecond *int64               `protobuf:"varint,2,opt,name=max_client_cache_time_in_second" json:"max_client_cache_time_in_second,omitempty"`
 	XXX_unrecognized           []byte               `json:"-"`
 }
 
-func (m *GetPublicCerti***REMOVED***cateForAppResponse) Reset()         { *m = GetPublicCerti***REMOVED***cateForAppResponse{} }
-func (m *GetPublicCerti***REMOVED***cateForAppResponse) String() string { return proto.CompactTextString(m) }
-func (*GetPublicCerti***REMOVED***cateForAppResponse) ProtoMessage()    {}
+func (m *GetPublicCertificateForAppResponse) Reset()         { *m = GetPublicCertificateForAppResponse{} }
+func (m *GetPublicCertificateForAppResponse) String() string { return proto.CompactTextString(m) }
+func (*GetPublicCertificateForAppResponse) ProtoMessage()    {}
 
-func (m *GetPublicCerti***REMOVED***cateForAppResponse) GetPublicCerti***REMOVED***cateList() []*PublicCerti***REMOVED***cate {
+func (m *GetPublicCertificateForAppResponse) GetPublicCertificateList() []*PublicCertificate {
 	if m != nil {
-		return m.PublicCerti***REMOVED***cateList
+		return m.PublicCertificateList
 	}
 	return nil
 }
 
-func (m *GetPublicCerti***REMOVED***cateForAppResponse) GetMaxClientCacheTimeInSecond() int64 {
+func (m *GetPublicCertificateForAppResponse) GetMaxClientCacheTimeInSecond() int64 {
 	if m != nil && m.MaxClientCacheTimeInSecond != nil {
 		return *m.MaxClientCacheTimeInSecond
 	}

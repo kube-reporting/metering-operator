@@ -41,23 +41,23 @@ type EC2Metadata struct {
 //     // Create a EC2Metadata client from just a session.
 //     svc := ec2metadata.New(mySession)
 //
-//     // Create a EC2Metadata client with additional con***REMOVED***guration
-//     svc := ec2metadata.New(mySession, aws.NewCon***REMOVED***g().WithLogLevel(aws.LogDebugHTTPBody))
-func New(p client.Con***REMOVED***gProvider, cfgs ...*aws.Con***REMOVED***g) *EC2Metadata {
-	c := p.ClientCon***REMOVED***g(ServiceName, cfgs...)
-	return NewClient(*c.Con***REMOVED***g, c.Handlers, c.Endpoint, c.SigningRegion)
+//     // Create a EC2Metadata client with additional configuration
+//     svc := ec2metadata.New(mySession, aws.NewConfig().WithLogLevel(aws.LogDebugHTTPBody))
+func New(p client.ConfigProvider, cfgs ...*aws.Config) *EC2Metadata {
+	c := p.ClientConfig(ServiceName, cfgs...)
+	return NewClient(*c.Config, c.Handlers, c.Endpoint, c.SigningRegion)
 }
 
 // NewClient returns a new EC2Metadata client. Should be used to create
 // a client when not using a session. Generally using just New with a session
 // is preferred.
 //
-// If an unmodi***REMOVED***ed HTTP client is provided from the stdlib default, or no client
+// If an unmodified HTTP client is provided from the stdlib default, or no client
 // the EC2RoleProvider's EC2Metadata HTTP client's timeout will be shortened.
-// To disable this set Con***REMOVED***g.EC2MetadataDisableTimeoutOverride to false. Enabled by default.
-func NewClient(cfg aws.Con***REMOVED***g, handlers request.Handlers, endpoint, signingRegion string, opts ...func(*client.Client)) *EC2Metadata {
+// To disable this set Config.EC2MetadataDisableTimeoutOverride to false. Enabled by default.
+func NewClient(cfg aws.Config, handlers request.Handlers, endpoint, signingRegion string, opts ...func(*client.Client)) *EC2Metadata {
 	if !aws.BoolValue(cfg.EC2MetadataDisableTimeoutOverride) && httpClientZero(cfg.HTTPClient) {
-		// If the http client is unmodi***REMOVED***ed and this feature is not disabled
+		// If the http client is unmodified and this feature is not disabled
 		// set custom timeouts for EC2Metadata requests.
 		cfg.HTTPClient = &http.Client{
 			// use a shorter timeout than default because the metadata
@@ -103,7 +103,7 @@ func NewClient(cfg aws.Con***REMOVED***g, handlers request.Handlers, endpoint, s
 		})
 	}
 
-	// Add additional options to the service con***REMOVED***g
+	// Add additional options to the service config
 	for _, option := range opts {
 		option(svc.Client)
 	}

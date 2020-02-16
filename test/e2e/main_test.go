@@ -4,7 +4,7 @@ import (
 	"flag"
 	"fmt"
 	"os"
-	"path/***REMOVED***lepath"
+	"path/filepath"
 	"strings"
 	"testing"
 	"time"
@@ -27,7 +27,7 @@ import (
 var (
 	df *deployframework.DeployFramework
 
-	kubeCon***REMOVED***g    string
+	kubeConfig    string
 	logLevel      string
 	runTestsLocal bool
 	runDevSetup   bool
@@ -36,12 +36,12 @@ var (
 	meteringOperatorImageTag   string
 	reportingOperatorImageRepo string
 	reportingOperatorImageTag  string
-	namespacePre***REMOVED***x            string
+	namespacePrefix            string
 	testOutputPath             string
 	repoPath                   string
 
 	kubeNamespaceCharLimit   = 63
-	namespacePre***REMOVED***xCharLimit = 10
+	namespacePrefixCharLimit = 10
 )
 
 func init() {
@@ -54,10 +54,10 @@ func init() {
 }
 
 func TestMain(m *testing.M) {
-	flag.StringVar(&kubeCon***REMOVED***g, "kubecon***REMOVED***g", "", "kube con***REMOVED***g path, e.g. $HOME/.kube/con***REMOVED***g")
+	flag.StringVar(&kubeConfig, "kubeconfig", "", "kube config path, e.g. $HOME/.kube/config")
 	flag.StringVar(&logLevel, "log-level", logrus.DebugLevel.String(), "The log level")
 	flag.BoolVar(&runTestsLocal, "run-tests-local", false, "Controls whether the metering and reporting operators are run locally during tests")
-	flag.BoolVar(&runDevSetup, "run-dev-setup", false, "Controls whether the e2e suite uses the dev-friendly con***REMOVED***guration")
+	flag.BoolVar(&runDevSetup, "run-dev-setup", false, "Controls whether the e2e suite uses the dev-friendly configuration")
 	flag.BoolVar(&runAWSBillingTests, "run-aws-billing-tests", runAWSBillingTests, "")
 
 	flag.StringVar(&meteringOperatorImageRepo, "metering-operator-image-repo", meteringOperatorImageRepo, "")
@@ -65,19 +65,19 @@ func TestMain(m *testing.M) {
 	flag.StringVar(&reportingOperatorImageRepo, "reporting-operator-image-repo", reportingOperatorImageRepo, "")
 	flag.StringVar(&reportingOperatorImageTag, "reporting-operator-image-tag", reportingOperatorImageTag, "")
 
-	flag.StringVar(&namespacePre***REMOVED***x, "namespace-pre***REMOVED***x", "", "The namespace pre***REMOVED***x to install the metering resources.")
+	flag.StringVar(&namespacePrefix, "namespace-prefix", "", "The namespace prefix to install the metering resources.")
 	flag.StringVar(&repoPath, "repo-path", "../../", "The absolute path to the operator-metering directory.")
 	flag.StringVar(&testOutputPath, "test-output-path", "", "The absolute/relative path that you want to store test logs within.")
 	flag.Parse()
 
 	logger := testhelpers.SetupLogger(logLevel)
 
-	if len(namespacePre***REMOVED***x) > namespacePre***REMOVED***xCharLimit {
-		logger.Fatalf("Error: the --namespace-pre***REMOVED***x exceeds the limit of %d characters", namespacePre***REMOVED***xCharLimit)
+	if len(namespacePrefix) > namespacePrefixCharLimit {
+		logger.Fatalf("Error: the --namespace-prefix exceeds the limit of %d characters", namespacePrefixCharLimit)
 	}
 
 	var err error
-	if df, err = deployframework.New(logger, runTestsLocal, runDevSetup, namespacePre***REMOVED***x, repoPath, kubeCon***REMOVED***g); err != nil {
+	if df, err = deployframework.New(logger, runTestsLocal, runDevSetup, namespacePrefix, repoPath, kubeConfig); err != nil {
 		logger.Fatalf("Failed to create a new deploy framework: %v", err)
 	}
 
@@ -91,7 +91,7 @@ type InstallTestCase struct {
 }
 
 func TestManualMeteringInstall(t *testing.T) {
-	testInstallCon***REMOVED***gs := []struct {
+	testInstallConfigs := []struct {
 		Name                      string
 		MeteringOperatorImageRepo string
 		MeteringOperatorImageTag  string
@@ -99,7 +99,7 @@ func TestManualMeteringInstall(t *testing.T) {
 		ExpectInstallErr          bool
 		ExpectInstallErrMsg       []string
 		InstallSubTest            InstallTestCase
-		MeteringCon***REMOVED***gSpec        metering.MeteringCon***REMOVED***gSpec
+		MeteringConfigSpec        metering.MeteringConfigSpec
 	}{
 		{
 			Name:                      "InvalidHDFS-MissingStorageSpec",
@@ -109,14 +109,14 @@ func TestManualMeteringInstall(t *testing.T) {
 			ExpectInstallErr:          true,
 			ExpectInstallErrMsg: []string{
 				"failed to install metering",
-				"failed to create the MeteringCon***REMOVED***g resource",
+				"failed to create the MeteringConfig resource",
 				"spec.storage in body is required|spec.storage: Required value",
 			},
 			InstallSubTest: InstallTestCase{
-				Name:     "testInvalidMeteringCon***REMOVED***gMissingStorageSpec",
-				TestFunc: testInvalidMeteringCon***REMOVED***gMissingStorageSpec,
+				Name:     "testInvalidMeteringConfigMissingStorageSpec",
+				TestFunc: testInvalidMeteringConfigMissingStorageSpec,
 			},
-			MeteringCon***REMOVED***gSpec: metering.MeteringCon***REMOVED***gSpec{
+			MeteringConfigSpec: metering.MeteringConfigSpec{
 				LogHelmTemplate: testhelpers.PtrToBool(true),
 			},
 		},
@@ -136,16 +136,16 @@ func TestManualMeteringInstall(t *testing.T) {
 					"REPORTING_OPERATOR_PROMETHEUS_METRICS_IMPORTER_STEP_SIZE=60s",
 				},
 			},
-			MeteringCon***REMOVED***gSpec: metering.MeteringCon***REMOVED***gSpec{
+			MeteringConfigSpec: metering.MeteringConfigSpec{
 				LogHelmTemplate: testhelpers.PtrToBool(true),
-				UnsupportedFeatures: &metering.UnsupportedFeaturesCon***REMOVED***g{
+				UnsupportedFeatures: &metering.UnsupportedFeaturesConfig{
 					EnableHDFS: testhelpers.PtrToBool(true),
 				},
-				Storage: &metering.StorageCon***REMOVED***g{
+				Storage: &metering.StorageConfig{
 					Type: "hive",
-					Hive: &metering.HiveStorageCon***REMOVED***g{
+					Hive: &metering.HiveStorageConfig{
 						Type: "hdfs",
-						Hdfs: &metering.HiveHDFSCon***REMOVED***g{
+						Hdfs: &metering.HiveHDFSConfig{
 							Namenode: "hdfs-namenode-0.hdfs-namenode:9820",
 						},
 					},
@@ -158,16 +158,16 @@ func TestManualMeteringInstall(t *testing.T) {
 								v1.ResourceMemory: resource.MustParse("250Mi"),
 							},
 						},
-						Image: &metering.ImageCon***REMOVED***g{},
-						Con***REMOVED***g: &metering.ReportingOperatorCon***REMOVED***g{
+						Image: &metering.ImageConfig{},
+						Config: &metering.ReportingOperatorConfig{
 							LogLevel: "debug",
-							Prometheus: &metering.ReportingOperatorPrometheusCon***REMOVED***g{
-								MetricsImporter: &metering.ReportingOperatorPrometheusMetricsImporterCon***REMOVED***g{
-									Con***REMOVED***g: &metering.ReportingOperatorPrometheusMetricsImporterCon***REMOVED***gSpec{
+							Prometheus: &metering.ReportingOperatorPrometheusConfig{
+								MetricsImporter: &metering.ReportingOperatorPrometheusMetricsImporterConfig{
+									Config: &metering.ReportingOperatorPrometheusMetricsImporterConfigSpec{
 										ChunkSize:                 &meta.Duration{Duration: 5 * time.Minute},
 										PollInterval:              &meta.Duration{Duration: 30 * time.Second},
 										StepSize:                  &meta.Duration{Duration: 1 * time.Minute},
-										MaxImportBack***REMOVED***llDuration: &meta.Duration{Duration: 15 * time.Minute},
+										MaxImportBackfillDuration: &meta.Duration{Duration: 15 * time.Minute},
 										MaxQueryRangeDuration:     &meta.Duration{Duration: 5 * time.Minute},
 									},
 								},
@@ -196,7 +196,7 @@ func TestManualMeteringInstall(t *testing.T) {
 									v1.ResourceMemory: resource.MustParse("650Mi"),
 								},
 							},
-							Storage: &metering.HiveMetastoreStorageCon***REMOVED***g{
+							Storage: &metering.HiveMetastoreStorageConfig{
 								Size: "5Gi",
 							},
 						},
@@ -220,7 +220,7 @@ func TestManualMeteringInstall(t *testing.T) {
 										v1.ResourceMemory: resource.MustParse("500Mi"),
 									},
 								},
-								Storage: &metering.HadoopHDFSStorageCon***REMOVED***g{
+								Storage: &metering.HadoopHDFSStorageConfig{
 									Size: "5Gi",
 								},
 							},
@@ -230,7 +230,7 @@ func TestManualMeteringInstall(t *testing.T) {
 										v1.ResourceMemory: resource.MustParse("500Mi"),
 									},
 								},
-								Storage: &metering.HadoopHDFSStorageCon***REMOVED***g{
+								Storage: &metering.HadoopHDFSStorageConfig{
 									Size: "5Gi",
 								},
 							},
@@ -251,16 +251,16 @@ func TestManualMeteringInstall(t *testing.T) {
 					"REPORTING_OPERATOR_DISABLE_PROMETHEUS_METRICS_IMPORTER=true",
 				},
 			},
-			MeteringCon***REMOVED***gSpec: metering.MeteringCon***REMOVED***gSpec{
+			MeteringConfigSpec: metering.MeteringConfigSpec{
 				LogHelmTemplate: testhelpers.PtrToBool(true),
-				UnsupportedFeatures: &metering.UnsupportedFeaturesCon***REMOVED***g{
+				UnsupportedFeatures: &metering.UnsupportedFeaturesConfig{
 					EnableHDFS: testhelpers.PtrToBool(true),
 				},
-				Storage: &metering.StorageCon***REMOVED***g{
+				Storage: &metering.StorageConfig{
 					Type: "hive",
-					Hive: &metering.HiveStorageCon***REMOVED***g{
+					Hive: &metering.HiveStorageConfig{
 						Type: "hdfs",
-						Hdfs: &metering.HiveHDFSCon***REMOVED***g{
+						Hdfs: &metering.HiveHDFSConfig{
 							Namenode: "hdfs-namenode-0.hdfs-namenode:9820",
 						},
 					},
@@ -273,11 +273,11 @@ func TestManualMeteringInstall(t *testing.T) {
 								v1.ResourceMemory: resource.MustParse("250Mi"),
 							},
 						},
-						Image: &metering.ImageCon***REMOVED***g{},
-						Con***REMOVED***g: &metering.ReportingOperatorCon***REMOVED***g{
+						Image: &metering.ImageConfig{},
+						Config: &metering.ReportingOperatorConfig{
 							LogLevel: "debug",
-							Prometheus: &metering.ReportingOperatorPrometheusCon***REMOVED***g{
-								MetricsImporter: &metering.ReportingOperatorPrometheusMetricsImporterCon***REMOVED***g{
+							Prometheus: &metering.ReportingOperatorPrometheusConfig{
+								MetricsImporter: &metering.ReportingOperatorPrometheusMetricsImporterConfig{
 									Enabled: testhelpers.PtrToBool(false),
 								},
 							},
@@ -305,7 +305,7 @@ func TestManualMeteringInstall(t *testing.T) {
 									v1.ResourceMemory: resource.MustParse("650Mi"),
 								},
 							},
-							Storage: &metering.HiveMetastoreStorageCon***REMOVED***g{
+							Storage: &metering.HiveMetastoreStorageConfig{
 								Size: "5Gi",
 							},
 						},
@@ -329,7 +329,7 @@ func TestManualMeteringInstall(t *testing.T) {
 										v1.ResourceMemory: resource.MustParse("500Mi"),
 									},
 								},
-								Storage: &metering.HadoopHDFSStorageCon***REMOVED***g{
+								Storage: &metering.HadoopHDFSStorageConfig{
 									Size: "5Gi",
 								},
 							},
@@ -339,7 +339,7 @@ func TestManualMeteringInstall(t *testing.T) {
 										v1.ResourceMemory: resource.MustParse("500Mi"),
 									},
 								},
-								Storage: &metering.HadoopHDFSStorageCon***REMOVED***g{
+								Storage: &metering.HadoopHDFSStorageConfig{
 									Size: "5Gi",
 								},
 							},
@@ -357,16 +357,16 @@ func TestManualMeteringInstall(t *testing.T) {
 				Name:     "testPrometheusConnectorWorks",
 				TestFunc: testPrometheusConnectorWorks,
 			},
-			MeteringCon***REMOVED***gSpec: metering.MeteringCon***REMOVED***gSpec{
+			MeteringConfigSpec: metering.MeteringConfigSpec{
 				LogHelmTemplate: testhelpers.PtrToBool(true),
-				UnsupportedFeatures: &metering.UnsupportedFeaturesCon***REMOVED***g{
+				UnsupportedFeatures: &metering.UnsupportedFeaturesConfig{
 					EnableHDFS: testhelpers.PtrToBool(true),
 				},
-				Storage: &metering.StorageCon***REMOVED***g{
+				Storage: &metering.StorageConfig{
 					Type: "hive",
-					Hive: &metering.HiveStorageCon***REMOVED***g{
+					Hive: &metering.HiveStorageConfig{
 						Type: "hdfs",
-						Hdfs: &metering.HiveHDFSCon***REMOVED***g{
+						Hdfs: &metering.HiveHDFSConfig{
 							Namenode: "hdfs-namenode-0.hdfs-namenode:9820",
 						},
 					},
@@ -385,11 +385,11 @@ func TestManualMeteringInstall(t *testing.T) {
 				},
 				ReportingOperator: &metering.ReportingOperator{
 					Spec: &metering.ReportingOperatorSpec{
-						Image: &metering.ImageCon***REMOVED***g{},
-						Con***REMOVED***g: &metering.ReportingOperatorCon***REMOVED***g{
+						Image: &metering.ImageConfig{},
+						Config: &metering.ReportingOperatorConfig{
 							LogLevel: "debug",
-							Prometheus: &metering.ReportingOperatorPrometheusCon***REMOVED***g{
-								MetricsImporter: &metering.ReportingOperatorPrometheusMetricsImporterCon***REMOVED***g{
+							Prometheus: &metering.ReportingOperatorPrometheusConfig{
+								MetricsImporter: &metering.ReportingOperatorPrometheusMetricsImporterConfig{
 									Enabled: testhelpers.PtrToBool(false),
 								},
 							},
@@ -400,7 +400,7 @@ func TestManualMeteringInstall(t *testing.T) {
 		},
 	}
 
-	for _, testCase := range testInstallCon***REMOVED***gs {
+	for _, testCase := range testInstallConfigs {
 		t := t
 		testCase := testCase
 
@@ -412,14 +412,14 @@ func TestManualMeteringInstall(t *testing.T) {
 			testManualMeteringInstall(
 				t,
 				testCase.Name,
-				namespacePre***REMOVED***x,
+				namespacePrefix,
 				testCase.MeteringOperatorImageRepo,
 				testCase.MeteringOperatorImageTag,
 				testOutputPath,
 				testCase.ExpectInstallErrMsg,
 				testCase.ExpectInstallErr,
 				testCase.InstallSubTest,
-				testCase.MeteringCon***REMOVED***gSpec,
+				testCase.MeteringConfigSpec,
 			)
 		})
 	}
@@ -428,21 +428,21 @@ func TestManualMeteringInstall(t *testing.T) {
 func testManualMeteringInstall(
 	t *testing.T,
 	testCaseName,
-	namespacePre***REMOVED***x,
+	namespacePrefix,
 	meteringOperatorImageRepo,
 	meteringOperatorImageTag,
 	testOutputPath string,
 	expectInstallErrMsg []string,
 	expectInstallErr bool,
 	testInstallFunction InstallTestCase,
-	testMeteringCon***REMOVED***gSpec metering.MeteringCon***REMOVED***gSpec,
+	testMeteringConfigSpec metering.MeteringConfigSpec,
 ) {
 	// create a directory used to store the @testCaseName container and resource logs
-	testCaseOutputBaseDir := ***REMOVED***lepath.Join(testOutputPath, testCaseName)
+	testCaseOutputBaseDir := filepath.Join(testOutputPath, testCaseName)
 	err := os.Mkdir(testCaseOutputBaseDir, 0777)
 	assert.NoError(t, err, "creating the test case output directory should produce no error")
 
-	testFuncNamespace := fmt.Sprintf("%s-%s", namespacePre***REMOVED***x, strings.ToLower(testCaseName))
+	testFuncNamespace := fmt.Sprintf("%s-%s", namespacePrefix, strings.ToLower(testCaseName))
 	if len(testFuncNamespace) > kubeNamespaceCharLimit {
 		require.Fail(t, "The length of the test function namespace exceeded the kube namespace limit of %d characters", kubeNamespaceCharLimit)
 	}
@@ -455,7 +455,7 @@ func testManualMeteringInstall(
 		reportingOperatorImageTag,
 		testCaseOutputBaseDir,
 		testInstallFunction.ExtraEnvVars,
-		testMeteringCon***REMOVED***gSpec,
+		testMeteringConfigSpec,
 	)
 	require.NoError(t, err, "creating a new deployer context should produce no error")
 
@@ -464,7 +464,7 @@ func testManualMeteringInstall(
 	rf, err := deployerCtx.Setup(expectInstallErr)
 	if expectInstallErr {
 		testhelpers.AssertErrorContainsErrorMsgs(t, err, expectInstallErrMsg)
-	} ***REMOVED*** {
+	} else {
 		assert.NoError(t, err, "expected there would be no error installing and setting up the metering stack")
 	}
 
@@ -477,7 +477,7 @@ func testManualMeteringInstall(
 				testInstallFunction.TestFunc(t, rf)
 			})
 
-			deployerCtx.Logger.Infof("The %s test has ***REMOVED***nished running", testInstallFunction.Name)
+			deployerCtx.Logger.Infof("The %s test has finished running", testInstallFunction.Name)
 		}
 	}
 

@@ -6,17 +6,17 @@
 //
 // - SequenceMatcher
 //
-// - uni***REMOVED***ed_diff
+// - unified_diff
 //
 // - context_diff
 //
-// Getting uni***REMOVED***ed diffs was the main goal of the port. Keep in mind this code
+// Getting unified diffs was the main goal of the port. Keep in mind this code
 // is mostly suitable to output text differences in a human friendly way, there
 // are no guarantees generated diffs are consumable by patch(1).
 package difflib
 
 import (
-	"bu***REMOVED***o"
+	"bufio"
 	"bytes"
 	"fmt"
 	"io"
@@ -61,7 +61,7 @@ type OpCode struct {
 // SequenceMatcher compares sequence of strings. The basic
 // algorithm predates, and is a little fancier than, an algorithm
 // published in the late 1980's by Ratcliff and Obershelp under the
-// hyperbolic name "gestalt pattern matching".  The basic idea is to ***REMOVED***nd
+// hyperbolic name "gestalt pattern matching".  The basic idea is to find
 // the longest contiguous matching subsequence that contains no "junk"
 // elements (R-O doesn't address junk).  The same idea is then applied
 // recursively to the pieces of the sequences to the left and to the right
@@ -76,7 +76,7 @@ type OpCode struct {
 // That, and the method here, appear to yield more intuitive difference
 // reports than does diff.  This method appears to be the least vulnerable
 // to synching up on blocks of "junk lines", though (like blank lines in
-// ordinary text ***REMOVED***les, or maybe "<P>" lines in HTML ***REMOVED***les).  That may be
+// ordinary text files, or maybe "<P>" lines in HTML files).  That may be
 // because this is the only method of the 3 that has a *concept* of
 // "junk" <wink>.
 //
@@ -117,7 +117,7 @@ func (m *SequenceMatcher) SetSeqs(a, b []string) {
 	m.SetSeq2(b)
 }
 
-// Set the ***REMOVED***rst sequence to be compared. The second sequence to be compared is
+// Set the first sequence to be compared. The second sequence to be compared is
 // not changed.
 //
 // SequenceMatcher computes and caches detailed information about the second
@@ -135,7 +135,7 @@ func (m *SequenceMatcher) SetSeq1(a []string) {
 	m.opCodes = nil
 }
 
-// Set the second sequence to be compared. The ***REMOVED***rst sequence to be compared is
+// Set the second sequence to be compared. The first sequence to be compared is
 // not changed.
 func (m *SequenceMatcher) SetSeq2(b []string) {
 	if &b == &m.b {
@@ -196,7 +196,7 @@ func (m *SequenceMatcher) isBJunk(s string) bool {
 
 // Find longest matching block in a[alo:ahi] and b[blo:bhi].
 //
-// If IsJunk is not de***REMOVED***ned:
+// If IsJunk is not defined:
 //
 // Return (i,j,k) such that a[i:i+k] is equal to b[j:j+k], where
 //     alo <= i <= i+k <= ahi
@@ -210,7 +210,7 @@ func (m *SequenceMatcher) isBJunk(s string) bool {
 // starts earliest in a, and of all those maximal matching blocks that
 // start earliest in a, return the one that starts earliest in b.
 //
-// If IsJunk is de***REMOVED***ned, ***REMOVED***rst the longest matching block is
+// If IsJunk is defined, first the longest matching block is
 // determined as above, but with the additional restriction that no
 // junk element appears in the block.  Then that block is extended as
 // far as possible by matching (only) junk elements on both sides.  So
@@ -218,21 +218,21 @@ func (m *SequenceMatcher) isBJunk(s string) bool {
 // happens to be adjacent to an "interesting" match.
 //
 // If no blocks match, return (alo, blo, 0).
-func (m *SequenceMatcher) ***REMOVED***ndLongestMatch(alo, ahi, blo, bhi int) Match {
-	// CAUTION:  stripping common pre***REMOVED***x or suf***REMOVED***x would be incorrect.
+func (m *SequenceMatcher) findLongestMatch(alo, ahi, blo, bhi int) Match {
+	// CAUTION:  stripping common prefix or suffix would be incorrect.
 	// E.g.,
 	//    ab
 	//    acab
-	// Longest matching block is "ab", but if common pre***REMOVED***x is
+	// Longest matching block is "ab", but if common prefix is
 	// stripped, it's "a" (tied with "b").  UNIX(tm) diff does so
 	// strip, so ends up claiming that ab is changed to acab by
 	// inserting "ca" in the middle.  That's minimal but unintuitive:
 	// "it's obvious" that someone inserted "ac" at the front.
 	// Windiff ends up at the same place as diff, but by pairing up
-	// the unique 'b's and then matching the ***REMOVED***rst two 'a's.
+	// the unique 'b's and then matching the first two 'a's.
 	besti, bestj, bestsize := alo, blo, 0
 
-	// ***REMOVED***nd longest junk-free match
+	// find longest junk-free match
 	// during an iteration of the loop, j2len[j] = length of longest
 	// junk-free match ending with a[i-1] and b[j]
 	j2len := map[int]int{}
@@ -275,7 +275,7 @@ func (m *SequenceMatcher) ***REMOVED***ndLongestMatch(alo, ahi, blo, bhi int) Ma
 	// empty!), we may as well suck up the matching junk on each
 	// side of it too.  Can't think of a good reason not to, and it
 	// saves post-processing the (possibly considerable) expense of
-	// ***REMOVED***guring out what to do with it.  In the case of an empty
+	// figuring out what to do with it.  In the case of an empty
 	// interesting match, this is clearly the right thing to do,
 	// because no other kind of match is possible in the regions.
 	for besti > alo && bestj > blo && m.isBJunk(m.b[bestj-1]) &&
@@ -309,7 +309,7 @@ func (m *SequenceMatcher) GetMatchingBlocks() []Match {
 
 	var matchBlocks func(alo, ahi, blo, bhi int, matched []Match) []Match
 	matchBlocks = func(alo, ahi, blo, bhi int, matched []Match) []Match {
-		match := m.***REMOVED***ndLongestMatch(alo, ahi, blo, bhi)
+		match := m.findLongestMatch(alo, ahi, blo, bhi)
 		i, j, k := match.A, match.B, match.Size
 		if match.Size > 0 {
 			if alo < i && blo < j {
@@ -333,11 +333,11 @@ func (m *SequenceMatcher) GetMatchingBlocks() []Match {
 		i2, j2, k2 := b.A, b.B, b.Size
 		if i1+k1 == i2 && j1+k1 == j2 {
 			// Yes, so collapse them -- this just increases the length of
-			// the ***REMOVED***rst block by the length of the second, and the ***REMOVED***rst
+			// the first block by the length of the second, and the first
 			// block so lengthened remains the block to compare against.
 			k1 += k2
-		} ***REMOVED*** {
-			// Not adjacent.  Remember the ***REMOVED***rst block (k1==0 means it's
+		} else {
+			// Not adjacent.  Remember the first block (k1==0 means it's
 			// the dummy we started with), and make the second block the
 			// new block to compare against.
 			if k1 > 0 {
@@ -357,7 +357,7 @@ func (m *SequenceMatcher) GetMatchingBlocks() []Match {
 
 // Return list of 5-tuples describing how to turn a into b.
 //
-// Each tuple is of the form (tag, i1, i2, j1, j2).  The ***REMOVED***rst tuple
+// Each tuple is of the form (tag, i1, i2, j1, j2).  The first tuple
 // has i1 == j1 == 0, and remaining tuples have i1 == the i2 from the
 // tuple preceding it, and likewise for j1 == the previous j2.
 //
@@ -387,9 +387,9 @@ func (m *SequenceMatcher) GetOpCodes() []OpCode {
 		tag := byte(0)
 		if i < ai && j < bj {
 			tag = 'r'
-		} ***REMOVED*** if i < ai {
+		} else if i < ai {
 			tag = 'd'
-		} ***REMOVED*** if j < bj {
+		} else if j < bj {
 			tag = 'i'
 		}
 		if tag > 0 {
@@ -460,7 +460,7 @@ func (m *SequenceMatcher) GetGroupedOpCodes(n int) [][]OpCode {
 //
 // .Ratio() is expensive to compute if you haven't already computed
 // .GetMatchingBlocks() or .GetOpCodes(), in which case you may
-// want to try .QuickRatio() or .RealQuickRation() ***REMOVED***rst to get an
+// want to try .QuickRatio() or .RealQuickRation() first to get an
 // upper bound.
 func (m *SequenceMatcher) Ratio() float64 {
 	matches := 0
@@ -472,7 +472,7 @@ func (m *SequenceMatcher) Ratio() float64 {
 
 // Return an upper bound on ratio() relatively quickly.
 //
-// This isn't de***REMOVED***ned beyond that it is an upper bound on .Ratio(), and
+// This isn't defined beyond that it is an upper bound on .Ratio(), and
 // is faster to compute.
 func (m *SequenceMatcher) QuickRatio() float64 {
 	// viewing a and b as multisets, set matches to the cardinality
@@ -504,7 +504,7 @@ func (m *SequenceMatcher) QuickRatio() float64 {
 
 // Return an upper bound on ratio() very quickly.
 //
-// This isn't de***REMOVED***ned beyond that it is an upper bound on .Ratio(), and
+// This isn't defined beyond that it is an upper bound on .Ratio(), and
 // is faster to compute than either .Ratio() or .QuickRatio().
 func (m *SequenceMatcher) RealQuickRatio() float64 {
 	la, lb := len(m.a), len(m.b)
@@ -512,8 +512,8 @@ func (m *SequenceMatcher) RealQuickRatio() float64 {
 }
 
 // Convert range to the "ed" format
-func formatRangeUni***REMOVED***ed(start, stop int) string {
-	// Per the diff spec at http://www.unix.org/single_unix_speci***REMOVED***cation/
+func formatRangeUnified(start, stop int) string {
+	// Per the diff spec at http://www.unix.org/single_unix_specification/
 	beginning := start + 1 // lines start numbering with one
 	length := stop - start
 	if length == 1 {
@@ -525,39 +525,39 @@ func formatRangeUni***REMOVED***ed(start, stop int) string {
 	return fmt.Sprintf("%d,%d", beginning, length)
 }
 
-// Uni***REMOVED***ed diff parameters
-type Uni***REMOVED***edDiff struct {
+// Unified diff parameters
+type UnifiedDiff struct {
 	A        []string // First sequence lines
-	FromFile string   // First ***REMOVED***le name
-	FromDate string   // First ***REMOVED***le time
+	FromFile string   // First file name
+	FromDate string   // First file time
 	B        []string // Second sequence lines
-	ToFile   string   // Second ***REMOVED***le name
-	ToDate   string   // Second ***REMOVED***le time
+	ToFile   string   // Second file name
+	ToDate   string   // Second file time
 	Eol      string   // Headers end of line, defaults to LF
 	Context  int      // Number of context lines
 }
 
-// Compare two sequences of lines; generate the delta as a uni***REMOVED***ed diff.
+// Compare two sequences of lines; generate the delta as a unified diff.
 //
-// Uni***REMOVED***ed diffs are a compact way of showing line changes and a few
+// Unified diffs are a compact way of showing line changes and a few
 // lines of context.  The number of context lines is set by 'n' which
 // defaults to three.
 //
 // By default, the diff control lines (those with ---, +++, or @@) are
 // created with a trailing newline.  This is helpful so that inputs
-// created from ***REMOVED***le.readlines() result in diffs that are suitable for
-// ***REMOVED***le.writelines() since both the inputs and outputs have trailing
+// created from file.readlines() result in diffs that are suitable for
+// file.writelines() since both the inputs and outputs have trailing
 // newlines.
 //
 // For inputs that do not have trailing newlines, set the lineterm
 // argument to "" so that the output will be uniformly newline free.
 //
-// The unidiff format normally has a header for ***REMOVED***lenames and modi***REMOVED***cation
-// times.  Any or all of these may be speci***REMOVED***ed using strings for
-// 'from***REMOVED***le', 'to***REMOVED***le', 'from***REMOVED***ledate', and 'to***REMOVED***ledate'.
-// The modi***REMOVED***cation times are normally expressed in the ISO 8601 format.
-func WriteUni***REMOVED***edDiff(writer io.Writer, diff Uni***REMOVED***edDiff) error {
-	buf := bu***REMOVED***o.NewWriter(writer)
+// The unidiff format normally has a header for filenames and modification
+// times.  Any or all of these may be specified using strings for
+// 'fromfile', 'tofile', 'fromfiledate', and 'tofiledate'.
+// The modification times are normally expressed in the ISO 8601 format.
+func WriteUnifiedDiff(writer io.Writer, diff UnifiedDiff) error {
+	buf := bufio.NewWriter(writer)
 	defer buf.Flush()
 	wf := func(format string, args ...interface{}) error {
 		_, err := buf.WriteString(fmt.Sprintf(format, args...))
@@ -596,9 +596,9 @@ func WriteUni***REMOVED***edDiff(writer io.Writer, diff Uni***REMOVED***edDiff) 
 				}
 			}
 		}
-		***REMOVED***rst, last := g[0], g[len(g)-1]
-		range1 := formatRangeUni***REMOVED***ed(***REMOVED***rst.I1, last.I2)
-		range2 := formatRangeUni***REMOVED***ed(***REMOVED***rst.J1, last.J2)
+		first, last := g[0], g[len(g)-1]
+		range1 := formatRangeUnified(first.I1, last.I2)
+		range2 := formatRangeUnified(first.J1, last.J2)
 		if err := wf("@@ -%s +%s @@%s", range1, range2, diff.Eol); err != nil {
 			return err
 		}
@@ -631,16 +631,16 @@ func WriteUni***REMOVED***edDiff(writer io.Writer, diff Uni***REMOVED***edDiff) 
 	return nil
 }
 
-// Like WriteUni***REMOVED***edDiff but returns the diff a string.
-func GetUni***REMOVED***edDiffString(diff Uni***REMOVED***edDiff) (string, error) {
+// Like WriteUnifiedDiff but returns the diff a string.
+func GetUnifiedDiffString(diff UnifiedDiff) (string, error) {
 	w := &bytes.Buffer{}
-	err := WriteUni***REMOVED***edDiff(w, diff)
+	err := WriteUnifiedDiff(w, diff)
 	return string(w.Bytes()), err
 }
 
 // Convert range to the "ed" format.
 func formatRangeContext(start, stop int) string {
-	// Per the diff spec at http://www.unix.org/single_unix_speci***REMOVED***cation/
+	// Per the diff spec at http://www.unix.org/single_unix_specification/
 	beginning := start + 1 // lines start numbering with one
 	length := stop - start
 	if length == 0 {
@@ -652,7 +652,7 @@ func formatRangeContext(start, stop int) string {
 	return fmt.Sprintf("%d,%d", beginning, beginning+length-1)
 }
 
-type ContextDiff Uni***REMOVED***edDiff
+type ContextDiff UnifiedDiff
 
 // Compare two sequences of lines; generate the delta as a context diff.
 //
@@ -666,13 +666,13 @@ type ContextDiff Uni***REMOVED***edDiff
 // For inputs that do not have trailing newlines, set the diff.Eol
 // argument to "" so that the output will be uniformly newline free.
 //
-// The context diff format normally has a header for ***REMOVED***lenames and
-// modi***REMOVED***cation times.  Any or all of these may be speci***REMOVED***ed using
+// The context diff format normally has a header for filenames and
+// modification times.  Any or all of these may be specified using
 // strings for diff.FromFile, diff.ToFile, diff.FromDate, diff.ToDate.
-// The modi***REMOVED***cation times are normally expressed in the ISO 8601 format.
-// If not speci***REMOVED***ed, the strings default to blanks.
+// The modification times are normally expressed in the ISO 8601 format.
+// If not specified, the strings default to blanks.
 func WriteContextDiff(writer io.Writer, diff ContextDiff) error {
-	buf := bu***REMOVED***o.NewWriter(writer)
+	buf := bufio.NewWriter(writer)
 	defer buf.Flush()
 	var diffErr error
 	wf := func(format string, args ...interface{}) {
@@ -692,7 +692,7 @@ func WriteContextDiff(writer io.Writer, diff ContextDiff) error {
 		diff.Eol = "\n"
 	}
 
-	pre***REMOVED***x := map[byte]string{
+	prefix := map[byte]string{
 		'i': "+ ",
 		'd': "- ",
 		'r': "! ",
@@ -718,10 +718,10 @@ func WriteContextDiff(writer io.Writer, diff ContextDiff) error {
 			}
 		}
 
-		***REMOVED***rst, last := g[0], g[len(g)-1]
+		first, last := g[0], g[len(g)-1]
 		ws("***************" + diff.Eol)
 
-		range1 := formatRangeContext(***REMOVED***rst.I1, last.I2)
+		range1 := formatRangeContext(first.I1, last.I2)
 		wf("*** %s ****%s", range1, diff.Eol)
 		for _, c := range g {
 			if c.Tag == 'r' || c.Tag == 'd' {
@@ -730,14 +730,14 @@ func WriteContextDiff(writer io.Writer, diff ContextDiff) error {
 						continue
 					}
 					for _, line := range diff.A[cc.I1:cc.I2] {
-						ws(pre***REMOVED***x[cc.Tag] + line)
+						ws(prefix[cc.Tag] + line)
 					}
 				}
 				break
 			}
 		}
 
-		range2 := formatRangeContext(***REMOVED***rst.J1, last.J2)
+		range2 := formatRangeContext(first.J1, last.J2)
 		wf("--- %s ----%s", range2, diff.Eol)
 		for _, c := range g {
 			if c.Tag == 'r' || c.Tag == 'i' {
@@ -746,7 +746,7 @@ func WriteContextDiff(writer io.Writer, diff ContextDiff) error {
 						continue
 					}
 					for _, line := range diff.B[cc.J1:cc.J2] {
-						ws(pre***REMOVED***x[cc.Tag] + line)
+						ws(prefix[cc.Tag] + line)
 					}
 				}
 				break
@@ -764,7 +764,7 @@ func GetContextDiffString(diff ContextDiff) (string, error) {
 }
 
 // Split a string on "\n" while preserving them. The output can be used
-// as input for Uni***REMOVED***edDiff and ContextDiff structures.
+// as input for UnifiedDiff and ContextDiff structures.
 func SplitLines(s string) []string {
 	lines := strings.SplitAfter(s, "\n")
 	lines[len(lines)-1] += "\n"

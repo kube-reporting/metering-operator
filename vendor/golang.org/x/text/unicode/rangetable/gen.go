@@ -1,6 +1,6 @@
 // Copyright 2015 The Go Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE ***REMOVED***le.
+// license that can be found in the LICENSE file.
 
 // +build ignore
 
@@ -26,7 +26,7 @@ import (
 var versionList = flag.String("versions", "",
 	"list of versions for which to generate RangeTables")
 
-const bootstrapMessage = `No versions speci***REMOVED***ed.
+const bootstrapMessage = `No versions specified.
 To bootstrap the code generation, run:
 	go run gen.go --versions=4.1.0,5.0.0,6.0.0,6.1.0,6.2.0,6.3.0,7.0.0
 

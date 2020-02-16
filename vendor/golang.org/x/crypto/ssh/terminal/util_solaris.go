@@ -1,6 +1,6 @@
 // Copyright 2015 The Go Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE ***REMOVED***le.
+// license that can be found in the LICENSE file.
 
 // +build solaris
 
@@ -17,7 +17,7 @@ type State struct {
 	termios unix.Termios
 }
 
-// IsTerminal returns true if the given ***REMOVED***le descriptor is a terminal.
+// IsTerminal returns true if the given file descriptor is a terminal.
 func IsTerminal(fd int) bool {
 	_, err := unix.IoctlGetTermio(fd, unix.TCGETA)
 	return err == nil
@@ -70,7 +70,7 @@ func ReadPassword(fd int) ([]byte, error) {
 	return ret, nil
 }
 
-// MakeRaw puts the terminal connected to the given ***REMOVED***le descriptor into raw
+// MakeRaw puts the terminal connected to the given file descriptor into raw
 // mode and returns the previous state of the terminal so that it can be
 // restored.
 // see http://cr.illumos.org/~webrev/andy_js/1060/
@@ -97,7 +97,7 @@ func MakeRaw(fd int) (*State, error) {
 	return &oldState, nil
 }
 
-// Restore restores the terminal connected to the given ***REMOVED***le descriptor to a
+// Restore restores the terminal connected to the given file descriptor to a
 // previous state.
 func Restore(fd int, oldState *State) error {
 	return unix.IoctlSetTermios(fd, unix.TCSETS, &oldState.termios)

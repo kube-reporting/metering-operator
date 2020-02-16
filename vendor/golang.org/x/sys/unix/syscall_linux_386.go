@@ -1,6 +1,6 @@
 // Copyright 2009 The Go Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE ***REMOVED***le.
+// license that can be found in the LICENSE file.
 
 // TODO(rsc): Rewrite all nn(SP) references into name+(nn-8)(FP)
 // so that go vet can check that they are correct.
@@ -48,8 +48,8 @@ func Pipe2(p []int, flags int) (err error) {
 	return
 }
 
-// 64-bit ***REMOVED***le system and 32-bit uid calls
-// (386 default is 32-bit ***REMOVED***le system and 16-bit uid).
+// 64-bit file system and 32-bit uid calls
+// (386 default is 32-bit file system and 16-bit uid).
 //sys	Dup2(oldfd int, newfd int) (err error)
 //sys	Fadvise(fd int, offset int64, length int64, advice int) (err error) = SYS_FADVISE64_64
 //sys	Fchown(fd int, uid int, gid int) (err error) = SYS_FCHOWN32
@@ -67,7 +67,7 @@ func Pipe2(p []int, flags int) (err error) {
 //sys	Lstat(path string, stat *Stat_t) (err error) = SYS_LSTAT64
 //sys	Pread(fd int, p []byte, offset int64) (n int, err error) = SYS_PREAD64
 //sys	Pwrite(fd int, p []byte, offset int64) (n int, err error) = SYS_PWRITE64
-//sys	send***REMOVED***le(outfd int, infd int, offset *int64, count int) (written int, err error) = SYS_SENDFILE64
+//sys	sendfile(outfd int, infd int, offset *int64, count int) (written int, err error) = SYS_SENDFILE64
 //sys	Setfsgid(gid int) (err error) = SYS_SETFSGID32
 //sys	Setfsuid(uid int) (err error) = SYS_SETFSUID32
 //sysnb	Setregid(rgid int, egid int) (err error) = SYS_SETREGID32
@@ -118,13 +118,13 @@ func Getrlimit(resource int, rlim *Rlimit) (err error) {
 
 	if rl.Cur == rlimInf32 {
 		rlim.Cur = rlimInf64
-	} ***REMOVED*** {
+	} else {
 		rlim.Cur = uint64(rl.Cur)
 	}
 
 	if rl.Max == rlimInf32 {
 		rlim.Max = rlimInf64
-	} ***REMOVED*** {
+	} else {
 		rlim.Max = uint64(rl.Max)
 	}
 	return
@@ -141,16 +141,16 @@ func Setrlimit(resource int, rlim *Rlimit) (err error) {
 	rl := rlimit32{}
 	if rlim.Cur == rlimInf64 {
 		rl.Cur = rlimInf32
-	} ***REMOVED*** if rlim.Cur < uint64(rlimInf32) {
+	} else if rlim.Cur < uint64(rlimInf32) {
 		rl.Cur = uint32(rlim.Cur)
-	} ***REMOVED*** {
+	} else {
 		return EINVAL
 	}
 	if rlim.Max == rlimInf64 {
 		rl.Max = rlimInf32
-	} ***REMOVED*** if rlim.Max < uint64(rlimInf32) {
+	} else if rlim.Max < uint64(rlimInf32) {
 		rl.Max = uint32(rlim.Max)
-	} ***REMOVED*** {
+	} else {
 		return EINVAL
 	}
 

@@ -11,7 +11,7 @@ FROM openshift/origin-base:latest
 
 RUN yum clean all && rm -rf /var/cache/yum/* && \
     yum install --setopt=skip_missing_names_on_install=False -y \
-        ca-certi***REMOVED***cates bash
+        ca-certificates bash
 
 COPY --from=build /go/src/github.com/operator-framework/operator-metering/bin/reporting-operator /usr/local/bin/reporting-operator
 

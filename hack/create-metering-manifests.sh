@@ -1,7 +1,7 @@
 #!/bin/bash
 # If $CUSTOM_HELM_OPERATOR_OVERRIDE_VALUES and
 # $CUSTOM_HELM_OPERATOR_OVERRIDE_VALUES are set, will be used as the paths to
-# ***REMOVED***les containing override values for rendering the manifests to the output
+# files containing override values for rendering the manifests to the output
 # directory.
 
 set -e
@@ -28,17 +28,17 @@ if [[ $# -ge 3 ]] ; then
     mkdir -p "${TELEMETER_OUTPUT_DIR}"
     shift
 
-    echo "Values ***REMOVED***les: [$*]"
+    echo "Values files: [$*]"
     # prepends -f to each argument passed in, and stores the list of arguments
     # (-f $arg1 -f $arg2) in VALUES_ARGS
     while (($# > 0)); do
         VALUES_ARGS+=(-f "$1")
         shift
     done
-***REMOVED***
-    echo "Must specify output directory and values ***REMOVED***les"
+else
+    echo "Must specify output directory and values files"
     exit 1
-***REMOVED***
+fi
 
 TMPDIR="$(mktemp -d)"
 trap 'rm -rf $TMPDIR' EXIT SIGINT
@@ -81,9 +81,9 @@ TELEMETER_OUTPUT="$(helm template "$CHART" \
 
 if [[ -z "$TELEMETER_OUTPUT" ]]; then
     echo "Skipping telemeter manifests"
-***REMOVED***
+else
     echo "$TELEMETER_OUTPUT" > "$TELEMETER_OUTPUT_DIR/list.yaml"
-***REMOVED***
+fi
 
 helm template "$CHART" \
     ${VALUES_ARGS[@]+"${VALUES_ARGS[@]}"} \
@@ -93,12 +93,12 @@ helm template "$CHART" \
 
 helm template "$CHART" \
     ${VALUES_ARGS[@]+"${VALUES_ARGS[@]}"} \
-    -x "templates/operator/meteringcon***REMOVED***g.yaml" \
+    -x "templates/operator/meteringconfig.yaml" \
     | sed -f "$ROOT_DIR/hack/remove-helm-template-header.sed" \
-    > "$METERING_OPERATOR_OUTPUT_DIR/meteringcon***REMOVED***g.yaml"
+    > "$METERING_OPERATOR_OUTPUT_DIR/meteringconfig.yaml"
 
 # Render the CSV to a temporary location, so we can add the version into it's
-# ***REMOVED***lename after it's been rendered
+# filename after it's been rendered
 TMP_CSV="$TMPDIR/metering.clusterserviceversion.yaml"
 helm template "$CHART" \
     ${VALUES_ARGS[@]+"${VALUES_ARGS[@]}"} \
@@ -126,12 +126,12 @@ CSV_MANIFEST_DESTINATION="$CSV_BUNDLE_DIR/meteringoperator.v${CSV_VERSION}.clust
 IMAGE_REFERENCES_MANIFEST_DESTINATION="$CSV_BUNDLE_DIR/image-references"
 
 SUBSCRIPTION_MANIFEST_DESTINATION="$OLM_OUTPUT_DIR/metering.subscription.yaml"
-CATALOGSOURCECONFIG_MANIFEST_DESTINATION="$OLM_OUTPUT_DIR/metering.catalogsourcecon***REMOVED***g.yaml"
+CATALOGSOURCECONFIG_MANIFEST_DESTINATION="$OLM_OUTPUT_DIR/metering.catalogsourceconfig.yaml"
 OPERATORGROUP_MANIFEST_DESTINATION="$OLM_OUTPUT_DIR/metering.operatorgroup.yaml"
 
 mkdir -p "$CSV_BUNDLE_DIR"
 
-# Rename the ***REMOVED***le with it's version in it, and move it to the ***REMOVED***nal destination
+# Rename the file with it's version in it, and move it to the final destination
 mv -f "$TMP_CSV" "$CSV_MANIFEST_DESTINATION"
 
 helm template "$CHART" \
@@ -141,7 +141,7 @@ helm template "$CHART" \
     > "$PACKAGE_MANIFEST_DESTINATION"
 
 # We don't always want to generate an ART package, so check if the helm template
-# output is empty before redirecting output to a ***REMOVED***le
+# output is empty before redirecting output to a file
 HELM_ART_PKG_OUTPUT="$(helm template "$CHART" \
     ${VALUES_ARGS[@]+"${VALUES_ARGS[@]}"} \
     -x "templates/olm/art.yaml" \
@@ -149,9 +149,9 @@ HELM_ART_PKG_OUTPUT="$(helm template "$CHART" \
 
 if [[ -z "$HELM_ART_PKG_OUTPUT" ]]; then
     echo "Skipping generating an ART package for $BUNDLE_DIR"
-***REMOVED***
+else
     echo "$HELM_ART_PKG_OUTPUT" > "$ART_CONFIG_DESTINATION"
-***REMOVED***
+fi
 
 helm template "$CHART" \
     ${VALUES_ARGS[@]+"${VALUES_ARGS[@]}"} \
@@ -167,7 +167,7 @@ helm template "$CHART" \
 
 helm template "$CHART" \
     ${VALUES_ARGS[@]+"${VALUES_ARGS[@]}"} \
-    -x "templates/olm/catalogsourcecon***REMOVED***g.yaml" \
+    -x "templates/olm/catalogsourceconfig.yaml" \
     | sed -f "$ROOT_DIR/hack/remove-helm-template-header.sed" \
     > "$CATALOGSOURCECONFIG_MANIFEST_DESTINATION"
 
@@ -180,9 +180,9 @@ helm template "$CHART" \
 for CRD_DIR in "$METERING_OPERATOR_OUTPUT_DIR" "$CSV_BUNDLE_DIR"; do
     helm template "$CHART" \
         ${VALUES_ARGS[@]+"${VALUES_ARGS[@]}"} \
-        -x "templates/crds/meteringcon***REMOVED***g.crd.yaml" \
+        -x "templates/crds/meteringconfig.crd.yaml" \
         | sed -f "$ROOT_DIR/hack/remove-helm-template-header.sed" \
-        > "$CRD_DIR/meteringcon***REMOVED***g.crd.yaml"
+        > "$CRD_DIR/meteringconfig.crd.yaml"
 
     helm template "$CHART" \
         ${VALUES_ARGS[@]+"${VALUES_ARGS[@]}"} \

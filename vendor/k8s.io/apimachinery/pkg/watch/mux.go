@@ -2,7 +2,7 @@
 Copyright 2014 The Kubernetes Authors.
 
 Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this ***REMOVED***le except in compliance with the License.
+you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
 
     http://www.apache.org/licenses/LICENSE-2.0
@@ -10,7 +10,7 @@ You may obtain a copy of the License at
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the speci***REMOVED***c language governing permissions and
+See the License for the specific language governing permissions and
 limitations under the License.
 */
 
@@ -37,7 +37,7 @@ const (
 // Broadcaster can't move them onto the watchers' queues fast enough.
 const incomingQueueLength = 25
 
-// Broadcaster distributes event noti***REMOVED***cations among any number of watchers. Every event
+// Broadcaster distributes event notifications among any number of watchers. Every event
 // is delivered to every watcher.
 type Broadcaster struct {
 	// TODO: see if this lock is needed now that new watchers go through
@@ -63,7 +63,7 @@ type Broadcaster struct {
 
 // NewBroadcaster creates a new Broadcaster. queueLength is the maximum number of events to queue per watcher.
 // It is guaranteed that events will be distributed in the order in which they occur,
-// but the order in which a single event is distributed among all of the watchers is unspeci***REMOVED***ed.
+// but the order in which a single event is distributed among all of the watchers is unspecified.
 func NewBroadcaster(queueLength int, fullChannelBehavior FullChannelBehavior) *Broadcaster {
 	m := &Broadcaster{
 		watchers:            map[int64]*broadcasterWatcher{},
@@ -92,7 +92,7 @@ func (obj functionFakeRuntimeObject) DeepCopyObject() runtime.Object {
 	return obj
 }
 
-// Execute f, blocking the incoming queue (and waiting for it to drain ***REMOVED***rst).
+// Execute f, blocking the incoming queue (and waiting for it to drain first).
 // The purpose of this terrible hack is so that watchers added after an event
 // won't ever see that event, and will always see any event after they are
 // added.
@@ -130,11 +130,11 @@ func (m *Broadcaster) Watch() Interface {
 	return w
 }
 
-// WatchWithPre***REMOVED***x adds a new watcher to the list and returns an Interface for it. It sends
+// WatchWithPrefix adds a new watcher to the list and returns an Interface for it. It sends
 // queuedEvents down the new watch before beginning to send ordinary events from Broadcaster.
 // The returned watch will have a queue length that is at least large enough to accommodate
 // all of the items in queuedEvents.
-func (m *Broadcaster) WatchWithPre***REMOVED***x(queuedEvents []Event) Interface {
+func (m *Broadcaster) WatchWithPrefix(queuedEvents []Event) Interface {
 	var w *broadcasterWatcher
 	m.blockQueue(func() {
 		m.lock.Lock()
@@ -227,7 +227,7 @@ func (m *Broadcaster) distribute(event Event) {
 			default: // Don't block if the event can't be queued.
 			}
 		}
-	} ***REMOVED*** {
+	} else {
 		for _, w := range m.watchers {
 			select {
 			case w.result <- event:

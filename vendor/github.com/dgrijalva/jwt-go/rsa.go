@@ -13,7 +13,7 @@ type SigningMethodRSA struct {
 	Hash crypto.Hash
 }
 
-// Speci***REMOVED***c instances for RS256 and company
+// Specific instances for RS256 and company
 var (
 	SigningMethodRS256 *SigningMethodRSA
 	SigningMethodRS384 *SigningMethodRSA
@@ -95,7 +95,7 @@ func (m *SigningMethodRSA) Sign(signingString string, key interface{}) (string, 
 	// Sign the string and return the encoded bytes
 	if sigBytes, err := rsa.SignPKCS1v15(rand.Reader, rsaKey, m.Hash, hasher.Sum(nil)); err == nil {
 		return EncodeSegment(sigBytes), nil
-	} ***REMOVED*** {
+	} else {
 		return "", err
 	}
 }

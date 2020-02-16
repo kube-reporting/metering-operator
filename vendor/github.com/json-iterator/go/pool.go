@@ -4,38 +4,38 @@ import (
 	"io"
 )
 
-// IteratorPool a thread safe pool of iterators with same con***REMOVED***guration
+// IteratorPool a thread safe pool of iterators with same configuration
 type IteratorPool interface {
 	BorrowIterator(data []byte) *Iterator
 	ReturnIterator(iter *Iterator)
 }
 
-// StreamPool a thread safe pool of streams with same con***REMOVED***guration
+// StreamPool a thread safe pool of streams with same configuration
 type StreamPool interface {
 	BorrowStream(writer io.Writer) *Stream
 	ReturnStream(stream *Stream)
 }
 
-func (cfg *frozenCon***REMOVED***g) BorrowStream(writer io.Writer) *Stream {
+func (cfg *frozenConfig) BorrowStream(writer io.Writer) *Stream {
 	stream := cfg.streamPool.Get().(*Stream)
 	stream.Reset(writer)
 	return stream
 }
 
-func (cfg *frozenCon***REMOVED***g) ReturnStream(stream *Stream) {
+func (cfg *frozenConfig) ReturnStream(stream *Stream) {
 	stream.out = nil
 	stream.Error = nil
 	stream.Attachment = nil
 	cfg.streamPool.Put(stream)
 }
 
-func (cfg *frozenCon***REMOVED***g) BorrowIterator(data []byte) *Iterator {
+func (cfg *frozenConfig) BorrowIterator(data []byte) *Iterator {
 	iter := cfg.iteratorPool.Get().(*Iterator)
 	iter.ResetBytes(data)
 	return iter
 }
 
-func (cfg *frozenCon***REMOVED***g) ReturnIterator(iter *Iterator) {
+func (cfg *frozenConfig) ReturnIterator(iter *Iterator) {
 	iter.Error = nil
 	iter.Attachment = nil
 	cfg.iteratorPool.Put(iter)

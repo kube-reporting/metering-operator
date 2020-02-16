@@ -2,7 +2,7 @@
 Copyright 2017 The Kubernetes Authors.
 
 Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this ***REMOVED***le except in compliance with the License.
+you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
 
     http://www.apache.org/licenses/LICENSE-2.0
@@ -10,7 +10,7 @@ You may obtain a copy of the License at
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the speci***REMOVED***c language governing permissions and
+See the License for the specific language governing permissions and
 limitations under the License.
 */
 
@@ -25,7 +25,7 @@ import (
 
 // SetCRDCondition sets the status condition.  It either overwrites the existing one or
 // creates a new one
-func SetCRDCondition(crd *CustomResourceDe***REMOVED***nition, newCondition CustomResourceDe***REMOVED***nitionCondition) {
+func SetCRDCondition(crd *CustomResourceDefinition, newCondition CustomResourceDefinitionCondition) {
 	existingCondition := FindCRDCondition(crd, newCondition.Type)
 	if existingCondition == nil {
 		newCondition.LastTransitionTime = metav1.NewTime(time.Now())
@@ -43,8 +43,8 @@ func SetCRDCondition(crd *CustomResourceDe***REMOVED***nition, newCondition Cust
 }
 
 // RemoveCRDCondition removes the status condition.
-func RemoveCRDCondition(crd *CustomResourceDe***REMOVED***nition, conditionType CustomResourceDe***REMOVED***nitionConditionType) {
-	newConditions := []CustomResourceDe***REMOVED***nitionCondition{}
+func RemoveCRDCondition(crd *CustomResourceDefinition, conditionType CustomResourceDefinitionConditionType) {
+	newConditions := []CustomResourceDefinitionCondition{}
 	for _, condition := range crd.Status.Conditions {
 		if condition.Type != conditionType {
 			newConditions = append(newConditions, condition)
@@ -54,7 +54,7 @@ func RemoveCRDCondition(crd *CustomResourceDe***REMOVED***nition, conditionType 
 }
 
 // FindCRDCondition returns the condition you're looking for or nil
-func FindCRDCondition(crd *CustomResourceDe***REMOVED***nition, conditionType CustomResourceDe***REMOVED***nitionConditionType) *CustomResourceDe***REMOVED***nitionCondition {
+func FindCRDCondition(crd *CustomResourceDefinition, conditionType CustomResourceDefinitionConditionType) *CustomResourceDefinitionCondition {
 	for i := range crd.Status.Conditions {
 		if crd.Status.Conditions[i].Type == conditionType {
 			return &crd.Status.Conditions[i]
@@ -65,17 +65,17 @@ func FindCRDCondition(crd *CustomResourceDe***REMOVED***nition, conditionType Cu
 }
 
 // IsCRDConditionTrue indicates if the condition is present and strictly true
-func IsCRDConditionTrue(crd *CustomResourceDe***REMOVED***nition, conditionType CustomResourceDe***REMOVED***nitionConditionType) bool {
+func IsCRDConditionTrue(crd *CustomResourceDefinition, conditionType CustomResourceDefinitionConditionType) bool {
 	return IsCRDConditionPresentAndEqual(crd, conditionType, ConditionTrue)
 }
 
 // IsCRDConditionFalse indicates if the condition is present and false true
-func IsCRDConditionFalse(crd *CustomResourceDe***REMOVED***nition, conditionType CustomResourceDe***REMOVED***nitionConditionType) bool {
+func IsCRDConditionFalse(crd *CustomResourceDefinition, conditionType CustomResourceDefinitionConditionType) bool {
 	return IsCRDConditionPresentAndEqual(crd, conditionType, ConditionFalse)
 }
 
 // IsCRDConditionPresentAndEqual indicates if the condition is present and equal to the arg
-func IsCRDConditionPresentAndEqual(crd *CustomResourceDe***REMOVED***nition, conditionType CustomResourceDe***REMOVED***nitionConditionType, status ConditionStatus) bool {
+func IsCRDConditionPresentAndEqual(crd *CustomResourceDefinition, conditionType CustomResourceDefinitionConditionType, status ConditionStatus) bool {
 	for _, condition := range crd.Status.Conditions {
 		if condition.Type == conditionType {
 			return condition.Status == status
@@ -85,7 +85,7 @@ func IsCRDConditionPresentAndEqual(crd *CustomResourceDe***REMOVED***nition, con
 }
 
 // IsCRDConditionEquivalent returns true if the lhs and rhs are equivalent except for times
-func IsCRDConditionEquivalent(lhs, rhs *CustomResourceDe***REMOVED***nitionCondition) bool {
+func IsCRDConditionEquivalent(lhs, rhs *CustomResourceDefinitionCondition) bool {
 	if lhs == nil && rhs == nil {
 		return true
 	}
@@ -96,10 +96,10 @@ func IsCRDConditionEquivalent(lhs, rhs *CustomResourceDe***REMOVED***nitionCondi
 	return lhs.Message == rhs.Message && lhs.Reason == rhs.Reason && lhs.Status == rhs.Status && lhs.Type == rhs.Type
 }
 
-// CRDHasFinalizer returns true if the ***REMOVED***nalizer is in the list
-func CRDHasFinalizer(crd *CustomResourceDe***REMOVED***nition, needle string) bool {
-	for _, ***REMOVED***nalizer := range crd.Finalizers {
-		if ***REMOVED***nalizer == needle {
+// CRDHasFinalizer returns true if the finalizer is in the list
+func CRDHasFinalizer(crd *CustomResourceDefinition, needle string) bool {
+	for _, finalizer := range crd.Finalizers {
+		if finalizer == needle {
 			return true
 		}
 	}
@@ -107,19 +107,19 @@ func CRDHasFinalizer(crd *CustomResourceDe***REMOVED***nition, needle string) bo
 	return false
 }
 
-// CRDRemoveFinalizer removes the ***REMOVED***nalizer if present
-func CRDRemoveFinalizer(crd *CustomResourceDe***REMOVED***nition, needle string) {
+// CRDRemoveFinalizer removes the finalizer if present
+func CRDRemoveFinalizer(crd *CustomResourceDefinition, needle string) {
 	newFinalizers := []string{}
-	for _, ***REMOVED***nalizer := range crd.Finalizers {
-		if ***REMOVED***nalizer != needle {
-			newFinalizers = append(newFinalizers, ***REMOVED***nalizer)
+	for _, finalizer := range crd.Finalizers {
+		if finalizer != needle {
+			newFinalizers = append(newFinalizers, finalizer)
 		}
 	}
 	crd.Finalizers = newFinalizers
 }
 
 // HasServedCRDVersion returns true if `version` is in the list of CRD's versions and the Served flag is set.
-func HasServedCRDVersion(crd *CustomResourceDe***REMOVED***nition, version string) bool {
+func HasServedCRDVersion(crd *CustomResourceDefinition, version string) bool {
 	for _, v := range crd.Spec.Versions {
 		if v.Name == version {
 			return v.Served
@@ -129,17 +129,17 @@ func HasServedCRDVersion(crd *CustomResourceDe***REMOVED***nition, version strin
 }
 
 // GetCRDStorageVersion returns the storage version for given CRD.
-func GetCRDStorageVersion(crd *CustomResourceDe***REMOVED***nition) (string, error) {
+func GetCRDStorageVersion(crd *CustomResourceDefinition) (string, error) {
 	for _, v := range crd.Spec.Versions {
 		if v.Storage {
 			return v.Name, nil
 		}
 	}
 	// This should not happened if crd is valid
-	return "", fmt.Errorf("invalid CustomResourceDe***REMOVED***nition, no storage version")
+	return "", fmt.Errorf("invalid CustomResourceDefinition, no storage version")
 }
 
-func IsStoredVersion(crd *CustomResourceDe***REMOVED***nition, version string) bool {
+func IsStoredVersion(crd *CustomResourceDefinition, version string) bool {
 	for _, v := range crd.Status.StoredVersions {
 		if version == v {
 			return true

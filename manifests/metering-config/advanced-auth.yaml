@@ -1,5 +1,5 @@
 apiVersion: metering.openshift.io/v1
-kind: MeteringCon***REMOVED***g
+kind: MeteringConfig
 metadata:
   name: "operator-metering"
 spec:
@@ -37,7 +37,7 @@ spec:
   reporting-operator:
     spec:
       authProxy:
-        # htpasswd.data can contain htpasswd ***REMOVED***le contents for allowing auth
+        # htpasswd.data can contain htpasswd file contents for allowing auth
         # using a static list of usernames and their password hashes.
         #
         # username is 'testuser' password is 'password123'

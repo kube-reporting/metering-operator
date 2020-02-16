@@ -1,6 +1,6 @@
 // Copyright 2014 The Go Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE ***REMOVED***le.
+// license that can be found in the LICENSE file.
 
 package http2
 
@@ -22,7 +22,7 @@ const frameHeaderLen = 9
 
 var padZeros = make([]byte, 255) // zeros for padding
 
-// A FrameType is a registered frame type as de***REMOVED***ned in
+// A FrameType is a registered frame type as defined in
 // http://http2.github.io/http2-spec/#rfc.section.11.2
 type FrameType uint8
 
@@ -68,7 +68,7 @@ func (f Flags) Has(v Flags) bool {
 	return (f & v) == v
 }
 
-// Frame-speci***REMOVED***c FrameHeader flag bits.
+// Frame-specific FrameHeader flag bits.
 const (
 	// Data Frame
 	FlagDataEndStream Flags = 0x1
@@ -148,7 +148,7 @@ func typeFrameParser(t FrameType) frameParser {
 //
 // See http://http2.github.io/http2-spec/#FrameHeader
 type FrameHeader struct {
-	valid bool // caller can access []byte ***REMOVED***elds in the Frame
+	valid bool // caller can access []byte fields in the Frame
 
 	// Type is the 1 byte frame type. There are ten standard frame
 	// types, but extension frame types may be written by WriteRawFrame
@@ -156,7 +156,7 @@ type FrameHeader struct {
 	Type FrameType
 
 	// Flags are the 1 byte of 8 potential bit flags per frame.
-	// They are speci***REMOVED***c to the frame type.
+	// They are specific to the frame type.
 	Flags Flags
 
 	// Length is the length of the frame, not including the 9 byte header.
@@ -165,12 +165,12 @@ type FrameHeader struct {
 	Length uint32
 
 	// StreamID is which stream this frame is for. Certain frames
-	// are not stream-speci***REMOVED***c, in which case this ***REMOVED***eld is 0.
+	// are not stream-specific, in which case this field is 0.
 	StreamID uint32
 }
 
 // Header returns h. It exists so FrameHeaders can be embedded in other
-// speci***REMOVED***c frame types and implement the Frame interface.
+// specific frame types and implement the Frame interface.
 func (h FrameHeader) Header() FrameHeader { return h }
 
 func (h FrameHeader) String() string {
@@ -197,7 +197,7 @@ func (h FrameHeader) writeDebug(buf *bytes.Buffer) {
 			name := flagName[h.Type][Flags(1<<i)]
 			if name != "" {
 				buf.WriteString(name)
-			} ***REMOVED*** {
+			} else {
 				fmt.Fprintf(buf, "0x%x", 1<<i)
 			}
 		}
@@ -248,7 +248,7 @@ func readFrameHeader(buf []byte, r io.Reader) (FrameHeader, error) {
 }
 
 // A Frame is the base interface implemented by all frame types.
-// Callers will generally type-assert the speci***REMOVED***c frame type:
+// Callers will generally type-assert the specific frame type:
 // *HeadersFrame, *SettingsFrame, *WindowUpdateFrame, etc.
 //
 // Frames are only valid until the next call to Framer.ReadFrame.
@@ -268,13 +268,13 @@ type Framer struct {
 	errDetail error
 
 	// lastHeaderStream is non-zero if the last frame was an
-	// un***REMOVED***nished HEADERS/CONTINUATION.
+	// unfinished HEADERS/CONTINUATION.
 	lastHeaderStream uint32
 
 	maxReadSize uint32
 	headerBuf   [frameHeaderLen]byte
 
-	// TODO: let getReadBuf be con***REMOVED***gurable, and use a less memory-pinning
+	// TODO: let getReadBuf be configurable, and use a less memory-pinning
 	// allocator in server.go to minimize memory pinned for many idle conns.
 	// Will probably also need to make frame invalidation have a hook too.
 	getReadBuf func(size uint32) []byte
@@ -337,7 +337,7 @@ func (fr *Framer) maxHeaderListSize() uint32 {
 func (f *Framer) startWrite(ftype FrameType, flags Flags, streamID uint32) {
 	// Write the FrameHeader.
 	f.wbuf = append(f.wbuf[:0],
-		0, // 3 bytes of length, ***REMOVED***lled in in endWrite
+		0, // 3 bytes of length, filled in in endWrite
 		0,
 		0,
 		byte(ftype),
@@ -349,7 +349,7 @@ func (f *Framer) startWrite(ftype FrameType, flags Flags, streamID uint32) {
 }
 
 func (f *Framer) endWrite() error {
-	// Now that we know the ***REMOVED***nal size, ***REMOVED***ll in the FrameHeader in
+	// Now that we know the final size, fill in the FrameHeader in
 	// the space previously reserved for it. Abuse append.
 	length := len(f.wbuf) - frameHeaderLen
 	if length >= (1 << 24) {
@@ -482,7 +482,7 @@ func terminalReadFrameError(err error) bool {
 //
 // If the frame is larger than previously set with SetMaxReadFrameSize, the
 // returned error is ErrFrameTooLarge. Other errors may be of type
-// ConnectionError, StreamError, or anything ***REMOVED*** from the underlying
+// ConnectionError, StreamError, or anything else from the underlying
 // reader.
 func (fr *Framer) ReadFrame() (Frame, error) {
 	fr.errDetail = nil
@@ -519,7 +519,7 @@ func (fr *Framer) ReadFrame() (Frame, error) {
 	return f, nil
 }
 
-// connError returns ConnectionError(code) but ***REMOVED***rst
+// connError returns ConnectionError(code) but first
 // stashes away a public reason to the caller can optionally relay it
 // to the peer before hanging up on them. This might help others debug
 // their implementations.
@@ -551,7 +551,7 @@ func (fr *Framer) checkFrameOrder(f Frame) error {
 				fmt.Sprintf("got CONTINUATION for stream %d; expected stream %d",
 					fh.StreamID, fr.lastHeaderStream))
 		}
-	} ***REMOVED*** if fh.Type == FrameContinuation {
+	} else if fh.Type == FrameContinuation {
 		return fr.connError(ErrCodeProtocol, fmt.Sprintf("unexpected CONTINUATION for stream %d", fh.StreamID))
 	}
 
@@ -559,7 +559,7 @@ func (fr *Framer) checkFrameOrder(f Frame) error {
 	case FrameHeaders, FrameContinuation:
 		if fh.Flags.Has(FlagHeadersEndHeaders) {
 			fr.lastHeaderStream = 0
-		} ***REMOVED*** {
+		} else {
 			fr.lastHeaderStream = fh.StreamID
 		}
 	}
@@ -580,7 +580,7 @@ func (f *DataFrame) StreamEnded() bool {
 }
 
 // Data returns the frame's data octets, not including any padding
-// size byte or padding suf***REMOVED***x bytes.
+// size byte or padding suffix bytes.
 // The caller must not retain the returned memory past the next
 // call to ReadFrame.
 func (f *DataFrame) Data() []byte {
@@ -591,8 +591,8 @@ func (f *DataFrame) Data() []byte {
 func parseDataFrame(fc *frameCache, fh FrameHeader, payload []byte) (Frame, error) {
 	if fh.StreamID == 0 {
 		// DATA frames MUST be associated with a stream. If a
-		// DATA frame is received whose stream identi***REMOVED***er
-		// ***REMOVED***eld is 0x0, the recipient MUST respond with a
+		// DATA frame is received whose stream identifier
+		// field is 0x0, the recipient MUST respond with a
 		// connection error (Section 5.4.1) of type
 		// PROTOCOL_ERROR.
 		return nil, connError{ErrCodeProtocol, "DATA frame with stream ID 0"}
@@ -685,7 +685,7 @@ func (f *Framer) WriteDataPadded(streamID uint32, endStream bool, data, pad []by
 	return f.endWrite()
 }
 
-// A SettingsFrame conveys con***REMOVED***guration parameters that affect how
+// A SettingsFrame conveys configuration parameters that affect how
 // endpoints communicate, such as preferences and constraints on peer
 // behavior.
 //
@@ -700,17 +700,17 @@ func parseSettingsFrame(_ *frameCache, fh FrameHeader, p []byte) (Frame, error) 
 		// When this (ACK 0x1) bit is set, the payload of the
 		// SETTINGS frame MUST be empty. Receipt of a
 		// SETTINGS frame with the ACK flag set and a length
-		// ***REMOVED***eld value other than 0 MUST be treated as a
+		// field value other than 0 MUST be treated as a
 		// connection error (Section 5.4.1) of type
 		// FRAME_SIZE_ERROR.
 		return nil, ConnectionError(ErrCodeFrameSize)
 	}
 	if fh.StreamID != 0 {
 		// SETTINGS frames always apply to a connection,
-		// never a single stream. The stream identi***REMOVED***er for a
+		// never a single stream. The stream identifier for a
 		// SETTINGS frame MUST be zero (0x0).  If an endpoint
-		// receives a SETTINGS frame whose stream identi***REMOVED***er
-		// ***REMOVED***eld is anything other than 0x0, the endpoint MUST
+		// receives a SETTINGS frame whose stream identifier
+		// field is anything other than 0x0, the endpoint MUST
 		// respond with a connection error (Section 5.4.1) of
 		// type PROTOCOL_ERROR.
 		return nil, ConnectionError(ErrCodeProtocol)
@@ -747,7 +747,7 @@ func (f *SettingsFrame) Value(s SettingID) (v uint32, ok bool) {
 }
 
 // ForeachSetting runs fn for each setting.
-// It stops and returns the ***REMOVED***rst error.
+// It stops and returns the first error.
 func (f *SettingsFrame) ForeachSetting(fn func(Setting) error) error {
 	f.checkValid()
 	buf := f.p
@@ -764,7 +764,7 @@ func (f *SettingsFrame) ForeachSetting(fn func(Setting) error) error {
 }
 
 // WriteSettings writes a SETTINGS frame with zero or more settings
-// speci***REMOVED***ed and the ACK bit not set.
+// specified and the ACK bit not set.
 //
 // It will perform exactly one Write to the underlying Writer.
 // It is the caller's responsibility to not call other Write methods concurrently.
@@ -829,7 +829,7 @@ type GoAwayFrame struct {
 }
 
 // DebugData returns any debug data in the GOAWAY frame. Its contents
-// are not de***REMOVED***ned.
+// are not defined.
 // The caller must not retain the returned memory past the next
 // call to ReadFrame.
 func (f *GoAwayFrame) DebugData() []byte {
@@ -861,7 +861,7 @@ func (f *Framer) WriteGoAway(maxStreamID uint32, code ErrCode, debugData []byte)
 }
 
 // An UnknownFrame is the frame type returned when the frame type is unknown
-// or no speci***REMOVED***c frame type parser exists.
+// or no specific frame type parser exists.
 type UnknownFrame struct {
 	FrameHeader
 	p []byte
@@ -959,7 +959,7 @@ func parseHeadersFrame(_ *frameCache, fh FrameHeader, p []byte) (_ Frame, err er
 	}
 	if fh.StreamID == 0 {
 		// HEADERS frames MUST be associated with a stream. If a HEADERS frame
-		// is received whose stream identi***REMOVED***er ***REMOVED***eld is 0x0, the recipient MUST
+		// is received whose stream identifier field is 0x0, the recipient MUST
 		// respond with a connection error (Section 5.4.1) of type
 		// PROTOCOL_ERROR.
 		return nil, connError{ErrCodeProtocol, "HEADERS frame with stream ID 0"}
@@ -998,7 +998,7 @@ type HeadersFrameParam struct {
 	BlockFragment []byte
 
 	// EndStream indicates that the header block is the last that
-	// the endpoint will send for the identi***REMOVED***ed stream. Setting
+	// the endpoint will send for the identified stream. Setting
 	// this flag causes the stream to enter one of "half closed"
 	// states.
 	EndStream bool
@@ -1021,7 +1021,7 @@ type HeadersFrameParam struct {
 //
 // This is a low-level header writing method. Encoding headers and
 // splitting them into any necessary CONTINUATION frames is handled
-// ***REMOVED***where.
+// elsewhere.
 //
 // It will perform exactly one Write to the underlying Writer.
 // It is the caller's responsibility to not call other Write methods concurrently.
@@ -1062,7 +1062,7 @@ func (f *Framer) WriteHeaders(p HeadersFrameParam) error {
 	return f.endWrite()
 }
 
-// A PriorityFrame speci***REMOVED***es the sender-advised priority of a stream.
+// A PriorityFrame specifies the sender-advised priority of a stream.
 // See http://http2.github.io/http2-spec/#rfc.section.6.3
 type PriorityFrame struct {
 	FrameHeader
@@ -1071,7 +1071,7 @@ type PriorityFrame struct {
 
 // PriorityParam are the stream prioritzation parameters.
 type PriorityParam struct {
-	// StreamDep is a 31-bit stream identi***REMOVED***er for the
+	// StreamDep is a 31-bit stream identifier for the
 	// stream that this stream depends on. Zero means no
 	// dependency.
 	StreamDep uint32
@@ -1223,15 +1223,15 @@ func parsePushPromise(_ *frameCache, fh FrameHeader, p []byte) (_ Frame, err err
 	}
 	if pp.StreamID == 0 {
 		// PUSH_PROMISE frames MUST be associated with an existing,
-		// peer-initiated stream. The stream identi***REMOVED***er of a
+		// peer-initiated stream. The stream identifier of a
 		// PUSH_PROMISE frame indicates the stream it is associated
-		// with. If the stream identi***REMOVED***er ***REMOVED***eld speci***REMOVED***es the value
+		// with. If the stream identifier field specifies the value
 		// 0x0, a recipient MUST respond with a connection error
 		// (Section 5.4.1) of type PROTOCOL_ERROR.
 		return nil, ConnectionError(ErrCodeProtocol)
 	}
 	// The PUSH_PROMISE frame includes optional padding.
-	// Padding ***REMOVED***elds and flags are identical to those de***REMOVED***ned for DATA frames
+	// Padding fields and flags are identical to those defined for DATA frames
 	var padLength uint8
 	if fh.Flags.Has(FlagPushPromisePadded) {
 		if p, padLength, err = readByte(p); err != nil {
@@ -1278,7 +1278,7 @@ type PushPromiseParam struct {
 // WritePushPromise writes a single PushPromise Frame.
 //
 // As with Header Frames, This is the low level call for writing
-// individual frames. Continuation frames are handled ***REMOVED***where.
+// individual frames. Continuation frames are handled elsewhere.
 //
 // It will perform exactly one Write to the underlying Writer.
 // It is the caller's responsibility to not call other Write methods concurrently.
@@ -1350,14 +1350,14 @@ type headersOrContinuation interface {
 type MetaHeadersFrame struct {
 	*HeadersFrame
 
-	// Fields are the ***REMOVED***elds contained in the HEADERS and
+	// Fields are the fields contained in the HEADERS and
 	// CONTINUATION frames. The underlying slice is owned by the
 	// Framer and must not be retained after the next call to
 	// ReadFrame.
 	//
 	// Fields are guaranteed to be in the correct http2 order and
-	// not have unknown pseudo header ***REMOVED***elds or invalid header
-	// ***REMOVED***eld names or values. Required pseudo header ***REMOVED***elds may be
+	// not have unknown pseudo header fields or invalid header
+	// field names or values. Required pseudo header fields may be
 	// missing, however. Use the MetaHeadersFrame.Pseudo accessor
 	// method access pseudo headers.
 	Fields []hpack.HeaderField
@@ -1368,8 +1368,8 @@ type MetaHeadersFrame struct {
 	Truncated bool
 }
 
-// PseudoValue returns the given pseudo header ***REMOVED***eld's value.
-// The provided pseudo ***REMOVED***eld should not contain the leading colon.
+// PseudoValue returns the given pseudo header field's value.
+// The provided pseudo field should not contain the leading colon.
 func (mh *MetaHeadersFrame) PseudoValue(pseudo string) string {
 	for _, hf := range mh.Fields {
 		if !hf.IsPseudo() {
@@ -1382,7 +1382,7 @@ func (mh *MetaHeadersFrame) PseudoValue(pseudo string) string {
 	return ""
 }
 
-// RegularFields returns the regular (non-pseudo) header ***REMOVED***elds of mh.
+// RegularFields returns the regular (non-pseudo) header fields of mh.
 // The caller does not own the returned slice.
 func (mh *MetaHeadersFrame) RegularFields() []hpack.HeaderField {
 	for i, hf := range mh.Fields {
@@ -1393,7 +1393,7 @@ func (mh *MetaHeadersFrame) RegularFields() []hpack.HeaderField {
 	return nil
 }
 
-// PseudoFields returns the pseudo header ***REMOVED***elds of mh.
+// PseudoFields returns the pseudo header fields of mh.
 // The caller does not own the returned slice.
 func (mh *MetaHeadersFrame) PseudoFields() []hpack.HeaderField {
 	for i, hf := range mh.Fields {
@@ -1454,23 +1454,23 @@ func (fr *Framer) readMetaFrame(hf *HeadersFrame) (*MetaHeadersFrame, error) {
 	var remainSize = fr.maxHeaderListSize()
 	var sawRegular bool
 
-	var invalid error // pseudo header ***REMOVED***eld errors
+	var invalid error // pseudo header field errors
 	hdec := fr.ReadMetaHeaders
 	hdec.SetEmitEnabled(true)
 	hdec.SetMaxStringLength(fr.maxHeaderStringLen())
 	hdec.SetEmitFunc(func(hf hpack.HeaderField) {
 		if VerboseLogs && fr.logReads {
-			fr.debugReadLoggerf("http2: decoded hpack ***REMOVED***eld %+v", hf)
+			fr.debugReadLoggerf("http2: decoded hpack field %+v", hf)
 		}
 		if !httplex.ValidHeaderFieldValue(hf.Value) {
 			invalid = headerFieldValueError(hf.Value)
 		}
-		isPseudo := strings.HasPre***REMOVED***x(hf.Name, ":")
+		isPseudo := strings.HasPrefix(hf.Name, ":")
 		if isPseudo {
 			if sawRegular {
 				invalid = errPseudoAfterRegular
 			}
-		} ***REMOVED*** {
+		} else {
 			sawRegular = true
 			if !validWireHeaderFieldName(hf.Name) {
 				invalid = headerFieldNameError(hf.Name)
@@ -1507,7 +1507,7 @@ func (fr *Framer) readMetaFrame(hf *HeadersFrame) (*MetaHeadersFrame, error) {
 		}
 		if f, err := fr.ReadFrame(); err != nil {
 			return nil, err
-		} ***REMOVED*** {
+		} else {
 			hc = f.(*ContinuationFrame) // guaranteed by checkFrameOrder
 		}
 	}

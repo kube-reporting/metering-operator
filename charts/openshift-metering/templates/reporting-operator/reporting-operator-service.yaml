@@ -19,7 +19,7 @@ spec:
     port: 8080
 {{- if $operatorValues.spec.authProxy.enabled }}
     targetPort: auth-proxy
-{{- ***REMOVED*** }}
+{{- else }}
     targetPort: api
 {{- end }}
 {{- if and (eq (lower $operatorValues.spec.apiService.type) "nodeport" "loadbalancer") $operatorValues.spec.apiService.nodePort }}

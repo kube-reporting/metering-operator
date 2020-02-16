@@ -7,7 +7,7 @@ import (
 
 type objectLazyAny struct {
 	baseAny
-	cfg *frozenCon***REMOVED***g
+	cfg *frozenConfig
 	buf []byte
 	err error
 }
@@ -74,25 +74,25 @@ func (any *objectLazyAny) Get(path ...interface{}) Any {
 	if len(path) == 0 {
 		return any
 	}
-	switch ***REMOVED***rstPath := path[0].(type) {
+	switch firstPath := path[0].(type) {
 	case string:
 		iter := any.cfg.BorrowIterator(any.buf)
 		defer any.cfg.ReturnIterator(iter)
-		valueBytes := locateObjectField(iter, ***REMOVED***rstPath)
+		valueBytes := locateObjectField(iter, firstPath)
 		if valueBytes == nil {
 			return newInvalidAny(path)
 		}
 		iter.ResetBytes(valueBytes)
 		return locatePath(iter, path[1:])
 	case int32:
-		if '*' == ***REMOVED***rstPath {
+		if '*' == firstPath {
 			mappedAll := map[string]Any{}
 			iter := any.cfg.BorrowIterator(any.buf)
 			defer any.cfg.ReturnIterator(iter)
-			iter.ReadMapCB(func(iter *Iterator, ***REMOVED***eld string) bool {
+			iter.ReadMapCB(func(iter *Iterator, field string) bool {
 				mapped := locatePath(iter, path[1:])
 				if mapped.ValueType() != InvalidValue {
-					mappedAll[***REMOVED***eld] = mapped
+					mappedAll[field] = mapped
 				}
 				return true
 			})
@@ -108,9 +108,9 @@ func (any *objectLazyAny) Keys() []string {
 	keys := []string{}
 	iter := any.cfg.BorrowIterator(any.buf)
 	defer any.cfg.ReturnIterator(iter)
-	iter.ReadMapCB(func(iter *Iterator, ***REMOVED***eld string) bool {
+	iter.ReadMapCB(func(iter *Iterator, field string) bool {
 		iter.Skip()
-		keys = append(keys, ***REMOVED***eld)
+		keys = append(keys, field)
 		return true
 	})
 	return keys
@@ -120,7 +120,7 @@ func (any *objectLazyAny) Size() int {
 	size := 0
 	iter := any.cfg.BorrowIterator(any.buf)
 	defer any.cfg.ReturnIterator(iter)
-	iter.ReadObjectCB(func(iter *Iterator, ***REMOVED***eld string) bool {
+	iter.ReadObjectCB(func(iter *Iterator, field string) bool {
 		iter.Skip()
 		size++
 		return true
@@ -210,20 +210,20 @@ func (any *objectAny) Get(path ...interface{}) Any {
 	if len(path) == 0 {
 		return any
 	}
-	switch ***REMOVED***rstPath := path[0].(type) {
+	switch firstPath := path[0].(type) {
 	case string:
-		***REMOVED***eld := any.val.FieldByName(***REMOVED***rstPath)
-		if !***REMOVED***eld.IsValid() {
+		field := any.val.FieldByName(firstPath)
+		if !field.IsValid() {
 			return newInvalidAny(path)
 		}
-		return Wrap(***REMOVED***eld.Interface())
+		return Wrap(field.Interface())
 	case int32:
-		if '*' == ***REMOVED***rstPath {
+		if '*' == firstPath {
 			mappedAll := map[string]Any{}
 			for i := 0; i < any.val.NumField(); i++ {
-				***REMOVED***eld := any.val.Field(i)
-				if ***REMOVED***eld.CanInterface() {
-					mapped := Wrap(***REMOVED***eld.Interface()).Get(path[1:]...)
+				field := any.val.Field(i)
+				if field.CanInterface() {
+					mapped := Wrap(field.Interface()).Get(path[1:]...)
 					if mapped.ValueType() != InvalidValue {
 						mappedAll[any.val.Type().Field(i).Name] = mapped
 					}
@@ -329,9 +329,9 @@ func (any *mapAny) Get(path ...interface{}) Any {
 	if len(path) == 0 {
 		return any
 	}
-	switch ***REMOVED***rstPath := path[0].(type) {
+	switch firstPath := path[0].(type) {
 	case int32:
-		if '*' == ***REMOVED***rstPath {
+		if '*' == firstPath {
 			mappedAll := map[string]Any{}
 			for _, key := range any.val.MapKeys() {
 				keyAsStr := key.String()
@@ -345,7 +345,7 @@ func (any *mapAny) Get(path ...interface{}) Any {
 		}
 		return newInvalidAny(path)
 	default:
-		value := any.val.MapIndex(reflect.ValueOf(***REMOVED***rstPath))
+		value := any.val.MapIndex(reflect.ValueOf(firstPath))
 		if !value.IsValid() {
 			return newInvalidAny(path)
 		}

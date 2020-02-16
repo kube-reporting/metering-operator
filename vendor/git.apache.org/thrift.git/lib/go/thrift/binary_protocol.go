@@ -1,10 +1,10 @@
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements. See the NOTICE ***REMOVED***le
+ * or more contributor license agreements. See the NOTICE file
  * distributed with this work for additional information
- * regarding copyright ownership. The ASF licenses this ***REMOVED***le
+ * regarding copyright ownership. The ASF licenses this file
  * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this ***REMOVED***le except in compliance
+ * "License"); you may not use this file except in compliance
  * with the License. You may obtain a copy of the License at
  *
  *   http://www.apache.org/licenses/LICENSE-2.0
@@ -13,7 +13,7 @@
  * software distributed under the License is distributed on an
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
  * KIND, either express or implied. See the License for the
- * speci***REMOVED***c language governing permissions and limitations
+ * specific language governing permissions and limitations
  * under the License.
  */
 
@@ -51,7 +51,7 @@ func NewTBinaryProtocol(t TTransport, strictRead, strictWrite bool) *TBinaryProt
 	p := &TBinaryProtocol{origTransport: t, strictRead: strictRead, strictWrite: strictWrite}
 	if et, ok := t.(TRichTransport); ok {
 		p.trans = et
-	} ***REMOVED*** {
+	} else {
 		p.trans = NewTRichTransport(t)
 	}
 	p.reader = p.trans
@@ -88,7 +88,7 @@ func (p *TBinaryProtocol) WriteMessageBegin(name string, typeId TMessageType, se
 		}
 		e = p.WriteI32(seqId)
 		return e
-	} ***REMOVED*** {
+	} else {
 		e := p.WriteString(name)
 		if e != nil {
 			return e
@@ -461,8 +461,8 @@ func (p *TBinaryProtocol) Flush() (err error) {
 	return NewTProtocolException(p.trans.Flush())
 }
 
-func (p *TBinaryProtocol) Skip(***REMOVED***eldType TType) (err error) {
-	return SkipDefaultDepth(p, ***REMOVED***eldType)
+func (p *TBinaryProtocol) Skip(fieldType TType) (err error) {
+	return SkipDefaultDepth(p, fieldType)
 }
 
 func (p *TBinaryProtocol) Transport() TTransport {

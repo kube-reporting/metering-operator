@@ -1,6 +1,6 @@
 // Copyright 2017 The Go Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE ***REMOVED***le.
+// license that can be found in the LICENSE file.
 
 // Package language implements BCP 47 language tags and related functionality.
 //
@@ -17,7 +17,7 @@
 // Danish, and standard Mandarin can be created as follows:
 //
 //    var matcher = language.NewMatcher([]language.Tag{
-//        language.English,   // The ***REMOVED***rst language is used as fallback.
+//        language.English,   // The first language is used as fallback.
 //        language.MustParse("en-AU"),
 //        language.Danish,
 //        language.Chinese,
@@ -28,7 +28,7 @@
 //
 // User-preferred languages usually come as a comma-separated list of BCP 47
 // language tags.
-// The MatchString ***REMOVED***nds best matches for such strings:
+// The MatchString finds best matches for such strings:
 //
 //    handler(w http.ResponseWriter, r *http.Request) {
 //        lang, _ := r.Cookie("lang")
@@ -36,7 +36,7 @@
 //        tag, _ := language.MatchStrings(matcher, lang.String(), accept)
 //
 //        // tag should now be used for the initialization of any
-//        // locale-speci***REMOVED***c service.
+//        // locale-specific service.
 //    }
 //
 // The Matcher's Match method can be used to match Tags directly.
@@ -44,7 +44,7 @@
 // Matchers are aware of the intricacies of equivalence between languages, such
 // as deprecated subtags, legacy tags, macro languages, mutual
 // intelligibility between scripts and languages, and transparently passing
-// BCP 47 user con***REMOVED***guration.
+// BCP 47 user configuration.
 // For instance, it will know that a reader of Bokmål Danish can read Norwegian
 // and will know that Cantonese ("yue") is a good match for "zh-HK".
 //
@@ -52,13 +52,13 @@
 // Using match results
 //
 // To guarantee a consistent user experience to the user it is important to
-// use the same language tag for the selection of any locale-speci***REMOVED***c services.
+// use the same language tag for the selection of any locale-specific services.
 // For example, it is utterly confusing to substitute spelled-out numbers
 // or dates in one language in text of another language.
 // More subtly confusing is using the wrong sorting order or casing
 // algorithm for a certain language.
 //
-//    All the packages in x/text that provide locale-speci***REMOVED***c services
+//    All the packages in x/text that provide locale-specific services
 //    (e.g. collate, cases) should be initialized with the tag that was
 //    obtained at the start of an interaction with the user.
 //
@@ -66,7 +66,7 @@
 // of the supported languages, as it may contain carried over settings from
 // the user tags.
 // This may be inconvenient when your application has some additional
-// locale-speci***REMOVED***c data for your supported languages.
+// locale-specific data for your supported languages.
 // Match and MatchString both return the index of the matched supported tag
 // to simplify associating such data with the matched tag.
 //
@@ -83,7 +83,7 @@
 //
 // By default, only legacy and deprecated tags are converted into their
 // canonical equivalent. All other information is preserved. This approach makes
-// the con***REMOVED***dence scores more accurate and allows matchers to distinguish
+// the confidence scores more accurate and allows matchers to distinguish
 // between variants that are otherwise lost.
 //
 // As a consequence, two tags that should be treated as identical according to
@@ -98,5 +98,5 @@
 //
 package language // import "golang.org/x/text/language"
 
-// TODO: explanation on how to match languages for your own locale-speci***REMOVED***c
+// TODO: explanation on how to match languages for your own locale-specific
 // service.

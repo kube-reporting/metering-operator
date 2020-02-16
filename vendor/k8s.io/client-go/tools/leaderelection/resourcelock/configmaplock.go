@@ -2,7 +2,7 @@
 Copyright 2017 The Kubernetes Authors.
 
 Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this ***REMOVED***le except in compliance with the License.
+you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
 
     http://www.apache.org/licenses/LICENSE-2.0
@@ -10,7 +10,7 @@ You may obtain a copy of the License at
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the speci***REMOVED***c language governing permissions and
+See the License for the specific language governing permissions and
 limitations under the License.
 */
 
@@ -28,23 +28,23 @@ import (
 
 // TODO: This is almost a exact replica of Endpoints lock.
 // going forwards as we self host more and more components
-// and use Con***REMOVED***gMaps as the means to pass that con***REMOVED***guration
+// and use ConfigMaps as the means to pass that configuration
 // data we will likely move to deprecate the Endpoints lock.
 
-type Con***REMOVED***gMapLock struct {
-	// Con***REMOVED***gMapMeta should contain a Name and a Namespace of a
-	// Con***REMOVED***gMapMeta object that the LeaderElector will attempt to lead.
-	Con***REMOVED***gMapMeta metav1.ObjectMeta
-	Client        corev1client.Con***REMOVED***gMapsGetter
-	LockCon***REMOVED***g    ResourceLockCon***REMOVED***g
-	cm            *v1.Con***REMOVED***gMap
+type ConfigMapLock struct {
+	// ConfigMapMeta should contain a Name and a Namespace of a
+	// ConfigMapMeta object that the LeaderElector will attempt to lead.
+	ConfigMapMeta metav1.ObjectMeta
+	Client        corev1client.ConfigMapsGetter
+	LockConfig    ResourceLockConfig
+	cm            *v1.ConfigMap
 }
 
-// Get returns the election record from a Con***REMOVED***gMap Annotation
-func (cml *Con***REMOVED***gMapLock) Get() (*LeaderElectionRecord, error) {
+// Get returns the election record from a ConfigMap Annotation
+func (cml *ConfigMapLock) Get() (*LeaderElectionRecord, error) {
 	var record LeaderElectionRecord
 	var err error
-	cml.cm, err = cml.Client.Con***REMOVED***gMaps(cml.Con***REMOVED***gMapMeta.Namespace).Get(cml.Con***REMOVED***gMapMeta.Name, metav1.GetOptions{})
+	cml.cm, err = cml.Client.ConfigMaps(cml.ConfigMapMeta.Namespace).Get(cml.ConfigMapMeta.Name, metav1.GetOptions{})
 	if err != nil {
 		return nil, err
 	}
@@ -60,15 +60,15 @@ func (cml *Con***REMOVED***gMapLock) Get() (*LeaderElectionRecord, error) {
 }
 
 // Create attempts to create a LeaderElectionRecord annotation
-func (cml *Con***REMOVED***gMapLock) Create(ler LeaderElectionRecord) error {
+func (cml *ConfigMapLock) Create(ler LeaderElectionRecord) error {
 	recordBytes, err := json.Marshal(ler)
 	if err != nil {
 		return err
 	}
-	cml.cm, err = cml.Client.Con***REMOVED***gMaps(cml.Con***REMOVED***gMapMeta.Namespace).Create(&v1.Con***REMOVED***gMap{
+	cml.cm, err = cml.Client.ConfigMaps(cml.ConfigMapMeta.Namespace).Create(&v1.ConfigMap{
 		ObjectMeta: metav1.ObjectMeta{
-			Name:      cml.Con***REMOVED***gMapMeta.Name,
-			Namespace: cml.Con***REMOVED***gMapMeta.Namespace,
+			Name:      cml.ConfigMapMeta.Name,
+			Namespace: cml.ConfigMapMeta.Namespace,
 			Annotations: map[string]string{
 				LeaderElectionRecordAnnotationKey: string(recordBytes),
 			},
@@ -78,32 +78,32 @@ func (cml *Con***REMOVED***gMapLock) Create(ler LeaderElectionRecord) error {
 }
 
 // Update will update an existing annotation on a given resource.
-func (cml *Con***REMOVED***gMapLock) Update(ler LeaderElectionRecord) error {
+func (cml *ConfigMapLock) Update(ler LeaderElectionRecord) error {
 	if cml.cm == nil {
-		return errors.New("con***REMOVED***gmap not initialized, call get or create ***REMOVED***rst")
+		return errors.New("configmap not initialized, call get or create first")
 	}
 	recordBytes, err := json.Marshal(ler)
 	if err != nil {
 		return err
 	}
 	cml.cm.Annotations[LeaderElectionRecordAnnotationKey] = string(recordBytes)
-	cml.cm, err = cml.Client.Con***REMOVED***gMaps(cml.Con***REMOVED***gMapMeta.Namespace).Update(cml.cm)
+	cml.cm, err = cml.Client.ConfigMaps(cml.ConfigMapMeta.Namespace).Update(cml.cm)
 	return err
 }
 
 // RecordEvent in leader election while adding meta-data
-func (cml *Con***REMOVED***gMapLock) RecordEvent(s string) {
-	events := fmt.Sprintf("%v %v", cml.LockCon***REMOVED***g.Identity, s)
-	cml.LockCon***REMOVED***g.EventRecorder.Eventf(&v1.Con***REMOVED***gMap{ObjectMeta: cml.cm.ObjectMeta}, v1.EventTypeNormal, "LeaderElection", events)
+func (cml *ConfigMapLock) RecordEvent(s string) {
+	events := fmt.Sprintf("%v %v", cml.LockConfig.Identity, s)
+	cml.LockConfig.EventRecorder.Eventf(&v1.ConfigMap{ObjectMeta: cml.cm.ObjectMeta}, v1.EventTypeNormal, "LeaderElection", events)
 }
 
 // Describe is used to convert details on current resource lock
 // into a string
-func (cml *Con***REMOVED***gMapLock) Describe() string {
-	return fmt.Sprintf("%v/%v", cml.Con***REMOVED***gMapMeta.Namespace, cml.Con***REMOVED***gMapMeta.Name)
+func (cml *ConfigMapLock) Describe() string {
+	return fmt.Sprintf("%v/%v", cml.ConfigMapMeta.Namespace, cml.ConfigMapMeta.Name)
 }
 
 // returns the Identity of the lock
-func (cml *Con***REMOVED***gMapLock) Identity() string {
-	return cml.LockCon***REMOVED***g.Identity
+func (cml *ConfigMapLock) Identity() string {
+	return cml.LockConfig.Identity
 }

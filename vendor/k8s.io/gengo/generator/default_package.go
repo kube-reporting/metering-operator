@@ -2,7 +2,7 @@
 Copyright 2015 The Kubernetes Authors.
 
 Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this ***REMOVED***le except in compliance with the License.
+you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
 
     http://www.apache.org/licenses/LICENSE-2.0
@@ -10,7 +10,7 @@ You may obtain a copy of the License at
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the speci***REMOVED***c language governing permissions and
+See the License for the specific language governing permissions and
 limitations under the License.
 */
 
@@ -27,19 +27,19 @@ type DefaultPackage struct {
 	// Import path of the package, and the location on disk of the package.
 	PackagePath string
 
-	// Emitted at the top of every ***REMOVED***le.
+	// Emitted at the top of every file.
 	HeaderText []byte
 
-	// Emitted only for a "doc.go" ***REMOVED***le; appended to the HeaderText for
-	// that ***REMOVED***le.
+	// Emitted only for a "doc.go" file; appended to the HeaderText for
+	// that file.
 	PackageDocumentation []byte
 
 	// If non-nil, will be called on "Generators"; otherwise, the static
-	// list will be used. So you should set only one of these two ***REMOVED***elds.
+	// list will be used. So you should set only one of these two fields.
 	GeneratorFunc func(*Context) []Generator
 	GeneratorList []Generator
 
-	// Optional; ***REMOVED***lters the types exposed to the generators.
+	// Optional; filters the types exposed to the generators.
 	FilterFunc func(*Context, *types.Type) bool
 }
 
@@ -60,8 +60,8 @@ func (d *DefaultPackage) Generators(c *Context) []Generator {
 	return d.GeneratorList
 }
 
-func (d *DefaultPackage) Header(***REMOVED***lename string) []byte {
-	if ***REMOVED***lename == "doc.go" {
+func (d *DefaultPackage) Header(filename string) []byte {
+	if filename == "doc.go" {
 		return append(d.HeaderText, d.PackageDocumentation...)
 	}
 	return d.HeaderText

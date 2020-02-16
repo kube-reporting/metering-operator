@@ -26,7 +26,7 @@ const (
 
 	// ReportFinishedReason is set in the report has generated report results
 	// for all periods between reportingStart and reportingEnd, according to
-	// it's con***REMOVED***gured schedule. Run-once reports are ***REMOVED***nished after their
+	// it's configured schedule. Run-once reports are finished after their
 	// execution.
 	ReportFinishedReason = "Finished"
 
@@ -79,17 +79,17 @@ func SetReportCondition(status *metering.ReportStatus, condition metering.Report
 	if currentCond != nil && currentCond.Status == condition.Status {
 		condition.LastTransitionTime = currentCond.LastTransitionTime
 	}
-	newConditions := ***REMOVED***lterOutCondition(status.Conditions, condition.Type)
+	newConditions := filterOutCondition(status.Conditions, condition.Type)
 	status.Conditions = append(newConditions, condition)
 }
 
 // RemoveReportCondition removes the report condition with the provided type.
 func RemoveReportCondition(status *metering.ReportStatus, condType metering.ReportConditionType) {
-	status.Conditions = ***REMOVED***lterOutCondition(status.Conditions, condType)
+	status.Conditions = filterOutCondition(status.Conditions, condType)
 }
 
-// ***REMOVED***lterOutCondition returns a new slice of report conditions without conditions with the provided type.
-func ***REMOVED***lterOutCondition(conditions []metering.ReportCondition, condType metering.ReportConditionType) []metering.ReportCondition {
+// filterOutCondition returns a new slice of report conditions without conditions with the provided type.
+func filterOutCondition(conditions []metering.ReportCondition, condType metering.ReportConditionType) []metering.ReportCondition {
 	var newConditions []metering.ReportCondition
 	for _, c := range conditions {
 		if c.Type == condType {

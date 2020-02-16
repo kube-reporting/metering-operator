@@ -16,7 +16,7 @@ PUSH_IMAGES="${PUSH_IMAGES:-"true"}"
 if [ -z "$OUTPUT_IMAGE_URL" ]; then
     echo "Couldn't detect \$OUTPUT_IMAGE_URL or unset"
     exit 1
-***REMOVED***
+fi
 
 # default to mirroring the $OSE_IMAGE_TAG for each, but allow overriding the tag to be mirrored per mirror
 METERING_ANSIBLE_OPERATOR_IMAGE_TAG="${METERING_ANSIBLE_OPERATOR_IMAGE_TAG:-$OSE_IMAGE_TAG}"
@@ -30,39 +30,39 @@ OAUTH_PROXY_IMAGE_TAG="${OAUTH_PROXY_IMAGE_TAG:-$OSE_IMAGE_TAG}"
 # if the _IMAGE variable is set for any component, we assume it's got the $SOURCE_REGISTY_PREFIX and lives in the $SOURCE_IMAGE_NAMESPACE, so we remove those values to get the image digest or image tag value (including the `@sha256:` or `:`.
 if [ -n "$METERING_ANSIBLE_OPERATOR_IMAGE" ]; then
     METERING_ANSIBLE_OPERATOR_IMAGE_TAG_OR_DIGEST="${METERING_ANSIBLE_OPERATOR_IMAGE##*/ose-metering-ansible-operator}"
-***REMOVED***
+else
     METERING_ANSIBLE_OPERATOR_IMAGE_TAG_OR_DIGEST=":$METERING_ANSIBLE_OPERATOR_IMAGE_TAG"
-***REMOVED***
+fi
 if [ -n "$METERING_REPORTING_OPERATOR_IMAGE" ]; then
     METERING_REPORTING_OPERATOR_IMAGE_TAG_OR_DIGEST="${METERING_REPORTING_OPERATOR_IMAGE##*/ose-metering-reporting-operator}"
-***REMOVED***
+else
     METERING_REPORTING_OPERATOR_IMAGE_TAG_OR_DIGEST=":$METERING_REPORTING_OPERATOR_IMAGE_TAG"
-***REMOVED***
+fi
 if [ -n "$METERING_PRESTO_IMAGE" ]; then
     METERING_PRESTO_IMAGE_TAG_OR_DIGEST="${METERING_PRESTO_IMAGE##*/ose-metering-presto}"
-***REMOVED***
+else
     METERING_PRESTO_IMAGE_TAG_OR_DIGEST=":$METERING_PRESTO_IMAGE_TAG"
-***REMOVED***
+fi
 if [ -n "$METERING_HIVE_IMAGE" ]; then
     METERING_HIVE_IMAGE_TAG_OR_DIGEST="${METERING_HIVE_IMAGE##*/ose-metering-hive}"
-***REMOVED***
+else
     METERING_HIVE_IMAGE_TAG_OR_DIGEST=":$METERING_HIVE_IMAGE_TAG"
-***REMOVED***
+fi
 if [ -n "$METERING_HADOOP_IMAGE" ]; then
     METERING_HADOOP_IMAGE_TAG_OR_DIGEST="${METERING_HADOOP_IMAGE##*/ose-metering-hadoop}"
-***REMOVED***
+else
     METERING_HADOOP_IMAGE_TAG_OR_DIGEST=":$METERING_HADOOP_IMAGE_TAG"
-***REMOVED***
+fi
 if [ -n "$GHOSTUNNEL_IMAGE" ]; then
     GHOSTUNNEL_IMAGE_TAG_OR_DIGEST="${GHOSTUNNEL_IMAGE##*/ose-ghostunnel}"
-***REMOVED***
+else
     GHOSTUNNEL_IMAGE_TAG_OR_DIGEST=":$GHOSTUNNEL_IMAGE_TAG"
-***REMOVED***
+fi
 if [ -n "$OAUTH_PROXY_IMAGE" ]; then
     OAUTH_PROXY_IMAGE_TAG_OR_DIGEST="${OAUTH_PROXY_IMAGE##*/ose-oauth-proxy}"
-***REMOVED***
+else
     OAUTH_PROXY_IMAGE_TAG_OR_DIGEST=":$OAUTH_PROXY_IMAGE_TAG"
-***REMOVED***
+fi
 
 METERING_ANSIBLE_OPERATOR_SOURCE_IMAGE="${METERING_ANSIBLE_OPERATOR_SOURCE_IMAGE:-"$SOURCE_IMAGE_NAMESPACE/openshift-ose-metering-ansible-operator$METERING_ANSIBLE_OPERATOR_IMAGE_TAG_OR_DIGEST"}"
 METERING_REPORTING_OPERATOR_SOURCE_IMAGE="${METERING_REPORTING_OPERATOR_SOURCE_IMAGE:-"$SOURCE_IMAGE_NAMESPACE/openshift-ose-metering-reporting-operator$METERING_REPORTING_OPERATOR_IMAGE_TAG_OR_DIGEST"}"
@@ -97,7 +97,7 @@ if [ "$SETUP_REGISTRY_AUTH" == "true" ]; then
         -u registry-editor \
         -p "$(oc sa get-token registry-editor -n "$REPO_NAMESPACE")"
     set -x
-***REMOVED***
+fi
 
 echo "Ensuring namespace $REPO_NAMESPACE exists for images to be pushed into"
 oc create namespace "$REPO_NAMESPACE" || true

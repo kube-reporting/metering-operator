@@ -3,17 +3,17 @@ package gophercloud
 import (
 	"fmt"
 	"net/url"
-	"path/***REMOVED***lepath"
+	"path/filepath"
 	"strings"
 	"time"
 )
 
 // WaitFor polls a predicate function, once per second, up to a timeout limit.
 // This is useful to wait for a resource to transition to a certain state.
-// To handle situations when the predicate might hang inde***REMOVED***nitely, the
+// To handle situations when the predicate might hang indefinitely, the
 // predicate will be prematurely cancelled after the timeout.
 // Resource packages will wrap this in a more convenient function that's
-// speci***REMOVED***c to a certain resource, but it can also be useful on its own.
+// specific to a certain resource, but it can also be useful on its own.
 func WaitFor(timeout int, predicate func() (bool, error)) error {
 	type WaitForResult struct {
 		Success bool
@@ -34,8 +34,8 @@ func WaitFor(timeout int, predicate func() (bool, error)) error {
 		ch := make(chan bool, 1)
 		go func() {
 			defer close(ch)
-			satis***REMOVED***ed, err := predicate()
-			result.Success = satis***REMOVED***ed
+			satisfied, err := predicate()
+			result.Success = satisfied
 			result.Error = err
 		}()
 
@@ -47,7 +47,7 @@ func WaitFor(timeout int, predicate func() (bool, error)) error {
 			if result.Success {
 				return nil
 			}
-		// If the predicate has not ***REMOVED***nished by the timeout, cancel it.
+		// If the predicate has not finished by the timeout, cancel it.
 		case <-time.After(time.Duration(timeout) * time.Second):
 			return fmt.Errorf("A timeout occurred")
 		}
@@ -59,22 +59,22 @@ func WaitFor(timeout int, predicate func() (bool, error)) error {
 // It ensures that each endpoint URL has a closing `/`, as expected by
 // ServiceClient's methods.
 func NormalizeURL(url string) string {
-	if !strings.HasSuf***REMOVED***x(url, "/") {
+	if !strings.HasSuffix(url, "/") {
 		return url + "/"
 	}
 	return url
 }
 
 // NormalizePathURL is used to convert rawPath to a fqdn, using basePath as
-// a reference in the ***REMOVED***lesystem, if necessary. basePath is assumed to contain
-// either '.' when ***REMOVED***rst used, or the ***REMOVED***le:// type fqdn of the parent resource.
-// e.g. myFavScript.yaml => ***REMOVED***le://opt/lib/myFavScript.yaml
+// a reference in the filesystem, if necessary. basePath is assumed to contain
+// either '.' when first used, or the file:// type fqdn of the parent resource.
+// e.g. myFavScript.yaml => file://opt/lib/myFavScript.yaml
 func NormalizePathURL(basePath, rawPath string) (string, error) {
 	u, err := url.Parse(rawPath)
 	if err != nil {
 		return "", err
 	}
-	// if a scheme is de***REMOVED***ned, it must be a fqdn already
+	// if a scheme is defined, it must be a fqdn already
 	if u.Scheme != "" {
 		return u.String(), nil
 	}
@@ -85,18 +85,18 @@ func NormalizePathURL(basePath, rawPath string) (string, error) {
 	}
 	var basePathSys, absPathSys string
 	if bu.Scheme != "" {
-		basePathSys = ***REMOVED***lepath.FromSlash(bu.Path)
-		absPathSys = ***REMOVED***lepath.Join(basePathSys, rawPath)
-		bu.Path = ***REMOVED***lepath.ToSlash(absPathSys)
+		basePathSys = filepath.FromSlash(bu.Path)
+		absPathSys = filepath.Join(basePathSys, rawPath)
+		bu.Path = filepath.ToSlash(absPathSys)
 		return bu.String(), nil
 	}
 
-	absPathSys = ***REMOVED***lepath.Join(basePath, rawPath)
-	u.Path = ***REMOVED***lepath.ToSlash(absPathSys)
+	absPathSys = filepath.Join(basePath, rawPath)
+	u.Path = filepath.ToSlash(absPathSys)
 	if err != nil {
 		return "", err
 	}
-	u.Scheme = "***REMOVED***le"
+	u.Scheme = "file"
 	return u.String(), nil
 
 }

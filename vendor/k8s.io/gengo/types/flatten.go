@@ -2,7 +2,7 @@
 Copyright 2015 The Kubernetes Authors.
 
 Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this ***REMOVED***le except in compliance with the License.
+you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
 
     http://www.apache.org/licenses/LICENSE-2.0
@@ -10,7 +10,7 @@ You may obtain a copy of the License at
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the speci***REMOVED***c language governing permissions and
+See the License for the specific language governing permissions and
 limitations under the License.
 */
 
@@ -18,10 +18,10 @@ package types
 
 // FlattenMembers recursively takes any embedded members and puts them in the
 // top level, correctly hiding them if the top level hides them. There must not
-// be a cycle-- that implies in***REMOVED***nite members.
+// be a cycle-- that implies infinite members.
 //
 // This is useful for e.g. computing all the valid keys in a json struct,
-// properly considering any con***REMOVED***guration of embedded structs.
+// properly considering any configuration of embedded structs.
 func FlattenMembers(m []Member) []Member {
 	embedded := []Member{}
 	normal := []Member{}
@@ -33,7 +33,7 @@ func FlattenMembers(m []Member) []Member {
 	for i := range m {
 		if m[i].Embedded && m[i].Type.Kind == Struct {
 			embedded = append(embedded, m[i])
-		} ***REMOVED*** {
+		} else {
 			normal = append(normal, m[i])
 			names[m[i].Name] = nameInfo{true, len(normal) - 1}
 		}

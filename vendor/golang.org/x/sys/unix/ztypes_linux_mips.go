@@ -237,7 +237,7 @@ type RawSockaddrUnix struct {
 type RawSockaddrLinklayer struct {
 	Family   uint16
 	Protocol uint16
-	I***REMOVED***ndex  int32
+	Ifindex  int32
 	Hatype   uint16
 	Pkttype  uint8
 	Halen    uint8
@@ -269,7 +269,7 @@ type RawSockaddrL2 struct {
 type RawSockaddrCAN struct {
 	Family  uint16
 	_       [2]byte
-	I***REMOVED***ndex int32
+	Ifindex int32
 	Addr    [8]byte
 }
 
@@ -319,7 +319,7 @@ type IPMreq struct {
 type IPMreqn struct {
 	Multiaddr [4]byte /* in_addr */
 	Address   [4]byte /* in_addr */
-	I***REMOVED***ndex   int32
+	Ifindex   int32
 }
 
 type IPv6Mreq struct {
@@ -328,7 +328,7 @@ type IPv6Mreq struct {
 }
 
 type PacketMreq struct {
-	I***REMOVED***ndex int32
+	Ifindex int32
 	Type    uint16
 	Alen    uint16
 	Address [8]uint8
@@ -351,14 +351,14 @@ type Cmsghdr struct {
 }
 
 type Inet4Pktinfo struct {
-	I***REMOVED***ndex  int32
+	Ifindex  int32
 	Spec_dst [4]byte /* in_addr */
 	Addr     [4]byte /* in_addr */
 }
 
 type Inet6Pktinfo struct {
 	Addr    [16]byte /* in6_addr */
-	I***REMOVED***ndex uint32
+	Ifindex uint32
 }
 
 type IPv6MTUInfo struct {
@@ -587,7 +587,7 @@ type RtAttr struct {
 
 type IfInfomsg struct {
 	Family     uint8
-	X__i***REMOVED***_pad uint8
+	X__ifi_pad uint8
 	Type       uint16
 	Index      int32
 	Flags      uint32
@@ -596,7 +596,7 @@ type IfInfomsg struct {
 
 type IfAddrmsg struct {
 	Family    uint8
-	Pre***REMOVED***xlen uint8
+	Prefixlen uint8
 	Flags     uint8
 	Scope     uint8
 	Index     uint32
@@ -618,7 +618,7 @@ type RtNexthop struct {
 	Len     uint16
 	Flags   uint8
 	Hops    uint8
-	I***REMOVED***ndex int32
+	Ifindex int32
 }
 
 const (

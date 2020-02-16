@@ -2,7 +2,7 @@
 //
 // The Credentials is the primary method of getting access to and managing
 // credentials Values. Using dependency injection retrieval of the credential
-// values is handled by a object which satis***REMOVED***es the Provider interface.
+// values is handled by a object which satisfies the Provider interface.
 //
 // By default the Credentials.Get() will cache the successful result of a
 // Provider's Retrieve() until Provider.IsExpired() returns true. At which
@@ -10,7 +10,7 @@
 //
 // The Provider is responsible for determining when credentials Value have expired.
 // It is also important to note that Credentials will always call Retrieve the
-// ***REMOVED***rst time Credentials.Get() is called.
+// first time Credentials.Get() is called.
 //
 // Example of using the environment variable credentials.
 //
@@ -36,7 +36,7 @@
 //
 // Each Provider built into this package also provides a helper method to generate
 // a Credentials pointer setup with the provider. To use a custom Provider just
-// create a type which satis***REMOVED***es the Provider interface and pass it to the
+// create a type which satisfies the Provider interface and pass it to the
 // NewCredentials method.
 //
 //     type MyProvider struct{}
@@ -59,17 +59,17 @@ import (
 // AnonymousCredentials is an empty Credential object that can be used as
 // dummy placeholder credentials for requests that do not need signed.
 //
-// This Credentials can be used to con***REMOVED***gure a service to not sign requests
+// This Credentials can be used to configure a service to not sign requests
 // when making service API calls. For example, when accessing public
 // s3 buckets.
 //
-//     svc := s3.New(session.Must(session.NewSession(&aws.Con***REMOVED***g{
+//     svc := s3.New(session.Must(session.NewSession(&aws.Config{
 //       Credentials: credentials.AnonymousCredentials,
 //     })))
 //     // Access public S3 buckets.
 var AnonymousCredentials = NewStaticCredentials("", "", "")
 
-// A Value is the AWS credentials value for individual credential ***REMOVED***elds.
+// A Value is the AWS credentials value for individual credential fields.
 type Value struct {
 	// AWS Access key ID
 	AccessKeyID string
@@ -138,7 +138,7 @@ func (p ErrorProvider) IsExpired() bool {
 // A Expiry provides shared expiration logic to be used by credentials
 // providers to implement expiry functionality.
 //
-// The best method to use this struct is as an anonymous ***REMOVED***eld within the
+// The best method to use this struct is as an anonymous field within the
 // provider's struct.
 //
 // Example:
@@ -193,8 +193,8 @@ func (e *Expiry) ExpiresAt() time.Time {
 // synchronous state so the Providers do not need to implement their own
 // synchronization.
 //
-// The ***REMOVED***rst Credentials.Get() will always call Provider.Retrieve() to get the
-// ***REMOVED***rst instance of the credentials Value. All calls to Get() after that
+// The first Credentials.Get() will always call Provider.Retrieve() to get the
+// first instance of the credentials Value. All calls to Get() after that
 // will return the cached credentials Value until IsExpired() returns true.
 type Credentials struct {
 	creds        Value
@@ -223,7 +223,7 @@ func NewCredentials(provider Provider) *Credentials {
 // If Credentials.Expire() was called the credentials Value will be force
 // expired, and the next call to Get() will cause them to be refreshed.
 func (c *Credentials) Get() (Value, error) {
-	// Check the cached credentials ***REMOVED***rst with just the read lock.
+	// Check the cached credentials first with just the read lock.
 	c.m.RLock()
 	if !c.isExpired() {
 		creds := c.creds
@@ -273,7 +273,7 @@ func (c *Credentials) IsExpired() bool {
 	return c.isExpired()
 }
 
-// isExpired helper method wrapping the de***REMOVED***nition of expired credentials.
+// isExpired helper method wrapping the definition of expired credentials.
 func (c *Credentials) isExpired() bool {
 	return c.forceRefresh || c.provider.IsExpired()
 }

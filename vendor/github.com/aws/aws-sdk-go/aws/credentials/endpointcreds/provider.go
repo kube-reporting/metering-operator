@@ -45,19 +45,19 @@ import (
 // ProviderName is the name of the credentials provider.
 const ProviderName = `CredentialsEndpointProvider`
 
-// Provider satis***REMOVED***es the credentials.Provider interface, and is a client to
+// Provider satisfies the credentials.Provider interface, and is a client to
 // retrieve credentials from an arbitrary endpoint.
 type Provider struct {
 	staticCreds bool
 	credentials.Expiry
 
 	// Requires a AWS Client to make HTTP requests to the endpoint with.
-	// the Endpoint the request will be made to is provided by the aws.Con***REMOVED***g's
+	// the Endpoint the request will be made to is provided by the aws.Config's
 	// Endpoint value.
 	Client *client.Client
 
 	// ExpiryWindow will allow the credentials to trigger refreshing prior to
-	// the credentials actually expiring. This is bene***REMOVED***cial so race conditions
+	// the credentials actually expiring. This is beneficial so race conditions
 	// with expiring credentials do not cause request to fail unexpectedly
 	// due to ExpiredTokenException exceptions.
 	//
@@ -74,7 +74,7 @@ type Provider struct {
 
 // NewProviderClient returns a credentials Provider for retrieving AWS credentials
 // from arbitrary endpoint.
-func NewProviderClient(cfg aws.Con***REMOVED***g, handlers request.Handlers, endpoint string, options ...func(*Provider)) credentials.Provider {
+func NewProviderClient(cfg aws.Config, handlers request.Handlers, endpoint string, options ...func(*Provider)) credentials.Provider {
 	p := &Provider{
 		Client: client.New(
 			cfg,
@@ -100,7 +100,7 @@ func NewProviderClient(cfg aws.Con***REMOVED***g, handlers request.Handlers, end
 
 // NewCredentialsClient returns a pointer to a new Credentials object
 // wrapping the endpoint credentials Provider.
-func NewCredentialsClient(cfg aws.Con***REMOVED***g, handlers request.Handlers, endpoint string, options ...func(*Provider)) *credentials.Credentials {
+func NewCredentialsClient(cfg aws.Config, handlers request.Handlers, endpoint string, options ...func(*Provider)) *credentials.Credentials {
 	return credentials.NewCredentials(NewProviderClient(cfg, handlers, endpoint, options...))
 }
 
@@ -114,7 +114,7 @@ func (p *Provider) IsExpired() bool {
 }
 
 // Retrieve will attempt to request the credentials from the endpoint the Provider
-// was con***REMOVED***gured for. And error will be returned if the retrieval fails.
+// was configured for. And error will be returned if the retrieval fails.
 func (p *Provider) Retrieve() (credentials.Value, error) {
 	resp, err := p.getCredentials()
 	if err != nil {
@@ -124,7 +124,7 @@ func (p *Provider) Retrieve() (credentials.Value, error) {
 
 	if resp.Expiration != nil {
 		p.SetExpiration(*resp.Expiration, p.ExpiryWindow)
-	} ***REMOVED*** {
+	} else {
 		p.staticCreds = true
 	}
 

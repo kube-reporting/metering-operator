@@ -19,7 +19,7 @@ type UnsafeSliceType struct {
 	elemSize   uintptr
 }
 
-func newUnsafeSliceType(cfg *frozenCon***REMOVED***g, type1 reflect.Type) SliceType {
+func newUnsafeSliceType(cfg *frozenConfig, type1 reflect.Type) SliceType {
 	elemType := type1.Elem()
 	return &UnsafeSliceType{
 		unsafeType: *newUnsafeType(cfg, type1),
@@ -164,11 +164,11 @@ func (type2 *UnsafeSliceType) UnsafeGrow(obj unsafe.Pointer, newLength int) {
 func calcNewCap(cap int, expectedCap int) int {
 	if cap == 0 {
 		cap = expectedCap
-	} ***REMOVED*** {
+	} else {
 		for cap < expectedCap {
 			if cap < 1024 {
 				cap += cap
-			} ***REMOVED*** {
+			} else {
 				cap += cap / 4
 			}
 		}

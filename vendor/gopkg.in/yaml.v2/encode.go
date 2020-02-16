@@ -48,7 +48,7 @@ func (e *encoder) init() {
 	e.doneInit = true
 }
 
-func (e *encoder) ***REMOVED***nish() {
+func (e *encoder) finish() {
 	e.emitter.open_ended = false
 	yaml_stream_end_event_initialize(&e.event)
 	e.emit()
@@ -122,19 +122,19 @@ func (e *encoder) marshal(tag string, in reflect.Value) {
 	case reflect.Ptr:
 		if in.Type() == ptrTimeType {
 			e.timev(tag, in.Elem())
-		} ***REMOVED*** {
+		} else {
 			e.marshal(tag, in.Elem())
 		}
 	case reflect.Struct:
 		if in.Type() == timeType {
 			e.timev(tag, in)
-		} ***REMOVED*** {
+		} else {
 			e.structv(tag, in)
 		}
 	case reflect.Slice, reflect.Array:
 		if in.Type().Elem() == mapItemType {
 			e.itemsv(tag, in)
-		} ***REMOVED*** {
+		} else {
 			e.slicev(tag, in)
 		}
 	case reflect.String:
@@ -142,7 +142,7 @@ func (e *encoder) marshal(tag string, in reflect.Value) {
 	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
 		if in.Type() == durationType {
 			e.stringv(tag, reflect.ValueOf(iface.(time.Duration).String()))
-		} ***REMOVED*** {
+		} else {
 			e.intv(tag, in)
 		}
 	case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64, reflect.Uintptr:
@@ -187,7 +187,7 @@ func (e *encoder) structv(tag string, in reflect.Value) {
 			var value reflect.Value
 			if info.Inline == nil {
 				value = in.Field(info.Num)
-			} ***REMOVED*** {
+			} else {
 				value = in.FieldByIndex(info.Inline)
 			}
 			if info.OmitEmpty && isZero(value) {
@@ -205,7 +205,7 @@ func (e *encoder) structv(tag string, in reflect.Value) {
 				sort.Sort(keys)
 				for _, k := range keys {
 					if _, found := sinfo.FieldsMap[k.String()]; found {
-						panic(fmt.Sprintf("Can't have key %q in inlined map; conflicts with struct ***REMOVED***eld", k.String()))
+						panic(fmt.Sprintf("Can't have key %q in inlined map; conflicts with struct field", k.String()))
 					}
 					e.marshal("", k)
 					e.flow = false
@@ -247,7 +247,7 @@ func (e *encoder) slicev(tag string, in reflect.Value) {
 	e.emit()
 }
 
-// isBase60 returns whether s is in base 60 notation as de***REMOVED***ned in YAML 1.1.
+// isBase60 returns whether s is in base 60 notation as defined in YAML 1.1.
 //
 // The base 60 float notation in YAML 1.1 is a terrible idea and is unsupported
 // in YAML 1.2 and by this package, but these should be marshalled quoted for
@@ -266,7 +266,7 @@ func isBase60Float(s string) (result bool) {
 }
 
 // From http://yaml.org/type/float.html, except the regular expression there
-// is bogus. In practice parsers do not enforce the "\.[0-9_]*" suf***REMOVED***x.
+// is bogus. In practice parsers do not enforce the "\.[0-9_]*" suffix.
 var base60float = regexp.MustCompile(`^[-+]?[0-9][0-9_]*(?::[0-5]?[0-9])+(?:\.[0-9_]*)?$`)
 
 func (e *encoder) stringv(tag string, in reflect.Value) {
@@ -286,7 +286,7 @@ func (e *encoder) stringv(tag string, in reflect.Value) {
 		tag = yaml_BINARY_TAG
 		s = encodeBase64(s)
 	case tag == "":
-		// Check to see if it would resolve to a speci***REMOVED***c
+		// Check to see if it would resolve to a specific
 		// tag when encoded unquoted. If it doesn't,
 		// there's no need to quote it.
 		rtag, _ := resolve("", s)
@@ -310,7 +310,7 @@ func (e *encoder) boolv(tag string, in reflect.Value) {
 	var s string
 	if in.Bool() {
 		s = "true"
-	} ***REMOVED*** {
+	} else {
 		s = "false"
 	}
 	e.emitScalar(s, "", tag, yaml_PLAIN_SCALAR_STYLE)

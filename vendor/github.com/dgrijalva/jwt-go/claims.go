@@ -34,7 +34,7 @@ func (c StandardClaims) Valid() error {
 	now := TimeFunc().Unix()
 
 	// The claims below are optional, by default, so if they are set to the
-	// default value in Go, let's not fail the veri***REMOVED***cation for them.
+	// default value in Go, let's not fail the verification for them.
 	if c.VerifyExpiresAt(now, false) == false {
 		delta := time.Unix(now, 0).Sub(time.Unix(c.ExpiresAt, 0))
 		vErr.Inner = fmt.Errorf("token is expired by %v", delta)
@@ -96,7 +96,7 @@ func verifyAud(aud string, cmp string, required bool) bool {
 	}
 	if subtle.ConstantTimeCompare([]byte(aud), []byte(cmp)) != 0 {
 		return true
-	} ***REMOVED*** {
+	} else {
 		return false
 	}
 }
@@ -121,7 +121,7 @@ func verifyIss(iss string, cmp string, required bool) bool {
 	}
 	if subtle.ConstantTimeCompare([]byte(iss), []byte(cmp)) != 0 {
 		return true
-	} ***REMOVED*** {
+	} else {
 		return false
 	}
 }

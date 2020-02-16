@@ -33,7 +33,7 @@ func (c *FakeReportQueries) Get(name string, options v1.GetOptions) (result *met
 	return obj.(*meteringv1.ReportQuery), err
 }
 
-// List takes label and ***REMOVED***eld selectors, and returns the list of ReportQueries that match those selectors.
+// List takes label and field selectors, and returns the list of ReportQueries that match those selectors.
 func (c *FakeReportQueries) List(opts v1.ListOptions) (result *meteringv1.ReportQueryList, err error) {
 	obj, err := c.Fake.
 		Invokes(testing.NewListAction(reportqueriesResource, reportqueriesKind, c.ns, opts), &meteringv1.ReportQueryList{})

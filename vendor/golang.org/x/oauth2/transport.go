@@ -1,6 +1,6 @@
 // Copyright 2014 The Go Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE ***REMOVED***le.
+// license that can be found in the LICENSE file.
 
 package oauth2
 
@@ -16,7 +16,7 @@ import (
 // with a token from the supplied Sources.
 //
 // Transport is a low-level mechanism. Most code will use the
-// higher-level Con***REMOVED***g.Client method instead.
+// higher-level Config.Client method instead.
 type Transport struct {
 	// Source supplies the token to add to outgoing requests'
 	// Authorization headers.
@@ -27,7 +27,7 @@ type Transport struct {
 	Base http.RoundTripper
 
 	mu     sync.Mutex                      // guards modReq
-	modReq map[*http.Request]*http.Request // original -> modi***REMOVED***ed
+	modReq map[*http.Request]*http.Request // original -> modified
 }
 
 // RoundTrip authorizes and authenticates the request with an
@@ -86,7 +86,7 @@ func (t *Transport) setModReq(orig, mod *http.Request) {
 	}
 	if mod == nil {
 		delete(t.modReq, orig)
-	} ***REMOVED*** {
+	} else {
 		t.modReq[orig] = mod
 	}
 }

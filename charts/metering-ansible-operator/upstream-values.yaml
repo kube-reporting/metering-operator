@@ -52,7 +52,7 @@ olm:
     description: |
       Operator Metering is a chargeback and reporting tool to provide accountability for how resources are used across a cluster. Cluster admins can schedule reports based on historical usage data by Pod, Namespace, and Cluster wide. Operator Metering is part of the [Operator Framework](https://coreos.com/blog/introducing-operator-framework-metering).
 
-      Read the user guide for more details on [running and viewing your ***REMOVED***rst report](https://github.com/operator-framework/operator-metering/blob/master/Documentation/using-metering.md).
+      Read the user guide for more details on [running and viewing your first report](https://github.com/operator-framework/operator-metering/blob/master/Documentation/using-metering.md).
 
       ### Core capabilities
 
@@ -70,15 +70,15 @@ olm:
 
       Metering runs a big data stack to crunch your data and requires at least 4GB of RAM and 4 CPU cores. At least one Node should have 2GB of RAM and 2 CPU cores. Memory and CPU consumption may often be lower, but will spike when running reports, or collecting data for larger clusters.
 
-      ### Common Con***REMOVED***gurations
+      ### Common Configurations
 
-      Metering works out of the box without any customizations or con***REMOVED***guration. Read the [full documentation](https://github.com/operator-framework/operator-metering/blob/master/Documentation/metering-con***REMOVED***g.md) for more details.
+      Metering works out of the box without any customizations or configuration. Read the [full documentation](https://github.com/operator-framework/operator-metering/blob/master/Documentation/metering-config.md) for more details.
 
-      * **Use a speci***REMOVED***c StorageClass** - Follow the example to [use your own StorageClass](https://github.com/operator-framework/operator-metering/blob/master/manifests/metering-con***REMOVED***g/shared-storage.yaml) instead of the Dynamic Provisioner.
+      * **Use a specific StorageClass** - Follow the example to [use your own StorageClass](https://github.com/operator-framework/operator-metering/blob/master/manifests/metering-config/shared-storage.yaml) instead of the Dynamic Provisioner.
 
-      * **Store data in S3 instead of PV** - Store your report output [in an S3 bucket](https://github.com/operator-framework/operator-metering/blob/master/Documentation/con***REMOVED***guring-storage.md#storing-data-in-s3) instead of a PersistentVolume.
+      * **Store data in S3 instead of PV** - Store your report output [in an S3 bucket](https://github.com/operator-framework/operator-metering/blob/master/Documentation/configuring-storage.md#storing-data-in-s3) instead of a PersistentVolume.
 
-      * **Con***REMOVED***gure AWS Billing Data Source** - To assign Pod $$ costs on AWS, create a [read-only IAM user](https://github.com/operator-framework/operator-metering/blob/master/Documentation/con***REMOVED***guring-aws-billing.md) ([example-policy](https://github.com/operator-framework/operator-metering/blob/master/Documentation/aws/read-only.json)) and [con***REMOVED***gure Metering](https://github.com/operator-framework/operator-metering/blob/master/manifests/metering-con***REMOVED***g/aws-billing.yaml) to use it.
+      * **Configure AWS Billing Data Source** - To assign Pod $$ costs on AWS, create a [read-only IAM user](https://github.com/operator-framework/operator-metering/blob/master/Documentation/configuring-aws-billing.md) ([example-policy](https://github.com/operator-framework/operator-metering/blob/master/Documentation/aws/read-only.json)) and [configure Metering](https://github.com/operator-framework/operator-metering/blob/master/manifests/metering-config/aws-billing.yaml) to use it.
 
     links:
     - name: Documentation
@@ -92,7 +92,7 @@ olm:
 
     annotations:
       categories: "OpenShift Optional, Monitoring"
-      certi***REMOVED***ed: "false"
+      certified: "false"
       capabilities: Basic Install
       support: Red Hat, Inc.
       createdAt: "2019-01-01T11:59:59Z"
@@ -101,10 +101,10 @@ olm:
   subscriptionName: metering
   subscriptionChannel: stable
 
-  catalogSourceCon***REMOVED***gName: installed-upstream-metering-operators-metering
-  catalogSourceCon***REMOVED***gNamespace: marketplace
-  catalogSourceCon***REMOVED***gTargetNamespace: metering
-  catalogSourceCon***REMOVED***gOperatorSource: upstream-community-operators
+  catalogSourceConfigName: installed-upstream-metering-operators-metering
+  catalogSourceConfigNamespace: marketplace
+  catalogSourceConfigTargetNamespace: metering
+  catalogSourceConfigOperatorSource: upstream-community-operators
 
   operatorGroupName: metering-operators
   operatorGroupTargetNamespaces: ["metering"]

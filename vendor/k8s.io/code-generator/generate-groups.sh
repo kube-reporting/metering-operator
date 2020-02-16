@@ -3,7 +3,7 @@
 # Copyright 2017 The Kubernetes Authors.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this ***REMOVED***le except in compliance with the License.
+# you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
 #
 #     http://www.apache.org/licenses/LICENSE-2.0
@@ -11,7 +11,7 @@
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the speci***REMOVED***c language governing permissions and
+# See the License for the specific language governing permissions and
 # limitations under the License.
 
 set -o errexit
@@ -19,7 +19,7 @@ set -o nounset
 set -o pipefail
 
 # generate-groups generates everything for a project with external types only, e.g. a project based
-# on CustomResourceDe***REMOVED***nitions.
+# on CustomResourceDefinitions.
 
 if [ "$#" -lt 4 ] || [ "${1}" == "--help" ]; then
   cat <<EOF
@@ -38,7 +38,7 @@ Examples:
   $(basename $0) deepcopy,client github.com/example/project/pkg/client github.com/example/project/pkg/apis "foo:v1 bar:v1alpha1,v1beta1"
 EOF
   exit 0
-***REMOVED***
+fi
 
 GENS="$1"
 OUTPUT_PKG="$2"
@@ -47,7 +47,7 @@ GROUPS_WITH_VERSIONS="$4"
 shift 4
 
 (
-  # To support running this script from anywhere, we have to ***REMOVED***rst cd into this directory
+  # To support running this script from anywhere, we have to first cd into this directory
   # so we can install the tools.
   cd $(dirname "${0}")
   go install ${GOFLAGS:-} ./cmd/{defaulter-gen,client-gen,lister-gen,informer-gen,deepcopy-gen}
@@ -69,17 +69,17 @@ done
 if [ "${GENS}" = "all" ] || grep -qw "deepcopy" <<<"${GENS}"; then
   echo "Generating deepcopy funcs"
   ${GOPATH}/bin/deepcopy-gen --input-dirs $(codegen::join , "${FQ_APIS[@]}") -O zz_generated.deepcopy --bounding-dirs ${APIS_PKG} "$@"
-***REMOVED***
+fi
 
 if [ "${GENS}" = "all" ] || grep -qw "client" <<<"${GENS}"; then
   echo "Generating clientset for ${GROUPS_WITH_VERSIONS} at ${OUTPUT_PKG}/${CLIENTSET_PKG_NAME:-clientset}"
   ${GOPATH}/bin/client-gen --clientset-name ${CLIENTSET_NAME_VERSIONED:-versioned} --input-base "" --input $(codegen::join , "${FQ_APIS[@]}") --output-package ${OUTPUT_PKG}/${CLIENTSET_PKG_NAME:-clientset} "$@"
-***REMOVED***
+fi
 
 if [ "${GENS}" = "all" ] || grep -qw "lister" <<<"${GENS}"; then
   echo "Generating listers for ${GROUPS_WITH_VERSIONS} at ${OUTPUT_PKG}/listers"
   ${GOPATH}/bin/lister-gen --input-dirs $(codegen::join , "${FQ_APIS[@]}") --output-package ${OUTPUT_PKG}/listers "$@"
-***REMOVED***
+fi
 
 if [ "${GENS}" = "all" ] || grep -qw "informer" <<<"${GENS}"; then
   echo "Generating informers for ${GROUPS_WITH_VERSIONS} at ${OUTPUT_PKG}/informers"
@@ -89,4 +89,4 @@ if [ "${GENS}" = "all" ] || grep -qw "informer" <<<"${GENS}"; then
            --listers-package ${OUTPUT_PKG}/listers \
            --output-package ${OUTPUT_PKG}/informers \
            "$@"
-***REMOVED***
+fi

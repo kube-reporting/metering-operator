@@ -15,8 +15,8 @@ type Visitor interface {
 // DefaultVisitor is used to visit statements and expressions
 // and ensure that they are both of the correct format.
 // In addition, upon visiting this will build sections and populate
-// the Sections ***REMOVED***eld which can be used to retrieve pro***REMOVED***le
-// con***REMOVED***guration.
+// the Sections field which can be used to retrieve profile
+// configuration.
 type DefaultVisitor struct {
 	scope    string
 	Sections Sections
@@ -92,7 +92,7 @@ func (v *DefaultVisitor) VisitStatement(stmt AST) error {
 }
 
 // Sections is a map of Section structures that represent
-// a con***REMOVED***guration.
+// a configuration.
 type Sections struct {
 	container map[string]Section
 }
@@ -122,7 +122,7 @@ func (t Sections) List() []string {
 }
 
 // Section contains a name and values. This represent
-// a sectioned entry in a con***REMOVED***guration ***REMOVED***le.
+// a sectioned entry in a configuration file.
 type Section struct {
 	Name   string
 	values values

@@ -39,7 +39,7 @@ func (f *FlagSet) GetUint16(name string) (uint16, error) {
 	return val.(uint16), nil
 }
 
-// Uint16Var de***REMOVED***nes a uint flag with speci***REMOVED***ed name, default value, and usage string.
+// Uint16Var defines a uint flag with specified name, default value, and usage string.
 // The argument p points to a uint variable in which to store the value of the flag.
 func (f *FlagSet) Uint16Var(p *uint16, name string, value uint16, usage string) {
 	f.VarP(newUint16Value(value, p), name, "", usage)
@@ -50,7 +50,7 @@ func (f *FlagSet) Uint16VarP(p *uint16, name, shorthand string, value uint16, us
 	f.VarP(newUint16Value(value, p), name, shorthand, usage)
 }
 
-// Uint16Var de***REMOVED***nes a uint flag with speci***REMOVED***ed name, default value, and usage string.
+// Uint16Var defines a uint flag with specified name, default value, and usage string.
 // The argument p points to a uint  variable in which to store the value of the flag.
 func Uint16Var(p *uint16, name string, value uint16, usage string) {
 	CommandLine.VarP(newUint16Value(value, p), name, "", usage)
@@ -61,7 +61,7 @@ func Uint16VarP(p *uint16, name, shorthand string, value uint16, usage string) {
 	CommandLine.VarP(newUint16Value(value, p), name, shorthand, usage)
 }
 
-// Uint16 de***REMOVED***nes a uint flag with speci***REMOVED***ed name, default value, and usage string.
+// Uint16 defines a uint flag with specified name, default value, and usage string.
 // The return value is the address of a uint  variable that stores the value of the flag.
 func (f *FlagSet) Uint16(name string, value uint16, usage string) *uint16 {
 	p := new(uint16)
@@ -76,7 +76,7 @@ func (f *FlagSet) Uint16P(name, shorthand string, value uint16, usage string) *u
 	return p
 }
 
-// Uint16 de***REMOVED***nes a uint flag with speci***REMOVED***ed name, default value, and usage string.
+// Uint16 defines a uint flag with specified name, default value, and usage string.
 // The return value is the address of a uint  variable that stores the value of the flag.
 func Uint16(name string, value uint16, usage string) *uint16 {
 	return CommandLine.Uint16P(name, "", value, usage)

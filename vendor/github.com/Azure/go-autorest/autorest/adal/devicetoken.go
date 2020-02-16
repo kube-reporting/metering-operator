@@ -3,7 +3,7 @@ package adal
 // Copyright 2017 Microsoft Corporation
 //
 //  Licensed under the Apache License, Version 2.0 (the "License");
-//  you may not use this ***REMOVED***le except in compliance with the License.
+//  you may not use this file except in compliance with the License.
 //  You may obtain a copy of the License at
 //
 //      http://www.apache.org/licenses/LICENSE-2.0
@@ -11,11 +11,11 @@ package adal
 //  Unless required by applicable law or agreed to in writing, software
 //  distributed under the License is distributed on an "AS IS" BASIS,
 //  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-//  See the License for the speci***REMOVED***c language governing permissions and
+//  See the License for the specific language governing permissions and
 //  limitations under the License.
 
 /*
-  This ***REMOVED***le is largely based on rjw57/oauth2device's code, with the follow differences:
+  This file is largely based on rjw57/oauth2device's code, with the follow differences:
    * scope -> resource, and only allow a single one
    * receive "Message" in the DeviceCode struct and show it to users as the prompt
    * azure-xplat-cli has the following behavior that this emulates:
@@ -34,30 +34,30 @@ import (
 )
 
 const (
-	logPre***REMOVED***x = "autorest/adal/devicetoken:"
+	logPrefix = "autorest/adal/devicetoken:"
 )
 
 var (
 	// ErrDeviceGeneric represents an unknown error from the token endpoint when using device flow
-	ErrDeviceGeneric = fmt.Errorf("%s Error while retrieving OAuth token: Unknown Error", logPre***REMOVED***x)
+	ErrDeviceGeneric = fmt.Errorf("%s Error while retrieving OAuth token: Unknown Error", logPrefix)
 
 	// ErrDeviceAccessDenied represents an access denied error from the token endpoint when using device flow
-	ErrDeviceAccessDenied = fmt.Errorf("%s Error while retrieving OAuth token: Access Denied", logPre***REMOVED***x)
+	ErrDeviceAccessDenied = fmt.Errorf("%s Error while retrieving OAuth token: Access Denied", logPrefix)
 
 	// ErrDeviceAuthorizationPending represents the server waiting on the user to complete the device flow
-	ErrDeviceAuthorizationPending = fmt.Errorf("%s Error while retrieving OAuth token: Authorization Pending", logPre***REMOVED***x)
+	ErrDeviceAuthorizationPending = fmt.Errorf("%s Error while retrieving OAuth token: Authorization Pending", logPrefix)
 
 	// ErrDeviceCodeExpired represents the server timing out and expiring the code during device flow
-	ErrDeviceCodeExpired = fmt.Errorf("%s Error while retrieving OAuth token: Code Expired", logPre***REMOVED***x)
+	ErrDeviceCodeExpired = fmt.Errorf("%s Error while retrieving OAuth token: Code Expired", logPrefix)
 
 	// ErrDeviceSlowDown represents the service telling us we're polling too often during device flow
-	ErrDeviceSlowDown = fmt.Errorf("%s Error while retrieving OAuth token: Slow Down", logPre***REMOVED***x)
+	ErrDeviceSlowDown = fmt.Errorf("%s Error while retrieving OAuth token: Slow Down", logPrefix)
 
 	// ErrDeviceCodeEmpty represents an empty device code from the device endpoint while using device flow
-	ErrDeviceCodeEmpty = fmt.Errorf("%s Error while retrieving device code: Device Code Empty", logPre***REMOVED***x)
+	ErrDeviceCodeEmpty = fmt.Errorf("%s Error while retrieving device code: Device Code Empty", logPrefix)
 
 	// ErrOAuthTokenEmpty represents an empty OAuth token from the token endpoint when using device flow
-	ErrOAuthTokenEmpty = fmt.Errorf("%s Error while retrieving OAuth token: Token Empty", logPre***REMOVED***x)
+	ErrOAuthTokenEmpty = fmt.Errorf("%s Error while retrieving OAuth token: Token Empty", logPrefix)
 
 	errCodeSendingFails   = "Error occurred while sending request for Device Authorization Code"
 	errCodeHandlingFails  = "Error occurred while handling response from the Device Endpoint"
@@ -71,13 +71,13 @@ var (
 type DeviceCode struct {
 	DeviceCode      *string `json:"device_code,omitempty"`
 	UserCode        *string `json:"user_code,omitempty"`
-	Veri***REMOVED***cationURL *string `json:"veri***REMOVED***cation_url,omitempty"`
+	VerificationURL *string `json:"verification_url,omitempty"`
 	ExpiresIn       *int64  `json:"expires_in,string,omitempty"`
 	Interval        *int64  `json:"interval,string,omitempty"`
 
-	Message     *string `json:"message"` // Azure speci***REMOVED***c
+	Message     *string `json:"message"` // Azure specific
 	Resource    string  // store the following, stored when initiating, used when exchanging
-	OAuthCon***REMOVED***g OAuthCon***REMOVED***g
+	OAuthConfig OAuthConfig
 	ClientID    string
 }
 
@@ -101,7 +101,7 @@ type deviceToken struct {
 
 // InitiateDeviceAuth initiates a device auth flow. It returns a DeviceCode
 // that can be used with CheckForUserCompletion or WaitForUserCompletion.
-func InitiateDeviceAuth(sender Sender, oauthCon***REMOVED***g OAuthCon***REMOVED***g, clientID, resource string) (*DeviceCode, error) {
+func InitiateDeviceAuth(sender Sender, oauthConfig OAuthConfig, clientID, resource string) (*DeviceCode, error) {
 	v := url.Values{
 		"client_id": []string{clientID},
 		"resource":  []string{resource},
@@ -110,26 +110,26 @@ func InitiateDeviceAuth(sender Sender, oauthCon***REMOVED***g OAuthCon***REMOVED
 	s := v.Encode()
 	body := ioutil.NopCloser(strings.NewReader(s))
 
-	req, err := http.NewRequest(http.MethodPost, oauthCon***REMOVED***g.DeviceCodeEndpoint.String(), body)
+	req, err := http.NewRequest(http.MethodPost, oauthConfig.DeviceCodeEndpoint.String(), body)
 	if err != nil {
-		return nil, fmt.Errorf("%s %s: %s", logPre***REMOVED***x, errCodeSendingFails, err.Error())
+		return nil, fmt.Errorf("%s %s: %s", logPrefix, errCodeSendingFails, err.Error())
 	}
 
 	req.ContentLength = int64(len(s))
 	req.Header.Set(contentType, mimeTypeFormPost)
 	resp, err := sender.Do(req)
 	if err != nil {
-		return nil, fmt.Errorf("%s %s: %s", logPre***REMOVED***x, errCodeSendingFails, err.Error())
+		return nil, fmt.Errorf("%s %s: %s", logPrefix, errCodeSendingFails, err.Error())
 	}
 	defer resp.Body.Close()
 
 	rb, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		return nil, fmt.Errorf("%s %s: %s", logPre***REMOVED***x, errCodeHandlingFails, err.Error())
+		return nil, fmt.Errorf("%s %s: %s", logPrefix, errCodeHandlingFails, err.Error())
 	}
 
 	if resp.StatusCode != http.StatusOK {
-		return nil, fmt.Errorf("%s %s: %s", logPre***REMOVED***x, errCodeHandlingFails, errStatusNotOK)
+		return nil, fmt.Errorf("%s %s: %s", logPrefix, errCodeHandlingFails, errStatusNotOK)
 	}
 
 	if len(strings.Trim(string(rb), " ")) == 0 {
@@ -139,12 +139,12 @@ func InitiateDeviceAuth(sender Sender, oauthCon***REMOVED***g OAuthCon***REMOVED
 	var code DeviceCode
 	err = json.Unmarshal(rb, &code)
 	if err != nil {
-		return nil, fmt.Errorf("%s %s: %s", logPre***REMOVED***x, errCodeHandlingFails, err.Error())
+		return nil, fmt.Errorf("%s %s: %s", logPrefix, errCodeHandlingFails, err.Error())
 	}
 
 	code.ClientID = clientID
 	code.Resource = resource
-	code.OAuthCon***REMOVED***g = oauthCon***REMOVED***g
+	code.OAuthConfig = oauthConfig
 
 	return &code, nil
 }
@@ -162,26 +162,26 @@ func CheckForUserCompletion(sender Sender, code *DeviceCode) (*Token, error) {
 	s := v.Encode()
 	body := ioutil.NopCloser(strings.NewReader(s))
 
-	req, err := http.NewRequest(http.MethodPost, code.OAuthCon***REMOVED***g.TokenEndpoint.String(), body)
+	req, err := http.NewRequest(http.MethodPost, code.OAuthConfig.TokenEndpoint.String(), body)
 	if err != nil {
-		return nil, fmt.Errorf("%s %s: %s", logPre***REMOVED***x, errTokenSendingFails, err.Error())
+		return nil, fmt.Errorf("%s %s: %s", logPrefix, errTokenSendingFails, err.Error())
 	}
 
 	req.ContentLength = int64(len(s))
 	req.Header.Set(contentType, mimeTypeFormPost)
 	resp, err := sender.Do(req)
 	if err != nil {
-		return nil, fmt.Errorf("%s %s: %s", logPre***REMOVED***x, errTokenSendingFails, err.Error())
+		return nil, fmt.Errorf("%s %s: %s", logPrefix, errTokenSendingFails, err.Error())
 	}
 	defer resp.Body.Close()
 
 	rb, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		return nil, fmt.Errorf("%s %s: %s", logPre***REMOVED***x, errTokenHandlingFails, err.Error())
+		return nil, fmt.Errorf("%s %s: %s", logPrefix, errTokenHandlingFails, err.Error())
 	}
 
 	if resp.StatusCode != http.StatusOK && len(strings.Trim(string(rb), " ")) == 0 {
-		return nil, fmt.Errorf("%s %s: %s", logPre***REMOVED***x, errTokenHandlingFails, errStatusNotOK)
+		return nil, fmt.Errorf("%s %s: %s", logPrefix, errTokenHandlingFails, errStatusNotOK)
 	}
 	if len(strings.Trim(string(rb), " ")) == 0 {
 		return nil, ErrOAuthTokenEmpty
@@ -190,7 +190,7 @@ func CheckForUserCompletion(sender Sender, code *DeviceCode) (*Token, error) {
 	var token deviceToken
 	err = json.Unmarshal(rb, &token)
 	if err != nil {
-		return nil, fmt.Errorf("%s %s: %s", logPre***REMOVED***x, errTokenHandlingFails, err.Error())
+		return nil, fmt.Errorf("%s %s: %s", logPrefix, errTokenHandlingFails, err.Error())
 	}
 
 	if token.Error == nil {
@@ -229,12 +229,12 @@ func WaitForUserCompletion(sender Sender, code *DeviceCode) (*Token, error) {
 			waitDuration += waitDuration
 		case ErrDeviceAuthorizationPending:
 			// noop
-		default: // everything ***REMOVED*** is "fatal" to us
+		default: // everything else is "fatal" to us
 			return nil, err
 		}
 
 		if waitDuration > (intervalDuration * 3) {
-			return nil, fmt.Errorf("%s Error waiting for user to complete device flow. Server told us to slow_down too much", logPre***REMOVED***x)
+			return nil, fmt.Errorf("%s Error waiting for user to complete device flow. Server told us to slow_down too much", logPrefix)
 		}
 
 		time.Sleep(waitDuration)

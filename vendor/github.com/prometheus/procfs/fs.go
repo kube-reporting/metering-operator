@@ -1,6 +1,6 @@
 // Copyright 2018 The Prometheus Authors
 // Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this ***REMOVED***le except in compliance with the License.
+// you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 //
 // http://www.apache.org/licenses/LICENSE-2.0
@@ -8,7 +8,7 @@
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the speci***REMOVED***c language governing permissions and
+// See the License for the specific language governing permissions and
 // limitations under the License.
 
 package procfs
@@ -22,11 +22,11 @@ import (
 	"github.com/prometheus/procfs/xfs"
 )
 
-// FS represents the pseudo-***REMOVED***lesystem proc, which provides an interface to
+// FS represents the pseudo-filesystem proc, which provides an interface to
 // kernel data structures.
 type FS string
 
-// DefaultMountPoint is the common mount point of the proc ***REMOVED***lesystem.
+// DefaultMountPoint is the common mount point of the proc filesystem.
 const DefaultMountPoint = "/proc"
 
 // NewFS returns a new FS mounted under the given mountPoint. It will error
@@ -48,7 +48,7 @@ func (fs FS) Path(p ...string) string {
 	return path.Join(append([]string{string(fs)}, p...)...)
 }
 
-// XFSStats retrieves XFS ***REMOVED***lesystem runtime statistics.
+// XFSStats retrieves XFS filesystem runtime statistics.
 func (fs FS) XFSStats() (*xfs.Stats, error) {
 	f, err := os.Open(fs.Path("fs/xfs/stat"))
 	if err != nil {

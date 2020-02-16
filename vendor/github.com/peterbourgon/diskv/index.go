@@ -15,17 +15,17 @@ type Index interface {
 	Keys(from string, n int) []string
 }
 
-// LessFunction is used to initialize an Index of keys in a speci***REMOVED***c order.
+// LessFunction is used to initialize an Index of keys in a specific order.
 type LessFunction func(string, string) bool
 
-// btreeString is a custom data type that satis***REMOVED***es the BTree Less interface,
+// btreeString is a custom data type that satisfies the BTree Less interface,
 // making the strings it wraps sortable by the BTree package.
 type btreeString struct {
 	s string
 	l LessFunction
 }
 
-// Less satis***REMOVED***es the BTree.Less interface using the btreeString's LessFunction.
+// Less satisfies the BTree.Less interface using the btreeString's LessFunction.
 func (s btreeString) Less(i btree.Item) bool {
 	return s.l(s.s, i.(btreeString).s)
 }
@@ -67,8 +67,8 @@ func (i *BTreeIndex) Delete(key string) {
 }
 
 // Keys yields a maximum of n keys in order. If the passed 'from' key is empty,
-// Keys will return the ***REMOVED***rst n keys. If the passed 'from' key is non-empty, the
-// ***REMOVED***rst key in the returned slice will be the key that immediately follows the
+// Keys will return the first n keys. If the passed 'from' key is non-empty, the
+// first key in the returned slice will be the key that immediately follows the
 // passed key, in key order.
 func (i *BTreeIndex) Keys(from string, n int) []string {
 	i.RLock()

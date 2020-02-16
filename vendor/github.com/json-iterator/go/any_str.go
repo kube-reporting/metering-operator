@@ -76,7 +76,7 @@ func (any *stringAny) ToInt64() int64 {
 	for i := startPos; i < len(any.val); i++ {
 		if any.val[i] >= '0' && any.val[i] <= '9' {
 			endPos = i + 1
-		} ***REMOVED*** {
+		} else {
 			break
 		}
 	}
@@ -110,7 +110,7 @@ func (any *stringAny) ToUint64() uint64 {
 	for i := startPos; i < len(any.val); i++ {
 		if any.val[i] >= '0' && any.val[i] <= '9' {
 			endPos = i + 1
-		} ***REMOVED*** {
+		} else {
 			break
 		}
 	}
@@ -127,7 +127,7 @@ func (any *stringAny) ToFloat64() float64 {
 		return 0
 	}
 
-	// ***REMOVED***rst char invalid
+	// first char invalid
 	if any.val[0] != '+' && any.val[0] != '-' && (any.val[0] > '9' || any.val[0] < '0') {
 		return 0
 	}
@@ -141,10 +141,10 @@ func (any *stringAny) ToFloat64() float64 {
 			continue
 		}
 
-		// end position is the ***REMOVED***rst char which is not digit
+		// end position is the first char which is not digit
 		if any.val[i] >= '0' && any.val[i] <= '9' {
 			endPos = i + 1
-		} ***REMOVED*** {
+		} else {
 			endPos = i
 			break
 		}

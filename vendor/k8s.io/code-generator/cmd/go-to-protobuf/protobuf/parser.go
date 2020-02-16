@@ -2,7 +2,7 @@
 Copyright 2015 The Kubernetes Authors.
 
 Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this ***REMOVED***le except in compliance with the License.
+you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
 
     http://www.apache.org/licenses/LICENSE-2.0
@@ -10,7 +10,7 @@ You may obtain a copy of the License at
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the speci***REMOVED***c language governing permissions and
+See the License for the specific language governing permissions and
 limitations under the License.
 */
 
@@ -39,18 +39,18 @@ func rewriteFile(name string, header []byte, rewriteFn func(*token.FileSet, *ast
 	if err != nil {
 		return err
 	}
-	***REMOVED***le, err := parser.ParseFile(fset, name, src, parser.DeclarationErrors|parser.ParseComments)
+	file, err := parser.ParseFile(fset, name, src, parser.DeclarationErrors|parser.ParseComments)
 	if err != nil {
 		return err
 	}
 
-	if err := rewriteFn(fset, ***REMOVED***le); err != nil {
+	if err := rewriteFn(fset, file); err != nil {
 		return err
 	}
 
 	b := &bytes.Buffer{}
 	b.Write(header)
-	if err := printer.Fprint(b, fset, ***REMOVED***le); err != nil {
+	if err := printer.Fprint(b, fset, file); err != nil {
 		return err
 	}
 
@@ -71,7 +71,7 @@ func rewriteFile(name string, header []byte, rewriteFn func(*token.FileSet, *ast
 }
 
 // ExtractFunc extracts information from the provided TypeSpec and returns true if the type should be
-// removed from the destination ***REMOVED***le.
+// removed from the destination file.
 type ExtractFunc func(*ast.TypeSpec) bool
 
 // OptionalFunc returns true if the provided local name is a type that has protobuf.nullable=true
@@ -79,17 +79,17 @@ type ExtractFunc func(*ast.TypeSpec) bool
 type OptionalFunc func(name string) bool
 
 func RewriteGeneratedGogoProtobufFile(name string, extractFn ExtractFunc, optionalFn OptionalFunc, header []byte) error {
-	return rewriteFile(name, header, func(fset *token.FileSet, ***REMOVED***le *ast.File) error {
-		cmap := ast.NewCommentMap(fset, ***REMOVED***le, ***REMOVED***le.Comments)
+	return rewriteFile(name, header, func(fset *token.FileSet, file *ast.File) error {
+		cmap := ast.NewCommentMap(fset, file, file.Comments)
 
 		// transform methods that point to optional maps or slices
-		for _, d := range ***REMOVED***le.Decls {
+		for _, d := range file.Decls {
 			rewriteOptionalMethods(d, optionalFn)
 		}
 
 		// remove types that are already declared
 		decls := []ast.Decl{}
-		for _, d := range ***REMOVED***le.Decls {
+		for _, d := range file.Decls {
 			if dropExistingTypeDeclarations(d, extractFn) {
 				continue
 			}
@@ -98,15 +98,15 @@ func RewriteGeneratedGogoProtobufFile(name string, extractFn ExtractFunc, option
 			}
 			decls = append(decls, d)
 		}
-		***REMOVED***le.Decls = decls
+		file.Decls = decls
 
 		// remove unmapped comments
-		***REMOVED***le.Comments = cmap.Filter(***REMOVED***le).Comments()
+		file.Comments = cmap.Filter(file).Comments()
 		return nil
 	})
 }
 
-// rewriteOptionalMethods makes speci***REMOVED***c mutations to marshaller methods that belong to types identi***REMOVED***ed
+// rewriteOptionalMethods makes specific mutations to marshaller methods that belong to types identified
 // as being "optional" (they may be nil on the wire). This allows protobuf to serialize a map or slice and
 // properly discriminate between empty and nil (which is not possible in protobuf).
 // TODO: move into upstream gogo-protobuf once https://github.com/gogo/protobuf/issues/181
@@ -148,7 +148,7 @@ type optionalAssignmentVisitor struct {
 	fn OptionalFunc
 }
 
-// Visit walks the provided node, transforming ***REMOVED***eld initializations of the form
+// Visit walks the provided node, transforming field initializations of the form
 // m.Field = &OptionalType{} -> m.Field = OptionalType{}
 func (v optionalAssignmentVisitor) Visit(n ast.Node) ast.Visitor {
 	switch t := n.(type) {
@@ -176,7 +176,7 @@ func (v optionalAssignmentVisitor) Visit(n ast.Node) ast.Visitor {
 
 type optionalItemsVisitor struct{}
 
-// Visit walks the provided node, looking for speci***REMOVED***c patterns to transform that match
+// Visit walks the provided node, looking for specific patterns to transform that match
 // the effective outcome of turning struct{ map[x]y || []x } into map[x]y or []x.
 func (v *optionalItemsVisitor) Visit(n ast.Node) ast.Visitor {
 	switch t := n.(type) {
@@ -270,9 +270,9 @@ func (v *optionalItemsVisitor) Visit(n ast.Node) ast.Visitor {
 	return v
 }
 
-func isFieldSelector(n ast.Expr, name, ***REMOVED***eld string) bool {
+func isFieldSelector(n ast.Expr, name, field string) bool {
 	s, ok := n.(*ast.SelectorExpr)
-	if !ok || s.Sel == nil || (***REMOVED***eld != "" && s.Sel.Name != ***REMOVED***eld) {
+	if !ok || s.Sel == nil || (field != "" && s.Sel.Name != field) {
 		return false
 	}
 	return isIdent(s.X, name)
@@ -327,7 +327,7 @@ func dropExistingTypeDeclarations(decl ast.Decl, extractFn ExtractFunc) bool {
 }
 
 // dropEmptyImportDeclarations strips any generated but no-op imports from the generated code
-// to prevent generation from being able to de***REMOVED***ne side-effects.  The function returns true
+// to prevent generation from being able to define side-effects.  The function returns true
 // if the entire declaration should be dropped.
 func dropEmptyImportDeclarations(decl ast.Decl) bool {
 	switch t := decl.(type) {
@@ -354,11 +354,11 @@ func dropEmptyImportDeclarations(decl ast.Decl) bool {
 }
 
 func RewriteTypesWithProtobufStructTags(name string, structTags map[string]map[string]string) error {
-	return rewriteFile(name, []byte{}, func(fset *token.FileSet, ***REMOVED***le *ast.File) error {
+	return rewriteFile(name, []byte{}, func(fset *token.FileSet, file *ast.File) error {
 		allErrs := []error{}
 
 		// set any new struct tags
-		for _, d := range ***REMOVED***le.Decls {
+		for _, d := range file.Decls {
 			if errs := updateStructTags(d, structTags, []string{"protobuf"}); len(errs) > 0 {
 				allErrs = append(allErrs, errs...)
 			}
@@ -391,7 +391,7 @@ func updateStructTags(decl ast.Decl, structTags map[string]map[string]string, to
 			continue
 		}
 		typeName := spec.Name.Name
-		***REMOVED***eldTags, ok := structTags[typeName]
+		fieldTags, ok := structTags[typeName]
 		if !ok {
 			continue
 		}
@@ -410,13 +410,13 @@ func updateStructTags(decl ast.Decl, structTags map[string]map[string]string, to
 				case *ast.SelectorExpr:
 					name = t.Sel.Name
 				default:
-					errs = append(errs, fmt.Errorf("unable to get name for tag from struct %q, ***REMOVED***eld %#v", spec.Name.Name, t))
+					errs = append(errs, fmt.Errorf("unable to get name for tag from struct %q, field %#v", spec.Name.Name, t))
 					continue
 				}
-			} ***REMOVED*** {
+			} else {
 				name = f.Names[0].Name
 			}
-			value, ok := ***REMOVED***eldTags[name]
+			value, ok := fieldTags[name]
 			if !ok {
 				continue
 			}
@@ -424,7 +424,7 @@ func updateStructTags(decl ast.Decl, structTags map[string]map[string]string, to
 			if f.Tag != nil {
 				oldTags, err := customreflect.ParseStructTags(strings.Trim(f.Tag.Value, "`"))
 				if err != nil {
-					errs = append(errs, fmt.Errorf("unable to read struct tag from struct %q, ***REMOVED***eld %q: %v", spec.Name.Name, name, err))
+					errs = append(errs, fmt.Errorf("unable to read struct tag from struct %q, field %q: %v", spec.Name.Name, name, err))
 					continue
 				}
 				tags = oldTags

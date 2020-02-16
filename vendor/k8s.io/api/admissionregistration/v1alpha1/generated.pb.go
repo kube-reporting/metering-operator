@@ -2,7 +2,7 @@
 Copyright The Kubernetes Authors.
 
 Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this ***REMOVED***le except in compliance with the License.
+you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
 
     http://www.apache.org/licenses/LICENSE-2.0
@@ -10,7 +10,7 @@ You may obtain a copy of the License at
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the speci***REMOVED***c language governing permissions and
+See the License for the specific language governing permissions and
 limitations under the License.
 */
 
@@ -20,13 +20,13 @@ limitations under the License.
 /*
 	Package v1alpha1 is a generated protocol buffer package.
 
-	It is generated from these ***REMOVED***les:
+	It is generated from these files:
 		k8s.io/kubernetes/vendor/k8s.io/api/admissionregistration/v1alpha1/generated.proto
 
 	It has these top-level messages:
 		Initializer
-		InitializerCon***REMOVED***guration
-		InitializerCon***REMOVED***gurationList
+		InitializerConfiguration
+		InitializerConfigurationList
 		Rule
 */
 package v1alpha1
@@ -45,7 +45,7 @@ var _ = proto.Marshal
 var _ = fmt.Errorf
 var _ = math.Inf
 
-// This is a compile-time assertion to ensure that this generated ***REMOVED***le
+// This is a compile-time assertion to ensure that this generated file
 // is compatible with the proto package it is being compiled against.
 // A compilation error at this line likely means your copy of the
 // proto package needs to be updated.
@@ -53,28 +53,28 @@ const _ = proto.GoGoProtoPackageIsVersion2 // please upgrade the proto package
 
 func (m *Initializer) Reset()                    { *m = Initializer{} }
 func (*Initializer) ProtoMessage()               {}
-func (*Initializer) Descriptor() ([]byte, []int) { return ***REMOVED***leDescriptorGenerated, []int{0} }
+func (*Initializer) Descriptor() ([]byte, []int) { return fileDescriptorGenerated, []int{0} }
 
-func (m *InitializerCon***REMOVED***guration) Reset()      { *m = InitializerCon***REMOVED***guration{} }
-func (*InitializerCon***REMOVED***guration) ProtoMessage() {}
-func (*InitializerCon***REMOVED***guration) Descriptor() ([]byte, []int) {
-	return ***REMOVED***leDescriptorGenerated, []int{1}
+func (m *InitializerConfiguration) Reset()      { *m = InitializerConfiguration{} }
+func (*InitializerConfiguration) ProtoMessage() {}
+func (*InitializerConfiguration) Descriptor() ([]byte, []int) {
+	return fileDescriptorGenerated, []int{1}
 }
 
-func (m *InitializerCon***REMOVED***gurationList) Reset()      { *m = InitializerCon***REMOVED***gurationList{} }
-func (*InitializerCon***REMOVED***gurationList) ProtoMessage() {}
-func (*InitializerCon***REMOVED***gurationList) Descriptor() ([]byte, []int) {
-	return ***REMOVED***leDescriptorGenerated, []int{2}
+func (m *InitializerConfigurationList) Reset()      { *m = InitializerConfigurationList{} }
+func (*InitializerConfigurationList) ProtoMessage() {}
+func (*InitializerConfigurationList) Descriptor() ([]byte, []int) {
+	return fileDescriptorGenerated, []int{2}
 }
 
 func (m *Rule) Reset()                    { *m = Rule{} }
 func (*Rule) ProtoMessage()               {}
-func (*Rule) Descriptor() ([]byte, []int) { return ***REMOVED***leDescriptorGenerated, []int{3} }
+func (*Rule) Descriptor() ([]byte, []int) { return fileDescriptorGenerated, []int{3} }
 
 func init() {
 	proto.RegisterType((*Initializer)(nil), "k8s.io.api.admissionregistration.v1alpha1.Initializer")
-	proto.RegisterType((*InitializerCon***REMOVED***guration)(nil), "k8s.io.api.admissionregistration.v1alpha1.InitializerCon***REMOVED***guration")
-	proto.RegisterType((*InitializerCon***REMOVED***gurationList)(nil), "k8s.io.api.admissionregistration.v1alpha1.InitializerCon***REMOVED***gurationList")
+	proto.RegisterType((*InitializerConfiguration)(nil), "k8s.io.api.admissionregistration.v1alpha1.InitializerConfiguration")
+	proto.RegisterType((*InitializerConfigurationList)(nil), "k8s.io.api.admissionregistration.v1alpha1.InitializerConfigurationList")
 	proto.RegisterType((*Rule)(nil), "k8s.io.api.admissionregistration.v1alpha1.Rule")
 }
 func (m *Initializer) Marshal() (dAtA []byte, err error) {
@@ -111,7 +111,7 @@ func (m *Initializer) MarshalTo(dAtA []byte) (int, error) {
 	return i, nil
 }
 
-func (m *InitializerCon***REMOVED***guration) Marshal() (dAtA []byte, err error) {
+func (m *InitializerConfiguration) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalTo(dAtA)
@@ -121,7 +121,7 @@ func (m *InitializerCon***REMOVED***guration) Marshal() (dAtA []byte, err error)
 	return dAtA[:n], nil
 }
 
-func (m *InitializerCon***REMOVED***guration) MarshalTo(dAtA []byte) (int, error) {
+func (m *InitializerConfiguration) MarshalTo(dAtA []byte) (int, error) {
 	var i int
 	_ = i
 	var l int
@@ -149,7 +149,7 @@ func (m *InitializerCon***REMOVED***guration) MarshalTo(dAtA []byte) (int, error
 	return i, nil
 }
 
-func (m *InitializerCon***REMOVED***gurationList) Marshal() (dAtA []byte, err error) {
+func (m *InitializerConfigurationList) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalTo(dAtA)
@@ -159,7 +159,7 @@ func (m *InitializerCon***REMOVED***gurationList) Marshal() (dAtA []byte, err er
 	return dAtA[:n], nil
 }
 
-func (m *InitializerCon***REMOVED***gurationList) MarshalTo(dAtA []byte) (int, error) {
+func (m *InitializerConfigurationList) MarshalTo(dAtA []byte) (int, error) {
 	var i int
 	_ = i
 	var l int
@@ -273,7 +273,7 @@ func (m *Initializer) Size() (n int) {
 	return n
 }
 
-func (m *InitializerCon***REMOVED***guration) Size() (n int) {
+func (m *InitializerConfiguration) Size() (n int) {
 	var l int
 	_ = l
 	l = m.ObjectMeta.Size()
@@ -287,7 +287,7 @@ func (m *InitializerCon***REMOVED***guration) Size() (n int) {
 	return n
 }
 
-func (m *InitializerCon***REMOVED***gurationList) Size() (n int) {
+func (m *InitializerConfigurationList) Size() (n int) {
 	var l int
 	_ = l
 	l = m.ListMeta.Size()
@@ -349,24 +349,24 @@ func (this *Initializer) String() string {
 	}, "")
 	return s
 }
-func (this *InitializerCon***REMOVED***guration) String() string {
+func (this *InitializerConfiguration) String() string {
 	if this == nil {
 		return "nil"
 	}
-	s := strings.Join([]string{`&InitializerCon***REMOVED***guration{`,
+	s := strings.Join([]string{`&InitializerConfiguration{`,
 		`ObjectMeta:` + strings.Replace(strings.Replace(this.ObjectMeta.String(), "ObjectMeta", "k8s_io_apimachinery_pkg_apis_meta_v1.ObjectMeta", 1), `&`, ``, 1) + `,`,
 		`Initializers:` + strings.Replace(strings.Replace(fmt.Sprintf("%v", this.Initializers), "Initializer", "Initializer", 1), `&`, ``, 1) + `,`,
 		`}`,
 	}, "")
 	return s
 }
-func (this *InitializerCon***REMOVED***gurationList) String() string {
+func (this *InitializerConfigurationList) String() string {
 	if this == nil {
 		return "nil"
 	}
-	s := strings.Join([]string{`&InitializerCon***REMOVED***gurationList{`,
+	s := strings.Join([]string{`&InitializerConfigurationList{`,
 		`ListMeta:` + strings.Replace(strings.Replace(this.ListMeta.String(), "ListMeta", "k8s_io_apimachinery_pkg_apis_meta_v1.ListMeta", 1), `&`, ``, 1) + `,`,
-		`Items:` + strings.Replace(strings.Replace(fmt.Sprintf("%v", this.Items), "InitializerCon***REMOVED***guration", "InitializerCon***REMOVED***guration", 1), `&`, ``, 1) + `,`,
+		`Items:` + strings.Replace(strings.Replace(fmt.Sprintf("%v", this.Items), "InitializerConfiguration", "InitializerConfiguration", 1), `&`, ``, 1) + `,`,
 		`}`,
 	}, "")
 	return s
@@ -411,18 +411,18 @@ func (m *Initializer) Unmarshal(dAtA []byte) error {
 				break
 			}
 		}
-		***REMOVED***eldNum := int32(wire >> 3)
+		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
 			return fmt.Errorf("proto: Initializer: wiretype end group for non-group")
 		}
-		if ***REMOVED***eldNum <= 0 {
-			return fmt.Errorf("proto: Initializer: illegal tag %d (wire type %d)", ***REMOVED***eldNum, wire)
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: Initializer: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
-		switch ***REMOVED***eldNum {
+		switch fieldNum {
 		case 1:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for ***REMOVED***eld Name", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field Name", wireType)
 			}
 			var stringLen uint64
 			for shift := uint(0); ; shift += 7 {
@@ -451,7 +451,7 @@ func (m *Initializer) Unmarshal(dAtA []byte) error {
 			iNdEx = postIndex
 		case 2:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for ***REMOVED***eld Rules", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field Rules", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -501,7 +501,7 @@ func (m *Initializer) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *InitializerCon***REMOVED***guration) Unmarshal(dAtA []byte) error {
+func (m *InitializerConfiguration) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -521,18 +521,18 @@ func (m *InitializerCon***REMOVED***guration) Unmarshal(dAtA []byte) error {
 				break
 			}
 		}
-		***REMOVED***eldNum := int32(wire >> 3)
+		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: InitializerCon***REMOVED***guration: wiretype end group for non-group")
+			return fmt.Errorf("proto: InitializerConfiguration: wiretype end group for non-group")
 		}
-		if ***REMOVED***eldNum <= 0 {
-			return fmt.Errorf("proto: InitializerCon***REMOVED***guration: illegal tag %d (wire type %d)", ***REMOVED***eldNum, wire)
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: InitializerConfiguration: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
-		switch ***REMOVED***eldNum {
+		switch fieldNum {
 		case 1:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for ***REMOVED***eld ObjectMeta", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field ObjectMeta", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -562,7 +562,7 @@ func (m *InitializerCon***REMOVED***guration) Unmarshal(dAtA []byte) error {
 			iNdEx = postIndex
 		case 2:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for ***REMOVED***eld Initializers", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field Initializers", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -612,7 +612,7 @@ func (m *InitializerCon***REMOVED***guration) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *InitializerCon***REMOVED***gurationList) Unmarshal(dAtA []byte) error {
+func (m *InitializerConfigurationList) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -632,18 +632,18 @@ func (m *InitializerCon***REMOVED***gurationList) Unmarshal(dAtA []byte) error {
 				break
 			}
 		}
-		***REMOVED***eldNum := int32(wire >> 3)
+		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: InitializerCon***REMOVED***gurationList: wiretype end group for non-group")
+			return fmt.Errorf("proto: InitializerConfigurationList: wiretype end group for non-group")
 		}
-		if ***REMOVED***eldNum <= 0 {
-			return fmt.Errorf("proto: InitializerCon***REMOVED***gurationList: illegal tag %d (wire type %d)", ***REMOVED***eldNum, wire)
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: InitializerConfigurationList: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
-		switch ***REMOVED***eldNum {
+		switch fieldNum {
 		case 1:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for ***REMOVED***eld ListMeta", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field ListMeta", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -673,7 +673,7 @@ func (m *InitializerCon***REMOVED***gurationList) Unmarshal(dAtA []byte) error {
 			iNdEx = postIndex
 		case 2:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for ***REMOVED***eld Items", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field Items", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -697,7 +697,7 @@ func (m *InitializerCon***REMOVED***gurationList) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.Items = append(m.Items, InitializerCon***REMOVED***guration{})
+			m.Items = append(m.Items, InitializerConfiguration{})
 			if err := m.Items[len(m.Items)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
@@ -743,18 +743,18 @@ func (m *Rule) Unmarshal(dAtA []byte) error {
 				break
 			}
 		}
-		***REMOVED***eldNum := int32(wire >> 3)
+		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
 			return fmt.Errorf("proto: Rule: wiretype end group for non-group")
 		}
-		if ***REMOVED***eldNum <= 0 {
-			return fmt.Errorf("proto: Rule: illegal tag %d (wire type %d)", ***REMOVED***eldNum, wire)
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: Rule: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
-		switch ***REMOVED***eldNum {
+		switch fieldNum {
 		case 1:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for ***REMOVED***eld APIGroups", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field APIGroups", wireType)
 			}
 			var stringLen uint64
 			for shift := uint(0); ; shift += 7 {
@@ -783,7 +783,7 @@ func (m *Rule) Unmarshal(dAtA []byte) error {
 			iNdEx = postIndex
 		case 2:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for ***REMOVED***eld APIVersions", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field APIVersions", wireType)
 			}
 			var stringLen uint64
 			for shift := uint(0); ; shift += 7 {
@@ -812,7 +812,7 @@ func (m *Rule) Unmarshal(dAtA []byte) error {
 			iNdEx = postIndex
 		case 3:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for ***REMOVED***eld Resources", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field Resources", wireType)
 			}
 			var stringLen uint64
 			for shift := uint(0); ; shift += 7 {
@@ -966,10 +966,10 @@ var (
 )
 
 func init() {
-	proto.RegisterFile("k8s.io/kubernetes/vendor/k8s.io/api/admissionregistration/v1alpha1/generated.proto", ***REMOVED***leDescriptorGenerated)
+	proto.RegisterFile("k8s.io/kubernetes/vendor/k8s.io/api/admissionregistration/v1alpha1/generated.proto", fileDescriptorGenerated)
 }
 
-var ***REMOVED***leDescriptorGenerated = []byte{
+var fileDescriptorGenerated = []byte{
 	// 531 bytes of a gzipped FileDescriptorProto
 	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x9c, 0x51, 0x4d, 0x8b, 0x13, 0x31,
 	0x18, 0x6e, 0x6c, 0x0b, 0x6d, 0xda, 0x45, 0x19, 0x3c, 0x94, 0x22, 0xd3, 0xd2, 0x53, 0x45, 0x4c,

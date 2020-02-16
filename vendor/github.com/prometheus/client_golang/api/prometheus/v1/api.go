@@ -1,6 +1,6 @@
 // Copyright 2017 The Prometheus Authors
 // Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this ***REMOVED***le except in compliance with the License.
+// you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 //
 // http://www.apache.org/licenses/LICENSE-2.0
@@ -8,7 +8,7 @@
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the speci***REMOVED***c language governing permissions and
+// See the License for the specific language governing permissions and
 // limitations under the License.
 
 // +build go1.7
@@ -32,12 +32,12 @@ import (
 const (
 	statusAPIError = 422
 
-	apiPre***REMOVED***x = "/api/v1"
+	apiPrefix = "/api/v1"
 
-	epQuery       = apiPre***REMOVED***x + "/query"
-	epQueryRange  = apiPre***REMOVED***x + "/query_range"
-	epLabelValues = apiPre***REMOVED***x + "/label/:name/values"
-	epSeries      = apiPre***REMOVED***x + "/series"
+	epQuery       = apiPrefix + "/query"
+	epQueryRange  = apiPrefix + "/query_range"
+	epLabelValues = apiPrefix + "/label/:name/values"
+	epSeries      = apiPrefix + "/series"
 )
 
 // ErrorType models the different API error types.

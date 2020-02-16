@@ -45,7 +45,7 @@ type UninitialiedDependendenciesHandler struct {
 }
 
 func ValidateQueryDependencies(deps *ReportQueryDependencies, handler *UninitialiedDependendenciesHandler) error {
-	// if the speci***REMOVED***ed ReportQuery depends on datasources without a
+	// if the specified ReportQuery depends on datasources without a
 	// table, it's invalid
 	var uninitializedDataSources []*metering.ReportDataSource
 	validationErr := new(reportQueryDependenciesValidationError)

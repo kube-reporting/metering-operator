@@ -2,7 +2,7 @@
 Copyright 2015 The Kubernetes Authors.
 
 Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this ***REMOVED***le except in compliance with the License.
+you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
 
     http://www.apache.org/licenses/LICENSE-2.0
@@ -10,7 +10,7 @@ You may obtain a copy of the License at
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the speci***REMOVED***c language governing permissions and
+See the License for the specific language governing permissions and
 limitations under the License.
 */
 
@@ -27,7 +27,7 @@ import (
 	"os"
 	"os/exec"
 	"path"
-	"path/***REMOVED***lepath"
+	"path/filepath"
 	"sort"
 	"strings"
 
@@ -35,10 +35,10 @@ import (
 	"k8s.io/klog"
 )
 
-// This clari***REMOVED***es when a pkg path has been canonicalized.
+// This clarifies when a pkg path has been canonicalized.
 type importPathString string
 
-// Builder lets you add all the go ***REMOVED***les in all the packages that you care
+// Builder lets you add all the go files in all the packages that you care
 // about, then constructs the type source data.
 type Builder struct {
 	context *build.Context
@@ -50,7 +50,7 @@ type Builder struct {
 	buildPackages map[string]*build.Package
 
 	fset *token.FileSet
-	// map of package path to list of parsed ***REMOVED***les
+	// map of package path to list of parsed files
 	parsed map[importPathString][]parsedFile
 	// map of package path to absolute path (to prevent overlap)
 	absPaths map[importPathString]string
@@ -62,22 +62,22 @@ type Builder struct {
 	// an import.
 	userRequested map[importPathString]bool
 
-	// All comments from everywhere in every parsed ***REMOVED***le.
-	endLineToCommentGroup map[***REMOVED***leLine]*ast.CommentGroup
+	// All comments from everywhere in every parsed file.
+	endLineToCommentGroup map[fileLine]*ast.CommentGroup
 
 	// map of package to list of packages it imports.
 	importGraph map[importPathString]map[string]struct{}
 }
 
-// parsedFile is for tracking ***REMOVED***les with name
+// parsedFile is for tracking files with name
 type parsedFile struct {
 	name string
-	***REMOVED***le *ast.File
+	file *ast.File
 }
 
-// key type for ***REMOVED***nding comments.
-type ***REMOVED***leLine struct {
-	***REMOVED***le string
+// key type for finding comments.
+type fileLine struct {
+	file string
 	line int
 }
 
@@ -87,9 +87,9 @@ func New() *Builder {
 	if c.GOROOT == "" {
 		if p, err := exec.Command("which", "go").CombinedOutput(); err == nil {
 			// The returned string will have some/path/bin/go, so remove the last two elements.
-			c.GOROOT = ***REMOVED***lepath.Dir(***REMOVED***lepath.Dir(strings.Trim(string(p), "\n")))
-		} ***REMOVED*** {
-			klog.Warningf("Warning: $GOROOT not set, and unable to run `which go` to ***REMOVED***nd it: %v\n", err)
+			c.GOROOT = filepath.Dir(filepath.Dir(strings.Trim(string(p), "\n")))
+		} else {
+			klog.Warningf("Warning: $GOROOT not set, and unable to run `which go` to find it: %v\n", err)
 		}
 	}
 	// Force this to off, since we don't properly parse CGo.  All symbols must
@@ -103,18 +103,18 @@ func New() *Builder {
 		parsed:                map[importPathString][]parsedFile{},
 		absPaths:              map[importPathString]string{},
 		userRequested:         map[importPathString]bool{},
-		endLineToCommentGroup: map[***REMOVED***leLine]*ast.CommentGroup{},
+		endLineToCommentGroup: map[fileLine]*ast.CommentGroup{},
 		importGraph:           map[importPathString]map[string]struct{}{},
 	}
 }
 
-// AddBuildTags adds the speci***REMOVED***ed build tags to the parse context.
+// AddBuildTags adds the specified build tags to the parse context.
 func (b *Builder) AddBuildTags(tags ...string) {
 	b.context.BuildTags = append(b.context.BuildTags, tags...)
 }
 
 // Get package information from the go/build package. Automatically excludes
-// e.g. test ***REMOVED***les and ***REMOVED***les for other platforms-- there is quite a bit of
+// e.g. test files and files for other platforms-- there is quite a bit of
 // logic of that nature in the build package.
 func (b *Builder) importBuildPackage(dir string) (*build.Package, error) {
 	if buildPkg, ok := b.buildPackages[dir]; ok {
@@ -128,7 +128,7 @@ func (b *Builder) importBuildPackage(dir string) (*build.Package, error) {
 		}
 	}
 	if buildPkg == nil {
-		// Might be an empty directory. Try to just ***REMOVED***nd the dir.
+		// Might be an empty directory. Try to just find the dir.
 		buildPkg, err = b.importWithMode(dir, build.FindOnly)
 		if err != nil {
 			return nil, err
@@ -152,11 +152,11 @@ func (b *Builder) importBuildPackage(dir string) (*build.Package, error) {
 	return buildPkg, nil
 }
 
-// AddFileForTest adds a ***REMOVED***le to the set, without verifying that the provided
+// AddFileForTest adds a file to the set, without verifying that the provided
 // pkg actually exists on disk. The pkg must be of the form "canonical/pkg/path"
-// and the path must be the absolute path to the ***REMOVED***le.  Because this bypasses
-// the normal recursive ***REMOVED***nding of package dependencies (on disk), test should
-// sort their test ***REMOVED***les topologically ***REMOVED***rst, so all deps are resolved by the
+// and the path must be the absolute path to the file.  Because this bypasses
+// the normal recursive finding of package dependencies (on disk), test should
+// sort their test files topologically first, so all deps are resolved by the
 // time we need them.
 func (b *Builder) AddFileForTest(pkg string, path string, src []byte) error {
 	if err := b.addFile(importPathString(pkg), path, src, true); err != nil {
@@ -168,9 +168,9 @@ func (b *Builder) AddFileForTest(pkg string, path string, src []byte) error {
 	return nil
 }
 
-// addFile adds a ***REMOVED***le to the set. The pkgPath must be of the form
-// "canonical/pkg/path" and the path must be the absolute path to the ***REMOVED***le. A
-// flag indicates whether this ***REMOVED***le was user-requested or just from following
+// addFile adds a file to the set. The pkgPath must be of the form
+// "canonical/pkg/path" and the path must be the absolute path to the file. A
+// flag indicates whether this file was user-requested or just from following
 // the import graph.
 func (b *Builder) addFile(pkgPath importPathString, path string, src []byte, userRequested bool) error {
 	for _, p := range b.parsed[pkgPath] {
@@ -192,11 +192,11 @@ func (b *Builder) addFile(pkgPath importPathString, path string, src []byte, use
 	b.parsed[pkgPath] = append(b.parsed[pkgPath], parsedFile{path, p})
 	for _, c := range p.Comments {
 		position := b.fset.Position(c.End())
-		b.endLineToCommentGroup[***REMOVED***leLine{position.Filename, position.Line}] = c
+		b.endLineToCommentGroup[fileLine{position.Filename, position.Line}] = c
 	}
 
-	// We have to get the packages from this speci***REMOVED***c ***REMOVED***le, in case the
-	// user added individual ***REMOVED***les instead of entire directories.
+	// We have to get the packages from this specific file, in case the
+	// user added individual files instead of entire directories.
 	if b.importGraph[pkgPath] == nil {
 		b.importGraph[pkgPath] = map[string]struct{}{}
 	}
@@ -207,7 +207,7 @@ func (b *Builder) addFile(pkgPath importPathString, path string, src []byte, use
 	return nil
 }
 
-// AddDir adds an entire directory, scanning it for go ***REMOVED***les. 'dir' should have
+// AddDir adds an entire directory, scanning it for go files. 'dir' should have
 // a single go package in it. GOPATH, GOROOT, and the location of your go
 // binary (`which go`) will all be searched if dir doesn't literally resolve.
 func (b *Builder) AddDir(dir string) error {
@@ -224,12 +224,12 @@ func (b *Builder) AddDirRecursive(dir string) error {
 		klog.Warningf("Ignoring directory %v: %v", dir, err)
 	}
 
-	// ***REMOVED***lepath.Walk includes the root dir, but we already did that, so we'll
-	// remove that pre***REMOVED***x and rebuild a package import path.
-	pre***REMOVED***x := b.buildPackages[dir].Dir
-	fn := func(***REMOVED***lePath string, info os.FileInfo, err error) error {
+	// filepath.Walk includes the root dir, but we already did that, so we'll
+	// remove that prefix and rebuild a package import path.
+	prefix := b.buildPackages[dir].Dir
+	fn := func(filePath string, info os.FileInfo, err error) error {
 		if info != nil && info.IsDir() {
-			rel := ***REMOVED***lepath.ToSlash(strings.TrimPre***REMOVED***x(***REMOVED***lePath, pre***REMOVED***x))
+			rel := filepath.ToSlash(strings.TrimPrefix(filePath, prefix))
 			if rel != "" {
 				// Make a pkg path.
 				pkg := path.Join(string(canonicalizeImportPath(b.buildPackages[dir].ImportPath)), rel)
@@ -242,7 +242,7 @@ func (b *Builder) AddDirRecursive(dir string) error {
 		}
 		return nil
 	}
-	if err := ***REMOVED***lepath.Walk(b.buildPackages[dir].Dir, fn); err != nil {
+	if err := filepath.Walk(b.buildPackages[dir].Dir, fn); err != nil {
 		return err
 	}
 	return nil
@@ -260,7 +260,7 @@ func (b *Builder) AddDirTo(dir string, u *types.Universe) error {
 	if _, err := b.importPackage(dir, true); err != nil {
 		return err
 	}
-	return b.***REMOVED***ndTypesIn(canonicalizeImportPath(b.buildPackages[dir].ImportPath), u)
+	return b.findTypesIn(canonicalizeImportPath(b.buildPackages[dir].ImportPath), u)
 }
 
 // AddDirectoryTo adds an entire directory to a given Universe. Unlike AddDir,
@@ -275,7 +275,7 @@ func (b *Builder) AddDirectoryTo(dir string, u *types.Universe) (*types.Package,
 		return nil, err
 	}
 	path := canonicalizeImportPath(b.buildPackages[dir].ImportPath)
-	if err := b.***REMOVED***ndTypesIn(path, u); err != nil {
+	if err := b.findTypesIn(path, u); err != nil {
 		return nil, err
 	}
 	return u.Package(string(path)), nil
@@ -300,15 +300,15 @@ func (b *Builder) addDir(dir string, userRequested bool) error {
 		if buildPkg.Dir != prev {
 			return fmt.Errorf("package %q (%s) previously resolved to %s", pkgPath, buildPkg.Dir, prev)
 		}
-	} ***REMOVED*** {
+	} else {
 		b.absPaths[pkgPath] = buildPkg.Dir
 	}
 
 	for _, n := range buildPkg.GoFiles {
-		if !strings.HasSuf***REMOVED***x(n, ".go") {
+		if !strings.HasSuffix(n, ".go") {
 			continue
 		}
-		absPath := ***REMOVED***lepath.Join(buildPkg.Dir, n)
+		absPath := filepath.Join(buildPkg.Dir, n)
 		data, err := ioutil.ReadFile(absPath)
 		if err != nil {
 			return fmt.Errorf("while loading %q: %v", absPath, err)
@@ -403,14 +403,14 @@ func (b *Builder) typeCheckPackage(pkgPath importPathString) (*tc.Package, error
 	}
 	parsedFiles, ok := b.parsed[pkgPath]
 	if !ok {
-		return nil, fmt.Errorf("No ***REMOVED***les for pkg %q", pkgPath)
+		return nil, fmt.Errorf("No files for pkg %q", pkgPath)
 	}
-	***REMOVED***les := make([]*ast.File, len(parsedFiles))
+	files := make([]*ast.File, len(parsedFiles))
 	for i := range parsedFiles {
-		***REMOVED***les[i] = parsedFiles[i].***REMOVED***le
+		files[i] = parsedFiles[i].file
 	}
 	b.typeCheckedPackages[pkgPath] = nil
-	c := tc.Con***REMOVED***g{
+	c := tc.Config{
 		IgnoreFuncBodies: true,
 		// Note that importAdapter can call b.importPackage which calls this
 		// method. So there can't be cycles in the import graph.
@@ -419,13 +419,13 @@ func (b *Builder) typeCheckPackage(pkgPath importPathString) (*tc.Package, error
 			klog.V(2).Infof("type checker: %v\n", err)
 		},
 	}
-	pkg, err := c.Check(string(pkgPath), b.fset, ***REMOVED***les, nil)
+	pkg, err := c.Check(string(pkgPath), b.fset, files, nil)
 	b.typeCheckedPackages[pkgPath] = pkg // record the result whether or not there was an error
 	return pkg, err
 }
 
 // FindPackages fetches a list of the user-imported packages.
-// Note that you need to call b.FindTypes() ***REMOVED***rst.
+// Note that you need to call b.FindTypes() first.
 func (b *Builder) FindPackages() []string {
 	// Iterate packages in a predictable order.
 	pkgPaths := []string{}
@@ -446,7 +446,7 @@ func (b *Builder) FindPackages() []string {
 	return result
 }
 
-// FindTypes ***REMOVED***nalizes the package imports, and searches through all the
+// FindTypes finalizes the package imports, and searches through all the
 // packages for types.
 func (b *Builder) FindTypes() (types.Universe, error) {
 	// Take a snapshot of pkgs to iterate, since this will recursively mutate
@@ -459,27 +459,27 @@ func (b *Builder) FindTypes() (types.Universe, error) {
 
 	u := types.Universe{}
 	for _, pkgPath := range pkgPaths {
-		if err := b.***REMOVED***ndTypesIn(importPathString(pkgPath), &u); err != nil {
+		if err := b.findTypesIn(importPathString(pkgPath), &u); err != nil {
 			return nil, err
 		}
 	}
 	return u, nil
 }
 
-// ***REMOVED***ndTypesIn ***REMOVED***nalizes the package import and searches through the package
+// findTypesIn finalizes the package import and searches through the package
 // for types.
-func (b *Builder) ***REMOVED***ndTypesIn(pkgPath importPathString, u *types.Universe) error {
-	klog.V(5).Infof("***REMOVED***ndTypesIn %s", pkgPath)
+func (b *Builder) findTypesIn(pkgPath importPathString, u *types.Universe) error {
+	klog.V(5).Infof("findTypesIn %s", pkgPath)
 	pkg := b.typeCheckedPackages[pkgPath]
 	if pkg == nil {
-		return fmt.Errorf("***REMOVED***ndTypesIn(%s): package is not known", pkgPath)
+		return fmt.Errorf("findTypesIn(%s): package is not known", pkgPath)
 	}
 	if !b.userRequested[pkgPath] {
 		// Since walkType is recursive, all types that the
 		// packages they asked for depend on will be included.
 		// But we don't need to include all types in all
 		// *packages* they depend on.
-		klog.V(5).Infof("***REMOVED***ndTypesIn %s: package is not user requested", pkgPath)
+		klog.V(5).Infof("findTypesIn %s: package is not user requested", pkgPath)
 		return nil
 	}
 
@@ -489,16 +489,16 @@ func (b *Builder) ***REMOVED***ndTypesIn(pkgPath importPathString, u *types.Univ
 	u.Package(string(pkgPath)).SourcePath = b.absPaths[pkgPath]
 
 	for _, f := range b.parsed[pkgPath] {
-		if _, ***REMOVED***leName := ***REMOVED***lepath.Split(f.name); ***REMOVED***leName == "doc.go" {
+		if _, fileName := filepath.Split(f.name); fileName == "doc.go" {
 			tp := u.Package(string(pkgPath))
-			// ***REMOVED***ndTypesIn might be called multiple times. Clean up tp.Comments
-			// to avoid repeatedly ***REMOVED***ll same comments to it.
+			// findTypesIn might be called multiple times. Clean up tp.Comments
+			// to avoid repeatedly fill same comments to it.
 			tp.Comments = []string{}
-			for i := range f.***REMOVED***le.Comments {
-				tp.Comments = append(tp.Comments, splitLines(f.***REMOVED***le.Comments[i].Text())...)
+			for i := range f.file.Comments {
+				tp.Comments = append(tp.Comments, splitLines(f.file.Comments[i].Text())...)
 			}
-			if f.***REMOVED***le.Doc != nil {
-				tp.DocComments = splitLines(f.***REMOVED***le.Doc.Text())
+			if f.file.Doc != nil {
+				tp.DocComments = splitLines(f.file.Doc.Text())
 			}
 		}
 	}
@@ -514,7 +514,7 @@ func (b *Builder) ***REMOVED***ndTypesIn(pkgPath importPathString, u *types.Univ
 			t.CommentLines = splitLines(c1.Text())
 			if c1 == nil {
 				t.SecondClosestCommentLines = splitLines(b.priorCommentLines(obj.Pos(), 2).Text())
-			} ***REMOVED*** {
+			} else {
 				t.SecondClosestCommentLines = splitLines(b.priorCommentLines(c1.List[0].Slash, 2).Text())
 			}
 		}
@@ -527,7 +527,7 @@ func (b *Builder) ***REMOVED***ndTypesIn(pkgPath importPathString, u *types.Univ
 			t.CommentLines = splitLines(c1.Text())
 			if c1 == nil {
 				t.SecondClosestCommentLines = splitLines(b.priorCommentLines(obj.Pos(), 2).Text())
-			} ***REMOVED*** {
+			} else {
 				t.SecondClosestCommentLines = splitLines(b.priorCommentLines(c1.List[0].Slash, 2).Text())
 			}
 		}
@@ -550,12 +550,12 @@ func (b *Builder) ***REMOVED***ndTypesIn(pkgPath importPathString, u *types.Univ
 
 func (b *Builder) importWithMode(dir string, mode build.ImportMode) (*build.Package, error) {
 	// This is a bit of a hack.  The srcDir argument to Import() should
-	// properly be the dir of the ***REMOVED***le which depends on the package to be
+	// properly be the dir of the file which depends on the package to be
 	// imported, so that vendoring can work properly and local paths can
 	// resolve.  We assume that there is only one level of vendoring, and that
 	// the CWD is inside the GOPATH, so this should be safe. Nobody should be
 	// using local (relative) paths except on the CLI, so CWD is also
-	// suf***REMOVED***cient.
+	// sufficient.
 	cwd, err := os.Getwd()
 	if err != nil {
 		return nil, fmt.Errorf("unable to get current directory: %v", err)
@@ -570,7 +570,7 @@ func (b *Builder) importWithMode(dir string, mode build.ImportMode) (*build.Pack
 // if there's a comment on the line `lines` before pos, return its text, otherwise "".
 func (b *Builder) priorCommentLines(pos token.Pos, lines int) *ast.CommentGroup {
 	position := b.fset.Position(pos)
-	key := ***REMOVED***leLine{position.Filename, position.Line - lines}
+	key := fileLine{position.Filename, position.Line - lines}
 	return b.endLineToCommentGroup[key]
 }
 
@@ -579,7 +579,7 @@ func splitLines(str string) []string {
 }
 
 func tcFuncNameToName(in string) types.Name {
-	name := strings.TrimPre***REMOVED***x(in, "func ")
+	name := strings.TrimPrefix(in, "func ")
 	nameParts := strings.Split(name, "(")
 	return tcNameToName(nameParts[0])
 }
@@ -594,14 +594,14 @@ func tcVarNameToName(in string) types.Name {
 func tcNameToName(in string) types.Name {
 	// Detect anonymous type names. (These may have '.' characters because
 	// embedded types may have packages, so we detect them specially.)
-	if strings.HasPre***REMOVED***x(in, "struct{") ||
-		strings.HasPre***REMOVED***x(in, "<-chan") ||
-		strings.HasPre***REMOVED***x(in, "chan<-") ||
-		strings.HasPre***REMOVED***x(in, "chan ") ||
-		strings.HasPre***REMOVED***x(in, "func(") ||
-		strings.HasPre***REMOVED***x(in, "*") ||
-		strings.HasPre***REMOVED***x(in, "map[") ||
-		strings.HasPre***REMOVED***x(in, "[") {
+	if strings.HasPrefix(in, "struct{") ||
+		strings.HasPrefix(in, "<-chan") ||
+		strings.HasPrefix(in, "chan<-") ||
+		strings.HasPrefix(in, "chan ") ||
+		strings.HasPrefix(in, "func(") ||
+		strings.HasPrefix(in, "*") ||
+		strings.HasPrefix(in, "map[") ||
+		strings.HasPrefix(in, "[") {
 		return types.Name{Name: in}
 	}
 
@@ -610,7 +610,7 @@ func tcNameToName(in string) types.Name {
 	nameParts := strings.Split(in, ".")
 	name := types.Name{Name: in}
 	if n := len(nameParts); n >= 2 {
-		// The ***REMOVED***nal "." is the name of the type--previous ones must
+		// The final "." is the name of the type--previous ones must
 		// have been in the package path.
 		name.Package, name.Name = strings.Join(nameParts[:n-1], "."), nameParts[n-1]
 	}

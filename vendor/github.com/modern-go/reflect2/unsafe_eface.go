@@ -26,7 +26,7 @@ type UnsafeEFaceType struct {
 	unsafeType
 }
 
-func newUnsafeEFaceType(cfg *frozenCon***REMOVED***g, type1 reflect.Type) *UnsafeEFaceType {
+func newUnsafeEFaceType(cfg *frozenConfig, type1 reflect.Type) *UnsafeEFaceType {
 	return &UnsafeEFaceType{
 		unsafeType: *newUnsafeType(cfg, type1),
 	}

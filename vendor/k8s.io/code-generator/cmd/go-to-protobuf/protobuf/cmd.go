@@ -2,7 +2,7 @@
 Copyright 2015 The Kubernetes Authors.
 
 Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this ***REMOVED***le except in compliance with the License.
+you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
 
     http://www.apache.org/licenses/LICENSE-2.0
@@ -10,7 +10,7 @@ You may obtain a copy of the License at
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the speci***REMOVED***c language governing permissions and
+See the License for the specific language governing permissions and
 limitations under the License.
 */
 
@@ -24,7 +24,7 @@ import (
 	"log"
 	"os"
 	"os/exec"
-	"path/***REMOVED***lepath"
+	"path/filepath"
 	"strings"
 
 	"k8s.io/code-generator/pkg/util"
@@ -56,9 +56,9 @@ func New() *Generator {
 	sourceTree := args.DefaultSourceTree()
 	common := args.GeneratorArgs{
 		OutputBase:       sourceTree,
-		GoHeaderFilePath: ***REMOVED***lepath.Join(sourceTree, util.BoilerplatePath()),
+		GoHeaderFilePath: filepath.Join(sourceTree, util.BoilerplatePath()),
 	}
-	defaultProtoImport := ***REMOVED***lepath.Join(sourceTree, "k8s.io", "kubernetes", "vendor", "github.com", "gogo", "protobuf", "protobuf")
+	defaultProtoImport := filepath.Join(sourceTree, "k8s.io", "kubernetes", "vendor", "github.com", "gogo", "protobuf", "protobuf")
 	cwd, err := os.Getwd()
 	if err != nil {
 		log.Fatalf("Cannot get current directory.")
@@ -66,7 +66,7 @@ func New() *Generator {
 	return &Generator{
 		Common:           common,
 		OutputBase:       sourceTree,
-		VendorOutputBase: ***REMOVED***lepath.Join(cwd, "vendor"),
+		VendorOutputBase: filepath.Join(cwd, "vendor"),
 		ProtoImport:      []string{defaultProtoImport},
 		APIMachineryPackages: strings.Join([]string{
 			`+k8s.io/apimachinery/pkg/util/intstr`,
@@ -83,19 +83,19 @@ func New() *Generator {
 }
 
 func (g *Generator) BindFlags(flag *flag.FlagSet) {
-	flag.StringVarP(&g.Common.GoHeaderFilePath, "go-header-***REMOVED***le", "h", g.Common.GoHeaderFilePath, "File containing boilerplate header text. The string YEAR will be replaced with the current 4-digit year.")
+	flag.StringVarP(&g.Common.GoHeaderFilePath, "go-header-file", "h", g.Common.GoHeaderFilePath, "File containing boilerplate header text. The string YEAR will be replaced with the current 4-digit year.")
 	flag.BoolVar(&g.Common.VerifyOnly, "verify-only", g.Common.VerifyOnly, "If true, only verify existing output, do not write anything.")
-	flag.StringVarP(&g.Packages, "packages", "p", g.Packages, "comma-separated list of directories to get input types from. Directories pre***REMOVED***xed with '-' are not generated, directories pre***REMOVED***xed with '+' only create types with explicit IDL instructions.")
-	flag.StringVar(&g.APIMachineryPackages, "apimachinery-packages", g.APIMachineryPackages, "comma-separated list of directories to get apimachinery input types from which are needed by any API. Directories pre***REMOVED***xed with '-' are not generated, directories pre***REMOVED***xed with '+' only create types with explicit IDL instructions.")
+	flag.StringVarP(&g.Packages, "packages", "p", g.Packages, "comma-separated list of directories to get input types from. Directories prefixed with '-' are not generated, directories prefixed with '+' only create types with explicit IDL instructions.")
+	flag.StringVar(&g.APIMachineryPackages, "apimachinery-packages", g.APIMachineryPackages, "comma-separated list of directories to get apimachinery input types from which are needed by any API. Directories prefixed with '-' are not generated, directories prefixed with '+' only create types with explicit IDL instructions.")
 	flag.StringVarP(&g.OutputBase, "output-base", "o", g.OutputBase, "Output base; defaults to $GOPATH/src/")
 	flag.StringVar(&g.VendorOutputBase, "vendor-output-base", g.VendorOutputBase, "The vendor/ directory to look for packages in; defaults to $PWD/vendor/.")
 	flag.StringSliceVar(&g.ProtoImport, "proto-import", g.ProtoImport, "The search path for the core protobuf .protos, required; defaults $GOPATH/src/k8s.io/kubernetes/vendor/github.com/gogo/protobuf/protobuf.")
 	flag.StringVar(&g.Conditional, "conditional", g.Conditional, "An optional Golang build tag condition to add to the generated Go code")
-	flag.BoolVar(&g.Clean, "clean", g.Clean, "If true, remove all generated ***REMOVED***les for the speci***REMOVED***ed Packages.")
+	flag.BoolVar(&g.Clean, "clean", g.Clean, "If true, remove all generated files for the specified Packages.")
 	flag.BoolVar(&g.OnlyIDL, "only-idl", g.OnlyIDL, "If true, only generate the IDL for each package.")
 	flag.BoolVar(&g.KeepGogoproto, "keep-gogoproto", g.KeepGogoproto, "If true, the generated IDL will contain gogoprotobuf extensions which are normally removed")
-	flag.BoolVar(&g.SkipGeneratedRewrite, "skip-generated-rewrite", g.SkipGeneratedRewrite, "If true, skip ***REMOVED***xing up the generated.pb.go ***REMOVED***le (debugging only).")
-	flag.StringVar(&g.DropEmbeddedFields, "drop-embedded-***REMOVED***elds", g.DropEmbeddedFields, "Comma-delimited list of embedded Go types to omit from generated protobufs")
+	flag.BoolVar(&g.SkipGeneratedRewrite, "skip-generated-rewrite", g.SkipGeneratedRewrite, "If true, skip fixing up the generated.pb.go file (debugging only).")
+	flag.StringVar(&g.DropEmbeddedFields, "drop-embedded-fields", g.DropEmbeddedFields, "Comma-delimited list of embedded Go types to omit from generated protobufs")
 }
 
 func Run(g *Generator) {
@@ -112,7 +112,7 @@ func Run(g *Generator) {
 		name := types.Name{}
 		if i := strings.LastIndex(t, "."); i != -1 {
 			name.Package, name.Name = t[:i], t[i+1:]
-		} ***REMOVED*** {
+		} else {
 			name.Name = t
 		}
 		if len(name.Name) == 0 {
@@ -123,7 +123,7 @@ func Run(g *Generator) {
 
 	boilerplate, err := g.Common.LoadGoBoilerplate()
 	if err != nil {
-		log.Fatalf("Failed loading boilerplate (consider using the go-header-***REMOVED***le flag): %v", err)
+		log.Fatalf("Failed loading boilerplate (consider using the go-header-file flag): %v", err)
 	}
 
 	protobufNames := NewProtobufNamer()
@@ -138,16 +138,16 @@ func Run(g *Generator) {
 		packages = append(packages, strings.Split(g.Packages, ",")...)
 	}
 	if len(packages) == 0 {
-		log.Fatalf("Both apimachinery-packages and packages are empty. At least one package must be speci***REMOVED***ed.")
+		log.Fatalf("Both apimachinery-packages and packages are empty. At least one package must be specified.")
 	}
 
 	for _, d := range packages {
 		generateAllTypes, outputPackage := true, true
 		switch {
-		case strings.HasPre***REMOVED***x(d, "+"):
+		case strings.HasPrefix(d, "+"):
 			d = d[1:]
 			generateAllTypes = false
-		case strings.HasPre***REMOVED***x(d, "-"):
+		case strings.HasPrefix(d, "-"):
 			d = d[1:]
 			outputPackage = false
 		}
@@ -164,7 +164,7 @@ func Run(g *Generator) {
 		protobufNames.Add(p)
 		if outputPackage {
 			outputPackages = append(outputPackages, p)
-		} ***REMOVED*** {
+		} else {
 			nonOutputPackages[name] = struct{}{}
 		}
 	}
@@ -211,7 +211,7 @@ func Run(g *Generator) {
 		p.Vendored = strings.Contains(c.Universe[p.PackagePath].SourcePath, "/vendor/")
 		if p.Vendored {
 			vendoredOutputPackages = append(vendoredOutputPackages, p)
-		} ***REMOVED*** {
+		} else {
 			localOutputPackages = append(localOutputPackages, p)
 		}
 	}
@@ -232,7 +232,7 @@ func Run(g *Generator) {
 	}
 
 	if _, err := exec.LookPath("protoc"); err != nil {
-		log.Fatalf("Unable to ***REMOVED***nd 'protoc': %v", err)
+		log.Fatalf("Unable to find 'protoc': %v", err)
 	}
 
 	searchArgs := []string{"-I", ".", "-I", g.OutputBase}
@@ -252,11 +252,11 @@ func Run(g *Generator) {
 	for _, outputPackage := range outputPackages {
 		p := outputPackage.(*protobufPackage)
 
-		path := ***REMOVED***lepath.Join(g.OutputBase, p.ImportPath())
-		outputPath := ***REMOVED***lepath.Join(g.OutputBase, p.OutputPath())
+		path := filepath.Join(g.OutputBase, p.ImportPath())
+		outputPath := filepath.Join(g.OutputBase, p.OutputPath())
 		if p.Vendored {
-			path = ***REMOVED***lepath.Join(g.VendorOutputBase, p.ImportPath())
-			outputPath = ***REMOVED***lepath.Join(g.VendorOutputBase, p.OutputPath())
+			path = filepath.Join(g.VendorOutputBase, p.ImportPath())
+			outputPath = filepath.Join(g.VendorOutputBase, p.OutputPath())
 		}
 
 		// generate the gogoprotobuf protoc
@@ -274,7 +274,7 @@ func Run(g *Generator) {
 			continue
 		}
 
-		// alter the generated protobuf ***REMOVED***le to remove the generated types (but leave the serializers) and rewrite the
+		// alter the generated protobuf file to remove the generated types (but leave the serializers) and rewrite the
 		// package statement to match the desired package name
 		if err := RewriteGeneratedGogoProtobufFile(outputPath, p.ExtractGeneratedType, p.OptionalTypeName, buf.Bytes()); err != nil {
 			log.Fatalf("Unable to rewrite generated %s: %v", outputPath, err)
@@ -291,7 +291,7 @@ func Run(g *Generator) {
 			log.Fatalf("Unable to rewrite imports for %s: %v", p.PackageName, err)
 		}
 
-		// format and simplify the generated ***REMOVED***le
+		// format and simplify the generated file
 		cmd = exec.Command("gofmt", "-s", "-w", outputPath)
 		out, err = cmd.CombinedOutput()
 		if len(out) > 0 {
@@ -328,17 +328,17 @@ func Run(g *Generator) {
 			continue
 		}
 
-		pattern := ***REMOVED***lepath.Join(g.OutputBase, p.PackagePath, "*.go")
+		pattern := filepath.Join(g.OutputBase, p.PackagePath, "*.go")
 		if p.Vendored {
-			pattern = ***REMOVED***lepath.Join(g.VendorOutputBase, p.PackagePath, "*.go")
+			pattern = filepath.Join(g.VendorOutputBase, p.PackagePath, "*.go")
 		}
-		***REMOVED***les, err := ***REMOVED***lepath.Glob(pattern)
+		files, err := filepath.Glob(pattern)
 		if err != nil {
 			log.Fatalf("Can't glob pattern %q: %v", pattern, err)
 		}
 
-		for _, s := range ***REMOVED***les {
-			if strings.HasSuf***REMOVED***x(s, "_test.go") {
+		for _, s := range files {
+			if strings.HasSuffix(s, "_test.go") {
 				continue
 			}
 			if err := RewriteTypesWithProtobufStructTags(s, p.StructTags); err != nil {

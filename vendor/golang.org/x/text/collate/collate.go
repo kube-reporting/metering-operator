@@ -1,6 +1,6 @@
 // Copyright 2012 The Go Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE ***REMOVED***le.
+// license that can be found in the LICENSE file.
 
 // TODO: remove hard-coded versions when we have implemented fractional weights.
 // The current implementation is incompatible with later CLDR versions.
@@ -103,7 +103,7 @@ func (b *Buffer) Reset() {
 // Compare returns an integer comparing the two byte slices.
 // The result will be 0 if a==b, -1 if a < b, and +1 if a > b.
 func (c *Collator) Compare(a, b []byte) int {
-	// TODO: skip identical pre***REMOVED***xes once we have a fast way to detect if a rune is
+	// TODO: skip identical prefixes once we have a fast way to detect if a rune is
 	// part of a contraction. This would lead to roughly a 10% speedup for the colcmp regtest.
 	c.iter(0).SetInput(a)
 	c.iter(1).SetInput(b)
@@ -119,7 +119,7 @@ func (c *Collator) Compare(a, b []byte) int {
 // CompareString returns an integer comparing the two strings.
 // The result will be 0 if a==b, -1 if a < b, and +1 if a > b.
 func (c *Collator) CompareString(a, b string) int {
-	// TODO: skip identical pre***REMOVED***xes once we have a fast way to detect if a rune is
+	// TODO: skip identical prefixes once we have a fast way to detect if a rune is
 	// part of a contraction. This would lead to roughly a 10% speedup for the colcmp regtest.
 	c.iter(0).SetInputString(a)
 	c.iter(1).SetInputString(b)
@@ -129,7 +129,7 @@ func (c *Collator) CompareString(a, b string) int {
 	if !c.ignore[colltab.Identity] {
 		if a < b {
 			return -1
-		} ***REMOVED*** if a > b {
+		} else if a > b {
 			return 1
 		}
 	}
@@ -147,7 +147,7 @@ func compareLevel(f func(i *iter) int, a, b *iter) int {
 				return -1
 			}
 			return 1
-		} ***REMOVED*** if va == 0 {
+		} else if va == 0 {
 			break
 		}
 	}
@@ -162,7 +162,7 @@ func (c *Collator) compare() int {
 		if res := compareLevel((*iter).nextPrimary, ia, ib); res != 0 {
 			return res
 		}
-	} ***REMOVED*** {
+	} else {
 		// TODO: handle shifted
 	}
 	if !c.ignore[colltab.Secondary] {
@@ -302,7 +302,7 @@ func appendPrimary(key []byte, p int) []byte {
 	// Convert to variable length encoding; supports up to 23 bits.
 	if p <= 0x7FFF {
 		key = append(key, uint8(p>>8), uint8(p))
-	} ***REMOVED*** {
+	} else {
 		key = append(key, uint8(p>>16)|0x80, uint8(p>>8), uint8(p))
 	}
 	return key
@@ -325,14 +325,14 @@ func (c *Collator) keyFromElems(buf *Buffer, ws []colltab.Elem) {
 					buf.key = append(buf.key, uint8(w>>8), uint8(w))
 				}
 			}
-		} ***REMOVED*** {
+		} else {
 			for i := len(ws) - 1; i >= 0; i-- {
 				if w := ws[i].Secondary(); w > 0 {
 					buf.key = append(buf.key, uint8(w>>8), uint8(w))
 				}
 			}
 		}
-	} ***REMOVED*** if c.caseLevel {
+	} else if c.caseLevel {
 		buf.key = append(buf.key, 0, 0)
 	}
 	if !c.ignore[colltab.Tertiary] || c.caseLevel {
@@ -343,7 +343,7 @@ func (c *Collator) keyFromElems(buf *Buffer, ws []colltab.Elem) {
 			}
 		}
 		// Derive the quaternary weights from the options and other levels.
-		// Note that we represent MaxQuaternary as 0xFF. The ***REMOVED***rst byte of the
+		// Note that we represent MaxQuaternary as 0xFF. The first byte of the
 		// representation of a primary weight is always smaller than 0xFF,
 		// so using this single byte value will compare correctly.
 		if !c.ignore[colltab.Quaternary] && c.alternate >= altShifted {
@@ -353,18 +353,18 @@ func (c *Collator) keyFromElems(buf *Buffer, ws []colltab.Elem) {
 				for _, v := range ws {
 					if w := v.Quaternary(); w == colltab.MaxQuaternary {
 						buf.key = append(buf.key, 0xFF)
-					} ***REMOVED*** if w > 0 {
+					} else if w > 0 {
 						buf.key = appendPrimary(buf.key, w)
 						lastNonFFFF = len(buf.key)
 					}
 				}
 				buf.key = buf.key[:lastNonFFFF]
-			} ***REMOVED*** {
+			} else {
 				buf.key = append(buf.key, 0)
 				for _, v := range ws {
 					if w := v.Quaternary(); w == colltab.MaxQuaternary {
 						buf.key = append(buf.key, 0xFF)
-					} ***REMOVED*** if w > 0 {
+					} else if w > 0 {
 						buf.key = appendPrimary(buf.key, w)
 					}
 				}
@@ -382,11 +382,11 @@ func processWeights(vw alternateHandling, top uint32, wa []colltab.Elem) {
 			if p := wa[i].Primary(); p <= vtop && p != 0 {
 				wa[i] = colltab.MakeQuaternary(p)
 				ignore = true
-			} ***REMOVED*** if p == 0 {
+			} else if p == 0 {
 				if ignore {
 					wa[i] = colltab.Ignore
 				}
-			} ***REMOVED*** {
+			} else {
 				ignore = false
 			}
 		}
@@ -395,7 +395,7 @@ func processWeights(vw alternateHandling, top uint32, wa []colltab.Elem) {
 			if p := wa[i].Primary(); p <= vtop && (ignore || p != 0) {
 				wa[i] = colltab.Ignore
 				ignore = true
-			} ***REMOVED*** {
+			} else {
 				ignore = false
 			}
 		}

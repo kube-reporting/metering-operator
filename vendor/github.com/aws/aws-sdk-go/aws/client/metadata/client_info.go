@@ -9,5 +9,5 @@ type ClientInfo struct {
 	SigningName   string
 	SigningRegion string
 	JSONVersion   string
-	TargetPre***REMOVED***x  string
+	TargetPrefix  string
 }

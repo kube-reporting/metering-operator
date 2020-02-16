@@ -21,54 +21,54 @@ func newUnsafeStructField(structType *UnsafeStructType, structField reflect.Stru
 	}
 }
 
-func (***REMOVED***eld *UnsafeStructField) Offset() uintptr {
-	return ***REMOVED***eld.StructField.Offset
+func (field *UnsafeStructField) Offset() uintptr {
+	return field.StructField.Offset
 }
 
-func (***REMOVED***eld *UnsafeStructField) Name() string {
-	return ***REMOVED***eld.StructField.Name
+func (field *UnsafeStructField) Name() string {
+	return field.StructField.Name
 }
 
-func (***REMOVED***eld *UnsafeStructField) PkgPath() string {
-	return ***REMOVED***eld.StructField.PkgPath
+func (field *UnsafeStructField) PkgPath() string {
+	return field.StructField.PkgPath
 }
 
-func (***REMOVED***eld *UnsafeStructField) Type() Type {
-	return ***REMOVED***eld.structType.cfg.Type2(***REMOVED***eld.StructField.Type)
+func (field *UnsafeStructField) Type() Type {
+	return field.structType.cfg.Type2(field.StructField.Type)
 }
 
-func (***REMOVED***eld *UnsafeStructField) Tag() reflect.StructTag {
-	return ***REMOVED***eld.StructField.Tag
+func (field *UnsafeStructField) Tag() reflect.StructTag {
+	return field.StructField.Tag
 }
 
-func (***REMOVED***eld *UnsafeStructField) Index() []int {
-	return ***REMOVED***eld.StructField.Index
+func (field *UnsafeStructField) Index() []int {
+	return field.StructField.Index
 }
 
-func (***REMOVED***eld *UnsafeStructField) Anonymous() bool {
-	return ***REMOVED***eld.StructField.Anonymous
+func (field *UnsafeStructField) Anonymous() bool {
+	return field.StructField.Anonymous
 }
 
-func (***REMOVED***eld *UnsafeStructField) Set(obj interface{}, value interface{}) {
+func (field *UnsafeStructField) Set(obj interface{}, value interface{}) {
 	objEFace := unpackEFace(obj)
-	assertType("StructField.SetIndex argument 1", ***REMOVED***eld.structType.ptrRType, objEFace.rtype)
+	assertType("StructField.SetIndex argument 1", field.structType.ptrRType, objEFace.rtype)
 	valueEFace := unpackEFace(value)
-	assertType("StructField.SetIndex argument 2", ***REMOVED***eld.ptrRType, valueEFace.rtype)
-	***REMOVED***eld.UnsafeSet(objEFace.data, valueEFace.data)
+	assertType("StructField.SetIndex argument 2", field.ptrRType, valueEFace.rtype)
+	field.UnsafeSet(objEFace.data, valueEFace.data)
 }
 
-func (***REMOVED***eld *UnsafeStructField) UnsafeSet(obj unsafe.Pointer, value unsafe.Pointer) {
-	***REMOVED***eldPtr := add(obj, ***REMOVED***eld.StructField.Offset, "same as non-reflect &v.***REMOVED***eld")
-	typedmemmove(***REMOVED***eld.rtype, ***REMOVED***eldPtr, value)
+func (field *UnsafeStructField) UnsafeSet(obj unsafe.Pointer, value unsafe.Pointer) {
+	fieldPtr := add(obj, field.StructField.Offset, "same as non-reflect &v.field")
+	typedmemmove(field.rtype, fieldPtr, value)
 }
 
-func (***REMOVED***eld *UnsafeStructField) Get(obj interface{}) interface{} {
+func (field *UnsafeStructField) Get(obj interface{}) interface{} {
 	objEFace := unpackEFace(obj)
-	assertType("StructField.GetIndex argument 1", ***REMOVED***eld.structType.ptrRType, objEFace.rtype)
-	value := ***REMOVED***eld.UnsafeGet(objEFace.data)
-	return packEFace(***REMOVED***eld.ptrRType, value)
+	assertType("StructField.GetIndex argument 1", field.structType.ptrRType, objEFace.rtype)
+	value := field.UnsafeGet(objEFace.data)
+	return packEFace(field.ptrRType, value)
 }
 
-func (***REMOVED***eld *UnsafeStructField) UnsafeGet(obj unsafe.Pointer) unsafe.Pointer {
-	return add(obj, ***REMOVED***eld.StructField.Offset, "same as non-reflect &v.***REMOVED***eld")
+func (field *UnsafeStructField) UnsafeGet(obj unsafe.Pointer) unsafe.Pointer {
+	return add(obj, field.StructField.Offset, "same as non-reflect &v.field")
 }

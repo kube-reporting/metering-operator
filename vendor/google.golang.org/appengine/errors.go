@@ -1,8 +1,8 @@
 // Copyright 2011 Google Inc. All rights reserved.
 // Use of this source code is governed by the Apache 2.0
-// license that can be found in the LICENSE ***REMOVED***le.
+// license that can be found in the LICENSE file.
 
-// This ***REMOVED***le provides error functions for common API failure modes.
+// This file provides error functions for common API failure modes.
 
 package appengine
 
@@ -13,7 +13,7 @@ import (
 )
 
 // IsOverQuota reports whether err represents an API call failure
-// due to insuf***REMOVED***cient available quota.
+// due to insufficient available quota.
 func IsOverQuota(err error) bool {
 	callErr, ok := err.(*internal.CallError)
 	return ok && callErr.Code == 4

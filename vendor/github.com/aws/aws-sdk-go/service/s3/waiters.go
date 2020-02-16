@@ -18,7 +18,7 @@ func (c *S3) WaitUntilBucketExists(input *HeadBucketInput) error {
 }
 
 // WaitUntilBucketExistsWithContext is an extended version of WaitUntilBucketExists.
-// With the support for passing in a context and options to con***REMOVED***gure the
+// With the support for passing in a context and options to configure the
 // Waiter and the underlying request options.
 //
 // The context must be non-nil and will be used for request cancellation. If
@@ -52,7 +52,7 @@ func (c *S3) WaitUntilBucketExistsWithContext(ctx aws.Context, input *HeadBucket
 				Expected: 404,
 			},
 		},
-		Logger: c.Con***REMOVED***g.Logger,
+		Logger: c.Config.Logger,
 		NewRequest: func(opts []request.Option) (*request.Request, error) {
 			var inCpy *HeadBucketInput
 			if input != nil {
@@ -79,7 +79,7 @@ func (c *S3) WaitUntilBucketNotExists(input *HeadBucketInput) error {
 }
 
 // WaitUntilBucketNotExistsWithContext is an extended version of WaitUntilBucketNotExists.
-// With the support for passing in a context and options to con***REMOVED***gure the
+// With the support for passing in a context and options to configure the
 // Waiter and the underlying request options.
 //
 // The context must be non-nil and will be used for request cancellation. If
@@ -98,7 +98,7 @@ func (c *S3) WaitUntilBucketNotExistsWithContext(ctx aws.Context, input *HeadBuc
 				Expected: 404,
 			},
 		},
-		Logger: c.Con***REMOVED***g.Logger,
+		Logger: c.Config.Logger,
 		NewRequest: func(opts []request.Option) (*request.Request, error) {
 			var inCpy *HeadBucketInput
 			if input != nil {
@@ -125,7 +125,7 @@ func (c *S3) WaitUntilObjectExists(input *HeadObjectInput) error {
 }
 
 // WaitUntilObjectExistsWithContext is an extended version of WaitUntilObjectExists.
-// With the support for passing in a context and options to con***REMOVED***gure the
+// With the support for passing in a context and options to configure the
 // Waiter and the underlying request options.
 //
 // The context must be non-nil and will be used for request cancellation. If
@@ -149,7 +149,7 @@ func (c *S3) WaitUntilObjectExistsWithContext(ctx aws.Context, input *HeadObject
 				Expected: 404,
 			},
 		},
-		Logger: c.Con***REMOVED***g.Logger,
+		Logger: c.Config.Logger,
 		NewRequest: func(opts []request.Option) (*request.Request, error) {
 			var inCpy *HeadObjectInput
 			if input != nil {
@@ -176,7 +176,7 @@ func (c *S3) WaitUntilObjectNotExists(input *HeadObjectInput) error {
 }
 
 // WaitUntilObjectNotExistsWithContext is an extended version of WaitUntilObjectNotExists.
-// With the support for passing in a context and options to con***REMOVED***gure the
+// With the support for passing in a context and options to configure the
 // Waiter and the underlying request options.
 //
 // The context must be non-nil and will be used for request cancellation. If
@@ -195,7 +195,7 @@ func (c *S3) WaitUntilObjectNotExistsWithContext(ctx aws.Context, input *HeadObj
 				Expected: 404,
 			},
 		},
-		Logger: c.Con***REMOVED***g.Logger,
+		Logger: c.Config.Logger,
 		NewRequest: func(opts []request.Option) (*request.Request, error) {
 			var inCpy *HeadObjectInput
 			if input != nil {

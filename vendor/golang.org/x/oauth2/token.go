@@ -1,6 +1,6 @@
 // Copyright 2014 The Go Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE ***REMOVED***le.
+// license that can be found in the LICENSE file.
 
 package oauth2
 
@@ -25,7 +25,7 @@ const expiryDelta = 10 * time.Second
 // the requests to access protected resources on the OAuth 2.0
 // provider's backend.
 //
-// Most users of this package should not access ***REMOVED***elds of Token
+// Most users of this package should not access fields of Token
 // directly. They're exported mostly for use by related packages
 // implementing derivative OAuth2 flows.
 type Token struct {
@@ -54,7 +54,7 @@ type Token struct {
 	raw interface{}
 }
 
-// Type returns t.TokenType if non-empty, ***REMOVED*** "Bearer".
+// Type returns t.TokenType if non-empty, else "Bearer".
 func (t *Token) Type() string {
 	if strings.EqualFold(t.TokenType, "bearer") {
 		return "Bearer"
@@ -90,8 +90,8 @@ func (t *Token) WithExtra(extra interface{}) *Token {
 	return t2
 }
 
-// Extra returns an extra ***REMOVED***eld.
-// Extra ***REMOVED***elds are key-value pairs returned by the server as a
+// Extra returns an extra field.
+// Extra fields are key-value pairs returned by the server as a
 // part of the token retrieval response.
 func (t *Token) Extra(key string) interface{} {
 	if raw, ok := t.raw.(map[string]interface{}); ok {
@@ -147,10 +147,10 @@ func tokenFromInternal(t *internal.Token) *Token {
 	}
 }
 
-// retrieveToken takes a *Con***REMOVED***g and uses that to retrieve an *internal.Token.
+// retrieveToken takes a *Config and uses that to retrieve an *internal.Token.
 // This token is then mapped from *internal.Token into an *oauth2.Token which is returned along
 // with an error..
-func retrieveToken(ctx context.Context, c *Con***REMOVED***g, v url.Values) (*Token, error) {
+func retrieveToken(ctx context.Context, c *Config, v url.Values) (*Token, error) {
 	tk, err := internal.RetrieveToken(ctx, c.ClientID, c.ClientSecret, c.Endpoint.TokenURL, v)
 	if err != nil {
 		if rErr, ok := err.(*internal.RetrieveError); ok {

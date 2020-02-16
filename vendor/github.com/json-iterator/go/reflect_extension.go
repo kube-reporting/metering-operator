@@ -11,9 +11,9 @@ import (
 )
 
 var typeDecoders = map[string]ValDecoder{}
-var ***REMOVED***eldDecoders = map[string]ValDecoder{}
+var fieldDecoders = map[string]ValDecoder{}
 var typeEncoders = map[string]ValEncoder{}
-var ***REMOVED***eldEncoders = map[string]ValEncoder{}
+var fieldEncoders = map[string]ValEncoder{}
 var extensions = []Extension{}
 
 // StructDescriptor describe how should we encode/decode the struct
@@ -22,18 +22,18 @@ type StructDescriptor struct {
 	Fields []*Binding
 }
 
-// GetField get one ***REMOVED***eld from the descriptor by its name.
-// Can not use map here to keep ***REMOVED***eld orders.
-func (structDescriptor *StructDescriptor) GetField(***REMOVED***eldName string) *Binding {
+// GetField get one field from the descriptor by its name.
+// Can not use map here to keep field orders.
+func (structDescriptor *StructDescriptor) GetField(fieldName string) *Binding {
 	for _, binding := range structDescriptor.Fields {
-		if binding.Field.Name() == ***REMOVED***eldName {
+		if binding.Field.Name() == fieldName {
 			return binding
 		}
 	}
 	return nil
 }
 
-// Binding describe how should we encode/decode the struct ***REMOVED***eld
+// Binding describe how should we encode/decode the struct field
 type Binding struct {
 	levels    []int
 	Field     reflect2.StructField
@@ -44,7 +44,7 @@ type Binding struct {
 }
 
 // Extension the one for all SPI. Customize encoding/decoding by specifying alternate encoder/decoder.
-// Can also rename ***REMOVED***elds by UpdateStructDescriptor.
+// Can also rename fields by UpdateStructDescriptor.
 type Extension interface {
 	UpdateStructDescriptor(structDescriptor *StructDescriptor)
 	CreateMapKeyDecoder(typ reflect2.Type) ValDecoder
@@ -205,14 +205,14 @@ func RegisterTypeDecoder(typ string, decoder ValDecoder) {
 	typeDecoders[typ] = decoder
 }
 
-// RegisterFieldDecoderFunc register TypeDecoder for a struct ***REMOVED***eld with function
-func RegisterFieldDecoderFunc(typ string, ***REMOVED***eld string, fun DecoderFunc) {
-	RegisterFieldDecoder(typ, ***REMOVED***eld, &funcDecoder{fun})
+// RegisterFieldDecoderFunc register TypeDecoder for a struct field with function
+func RegisterFieldDecoderFunc(typ string, field string, fun DecoderFunc) {
+	RegisterFieldDecoder(typ, field, &funcDecoder{fun})
 }
 
-// RegisterFieldDecoder register TypeDecoder for a struct ***REMOVED***eld
-func RegisterFieldDecoder(typ string, ***REMOVED***eld string, decoder ValDecoder) {
-	***REMOVED***eldDecoders[fmt.Sprintf("%s/%s", typ, ***REMOVED***eld)] = decoder
+// RegisterFieldDecoder register TypeDecoder for a struct field
+func RegisterFieldDecoder(typ string, field string, decoder ValDecoder) {
+	fieldDecoders[fmt.Sprintf("%s/%s", typ, field)] = decoder
 }
 
 // RegisterTypeEncoderFunc register TypeEncoder for a type with encode/isEmpty function
@@ -225,14 +225,14 @@ func RegisterTypeEncoder(typ string, encoder ValEncoder) {
 	typeEncoders[typ] = encoder
 }
 
-// RegisterFieldEncoderFunc register TypeEncoder for a struct ***REMOVED***eld with encode/isEmpty function
-func RegisterFieldEncoderFunc(typ string, ***REMOVED***eld string, fun EncoderFunc, isEmptyFunc func(unsafe.Pointer) bool) {
-	RegisterFieldEncoder(typ, ***REMOVED***eld, &funcEncoder{fun, isEmptyFunc})
+// RegisterFieldEncoderFunc register TypeEncoder for a struct field with encode/isEmpty function
+func RegisterFieldEncoderFunc(typ string, field string, fun EncoderFunc, isEmptyFunc func(unsafe.Pointer) bool) {
+	RegisterFieldEncoder(typ, field, &funcEncoder{fun, isEmptyFunc})
 }
 
-// RegisterFieldEncoder register TypeEncoder for a struct ***REMOVED***eld
-func RegisterFieldEncoder(typ string, ***REMOVED***eld string, encoder ValEncoder) {
-	***REMOVED***eldEncoders[fmt.Sprintf("%s/%s", typ, ***REMOVED***eld)] = encoder
+// RegisterFieldEncoder register TypeEncoder for a struct field
+func RegisterFieldEncoder(typ string, field string, encoder ValEncoder) {
+	fieldEncoders[fmt.Sprintf("%s/%s", typ, field)] = encoder
 }
 
 // RegisterExtension register extension
@@ -336,8 +336,8 @@ func describeStruct(ctx *ctx, typ reflect2.Type) *StructDescriptor {
 	embeddedBindings := []*Binding{}
 	bindings := []*Binding{}
 	for i := 0; i < structType.NumField(); i++ {
-		***REMOVED***eld := structType.Field(i)
-		tag, hastag := ***REMOVED***eld.Tag().Lookup(ctx.getTagKey())
+		field := structType.Field(i)
+		tag, hastag := field.Tag().Lookup(ctx.getTagKey())
 		if ctx.onlyTaggedField && !hastag {
 			continue
 		}
@@ -345,48 +345,48 @@ func describeStruct(ctx *ctx, typ reflect2.Type) *StructDescriptor {
 		if tag == "-" {
 			continue
 		}
-		if ***REMOVED***eld.Anonymous() && (tag == "" || tagParts[0] == "") {
-			if ***REMOVED***eld.Type().Kind() == reflect.Struct {
-				structDescriptor := describeStruct(ctx, ***REMOVED***eld.Type())
+		if field.Anonymous() && (tag == "" || tagParts[0] == "") {
+			if field.Type().Kind() == reflect.Struct {
+				structDescriptor := describeStruct(ctx, field.Type())
 				for _, binding := range structDescriptor.Fields {
 					binding.levels = append([]int{i}, binding.levels...)
 					omitempty := binding.Encoder.(*structFieldEncoder).omitempty
-					binding.Encoder = &structFieldEncoder{***REMOVED***eld, binding.Encoder, omitempty}
-					binding.Decoder = &structFieldDecoder{***REMOVED***eld, binding.Decoder}
+					binding.Encoder = &structFieldEncoder{field, binding.Encoder, omitempty}
+					binding.Decoder = &structFieldDecoder{field, binding.Decoder}
 					embeddedBindings = append(embeddedBindings, binding)
 				}
 				continue
-			} ***REMOVED*** if ***REMOVED***eld.Type().Kind() == reflect.Ptr {
-				ptrType := ***REMOVED***eld.Type().(*reflect2.UnsafePtrType)
+			} else if field.Type().Kind() == reflect.Ptr {
+				ptrType := field.Type().(*reflect2.UnsafePtrType)
 				if ptrType.Elem().Kind() == reflect.Struct {
 					structDescriptor := describeStruct(ctx, ptrType.Elem())
 					for _, binding := range structDescriptor.Fields {
 						binding.levels = append([]int{i}, binding.levels...)
 						omitempty := binding.Encoder.(*structFieldEncoder).omitempty
 						binding.Encoder = &dereferenceEncoder{binding.Encoder}
-						binding.Encoder = &structFieldEncoder{***REMOVED***eld, binding.Encoder, omitempty}
+						binding.Encoder = &structFieldEncoder{field, binding.Encoder, omitempty}
 						binding.Decoder = &dereferenceDecoder{ptrType.Elem(), binding.Decoder}
-						binding.Decoder = &structFieldDecoder{***REMOVED***eld, binding.Decoder}
+						binding.Decoder = &structFieldDecoder{field, binding.Decoder}
 						embeddedBindings = append(embeddedBindings, binding)
 					}
 					continue
 				}
 			}
 		}
-		***REMOVED***eldNames := calcFieldNames(***REMOVED***eld.Name(), tagParts[0], tag)
-		***REMOVED***eldCacheKey := fmt.Sprintf("%s/%s", typ.String(), ***REMOVED***eld.Name())
-		decoder := ***REMOVED***eldDecoders[***REMOVED***eldCacheKey]
+		fieldNames := calcFieldNames(field.Name(), tagParts[0], tag)
+		fieldCacheKey := fmt.Sprintf("%s/%s", typ.String(), field.Name())
+		decoder := fieldDecoders[fieldCacheKey]
 		if decoder == nil {
-			decoder = decoderOfType(ctx.append(***REMOVED***eld.Name()), ***REMOVED***eld.Type())
+			decoder = decoderOfType(ctx.append(field.Name()), field.Type())
 		}
-		encoder := ***REMOVED***eldEncoders[***REMOVED***eldCacheKey]
+		encoder := fieldEncoders[fieldCacheKey]
 		if encoder == nil {
-			encoder = encoderOfType(ctx.append(***REMOVED***eld.Name()), ***REMOVED***eld.Type())
+			encoder = encoderOfType(ctx.append(field.Name()), field.Type())
 		}
 		binding := &Binding{
-			Field:     ***REMOVED***eld,
-			FromNames: ***REMOVED***eldNames,
-			ToNames:   ***REMOVED***eldNames,
+			Field:     field,
+			FromNames: fieldNames,
+			ToNames:   fieldNames,
 			Decoder:   decoder,
 			Encoder:   encoder,
 		}
@@ -408,7 +408,7 @@ func createStructDescriptor(ctx *ctx, typ reflect2.Type, bindings []*Binding, em
 	for _, extension := range ctx.extraExtensions {
 		extension.UpdateStructDescriptor(structDescriptor)
 	}
-	processTags(structDescriptor, ctx.frozenCon***REMOVED***g)
+	processTags(structDescriptor, ctx.frozenConfig)
 	// merge normal & embedded bindings & sort with original order
 	allBindings := sortableBindings(append(embeddedBindings, structDescriptor.Fields...))
 	sort.Sort(allBindings)
@@ -429,7 +429,7 @@ func (bindings sortableBindings) Less(i, j int) bool {
 	for {
 		if left[k] < right[k] {
 			return true
-		} ***REMOVED*** if left[k] > right[k] {
+		} else if left[k] > right[k] {
 			return false
 		}
 		k++
@@ -440,18 +440,18 @@ func (bindings sortableBindings) Swap(i, j int) {
 	bindings[i], bindings[j] = bindings[j], bindings[i]
 }
 
-func processTags(structDescriptor *StructDescriptor, cfg *frozenCon***REMOVED***g) {
+func processTags(structDescriptor *StructDescriptor, cfg *frozenConfig) {
 	for _, binding := range structDescriptor.Fields {
 		shouldOmitEmpty := false
 		tagParts := strings.Split(binding.Field.Tag().Get(cfg.getTagKey()), ",")
 		for _, tagPart := range tagParts[1:] {
 			if tagPart == "omitempty" {
 				shouldOmitEmpty = true
-			} ***REMOVED*** if tagPart == "string" {
+			} else if tagPart == "string" {
 				if binding.Field.Type().Kind() == reflect.String {
 					binding.Decoder = &stringModeStringDecoder{binding.Decoder, cfg}
 					binding.Encoder = &stringModeStringEncoder{binding.Encoder, cfg}
-				} ***REMOVED*** {
+				} else {
 					binding.Decoder = &stringModeNumberDecoder{binding.Decoder}
 					binding.Encoder = &stringModeNumberEncoder{binding.Encoder}
 				}
@@ -468,16 +468,16 @@ func calcFieldNames(originalFieldName string, tagProvidedFieldName string, whole
 		return []string{}
 	}
 	// rename?
-	var ***REMOVED***eldNames []string
+	var fieldNames []string
 	if tagProvidedFieldName == "" {
-		***REMOVED***eldNames = []string{originalFieldName}
-	} ***REMOVED*** {
-		***REMOVED***eldNames = []string{tagProvidedFieldName}
+		fieldNames = []string{originalFieldName}
+	} else {
+		fieldNames = []string{tagProvidedFieldName}
 	}
 	// private?
 	isNotExported := unicode.IsLower(rune(originalFieldName[0]))
 	if isNotExported {
-		***REMOVED***eldNames = []string{}
+		fieldNames = []string{}
 	}
-	return ***REMOVED***eldNames
+	return fieldNames
 }

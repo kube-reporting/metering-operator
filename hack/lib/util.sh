@@ -10,31 +10,31 @@ function kubectl_cmd() {
 }
 
 function kube-install() {
-  local ***REMOVED***les
-  IFS=" " read -r -a ***REMOVED***les <<< "$(kubectl_***REMOVED***les "$@")"
-  kubectl_cmd apply "${***REMOVED***les[@]}"
+  local files
+  IFS=" " read -r -a files <<< "$(kubectl_files "$@")"
+  kubectl_cmd apply "${files[@]}"
 }
 
-function kube-remove-non-***REMOVED***le() {
+function kube-remove-non-file() {
   kubectl_cmd delete "$@"
 }
 
 function kube-remove() {
-  IFS=" " read -r -a ***REMOVED***les <<< "$(kubectl_***REMOVED***les "$@")"
-  kubectl_cmd delete "${***REMOVED***les[@]}"
+  IFS=" " read -r -a files <<< "$(kubectl_files "$@")"
+  kubectl_cmd delete "${files[@]}"
 }
 
 function msg() {
   echo -e "\x1b[1;35m${@}\x1b[0m"
 }
 
-# formats flags for kubectl for the given ***REMOVED***les
-function kubectl_***REMOVED***les() {
-  local ***REMOVED***les=()
+# formats flags for kubectl for the given files
+function kubectl_files() {
+  local files=()
   for f in "${@}"; do
-      ***REMOVED***les+=(-f "$f")
+      files+=(-f "$f")
   done
-  echo "${***REMOVED***les[@]}"
+  echo "${files[@]}"
 }
 
 function install_metering() {
@@ -45,10 +45,10 @@ function install_metering() {
     # TODO: update the deploy package/cli to handle OLM
     elif [ "$INSTALL_METHOD" == "olm" ]; then
         "$ROOT_DIR/hack/olm-install.sh"
-    ***REMOVED***
+    else
         echo "Invalid \$INSTALL_METHOD: $INSTALL_METHOD"
         exit 1
-    ***REMOVED***
+    fi
 }
 
 function uninstall_metering() {
@@ -59,9 +59,9 @@ function uninstall_metering() {
     # TODO: update the deploy package/cli to handle OLM
     elif [ "$INSTALL_METHOD" == "olm" ]; then
         "$ROOT_DIR/hack/olm-uninstall.sh"
-    ***REMOVED***
+    else
         echo "Invalid \$INSTALL_METHOD: $INSTALL_METHOD"
         exit 1
-    ***REMOVED***
+    fi
 }
 

@@ -1,5 +1,5 @@
 // Diskv (disk-vee) is a simple, persistent, key-value store.
-// It stores all data flatly on the ***REMOVED***lesystem.
+// It stores all data flatly on the filesystem.
 
 package diskv
 
@@ -10,7 +10,7 @@ import (
 	"io"
 	"io/ioutil"
 	"os"
-	"path/***REMOVED***lepath"
+	"path/filepath"
 	"strings"
 	"sync"
 	"syscall"
@@ -31,14 +31,14 @@ var (
 )
 
 // TransformFunction transforms a key into a slice of strings, with each
-// element in the slice representing a directory in the ***REMOVED***le path where the
+// element in the slice representing a directory in the file path where the
 // key's entry will eventually be stored.
 //
 // For example, if TransformFunc transforms "abcdef" to ["ab", "cde", "f"],
-// the ***REMOVED***nal location of the data ***REMOVED***le will be <basedir>/ab/cde/f/abcdef
+// the final location of the data file will be <basedir>/ab/cde/f/abcdef
 type TransformFunction func(s string) []string
 
-// Options de***REMOVED***ne a set of properties that dictate Diskv behavior.
+// Options define a set of properties that dictate Diskv behavior.
 // All values are optional.
 type Options struct {
 	BasePath     string
@@ -46,8 +46,8 @@ type Options struct {
 	CacheSizeMax uint64 // bytes
 	PathPerm     os.FileMode
 	FilePerm     os.FileMode
-	// If TempDir is set, it will enable ***REMOVED***lesystem atomic writes by
-	// writing temporary ***REMOVED***les to that location before being moved
+	// If TempDir is set, it will enable filesystem atomic writes by
+	// writing temporary files to that location before being moved
 	// to BasePath.
 	// Note that TempDir MUST be on the same device/partition as
 	// BasePath.
@@ -69,7 +69,7 @@ type Diskv struct {
 }
 
 // New returns an initialized Diskv structure, ready to use.
-// If the path identi***REMOVED***ed by baseDir already contains data,
+// If the path identified by baseDir already contains data,
 // it will be accessible, but not yet cached.
 func New(o Options) *Diskv {
 	if o.BasePath == "" {
@@ -99,7 +99,7 @@ func New(o Options) *Diskv {
 }
 
 // Write synchronously writes the key-value pair to disk, making it immediately
-// available for reads. Write relies on the ***REMOVED***lesystem to perform an eventual
+// available for reads. Write relies on the filesystem to perform an eventual
 // sync to physical media. If you need stronger guarantees, see WriteStream.
 func (d *Diskv) Write(key string, val []byte) error {
 	return d.WriteStream(key, bytes.NewBuffer(val), false)
@@ -107,7 +107,7 @@ func (d *Diskv) Write(key string, val []byte) error {
 
 // WriteStream writes the data represented by the io.Reader to the disk, under
 // the provided key. If sync is true, WriteStream performs an explicit sync on
-// the ***REMOVED***le as soon as it's written.
+// the file as soon as it's written.
 //
 // bytes.Buffer provides io.Reader semantics for basic data types.
 func (d *Diskv) WriteStream(key string, r io.Reader, sync bool) error {
@@ -121,8 +121,8 @@ func (d *Diskv) WriteStream(key string, r io.Reader, sync bool) error {
 	return d.writeStreamWithLock(key, r, sync)
 }
 
-// createKeyFileWithLock either creates the key ***REMOVED***le directly, or
-// creates a temporary ***REMOVED***le in TempDir if it is set.
+// createKeyFileWithLock either creates the key file directly, or
+// creates a temporary file in TempDir if it is set.
 func (d *Diskv) createKeyFileWithLock(key string) (*os.File, error) {
 	if d.TempDir != "" {
 		if err := os.MkdirAll(d.TempDir, d.PathPerm); err != nil {
@@ -130,7 +130,7 @@ func (d *Diskv) createKeyFileWithLock(key string) (*os.File, error) {
 		}
 		f, err := ioutil.TempFile(d.TempDir, "")
 		if err != nil {
-			return nil, fmt.Errorf("temp ***REMOVED***le: %s", err)
+			return nil, fmt.Errorf("temp file: %s", err)
 		}
 
 		if err := f.Chmod(d.FilePerm); err != nil {
@@ -144,7 +144,7 @@ func (d *Diskv) createKeyFileWithLock(key string) (*os.File, error) {
 	mode := os.O_WRONLY | os.O_CREATE | os.O_TRUNC // overwrite if exists
 	f, err := os.OpenFile(d.completeFilename(key), mode, d.FilePerm)
 	if err != nil {
-		return nil, fmt.Errorf("open ***REMOVED***le: %s", err)
+		return nil, fmt.Errorf("open file: %s", err)
 	}
 	return f, nil
 }
@@ -157,7 +157,7 @@ func (d *Diskv) writeStreamWithLock(key string, r io.Reader, sync bool) error {
 
 	f, err := d.createKeyFileWithLock(key)
 	if err != nil {
-		return fmt.Errorf("create key ***REMOVED***le: %s", err)
+		return fmt.Errorf("create key file: %s", err)
 	}
 
 	wc := io.WriteCloser(&nopWriteCloser{f})
@@ -186,12 +186,12 @@ func (d *Diskv) writeStreamWithLock(key string, r io.Reader, sync bool) error {
 		if err := f.Sync(); err != nil {
 			f.Close()           // error deliberately ignored
 			os.Remove(f.Name()) // error deliberately ignored
-			return fmt.Errorf("***REMOVED***le sync: %s", err)
+			return fmt.Errorf("file sync: %s", err)
 		}
 	}
 
 	if err := f.Close(); err != nil {
-		return fmt.Errorf("***REMOVED***le close: %s", err)
+		return fmt.Errorf("file close: %s", err)
 	}
 
 	if f.Name() != d.completeFilename(key) {
@@ -210,17 +210,17 @@ func (d *Diskv) writeStreamWithLock(key string, r io.Reader, sync bool) error {
 	return nil
 }
 
-// Import imports the source ***REMOVED***le into diskv under the destination key. If the
+// Import imports the source file into diskv under the destination key. If the
 // destination key already exists, it's overwritten. If move is true, the
-// source ***REMOVED***le is removed after a successful import.
+// source file is removed after a successful import.
 func (d *Diskv) Import(srcFilename, dstKey string, move bool) (err error) {
 	if dstKey == "" {
 		return errEmptyKey
 	}
 
-	if ***REMOVED***, err := os.Stat(srcFilename); err != nil {
+	if fi, err := os.Stat(srcFilename); err != nil {
 		return err
-	} ***REMOVED*** if ***REMOVED***.IsDir() {
+	} else if fi.IsDir() {
 		return errImportDirectory
 	}
 
@@ -235,7 +235,7 @@ func (d *Diskv) Import(srcFilename, dstKey string, move bool) (err error) {
 		if err := syscall.Rename(srcFilename, d.completeFilename(dstKey)); err == nil {
 			d.bustCacheWithLock(dstKey)
 			return nil
-		} ***REMOVED*** if err != syscall.EXDEV {
+		} else if err != syscall.EXDEV {
 			// If it failed due to being on a different device, fall back to copying
 			return err
 		}
@@ -269,10 +269,10 @@ func (d *Diskv) Read(key string) ([]byte, error) {
 // ReadStream reads the key and returns the value (data) as an io.ReadCloser.
 // If the value is cached from a previous read, and direct is false,
 // ReadStream will use the cached value. Otherwise, it will return a handle to
-// the ***REMOVED***le on disk, and cache the data on read.
+// the file on disk, and cache the data on read.
 //
 // If direct is true, ReadStream will lazily delete any cached value for the
-// key, and return a direct handle to the ***REMOVED***le on disk.
+// key, and return a direct handle to the file on disk.
 //
 // If compression is enabled, ReadStream taps into the io.Reader stream prior
 // to decompression, and caches the compressed data.
@@ -304,17 +304,17 @@ func (d *Diskv) ReadStream(key string, direct bool) (io.ReadCloser, error) {
 // acquire a read lock on the Diskv and check the cache themselves before
 // calling read.
 func (d *Diskv) readWithRLock(key string) (io.ReadCloser, error) {
-	***REMOVED***lename := d.completeFilename(key)
+	filename := d.completeFilename(key)
 
-	***REMOVED***, err := os.Stat(***REMOVED***lename)
+	fi, err := os.Stat(filename)
 	if err != nil {
 		return nil, err
 	}
-	if ***REMOVED***.IsDir() {
+	if fi.IsDir() {
 		return nil, os.ErrNotExist
 	}
 
-	f, err := os.Open(***REMOVED***lename)
+	f, err := os.Open(filename)
 	if err != nil {
 		return nil, err
 	}
@@ -322,7 +322,7 @@ func (d *Diskv) readWithRLock(key string) (io.ReadCloser, error) {
 	var r io.Reader
 	if d.CacheSizeMax > 0 {
 		r = newSiphon(f, d, key)
-	} ***REMOVED*** {
+	} else {
 		r = &closingReader{f}
 	}
 
@@ -362,7 +362,7 @@ type siphon struct {
 	buf *bytes.Buffer
 }
 
-// newSiphon constructs a siphoning reader that represents the passed ***REMOVED***le.
+// newSiphon constructs a siphoning reader that represents the passed file.
 // When a successful series of reads ends in an EOF, the siphon will write
 // the buffered data to Diskv's cache under the given key.
 func newSiphon(f *os.File, d *Diskv, key string) io.Reader {
@@ -406,15 +406,15 @@ func (d *Diskv) Erase(key string) error {
 	}
 
 	// erase from disk
-	***REMOVED***lename := d.completeFilename(key)
-	if s, err := os.Stat(***REMOVED***lename); err == nil {
+	filename := d.completeFilename(key)
+	if s, err := os.Stat(filename); err == nil {
 		if s.IsDir() {
 			return errBadKey
 		}
-		if err = os.Remove(***REMOVED***lename); err != nil {
+		if err = os.Remove(filename); err != nil {
 			return err
 		}
-	} ***REMOVED*** {
+	} else {
 		// Return err as-is so caller can do os.IsNotExist(err).
 		return err
 	}
@@ -448,8 +448,8 @@ func (d *Diskv) Has(key string) bool {
 		return true
 	}
 
-	***REMOVED***lename := d.completeFilename(key)
-	s, err := os.Stat(***REMOVED***lename)
+	filename := d.completeFilename(key)
+	s, err := os.Stat(filename)
 	if err != nil {
 		return false
 	}
@@ -461,40 +461,40 @@ func (d *Diskv) Has(key string) bool {
 }
 
 // Keys returns a channel that will yield every key accessible by the store,
-// in unde***REMOVED***ned order. If a cancel channel is provided, closing it will
+// in undefined order. If a cancel channel is provided, closing it will
 // terminate and close the keys channel.
 func (d *Diskv) Keys(cancel <-chan struct{}) <-chan string {
-	return d.KeysPre***REMOVED***x("", cancel)
+	return d.KeysPrefix("", cancel)
 }
 
-// KeysPre***REMOVED***x returns a channel that will yield every key accessible by the
-// store with the given pre***REMOVED***x, in unde***REMOVED***ned order. If a cancel channel is
+// KeysPrefix returns a channel that will yield every key accessible by the
+// store with the given prefix, in undefined order. If a cancel channel is
 // provided, closing it will terminate and close the keys channel. If the
-// provided pre***REMOVED***x is the empty string, all keys will be yielded.
-func (d *Diskv) KeysPre***REMOVED***x(pre***REMOVED***x string, cancel <-chan struct{}) <-chan string {
+// provided prefix is the empty string, all keys will be yielded.
+func (d *Diskv) KeysPrefix(prefix string, cancel <-chan struct{}) <-chan string {
 	var prepath string
-	if pre***REMOVED***x == "" {
+	if prefix == "" {
 		prepath = d.BasePath
-	} ***REMOVED*** {
-		prepath = d.pathFor(pre***REMOVED***x)
+	} else {
+		prepath = d.pathFor(prefix)
 	}
 	c := make(chan string)
 	go func() {
-		***REMOVED***lepath.Walk(prepath, walker(c, pre***REMOVED***x, cancel))
+		filepath.Walk(prepath, walker(c, prefix, cancel))
 		close(c)
 	}()
 	return c
 }
 
-// walker returns a function which satis***REMOVED***es the ***REMOVED***lepath.WalkFunc interface.
-// It sends every non-directory ***REMOVED***le entry down the channel c.
-func walker(c chan<- string, pre***REMOVED***x string, cancel <-chan struct{}) ***REMOVED***lepath.WalkFunc {
+// walker returns a function which satisfies the filepath.WalkFunc interface.
+// It sends every non-directory file entry down the channel c.
+func walker(c chan<- string, prefix string, cancel <-chan struct{}) filepath.WalkFunc {
 	return func(path string, info os.FileInfo, err error) error {
 		if err != nil {
 			return err
 		}
 
-		if info.IsDir() || !strings.HasPre***REMOVED***x(info.Name(), pre***REMOVED***x) {
+		if info.IsDir() || !strings.HasPrefix(info.Name(), prefix) {
 			return nil // "pass"
 		}
 
@@ -508,21 +508,21 @@ func walker(c chan<- string, pre***REMOVED***x string, cancel <-chan struct{}) *
 	}
 }
 
-// pathFor returns the absolute path for location on the ***REMOVED***lesystem where the
+// pathFor returns the absolute path for location on the filesystem where the
 // data for the given key will be stored.
 func (d *Diskv) pathFor(key string) string {
-	return ***REMOVED***lepath.Join(d.BasePath, ***REMOVED***lepath.Join(d.Transform(key)...))
+	return filepath.Join(d.BasePath, filepath.Join(d.Transform(key)...))
 }
 
 // ensurePathWithLock is a helper function that generates all necessary
-// directories on the ***REMOVED***lesystem for the given key.
+// directories on the filesystem for the given key.
 func (d *Diskv) ensurePathWithLock(key string) error {
 	return os.MkdirAll(d.pathFor(key), d.PathPerm)
 }
 
-// completeFilename returns the absolute path to the ***REMOVED***le for the given key.
+// completeFilename returns the absolute path to the file for the given key.
 func (d *Diskv) completeFilename(key string) string {
-	return ***REMOVED***lepath.Join(d.pathFor(key), key)
+	return filepath.Join(d.pathFor(key), key)
 }
 
 // cacheWithLock attempts to cache the given key-value pair in the store's
@@ -566,20 +566,20 @@ func (d *Diskv) uncacheWithLock(key string, sz uint64) {
 func (d *Diskv) pruneDirsWithLock(key string) error {
 	pathlist := d.Transform(key)
 	for i := range pathlist {
-		dir := ***REMOVED***lepath.Join(d.BasePath, ***REMOVED***lepath.Join(pathlist[:len(pathlist)-i]...))
+		dir := filepath.Join(d.BasePath, filepath.Join(pathlist[:len(pathlist)-i]...))
 
 		// thanks to Steven Blenkinsop for this snippet
-		switch ***REMOVED***, err := os.Stat(dir); true {
+		switch fi, err := os.Stat(dir); true {
 		case err != nil:
 			return err
-		case !***REMOVED***.IsDir():
+		case !fi.IsDir():
 			panic(fmt.Sprintf("corrupt dirstate at %s", dir))
 		}
 
-		nlinks, err := ***REMOVED***lepath.Glob(***REMOVED***lepath.Join(dir, "*"))
+		nlinks, err := filepath.Glob(filepath.Join(dir, "*"))
 		if err != nil {
 			return err
-		} ***REMOVED*** if len(nlinks) > 0 {
+		} else if len(nlinks) > 0 {
 			return nil // has subdirs -- do not prune
 		}
 		if err = os.Remove(dir); err != nil {
@@ -608,7 +608,7 @@ func (d *Diskv) ensureCacheSpaceWithLock(valueSize uint64) error {
 	}
 
 	if !safe() {
-		panic(fmt.Sprintf("%d bytes still won't ***REMOVED***t in the cache! (max %d bytes)", valueSize, d.CacheSizeMax))
+		panic(fmt.Sprintf("%d bytes still won't fit in the cache! (max %d bytes)", valueSize, d.CacheSizeMax))
 	}
 
 	return nil

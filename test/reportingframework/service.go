@@ -36,7 +36,7 @@ func (rf *ReportingFramework) doRequest(endpoint, method string, body []byte, qu
 			Host:   meteringRoute.Spec.Host,
 			Path:   endpoint,
 		}
-	} ***REMOVED*** if rf.UseKubeProxyForReportingAPI {
+	} else if rf.UseKubeProxyForReportingAPI {
 		u = rf.KubeAPIURL
 		proto := "http"
 		if rf.HTTPSAPI {
@@ -44,7 +44,7 @@ func (rf *ReportingFramework) doRequest(endpoint, method string, body []byte, qu
 		}
 		apiProxyPath := fmt.Sprintf("/api/v1/namespaces/%s/services/%s/proxy/", rf.Namespace, net.JoinSchemeNamePort(proto, reportingOperatorServiceName, reportingOperatorServicePortName))
 		u.Path = path.Join(apiProxyPath, endpoint)
-	} ***REMOVED*** {
+	} else {
 		u = rf.ReportingAPIURL
 		if rf.HTTPSAPI {
 			u.Scheme = "https"

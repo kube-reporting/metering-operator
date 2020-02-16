@@ -61,7 +61,7 @@ func (node ASTNode) PrettyPrint(indent int) string {
 			// Account for things like comparator nodes
 			// that are enums with a String() method.
 			output += fmt.Sprintf("%svalue: %s\n", strings.Repeat(" ", nextIndent), converted.String())
-		} ***REMOVED*** {
+		} else {
 			output += fmt.Sprintf("%svalue: %#v\n", strings.Repeat(" ", nextIndent), node.value)
 		}
 	}
@@ -79,8 +79,8 @@ func (node ASTNode) PrettyPrint(indent int) string {
 
 var bindingPowers = map[tokType]int{
 	tEOF:                0,
-	tUnquotedIdenti***REMOVED***er: 0,
-	tQuotedIdenti***REMOVED***er:   0,
+	tUnquotedIdentifier: 0,
+	tQuotedIdentifier:   0,
 	tRbracket:           0,
 	tRparen:             0,
 	tComma:              0,
@@ -187,14 +187,14 @@ func (p *Parser) parseSliceExpression() (ASTNode, error) {
 		if current == tColon {
 			index++
 			p.advance()
-		} ***REMOVED*** if current == tNumber {
+		} else if current == tNumber {
 			parsedInt, err := strconv.Atoi(p.lookaheadToken(0).value)
 			if err != nil {
 				return ASTNode{}, err
 			}
 			parts[index] = &parsedInt
 			p.advance()
-		} ***REMOVED*** {
+		} else {
 			return ASTNode{}, p.syntaxError(
 				"Expected tColon or tNumber" + ", received: " + p.current().String())
 		}
@@ -325,15 +325,15 @@ func (p *Parser) nud(token token) (ASTNode, error) {
 		return ASTNode{nodeType: ASTLiteral, value: parsed}, nil
 	case tStringLiteral:
 		return ASTNode{nodeType: ASTLiteral, value: token.value}, nil
-	case tUnquotedIdenti***REMOVED***er:
+	case tUnquotedIdentifier:
 		return ASTNode{
 			nodeType: ASTField,
 			value:    token.value,
 		}, nil
-	case tQuotedIdenti***REMOVED***er:
+	case tQuotedIdentifier:
 		node := ASTNode{nodeType: ASTField, value: token.value}
 		if p.current() == tLparen {
-			return ASTNode{}, p.syntaxErrorToken("Can't have quoted identi***REMOVED***er as function name.", token)
+			return ASTNode{}, p.syntaxErrorToken("Can't have quoted identifier as function name.", token)
 		}
 		return node, nil
 	case tStar:
@@ -342,7 +342,7 @@ func (p *Parser) nud(token token) (ASTNode, error) {
 		var err error
 		if p.current() == tRbracket {
 			right = ASTNode{nodeType: ASTIdentity}
-		} ***REMOVED*** {
+		} else {
 			right, err = p.parseProjectionRHS(bindingPowers[tStar])
 		}
 		return ASTNode{nodeType: ASTValueProjection, children: []ASTNode{left, right}}, err
@@ -369,7 +369,7 @@ func (p *Parser) nud(token token) (ASTNode, error) {
 				return ASTNode{}, nil
 			}
 			return p.projectIfSlice(ASTNode{nodeType: ASTIdentity}, right)
-		} ***REMOVED*** if tokenType == tStar && p.lookahead(1) == tRbracket {
+		} else if tokenType == tStar && p.lookahead(1) == tRbracket {
 			p.advance()
 			p.advance()
 			right, err := p.parseProjectionRHS(bindingPowers[tStar])
@@ -380,7 +380,7 @@ func (p *Parser) nud(token token) (ASTNode, error) {
 				nodeType: ASTProjection,
 				children: []ASTNode{{nodeType: ASTIdentity}, right},
 			}, nil
-		} ***REMOVED*** {
+		} else {
 			return p.parseMultiSelectList()
 		}
 	case tCurrent:
@@ -443,9 +443,9 @@ func (p *Parser) parseMultiSelectHash() (ASTNode, error) {
 	var children []ASTNode
 	for {
 		keyToken := p.lookaheadToken(0)
-		if err := p.match(tUnquotedIdenti***REMOVED***er); err != nil {
-			if err := p.match(tQuotedIdenti***REMOVED***er); err != nil {
-				return ASTNode{}, p.syntaxError("Expected tQuotedIdenti***REMOVED***er or tUnquotedIdenti***REMOVED***er")
+		if err := p.match(tUnquotedIdentifier); err != nil {
+			if err := p.match(tQuotedIdentifier); err != nil {
+				return ASTNode{}, p.syntaxError("Expected tQuotedIdentifier or tUnquotedIdentifier")
 			}
 		}
 		keyName := keyToken.value
@@ -468,7 +468,7 @@ func (p *Parser) parseMultiSelectHash() (ASTNode, error) {
 			if err != nil {
 				return ASTNode{}, nil
 			}
-		} ***REMOVED*** if p.current() == tRbrace {
+		} else if p.current() == tRbrace {
 			err := p.match(tRbrace)
 			if err != nil {
 				return ASTNode{}, nil
@@ -508,7 +508,7 @@ func (p *Parser) parseFilter(node ASTNode) (ASTNode, error) {
 	}
 	if p.current() == tFlatten {
 		right = ASTNode{nodeType: ASTIdentity}
-	} ***REMOVED*** {
+	} else {
 		right, err = p.parseProjectionRHS(bindingPowers[tFilter])
 		if err != nil {
 			return ASTNode{}, err
@@ -523,37 +523,37 @@ func (p *Parser) parseFilter(node ASTNode) (ASTNode, error) {
 
 func (p *Parser) parseDotRHS(bindingPower int) (ASTNode, error) {
 	lookahead := p.current()
-	if tokensOneOf([]tokType{tQuotedIdenti***REMOVED***er, tUnquotedIdenti***REMOVED***er, tStar}, lookahead) {
+	if tokensOneOf([]tokType{tQuotedIdentifier, tUnquotedIdentifier, tStar}, lookahead) {
 		return p.parseExpression(bindingPower)
-	} ***REMOVED*** if lookahead == tLbracket {
+	} else if lookahead == tLbracket {
 		if err := p.match(tLbracket); err != nil {
 			return ASTNode{}, err
 		}
 		return p.parseMultiSelectList()
-	} ***REMOVED*** if lookahead == tLbrace {
+	} else if lookahead == tLbrace {
 		if err := p.match(tLbrace); err != nil {
 			return ASTNode{}, err
 		}
 		return p.parseMultiSelectHash()
 	}
-	return ASTNode{}, p.syntaxError("Expected identi***REMOVED***er, lbracket, or lbrace")
+	return ASTNode{}, p.syntaxError("Expected identifier, lbracket, or lbrace")
 }
 
 func (p *Parser) parseProjectionRHS(bindingPower int) (ASTNode, error) {
 	current := p.current()
 	if bindingPowers[current] < 10 {
 		return ASTNode{nodeType: ASTIdentity}, nil
-	} ***REMOVED*** if current == tLbracket {
+	} else if current == tLbracket {
 		return p.parseExpression(bindingPower)
-	} ***REMOVED*** if current == tFilter {
+	} else if current == tFilter {
 		return p.parseExpression(bindingPower)
-	} ***REMOVED*** if current == tDot {
+	} else if current == tDot {
 		err := p.match(tDot)
 		if err != nil {
 			return ASTNode{}, err
 		}
 		return p.parseDotRHS(bindingPower)
-	} ***REMOVED*** {
+	} else {
 		return ASTNode{}, p.syntaxError("Error")
 	}
 }

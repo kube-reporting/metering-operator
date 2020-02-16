@@ -2,7 +2,7 @@
 Copyright 2014 The Kubernetes Authors.
 
 Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this ***REMOVED***le except in compliance with the License.
+you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
 
     http://www.apache.org/licenses/LICENSE-2.0
@@ -10,7 +10,7 @@ You may obtain a copy of the License at
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the speci***REMOVED***c language governing permissions and
+See the License for the specific language governing permissions and
 limitations under the License.
 */
 
@@ -30,7 +30,7 @@ const (
 	APIVersionInternal = "__internal"
 )
 
-// GroupVersioner re***REMOVED***nes a set of possible conversion targets into a single option.
+// GroupVersioner refines a set of possible conversion targets into a single option.
 type GroupVersioner interface {
 	// KindForGroupVersionKinds returns a desired target group version kind for the given input, or returns ok false if no
 	// target is known. In general, if the return target is not in the input list, the caller is expected to invoke
@@ -42,7 +42,7 @@ type GroupVersioner interface {
 // Encoder writes objects to a serialized form
 type Encoder interface {
 	// Encode writes an object to a stream. Implementations may return errors if the versions are
-	// incompatible, or if no conversion is de***REMOVED***ned.
+	// incompatible, or if no conversion is defined.
 	Encode(obj Object, w io.Writer) error
 }
 
@@ -70,11 +70,11 @@ type Serializer interface {
 // they receive.
 type Codec Serializer
 
-// ParameterCodec de***REMOVED***nes methods for serializing and deserializing API objects to url.Values and
+// ParameterCodec defines methods for serializing and deserializing API objects to url.Values and
 // performing any necessary conversion. Unlike the normal Codec, query parameters are not self describing
-// and the desired version must be speci***REMOVED***ed.
+// and the desired version must be specified.
 type ParameterCodec interface {
-	// DecodeParameters takes the given url.Values in the speci***REMOVED***ed group version and decodes them
+	// DecodeParameters takes the given url.Values in the specified group version and decodes them
 	// into the provided object, or returns an error.
 	DecodeParameters(parameters url.Values, from schema.GroupVersion, into Object) error
 	// EncodeParameters encodes the provided object as query parameters or returns an error.
@@ -87,7 +87,7 @@ type Framer interface {
 	NewFrameWriter(w io.Writer) io.Writer
 }
 
-// SerializerInfo contains information about a speci***REMOVED***c serialization format
+// SerializerInfo contains information about a specific serialization format
 type SerializerInfo struct {
 	// MediaType is the value that represents this serializer over the wire.
 	MediaType string
@@ -103,7 +103,7 @@ type SerializerInfo struct {
 	StreamSerializer *StreamSerializerInfo
 }
 
-// StreamSerializerInfo contains information about a speci***REMOVED***c stream serialization format
+// StreamSerializerInfo contains information about a specific stream serialization format
 type StreamSerializerInfo struct {
 	// EncodesAsText indicates this serializer can be encoded to UTF-8 safely.
 	EncodesAsText bool
@@ -130,7 +130,7 @@ type NegotiatedSerializer interface {
 
 // StorageSerializer is an interface used for obtaining encoders, decoders, and serializers
 // that can read and write data at rest. This would commonly be used by client tools that must
-// read ***REMOVED***les, or server side storage interfaces that persist restful objects.
+// read files, or server side storage interfaces that persist restful objects.
 type StorageSerializer interface {
 	// SupportedMediaTypes are the media types supported for reading and writing objects.
 	SupportedMediaTypes() []SerializerInfo
@@ -182,7 +182,7 @@ type ObjectConvertor interface {
 	// ConvertToVersion takes the provided object and converts it the provided version. This
 	// method does not mutate the in object, but the in and out object might share data structures,
 	// i.e. the out object cannot be mutated without mutating the in object as well.
-	// This method is similar to Convert() but handles speci***REMOVED***c details of choosing the correct
+	// This method is similar to Convert() but handles specific details of choosing the correct
 	// output version.
 	ConvertToVersion(in Object, gv GroupVersioner) (out Object, err error)
 	ConvertFieldLabel(gvk schema.GroupVersionKind, label, value string) (string, string, error)
@@ -213,7 +213,7 @@ type ResourceVersioner interface {
 	ResourceVersion(obj Object) (string, error)
 }
 
-// SelfLinker provides methods for setting and retrieving the SelfLink ***REMOVED***eld of an API object.
+// SelfLinker provides methods for setting and retrieving the SelfLink field of an API object.
 type SelfLinker interface {
 	SetSelfLink(obj Object, selfLink string) error
 	SelfLink(obj Object) (string, error)

@@ -9,16 +9,16 @@ import (
 	"github.com/go-chi/chi"
 )
 
-// Pro***REMOVED***ler is a convenient subrouter used for mounting net/http/pprof. ie.
+// Profiler is a convenient subrouter used for mounting net/http/pprof. ie.
 //
 //  func MyService() http.Handler {
 //    r := chi.NewRouter()
 //    // ..middlewares
-//    r.Mount("/debug", middleware.Pro***REMOVED***ler())
+//    r.Mount("/debug", middleware.Profiler())
 //    // ..routes
 //    return r
 //  }
-func Pro***REMOVED***ler() http.Handler {
+func Profiler() http.Handler {
 	r := chi.NewRouter()
 	r.Use(NoCache)
 
@@ -31,7 +31,7 @@ func Pro***REMOVED***ler() http.Handler {
 
 	r.HandleFunc("/pprof/*", pprof.Index)
 	r.HandleFunc("/pprof/cmdline", pprof.Cmdline)
-	r.HandleFunc("/pprof/pro***REMOVED***le", pprof.Pro***REMOVED***le)
+	r.HandleFunc("/pprof/profile", pprof.Profile)
 	r.HandleFunc("/pprof/symbol", pprof.Symbol)
 	r.HandleFunc("/pprof/trace", pprof.Trace)
 	r.HandleFunc("/vars", expVars)
@@ -41,14 +41,14 @@ func Pro***REMOVED***ler() http.Handler {
 
 // Replicated from expvar.go as not public.
 func expVars(w http.ResponseWriter, r *http.Request) {
-	***REMOVED***rst := true
+	first := true
 	w.Header().Set("Content-Type", "application/json")
 	fmt.Fprintf(w, "{\n")
 	expvar.Do(func(kv expvar.KeyValue) {
-		if !***REMOVED***rst {
+		if !first {
 			fmt.Fprintf(w, ",\n")
 		}
-		***REMOVED***rst = false
+		first = false
 		fmt.Fprintf(w, "%q: %s", kv.Key, kv.Value)
 	})
 	fmt.Fprintf(w, "\n}\n")

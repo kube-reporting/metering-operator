@@ -2,15 +2,15 @@
 
 // Copyright 2016 The Go Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE ***REMOVED***le.
+// license that can be found in the LICENSE file.
 
 // Package idna implements IDNA2008 using the compatibility processing
-// de***REMOVED***ned by UTS (Unicode Technical Standard) #46, which de***REMOVED***nes a standard to
+// defined by UTS (Unicode Technical Standard) #46, which defines a standard to
 // deal with the transition from IDNA2003.
 //
-// IDNA2008 (Internationalized Domain Names for Applications), is de***REMOVED***ned in RFC
+// IDNA2008 (Internationalized Domain Names for Applications), is defined in RFC
 // 5890, RFC 5891, RFC 5892, RFC 5893 and RFC 5894.
-// UTS #46 is de***REMOVED***ned in http://www.unicode.org/reports/tr46.
+// UTS #46 is defined in http://www.unicode.org/reports/tr46.
 // See http://unicode.org/cldr/utility/idna.jsp for a visualization of the
 // differences between these two standards.
 package idna // import "golang.org/x/net/idna"
@@ -50,10 +50,10 @@ func ToUnicode(s string) (string, error) {
 	return Punycode.process(s, false)
 }
 
-// An Option con***REMOVED***gures a Pro***REMOVED***le at creation time.
+// An Option configures a Profile at creation time.
 type Option func(*options)
 
-// Transitional sets a Pro***REMOVED***le to use the Transitional mapping as de***REMOVED***ned in UTS
+// Transitional sets a Profile to use the Transitional mapping as defined in UTS
 // #46. This will cause, for example, "ß" to be mapped to "ss". Using the
 // transitional mapping provides a compromise between IDNA2003 and IDNA2008
 // compatibility. It is used by most browsers when resolving domain names. This
@@ -62,7 +62,7 @@ func Transitional(transitional bool) Option {
 	return func(o *options) { o.transitional = true }
 }
 
-// VerifyDNSLength sets whether a Pro***REMOVED***le should fail if any of the IDN parts
+// VerifyDNSLength sets whether a Profile should fail if any of the IDN parts
 // are longer than allowed by the RFC.
 func VerifyDNSLength(verify bool) Option {
 	return func(o *options) { o.verifyDNSLength = verify }
@@ -78,7 +78,7 @@ func RemoveLeadingDots(remove bool) Option {
 }
 
 // ValidateLabels sets whether to check the mandatory label validation criteria
-// as de***REMOVED***ned in Section 5.4 of RFC 5891. This includes testing for correct use
+// as defined in Section 5.4 of RFC 5891. This includes testing for correct use
 // of hyphens ('-'), normalization, validity of runes, and the context rules.
 func ValidateLabels(enable bool) Option {
 	return func(o *options) {
@@ -94,7 +94,7 @@ func ValidateLabels(enable bool) Option {
 }
 
 // StrictDomainName limits the set of permissible ASCII characters to those
-// allowed in domain names as de***REMOVED***ned in RFC 1034 (A-Z, a-z, 0-9 and the
+// allowed in domain names as defined in RFC 1034 (A-Z, a-z, 0-9 and the
 // hyphen). This is set by default for MapForLookup and ValidateForRegistration.
 //
 // This option is useful, for instance, for browsers that allow characters
@@ -112,14 +112,14 @@ func StrictDomainName(use bool) Option {
 // NOTE: the following options pull in tables. The tables should not be linked
 // in as long as the options are not used.
 
-// BidiRule enables the Bidi rule as de***REMOVED***ned in RFC 5893. Any application
+// BidiRule enables the Bidi rule as defined in RFC 5893. Any application
 // that relies on proper validation of labels should include this rule.
 func BidiRule() Option {
 	return func(o *options) { o.bidirule = bidirule.ValidString }
 }
 
 // ValidateForRegistration sets validation options to verify that a given IDN is
-// properly formatted for registration as de***REMOVED***ned by Section 4 of RFC 5891.
+// properly formatted for registration as defined by Section 4 of RFC 5891.
 func ValidateForRegistration() Option {
 	return func(o *options) {
 		o.mapping = validateRegistration
@@ -156,19 +156,19 @@ type options struct {
 	trie *idnaTrie
 
 	// fromPuny calls validation rules when converting A-labels to U-labels.
-	fromPuny func(p *Pro***REMOVED***le, s string) error
+	fromPuny func(p *Profile, s string) error
 
-	// mapping implements a validation and mapping step as de***REMOVED***ned in RFC 5895
+	// mapping implements a validation and mapping step as defined in RFC 5895
 	// or UTS 46, tailored to, for example, domain registration or lookup.
-	mapping func(p *Pro***REMOVED***le, s string) (mapped string, isBidi bool, err error)
+	mapping func(p *Profile, s string) (mapped string, isBidi bool, err error)
 
-	// bidirule, if speci***REMOVED***ed, checks whether s conforms to the Bidi Rule
-	// de***REMOVED***ned in RFC 5893.
+	// bidirule, if specified, checks whether s conforms to the Bidi Rule
+	// defined in RFC 5893.
 	bidirule func(s string) bool
 }
 
-// A Pro***REMOVED***le de***REMOVED***nes the con***REMOVED***guration of an IDNA mapper.
-type Pro***REMOVED***le struct {
+// A Profile defines the configuration of an IDNA mapper.
+type Profile struct {
 	options
 }
 
@@ -178,16 +178,16 @@ func apply(o *options, opts []Option) {
 	}
 }
 
-// New creates a new Pro***REMOVED***le.
+// New creates a new Profile.
 //
-// With no options, the returned Pro***REMOVED***le is the most permissive and equals the
-// Punycode Pro***REMOVED***le. Options can be passed to further restrict the Pro***REMOVED***le. The
+// With no options, the returned Profile is the most permissive and equals the
+// Punycode Profile. Options can be passed to further restrict the Profile. The
 // MapForLookup and ValidateForRegistration options set a collection of options,
 // for lookup and registration purposes respectively, which can be tailored by
-// adding more ***REMOVED***ne-grained options, where later options override earlier
+// adding more fine-grained options, where later options override earlier
 // options.
-func New(o ...Option) *Pro***REMOVED***le {
-	p := &Pro***REMOVED***le{}
+func New(o ...Option) *Profile {
+	p := &Profile{}
 	apply(&p.options, o)
 	return p
 }
@@ -196,7 +196,7 @@ func New(o ...Option) *Pro***REMOVED***le {
 // ToASCII("bücher.example.com") is "xn--bcher-kva.example.com", and
 // ToASCII("golang") is "golang". If an error is encountered it will return
 // an error and a (partially) processed result.
-func (p *Pro***REMOVED***le) ToASCII(s string) (string, error) {
+func (p *Profile) ToASCII(s string) (string, error) {
 	return p.process(s, true)
 }
 
@@ -204,19 +204,19 @@ func (p *Pro***REMOVED***le) ToASCII(s string) (string, error) {
 // ToUnicode("xn--bcher-kva.example.com") is "bücher.example.com", and
 // ToUnicode("golang") is "golang". If an error is encountered it will return
 // an error and a (partially) processed result.
-func (p *Pro***REMOVED***le) ToUnicode(s string) (string, error) {
+func (p *Profile) ToUnicode(s string) (string, error) {
 	pp := *p
 	pp.transitional = false
 	return pp.process(s, false)
 }
 
-// String reports a string with a description of the pro***REMOVED***le for debugging
+// String reports a string with a description of the profile for debugging
 // purposes. The string format may change with different versions.
-func (p *Pro***REMOVED***le) String() string {
+func (p *Profile) String() string {
 	s := ""
 	if p.transitional {
 		s = "Transitional"
-	} ***REMOVED*** {
+	} else {
 		s = "NonTransitional"
 	}
 	if p.useSTD3Rules {
@@ -232,25 +232,25 @@ func (p *Pro***REMOVED***le) String() string {
 }
 
 var (
-	// Punycode is a Pro***REMOVED***le that does raw punycode processing with a minimum
+	// Punycode is a Profile that does raw punycode processing with a minimum
 	// of validation.
-	Punycode *Pro***REMOVED***le = punycode
+	Punycode *Profile = punycode
 
-	// Lookup is the recommended pro***REMOVED***le for looking up domain names, according
-	// to Section 5 of RFC 5891. The exact con***REMOVED***guration of this pro***REMOVED***le may
+	// Lookup is the recommended profile for looking up domain names, according
+	// to Section 5 of RFC 5891. The exact configuration of this profile may
 	// change over time.
-	Lookup *Pro***REMOVED***le = lookup
+	Lookup *Profile = lookup
 
-	// Display is the recommended pro***REMOVED***le for displaying domain names.
-	// The con***REMOVED***guration of this pro***REMOVED***le may change over time.
-	Display *Pro***REMOVED***le = display
+	// Display is the recommended profile for displaying domain names.
+	// The configuration of this profile may change over time.
+	Display *Profile = display
 
-	// Registration is the recommended pro***REMOVED***le for checking whether a given
+	// Registration is the recommended profile for checking whether a given
 	// IDN is valid for registration, according to Section 4 of RFC 5891.
-	Registration *Pro***REMOVED***le = registration
+	Registration *Profile = registration
 
-	punycode = &Pro***REMOVED***le{}
-	lookup   = &Pro***REMOVED***le{options{
+	punycode = &Profile{}
+	lookup   = &Profile{options{
 		transitional:   true,
 		useSTD3Rules:   true,
 		validateLabels: true,
@@ -259,7 +259,7 @@ var (
 		mapping:        validateAndMap,
 		bidirule:       bidirule.ValidString,
 	}}
-	display = &Pro***REMOVED***le{options{
+	display = &Profile{options{
 		useSTD3Rules:   true,
 		validateLabels: true,
 		trie:           trie,
@@ -267,7 +267,7 @@ var (
 		mapping:        validateAndMap,
 		bidirule:       bidirule.ValidString,
 	}}
-	registration = &Pro***REMOVED***le{options{
+	registration = &Profile{options{
 		useSTD3Rules:    true,
 		validateLabels:  true,
 		verifyDNSLength: true,
@@ -277,7 +277,7 @@ var (
 		bidirule:        bidirule.ValidString,
 	}}
 
-	// TODO: pro***REMOVED***les
+	// TODO: profiles
 	// Register: recommended for approving domain names: don't do any mappings
 	// but rather reject on invalid input. Bundle or block deviation characters.
 )
@@ -298,7 +298,7 @@ func (e runeError) Error() string {
 
 // process implements the algorithm described in section 4 of UTS #46,
 // see http://www.unicode.org/reports/tr46.
-func (p *Pro***REMOVED***le) process(s string, toASCII bool) (string, error) {
+func (p *Profile) process(s string, toASCII bool) (string, error) {
 	var err error
 	var isBidi bool
 	if p.mapping != nil {
@@ -326,8 +326,8 @@ func (p *Pro***REMOVED***le) process(s string, toASCII bool) (string, error) {
 			}
 			continue
 		}
-		if strings.HasPre***REMOVED***x(label, acePre***REMOVED***x) {
-			u, err2 := decode(label[len(acePre***REMOVED***x):])
+		if strings.HasPrefix(label, acePrefix) {
+			u, err2 := decode(label[len(acePrefix):])
 			if err2 != nil {
 				if err == nil {
 					err = err2
@@ -343,10 +343,10 @@ func (p *Pro***REMOVED***le) process(s string, toASCII bool) (string, error) {
 			if err == nil {
 				// This should be called on NonTransitional, according to the
 				// spec, but that currently does not have any effect. Use the
-				// original pro***REMOVED***le to preserve options.
+				// original profile to preserve options.
 				err = p.validateLabel(u)
 			}
-		} ***REMOVED*** if err == nil {
+		} else if err == nil {
 			err = p.validateLabel(label)
 		}
 	}
@@ -362,7 +362,7 @@ func (p *Pro***REMOVED***le) process(s string, toASCII bool) (string, error) {
 		for labels.reset(); !labels.done(); labels.next() {
 			label := labels.label()
 			if !ascii(label) {
-				a, err2 := encode(acePre***REMOVED***x, label)
+				a, err2 := encode(acePrefix, label)
 				if err == nil {
 					err = err2
 				}
@@ -389,8 +389,8 @@ func (p *Pro***REMOVED***le) process(s string, toASCII bool) (string, error) {
 	return s, err
 }
 
-func normalize(p *Pro***REMOVED***le, s string) (mapped string, isBidi bool, err error) {
-	// TODO: consider ***REMOVED***rst doing a quick check to see if any of these checks
+func normalize(p *Profile, s string) (mapped string, isBidi bool, err error) {
+	// TODO: consider first doing a quick check to see if any of these checks
 	// need to be done. This will make it slower in the general case, but
 	// faster in the common case.
 	mapped = norm.NFC.String(s)
@@ -398,8 +398,8 @@ func normalize(p *Pro***REMOVED***le, s string) (mapped string, isBidi bool, err
 	return mapped, isBidi, nil
 }
 
-func validateRegistration(p *Pro***REMOVED***le, s string) (idem string, bidi bool, err error) {
-	// TODO: ***REMOVED***lter need for normalization in loop below.
+func validateRegistration(p *Profile, s string) (idem string, bidi bool, err error) {
+	// TODO: filter need for normalization in loop below.
 	if !norm.NFC.IsNormalString(s) {
 		return s, false, &labelError{s, "V1"}
 	}
@@ -411,7 +411,7 @@ func validateRegistration(p *Pro***REMOVED***le, s string) (idem string, bidi bo
 		bidi = bidi || info(v).isBidi(s[i:])
 		// Copy bytes not copied so far.
 		switch p.simplify(info(v).category()) {
-		// TODO: handle the NV8 de***REMOVED***ned in the Unicode idna data set to allow
+		// TODO: handle the NV8 defined in the Unicode idna data set to allow
 		// for strict conformance to IDNA2008.
 		case valid, deviation:
 		case disallowed, mapped, unknown, ignored:
@@ -437,7 +437,7 @@ func (c info) isBidi(s string) bool {
 	return false
 }
 
-func validateAndMap(p *Pro***REMOVED***le, s string) (vm string, bidi bool, err error) {
+func validateAndMap(p *Profile, s string) (vm string, bidi bool, err error) {
 	var (
 		b []byte
 		k int
@@ -445,7 +445,7 @@ func validateAndMap(p *Pro***REMOVED***le, s string) (vm string, bidi bool, err 
 	// combinedInfoBits contains the or-ed bits of all runes. We use this
 	// to derive the mayNeedNorm bit later. This may trigger normalization
 	// overeagerly, but it will not do so in the common case. The end result
-	// is another 10% saving on BenchmarkPro***REMOVED***le for the common case.
+	// is another 10% saving on BenchmarkProfile for the common case.
 	var combinedInfoBits info
 	for i := 0; i < len(s); {
 		v, sz := trie.lookupString(s[i:])
@@ -489,7 +489,7 @@ func validateAndMap(p *Pro***REMOVED***le, s string) (vm string, bidi bool, err 
 		if combinedInfoBits&mayNeedNorm != 0 {
 			s = norm.NFC.String(s)
 		}
-	} ***REMOVED*** {
+	} else {
 		b = append(b, s[k:]...)
 		if norm.NFC.QuickSpan(b) != len(b) {
 			b = norm.NFC.Bytes(b)
@@ -545,7 +545,7 @@ func (l *labelIter) next() {
 		if l.i >= len(l.slice) || l.i == len(l.slice)-1 && l.slice[l.i] == "" {
 			l.curStart = len(l.orig)
 		}
-	} ***REMOVED*** {
+	} else {
 		l.curStart = l.curEnd + 1
 		if l.curStart == len(l.orig)-1 && l.orig[l.curStart] == '.' {
 			l.curStart = len(l.orig)
@@ -560,21 +560,21 @@ func (l *labelIter) set(s string) {
 	l.slice[l.i] = s
 }
 
-// acePre***REMOVED***x is the ASCII Compatible Encoding pre***REMOVED***x.
-const acePre***REMOVED***x = "xn--"
+// acePrefix is the ASCII Compatible Encoding prefix.
+const acePrefix = "xn--"
 
-func (p *Pro***REMOVED***le) simplify(cat category) category {
+func (p *Profile) simplify(cat category) category {
 	switch cat {
 	case disallowedSTD3Mapped:
 		if p.useSTD3Rules {
 			cat = disallowed
-		} ***REMOVED*** {
+		} else {
 			cat = mapped
 		}
 	case disallowedSTD3Valid:
 		if p.useSTD3Rules {
 			cat = disallowed
-		} ***REMOVED*** {
+		} else {
 			cat = valid
 		}
 	case deviation:
@@ -588,7 +588,7 @@ func (p *Pro***REMOVED***le) simplify(cat category) category {
 	return cat
 }
 
-func validateFromPunycode(p *Pro***REMOVED***le, s string) error {
+func validateFromPunycode(p *Profile, s string) error {
 	if !norm.NFC.IsNormalString(s) {
 		return &labelError{s, "V1"}
 	}
@@ -670,8 +670,8 @@ var joinStates = [][numJoinTypes]joinState{
 }
 
 // validateLabel validates the criteria from Section 4.1. Item 1, 4, and 6 are
-// already implicitly satis***REMOVED***ed by the overall implementation.
-func (p *Pro***REMOVED***le) validateLabel(s string) (err error) {
+// already implicitly satisfied by the overall implementation.
+func (p *Profile) validateLabel(s string) (err error) {
 	if s == "" {
 		if p.verifyDNSLength {
 			return &labelError{s, "A4"}
@@ -691,7 +691,7 @@ func (p *Pro***REMOVED***le) validateLabel(s string) (err error) {
 	// TODO: merge the use of this in the trie.
 	v, sz := trie.lookupString(s)
 	x := info(v)
-	if x.isModi***REMOVED***er() {
+	if x.isModifier() {
 		return &labelError{s, "V5"}
 	}
 	// Quickly return in the absence of zero-width (non) joiners.
@@ -703,11 +703,11 @@ func (p *Pro***REMOVED***le) validateLabel(s string) (err error) {
 		jt := x.joinType()
 		if s[i:i+sz] == zwj {
 			jt = joinZWJ
-		} ***REMOVED*** if s[i:i+sz] == zwnj {
+		} else if s[i:i+sz] == zwnj {
 			jt = joinZWNJ
 		}
 		st = joinStates[st][jt]
-		if x.isViramaModi***REMOVED***er() {
+		if x.isViramaModifier() {
 			st = joinStates[st][joinVirama]
 		}
 		if i += sz; i == len(s) {

@@ -2,7 +2,7 @@
 Copyright 2016 The Kubernetes Authors.
 
 Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this ***REMOVED***le except in compliance with the License.
+you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
 
     http://www.apache.org/licenses/LICENSE-2.0
@@ -10,7 +10,7 @@ You may obtain a copy of the License at
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the speci***REMOVED***c language governing permissions and
+See the License for the specific language governing permissions and
 limitations under the License.
 */
 
@@ -26,29 +26,29 @@ import (
 // +genclient:nonNamespaced
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
 
-// Describes a certi***REMOVED***cate signing request
-type Certi***REMOVED***cateSigningRequest struct {
+// Describes a certificate signing request
+type CertificateSigningRequest struct {
 	metav1.TypeMeta `json:",inline"`
 	// +optional
 	metav1.ObjectMeta `json:"metadata,omitempty" protobuf:"bytes,1,opt,name=metadata"`
 
-	// The certi***REMOVED***cate request itself and any additional information.
+	// The certificate request itself and any additional information.
 	// +optional
-	Spec Certi***REMOVED***cateSigningRequestSpec `json:"spec,omitempty" protobuf:"bytes,2,opt,name=spec"`
+	Spec CertificateSigningRequestSpec `json:"spec,omitempty" protobuf:"bytes,2,opt,name=spec"`
 
 	// Derived information about the request.
 	// +optional
-	Status Certi***REMOVED***cateSigningRequestStatus `json:"status,omitempty" protobuf:"bytes,3,opt,name=status"`
+	Status CertificateSigningRequestStatus `json:"status,omitempty" protobuf:"bytes,3,opt,name=status"`
 }
 
 // This information is immutable after the request is created. Only the Request
-// and Usages ***REMOVED***elds can be set on creation, other ***REMOVED***elds are derived by
-// Kubernetes and cannot be modi***REMOVED***ed by users.
-type Certi***REMOVED***cateSigningRequestSpec struct {
+// and Usages fields can be set on creation, other fields are derived by
+// Kubernetes and cannot be modified by users.
+type CertificateSigningRequestSpec struct {
 	// Base64-encoded PKCS#10 CSR data
 	Request []byte `json:"request" protobuf:"bytes,1,opt,name=request"`
 
-	// allowedUsages speci***REMOVED***es a set of usage contexts the key will be
+	// allowedUsages specifies a set of usage contexts the key will be
 	// valid for.
 	// See: https://tools.ietf.org/html/rfc5280#section-4.2.1.3
 	//      https://tools.ietf.org/html/rfc5280#section-4.2.1.12
@@ -81,25 +81,25 @@ func (t ExtraValue) String() string {
 	return fmt.Sprintf("%v", []string(t))
 }
 
-type Certi***REMOVED***cateSigningRequestStatus struct {
+type CertificateSigningRequestStatus struct {
 	// Conditions applied to the request, such as approval or denial.
 	// +optional
-	Conditions []Certi***REMOVED***cateSigningRequestCondition `json:"conditions,omitempty" protobuf:"bytes,1,rep,name=conditions"`
+	Conditions []CertificateSigningRequestCondition `json:"conditions,omitempty" protobuf:"bytes,1,rep,name=conditions"`
 
-	// If request was approved, the controller will place the issued certi***REMOVED***cate here.
+	// If request was approved, the controller will place the issued certificate here.
 	// +optional
-	Certi***REMOVED***cate []byte `json:"certi***REMOVED***cate,omitempty" protobuf:"bytes,2,opt,name=certi***REMOVED***cate"`
+	Certificate []byte `json:"certificate,omitempty" protobuf:"bytes,2,opt,name=certificate"`
 }
 
 type RequestConditionType string
 
-// These are the possible conditions for a certi***REMOVED***cate request.
+// These are the possible conditions for a certificate request.
 const (
-	Certi***REMOVED***cateApproved RequestConditionType = "Approved"
-	Certi***REMOVED***cateDenied   RequestConditionType = "Denied"
+	CertificateApproved RequestConditionType = "Approved"
+	CertificateDenied   RequestConditionType = "Denied"
 )
 
-type Certi***REMOVED***cateSigningRequestCondition struct {
+type CertificateSigningRequestCondition struct {
 	// request approval state, currently Approved or Denied.
 	Type RequestConditionType `json:"type" protobuf:"bytes,1,opt,name=type,casttype=RequestConditionType"`
 	// brief reason for the request state
@@ -115,15 +115,15 @@ type Certi***REMOVED***cateSigningRequestCondition struct {
 
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
 
-type Certi***REMOVED***cateSigningRequestList struct {
+type CertificateSigningRequestList struct {
 	metav1.TypeMeta `json:",inline"`
 	// +optional
 	metav1.ListMeta `json:"metadata,omitempty" protobuf:"bytes,1,opt,name=metadata"`
 
-	Items []Certi***REMOVED***cateSigningRequest `json:"items" protobuf:"bytes,2,rep,name=items"`
+	Items []CertificateSigningRequest `json:"items" protobuf:"bytes,2,rep,name=items"`
 }
 
-// KeyUsages speci***REMOVED***es valid usage contexts for keys.
+// KeyUsages specifies valid usage contexts for keys.
 // See: https://tools.ietf.org/html/rfc5280#section-4.2.1.3
 //      https://tools.ietf.org/html/rfc5280#section-4.2.1.12
 type KeyUsage string

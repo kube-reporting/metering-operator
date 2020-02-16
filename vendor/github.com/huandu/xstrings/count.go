@@ -1,5 +1,5 @@
 // Copyright 2015 Huan Du. All rights reserved.
-// Licensed under the MIT license that can be found in the LICENSE ***REMOVED***le.
+// Licensed under the MIT license that can be found in the LICENSE file.
 
 package xstrings
 
@@ -15,7 +15,7 @@ func Len(str string) int {
 
 // WordCount returns number of words in a string.
 //
-// Word is de***REMOVED***ned as a locale dependent string containing alphabetic characters,
+// Word is defined as a locale dependent string containing alphabetic characters,
 // which may also contain but not start with `'` and `-` characters.
 func WordCount(str string) int {
 	var r rune

@@ -2,7 +2,7 @@
 Copyright The Kubernetes Authors.
 
 Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this ***REMOVED***le except in compliance with the License.
+you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
 
     http://www.apache.org/licenses/LICENSE-2.0
@@ -10,7 +10,7 @@ You may obtain a copy of the License at
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the speci***REMOVED***c language governing permissions and
+See the License for the specific language governing permissions and
 limitations under the License.
 */
 
@@ -29,43 +29,43 @@ import (
 	rest "k8s.io/client-go/rest"
 )
 
-// CustomResourceDe***REMOVED***nitionsGetter has a method to return a CustomResourceDe***REMOVED***nitionInterface.
+// CustomResourceDefinitionsGetter has a method to return a CustomResourceDefinitionInterface.
 // A group's client should implement this interface.
-type CustomResourceDe***REMOVED***nitionsGetter interface {
-	CustomResourceDe***REMOVED***nitions() CustomResourceDe***REMOVED***nitionInterface
+type CustomResourceDefinitionsGetter interface {
+	CustomResourceDefinitions() CustomResourceDefinitionInterface
 }
 
-// CustomResourceDe***REMOVED***nitionInterface has methods to work with CustomResourceDe***REMOVED***nition resources.
-type CustomResourceDe***REMOVED***nitionInterface interface {
-	Create(*v1beta1.CustomResourceDe***REMOVED***nition) (*v1beta1.CustomResourceDe***REMOVED***nition, error)
-	Update(*v1beta1.CustomResourceDe***REMOVED***nition) (*v1beta1.CustomResourceDe***REMOVED***nition, error)
-	UpdateStatus(*v1beta1.CustomResourceDe***REMOVED***nition) (*v1beta1.CustomResourceDe***REMOVED***nition, error)
+// CustomResourceDefinitionInterface has methods to work with CustomResourceDefinition resources.
+type CustomResourceDefinitionInterface interface {
+	Create(*v1beta1.CustomResourceDefinition) (*v1beta1.CustomResourceDefinition, error)
+	Update(*v1beta1.CustomResourceDefinition) (*v1beta1.CustomResourceDefinition, error)
+	UpdateStatus(*v1beta1.CustomResourceDefinition) (*v1beta1.CustomResourceDefinition, error)
 	Delete(name string, options *v1.DeleteOptions) error
 	DeleteCollection(options *v1.DeleteOptions, listOptions v1.ListOptions) error
-	Get(name string, options v1.GetOptions) (*v1beta1.CustomResourceDe***REMOVED***nition, error)
-	List(opts v1.ListOptions) (*v1beta1.CustomResourceDe***REMOVED***nitionList, error)
+	Get(name string, options v1.GetOptions) (*v1beta1.CustomResourceDefinition, error)
+	List(opts v1.ListOptions) (*v1beta1.CustomResourceDefinitionList, error)
 	Watch(opts v1.ListOptions) (watch.Interface, error)
-	Patch(name string, pt types.PatchType, data []byte, subresources ...string) (result *v1beta1.CustomResourceDe***REMOVED***nition, err error)
-	CustomResourceDe***REMOVED***nitionExpansion
+	Patch(name string, pt types.PatchType, data []byte, subresources ...string) (result *v1beta1.CustomResourceDefinition, err error)
+	CustomResourceDefinitionExpansion
 }
 
-// customResourceDe***REMOVED***nitions implements CustomResourceDe***REMOVED***nitionInterface
-type customResourceDe***REMOVED***nitions struct {
+// customResourceDefinitions implements CustomResourceDefinitionInterface
+type customResourceDefinitions struct {
 	client rest.Interface
 }
 
-// newCustomResourceDe***REMOVED***nitions returns a CustomResourceDe***REMOVED***nitions
-func newCustomResourceDe***REMOVED***nitions(c *ApiextensionsV1beta1Client) *customResourceDe***REMOVED***nitions {
-	return &customResourceDe***REMOVED***nitions{
+// newCustomResourceDefinitions returns a CustomResourceDefinitions
+func newCustomResourceDefinitions(c *ApiextensionsV1beta1Client) *customResourceDefinitions {
+	return &customResourceDefinitions{
 		client: c.RESTClient(),
 	}
 }
 
-// Get takes name of the customResourceDe***REMOVED***nition, and returns the corresponding customResourceDe***REMOVED***nition object, and an error if there is any.
-func (c *customResourceDe***REMOVED***nitions) Get(name string, options v1.GetOptions) (result *v1beta1.CustomResourceDe***REMOVED***nition, err error) {
-	result = &v1beta1.CustomResourceDe***REMOVED***nition{}
+// Get takes name of the customResourceDefinition, and returns the corresponding customResourceDefinition object, and an error if there is any.
+func (c *customResourceDefinitions) Get(name string, options v1.GetOptions) (result *v1beta1.CustomResourceDefinition, err error) {
+	result = &v1beta1.CustomResourceDefinition{}
 	err = c.client.Get().
-		Resource("customresourcede***REMOVED***nitions").
+		Resource("customresourcedefinitions").
 		Name(name).
 		VersionedParams(&options, scheme.ParameterCodec).
 		Do().
@@ -73,15 +73,15 @@ func (c *customResourceDe***REMOVED***nitions) Get(name string, options v1.GetOp
 	return
 }
 
-// List takes label and ***REMOVED***eld selectors, and returns the list of CustomResourceDe***REMOVED***nitions that match those selectors.
-func (c *customResourceDe***REMOVED***nitions) List(opts v1.ListOptions) (result *v1beta1.CustomResourceDe***REMOVED***nitionList, err error) {
+// List takes label and field selectors, and returns the list of CustomResourceDefinitions that match those selectors.
+func (c *customResourceDefinitions) List(opts v1.ListOptions) (result *v1beta1.CustomResourceDefinitionList, err error) {
 	var timeout time.Duration
 	if opts.TimeoutSeconds != nil {
 		timeout = time.Duration(*opts.TimeoutSeconds) * time.Second
 	}
-	result = &v1beta1.CustomResourceDe***REMOVED***nitionList{}
+	result = &v1beta1.CustomResourceDefinitionList{}
 	err = c.client.Get().
-		Resource("customresourcede***REMOVED***nitions").
+		Resource("customresourcedefinitions").
 		VersionedParams(&opts, scheme.ParameterCodec).
 		Timeout(timeout).
 		Do().
@@ -89,38 +89,38 @@ func (c *customResourceDe***REMOVED***nitions) List(opts v1.ListOptions) (result
 	return
 }
 
-// Watch returns a watch.Interface that watches the requested customResourceDe***REMOVED***nitions.
-func (c *customResourceDe***REMOVED***nitions) Watch(opts v1.ListOptions) (watch.Interface, error) {
+// Watch returns a watch.Interface that watches the requested customResourceDefinitions.
+func (c *customResourceDefinitions) Watch(opts v1.ListOptions) (watch.Interface, error) {
 	var timeout time.Duration
 	if opts.TimeoutSeconds != nil {
 		timeout = time.Duration(*opts.TimeoutSeconds) * time.Second
 	}
 	opts.Watch = true
 	return c.client.Get().
-		Resource("customresourcede***REMOVED***nitions").
+		Resource("customresourcedefinitions").
 		VersionedParams(&opts, scheme.ParameterCodec).
 		Timeout(timeout).
 		Watch()
 }
 
-// Create takes the representation of a customResourceDe***REMOVED***nition and creates it.  Returns the server's representation of the customResourceDe***REMOVED***nition, and an error, if there is any.
-func (c *customResourceDe***REMOVED***nitions) Create(customResourceDe***REMOVED***nition *v1beta1.CustomResourceDe***REMOVED***nition) (result *v1beta1.CustomResourceDe***REMOVED***nition, err error) {
-	result = &v1beta1.CustomResourceDe***REMOVED***nition{}
+// Create takes the representation of a customResourceDefinition and creates it.  Returns the server's representation of the customResourceDefinition, and an error, if there is any.
+func (c *customResourceDefinitions) Create(customResourceDefinition *v1beta1.CustomResourceDefinition) (result *v1beta1.CustomResourceDefinition, err error) {
+	result = &v1beta1.CustomResourceDefinition{}
 	err = c.client.Post().
-		Resource("customresourcede***REMOVED***nitions").
-		Body(customResourceDe***REMOVED***nition).
+		Resource("customresourcedefinitions").
+		Body(customResourceDefinition).
 		Do().
 		Into(result)
 	return
 }
 
-// Update takes the representation of a customResourceDe***REMOVED***nition and updates it. Returns the server's representation of the customResourceDe***REMOVED***nition, and an error, if there is any.
-func (c *customResourceDe***REMOVED***nitions) Update(customResourceDe***REMOVED***nition *v1beta1.CustomResourceDe***REMOVED***nition) (result *v1beta1.CustomResourceDe***REMOVED***nition, err error) {
-	result = &v1beta1.CustomResourceDe***REMOVED***nition{}
+// Update takes the representation of a customResourceDefinition and updates it. Returns the server's representation of the customResourceDefinition, and an error, if there is any.
+func (c *customResourceDefinitions) Update(customResourceDefinition *v1beta1.CustomResourceDefinition) (result *v1beta1.CustomResourceDefinition, err error) {
+	result = &v1beta1.CustomResourceDefinition{}
 	err = c.client.Put().
-		Resource("customresourcede***REMOVED***nitions").
-		Name(customResourceDe***REMOVED***nition.Name).
-		Body(customResourceDe***REMOVED***nition).
+		Resource("customresourcedefinitions").
+		Name(customResourceDefinition.Name).
+		Body(customResourceDefinition).
 		Do().
 		Into(result)
 	return
@@ -129,22 +129,22 @@ func (c *customResourceDe***REMOVED***nitions) Update(customResourceDe***REMOVED
 // UpdateStatus was generated because the type contains a Status member.
 // Add a +genclient:noStatus comment above the type to avoid generating UpdateStatus().
 
-func (c *customResourceDe***REMOVED***nitions) UpdateStatus(customResourceDe***REMOVED***nition *v1beta1.CustomResourceDe***REMOVED***nition) (result *v1beta1.CustomResourceDe***REMOVED***nition, err error) {
-	result = &v1beta1.CustomResourceDe***REMOVED***nition{}
+func (c *customResourceDefinitions) UpdateStatus(customResourceDefinition *v1beta1.CustomResourceDefinition) (result *v1beta1.CustomResourceDefinition, err error) {
+	result = &v1beta1.CustomResourceDefinition{}
 	err = c.client.Put().
-		Resource("customresourcede***REMOVED***nitions").
-		Name(customResourceDe***REMOVED***nition.Name).
+		Resource("customresourcedefinitions").
+		Name(customResourceDefinition.Name).
 		SubResource("status").
-		Body(customResourceDe***REMOVED***nition).
+		Body(customResourceDefinition).
 		Do().
 		Into(result)
 	return
 }
 
-// Delete takes name of the customResourceDe***REMOVED***nition and deletes it. Returns an error if one occurs.
-func (c *customResourceDe***REMOVED***nitions) Delete(name string, options *v1.DeleteOptions) error {
+// Delete takes name of the customResourceDefinition and deletes it. Returns an error if one occurs.
+func (c *customResourceDefinitions) Delete(name string, options *v1.DeleteOptions) error {
 	return c.client.Delete().
-		Resource("customresourcede***REMOVED***nitions").
+		Resource("customresourcedefinitions").
 		Name(name).
 		Body(options).
 		Do().
@@ -152,13 +152,13 @@ func (c *customResourceDe***REMOVED***nitions) Delete(name string, options *v1.D
 }
 
 // DeleteCollection deletes a collection of objects.
-func (c *customResourceDe***REMOVED***nitions) DeleteCollection(options *v1.DeleteOptions, listOptions v1.ListOptions) error {
+func (c *customResourceDefinitions) DeleteCollection(options *v1.DeleteOptions, listOptions v1.ListOptions) error {
 	var timeout time.Duration
 	if listOptions.TimeoutSeconds != nil {
 		timeout = time.Duration(*listOptions.TimeoutSeconds) * time.Second
 	}
 	return c.client.Delete().
-		Resource("customresourcede***REMOVED***nitions").
+		Resource("customresourcedefinitions").
 		VersionedParams(&listOptions, scheme.ParameterCodec).
 		Timeout(timeout).
 		Body(options).
@@ -166,11 +166,11 @@ func (c *customResourceDe***REMOVED***nitions) DeleteCollection(options *v1.Dele
 		Error()
 }
 
-// Patch applies the patch and returns the patched customResourceDe***REMOVED***nition.
-func (c *customResourceDe***REMOVED***nitions) Patch(name string, pt types.PatchType, data []byte, subresources ...string) (result *v1beta1.CustomResourceDe***REMOVED***nition, err error) {
-	result = &v1beta1.CustomResourceDe***REMOVED***nition{}
+// Patch applies the patch and returns the patched customResourceDefinition.
+func (c *customResourceDefinitions) Patch(name string, pt types.PatchType, data []byte, subresources ...string) (result *v1beta1.CustomResourceDefinition, err error) {
+	result = &v1beta1.CustomResourceDefinition{}
 	err = c.client.Patch(pt).
-		Resource("customresourcede***REMOVED***nitions").
+		Resource("customresourcedefinitions").
 		SubResource(subresources...).
 		Name(name).
 		Body(data).

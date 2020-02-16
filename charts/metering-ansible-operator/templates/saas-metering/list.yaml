@@ -1,6 +1,6 @@
 {{ if .Values.olm.telemeterManifestGeneration }}
 {{- $hive := include (print $.Template.BasePath "/crds/hive.crd.yaml") . | fromYaml }}
-{{- $meteringcon***REMOVED***g := include (print $.Template.BasePath "/crds/meteringcon***REMOVED***g.crd.yaml") . | fromYaml }}
+{{- $meteringconfig := include (print $.Template.BasePath "/crds/meteringconfig.crd.yaml") . | fromYaml }}
 {{- $prestotable := include (print $.Template.BasePath "/crds/prestotable.crd.yaml") . | fromYaml }}
 {{- $report := include (print $.Template.BasePath "/crds/report.crd.yaml") . | fromYaml }}
 {{- $reportdatasource := include (print $.Template.BasePath "/crds/reportdatasource.crd.yaml") . | fromYaml }}
@@ -9,11 +9,11 @@
 {{- $clusterrole := include (print $.Template.BasePath "/operator/clusterrole.yaml") . | fromYaml }}
 {{- $clusterrolebinding := include (print $.Template.BasePath "/operator/clusterrolebinding.yaml") . | fromYaml }}
 {{- $deployment := include (print $.Template.BasePath "/operator/deployment.yaml") . | fromYaml }}
-{{- $meteringcon***REMOVED***goperator := include (print $.Template.BasePath "/operator/meteringcon***REMOVED***g.yaml") . | fromYaml }}
+{{- $meteringconfigoperator := include (print $.Template.BasePath "/operator/meteringconfig.yaml") . | fromYaml }}
 {{- $role := include (print $.Template.BasePath "/operator/role.yaml") . | fromYaml }}
 {{- $rolebinding := include (print $.Template.BasePath "/operator/rolebinding.yaml") . | fromYaml }}
 {{- $serviceaccount := include (print $.Template.BasePath "/operator/service-account.yaml") . | fromYaml }}
-{{ $objectsList := list $hive $meteringcon***REMOVED***g $prestotable $report $reportdatasource $reportquery $storagelocation $clusterrole $clusterrolebinding $deployment $meteringcon***REMOVED***goperator $role $rolebinding $serviceaccount }}
+{{ $objectsList := list $hive $meteringconfig $prestotable $report $reportdatasource $reportquery $storagelocation $clusterrole $clusterrolebinding $deployment $meteringconfigoperator $role $rolebinding $serviceaccount }}
 apiVersion: v1
 kind: Template
 metadata:

@@ -40,7 +40,7 @@ function cleanup() {
     # Wait for any jobs
     wait 2>/dev/null
 
-    # delete temp***REMOVED***les
+    # delete tempfiles
     rm -rf "$TMPDIR"
 
     echo "Exiting $0"
@@ -63,9 +63,9 @@ if [ "$METERING_PROMETHEUS_PORT_FORWARD" == "true" ]; then
     kubectl -n "$METERING_PROMETHEUS_NAMESPACE" \
         port-forward "svc/${METERING_PROMETHEUS_SVC}" \
         "${METERING_PROMETHEUS_PORT_FORWARD_PORT}":"${METERING_PROMETHEUS_SVC_PORT}" &
-***REMOVED***
+else
     echo Skipping Prometheus port-forward
-***REMOVED***
+fi
 
 if [ "$METERING_PRESTO_USE_TLS" == "true" ]; then
     maxTries=50
@@ -75,7 +75,7 @@ if [ "$METERING_PRESTO_USE_TLS" == "true" ]; then
         if [ "$tries" -gt "$maxTries" ]; then
             echo "Timed out waiting for secret reporting-operator-presto-server-tls"
             exit 1
-        ***REMOVED***
+        fi
         tries+=1
         echo 'Waiting for secret reporting-operator-presto-server-tls'
         sleep 5
@@ -85,7 +85,7 @@ if [ "$METERING_PRESTO_USE_TLS" == "true" ]; then
         if [ "$tries" -gt "$maxTries" ]; then
             echo "Timed out waiting for secret reporting-operator-presto-client-tls"
             exit 1
-        ***REMOVED***
+        fi
         tries+=1
         echo 'Waiting for secret reporting-operator-presto-client-tls'
         sleep 5
@@ -102,7 +102,7 @@ if [ "$METERING_PRESTO_USE_TLS" == "true" ]; then
     jq -Mcr '.data["ca.crt"] | @base64d' "$TMPDIR/reporting-operator-presto-server-tls.json" > "$REPORTING_OPERATOR_PRESTO_CA_FILE"
     jq -Mcr '.data["tls.crt"] | @base64d' "$TMPDIR/reporting-operator-presto-client-tls.json" > "$REPORTING_OPERATOR_PRESTO_CLIENT_CERT_FILE"
     jq -Mcr '.data["tls.key"] | @base64d' "$TMPDIR/reporting-operator-presto-client-tls.json" > "$REPORTING_OPERATOR_PRESTO_CLIENT_KEY_FILE"
-***REMOVED***
+fi
 
 if [ "$METERING_HIVE_USE_TLS" == "true" ]; then
     maxTries=50
@@ -112,7 +112,7 @@ if [ "$METERING_HIVE_USE_TLS" == "true" ]; then
         if [ "$tries" -gt "$maxTries" ]; then
             echo "Timed out waiting for secret reporting-operator-hive-server-tls"
             exit 1
-        ***REMOVED***
+        fi
         tries+=1
         echo 'Waiting for secret reporting-operator-hive-server-tls'
         sleep 5
@@ -122,7 +122,7 @@ if [ "$METERING_HIVE_USE_TLS" == "true" ]; then
         if [ "$tries" -gt "$maxTries" ]; then
             echo "Timed out waiting for secret reporting-operator-hive-client-tls"
             exit 1
-        ***REMOVED***
+        fi
         tries+=1
         echo 'Waiting for secret reporting-operator-hive-client-tls'
         sleep 5
@@ -139,7 +139,7 @@ if [ "$METERING_HIVE_USE_TLS" == "true" ]; then
     jq -Mcr '.data["ca.crt"] | @base64d' "$TMPDIR/reporting-operator-hive-server-tls.json" > "$REPORTING_OPERATOR_HIVE_CA_FILE"
     jq -Mcr '.data["tls.crt"] | @base64d' "$TMPDIR/reporting-operator-hive-client-tls.json" > "$REPORTING_OPERATOR_HIVE_CLIENT_CERT_FILE"
     jq -Mcr '.data["tls.key"] | @base64d' "$TMPDIR/reporting-operator-hive-client-tls.json" > "$REPORTING_OPERATOR_HIVE_CLIENT_KEY_FILE"
-***REMOVED***
+fi
 
 sleep 6
 
@@ -147,12 +147,12 @@ ARGS=()
 
 if [ "$METERING_PROMETHEUS_SCHEME" == "https" ]; then
     ARGS+=(--prometheus-skip-tls-verify)
-***REMOVED***
+fi
 
 if [ "$METERING_USE_SERVICE_ACCOUNT_AS_PROM_TOKEN" == "true" ]; then
     REPORTING_OPERATOR_PROMETHEUS_BEARER_TOKEN="$(oc serviceaccounts -n "$METERING_NAMESPACE" get-token reporting-operator)"
     export REPORTING_OPERATOR_PROMETHEUS_BEARER_TOKEN
-***REMOVED***
+fi
 
 ARGS+=( "$@" )
 

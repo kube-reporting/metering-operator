@@ -102,7 +102,7 @@ func testReportsProduceData(t *testing.T, testReportingFramework *reportingframe
 		test := test
 		t.Run(name, func(t *testing.T) {
 			if test.skip {
-				t.Skip("test con***REMOVED***gured to be skipped")
+				t.Skip("test configured to be skipped")
 				return
 			}
 			if test.parallel {
@@ -156,7 +156,7 @@ func testReportsProduceData(t *testing.T, testReportingFramework *reportingframe
 
 			report := test.newReportFunc(test.name, test.queryName, test.schedule, &reportStart, &reportEnd)
 			reportRunTimeout := 10 * time.Minute
-			t.Logf("creating report %s and waiting %s to ***REMOVED***nish", report.Name, reportRunTimeout)
+			t.Logf("creating report %s and waiting %s to finish", report.Name, reportRunTimeout)
 			testReportingFramework.RequireReportSuccessfullyRuns(t, report, reportRunTimeout)
 
 			resultTimeout := time.Minute

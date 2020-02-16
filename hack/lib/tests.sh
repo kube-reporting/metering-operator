@@ -15,10 +15,10 @@ if [ -n "${IMAGE_FORMAT:-}" ]; then
     # for metering-operator and reporting-operator being tested in ci, these are unchanging
     export METERING_OPERATOR_IMAGE_TAG="metering-ansible-operator"
     export REPORTING_OPERATOR_IMAGE_TAG="metering-reporting-operator"
-***REMOVED***
+else
     # use the _DEPLOY_ values if set already, otherwise use default image repo/tags
     export METERING_OPERATOR_IMAGE_REPO="${METERING_OPERATOR_IMAGE_REPO:-""}"
     export REPORTING_OPERATOR_IMAGE_REPO="${REPORTING_OPERATOR_IMAGE_REPO:-""}"
     export METERING_OPERATOR_IMAGE_TAG="${METERING_OPERATOR_IMAGE_TAG:-""}"
     export REPORTING_OPERATOR_IMAGE_TAG="${REPORTING_OPERATOR_IMAGE_TAG:-""}"
-***REMOVED***
+fi

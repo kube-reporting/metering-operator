@@ -12,15 +12,15 @@ var RandReader = rand.Reader
 
 const idempotencyTokenFillTag = `idempotencyToken`
 
-// CanSetIdempotencyToken returns true if the struct ***REMOVED***eld should be
+// CanSetIdempotencyToken returns true if the struct field should be
 // automatically populated with a Idempotency token.
 //
-// Only *string and string type ***REMOVED***elds that are tagged with idempotencyToken
-// which are not already set can be auto ***REMOVED***lled.
+// Only *string and string type fields that are tagged with idempotencyToken
+// which are not already set can be auto filled.
 func CanSetIdempotencyToken(v reflect.Value, f reflect.StructField) bool {
 	switch u := v.Interface().(type) {
-	// To auto ***REMOVED***ll an Idempotency token the ***REMOVED***eld must be a string,
-	// tagged for auto ***REMOVED***ll, and have a zero value.
+	// To auto fill an Idempotency token the field must be a string,
+	// tagged for auto fill, and have a zero value.
 	case *string:
 		return u == nil && len(f.Tag.Get(idempotencyTokenFillTag)) != 0
 	case string:
@@ -65,7 +65,7 @@ func SetIdempotencyToken(v reflect.Value) {
 
 // UUIDVersion4 returns a Version 4 random UUID from the byte slice provided
 func UUIDVersion4(u []byte) string {
-	// https://en.wikipedia.org/wiki/Universally_unique_identi***REMOVED***er#Version_4_.28random.29
+	// https://en.wikipedia.org/wiki/Universally_unique_identifier#Version_4_.28random.29
 	// 13th character is "4"
 	u[6] = (u[6] | 0x40) & 0x4F
 	// 17th character is "8", "9", "a", or "b"

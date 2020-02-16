@@ -36,9 +36,9 @@ import (
 //        myFunc(svc)
 //    }
 //
-// In your _test.go ***REMOVED***le:
+// In your _test.go file:
 //
-//    // De***REMOVED***ne a mock struct to be used in your unit tests of myFunc.
+//    // Define a mock struct to be used in your unit tests of myFunc.
 //    type mockSTSClient struct {
 //        stsiface.STSAPI
 //    }

@@ -44,10 +44,10 @@ func init() {
 	// code.google.com/p/go.crypto/ssh/terminal, for instance, but as a
 	// heuristic for whether to print in color or in black-and-white, I'd
 	// really rather not.
-	***REMOVED***, err := os.Stdout.Stat()
+	fi, err := os.Stdout.Stat()
 	if err == nil {
 		m := os.ModeDevice | os.ModeCharDevice
-		isTTY = ***REMOVED***.Mode()&m == m
+		isTTY = fi.Mode()&m == m
 	}
 }
 

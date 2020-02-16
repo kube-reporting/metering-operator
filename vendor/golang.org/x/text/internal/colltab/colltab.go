@@ -1,6 +1,6 @@
 // Copyright 2015 The Go Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE ***REMOVED***le.
+// license that can be found in the LICENSE file.
 
 // Package colltab contains functionality related to collation tables.
 // It is only to be used by the collate and search packages.
@@ -12,13 +12,13 @@ import (
 	"golang.org/x/text/language"
 )
 
-// MatchLang ***REMOVED***nds the index of t in tags, using a matching algorithm used for
+// MatchLang finds the index of t in tags, using a matching algorithm used for
 // collation and search. tags[0] must be language.Und, the remaining tags should
 // be sorted alphabetically.
 //
 // Language matching for collation and search is different from the matching
-// de***REMOVED***ned by language.Matcher: the (inferred) base language must be an exact
-// match for the relevant ***REMOVED***elds. For example, "gsw" should not match "de".
+// defined by language.Matcher: the (inferred) base language must be an exact
+// match for the relevant fields. For example, "gsw" should not match "de".
 // Also the parent relation is different, as a parent may have a different
 // script. So usually the parent of zh-Hant is und, whereas for MatchLang it is
 // zh.
@@ -27,7 +27,7 @@ func MatchLang(t language.Tag, tags []language.Tag) int {
 	t, _ = language.All.Canonicalize(t)
 
 	base, conf := t.Base()
-	// Estimate the base language, but only use high-con***REMOVED***dence values.
+	// Estimate the base language, but only use high-confidence values.
 	if conf < language.High {
 		// The root locale supports "search" and "standard". We assume that any
 		// implementation will only use one of both.
@@ -41,7 +41,7 @@ func MatchLang(t language.Tag, tags []language.Tag) int {
 		p = p.Parent()
 		// Add back region and extensions.
 		t, _ = language.Raw.Compose(p, r, t.Extensions())
-	} ***REMOVED*** {
+	} else {
 		// Set the maximized base language.
 		t, _ = language.Raw.Compose(base, s, t.Extensions())
 	}
@@ -58,7 +58,7 @@ func MatchLang(t language.Tag, tags []language.Tag) int {
 	}
 
 	// Besides the base language, script and region, only the collation type and
-	// the custom variant de***REMOVED***ned in the 'u' extension are used to distinguish a
+	// the custom variant defined in the 'u' extension are used to distinguish a
 	// locale.
 	// Strip all variants and extensions and add back the custom variant.
 	tdef, _ := language.Raw.Compose(t.Raw())
@@ -96,9 +96,9 @@ func parent(t language.Tag) language.Tag {
 	result := language.Und
 	if b, s, r := t.Raw(); (r != language.Region{}) {
 		result, _ = language.Raw.Compose(b, s, t.Extensions())
-	} ***REMOVED*** if (s != language.Script{}) {
+	} else if (s != language.Script{}) {
 		result, _ = language.Raw.Compose(b, t.Extensions())
-	} ***REMOVED*** if (b != language.Base{}) {
+	} else if (b != language.Base{}) {
 		result, _ = language.Raw.Compose(t.Extensions())
 	}
 	return result

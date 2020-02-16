@@ -1,6 +1,6 @@
 // Copyright 2009 The Go Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE ***REMOVED***le.
+// license that can be found in the LICENSE file.
 
 package pflag
 
@@ -41,7 +41,7 @@ func wrapFlagValue(v goflag.Value) Value {
 		t = t.Elem()
 	}
 
-	pv.flagType = strings.TrimSuf***REMOVED***x(t.Name(), "Value")
+	pv.flagType = strings.TrimSuffix(t.Name(), "Value")
 	return pv
 }
 

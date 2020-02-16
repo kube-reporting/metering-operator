@@ -1,6 +1,6 @@
 // Copyright 2018 The Prometheus Authors
 // Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this ***REMOVED***le except in compliance with the License.
+// you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 //
 // http://www.apache.org/licenses/LICENSE-2.0
@@ -8,7 +8,7 @@
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the speci***REMOVED***c language governing permissions and
+// See the License for the specific language governing permissions and
 // limitations under the License.
 
 // Package nfs implements parsing of /proc/net/rpc/nfsd.
@@ -129,7 +129,7 @@ type ClientV4Stats struct {
 	Write              uint64
 	Commit             uint64
 	Open               uint64
-	OpenCon***REMOVED***rm        uint64
+	OpenConfirm        uint64
 	OpenNoattr         uint64
 	OpenDowngrade      uint64
 	Close              uint64
@@ -137,7 +137,7 @@ type ClientV4Stats struct {
 	FsInfo             uint64
 	Renew              uint64
 	SetClientID        uint64
-	SetClientIDCon***REMOVED***rm uint64
+	SetClientIDConfirm uint64
 	Lock               uint64
 	Lockt              uint64
 	Locku              uint64
@@ -197,7 +197,7 @@ type ServerV4Stats struct {
 // v4.1 https://tools.ietf.org/html/rfc5661 (58 operations)
 // v4.2 https://tools.ietf.org/html/draft-ietf-nfsv4-minorversion2-41 (71 operations)
 type V4Ops struct {
-	//Values       uint64 // Variable depending on v4.x sub-version. TODO: Will this always at least include the ***REMOVED***elds in this struct?
+	//Values       uint64 // Variable depending on v4.x sub-version. TODO: Will this always at least include the fields in this struct?
 	Op0Unused    uint64
 	Op1Unused    uint64
 	Op2Future    uint64
@@ -218,7 +218,7 @@ type V4Ops struct {
 	Nverify      uint64
 	Open         uint64
 	OpenAttr     uint64
-	OpenCon***REMOVED***rm  uint64
+	OpenConfirm  uint64
 	OpenDgrd     uint64
 	PutFH        uint64
 	PutPubFH     uint64

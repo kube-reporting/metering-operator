@@ -3,7 +3,7 @@ package deployframework
 import (
 	"fmt"
 	"os"
-	"path/***REMOVED***lepath"
+	"path/filepath"
 	"strings"
 	"time"
 
@@ -43,7 +43,7 @@ var (
 type DeployerCtx struct {
 	TargetPodsCount           int
 	Namespace                 string
-	KubeCon***REMOVED***gPath            string
+	KubeConfigPath            string
 	TestCaseOutputPath        string
 	HackScriptPath            string
 	MeteringOperatorImageRepo string
@@ -54,9 +54,9 @@ type DeployerCtx struct {
 	LocalCtx                  *LocalCtx
 	Deployer                  *deploy.Deployer
 	Logger                    logrus.FieldLogger
-	Con***REMOVED***g                    *rest.Con***REMOVED***g
+	Config                    *rest.Config
 	Client                    kubernetes.Interface
-	APIExtClient              apiextclientv1beta1.CustomResourceDe***REMOVED***nitionsGetter
+	APIExtClient              apiextclientv1beta1.CustomResourceDefinitionsGetter
 	MeteringClient            meteringclient.MeteringV1Interface
 }
 
@@ -69,14 +69,14 @@ func (df *DeployFramework) NewDeployerCtx(
 	reportingOperatorImageTag,
 	outputPath string,
 	extraLocalEnvVars []string,
-	spec metering.MeteringCon***REMOVED***gSpec,
+	spec metering.MeteringConfigSpec,
 ) (*DeployerCtx, error) {
-	cfg, err := df.NewDeployerCon***REMOVED***g(namespace, meteringOperatorImageRepo, meteringOperatorImageTag, reportingOperatorImageRepo, reportingOperatorImageTag, spec)
+	cfg, err := df.NewDeployerConfig(namespace, meteringOperatorImageRepo, meteringOperatorImageTag, reportingOperatorImageRepo, reportingOperatorImageTag, spec)
 	if err != nil {
 		return nil, err
 	}
 
-	hackScriptDir, err := ***REMOVED***lepath.Abs(***REMOVED***lepath.Join(df.RepoDir, hackScriptDirName))
+	hackScriptDir, err := filepath.Abs(filepath.Join(df.RepoDir, hackScriptDirName))
 	if err != nil {
 		return nil, fmt.Errorf("failed to get the absolute path to the hack script directory: %v", err)
 	}
@@ -90,13 +90,13 @@ func (df *DeployFramework) NewDeployerCtx(
 	if df.RunLocal {
 		var replicas int32
 
-		if cfg.MeteringCon***REMOVED***g.Spec.ReportingOperator != nil && cfg.MeteringCon***REMOVED***g.Spec.ReportingOperator.Spec != nil {
-			cfg.MeteringCon***REMOVED***g.Spec.ReportingOperator.Spec.Replicas = &replicas
+		if cfg.MeteringConfig.Spec.ReportingOperator != nil && cfg.MeteringConfig.Spec.ReportingOperator.Spec != nil {
+			cfg.MeteringConfig.Spec.ReportingOperator.Spec.Replicas = &replicas
 		}
 		targetPodCount -= 2
 	}
 
-	df.Logger.Debugf("Deployer con***REMOVED***g: %+v", cfg)
+	df.Logger.Debugf("Deployer config: %+v", cfg)
 
 	deployer, err := deploy.NewDeployer(*cfg, df.Logger, df.Client, df.APIExtClient, df.MeteringClient)
 	if err != nil {
@@ -114,9 +114,9 @@ func (df *DeployFramework) NewDeployerCtx(
 		ExtraLocalEnvVars:         extraLocalEnvVars,
 		RunTestLocal:              df.RunLocal,
 		RunDevSetup:               df.RunDevSetup,
-		KubeCon***REMOVED***gPath:            df.KubeCon***REMOVED***gPath,
+		KubeConfigPath:            df.KubeConfigPath,
 		Logger:                    df.Logger,
-		Con***REMOVED***g:                    df.Con***REMOVED***g,
+		Config:                    df.Config,
 		Client:                    df.Client,
 		APIExtClient:              df.APIExtClient,
 		MeteringClient:            df.MeteringClient,
@@ -129,7 +129,7 @@ func (ctx *DeployerCtx) NewLocalCtx() *LocalCtx {
 
 	return &LocalCtx{
 		Namespace:                     ctx.Namespace,
-		KubeCon***REMOVED***gPath:                ctx.KubeCon***REMOVED***gPath,
+		KubeConfigPath:                ctx.KubeConfigPath,
 		BasePath:                      ctx.TestCaseOutputPath,
 		HackScriptPath:                ctx.HackScriptPath,
 		ExtraReportingOperatorEnvVars: ctx.ExtraLocalEnvVars,
@@ -225,7 +225,7 @@ func (ctx *DeployerCtx) Setup(expectInstallErr bool) (*reportingframework.Report
 		}
 	}
 
-	reportResultsPath := ***REMOVED***lepath.Join(ctx.TestCaseOutputPath, reportResultsDir)
+	reportResultsPath := filepath.Join(ctx.TestCaseOutputPath, reportResultsDir)
 	err = os.Mkdir(reportResultsPath, 0777)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create the report results directory %s: %v", reportResultsPath, err)
@@ -241,7 +241,7 @@ func (ctx *DeployerCtx) Setup(expectInstallErr bool) (*reportingframework.Report
 		routeBearerToken,
 		reportingAPIURL,
 		reportResultsPath,
-		ctx.Con***REMOVED***g,
+		ctx.Config,
 		ctx.Client,
 		ctx.MeteringClient,
 	)
@@ -259,7 +259,7 @@ func (ctx *DeployerCtx) Setup(expectInstallErr bool) (*reportingframework.Report
 // Teardown is a method that creates the resource and container logging
 // directories, then populates those directories by executing the
 // cleanup bash script, while streaming the script output
-// to stdout. Once the cleanup script has ***REMOVED***nished execution, we can
+// to stdout. Once the cleanup script has finished execution, we can
 // uninstall the metering stack and return an error if there is any.
 func (ctx *DeployerCtx) Teardown() error {
 	var errArr []string
@@ -277,8 +277,8 @@ func (ctx *DeployerCtx) Teardown() error {
 	// If true, we skip the process of deleting and logging of the metering
 	// resources that were provisioned during the manual install.
 	if !ctx.RunDevSetup {
-		relPath := ***REMOVED***lepath.Join(ctx.HackScriptPath, cleanupScriptName)
-		targetScriptDir, err := ***REMOVED***lepath.Abs(relPath)
+		relPath := filepath.Join(ctx.HackScriptPath, cleanupScriptName)
+		targetScriptDir, err := filepath.Abs(relPath)
 		if err != nil {
 			errArr = append(errArr, fmt.Sprintf("failed to get the absolute path from '%s': %v", relPath, err))
 		}

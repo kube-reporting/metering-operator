@@ -1,6 +1,6 @@
 // Copyright 2017 The Go Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE ***REMOVED***le.
+// license that can be found in the LICENSE file.
 
 package astutil
 
@@ -21,7 +21,7 @@ type ApplyFunc func(*Cursor) bool
 
 // Apply traverses a syntax tree recursively, starting with root,
 // and calling pre and post for each node as described below.
-// Apply returns the syntax tree, possibly modi***REMOVED***ed.
+// Apply returns the syntax tree, possibly modified.
 //
 // If pre is not nil, it is called for each node before the node's
 // children are traversed (pre-order). If pre returns false, no
@@ -32,13 +32,13 @@ type ApplyFunc func(*Cursor) bool
 // (post-order). If post returns false, traversal is terminated and
 // Apply returns immediately.
 //
-// Only ***REMOVED***elds that refer to AST nodes are considered children;
-// i.e., token.Pos, Scopes, Objects, and ***REMOVED***elds of basic types
+// Only fields that refer to AST nodes are considered children;
+// i.e., token.Pos, Scopes, Objects, and fields of basic types
 // (strings, etc.) are ignored.
 //
 // Children are traversed in the order in which they appear in the
-// respective node's struct de***REMOVED***nition. A package's ***REMOVED***les are
-// traversed in the ***REMOVED***lenames' alphabetical order.
+// respective node's struct definition. A package's files are
+// traversed in the filenames' alphabetical order.
 //
 func Apply(root ast.Node, pre, post ApplyFunc) (result ast.Node) {
 	parent := &struct{ ast.Node }{root}
@@ -60,7 +60,7 @@ var abort = new(int) // singleton, to signal termination of Apply
 // from the Node, Parent, Name, and Index methods.
 //
 // If p is a variable of type and value of the current parent node
-// c.Parent(), and f is the ***REMOVED***eld identi***REMOVED***er with name c.Name(),
+// c.Parent(), and f is the field identifier with name c.Name(),
 // the following invariants hold:
 //
 //   p.f            == c.Node()  if c.Index() <  0
@@ -81,9 +81,9 @@ func (c *Cursor) Node() ast.Node { return c.node }
 // Parent returns the parent of the current Node.
 func (c *Cursor) Parent() ast.Node { return c.parent }
 
-// Name returns the name of the parent Node ***REMOVED***eld that contains the current Node.
+// Name returns the name of the parent Node field that contains the current Node.
 // If the parent is a *ast.Package and the current Node is a *ast.File, Name returns
-// the ***REMOVED***lename for the current Node.
+// the filename for the current Node.
 func (c *Cursor) Name() string { return c.name }
 
 // Index reports the index >= 0 of the current Node in the slice of Nodes that
@@ -97,8 +97,8 @@ func (c *Cursor) Index() int {
 	return -1
 }
 
-// ***REMOVED***eld returns the current node's parent ***REMOVED***eld value.
-func (c *Cursor) ***REMOVED***eld() reflect.Value {
+// field returns the current node's parent field value.
+func (c *Cursor) field() reflect.Value {
 	return reflect.Indirect(reflect.ValueOf(c.parent)).FieldByName(c.name)
 }
 
@@ -106,15 +106,15 @@ func (c *Cursor) ***REMOVED***eld() reflect.Value {
 // The replacement node is not walked by Apply.
 func (c *Cursor) Replace(n ast.Node) {
 	if _, ok := c.node.(*ast.File); ok {
-		***REMOVED***le, ok := n.(*ast.File)
+		file, ok := n.(*ast.File)
 		if !ok {
 			panic("attempt to replace *ast.File with non-*ast.File")
 		}
-		c.parent.(*ast.Package).Files[c.name] = ***REMOVED***le
+		c.parent.(*ast.Package).Files[c.name] = file
 		return
 	}
 
-	v := c.***REMOVED***eld()
+	v := c.field()
 	if i := c.Index(); i >= 0 {
 		v = v.Index(i)
 	}
@@ -123,7 +123,7 @@ func (c *Cursor) Replace(n ast.Node) {
 
 // Delete deletes the current Node from its containing slice.
 // If the current Node is not part of a slice, Delete panics.
-// As a special case, if the current node is a package ***REMOVED***le,
+// As a special case, if the current node is a package file,
 // Delete removes it from the package's Files map.
 func (c *Cursor) Delete() {
 	if _, ok := c.node.(*ast.File); ok {
@@ -135,7 +135,7 @@ func (c *Cursor) Delete() {
 	if i < 0 {
 		panic("Delete node not contained in slice")
 	}
-	v := c.***REMOVED***eld()
+	v := c.field()
 	l := v.Len()
 	reflect.Copy(v.Slice(i, l), v.Slice(i+1, l))
 	v.Index(l - 1).Set(reflect.Zero(v.Type().Elem()))
@@ -151,7 +151,7 @@ func (c *Cursor) InsertAfter(n ast.Node) {
 	if i < 0 {
 		panic("InsertAfter node not contained in slice")
 	}
-	v := c.***REMOVED***eld()
+	v := c.field()
 	v.Set(reflect.Append(v, reflect.Zero(v.Type().Elem())))
 	l := v.Len()
 	reflect.Copy(v.Slice(i+2, l), v.Slice(i+1, l))
@@ -167,7 +167,7 @@ func (c *Cursor) InsertBefore(n ast.Node) {
 	if i < 0 {
 		panic("InsertBefore node not contained in slice")
 	}
-	v := c.***REMOVED***eld()
+	v := c.field()
 	v.Set(reflect.Append(v, reflect.Zero(v.Type().Elem())))
 	l := v.Len()
 	reflect.Copy(v.Slice(i+1, l), v.Slice(i, l))
@@ -206,7 +206,7 @@ func (a *application) apply(parent ast.Node, name string, iter *iterator, n ast.
 	case nil:
 		// nothing to do
 
-	// Comments and ***REMOVED***elds
+	// Comments and fields
 	case *ast.Comment:
 		// nothing to do
 
@@ -457,7 +457,7 @@ func (a *application) applyList(parent ast.Node, name string) {
 	saved := a.iter
 	a.iter.index = 0
 	for {
-		// must reload parent.name each time, since cursor modi***REMOVED***cations might change it
+		// must reload parent.name each time, since cursor modifications might change it
 		v := reflect.Indirect(reflect.ValueOf(parent)).FieldByName(name)
 		if a.iter.index >= v.Len() {
 			break

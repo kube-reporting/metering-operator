@@ -63,7 +63,7 @@ func Unmarshal(r *request.Request) {
 			)
 			return
 		}
-	} ***REMOVED*** {
+	} else {
 		rest.Unmarshal(r)
 	}
 }

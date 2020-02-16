@@ -1,6 +1,6 @@
 // Copyright 2014 The Go Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE ***REMOVED***le.
+// license that can be found in the LICENSE file.
 
 package language
 
@@ -9,7 +9,7 @@ import (
 	"sort"
 )
 
-// The Coverage interface is used to de***REMOVED***ne the level of coverage of an
+// The Coverage interface is used to define the level of coverage of an
 // internationalization service. Note that not all types are supported by all
 // services. As lists may be generated on the fly, it is recommended that users
 // of a Coverage cache the results.
@@ -28,7 +28,7 @@ type Coverage interface {
 }
 
 var (
-	// Supported de***REMOVED***nes a Coverage that lists all supported subtags. Tags
+	// Supported defines a Coverage that lists all supported subtags. Tags
 	// always returns nil.
 	Supported Coverage = allSubtags{}
 )
@@ -36,13 +36,13 @@ var (
 // TODO:
 // - Support Variants, numbering systems.
 // - CLDR coverage levels.
-// - Set of common tags de***REMOVED***ned in this package.
+// - Set of common tags defined in this package.
 
 type allSubtags struct{}
 
 // Regions returns the list of supported regions. As all regions are in a
 // consecutive range, it simply returns a slice of numbers in increasing order.
-// The "unde***REMOVED***ned" region is not returned.
+// The "undefined" region is not returned.
 func (s allSubtags) Regions() []Region {
 	reg := make([]Region, numRegions)
 	for i := range reg {
@@ -53,7 +53,7 @@ func (s allSubtags) Regions() []Region {
 
 // Scripts returns the list of supported scripts. As all scripts are in a
 // consecutive range, it simply returns a slice of numbers in increasing order.
-// The "unde***REMOVED***ned" script is not returned.
+// The "undefined" script is not returned.
 func (s allSubtags) Scripts() []Script {
 	scr := make([]Script, numScripts)
 	for i := range scr {
@@ -91,8 +91,8 @@ func (s allSubtags) Tags() []Tag {
 }
 
 // coverage is used used by NewCoverage which is used as a convenient way for
-// creating Coverage implementations for partially de***REMOVED***ned data. Very often a
-// package will only need to de***REMOVED***ne a subset of slices. coverage provides a
+// creating Coverage implementations for partially defined data. Very often a
+// package will only need to define a subset of slices. coverage provides a
 // convenient way to do this. Moreover, packages using NewCoverage, instead of
 // their own implementation, will not break if later new slice types are added.
 type coverage struct {
@@ -124,7 +124,7 @@ func (b bases) Less(i, j int) bool {
 	return b[i].langID < b[j].langID
 }
 
-// BaseLanguages returns the result from calling s.bases if it is speci***REMOVED***ed or
+// BaseLanguages returns the result from calling s.bases if it is specified or
 // otherwise derives the set of supported base languages from tags.
 func (s *coverage) BaseLanguages() []Base {
 	if s.bases == nil {
@@ -164,10 +164,10 @@ func (s *coverage) Regions() []Region {
 }
 
 // NewCoverage returns a Coverage for the given lists. It is typically used by
-// packages providing internationalization services to de***REMOVED***ne their level of
+// packages providing internationalization services to define their level of
 // coverage. A list may be of type []T or func() []T, where T is either Tag,
 // Base, Script or Region. The returned Coverage derives the value for Bases
-// from Tags if no func or slice for []Base is speci***REMOVED***ed. For other unspeci***REMOVED***ed
+// from Tags if no func or slice for []Base is specified. For other unspecified
 // types the returned Coverage will return nil for the respective methods.
 func NewCoverage(list ...interface{}) Coverage {
 	s := &coverage{}

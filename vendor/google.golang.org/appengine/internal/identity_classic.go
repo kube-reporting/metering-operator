@@ -1,6 +1,6 @@
 // Copyright 2015 Google Inc. All rights reserved.
 // Use of this source code is governed by the Apache 2.0
-// license that can be found in the LICENSE ***REMOVED***le.
+// license that can be found in the LICENSE file.
 
 // +build appengine
 
@@ -24,4 +24,4 @@ func VersionID(ctx netcontext.Context) string  { return appengine.VersionID(from
 func InstanceID() string                       { return appengine.InstanceID() }
 func IsDevAppServer() bool                     { return appengine.IsDevAppServer() }
 
-func fullyQuali***REMOVED***edAppID(ctx netcontext.Context) string { return fromContext(ctx).FullyQuali***REMOVED***edAppID() }
+func fullyQualifiedAppID(ctx netcontext.Context) string { return fromContext(ctx).FullyQualifiedAppID() }

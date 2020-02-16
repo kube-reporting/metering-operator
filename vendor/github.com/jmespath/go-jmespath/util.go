@@ -6,7 +6,7 @@ import (
 )
 
 // IsFalse determines if an object is false based on the JMESPath spec.
-// JMESPath de***REMOVED***nes false values to be any of:
+// JMESPath defines false values to be any of:
 // - An empty string array, or hash.
 // - The boolean value false.
 // - nil
@@ -56,7 +56,7 @@ func objsEqual(left interface{}, right interface{}) bool {
 // python slices.
 type sliceParam struct {
 	N         int
-	Speci***REMOVED***ed bool
+	Specified bool
 }
 
 // Slice supports [start:stop:step] style slicing that's supported in JMESPath.
@@ -71,7 +71,7 @@ func slice(slice []interface{}, parts []sliceParam) ([]interface{}, error) {
 		for i := start; i < stop; i += step {
 			result = append(result, slice[i])
 		}
-	} ***REMOVED*** {
+	} else {
 		for i := start; i > stop; i += step {
 			result = append(result, slice[i])
 		}
@@ -81,37 +81,37 @@ func slice(slice []interface{}, parts []sliceParam) ([]interface{}, error) {
 
 func computeSliceParams(length int, parts []sliceParam) ([]int, error) {
 	var start, stop, step int
-	if !parts[2].Speci***REMOVED***ed {
+	if !parts[2].Specified {
 		step = 1
-	} ***REMOVED*** if parts[2].N == 0 {
+	} else if parts[2].N == 0 {
 		return nil, errors.New("Invalid slice, step cannot be 0")
-	} ***REMOVED*** {
+	} else {
 		step = parts[2].N
 	}
 	var stepValueNegative bool
 	if step < 0 {
 		stepValueNegative = true
-	} ***REMOVED*** {
+	} else {
 		stepValueNegative = false
 	}
 
-	if !parts[0].Speci***REMOVED***ed {
+	if !parts[0].Specified {
 		if stepValueNegative {
 			start = length - 1
-		} ***REMOVED*** {
+		} else {
 			start = 0
 		}
-	} ***REMOVED*** {
+	} else {
 		start = capSlice(length, parts[0].N, step)
 	}
 
-	if !parts[1].Speci***REMOVED***ed {
+	if !parts[1].Specified {
 		if stepValueNegative {
 			stop = -1
-		} ***REMOVED*** {
+		} else {
 			stop = length
 		}
-	} ***REMOVED*** {
+	} else {
 		stop = capSlice(length, parts[1].N, step)
 	}
 	return []int{start, stop, step}, nil
@@ -123,14 +123,14 @@ func capSlice(length int, actual int, step int) int {
 		if actual < 0 {
 			if step < 0 {
 				actual = -1
-			} ***REMOVED*** {
+			} else {
 				actual = 0
 			}
 		}
-	} ***REMOVED*** if actual >= length {
+	} else if actual >= length {
 		if step < 0 {
 			actual = length - 1
-		} ***REMOVED*** {
+		} else {
 			actual = length
 		}
 	}

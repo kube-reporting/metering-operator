@@ -27,10 +27,10 @@ docker tag 'brew-pulp-docker01.web.prod.ext.phx2.redhat.com:8888/openshift/ose-c
 if [ "$PULL_OSE_METERING_HELM" == "true" ]; then
     docker pull 'brew-pulp-docker01.web.prod.ext.phx2.redhat.com:8888/openshift/ose-metering-helm:latest'
     docker tag 'brew-pulp-docker01.web.prod.ext.phx2.redhat.com:8888/openshift/ose-metering-helm:latest' openshift/ose-metering-helm:latest
-***REMOVED***
+fi
 
 # ansible-operator is pulled for building metering-ansible-operator
 if [ "$PULL_OSE_ANSIBLE_OPERATOR" == "true" ]; then
     docker pull 'brew-pulp-docker01.web.prod.ext.phx2.redhat.com:8888/openshift/ose-ansible-operator:latest'
     docker tag 'brew-pulp-docker01.web.prod.ext.phx2.redhat.com:8888/openshift/ose-ansible-operator:latest' openshift/ose-ansible-operator:latest
-***REMOVED***
+fi

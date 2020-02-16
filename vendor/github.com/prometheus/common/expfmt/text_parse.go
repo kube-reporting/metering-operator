@@ -1,6 +1,6 @@
 // Copyright 2014 The Prometheus Authors
 // Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this ***REMOVED***le except in compliance with the License.
+// you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 //
 // http://www.apache.org/licenses/LICENSE-2.0
@@ -8,13 +8,13 @@
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the speci***REMOVED***c language governing permissions and
+// See the License for the specific language governing permissions and
 // limitations under the License.
 
 package expfmt
 
 import (
-	"bu***REMOVED***o"
+	"bufio"
 	"bytes"
 	"fmt"
 	"io"
@@ -50,7 +50,7 @@ func (e ParseError) Error() string {
 // zero value is ready to use.
 type TextParser struct {
 	metricFamiliesByName map[string]*dto.MetricFamily
-	buf                  *bu***REMOVED***o.Reader // Where the parsed input is read through.
+	buf                  *bufio.Reader // Where the parsed input is read through.
 	err                  error         // Most recent error.
 	lineCount            int           // Tracks the line count for error messages.
 	currentByte          byte          // The most recent byte read.
@@ -61,10 +61,10 @@ type TextParser struct {
 
 	// The remaining member variables are only used for summaries/histograms.
 	currentLabels map[string]string // All labels including '__name__' but excluding 'quantile'/'le'
-	// Summary speci***REMOVED***c.
+	// Summary specific.
 	summaries       map[uint64]*dto.Metric // Key is created with LabelsToSignature.
 	currentQuantile float64
-	// Histogram speci***REMOVED***c.
+	// Histogram specific.
 	histograms    map[uint64]*dto.Metric // Key is created with LabelsToSignature.
 	currentBucket float64
 	// These tell us if the currently processed line ends on '_count' or
@@ -121,8 +121,8 @@ func (p *TextParser) TextToMetricFamilies(in io.Reader) (map[string]*dto.MetricF
 func (p *TextParser) reset(in io.Reader) {
 	p.metricFamiliesByName = map[string]*dto.MetricFamily{}
 	if p.buf == nil {
-		p.buf = bu***REMOVED***o.NewReader(in)
-	} ***REMOVED*** {
+		p.buf = bufio.NewReader(in)
+	} else {
 		p.buf.Reset(in)
 	}
 	p.err = nil
@@ -218,7 +218,7 @@ func (p *TextParser) startComment() stateFn {
 }
 
 // readingMetricName represents the state where the last byte read (now in
-// p.currentByte) is the ***REMOVED***rst byte of a metric name.
+// p.currentByte) is the first byte of a metric name.
 func (p *TextParser) readingMetricName() stateFn {
 	if p.readTokenAsMetricName(); p.err != nil {
 		return nil
@@ -228,7 +228,7 @@ func (p *TextParser) readingMetricName() stateFn {
 		return nil
 	}
 	p.setOrCreateCurrentMF()
-	// Now is the time to ***REMOVED***x the type if it hasn't happened yet.
+	// Now is the time to fix the type if it hasn't happened yet.
 	if p.currentMF.Type == nil {
 		p.currentMF.Type = dto.MetricType_UNTYPED.Enum()
 	}
@@ -244,8 +244,8 @@ func (p *TextParser) readingMetricName() stateFn {
 }
 
 // readingLabels represents the state where the last byte read (now in
-// p.currentByte) is either the ***REMOVED***rst byte of the label set (i.e. a '{'), or the
-// ***REMOVED***rst byte of the value (otherwise).
+// p.currentByte) is either the first byte of the label set (i.e. a '{'), or the
+// first byte of the value (otherwise).
 func (p *TextParser) readingLabels() stateFn {
 	// Summaries/histograms are special. We have to reset the
 	// currentLabels map, currentQuantile and currentBucket before starting to
@@ -330,7 +330,7 @@ func (p *TextParser) startLabelValue() stateFn {
 				p.parseError(fmt.Sprintf("expected float as value for 'quantile' label, got %q", p.currentLabelPair.GetValue()))
 				return nil
 			}
-		} ***REMOVED*** {
+		} else {
 			p.currentLabels[p.currentLabelPair.GetName()] = p.currentLabelPair.GetValue()
 		}
 	}
@@ -342,7 +342,7 @@ func (p *TextParser) startLabelValue() stateFn {
 				p.parseError(fmt.Sprintf("expected float as value for 'le' label, got %q", p.currentLabelPair.GetValue()))
 				return nil
 			}
-		} ***REMOVED*** {
+		} else {
 			p.currentLabels[p.currentLabelPair.GetName()] = p.currentLabelPair.GetValue()
 		}
 	}
@@ -365,28 +365,28 @@ func (p *TextParser) startLabelValue() stateFn {
 }
 
 // readingValue represents the state where the last byte read (now in
-// p.currentByte) is the ***REMOVED***rst byte of the sample value (i.e. a float).
+// p.currentByte) is the first byte of the sample value (i.e. a float).
 func (p *TextParser) readingValue() stateFn {
 	// When we are here, we have read all the labels, so for the
-	// special case of a summary/histogram, we can ***REMOVED***nally ***REMOVED***nd out
+	// special case of a summary/histogram, we can finally find out
 	// if the metric already exists.
 	if p.currentMF.GetType() == dto.MetricType_SUMMARY {
 		signature := model.LabelsToSignature(p.currentLabels)
 		if summary := p.summaries[signature]; summary != nil {
 			p.currentMetric = summary
-		} ***REMOVED*** {
+		} else {
 			p.summaries[signature] = p.currentMetric
 			p.currentMF.Metric = append(p.currentMF.Metric, p.currentMetric)
 		}
-	} ***REMOVED*** if p.currentMF.GetType() == dto.MetricType_HISTOGRAM {
+	} else if p.currentMF.GetType() == dto.MetricType_HISTOGRAM {
 		signature := model.LabelsToSignature(p.currentLabels)
 		if histogram := p.histograms[signature]; histogram != nil {
 			p.currentMetric = histogram
-		} ***REMOVED*** {
+		} else {
 			p.histograms[signature] = p.currentMetric
 			p.currentMF.Metric = append(p.currentMF.Metric, p.currentMetric)
 		}
-	} ***REMOVED*** {
+	} else {
 		p.currentMF.Metric = append(p.currentMF.Metric, p.currentMetric)
 	}
 	if p.readTokenUntilWhitespace(); p.err != nil {
@@ -479,7 +479,7 @@ func (p *TextParser) startTimestamp() stateFn {
 }
 
 // readingHelp represents the state where the last byte read (now in
-// p.currentByte) is the ***REMOVED***rst byte of the docstring after 'HELP'.
+// p.currentByte) is the first byte of the docstring after 'HELP'.
 func (p *TextParser) readingHelp() stateFn {
 	if p.currentMF.Help != nil {
 		p.parseError(fmt.Sprintf("second HELP line for metric name %q", p.currentMF.GetName()))
@@ -494,7 +494,7 @@ func (p *TextParser) readingHelp() stateFn {
 }
 
 // readingType represents the state where the last byte read (now in
-// p.currentByte) is the ***REMOVED***rst byte of the type hint after 'HELP'.
+// p.currentByte) is the first byte of the type hint after 'HELP'.
 func (p *TextParser) readingType() stateFn {
 	if p.currentMF.Type != nil {
 		p.parseError(fmt.Sprintf("second TYPE line for metric name %q, or TYPE reported after samples", p.currentMF.GetName()))
@@ -541,8 +541,8 @@ func (p *TextParser) skipBlankTabIfCurrentBlankTab() {
 }
 
 // readTokenUntilWhitespace copies bytes from p.buf into p.currentToken.  The
-// ***REMOVED***rst byte considered is the byte already read (now in p.currentByte).  The
-// ***REMOVED***rst whitespace byte encountered is still copied into p.currentByte, but not
+// first byte considered is the byte already read (now in p.currentByte).  The
+// first whitespace byte encountered is still copied into p.currentByte, but not
 // into p.currentToken.
 func (p *TextParser) readTokenUntilWhitespace() {
 	p.currentToken.Reset()
@@ -552,8 +552,8 @@ func (p *TextParser) readTokenUntilWhitespace() {
 	}
 }
 
-// readTokenUntilNewline copies bytes from p.buf into p.currentToken.  The ***REMOVED***rst
-// byte considered is the byte already read (now in p.currentByte).  The ***REMOVED***rst
+// readTokenUntilNewline copies bytes from p.buf into p.currentToken.  The first
+// byte considered is the byte already read (now in p.currentByte).  The first
 // newline byte encountered is still copied into p.currentByte, but not into
 // p.currentToken. If recognizeEscapeSequence is true, two escape sequences are
 // recognized: '\\' tranlates into '\', and '\n' into a line-feed character. All
@@ -573,7 +573,7 @@ func (p *TextParser) readTokenUntilNewline(recognizeEscapeSequence bool) {
 				return
 			}
 			escaped = false
-		} ***REMOVED*** {
+		} else {
 			switch p.currentByte {
 			case '\n':
 				return
@@ -588,8 +588,8 @@ func (p *TextParser) readTokenUntilNewline(recognizeEscapeSequence bool) {
 }
 
 // readTokenAsMetricName copies a metric name from p.buf into p.currentToken.
-// The ***REMOVED***rst byte considered is the byte already read (now in p.currentByte).
-// The ***REMOVED***rst byte not part of a metric name is still copied into p.currentByte,
+// The first byte considered is the byte already read (now in p.currentByte).
+// The first byte not part of a metric name is still copied into p.currentByte,
 // but not into p.currentToken.
 func (p *TextParser) readTokenAsMetricName() {
 	p.currentToken.Reset()
@@ -606,8 +606,8 @@ func (p *TextParser) readTokenAsMetricName() {
 }
 
 // readTokenAsLabelName copies a label name from p.buf into p.currentToken.
-// The ***REMOVED***rst byte considered is the byte already read (now in p.currentByte).
-// The ***REMOVED***rst byte not part of a label name is still copied into p.currentByte,
+// The first byte considered is the byte already read (now in p.currentByte).
+// The first byte not part of a label name is still copied into p.currentByte,
 // but not into p.currentToken.
 func (p *TextParser) readTokenAsLabelName() {
 	p.currentToken.Reset()
@@ -626,7 +626,7 @@ func (p *TextParser) readTokenAsLabelName() {
 // readTokenAsLabelValue copies a label value from p.buf into p.currentToken.
 // In contrast to the other 'readTokenAs...' functions, which start with the
 // last read byte in p.currentByte, this method ignores p.currentByte and starts
-// with reading a new byte from p.buf. The ***REMOVED***rst byte not part of a label value
+// with reading a new byte from p.buf. The first byte not part of a label value
 // is still copied into p.currentByte, but not into p.currentToken.
 func (p *TextParser) readTokenAsLabelValue() {
 	p.currentToken.Reset()

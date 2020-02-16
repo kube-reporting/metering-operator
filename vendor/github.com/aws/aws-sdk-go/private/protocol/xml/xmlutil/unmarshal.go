@@ -16,7 +16,7 @@ import (
 )
 
 // UnmarshalXMLError unmarshals the XML error from the stream into the value
-// type speci***REMOVED***ed. The value must be a pointer. If the message fails to
+// type specified. The value must be a pointer. If the message fails to
 // unmarshal, the message content will be included in the returned error as a
 // awserr.UnmarshalError.
 func UnmarshalXMLError(v interface{}, stream io.Reader) error {
@@ -89,8 +89,8 @@ func parse(r reflect.Value, node *XMLNode, tag reflect.StructTag) error {
 
 	switch t {
 	case "structure":
-		if ***REMOVED***eld, ok := rtype.FieldByName("_"); ok {
-			tag = ***REMOVED***eld.Tag
+		if field, ok := rtype.FieldByName("_"); ok {
+			tag = field.Tag
 		}
 		return parseStruct(r, node, tag)
 	case "list":
@@ -102,7 +102,7 @@ func parse(r reflect.Value, node *XMLNode, tag reflect.StructTag) error {
 	}
 }
 
-// parseStruct deserializes a structure and its ***REMOVED***elds from an XMLNode. Any nested
+// parseStruct deserializes a structure and its fields from an XMLNode. Any nested
 // types in the structure will also be deserialized.
 func parseStruct(r reflect.Value, node *XMLNode, tag reflect.StructTag) error {
 	t := r.Type()
@@ -119,36 +119,36 @@ func parseStruct(r reflect.Value, node *XMLNode, tag reflect.StructTag) error {
 
 	// unwrap any payloads
 	if payload := tag.Get("payload"); payload != "" {
-		***REMOVED***eld, _ := t.FieldByName(payload)
-		return parseStruct(r.FieldByName(payload), node, ***REMOVED***eld.Tag)
+		field, _ := t.FieldByName(payload)
+		return parseStruct(r.FieldByName(payload), node, field.Tag)
 	}
 
 	for i := 0; i < t.NumField(); i++ {
-		***REMOVED***eld := t.Field(i)
-		if c := ***REMOVED***eld.Name[0:1]; strings.ToLower(c) == c {
-			continue // ignore unexported ***REMOVED***elds
+		field := t.Field(i)
+		if c := field.Name[0:1]; strings.ToLower(c) == c {
+			continue // ignore unexported fields
 		}
 
-		// ***REMOVED***gure out what this ***REMOVED***eld is called
-		name := ***REMOVED***eld.Name
-		if ***REMOVED***eld.Tag.Get("flattened") != "" && ***REMOVED***eld.Tag.Get("locationNameList") != "" {
-			name = ***REMOVED***eld.Tag.Get("locationNameList")
-		} ***REMOVED*** if locName := ***REMOVED***eld.Tag.Get("locationName"); locName != "" {
+		// figure out what this field is called
+		name := field.Name
+		if field.Tag.Get("flattened") != "" && field.Tag.Get("locationNameList") != "" {
+			name = field.Tag.Get("locationNameList")
+		} else if locName := field.Tag.Get("locationName"); locName != "" {
 			name = locName
 		}
 
-		// try to ***REMOVED***nd the ***REMOVED***eld by name in elements
+		// try to find the field by name in elements
 		elems := node.Children[name]
 
-		if elems == nil { // try to ***REMOVED***nd the ***REMOVED***eld in attributes
-			if val, ok := node.***REMOVED***ndElem(name); ok {
+		if elems == nil { // try to find the field in attributes
+			if val, ok := node.findElem(name); ok {
 				elems = []*XMLNode{{Text: val}}
 			}
 		}
 
-		member := r.FieldByName(***REMOVED***eld.Name)
+		member := r.FieldByName(field.Name)
 		for _, elem := range elems {
-			err := parse(member, elem, ***REMOVED***eld.Tag)
+			err := parse(member, elem, field.Tag)
 			if err != nil {
 				return err
 			}
@@ -180,7 +180,7 @@ func parseList(r reflect.Value, node *XMLNode, tag reflect.StructTag) error {
 				}
 			}
 		}
-	} ***REMOVED*** { // flattened list means this is a single element
+	} else { // flattened list means this is a single element
 		if r.IsNil() {
 			r.Set(reflect.MakeSlice(t, 0, 0))
 		}
@@ -207,7 +207,7 @@ func parseMap(r reflect.Value, node *XMLNode, tag reflect.StructTag) error {
 		for _, entry := range node.Children["entry"] {
 			parseMapEntry(r, entry, tag)
 		}
-	} ***REMOVED*** { // this element is itself an entry
+	} else { // this element is itself an entry
 		parseMapEntry(r, node, tag)
 	}
 

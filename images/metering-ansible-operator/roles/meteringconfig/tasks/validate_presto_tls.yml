@@ -1,29 +1,29 @@
 ---
 
 #
-# Validate the user-provided cert/key/caCert ***REMOVED***elds are non-empty when top-level spec.tls.enabled is false
+# Validate the user-provided cert/key/caCert fields are non-empty when top-level spec.tls.enabled is false
 #
-- name: Validate that the user-provided Presto server TLS ***REMOVED***elds are not empty
+- name: Validate that the user-provided Presto server TLS fields are not empty
   block:
-  - name: Validate that the user provided a non-empty TLS certi***REMOVED***cate value
+  - name: Validate that the user provided a non-empty TLS certificate value
     assert:
       that:
-        - meteringcon***REMOVED***g_spec.presto.spec.con***REMOVED***g.tls.certi***REMOVED***cate != ""
-      msg: "presto.spec.con***REMOVED***g.tls.certi***REMOVED***cate cannot be empty if createSecret: true and secretName != ''"
+        - meteringconfig_spec.presto.spec.config.tls.certificate != ""
+      msg: "presto.spec.config.tls.certificate cannot be empty if createSecret: true and secretName != ''"
 
-  - name: Validate that the user provided a non-empty TLS CA certi***REMOVED***cate value
+  - name: Validate that the user provided a non-empty TLS CA certificate value
     assert:
       that:
-        - meteringcon***REMOVED***g_spec.presto.spec.con***REMOVED***g.tls.caCerti***REMOVED***cate != ""
-      msg: "presto.spec.con***REMOVED***g.tls.caCerti***REMOVED***cate cannot be empty if createSecret: true and secretName != ''"
+        - meteringconfig_spec.presto.spec.config.tls.caCertificate != ""
+      msg: "presto.spec.config.tls.caCertificate cannot be empty if createSecret: true and secretName != ''"
 
   - name: Validate that the user provided a non-empty TLS key value
     assert:
       that:
-        - meteringcon***REMOVED***g_spec.presto.spec.con***REMOVED***g.tls.key != ""
-      msg: "presto.spec.con***REMOVED***g.tls.key cannot be empty if createSecret: true and secretName != ''"
+        - meteringconfig_spec.presto.spec.config.tls.key != ""
+      msg: "presto.spec.config.tls.key cannot be empty if createSecret: true and secretName != ''"
   rescue:
-  - include_tasks: update_meteringcon***REMOVED***g_status.yml
+  - include_tasks: update_meteringconfig_status.yml
     vars:
       end_play_after_updating_status: true
       current_conditions:
@@ -33,35 +33,35 @@
           "Failed task name: {{ ansible_failed_task.name }}"
           "Failed task message: {{ ansible_failed_result.msg }}"
         lastTransitionTime: "{{ now(utc=False).isoformat() + 'Z' }}"
-  when: meteringcon***REMOVED***g_template_presto_tls_secret
+  when: meteringconfig_template_presto_tls_secret
 
-- name: Validate that the user-provided Presto client Auth ***REMOVED***elds are not empty
+- name: Validate that the user-provided Presto client Auth fields are not empty
   block:
-  - name: Validate that the user provided a non-empty auth certi***REMOVED***cate value
+  - name: Validate that the user provided a non-empty auth certificate value
     assert:
       that:
-        - meteringcon***REMOVED***g_spec.presto.spec.con***REMOVED***g.auth.certi***REMOVED***cate != ""
-      msg: "presto.spec.con***REMOVED***g.auth.certi***REMOVED***cate cannot be empty if createSecret: true and secretName != ''"
+        - meteringconfig_spec.presto.spec.config.auth.certificate != ""
+      msg: "presto.spec.config.auth.certificate cannot be empty if createSecret: true and secretName != ''"
 
-  - name: Validate that the user provided a non-empty auth CA certi***REMOVED***cate value
+  - name: Validate that the user provided a non-empty auth CA certificate value
     assert:
       that:
-        - meteringcon***REMOVED***g_spec.presto.spec.con***REMOVED***g.auth.caCerti***REMOVED***cate != ""
-      msg: "presto.spec.con***REMOVED***g.auth.caCerti***REMOVED***cate cannot be empty if createSecret: true and secretName != ''"
+        - meteringconfig_spec.presto.spec.config.auth.caCertificate != ""
+      msg: "presto.spec.config.auth.caCertificate cannot be empty if createSecret: true and secretName != ''"
 
   - name: Validate that the user provided a non-empty auth key value
     assert:
       that:
-        - meteringcon***REMOVED***g_spec.presto.spec.con***REMOVED***g.auth.key != ""
-      msg: "presto.spec.con***REMOVED***g.auth.key cannot be empty if createSecret: true and secretName != ''"
+        - meteringconfig_spec.presto.spec.config.auth.key != ""
+      msg: "presto.spec.config.auth.key cannot be empty if createSecret: true and secretName != ''"
 
   - name: Validate that TLS is enabled when auth is enabled
     assert:
       that:
-        - meteringcon***REMOVED***g_spec.presto.spec.con***REMOVED***g.tls.enabled and meteringcon***REMOVED***g_spec.presto.spec.con***REMOVED***g.auth.enabled
-      msg: "Invalid con***REMOVED***guration: you cannot enable auth but disable TLS."
+        - meteringconfig_spec.presto.spec.config.tls.enabled and meteringconfig_spec.presto.spec.config.auth.enabled
+      msg: "Invalid configuration: you cannot enable auth but disable TLS."
   rescue:
-  - include_tasks: update_meteringcon***REMOVED***g_status.yml
+  - include_tasks: update_meteringconfig_status.yml
     vars:
       end_play_after_updating_status: true
       current_conditions:
@@ -71,29 +71,29 @@
           "Failed task name: {{ ansible_failed_task.name }}"
           "Failed task message: {{ ansible_failed_result.msg }}"
         lastTransitionTime: "{{ now(utc=False).isoformat() + 'Z' }}"
-  when: meteringcon***REMOVED***g_template_presto_auth_secret
+  when: meteringconfig_template_presto_auth_secret
 
-- name: Validate that the user provided Presto/Hive client TLS ***REMOVED***elds are not empty
+- name: Validate that the user provided Presto/Hive client TLS fields are not empty
   block:
-  - name: Validate that the user provided a non-empty Hive client TLS certi***REMOVED***cate value
+  - name: Validate that the user provided a non-empty Hive client TLS certificate value
     assert:
       that:
-        - meteringcon***REMOVED***g_spec.presto.spec.con***REMOVED***g.connectors.hive.tls.certi***REMOVED***cate != ""
-      msg: "spec.presto.spec.con***REMOVED***g.connectors.hive.tls.certi***REMOVED***cate cannot be empty when createSecret is set to true"
+        - meteringconfig_spec.presto.spec.config.connectors.hive.tls.certificate != ""
+      msg: "spec.presto.spec.config.connectors.hive.tls.certificate cannot be empty when createSecret is set to true"
 
   - name: Validate that the user provided a non-empty Hive client TLS key value
     assert:
       that:
-        - meteringcon***REMOVED***g_spec.presto.spec.con***REMOVED***g.connectors.hive.tls.key != ""
-      msg: "spec.presto.spec.con***REMOVED***g.connectors.hive.tls.key cannot be empty when createSecret is set to true"
+        - meteringconfig_spec.presto.spec.config.connectors.hive.tls.key != ""
+      msg: "spec.presto.spec.config.connectors.hive.tls.key cannot be empty when createSecret is set to true"
 
-  - name: Validate that the user provided a non-empty Hive client TLS CA certi***REMOVED***cate value
+  - name: Validate that the user provided a non-empty Hive client TLS CA certificate value
     assert:
       that:
-        - meteringcon***REMOVED***g_spec.presto.spec.con***REMOVED***g.connectors.hive.tls.caCerti***REMOVED***cate != ""
-      msg: "spec.presto.spec.con***REMOVED***g.connectors.hive.tls.caCerti***REMOVED***cate cannot be empty when createSecret is set to true"
+        - meteringconfig_spec.presto.spec.config.connectors.hive.tls.caCertificate != ""
+      msg: "spec.presto.spec.config.connectors.hive.tls.caCertificate cannot be empty when createSecret is set to true"
   rescue:
-  - include_tasks: update_meteringcon***REMOVED***g_status.yml
+  - include_tasks: update_meteringconfig_status.yml
     vars:
       end_play_after_updating_status: true
       current_conditions:
@@ -103,4 +103,4 @@
           "Failed task name: {{ ansible_failed_task.name }}"
           "Failed task message: {{ ansible_failed_result.msg }}"
         lastTransitionTime: "{{ now(utc=False).isoformat() + 'Z' }}"
-  when: meteringcon***REMOVED***g_template_presto_hive_tls_secret
+  when: meteringconfig_template_presto_hive_tls_secret

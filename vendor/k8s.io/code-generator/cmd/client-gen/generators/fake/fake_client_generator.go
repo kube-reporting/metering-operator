@@ -2,7 +2,7 @@
 Copyright 2015 The Kubernetes Authors.
 
 Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this ***REMOVED***le except in compliance with the License.
+you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
 
     http://www.apache.org/licenses/LICENSE-2.0
@@ -10,14 +10,14 @@ You may obtain a copy of the License at
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the speci***REMOVED***c language governing permissions and
+See the License for the specific language governing permissions and
 limitations under the License.
 */
 
 package fake
 
 import (
-	"path/***REMOVED***lepath"
+	"path/filepath"
 	"strings"
 
 	"k8s.io/gengo/generator"
@@ -30,9 +30,9 @@ import (
 )
 
 func PackageForGroup(gv clientgentypes.GroupVersion, typeList []*types.Type, clientsetPackage string, groupPackageName string, groupGoName string, inputPackage string, boilerplate []byte) generator.Package {
-	outputPackage := ***REMOVED***lepath.Join(clientsetPackage, "typed", strings.ToLower(groupPackageName), strings.ToLower(gv.Version.NonEmpty()), "fake")
+	outputPackage := filepath.Join(clientsetPackage, "typed", strings.ToLower(groupPackageName), strings.ToLower(gv.Version.NonEmpty()), "fake")
 	// TODO: should make this a function, called by here and in client-generator.go
-	realClientPackage := ***REMOVED***lepath.Join(clientsetPackage, "typed", strings.ToLower(groupPackageName), strings.ToLower(gv.Version.NonEmpty()))
+	realClientPackage := filepath.Join(clientsetPackage, "typed", strings.ToLower(groupPackageName), strings.ToLower(gv.Version.NonEmpty()))
 	return &generator.DefaultPackage{
 		PackageName: "fake",
 		PackagePath: outputPackage,
@@ -41,13 +41,13 @@ func PackageForGroup(gv clientgentypes.GroupVersion, typeList []*types.Type, cli
 			`// Package fake has the automatically generated clients.
 `),
 		// GeneratorFunc returns a list of generators. Each generator makes a
-		// single ***REMOVED***le.
+		// single file.
 		GeneratorFunc: func(c *generator.Context) (generators []generator.Generator) {
 			generators = []generator.Generator{
-				// Always generate a "doc.go" ***REMOVED***le.
+				// Always generate a "doc.go" file.
 				generator.DefaultGen{OptionalName: "doc"},
 			}
-			// Since we want a ***REMOVED***le per type that we generate a client for, we
+			// Since we want a file per type that we generate a client for, we
 			// have to provide a function for this.
 			for _, t := range typeList {
 				generators = append(generators, &genFakeForType{
@@ -89,16 +89,16 @@ func PackageForClientset(customArgs *clientgenargs.CustomArgs, clientsetPackage 
 		// TODO: we'll generate fake clientset for different release in the future.
 		// Package name and path are hard coded for now.
 		PackageName: "fake",
-		PackagePath: ***REMOVED***lepath.Join(clientsetPackage, "fake"),
+		PackagePath: filepath.Join(clientsetPackage, "fake"),
 		HeaderText:  boilerplate,
 		PackageDocumentation: []byte(
 			`// This package has the automatically generated fake clientset.
 `),
 		// GeneratorFunc returns a list of generators. Each generator generates a
-		// single ***REMOVED***le.
+		// single file.
 		GeneratorFunc: func(c *generator.Context) (generators []generator.Generator) {
 			generators = []generator.Generator{
-				// Always generate a "doc.go" ***REMOVED***le.
+				// Always generate a "doc.go" file.
 				generator.DefaultGen{OptionalName: "doc"},
 
 				&genClientset{

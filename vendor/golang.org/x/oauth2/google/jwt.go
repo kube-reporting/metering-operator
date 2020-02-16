@@ -1,6 +1,6 @@
 // Copyright 2015 The Go Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE ***REMOVED***le.
+// license that can be found in the LICENSE file.
 
 package google
 
@@ -15,16 +15,16 @@ import (
 )
 
 // JWTAccessTokenSourceFromJSON uses a Google Developers service account JSON
-// key ***REMOVED***le to read the credentials that authorize and authenticate the
+// key file to read the credentials that authorize and authenticate the
 // requests, and returns a TokenSource that does not use any OAuth2 flow but
 // instead creates a JWT and sends that as the access token.
-// The audience is typically a URL that speci***REMOVED***es the scope of the credentials.
+// The audience is typically a URL that specifies the scope of the credentials.
 //
 // Note that this is not a standard OAuth flow, but rather an
 // optimization supported by a few Google services.
-// Unless you know otherwise, you should use JWTCon***REMOVED***gFromJSON instead.
+// Unless you know otherwise, you should use JWTConfigFromJSON instead.
 func JWTAccessTokenSourceFromJSON(jsonKey []byte, audience string) (oauth2.TokenSource, error) {
-	cfg, err := JWTCon***REMOVED***gFromJSON(jsonKey)
+	cfg, err := JWTConfigFromJSON(jsonKey)
 	if err != nil {
 		return nil, fmt.Errorf("google: could not parse JSON key: %v", err)
 	}

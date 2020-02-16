@@ -5,7 +5,7 @@ If you want to install metering into a non-Openshift Kubernetes cluster, please 
 
 ## Install
 
-This will cover installing the metering-operator via the openshift-marketplace using `kubectl`/`oc` and will then create a Metering resource de***REMOVED***ning the con***REMOVED***guration for the metering-operator to use to install the rest of the Metering stack.
+This will cover installing the metering-operator via the openshift-marketplace using `kubectl`/`oc` and will then create a Metering resource defining the configuration for the metering-operator to use to install the rest of the Metering stack.
 
 ### Install Metering Operator
 
@@ -19,16 +19,16 @@ First, start by creating the `openshift-metering` namespace:
 kubectl create ns openshift-metering
 ```
 
-Next a `CatalogSourceCon***REMOVED***g` needs to be added to the `openshift-marketplace` namespace.
+Next a `CatalogSourceConfig` needs to be added to the `openshift-marketplace` namespace.
 This results in a `CatalogSource` containing the `metering` OLM package being created in the `openshift-metering` namespace.
 
-Download the `metering-operators` [metering.catalogsourcecon***REMOVED***g.yaml][metering-catalogsourcecon***REMOVED***g] and install it into the `openshift-marketplace` namespace:
+Download the `metering-operators` [metering.catalogsourceconfig.yaml][metering-catalogsourceconfig] and install it into the `openshift-marketplace` namespace:
 
 ```
-kubectl apply -n openshift-marketplace -f metering.catalogsourcecon***REMOVED***g.yaml
+kubectl apply -n openshift-marketplace -f metering.catalogsourceconfig.yaml
 ```
 
-After it is created, con***REMOVED***rm a new `CatalogSource` is created in the `openshift-metering` namespace:
+After it is created, confirm a new `CatalogSource` is created in the `openshift-metering` namespace:
 
 ```
 kubectl -n openshift-metering get catalogsources
@@ -41,7 +41,7 @@ You should also see a pod with a name resembling `metering-operators-12345` in t
 ```
 kubectl -n openshift-marketplace get pods
 NAME                                                              READY   STATUS    RESTARTS   AGE
-certi***REMOVED***ed-operators-7f89948b85-mpzw6                              1/1     Running   0          3h36m
+certified-operators-7f89948b85-mpzw6                              1/1     Running   0          3h36m
 community-operators-7c7b9447cf-gzp78                              1/1     Running   0          3h36m
 installed-redhat-metering-operators-openshift-metering-6d6hhfmg   1/1     Running   0          3m34s
 marketplace-operator-7df66dbf67-99zql                             1/1     Running   2          3h38m
@@ -77,14 +77,14 @@ metering-operator-c7545d555-h5m6x   2/2     Running   0          32s
 
 ### Install Metering
 
-Once the metering-operator is installed, we can now use it to install the rest of the Metering stack by con***REMOVED***guring a `MeteringCon***REMOVED***g` CR.
+Once the metering-operator is installed, we can now use it to install the rest of the Metering stack by configuring a `MeteringConfig` CR.
 
-#### Con***REMOVED***guration
+#### Configuration
 
-All of the supported con***REMOVED***guration options are documented in [con***REMOVED***guring metering][con***REMOVED***guring-metering].
-In this document, we will refer to your con***REMOVED***guration as your `metering.yaml`.
+All of the supported configuration options are documented in [configuring metering][configuring-metering].
+In this document, we will refer to your configuration as your `metering.yaml`.
 
-To start, download the example [default.yaml][default-con***REMOVED***g] `MeteringCon***REMOVED***g` resource and save it as `metering.yaml`, and make any additional customizations you require.
+To start, download the example [default.yaml][default-config] `MeteringConfig` resource and save it as `metering.yaml`, and make any additional customizations you require.
 
 #### Install Metering Custom Resource
 
@@ -122,7 +122,7 @@ reporting-operator-5588964bf8-x2tkn   2/2     Running   0          2m40s
 ```
 
 Next, verify that the ReportDataSources are beginning to import data, indicated by a valid timestamp in the `EARLIEST METRIC` column (this may take a few minutes).
-We ***REMOVED***lter out the "-raw" ReportDataSources which don't import data:
+We filter out the "-raw" ReportDataSources which don't import data:
 
 ```
 $ kubectl get reportdatasources -n $METERING_NAMESPACE | grep -v raw
@@ -144,13 +144,13 @@ pod-usage-cpu-cores                          2019-08-05T16:52:00Z   2019-08-05T1
 pod-usage-memory-bytes                       2019-08-05T16:52:00Z   2019-08-05T18:08:00Z   2019-08-05T16:52:00Z   2019-08-05T18:08:00Z   2019-08-05T18:54:20Z   9m49s
 ```
 
-Once all pods are ready and you have veri***REMOVED***ed that data is being imported, you can begin using Metering to collect and Report on your cluster.
+Once all pods are ready and you have verified that data is being imported, you can begin using Metering to collect and Report on your cluster.
 For further reading on using metering, see the [using metering documentation][using-metering].
 
 [manual-install]: manual-install.md
-[metering-catalogsourcecon***REMOVED***g]: ../manifests/deploy/openshift/olm/metering.catalogsourcecon***REMOVED***g.yaml
+[metering-catalogsourceconfig]: ../manifests/deploy/openshift/olm/metering.catalogsourceconfig.yaml
 [metering-operatorgroup]: ../manifests/deploy/openshift/olm/metering.operatorgroup.yaml
 [metering-subscription]: ../manifests/deploy/openshift/olm/metering.subscription.yaml
-[con***REMOVED***guring-metering]: metering-con***REMOVED***g.md
-[default-con***REMOVED***g]: ../manifests/metering-con***REMOVED***g/default.yaml
+[configuring-metering]: metering-config.md
+[default-config]: ../manifests/metering-config/default.yaml
 [using-metering]: using-metering.md

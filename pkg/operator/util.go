@@ -9,7 +9,7 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-const logIdenti***REMOVED***erLength = 10
+const logIdentifierLength = 10
 
 func randomString(rand *rand.Rand, size int) string {
 	const charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
@@ -20,9 +20,9 @@ func randomString(rand *rand.Rand, size int) string {
 	return string(b)
 }
 
-func newLogIdenti***REMOVED***er(r *rand.Rand) logrus.Fields {
+func newLogIdentifier(r *rand.Rand) logrus.Fields {
 	return logrus.Fields{
-		"logID": randomString(r, logIdenti***REMOVED***erLength),
+		"logID": randomString(r, logIdentifierLength),
 	}
 }
 
@@ -30,7 +30,7 @@ func newRequestLogger(logger logrus.FieldLogger, r *http.Request, rand *rand.Ran
 	return logger.WithFields(logrus.Fields{
 		"method": r.Method,
 		"url":    r.URL.String(),
-	}).WithFields(newLogIdenti***REMOVED***er(rand))
+	}).WithFields(newLogIdentifier(rand))
 }
 
 type errorResponse struct {

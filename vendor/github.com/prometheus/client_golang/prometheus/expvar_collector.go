@@ -1,6 +1,6 @@
 // Copyright 2014 The Prometheus Authors
 // Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this ***REMOVED***le except in compliance with the License.
+// you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 //
 // http://www.apache.org/licenses/LICENSE-2.0
@@ -8,7 +8,7 @@
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the speci***REMOVED***c language governing permissions and
+// See the License for the specific language governing permissions and
 // limitations under the License.
 
 package prometheus
@@ -39,7 +39,7 @@ type expvarCollector struct {
 // The keys in the map correspond to expvar keys, i.e. for every expvar key you
 // want to export as Prometheus metric, you need an entry in the exports
 // map. The descriptor mapped to each key describes how to export the expvar
-// value. It de***REMOVED***nes the name and the help string of the Prometheus metric
+// value. It defines the name and the help string of the Prometheus metric
 // proxying the expvar value. The type will always be Untyped.
 //
 // For descriptors without variable labels, the expvar value must be a number or
@@ -58,7 +58,7 @@ type expvarCollector struct {
 // leaves of that structure must be numbers or bools as above to serve as the
 // sample values.
 //
-// Anything that does not ***REMOVED***t into the scheme above is silently ignored.
+// Anything that does not fit into the scheme above is silently ignored.
 func NewExpvarCollector(exports map[string]*Desc) Collector {
 	return &expvarCollector{
 		exports: exports,
@@ -96,7 +96,7 @@ func (e *expvarCollector) Collect(ch chan<- Metric) {
 				case bool:
 					if v {
 						m = MustNewConstMetric(desc, UntypedValue, 1, copiedLabels...)
-					} ***REMOVED*** {
+					} else {
 						m = MustNewConstMetric(desc, UntypedValue, 0, copiedLabels...)
 					}
 				default:

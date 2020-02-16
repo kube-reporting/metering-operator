@@ -50,7 +50,7 @@ func TestManifest_Paths(t *testing.T) {
 	expectedPath := "billing-path/20170701-20170801/ea74f90b-e82f-9c72-fab6-abc716793752"
 	if paths := manifest.paths(); len(paths) != numExpectedPaths {
 		t.Errorf("unexpected number of paths: got %d, want %d", len(paths), numExpectedPaths)
-	} ***REMOVED*** if paths[0] != expectedPath {
+	} else if paths[0] != expectedPath {
 		t.Errorf("unexpected path: got %s, want %s", paths[0], expectedPath)
 	}
 

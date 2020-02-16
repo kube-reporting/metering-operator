@@ -16,8 +16,8 @@ func (c *FakeMeteringV1) HiveTables(namespace string) v1.HiveTableInterface {
 	return &FakeHiveTables{c, namespace}
 }
 
-func (c *FakeMeteringV1) MeteringCon***REMOVED***gs(namespace string) v1.MeteringCon***REMOVED***gInterface {
-	return &FakeMeteringCon***REMOVED***gs{c, namespace}
+func (c *FakeMeteringV1) MeteringConfigs(namespace string) v1.MeteringConfigInterface {
+	return &FakeMeteringConfigs{c, namespace}
 }
 
 func (c *FakeMeteringV1) PrestoTables(namespace string) v1.PrestoTableInterface {

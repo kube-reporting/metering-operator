@@ -2,7 +2,7 @@
 Copyright 2014 The Kubernetes Authors.
 
 Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this ***REMOVED***le except in compliance with the License.
+you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
 
     http://www.apache.org/licenses/LICENSE-2.0
@@ -10,7 +10,7 @@ You may obtain a copy of the License at
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the speci***REMOVED***c language governing permissions and
+See the License for the specific language governing permissions and
 limitations under the License.
 */
 
@@ -30,9 +30,9 @@ import (
 
 var (
 	ErrNoContext   = errors.New("no context chosen")
-	ErrEmptyCon***REMOVED***g = errors.New("no con***REMOVED***guration has been provided")
+	ErrEmptyConfig = errors.New("no configuration has been provided")
 	// message is for consistency with old behavior
-	ErrEmptyCluster = errors.New("cluster has no server de***REMOVED***ned")
+	ErrEmptyCluster = errors.New("cluster has no server defined")
 )
 
 type errContextNotFound struct {
@@ -40,7 +40,7 @@ type errContextNotFound struct {
 }
 
 func (e *errContextNotFound) Error() string {
-	return fmt.Sprintf("context was not found for speci***REMOVED***ed context: %v", e.ContextName)
+	return fmt.Sprintf("context was not found for specified context: %v", e.ContextName)
 }
 
 // IsContextNotFound returns a boolean indicating whether the error is known to
@@ -52,115 +52,115 @@ func IsContextNotFound(err error) bool {
 	if _, ok := err.(*errContextNotFound); ok || err == ErrNoContext {
 		return true
 	}
-	return strings.Contains(err.Error(), "context was not found for speci***REMOVED***ed context")
+	return strings.Contains(err.Error(), "context was not found for specified context")
 }
 
-// IsEmptyCon***REMOVED***g returns true if the provided error indicates the provided con***REMOVED***guration
+// IsEmptyConfig returns true if the provided error indicates the provided configuration
 // is empty.
-func IsEmptyCon***REMOVED***g(err error) bool {
+func IsEmptyConfig(err error) bool {
 	switch t := err.(type) {
-	case errCon***REMOVED***gurationInvalid:
-		return len(t) == 1 && t[0] == ErrEmptyCon***REMOVED***g
+	case errConfigurationInvalid:
+		return len(t) == 1 && t[0] == ErrEmptyConfig
 	}
-	return err == ErrEmptyCon***REMOVED***g
+	return err == ErrEmptyConfig
 }
 
-// errCon***REMOVED***gurationInvalid is a set of errors indicating the con***REMOVED***guration is invalid.
-type errCon***REMOVED***gurationInvalid []error
+// errConfigurationInvalid is a set of errors indicating the configuration is invalid.
+type errConfigurationInvalid []error
 
-// errCon***REMOVED***gurationInvalid implements error and Aggregate
-var _ error = errCon***REMOVED***gurationInvalid{}
-var _ utilerrors.Aggregate = errCon***REMOVED***gurationInvalid{}
+// errConfigurationInvalid implements error and Aggregate
+var _ error = errConfigurationInvalid{}
+var _ utilerrors.Aggregate = errConfigurationInvalid{}
 
-func newErrCon***REMOVED***gurationInvalid(errs []error) error {
+func newErrConfigurationInvalid(errs []error) error {
 	switch len(errs) {
 	case 0:
 		return nil
 	default:
-		return errCon***REMOVED***gurationInvalid(errs)
+		return errConfigurationInvalid(errs)
 	}
 }
 
 // Error implements the error interface
-func (e errCon***REMOVED***gurationInvalid) Error() string {
-	return fmt.Sprintf("invalid con***REMOVED***guration: %v", utilerrors.NewAggregate(e).Error())
+func (e errConfigurationInvalid) Error() string {
+	return fmt.Sprintf("invalid configuration: %v", utilerrors.NewAggregate(e).Error())
 }
 
 // Errors implements the AggregateError interface
-func (e errCon***REMOVED***gurationInvalid) Errors() []error {
+func (e errConfigurationInvalid) Errors() []error {
 	return e
 }
 
-// IsCon***REMOVED***gurationInvalid returns true if the provided error indicates the con***REMOVED***guration is invalid.
-func IsCon***REMOVED***gurationInvalid(err error) bool {
+// IsConfigurationInvalid returns true if the provided error indicates the configuration is invalid.
+func IsConfigurationInvalid(err error) bool {
 	switch err.(type) {
-	case *errContextNotFound, errCon***REMOVED***gurationInvalid:
+	case *errContextNotFound, errConfigurationInvalid:
 		return true
 	}
 	return IsContextNotFound(err)
 }
 
-// Validate checks for errors in the Con***REMOVED***g.  It does not return early so that it can ***REMOVED***nd as many errors as possible.
-func Validate(con***REMOVED***g clientcmdapi.Con***REMOVED***g) error {
+// Validate checks for errors in the Config.  It does not return early so that it can find as many errors as possible.
+func Validate(config clientcmdapi.Config) error {
 	validationErrors := make([]error, 0)
 
-	if clientcmdapi.IsCon***REMOVED***gEmpty(&con***REMOVED***g) {
-		return newErrCon***REMOVED***gurationInvalid([]error{ErrEmptyCon***REMOVED***g})
+	if clientcmdapi.IsConfigEmpty(&config) {
+		return newErrConfigurationInvalid([]error{ErrEmptyConfig})
 	}
 
-	if len(con***REMOVED***g.CurrentContext) != 0 {
-		if _, exists := con***REMOVED***g.Contexts[con***REMOVED***g.CurrentContext]; !exists {
-			validationErrors = append(validationErrors, &errContextNotFound{con***REMOVED***g.CurrentContext})
+	if len(config.CurrentContext) != 0 {
+		if _, exists := config.Contexts[config.CurrentContext]; !exists {
+			validationErrors = append(validationErrors, &errContextNotFound{config.CurrentContext})
 		}
 	}
 
-	for contextName, context := range con***REMOVED***g.Contexts {
-		validationErrors = append(validationErrors, validateContext(contextName, *context, con***REMOVED***g)...)
+	for contextName, context := range config.Contexts {
+		validationErrors = append(validationErrors, validateContext(contextName, *context, config)...)
 	}
 
-	for authInfoName, authInfo := range con***REMOVED***g.AuthInfos {
+	for authInfoName, authInfo := range config.AuthInfos {
 		validationErrors = append(validationErrors, validateAuthInfo(authInfoName, *authInfo)...)
 	}
 
-	for clusterName, clusterInfo := range con***REMOVED***g.Clusters {
+	for clusterName, clusterInfo := range config.Clusters {
 		validationErrors = append(validationErrors, validateClusterInfo(clusterName, *clusterInfo)...)
 	}
 
-	return newErrCon***REMOVED***gurationInvalid(validationErrors)
+	return newErrConfigurationInvalid(validationErrors)
 }
 
-// Con***REMOVED***rmUsable looks a particular context and determines if that particular part of the con***REMOVED***g is useable.  There might still be errors in the con***REMOVED***g,
-// but no errors in the sections requested or referenced.  It does not return early so that it can ***REMOVED***nd as many errors as possible.
-func Con***REMOVED***rmUsable(con***REMOVED***g clientcmdapi.Con***REMOVED***g, passedContextName string) error {
+// ConfirmUsable looks a particular context and determines if that particular part of the config is useable.  There might still be errors in the config,
+// but no errors in the sections requested or referenced.  It does not return early so that it can find as many errors as possible.
+func ConfirmUsable(config clientcmdapi.Config, passedContextName string) error {
 	validationErrors := make([]error, 0)
 
-	if clientcmdapi.IsCon***REMOVED***gEmpty(&con***REMOVED***g) {
-		return newErrCon***REMOVED***gurationInvalid([]error{ErrEmptyCon***REMOVED***g})
+	if clientcmdapi.IsConfigEmpty(&config) {
+		return newErrConfigurationInvalid([]error{ErrEmptyConfig})
 	}
 
 	var contextName string
 	if len(passedContextName) != 0 {
 		contextName = passedContextName
-	} ***REMOVED*** {
-		contextName = con***REMOVED***g.CurrentContext
+	} else {
+		contextName = config.CurrentContext
 	}
 
 	if len(contextName) == 0 {
 		return ErrNoContext
 	}
 
-	context, exists := con***REMOVED***g.Contexts[contextName]
+	context, exists := config.Contexts[contextName]
 	if !exists {
 		validationErrors = append(validationErrors, &errContextNotFound{contextName})
 	}
 
 	if exists {
-		validationErrors = append(validationErrors, validateContext(contextName, *context, con***REMOVED***g)...)
-		validationErrors = append(validationErrors, validateAuthInfo(context.AuthInfo, *con***REMOVED***g.AuthInfos[context.AuthInfo])...)
-		validationErrors = append(validationErrors, validateClusterInfo(context.Cluster, *con***REMOVED***g.Clusters[context.Cluster])...)
+		validationErrors = append(validationErrors, validateContext(contextName, *context, config)...)
+		validationErrors = append(validationErrors, validateAuthInfo(context.AuthInfo, *config.AuthInfos[context.AuthInfo])...)
+		validationErrors = append(validationErrors, validateClusterInfo(context.Cluster, *config.Clusters[context.Cluster])...)
 	}
 
-	return newErrCon***REMOVED***gurationInvalid(validationErrors)
+	return newErrConfigurationInvalid(validationErrors)
 }
 
 // validateClusterInfo looks for conflicts and errors in the cluster info
@@ -174,20 +174,20 @@ func validateClusterInfo(clusterName string, clusterInfo clientcmdapi.Cluster) [
 
 	if len(clusterInfo.Server) == 0 {
 		if len(clusterName) == 0 {
-			validationErrors = append(validationErrors, fmt.Errorf("default cluster has no server de***REMOVED***ned"))
-		} ***REMOVED*** {
+			validationErrors = append(validationErrors, fmt.Errorf("default cluster has no server defined"))
+		} else {
 			validationErrors = append(validationErrors, fmt.Errorf("no server found for cluster %q", clusterName))
 		}
 	}
-	// Make sure CA data and CA ***REMOVED***le aren't both speci***REMOVED***ed
-	if len(clusterInfo.Certi***REMOVED***cateAuthority) != 0 && len(clusterInfo.Certi***REMOVED***cateAuthorityData) != 0 {
-		validationErrors = append(validationErrors, fmt.Errorf("certi***REMOVED***cate-authority-data and certi***REMOVED***cate-authority are both speci***REMOVED***ed for %v. certi***REMOVED***cate-authority-data will override.", clusterName))
+	// Make sure CA data and CA file aren't both specified
+	if len(clusterInfo.CertificateAuthority) != 0 && len(clusterInfo.CertificateAuthorityData) != 0 {
+		validationErrors = append(validationErrors, fmt.Errorf("certificate-authority-data and certificate-authority are both specified for %v. certificate-authority-data will override.", clusterName))
 	}
-	if len(clusterInfo.Certi***REMOVED***cateAuthority) != 0 {
-		clientCertCA, err := os.Open(clusterInfo.Certi***REMOVED***cateAuthority)
+	if len(clusterInfo.CertificateAuthority) != 0 {
+		clientCertCA, err := os.Open(clusterInfo.CertificateAuthority)
 		defer clientCertCA.Close()
 		if err != nil {
-			validationErrors = append(validationErrors, fmt.Errorf("unable to read certi***REMOVED***cate-authority %v for %v due to %v", clusterInfo.Certi***REMOVED***cateAuthority, clusterName, err))
+			validationErrors = append(validationErrors, fmt.Errorf("unable to read certificate-authority %v for %v due to %v", clusterInfo.CertificateAuthority, clusterName, err))
 		}
 	}
 
@@ -207,25 +207,25 @@ func validateAuthInfo(authInfoName string, authInfo clientcmdapi.AuthInfo) []err
 		methods = append(methods, "basicAuth")
 	}
 
-	if len(authInfo.ClientCerti***REMOVED***cate) != 0 || len(authInfo.ClientCerti***REMOVED***cateData) != 0 {
-		// Make sure cert data and ***REMOVED***le aren't both speci***REMOVED***ed
-		if len(authInfo.ClientCerti***REMOVED***cate) != 0 && len(authInfo.ClientCerti***REMOVED***cateData) != 0 {
-			validationErrors = append(validationErrors, fmt.Errorf("client-cert-data and client-cert are both speci***REMOVED***ed for %v. client-cert-data will override.", authInfoName))
+	if len(authInfo.ClientCertificate) != 0 || len(authInfo.ClientCertificateData) != 0 {
+		// Make sure cert data and file aren't both specified
+		if len(authInfo.ClientCertificate) != 0 && len(authInfo.ClientCertificateData) != 0 {
+			validationErrors = append(validationErrors, fmt.Errorf("client-cert-data and client-cert are both specified for %v. client-cert-data will override.", authInfoName))
 		}
-		// Make sure key data and ***REMOVED***le aren't both speci***REMOVED***ed
+		// Make sure key data and file aren't both specified
 		if len(authInfo.ClientKey) != 0 && len(authInfo.ClientKeyData) != 0 {
-			validationErrors = append(validationErrors, fmt.Errorf("client-key-data and client-key are both speci***REMOVED***ed for %v; client-key-data will override", authInfoName))
+			validationErrors = append(validationErrors, fmt.Errorf("client-key-data and client-key are both specified for %v; client-key-data will override", authInfoName))
 		}
-		// Make sure a key is speci***REMOVED***ed
+		// Make sure a key is specified
 		if len(authInfo.ClientKey) == 0 && len(authInfo.ClientKeyData) == 0 {
-			validationErrors = append(validationErrors, fmt.Errorf("client-key-data or client-key must be speci***REMOVED***ed for %v to use the clientCert authentication method.", authInfoName))
+			validationErrors = append(validationErrors, fmt.Errorf("client-key-data or client-key must be specified for %v to use the clientCert authentication method.", authInfoName))
 		}
 
-		if len(authInfo.ClientCerti***REMOVED***cate) != 0 {
-			clientCertFile, err := os.Open(authInfo.ClientCerti***REMOVED***cate)
+		if len(authInfo.ClientCertificate) != 0 {
+			clientCertFile, err := os.Open(authInfo.ClientCertificate)
 			defer clientCertFile.Close()
 			if err != nil {
-				validationErrors = append(validationErrors, fmt.Errorf("unable to read client-cert %v for %v due to %v", authInfo.ClientCerti***REMOVED***cate, authInfoName, err))
+				validationErrors = append(validationErrors, fmt.Errorf("unable to read client-cert %v for %v due to %v", authInfo.ClientCertificate, authInfoName, err))
 			}
 		}
 		if len(authInfo.ClientKey) != 0 {
@@ -242,16 +242,16 @@ func validateAuthInfo(authInfoName string, authInfo clientcmdapi.AuthInfo) []err
 			validationErrors = append(validationErrors, fmt.Errorf("authProvider cannot be provided in combination with an exec plugin for %s", authInfoName))
 		}
 		if len(authInfo.Exec.Command) == 0 {
-			validationErrors = append(validationErrors, fmt.Errorf("command must be speci***REMOVED***ed for %v to use exec authentication plugin", authInfoName))
+			validationErrors = append(validationErrors, fmt.Errorf("command must be specified for %v to use exec authentication plugin", authInfoName))
 		}
 		if len(authInfo.Exec.APIVersion) == 0 {
-			validationErrors = append(validationErrors, fmt.Errorf("apiVersion must be speci***REMOVED***ed for %v to use exec authentication plugin", authInfoName))
+			validationErrors = append(validationErrors, fmt.Errorf("apiVersion must be specified for %v to use exec authentication plugin", authInfoName))
 		}
 		for _, v := range authInfo.Exec.Env {
 			if len(v.Name) == 0 {
-				validationErrors = append(validationErrors, fmt.Errorf("env variable name must be speci***REMOVED***ed for %v to use exec authentication plugin", authInfoName))
-			} ***REMOVED*** if len(v.Value) == 0 {
-				validationErrors = append(validationErrors, fmt.Errorf("env variable %s value must be speci***REMOVED***ed for %v to use exec authentication plugin", v.Name, authInfoName))
+				validationErrors = append(validationErrors, fmt.Errorf("env variable name must be specified for %v to use exec authentication plugin", authInfoName))
+			} else if len(v.Value) == 0 {
+				validationErrors = append(validationErrors, fmt.Errorf("env variable %s value must be specified for %v to use exec authentication plugin", v.Name, authInfoName))
 			}
 		}
 	}
@@ -268,8 +268,8 @@ func validateAuthInfo(authInfoName string, authInfo clientcmdapi.AuthInfo) []err
 	return validationErrors
 }
 
-// validateContext looks for errors in the context.  It is not transitive, so errors in the reference authInfo or cluster con***REMOVED***gs are not included in this return
-func validateContext(contextName string, context clientcmdapi.Context, con***REMOVED***g clientcmdapi.Con***REMOVED***g) []error {
+// validateContext looks for errors in the context.  It is not transitive, so errors in the reference authInfo or cluster configs are not included in this return
+func validateContext(contextName string, context clientcmdapi.Context, config clientcmdapi.Config) []error {
 	validationErrors := make([]error, 0)
 
 	if len(contextName) == 0 {
@@ -277,14 +277,14 @@ func validateContext(contextName string, context clientcmdapi.Context, con***REM
 	}
 
 	if len(context.AuthInfo) == 0 {
-		validationErrors = append(validationErrors, fmt.Errorf("user was not speci***REMOVED***ed for context %q", contextName))
-	} ***REMOVED*** if _, exists := con***REMOVED***g.AuthInfos[context.AuthInfo]; !exists {
+		validationErrors = append(validationErrors, fmt.Errorf("user was not specified for context %q", contextName))
+	} else if _, exists := config.AuthInfos[context.AuthInfo]; !exists {
 		validationErrors = append(validationErrors, fmt.Errorf("user %q was not found for context %q", context.AuthInfo, contextName))
 	}
 
 	if len(context.Cluster) == 0 {
-		validationErrors = append(validationErrors, fmt.Errorf("cluster was not speci***REMOVED***ed for context %q", contextName))
-	} ***REMOVED*** if _, exists := con***REMOVED***g.Clusters[context.Cluster]; !exists {
+		validationErrors = append(validationErrors, fmt.Errorf("cluster was not specified for context %q", contextName))
+	} else if _, exists := config.Clusters[context.Cluster]; !exists {
 		validationErrors = append(validationErrors, fmt.Errorf("cluster %q was not found for context %q", context.Cluster, contextName))
 	}
 

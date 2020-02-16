@@ -2,7 +2,7 @@
 Copyright The Kubernetes Authors.
 
 Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this ***REMOVED***le except in compliance with the License.
+you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
 
     http://www.apache.org/licenses/LICENSE-2.0
@@ -10,13 +10,13 @@ You may obtain a copy of the License at
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the speci***REMOVED***c language governing permissions and
+See the License for the specific language governing permissions and
 limitations under the License.
 */
 
 package v1alpha1
 
-// This ***REMOVED***le contains a collection of methods that can be used from go-restful to
+// This file contains a collection of methods that can be used from go-restful to
 // generate Swagger API documentation for its models. Please read this PR for more
 // information on the implementation: https://github.com/emicklei/go-restful/pull/215
 //
@@ -28,9 +28,9 @@ package v1alpha1
 
 // AUTO-GENERATED FUNCTIONS START HERE. DO NOT EDIT.
 var map_VolumeAttachment = map[string]string{
-	"":         "VolumeAttachment captures the intent to attach or detach the speci***REMOVED***ed volume to/from the speci***REMOVED***ed node.\n\nVolumeAttachment objects are non-namespaced.",
+	"":         "VolumeAttachment captures the intent to attach or detach the specified volume to/from the specified node.\n\nVolumeAttachment objects are non-namespaced.",
 	"metadata": "Standard object metadata. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#metadata",
-	"spec":     "Speci***REMOVED***cation of the desired attach/detach volume behavior. Populated by the Kubernetes system.",
+	"spec":     "Specification of the desired attach/detach volume behavior. Populated by the Kubernetes system.",
 	"status":   "Status of the VolumeAttachment request. Populated by the entity completing the attach or detach operation, i.e. the external-attacher.",
 }
 
@@ -58,7 +58,7 @@ func (VolumeAttachmentSource) SwaggerDoc() map[string]string {
 }
 
 var map_VolumeAttachmentSpec = map[string]string{
-	"":         "VolumeAttachmentSpec is the speci***REMOVED***cation of a VolumeAttachment request.",
+	"":         "VolumeAttachmentSpec is the specification of a VolumeAttachment request.",
 	"attacher": "Attacher indicates the name of the volume driver that MUST handle this request. This is the name returned by GetPluginName().",
 	"source":   "Source represents the volume that should be attached.",
 	"nodeName": "The node that the volume should be attached to.",
@@ -70,10 +70,10 @@ func (VolumeAttachmentSpec) SwaggerDoc() map[string]string {
 
 var map_VolumeAttachmentStatus = map[string]string{
 	"":                   "VolumeAttachmentStatus is the status of a VolumeAttachment request.",
-	"attached":           "Indicates the volume is successfully attached. This ***REMOVED***eld must only be set by the entity completing the attach operation, i.e. the external-attacher.",
-	"attachmentMetadata": "Upon successful attach, this ***REMOVED***eld is populated with any information returned by the attach operation that must be passed into subsequent WaitForAttach or Mount calls. This ***REMOVED***eld must only be set by the entity completing the attach operation, i.e. the external-attacher.",
-	"attachError":        "The last error encountered during attach operation, if any. This ***REMOVED***eld must only be set by the entity completing the attach operation, i.e. the external-attacher.",
-	"detachError":        "The last error encountered during detach operation, if any. This ***REMOVED***eld must only be set by the entity completing the detach operation, i.e. the external-attacher.",
+	"attached":           "Indicates the volume is successfully attached. This field must only be set by the entity completing the attach operation, i.e. the external-attacher.",
+	"attachmentMetadata": "Upon successful attach, this field is populated with any information returned by the attach operation that must be passed into subsequent WaitForAttach or Mount calls. This field must only be set by the entity completing the attach operation, i.e. the external-attacher.",
+	"attachError":        "The last error encountered during attach operation, if any. This field must only be set by the entity completing the attach operation, i.e. the external-attacher.",
+	"detachError":        "The last error encountered during detach operation, if any. This field must only be set by the entity completing the detach operation, i.e. the external-attacher.",
 }
 
 func (VolumeAttachmentStatus) SwaggerDoc() map[string]string {

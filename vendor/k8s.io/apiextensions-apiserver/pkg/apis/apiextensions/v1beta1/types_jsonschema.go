@@ -2,7 +2,7 @@
 Copyright 2017 The Kubernetes Authors.
 
 Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this ***REMOVED***le except in compliance with the License.
+you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
 
     http://www.apache.org/licenses/LICENSE-2.0
@@ -10,13 +10,13 @@ You may obtain a copy of the License at
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the speci***REMOVED***c language governing permissions and
+See the License for the specific language governing permissions and
 limitations under the License.
 */
 
 package v1beta1
 
-// JSONSchemaProps is a JSON-Schema following Speci***REMOVED***cation Draft 4 (http://json-schema.org/).
+// JSONSchemaProps is a JSON-Schema following Specification Draft 4 (http://json-schema.org/).
 type JSONSchemaProps struct {
 	ID                   string                     `json:"id,omitempty" protobuf:"bytes,1,opt,name=id"`
 	Schema               JSONSchemaURL              `json:"$schema,omitempty" protobuf:"bytes,2,opt,name=schema"`
@@ -51,7 +51,7 @@ type JSONSchemaProps struct {
 	PatternProperties    map[string]JSONSchemaProps `json:"patternProperties,omitempty" protobuf:"bytes,31,rep,name=patternProperties"`
 	Dependencies         JSONSchemaDependencies     `json:"dependencies,omitempty" protobuf:"bytes,32,opt,name=dependencies"`
 	AdditionalItems      *JSONSchemaPropsOrBool     `json:"additionalItems,omitempty" protobuf:"bytes,33,opt,name=additionalItems"`
-	De***REMOVED***nitions          JSONSchemaDe***REMOVED***nitions      `json:"de***REMOVED***nitions,omitempty" protobuf:"bytes,34,opt,name=de***REMOVED***nitions"`
+	Definitions          JSONSchemaDefinitions      `json:"definitions,omitempty" protobuf:"bytes,34,opt,name=definitions"`
 	ExternalDocs         *ExternalDocumentation     `json:"externalDocs,omitempty" protobuf:"bytes,35,opt,name=externalDocs"`
 	Example              *JSON                      `json:"example,omitempty" protobuf:"bytes,36,opt,name=example"`
 }
@@ -140,8 +140,8 @@ func (_ JSONSchemaPropsOrStringArray) OpenAPISchemaType() []string {
 // the OpenAPI spec of this type.
 func (_ JSONSchemaPropsOrStringArray) OpenAPISchemaFormat() string { return "" }
 
-// JSONSchemaDe***REMOVED***nitions contains the models explicitly de***REMOVED***ned in this spec.
-type JSONSchemaDe***REMOVED***nitions map[string]JSONSchemaProps
+// JSONSchemaDefinitions contains the models explicitly defined in this spec.
+type JSONSchemaDefinitions map[string]JSONSchemaProps
 
 // ExternalDocumentation allows referencing an external resource for extended documentation.
 type ExternalDocumentation struct {

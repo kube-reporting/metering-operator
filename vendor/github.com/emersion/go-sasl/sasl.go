@@ -1,8 +1,8 @@
-// Library for Simple Authentication and Security Layer (SASL) de***REMOVED***ned in RFC 4422.
+// Library for Simple Authentication and Security Layer (SASL) defined in RFC 4422.
 package sasl
 
 // Note:
-//   Most of this code was copied, with some modi***REMOVED***cations, from net/smtp. It
+//   Most of this code was copied, with some modifications, from net/smtp. It
 //   would be better if Go provided a standard package (e.g. crypto/sasl) that
 //   could be shared by SMTP, IMAP, and other packages.
 
@@ -39,7 +39,7 @@ type Server interface {
 	// Begins or continues challenge-response authentication. If the client
 	// supplies an initial response, response is non-nil.
 	//
-	// If the authentication is ***REMOVED***nished, done is set to true. If the
+	// If the authentication is finished, done is set to true. If the
 	// authentication has failed, an error is returned.
 	Next(response []byte) (challenge []byte, done bool, err error)
 }

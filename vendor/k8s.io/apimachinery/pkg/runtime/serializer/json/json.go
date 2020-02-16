@@ -2,7 +2,7 @@
 Copyright 2014 The Kubernetes Authors.
 
 Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this ***REMOVED***le except in compliance with the License.
+you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
 
     http://www.apache.org/licenses/LICENSE-2.0
@@ -10,7 +10,7 @@ You may obtain a copy of the License at
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the speci***REMOVED***c language governing permissions and
+See the License for the specific language governing permissions and
 limitations under the License.
 */
 
@@ -34,7 +34,7 @@ import (
 )
 
 // NewSerializer creates a JSON serializer that handles encoding versioned objects into the proper JSON form. If typer
-// is not nil, the object has the group, version, and kind ***REMOVED***elds set.
+// is not nil, the object has the group, version, and kind fields set.
 func NewSerializer(meta MetaFactory, creater runtime.ObjectCreater, typer runtime.ObjectTyper, pretty bool) *Serializer {
 	return &Serializer{
 		meta:    meta,
@@ -46,7 +46,7 @@ func NewSerializer(meta MetaFactory, creater runtime.ObjectCreater, typer runtim
 }
 
 // NewYAMLSerializer creates a YAML serializer that handles encoding versioned objects into the proper YAML form. If typer
-// is not nil, the object has the group, version, and kind ***REMOVED***elds set. This serializer supports only the subset of YAML that
+// is not nil, the object has the group, version, and kind fields set. This serializer supports only the subset of YAML that
 // matches JSON, and will error if constructs are used that do not serialize to JSON.
 func NewYAMLSerializer(meta MetaFactory, creater runtime.ObjectCreater, typer runtime.ObjectTyper) *Serializer {
 	return &Serializer{
@@ -104,19 +104,19 @@ func (customNumberDecoder) Decode(ptr unsafe.Pointer, iter *jsoniter.Iterator) {
 	}
 }
 
-// CaseSensitiveJsonIterator returns a jsoniterator API that's con***REMOVED***gured to be
+// CaseSensitiveJsonIterator returns a jsoniterator API that's configured to be
 // case-sensitive when unmarshalling, and otherwise compatible with
 // the encoding/json standard library.
 func CaseSensitiveJsonIterator() jsoniter.API {
-	con***REMOVED***g := jsoniter.Con***REMOVED***g{
+	config := jsoniter.Config{
 		EscapeHTML:             true,
 		SortMapKeys:            true,
 		ValidateJsonRawMessage: true,
 		CaseSensitive:          true,
 	}.Froze()
 	// Force jsoniter to decode number to interface{} via int64/float64, if possible.
-	con***REMOVED***g.RegisterExtension(&customNumberExtension{})
-	return con***REMOVED***g
+	config.RegisterExtension(&customNumberExtension{})
+	return config
 }
 
 // Private copy of jsoniter to try to shield against possible mutations
@@ -144,7 +144,7 @@ func gvkWithDefaults(actual, defaultGVK schema.GroupVersionKind) schema.GroupVer
 // load that data into an object matching the desired schema kind or the provided into.
 // If into is *runtime.Unknown, the raw data will be extracted and no decoding will be performed.
 // If into is not registered with the typer, then the object will be straight decoded using normal JSON/YAML unmarshalling.
-// If into is provided and the original data is not fully quali***REMOVED***ed with kind/version/group, the type of the into will be used to alter the returned gvk.
+// If into is provided and the original data is not fully qualified with kind/version/group, the type of the into will be used to alter the returned gvk.
 // If into is nil or data's gvk different from into's gvk, it will generate a new Object with ObjectCreater.New(gvk)
 // On success or most errors, the method will return the calculated schema kind.
 // The gvk calculate priority will be originalData > default gvk > into
@@ -294,7 +294,7 @@ type yamlFrameWriter struct {
 }
 
 // Write separates each document with the YAML document separator (`---` followed by line
-// break). Writers must write well formed YAML documents (include a ***REMOVED***nal line break).
+// break). Writers must write well formed YAML documents (include a final line break).
 func (w yamlFrameWriter) Write(data []byte) (n int, err error) {
 	if _, err := w.w.Write([]byte("---\n")); err != nil {
 		return 0, err

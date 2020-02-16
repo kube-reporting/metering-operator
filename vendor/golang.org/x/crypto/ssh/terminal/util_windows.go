@@ -1,6 +1,6 @@
 // Copyright 2011 The Go Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE ***REMOVED***le.
+// license that can be found in the LICENSE file.
 
 // +build windows
 
@@ -26,14 +26,14 @@ type State struct {
 	mode uint32
 }
 
-// IsTerminal returns true if the given ***REMOVED***le descriptor is a terminal.
+// IsTerminal returns true if the given file descriptor is a terminal.
 func IsTerminal(fd int) bool {
 	var st uint32
 	err := windows.GetConsoleMode(windows.Handle(fd), &st)
 	return err == nil
 }
 
-// MakeRaw put the terminal connected to the given ***REMOVED***le descriptor into raw
+// MakeRaw put the terminal connected to the given file descriptor into raw
 // mode and returns the previous state of the terminal so that it can be
 // restored.
 func MakeRaw(fd int) (*State, error) {
@@ -58,7 +58,7 @@ func GetState(fd int) (*State, error) {
 	return &State{st}, nil
 }
 
-// Restore restores the terminal connected to the given ***REMOVED***le descriptor to a
+// Restore restores the terminal connected to the given file descriptor to a
 // previous state.
 func Restore(fd int, state *State) error {
 	return windows.SetConsoleMode(windows.Handle(fd), state.mode)

@@ -1,7 +1,7 @@
 package logrus
 
 import (
-	"bu***REMOVED***o"
+	"bufio"
 	"io"
 	"runtime"
 )
@@ -47,7 +47,7 @@ func (entry *Entry) WriterLevel(level Level) *io.PipeWriter {
 }
 
 func (entry *Entry) writerScanner(reader *io.PipeReader, printFunc func(args ...interface{})) {
-	scanner := bu***REMOVED***o.NewScanner(reader)
+	scanner := bufio.NewScanner(reader)
 	for scanner.Scan() {
 		printFunc(scanner.Text())
 	}

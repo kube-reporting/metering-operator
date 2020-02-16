@@ -66,10 +66,10 @@ func init() {
 	valueTypes['{'] = ObjectValue
 }
 
-// Iterator is a io.Reader like object, with JSON speci***REMOVED***c read functions.
+// Iterator is a io.Reader like object, with JSON specific read functions.
 // Error is not returned as return value, but stored as Error member on this iterator instance.
 type Iterator struct {
-	cfg              *frozenCon***REMOVED***g
+	cfg              *frozenConfig
 	reader           io.Reader
 	buf              []byte
 	head             int
@@ -83,7 +83,7 @@ type Iterator struct {
 // NewIterator creates an empty Iterator instance
 func NewIterator(cfg API) *Iterator {
 	return &Iterator{
-		cfg:    cfg.(*frozenCon***REMOVED***g),
+		cfg:    cfg.(*frozenConfig),
 		reader: nil,
 		buf:    nil,
 		head:   0,
@@ -94,7 +94,7 @@ func NewIterator(cfg API) *Iterator {
 // Parse creates an Iterator instance from io.Reader
 func Parse(cfg API, reader io.Reader, bufSize int) *Iterator {
 	return &Iterator{
-		cfg:    cfg.(*frozenCon***REMOVED***g),
+		cfg:    cfg.(*frozenConfig),
 		reader: reader,
 		buf:    make([]byte, bufSize),
 		head:   0,
@@ -105,7 +105,7 @@ func Parse(cfg API, reader io.Reader, bufSize int) *Iterator {
 // ParseBytes creates an Iterator instance from byte array
 func ParseBytes(cfg API, input []byte) *Iterator {
 	return &Iterator{
-		cfg:    cfg.(*frozenCon***REMOVED***g),
+		cfg:    cfg.(*frozenConfig),
 		reader: nil,
 		buf:    input,
 		head:   0,
@@ -118,7 +118,7 @@ func ParseString(cfg API, input string) *Iterator {
 	return ParseBytes(cfg, []byte(input))
 }
 
-// Pool returns a pool can provide more iterator with same con***REMOVED***guration
+// Pool returns a pool can provide more iterator with same configuration
 func (iter *Iterator) Pool() IteratorPool {
 	return iter.cfg
 }
@@ -265,7 +265,7 @@ func (iter *Iterator) loadMore() bool {
 				}
 				return false
 			}
-		} ***REMOVED*** {
+		} else {
 			iter.head = 0
 			iter.tail = n
 			return true
@@ -288,7 +288,7 @@ func (iter *Iterator) Read() interface{} {
 	case StringValue:
 		return iter.ReadString()
 	case NumberValue:
-		if iter.cfg.con***REMOVED***gBeforeFrozen.UseNumber {
+		if iter.cfg.configBeforeFrozen.UseNumber {
 			return json.Number(iter.readNumberAsString())
 		}
 		return iter.ReadFloat64()
@@ -308,10 +308,10 @@ func (iter *Iterator) Read() interface{} {
 		return arr
 	case ObjectValue:
 		obj := map[string]interface{}{}
-		iter.ReadMapCB(func(Iter *Iterator, ***REMOVED***eld string) bool {
+		iter.ReadMapCB(func(Iter *Iterator, field string) bool {
 			var elem interface{}
 			iter.ReadVal(&elem)
-			obj[***REMOVED***eld] = elem
+			obj[field] = elem
 			return true
 		})
 		return obj

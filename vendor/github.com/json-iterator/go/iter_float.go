@@ -80,7 +80,7 @@ func (iter *Iterator) readPositiveFloat32() (ret float32) {
 	value := uint64(0)
 	c := byte(' ')
 	i := iter.head
-	// ***REMOVED***rst char
+	// first char
 	if i == iter.tail {
 		return iter.readFloat32SlowPath()
 	}
@@ -221,7 +221,7 @@ func (iter *Iterator) readPositiveFloat64() (ret float64) {
 	value := uint64(0)
 	c := byte(' ')
 	i := iter.head
-	// ***REMOVED***rst char
+	// first char
 	if i == iter.tail {
 		return iter.readFloat64SlowPath()
 	}

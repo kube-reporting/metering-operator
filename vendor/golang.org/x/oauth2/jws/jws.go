@@ -1,6 +1,6 @@
 // Copyright 2014 The Go Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE ***REMOVED***le.
+// license that can be found in the LICENSE file.
 
 // Package jws provides a partial implementation
 // of JSON Web Signature encoding and decoding.
@@ -82,10 +82,10 @@ func (c *ClaimSet) encode() (string, error) {
 	}
 
 	// Concatenate public and private claim JSON objects.
-	if !bytes.HasSuf***REMOVED***x(b, []byte{'}'}) {
+	if !bytes.HasSuffix(b, []byte{'}'}) {
 		return "", fmt.Errorf("jws: invalid JSON %s", b)
 	}
-	if !bytes.HasPre***REMOVED***x(prv, []byte{'{'}) {
+	if !bytes.HasPrefix(prv, []byte{'{'}) {
 		return "", fmt.Errorf("jws: invalid JSON %s", prv)
 	}
 	b[len(b)-1] = ','         // Replace closing curly brace with a comma.

@@ -1,9 +1,9 @@
 // Copyright 2009 The Go Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE ***REMOVED***le.
+// license that can be found in the LICENSE file.
 
 // Package reflect is a fork of go's standard library reflection package, which
-// allows for deep equal with equality functions de***REMOVED***ned.
+// allows for deep equal with equality functions defined.
 package reflect
 
 import (
@@ -84,7 +84,7 @@ func (u unexportedTypePanic) String() string {
 	for i, t := range u {
 		strs[i] = fmt.Sprintf("%v", t)
 	}
-	return "an unexported ***REMOVED***eld was encountered, nested like this: " + strings.Join(strs, " -> ")
+	return "an unexported field was encountered, nested like this: " + strings.Join(strs, " -> ")
 }
 
 func makeUsefulPanic(v reflect.Value) {
@@ -148,7 +148,7 @@ func (e Equalities) deepValueEqual(v1, v2 reflect.Value, visited map[visit]bool,
 	switch v1.Kind() {
 	case reflect.Array:
 		// We don't need to check length here because length is part of
-		// an array's type, which has already been ***REMOVED***ltered for.
+		// an array's type, which has already been filtered for.
 		for i := 0; i < v1.Len(); i++ {
 			if !e.deepValueEqual(v1.Index(i), v2.Index(i), visited, depth+1) {
 				return false
@@ -214,7 +214,7 @@ func (e Equalities) deepValueEqual(v1, v2 reflect.Value, visited map[visit]bool,
 		// Can't do better than this:
 		return false
 	default:
-		// Normal equality suf***REMOVED***ces
+		// Normal equality suffices
 		if !v1.CanInterface() || !v2.CanInterface() {
 			panic(unexportedTypePanic{})
 		}
@@ -225,11 +225,11 @@ func (e Equalities) deepValueEqual(v1, v2 reflect.Value, visited map[visit]bool,
 // DeepEqual is like reflect.DeepEqual, but focused on semantic equality
 // instead of memory equality.
 //
-// It will use e's equality functions if it ***REMOVED***nds types that match.
+// It will use e's equality functions if it finds types that match.
 //
 // An empty slice *is* equal to a nil slice for our purposes; same for maps.
 //
-// Unexported ***REMOVED***eld members cannot be compared and will cause an imformative panic; you must add an Equality
+// Unexported field members cannot be compared and will cause an imformative panic; you must add an Equality
 // function for these types.
 func (e Equalities) DeepEqual(a1, a2 interface{}) bool {
 	if a1 == nil || a2 == nil {
@@ -291,7 +291,7 @@ func (e Equalities) deepValueDerive(v1, v2 reflect.Value, visited map[visit]bool
 	switch v1.Kind() {
 	case reflect.Array:
 		// We don't need to check length here because length is part of
-		// an array's type, which has already been ***REMOVED***ltered for.
+		// an array's type, which has already been filtered for.
 		for i := 0; i < v1.Len(); i++ {
 			if !e.deepValueDerive(v1.Index(i), v2.Index(i), visited, depth+1) {
 				return false
@@ -362,7 +362,7 @@ func (e Equalities) deepValueDerive(v1, v2 reflect.Value, visited map[visit]bool
 		// Can't do better than this:
 		return false
 	default:
-		// Normal equality suf***REMOVED***ces
+		// Normal equality suffices
 		if !v1.CanInterface() || !v2.CanInterface() {
 			panic(unexportedTypePanic{})
 		}
@@ -370,11 +370,11 @@ func (e Equalities) deepValueDerive(v1, v2 reflect.Value, visited map[visit]bool
 	}
 }
 
-// DeepDerivative is similar to DeepEqual except that unset ***REMOVED***elds in a1 are
-// ignored (not compared). This allows us to focus on the ***REMOVED***elds that matter to
+// DeepDerivative is similar to DeepEqual except that unset fields in a1 are
+// ignored (not compared). This allows us to focus on the fields that matter to
 // the semantic comparison.
 //
-// The unset ***REMOVED***elds include a nil pointer and an empty string.
+// The unset fields include a nil pointer and an empty string.
 func (e Equalities) DeepDerivative(a1, a2 interface{}) bool {
 	if a1 == nil {
 		return true

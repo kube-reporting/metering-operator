@@ -33,7 +33,7 @@ type ReportDataSourceSpec struct {
 	// bucket.
 	AWSBilling *AWSBillingDataSource `json:"awsBilling,omitempty"`
 	// PrestoTable represents a datasource which points to an existing
-	// PrestoTable CR or an existing, fully-quali***REMOVED***ed table name in Presto.
+	// PrestoTable CR or an existing, fully-qualified table name in Presto.
 	PrestoTable *PrestoTableDataSource `json:"prestoTable,omitempty"`
 
 	ExistingPrestoTable *ExistingPrestoTableDataSource `json:"existingPrestoTable,omitempty"`
@@ -51,24 +51,24 @@ type AWSBillingDataSource struct {
 type S3Bucket struct {
 	Region string `json:"region"`
 	Bucket string `json:"bucket"`
-	Pre***REMOVED***x string `json:"pre***REMOVED***x"`
+	Prefix string `json:"prefix"`
 }
 
-type PrometheusQueryCon***REMOVED***g struct {
+type PrometheusQueryConfig struct {
 	QueryInterval *meta.Duration `json:"queryInterval,omitempty"`
 	StepSize      *meta.Duration `json:"stepSize,omitempty"`
 	ChunkSize     *meta.Duration `json:"chunkSize,omitempty"`
 }
 
-type PrometheusConnectionCon***REMOVED***g struct {
+type PrometheusConnectionConfig struct {
 	URL string `json:"url,omitempty"`
 }
 
 type PrometheusMetricsImporterDataSource struct {
 	Query            string                      `json:"query"`
-	QueryCon***REMOVED***g      *PrometheusQueryCon***REMOVED***g      `json:"queryCon***REMOVED***g,omitempty"`
+	QueryConfig      *PrometheusQueryConfig      `json:"queryConfig,omitempty"`
 	Storage          *StorageLocationRef         `json:"storage,omitempty"`
-	PrometheusCon***REMOVED***g *PrometheusConnectionCon***REMOVED***g `json:"prometheusCon***REMOVED***g,omitempty"`
+	PrometheusConfig *PrometheusConnectionConfig `json:"prometheusConfig,omitempty"`
 }
 
 type ExistingPrestoTableDataSource struct {
@@ -80,7 +80,7 @@ type PrestoTableDataSource struct {
 }
 
 type ReportQueryViewDataSource struct {
-	// QueryName speci***REMOVED***es the ReportQuery to execute when the report
+	// QueryName specifies the ReportQuery to execute when the report
 	// runs.
 	QueryName string `json:"queryName"`
 	// Inputs are the inputs to the ReportQuery
@@ -97,7 +97,7 @@ type PrometheusMetricsImportStatus struct {
 	// LastImportTime is the time the import last import was ran.
 	LastImportTime *meta.Time `json:"lastImportTime,omitempty"`
 
-	// ImportDataStartTime is the start of the time ***REMOVED***rst time range queried.
+	// ImportDataStartTime is the start of the time first time range queried.
 	ImportDataStartTime *meta.Time `json:"importDataStartTime,omitempty"`
 	// ImportDataEndTime is the end of the time last time range queried.
 	ImportDataEndTime *meta.Time `json:"importDataEndTime,omitempty"`

@@ -39,7 +39,7 @@ func (f *FlagSet) GetUint32(name string) (uint32, error) {
 	return val.(uint32), nil
 }
 
-// Uint32Var de***REMOVED***nes a uint32 flag with speci***REMOVED***ed name, default value, and usage string.
+// Uint32Var defines a uint32 flag with specified name, default value, and usage string.
 // The argument p points to a uint32 variable in which to store the value of the flag.
 func (f *FlagSet) Uint32Var(p *uint32, name string, value uint32, usage string) {
 	f.VarP(newUint32Value(value, p), name, "", usage)
@@ -50,7 +50,7 @@ func (f *FlagSet) Uint32VarP(p *uint32, name, shorthand string, value uint32, us
 	f.VarP(newUint32Value(value, p), name, shorthand, usage)
 }
 
-// Uint32Var de***REMOVED***nes a uint32 flag with speci***REMOVED***ed name, default value, and usage string.
+// Uint32Var defines a uint32 flag with specified name, default value, and usage string.
 // The argument p points to a uint32  variable in which to store the value of the flag.
 func Uint32Var(p *uint32, name string, value uint32, usage string) {
 	CommandLine.VarP(newUint32Value(value, p), name, "", usage)
@@ -61,7 +61,7 @@ func Uint32VarP(p *uint32, name, shorthand string, value uint32, usage string) {
 	CommandLine.VarP(newUint32Value(value, p), name, shorthand, usage)
 }
 
-// Uint32 de***REMOVED***nes a uint32 flag with speci***REMOVED***ed name, default value, and usage string.
+// Uint32 defines a uint32 flag with specified name, default value, and usage string.
 // The return value is the address of a uint32  variable that stores the value of the flag.
 func (f *FlagSet) Uint32(name string, value uint32, usage string) *uint32 {
 	p := new(uint32)
@@ -76,7 +76,7 @@ func (f *FlagSet) Uint32P(name, shorthand string, value uint32, usage string) *u
 	return p
 }
 
-// Uint32 de***REMOVED***nes a uint32 flag with speci***REMOVED***ed name, default value, and usage string.
+// Uint32 defines a uint32 flag with specified name, default value, and usage string.
 // The return value is the address of a uint32  variable that stores the value of the flag.
 func Uint32(name string, value uint32, usage string) *uint32 {
 	return CommandLine.Uint32P(name, "", value, usage)

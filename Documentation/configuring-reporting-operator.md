@@ -1,56 +1,56 @@
-# Con***REMOVED***guring reporting-operator
+# Configuring reporting-operator
 
 The reporting-operator is responsible for collecting data from Prometheus, storing the metrics in Presto, running report queries against Presto, and exposing their results via an HTTP API.
-Con***REMOVED***guring the operator is primarily done within a `MeteringCon***REMOVED***g` Custom Resources's `spec.reporting-operator.spec` section.
+Configuring the operator is primarily done within a `MeteringConfig` Custom Resources's `spec.reporting-operator.spec` section.
 
 ## Prometheus connection
 
 Depending on how you installed Metering, the default Prometheus URL varies.
 If you installed for Openshift then the default assumes Prometheus is available at `https://prometheus-k8s.openshift-monitoring.svc:9091/`.
 Otherwise it assumes that your Prometheus service is available at `http://prometheus-k8s.monitoring.svc:9090`.
-If you're not on Openshift and aren't using [kube-prometheus][kube-prometheus], then you will need to override the `reporting-operator.con***REMOVED***g.prometheus.url` con***REMOVED***guration option.
+If you're not on Openshift and aren't using [kube-prometheus][kube-prometheus], then you will need to override the `reporting-operator.config.prometheus.url` configuration option.
 
-Below is an example of con***REMOVED***guring Metering to use the service `prometheus` on port 9090 in the `cluster-monitoring` namespace:
+Below is an example of configuring Metering to use the service `prometheus` on port 9090 in the `cluster-monitoring` namespace:
 
 ```
 spec:
   reporting-operator:
     spec:
-      con***REMOVED***g:
+      config:
         prometheus:
           url: "http://prometheus.cluster-monitoring.svc:9090"
 ```
 
-To secure the connection to Prometheus, the default Metering installation uses the Openshift certi***REMOVED***cate authority. If your Prometheus instance uses a different CA, the CA can be injected through a Con***REMOVED***gMap:
+To secure the connection to Prometheus, the default Metering installation uses the Openshift certificate authority. If your Prometheus instance uses a different CA, the CA can be injected through a ConfigMap:
 
 ```
 spec:
   reporting-operator:
     spec:
-      con***REMOVED***g:
+      config:
         prometheus:
-          certi***REMOVED***cateAuthority:
+          certificateAuthority:
             useServiceAccountCA: false
-            con***REMOVED***gMap:
+            configMap:
               enabled: true
               create: true
-              name: reporting-operator-certi***REMOVED***cate-authority-con***REMOVED***g
-              ***REMOVED***lename: "internal-ca.crt"
+              name: reporting-operator-certificate-authority-config
+              filename: "internal-ca.crt"
               value: |
                 -----BEGIN CERTIFICATE-----
                 (snip)
                 -----END CERTIFICATE-----
 ```
 
-Alternatively, to use the system certi***REMOVED***cate authorities for publicly valid certi***REMOVED***cates, set both `useServiceAccountCA` and `con***REMOVED***gMap.enabled` to false.
+Alternatively, to use the system certificate authorities for publicly valid certificates, set both `useServiceAccountCA` and `configMap.enabled` to false.
 
-Reporting-operator can also be con***REMOVED***gured to use a speci***REMOVED***ed bearer token to auth with Prometheus:
+Reporting-operator can also be configured to use a specified bearer token to auth with Prometheus:
 
 ```
 spec:
   reporting-operator:
     spec:
-      con***REMOVED***g:
+      config:
         prometheus:
           metricsImporter:
             auth:
@@ -65,7 +65,7 @@ spec:
 
 There are two ways to expose the reporting API depending on if you're using regular Kubernetes, or Openshift.
 
-For Openshift, the metering operator exposes a [Route][route] by default, and for anything ***REMOVED*** you can use regular [Load Balancer][load-balancer-svc] or [Node Port][node-port-svc] [Kubernetes services][kube-svc].
+For Openshift, the metering operator exposes a [Route][route] by default, and for anything else you can use regular [Load Balancer][load-balancer-svc] or [Node Port][node-port-svc] [Kubernetes services][kube-svc].
 
 ### Openshift Route
 
@@ -76,10 +76,10 @@ Using an Openshift route has a few advantages over using a load balancer or node
 
 Additionally, on Openshift:
 
-- We can take advantage of the [Openshift service serving certi***REMOVED***cates][service-certs] to protect the reporting API with TLS.
+- We can take advantage of the [Openshift service serving certificates][service-certs] to protect the reporting API with TLS.
 - We deploy the [Openshift OAuth proxy][oauth-proxy] as a side-car container for reporting-operator, which protects the reporting API with authentication.
 
-There are a few ways to do authentication: you can use service account tokens for authentication, and/or you can also use a static username/password via an httpasswd ***REMOVED***le.
+There are a few ways to do authentication: you can use service account tokens for authentication, and/or you can also use a static username/password via an httpasswd file.
 See the [openshift authentication](#openshift-authentication) section below for details on how authentication and authorization works.
 
 ### Load Balancer/Node Port services
@@ -92,7 +92,7 @@ Exposing the reporting API is as simple as changing the type of `Service` used f
 
 ```
 apiVersion: metering.openshift.io/v1
-kind: MeteringCon***REMOVED***g
+kind: MeteringConfig
 metadata:
   name: "operator-metering"
 spec:
@@ -122,9 +122,9 @@ curl "http://35.227.172.86:8080/api/v1/reports/get?name=cluster-memory-capacity-
 
 ### Openshift Authentication
 
-By default, the reporting API is secured with TLS and authentication. This is done by con***REMOVED***guring the reporting-operator to deploy a pod containing both the reporting-operator's container, and a sidecar container running [Openshift auth-proxy](https://github.com/openshift/oauth-proxy).
+By default, the reporting API is secured with TLS and authentication. This is done by configuring the reporting-operator to deploy a pod containing both the reporting-operator's container, and a sidecar container running [Openshift auth-proxy](https://github.com/openshift/oauth-proxy).
 
-If you want to manually con***REMOVED***gure authentication in Openshift, disable it entirely, or want more information on the reporting-operator options, see the [manual setup](#manual-setup) section.
+If you want to manually configure authentication in Openshift, disable it entirely, or want more information on the reporting-operator options, see the [manual setup](#manual-setup) section.
 
 In order to access the reporting API, the metering operator exposes a route. Once that route has been installed, you can run the command below to get the route's hostname.
 
@@ -149,9 +149,9 @@ curl -H "Authorization: Bearer $TOKEN" -k "https://$METERING_ROUTE_HOSTNAME/api/
 Be sure to replace the `name=[Report Name]` and `format=[Format]` parameters in the URL above.
 
 ##### Authenticate using a username and password
-We are able to do basic authentication using a username and password combination, which is speci***REMOVED***ed in the contents of a htpasswd ***REMOVED***le. We, by default, create a secret containing an empty htpasswd data. You can, however, con***REMOVED***gure the `reporting-operator.spec.authProxy.htpasswd.data` and `reporting-operator.spec.authProxy.htpasswd.createSecret` keys to use this method. See the [basic authentication](#basic-authentication-usernamepassword) section for more information.
+We are able to do basic authentication using a username and password combination, which is specified in the contents of a htpasswd file. We, by default, create a secret containing an empty htpasswd data. You can, however, configure the `reporting-operator.spec.authProxy.htpasswd.data` and `reporting-operator.spec.authProxy.htpasswd.createSecret` keys to use this method. See the [basic authentication](#basic-authentication-usernamepassword) section for more information.
 
-Once you have speci***REMOVED***ed the above in your `MeteringCon***REMOVED***g` CR, you can run the following command:
+Once you have specified the above in your `MeteringConfig` CR, you can run the following command:
 ```
 curl -u testuser:password123 -k "https://$METERING_ROUTE_HOSTNAME/api/v1/reports/get?name=[Report Name]&namespace=$METERING_NAMESPACE&format=[Format]"
 ```
@@ -160,10 +160,10 @@ Be sure to replace `testuser:password123` with a valid username and password com
 
 ### Manual Setup
 
-In order to manually con***REMOVED***gure, or disable OAuth in the reporting-operator, you need to set `spec.tls.enabled: false` in your `MeteringCon***REMOVED***g` CR. Warning: this also disables all TLS/authentication between the reporting-operator, presto, and hive. You would need to manually con***REMOVED***gure these resources yourself.
+In order to manually configure, or disable OAuth in the reporting-operator, you need to set `spec.tls.enabled: false` in your `MeteringConfig` CR. Warning: this also disables all TLS/authentication between the reporting-operator, presto, and hive. You would need to manually configure these resources yourself.
 
-Authentication can be enabled by con***REMOVED***guring the options below.
-Enabling authentication con***REMOVED***gures the reporting-operator pod to run the Openshift auth-proxy as a sidecar container in the pod.
+Authentication can be enabled by configuring the options below.
+Enabling authentication configures the reporting-operator pod to run the Openshift auth-proxy as a sidecar container in the pod.
 This adjusts the ports so that the reporting-operator API isn't exposed directly, but instead is proxied to via the auth-proxy sidecar container.
 
 - `reporting-operator.spec.authProxy.enabled`
@@ -191,7 +191,7 @@ When authentication is enabled, the Bearer token used to query the reporting API
 - `metering-viewer`
 
 The metering-operator is capable of creating RoleBindings for you, granting these permissions by specifying a list of subjects in the Metering `spec.permissions` section.
-For an example see the [advanced-auth.yaml][advanced-auth-con***REMOVED***g] example con***REMOVED***guration.
+For an example see the [advanced-auth.yaml][advanced-auth-config] example configuration.
 
 Alternatively, you may use any role which has rules granting `get` permissions to `reports/export`.
 Meaning: `get` access to the `export` _sub-resource_ of the `Report` resources in the namespace of the `reporting-operator`.
@@ -202,16 +202,16 @@ In this document, most examples will prefer this method.
 
 #### Basic Authentication (username/password)
 
-If `reporting-operator.spec.authProxy.htpasswd.data` is non-empty, its contents must be that of an [htpasswd ***REMOVED***le](https://httpd.apache.org/docs/2.4/programs/htpasswd.html).
+If `reporting-operator.spec.authProxy.htpasswd.data` is non-empty, its contents must be that of an [htpasswd file](https://httpd.apache.org/docs/2.4/programs/htpasswd.html).
 When set, you can use [HTTP basic authentication][basic-auth-rfc] to provide your username and password that has a corresponding entry in the `htpasswdData` contents.
 
 [route]: https://docs.openshift.com/container-platform/3.11/dev_guide/routes.html
 [kube-svc]: https://kubernetes.io/docs/concepts/services-networking/service/
 [load-balancer-svc]: https://kubernetes.io/docs/concepts/services-networking/service/#loadbalancer
 [node-port-svc]: https://kubernetes.io/docs/concepts/services-networking/service/#nodeport
-[service-certs]: https://docs.openshift.com/container-platform/3.11/dev_guide/secrets.html#service-serving-certi***REMOVED***cate-secrets
+[service-certs]: https://docs.openshift.com/container-platform/3.11/dev_guide/secrets.html#service-serving-certificate-secrets
 [oauth-proxy]: https://github.com/openshift/oauth-proxy
-[expose-route-con***REMOVED***g]: ../manifests/metering-con***REMOVED***g/expose-route.yaml
+[expose-route-config]: ../manifests/metering-config/expose-route.yaml
 [basic-auth-rfc]: https://tools.ietf.org/html/rfc7617
-[advanced-auth-con***REMOVED***g]: ../manifests/metering-con***REMOVED***g/advanced-auth.yaml
+[advanced-auth-config]: ../manifests/metering-config/advanced-auth.yaml
 [kube-prometheus]: https://github.com/coreos/kube-prometheus

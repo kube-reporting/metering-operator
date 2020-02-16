@@ -98,7 +98,7 @@ func TestGetPartitionChanges(t *testing.T) {
 						"start": "20170101",
 						"end":   "20170201",
 					},
-					Location: "***REMOVED***zbuzz",
+					Location: "fizbuzz",
 				},
 			},
 			expectedToUpdate: []metering.HiveTablePartition{
@@ -107,7 +107,7 @@ func TestGetPartitionChanges(t *testing.T) {
 						"start": "20170101",
 						"end":   "20170201",
 					},
-					Location: "***REMOVED***zbuzz",
+					Location: "fizbuzz",
 				},
 			},
 		},

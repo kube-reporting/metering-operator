@@ -2,7 +2,7 @@
 Copyright 2017 The Kubernetes Authors.
 
 Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this ***REMOVED***le except in compliance with the License.
+you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
 
     http://www.apache.org/licenses/LICENSE-2.0
@@ -10,7 +10,7 @@ You may obtain a copy of the License at
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the speci***REMOVED***c language governing permissions and
+See the License for the specific language governing permissions and
 limitations under the License.
 */
 
@@ -45,25 +45,25 @@ type UnstructuredConverter interface {
 
 type structField struct {
 	structType reflect.Type
-	***REMOVED***eld      int
+	field      int
 }
 
-type ***REMOVED***eldInfo struct {
+type fieldInfo struct {
 	name      string
 	nameValue reflect.Value
 	omitempty bool
 }
 
-type ***REMOVED***eldsCacheMap map[structField]****REMOVED***eldInfo
+type fieldsCacheMap map[structField]*fieldInfo
 
-type ***REMOVED***eldsCache struct {
+type fieldsCache struct {
 	sync.Mutex
 	value atomic.Value
 }
 
-func newFieldsCache() ****REMOVED***eldsCache {
-	cache := &***REMOVED***eldsCache{}
-	cache.value.Store(make(***REMOVED***eldsCacheMap))
+func newFieldsCache() *fieldsCache {
+	cache := &fieldsCache{}
+	cache.value.Store(make(fieldsCacheMap))
 	return cache
 }
 
@@ -75,7 +75,7 @@ var (
 	int64Type              = reflect.TypeOf(int64(0))
 	float64Type            = reflect.TypeOf(float64(0))
 	boolType               = reflect.TypeOf(bool(false))
-	***REMOVED***eldCache             = newFieldsCache()
+	fieldCache             = newFieldsCache()
 
 	// DefaultUnstructuredConverter performs unstructured to Go typed object conversions.
 	DefaultUnstructuredConverter = &unstructuredConverter{
@@ -233,24 +233,24 @@ func fromUnstructured(sv, dv reflect.Value) error {
 	}
 }
 
-func ***REMOVED***eldInfoFromField(structType reflect.Type, ***REMOVED***eld int) ****REMOVED***eldInfo {
-	***REMOVED***eldCacheMap := ***REMOVED***eldCache.value.Load().(***REMOVED***eldsCacheMap)
-	if info, ok := ***REMOVED***eldCacheMap[structField{structType, ***REMOVED***eld}]; ok {
+func fieldInfoFromField(structType reflect.Type, field int) *fieldInfo {
+	fieldCacheMap := fieldCache.value.Load().(fieldsCacheMap)
+	if info, ok := fieldCacheMap[structField{structType, field}]; ok {
 		return info
 	}
 
-	// Cache miss - we need to compute the ***REMOVED***eld name.
-	info := &***REMOVED***eldInfo{}
-	typeField := structType.Field(***REMOVED***eld)
+	// Cache miss - we need to compute the field name.
+	info := &fieldInfo{}
+	typeField := structType.Field(field)
 	jsonTag := typeField.Tag.Get("json")
 	if len(jsonTag) == 0 {
-		// Make the ***REMOVED***rst character lowercase.
+		// Make the first character lowercase.
 		if typeField.Name == "" {
 			info.name = typeField.Name
-		} ***REMOVED*** {
+		} else {
 			info.name = strings.ToLower(typeField.Name[:1]) + typeField.Name[1:]
 		}
-	} ***REMOVED*** {
+	} else {
 		items := strings.Split(jsonTag, ",")
 		info.name = items[0]
 		for i := range items {
@@ -261,15 +261,15 @@ func ***REMOVED***eldInfoFromField(structType reflect.Type, ***REMOVED***eld int
 	}
 	info.nameValue = reflect.ValueOf(info.name)
 
-	***REMOVED***eldCache.Lock()
-	defer ***REMOVED***eldCache.Unlock()
-	***REMOVED***eldCacheMap = ***REMOVED***eldCache.value.Load().(***REMOVED***eldsCacheMap)
-	newFieldCacheMap := make(***REMOVED***eldsCacheMap)
-	for k, v := range ***REMOVED***eldCacheMap {
+	fieldCache.Lock()
+	defer fieldCache.Unlock()
+	fieldCacheMap = fieldCache.value.Load().(fieldsCacheMap)
+	newFieldCacheMap := make(fieldsCacheMap)
+	for k, v := range fieldCacheMap {
 		newFieldCacheMap[k] = v
 	}
-	newFieldCacheMap[structField{structType, ***REMOVED***eld}] = info
-	***REMOVED***eldCache.value.Store(newFieldCacheMap)
+	newFieldCacheMap[structField{structType, field}] = info
+	fieldCache.value.Store(newFieldCacheMap)
 	return info
 }
 
@@ -301,12 +301,12 @@ func mapFromUnstructured(sv, dv reflect.Value) error {
 			if err := fromUnstructured(val, value); err != nil {
 				return err
 			}
-		} ***REMOVED*** {
+		} else {
 			value.Set(reflect.Zero(dt.Elem()))
 		}
 		if st.Key().AssignableTo(dt.Key()) {
 			dv.SetMapIndex(key, value)
-		} ***REMOVED*** {
+		} else {
 			dv.SetMapIndex(key.Convert(dt.Key()), value)
 		}
 	}
@@ -331,7 +331,7 @@ func sliceFromUnstructured(sv, dv reflect.Value) error {
 				return fmt.Errorf("error decoding from json: %v", err)
 			}
 			dv.SetBytes(data)
-		} ***REMOVED*** {
+		} else {
 			dv.Set(reflect.Zero(dt))
 		}
 		return nil
@@ -376,21 +376,21 @@ func structFromUnstructured(sv, dv reflect.Value) error {
 	}
 
 	for i := 0; i < dt.NumField(); i++ {
-		***REMOVED***eldInfo := ***REMOVED***eldInfoFromField(dt, i)
+		fieldInfo := fieldInfoFromField(dt, i)
 		fv := dv.Field(i)
 
-		if len(***REMOVED***eldInfo.name) == 0 {
-			// This ***REMOVED***eld is inlined.
+		if len(fieldInfo.name) == 0 {
+			// This field is inlined.
 			if err := fromUnstructured(sv, fv); err != nil {
 				return err
 			}
-		} ***REMOVED*** {
-			value := unwrapInterface(sv.MapIndex(***REMOVED***eldInfo.nameValue))
+		} else {
+			value := unwrapInterface(sv.MapIndex(fieldInfo.nameValue))
 			if value.IsValid() {
 				if err := fromUnstructured(value, fv); err != nil {
 					return err
 				}
-			} ***REMOVED*** {
+			} else {
 				fv.Set(reflect.Zero(fv.Type()))
 			}
 		}
@@ -411,7 +411,7 @@ func (c *unstructuredConverter) ToUnstructured(obj interface{}) (map[string]inte
 	var err error
 	if unstr, ok := obj.(Unstructured); ok {
 		u = unstr.UnstructuredContent()
-	} ***REMOVED*** {
+	} else {
 		t := reflect.TypeOf(obj)
 		value := reflect.ValueOf(obj)
 		if t.Kind() != reflect.Ptr || value.IsNil() {
@@ -561,9 +561,9 @@ func toUnstructured(sv, dv reflect.Value) error {
 			)
 			if err = json.Unmarshal(data, &resultInt); err == nil {
 				dv.Set(reflect.ValueOf(resultInt))
-			} ***REMOVED*** if err = json.Unmarshal(data, &resultFloat); err == nil {
+			} else if err = json.Unmarshal(data, &resultFloat); err == nil {
 				dv.Set(reflect.ValueOf(resultFloat))
-			} ***REMOVED*** {
+			} else {
 				return fmt.Errorf("error decoding number from json: %v", err)
 			}
 		}
@@ -594,7 +594,7 @@ func toUnstructured(sv, dv reflect.Value) error {
 	case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64:
 		uVal := sv.Uint()
 		if uVal > math.MaxInt64 {
-			return fmt.Errorf("unsigned value %d does not ***REMOVED***t into int64 (overflow)", uVal)
+			return fmt.Errorf("unsigned value %d does not fit into int64 (overflow)", uVal)
 		}
 		if dt.Kind() == reflect.Interface && dv.NumMethod() == 0 {
 			dv.Set(reflect.New(int64Type))
@@ -661,7 +661,7 @@ func mapToUnstructured(sv, dv reflect.Value) error {
 		}
 		if st.Key().AssignableTo(dt.Key()) {
 			dv.SetMapIndex(key, value)
-		} ***REMOVED*** {
+		} else {
 			dv.SetMapIndex(key.Convert(dt.Key()), value)
 		}
 	}
@@ -756,19 +756,19 @@ func structToUnstructured(sv, dv reflect.Value) error {
 	realMap := dv.Interface().(map[string]interface{})
 
 	for i := 0; i < st.NumField(); i++ {
-		***REMOVED***eldInfo := ***REMOVED***eldInfoFromField(st, i)
+		fieldInfo := fieldInfoFromField(st, i)
 		fv := sv.Field(i)
 
-		if ***REMOVED***eldInfo.name == "-" {
-			// This ***REMOVED***eld should be skipped.
+		if fieldInfo.name == "-" {
+			// This field should be skipped.
 			continue
 		}
-		if ***REMOVED***eldInfo.omitempty && isZero(fv) {
-			// omitempty ***REMOVED***elds should be ignored.
+		if fieldInfo.omitempty && isZero(fv) {
+			// omitempty fields should be ignored.
 			continue
 		}
-		if len(***REMOVED***eldInfo.name) == 0 {
-			// This ***REMOVED***eld is inlined.
+		if len(fieldInfo.name) == 0 {
+			// This field is inlined.
 			if err := toUnstructured(fv, dv); err != nil {
 				return err
 			}
@@ -776,21 +776,21 @@ func structToUnstructured(sv, dv reflect.Value) error {
 		}
 		switch fv.Type().Kind() {
 		case reflect.String:
-			realMap[***REMOVED***eldInfo.name] = fv.String()
+			realMap[fieldInfo.name] = fv.String()
 		case reflect.Bool:
-			realMap[***REMOVED***eldInfo.name] = fv.Bool()
+			realMap[fieldInfo.name] = fv.Bool()
 		case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
-			realMap[***REMOVED***eldInfo.name] = fv.Int()
+			realMap[fieldInfo.name] = fv.Int()
 		case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64:
-			realMap[***REMOVED***eldInfo.name] = fv.Uint()
+			realMap[fieldInfo.name] = fv.Uint()
 		case reflect.Float32, reflect.Float64:
-			realMap[***REMOVED***eldInfo.name] = fv.Float()
+			realMap[fieldInfo.name] = fv.Float()
 		default:
 			subv := reflect.New(dt.Elem()).Elem()
 			if err := toUnstructured(fv, subv); err != nil {
 				return err
 			}
-			dv.SetMapIndex(***REMOVED***eldInfo.nameValue, subv)
+			dv.SetMapIndex(fieldInfo.nameValue, subv)
 		}
 	}
 	return nil

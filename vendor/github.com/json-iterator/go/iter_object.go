@@ -5,9 +5,9 @@ import (
 	"strings"
 )
 
-// ReadObject read one ***REMOVED***eld from object.
+// ReadObject read one field from object.
 // If object ended, returns empty string.
-// Otherwise, returns the ***REMOVED***eld name.
+// Otherwise, returns the field name.
 func (iter *Iterator) ReadObject() (ret string) {
 	c := iter.nextToken()
 	switch c {
@@ -18,12 +18,12 @@ func (iter *Iterator) ReadObject() (ret string) {
 		c = iter.nextToken()
 		if c == '"' {
 			iter.unreadByte()
-			***REMOVED***eld := iter.ReadString()
+			field := iter.ReadString()
 			c = iter.nextToken()
 			if c != ':' {
-				iter.ReportError("ReadObject", "expect : after object ***REMOVED***eld, but found "+string([]byte{c}))
+				iter.ReportError("ReadObject", "expect : after object field, but found "+string([]byte{c}))
 			}
-			return ***REMOVED***eld
+			return field
 		}
 		if c == '}' {
 			return "" // end of object
@@ -31,12 +31,12 @@ func (iter *Iterator) ReadObject() (ret string) {
 		iter.ReportError("ReadObject", `expect " after {, but found `+string([]byte{c}))
 		return
 	case ',':
-		***REMOVED***eld := iter.ReadString()
+		field := iter.ReadString()
 		c = iter.nextToken()
 		if c != ':' {
-			iter.ReportError("ReadObject", "expect : after object ***REMOVED***eld, but found "+string([]byte{c}))
+			iter.ReportError("ReadObject", "expect : after object field, but found "+string([]byte{c}))
 		}
-		return ***REMOVED***eld
+		return field
 	case '}':
 		return "" // end of object
 	default:
@@ -89,7 +89,7 @@ func (iter *Iterator) readFieldHash() int64 {
 			hash *= 0x1000193
 		}
 		if !iter.loadMore() {
-			iter.ReportError("readFieldHash", `incomplete ***REMOVED***eld name`)
+			iter.ReportError("readFieldHash", `incomplete field name`)
 			return 0
 		}
 	}
@@ -107,30 +107,30 @@ func calcHash(str string, caseSensitive bool) int64 {
 	return int64(hash)
 }
 
-// ReadObjectCB read object with callback, the key is ascii only and ***REMOVED***eld name not copied
+// ReadObjectCB read object with callback, the key is ascii only and field name not copied
 func (iter *Iterator) ReadObjectCB(callback func(*Iterator, string) bool) bool {
 	c := iter.nextToken()
-	var ***REMOVED***eld string
+	var field string
 	if c == '{' {
 		c = iter.nextToken()
 		if c == '"' {
 			iter.unreadByte()
-			***REMOVED***eld = iter.ReadString()
+			field = iter.ReadString()
 			c = iter.nextToken()
 			if c != ':' {
-				iter.ReportError("ReadObject", "expect : after object ***REMOVED***eld, but found "+string([]byte{c}))
+				iter.ReportError("ReadObject", "expect : after object field, but found "+string([]byte{c}))
 			}
-			if !callback(iter, ***REMOVED***eld) {
+			if !callback(iter, field) {
 				return false
 			}
 			c = iter.nextToken()
 			for c == ',' {
-				***REMOVED***eld = iter.ReadString()
+				field = iter.ReadString()
 				c = iter.nextToken()
 				if c != ':' {
-					iter.ReportError("ReadObject", "expect : after object ***REMOVED***eld, but found "+string([]byte{c}))
+					iter.ReportError("ReadObject", "expect : after object field, but found "+string([]byte{c}))
 				}
-				if !callback(iter, ***REMOVED***eld) {
+				if !callback(iter, field) {
 					return false
 				}
 				c = iter.nextToken()
@@ -162,22 +162,22 @@ func (iter *Iterator) ReadMapCB(callback func(*Iterator, string) bool) bool {
 		c = iter.nextToken()
 		if c == '"' {
 			iter.unreadByte()
-			***REMOVED***eld := iter.ReadString()
+			field := iter.ReadString()
 			if iter.nextToken() != ':' {
-				iter.ReportError("ReadMapCB", "expect : after object ***REMOVED***eld, but found "+string([]byte{c}))
+				iter.ReportError("ReadMapCB", "expect : after object field, but found "+string([]byte{c}))
 				return false
 			}
-			if !callback(iter, ***REMOVED***eld) {
+			if !callback(iter, field) {
 				return false
 			}
 			c = iter.nextToken()
 			for c == ',' {
-				***REMOVED***eld = iter.ReadString()
+				field = iter.ReadString()
 				if iter.nextToken() != ':' {
-					iter.ReportError("ReadMapCB", "expect : after object ***REMOVED***eld, but found "+string([]byte{c}))
+					iter.ReportError("ReadMapCB", "expect : after object field, but found "+string([]byte{c}))
 					return false
 				}
-				if !callback(iter, ***REMOVED***eld) {
+				if !callback(iter, field) {
 					return false
 				}
 				c = iter.nextToken()
@@ -211,7 +211,7 @@ func (iter *Iterator) readObjectStart() bool {
 		}
 		iter.unreadByte()
 		return true
-	} ***REMOVED*** if c == 'n' {
+	} else if c == 'n' {
 		iter.skipThreeBytes('u', 'l', 'l')
 		return false
 	}
@@ -231,7 +231,7 @@ func (iter *Iterator) readObjectFieldAsBytes() (ret []byte) {
 		}
 	}
 	if iter.buf[iter.head] != ':' {
-		iter.ReportError("readObjectFieldAsBytes", "expect : after object ***REMOVED***eld, but found "+string([]byte{iter.buf[iter.head]}))
+		iter.ReportError("readObjectFieldAsBytes", "expect : after object field, but found "+string([]byte{iter.buf[iter.head]}))
 		return
 	}
 	iter.head++

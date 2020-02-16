@@ -4,7 +4,7 @@
 Copyright The Kubernetes Authors.
 
 Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this ***REMOVED***le except in compliance with the License.
+you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
 
     http://www.apache.org/licenses/LICENSE-2.0
@@ -12,7 +12,7 @@ You may obtain a copy of the License at
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the speci***REMOVED***c language governing permissions and
+See the License for the specific language governing permissions and
 limitations under the License.
 */
 
@@ -35,13 +35,13 @@ func init() {
 // RegisterConversions adds conversion functions to the given scheme.
 // Public to allow building arbitrary schemes.
 func RegisterConversions(s *runtime.Scheme) error {
-	if err := s.AddGeneratedConversionFunc((*CustomResourceColumnDe***REMOVED***nition)(nil), (*apiextensions.CustomResourceColumnDe***REMOVED***nition)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1beta1_CustomResourceColumnDe***REMOVED***nition_To_apiextensions_CustomResourceColumnDe***REMOVED***nition(a.(*CustomResourceColumnDe***REMOVED***nition), b.(*apiextensions.CustomResourceColumnDe***REMOVED***nition), scope)
+	if err := s.AddGeneratedConversionFunc((*CustomResourceColumnDefinition)(nil), (*apiextensions.CustomResourceColumnDefinition)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_v1beta1_CustomResourceColumnDefinition_To_apiextensions_CustomResourceColumnDefinition(a.(*CustomResourceColumnDefinition), b.(*apiextensions.CustomResourceColumnDefinition), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*apiextensions.CustomResourceColumnDe***REMOVED***nition)(nil), (*CustomResourceColumnDe***REMOVED***nition)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_apiextensions_CustomResourceColumnDe***REMOVED***nition_To_v1beta1_CustomResourceColumnDe***REMOVED***nition(a.(*apiextensions.CustomResourceColumnDe***REMOVED***nition), b.(*CustomResourceColumnDe***REMOVED***nition), scope)
+	if err := s.AddGeneratedConversionFunc((*apiextensions.CustomResourceColumnDefinition)(nil), (*CustomResourceColumnDefinition)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_apiextensions_CustomResourceColumnDefinition_To_v1beta1_CustomResourceColumnDefinition(a.(*apiextensions.CustomResourceColumnDefinition), b.(*CustomResourceColumnDefinition), scope)
 	}); err != nil {
 		return err
 	}
@@ -55,73 +55,73 @@ func RegisterConversions(s *runtime.Scheme) error {
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*CustomResourceDe***REMOVED***nition)(nil), (*apiextensions.CustomResourceDe***REMOVED***nition)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1beta1_CustomResourceDe***REMOVED***nition_To_apiextensions_CustomResourceDe***REMOVED***nition(a.(*CustomResourceDe***REMOVED***nition), b.(*apiextensions.CustomResourceDe***REMOVED***nition), scope)
+	if err := s.AddGeneratedConversionFunc((*CustomResourceDefinition)(nil), (*apiextensions.CustomResourceDefinition)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_v1beta1_CustomResourceDefinition_To_apiextensions_CustomResourceDefinition(a.(*CustomResourceDefinition), b.(*apiextensions.CustomResourceDefinition), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*apiextensions.CustomResourceDe***REMOVED***nition)(nil), (*CustomResourceDe***REMOVED***nition)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_apiextensions_CustomResourceDe***REMOVED***nition_To_v1beta1_CustomResourceDe***REMOVED***nition(a.(*apiextensions.CustomResourceDe***REMOVED***nition), b.(*CustomResourceDe***REMOVED***nition), scope)
+	if err := s.AddGeneratedConversionFunc((*apiextensions.CustomResourceDefinition)(nil), (*CustomResourceDefinition)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_apiextensions_CustomResourceDefinition_To_v1beta1_CustomResourceDefinition(a.(*apiextensions.CustomResourceDefinition), b.(*CustomResourceDefinition), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*CustomResourceDe***REMOVED***nitionCondition)(nil), (*apiextensions.CustomResourceDe***REMOVED***nitionCondition)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1beta1_CustomResourceDe***REMOVED***nitionCondition_To_apiextensions_CustomResourceDe***REMOVED***nitionCondition(a.(*CustomResourceDe***REMOVED***nitionCondition), b.(*apiextensions.CustomResourceDe***REMOVED***nitionCondition), scope)
+	if err := s.AddGeneratedConversionFunc((*CustomResourceDefinitionCondition)(nil), (*apiextensions.CustomResourceDefinitionCondition)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_v1beta1_CustomResourceDefinitionCondition_To_apiextensions_CustomResourceDefinitionCondition(a.(*CustomResourceDefinitionCondition), b.(*apiextensions.CustomResourceDefinitionCondition), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*apiextensions.CustomResourceDe***REMOVED***nitionCondition)(nil), (*CustomResourceDe***REMOVED***nitionCondition)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_apiextensions_CustomResourceDe***REMOVED***nitionCondition_To_v1beta1_CustomResourceDe***REMOVED***nitionCondition(a.(*apiextensions.CustomResourceDe***REMOVED***nitionCondition), b.(*CustomResourceDe***REMOVED***nitionCondition), scope)
+	if err := s.AddGeneratedConversionFunc((*apiextensions.CustomResourceDefinitionCondition)(nil), (*CustomResourceDefinitionCondition)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_apiextensions_CustomResourceDefinitionCondition_To_v1beta1_CustomResourceDefinitionCondition(a.(*apiextensions.CustomResourceDefinitionCondition), b.(*CustomResourceDefinitionCondition), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*CustomResourceDe***REMOVED***nitionList)(nil), (*apiextensions.CustomResourceDe***REMOVED***nitionList)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1beta1_CustomResourceDe***REMOVED***nitionList_To_apiextensions_CustomResourceDe***REMOVED***nitionList(a.(*CustomResourceDe***REMOVED***nitionList), b.(*apiextensions.CustomResourceDe***REMOVED***nitionList), scope)
+	if err := s.AddGeneratedConversionFunc((*CustomResourceDefinitionList)(nil), (*apiextensions.CustomResourceDefinitionList)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_v1beta1_CustomResourceDefinitionList_To_apiextensions_CustomResourceDefinitionList(a.(*CustomResourceDefinitionList), b.(*apiextensions.CustomResourceDefinitionList), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*apiextensions.CustomResourceDe***REMOVED***nitionList)(nil), (*CustomResourceDe***REMOVED***nitionList)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_apiextensions_CustomResourceDe***REMOVED***nitionList_To_v1beta1_CustomResourceDe***REMOVED***nitionList(a.(*apiextensions.CustomResourceDe***REMOVED***nitionList), b.(*CustomResourceDe***REMOVED***nitionList), scope)
+	if err := s.AddGeneratedConversionFunc((*apiextensions.CustomResourceDefinitionList)(nil), (*CustomResourceDefinitionList)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_apiextensions_CustomResourceDefinitionList_To_v1beta1_CustomResourceDefinitionList(a.(*apiextensions.CustomResourceDefinitionList), b.(*CustomResourceDefinitionList), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*CustomResourceDe***REMOVED***nitionNames)(nil), (*apiextensions.CustomResourceDe***REMOVED***nitionNames)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1beta1_CustomResourceDe***REMOVED***nitionNames_To_apiextensions_CustomResourceDe***REMOVED***nitionNames(a.(*CustomResourceDe***REMOVED***nitionNames), b.(*apiextensions.CustomResourceDe***REMOVED***nitionNames), scope)
+	if err := s.AddGeneratedConversionFunc((*CustomResourceDefinitionNames)(nil), (*apiextensions.CustomResourceDefinitionNames)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_v1beta1_CustomResourceDefinitionNames_To_apiextensions_CustomResourceDefinitionNames(a.(*CustomResourceDefinitionNames), b.(*apiextensions.CustomResourceDefinitionNames), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*apiextensions.CustomResourceDe***REMOVED***nitionNames)(nil), (*CustomResourceDe***REMOVED***nitionNames)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_apiextensions_CustomResourceDe***REMOVED***nitionNames_To_v1beta1_CustomResourceDe***REMOVED***nitionNames(a.(*apiextensions.CustomResourceDe***REMOVED***nitionNames), b.(*CustomResourceDe***REMOVED***nitionNames), scope)
+	if err := s.AddGeneratedConversionFunc((*apiextensions.CustomResourceDefinitionNames)(nil), (*CustomResourceDefinitionNames)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_apiextensions_CustomResourceDefinitionNames_To_v1beta1_CustomResourceDefinitionNames(a.(*apiextensions.CustomResourceDefinitionNames), b.(*CustomResourceDefinitionNames), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*CustomResourceDe***REMOVED***nitionSpec)(nil), (*apiextensions.CustomResourceDe***REMOVED***nitionSpec)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1beta1_CustomResourceDe***REMOVED***nitionSpec_To_apiextensions_CustomResourceDe***REMOVED***nitionSpec(a.(*CustomResourceDe***REMOVED***nitionSpec), b.(*apiextensions.CustomResourceDe***REMOVED***nitionSpec), scope)
+	if err := s.AddGeneratedConversionFunc((*CustomResourceDefinitionSpec)(nil), (*apiextensions.CustomResourceDefinitionSpec)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_v1beta1_CustomResourceDefinitionSpec_To_apiextensions_CustomResourceDefinitionSpec(a.(*CustomResourceDefinitionSpec), b.(*apiextensions.CustomResourceDefinitionSpec), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*apiextensions.CustomResourceDe***REMOVED***nitionSpec)(nil), (*CustomResourceDe***REMOVED***nitionSpec)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_apiextensions_CustomResourceDe***REMOVED***nitionSpec_To_v1beta1_CustomResourceDe***REMOVED***nitionSpec(a.(*apiextensions.CustomResourceDe***REMOVED***nitionSpec), b.(*CustomResourceDe***REMOVED***nitionSpec), scope)
+	if err := s.AddGeneratedConversionFunc((*apiextensions.CustomResourceDefinitionSpec)(nil), (*CustomResourceDefinitionSpec)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_apiextensions_CustomResourceDefinitionSpec_To_v1beta1_CustomResourceDefinitionSpec(a.(*apiextensions.CustomResourceDefinitionSpec), b.(*CustomResourceDefinitionSpec), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*CustomResourceDe***REMOVED***nitionStatus)(nil), (*apiextensions.CustomResourceDe***REMOVED***nitionStatus)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1beta1_CustomResourceDe***REMOVED***nitionStatus_To_apiextensions_CustomResourceDe***REMOVED***nitionStatus(a.(*CustomResourceDe***REMOVED***nitionStatus), b.(*apiextensions.CustomResourceDe***REMOVED***nitionStatus), scope)
+	if err := s.AddGeneratedConversionFunc((*CustomResourceDefinitionStatus)(nil), (*apiextensions.CustomResourceDefinitionStatus)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_v1beta1_CustomResourceDefinitionStatus_To_apiextensions_CustomResourceDefinitionStatus(a.(*CustomResourceDefinitionStatus), b.(*apiextensions.CustomResourceDefinitionStatus), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*apiextensions.CustomResourceDe***REMOVED***nitionStatus)(nil), (*CustomResourceDe***REMOVED***nitionStatus)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_apiextensions_CustomResourceDe***REMOVED***nitionStatus_To_v1beta1_CustomResourceDe***REMOVED***nitionStatus(a.(*apiextensions.CustomResourceDe***REMOVED***nitionStatus), b.(*CustomResourceDe***REMOVED***nitionStatus), scope)
+	if err := s.AddGeneratedConversionFunc((*apiextensions.CustomResourceDefinitionStatus)(nil), (*CustomResourceDefinitionStatus)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_apiextensions_CustomResourceDefinitionStatus_To_v1beta1_CustomResourceDefinitionStatus(a.(*apiextensions.CustomResourceDefinitionStatus), b.(*CustomResourceDefinitionStatus), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*CustomResourceDe***REMOVED***nitionVersion)(nil), (*apiextensions.CustomResourceDe***REMOVED***nitionVersion)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1beta1_CustomResourceDe***REMOVED***nitionVersion_To_apiextensions_CustomResourceDe***REMOVED***nitionVersion(a.(*CustomResourceDe***REMOVED***nitionVersion), b.(*apiextensions.CustomResourceDe***REMOVED***nitionVersion), scope)
+	if err := s.AddGeneratedConversionFunc((*CustomResourceDefinitionVersion)(nil), (*apiextensions.CustomResourceDefinitionVersion)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_v1beta1_CustomResourceDefinitionVersion_To_apiextensions_CustomResourceDefinitionVersion(a.(*CustomResourceDefinitionVersion), b.(*apiextensions.CustomResourceDefinitionVersion), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*apiextensions.CustomResourceDe***REMOVED***nitionVersion)(nil), (*CustomResourceDe***REMOVED***nitionVersion)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_apiextensions_CustomResourceDe***REMOVED***nitionVersion_To_v1beta1_CustomResourceDe***REMOVED***nitionVersion(a.(*apiextensions.CustomResourceDe***REMOVED***nitionVersion), b.(*CustomResourceDe***REMOVED***nitionVersion), scope)
+	if err := s.AddGeneratedConversionFunc((*apiextensions.CustomResourceDefinitionVersion)(nil), (*CustomResourceDefinitionVersion)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_apiextensions_CustomResourceDefinitionVersion_To_v1beta1_CustomResourceDefinitionVersion(a.(*apiextensions.CustomResourceDefinitionVersion), b.(*CustomResourceDefinitionVersion), scope)
 	}); err != nil {
 		return err
 	}
@@ -235,13 +235,13 @@ func RegisterConversions(s *runtime.Scheme) error {
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*WebhookClientCon***REMOVED***g)(nil), (*apiextensions.WebhookClientCon***REMOVED***g)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1beta1_WebhookClientCon***REMOVED***g_To_apiextensions_WebhookClientCon***REMOVED***g(a.(*WebhookClientCon***REMOVED***g), b.(*apiextensions.WebhookClientCon***REMOVED***g), scope)
+	if err := s.AddGeneratedConversionFunc((*WebhookClientConfig)(nil), (*apiextensions.WebhookClientConfig)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_v1beta1_WebhookClientConfig_To_apiextensions_WebhookClientConfig(a.(*WebhookClientConfig), b.(*apiextensions.WebhookClientConfig), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*apiextensions.WebhookClientCon***REMOVED***g)(nil), (*WebhookClientCon***REMOVED***g)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_apiextensions_WebhookClientCon***REMOVED***g_To_v1beta1_WebhookClientCon***REMOVED***g(a.(*apiextensions.WebhookClientCon***REMOVED***g), b.(*WebhookClientCon***REMOVED***g), scope)
+	if err := s.AddGeneratedConversionFunc((*apiextensions.WebhookClientConfig)(nil), (*WebhookClientConfig)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_apiextensions_WebhookClientConfig_To_v1beta1_WebhookClientConfig(a.(*apiextensions.WebhookClientConfig), b.(*WebhookClientConfig), scope)
 	}); err != nil {
 		return err
 	}
@@ -263,7 +263,7 @@ func RegisterConversions(s *runtime.Scheme) error {
 	return nil
 }
 
-func autoConvert_v1beta1_CustomResourceColumnDe***REMOVED***nition_To_apiextensions_CustomResourceColumnDe***REMOVED***nition(in *CustomResourceColumnDe***REMOVED***nition, out *apiextensions.CustomResourceColumnDe***REMOVED***nition, s conversion.Scope) error {
+func autoConvert_v1beta1_CustomResourceColumnDefinition_To_apiextensions_CustomResourceColumnDefinition(in *CustomResourceColumnDefinition, out *apiextensions.CustomResourceColumnDefinition, s conversion.Scope) error {
 	out.Name = in.Name
 	out.Type = in.Type
 	out.Format = in.Format
@@ -273,12 +273,12 @@ func autoConvert_v1beta1_CustomResourceColumnDe***REMOVED***nition_To_apiextensi
 	return nil
 }
 
-// Convert_v1beta1_CustomResourceColumnDe***REMOVED***nition_To_apiextensions_CustomResourceColumnDe***REMOVED***nition is an autogenerated conversion function.
-func Convert_v1beta1_CustomResourceColumnDe***REMOVED***nition_To_apiextensions_CustomResourceColumnDe***REMOVED***nition(in *CustomResourceColumnDe***REMOVED***nition, out *apiextensions.CustomResourceColumnDe***REMOVED***nition, s conversion.Scope) error {
-	return autoConvert_v1beta1_CustomResourceColumnDe***REMOVED***nition_To_apiextensions_CustomResourceColumnDe***REMOVED***nition(in, out, s)
+// Convert_v1beta1_CustomResourceColumnDefinition_To_apiextensions_CustomResourceColumnDefinition is an autogenerated conversion function.
+func Convert_v1beta1_CustomResourceColumnDefinition_To_apiextensions_CustomResourceColumnDefinition(in *CustomResourceColumnDefinition, out *apiextensions.CustomResourceColumnDefinition, s conversion.Scope) error {
+	return autoConvert_v1beta1_CustomResourceColumnDefinition_To_apiextensions_CustomResourceColumnDefinition(in, out, s)
 }
 
-func autoConvert_apiextensions_CustomResourceColumnDe***REMOVED***nition_To_v1beta1_CustomResourceColumnDe***REMOVED***nition(in *apiextensions.CustomResourceColumnDe***REMOVED***nition, out *CustomResourceColumnDe***REMOVED***nition, s conversion.Scope) error {
+func autoConvert_apiextensions_CustomResourceColumnDefinition_To_v1beta1_CustomResourceColumnDefinition(in *apiextensions.CustomResourceColumnDefinition, out *CustomResourceColumnDefinition, s conversion.Scope) error {
 	out.Name = in.Name
 	out.Type = in.Type
 	out.Format = in.Format
@@ -288,14 +288,14 @@ func autoConvert_apiextensions_CustomResourceColumnDe***REMOVED***nition_To_v1be
 	return nil
 }
 
-// Convert_apiextensions_CustomResourceColumnDe***REMOVED***nition_To_v1beta1_CustomResourceColumnDe***REMOVED***nition is an autogenerated conversion function.
-func Convert_apiextensions_CustomResourceColumnDe***REMOVED***nition_To_v1beta1_CustomResourceColumnDe***REMOVED***nition(in *apiextensions.CustomResourceColumnDe***REMOVED***nition, out *CustomResourceColumnDe***REMOVED***nition, s conversion.Scope) error {
-	return autoConvert_apiextensions_CustomResourceColumnDe***REMOVED***nition_To_v1beta1_CustomResourceColumnDe***REMOVED***nition(in, out, s)
+// Convert_apiextensions_CustomResourceColumnDefinition_To_v1beta1_CustomResourceColumnDefinition is an autogenerated conversion function.
+func Convert_apiextensions_CustomResourceColumnDefinition_To_v1beta1_CustomResourceColumnDefinition(in *apiextensions.CustomResourceColumnDefinition, out *CustomResourceColumnDefinition, s conversion.Scope) error {
+	return autoConvert_apiextensions_CustomResourceColumnDefinition_To_v1beta1_CustomResourceColumnDefinition(in, out, s)
 }
 
 func autoConvert_v1beta1_CustomResourceConversion_To_apiextensions_CustomResourceConversion(in *CustomResourceConversion, out *apiextensions.CustomResourceConversion, s conversion.Scope) error {
 	out.Strategy = apiextensions.ConversionStrategyType(in.Strategy)
-	out.WebhookClientCon***REMOVED***g = (*apiextensions.WebhookClientCon***REMOVED***g)(unsafe.Pointer(in.WebhookClientCon***REMOVED***g))
+	out.WebhookClientConfig = (*apiextensions.WebhookClientConfig)(unsafe.Pointer(in.WebhookClientConfig))
 	return nil
 }
 
@@ -306,7 +306,7 @@ func Convert_v1beta1_CustomResourceConversion_To_apiextensions_CustomResourceCon
 
 func autoConvert_apiextensions_CustomResourceConversion_To_v1beta1_CustomResourceConversion(in *apiextensions.CustomResourceConversion, out *CustomResourceConversion, s conversion.Scope) error {
 	out.Strategy = ConversionStrategyType(in.Strategy)
-	out.WebhookClientCon***REMOVED***g = (*WebhookClientCon***REMOVED***g)(unsafe.Pointer(in.WebhookClientCon***REMOVED***g))
+	out.WebhookClientConfig = (*WebhookClientConfig)(unsafe.Pointer(in.WebhookClientConfig))
 	return nil
 }
 
@@ -315,40 +315,40 @@ func Convert_apiextensions_CustomResourceConversion_To_v1beta1_CustomResourceCon
 	return autoConvert_apiextensions_CustomResourceConversion_To_v1beta1_CustomResourceConversion(in, out, s)
 }
 
-func autoConvert_v1beta1_CustomResourceDe***REMOVED***nition_To_apiextensions_CustomResourceDe***REMOVED***nition(in *CustomResourceDe***REMOVED***nition, out *apiextensions.CustomResourceDe***REMOVED***nition, s conversion.Scope) error {
+func autoConvert_v1beta1_CustomResourceDefinition_To_apiextensions_CustomResourceDefinition(in *CustomResourceDefinition, out *apiextensions.CustomResourceDefinition, s conversion.Scope) error {
 	out.ObjectMeta = in.ObjectMeta
-	if err := Convert_v1beta1_CustomResourceDe***REMOVED***nitionSpec_To_apiextensions_CustomResourceDe***REMOVED***nitionSpec(&in.Spec, &out.Spec, s); err != nil {
+	if err := Convert_v1beta1_CustomResourceDefinitionSpec_To_apiextensions_CustomResourceDefinitionSpec(&in.Spec, &out.Spec, s); err != nil {
 		return err
 	}
-	if err := Convert_v1beta1_CustomResourceDe***REMOVED***nitionStatus_To_apiextensions_CustomResourceDe***REMOVED***nitionStatus(&in.Status, &out.Status, s); err != nil {
+	if err := Convert_v1beta1_CustomResourceDefinitionStatus_To_apiextensions_CustomResourceDefinitionStatus(&in.Status, &out.Status, s); err != nil {
 		return err
 	}
 	return nil
 }
 
-// Convert_v1beta1_CustomResourceDe***REMOVED***nition_To_apiextensions_CustomResourceDe***REMOVED***nition is an autogenerated conversion function.
-func Convert_v1beta1_CustomResourceDe***REMOVED***nition_To_apiextensions_CustomResourceDe***REMOVED***nition(in *CustomResourceDe***REMOVED***nition, out *apiextensions.CustomResourceDe***REMOVED***nition, s conversion.Scope) error {
-	return autoConvert_v1beta1_CustomResourceDe***REMOVED***nition_To_apiextensions_CustomResourceDe***REMOVED***nition(in, out, s)
+// Convert_v1beta1_CustomResourceDefinition_To_apiextensions_CustomResourceDefinition is an autogenerated conversion function.
+func Convert_v1beta1_CustomResourceDefinition_To_apiextensions_CustomResourceDefinition(in *CustomResourceDefinition, out *apiextensions.CustomResourceDefinition, s conversion.Scope) error {
+	return autoConvert_v1beta1_CustomResourceDefinition_To_apiextensions_CustomResourceDefinition(in, out, s)
 }
 
-func autoConvert_apiextensions_CustomResourceDe***REMOVED***nition_To_v1beta1_CustomResourceDe***REMOVED***nition(in *apiextensions.CustomResourceDe***REMOVED***nition, out *CustomResourceDe***REMOVED***nition, s conversion.Scope) error {
+func autoConvert_apiextensions_CustomResourceDefinition_To_v1beta1_CustomResourceDefinition(in *apiextensions.CustomResourceDefinition, out *CustomResourceDefinition, s conversion.Scope) error {
 	out.ObjectMeta = in.ObjectMeta
-	if err := Convert_apiextensions_CustomResourceDe***REMOVED***nitionSpec_To_v1beta1_CustomResourceDe***REMOVED***nitionSpec(&in.Spec, &out.Spec, s); err != nil {
+	if err := Convert_apiextensions_CustomResourceDefinitionSpec_To_v1beta1_CustomResourceDefinitionSpec(&in.Spec, &out.Spec, s); err != nil {
 		return err
 	}
-	if err := Convert_apiextensions_CustomResourceDe***REMOVED***nitionStatus_To_v1beta1_CustomResourceDe***REMOVED***nitionStatus(&in.Status, &out.Status, s); err != nil {
+	if err := Convert_apiextensions_CustomResourceDefinitionStatus_To_v1beta1_CustomResourceDefinitionStatus(&in.Status, &out.Status, s); err != nil {
 		return err
 	}
 	return nil
 }
 
-// Convert_apiextensions_CustomResourceDe***REMOVED***nition_To_v1beta1_CustomResourceDe***REMOVED***nition is an autogenerated conversion function.
-func Convert_apiextensions_CustomResourceDe***REMOVED***nition_To_v1beta1_CustomResourceDe***REMOVED***nition(in *apiextensions.CustomResourceDe***REMOVED***nition, out *CustomResourceDe***REMOVED***nition, s conversion.Scope) error {
-	return autoConvert_apiextensions_CustomResourceDe***REMOVED***nition_To_v1beta1_CustomResourceDe***REMOVED***nition(in, out, s)
+// Convert_apiextensions_CustomResourceDefinition_To_v1beta1_CustomResourceDefinition is an autogenerated conversion function.
+func Convert_apiextensions_CustomResourceDefinition_To_v1beta1_CustomResourceDefinition(in *apiextensions.CustomResourceDefinition, out *CustomResourceDefinition, s conversion.Scope) error {
+	return autoConvert_apiextensions_CustomResourceDefinition_To_v1beta1_CustomResourceDefinition(in, out, s)
 }
 
-func autoConvert_v1beta1_CustomResourceDe***REMOVED***nitionCondition_To_apiextensions_CustomResourceDe***REMOVED***nitionCondition(in *CustomResourceDe***REMOVED***nitionCondition, out *apiextensions.CustomResourceDe***REMOVED***nitionCondition, s conversion.Scope) error {
-	out.Type = apiextensions.CustomResourceDe***REMOVED***nitionConditionType(in.Type)
+func autoConvert_v1beta1_CustomResourceDefinitionCondition_To_apiextensions_CustomResourceDefinitionCondition(in *CustomResourceDefinitionCondition, out *apiextensions.CustomResourceDefinitionCondition, s conversion.Scope) error {
+	out.Type = apiextensions.CustomResourceDefinitionConditionType(in.Type)
 	out.Status = apiextensions.ConditionStatus(in.Status)
 	out.LastTransitionTime = in.LastTransitionTime
 	out.Reason = in.Reason
@@ -356,13 +356,13 @@ func autoConvert_v1beta1_CustomResourceDe***REMOVED***nitionCondition_To_apiexte
 	return nil
 }
 
-// Convert_v1beta1_CustomResourceDe***REMOVED***nitionCondition_To_apiextensions_CustomResourceDe***REMOVED***nitionCondition is an autogenerated conversion function.
-func Convert_v1beta1_CustomResourceDe***REMOVED***nitionCondition_To_apiextensions_CustomResourceDe***REMOVED***nitionCondition(in *CustomResourceDe***REMOVED***nitionCondition, out *apiextensions.CustomResourceDe***REMOVED***nitionCondition, s conversion.Scope) error {
-	return autoConvert_v1beta1_CustomResourceDe***REMOVED***nitionCondition_To_apiextensions_CustomResourceDe***REMOVED***nitionCondition(in, out, s)
+// Convert_v1beta1_CustomResourceDefinitionCondition_To_apiextensions_CustomResourceDefinitionCondition is an autogenerated conversion function.
+func Convert_v1beta1_CustomResourceDefinitionCondition_To_apiextensions_CustomResourceDefinitionCondition(in *CustomResourceDefinitionCondition, out *apiextensions.CustomResourceDefinitionCondition, s conversion.Scope) error {
+	return autoConvert_v1beta1_CustomResourceDefinitionCondition_To_apiextensions_CustomResourceDefinitionCondition(in, out, s)
 }
 
-func autoConvert_apiextensions_CustomResourceDe***REMOVED***nitionCondition_To_v1beta1_CustomResourceDe***REMOVED***nitionCondition(in *apiextensions.CustomResourceDe***REMOVED***nitionCondition, out *CustomResourceDe***REMOVED***nitionCondition, s conversion.Scope) error {
-	out.Type = CustomResourceDe***REMOVED***nitionConditionType(in.Type)
+func autoConvert_apiextensions_CustomResourceDefinitionCondition_To_v1beta1_CustomResourceDefinitionCondition(in *apiextensions.CustomResourceDefinitionCondition, out *CustomResourceDefinitionCondition, s conversion.Scope) error {
+	out.Type = CustomResourceDefinitionConditionType(in.Type)
 	out.Status = ConditionStatus(in.Status)
 	out.LastTransitionTime = in.LastTransitionTime
 	out.Reason = in.Reason
@@ -370,54 +370,54 @@ func autoConvert_apiextensions_CustomResourceDe***REMOVED***nitionCondition_To_v
 	return nil
 }
 
-// Convert_apiextensions_CustomResourceDe***REMOVED***nitionCondition_To_v1beta1_CustomResourceDe***REMOVED***nitionCondition is an autogenerated conversion function.
-func Convert_apiextensions_CustomResourceDe***REMOVED***nitionCondition_To_v1beta1_CustomResourceDe***REMOVED***nitionCondition(in *apiextensions.CustomResourceDe***REMOVED***nitionCondition, out *CustomResourceDe***REMOVED***nitionCondition, s conversion.Scope) error {
-	return autoConvert_apiextensions_CustomResourceDe***REMOVED***nitionCondition_To_v1beta1_CustomResourceDe***REMOVED***nitionCondition(in, out, s)
+// Convert_apiextensions_CustomResourceDefinitionCondition_To_v1beta1_CustomResourceDefinitionCondition is an autogenerated conversion function.
+func Convert_apiextensions_CustomResourceDefinitionCondition_To_v1beta1_CustomResourceDefinitionCondition(in *apiextensions.CustomResourceDefinitionCondition, out *CustomResourceDefinitionCondition, s conversion.Scope) error {
+	return autoConvert_apiextensions_CustomResourceDefinitionCondition_To_v1beta1_CustomResourceDefinitionCondition(in, out, s)
 }
 
-func autoConvert_v1beta1_CustomResourceDe***REMOVED***nitionList_To_apiextensions_CustomResourceDe***REMOVED***nitionList(in *CustomResourceDe***REMOVED***nitionList, out *apiextensions.CustomResourceDe***REMOVED***nitionList, s conversion.Scope) error {
+func autoConvert_v1beta1_CustomResourceDefinitionList_To_apiextensions_CustomResourceDefinitionList(in *CustomResourceDefinitionList, out *apiextensions.CustomResourceDefinitionList, s conversion.Scope) error {
 	out.ListMeta = in.ListMeta
 	if in.Items != nil {
 		in, out := &in.Items, &out.Items
-		*out = make([]apiextensions.CustomResourceDe***REMOVED***nition, len(*in))
+		*out = make([]apiextensions.CustomResourceDefinition, len(*in))
 		for i := range *in {
-			if err := Convert_v1beta1_CustomResourceDe***REMOVED***nition_To_apiextensions_CustomResourceDe***REMOVED***nition(&(*in)[i], &(*out)[i], s); err != nil {
+			if err := Convert_v1beta1_CustomResourceDefinition_To_apiextensions_CustomResourceDefinition(&(*in)[i], &(*out)[i], s); err != nil {
 				return err
 			}
 		}
-	} ***REMOVED*** {
+	} else {
 		out.Items = nil
 	}
 	return nil
 }
 
-// Convert_v1beta1_CustomResourceDe***REMOVED***nitionList_To_apiextensions_CustomResourceDe***REMOVED***nitionList is an autogenerated conversion function.
-func Convert_v1beta1_CustomResourceDe***REMOVED***nitionList_To_apiextensions_CustomResourceDe***REMOVED***nitionList(in *CustomResourceDe***REMOVED***nitionList, out *apiextensions.CustomResourceDe***REMOVED***nitionList, s conversion.Scope) error {
-	return autoConvert_v1beta1_CustomResourceDe***REMOVED***nitionList_To_apiextensions_CustomResourceDe***REMOVED***nitionList(in, out, s)
+// Convert_v1beta1_CustomResourceDefinitionList_To_apiextensions_CustomResourceDefinitionList is an autogenerated conversion function.
+func Convert_v1beta1_CustomResourceDefinitionList_To_apiextensions_CustomResourceDefinitionList(in *CustomResourceDefinitionList, out *apiextensions.CustomResourceDefinitionList, s conversion.Scope) error {
+	return autoConvert_v1beta1_CustomResourceDefinitionList_To_apiextensions_CustomResourceDefinitionList(in, out, s)
 }
 
-func autoConvert_apiextensions_CustomResourceDe***REMOVED***nitionList_To_v1beta1_CustomResourceDe***REMOVED***nitionList(in *apiextensions.CustomResourceDe***REMOVED***nitionList, out *CustomResourceDe***REMOVED***nitionList, s conversion.Scope) error {
+func autoConvert_apiextensions_CustomResourceDefinitionList_To_v1beta1_CustomResourceDefinitionList(in *apiextensions.CustomResourceDefinitionList, out *CustomResourceDefinitionList, s conversion.Scope) error {
 	out.ListMeta = in.ListMeta
 	if in.Items != nil {
 		in, out := &in.Items, &out.Items
-		*out = make([]CustomResourceDe***REMOVED***nition, len(*in))
+		*out = make([]CustomResourceDefinition, len(*in))
 		for i := range *in {
-			if err := Convert_apiextensions_CustomResourceDe***REMOVED***nition_To_v1beta1_CustomResourceDe***REMOVED***nition(&(*in)[i], &(*out)[i], s); err != nil {
+			if err := Convert_apiextensions_CustomResourceDefinition_To_v1beta1_CustomResourceDefinition(&(*in)[i], &(*out)[i], s); err != nil {
 				return err
 			}
 		}
-	} ***REMOVED*** {
+	} else {
 		out.Items = nil
 	}
 	return nil
 }
 
-// Convert_apiextensions_CustomResourceDe***REMOVED***nitionList_To_v1beta1_CustomResourceDe***REMOVED***nitionList is an autogenerated conversion function.
-func Convert_apiextensions_CustomResourceDe***REMOVED***nitionList_To_v1beta1_CustomResourceDe***REMOVED***nitionList(in *apiextensions.CustomResourceDe***REMOVED***nitionList, out *CustomResourceDe***REMOVED***nitionList, s conversion.Scope) error {
-	return autoConvert_apiextensions_CustomResourceDe***REMOVED***nitionList_To_v1beta1_CustomResourceDe***REMOVED***nitionList(in, out, s)
+// Convert_apiextensions_CustomResourceDefinitionList_To_v1beta1_CustomResourceDefinitionList is an autogenerated conversion function.
+func Convert_apiextensions_CustomResourceDefinitionList_To_v1beta1_CustomResourceDefinitionList(in *apiextensions.CustomResourceDefinitionList, out *CustomResourceDefinitionList, s conversion.Scope) error {
+	return autoConvert_apiextensions_CustomResourceDefinitionList_To_v1beta1_CustomResourceDefinitionList(in, out, s)
 }
 
-func autoConvert_v1beta1_CustomResourceDe***REMOVED***nitionNames_To_apiextensions_CustomResourceDe***REMOVED***nitionNames(in *CustomResourceDe***REMOVED***nitionNames, out *apiextensions.CustomResourceDe***REMOVED***nitionNames, s conversion.Scope) error {
+func autoConvert_v1beta1_CustomResourceDefinitionNames_To_apiextensions_CustomResourceDefinitionNames(in *CustomResourceDefinitionNames, out *apiextensions.CustomResourceDefinitionNames, s conversion.Scope) error {
 	out.Plural = in.Plural
 	out.Singular = in.Singular
 	out.ShortNames = *(*[]string)(unsafe.Pointer(&in.ShortNames))
@@ -427,12 +427,12 @@ func autoConvert_v1beta1_CustomResourceDe***REMOVED***nitionNames_To_apiextensio
 	return nil
 }
 
-// Convert_v1beta1_CustomResourceDe***REMOVED***nitionNames_To_apiextensions_CustomResourceDe***REMOVED***nitionNames is an autogenerated conversion function.
-func Convert_v1beta1_CustomResourceDe***REMOVED***nitionNames_To_apiextensions_CustomResourceDe***REMOVED***nitionNames(in *CustomResourceDe***REMOVED***nitionNames, out *apiextensions.CustomResourceDe***REMOVED***nitionNames, s conversion.Scope) error {
-	return autoConvert_v1beta1_CustomResourceDe***REMOVED***nitionNames_To_apiextensions_CustomResourceDe***REMOVED***nitionNames(in, out, s)
+// Convert_v1beta1_CustomResourceDefinitionNames_To_apiextensions_CustomResourceDefinitionNames is an autogenerated conversion function.
+func Convert_v1beta1_CustomResourceDefinitionNames_To_apiextensions_CustomResourceDefinitionNames(in *CustomResourceDefinitionNames, out *apiextensions.CustomResourceDefinitionNames, s conversion.Scope) error {
+	return autoConvert_v1beta1_CustomResourceDefinitionNames_To_apiextensions_CustomResourceDefinitionNames(in, out, s)
 }
 
-func autoConvert_apiextensions_CustomResourceDe***REMOVED***nitionNames_To_v1beta1_CustomResourceDe***REMOVED***nitionNames(in *apiextensions.CustomResourceDe***REMOVED***nitionNames, out *CustomResourceDe***REMOVED***nitionNames, s conversion.Scope) error {
+func autoConvert_apiextensions_CustomResourceDefinitionNames_To_v1beta1_CustomResourceDefinitionNames(in *apiextensions.CustomResourceDefinitionNames, out *CustomResourceDefinitionNames, s conversion.Scope) error {
 	out.Plural = in.Plural
 	out.Singular = in.Singular
 	out.ShortNames = *(*[]string)(unsafe.Pointer(&in.ShortNames))
@@ -442,15 +442,15 @@ func autoConvert_apiextensions_CustomResourceDe***REMOVED***nitionNames_To_v1bet
 	return nil
 }
 
-// Convert_apiextensions_CustomResourceDe***REMOVED***nitionNames_To_v1beta1_CustomResourceDe***REMOVED***nitionNames is an autogenerated conversion function.
-func Convert_apiextensions_CustomResourceDe***REMOVED***nitionNames_To_v1beta1_CustomResourceDe***REMOVED***nitionNames(in *apiextensions.CustomResourceDe***REMOVED***nitionNames, out *CustomResourceDe***REMOVED***nitionNames, s conversion.Scope) error {
-	return autoConvert_apiextensions_CustomResourceDe***REMOVED***nitionNames_To_v1beta1_CustomResourceDe***REMOVED***nitionNames(in, out, s)
+// Convert_apiextensions_CustomResourceDefinitionNames_To_v1beta1_CustomResourceDefinitionNames is an autogenerated conversion function.
+func Convert_apiextensions_CustomResourceDefinitionNames_To_v1beta1_CustomResourceDefinitionNames(in *apiextensions.CustomResourceDefinitionNames, out *CustomResourceDefinitionNames, s conversion.Scope) error {
+	return autoConvert_apiextensions_CustomResourceDefinitionNames_To_v1beta1_CustomResourceDefinitionNames(in, out, s)
 }
 
-func autoConvert_v1beta1_CustomResourceDe***REMOVED***nitionSpec_To_apiextensions_CustomResourceDe***REMOVED***nitionSpec(in *CustomResourceDe***REMOVED***nitionSpec, out *apiextensions.CustomResourceDe***REMOVED***nitionSpec, s conversion.Scope) error {
+func autoConvert_v1beta1_CustomResourceDefinitionSpec_To_apiextensions_CustomResourceDefinitionSpec(in *CustomResourceDefinitionSpec, out *apiextensions.CustomResourceDefinitionSpec, s conversion.Scope) error {
 	out.Group = in.Group
 	out.Version = in.Version
-	if err := Convert_v1beta1_CustomResourceDe***REMOVED***nitionNames_To_apiextensions_CustomResourceDe***REMOVED***nitionNames(&in.Names, &out.Names, s); err != nil {
+	if err := Convert_v1beta1_CustomResourceDefinitionNames_To_apiextensions_CustomResourceDefinitionNames(&in.Names, &out.Names, s); err != nil {
 		return err
 	}
 	out.Scope = apiextensions.ResourceScope(in.Scope)
@@ -460,35 +460,35 @@ func autoConvert_v1beta1_CustomResourceDe***REMOVED***nitionSpec_To_apiextension
 		if err := Convert_v1beta1_CustomResourceValidation_To_apiextensions_CustomResourceValidation(*in, *out, s); err != nil {
 			return err
 		}
-	} ***REMOVED*** {
+	} else {
 		out.Validation = nil
 	}
 	out.Subresources = (*apiextensions.CustomResourceSubresources)(unsafe.Pointer(in.Subresources))
 	if in.Versions != nil {
 		in, out := &in.Versions, &out.Versions
-		*out = make([]apiextensions.CustomResourceDe***REMOVED***nitionVersion, len(*in))
+		*out = make([]apiextensions.CustomResourceDefinitionVersion, len(*in))
 		for i := range *in {
-			if err := Convert_v1beta1_CustomResourceDe***REMOVED***nitionVersion_To_apiextensions_CustomResourceDe***REMOVED***nitionVersion(&(*in)[i], &(*out)[i], s); err != nil {
+			if err := Convert_v1beta1_CustomResourceDefinitionVersion_To_apiextensions_CustomResourceDefinitionVersion(&(*in)[i], &(*out)[i], s); err != nil {
 				return err
 			}
 		}
-	} ***REMOVED*** {
+	} else {
 		out.Versions = nil
 	}
-	out.AdditionalPrinterColumns = *(*[]apiextensions.CustomResourceColumnDe***REMOVED***nition)(unsafe.Pointer(&in.AdditionalPrinterColumns))
+	out.AdditionalPrinterColumns = *(*[]apiextensions.CustomResourceColumnDefinition)(unsafe.Pointer(&in.AdditionalPrinterColumns))
 	out.Conversion = (*apiextensions.CustomResourceConversion)(unsafe.Pointer(in.Conversion))
 	return nil
 }
 
-// Convert_v1beta1_CustomResourceDe***REMOVED***nitionSpec_To_apiextensions_CustomResourceDe***REMOVED***nitionSpec is an autogenerated conversion function.
-func Convert_v1beta1_CustomResourceDe***REMOVED***nitionSpec_To_apiextensions_CustomResourceDe***REMOVED***nitionSpec(in *CustomResourceDe***REMOVED***nitionSpec, out *apiextensions.CustomResourceDe***REMOVED***nitionSpec, s conversion.Scope) error {
-	return autoConvert_v1beta1_CustomResourceDe***REMOVED***nitionSpec_To_apiextensions_CustomResourceDe***REMOVED***nitionSpec(in, out, s)
+// Convert_v1beta1_CustomResourceDefinitionSpec_To_apiextensions_CustomResourceDefinitionSpec is an autogenerated conversion function.
+func Convert_v1beta1_CustomResourceDefinitionSpec_To_apiextensions_CustomResourceDefinitionSpec(in *CustomResourceDefinitionSpec, out *apiextensions.CustomResourceDefinitionSpec, s conversion.Scope) error {
+	return autoConvert_v1beta1_CustomResourceDefinitionSpec_To_apiextensions_CustomResourceDefinitionSpec(in, out, s)
 }
 
-func autoConvert_apiextensions_CustomResourceDe***REMOVED***nitionSpec_To_v1beta1_CustomResourceDe***REMOVED***nitionSpec(in *apiextensions.CustomResourceDe***REMOVED***nitionSpec, out *CustomResourceDe***REMOVED***nitionSpec, s conversion.Scope) error {
+func autoConvert_apiextensions_CustomResourceDefinitionSpec_To_v1beta1_CustomResourceDefinitionSpec(in *apiextensions.CustomResourceDefinitionSpec, out *CustomResourceDefinitionSpec, s conversion.Scope) error {
 	out.Group = in.Group
 	out.Version = in.Version
-	if err := Convert_apiextensions_CustomResourceDe***REMOVED***nitionNames_To_v1beta1_CustomResourceDe***REMOVED***nitionNames(&in.Names, &out.Names, s); err != nil {
+	if err := Convert_apiextensions_CustomResourceDefinitionNames_To_v1beta1_CustomResourceDefinitionNames(&in.Names, &out.Names, s); err != nil {
 		return err
 	}
 	out.Scope = ResourceScope(in.Scope)
@@ -498,60 +498,60 @@ func autoConvert_apiextensions_CustomResourceDe***REMOVED***nitionSpec_To_v1beta
 		if err := Convert_apiextensions_CustomResourceValidation_To_v1beta1_CustomResourceValidation(*in, *out, s); err != nil {
 			return err
 		}
-	} ***REMOVED*** {
+	} else {
 		out.Validation = nil
 	}
 	out.Subresources = (*CustomResourceSubresources)(unsafe.Pointer(in.Subresources))
 	if in.Versions != nil {
 		in, out := &in.Versions, &out.Versions
-		*out = make([]CustomResourceDe***REMOVED***nitionVersion, len(*in))
+		*out = make([]CustomResourceDefinitionVersion, len(*in))
 		for i := range *in {
-			if err := Convert_apiextensions_CustomResourceDe***REMOVED***nitionVersion_To_v1beta1_CustomResourceDe***REMOVED***nitionVersion(&(*in)[i], &(*out)[i], s); err != nil {
+			if err := Convert_apiextensions_CustomResourceDefinitionVersion_To_v1beta1_CustomResourceDefinitionVersion(&(*in)[i], &(*out)[i], s); err != nil {
 				return err
 			}
 		}
-	} ***REMOVED*** {
+	} else {
 		out.Versions = nil
 	}
-	out.AdditionalPrinterColumns = *(*[]CustomResourceColumnDe***REMOVED***nition)(unsafe.Pointer(&in.AdditionalPrinterColumns))
+	out.AdditionalPrinterColumns = *(*[]CustomResourceColumnDefinition)(unsafe.Pointer(&in.AdditionalPrinterColumns))
 	out.Conversion = (*CustomResourceConversion)(unsafe.Pointer(in.Conversion))
 	return nil
 }
 
-// Convert_apiextensions_CustomResourceDe***REMOVED***nitionSpec_To_v1beta1_CustomResourceDe***REMOVED***nitionSpec is an autogenerated conversion function.
-func Convert_apiextensions_CustomResourceDe***REMOVED***nitionSpec_To_v1beta1_CustomResourceDe***REMOVED***nitionSpec(in *apiextensions.CustomResourceDe***REMOVED***nitionSpec, out *CustomResourceDe***REMOVED***nitionSpec, s conversion.Scope) error {
-	return autoConvert_apiextensions_CustomResourceDe***REMOVED***nitionSpec_To_v1beta1_CustomResourceDe***REMOVED***nitionSpec(in, out, s)
+// Convert_apiextensions_CustomResourceDefinitionSpec_To_v1beta1_CustomResourceDefinitionSpec is an autogenerated conversion function.
+func Convert_apiextensions_CustomResourceDefinitionSpec_To_v1beta1_CustomResourceDefinitionSpec(in *apiextensions.CustomResourceDefinitionSpec, out *CustomResourceDefinitionSpec, s conversion.Scope) error {
+	return autoConvert_apiextensions_CustomResourceDefinitionSpec_To_v1beta1_CustomResourceDefinitionSpec(in, out, s)
 }
 
-func autoConvert_v1beta1_CustomResourceDe***REMOVED***nitionStatus_To_apiextensions_CustomResourceDe***REMOVED***nitionStatus(in *CustomResourceDe***REMOVED***nitionStatus, out *apiextensions.CustomResourceDe***REMOVED***nitionStatus, s conversion.Scope) error {
-	out.Conditions = *(*[]apiextensions.CustomResourceDe***REMOVED***nitionCondition)(unsafe.Pointer(&in.Conditions))
-	if err := Convert_v1beta1_CustomResourceDe***REMOVED***nitionNames_To_apiextensions_CustomResourceDe***REMOVED***nitionNames(&in.AcceptedNames, &out.AcceptedNames, s); err != nil {
+func autoConvert_v1beta1_CustomResourceDefinitionStatus_To_apiextensions_CustomResourceDefinitionStatus(in *CustomResourceDefinitionStatus, out *apiextensions.CustomResourceDefinitionStatus, s conversion.Scope) error {
+	out.Conditions = *(*[]apiextensions.CustomResourceDefinitionCondition)(unsafe.Pointer(&in.Conditions))
+	if err := Convert_v1beta1_CustomResourceDefinitionNames_To_apiextensions_CustomResourceDefinitionNames(&in.AcceptedNames, &out.AcceptedNames, s); err != nil {
 		return err
 	}
 	out.StoredVersions = *(*[]string)(unsafe.Pointer(&in.StoredVersions))
 	return nil
 }
 
-// Convert_v1beta1_CustomResourceDe***REMOVED***nitionStatus_To_apiextensions_CustomResourceDe***REMOVED***nitionStatus is an autogenerated conversion function.
-func Convert_v1beta1_CustomResourceDe***REMOVED***nitionStatus_To_apiextensions_CustomResourceDe***REMOVED***nitionStatus(in *CustomResourceDe***REMOVED***nitionStatus, out *apiextensions.CustomResourceDe***REMOVED***nitionStatus, s conversion.Scope) error {
-	return autoConvert_v1beta1_CustomResourceDe***REMOVED***nitionStatus_To_apiextensions_CustomResourceDe***REMOVED***nitionStatus(in, out, s)
+// Convert_v1beta1_CustomResourceDefinitionStatus_To_apiextensions_CustomResourceDefinitionStatus is an autogenerated conversion function.
+func Convert_v1beta1_CustomResourceDefinitionStatus_To_apiextensions_CustomResourceDefinitionStatus(in *CustomResourceDefinitionStatus, out *apiextensions.CustomResourceDefinitionStatus, s conversion.Scope) error {
+	return autoConvert_v1beta1_CustomResourceDefinitionStatus_To_apiextensions_CustomResourceDefinitionStatus(in, out, s)
 }
 
-func autoConvert_apiextensions_CustomResourceDe***REMOVED***nitionStatus_To_v1beta1_CustomResourceDe***REMOVED***nitionStatus(in *apiextensions.CustomResourceDe***REMOVED***nitionStatus, out *CustomResourceDe***REMOVED***nitionStatus, s conversion.Scope) error {
-	out.Conditions = *(*[]CustomResourceDe***REMOVED***nitionCondition)(unsafe.Pointer(&in.Conditions))
-	if err := Convert_apiextensions_CustomResourceDe***REMOVED***nitionNames_To_v1beta1_CustomResourceDe***REMOVED***nitionNames(&in.AcceptedNames, &out.AcceptedNames, s); err != nil {
+func autoConvert_apiextensions_CustomResourceDefinitionStatus_To_v1beta1_CustomResourceDefinitionStatus(in *apiextensions.CustomResourceDefinitionStatus, out *CustomResourceDefinitionStatus, s conversion.Scope) error {
+	out.Conditions = *(*[]CustomResourceDefinitionCondition)(unsafe.Pointer(&in.Conditions))
+	if err := Convert_apiextensions_CustomResourceDefinitionNames_To_v1beta1_CustomResourceDefinitionNames(&in.AcceptedNames, &out.AcceptedNames, s); err != nil {
 		return err
 	}
 	out.StoredVersions = *(*[]string)(unsafe.Pointer(&in.StoredVersions))
 	return nil
 }
 
-// Convert_apiextensions_CustomResourceDe***REMOVED***nitionStatus_To_v1beta1_CustomResourceDe***REMOVED***nitionStatus is an autogenerated conversion function.
-func Convert_apiextensions_CustomResourceDe***REMOVED***nitionStatus_To_v1beta1_CustomResourceDe***REMOVED***nitionStatus(in *apiextensions.CustomResourceDe***REMOVED***nitionStatus, out *CustomResourceDe***REMOVED***nitionStatus, s conversion.Scope) error {
-	return autoConvert_apiextensions_CustomResourceDe***REMOVED***nitionStatus_To_v1beta1_CustomResourceDe***REMOVED***nitionStatus(in, out, s)
+// Convert_apiextensions_CustomResourceDefinitionStatus_To_v1beta1_CustomResourceDefinitionStatus is an autogenerated conversion function.
+func Convert_apiextensions_CustomResourceDefinitionStatus_To_v1beta1_CustomResourceDefinitionStatus(in *apiextensions.CustomResourceDefinitionStatus, out *CustomResourceDefinitionStatus, s conversion.Scope) error {
+	return autoConvert_apiextensions_CustomResourceDefinitionStatus_To_v1beta1_CustomResourceDefinitionStatus(in, out, s)
 }
 
-func autoConvert_v1beta1_CustomResourceDe***REMOVED***nitionVersion_To_apiextensions_CustomResourceDe***REMOVED***nitionVersion(in *CustomResourceDe***REMOVED***nitionVersion, out *apiextensions.CustomResourceDe***REMOVED***nitionVersion, s conversion.Scope) error {
+func autoConvert_v1beta1_CustomResourceDefinitionVersion_To_apiextensions_CustomResourceDefinitionVersion(in *CustomResourceDefinitionVersion, out *apiextensions.CustomResourceDefinitionVersion, s conversion.Scope) error {
 	out.Name = in.Name
 	out.Served = in.Served
 	out.Storage = in.Storage
@@ -561,20 +561,20 @@ func autoConvert_v1beta1_CustomResourceDe***REMOVED***nitionVersion_To_apiextens
 		if err := Convert_v1beta1_CustomResourceValidation_To_apiextensions_CustomResourceValidation(*in, *out, s); err != nil {
 			return err
 		}
-	} ***REMOVED*** {
+	} else {
 		out.Schema = nil
 	}
 	out.Subresources = (*apiextensions.CustomResourceSubresources)(unsafe.Pointer(in.Subresources))
-	out.AdditionalPrinterColumns = *(*[]apiextensions.CustomResourceColumnDe***REMOVED***nition)(unsafe.Pointer(&in.AdditionalPrinterColumns))
+	out.AdditionalPrinterColumns = *(*[]apiextensions.CustomResourceColumnDefinition)(unsafe.Pointer(&in.AdditionalPrinterColumns))
 	return nil
 }
 
-// Convert_v1beta1_CustomResourceDe***REMOVED***nitionVersion_To_apiextensions_CustomResourceDe***REMOVED***nitionVersion is an autogenerated conversion function.
-func Convert_v1beta1_CustomResourceDe***REMOVED***nitionVersion_To_apiextensions_CustomResourceDe***REMOVED***nitionVersion(in *CustomResourceDe***REMOVED***nitionVersion, out *apiextensions.CustomResourceDe***REMOVED***nitionVersion, s conversion.Scope) error {
-	return autoConvert_v1beta1_CustomResourceDe***REMOVED***nitionVersion_To_apiextensions_CustomResourceDe***REMOVED***nitionVersion(in, out, s)
+// Convert_v1beta1_CustomResourceDefinitionVersion_To_apiextensions_CustomResourceDefinitionVersion is an autogenerated conversion function.
+func Convert_v1beta1_CustomResourceDefinitionVersion_To_apiextensions_CustomResourceDefinitionVersion(in *CustomResourceDefinitionVersion, out *apiextensions.CustomResourceDefinitionVersion, s conversion.Scope) error {
+	return autoConvert_v1beta1_CustomResourceDefinitionVersion_To_apiextensions_CustomResourceDefinitionVersion(in, out, s)
 }
 
-func autoConvert_apiextensions_CustomResourceDe***REMOVED***nitionVersion_To_v1beta1_CustomResourceDe***REMOVED***nitionVersion(in *apiextensions.CustomResourceDe***REMOVED***nitionVersion, out *CustomResourceDe***REMOVED***nitionVersion, s conversion.Scope) error {
+func autoConvert_apiextensions_CustomResourceDefinitionVersion_To_v1beta1_CustomResourceDefinitionVersion(in *apiextensions.CustomResourceDefinitionVersion, out *CustomResourceDefinitionVersion, s conversion.Scope) error {
 	out.Name = in.Name
 	out.Served = in.Served
 	out.Storage = in.Storage
@@ -584,17 +584,17 @@ func autoConvert_apiextensions_CustomResourceDe***REMOVED***nitionVersion_To_v1b
 		if err := Convert_apiextensions_CustomResourceValidation_To_v1beta1_CustomResourceValidation(*in, *out, s); err != nil {
 			return err
 		}
-	} ***REMOVED*** {
+	} else {
 		out.Schema = nil
 	}
 	out.Subresources = (*CustomResourceSubresources)(unsafe.Pointer(in.Subresources))
-	out.AdditionalPrinterColumns = *(*[]CustomResourceColumnDe***REMOVED***nition)(unsafe.Pointer(&in.AdditionalPrinterColumns))
+	out.AdditionalPrinterColumns = *(*[]CustomResourceColumnDefinition)(unsafe.Pointer(&in.AdditionalPrinterColumns))
 	return nil
 }
 
-// Convert_apiextensions_CustomResourceDe***REMOVED***nitionVersion_To_v1beta1_CustomResourceDe***REMOVED***nitionVersion is an autogenerated conversion function.
-func Convert_apiextensions_CustomResourceDe***REMOVED***nitionVersion_To_v1beta1_CustomResourceDe***REMOVED***nitionVersion(in *apiextensions.CustomResourceDe***REMOVED***nitionVersion, out *CustomResourceDe***REMOVED***nitionVersion, s conversion.Scope) error {
-	return autoConvert_apiextensions_CustomResourceDe***REMOVED***nitionVersion_To_v1beta1_CustomResourceDe***REMOVED***nitionVersion(in, out, s)
+// Convert_apiextensions_CustomResourceDefinitionVersion_To_v1beta1_CustomResourceDefinitionVersion is an autogenerated conversion function.
+func Convert_apiextensions_CustomResourceDefinitionVersion_To_v1beta1_CustomResourceDefinitionVersion(in *apiextensions.CustomResourceDefinitionVersion, out *CustomResourceDefinitionVersion, s conversion.Scope) error {
+	return autoConvert_apiextensions_CustomResourceDefinitionVersion_To_v1beta1_CustomResourceDefinitionVersion(in, out, s)
 }
 
 func autoConvert_v1beta1_CustomResourceSubresourceScale_To_apiextensions_CustomResourceSubresourceScale(in *CustomResourceSubresourceScale, out *apiextensions.CustomResourceSubresourceScale, s conversion.Scope) error {
@@ -668,7 +668,7 @@ func autoConvert_v1beta1_CustomResourceValidation_To_apiextensions_CustomResourc
 		if err := Convert_v1beta1_JSONSchemaProps_To_apiextensions_JSONSchemaProps(*in, *out, s); err != nil {
 			return err
 		}
-	} ***REMOVED*** {
+	} else {
 		out.OpenAPIV3Schema = nil
 	}
 	return nil
@@ -686,7 +686,7 @@ func autoConvert_apiextensions_CustomResourceValidation_To_v1beta1_CustomResourc
 		if err := Convert_apiextensions_JSONSchemaProps_To_v1beta1_JSONSchemaProps(*in, *out, s); err != nil {
 			return err
 		}
-	} ***REMOVED*** {
+	} else {
 		out.OpenAPIV3Schema = nil
 	}
 	return nil
@@ -743,7 +743,7 @@ func autoConvert_v1beta1_JSONSchemaProps_To_apiextensions_JSONSchemaProps(in *JS
 		if err := Convert_v1beta1_JSON_To_apiextensions_JSON(*in, *out, s); err != nil {
 			return err
 		}
-	} ***REMOVED*** {
+	} else {
 		out.Default = nil
 	}
 	out.Maximum = (*float64)(unsafe.Pointer(in.Maximum))
@@ -765,7 +765,7 @@ func autoConvert_v1beta1_JSONSchemaProps_To_apiextensions_JSONSchemaProps(in *JS
 				return err
 			}
 		}
-	} ***REMOVED*** {
+	} else {
 		out.Enum = nil
 	}
 	out.MaxProperties = (*int64)(unsafe.Pointer(in.MaxProperties))
@@ -777,7 +777,7 @@ func autoConvert_v1beta1_JSONSchemaProps_To_apiextensions_JSONSchemaProps(in *JS
 		if err := Convert_v1beta1_JSONSchemaPropsOrArray_To_apiextensions_JSONSchemaPropsOrArray(*in, *out, s); err != nil {
 			return err
 		}
-	} ***REMOVED*** {
+	} else {
 		out.Items = nil
 	}
 	if in.AllOf != nil {
@@ -788,7 +788,7 @@ func autoConvert_v1beta1_JSONSchemaProps_To_apiextensions_JSONSchemaProps(in *JS
 				return err
 			}
 		}
-	} ***REMOVED*** {
+	} else {
 		out.AllOf = nil
 	}
 	if in.OneOf != nil {
@@ -799,7 +799,7 @@ func autoConvert_v1beta1_JSONSchemaProps_To_apiextensions_JSONSchemaProps(in *JS
 				return err
 			}
 		}
-	} ***REMOVED*** {
+	} else {
 		out.OneOf = nil
 	}
 	if in.AnyOf != nil {
@@ -810,7 +810,7 @@ func autoConvert_v1beta1_JSONSchemaProps_To_apiextensions_JSONSchemaProps(in *JS
 				return err
 			}
 		}
-	} ***REMOVED*** {
+	} else {
 		out.AnyOf = nil
 	}
 	if in.Not != nil {
@@ -819,7 +819,7 @@ func autoConvert_v1beta1_JSONSchemaProps_To_apiextensions_JSONSchemaProps(in *JS
 		if err := Convert_v1beta1_JSONSchemaProps_To_apiextensions_JSONSchemaProps(*in, *out, s); err != nil {
 			return err
 		}
-	} ***REMOVED*** {
+	} else {
 		out.Not = nil
 	}
 	if in.Properties != nil {
@@ -832,7 +832,7 @@ func autoConvert_v1beta1_JSONSchemaProps_To_apiextensions_JSONSchemaProps(in *JS
 			}
 			(*out)[key] = *newVal
 		}
-	} ***REMOVED*** {
+	} else {
 		out.Properties = nil
 	}
 	if in.AdditionalProperties != nil {
@@ -841,7 +841,7 @@ func autoConvert_v1beta1_JSONSchemaProps_To_apiextensions_JSONSchemaProps(in *JS
 		if err := Convert_v1beta1_JSONSchemaPropsOrBool_To_apiextensions_JSONSchemaPropsOrBool(*in, *out, s); err != nil {
 			return err
 		}
-	} ***REMOVED*** {
+	} else {
 		out.AdditionalProperties = nil
 	}
 	if in.PatternProperties != nil {
@@ -854,7 +854,7 @@ func autoConvert_v1beta1_JSONSchemaProps_To_apiextensions_JSONSchemaProps(in *JS
 			}
 			(*out)[key] = *newVal
 		}
-	} ***REMOVED*** {
+	} else {
 		out.PatternProperties = nil
 	}
 	if in.Dependencies != nil {
@@ -867,7 +867,7 @@ func autoConvert_v1beta1_JSONSchemaProps_To_apiextensions_JSONSchemaProps(in *JS
 			}
 			(*out)[key] = *newVal
 		}
-	} ***REMOVED*** {
+	} else {
 		out.Dependencies = nil
 	}
 	if in.AdditionalItems != nil {
@@ -876,12 +876,12 @@ func autoConvert_v1beta1_JSONSchemaProps_To_apiextensions_JSONSchemaProps(in *JS
 		if err := Convert_v1beta1_JSONSchemaPropsOrBool_To_apiextensions_JSONSchemaPropsOrBool(*in, *out, s); err != nil {
 			return err
 		}
-	} ***REMOVED*** {
+	} else {
 		out.AdditionalItems = nil
 	}
-	if in.De***REMOVED***nitions != nil {
-		in, out := &in.De***REMOVED***nitions, &out.De***REMOVED***nitions
-		*out = make(apiextensions.JSONSchemaDe***REMOVED***nitions, len(*in))
+	if in.Definitions != nil {
+		in, out := &in.Definitions, &out.Definitions
+		*out = make(apiextensions.JSONSchemaDefinitions, len(*in))
 		for key, val := range *in {
 			newVal := new(apiextensions.JSONSchemaProps)
 			if err := Convert_v1beta1_JSONSchemaProps_To_apiextensions_JSONSchemaProps(&val, newVal, s); err != nil {
@@ -889,8 +889,8 @@ func autoConvert_v1beta1_JSONSchemaProps_To_apiextensions_JSONSchemaProps(in *JS
 			}
 			(*out)[key] = *newVal
 		}
-	} ***REMOVED*** {
-		out.De***REMOVED***nitions = nil
+	} else {
+		out.Definitions = nil
 	}
 	out.ExternalDocs = (*apiextensions.ExternalDocumentation)(unsafe.Pointer(in.ExternalDocs))
 	if in.Example != nil {
@@ -899,7 +899,7 @@ func autoConvert_v1beta1_JSONSchemaProps_To_apiextensions_JSONSchemaProps(in *JS
 		if err := Convert_v1beta1_JSON_To_apiextensions_JSON(*in, *out, s); err != nil {
 			return err
 		}
-	} ***REMOVED*** {
+	} else {
 		out.Example = nil
 	}
 	return nil
@@ -924,7 +924,7 @@ func autoConvert_apiextensions_JSONSchemaProps_To_v1beta1_JSONSchemaProps(in *ap
 		if err := Convert_apiextensions_JSON_To_v1beta1_JSON(*in, *out, s); err != nil {
 			return err
 		}
-	} ***REMOVED*** {
+	} else {
 		out.Default = nil
 	}
 	out.Maximum = (*float64)(unsafe.Pointer(in.Maximum))
@@ -946,7 +946,7 @@ func autoConvert_apiextensions_JSONSchemaProps_To_v1beta1_JSONSchemaProps(in *ap
 				return err
 			}
 		}
-	} ***REMOVED*** {
+	} else {
 		out.Enum = nil
 	}
 	out.MaxProperties = (*int64)(unsafe.Pointer(in.MaxProperties))
@@ -958,7 +958,7 @@ func autoConvert_apiextensions_JSONSchemaProps_To_v1beta1_JSONSchemaProps(in *ap
 		if err := Convert_apiextensions_JSONSchemaPropsOrArray_To_v1beta1_JSONSchemaPropsOrArray(*in, *out, s); err != nil {
 			return err
 		}
-	} ***REMOVED*** {
+	} else {
 		out.Items = nil
 	}
 	if in.AllOf != nil {
@@ -969,7 +969,7 @@ func autoConvert_apiextensions_JSONSchemaProps_To_v1beta1_JSONSchemaProps(in *ap
 				return err
 			}
 		}
-	} ***REMOVED*** {
+	} else {
 		out.AllOf = nil
 	}
 	if in.OneOf != nil {
@@ -980,7 +980,7 @@ func autoConvert_apiextensions_JSONSchemaProps_To_v1beta1_JSONSchemaProps(in *ap
 				return err
 			}
 		}
-	} ***REMOVED*** {
+	} else {
 		out.OneOf = nil
 	}
 	if in.AnyOf != nil {
@@ -991,7 +991,7 @@ func autoConvert_apiextensions_JSONSchemaProps_To_v1beta1_JSONSchemaProps(in *ap
 				return err
 			}
 		}
-	} ***REMOVED*** {
+	} else {
 		out.AnyOf = nil
 	}
 	if in.Not != nil {
@@ -1000,7 +1000,7 @@ func autoConvert_apiextensions_JSONSchemaProps_To_v1beta1_JSONSchemaProps(in *ap
 		if err := Convert_apiextensions_JSONSchemaProps_To_v1beta1_JSONSchemaProps(*in, *out, s); err != nil {
 			return err
 		}
-	} ***REMOVED*** {
+	} else {
 		out.Not = nil
 	}
 	if in.Properties != nil {
@@ -1013,7 +1013,7 @@ func autoConvert_apiextensions_JSONSchemaProps_To_v1beta1_JSONSchemaProps(in *ap
 			}
 			(*out)[key] = *newVal
 		}
-	} ***REMOVED*** {
+	} else {
 		out.Properties = nil
 	}
 	if in.AdditionalProperties != nil {
@@ -1022,7 +1022,7 @@ func autoConvert_apiextensions_JSONSchemaProps_To_v1beta1_JSONSchemaProps(in *ap
 		if err := Convert_apiextensions_JSONSchemaPropsOrBool_To_v1beta1_JSONSchemaPropsOrBool(*in, *out, s); err != nil {
 			return err
 		}
-	} ***REMOVED*** {
+	} else {
 		out.AdditionalProperties = nil
 	}
 	if in.PatternProperties != nil {
@@ -1035,7 +1035,7 @@ func autoConvert_apiextensions_JSONSchemaProps_To_v1beta1_JSONSchemaProps(in *ap
 			}
 			(*out)[key] = *newVal
 		}
-	} ***REMOVED*** {
+	} else {
 		out.PatternProperties = nil
 	}
 	if in.Dependencies != nil {
@@ -1048,7 +1048,7 @@ func autoConvert_apiextensions_JSONSchemaProps_To_v1beta1_JSONSchemaProps(in *ap
 			}
 			(*out)[key] = *newVal
 		}
-	} ***REMOVED*** {
+	} else {
 		out.Dependencies = nil
 	}
 	if in.AdditionalItems != nil {
@@ -1057,12 +1057,12 @@ func autoConvert_apiextensions_JSONSchemaProps_To_v1beta1_JSONSchemaProps(in *ap
 		if err := Convert_apiextensions_JSONSchemaPropsOrBool_To_v1beta1_JSONSchemaPropsOrBool(*in, *out, s); err != nil {
 			return err
 		}
-	} ***REMOVED*** {
+	} else {
 		out.AdditionalItems = nil
 	}
-	if in.De***REMOVED***nitions != nil {
-		in, out := &in.De***REMOVED***nitions, &out.De***REMOVED***nitions
-		*out = make(JSONSchemaDe***REMOVED***nitions, len(*in))
+	if in.Definitions != nil {
+		in, out := &in.Definitions, &out.Definitions
+		*out = make(JSONSchemaDefinitions, len(*in))
 		for key, val := range *in {
 			newVal := new(JSONSchemaProps)
 			if err := Convert_apiextensions_JSONSchemaProps_To_v1beta1_JSONSchemaProps(&val, newVal, s); err != nil {
@@ -1070,8 +1070,8 @@ func autoConvert_apiextensions_JSONSchemaProps_To_v1beta1_JSONSchemaProps(in *ap
 			}
 			(*out)[key] = *newVal
 		}
-	} ***REMOVED*** {
-		out.De***REMOVED***nitions = nil
+	} else {
+		out.Definitions = nil
 	}
 	out.ExternalDocs = (*ExternalDocumentation)(unsafe.Pointer(in.ExternalDocs))
 	if in.Example != nil {
@@ -1080,7 +1080,7 @@ func autoConvert_apiextensions_JSONSchemaProps_To_v1beta1_JSONSchemaProps(in *ap
 		if err := Convert_apiextensions_JSON_To_v1beta1_JSON(*in, *out, s); err != nil {
 			return err
 		}
-	} ***REMOVED*** {
+	} else {
 		out.Example = nil
 	}
 	return nil
@@ -1093,7 +1093,7 @@ func autoConvert_v1beta1_JSONSchemaPropsOrArray_To_apiextensions_JSONSchemaProps
 		if err := Convert_v1beta1_JSONSchemaProps_To_apiextensions_JSONSchemaProps(*in, *out, s); err != nil {
 			return err
 		}
-	} ***REMOVED*** {
+	} else {
 		out.Schema = nil
 	}
 	if in.JSONSchemas != nil {
@@ -1104,7 +1104,7 @@ func autoConvert_v1beta1_JSONSchemaPropsOrArray_To_apiextensions_JSONSchemaProps
 				return err
 			}
 		}
-	} ***REMOVED*** {
+	} else {
 		out.JSONSchemas = nil
 	}
 	return nil
@@ -1122,7 +1122,7 @@ func autoConvert_apiextensions_JSONSchemaPropsOrArray_To_v1beta1_JSONSchemaProps
 		if err := Convert_apiextensions_JSONSchemaProps_To_v1beta1_JSONSchemaProps(*in, *out, s); err != nil {
 			return err
 		}
-	} ***REMOVED*** {
+	} else {
 		out.Schema = nil
 	}
 	if in.JSONSchemas != nil {
@@ -1133,7 +1133,7 @@ func autoConvert_apiextensions_JSONSchemaPropsOrArray_To_v1beta1_JSONSchemaProps
 				return err
 			}
 		}
-	} ***REMOVED*** {
+	} else {
 		out.JSONSchemas = nil
 	}
 	return nil
@@ -1152,7 +1152,7 @@ func autoConvert_v1beta1_JSONSchemaPropsOrBool_To_apiextensions_JSONSchemaPropsO
 		if err := Convert_v1beta1_JSONSchemaProps_To_apiextensions_JSONSchemaProps(*in, *out, s); err != nil {
 			return err
 		}
-	} ***REMOVED*** {
+	} else {
 		out.Schema = nil
 	}
 	return nil
@@ -1171,7 +1171,7 @@ func autoConvert_apiextensions_JSONSchemaPropsOrBool_To_v1beta1_JSONSchemaPropsO
 		if err := Convert_apiextensions_JSONSchemaProps_To_v1beta1_JSONSchemaProps(*in, *out, s); err != nil {
 			return err
 		}
-	} ***REMOVED*** {
+	} else {
 		out.Schema = nil
 	}
 	return nil
@@ -1189,7 +1189,7 @@ func autoConvert_v1beta1_JSONSchemaPropsOrStringArray_To_apiextensions_JSONSchem
 		if err := Convert_v1beta1_JSONSchemaProps_To_apiextensions_JSONSchemaProps(*in, *out, s); err != nil {
 			return err
 		}
-	} ***REMOVED*** {
+	} else {
 		out.Schema = nil
 	}
 	out.Property = *(*[]string)(unsafe.Pointer(&in.Property))
@@ -1208,7 +1208,7 @@ func autoConvert_apiextensions_JSONSchemaPropsOrStringArray_To_v1beta1_JSONSchem
 		if err := Convert_apiextensions_JSONSchemaProps_To_v1beta1_JSONSchemaProps(*in, *out, s); err != nil {
 			return err
 		}
-	} ***REMOVED*** {
+	} else {
 		out.Schema = nil
 	}
 	out.Property = *(*[]string)(unsafe.Pointer(&in.Property))
@@ -1244,26 +1244,26 @@ func Convert_apiextensions_ServiceReference_To_v1beta1_ServiceReference(in *apie
 	return autoConvert_apiextensions_ServiceReference_To_v1beta1_ServiceReference(in, out, s)
 }
 
-func autoConvert_v1beta1_WebhookClientCon***REMOVED***g_To_apiextensions_WebhookClientCon***REMOVED***g(in *WebhookClientCon***REMOVED***g, out *apiextensions.WebhookClientCon***REMOVED***g, s conversion.Scope) error {
+func autoConvert_v1beta1_WebhookClientConfig_To_apiextensions_WebhookClientConfig(in *WebhookClientConfig, out *apiextensions.WebhookClientConfig, s conversion.Scope) error {
 	out.URL = (*string)(unsafe.Pointer(in.URL))
 	out.Service = (*apiextensions.ServiceReference)(unsafe.Pointer(in.Service))
 	out.CABundle = *(*[]byte)(unsafe.Pointer(&in.CABundle))
 	return nil
 }
 
-// Convert_v1beta1_WebhookClientCon***REMOVED***g_To_apiextensions_WebhookClientCon***REMOVED***g is an autogenerated conversion function.
-func Convert_v1beta1_WebhookClientCon***REMOVED***g_To_apiextensions_WebhookClientCon***REMOVED***g(in *WebhookClientCon***REMOVED***g, out *apiextensions.WebhookClientCon***REMOVED***g, s conversion.Scope) error {
-	return autoConvert_v1beta1_WebhookClientCon***REMOVED***g_To_apiextensions_WebhookClientCon***REMOVED***g(in, out, s)
+// Convert_v1beta1_WebhookClientConfig_To_apiextensions_WebhookClientConfig is an autogenerated conversion function.
+func Convert_v1beta1_WebhookClientConfig_To_apiextensions_WebhookClientConfig(in *WebhookClientConfig, out *apiextensions.WebhookClientConfig, s conversion.Scope) error {
+	return autoConvert_v1beta1_WebhookClientConfig_To_apiextensions_WebhookClientConfig(in, out, s)
 }
 
-func autoConvert_apiextensions_WebhookClientCon***REMOVED***g_To_v1beta1_WebhookClientCon***REMOVED***g(in *apiextensions.WebhookClientCon***REMOVED***g, out *WebhookClientCon***REMOVED***g, s conversion.Scope) error {
+func autoConvert_apiextensions_WebhookClientConfig_To_v1beta1_WebhookClientConfig(in *apiextensions.WebhookClientConfig, out *WebhookClientConfig, s conversion.Scope) error {
 	out.URL = (*string)(unsafe.Pointer(in.URL))
 	out.Service = (*ServiceReference)(unsafe.Pointer(in.Service))
 	out.CABundle = *(*[]byte)(unsafe.Pointer(&in.CABundle))
 	return nil
 }
 
-// Convert_apiextensions_WebhookClientCon***REMOVED***g_To_v1beta1_WebhookClientCon***REMOVED***g is an autogenerated conversion function.
-func Convert_apiextensions_WebhookClientCon***REMOVED***g_To_v1beta1_WebhookClientCon***REMOVED***g(in *apiextensions.WebhookClientCon***REMOVED***g, out *WebhookClientCon***REMOVED***g, s conversion.Scope) error {
-	return autoConvert_apiextensions_WebhookClientCon***REMOVED***g_To_v1beta1_WebhookClientCon***REMOVED***g(in, out, s)
+// Convert_apiextensions_WebhookClientConfig_To_v1beta1_WebhookClientConfig is an autogenerated conversion function.
+func Convert_apiextensions_WebhookClientConfig_To_v1beta1_WebhookClientConfig(in *apiextensions.WebhookClientConfig, out *WebhookClientConfig, s conversion.Scope) error {
+	return autoConvert_apiextensions_WebhookClientConfig_To_v1beta1_WebhookClientConfig(in, out, s)
 }

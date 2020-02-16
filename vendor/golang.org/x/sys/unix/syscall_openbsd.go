@@ -1,9 +1,9 @@
 // Copyright 2009,2010 The Go Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE ***REMOVED***le.
+// license that can be found in the LICENSE file.
 
 // OpenBSD system calls.
-// This ***REMOVED***le is compiled as ordinary Go code,
+// This file is compiled as ordinary Go code,
 // but it is also input to mksyscall,
 // which parses the //sys lines and generates system call stubs.
 // Note that sometimes we use a lowercase //sys name and wrap
@@ -78,7 +78,7 @@ func Getwd() (string, error) {
 }
 
 // TODO
-func send***REMOVED***le(outfd int, infd int, offset *int64, count int) (written int, err error) {
+func sendfile(outfd int, infd int, offset *int64, count int) (written int, err error) {
 	return -1, ENOSYS
 }
 
@@ -105,10 +105,10 @@ func setattrlistTimes(path string, times []Timespec, flags int) error {
 //sys	ioctl(fd int, req uint, arg uintptr) (err error)
 
 // ioctl itself should not be exposed directly, but additional get/set
-// functions for speci***REMOVED***c types are permissible.
+// functions for specific types are permissible.
 
 // IoctlSetInt performs an ioctl operation which sets an integer value
-// on fd, using the speci***REMOVED***ed request number.
+// on fd, using the specified request number.
 func IoctlSetInt(fd int, req uint, value int) error {
 	return ioctl(fd, req, uintptr(value))
 }
@@ -122,7 +122,7 @@ func IoctlSetTermios(fd int, req uint, value *Termios) error {
 }
 
 // IoctlGetInt performs an ioctl operation which gets an integer value
-// from fd, using the speci***REMOVED***ed request number.
+// from fd, using the specified request number.
 func IoctlGetInt(fd int, req uint) (int, error) {
 	var value int
 	err := ioctl(fd, req, uintptr(unsafe.Pointer(&value)))
@@ -172,7 +172,7 @@ func Uname(uname *Utsname) error {
 		if b == '\n' || b == '\t' {
 			if i == len(uname.Version)-1 {
 				uname.Version[i] = 0
-			} ***REMOVED*** {
+			} else {
 				uname.Version[i] = ' '
 			}
 		}
@@ -234,7 +234,7 @@ func Uname(uname *Utsname) error {
 //sys	Listen(s int, backlog int) (err error)
 //sys	Lstat(path string, stat *Stat_t) (err error)
 //sys	Mkdir(path string, mode uint32) (err error)
-//sys	Mk***REMOVED***fo(path string, mode uint32) (err error)
+//sys	Mkfifo(path string, mode uint32) (err error)
 //sys	Mknod(path string, mode uint32, dev int) (err error)
 //sys	Nanosleep(time *Timespec, leftover *Timespec) (err error)
 //sys	Open(path string, mode int, perm uint32) (fd int, err error)
@@ -318,7 +318,7 @@ func Uname(uname *Utsname) error {
 // mincore
 // minherit
 // mkdirat
-// mk***REMOVED***foat
+// mkfifoat
 // mknodat
 // mount
 // mquery
@@ -330,7 +330,7 @@ func Uname(uname *Utsname) error {
 // nnpfspioctl
 // openat
 // preadv
-// pro***REMOVED***l
+// profil
 // pwritev
 // quotactl
 // readlinkat

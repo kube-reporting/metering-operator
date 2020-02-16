@@ -1,6 +1,6 @@
 // Copyright 2014 The Go Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE ***REMOVED***le.
+// license that can be found in the LICENSE file.
 
 package internal
 
@@ -16,7 +16,7 @@ var HTTPClient ContextKey
 
 // ContextKey is just an empty struct. It exists so HTTPClient can be
 // an immutable public variable with a unique type. It's immutable
-// because nobody ***REMOVED*** can create a ContextKey, being unexported.
+// because nobody else can create a ContextKey, being unexported.
 type ContextKey struct{}
 
 var appengineClientHook func(context.Context) *http.Client

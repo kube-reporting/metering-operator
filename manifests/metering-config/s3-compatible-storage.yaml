@@ -1,5 +1,5 @@
 apiVersion: metering.openshift.io/v1
-kind: MeteringCon***REMOVED***g
+kind: MeteringConfig
 metadata:
   name: "operator-metering"
 spec:
@@ -11,8 +11,8 @@ spec:
         bucket: "bucketname"
         endpoint: "https://example:port-number"
         secretName: "my-aws-secret"
-        # If you need to trust a self-signed certi***REMOVED***cate, uncomment the "ca"
-        # section below. Be sure to include the full certi***REMOVED***cate chain.
+        # If you need to trust a self-signed certificate, uncomment the "ca"
+        # section below. Be sure to include the full certificate chain.
         #
         # ca:
         #   createSecret: true

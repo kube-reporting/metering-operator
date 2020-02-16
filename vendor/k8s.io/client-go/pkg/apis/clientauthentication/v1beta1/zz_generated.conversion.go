@@ -4,7 +4,7 @@
 Copyright The Kubernetes Authors.
 
 Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this ***REMOVED***le except in compliance with the License.
+you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
 
     http://www.apache.org/licenses/LICENSE-2.0
@@ -12,7 +12,7 @@ You may obtain a copy of the License at
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the speci***REMOVED***c language governing permissions and
+See the License for the specific language governing permissions and
 limitations under the License.
 */
 
@@ -118,7 +118,7 @@ func autoConvert_clientauthentication_ExecCredentialSpec_To_v1beta1_ExecCredenti
 func autoConvert_v1beta1_ExecCredentialStatus_To_clientauthentication_ExecCredentialStatus(in *ExecCredentialStatus, out *clientauthentication.ExecCredentialStatus, s conversion.Scope) error {
 	out.ExpirationTimestamp = (*v1.Time)(unsafe.Pointer(in.ExpirationTimestamp))
 	out.Token = in.Token
-	out.ClientCerti***REMOVED***cateData = in.ClientCerti***REMOVED***cateData
+	out.ClientCertificateData = in.ClientCertificateData
 	out.ClientKeyData = in.ClientKeyData
 	return nil
 }
@@ -131,7 +131,7 @@ func Convert_v1beta1_ExecCredentialStatus_To_clientauthentication_ExecCredential
 func autoConvert_clientauthentication_ExecCredentialStatus_To_v1beta1_ExecCredentialStatus(in *clientauthentication.ExecCredentialStatus, out *ExecCredentialStatus, s conversion.Scope) error {
 	out.ExpirationTimestamp = (*v1.Time)(unsafe.Pointer(in.ExpirationTimestamp))
 	out.Token = in.Token
-	out.ClientCerti***REMOVED***cateData = in.ClientCerti***REMOVED***cateData
+	out.ClientCertificateData = in.ClientCertificateData
 	out.ClientKeyData = in.ClientKeyData
 	return nil
 }

@@ -1,6 +1,6 @@
 ---
 
-- include_tasks: update_meteringcon***REMOVED***g_status.yml
+- include_tasks: update_meteringconfig_status.yml
   vars:
     current_conditions:
       type: "Running"
@@ -11,73 +11,73 @@
 - name: Deploy presto resources
   include_tasks: deploy_resources.yml
   vars:
-    values_***REMOVED***le: /tmp/metering-values.yaml
+    values_file: /tmp/metering-values.yaml
     resources:
-      - template_***REMOVED***le: templates/presto/presto-aws-credentials-secret.yaml
+      - template_file: templates/presto/presto-aws-credentials-secret.yaml
         apis: [ {kind: secret} ]
         prune_label_value: presto-aws-credentials-secret
-        create: "{{ meteringcon***REMOVED***g_create_presto_aws_credentials }}"
-      - template_***REMOVED***le: templates/presto/presto-azure-credentials-secret.yaml
+        create: "{{ meteringconfig_create_presto_aws_credentials }}"
+      - template_file: templates/presto/presto-azure-credentials-secret.yaml
         apis: [ {kind: secret} ]
         prune_label_value: presto-azure-credentials-secret
-        create: "{{ meteringcon***REMOVED***g_create_presto_azure_credentials }}"
-      - template_***REMOVED***le: templates/presto/presto-gcs-credentials-secret.yaml
+        create: "{{ meteringconfig_create_presto_azure_credentials }}"
+      - template_file: templates/presto/presto-gcs-credentials-secret.yaml
         apis: [ {kind: secret} ]
         prune_label_value: presto-gcs-credentials-secret
-        create: "{{ meteringcon***REMOVED***g_create_presto_gcs_credentials }}"
-      - template_***REMOVED***le: templates/presto/presto-s3-compatible-credentials-secret.yaml
+        create: "{{ meteringconfig_create_presto_gcs_credentials }}"
+      - template_file: templates/presto/presto-s3-compatible-credentials-secret.yaml
         apis: [ {kind: secret} ]
         prune_label_value: presto-s3-compatible-credentials-secret
-        create: "{{ meteringcon***REMOVED***g_create_presto_s3_compatible_credentials }}"
-      - template_***REMOVED***le: templates/presto/presto-s3-compatible-ca-secret.yaml
+        create: "{{ meteringconfig_create_presto_s3_compatible_credentials }}"
+      - template_file: templates/presto/presto-s3-compatible-ca-secret.yaml
         apis: [ {kind: secret} ]
         prune_label_value: presto-s3-compatible-ca-secret
-        create: "{{ meteringcon***REMOVED***g_create_presto_s3_compatible_ca }}"
-      - template_***REMOVED***le: templates/presto/presto-tls-secrets.yaml
+        create: "{{ meteringconfig_create_presto_s3_compatible_ca }}"
+      - template_file: templates/presto/presto-tls-secrets.yaml
         apis: [ {kind: secret} ]
         prune_label_value: presto-tls-secrets
-        create: "{{ meteringcon***REMOVED***g_create_presto_tls_secrets }}"
-      - template_***REMOVED***le: templates/presto/presto-auth-secrets.yaml
+        create: "{{ meteringconfig_create_presto_tls_secrets }}"
+      - template_file: templates/presto/presto-auth-secrets.yaml
         apis: [ {kind: secret} ]
         prune_label_value: presto-auth-secrets
-        create: "{{ meteringcon***REMOVED***g_create_presto_auth_secrets }}"
-      - template_***REMOVED***le: templates/presto/presto-hive-metastore-tls-secrets.yaml
+        create: "{{ meteringconfig_create_presto_auth_secrets }}"
+      - template_file: templates/presto/presto-hive-metastore-tls-secrets.yaml
         apis: [ {kind: secret} ]
         prune_label_value: presto-hive-metastore-tls-secrets
-        create: "{{ meteringcon***REMOVED***g_create_presto_hive_metastore_tls_secrets }}"
-      - template_***REMOVED***le: templates/presto/presto-catalog-con***REMOVED***g-secret.yaml
+        create: "{{ meteringconfig_create_presto_hive_metastore_tls_secrets }}"
+      - template_file: templates/presto/presto-catalog-config-secret.yaml
         apis: [ {kind: secret} ]
-        prune_label_value: presto-catalog-con***REMOVED***g-secret
-      - template_***REMOVED***le: templates/presto/presto-common-con***REMOVED***g.yaml
-        apis: [ {kind: con***REMOVED***gmap} ]
-        prune_label_value: presto-common-con***REMOVED***g
-      - template_***REMOVED***le: templates/presto/presto-coordinator-con***REMOVED***g.yaml
-        apis: [ {kind: con***REMOVED***gmap} ]
-        prune_label_value: presto-coordinator-con***REMOVED***g
-      - template_***REMOVED***le: templates/presto/presto-serviceaccount.yaml
+        prune_label_value: presto-catalog-config-secret
+      - template_file: templates/presto/presto-common-config.yaml
+        apis: [ {kind: configmap} ]
+        prune_label_value: presto-common-config
+      - template_file: templates/presto/presto-coordinator-config.yaml
+        apis: [ {kind: configmap} ]
+        prune_label_value: presto-coordinator-config
+      - template_file: templates/presto/presto-serviceaccount.yaml
         apis: [ {kind: serviceaccount} ]
         prune_label_value: presto-serviceaccount
-      - template_***REMOVED***le: templates/presto/presto-prometheus-auth.yaml
+      - template_file: templates/presto/presto-prometheus-auth.yaml
         apis: [ {kind: serviceaccount} ]
         prune_label_value: presto-prometheus-auth
-        create: "{{ meteringcon***REMOVED***g_create_presto_prometheus_auth }}"
-      - template_***REMOVED***le: templates/presto/presto-jmx-con***REMOVED***g.yaml
-        apis: [ {kind: con***REMOVED***gmap} ]
-        prune_label_value: presto-jmx-con***REMOVED***g
-      - template_***REMOVED***le: templates/presto/presto-service.yaml
+        create: "{{ meteringconfig_create_presto_prometheus_auth }}"
+      - template_file: templates/presto/presto-jmx-config.yaml
+        apis: [ {kind: configmap} ]
+        prune_label_value: presto-jmx-config
+      - template_file: templates/presto/presto-service.yaml
         apis: [ {kind: service} ]
         prune_label_value: presto-service
-      - template_***REMOVED***le: templates/presto/presto-worker-con***REMOVED***g.yaml
-        apis: [ {kind: con***REMOVED***gmap} ]
-        prune_label_value: presto-worker-con***REMOVED***g
-      - template_***REMOVED***le: templates/presto/presto-coordinator-statefulset.yaml
+      - template_file: templates/presto/presto-worker-config.yaml
+        apis: [ {kind: configmap} ]
+        prune_label_value: presto-worker-config
+      - template_file: templates/presto/presto-coordinator-statefulset.yaml
         apis: [ {kind: statefulset} ]
         prune_label_value: presto-coordinator-statefulset
-      - template_***REMOVED***le: templates/presto/presto-worker-statefulset.yaml
+      - template_file: templates/presto/presto-worker-statefulset.yaml
         apis: [ {kind: statefulset} ]
         prune_label_value: presto-worker-statefulset
 
-- include_tasks: update_meteringcon***REMOVED***g_status.yml
+- include_tasks: update_meteringconfig_status.yml
   vars:
     current_conditions:
       type: "Running"
@@ -98,6 +98,6 @@
       component: Metering components
     involvedObject:
       apiVersion: metering.openshift.io
-      kind: MeteringCon***REMOVED***g
+      kind: MeteringConfig
       name: "{{ meta.name }}"
       namespace: "{{ meta.namespace }}"

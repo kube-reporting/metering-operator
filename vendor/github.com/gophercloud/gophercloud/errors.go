@@ -288,7 +288,7 @@ func (e ErrServiceNotFound) Error() string {
 
 // ErrEndpointNotFound is returned when no available endpoints match the
 // provided EndpointOpts. This is also generally returned by provider service
-// factory methods, and usually indicates that a region was speci***REMOVED***ed
+// factory methods, and usually indicates that a region was specified
 // incorrectly.
 type ErrEndpointNotFound struct {
 	BaseError
@@ -308,7 +308,7 @@ type ErrResourceNotFound struct {
 }
 
 func (e ErrResourceNotFound) Error() string {
-	e.DefaultErrString = fmt.Sprintf("Unable to ***REMOVED***nd %s with name %s", e.ResourceType, e.Name)
+	e.DefaultErrString = fmt.Sprintf("Unable to find %s with name %s", e.ResourceType, e.Name)
 	return e.choseErrString()
 }
 
@@ -399,7 +399,7 @@ func (e ErrDomainNameWithToken) Error() string {
 	return redundantWithTokenErr("DomainName")
 }
 
-// ErrUsernameOrUserID indicates that neither username nor userID are speci***REMOVED***ed, or both are at once.
+// ErrUsernameOrUserID indicates that neither username nor userID are specified, or both are at once.
 type ErrUsernameOrUserID struct{ BaseError }
 
 func (e ErrUsernameOrUserID) Error() string {

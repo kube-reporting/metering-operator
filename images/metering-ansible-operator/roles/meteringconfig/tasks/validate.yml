@@ -1,6 +1,6 @@
 ---
 
-- include_tasks: update_meteringcon***REMOVED***g_status.yml
+- include_tasks: update_meteringconfig_status.yml
   vars:
     current_conditions:
       type: "Running"
@@ -11,33 +11,33 @@
 #
 # Validate OCP-only features were properly disabled
 #
-- name: Validate ***REMOVED***elds when OCP-only features are disabled
+- name: Validate fields when OCP-only features are disabled
   block:
   - name: Validate that top-level TLS key is unset/disabled
     assert:
       that:
-        - meteringcon***REMOVED***g_spec | json_query('tls.enabled') != true
-      msg: "Invalid con***REMOVED***guration for non-OKD distributions: You cannot set the tls.enabled key to true when disabling OCP-only features."
+        - meteringconfig_spec | json_query('tls.enabled') != true
+      msg: "Invalid configuration for non-OKD distributions: You cannot set the tls.enabled key to true when disabling OCP-only features."
 
   - name: Validate that the Prometheus URL is set
     assert:
       that:
-        - meteringcon***REMOVED***g_spec['reporting-operator'] | json_query('spec.con***REMOVED***g.prometheus.url') != ""
-      msg: "Invalid con***REMOVED***guration for non-OKD distributions: You must set the reporting-operator.spec.con***REMOVED***g.prometheus.url."
+        - meteringconfig_spec['reporting-operator'] | json_query('spec.config.prometheus.url') != ""
+      msg: "Invalid configuration for non-OKD distributions: You must set the reporting-operator.spec.config.prometheus.url."
 
   - name: Validate that the reporting-operator Openshift Route is not enabled
     assert:
       that:
-      - meteringcon***REMOVED***g_spec['reporting-operator'] | json_query('spec.route.enabled') != true
-      msg: "Invalid con***REMOVED***guration for non-OKD distributions: You cannot enable the Openshift-only reporting-operator route."
+      - meteringconfig_spec['reporting-operator'] | json_query('spec.route.enabled') != true
+      msg: "Invalid configuration for non-OKD distributions: You cannot enable the Openshift-only reporting-operator route."
 
   - name: Validate that the reporting-operator OAuth authProxy is not enabled
     assert:
       that:
-      - meteringcon***REMOVED***g_spec['reporting-operator'] | json_query('spec.authProxy.enabled') != true
-      msg: "Invalid con***REMOVED***guration for non-OKD distributions: You cannot enable the Openshift-only reporting-operator authProxy."
+      - meteringconfig_spec['reporting-operator'] | json_query('spec.authProxy.enabled') != true
+      msg: "Invalid configuration for non-OKD distributions: You cannot enable the Openshift-only reporting-operator authProxy."
   rescue:
-  - include_tasks: update_meteringcon***REMOVED***g_status.yml
+  - include_tasks: update_meteringconfig_status.yml
     vars:
       end_play_after_updating_status: true
       current_conditions:
@@ -47,29 +47,29 @@
           "Failed task name: {{ ansible_failed_task.name }}"
           "Failed task message: {{ ansible_failed_result.msg }}"
         lastTransitionTime: "{{ now(utc=False).isoformat() + 'Z' }}"
-  when: meteringcon***REMOVED***g_ocp_disabled
+  when: meteringconfig_ocp_disabled
 
 #
-# Validate the user-provided storage con***REMOVED***guration
+# Validate the user-provided storage configuration
 #
-- name: Validate the storage con***REMOVED***guration
+- name: Validate the storage configuration
   block:
   - name: Validate the user-provided storage type
     assert:
       that:
-        - storageType is not unde***REMOVED***ned and storageType == 'hive'
+        - storageType is not undefined and storageType == 'hive'
       msg: "Unsupported spec.storage.type, only 'hive' is  a supported option"
 
-  - name: Validate the user-provided Hive storage con***REMOVED***guration matches a support option
+  - name: Validate the user-provided Hive storage configuration matches a support option
     assert:
       that:
-        - hiveStorageType is not unde***REMOVED***ned and hiveStorageType in ['s3', 'sharedPVC', 'hdfs', 'azure', 'gcs' , 's3Compatible']
+        - hiveStorageType is not undefined and hiveStorageType in ['s3', 'sharedPVC', 'hdfs', 'azure', 'gcs' , 's3Compatible']
       msg: "Invalid spec.storage.hive.type: '{{ hiveStorageType }}', must be one of hdfs, s3, azure, gcs, s3Compatible or sharedPVC"
   vars:
-    storageType: "{{ meteringcon***REMOVED***g_spec_overrides | json_query('storage.type') }}"
-    hiveStorageType: "{{ meteringcon***REMOVED***g_spec_overrides | json_query('storage.hive.type') }}"
+    storageType: "{{ meteringconfig_spec_overrides | json_query('storage.type') }}"
+    hiveStorageType: "{{ meteringconfig_spec_overrides | json_query('storage.hive.type') }}"
   rescue:
-  - include_tasks: update_meteringcon***REMOVED***g_status.yml
+  - include_tasks: update_meteringconfig_status.yml
     vars:
       end_play_after_updating_status: true
       current_conditions:
@@ -80,7 +80,7 @@
           "Failed task message: {{ ansible_failed_result.msg }}"
         lastTransitionTime: "{{ now(utc=False).isoformat() + 'Z' }}"
 
-- include_tasks: update_meteringcon***REMOVED***g_status.yml
+- include_tasks: update_meteringconfig_status.yml
   vars:
     current_conditions:
       type: "Running"
@@ -88,12 +88,12 @@
       message: "Finished the validation process"
       lastTransitionTime: "{{ now(utc=False).isoformat() + 'Z' }}"
 
-- name: Log Events for validating con***REMOVED***gurations
+- name: Log Events for validating configurations
   k8s_event:
     state: present
-    name: Validate Con***REMOVED***guration
+    name: Validate Configuration
     namespace: "{{ meta.namespace }}"
-    message: Validate Con***REMOVED***gurations
+    message: Validate Configurations
     reason: Created
     reportingComponent: Reporting components
     type: Normal
@@ -101,7 +101,7 @@
       component: Metering components
     involvedObject:
       apiVersion: metering.openshift.io
-      kind: MeteringCon***REMOVED***g
+      kind: MeteringConfig
       name: "{{ meta.name }}"
       namespace: "{{ meta.namespace }}"
 

@@ -1,6 +1,6 @@
 // Copyright 2011 The Go Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE ***REMOVED***le.
+// license that can be found in the LICENSE file.
 
 package norm
 
@@ -40,7 +40,7 @@ func (in *input) skipASCII(p, max int) int {
 	if in.bytes == nil {
 		for ; p < max && in.str[p] < utf8.RuneSelf; p++ {
 		}
-	} ***REMOVED*** {
+	} else {
 		for ; p < max && in.bytes[p] < utf8.RuneSelf; p++ {
 		}
 	}
@@ -51,7 +51,7 @@ func (in *input) skipContinuationBytes(p int) int {
 	if in.bytes == nil {
 		for ; p < len(in.str) && !utf8.RuneStart(in.str[p]); p++ {
 		}
-	} ***REMOVED*** {
+	} else {
 		for ; p < len(in.bytes) && !utf8.RuneStart(in.bytes[p]); p++ {
 		}
 	}
@@ -96,7 +96,7 @@ func (in *input) hangul(p int) (r rune) {
 			return 0
 		}
 		r, size = utf8.DecodeRuneInString(in.str[p:])
-	} ***REMOVED*** {
+	} else {
 		if !isHangul(in.bytes[p:]) {
 			return 0
 		}

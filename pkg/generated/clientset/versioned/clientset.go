@@ -42,33 +42,33 @@ func (c *Clientset) Discovery() discovery.DiscoveryInterface {
 	return c.DiscoveryClient
 }
 
-// NewForCon***REMOVED***g creates a new Clientset for the given con***REMOVED***g.
-func NewForCon***REMOVED***g(c *rest.Con***REMOVED***g) (*Clientset, error) {
-	con***REMOVED***gShallowCopy := *c
-	if con***REMOVED***gShallowCopy.RateLimiter == nil && con***REMOVED***gShallowCopy.QPS > 0 {
-		con***REMOVED***gShallowCopy.RateLimiter = flowcontrol.NewTokenBucketRateLimiter(con***REMOVED***gShallowCopy.QPS, con***REMOVED***gShallowCopy.Burst)
+// NewForConfig creates a new Clientset for the given config.
+func NewForConfig(c *rest.Config) (*Clientset, error) {
+	configShallowCopy := *c
+	if configShallowCopy.RateLimiter == nil && configShallowCopy.QPS > 0 {
+		configShallowCopy.RateLimiter = flowcontrol.NewTokenBucketRateLimiter(configShallowCopy.QPS, configShallowCopy.Burst)
 	}
 	var cs Clientset
 	var err error
-	cs.meteringV1, err = meteringv1.NewForCon***REMOVED***g(&con***REMOVED***gShallowCopy)
+	cs.meteringV1, err = meteringv1.NewForConfig(&configShallowCopy)
 	if err != nil {
 		return nil, err
 	}
 
-	cs.DiscoveryClient, err = discovery.NewDiscoveryClientForCon***REMOVED***g(&con***REMOVED***gShallowCopy)
+	cs.DiscoveryClient, err = discovery.NewDiscoveryClientForConfig(&configShallowCopy)
 	if err != nil {
 		return nil, err
 	}
 	return &cs, nil
 }
 
-// NewForCon***REMOVED***gOrDie creates a new Clientset for the given con***REMOVED***g and
-// panics if there is an error in the con***REMOVED***g.
-func NewForCon***REMOVED***gOrDie(c *rest.Con***REMOVED***g) *Clientset {
+// NewForConfigOrDie creates a new Clientset for the given config and
+// panics if there is an error in the config.
+func NewForConfigOrDie(c *rest.Config) *Clientset {
 	var cs Clientset
-	cs.meteringV1 = meteringv1.NewForCon***REMOVED***gOrDie(c)
+	cs.meteringV1 = meteringv1.NewForConfigOrDie(c)
 
-	cs.DiscoveryClient = discovery.NewDiscoveryClientForCon***REMOVED***gOrDie(c)
+	cs.DiscoveryClient = discovery.NewDiscoveryClientForConfigOrDie(c)
 	return &cs
 }
 

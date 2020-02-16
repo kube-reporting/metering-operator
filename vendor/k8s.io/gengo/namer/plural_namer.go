@@ -2,7 +2,7 @@
 Copyright 2015 The Kubernetes Authors.
 
 Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this ***REMOVED***le except in compliance with the License.
+you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
 
     http://www.apache.org/licenses/LICENSE-2.0
@@ -10,7 +10,7 @@ You may obtain a copy of the License at
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the speci***REMOVED***c language governing permissions and
+See the License for the specific language governing permissions and
 limitations under the License.
 */
 
@@ -28,7 +28,7 @@ type pluralNamer struct {
 	// key is the case-sensitive type name, value is the case-insensitive
 	// intended output.
 	exceptions map[string]string
-	***REMOVED***nalize   func(string) string
+	finalize   func(string) string
 }
 
 // NewPublicPluralNamer returns a namer that returns the plural form of the input
@@ -56,10 +56,10 @@ func (r *pluralNamer) Name(t *types.Type) string {
 	var plural string
 	var ok bool
 	if plural, ok = r.exceptions[singular]; ok {
-		return r.***REMOVED***nalize(plural)
+		return r.finalize(plural)
 	}
 	if len(singular) < 2 {
-		return r.***REMOVED***nalize(singular)
+		return r.finalize(singular)
 	}
 
 	switch rune(singular[len(singular)-1]) {
@@ -69,21 +69,21 @@ func (r *pluralNamer) Name(t *types.Type) string {
 		sl := rune(singular[len(singular)-2])
 		if isConsonant(sl) {
 			plural = iesPlural(singular)
-		} ***REMOVED*** {
+		} else {
 			plural = sPlural(singular)
 		}
 	case 'h':
 		sl := rune(singular[len(singular)-2])
 		if sl == 'c' || sl == 's' {
 			plural = esPlural(singular)
-		} ***REMOVED*** {
+		} else {
 			plural = sPlural(singular)
 		}
 	case 'e':
 		sl := rune(singular[len(singular)-2])
 		if sl == 'f' {
 			plural = vesPlural(singular[:len(singular)-1])
-		} ***REMOVED*** {
+		} else {
 			plural = sPlural(singular)
 		}
 	case 'f':
@@ -91,7 +91,7 @@ func (r *pluralNamer) Name(t *types.Type) string {
 	default:
 		plural = sPlural(singular)
 	}
-	return r.***REMOVED***nalize(plural)
+	return r.finalize(plural)
 }
 
 func iesPlural(singular string) string {

@@ -80,7 +80,7 @@ func (intr *treeInterpreter) Execute(node ASTNode, value interface{}) (interface
 			key := node.value.(string)
 			return m[key], nil
 		}
-		return intr.***REMOVED***eldFromStruct(node.value.(string), value)
+		return intr.fieldFromStruct(node.value.(string), value)
 	case ASTFilterProjection:
 		left, err := intr.Execute(node.children[0], value)
 		if err != nil {
@@ -89,7 +89,7 @@ func (intr *treeInterpreter) Execute(node ASTNode, value interface{}) (interface
 		sliceType, ok := left.([]interface{})
 		if !ok {
 			if isSliceType(left) {
-				return intr.***REMOVED***lterProjectionWithReflection(node, left)
+				return intr.filterProjectionWithReflection(node, left)
 			}
 			return nil, nil
 		}
@@ -130,14 +130,14 @@ func (intr *treeInterpreter) Execute(node ASTNode, value interface{}) (interface
 		for _, element := range sliceType {
 			if elementSlice, ok := element.([]interface{}); ok {
 				flattened = append(flattened, elementSlice...)
-			} ***REMOVED*** if isSliceType(element) {
+			} else if isSliceType(element) {
 				reflectFlat := []interface{}{}
 				v := reflect.ValueOf(element)
 				for i := 0; i < v.Len(); i++ {
 					reflectFlat = append(reflectFlat, v.Index(i).Interface())
 				}
 				flattened = append(flattened, reflectFlat...)
-			} ***REMOVED*** {
+			} else {
 				flattened = append(flattened, element)
 			}
 		}
@@ -281,7 +281,7 @@ func (intr *treeInterpreter) Execute(node ASTNode, value interface{}) (interface
 		sliceParams := make([]sliceParam, 3)
 		for i, part := range parts {
 			if part != nil {
-				sliceParams[i].Speci***REMOVED***ed = true
+				sliceParams[i].Specified = true
 				sliceParams[i].N = *part
 			}
 		}
@@ -314,23 +314,23 @@ func (intr *treeInterpreter) Execute(node ASTNode, value interface{}) (interface
 	return nil, errors.New("Unknown AST node: " + node.nodeType.String())
 }
 
-func (intr *treeInterpreter) ***REMOVED***eldFromStruct(key string, value interface{}) (interface{}, error) {
+func (intr *treeInterpreter) fieldFromStruct(key string, value interface{}) (interface{}, error) {
 	rv := reflect.ValueOf(value)
-	***REMOVED***rst, n := utf8.DecodeRuneInString(key)
-	***REMOVED***eldName := string(unicode.ToUpper(***REMOVED***rst)) + key[n:]
+	first, n := utf8.DecodeRuneInString(key)
+	fieldName := string(unicode.ToUpper(first)) + key[n:]
 	if rv.Kind() == reflect.Struct {
-		v := rv.FieldByName(***REMOVED***eldName)
+		v := rv.FieldByName(fieldName)
 		if !v.IsValid() {
 			return nil, nil
 		}
 		return v.Interface(), nil
-	} ***REMOVED*** if rv.Kind() == reflect.Ptr {
+	} else if rv.Kind() == reflect.Ptr {
 		// Handle multiple levels of indirection?
 		if rv.IsNil() {
 			return nil, nil
 		}
 		rv = rv.Elem()
-		v := rv.FieldByName(***REMOVED***eldName)
+		v := rv.FieldByName(fieldName)
 		if !v.IsValid() {
 			return nil, nil
 		}
@@ -353,7 +353,7 @@ func (intr *treeInterpreter) flattenWithReflection(value interface{}) (interface
 				flattened = append(
 					flattened, elementV.Index(j).Interface())
 			}
-		} ***REMOVED*** {
+		} else {
 			flattened = append(flattened, element)
 		}
 	}
@@ -366,19 +366,19 @@ func (intr *treeInterpreter) sliceWithReflection(node ASTNode, value interface{}
 	sliceParams := make([]sliceParam, 3)
 	for i, part := range parts {
 		if part != nil {
-			sliceParams[i].Speci***REMOVED***ed = true
+			sliceParams[i].Specified = true
 			sliceParams[i].N = *part
 		}
 	}
-	***REMOVED***nal := []interface{}{}
+	final := []interface{}{}
 	for i := 0; i < v.Len(); i++ {
 		element := v.Index(i).Interface()
-		***REMOVED***nal = append(***REMOVED***nal, element)
+		final = append(final, element)
 	}
-	return slice(***REMOVED***nal, sliceParams)
+	return slice(final, sliceParams)
 }
 
-func (intr *treeInterpreter) ***REMOVED***lterProjectionWithReflection(node ASTNode, value interface{}) (interface{}, error) {
+func (intr *treeInterpreter) filterProjectionWithReflection(node ASTNode, value interface{}) (interface{}, error) {
 	compareNode := node.children[2]
 	collected := []interface{}{}
 	v := reflect.ValueOf(value)

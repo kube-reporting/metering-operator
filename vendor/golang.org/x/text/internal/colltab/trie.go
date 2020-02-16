@@ -1,8 +1,8 @@
 // Copyright 2012 The Go Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE ***REMOVED***le.
+// license that can be found in the LICENSE file.
 
-// The trie in this ***REMOVED***le is used to associate the ***REMOVED***rst full character in an
+// The trie in this file is used to associate the first full character in an
 // UTF-8 string to a collation element. All but the last byte in a UTF-8 byte
 // sequence are used to lookup offsets in the index table to be used for the
 // next byte. The last byte is used to index into a table of collation elements.
@@ -13,8 +13,8 @@ package colltab
 const blockSize = 64
 
 type Trie struct {
-	Index0  []uint16 // index for ***REMOVED***rst byte (0xC0-0xFF)
-	Values0 []uint32 // index for ***REMOVED***rst byte (0x00-0x7F)
+	Index0  []uint16 // index for first byte (0xC0-0xFF)
+	Values0 []uint32 // index for first byte (0x00-0x7F)
 	Index   []uint16
 	Values  []uint32
 }
@@ -34,7 +34,7 @@ func (t *Trie) lookupValue(n uint16, b byte) Elem {
 	return Elem(t.Values[int(n)<<6+int(b)])
 }
 
-// lookup returns the trie value for the ***REMOVED***rst UTF-8 encoding in s and
+// lookup returns the trie value for the first UTF-8 encoding in s and
 // the width in bytes of this encoding. The size will be 0 if s does not
 // hold enough bytes to complete the encoding. len(s) must be greater than 0.
 func (t *Trie) lookup(s []byte) (v Elem, sz int) {

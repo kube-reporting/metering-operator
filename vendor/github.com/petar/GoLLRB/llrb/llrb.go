@@ -1,6 +1,6 @@
 // Copyright 2010 Petar Maymounkov. All rights reserved.
 // Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE ***REMOVED***le.
+// license that can be found in the LICENSE file.
 
 // A Left-Leaning Red-Black (LLRB) implementation of 2-3 balanced binary search trees,
 // based on the following work:
@@ -175,9 +175,9 @@ func (t *LLRB) replaceOrInsert(h *Node, item Item) (*Node, Item) {
 	var replaced Item
 	if less(item, h.Item) { // BUG
 		h.Left, replaced = t.replaceOrInsert(h.Left, item)
-	} ***REMOVED*** if less(h.Item, item) {
+	} else if less(h.Item, item) {
 		h.Right, replaced = t.replaceOrInsert(h.Right, item)
-	} ***REMOVED*** {
+	} else {
 		replaced, h.Item = h.Item, item
 	}
 
@@ -206,7 +206,7 @@ func (t *LLRB) insertNoReplace(h *Node, item Item) *Node {
 
 	if less(item, h.Item) {
 		h.Left = t.insertNoReplace(h.Left, item)
-	} ***REMOVED*** {
+	} else {
 		h.Right = t.insertNoReplace(h.Right, item)
 	}
 
@@ -285,7 +285,7 @@ func deleteMin(h *Node) (*Node, Item) {
 	var deleted Item
 	h.Left, deleted = deleteMin(h.Left)
 
-	return ***REMOVED***xUp(h), deleted
+	return fixUp(h), deleted
 }
 
 // DeleteMax deletes the maximum element in the tree and returns
@@ -318,7 +318,7 @@ func deleteMax(h *Node) (*Node, Item) {
 	var deleted Item
 	h.Right, deleted = deleteMax(h.Right)
 
-	return ***REMOVED***xUp(h), deleted
+	return fixUp(h), deleted
 }
 
 // Delete deletes an item from the tree whose key equals key.
@@ -348,7 +348,7 @@ func (t *LLRB) delete(h *Node, item Item) (*Node, Item) {
 			h = moveRedLeft(h)
 		}
 		h.Left, deleted = t.delete(h.Left, item)
-	} ***REMOVED*** {
+	} else {
 		if isRed(h.Left) {
 			h = rotateRight(h)
 		}
@@ -368,12 +368,12 @@ func (t *LLRB) delete(h *Node, item Item) (*Node, Item) {
 				panic("logic")
 			}
 			deleted, h.Item = h.Item, subDeleted
-		} ***REMOVED*** { // Else, @item is bigger than @h.Item
+		} else { // Else, @item is bigger than @h.Item
 			h.Right, deleted = t.delete(h.Right, item)
 		}
 	}
 
-	return ***REMOVED***xUp(h), deleted
+	return fixUp(h), deleted
 }
 
 // Internal node manipulation routines
@@ -439,7 +439,7 @@ func moveRedRight(h *Node) *Node {
 	return h
 }
 
-func ***REMOVED***xUp(h *Node) *Node {
+func fixUp(h *Node) *Node {
 	if isRed(h.Right) {
 		h = rotateLeft(h)
 	}

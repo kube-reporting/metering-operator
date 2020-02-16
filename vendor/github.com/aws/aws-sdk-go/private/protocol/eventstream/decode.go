@@ -72,7 +72,7 @@ func (d *Decoder) Decode(payloadBuf []byte) (m Message, err error) {
 	return m, nil
 }
 
-// UseLogger speci***REMOVED***es the Logger that that the decoder should use to log the
+// UseLogger specifies the Logger that that the decoder should use to log the
 // message decode to.
 func (d *Decoder) UseLogger(logger aws.Logger) {
 	d.logger = logger

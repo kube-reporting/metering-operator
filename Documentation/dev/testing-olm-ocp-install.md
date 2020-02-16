@@ -6,10 +6,10 @@ This document is a summarization of https://docs.google.com/document/d/1t81RSsZb
 
 Disable ClusterVersionOperator management of the Marketplace redhat-operators OperatorSource so we can delete the existing one and install ours.
 
-Store the following yaml in a ***REMOVED***le named `cvo-overrides.yaml`
+Store the following yaml in a file named `cvo-overrides.yaml`
 
 ```
-apiVersion: con***REMOVED***g.openshift.io/v1
+apiVersion: config.openshift.io/v1
 kind: ClusterVersion
 metadata:
   name: version
@@ -39,10 +39,10 @@ oc -n openshift-marketplace delete operatorsource redhat-operators
 
 # Disable built-in OperatorSources in OCP 4.2
 
-Store the following in a ***REMOVED***le called `operatorhub.yaml`:
+Store the following in a file called `operatorhub.yaml`:
 
 ```
-apiVersion: con***REMOVED***g.openshift.io/v1
+apiVersion: config.openshift.io/v1
 kind: OperatorHub
 metadata:
   name: cluster
@@ -62,11 +62,11 @@ Add yourself to https://docs.google.com/spreadsheets/d/1OyUtbu9aiAi3rfkappz5gcq5
 This must be done before proceeding.
 Once done, look at https://quay.io/application/ and verify you see the metering-ocp package listed in the registry namespaces `rh-operators-art` and `rh-osbs-operators`.
 
-# Con***REMOVED***gure credentials
+# Configure credentials
 
 Next create a secret containing credentials containing your Quay credentials for accessing the app bundles ART builds.
 
-Replace `$QUAY_AUTH_TOKEN` with the actual literal value of your `$QUAY_AUTH_TOKEN` and store this in a ***REMOVED***le named `marketplace-secret.yaml`
+Replace `$QUAY_AUTH_TOKEN` with the actual literal value of your `$QUAY_AUTH_TOKEN` and store this in a file named `marketplace-secret.yaml`
 
 ```
 apiVersion: v1
@@ -85,9 +85,9 @@ Next, create it:
 oc apply -n openshift-marketplace -f marketplace-secret.yaml
 ```
 
-# Con***REMOVED***gure operator source
+# Configure operator source
 
-Copy the following and store it in a ***REMOVED***le named `art-applications-operator-source.yaml`:
+Copy the following and store it in a file named `art-applications-operator-source.yaml`:
 
 ```
 apiVersion: operators.coreos.com/v1
@@ -101,23 +101,23 @@ spec:
   # use "redhat-operators" to test production, current release contents.
   # use redhat-operators-art for pre-production content. This is unreleased, but for the current major release version.
   # use redhat-operators-stage for testing staging images.
-  # use rh-veri***REMOVED***ed-operators for the latest thing built (is the replacement of rh-osbs-operators) for stuff in the next major release.
+  # use rh-verified-operators for the latest thing built (is the replacement of rh-osbs-operators) for stuff in the next major release.
   # rh-osbs-operators is the most regularly updated one.
   registryNamespace: redhat-operators-art
   # registryNamespace: redhat-operators-stage
   # registryNamespace: redhat-operators
-  # registryNamespace: rh-veri***REMOVED***ed-operators
+  # registryNamespace: rh-verified-operators
   authorizationToken:
     secretName: marketplacesecret
 ```
 
-Once you've copied and the ***REMOVED***le, install the operator source:
+Once you've copied and the file, install the operator source:
 
 ```
 oc apply -n openshift-marketplace -f art-applications-operator-source.yaml
 ```
 
-# Con***REMOVED***gure images to be mirrored
+# Configure images to be mirrored
 
 First, make sure you have [grpcurl](https://github.com/fullstorydev/grpcurl) installed, this will be used to query package information from the operator-registry pod containing our OLM package.
 

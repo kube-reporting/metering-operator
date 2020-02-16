@@ -11,7 +11,7 @@ spec:
   awsBilling:
     source:
       bucket: "{{ $reportingValues.spec.awsBillingReportDataSource.bucket }}"
-      pre***REMOVED***x: "{{ $reportingValues.spec.awsBillingReportDataSource.pre***REMOVED***x }}"
+      prefix: "{{ $reportingValues.spec.awsBillingReportDataSource.prefix }}"
       region: "{{ $reportingValues.spec.awsBillingReportDataSource.region }}"
 
 ---

@@ -36,10 +36,10 @@
 // Assertions
 //
 // Assertions allow you to easily write test code, and are global funcs in the `assert` package.
-// All assertion functions take, as the ***REMOVED***rst argument, the `*testing.T` object provided by the
+// All assertion functions take, as the first argument, the `*testing.T` object provided by the
 // testing framework. This allows the assertion funcs to write the failings and other details to
 // the correct place.
 //
-// Every assertion function also takes an optional string message as the ***REMOVED***nal argument,
+// Every assertion function also takes an optional string message as the final argument,
 // allowing custom error messages to be appended to the message the assertion method outputs.
 package assert

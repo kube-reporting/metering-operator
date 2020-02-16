@@ -4,7 +4,7 @@
 // https://github.com/golang/protobuf
 //
 // Redistribution and use in source and binary forms, with or without
-// modi***REMOVED***cation, are permitted provided that the following conditions are
+// modification, are permitted provided that the following conditions are
 // met:
 //
 //     * Redistributions of source code must retain the above copyright
@@ -15,7 +15,7 @@
 // distribution.
 //     * Neither the name of Google Inc. nor the names of its
 // contributors may be used to endorse or promote products derived from
-// this software without speci***REMOVED***c prior written permission.
+// this software without specific prior written permission.
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
 // "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
@@ -56,22 +56,22 @@ type mergeInfo struct {
 	initialized int32 // 0: only typ is valid, 1: everything is valid
 	lock        sync.Mutex
 
-	***REMOVED***elds       []mergeFieldInfo
-	unrecognized ***REMOVED***eld // Offset of XXX_unrecognized
+	fields       []mergeFieldInfo
+	unrecognized field // Offset of XXX_unrecognized
 }
 
 type mergeFieldInfo struct {
-	***REMOVED***eld ***REMOVED***eld // Offset of ***REMOVED***eld, guaranteed to be valid
+	field field // Offset of field, guaranteed to be valid
 
-	// isPointer reports whether the value in the ***REMOVED***eld is a pointer.
+	// isPointer reports whether the value in the field is a pointer.
 	// This is true for the following situations:
 	//	* Pointer to struct
 	//	* Pointer to basic type (proto2 only)
-	//	* Slice (***REMOVED***rst value in slice header is a pointer)
-	//	* String (***REMOVED***rst value in string header is a pointer)
+	//	* Slice (first value in slice header is a pointer)
+	//	* String (first value in string header is a pointer)
 	isPointer bool
 
-	// basicWidth reports the width of the ***REMOVED***eld assuming that it is directly
+	// basicWidth reports the width of the field assuming that it is directly
 	// embedded in the struct (as is the case for basic types in proto3).
 	// The possible values are:
 	// 	0: invalid
@@ -113,30 +113,30 @@ func (mi *mergeInfo) merge(dst, src pointer) {
 		mi.computeMergeInfo()
 	}
 
-	for _, ***REMOVED*** := range mi.***REMOVED***elds {
-		sfp := src.offset(***REMOVED***.***REMOVED***eld)
+	for _, fi := range mi.fields {
+		sfp := src.offset(fi.field)
 
 		// As an optimization, we can avoid the merge function call cost
 		// if we know for sure that the source will have no effect
 		// by checking if it is the zero value.
 		if unsafeAllowed {
-			if ***REMOVED***.isPointer && sfp.getPointer().isNil() { // Could be slice or string
+			if fi.isPointer && sfp.getPointer().isNil() { // Could be slice or string
 				continue
 			}
-			if ***REMOVED***.basicWidth > 0 {
+			if fi.basicWidth > 0 {
 				switch {
-				case ***REMOVED***.basicWidth == 1 && !*sfp.toBool():
+				case fi.basicWidth == 1 && !*sfp.toBool():
 					continue
-				case ***REMOVED***.basicWidth == 4 && *sfp.toUint32() == 0:
+				case fi.basicWidth == 4 && *sfp.toUint32() == 0:
 					continue
-				case ***REMOVED***.basicWidth == 8 && *sfp.toUint64() == 0:
+				case fi.basicWidth == 8 && *sfp.toUint64() == 0:
 					continue
 				}
 			}
 		}
 
-		dfp := dst.offset(***REMOVED***.***REMOVED***eld)
-		***REMOVED***.merge(dfp, sfp)
+		dfp := dst.offset(fi.field)
+		fi.merge(dfp, sfp)
 	}
 
 	// TODO: Make this faster?
@@ -172,11 +172,11 @@ func (mi *mergeInfo) computeMergeInfo() {
 	props := GetProperties(t)
 	for i := 0; i < n; i++ {
 		f := t.Field(i)
-		if strings.HasPre***REMOVED***x(f.Name, "XXX_") {
+		if strings.HasPrefix(f.Name, "XXX_") {
 			continue
 		}
 
-		m***REMOVED*** := mergeFieldInfo{***REMOVED***eld: toField(&f)}
+		mfi := mergeFieldInfo{field: toField(&f)}
 		tf := f.Type
 
 		// As an optimization, we can avoid the merge function call cost
@@ -186,15 +186,15 @@ func (mi *mergeInfo) computeMergeInfo() {
 			switch tf.Kind() {
 			case reflect.Ptr, reflect.Slice, reflect.String:
 				// As a special case, we assume slices and strings are pointers
-				// since we know that the ***REMOVED***rst ***REMOVED***eld in the SliceSlice or
+				// since we know that the first field in the SliceSlice or
 				// StringHeader is a data pointer.
-				m***REMOVED***.isPointer = true
+				mfi.isPointer = true
 			case reflect.Bool:
-				m***REMOVED***.basicWidth = 1
+				mfi.basicWidth = 1
 			case reflect.Int32, reflect.Uint32, reflect.Float32:
-				m***REMOVED***.basicWidth = 4
+				mfi.basicWidth = 4
 			case reflect.Int64, reflect.Uint64, reflect.Float64:
-				m***REMOVED***.basicWidth = 8
+				mfi.basicWidth = 8
 			}
 		}
 
@@ -216,8 +216,8 @@ func (mi *mergeInfo) computeMergeInfo() {
 		case reflect.Int32:
 			switch {
 			case isSlice: // E.g., []int32
-				m***REMOVED***.merge = func(dst, src pointer) {
-					// NOTE: toInt32Slice is not de***REMOVED***ned (see pointer_reflect.go).
+				mfi.merge = func(dst, src pointer) {
+					// NOTE: toInt32Slice is not defined (see pointer_reflect.go).
 					/*
 						sfsp := src.toInt32Slice()
 						if *sfsp != nil {
@@ -239,15 +239,15 @@ func (mi *mergeInfo) computeMergeInfo() {
 					}
 				}
 			case isPointer: // E.g., *int32
-				m***REMOVED***.merge = func(dst, src pointer) {
-					// NOTE: toInt32Ptr is not de***REMOVED***ned (see pointer_reflect.go).
+				mfi.merge = func(dst, src pointer) {
+					// NOTE: toInt32Ptr is not defined (see pointer_reflect.go).
 					/*
 						sfpp := src.toInt32Ptr()
 						if *sfpp != nil {
 							dfpp := dst.toInt32Ptr()
 							if *dfpp == nil {
 								*dfpp = Int32(**sfpp)
-							} ***REMOVED*** {
+							} else {
 								**dfpp = **sfpp
 							}
 						}
@@ -257,13 +257,13 @@ func (mi *mergeInfo) computeMergeInfo() {
 						dfp := dst.getInt32Ptr()
 						if dfp == nil {
 							dst.setInt32Ptr(*sfp)
-						} ***REMOVED*** {
+						} else {
 							*dfp = *sfp
 						}
 					}
 				}
 			default: // E.g., int32
-				m***REMOVED***.merge = func(dst, src pointer) {
+				mfi.merge = func(dst, src pointer) {
 					if v := *src.toInt32(); v != 0 {
 						*dst.toInt32() = v
 					}
@@ -272,7 +272,7 @@ func (mi *mergeInfo) computeMergeInfo() {
 		case reflect.Int64:
 			switch {
 			case isSlice: // E.g., []int64
-				m***REMOVED***.merge = func(dst, src pointer) {
+				mfi.merge = func(dst, src pointer) {
 					sfsp := src.toInt64Slice()
 					if *sfsp != nil {
 						dfsp := dst.toInt64Slice()
@@ -283,19 +283,19 @@ func (mi *mergeInfo) computeMergeInfo() {
 					}
 				}
 			case isPointer: // E.g., *int64
-				m***REMOVED***.merge = func(dst, src pointer) {
+				mfi.merge = func(dst, src pointer) {
 					sfpp := src.toInt64Ptr()
 					if *sfpp != nil {
 						dfpp := dst.toInt64Ptr()
 						if *dfpp == nil {
 							*dfpp = Int64(**sfpp)
-						} ***REMOVED*** {
+						} else {
 							**dfpp = **sfpp
 						}
 					}
 				}
 			default: // E.g., int64
-				m***REMOVED***.merge = func(dst, src pointer) {
+				mfi.merge = func(dst, src pointer) {
 					if v := *src.toInt64(); v != 0 {
 						*dst.toInt64() = v
 					}
@@ -304,7 +304,7 @@ func (mi *mergeInfo) computeMergeInfo() {
 		case reflect.Uint32:
 			switch {
 			case isSlice: // E.g., []uint32
-				m***REMOVED***.merge = func(dst, src pointer) {
+				mfi.merge = func(dst, src pointer) {
 					sfsp := src.toUint32Slice()
 					if *sfsp != nil {
 						dfsp := dst.toUint32Slice()
@@ -315,19 +315,19 @@ func (mi *mergeInfo) computeMergeInfo() {
 					}
 				}
 			case isPointer: // E.g., *uint32
-				m***REMOVED***.merge = func(dst, src pointer) {
+				mfi.merge = func(dst, src pointer) {
 					sfpp := src.toUint32Ptr()
 					if *sfpp != nil {
 						dfpp := dst.toUint32Ptr()
 						if *dfpp == nil {
 							*dfpp = Uint32(**sfpp)
-						} ***REMOVED*** {
+						} else {
 							**dfpp = **sfpp
 						}
 					}
 				}
 			default: // E.g., uint32
-				m***REMOVED***.merge = func(dst, src pointer) {
+				mfi.merge = func(dst, src pointer) {
 					if v := *src.toUint32(); v != 0 {
 						*dst.toUint32() = v
 					}
@@ -336,7 +336,7 @@ func (mi *mergeInfo) computeMergeInfo() {
 		case reflect.Uint64:
 			switch {
 			case isSlice: // E.g., []uint64
-				m***REMOVED***.merge = func(dst, src pointer) {
+				mfi.merge = func(dst, src pointer) {
 					sfsp := src.toUint64Slice()
 					if *sfsp != nil {
 						dfsp := dst.toUint64Slice()
@@ -347,19 +347,19 @@ func (mi *mergeInfo) computeMergeInfo() {
 					}
 				}
 			case isPointer: // E.g., *uint64
-				m***REMOVED***.merge = func(dst, src pointer) {
+				mfi.merge = func(dst, src pointer) {
 					sfpp := src.toUint64Ptr()
 					if *sfpp != nil {
 						dfpp := dst.toUint64Ptr()
 						if *dfpp == nil {
 							*dfpp = Uint64(**sfpp)
-						} ***REMOVED*** {
+						} else {
 							**dfpp = **sfpp
 						}
 					}
 				}
 			default: // E.g., uint64
-				m***REMOVED***.merge = func(dst, src pointer) {
+				mfi.merge = func(dst, src pointer) {
 					if v := *src.toUint64(); v != 0 {
 						*dst.toUint64() = v
 					}
@@ -368,7 +368,7 @@ func (mi *mergeInfo) computeMergeInfo() {
 		case reflect.Float32:
 			switch {
 			case isSlice: // E.g., []float32
-				m***REMOVED***.merge = func(dst, src pointer) {
+				mfi.merge = func(dst, src pointer) {
 					sfsp := src.toFloat32Slice()
 					if *sfsp != nil {
 						dfsp := dst.toFloat32Slice()
@@ -379,19 +379,19 @@ func (mi *mergeInfo) computeMergeInfo() {
 					}
 				}
 			case isPointer: // E.g., *float32
-				m***REMOVED***.merge = func(dst, src pointer) {
+				mfi.merge = func(dst, src pointer) {
 					sfpp := src.toFloat32Ptr()
 					if *sfpp != nil {
 						dfpp := dst.toFloat32Ptr()
 						if *dfpp == nil {
 							*dfpp = Float32(**sfpp)
-						} ***REMOVED*** {
+						} else {
 							**dfpp = **sfpp
 						}
 					}
 				}
 			default: // E.g., float32
-				m***REMOVED***.merge = func(dst, src pointer) {
+				mfi.merge = func(dst, src pointer) {
 					if v := *src.toFloat32(); v != 0 {
 						*dst.toFloat32() = v
 					}
@@ -400,7 +400,7 @@ func (mi *mergeInfo) computeMergeInfo() {
 		case reflect.Float64:
 			switch {
 			case isSlice: // E.g., []float64
-				m***REMOVED***.merge = func(dst, src pointer) {
+				mfi.merge = func(dst, src pointer) {
 					sfsp := src.toFloat64Slice()
 					if *sfsp != nil {
 						dfsp := dst.toFloat64Slice()
@@ -411,19 +411,19 @@ func (mi *mergeInfo) computeMergeInfo() {
 					}
 				}
 			case isPointer: // E.g., *float64
-				m***REMOVED***.merge = func(dst, src pointer) {
+				mfi.merge = func(dst, src pointer) {
 					sfpp := src.toFloat64Ptr()
 					if *sfpp != nil {
 						dfpp := dst.toFloat64Ptr()
 						if *dfpp == nil {
 							*dfpp = Float64(**sfpp)
-						} ***REMOVED*** {
+						} else {
 							**dfpp = **sfpp
 						}
 					}
 				}
 			default: // E.g., float64
-				m***REMOVED***.merge = func(dst, src pointer) {
+				mfi.merge = func(dst, src pointer) {
 					if v := *src.toFloat64(); v != 0 {
 						*dst.toFloat64() = v
 					}
@@ -432,7 +432,7 @@ func (mi *mergeInfo) computeMergeInfo() {
 		case reflect.Bool:
 			switch {
 			case isSlice: // E.g., []bool
-				m***REMOVED***.merge = func(dst, src pointer) {
+				mfi.merge = func(dst, src pointer) {
 					sfsp := src.toBoolSlice()
 					if *sfsp != nil {
 						dfsp := dst.toBoolSlice()
@@ -443,19 +443,19 @@ func (mi *mergeInfo) computeMergeInfo() {
 					}
 				}
 			case isPointer: // E.g., *bool
-				m***REMOVED***.merge = func(dst, src pointer) {
+				mfi.merge = func(dst, src pointer) {
 					sfpp := src.toBoolPtr()
 					if *sfpp != nil {
 						dfpp := dst.toBoolPtr()
 						if *dfpp == nil {
 							*dfpp = Bool(**sfpp)
-						} ***REMOVED*** {
+						} else {
 							**dfpp = **sfpp
 						}
 					}
 				}
 			default: // E.g., bool
-				m***REMOVED***.merge = func(dst, src pointer) {
+				mfi.merge = func(dst, src pointer) {
 					if v := *src.toBool(); v {
 						*dst.toBool() = v
 					}
@@ -464,7 +464,7 @@ func (mi *mergeInfo) computeMergeInfo() {
 		case reflect.String:
 			switch {
 			case isSlice: // E.g., []string
-				m***REMOVED***.merge = func(dst, src pointer) {
+				mfi.merge = func(dst, src pointer) {
 					sfsp := src.toStringSlice()
 					if *sfsp != nil {
 						dfsp := dst.toStringSlice()
@@ -475,19 +475,19 @@ func (mi *mergeInfo) computeMergeInfo() {
 					}
 				}
 			case isPointer: // E.g., *string
-				m***REMOVED***.merge = func(dst, src pointer) {
+				mfi.merge = func(dst, src pointer) {
 					sfpp := src.toStringPtr()
 					if *sfpp != nil {
 						dfpp := dst.toStringPtr()
 						if *dfpp == nil {
 							*dfpp = String(**sfpp)
-						} ***REMOVED*** {
+						} else {
 							**dfpp = **sfpp
 						}
 					}
 				}
 			default: // E.g., string
-				m***REMOVED***.merge = func(dst, src pointer) {
+				mfi.merge = func(dst, src pointer) {
 					if v := *src.toString(); v != "" {
 						*dst.toString() = v
 					}
@@ -501,14 +501,14 @@ func (mi *mergeInfo) computeMergeInfo() {
 			case tf.Elem().Kind() != reflect.Uint8:
 				panic("bad element kind in byte slice case in " + tf.Name())
 			case isSlice: // E.g., [][]byte
-				m***REMOVED***.merge = func(dst, src pointer) {
+				mfi.merge = func(dst, src pointer) {
 					sbsp := src.toBytesSlice()
 					if *sbsp != nil {
 						dbsp := dst.toBytesSlice()
 						for _, sb := range *sbsp {
 							if sb == nil {
 								*dbsp = append(*dbsp, nil)
-							} ***REMOVED*** {
+							} else {
 								*dbsp = append(*dbsp, append([]byte{}, sb...))
 							}
 						}
@@ -518,7 +518,7 @@ func (mi *mergeInfo) computeMergeInfo() {
 					}
 				}
 			default: // E.g., []byte
-				m***REMOVED***.merge = func(dst, src pointer) {
+				mfi.merge = func(dst, src pointer) {
 					sbp := src.toBytes()
 					if *sbp != nil {
 						dbp := dst.toBytes()
@@ -531,10 +531,10 @@ func (mi *mergeInfo) computeMergeInfo() {
 		case reflect.Struct:
 			switch {
 			case !isPointer:
-				panic(fmt.Sprintf("message ***REMOVED***eld %s without pointer", tf))
+				panic(fmt.Sprintf("message field %s without pointer", tf))
 			case isSlice: // E.g., []*pb.T
 				mi := getMergeInfo(tf)
-				m***REMOVED***.merge = func(dst, src pointer) {
+				mfi.merge = func(dst, src pointer) {
 					sps := src.getPointerSlice()
 					if sps != nil {
 						dps := dst.getPointerSlice()
@@ -554,7 +554,7 @@ func (mi *mergeInfo) computeMergeInfo() {
 				}
 			default: // E.g., *pb.T
 				mi := getMergeInfo(tf)
-				m***REMOVED***.merge = func(dst, src pointer) {
+				mfi.merge = func(dst, src pointer) {
 					sp := src.getPointer()
 					if !sp.isNil() {
 						dp := dst.getPointer()
@@ -571,7 +571,7 @@ func (mi *mergeInfo) computeMergeInfo() {
 			case isPointer || isSlice:
 				panic("bad pointer or slice in map case in " + tf.Name())
 			default: // E.g., map[K]V
-				m***REMOVED***.merge = func(dst, src pointer) {
+				mfi.merge = func(dst, src pointer) {
 					sm := src.asPointerTo(tf).Elem()
 					if sm.Len() == 0 {
 						return
@@ -603,13 +603,13 @@ func (mi *mergeInfo) computeMergeInfo() {
 				}
 			}
 		case reflect.Interface:
-			// Must be oneof ***REMOVED***eld.
+			// Must be oneof field.
 			switch {
 			case isPointer || isSlice:
 				panic("bad pointer or slice in interface case in " + tf.Name())
 			default: // E.g., interface{}
 				// TODO: Make this faster?
-				m***REMOVED***.merge = func(dst, src pointer) {
+				mfi.merge = func(dst, src pointer) {
 					su := src.asPointerTo(tf).Elem()
 					if !su.IsNil() {
 						du := dst.asPointerTo(tf).Elem()
@@ -639,7 +639,7 @@ func (mi *mergeInfo) computeMergeInfo() {
 		default:
 			panic(fmt.Sprintf("merger not found for type:%s", tf))
 		}
-		mi.***REMOVED***elds = append(mi.***REMOVED***elds, m***REMOVED***)
+		mi.fields = append(mi.fields, mfi)
 	}
 
 	mi.unrecognized = invalidField

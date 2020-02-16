@@ -2,8 +2,8 @@ package cron
 
 import "time"
 
-// SpecSchedule speci***REMOVED***es a duty cycle (to the second granularity), based on a
-// traditional crontab speci***REMOVED***cation. It is computed initially and stored as bit sets.
+// SpecSchedule specifies a duty cycle (to the second granularity), based on a
+// traditional crontab specification. It is computed initially and stored as bit sets.
 type SpecSchedule struct {
 	Second, Minute, Hour, Dom, Month, Dow uint64
 }
@@ -14,7 +14,7 @@ type bounds struct {
 	names    map[string]uint
 }
 
-// The bounds for each ***REMOVED***eld.
+// The bounds for each field.
 var (
 	seconds = bounds{0, 59, nil}
 	minutes = bounds{0, 59, nil}
@@ -55,19 +55,19 @@ const (
 func (s *SpecSchedule) Next(t time.Time) time.Time {
 	// General approach:
 	// For Month, Day, Hour, Minute, Second:
-	// Check if the time value matches.  If yes, continue to the next ***REMOVED***eld.
-	// If the ***REMOVED***eld doesn't match the schedule, then increment the ***REMOVED***eld until it matches.
-	// While incrementing the ***REMOVED***eld, a wrap-around brings it back to the beginning
-	// of the ***REMOVED***eld list (since it is necessary to re-verify previous ***REMOVED***eld
+	// Check if the time value matches.  If yes, continue to the next field.
+	// If the field doesn't match the schedule, then increment the field until it matches.
+	// While incrementing the field, a wrap-around brings it back to the beginning
+	// of the field list (since it is necessary to re-verify previous field
 	// values)
 
 	// Start at the earliest possible time (the upcoming second).
 	t = t.Add(1*time.Second - time.Duration(t.Nanosecond())*time.Nanosecond)
 
-	// This flag indicates whether a ***REMOVED***eld has been incremented.
+	// This flag indicates whether a field has been incremented.
 	added := false
 
-	// If no time is found within ***REMOVED***ve years, return zero.
+	// If no time is found within five years, return zero.
 	yearLimit := t.Year() + 5
 
 WRAP:
@@ -75,7 +75,7 @@ WRAP:
 		return time.Time{}
 	}
 
-	// Find the ***REMOVED***rst applicable month.
+	// Find the first applicable month.
 	// If it's this month, then do nothing.
 	for 1<<uint(t.Month())&s.Month == 0 {
 		// If we have to add a month, reset the other parts to 0.
@@ -145,7 +145,7 @@ WRAP:
 }
 
 // dayMatches returns true if the schedule's day-of-week and day-of-month
-// restrictions are satis***REMOVED***ed by the given time.
+// restrictions are satisfied by the given time.
 func dayMatches(s *SpecSchedule, t time.Time) bool {
 	var (
 		domMatch bool = 1<<uint(t.Day())&s.Dom > 0

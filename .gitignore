@@ -7,13 +7,13 @@
 # Test binary, build with `go test -c`
 *.test
 
-# Output of the go coverage tool, speci***REMOVED***cally when used with LiteIDE
+# Output of the go coverage tool, specifically when used with LiteIDE
 *.out
 
 # Project-local glide cache, RE: https://github.com/Masterminds/glide/issues/736
 .glide/
 
-# Hive thift de***REMOVED***ntions and generated code (automated with Make***REMOVED***le)
+# Hive thift defintions and generated code (automated with Makefile)
 out
 
 # Distribution packages

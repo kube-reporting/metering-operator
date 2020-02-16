@@ -60,7 +60,7 @@ func (c *routes) Get(name string, options metav1.GetOptions) (result *v1.Route, 
 	return
 }
 
-// List takes label and ***REMOVED***eld selectors, and returns the list of Routes that match those selectors.
+// List takes label and field selectors, and returns the list of Routes that match those selectors.
 func (c *routes) List(opts metav1.ListOptions) (result *v1.RouteList, err error) {
 	var timeout time.Duration
 	if opts.TimeoutSeconds != nil {

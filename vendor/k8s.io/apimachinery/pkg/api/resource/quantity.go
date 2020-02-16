@@ -2,7 +2,7 @@
 Copyright 2014 The Kubernetes Authors.
 
 Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this ***REMOVED***le except in compliance with the License.
+you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
 
     http://www.apache.org/licenses/LICENSE-2.0
@@ -10,7 +10,7 @@ You may obtain a copy of the License at
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the speci***REMOVED***c language governing permissions and
+See the License for the specific language governing permissions and
 limitations under the License.
 */
 
@@ -27,20 +27,20 @@ import (
 	inf "gopkg.in/inf.v0"
 )
 
-// Quantity is a ***REMOVED***xed-point representation of a number.
+// Quantity is a fixed-point representation of a number.
 // It provides convenient marshaling/unmarshaling in JSON and YAML,
 // in addition to String() and Int64() accessors.
 //
 // The serialization format is:
 //
-// <quantity>        ::= <signedNumber><suf***REMOVED***x>
-//   (Note that <suf***REMOVED***x> may be empty, from the "" case in <decimalSI>.)
+// <quantity>        ::= <signedNumber><suffix>
+//   (Note that <suffix> may be empty, from the "" case in <decimalSI>.)
 // <digit>           ::= 0 | 1 | ... | 9
 // <digits>          ::= <digit> | <digit><digits>
 // <number>          ::= <digits> | <digits>.<digits> | <digits>. | .<digits>
 // <sign>            ::= "+" | "-"
 // <signedNumber>    ::= <number> | <sign><number>
-// <suf***REMOVED***x>          ::= <binarySI> | <decimalExponent> | <decimalSI>
+// <suffix>          ::= <binarySI> | <decimalExponent> | <decimalSI>
 // <binarySI>        ::= Ki | Mi | Gi | Ti | Pi | Ei
 //   (International System of units; See: http://physics.nist.gov/cuu/Units/binary.html)
 // <decimalSI>       ::= m | "" | k | M | G | T | P | E
@@ -53,15 +53,15 @@ import (
 // (E.g.: 0.1m will rounded up to 1m.)
 // This may be extended in the future if we require larger or smaller quantities.
 //
-// When a Quantity is parsed from a string, it will remember the type of suf***REMOVED***x
+// When a Quantity is parsed from a string, it will remember the type of suffix
 // it had, and will use the same type again when it is serialized.
 //
 // Before serializing, Quantity will be put in "canonical form".
-// This means that Exponent/suf***REMOVED***x will be adjusted up or down (with a
+// This means that Exponent/suffix will be adjusted up or down (with a
 // corresponding increase or decrease in Mantissa) such that:
 //   a. No precision is lost
 //   b. No fractional digits will be emitted
-//   c. The exponent (or suf***REMOVED***x) is as large as possible.
+//   c. The exponent (or suffix) is as large as possible.
 // The sign will be omitted unless the number is negative.
 //
 // Examples:
@@ -75,9 +75,9 @@ import (
 // but will be re-emitted in their canonical form. (So always use canonical
 // form, or don't diff.)
 //
-// This format is intended to make it dif***REMOVED***cult to use these numbers without
+// This format is intended to make it difficult to use these numbers without
 // writing some sort of special handling code in the hopes that that will
-// cause implementors to also use a ***REMOVED***xed point implementation.
+// cause implementors to also use a fixed point implementation.
 //
 // +protobuf=true
 // +protobuf.embed=string
@@ -130,7 +130,7 @@ func MustParse(str string) Quantity {
 }
 
 const (
-	// splitREString is used to separate a number from its suf***REMOVED***x; as such,
+	// splitREString is used to separate a number from its suffix; as such,
 	// this is overly permissive, but that's OK-- it will be checked later.
 	splitREString = "^([+-]?[0-9.]+)([eEinumkKMGTP]*[-+]?[0-9]*)$"
 )
@@ -139,11 +139,11 @@ var (
 	// Errors that could happen while parsing a string.
 	ErrFormatWrong = errors.New("quantities must match the regular expression '" + splitREString + "'")
 	ErrNumeric     = errors.New("unable to parse numeric part of quantity")
-	ErrSuf***REMOVED***x      = errors.New("unable to parse quantity's suf***REMOVED***x")
+	ErrSuffix      = errors.New("unable to parse quantity's suffix")
 )
 
 // parseQuantityString is a fast scanner for quantity values.
-func parseQuantityString(str string) (positive bool, value, num, denom, suf***REMOVED***x string, err error) {
+func parseQuantityString(str string) (positive bool, value, num, denom, suffix string, err error) {
 	positive = true
 	pos := 0
 	end := len(str)
@@ -223,11 +223,11 @@ Num:
 	}
 	value = str[0:pos]
 
-	// grab the elements of the suf***REMOVED***x
-	suf***REMOVED***xStart := pos
+	// grab the elements of the suffix
+	suffixStart := pos
 	for i := pos; ; i++ {
 		if i >= end {
-			suf***REMOVED***x = str[suf***REMOVED***xStart:end]
+			suffix = str[suffixStart:end]
 			return
 		}
 		if !strings.ContainsAny(str[i:i+1], "eEinumkKMGTP") {
@@ -241,19 +241,19 @@ Num:
 			pos++
 		}
 	}
-Suf***REMOVED***x:
+Suffix:
 	for i := pos; ; i++ {
 		if i >= end {
-			suf***REMOVED***x = str[suf***REMOVED***xStart:end]
+			suffix = str[suffixStart:end]
 			return
 		}
 		switch str[i] {
 		case '0', '1', '2', '3', '4', '5', '6', '7', '8', '9':
 		default:
-			break Suf***REMOVED***x
+			break Suffix
 		}
 	}
-	// we encountered a non decimal in the Suf***REMOVED***x loop, but the last character
+	// we encountered a non decimal in the Suffix loop, but the last character
 	// was not a valid exponent
 	err = ErrFormatWrong
 	return
@@ -273,9 +273,9 @@ func ParseQuantity(str string) (Quantity, error) {
 		return Quantity{}, err
 	}
 
-	base, exponent, format, ok := quantitySuf***REMOVED***xer.interpret(suf***REMOVED***x(suf))
+	base, exponent, format, ok := quantitySuffixer.interpret(suffix(suf))
 	if !ok {
-		return Quantity{}, ErrSuf***REMOVED***x
+		return Quantity{}, ErrSuffix
 	}
 
 	precision := int32(0)
@@ -321,7 +321,7 @@ func ParseQuantity(str string) (Quantity, error) {
 						return Quantity{i: int64Amount{value: result, scale: Scale(scale)}, Format: format, s: str}, nil
 					}
 				default:
-					if scale%3 == 0 && !strings.HasSuf***REMOVED***x(shifted, "000") && shifted[0] != '0' {
+					if scale%3 == 0 && !strings.HasSuffix(shifted, "000") && shifted[0] != '0' {
 						return Quantity{i: int64Amount{value: result, scale: Scale(scale)}, Format: format, s: str}, nil
 					}
 				}
@@ -335,14 +335,14 @@ func ParseQuantity(str string) (Quantity, error) {
 		return Quantity{}, ErrNumeric
 	}
 
-	// So that no one but us has to think about suf***REMOVED***xes, remove it.
+	// So that no one but us has to think about suffixes, remove it.
 	if base == 10 {
 		amount.SetScale(amount.Scale() + Scale(exponent).infScale())
-	} ***REMOVED*** if base == 2 {
-		// numericSuf***REMOVED***x = 2 ** exponent
-		numericSuf***REMOVED***x := big.NewInt(1).Lsh(bigOne, uint(exponent))
+	} else if base == 2 {
+		// numericSuffix = 2 ** exponent
+		numericSuffix := big.NewInt(1).Lsh(bigOne, uint(exponent))
 		ub := amount.UnscaledBig()
-		amount.SetUnscaledBig(ub.Mul(ub, numericSuf***REMOVED***x))
+		amount.SetUnscaledBig(ub.Mul(ub, numericSuffix))
 	}
 
 	// Cap at min/max bounds.
@@ -396,14 +396,14 @@ func (_ Quantity) OpenAPISchemaType() []string { return []string{"string"} }
 // the OpenAPI spec of this type.
 func (_ Quantity) OpenAPISchemaFormat() string { return "" }
 
-// CanonicalizeBytes returns the canonical form of q and its suf***REMOVED***x (see comment on Quantity).
+// CanonicalizeBytes returns the canonical form of q and its suffix (see comment on Quantity).
 //
 // Note about BinarySI:
 // * If q.Format is set to BinarySI and q.Amount represents a non-zero value between
 //   -1 and +1, it will be emitted as if q.Format were DecimalSI.
 // * Otherwise, if q.Format is set to BinarySI, fractional parts of q.Amount will be
 //   rounded up. (1.1i becomes 2i.)
-func (q *Quantity) CanonicalizeBytes(out []byte) (result, suf***REMOVED***x []byte) {
+func (q *Quantity) CanonicalizeBytes(out []byte) (result, suffix []byte) {
 	if q.IsZero() {
 		return zeroBytes, nil
 	}
@@ -416,7 +416,7 @@ func (q *Quantity) CanonicalizeBytes(out []byte) (result, suf***REMOVED***x []by
 		if q.CmpInt64(-1024) > 0 && q.CmpInt64(1024) < 0 {
 			// This avoids rounding and hopefully confusion, too.
 			format = DecimalSI
-		} ***REMOVED*** {
+		} else {
 			var exact bool
 			if rounded, exact = q.AsScale(0); !exact {
 				// Don't lose precision-- show as DecimalSI
@@ -432,13 +432,13 @@ func (q *Quantity) CanonicalizeBytes(out []byte) (result, suf***REMOVED***x []by
 	switch format {
 	case DecimalExponent, DecimalSI:
 		number, exponent := q.AsCanonicalBytes(out)
-		suf***REMOVED***x, _ := quantitySuf***REMOVED***xer.constructBytes(10, exponent, format)
-		return number, suf***REMOVED***x
+		suffix, _ := quantitySuffixer.constructBytes(10, exponent, format)
+		return number, suffix
 	default:
 		// format must be BinarySI
 		number, exponent := rounded.AsCanonicalBase1024Bytes(out)
-		suf***REMOVED***x, _ := quantitySuf***REMOVED***xer.constructBytes(2, exponent*10, format)
-		return number, suf***REMOVED***x
+		suffix, _ := quantitySuffixer.constructBytes(2, exponent*10, format)
+		return number, suffix
 	}
 }
 
@@ -537,7 +537,7 @@ func (q *Quantity) Add(y Quantity) {
 		if q.i.Add(y.i) {
 			return
 		}
-	} ***REMOVED*** if q.IsZero() {
+	} else if q.IsZero() {
 		q.Format = y.Format
 	}
 	q.ToDec().d.Dec.Add(q.d.Dec, y.AsDec())
@@ -589,13 +589,13 @@ func (q *Quantity) Neg() {
 const int64QuantityExpectedBytes = 18
 
 // String formats the Quantity as a string, caching the result if not calculated.
-// String is an expensive operation and caching this result signi***REMOVED***cantly reduces the cost of
+// String is an expensive operation and caching this result significantly reduces the cost of
 // normal parse / marshal operations on Quantity.
 func (q *Quantity) String() string {
 	if len(q.s) == 0 {
 		result := make([]byte, 0, int64QuantityExpectedBytes)
-		number, suf***REMOVED***x := q.CanonicalizeBytes(result)
-		number = append(number, suf***REMOVED***x...)
+		number, suffix := q.CanonicalizeBytes(result)
+		number = append(number, suffix...)
 		q.s = string(number)
 	}
 	return q.s
@@ -611,11 +611,11 @@ func (q Quantity) MarshalJSON() ([]byte, error) {
 	}
 	result := make([]byte, int64QuantityExpectedBytes, int64QuantityExpectedBytes)
 	result[0] = '"'
-	number, suf***REMOVED***x := q.CanonicalizeBytes(result[1:1])
+	number, suffix := q.CanonicalizeBytes(result[1:1])
 	// if the same slice was returned to us that we passed in, avoid another allocation by copying number into
 	// the source slice and returning that
-	if len(number) > 0 && &number[0] == &result[1] && (len(number)+len(suf***REMOVED***x)+2) <= int64QuantityExpectedBytes {
-		number = append(number, suf***REMOVED***x...)
+	if len(number) > 0 && &number[0] == &result[1] && (len(number)+len(suffix)+2) <= int64QuantityExpectedBytes {
+		number = append(number, suffix...)
 		number = append(number, '"')
 		return result[:1+len(number)], nil
 	}
@@ -623,7 +623,7 @@ func (q Quantity) MarshalJSON() ([]byte, error) {
 	// append
 	result = result[:1]
 	result = append(result, number...)
-	result = append(result, suf***REMOVED***x...)
+	result = append(result, suffix...)
 	result = append(result, '"')
 	return result, nil
 }
@@ -686,13 +686,13 @@ func (q *Quantity) Value() int64 {
 }
 
 // MilliValue returns the value of ceil(q * 1000); this could overflow an int64;
-// if that's a concern, call Value() ***REMOVED***rst to verify the number is small enough.
+// if that's a concern, call Value() first to verify the number is small enough.
 func (q *Quantity) MilliValue() int64 {
 	return q.ScaledValue(Milli)
 }
 
 // ScaledValue returns the value of ceil(q * 10^scale); this could overflow an int64.
-// To detect overflow, call Value() ***REMOVED***rst and verify the expected magnitude.
+// To detect overflow, call Value() first and verify the expected magnitude.
 func (q *Quantity) ScaledValue(scale Scale) int64 {
 	if q.d.Dec == nil {
 		i, _ := q.i.AsScaledInt64(scale)

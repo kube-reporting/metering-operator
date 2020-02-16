@@ -8,7 +8,7 @@ import (
 // EvictCallback is used to get a callback when a cache entry is evicted
 type EvictCallback func(key interface{}, value interface{})
 
-// LRU implements a non-thread safe ***REMOVED***xed size LRU cache
+// LRU implements a non-thread safe fixed size LRU cache
 type LRU struct {
 	size      int
 	evictList *list.List
@@ -85,7 +85,7 @@ func (c *LRU) Contains(key interface{}) (ok bool) {
 	return ok
 }
 
-// Peek returns the key value (or unde***REMOVED***ned if not found) without updating
+// Peek returns the key value (or undefined if not found) without updating
 // the "recently used"-ness of the key.
 func (c *LRU) Peek(key interface{}) (value interface{}, ok bool) {
 	var ent *list.Element

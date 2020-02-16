@@ -35,7 +35,7 @@ const opAbortMultipartUpload = "AbortMultipartUpload"
 // See AbortMultipartUpload for more information on using the AbortMultipartUpload
 // API call, and error handling.
 //
-// This method is useful when you want to inject custom logic or con***REMOVED***guration
+// This method is useful when you want to inject custom logic or configuration
 // into the SDK's request lifecycle. Such as custom headers, or retry logic.
 //
 //
@@ -43,7 +43,7 @@ const opAbortMultipartUpload = "AbortMultipartUpload"
 //    req, resp := client.AbortMultipartUploadRequest(params)
 //
 //    err := req.Send()
-//    if err == nil { // resp is now ***REMOVED***lled
+//    if err == nil { // resp is now filled
 //        fmt.Println(resp)
 //    }
 //
@@ -81,7 +81,7 @@ func (c *S3) AbortMultipartUploadRequest(input *AbortMultipartUploadInput) (req 
 //
 // Returned Error Codes:
 //   * ErrCodeNoSuchUpload "NoSuchUpload"
-//   The speci***REMOVED***ed multipart upload does not exist.
+//   The specified multipart upload does not exist.
 //
 // See also, https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/AbortMultipartUpload
 func (c *S3) AbortMultipartUpload(input *AbortMultipartUploadInput) (*AbortMultipartUploadOutput, error) {
@@ -118,7 +118,7 @@ const opCompleteMultipartUpload = "CompleteMultipartUpload"
 // See CompleteMultipartUpload for more information on using the CompleteMultipartUpload
 // API call, and error handling.
 //
-// This method is useful when you want to inject custom logic or con***REMOVED***guration
+// This method is useful when you want to inject custom logic or configuration
 // into the SDK's request lifecycle. Such as custom headers, or retry logic.
 //
 //
@@ -126,7 +126,7 @@ const opCompleteMultipartUpload = "CompleteMultipartUpload"
 //    req, resp := client.CompleteMultipartUploadRequest(params)
 //
 //    err := req.Send()
-//    if err == nil { // resp is now ***REMOVED***lled
+//    if err == nil { // resp is now filled
 //        fmt.Println(resp)
 //    }
 //
@@ -192,7 +192,7 @@ const opCopyObject = "CopyObject"
 // See CopyObject for more information on using the CopyObject
 // API call, and error handling.
 //
-// This method is useful when you want to inject custom logic or con***REMOVED***guration
+// This method is useful when you want to inject custom logic or configuration
 // into the SDK's request lifecycle. Such as custom headers, or retry logic.
 //
 //
@@ -200,7 +200,7 @@ const opCopyObject = "CopyObject"
 //    req, resp := client.CopyObjectRequest(params)
 //
 //    err := req.Send()
-//    if err == nil { // resp is now ***REMOVED***lled
+//    if err == nil { // resp is now filled
 //        fmt.Println(resp)
 //    }
 //
@@ -272,7 +272,7 @@ const opCreateBucket = "CreateBucket"
 // See CreateBucket for more information on using the CreateBucket
 // API call, and error handling.
 //
-// This method is useful when you want to inject custom logic or con***REMOVED***guration
+// This method is useful when you want to inject custom logic or configuration
 // into the SDK's request lifecycle. Such as custom headers, or retry logic.
 //
 //
@@ -280,7 +280,7 @@ const opCreateBucket = "CreateBucket"
 //    req, resp := client.CreateBucketRequest(params)
 //
 //    err := req.Send()
-//    if err == nil { // resp is now ***REMOVED***lled
+//    if err == nil { // resp is now filled
 //        fmt.Println(resp)
 //    }
 //
@@ -354,7 +354,7 @@ const opCreateMultipartUpload = "CreateMultipartUpload"
 // See CreateMultipartUpload for more information on using the CreateMultipartUpload
 // API call, and error handling.
 //
-// This method is useful when you want to inject custom logic or con***REMOVED***guration
+// This method is useful when you want to inject custom logic or configuration
 // into the SDK's request lifecycle. Such as custom headers, or retry logic.
 //
 //
@@ -362,7 +362,7 @@ const opCreateMultipartUpload = "CreateMultipartUpload"
 //    req, resp := client.CreateMultipartUploadRequest(params)
 //
 //    err := req.Send()
-//    if err == nil { // resp is now ***REMOVED***lled
+//    if err == nil { // resp is now filled
 //        fmt.Println(resp)
 //    }
 //
@@ -434,7 +434,7 @@ const opDeleteBucket = "DeleteBucket"
 // See DeleteBucket for more information on using the DeleteBucket
 // API call, and error handling.
 //
-// This method is useful when you want to inject custom logic or con***REMOVED***guration
+// This method is useful when you want to inject custom logic or configuration
 // into the SDK's request lifecycle. Such as custom headers, or retry logic.
 //
 //
@@ -442,7 +442,7 @@ const opDeleteBucket = "DeleteBucket"
 //    req, resp := client.DeleteBucketRequest(params)
 //
 //    err := req.Send()
-//    if err == nil { // resp is now ***REMOVED***lled
+//    if err == nil { // resp is now filled
 //        fmt.Println(resp)
 //    }
 //
@@ -497,55 +497,55 @@ func (c *S3) DeleteBucketWithContext(ctx aws.Context, input *DeleteBucketInput, 
 	return out, req.Send()
 }
 
-const opDeleteBucketAnalyticsCon***REMOVED***guration = "DeleteBucketAnalyticsCon***REMOVED***guration"
+const opDeleteBucketAnalyticsConfiguration = "DeleteBucketAnalyticsConfiguration"
 
-// DeleteBucketAnalyticsCon***REMOVED***gurationRequest generates a "aws/request.Request" representing the
-// client's request for the DeleteBucketAnalyticsCon***REMOVED***guration operation. The "output" return
+// DeleteBucketAnalyticsConfigurationRequest generates a "aws/request.Request" representing the
+// client's request for the DeleteBucketAnalyticsConfiguration operation. The "output" return
 // value will be populated with the request's response once the request completes
 // successfully.
 //
 // Use "Send" method on the returned Request to send the API call to the service.
 // the "output" return value is not valid until after Send returns without error.
 //
-// See DeleteBucketAnalyticsCon***REMOVED***guration for more information on using the DeleteBucketAnalyticsCon***REMOVED***guration
+// See DeleteBucketAnalyticsConfiguration for more information on using the DeleteBucketAnalyticsConfiguration
 // API call, and error handling.
 //
-// This method is useful when you want to inject custom logic or con***REMOVED***guration
+// This method is useful when you want to inject custom logic or configuration
 // into the SDK's request lifecycle. Such as custom headers, or retry logic.
 //
 //
-//    // Example sending a request using the DeleteBucketAnalyticsCon***REMOVED***gurationRequest method.
-//    req, resp := client.DeleteBucketAnalyticsCon***REMOVED***gurationRequest(params)
+//    // Example sending a request using the DeleteBucketAnalyticsConfigurationRequest method.
+//    req, resp := client.DeleteBucketAnalyticsConfigurationRequest(params)
 //
 //    err := req.Send()
-//    if err == nil { // resp is now ***REMOVED***lled
+//    if err == nil { // resp is now filled
 //        fmt.Println(resp)
 //    }
 //
-// See also, https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/DeleteBucketAnalyticsCon***REMOVED***guration
-func (c *S3) DeleteBucketAnalyticsCon***REMOVED***gurationRequest(input *DeleteBucketAnalyticsCon***REMOVED***gurationInput) (req *request.Request, output *DeleteBucketAnalyticsCon***REMOVED***gurationOutput) {
+// See also, https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/DeleteBucketAnalyticsConfiguration
+func (c *S3) DeleteBucketAnalyticsConfigurationRequest(input *DeleteBucketAnalyticsConfigurationInput) (req *request.Request, output *DeleteBucketAnalyticsConfigurationOutput) {
 	op := &request.Operation{
-		Name:       opDeleteBucketAnalyticsCon***REMOVED***guration,
+		Name:       opDeleteBucketAnalyticsConfiguration,
 		HTTPMethod: "DELETE",
 		HTTPPath:   "/{Bucket}?analytics",
 	}
 
 	if input == nil {
-		input = &DeleteBucketAnalyticsCon***REMOVED***gurationInput{}
+		input = &DeleteBucketAnalyticsConfigurationInput{}
 	}
 
-	output = &DeleteBucketAnalyticsCon***REMOVED***gurationOutput{}
+	output = &DeleteBucketAnalyticsConfigurationOutput{}
 	req = c.newRequest(op, input, output)
 	req.Handlers.Unmarshal.Swap(restxml.UnmarshalHandler.Name, protocol.UnmarshalDiscardBodyHandler)
 	return
 }
 
-// DeleteBucketAnalyticsCon***REMOVED***guration API operation for Amazon Simple Storage Service.
+// DeleteBucketAnalyticsConfiguration API operation for Amazon Simple Storage Service.
 //
-// Deletes an analytics con***REMOVED***guration for the bucket (speci***REMOVED***ed by the analytics
-// con***REMOVED***guration ID).
+// Deletes an analytics configuration for the bucket (specified by the analytics
+// configuration ID).
 //
-// To use this operation, you must have permissions to perform the s3:PutAnalyticsCon***REMOVED***guration
+// To use this operation, you must have permissions to perform the s3:PutAnalyticsConfiguration
 // action. The bucket owner has this permission by default. The bucket owner
 // can grant this permission to others.
 //
@@ -554,24 +554,24 @@ func (c *S3) DeleteBucketAnalyticsCon***REMOVED***gurationRequest(input *DeleteB
 // the error.
 //
 // See the AWS API reference guide for Amazon Simple Storage Service's
-// API operation DeleteBucketAnalyticsCon***REMOVED***guration for usage and error information.
-// See also, https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/DeleteBucketAnalyticsCon***REMOVED***guration
-func (c *S3) DeleteBucketAnalyticsCon***REMOVED***guration(input *DeleteBucketAnalyticsCon***REMOVED***gurationInput) (*DeleteBucketAnalyticsCon***REMOVED***gurationOutput, error) {
-	req, out := c.DeleteBucketAnalyticsCon***REMOVED***gurationRequest(input)
+// API operation DeleteBucketAnalyticsConfiguration for usage and error information.
+// See also, https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/DeleteBucketAnalyticsConfiguration
+func (c *S3) DeleteBucketAnalyticsConfiguration(input *DeleteBucketAnalyticsConfigurationInput) (*DeleteBucketAnalyticsConfigurationOutput, error) {
+	req, out := c.DeleteBucketAnalyticsConfigurationRequest(input)
 	return out, req.Send()
 }
 
-// DeleteBucketAnalyticsCon***REMOVED***gurationWithContext is the same as DeleteBucketAnalyticsCon***REMOVED***guration with the addition of
+// DeleteBucketAnalyticsConfigurationWithContext is the same as DeleteBucketAnalyticsConfiguration with the addition of
 // the ability to pass a context and additional request options.
 //
-// See DeleteBucketAnalyticsCon***REMOVED***guration for details on how to use this API operation.
+// See DeleteBucketAnalyticsConfiguration for details on how to use this API operation.
 //
 // The context must be non-nil and will be used for request cancellation. If
 // the context is nil a panic will occur. In the future the SDK may create
 // sub-contexts for http.Requests. See https://golang.org/pkg/context/
 // for more information on using Contexts.
-func (c *S3) DeleteBucketAnalyticsCon***REMOVED***gurationWithContext(ctx aws.Context, input *DeleteBucketAnalyticsCon***REMOVED***gurationInput, opts ...request.Option) (*DeleteBucketAnalyticsCon***REMOVED***gurationOutput, error) {
-	req, out := c.DeleteBucketAnalyticsCon***REMOVED***gurationRequest(input)
+func (c *S3) DeleteBucketAnalyticsConfigurationWithContext(ctx aws.Context, input *DeleteBucketAnalyticsConfigurationInput, opts ...request.Option) (*DeleteBucketAnalyticsConfigurationOutput, error) {
+	req, out := c.DeleteBucketAnalyticsConfigurationRequest(input)
 	req.SetContext(ctx)
 	req.ApplyOptions(opts...)
 	return out, req.Send()
@@ -590,7 +590,7 @@ const opDeleteBucketCors = "DeleteBucketCors"
 // See DeleteBucketCors for more information on using the DeleteBucketCors
 // API call, and error handling.
 //
-// This method is useful when you want to inject custom logic or con***REMOVED***guration
+// This method is useful when you want to inject custom logic or configuration
 // into the SDK's request lifecycle. Such as custom headers, or retry logic.
 //
 //
@@ -598,7 +598,7 @@ const opDeleteBucketCors = "DeleteBucketCors"
 //    req, resp := client.DeleteBucketCorsRequest(params)
 //
 //    err := req.Send()
-//    if err == nil { // resp is now ***REMOVED***lled
+//    if err == nil { // resp is now filled
 //        fmt.Println(resp)
 //    }
 //
@@ -622,7 +622,7 @@ func (c *S3) DeleteBucketCorsRequest(input *DeleteBucketCorsInput) (req *request
 
 // DeleteBucketCors API operation for Amazon Simple Storage Service.
 //
-// Deletes the CORS con***REMOVED***guration information set for the bucket.
+// Deletes the CORS configuration information set for the bucket.
 //
 // Returns awserr.Error for service API and SDK errors. Use runtime type assertions
 // with awserr.Error's Code and Message methods to get detailed information about
@@ -665,7 +665,7 @@ const opDeleteBucketEncryption = "DeleteBucketEncryption"
 // See DeleteBucketEncryption for more information on using the DeleteBucketEncryption
 // API call, and error handling.
 //
-// This method is useful when you want to inject custom logic or con***REMOVED***guration
+// This method is useful when you want to inject custom logic or configuration
 // into the SDK's request lifecycle. Such as custom headers, or retry logic.
 //
 //
@@ -673,7 +673,7 @@ const opDeleteBucketEncryption = "DeleteBucketEncryption"
 //    req, resp := client.DeleteBucketEncryptionRequest(params)
 //
 //    err := req.Send()
-//    if err == nil { // resp is now ***REMOVED***lled
+//    if err == nil { // resp is now filled
 //        fmt.Println(resp)
 //    }
 //
@@ -697,7 +697,7 @@ func (c *S3) DeleteBucketEncryptionRequest(input *DeleteBucketEncryptionInput) (
 
 // DeleteBucketEncryption API operation for Amazon Simple Storage Service.
 //
-// Deletes the server-side encryption con***REMOVED***guration from the bucket.
+// Deletes the server-side encryption configuration from the bucket.
 //
 // Returns awserr.Error for service API and SDK errors. Use runtime type assertions
 // with awserr.Error's Code and Message methods to get detailed information about
@@ -727,52 +727,52 @@ func (c *S3) DeleteBucketEncryptionWithContext(ctx aws.Context, input *DeleteBuc
 	return out, req.Send()
 }
 
-const opDeleteBucketInventoryCon***REMOVED***guration = "DeleteBucketInventoryCon***REMOVED***guration"
+const opDeleteBucketInventoryConfiguration = "DeleteBucketInventoryConfiguration"
 
-// DeleteBucketInventoryCon***REMOVED***gurationRequest generates a "aws/request.Request" representing the
-// client's request for the DeleteBucketInventoryCon***REMOVED***guration operation. The "output" return
+// DeleteBucketInventoryConfigurationRequest generates a "aws/request.Request" representing the
+// client's request for the DeleteBucketInventoryConfiguration operation. The "output" return
 // value will be populated with the request's response once the request completes
 // successfully.
 //
 // Use "Send" method on the returned Request to send the API call to the service.
 // the "output" return value is not valid until after Send returns without error.
 //
-// See DeleteBucketInventoryCon***REMOVED***guration for more information on using the DeleteBucketInventoryCon***REMOVED***guration
+// See DeleteBucketInventoryConfiguration for more information on using the DeleteBucketInventoryConfiguration
 // API call, and error handling.
 //
-// This method is useful when you want to inject custom logic or con***REMOVED***guration
+// This method is useful when you want to inject custom logic or configuration
 // into the SDK's request lifecycle. Such as custom headers, or retry logic.
 //
 //
-//    // Example sending a request using the DeleteBucketInventoryCon***REMOVED***gurationRequest method.
-//    req, resp := client.DeleteBucketInventoryCon***REMOVED***gurationRequest(params)
+//    // Example sending a request using the DeleteBucketInventoryConfigurationRequest method.
+//    req, resp := client.DeleteBucketInventoryConfigurationRequest(params)
 //
 //    err := req.Send()
-//    if err == nil { // resp is now ***REMOVED***lled
+//    if err == nil { // resp is now filled
 //        fmt.Println(resp)
 //    }
 //
-// See also, https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/DeleteBucketInventoryCon***REMOVED***guration
-func (c *S3) DeleteBucketInventoryCon***REMOVED***gurationRequest(input *DeleteBucketInventoryCon***REMOVED***gurationInput) (req *request.Request, output *DeleteBucketInventoryCon***REMOVED***gurationOutput) {
+// See also, https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/DeleteBucketInventoryConfiguration
+func (c *S3) DeleteBucketInventoryConfigurationRequest(input *DeleteBucketInventoryConfigurationInput) (req *request.Request, output *DeleteBucketInventoryConfigurationOutput) {
 	op := &request.Operation{
-		Name:       opDeleteBucketInventoryCon***REMOVED***guration,
+		Name:       opDeleteBucketInventoryConfiguration,
 		HTTPMethod: "DELETE",
 		HTTPPath:   "/{Bucket}?inventory",
 	}
 
 	if input == nil {
-		input = &DeleteBucketInventoryCon***REMOVED***gurationInput{}
+		input = &DeleteBucketInventoryConfigurationInput{}
 	}
 
-	output = &DeleteBucketInventoryCon***REMOVED***gurationOutput{}
+	output = &DeleteBucketInventoryConfigurationOutput{}
 	req = c.newRequest(op, input, output)
 	req.Handlers.Unmarshal.Swap(restxml.UnmarshalHandler.Name, protocol.UnmarshalDiscardBodyHandler)
 	return
 }
 
-// DeleteBucketInventoryCon***REMOVED***guration API operation for Amazon Simple Storage Service.
+// DeleteBucketInventoryConfiguration API operation for Amazon Simple Storage Service.
 //
-// Deletes an inventory con***REMOVED***guration (identi***REMOVED***ed by the inventory ID) from
+// Deletes an inventory configuration (identified by the inventory ID) from
 // the bucket.
 //
 // Returns awserr.Error for service API and SDK errors. Use runtime type assertions
@@ -780,24 +780,24 @@ func (c *S3) DeleteBucketInventoryCon***REMOVED***gurationRequest(input *DeleteB
 // the error.
 //
 // See the AWS API reference guide for Amazon Simple Storage Service's
-// API operation DeleteBucketInventoryCon***REMOVED***guration for usage and error information.
-// See also, https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/DeleteBucketInventoryCon***REMOVED***guration
-func (c *S3) DeleteBucketInventoryCon***REMOVED***guration(input *DeleteBucketInventoryCon***REMOVED***gurationInput) (*DeleteBucketInventoryCon***REMOVED***gurationOutput, error) {
-	req, out := c.DeleteBucketInventoryCon***REMOVED***gurationRequest(input)
+// API operation DeleteBucketInventoryConfiguration for usage and error information.
+// See also, https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/DeleteBucketInventoryConfiguration
+func (c *S3) DeleteBucketInventoryConfiguration(input *DeleteBucketInventoryConfigurationInput) (*DeleteBucketInventoryConfigurationOutput, error) {
+	req, out := c.DeleteBucketInventoryConfigurationRequest(input)
 	return out, req.Send()
 }
 
-// DeleteBucketInventoryCon***REMOVED***gurationWithContext is the same as DeleteBucketInventoryCon***REMOVED***guration with the addition of
+// DeleteBucketInventoryConfigurationWithContext is the same as DeleteBucketInventoryConfiguration with the addition of
 // the ability to pass a context and additional request options.
 //
-// See DeleteBucketInventoryCon***REMOVED***guration for details on how to use this API operation.
+// See DeleteBucketInventoryConfiguration for details on how to use this API operation.
 //
 // The context must be non-nil and will be used for request cancellation. If
 // the context is nil a panic will occur. In the future the SDK may create
 // sub-contexts for http.Requests. See https://golang.org/pkg/context/
 // for more information on using Contexts.
-func (c *S3) DeleteBucketInventoryCon***REMOVED***gurationWithContext(ctx aws.Context, input *DeleteBucketInventoryCon***REMOVED***gurationInput, opts ...request.Option) (*DeleteBucketInventoryCon***REMOVED***gurationOutput, error) {
-	req, out := c.DeleteBucketInventoryCon***REMOVED***gurationRequest(input)
+func (c *S3) DeleteBucketInventoryConfigurationWithContext(ctx aws.Context, input *DeleteBucketInventoryConfigurationInput, opts ...request.Option) (*DeleteBucketInventoryConfigurationOutput, error) {
+	req, out := c.DeleteBucketInventoryConfigurationRequest(input)
 	req.SetContext(ctx)
 	req.ApplyOptions(opts...)
 	return out, req.Send()
@@ -816,7 +816,7 @@ const opDeleteBucketLifecycle = "DeleteBucketLifecycle"
 // See DeleteBucketLifecycle for more information on using the DeleteBucketLifecycle
 // API call, and error handling.
 //
-// This method is useful when you want to inject custom logic or con***REMOVED***guration
+// This method is useful when you want to inject custom logic or configuration
 // into the SDK's request lifecycle. Such as custom headers, or retry logic.
 //
 //
@@ -824,7 +824,7 @@ const opDeleteBucketLifecycle = "DeleteBucketLifecycle"
 //    req, resp := client.DeleteBucketLifecycleRequest(params)
 //
 //    err := req.Send()
-//    if err == nil { // resp is now ***REMOVED***lled
+//    if err == nil { // resp is now filled
 //        fmt.Println(resp)
 //    }
 //
@@ -848,7 +848,7 @@ func (c *S3) DeleteBucketLifecycleRequest(input *DeleteBucketLifecycleInput) (re
 
 // DeleteBucketLifecycle API operation for Amazon Simple Storage Service.
 //
-// Deletes the lifecycle con***REMOVED***guration from the bucket.
+// Deletes the lifecycle configuration from the bucket.
 //
 // Returns awserr.Error for service API and SDK errors. Use runtime type assertions
 // with awserr.Error's Code and Message methods to get detailed information about
@@ -878,52 +878,52 @@ func (c *S3) DeleteBucketLifecycleWithContext(ctx aws.Context, input *DeleteBuck
 	return out, req.Send()
 }
 
-const opDeleteBucketMetricsCon***REMOVED***guration = "DeleteBucketMetricsCon***REMOVED***guration"
+const opDeleteBucketMetricsConfiguration = "DeleteBucketMetricsConfiguration"
 
-// DeleteBucketMetricsCon***REMOVED***gurationRequest generates a "aws/request.Request" representing the
-// client's request for the DeleteBucketMetricsCon***REMOVED***guration operation. The "output" return
+// DeleteBucketMetricsConfigurationRequest generates a "aws/request.Request" representing the
+// client's request for the DeleteBucketMetricsConfiguration operation. The "output" return
 // value will be populated with the request's response once the request completes
 // successfully.
 //
 // Use "Send" method on the returned Request to send the API call to the service.
 // the "output" return value is not valid until after Send returns without error.
 //
-// See DeleteBucketMetricsCon***REMOVED***guration for more information on using the DeleteBucketMetricsCon***REMOVED***guration
+// See DeleteBucketMetricsConfiguration for more information on using the DeleteBucketMetricsConfiguration
 // API call, and error handling.
 //
-// This method is useful when you want to inject custom logic or con***REMOVED***guration
+// This method is useful when you want to inject custom logic or configuration
 // into the SDK's request lifecycle. Such as custom headers, or retry logic.
 //
 //
-//    // Example sending a request using the DeleteBucketMetricsCon***REMOVED***gurationRequest method.
-//    req, resp := client.DeleteBucketMetricsCon***REMOVED***gurationRequest(params)
+//    // Example sending a request using the DeleteBucketMetricsConfigurationRequest method.
+//    req, resp := client.DeleteBucketMetricsConfigurationRequest(params)
 //
 //    err := req.Send()
-//    if err == nil { // resp is now ***REMOVED***lled
+//    if err == nil { // resp is now filled
 //        fmt.Println(resp)
 //    }
 //
-// See also, https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/DeleteBucketMetricsCon***REMOVED***guration
-func (c *S3) DeleteBucketMetricsCon***REMOVED***gurationRequest(input *DeleteBucketMetricsCon***REMOVED***gurationInput) (req *request.Request, output *DeleteBucketMetricsCon***REMOVED***gurationOutput) {
+// See also, https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/DeleteBucketMetricsConfiguration
+func (c *S3) DeleteBucketMetricsConfigurationRequest(input *DeleteBucketMetricsConfigurationInput) (req *request.Request, output *DeleteBucketMetricsConfigurationOutput) {
 	op := &request.Operation{
-		Name:       opDeleteBucketMetricsCon***REMOVED***guration,
+		Name:       opDeleteBucketMetricsConfiguration,
 		HTTPMethod: "DELETE",
 		HTTPPath:   "/{Bucket}?metrics",
 	}
 
 	if input == nil {
-		input = &DeleteBucketMetricsCon***REMOVED***gurationInput{}
+		input = &DeleteBucketMetricsConfigurationInput{}
 	}
 
-	output = &DeleteBucketMetricsCon***REMOVED***gurationOutput{}
+	output = &DeleteBucketMetricsConfigurationOutput{}
 	req = c.newRequest(op, input, output)
 	req.Handlers.Unmarshal.Swap(restxml.UnmarshalHandler.Name, protocol.UnmarshalDiscardBodyHandler)
 	return
 }
 
-// DeleteBucketMetricsCon***REMOVED***guration API operation for Amazon Simple Storage Service.
+// DeleteBucketMetricsConfiguration API operation for Amazon Simple Storage Service.
 //
-// Deletes a metrics con***REMOVED***guration (speci***REMOVED***ed by the metrics con***REMOVED***guration ID)
+// Deletes a metrics configuration (specified by the metrics configuration ID)
 // from the bucket.
 //
 // Returns awserr.Error for service API and SDK errors. Use runtime type assertions
@@ -931,24 +931,24 @@ func (c *S3) DeleteBucketMetricsCon***REMOVED***gurationRequest(input *DeleteBuc
 // the error.
 //
 // See the AWS API reference guide for Amazon Simple Storage Service's
-// API operation DeleteBucketMetricsCon***REMOVED***guration for usage and error information.
-// See also, https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/DeleteBucketMetricsCon***REMOVED***guration
-func (c *S3) DeleteBucketMetricsCon***REMOVED***guration(input *DeleteBucketMetricsCon***REMOVED***gurationInput) (*DeleteBucketMetricsCon***REMOVED***gurationOutput, error) {
-	req, out := c.DeleteBucketMetricsCon***REMOVED***gurationRequest(input)
+// API operation DeleteBucketMetricsConfiguration for usage and error information.
+// See also, https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/DeleteBucketMetricsConfiguration
+func (c *S3) DeleteBucketMetricsConfiguration(input *DeleteBucketMetricsConfigurationInput) (*DeleteBucketMetricsConfigurationOutput, error) {
+	req, out := c.DeleteBucketMetricsConfigurationRequest(input)
 	return out, req.Send()
 }
 
-// DeleteBucketMetricsCon***REMOVED***gurationWithContext is the same as DeleteBucketMetricsCon***REMOVED***guration with the addition of
+// DeleteBucketMetricsConfigurationWithContext is the same as DeleteBucketMetricsConfiguration with the addition of
 // the ability to pass a context and additional request options.
 //
-// See DeleteBucketMetricsCon***REMOVED***guration for details on how to use this API operation.
+// See DeleteBucketMetricsConfiguration for details on how to use this API operation.
 //
 // The context must be non-nil and will be used for request cancellation. If
 // the context is nil a panic will occur. In the future the SDK may create
 // sub-contexts for http.Requests. See https://golang.org/pkg/context/
 // for more information on using Contexts.
-func (c *S3) DeleteBucketMetricsCon***REMOVED***gurationWithContext(ctx aws.Context, input *DeleteBucketMetricsCon***REMOVED***gurationInput, opts ...request.Option) (*DeleteBucketMetricsCon***REMOVED***gurationOutput, error) {
-	req, out := c.DeleteBucketMetricsCon***REMOVED***gurationRequest(input)
+func (c *S3) DeleteBucketMetricsConfigurationWithContext(ctx aws.Context, input *DeleteBucketMetricsConfigurationInput, opts ...request.Option) (*DeleteBucketMetricsConfigurationOutput, error) {
+	req, out := c.DeleteBucketMetricsConfigurationRequest(input)
 	req.SetContext(ctx)
 	req.ApplyOptions(opts...)
 	return out, req.Send()
@@ -967,7 +967,7 @@ const opDeleteBucketPolicy = "DeleteBucketPolicy"
 // See DeleteBucketPolicy for more information on using the DeleteBucketPolicy
 // API call, and error handling.
 //
-// This method is useful when you want to inject custom logic or con***REMOVED***guration
+// This method is useful when you want to inject custom logic or configuration
 // into the SDK's request lifecycle. Such as custom headers, or retry logic.
 //
 //
@@ -975,7 +975,7 @@ const opDeleteBucketPolicy = "DeleteBucketPolicy"
 //    req, resp := client.DeleteBucketPolicyRequest(params)
 //
 //    err := req.Send()
-//    if err == nil { // resp is now ***REMOVED***lled
+//    if err == nil { // resp is now filled
 //        fmt.Println(resp)
 //    }
 //
@@ -1042,7 +1042,7 @@ const opDeleteBucketReplication = "DeleteBucketReplication"
 // See DeleteBucketReplication for more information on using the DeleteBucketReplication
 // API call, and error handling.
 //
-// This method is useful when you want to inject custom logic or con***REMOVED***guration
+// This method is useful when you want to inject custom logic or configuration
 // into the SDK's request lifecycle. Such as custom headers, or retry logic.
 //
 //
@@ -1050,7 +1050,7 @@ const opDeleteBucketReplication = "DeleteBucketReplication"
 //    req, resp := client.DeleteBucketReplicationRequest(params)
 //
 //    err := req.Send()
-//    if err == nil { // resp is now ***REMOVED***lled
+//    if err == nil { // resp is now filled
 //        fmt.Println(resp)
 //    }
 //
@@ -1074,8 +1074,8 @@ func (c *S3) DeleteBucketReplicationRequest(input *DeleteBucketReplicationInput)
 
 // DeleteBucketReplication API operation for Amazon Simple Storage Service.
 //
-// Deletes the replication con***REMOVED***guration from the bucket. For information about
-// replication con***REMOVED***guration, see Cross-Region Replication (CRR) (https://docs.aws.amazon.com/AmazonS3/latest/dev/crr.html)
+// Deletes the replication configuration from the bucket. For information about
+// replication configuration, see Cross-Region Replication (CRR) (https://docs.aws.amazon.com/AmazonS3/latest/dev/crr.html)
 // in the Amazon S3 Developer Guide.
 //
 // Returns awserr.Error for service API and SDK errors. Use runtime type assertions
@@ -1119,7 +1119,7 @@ const opDeleteBucketTagging = "DeleteBucketTagging"
 // See DeleteBucketTagging for more information on using the DeleteBucketTagging
 // API call, and error handling.
 //
-// This method is useful when you want to inject custom logic or con***REMOVED***guration
+// This method is useful when you want to inject custom logic or configuration
 // into the SDK's request lifecycle. Such as custom headers, or retry logic.
 //
 //
@@ -1127,7 +1127,7 @@ const opDeleteBucketTagging = "DeleteBucketTagging"
 //    req, resp := client.DeleteBucketTaggingRequest(params)
 //
 //    err := req.Send()
-//    if err == nil { // resp is now ***REMOVED***lled
+//    if err == nil { // resp is now filled
 //        fmt.Println(resp)
 //    }
 //
@@ -1194,7 +1194,7 @@ const opDeleteBucketWebsite = "DeleteBucketWebsite"
 // See DeleteBucketWebsite for more information on using the DeleteBucketWebsite
 // API call, and error handling.
 //
-// This method is useful when you want to inject custom logic or con***REMOVED***guration
+// This method is useful when you want to inject custom logic or configuration
 // into the SDK's request lifecycle. Such as custom headers, or retry logic.
 //
 //
@@ -1202,7 +1202,7 @@ const opDeleteBucketWebsite = "DeleteBucketWebsite"
 //    req, resp := client.DeleteBucketWebsiteRequest(params)
 //
 //    err := req.Send()
-//    if err == nil { // resp is now ***REMOVED***lled
+//    if err == nil { // resp is now filled
 //        fmt.Println(resp)
 //    }
 //
@@ -1226,7 +1226,7 @@ func (c *S3) DeleteBucketWebsiteRequest(input *DeleteBucketWebsiteInput) (req *r
 
 // DeleteBucketWebsite API operation for Amazon Simple Storage Service.
 //
-// This operation removes the website con***REMOVED***guration from the bucket.
+// This operation removes the website configuration from the bucket.
 //
 // Returns awserr.Error for service API and SDK errors. Use runtime type assertions
 // with awserr.Error's Code and Message methods to get detailed information about
@@ -1269,7 +1269,7 @@ const opDeleteObject = "DeleteObject"
 // See DeleteObject for more information on using the DeleteObject
 // API call, and error handling.
 //
-// This method is useful when you want to inject custom logic or con***REMOVED***guration
+// This method is useful when you want to inject custom logic or configuration
 // into the SDK's request lifecycle. Such as custom headers, or retry logic.
 //
 //
@@ -1277,7 +1277,7 @@ const opDeleteObject = "DeleteObject"
 //    req, resp := client.DeleteObjectRequest(params)
 //
 //    err := req.Send()
-//    if err == nil { // resp is now ***REMOVED***lled
+//    if err == nil { // resp is now filled
 //        fmt.Println(resp)
 //    }
 //
@@ -1345,7 +1345,7 @@ const opDeleteObjectTagging = "DeleteObjectTagging"
 // See DeleteObjectTagging for more information on using the DeleteObjectTagging
 // API call, and error handling.
 //
-// This method is useful when you want to inject custom logic or con***REMOVED***guration
+// This method is useful when you want to inject custom logic or configuration
 // into the SDK's request lifecycle. Such as custom headers, or retry logic.
 //
 //
@@ -1353,7 +1353,7 @@ const opDeleteObjectTagging = "DeleteObjectTagging"
 //    req, resp := client.DeleteObjectTaggingRequest(params)
 //
 //    err := req.Send()
-//    if err == nil { // resp is now ***REMOVED***lled
+//    if err == nil { // resp is now filled
 //        fmt.Println(resp)
 //    }
 //
@@ -1419,7 +1419,7 @@ const opDeleteObjects = "DeleteObjects"
 // See DeleteObjects for more information on using the DeleteObjects
 // API call, and error handling.
 //
-// This method is useful when you want to inject custom logic or con***REMOVED***guration
+// This method is useful when you want to inject custom logic or configuration
 // into the SDK's request lifecycle. Such as custom headers, or retry logic.
 //
 //
@@ -1427,7 +1427,7 @@ const opDeleteObjects = "DeleteObjects"
 //    req, resp := client.DeleteObjectsRequest(params)
 //
 //    err := req.Send()
-//    if err == nil { // resp is now ***REMOVED***lled
+//    if err == nil { // resp is now filled
 //        fmt.Println(resp)
 //    }
 //
@@ -1494,7 +1494,7 @@ const opDeletePublicAccessBlock = "DeletePublicAccessBlock"
 // See DeletePublicAccessBlock for more information on using the DeletePublicAccessBlock
 // API call, and error handling.
 //
-// This method is useful when you want to inject custom logic or con***REMOVED***guration
+// This method is useful when you want to inject custom logic or configuration
 // into the SDK's request lifecycle. Such as custom headers, or retry logic.
 //
 //
@@ -1502,7 +1502,7 @@ const opDeletePublicAccessBlock = "DeletePublicAccessBlock"
 //    req, resp := client.DeletePublicAccessBlockRequest(params)
 //
 //    err := req.Send()
-//    if err == nil { // resp is now ***REMOVED***lled
+//    if err == nil { // resp is now filled
 //        fmt.Println(resp)
 //    }
 //
@@ -1526,7 +1526,7 @@ func (c *S3) DeletePublicAccessBlockRequest(input *DeletePublicAccessBlockInput)
 
 // DeletePublicAccessBlock API operation for Amazon Simple Storage Service.
 //
-// Removes the PublicAccessBlock con***REMOVED***guration from an Amazon S3 bucket.
+// Removes the PublicAccessBlock configuration from an Amazon S3 bucket.
 //
 // Returns awserr.Error for service API and SDK errors. Use runtime type assertions
 // with awserr.Error's Code and Message methods to get detailed information about
@@ -1556,75 +1556,75 @@ func (c *S3) DeletePublicAccessBlockWithContext(ctx aws.Context, input *DeletePu
 	return out, req.Send()
 }
 
-const opGetBucketAccelerateCon***REMOVED***guration = "GetBucketAccelerateCon***REMOVED***guration"
+const opGetBucketAccelerateConfiguration = "GetBucketAccelerateConfiguration"
 
-// GetBucketAccelerateCon***REMOVED***gurationRequest generates a "aws/request.Request" representing the
-// client's request for the GetBucketAccelerateCon***REMOVED***guration operation. The "output" return
+// GetBucketAccelerateConfigurationRequest generates a "aws/request.Request" representing the
+// client's request for the GetBucketAccelerateConfiguration operation. The "output" return
 // value will be populated with the request's response once the request completes
 // successfully.
 //
 // Use "Send" method on the returned Request to send the API call to the service.
 // the "output" return value is not valid until after Send returns without error.
 //
-// See GetBucketAccelerateCon***REMOVED***guration for more information on using the GetBucketAccelerateCon***REMOVED***guration
+// See GetBucketAccelerateConfiguration for more information on using the GetBucketAccelerateConfiguration
 // API call, and error handling.
 //
-// This method is useful when you want to inject custom logic or con***REMOVED***guration
+// This method is useful when you want to inject custom logic or configuration
 // into the SDK's request lifecycle. Such as custom headers, or retry logic.
 //
 //
-//    // Example sending a request using the GetBucketAccelerateCon***REMOVED***gurationRequest method.
-//    req, resp := client.GetBucketAccelerateCon***REMOVED***gurationRequest(params)
+//    // Example sending a request using the GetBucketAccelerateConfigurationRequest method.
+//    req, resp := client.GetBucketAccelerateConfigurationRequest(params)
 //
 //    err := req.Send()
-//    if err == nil { // resp is now ***REMOVED***lled
+//    if err == nil { // resp is now filled
 //        fmt.Println(resp)
 //    }
 //
-// See also, https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/GetBucketAccelerateCon***REMOVED***guration
-func (c *S3) GetBucketAccelerateCon***REMOVED***gurationRequest(input *GetBucketAccelerateCon***REMOVED***gurationInput) (req *request.Request, output *GetBucketAccelerateCon***REMOVED***gurationOutput) {
+// See also, https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/GetBucketAccelerateConfiguration
+func (c *S3) GetBucketAccelerateConfigurationRequest(input *GetBucketAccelerateConfigurationInput) (req *request.Request, output *GetBucketAccelerateConfigurationOutput) {
 	op := &request.Operation{
-		Name:       opGetBucketAccelerateCon***REMOVED***guration,
+		Name:       opGetBucketAccelerateConfiguration,
 		HTTPMethod: "GET",
 		HTTPPath:   "/{Bucket}?accelerate",
 	}
 
 	if input == nil {
-		input = &GetBucketAccelerateCon***REMOVED***gurationInput{}
+		input = &GetBucketAccelerateConfigurationInput{}
 	}
 
-	output = &GetBucketAccelerateCon***REMOVED***gurationOutput{}
+	output = &GetBucketAccelerateConfigurationOutput{}
 	req = c.newRequest(op, input, output)
 	return
 }
 
-// GetBucketAccelerateCon***REMOVED***guration API operation for Amazon Simple Storage Service.
+// GetBucketAccelerateConfiguration API operation for Amazon Simple Storage Service.
 //
-// Returns the accelerate con***REMOVED***guration of a bucket.
+// Returns the accelerate configuration of a bucket.
 //
 // Returns awserr.Error for service API and SDK errors. Use runtime type assertions
 // with awserr.Error's Code and Message methods to get detailed information about
 // the error.
 //
 // See the AWS API reference guide for Amazon Simple Storage Service's
-// API operation GetBucketAccelerateCon***REMOVED***guration for usage and error information.
-// See also, https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/GetBucketAccelerateCon***REMOVED***guration
-func (c *S3) GetBucketAccelerateCon***REMOVED***guration(input *GetBucketAccelerateCon***REMOVED***gurationInput) (*GetBucketAccelerateCon***REMOVED***gurationOutput, error) {
-	req, out := c.GetBucketAccelerateCon***REMOVED***gurationRequest(input)
+// API operation GetBucketAccelerateConfiguration for usage and error information.
+// See also, https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/GetBucketAccelerateConfiguration
+func (c *S3) GetBucketAccelerateConfiguration(input *GetBucketAccelerateConfigurationInput) (*GetBucketAccelerateConfigurationOutput, error) {
+	req, out := c.GetBucketAccelerateConfigurationRequest(input)
 	return out, req.Send()
 }
 
-// GetBucketAccelerateCon***REMOVED***gurationWithContext is the same as GetBucketAccelerateCon***REMOVED***guration with the addition of
+// GetBucketAccelerateConfigurationWithContext is the same as GetBucketAccelerateConfiguration with the addition of
 // the ability to pass a context and additional request options.
 //
-// See GetBucketAccelerateCon***REMOVED***guration for details on how to use this API operation.
+// See GetBucketAccelerateConfiguration for details on how to use this API operation.
 //
 // The context must be non-nil and will be used for request cancellation. If
 // the context is nil a panic will occur. In the future the SDK may create
 // sub-contexts for http.Requests. See https://golang.org/pkg/context/
 // for more information on using Contexts.
-func (c *S3) GetBucketAccelerateCon***REMOVED***gurationWithContext(ctx aws.Context, input *GetBucketAccelerateCon***REMOVED***gurationInput, opts ...request.Option) (*GetBucketAccelerateCon***REMOVED***gurationOutput, error) {
-	req, out := c.GetBucketAccelerateCon***REMOVED***gurationRequest(input)
+func (c *S3) GetBucketAccelerateConfigurationWithContext(ctx aws.Context, input *GetBucketAccelerateConfigurationInput, opts ...request.Option) (*GetBucketAccelerateConfigurationOutput, error) {
+	req, out := c.GetBucketAccelerateConfigurationRequest(input)
 	req.SetContext(ctx)
 	req.ApplyOptions(opts...)
 	return out, req.Send()
@@ -1643,7 +1643,7 @@ const opGetBucketAcl = "GetBucketAcl"
 // See GetBucketAcl for more information on using the GetBucketAcl
 // API call, and error handling.
 //
-// This method is useful when you want to inject custom logic or con***REMOVED***guration
+// This method is useful when you want to inject custom logic or configuration
 // into the SDK's request lifecycle. Such as custom headers, or retry logic.
 //
 //
@@ -1651,7 +1651,7 @@ const opGetBucketAcl = "GetBucketAcl"
 //    req, resp := client.GetBucketAclRequest(params)
 //
 //    err := req.Send()
-//    if err == nil { // resp is now ***REMOVED***lled
+//    if err == nil { // resp is now filled
 //        fmt.Println(resp)
 //    }
 //
@@ -1704,76 +1704,76 @@ func (c *S3) GetBucketAclWithContext(ctx aws.Context, input *GetBucketAclInput, 
 	return out, req.Send()
 }
 
-const opGetBucketAnalyticsCon***REMOVED***guration = "GetBucketAnalyticsCon***REMOVED***guration"
+const opGetBucketAnalyticsConfiguration = "GetBucketAnalyticsConfiguration"
 
-// GetBucketAnalyticsCon***REMOVED***gurationRequest generates a "aws/request.Request" representing the
-// client's request for the GetBucketAnalyticsCon***REMOVED***guration operation. The "output" return
+// GetBucketAnalyticsConfigurationRequest generates a "aws/request.Request" representing the
+// client's request for the GetBucketAnalyticsConfiguration operation. The "output" return
 // value will be populated with the request's response once the request completes
 // successfully.
 //
 // Use "Send" method on the returned Request to send the API call to the service.
 // the "output" return value is not valid until after Send returns without error.
 //
-// See GetBucketAnalyticsCon***REMOVED***guration for more information on using the GetBucketAnalyticsCon***REMOVED***guration
+// See GetBucketAnalyticsConfiguration for more information on using the GetBucketAnalyticsConfiguration
 // API call, and error handling.
 //
-// This method is useful when you want to inject custom logic or con***REMOVED***guration
+// This method is useful when you want to inject custom logic or configuration
 // into the SDK's request lifecycle. Such as custom headers, or retry logic.
 //
 //
-//    // Example sending a request using the GetBucketAnalyticsCon***REMOVED***gurationRequest method.
-//    req, resp := client.GetBucketAnalyticsCon***REMOVED***gurationRequest(params)
+//    // Example sending a request using the GetBucketAnalyticsConfigurationRequest method.
+//    req, resp := client.GetBucketAnalyticsConfigurationRequest(params)
 //
 //    err := req.Send()
-//    if err == nil { // resp is now ***REMOVED***lled
+//    if err == nil { // resp is now filled
 //        fmt.Println(resp)
 //    }
 //
-// See also, https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/GetBucketAnalyticsCon***REMOVED***guration
-func (c *S3) GetBucketAnalyticsCon***REMOVED***gurationRequest(input *GetBucketAnalyticsCon***REMOVED***gurationInput) (req *request.Request, output *GetBucketAnalyticsCon***REMOVED***gurationOutput) {
+// See also, https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/GetBucketAnalyticsConfiguration
+func (c *S3) GetBucketAnalyticsConfigurationRequest(input *GetBucketAnalyticsConfigurationInput) (req *request.Request, output *GetBucketAnalyticsConfigurationOutput) {
 	op := &request.Operation{
-		Name:       opGetBucketAnalyticsCon***REMOVED***guration,
+		Name:       opGetBucketAnalyticsConfiguration,
 		HTTPMethod: "GET",
 		HTTPPath:   "/{Bucket}?analytics",
 	}
 
 	if input == nil {
-		input = &GetBucketAnalyticsCon***REMOVED***gurationInput{}
+		input = &GetBucketAnalyticsConfigurationInput{}
 	}
 
-	output = &GetBucketAnalyticsCon***REMOVED***gurationOutput{}
+	output = &GetBucketAnalyticsConfigurationOutput{}
 	req = c.newRequest(op, input, output)
 	return
 }
 
-// GetBucketAnalyticsCon***REMOVED***guration API operation for Amazon Simple Storage Service.
+// GetBucketAnalyticsConfiguration API operation for Amazon Simple Storage Service.
 //
-// Gets an analytics con***REMOVED***guration for the bucket (speci***REMOVED***ed by the analytics
-// con***REMOVED***guration ID).
+// Gets an analytics configuration for the bucket (specified by the analytics
+// configuration ID).
 //
 // Returns awserr.Error for service API and SDK errors. Use runtime type assertions
 // with awserr.Error's Code and Message methods to get detailed information about
 // the error.
 //
 // See the AWS API reference guide for Amazon Simple Storage Service's
-// API operation GetBucketAnalyticsCon***REMOVED***guration for usage and error information.
-// See also, https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/GetBucketAnalyticsCon***REMOVED***guration
-func (c *S3) GetBucketAnalyticsCon***REMOVED***guration(input *GetBucketAnalyticsCon***REMOVED***gurationInput) (*GetBucketAnalyticsCon***REMOVED***gurationOutput, error) {
-	req, out := c.GetBucketAnalyticsCon***REMOVED***gurationRequest(input)
+// API operation GetBucketAnalyticsConfiguration for usage and error information.
+// See also, https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/GetBucketAnalyticsConfiguration
+func (c *S3) GetBucketAnalyticsConfiguration(input *GetBucketAnalyticsConfigurationInput) (*GetBucketAnalyticsConfigurationOutput, error) {
+	req, out := c.GetBucketAnalyticsConfigurationRequest(input)
 	return out, req.Send()
 }
 
-// GetBucketAnalyticsCon***REMOVED***gurationWithContext is the same as GetBucketAnalyticsCon***REMOVED***guration with the addition of
+// GetBucketAnalyticsConfigurationWithContext is the same as GetBucketAnalyticsConfiguration with the addition of
 // the ability to pass a context and additional request options.
 //
-// See GetBucketAnalyticsCon***REMOVED***guration for details on how to use this API operation.
+// See GetBucketAnalyticsConfiguration for details on how to use this API operation.
 //
 // The context must be non-nil and will be used for request cancellation. If
 // the context is nil a panic will occur. In the future the SDK may create
 // sub-contexts for http.Requests. See https://golang.org/pkg/context/
 // for more information on using Contexts.
-func (c *S3) GetBucketAnalyticsCon***REMOVED***gurationWithContext(ctx aws.Context, input *GetBucketAnalyticsCon***REMOVED***gurationInput, opts ...request.Option) (*GetBucketAnalyticsCon***REMOVED***gurationOutput, error) {
-	req, out := c.GetBucketAnalyticsCon***REMOVED***gurationRequest(input)
+func (c *S3) GetBucketAnalyticsConfigurationWithContext(ctx aws.Context, input *GetBucketAnalyticsConfigurationInput, opts ...request.Option) (*GetBucketAnalyticsConfigurationOutput, error) {
+	req, out := c.GetBucketAnalyticsConfigurationRequest(input)
 	req.SetContext(ctx)
 	req.ApplyOptions(opts...)
 	return out, req.Send()
@@ -1792,7 +1792,7 @@ const opGetBucketCors = "GetBucketCors"
 // See GetBucketCors for more information on using the GetBucketCors
 // API call, and error handling.
 //
-// This method is useful when you want to inject custom logic or con***REMOVED***guration
+// This method is useful when you want to inject custom logic or configuration
 // into the SDK's request lifecycle. Such as custom headers, or retry logic.
 //
 //
@@ -1800,7 +1800,7 @@ const opGetBucketCors = "GetBucketCors"
 //    req, resp := client.GetBucketCorsRequest(params)
 //
 //    err := req.Send()
-//    if err == nil { // resp is now ***REMOVED***lled
+//    if err == nil { // resp is now filled
 //        fmt.Println(resp)
 //    }
 //
@@ -1823,7 +1823,7 @@ func (c *S3) GetBucketCorsRequest(input *GetBucketCorsInput) (req *request.Reque
 
 // GetBucketCors API operation for Amazon Simple Storage Service.
 //
-// Returns the CORS con***REMOVED***guration for the bucket.
+// Returns the CORS configuration for the bucket.
 //
 // Returns awserr.Error for service API and SDK errors. Use runtime type assertions
 // with awserr.Error's Code and Message methods to get detailed information about
@@ -1866,7 +1866,7 @@ const opGetBucketEncryption = "GetBucketEncryption"
 // See GetBucketEncryption for more information on using the GetBucketEncryption
 // API call, and error handling.
 //
-// This method is useful when you want to inject custom logic or con***REMOVED***guration
+// This method is useful when you want to inject custom logic or configuration
 // into the SDK's request lifecycle. Such as custom headers, or retry logic.
 //
 //
@@ -1874,7 +1874,7 @@ const opGetBucketEncryption = "GetBucketEncryption"
 //    req, resp := client.GetBucketEncryptionRequest(params)
 //
 //    err := req.Send()
-//    if err == nil { // resp is now ***REMOVED***lled
+//    if err == nil { // resp is now filled
 //        fmt.Println(resp)
 //    }
 //
@@ -1897,7 +1897,7 @@ func (c *S3) GetBucketEncryptionRequest(input *GetBucketEncryptionInput) (req *r
 
 // GetBucketEncryption API operation for Amazon Simple Storage Service.
 //
-// Returns the server-side encryption con***REMOVED***guration of a bucket.
+// Returns the server-side encryption configuration of a bucket.
 //
 // Returns awserr.Error for service API and SDK errors. Use runtime type assertions
 // with awserr.Error's Code and Message methods to get detailed information about
@@ -1927,51 +1927,51 @@ func (c *S3) GetBucketEncryptionWithContext(ctx aws.Context, input *GetBucketEnc
 	return out, req.Send()
 }
 
-const opGetBucketInventoryCon***REMOVED***guration = "GetBucketInventoryCon***REMOVED***guration"
+const opGetBucketInventoryConfiguration = "GetBucketInventoryConfiguration"
 
-// GetBucketInventoryCon***REMOVED***gurationRequest generates a "aws/request.Request" representing the
-// client's request for the GetBucketInventoryCon***REMOVED***guration operation. The "output" return
+// GetBucketInventoryConfigurationRequest generates a "aws/request.Request" representing the
+// client's request for the GetBucketInventoryConfiguration operation. The "output" return
 // value will be populated with the request's response once the request completes
 // successfully.
 //
 // Use "Send" method on the returned Request to send the API call to the service.
 // the "output" return value is not valid until after Send returns without error.
 //
-// See GetBucketInventoryCon***REMOVED***guration for more information on using the GetBucketInventoryCon***REMOVED***guration
+// See GetBucketInventoryConfiguration for more information on using the GetBucketInventoryConfiguration
 // API call, and error handling.
 //
-// This method is useful when you want to inject custom logic or con***REMOVED***guration
+// This method is useful when you want to inject custom logic or configuration
 // into the SDK's request lifecycle. Such as custom headers, or retry logic.
 //
 //
-//    // Example sending a request using the GetBucketInventoryCon***REMOVED***gurationRequest method.
-//    req, resp := client.GetBucketInventoryCon***REMOVED***gurationRequest(params)
+//    // Example sending a request using the GetBucketInventoryConfigurationRequest method.
+//    req, resp := client.GetBucketInventoryConfigurationRequest(params)
 //
 //    err := req.Send()
-//    if err == nil { // resp is now ***REMOVED***lled
+//    if err == nil { // resp is now filled
 //        fmt.Println(resp)
 //    }
 //
-// See also, https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/GetBucketInventoryCon***REMOVED***guration
-func (c *S3) GetBucketInventoryCon***REMOVED***gurationRequest(input *GetBucketInventoryCon***REMOVED***gurationInput) (req *request.Request, output *GetBucketInventoryCon***REMOVED***gurationOutput) {
+// See also, https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/GetBucketInventoryConfiguration
+func (c *S3) GetBucketInventoryConfigurationRequest(input *GetBucketInventoryConfigurationInput) (req *request.Request, output *GetBucketInventoryConfigurationOutput) {
 	op := &request.Operation{
-		Name:       opGetBucketInventoryCon***REMOVED***guration,
+		Name:       opGetBucketInventoryConfiguration,
 		HTTPMethod: "GET",
 		HTTPPath:   "/{Bucket}?inventory",
 	}
 
 	if input == nil {
-		input = &GetBucketInventoryCon***REMOVED***gurationInput{}
+		input = &GetBucketInventoryConfigurationInput{}
 	}
 
-	output = &GetBucketInventoryCon***REMOVED***gurationOutput{}
+	output = &GetBucketInventoryConfigurationOutput{}
 	req = c.newRequest(op, input, output)
 	return
 }
 
-// GetBucketInventoryCon***REMOVED***guration API operation for Amazon Simple Storage Service.
+// GetBucketInventoryConfiguration API operation for Amazon Simple Storage Service.
 //
-// Returns an inventory con***REMOVED***guration (identi***REMOVED***ed by the inventory ID) from
+// Returns an inventory configuration (identified by the inventory ID) from
 // the bucket.
 //
 // Returns awserr.Error for service API and SDK errors. Use runtime type assertions
@@ -1979,24 +1979,24 @@ func (c *S3) GetBucketInventoryCon***REMOVED***gurationRequest(input *GetBucketI
 // the error.
 //
 // See the AWS API reference guide for Amazon Simple Storage Service's
-// API operation GetBucketInventoryCon***REMOVED***guration for usage and error information.
-// See also, https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/GetBucketInventoryCon***REMOVED***guration
-func (c *S3) GetBucketInventoryCon***REMOVED***guration(input *GetBucketInventoryCon***REMOVED***gurationInput) (*GetBucketInventoryCon***REMOVED***gurationOutput, error) {
-	req, out := c.GetBucketInventoryCon***REMOVED***gurationRequest(input)
+// API operation GetBucketInventoryConfiguration for usage and error information.
+// See also, https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/GetBucketInventoryConfiguration
+func (c *S3) GetBucketInventoryConfiguration(input *GetBucketInventoryConfigurationInput) (*GetBucketInventoryConfigurationOutput, error) {
+	req, out := c.GetBucketInventoryConfigurationRequest(input)
 	return out, req.Send()
 }
 
-// GetBucketInventoryCon***REMOVED***gurationWithContext is the same as GetBucketInventoryCon***REMOVED***guration with the addition of
+// GetBucketInventoryConfigurationWithContext is the same as GetBucketInventoryConfiguration with the addition of
 // the ability to pass a context and additional request options.
 //
-// See GetBucketInventoryCon***REMOVED***guration for details on how to use this API operation.
+// See GetBucketInventoryConfiguration for details on how to use this API operation.
 //
 // The context must be non-nil and will be used for request cancellation. If
 // the context is nil a panic will occur. In the future the SDK may create
 // sub-contexts for http.Requests. See https://golang.org/pkg/context/
 // for more information on using Contexts.
-func (c *S3) GetBucketInventoryCon***REMOVED***gurationWithContext(ctx aws.Context, input *GetBucketInventoryCon***REMOVED***gurationInput, opts ...request.Option) (*GetBucketInventoryCon***REMOVED***gurationOutput, error) {
-	req, out := c.GetBucketInventoryCon***REMOVED***gurationRequest(input)
+func (c *S3) GetBucketInventoryConfigurationWithContext(ctx aws.Context, input *GetBucketInventoryConfigurationInput, opts ...request.Option) (*GetBucketInventoryConfigurationOutput, error) {
+	req, out := c.GetBucketInventoryConfigurationRequest(input)
 	req.SetContext(ctx)
 	req.ApplyOptions(opts...)
 	return out, req.Send()
@@ -2015,7 +2015,7 @@ const opGetBucketLifecycle = "GetBucketLifecycle"
 // See GetBucketLifecycle for more information on using the GetBucketLifecycle
 // API call, and error handling.
 //
-// This method is useful when you want to inject custom logic or con***REMOVED***guration
+// This method is useful when you want to inject custom logic or configuration
 // into the SDK's request lifecycle. Such as custom headers, or retry logic.
 //
 //
@@ -2023,7 +2023,7 @@ const opGetBucketLifecycle = "GetBucketLifecycle"
 //    req, resp := client.GetBucketLifecycleRequest(params)
 //
 //    err := req.Send()
-//    if err == nil { // resp is now ***REMOVED***lled
+//    if err == nil { // resp is now filled
 //        fmt.Println(resp)
 //    }
 //
@@ -2031,8 +2031,8 @@ const opGetBucketLifecycle = "GetBucketLifecycle"
 //
 // Deprecated: GetBucketLifecycle has been deprecated
 func (c *S3) GetBucketLifecycleRequest(input *GetBucketLifecycleInput) (req *request.Request, output *GetBucketLifecycleOutput) {
-	if c.Client.Con***REMOVED***g.Logger != nil {
-		c.Client.Con***REMOVED***g.Logger.Log("This operation, GetBucketLifecycle, has been deprecated")
+	if c.Client.Config.Logger != nil {
+		c.Client.Config.Logger.Log("This operation, GetBucketLifecycle, has been deprecated")
 	}
 	op := &request.Operation{
 		Name:       opGetBucketLifecycle,
@@ -2051,7 +2051,7 @@ func (c *S3) GetBucketLifecycleRequest(input *GetBucketLifecycleInput) (req *req
 
 // GetBucketLifecycle API operation for Amazon Simple Storage Service.
 //
-// No longer used, see the GetBucketLifecycleCon***REMOVED***guration operation.
+// No longer used, see the GetBucketLifecycleConfiguration operation.
 //
 // Returns awserr.Error for service API and SDK errors. Use runtime type assertions
 // with awserr.Error's Code and Message methods to get detailed information about
@@ -2085,75 +2085,75 @@ func (c *S3) GetBucketLifecycleWithContext(ctx aws.Context, input *GetBucketLife
 	return out, req.Send()
 }
 
-const opGetBucketLifecycleCon***REMOVED***guration = "GetBucketLifecycleCon***REMOVED***guration"
+const opGetBucketLifecycleConfiguration = "GetBucketLifecycleConfiguration"
 
-// GetBucketLifecycleCon***REMOVED***gurationRequest generates a "aws/request.Request" representing the
-// client's request for the GetBucketLifecycleCon***REMOVED***guration operation. The "output" return
+// GetBucketLifecycleConfigurationRequest generates a "aws/request.Request" representing the
+// client's request for the GetBucketLifecycleConfiguration operation. The "output" return
 // value will be populated with the request's response once the request completes
 // successfully.
 //
 // Use "Send" method on the returned Request to send the API call to the service.
 // the "output" return value is not valid until after Send returns without error.
 //
-// See GetBucketLifecycleCon***REMOVED***guration for more information on using the GetBucketLifecycleCon***REMOVED***guration
+// See GetBucketLifecycleConfiguration for more information on using the GetBucketLifecycleConfiguration
 // API call, and error handling.
 //
-// This method is useful when you want to inject custom logic or con***REMOVED***guration
+// This method is useful when you want to inject custom logic or configuration
 // into the SDK's request lifecycle. Such as custom headers, or retry logic.
 //
 //
-//    // Example sending a request using the GetBucketLifecycleCon***REMOVED***gurationRequest method.
-//    req, resp := client.GetBucketLifecycleCon***REMOVED***gurationRequest(params)
+//    // Example sending a request using the GetBucketLifecycleConfigurationRequest method.
+//    req, resp := client.GetBucketLifecycleConfigurationRequest(params)
 //
 //    err := req.Send()
-//    if err == nil { // resp is now ***REMOVED***lled
+//    if err == nil { // resp is now filled
 //        fmt.Println(resp)
 //    }
 //
-// See also, https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/GetBucketLifecycleCon***REMOVED***guration
-func (c *S3) GetBucketLifecycleCon***REMOVED***gurationRequest(input *GetBucketLifecycleCon***REMOVED***gurationInput) (req *request.Request, output *GetBucketLifecycleCon***REMOVED***gurationOutput) {
+// See also, https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/GetBucketLifecycleConfiguration
+func (c *S3) GetBucketLifecycleConfigurationRequest(input *GetBucketLifecycleConfigurationInput) (req *request.Request, output *GetBucketLifecycleConfigurationOutput) {
 	op := &request.Operation{
-		Name:       opGetBucketLifecycleCon***REMOVED***guration,
+		Name:       opGetBucketLifecycleConfiguration,
 		HTTPMethod: "GET",
 		HTTPPath:   "/{Bucket}?lifecycle",
 	}
 
 	if input == nil {
-		input = &GetBucketLifecycleCon***REMOVED***gurationInput{}
+		input = &GetBucketLifecycleConfigurationInput{}
 	}
 
-	output = &GetBucketLifecycleCon***REMOVED***gurationOutput{}
+	output = &GetBucketLifecycleConfigurationOutput{}
 	req = c.newRequest(op, input, output)
 	return
 }
 
-// GetBucketLifecycleCon***REMOVED***guration API operation for Amazon Simple Storage Service.
+// GetBucketLifecycleConfiguration API operation for Amazon Simple Storage Service.
 //
-// Returns the lifecycle con***REMOVED***guration information set on the bucket.
+// Returns the lifecycle configuration information set on the bucket.
 //
 // Returns awserr.Error for service API and SDK errors. Use runtime type assertions
 // with awserr.Error's Code and Message methods to get detailed information about
 // the error.
 //
 // See the AWS API reference guide for Amazon Simple Storage Service's
-// API operation GetBucketLifecycleCon***REMOVED***guration for usage and error information.
-// See also, https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/GetBucketLifecycleCon***REMOVED***guration
-func (c *S3) GetBucketLifecycleCon***REMOVED***guration(input *GetBucketLifecycleCon***REMOVED***gurationInput) (*GetBucketLifecycleCon***REMOVED***gurationOutput, error) {
-	req, out := c.GetBucketLifecycleCon***REMOVED***gurationRequest(input)
+// API operation GetBucketLifecycleConfiguration for usage and error information.
+// See also, https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/GetBucketLifecycleConfiguration
+func (c *S3) GetBucketLifecycleConfiguration(input *GetBucketLifecycleConfigurationInput) (*GetBucketLifecycleConfigurationOutput, error) {
+	req, out := c.GetBucketLifecycleConfigurationRequest(input)
 	return out, req.Send()
 }
 
-// GetBucketLifecycleCon***REMOVED***gurationWithContext is the same as GetBucketLifecycleCon***REMOVED***guration with the addition of
+// GetBucketLifecycleConfigurationWithContext is the same as GetBucketLifecycleConfiguration with the addition of
 // the ability to pass a context and additional request options.
 //
-// See GetBucketLifecycleCon***REMOVED***guration for details on how to use this API operation.
+// See GetBucketLifecycleConfiguration for details on how to use this API operation.
 //
 // The context must be non-nil and will be used for request cancellation. If
 // the context is nil a panic will occur. In the future the SDK may create
 // sub-contexts for http.Requests. See https://golang.org/pkg/context/
 // for more information on using Contexts.
-func (c *S3) GetBucketLifecycleCon***REMOVED***gurationWithContext(ctx aws.Context, input *GetBucketLifecycleCon***REMOVED***gurationInput, opts ...request.Option) (*GetBucketLifecycleCon***REMOVED***gurationOutput, error) {
-	req, out := c.GetBucketLifecycleCon***REMOVED***gurationRequest(input)
+func (c *S3) GetBucketLifecycleConfigurationWithContext(ctx aws.Context, input *GetBucketLifecycleConfigurationInput, opts ...request.Option) (*GetBucketLifecycleConfigurationOutput, error) {
+	req, out := c.GetBucketLifecycleConfigurationRequest(input)
 	req.SetContext(ctx)
 	req.ApplyOptions(opts...)
 	return out, req.Send()
@@ -2172,7 +2172,7 @@ const opGetBucketLocation = "GetBucketLocation"
 // See GetBucketLocation for more information on using the GetBucketLocation
 // API call, and error handling.
 //
-// This method is useful when you want to inject custom logic or con***REMOVED***guration
+// This method is useful when you want to inject custom logic or configuration
 // into the SDK's request lifecycle. Such as custom headers, or retry logic.
 //
 //
@@ -2180,7 +2180,7 @@ const opGetBucketLocation = "GetBucketLocation"
 //    req, resp := client.GetBucketLocationRequest(params)
 //
 //    err := req.Send()
-//    if err == nil { // resp is now ***REMOVED***lled
+//    if err == nil { // resp is now filled
 //        fmt.Println(resp)
 //    }
 //
@@ -2246,7 +2246,7 @@ const opGetBucketLogging = "GetBucketLogging"
 // See GetBucketLogging for more information on using the GetBucketLogging
 // API call, and error handling.
 //
-// This method is useful when you want to inject custom logic or con***REMOVED***guration
+// This method is useful when you want to inject custom logic or configuration
 // into the SDK's request lifecycle. Such as custom headers, or retry logic.
 //
 //
@@ -2254,7 +2254,7 @@ const opGetBucketLogging = "GetBucketLogging"
 //    req, resp := client.GetBucketLoggingRequest(params)
 //
 //    err := req.Send()
-//    if err == nil { // resp is now ***REMOVED***lled
+//    if err == nil { // resp is now filled
 //        fmt.Println(resp)
 //    }
 //
@@ -2308,51 +2308,51 @@ func (c *S3) GetBucketLoggingWithContext(ctx aws.Context, input *GetBucketLoggin
 	return out, req.Send()
 }
 
-const opGetBucketMetricsCon***REMOVED***guration = "GetBucketMetricsCon***REMOVED***guration"
+const opGetBucketMetricsConfiguration = "GetBucketMetricsConfiguration"
 
-// GetBucketMetricsCon***REMOVED***gurationRequest generates a "aws/request.Request" representing the
-// client's request for the GetBucketMetricsCon***REMOVED***guration operation. The "output" return
+// GetBucketMetricsConfigurationRequest generates a "aws/request.Request" representing the
+// client's request for the GetBucketMetricsConfiguration operation. The "output" return
 // value will be populated with the request's response once the request completes
 // successfully.
 //
 // Use "Send" method on the returned Request to send the API call to the service.
 // the "output" return value is not valid until after Send returns without error.
 //
-// See GetBucketMetricsCon***REMOVED***guration for more information on using the GetBucketMetricsCon***REMOVED***guration
+// See GetBucketMetricsConfiguration for more information on using the GetBucketMetricsConfiguration
 // API call, and error handling.
 //
-// This method is useful when you want to inject custom logic or con***REMOVED***guration
+// This method is useful when you want to inject custom logic or configuration
 // into the SDK's request lifecycle. Such as custom headers, or retry logic.
 //
 //
-//    // Example sending a request using the GetBucketMetricsCon***REMOVED***gurationRequest method.
-//    req, resp := client.GetBucketMetricsCon***REMOVED***gurationRequest(params)
+//    // Example sending a request using the GetBucketMetricsConfigurationRequest method.
+//    req, resp := client.GetBucketMetricsConfigurationRequest(params)
 //
 //    err := req.Send()
-//    if err == nil { // resp is now ***REMOVED***lled
+//    if err == nil { // resp is now filled
 //        fmt.Println(resp)
 //    }
 //
-// See also, https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/GetBucketMetricsCon***REMOVED***guration
-func (c *S3) GetBucketMetricsCon***REMOVED***gurationRequest(input *GetBucketMetricsCon***REMOVED***gurationInput) (req *request.Request, output *GetBucketMetricsCon***REMOVED***gurationOutput) {
+// See also, https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/GetBucketMetricsConfiguration
+func (c *S3) GetBucketMetricsConfigurationRequest(input *GetBucketMetricsConfigurationInput) (req *request.Request, output *GetBucketMetricsConfigurationOutput) {
 	op := &request.Operation{
-		Name:       opGetBucketMetricsCon***REMOVED***guration,
+		Name:       opGetBucketMetricsConfiguration,
 		HTTPMethod: "GET",
 		HTTPPath:   "/{Bucket}?metrics",
 	}
 
 	if input == nil {
-		input = &GetBucketMetricsCon***REMOVED***gurationInput{}
+		input = &GetBucketMetricsConfigurationInput{}
 	}
 
-	output = &GetBucketMetricsCon***REMOVED***gurationOutput{}
+	output = &GetBucketMetricsConfigurationOutput{}
 	req = c.newRequest(op, input, output)
 	return
 }
 
-// GetBucketMetricsCon***REMOVED***guration API operation for Amazon Simple Storage Service.
+// GetBucketMetricsConfiguration API operation for Amazon Simple Storage Service.
 //
-// Gets a metrics con***REMOVED***guration (speci***REMOVED***ed by the metrics con***REMOVED***guration ID)
+// Gets a metrics configuration (specified by the metrics configuration ID)
 // from the bucket.
 //
 // Returns awserr.Error for service API and SDK errors. Use runtime type assertions
@@ -2360,181 +2360,181 @@ func (c *S3) GetBucketMetricsCon***REMOVED***gurationRequest(input *GetBucketMet
 // the error.
 //
 // See the AWS API reference guide for Amazon Simple Storage Service's
-// API operation GetBucketMetricsCon***REMOVED***guration for usage and error information.
-// See also, https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/GetBucketMetricsCon***REMOVED***guration
-func (c *S3) GetBucketMetricsCon***REMOVED***guration(input *GetBucketMetricsCon***REMOVED***gurationInput) (*GetBucketMetricsCon***REMOVED***gurationOutput, error) {
-	req, out := c.GetBucketMetricsCon***REMOVED***gurationRequest(input)
+// API operation GetBucketMetricsConfiguration for usage and error information.
+// See also, https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/GetBucketMetricsConfiguration
+func (c *S3) GetBucketMetricsConfiguration(input *GetBucketMetricsConfigurationInput) (*GetBucketMetricsConfigurationOutput, error) {
+	req, out := c.GetBucketMetricsConfigurationRequest(input)
 	return out, req.Send()
 }
 
-// GetBucketMetricsCon***REMOVED***gurationWithContext is the same as GetBucketMetricsCon***REMOVED***guration with the addition of
+// GetBucketMetricsConfigurationWithContext is the same as GetBucketMetricsConfiguration with the addition of
 // the ability to pass a context and additional request options.
 //
-// See GetBucketMetricsCon***REMOVED***guration for details on how to use this API operation.
+// See GetBucketMetricsConfiguration for details on how to use this API operation.
 //
 // The context must be non-nil and will be used for request cancellation. If
 // the context is nil a panic will occur. In the future the SDK may create
 // sub-contexts for http.Requests. See https://golang.org/pkg/context/
 // for more information on using Contexts.
-func (c *S3) GetBucketMetricsCon***REMOVED***gurationWithContext(ctx aws.Context, input *GetBucketMetricsCon***REMOVED***gurationInput, opts ...request.Option) (*GetBucketMetricsCon***REMOVED***gurationOutput, error) {
-	req, out := c.GetBucketMetricsCon***REMOVED***gurationRequest(input)
+func (c *S3) GetBucketMetricsConfigurationWithContext(ctx aws.Context, input *GetBucketMetricsConfigurationInput, opts ...request.Option) (*GetBucketMetricsConfigurationOutput, error) {
+	req, out := c.GetBucketMetricsConfigurationRequest(input)
 	req.SetContext(ctx)
 	req.ApplyOptions(opts...)
 	return out, req.Send()
 }
 
-const opGetBucketNoti***REMOVED***cation = "GetBucketNoti***REMOVED***cation"
+const opGetBucketNotification = "GetBucketNotification"
 
-// GetBucketNoti***REMOVED***cationRequest generates a "aws/request.Request" representing the
-// client's request for the GetBucketNoti***REMOVED***cation operation. The "output" return
+// GetBucketNotificationRequest generates a "aws/request.Request" representing the
+// client's request for the GetBucketNotification operation. The "output" return
 // value will be populated with the request's response once the request completes
 // successfully.
 //
 // Use "Send" method on the returned Request to send the API call to the service.
 // the "output" return value is not valid until after Send returns without error.
 //
-// See GetBucketNoti***REMOVED***cation for more information on using the GetBucketNoti***REMOVED***cation
+// See GetBucketNotification for more information on using the GetBucketNotification
 // API call, and error handling.
 //
-// This method is useful when you want to inject custom logic or con***REMOVED***guration
+// This method is useful when you want to inject custom logic or configuration
 // into the SDK's request lifecycle. Such as custom headers, or retry logic.
 //
 //
-//    // Example sending a request using the GetBucketNoti***REMOVED***cationRequest method.
-//    req, resp := client.GetBucketNoti***REMOVED***cationRequest(params)
+//    // Example sending a request using the GetBucketNotificationRequest method.
+//    req, resp := client.GetBucketNotificationRequest(params)
 //
 //    err := req.Send()
-//    if err == nil { // resp is now ***REMOVED***lled
+//    if err == nil { // resp is now filled
 //        fmt.Println(resp)
 //    }
 //
-// See also, https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/GetBucketNoti***REMOVED***cation
+// See also, https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/GetBucketNotification
 //
-// Deprecated: GetBucketNoti***REMOVED***cation has been deprecated
-func (c *S3) GetBucketNoti***REMOVED***cationRequest(input *GetBucketNoti***REMOVED***cationCon***REMOVED***gurationRequest) (req *request.Request, output *Noti***REMOVED***cationCon***REMOVED***gurationDeprecated) {
-	if c.Client.Con***REMOVED***g.Logger != nil {
-		c.Client.Con***REMOVED***g.Logger.Log("This operation, GetBucketNoti***REMOVED***cation, has been deprecated")
+// Deprecated: GetBucketNotification has been deprecated
+func (c *S3) GetBucketNotificationRequest(input *GetBucketNotificationConfigurationRequest) (req *request.Request, output *NotificationConfigurationDeprecated) {
+	if c.Client.Config.Logger != nil {
+		c.Client.Config.Logger.Log("This operation, GetBucketNotification, has been deprecated")
 	}
 	op := &request.Operation{
-		Name:       opGetBucketNoti***REMOVED***cation,
+		Name:       opGetBucketNotification,
 		HTTPMethod: "GET",
-		HTTPPath:   "/{Bucket}?noti***REMOVED***cation",
+		HTTPPath:   "/{Bucket}?notification",
 	}
 
 	if input == nil {
-		input = &GetBucketNoti***REMOVED***cationCon***REMOVED***gurationRequest{}
+		input = &GetBucketNotificationConfigurationRequest{}
 	}
 
-	output = &Noti***REMOVED***cationCon***REMOVED***gurationDeprecated{}
+	output = &NotificationConfigurationDeprecated{}
 	req = c.newRequest(op, input, output)
 	return
 }
 
-// GetBucketNoti***REMOVED***cation API operation for Amazon Simple Storage Service.
+// GetBucketNotification API operation for Amazon Simple Storage Service.
 //
-// No longer used, see the GetBucketNoti***REMOVED***cationCon***REMOVED***guration operation.
+// No longer used, see the GetBucketNotificationConfiguration operation.
 //
 // Returns awserr.Error for service API and SDK errors. Use runtime type assertions
 // with awserr.Error's Code and Message methods to get detailed information about
 // the error.
 //
 // See the AWS API reference guide for Amazon Simple Storage Service's
-// API operation GetBucketNoti***REMOVED***cation for usage and error information.
-// See also, https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/GetBucketNoti***REMOVED***cation
+// API operation GetBucketNotification for usage and error information.
+// See also, https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/GetBucketNotification
 //
-// Deprecated: GetBucketNoti***REMOVED***cation has been deprecated
-func (c *S3) GetBucketNoti***REMOVED***cation(input *GetBucketNoti***REMOVED***cationCon***REMOVED***gurationRequest) (*Noti***REMOVED***cationCon***REMOVED***gurationDeprecated, error) {
-	req, out := c.GetBucketNoti***REMOVED***cationRequest(input)
+// Deprecated: GetBucketNotification has been deprecated
+func (c *S3) GetBucketNotification(input *GetBucketNotificationConfigurationRequest) (*NotificationConfigurationDeprecated, error) {
+	req, out := c.GetBucketNotificationRequest(input)
 	return out, req.Send()
 }
 
-// GetBucketNoti***REMOVED***cationWithContext is the same as GetBucketNoti***REMOVED***cation with the addition of
+// GetBucketNotificationWithContext is the same as GetBucketNotification with the addition of
 // the ability to pass a context and additional request options.
 //
-// See GetBucketNoti***REMOVED***cation for details on how to use this API operation.
+// See GetBucketNotification for details on how to use this API operation.
 //
 // The context must be non-nil and will be used for request cancellation. If
 // the context is nil a panic will occur. In the future the SDK may create
 // sub-contexts for http.Requests. See https://golang.org/pkg/context/
 // for more information on using Contexts.
 //
-// Deprecated: GetBucketNoti***REMOVED***cationWithContext has been deprecated
-func (c *S3) GetBucketNoti***REMOVED***cationWithContext(ctx aws.Context, input *GetBucketNoti***REMOVED***cationCon***REMOVED***gurationRequest, opts ...request.Option) (*Noti***REMOVED***cationCon***REMOVED***gurationDeprecated, error) {
-	req, out := c.GetBucketNoti***REMOVED***cationRequest(input)
+// Deprecated: GetBucketNotificationWithContext has been deprecated
+func (c *S3) GetBucketNotificationWithContext(ctx aws.Context, input *GetBucketNotificationConfigurationRequest, opts ...request.Option) (*NotificationConfigurationDeprecated, error) {
+	req, out := c.GetBucketNotificationRequest(input)
 	req.SetContext(ctx)
 	req.ApplyOptions(opts...)
 	return out, req.Send()
 }
 
-const opGetBucketNoti***REMOVED***cationCon***REMOVED***guration = "GetBucketNoti***REMOVED***cationCon***REMOVED***guration"
+const opGetBucketNotificationConfiguration = "GetBucketNotificationConfiguration"
 
-// GetBucketNoti***REMOVED***cationCon***REMOVED***gurationRequest generates a "aws/request.Request" representing the
-// client's request for the GetBucketNoti***REMOVED***cationCon***REMOVED***guration operation. The "output" return
+// GetBucketNotificationConfigurationRequest generates a "aws/request.Request" representing the
+// client's request for the GetBucketNotificationConfiguration operation. The "output" return
 // value will be populated with the request's response once the request completes
 // successfully.
 //
 // Use "Send" method on the returned Request to send the API call to the service.
 // the "output" return value is not valid until after Send returns without error.
 //
-// See GetBucketNoti***REMOVED***cationCon***REMOVED***guration for more information on using the GetBucketNoti***REMOVED***cationCon***REMOVED***guration
+// See GetBucketNotificationConfiguration for more information on using the GetBucketNotificationConfiguration
 // API call, and error handling.
 //
-// This method is useful when you want to inject custom logic or con***REMOVED***guration
+// This method is useful when you want to inject custom logic or configuration
 // into the SDK's request lifecycle. Such as custom headers, or retry logic.
 //
 //
-//    // Example sending a request using the GetBucketNoti***REMOVED***cationCon***REMOVED***gurationRequest method.
-//    req, resp := client.GetBucketNoti***REMOVED***cationCon***REMOVED***gurationRequest(params)
+//    // Example sending a request using the GetBucketNotificationConfigurationRequest method.
+//    req, resp := client.GetBucketNotificationConfigurationRequest(params)
 //
 //    err := req.Send()
-//    if err == nil { // resp is now ***REMOVED***lled
+//    if err == nil { // resp is now filled
 //        fmt.Println(resp)
 //    }
 //
-// See also, https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/GetBucketNoti***REMOVED***cationCon***REMOVED***guration
-func (c *S3) GetBucketNoti***REMOVED***cationCon***REMOVED***gurationRequest(input *GetBucketNoti***REMOVED***cationCon***REMOVED***gurationRequest) (req *request.Request, output *Noti***REMOVED***cationCon***REMOVED***guration) {
+// See also, https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/GetBucketNotificationConfiguration
+func (c *S3) GetBucketNotificationConfigurationRequest(input *GetBucketNotificationConfigurationRequest) (req *request.Request, output *NotificationConfiguration) {
 	op := &request.Operation{
-		Name:       opGetBucketNoti***REMOVED***cationCon***REMOVED***guration,
+		Name:       opGetBucketNotificationConfiguration,
 		HTTPMethod: "GET",
-		HTTPPath:   "/{Bucket}?noti***REMOVED***cation",
+		HTTPPath:   "/{Bucket}?notification",
 	}
 
 	if input == nil {
-		input = &GetBucketNoti***REMOVED***cationCon***REMOVED***gurationRequest{}
+		input = &GetBucketNotificationConfigurationRequest{}
 	}
 
-	output = &Noti***REMOVED***cationCon***REMOVED***guration{}
+	output = &NotificationConfiguration{}
 	req = c.newRequest(op, input, output)
 	return
 }
 
-// GetBucketNoti***REMOVED***cationCon***REMOVED***guration API operation for Amazon Simple Storage Service.
+// GetBucketNotificationConfiguration API operation for Amazon Simple Storage Service.
 //
-// Returns the noti***REMOVED***cation con***REMOVED***guration of a bucket.
+// Returns the notification configuration of a bucket.
 //
 // Returns awserr.Error for service API and SDK errors. Use runtime type assertions
 // with awserr.Error's Code and Message methods to get detailed information about
 // the error.
 //
 // See the AWS API reference guide for Amazon Simple Storage Service's
-// API operation GetBucketNoti***REMOVED***cationCon***REMOVED***guration for usage and error information.
-// See also, https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/GetBucketNoti***REMOVED***cationCon***REMOVED***guration
-func (c *S3) GetBucketNoti***REMOVED***cationCon***REMOVED***guration(input *GetBucketNoti***REMOVED***cationCon***REMOVED***gurationRequest) (*Noti***REMOVED***cationCon***REMOVED***guration, error) {
-	req, out := c.GetBucketNoti***REMOVED***cationCon***REMOVED***gurationRequest(input)
+// API operation GetBucketNotificationConfiguration for usage and error information.
+// See also, https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/GetBucketNotificationConfiguration
+func (c *S3) GetBucketNotificationConfiguration(input *GetBucketNotificationConfigurationRequest) (*NotificationConfiguration, error) {
+	req, out := c.GetBucketNotificationConfigurationRequest(input)
 	return out, req.Send()
 }
 
-// GetBucketNoti***REMOVED***cationCon***REMOVED***gurationWithContext is the same as GetBucketNoti***REMOVED***cationCon***REMOVED***guration with the addition of
+// GetBucketNotificationConfigurationWithContext is the same as GetBucketNotificationConfiguration with the addition of
 // the ability to pass a context and additional request options.
 //
-// See GetBucketNoti***REMOVED***cationCon***REMOVED***guration for details on how to use this API operation.
+// See GetBucketNotificationConfiguration for details on how to use this API operation.
 //
 // The context must be non-nil and will be used for request cancellation. If
 // the context is nil a panic will occur. In the future the SDK may create
 // sub-contexts for http.Requests. See https://golang.org/pkg/context/
 // for more information on using Contexts.
-func (c *S3) GetBucketNoti***REMOVED***cationCon***REMOVED***gurationWithContext(ctx aws.Context, input *GetBucketNoti***REMOVED***cationCon***REMOVED***gurationRequest, opts ...request.Option) (*Noti***REMOVED***cationCon***REMOVED***guration, error) {
-	req, out := c.GetBucketNoti***REMOVED***cationCon***REMOVED***gurationRequest(input)
+func (c *S3) GetBucketNotificationConfigurationWithContext(ctx aws.Context, input *GetBucketNotificationConfigurationRequest, opts ...request.Option) (*NotificationConfiguration, error) {
+	req, out := c.GetBucketNotificationConfigurationRequest(input)
 	req.SetContext(ctx)
 	req.ApplyOptions(opts...)
 	return out, req.Send()
@@ -2553,7 +2553,7 @@ const opGetBucketPolicy = "GetBucketPolicy"
 // See GetBucketPolicy for more information on using the GetBucketPolicy
 // API call, and error handling.
 //
-// This method is useful when you want to inject custom logic or con***REMOVED***guration
+// This method is useful when you want to inject custom logic or configuration
 // into the SDK's request lifecycle. Such as custom headers, or retry logic.
 //
 //
@@ -2561,7 +2561,7 @@ const opGetBucketPolicy = "GetBucketPolicy"
 //    req, resp := client.GetBucketPolicyRequest(params)
 //
 //    err := req.Send()
-//    if err == nil { // resp is now ***REMOVED***lled
+//    if err == nil { // resp is now filled
 //        fmt.Println(resp)
 //    }
 //
@@ -2584,7 +2584,7 @@ func (c *S3) GetBucketPolicyRequest(input *GetBucketPolicyInput) (req *request.R
 
 // GetBucketPolicy API operation for Amazon Simple Storage Service.
 //
-// Returns the policy of a speci***REMOVED***ed bucket.
+// Returns the policy of a specified bucket.
 //
 // Returns awserr.Error for service API and SDK errors. Use runtime type assertions
 // with awserr.Error's Code and Message methods to get detailed information about
@@ -2627,7 +2627,7 @@ const opGetBucketPolicyStatus = "GetBucketPolicyStatus"
 // See GetBucketPolicyStatus for more information on using the GetBucketPolicyStatus
 // API call, and error handling.
 //
-// This method is useful when you want to inject custom logic or con***REMOVED***guration
+// This method is useful when you want to inject custom logic or configuration
 // into the SDK's request lifecycle. Such as custom headers, or retry logic.
 //
 //
@@ -2635,7 +2635,7 @@ const opGetBucketPolicyStatus = "GetBucketPolicyStatus"
 //    req, resp := client.GetBucketPolicyStatusRequest(params)
 //
 //    err := req.Send()
-//    if err == nil { // resp is now ***REMOVED***lled
+//    if err == nil { // resp is now filled
 //        fmt.Println(resp)
 //    }
 //
@@ -2702,7 +2702,7 @@ const opGetBucketReplication = "GetBucketReplication"
 // See GetBucketReplication for more information on using the GetBucketReplication
 // API call, and error handling.
 //
-// This method is useful when you want to inject custom logic or con***REMOVED***guration
+// This method is useful when you want to inject custom logic or configuration
 // into the SDK's request lifecycle. Such as custom headers, or retry logic.
 //
 //
@@ -2710,7 +2710,7 @@ const opGetBucketReplication = "GetBucketReplication"
 //    req, resp := client.GetBucketReplicationRequest(params)
 //
 //    err := req.Send()
-//    if err == nil { // resp is now ***REMOVED***lled
+//    if err == nil { // resp is now filled
 //        fmt.Println(resp)
 //    }
 //
@@ -2733,9 +2733,9 @@ func (c *S3) GetBucketReplicationRequest(input *GetBucketReplicationInput) (req 
 
 // GetBucketReplication API operation for Amazon Simple Storage Service.
 //
-// Returns the replication con***REMOVED***guration of a bucket.
+// Returns the replication configuration of a bucket.
 //
-// It can take a while to propagate the put or delete a replication con***REMOVED***guration
+// It can take a while to propagate the put or delete a replication configuration
 // to all Amazon S3 systems. Therefore, a get request soon after put or delete
 // can return a wrong result.
 //
@@ -2780,7 +2780,7 @@ const opGetBucketRequestPayment = "GetBucketRequestPayment"
 // See GetBucketRequestPayment for more information on using the GetBucketRequestPayment
 // API call, and error handling.
 //
-// This method is useful when you want to inject custom logic or con***REMOVED***guration
+// This method is useful when you want to inject custom logic or configuration
 // into the SDK's request lifecycle. Such as custom headers, or retry logic.
 //
 //
@@ -2788,7 +2788,7 @@ const opGetBucketRequestPayment = "GetBucketRequestPayment"
 //    req, resp := client.GetBucketRequestPaymentRequest(params)
 //
 //    err := req.Send()
-//    if err == nil { // resp is now ***REMOVED***lled
+//    if err == nil { // resp is now filled
 //        fmt.Println(resp)
 //    }
 //
@@ -2811,7 +2811,7 @@ func (c *S3) GetBucketRequestPaymentRequest(input *GetBucketRequestPaymentInput)
 
 // GetBucketRequestPayment API operation for Amazon Simple Storage Service.
 //
-// Returns the request payment con***REMOVED***guration of a bucket.
+// Returns the request payment configuration of a bucket.
 //
 // Returns awserr.Error for service API and SDK errors. Use runtime type assertions
 // with awserr.Error's Code and Message methods to get detailed information about
@@ -2854,7 +2854,7 @@ const opGetBucketTagging = "GetBucketTagging"
 // See GetBucketTagging for more information on using the GetBucketTagging
 // API call, and error handling.
 //
-// This method is useful when you want to inject custom logic or con***REMOVED***guration
+// This method is useful when you want to inject custom logic or configuration
 // into the SDK's request lifecycle. Such as custom headers, or retry logic.
 //
 //
@@ -2862,7 +2862,7 @@ const opGetBucketTagging = "GetBucketTagging"
 //    req, resp := client.GetBucketTaggingRequest(params)
 //
 //    err := req.Send()
-//    if err == nil { // resp is now ***REMOVED***lled
+//    if err == nil { // resp is now filled
 //        fmt.Println(resp)
 //    }
 //
@@ -2928,7 +2928,7 @@ const opGetBucketVersioning = "GetBucketVersioning"
 // See GetBucketVersioning for more information on using the GetBucketVersioning
 // API call, and error handling.
 //
-// This method is useful when you want to inject custom logic or con***REMOVED***guration
+// This method is useful when you want to inject custom logic or configuration
 // into the SDK's request lifecycle. Such as custom headers, or retry logic.
 //
 //
@@ -2936,7 +2936,7 @@ const opGetBucketVersioning = "GetBucketVersioning"
 //    req, resp := client.GetBucketVersioningRequest(params)
 //
 //    err := req.Send()
-//    if err == nil { // resp is now ***REMOVED***lled
+//    if err == nil { // resp is now filled
 //        fmt.Println(resp)
 //    }
 //
@@ -3002,7 +3002,7 @@ const opGetBucketWebsite = "GetBucketWebsite"
 // See GetBucketWebsite for more information on using the GetBucketWebsite
 // API call, and error handling.
 //
-// This method is useful when you want to inject custom logic or con***REMOVED***guration
+// This method is useful when you want to inject custom logic or configuration
 // into the SDK's request lifecycle. Such as custom headers, or retry logic.
 //
 //
@@ -3010,7 +3010,7 @@ const opGetBucketWebsite = "GetBucketWebsite"
 //    req, resp := client.GetBucketWebsiteRequest(params)
 //
 //    err := req.Send()
-//    if err == nil { // resp is now ***REMOVED***lled
+//    if err == nil { // resp is now filled
 //        fmt.Println(resp)
 //    }
 //
@@ -3033,7 +3033,7 @@ func (c *S3) GetBucketWebsiteRequest(input *GetBucketWebsiteInput) (req *request
 
 // GetBucketWebsite API operation for Amazon Simple Storage Service.
 //
-// Returns the website con***REMOVED***guration for a bucket.
+// Returns the website configuration for a bucket.
 //
 // Returns awserr.Error for service API and SDK errors. Use runtime type assertions
 // with awserr.Error's Code and Message methods to get detailed information about
@@ -3076,7 +3076,7 @@ const opGetObject = "GetObject"
 // See GetObject for more information on using the GetObject
 // API call, and error handling.
 //
-// This method is useful when you want to inject custom logic or con***REMOVED***guration
+// This method is useful when you want to inject custom logic or configuration
 // into the SDK's request lifecycle. Such as custom headers, or retry logic.
 //
 //
@@ -3084,7 +3084,7 @@ const opGetObject = "GetObject"
 //    req, resp := client.GetObjectRequest(params)
 //
 //    err := req.Send()
-//    if err == nil { // resp is now ***REMOVED***lled
+//    if err == nil { // resp is now filled
 //        fmt.Println(resp)
 //    }
 //
@@ -3118,7 +3118,7 @@ func (c *S3) GetObjectRequest(input *GetObjectInput) (req *request.Request, outp
 //
 // Returned Error Codes:
 //   * ErrCodeNoSuchKey "NoSuchKey"
-//   The speci***REMOVED***ed key does not exist.
+//   The specified key does not exist.
 //
 // See also, https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/GetObject
 func (c *S3) GetObject(input *GetObjectInput) (*GetObjectOutput, error) {
@@ -3155,7 +3155,7 @@ const opGetObjectAcl = "GetObjectAcl"
 // See GetObjectAcl for more information on using the GetObjectAcl
 // API call, and error handling.
 //
-// This method is useful when you want to inject custom logic or con***REMOVED***guration
+// This method is useful when you want to inject custom logic or configuration
 // into the SDK's request lifecycle. Such as custom headers, or retry logic.
 //
 //
@@ -3163,7 +3163,7 @@ const opGetObjectAcl = "GetObjectAcl"
 //    req, resp := client.GetObjectAclRequest(params)
 //
 //    err := req.Send()
-//    if err == nil { // resp is now ***REMOVED***lled
+//    if err == nil { // resp is now filled
 //        fmt.Println(resp)
 //    }
 //
@@ -3197,7 +3197,7 @@ func (c *S3) GetObjectAclRequest(input *GetObjectAclInput) (req *request.Request
 //
 // Returned Error Codes:
 //   * ErrCodeNoSuchKey "NoSuchKey"
-//   The speci***REMOVED***ed key does not exist.
+//   The specified key does not exist.
 //
 // See also, https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/GetObjectAcl
 func (c *S3) GetObjectAcl(input *GetObjectAclInput) (*GetObjectAclOutput, error) {
@@ -3234,7 +3234,7 @@ const opGetObjectLegalHold = "GetObjectLegalHold"
 // See GetObjectLegalHold for more information on using the GetObjectLegalHold
 // API call, and error handling.
 //
-// This method is useful when you want to inject custom logic or con***REMOVED***guration
+// This method is useful when you want to inject custom logic or configuration
 // into the SDK's request lifecycle. Such as custom headers, or retry logic.
 //
 //
@@ -3242,7 +3242,7 @@ const opGetObjectLegalHold = "GetObjectLegalHold"
 //    req, resp := client.GetObjectLegalHoldRequest(params)
 //
 //    err := req.Send()
-//    if err == nil { // resp is now ***REMOVED***lled
+//    if err == nil { // resp is now filled
 //        fmt.Println(resp)
 //    }
 //
@@ -3295,77 +3295,77 @@ func (c *S3) GetObjectLegalHoldWithContext(ctx aws.Context, input *GetObjectLega
 	return out, req.Send()
 }
 
-const opGetObjectLockCon***REMOVED***guration = "GetObjectLockCon***REMOVED***guration"
+const opGetObjectLockConfiguration = "GetObjectLockConfiguration"
 
-// GetObjectLockCon***REMOVED***gurationRequest generates a "aws/request.Request" representing the
-// client's request for the GetObjectLockCon***REMOVED***guration operation. The "output" return
+// GetObjectLockConfigurationRequest generates a "aws/request.Request" representing the
+// client's request for the GetObjectLockConfiguration operation. The "output" return
 // value will be populated with the request's response once the request completes
 // successfully.
 //
 // Use "Send" method on the returned Request to send the API call to the service.
 // the "output" return value is not valid until after Send returns without error.
 //
-// See GetObjectLockCon***REMOVED***guration for more information on using the GetObjectLockCon***REMOVED***guration
+// See GetObjectLockConfiguration for more information on using the GetObjectLockConfiguration
 // API call, and error handling.
 //
-// This method is useful when you want to inject custom logic or con***REMOVED***guration
+// This method is useful when you want to inject custom logic or configuration
 // into the SDK's request lifecycle. Such as custom headers, or retry logic.
 //
 //
-//    // Example sending a request using the GetObjectLockCon***REMOVED***gurationRequest method.
-//    req, resp := client.GetObjectLockCon***REMOVED***gurationRequest(params)
+//    // Example sending a request using the GetObjectLockConfigurationRequest method.
+//    req, resp := client.GetObjectLockConfigurationRequest(params)
 //
 //    err := req.Send()
-//    if err == nil { // resp is now ***REMOVED***lled
+//    if err == nil { // resp is now filled
 //        fmt.Println(resp)
 //    }
 //
-// See also, https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/GetObjectLockCon***REMOVED***guration
-func (c *S3) GetObjectLockCon***REMOVED***gurationRequest(input *GetObjectLockCon***REMOVED***gurationInput) (req *request.Request, output *GetObjectLockCon***REMOVED***gurationOutput) {
+// See also, https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/GetObjectLockConfiguration
+func (c *S3) GetObjectLockConfigurationRequest(input *GetObjectLockConfigurationInput) (req *request.Request, output *GetObjectLockConfigurationOutput) {
 	op := &request.Operation{
-		Name:       opGetObjectLockCon***REMOVED***guration,
+		Name:       opGetObjectLockConfiguration,
 		HTTPMethod: "GET",
 		HTTPPath:   "/{Bucket}?object-lock",
 	}
 
 	if input == nil {
-		input = &GetObjectLockCon***REMOVED***gurationInput{}
+		input = &GetObjectLockConfigurationInput{}
 	}
 
-	output = &GetObjectLockCon***REMOVED***gurationOutput{}
+	output = &GetObjectLockConfigurationOutput{}
 	req = c.newRequest(op, input, output)
 	return
 }
 
-// GetObjectLockCon***REMOVED***guration API operation for Amazon Simple Storage Service.
+// GetObjectLockConfiguration API operation for Amazon Simple Storage Service.
 //
-// Gets the object lock con***REMOVED***guration for a bucket. The rule speci***REMOVED***ed in the
-// object lock con***REMOVED***guration will be applied by default to every new object
-// placed in the speci***REMOVED***ed bucket.
+// Gets the object lock configuration for a bucket. The rule specified in the
+// object lock configuration will be applied by default to every new object
+// placed in the specified bucket.
 //
 // Returns awserr.Error for service API and SDK errors. Use runtime type assertions
 // with awserr.Error's Code and Message methods to get detailed information about
 // the error.
 //
 // See the AWS API reference guide for Amazon Simple Storage Service's
-// API operation GetObjectLockCon***REMOVED***guration for usage and error information.
-// See also, https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/GetObjectLockCon***REMOVED***guration
-func (c *S3) GetObjectLockCon***REMOVED***guration(input *GetObjectLockCon***REMOVED***gurationInput) (*GetObjectLockCon***REMOVED***gurationOutput, error) {
-	req, out := c.GetObjectLockCon***REMOVED***gurationRequest(input)
+// API operation GetObjectLockConfiguration for usage and error information.
+// See also, https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/GetObjectLockConfiguration
+func (c *S3) GetObjectLockConfiguration(input *GetObjectLockConfigurationInput) (*GetObjectLockConfigurationOutput, error) {
+	req, out := c.GetObjectLockConfigurationRequest(input)
 	return out, req.Send()
 }
 
-// GetObjectLockCon***REMOVED***gurationWithContext is the same as GetObjectLockCon***REMOVED***guration with the addition of
+// GetObjectLockConfigurationWithContext is the same as GetObjectLockConfiguration with the addition of
 // the ability to pass a context and additional request options.
 //
-// See GetObjectLockCon***REMOVED***guration for details on how to use this API operation.
+// See GetObjectLockConfiguration for details on how to use this API operation.
 //
 // The context must be non-nil and will be used for request cancellation. If
 // the context is nil a panic will occur. In the future the SDK may create
 // sub-contexts for http.Requests. See https://golang.org/pkg/context/
 // for more information on using Contexts.
-func (c *S3) GetObjectLockCon***REMOVED***gurationWithContext(ctx aws.Context, input *GetObjectLockCon***REMOVED***gurationInput, opts ...request.Option) (*GetObjectLockCon***REMOVED***gurationOutput, error) {
-	req, out := c.GetObjectLockCon***REMOVED***gurationRequest(input)
+func (c *S3) GetObjectLockConfigurationWithContext(ctx aws.Context, input *GetObjectLockConfigurationInput, opts ...request.Option) (*GetObjectLockConfigurationOutput, error) {
+	req, out := c.GetObjectLockConfigurationRequest(input)
 	req.SetContext(ctx)
 	req.ApplyOptions(opts...)
 	return out, req.Send()
@@ -3384,7 +3384,7 @@ const opGetObjectRetention = "GetObjectRetention"
 // See GetObjectRetention for more information on using the GetObjectRetention
 // API call, and error handling.
 //
-// This method is useful when you want to inject custom logic or con***REMOVED***guration
+// This method is useful when you want to inject custom logic or configuration
 // into the SDK's request lifecycle. Such as custom headers, or retry logic.
 //
 //
@@ -3392,7 +3392,7 @@ const opGetObjectRetention = "GetObjectRetention"
 //    req, resp := client.GetObjectRetentionRequest(params)
 //
 //    err := req.Send()
-//    if err == nil { // resp is now ***REMOVED***lled
+//    if err == nil { // resp is now filled
 //        fmt.Println(resp)
 //    }
 //
@@ -3458,7 +3458,7 @@ const opGetObjectTagging = "GetObjectTagging"
 // See GetObjectTagging for more information on using the GetObjectTagging
 // API call, and error handling.
 //
-// This method is useful when you want to inject custom logic or con***REMOVED***guration
+// This method is useful when you want to inject custom logic or configuration
 // into the SDK's request lifecycle. Such as custom headers, or retry logic.
 //
 //
@@ -3466,7 +3466,7 @@ const opGetObjectTagging = "GetObjectTagging"
 //    req, resp := client.GetObjectTaggingRequest(params)
 //
 //    err := req.Send()
-//    if err == nil { // resp is now ***REMOVED***lled
+//    if err == nil { // resp is now filled
 //        fmt.Println(resp)
 //    }
 //
@@ -3532,7 +3532,7 @@ const opGetObjectTorrent = "GetObjectTorrent"
 // See GetObjectTorrent for more information on using the GetObjectTorrent
 // API call, and error handling.
 //
-// This method is useful when you want to inject custom logic or con***REMOVED***guration
+// This method is useful when you want to inject custom logic or configuration
 // into the SDK's request lifecycle. Such as custom headers, or retry logic.
 //
 //
@@ -3540,7 +3540,7 @@ const opGetObjectTorrent = "GetObjectTorrent"
 //    req, resp := client.GetObjectTorrentRequest(params)
 //
 //    err := req.Send()
-//    if err == nil { // resp is now ***REMOVED***lled
+//    if err == nil { // resp is now filled
 //        fmt.Println(resp)
 //    }
 //
@@ -3563,7 +3563,7 @@ func (c *S3) GetObjectTorrentRequest(input *GetObjectTorrentInput) (req *request
 
 // GetObjectTorrent API operation for Amazon Simple Storage Service.
 //
-// Return torrent ***REMOVED***les from a bucket.
+// Return torrent files from a bucket.
 //
 // Returns awserr.Error for service API and SDK errors. Use runtime type assertions
 // with awserr.Error's Code and Message methods to get detailed information about
@@ -3606,7 +3606,7 @@ const opGetPublicAccessBlock = "GetPublicAccessBlock"
 // See GetPublicAccessBlock for more information on using the GetPublicAccessBlock
 // API call, and error handling.
 //
-// This method is useful when you want to inject custom logic or con***REMOVED***guration
+// This method is useful when you want to inject custom logic or configuration
 // into the SDK's request lifecycle. Such as custom headers, or retry logic.
 //
 //
@@ -3614,7 +3614,7 @@ const opGetPublicAccessBlock = "GetPublicAccessBlock"
 //    req, resp := client.GetPublicAccessBlockRequest(params)
 //
 //    err := req.Send()
-//    if err == nil { // resp is now ***REMOVED***lled
+//    if err == nil { // resp is now filled
 //        fmt.Println(resp)
 //    }
 //
@@ -3637,7 +3637,7 @@ func (c *S3) GetPublicAccessBlockRequest(input *GetPublicAccessBlockInput) (req 
 
 // GetPublicAccessBlock API operation for Amazon Simple Storage Service.
 //
-// Retrieves the PublicAccessBlock con***REMOVED***guration for an Amazon S3 bucket.
+// Retrieves the PublicAccessBlock configuration for an Amazon S3 bucket.
 //
 // Returns awserr.Error for service API and SDK errors. Use runtime type assertions
 // with awserr.Error's Code and Message methods to get detailed information about
@@ -3680,7 +3680,7 @@ const opHeadBucket = "HeadBucket"
 // See HeadBucket for more information on using the HeadBucket
 // API call, and error handling.
 //
-// This method is useful when you want to inject custom logic or con***REMOVED***guration
+// This method is useful when you want to inject custom logic or configuration
 // into the SDK's request lifecycle. Such as custom headers, or retry logic.
 //
 //
@@ -3688,7 +3688,7 @@ const opHeadBucket = "HeadBucket"
 //    req, resp := client.HeadBucketRequest(params)
 //
 //    err := req.Send()
-//    if err == nil { // resp is now ***REMOVED***lled
+//    if err == nil { // resp is now filled
 //        fmt.Println(resp)
 //    }
 //
@@ -3724,7 +3724,7 @@ func (c *S3) HeadBucketRequest(input *HeadBucketInput) (req *request.Request, ou
 //
 // Returned Error Codes:
 //   * ErrCodeNoSuchBucket "NoSuchBucket"
-//   The speci***REMOVED***ed bucket does not exist.
+//   The specified bucket does not exist.
 //
 // See also, https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/HeadBucket
 func (c *S3) HeadBucket(input *HeadBucketInput) (*HeadBucketOutput, error) {
@@ -3761,7 +3761,7 @@ const opHeadObject = "HeadObject"
 // See HeadObject for more information on using the HeadObject
 // API call, and error handling.
 //
-// This method is useful when you want to inject custom logic or con***REMOVED***guration
+// This method is useful when you want to inject custom logic or configuration
 // into the SDK's request lifecycle. Such as custom headers, or retry logic.
 //
 //
@@ -3769,7 +3769,7 @@ const opHeadObject = "HeadObject"
 //    req, resp := client.HeadObjectRequest(params)
 //
 //    err := req.Send()
-//    if err == nil { // resp is now ***REMOVED***lled
+//    if err == nil { // resp is now filled
 //        fmt.Println(resp)
 //    }
 //
@@ -3827,223 +3827,223 @@ func (c *S3) HeadObjectWithContext(ctx aws.Context, input *HeadObjectInput, opts
 	return out, req.Send()
 }
 
-const opListBucketAnalyticsCon***REMOVED***gurations = "ListBucketAnalyticsCon***REMOVED***gurations"
+const opListBucketAnalyticsConfigurations = "ListBucketAnalyticsConfigurations"
 
-// ListBucketAnalyticsCon***REMOVED***gurationsRequest generates a "aws/request.Request" representing the
-// client's request for the ListBucketAnalyticsCon***REMOVED***gurations operation. The "output" return
+// ListBucketAnalyticsConfigurationsRequest generates a "aws/request.Request" representing the
+// client's request for the ListBucketAnalyticsConfigurations operation. The "output" return
 // value will be populated with the request's response once the request completes
 // successfully.
 //
 // Use "Send" method on the returned Request to send the API call to the service.
 // the "output" return value is not valid until after Send returns without error.
 //
-// See ListBucketAnalyticsCon***REMOVED***gurations for more information on using the ListBucketAnalyticsCon***REMOVED***gurations
+// See ListBucketAnalyticsConfigurations for more information on using the ListBucketAnalyticsConfigurations
 // API call, and error handling.
 //
-// This method is useful when you want to inject custom logic or con***REMOVED***guration
+// This method is useful when you want to inject custom logic or configuration
 // into the SDK's request lifecycle. Such as custom headers, or retry logic.
 //
 //
-//    // Example sending a request using the ListBucketAnalyticsCon***REMOVED***gurationsRequest method.
-//    req, resp := client.ListBucketAnalyticsCon***REMOVED***gurationsRequest(params)
+//    // Example sending a request using the ListBucketAnalyticsConfigurationsRequest method.
+//    req, resp := client.ListBucketAnalyticsConfigurationsRequest(params)
 //
 //    err := req.Send()
-//    if err == nil { // resp is now ***REMOVED***lled
+//    if err == nil { // resp is now filled
 //        fmt.Println(resp)
 //    }
 //
-// See also, https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/ListBucketAnalyticsCon***REMOVED***gurations
-func (c *S3) ListBucketAnalyticsCon***REMOVED***gurationsRequest(input *ListBucketAnalyticsCon***REMOVED***gurationsInput) (req *request.Request, output *ListBucketAnalyticsCon***REMOVED***gurationsOutput) {
+// See also, https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/ListBucketAnalyticsConfigurations
+func (c *S3) ListBucketAnalyticsConfigurationsRequest(input *ListBucketAnalyticsConfigurationsInput) (req *request.Request, output *ListBucketAnalyticsConfigurationsOutput) {
 	op := &request.Operation{
-		Name:       opListBucketAnalyticsCon***REMOVED***gurations,
+		Name:       opListBucketAnalyticsConfigurations,
 		HTTPMethod: "GET",
 		HTTPPath:   "/{Bucket}?analytics",
 	}
 
 	if input == nil {
-		input = &ListBucketAnalyticsCon***REMOVED***gurationsInput{}
+		input = &ListBucketAnalyticsConfigurationsInput{}
 	}
 
-	output = &ListBucketAnalyticsCon***REMOVED***gurationsOutput{}
+	output = &ListBucketAnalyticsConfigurationsOutput{}
 	req = c.newRequest(op, input, output)
 	return
 }
 
-// ListBucketAnalyticsCon***REMOVED***gurations API operation for Amazon Simple Storage Service.
+// ListBucketAnalyticsConfigurations API operation for Amazon Simple Storage Service.
 //
-// Lists the analytics con***REMOVED***gurations for the bucket.
+// Lists the analytics configurations for the bucket.
 //
 // Returns awserr.Error for service API and SDK errors. Use runtime type assertions
 // with awserr.Error's Code and Message methods to get detailed information about
 // the error.
 //
 // See the AWS API reference guide for Amazon Simple Storage Service's
-// API operation ListBucketAnalyticsCon***REMOVED***gurations for usage and error information.
-// See also, https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/ListBucketAnalyticsCon***REMOVED***gurations
-func (c *S3) ListBucketAnalyticsCon***REMOVED***gurations(input *ListBucketAnalyticsCon***REMOVED***gurationsInput) (*ListBucketAnalyticsCon***REMOVED***gurationsOutput, error) {
-	req, out := c.ListBucketAnalyticsCon***REMOVED***gurationsRequest(input)
+// API operation ListBucketAnalyticsConfigurations for usage and error information.
+// See also, https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/ListBucketAnalyticsConfigurations
+func (c *S3) ListBucketAnalyticsConfigurations(input *ListBucketAnalyticsConfigurationsInput) (*ListBucketAnalyticsConfigurationsOutput, error) {
+	req, out := c.ListBucketAnalyticsConfigurationsRequest(input)
 	return out, req.Send()
 }
 
-// ListBucketAnalyticsCon***REMOVED***gurationsWithContext is the same as ListBucketAnalyticsCon***REMOVED***gurations with the addition of
+// ListBucketAnalyticsConfigurationsWithContext is the same as ListBucketAnalyticsConfigurations with the addition of
 // the ability to pass a context and additional request options.
 //
-// See ListBucketAnalyticsCon***REMOVED***gurations for details on how to use this API operation.
+// See ListBucketAnalyticsConfigurations for details on how to use this API operation.
 //
 // The context must be non-nil and will be used for request cancellation. If
 // the context is nil a panic will occur. In the future the SDK may create
 // sub-contexts for http.Requests. See https://golang.org/pkg/context/
 // for more information on using Contexts.
-func (c *S3) ListBucketAnalyticsCon***REMOVED***gurationsWithContext(ctx aws.Context, input *ListBucketAnalyticsCon***REMOVED***gurationsInput, opts ...request.Option) (*ListBucketAnalyticsCon***REMOVED***gurationsOutput, error) {
-	req, out := c.ListBucketAnalyticsCon***REMOVED***gurationsRequest(input)
+func (c *S3) ListBucketAnalyticsConfigurationsWithContext(ctx aws.Context, input *ListBucketAnalyticsConfigurationsInput, opts ...request.Option) (*ListBucketAnalyticsConfigurationsOutput, error) {
+	req, out := c.ListBucketAnalyticsConfigurationsRequest(input)
 	req.SetContext(ctx)
 	req.ApplyOptions(opts...)
 	return out, req.Send()
 }
 
-const opListBucketInventoryCon***REMOVED***gurations = "ListBucketInventoryCon***REMOVED***gurations"
+const opListBucketInventoryConfigurations = "ListBucketInventoryConfigurations"
 
-// ListBucketInventoryCon***REMOVED***gurationsRequest generates a "aws/request.Request" representing the
-// client's request for the ListBucketInventoryCon***REMOVED***gurations operation. The "output" return
+// ListBucketInventoryConfigurationsRequest generates a "aws/request.Request" representing the
+// client's request for the ListBucketInventoryConfigurations operation. The "output" return
 // value will be populated with the request's response once the request completes
 // successfully.
 //
 // Use "Send" method on the returned Request to send the API call to the service.
 // the "output" return value is not valid until after Send returns without error.
 //
-// See ListBucketInventoryCon***REMOVED***gurations for more information on using the ListBucketInventoryCon***REMOVED***gurations
+// See ListBucketInventoryConfigurations for more information on using the ListBucketInventoryConfigurations
 // API call, and error handling.
 //
-// This method is useful when you want to inject custom logic or con***REMOVED***guration
+// This method is useful when you want to inject custom logic or configuration
 // into the SDK's request lifecycle. Such as custom headers, or retry logic.
 //
 //
-//    // Example sending a request using the ListBucketInventoryCon***REMOVED***gurationsRequest method.
-//    req, resp := client.ListBucketInventoryCon***REMOVED***gurationsRequest(params)
+//    // Example sending a request using the ListBucketInventoryConfigurationsRequest method.
+//    req, resp := client.ListBucketInventoryConfigurationsRequest(params)
 //
 //    err := req.Send()
-//    if err == nil { // resp is now ***REMOVED***lled
+//    if err == nil { // resp is now filled
 //        fmt.Println(resp)
 //    }
 //
-// See also, https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/ListBucketInventoryCon***REMOVED***gurations
-func (c *S3) ListBucketInventoryCon***REMOVED***gurationsRequest(input *ListBucketInventoryCon***REMOVED***gurationsInput) (req *request.Request, output *ListBucketInventoryCon***REMOVED***gurationsOutput) {
+// See also, https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/ListBucketInventoryConfigurations
+func (c *S3) ListBucketInventoryConfigurationsRequest(input *ListBucketInventoryConfigurationsInput) (req *request.Request, output *ListBucketInventoryConfigurationsOutput) {
 	op := &request.Operation{
-		Name:       opListBucketInventoryCon***REMOVED***gurations,
+		Name:       opListBucketInventoryConfigurations,
 		HTTPMethod: "GET",
 		HTTPPath:   "/{Bucket}?inventory",
 	}
 
 	if input == nil {
-		input = &ListBucketInventoryCon***REMOVED***gurationsInput{}
+		input = &ListBucketInventoryConfigurationsInput{}
 	}
 
-	output = &ListBucketInventoryCon***REMOVED***gurationsOutput{}
+	output = &ListBucketInventoryConfigurationsOutput{}
 	req = c.newRequest(op, input, output)
 	return
 }
 
-// ListBucketInventoryCon***REMOVED***gurations API operation for Amazon Simple Storage Service.
+// ListBucketInventoryConfigurations API operation for Amazon Simple Storage Service.
 //
-// Returns a list of inventory con***REMOVED***gurations for the bucket.
+// Returns a list of inventory configurations for the bucket.
 //
 // Returns awserr.Error for service API and SDK errors. Use runtime type assertions
 // with awserr.Error's Code and Message methods to get detailed information about
 // the error.
 //
 // See the AWS API reference guide for Amazon Simple Storage Service's
-// API operation ListBucketInventoryCon***REMOVED***gurations for usage and error information.
-// See also, https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/ListBucketInventoryCon***REMOVED***gurations
-func (c *S3) ListBucketInventoryCon***REMOVED***gurations(input *ListBucketInventoryCon***REMOVED***gurationsInput) (*ListBucketInventoryCon***REMOVED***gurationsOutput, error) {
-	req, out := c.ListBucketInventoryCon***REMOVED***gurationsRequest(input)
+// API operation ListBucketInventoryConfigurations for usage and error information.
+// See also, https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/ListBucketInventoryConfigurations
+func (c *S3) ListBucketInventoryConfigurations(input *ListBucketInventoryConfigurationsInput) (*ListBucketInventoryConfigurationsOutput, error) {
+	req, out := c.ListBucketInventoryConfigurationsRequest(input)
 	return out, req.Send()
 }
 
-// ListBucketInventoryCon***REMOVED***gurationsWithContext is the same as ListBucketInventoryCon***REMOVED***gurations with the addition of
+// ListBucketInventoryConfigurationsWithContext is the same as ListBucketInventoryConfigurations with the addition of
 // the ability to pass a context and additional request options.
 //
-// See ListBucketInventoryCon***REMOVED***gurations for details on how to use this API operation.
+// See ListBucketInventoryConfigurations for details on how to use this API operation.
 //
 // The context must be non-nil and will be used for request cancellation. If
 // the context is nil a panic will occur. In the future the SDK may create
 // sub-contexts for http.Requests. See https://golang.org/pkg/context/
 // for more information on using Contexts.
-func (c *S3) ListBucketInventoryCon***REMOVED***gurationsWithContext(ctx aws.Context, input *ListBucketInventoryCon***REMOVED***gurationsInput, opts ...request.Option) (*ListBucketInventoryCon***REMOVED***gurationsOutput, error) {
-	req, out := c.ListBucketInventoryCon***REMOVED***gurationsRequest(input)
+func (c *S3) ListBucketInventoryConfigurationsWithContext(ctx aws.Context, input *ListBucketInventoryConfigurationsInput, opts ...request.Option) (*ListBucketInventoryConfigurationsOutput, error) {
+	req, out := c.ListBucketInventoryConfigurationsRequest(input)
 	req.SetContext(ctx)
 	req.ApplyOptions(opts...)
 	return out, req.Send()
 }
 
-const opListBucketMetricsCon***REMOVED***gurations = "ListBucketMetricsCon***REMOVED***gurations"
+const opListBucketMetricsConfigurations = "ListBucketMetricsConfigurations"
 
-// ListBucketMetricsCon***REMOVED***gurationsRequest generates a "aws/request.Request" representing the
-// client's request for the ListBucketMetricsCon***REMOVED***gurations operation. The "output" return
+// ListBucketMetricsConfigurationsRequest generates a "aws/request.Request" representing the
+// client's request for the ListBucketMetricsConfigurations operation. The "output" return
 // value will be populated with the request's response once the request completes
 // successfully.
 //
 // Use "Send" method on the returned Request to send the API call to the service.
 // the "output" return value is not valid until after Send returns without error.
 //
-// See ListBucketMetricsCon***REMOVED***gurations for more information on using the ListBucketMetricsCon***REMOVED***gurations
+// See ListBucketMetricsConfigurations for more information on using the ListBucketMetricsConfigurations
 // API call, and error handling.
 //
-// This method is useful when you want to inject custom logic or con***REMOVED***guration
+// This method is useful when you want to inject custom logic or configuration
 // into the SDK's request lifecycle. Such as custom headers, or retry logic.
 //
 //
-//    // Example sending a request using the ListBucketMetricsCon***REMOVED***gurationsRequest method.
-//    req, resp := client.ListBucketMetricsCon***REMOVED***gurationsRequest(params)
+//    // Example sending a request using the ListBucketMetricsConfigurationsRequest method.
+//    req, resp := client.ListBucketMetricsConfigurationsRequest(params)
 //
 //    err := req.Send()
-//    if err == nil { // resp is now ***REMOVED***lled
+//    if err == nil { // resp is now filled
 //        fmt.Println(resp)
 //    }
 //
-// See also, https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/ListBucketMetricsCon***REMOVED***gurations
-func (c *S3) ListBucketMetricsCon***REMOVED***gurationsRequest(input *ListBucketMetricsCon***REMOVED***gurationsInput) (req *request.Request, output *ListBucketMetricsCon***REMOVED***gurationsOutput) {
+// See also, https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/ListBucketMetricsConfigurations
+func (c *S3) ListBucketMetricsConfigurationsRequest(input *ListBucketMetricsConfigurationsInput) (req *request.Request, output *ListBucketMetricsConfigurationsOutput) {
 	op := &request.Operation{
-		Name:       opListBucketMetricsCon***REMOVED***gurations,
+		Name:       opListBucketMetricsConfigurations,
 		HTTPMethod: "GET",
 		HTTPPath:   "/{Bucket}?metrics",
 	}
 
 	if input == nil {
-		input = &ListBucketMetricsCon***REMOVED***gurationsInput{}
+		input = &ListBucketMetricsConfigurationsInput{}
 	}
 
-	output = &ListBucketMetricsCon***REMOVED***gurationsOutput{}
+	output = &ListBucketMetricsConfigurationsOutput{}
 	req = c.newRequest(op, input, output)
 	return
 }
 
-// ListBucketMetricsCon***REMOVED***gurations API operation for Amazon Simple Storage Service.
+// ListBucketMetricsConfigurations API operation for Amazon Simple Storage Service.
 //
-// Lists the metrics con***REMOVED***gurations for the bucket.
+// Lists the metrics configurations for the bucket.
 //
 // Returns awserr.Error for service API and SDK errors. Use runtime type assertions
 // with awserr.Error's Code and Message methods to get detailed information about
 // the error.
 //
 // See the AWS API reference guide for Amazon Simple Storage Service's
-// API operation ListBucketMetricsCon***REMOVED***gurations for usage and error information.
-// See also, https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/ListBucketMetricsCon***REMOVED***gurations
-func (c *S3) ListBucketMetricsCon***REMOVED***gurations(input *ListBucketMetricsCon***REMOVED***gurationsInput) (*ListBucketMetricsCon***REMOVED***gurationsOutput, error) {
-	req, out := c.ListBucketMetricsCon***REMOVED***gurationsRequest(input)
+// API operation ListBucketMetricsConfigurations for usage and error information.
+// See also, https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/ListBucketMetricsConfigurations
+func (c *S3) ListBucketMetricsConfigurations(input *ListBucketMetricsConfigurationsInput) (*ListBucketMetricsConfigurationsOutput, error) {
+	req, out := c.ListBucketMetricsConfigurationsRequest(input)
 	return out, req.Send()
 }
 
-// ListBucketMetricsCon***REMOVED***gurationsWithContext is the same as ListBucketMetricsCon***REMOVED***gurations with the addition of
+// ListBucketMetricsConfigurationsWithContext is the same as ListBucketMetricsConfigurations with the addition of
 // the ability to pass a context and additional request options.
 //
-// See ListBucketMetricsCon***REMOVED***gurations for details on how to use this API operation.
+// See ListBucketMetricsConfigurations for details on how to use this API operation.
 //
 // The context must be non-nil and will be used for request cancellation. If
 // the context is nil a panic will occur. In the future the SDK may create
 // sub-contexts for http.Requests. See https://golang.org/pkg/context/
 // for more information on using Contexts.
-func (c *S3) ListBucketMetricsCon***REMOVED***gurationsWithContext(ctx aws.Context, input *ListBucketMetricsCon***REMOVED***gurationsInput, opts ...request.Option) (*ListBucketMetricsCon***REMOVED***gurationsOutput, error) {
-	req, out := c.ListBucketMetricsCon***REMOVED***gurationsRequest(input)
+func (c *S3) ListBucketMetricsConfigurationsWithContext(ctx aws.Context, input *ListBucketMetricsConfigurationsInput, opts ...request.Option) (*ListBucketMetricsConfigurationsOutput, error) {
+	req, out := c.ListBucketMetricsConfigurationsRequest(input)
 	req.SetContext(ctx)
 	req.ApplyOptions(opts...)
 	return out, req.Send()
@@ -4062,7 +4062,7 @@ const opListBuckets = "ListBuckets"
 // See ListBuckets for more information on using the ListBuckets
 // API call, and error handling.
 //
-// This method is useful when you want to inject custom logic or con***REMOVED***guration
+// This method is useful when you want to inject custom logic or configuration
 // into the SDK's request lifecycle. Such as custom headers, or retry logic.
 //
 //
@@ -4070,7 +4070,7 @@ const opListBuckets = "ListBuckets"
 //    req, resp := client.ListBucketsRequest(params)
 //
 //    err := req.Send()
-//    if err == nil { // resp is now ***REMOVED***lled
+//    if err == nil { // resp is now filled
 //        fmt.Println(resp)
 //    }
 //
@@ -4136,7 +4136,7 @@ const opListMultipartUploads = "ListMultipartUploads"
 // See ListMultipartUploads for more information on using the ListMultipartUploads
 // API call, and error handling.
 //
-// This method is useful when you want to inject custom logic or con***REMOVED***guration
+// This method is useful when you want to inject custom logic or configuration
 // into the SDK's request lifecycle. Such as custom headers, or retry logic.
 //
 //
@@ -4144,7 +4144,7 @@ const opListMultipartUploads = "ListMultipartUploads"
 //    req, resp := client.ListMultipartUploadsRequest(params)
 //
 //    err := req.Send()
-//    if err == nil { // resp is now ***REMOVED***lled
+//    if err == nil { // resp is now filled
 //        fmt.Println(resp)
 //    }
 //
@@ -4266,7 +4266,7 @@ const opListObjectVersions = "ListObjectVersions"
 // See ListObjectVersions for more information on using the ListObjectVersions
 // API call, and error handling.
 //
-// This method is useful when you want to inject custom logic or con***REMOVED***guration
+// This method is useful when you want to inject custom logic or configuration
 // into the SDK's request lifecycle. Such as custom headers, or retry logic.
 //
 //
@@ -4274,7 +4274,7 @@ const opListObjectVersions = "ListObjectVersions"
 //    req, resp := client.ListObjectVersionsRequest(params)
 //
 //    err := req.Send()
-//    if err == nil { // resp is now ***REMOVED***lled
+//    if err == nil { // resp is now filled
 //        fmt.Println(resp)
 //    }
 //
@@ -4396,7 +4396,7 @@ const opListObjects = "ListObjects"
 // See ListObjects for more information on using the ListObjects
 // API call, and error handling.
 //
-// This method is useful when you want to inject custom logic or con***REMOVED***guration
+// This method is useful when you want to inject custom logic or configuration
 // into the SDK's request lifecycle. Such as custom headers, or retry logic.
 //
 //
@@ -4404,7 +4404,7 @@ const opListObjects = "ListObjects"
 //    req, resp := client.ListObjectsRequest(params)
 //
 //    err := req.Send()
-//    if err == nil { // resp is now ***REMOVED***lled
+//    if err == nil { // resp is now filled
 //        fmt.Println(resp)
 //    }
 //
@@ -4446,7 +4446,7 @@ func (c *S3) ListObjectsRequest(input *ListObjectsInput) (req *request.Request, 
 //
 // Returned Error Codes:
 //   * ErrCodeNoSuchBucket "NoSuchBucket"
-//   The speci***REMOVED***ed bucket does not exist.
+//   The specified bucket does not exist.
 //
 // See also, https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/ListObjects
 func (c *S3) ListObjects(input *ListObjectsInput) (*ListObjectsOutput, error) {
@@ -4533,7 +4533,7 @@ const opListObjectsV2 = "ListObjectsV2"
 // See ListObjectsV2 for more information on using the ListObjectsV2
 // API call, and error handling.
 //
-// This method is useful when you want to inject custom logic or con***REMOVED***guration
+// This method is useful when you want to inject custom logic or configuration
 // into the SDK's request lifecycle. Such as custom headers, or retry logic.
 //
 //
@@ -4541,7 +4541,7 @@ const opListObjectsV2 = "ListObjectsV2"
 //    req, resp := client.ListObjectsV2Request(params)
 //
 //    err := req.Send()
-//    if err == nil { // resp is now ***REMOVED***lled
+//    if err == nil { // resp is now filled
 //        fmt.Println(resp)
 //    }
 //
@@ -4584,7 +4584,7 @@ func (c *S3) ListObjectsV2Request(input *ListObjectsV2Input) (req *request.Reque
 //
 // Returned Error Codes:
 //   * ErrCodeNoSuchBucket "NoSuchBucket"
-//   The speci***REMOVED***ed bucket does not exist.
+//   The specified bucket does not exist.
 //
 // See also, https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/ListObjectsV2
 func (c *S3) ListObjectsV2(input *ListObjectsV2Input) (*ListObjectsV2Output, error) {
@@ -4671,7 +4671,7 @@ const opListParts = "ListParts"
 // See ListParts for more information on using the ListParts
 // API call, and error handling.
 //
-// This method is useful when you want to inject custom logic or con***REMOVED***guration
+// This method is useful when you want to inject custom logic or configuration
 // into the SDK's request lifecycle. Such as custom headers, or retry logic.
 //
 //
@@ -4679,7 +4679,7 @@ const opListParts = "ListParts"
 //    req, resp := client.ListPartsRequest(params)
 //
 //    err := req.Send()
-//    if err == nil { // resp is now ***REMOVED***lled
+//    if err == nil { // resp is now filled
 //        fmt.Println(resp)
 //    }
 //
@@ -4708,7 +4708,7 @@ func (c *S3) ListPartsRequest(input *ListPartsInput) (req *request.Request, outp
 
 // ListParts API operation for Amazon Simple Storage Service.
 //
-// Lists the parts that have been uploaded for a speci***REMOVED***c multipart upload.
+// Lists the parts that have been uploaded for a specific multipart upload.
 //
 // Returns awserr.Error for service API and SDK errors. Use runtime type assertions
 // with awserr.Error's Code and Message methods to get detailed information about
@@ -4788,76 +4788,76 @@ func (c *S3) ListPartsPagesWithContext(ctx aws.Context, input *ListPartsInput, f
 	return p.Err()
 }
 
-const opPutBucketAccelerateCon***REMOVED***guration = "PutBucketAccelerateCon***REMOVED***guration"
+const opPutBucketAccelerateConfiguration = "PutBucketAccelerateConfiguration"
 
-// PutBucketAccelerateCon***REMOVED***gurationRequest generates a "aws/request.Request" representing the
-// client's request for the PutBucketAccelerateCon***REMOVED***guration operation. The "output" return
+// PutBucketAccelerateConfigurationRequest generates a "aws/request.Request" representing the
+// client's request for the PutBucketAccelerateConfiguration operation. The "output" return
 // value will be populated with the request's response once the request completes
 // successfully.
 //
 // Use "Send" method on the returned Request to send the API call to the service.
 // the "output" return value is not valid until after Send returns without error.
 //
-// See PutBucketAccelerateCon***REMOVED***guration for more information on using the PutBucketAccelerateCon***REMOVED***guration
+// See PutBucketAccelerateConfiguration for more information on using the PutBucketAccelerateConfiguration
 // API call, and error handling.
 //
-// This method is useful when you want to inject custom logic or con***REMOVED***guration
+// This method is useful when you want to inject custom logic or configuration
 // into the SDK's request lifecycle. Such as custom headers, or retry logic.
 //
 //
-//    // Example sending a request using the PutBucketAccelerateCon***REMOVED***gurationRequest method.
-//    req, resp := client.PutBucketAccelerateCon***REMOVED***gurationRequest(params)
+//    // Example sending a request using the PutBucketAccelerateConfigurationRequest method.
+//    req, resp := client.PutBucketAccelerateConfigurationRequest(params)
 //
 //    err := req.Send()
-//    if err == nil { // resp is now ***REMOVED***lled
+//    if err == nil { // resp is now filled
 //        fmt.Println(resp)
 //    }
 //
-// See also, https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/PutBucketAccelerateCon***REMOVED***guration
-func (c *S3) PutBucketAccelerateCon***REMOVED***gurationRequest(input *PutBucketAccelerateCon***REMOVED***gurationInput) (req *request.Request, output *PutBucketAccelerateCon***REMOVED***gurationOutput) {
+// See also, https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/PutBucketAccelerateConfiguration
+func (c *S3) PutBucketAccelerateConfigurationRequest(input *PutBucketAccelerateConfigurationInput) (req *request.Request, output *PutBucketAccelerateConfigurationOutput) {
 	op := &request.Operation{
-		Name:       opPutBucketAccelerateCon***REMOVED***guration,
+		Name:       opPutBucketAccelerateConfiguration,
 		HTTPMethod: "PUT",
 		HTTPPath:   "/{Bucket}?accelerate",
 	}
 
 	if input == nil {
-		input = &PutBucketAccelerateCon***REMOVED***gurationInput{}
+		input = &PutBucketAccelerateConfigurationInput{}
 	}
 
-	output = &PutBucketAccelerateCon***REMOVED***gurationOutput{}
+	output = &PutBucketAccelerateConfigurationOutput{}
 	req = c.newRequest(op, input, output)
 	req.Handlers.Unmarshal.Swap(restxml.UnmarshalHandler.Name, protocol.UnmarshalDiscardBodyHandler)
 	return
 }
 
-// PutBucketAccelerateCon***REMOVED***guration API operation for Amazon Simple Storage Service.
+// PutBucketAccelerateConfiguration API operation for Amazon Simple Storage Service.
 //
-// Sets the accelerate con***REMOVED***guration of an existing bucket.
+// Sets the accelerate configuration of an existing bucket.
 //
 // Returns awserr.Error for service API and SDK errors. Use runtime type assertions
 // with awserr.Error's Code and Message methods to get detailed information about
 // the error.
 //
 // See the AWS API reference guide for Amazon Simple Storage Service's
-// API operation PutBucketAccelerateCon***REMOVED***guration for usage and error information.
-// See also, https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/PutBucketAccelerateCon***REMOVED***guration
-func (c *S3) PutBucketAccelerateCon***REMOVED***guration(input *PutBucketAccelerateCon***REMOVED***gurationInput) (*PutBucketAccelerateCon***REMOVED***gurationOutput, error) {
-	req, out := c.PutBucketAccelerateCon***REMOVED***gurationRequest(input)
+// API operation PutBucketAccelerateConfiguration for usage and error information.
+// See also, https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/PutBucketAccelerateConfiguration
+func (c *S3) PutBucketAccelerateConfiguration(input *PutBucketAccelerateConfigurationInput) (*PutBucketAccelerateConfigurationOutput, error) {
+	req, out := c.PutBucketAccelerateConfigurationRequest(input)
 	return out, req.Send()
 }
 
-// PutBucketAccelerateCon***REMOVED***gurationWithContext is the same as PutBucketAccelerateCon***REMOVED***guration with the addition of
+// PutBucketAccelerateConfigurationWithContext is the same as PutBucketAccelerateConfiguration with the addition of
 // the ability to pass a context and additional request options.
 //
-// See PutBucketAccelerateCon***REMOVED***guration for details on how to use this API operation.
+// See PutBucketAccelerateConfiguration for details on how to use this API operation.
 //
 // The context must be non-nil and will be used for request cancellation. If
 // the context is nil a panic will occur. In the future the SDK may create
 // sub-contexts for http.Requests. See https://golang.org/pkg/context/
 // for more information on using Contexts.
-func (c *S3) PutBucketAccelerateCon***REMOVED***gurationWithContext(ctx aws.Context, input *PutBucketAccelerateCon***REMOVED***gurationInput, opts ...request.Option) (*PutBucketAccelerateCon***REMOVED***gurationOutput, error) {
-	req, out := c.PutBucketAccelerateCon***REMOVED***gurationRequest(input)
+func (c *S3) PutBucketAccelerateConfigurationWithContext(ctx aws.Context, input *PutBucketAccelerateConfigurationInput, opts ...request.Option) (*PutBucketAccelerateConfigurationOutput, error) {
+	req, out := c.PutBucketAccelerateConfigurationRequest(input)
 	req.SetContext(ctx)
 	req.ApplyOptions(opts...)
 	return out, req.Send()
@@ -4876,7 +4876,7 @@ const opPutBucketAcl = "PutBucketAcl"
 // See PutBucketAcl for more information on using the PutBucketAcl
 // API call, and error handling.
 //
-// This method is useful when you want to inject custom logic or con***REMOVED***guration
+// This method is useful when you want to inject custom logic or configuration
 // into the SDK's request lifecycle. Such as custom headers, or retry logic.
 //
 //
@@ -4884,7 +4884,7 @@ const opPutBucketAcl = "PutBucketAcl"
 //    req, resp := client.PutBucketAclRequest(params)
 //
 //    err := req.Send()
-//    if err == nil { // resp is now ***REMOVED***lled
+//    if err == nil { // resp is now filled
 //        fmt.Println(resp)
 //    }
 //
@@ -4938,77 +4938,77 @@ func (c *S3) PutBucketAclWithContext(ctx aws.Context, input *PutBucketAclInput, 
 	return out, req.Send()
 }
 
-const opPutBucketAnalyticsCon***REMOVED***guration = "PutBucketAnalyticsCon***REMOVED***guration"
+const opPutBucketAnalyticsConfiguration = "PutBucketAnalyticsConfiguration"
 
-// PutBucketAnalyticsCon***REMOVED***gurationRequest generates a "aws/request.Request" representing the
-// client's request for the PutBucketAnalyticsCon***REMOVED***guration operation. The "output" return
+// PutBucketAnalyticsConfigurationRequest generates a "aws/request.Request" representing the
+// client's request for the PutBucketAnalyticsConfiguration operation. The "output" return
 // value will be populated with the request's response once the request completes
 // successfully.
 //
 // Use "Send" method on the returned Request to send the API call to the service.
 // the "output" return value is not valid until after Send returns without error.
 //
-// See PutBucketAnalyticsCon***REMOVED***guration for more information on using the PutBucketAnalyticsCon***REMOVED***guration
+// See PutBucketAnalyticsConfiguration for more information on using the PutBucketAnalyticsConfiguration
 // API call, and error handling.
 //
-// This method is useful when you want to inject custom logic or con***REMOVED***guration
+// This method is useful when you want to inject custom logic or configuration
 // into the SDK's request lifecycle. Such as custom headers, or retry logic.
 //
 //
-//    // Example sending a request using the PutBucketAnalyticsCon***REMOVED***gurationRequest method.
-//    req, resp := client.PutBucketAnalyticsCon***REMOVED***gurationRequest(params)
+//    // Example sending a request using the PutBucketAnalyticsConfigurationRequest method.
+//    req, resp := client.PutBucketAnalyticsConfigurationRequest(params)
 //
 //    err := req.Send()
-//    if err == nil { // resp is now ***REMOVED***lled
+//    if err == nil { // resp is now filled
 //        fmt.Println(resp)
 //    }
 //
-// See also, https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/PutBucketAnalyticsCon***REMOVED***guration
-func (c *S3) PutBucketAnalyticsCon***REMOVED***gurationRequest(input *PutBucketAnalyticsCon***REMOVED***gurationInput) (req *request.Request, output *PutBucketAnalyticsCon***REMOVED***gurationOutput) {
+// See also, https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/PutBucketAnalyticsConfiguration
+func (c *S3) PutBucketAnalyticsConfigurationRequest(input *PutBucketAnalyticsConfigurationInput) (req *request.Request, output *PutBucketAnalyticsConfigurationOutput) {
 	op := &request.Operation{
-		Name:       opPutBucketAnalyticsCon***REMOVED***guration,
+		Name:       opPutBucketAnalyticsConfiguration,
 		HTTPMethod: "PUT",
 		HTTPPath:   "/{Bucket}?analytics",
 	}
 
 	if input == nil {
-		input = &PutBucketAnalyticsCon***REMOVED***gurationInput{}
+		input = &PutBucketAnalyticsConfigurationInput{}
 	}
 
-	output = &PutBucketAnalyticsCon***REMOVED***gurationOutput{}
+	output = &PutBucketAnalyticsConfigurationOutput{}
 	req = c.newRequest(op, input, output)
 	req.Handlers.Unmarshal.Swap(restxml.UnmarshalHandler.Name, protocol.UnmarshalDiscardBodyHandler)
 	return
 }
 
-// PutBucketAnalyticsCon***REMOVED***guration API operation for Amazon Simple Storage Service.
+// PutBucketAnalyticsConfiguration API operation for Amazon Simple Storage Service.
 //
-// Sets an analytics con***REMOVED***guration for the bucket (speci***REMOVED***ed by the analytics
-// con***REMOVED***guration ID).
+// Sets an analytics configuration for the bucket (specified by the analytics
+// configuration ID).
 //
 // Returns awserr.Error for service API and SDK errors. Use runtime type assertions
 // with awserr.Error's Code and Message methods to get detailed information about
 // the error.
 //
 // See the AWS API reference guide for Amazon Simple Storage Service's
-// API operation PutBucketAnalyticsCon***REMOVED***guration for usage and error information.
-// See also, https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/PutBucketAnalyticsCon***REMOVED***guration
-func (c *S3) PutBucketAnalyticsCon***REMOVED***guration(input *PutBucketAnalyticsCon***REMOVED***gurationInput) (*PutBucketAnalyticsCon***REMOVED***gurationOutput, error) {
-	req, out := c.PutBucketAnalyticsCon***REMOVED***gurationRequest(input)
+// API operation PutBucketAnalyticsConfiguration for usage and error information.
+// See also, https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/PutBucketAnalyticsConfiguration
+func (c *S3) PutBucketAnalyticsConfiguration(input *PutBucketAnalyticsConfigurationInput) (*PutBucketAnalyticsConfigurationOutput, error) {
+	req, out := c.PutBucketAnalyticsConfigurationRequest(input)
 	return out, req.Send()
 }
 
-// PutBucketAnalyticsCon***REMOVED***gurationWithContext is the same as PutBucketAnalyticsCon***REMOVED***guration with the addition of
+// PutBucketAnalyticsConfigurationWithContext is the same as PutBucketAnalyticsConfiguration with the addition of
 // the ability to pass a context and additional request options.
 //
-// See PutBucketAnalyticsCon***REMOVED***guration for details on how to use this API operation.
+// See PutBucketAnalyticsConfiguration for details on how to use this API operation.
 //
 // The context must be non-nil and will be used for request cancellation. If
 // the context is nil a panic will occur. In the future the SDK may create
 // sub-contexts for http.Requests. See https://golang.org/pkg/context/
 // for more information on using Contexts.
-func (c *S3) PutBucketAnalyticsCon***REMOVED***gurationWithContext(ctx aws.Context, input *PutBucketAnalyticsCon***REMOVED***gurationInput, opts ...request.Option) (*PutBucketAnalyticsCon***REMOVED***gurationOutput, error) {
-	req, out := c.PutBucketAnalyticsCon***REMOVED***gurationRequest(input)
+func (c *S3) PutBucketAnalyticsConfigurationWithContext(ctx aws.Context, input *PutBucketAnalyticsConfigurationInput, opts ...request.Option) (*PutBucketAnalyticsConfigurationOutput, error) {
+	req, out := c.PutBucketAnalyticsConfigurationRequest(input)
 	req.SetContext(ctx)
 	req.ApplyOptions(opts...)
 	return out, req.Send()
@@ -5027,7 +5027,7 @@ const opPutBucketCors = "PutBucketCors"
 // See PutBucketCors for more information on using the PutBucketCors
 // API call, and error handling.
 //
-// This method is useful when you want to inject custom logic or con***REMOVED***guration
+// This method is useful when you want to inject custom logic or configuration
 // into the SDK's request lifecycle. Such as custom headers, or retry logic.
 //
 //
@@ -5035,7 +5035,7 @@ const opPutBucketCors = "PutBucketCors"
 //    req, resp := client.PutBucketCorsRequest(params)
 //
 //    err := req.Send()
-//    if err == nil { // resp is now ***REMOVED***lled
+//    if err == nil { // resp is now filled
 //        fmt.Println(resp)
 //    }
 //
@@ -5059,7 +5059,7 @@ func (c *S3) PutBucketCorsRequest(input *PutBucketCorsInput) (req *request.Reque
 
 // PutBucketCors API operation for Amazon Simple Storage Service.
 //
-// Sets the CORS con***REMOVED***guration for a bucket.
+// Sets the CORS configuration for a bucket.
 //
 // Returns awserr.Error for service API and SDK errors. Use runtime type assertions
 // with awserr.Error's Code and Message methods to get detailed information about
@@ -5102,7 +5102,7 @@ const opPutBucketEncryption = "PutBucketEncryption"
 // See PutBucketEncryption for more information on using the PutBucketEncryption
 // API call, and error handling.
 //
-// This method is useful when you want to inject custom logic or con***REMOVED***guration
+// This method is useful when you want to inject custom logic or configuration
 // into the SDK's request lifecycle. Such as custom headers, or retry logic.
 //
 //
@@ -5110,7 +5110,7 @@ const opPutBucketEncryption = "PutBucketEncryption"
 //    req, resp := client.PutBucketEncryptionRequest(params)
 //
 //    err := req.Send()
-//    if err == nil { // resp is now ***REMOVED***lled
+//    if err == nil { // resp is now filled
 //        fmt.Println(resp)
 //    }
 //
@@ -5134,7 +5134,7 @@ func (c *S3) PutBucketEncryptionRequest(input *PutBucketEncryptionInput) (req *r
 
 // PutBucketEncryption API operation for Amazon Simple Storage Service.
 //
-// Creates a new server-side encryption con***REMOVED***guration (or replaces an existing
+// Creates a new server-side encryption configuration (or replaces an existing
 // one, if present).
 //
 // Returns awserr.Error for service API and SDK errors. Use runtime type assertions
@@ -5165,52 +5165,52 @@ func (c *S3) PutBucketEncryptionWithContext(ctx aws.Context, input *PutBucketEnc
 	return out, req.Send()
 }
 
-const opPutBucketInventoryCon***REMOVED***guration = "PutBucketInventoryCon***REMOVED***guration"
+const opPutBucketInventoryConfiguration = "PutBucketInventoryConfiguration"
 
-// PutBucketInventoryCon***REMOVED***gurationRequest generates a "aws/request.Request" representing the
-// client's request for the PutBucketInventoryCon***REMOVED***guration operation. The "output" return
+// PutBucketInventoryConfigurationRequest generates a "aws/request.Request" representing the
+// client's request for the PutBucketInventoryConfiguration operation. The "output" return
 // value will be populated with the request's response once the request completes
 // successfully.
 //
 // Use "Send" method on the returned Request to send the API call to the service.
 // the "output" return value is not valid until after Send returns without error.
 //
-// See PutBucketInventoryCon***REMOVED***guration for more information on using the PutBucketInventoryCon***REMOVED***guration
+// See PutBucketInventoryConfiguration for more information on using the PutBucketInventoryConfiguration
 // API call, and error handling.
 //
-// This method is useful when you want to inject custom logic or con***REMOVED***guration
+// This method is useful when you want to inject custom logic or configuration
 // into the SDK's request lifecycle. Such as custom headers, or retry logic.
 //
 //
-//    // Example sending a request using the PutBucketInventoryCon***REMOVED***gurationRequest method.
-//    req, resp := client.PutBucketInventoryCon***REMOVED***gurationRequest(params)
+//    // Example sending a request using the PutBucketInventoryConfigurationRequest method.
+//    req, resp := client.PutBucketInventoryConfigurationRequest(params)
 //
 //    err := req.Send()
-//    if err == nil { // resp is now ***REMOVED***lled
+//    if err == nil { // resp is now filled
 //        fmt.Println(resp)
 //    }
 //
-// See also, https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/PutBucketInventoryCon***REMOVED***guration
-func (c *S3) PutBucketInventoryCon***REMOVED***gurationRequest(input *PutBucketInventoryCon***REMOVED***gurationInput) (req *request.Request, output *PutBucketInventoryCon***REMOVED***gurationOutput) {
+// See also, https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/PutBucketInventoryConfiguration
+func (c *S3) PutBucketInventoryConfigurationRequest(input *PutBucketInventoryConfigurationInput) (req *request.Request, output *PutBucketInventoryConfigurationOutput) {
 	op := &request.Operation{
-		Name:       opPutBucketInventoryCon***REMOVED***guration,
+		Name:       opPutBucketInventoryConfiguration,
 		HTTPMethod: "PUT",
 		HTTPPath:   "/{Bucket}?inventory",
 	}
 
 	if input == nil {
-		input = &PutBucketInventoryCon***REMOVED***gurationInput{}
+		input = &PutBucketInventoryConfigurationInput{}
 	}
 
-	output = &PutBucketInventoryCon***REMOVED***gurationOutput{}
+	output = &PutBucketInventoryConfigurationOutput{}
 	req = c.newRequest(op, input, output)
 	req.Handlers.Unmarshal.Swap(restxml.UnmarshalHandler.Name, protocol.UnmarshalDiscardBodyHandler)
 	return
 }
 
-// PutBucketInventoryCon***REMOVED***guration API operation for Amazon Simple Storage Service.
+// PutBucketInventoryConfiguration API operation for Amazon Simple Storage Service.
 //
-// Adds an inventory con***REMOVED***guration (identi***REMOVED***ed by the inventory ID) from the
+// Adds an inventory configuration (identified by the inventory ID) from the
 // bucket.
 //
 // Returns awserr.Error for service API and SDK errors. Use runtime type assertions
@@ -5218,24 +5218,24 @@ func (c *S3) PutBucketInventoryCon***REMOVED***gurationRequest(input *PutBucketI
 // the error.
 //
 // See the AWS API reference guide for Amazon Simple Storage Service's
-// API operation PutBucketInventoryCon***REMOVED***guration for usage and error information.
-// See also, https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/PutBucketInventoryCon***REMOVED***guration
-func (c *S3) PutBucketInventoryCon***REMOVED***guration(input *PutBucketInventoryCon***REMOVED***gurationInput) (*PutBucketInventoryCon***REMOVED***gurationOutput, error) {
-	req, out := c.PutBucketInventoryCon***REMOVED***gurationRequest(input)
+// API operation PutBucketInventoryConfiguration for usage and error information.
+// See also, https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/PutBucketInventoryConfiguration
+func (c *S3) PutBucketInventoryConfiguration(input *PutBucketInventoryConfigurationInput) (*PutBucketInventoryConfigurationOutput, error) {
+	req, out := c.PutBucketInventoryConfigurationRequest(input)
 	return out, req.Send()
 }
 
-// PutBucketInventoryCon***REMOVED***gurationWithContext is the same as PutBucketInventoryCon***REMOVED***guration with the addition of
+// PutBucketInventoryConfigurationWithContext is the same as PutBucketInventoryConfiguration with the addition of
 // the ability to pass a context and additional request options.
 //
-// See PutBucketInventoryCon***REMOVED***guration for details on how to use this API operation.
+// See PutBucketInventoryConfiguration for details on how to use this API operation.
 //
 // The context must be non-nil and will be used for request cancellation. If
 // the context is nil a panic will occur. In the future the SDK may create
 // sub-contexts for http.Requests. See https://golang.org/pkg/context/
 // for more information on using Contexts.
-func (c *S3) PutBucketInventoryCon***REMOVED***gurationWithContext(ctx aws.Context, input *PutBucketInventoryCon***REMOVED***gurationInput, opts ...request.Option) (*PutBucketInventoryCon***REMOVED***gurationOutput, error) {
-	req, out := c.PutBucketInventoryCon***REMOVED***gurationRequest(input)
+func (c *S3) PutBucketInventoryConfigurationWithContext(ctx aws.Context, input *PutBucketInventoryConfigurationInput, opts ...request.Option) (*PutBucketInventoryConfigurationOutput, error) {
+	req, out := c.PutBucketInventoryConfigurationRequest(input)
 	req.SetContext(ctx)
 	req.ApplyOptions(opts...)
 	return out, req.Send()
@@ -5254,7 +5254,7 @@ const opPutBucketLifecycle = "PutBucketLifecycle"
 // See PutBucketLifecycle for more information on using the PutBucketLifecycle
 // API call, and error handling.
 //
-// This method is useful when you want to inject custom logic or con***REMOVED***guration
+// This method is useful when you want to inject custom logic or configuration
 // into the SDK's request lifecycle. Such as custom headers, or retry logic.
 //
 //
@@ -5262,7 +5262,7 @@ const opPutBucketLifecycle = "PutBucketLifecycle"
 //    req, resp := client.PutBucketLifecycleRequest(params)
 //
 //    err := req.Send()
-//    if err == nil { // resp is now ***REMOVED***lled
+//    if err == nil { // resp is now filled
 //        fmt.Println(resp)
 //    }
 //
@@ -5270,8 +5270,8 @@ const opPutBucketLifecycle = "PutBucketLifecycle"
 //
 // Deprecated: PutBucketLifecycle has been deprecated
 func (c *S3) PutBucketLifecycleRequest(input *PutBucketLifecycleInput) (req *request.Request, output *PutBucketLifecycleOutput) {
-	if c.Client.Con***REMOVED***g.Logger != nil {
-		c.Client.Con***REMOVED***g.Logger.Log("This operation, PutBucketLifecycle, has been deprecated")
+	if c.Client.Config.Logger != nil {
+		c.Client.Config.Logger.Log("This operation, PutBucketLifecycle, has been deprecated")
 	}
 	op := &request.Operation{
 		Name:       opPutBucketLifecycle,
@@ -5291,7 +5291,7 @@ func (c *S3) PutBucketLifecycleRequest(input *PutBucketLifecycleInput) (req *req
 
 // PutBucketLifecycle API operation for Amazon Simple Storage Service.
 //
-// No longer used, see the PutBucketLifecycleCon***REMOVED***guration operation.
+// No longer used, see the PutBucketLifecycleConfiguration operation.
 //
 // Returns awserr.Error for service API and SDK errors. Use runtime type assertions
 // with awserr.Error's Code and Message methods to get detailed information about
@@ -5325,52 +5325,52 @@ func (c *S3) PutBucketLifecycleWithContext(ctx aws.Context, input *PutBucketLife
 	return out, req.Send()
 }
 
-const opPutBucketLifecycleCon***REMOVED***guration = "PutBucketLifecycleCon***REMOVED***guration"
+const opPutBucketLifecycleConfiguration = "PutBucketLifecycleConfiguration"
 
-// PutBucketLifecycleCon***REMOVED***gurationRequest generates a "aws/request.Request" representing the
-// client's request for the PutBucketLifecycleCon***REMOVED***guration operation. The "output" return
+// PutBucketLifecycleConfigurationRequest generates a "aws/request.Request" representing the
+// client's request for the PutBucketLifecycleConfiguration operation. The "output" return
 // value will be populated with the request's response once the request completes
 // successfully.
 //
 // Use "Send" method on the returned Request to send the API call to the service.
 // the "output" return value is not valid until after Send returns without error.
 //
-// See PutBucketLifecycleCon***REMOVED***guration for more information on using the PutBucketLifecycleCon***REMOVED***guration
+// See PutBucketLifecycleConfiguration for more information on using the PutBucketLifecycleConfiguration
 // API call, and error handling.
 //
-// This method is useful when you want to inject custom logic or con***REMOVED***guration
+// This method is useful when you want to inject custom logic or configuration
 // into the SDK's request lifecycle. Such as custom headers, or retry logic.
 //
 //
-//    // Example sending a request using the PutBucketLifecycleCon***REMOVED***gurationRequest method.
-//    req, resp := client.PutBucketLifecycleCon***REMOVED***gurationRequest(params)
+//    // Example sending a request using the PutBucketLifecycleConfigurationRequest method.
+//    req, resp := client.PutBucketLifecycleConfigurationRequest(params)
 //
 //    err := req.Send()
-//    if err == nil { // resp is now ***REMOVED***lled
+//    if err == nil { // resp is now filled
 //        fmt.Println(resp)
 //    }
 //
-// See also, https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/PutBucketLifecycleCon***REMOVED***guration
-func (c *S3) PutBucketLifecycleCon***REMOVED***gurationRequest(input *PutBucketLifecycleCon***REMOVED***gurationInput) (req *request.Request, output *PutBucketLifecycleCon***REMOVED***gurationOutput) {
+// See also, https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/PutBucketLifecycleConfiguration
+func (c *S3) PutBucketLifecycleConfigurationRequest(input *PutBucketLifecycleConfigurationInput) (req *request.Request, output *PutBucketLifecycleConfigurationOutput) {
 	op := &request.Operation{
-		Name:       opPutBucketLifecycleCon***REMOVED***guration,
+		Name:       opPutBucketLifecycleConfiguration,
 		HTTPMethod: "PUT",
 		HTTPPath:   "/{Bucket}?lifecycle",
 	}
 
 	if input == nil {
-		input = &PutBucketLifecycleCon***REMOVED***gurationInput{}
+		input = &PutBucketLifecycleConfigurationInput{}
 	}
 
-	output = &PutBucketLifecycleCon***REMOVED***gurationOutput{}
+	output = &PutBucketLifecycleConfigurationOutput{}
 	req = c.newRequest(op, input, output)
 	req.Handlers.Unmarshal.Swap(restxml.UnmarshalHandler.Name, protocol.UnmarshalDiscardBodyHandler)
 	return
 }
 
-// PutBucketLifecycleCon***REMOVED***guration API operation for Amazon Simple Storage Service.
+// PutBucketLifecycleConfiguration API operation for Amazon Simple Storage Service.
 //
-// Sets lifecycle con***REMOVED***guration for your bucket. If a lifecycle con***REMOVED***guration
+// Sets lifecycle configuration for your bucket. If a lifecycle configuration
 // exists, it replaces it.
 //
 // Returns awserr.Error for service API and SDK errors. Use runtime type assertions
@@ -5378,24 +5378,24 @@ func (c *S3) PutBucketLifecycleCon***REMOVED***gurationRequest(input *PutBucketL
 // the error.
 //
 // See the AWS API reference guide for Amazon Simple Storage Service's
-// API operation PutBucketLifecycleCon***REMOVED***guration for usage and error information.
-// See also, https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/PutBucketLifecycleCon***REMOVED***guration
-func (c *S3) PutBucketLifecycleCon***REMOVED***guration(input *PutBucketLifecycleCon***REMOVED***gurationInput) (*PutBucketLifecycleCon***REMOVED***gurationOutput, error) {
-	req, out := c.PutBucketLifecycleCon***REMOVED***gurationRequest(input)
+// API operation PutBucketLifecycleConfiguration for usage and error information.
+// See also, https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/PutBucketLifecycleConfiguration
+func (c *S3) PutBucketLifecycleConfiguration(input *PutBucketLifecycleConfigurationInput) (*PutBucketLifecycleConfigurationOutput, error) {
+	req, out := c.PutBucketLifecycleConfigurationRequest(input)
 	return out, req.Send()
 }
 
-// PutBucketLifecycleCon***REMOVED***gurationWithContext is the same as PutBucketLifecycleCon***REMOVED***guration with the addition of
+// PutBucketLifecycleConfigurationWithContext is the same as PutBucketLifecycleConfiguration with the addition of
 // the ability to pass a context and additional request options.
 //
-// See PutBucketLifecycleCon***REMOVED***guration for details on how to use this API operation.
+// See PutBucketLifecycleConfiguration for details on how to use this API operation.
 //
 // The context must be non-nil and will be used for request cancellation. If
 // the context is nil a panic will occur. In the future the SDK may create
 // sub-contexts for http.Requests. See https://golang.org/pkg/context/
 // for more information on using Contexts.
-func (c *S3) PutBucketLifecycleCon***REMOVED***gurationWithContext(ctx aws.Context, input *PutBucketLifecycleCon***REMOVED***gurationInput, opts ...request.Option) (*PutBucketLifecycleCon***REMOVED***gurationOutput, error) {
-	req, out := c.PutBucketLifecycleCon***REMOVED***gurationRequest(input)
+func (c *S3) PutBucketLifecycleConfigurationWithContext(ctx aws.Context, input *PutBucketLifecycleConfigurationInput, opts ...request.Option) (*PutBucketLifecycleConfigurationOutput, error) {
+	req, out := c.PutBucketLifecycleConfigurationRequest(input)
 	req.SetContext(ctx)
 	req.ApplyOptions(opts...)
 	return out, req.Send()
@@ -5414,7 +5414,7 @@ const opPutBucketLogging = "PutBucketLogging"
 // See PutBucketLogging for more information on using the PutBucketLogging
 // API call, and error handling.
 //
-// This method is useful when you want to inject custom logic or con***REMOVED***guration
+// This method is useful when you want to inject custom logic or configuration
 // into the SDK's request lifecycle. Such as custom headers, or retry logic.
 //
 //
@@ -5422,7 +5422,7 @@ const opPutBucketLogging = "PutBucketLogging"
 //    req, resp := client.PutBucketLoggingRequest(params)
 //
 //    err := req.Send()
-//    if err == nil { // resp is now ***REMOVED***lled
+//    if err == nil { // resp is now filled
 //        fmt.Println(resp)
 //    }
 //
@@ -5478,52 +5478,52 @@ func (c *S3) PutBucketLoggingWithContext(ctx aws.Context, input *PutBucketLoggin
 	return out, req.Send()
 }
 
-const opPutBucketMetricsCon***REMOVED***guration = "PutBucketMetricsCon***REMOVED***guration"
+const opPutBucketMetricsConfiguration = "PutBucketMetricsConfiguration"
 
-// PutBucketMetricsCon***REMOVED***gurationRequest generates a "aws/request.Request" representing the
-// client's request for the PutBucketMetricsCon***REMOVED***guration operation. The "output" return
+// PutBucketMetricsConfigurationRequest generates a "aws/request.Request" representing the
+// client's request for the PutBucketMetricsConfiguration operation. The "output" return
 // value will be populated with the request's response once the request completes
 // successfully.
 //
 // Use "Send" method on the returned Request to send the API call to the service.
 // the "output" return value is not valid until after Send returns without error.
 //
-// See PutBucketMetricsCon***REMOVED***guration for more information on using the PutBucketMetricsCon***REMOVED***guration
+// See PutBucketMetricsConfiguration for more information on using the PutBucketMetricsConfiguration
 // API call, and error handling.
 //
-// This method is useful when you want to inject custom logic or con***REMOVED***guration
+// This method is useful when you want to inject custom logic or configuration
 // into the SDK's request lifecycle. Such as custom headers, or retry logic.
 //
 //
-//    // Example sending a request using the PutBucketMetricsCon***REMOVED***gurationRequest method.
-//    req, resp := client.PutBucketMetricsCon***REMOVED***gurationRequest(params)
+//    // Example sending a request using the PutBucketMetricsConfigurationRequest method.
+//    req, resp := client.PutBucketMetricsConfigurationRequest(params)
 //
 //    err := req.Send()
-//    if err == nil { // resp is now ***REMOVED***lled
+//    if err == nil { // resp is now filled
 //        fmt.Println(resp)
 //    }
 //
-// See also, https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/PutBucketMetricsCon***REMOVED***guration
-func (c *S3) PutBucketMetricsCon***REMOVED***gurationRequest(input *PutBucketMetricsCon***REMOVED***gurationInput) (req *request.Request, output *PutBucketMetricsCon***REMOVED***gurationOutput) {
+// See also, https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/PutBucketMetricsConfiguration
+func (c *S3) PutBucketMetricsConfigurationRequest(input *PutBucketMetricsConfigurationInput) (req *request.Request, output *PutBucketMetricsConfigurationOutput) {
 	op := &request.Operation{
-		Name:       opPutBucketMetricsCon***REMOVED***guration,
+		Name:       opPutBucketMetricsConfiguration,
 		HTTPMethod: "PUT",
 		HTTPPath:   "/{Bucket}?metrics",
 	}
 
 	if input == nil {
-		input = &PutBucketMetricsCon***REMOVED***gurationInput{}
+		input = &PutBucketMetricsConfigurationInput{}
 	}
 
-	output = &PutBucketMetricsCon***REMOVED***gurationOutput{}
+	output = &PutBucketMetricsConfigurationOutput{}
 	req = c.newRequest(op, input, output)
 	req.Handlers.Unmarshal.Swap(restxml.UnmarshalHandler.Name, protocol.UnmarshalDiscardBodyHandler)
 	return
 }
 
-// PutBucketMetricsCon***REMOVED***guration API operation for Amazon Simple Storage Service.
+// PutBucketMetricsConfiguration API operation for Amazon Simple Storage Service.
 //
-// Sets a metrics con***REMOVED***guration (speci***REMOVED***ed by the metrics con***REMOVED***guration ID)
+// Sets a metrics configuration (specified by the metrics configuration ID)
 // for the bucket.
 //
 // Returns awserr.Error for service API and SDK errors. Use runtime type assertions
@@ -5531,183 +5531,183 @@ func (c *S3) PutBucketMetricsCon***REMOVED***gurationRequest(input *PutBucketMet
 // the error.
 //
 // See the AWS API reference guide for Amazon Simple Storage Service's
-// API operation PutBucketMetricsCon***REMOVED***guration for usage and error information.
-// See also, https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/PutBucketMetricsCon***REMOVED***guration
-func (c *S3) PutBucketMetricsCon***REMOVED***guration(input *PutBucketMetricsCon***REMOVED***gurationInput) (*PutBucketMetricsCon***REMOVED***gurationOutput, error) {
-	req, out := c.PutBucketMetricsCon***REMOVED***gurationRequest(input)
+// API operation PutBucketMetricsConfiguration for usage and error information.
+// See also, https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/PutBucketMetricsConfiguration
+func (c *S3) PutBucketMetricsConfiguration(input *PutBucketMetricsConfigurationInput) (*PutBucketMetricsConfigurationOutput, error) {
+	req, out := c.PutBucketMetricsConfigurationRequest(input)
 	return out, req.Send()
 }
 
-// PutBucketMetricsCon***REMOVED***gurationWithContext is the same as PutBucketMetricsCon***REMOVED***guration with the addition of
+// PutBucketMetricsConfigurationWithContext is the same as PutBucketMetricsConfiguration with the addition of
 // the ability to pass a context and additional request options.
 //
-// See PutBucketMetricsCon***REMOVED***guration for details on how to use this API operation.
+// See PutBucketMetricsConfiguration for details on how to use this API operation.
 //
 // The context must be non-nil and will be used for request cancellation. If
 // the context is nil a panic will occur. In the future the SDK may create
 // sub-contexts for http.Requests. See https://golang.org/pkg/context/
 // for more information on using Contexts.
-func (c *S3) PutBucketMetricsCon***REMOVED***gurationWithContext(ctx aws.Context, input *PutBucketMetricsCon***REMOVED***gurationInput, opts ...request.Option) (*PutBucketMetricsCon***REMOVED***gurationOutput, error) {
-	req, out := c.PutBucketMetricsCon***REMOVED***gurationRequest(input)
+func (c *S3) PutBucketMetricsConfigurationWithContext(ctx aws.Context, input *PutBucketMetricsConfigurationInput, opts ...request.Option) (*PutBucketMetricsConfigurationOutput, error) {
+	req, out := c.PutBucketMetricsConfigurationRequest(input)
 	req.SetContext(ctx)
 	req.ApplyOptions(opts...)
 	return out, req.Send()
 }
 
-const opPutBucketNoti***REMOVED***cation = "PutBucketNoti***REMOVED***cation"
+const opPutBucketNotification = "PutBucketNotification"
 
-// PutBucketNoti***REMOVED***cationRequest generates a "aws/request.Request" representing the
-// client's request for the PutBucketNoti***REMOVED***cation operation. The "output" return
+// PutBucketNotificationRequest generates a "aws/request.Request" representing the
+// client's request for the PutBucketNotification operation. The "output" return
 // value will be populated with the request's response once the request completes
 // successfully.
 //
 // Use "Send" method on the returned Request to send the API call to the service.
 // the "output" return value is not valid until after Send returns without error.
 //
-// See PutBucketNoti***REMOVED***cation for more information on using the PutBucketNoti***REMOVED***cation
+// See PutBucketNotification for more information on using the PutBucketNotification
 // API call, and error handling.
 //
-// This method is useful when you want to inject custom logic or con***REMOVED***guration
+// This method is useful when you want to inject custom logic or configuration
 // into the SDK's request lifecycle. Such as custom headers, or retry logic.
 //
 //
-//    // Example sending a request using the PutBucketNoti***REMOVED***cationRequest method.
-//    req, resp := client.PutBucketNoti***REMOVED***cationRequest(params)
+//    // Example sending a request using the PutBucketNotificationRequest method.
+//    req, resp := client.PutBucketNotificationRequest(params)
 //
 //    err := req.Send()
-//    if err == nil { // resp is now ***REMOVED***lled
+//    if err == nil { // resp is now filled
 //        fmt.Println(resp)
 //    }
 //
-// See also, https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/PutBucketNoti***REMOVED***cation
+// See also, https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/PutBucketNotification
 //
-// Deprecated: PutBucketNoti***REMOVED***cation has been deprecated
-func (c *S3) PutBucketNoti***REMOVED***cationRequest(input *PutBucketNoti***REMOVED***cationInput) (req *request.Request, output *PutBucketNoti***REMOVED***cationOutput) {
-	if c.Client.Con***REMOVED***g.Logger != nil {
-		c.Client.Con***REMOVED***g.Logger.Log("This operation, PutBucketNoti***REMOVED***cation, has been deprecated")
+// Deprecated: PutBucketNotification has been deprecated
+func (c *S3) PutBucketNotificationRequest(input *PutBucketNotificationInput) (req *request.Request, output *PutBucketNotificationOutput) {
+	if c.Client.Config.Logger != nil {
+		c.Client.Config.Logger.Log("This operation, PutBucketNotification, has been deprecated")
 	}
 	op := &request.Operation{
-		Name:       opPutBucketNoti***REMOVED***cation,
+		Name:       opPutBucketNotification,
 		HTTPMethod: "PUT",
-		HTTPPath:   "/{Bucket}?noti***REMOVED***cation",
+		HTTPPath:   "/{Bucket}?notification",
 	}
 
 	if input == nil {
-		input = &PutBucketNoti***REMOVED***cationInput{}
+		input = &PutBucketNotificationInput{}
 	}
 
-	output = &PutBucketNoti***REMOVED***cationOutput{}
+	output = &PutBucketNotificationOutput{}
 	req = c.newRequest(op, input, output)
 	req.Handlers.Unmarshal.Swap(restxml.UnmarshalHandler.Name, protocol.UnmarshalDiscardBodyHandler)
 	return
 }
 
-// PutBucketNoti***REMOVED***cation API operation for Amazon Simple Storage Service.
+// PutBucketNotification API operation for Amazon Simple Storage Service.
 //
-// No longer used, see the PutBucketNoti***REMOVED***cationCon***REMOVED***guration operation.
+// No longer used, see the PutBucketNotificationConfiguration operation.
 //
 // Returns awserr.Error for service API and SDK errors. Use runtime type assertions
 // with awserr.Error's Code and Message methods to get detailed information about
 // the error.
 //
 // See the AWS API reference guide for Amazon Simple Storage Service's
-// API operation PutBucketNoti***REMOVED***cation for usage and error information.
-// See also, https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/PutBucketNoti***REMOVED***cation
+// API operation PutBucketNotification for usage and error information.
+// See also, https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/PutBucketNotification
 //
-// Deprecated: PutBucketNoti***REMOVED***cation has been deprecated
-func (c *S3) PutBucketNoti***REMOVED***cation(input *PutBucketNoti***REMOVED***cationInput) (*PutBucketNoti***REMOVED***cationOutput, error) {
-	req, out := c.PutBucketNoti***REMOVED***cationRequest(input)
+// Deprecated: PutBucketNotification has been deprecated
+func (c *S3) PutBucketNotification(input *PutBucketNotificationInput) (*PutBucketNotificationOutput, error) {
+	req, out := c.PutBucketNotificationRequest(input)
 	return out, req.Send()
 }
 
-// PutBucketNoti***REMOVED***cationWithContext is the same as PutBucketNoti***REMOVED***cation with the addition of
+// PutBucketNotificationWithContext is the same as PutBucketNotification with the addition of
 // the ability to pass a context and additional request options.
 //
-// See PutBucketNoti***REMOVED***cation for details on how to use this API operation.
+// See PutBucketNotification for details on how to use this API operation.
 //
 // The context must be non-nil and will be used for request cancellation. If
 // the context is nil a panic will occur. In the future the SDK may create
 // sub-contexts for http.Requests. See https://golang.org/pkg/context/
 // for more information on using Contexts.
 //
-// Deprecated: PutBucketNoti***REMOVED***cationWithContext has been deprecated
-func (c *S3) PutBucketNoti***REMOVED***cationWithContext(ctx aws.Context, input *PutBucketNoti***REMOVED***cationInput, opts ...request.Option) (*PutBucketNoti***REMOVED***cationOutput, error) {
-	req, out := c.PutBucketNoti***REMOVED***cationRequest(input)
+// Deprecated: PutBucketNotificationWithContext has been deprecated
+func (c *S3) PutBucketNotificationWithContext(ctx aws.Context, input *PutBucketNotificationInput, opts ...request.Option) (*PutBucketNotificationOutput, error) {
+	req, out := c.PutBucketNotificationRequest(input)
 	req.SetContext(ctx)
 	req.ApplyOptions(opts...)
 	return out, req.Send()
 }
 
-const opPutBucketNoti***REMOVED***cationCon***REMOVED***guration = "PutBucketNoti***REMOVED***cationCon***REMOVED***guration"
+const opPutBucketNotificationConfiguration = "PutBucketNotificationConfiguration"
 
-// PutBucketNoti***REMOVED***cationCon***REMOVED***gurationRequest generates a "aws/request.Request" representing the
-// client's request for the PutBucketNoti***REMOVED***cationCon***REMOVED***guration operation. The "output" return
+// PutBucketNotificationConfigurationRequest generates a "aws/request.Request" representing the
+// client's request for the PutBucketNotificationConfiguration operation. The "output" return
 // value will be populated with the request's response once the request completes
 // successfully.
 //
 // Use "Send" method on the returned Request to send the API call to the service.
 // the "output" return value is not valid until after Send returns without error.
 //
-// See PutBucketNoti***REMOVED***cationCon***REMOVED***guration for more information on using the PutBucketNoti***REMOVED***cationCon***REMOVED***guration
+// See PutBucketNotificationConfiguration for more information on using the PutBucketNotificationConfiguration
 // API call, and error handling.
 //
-// This method is useful when you want to inject custom logic or con***REMOVED***guration
+// This method is useful when you want to inject custom logic or configuration
 // into the SDK's request lifecycle. Such as custom headers, or retry logic.
 //
 //
-//    // Example sending a request using the PutBucketNoti***REMOVED***cationCon***REMOVED***gurationRequest method.
-//    req, resp := client.PutBucketNoti***REMOVED***cationCon***REMOVED***gurationRequest(params)
+//    // Example sending a request using the PutBucketNotificationConfigurationRequest method.
+//    req, resp := client.PutBucketNotificationConfigurationRequest(params)
 //
 //    err := req.Send()
-//    if err == nil { // resp is now ***REMOVED***lled
+//    if err == nil { // resp is now filled
 //        fmt.Println(resp)
 //    }
 //
-// See also, https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/PutBucketNoti***REMOVED***cationCon***REMOVED***guration
-func (c *S3) PutBucketNoti***REMOVED***cationCon***REMOVED***gurationRequest(input *PutBucketNoti***REMOVED***cationCon***REMOVED***gurationInput) (req *request.Request, output *PutBucketNoti***REMOVED***cationCon***REMOVED***gurationOutput) {
+// See also, https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/PutBucketNotificationConfiguration
+func (c *S3) PutBucketNotificationConfigurationRequest(input *PutBucketNotificationConfigurationInput) (req *request.Request, output *PutBucketNotificationConfigurationOutput) {
 	op := &request.Operation{
-		Name:       opPutBucketNoti***REMOVED***cationCon***REMOVED***guration,
+		Name:       opPutBucketNotificationConfiguration,
 		HTTPMethod: "PUT",
-		HTTPPath:   "/{Bucket}?noti***REMOVED***cation",
+		HTTPPath:   "/{Bucket}?notification",
 	}
 
 	if input == nil {
-		input = &PutBucketNoti***REMOVED***cationCon***REMOVED***gurationInput{}
+		input = &PutBucketNotificationConfigurationInput{}
 	}
 
-	output = &PutBucketNoti***REMOVED***cationCon***REMOVED***gurationOutput{}
+	output = &PutBucketNotificationConfigurationOutput{}
 	req = c.newRequest(op, input, output)
 	req.Handlers.Unmarshal.Swap(restxml.UnmarshalHandler.Name, protocol.UnmarshalDiscardBodyHandler)
 	return
 }
 
-// PutBucketNoti***REMOVED***cationCon***REMOVED***guration API operation for Amazon Simple Storage Service.
+// PutBucketNotificationConfiguration API operation for Amazon Simple Storage Service.
 //
-// Enables noti***REMOVED***cations of speci***REMOVED***ed events for a bucket.
+// Enables notifications of specified events for a bucket.
 //
 // Returns awserr.Error for service API and SDK errors. Use runtime type assertions
 // with awserr.Error's Code and Message methods to get detailed information about
 // the error.
 //
 // See the AWS API reference guide for Amazon Simple Storage Service's
-// API operation PutBucketNoti***REMOVED***cationCon***REMOVED***guration for usage and error information.
-// See also, https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/PutBucketNoti***REMOVED***cationCon***REMOVED***guration
-func (c *S3) PutBucketNoti***REMOVED***cationCon***REMOVED***guration(input *PutBucketNoti***REMOVED***cationCon***REMOVED***gurationInput) (*PutBucketNoti***REMOVED***cationCon***REMOVED***gurationOutput, error) {
-	req, out := c.PutBucketNoti***REMOVED***cationCon***REMOVED***gurationRequest(input)
+// API operation PutBucketNotificationConfiguration for usage and error information.
+// See also, https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/PutBucketNotificationConfiguration
+func (c *S3) PutBucketNotificationConfiguration(input *PutBucketNotificationConfigurationInput) (*PutBucketNotificationConfigurationOutput, error) {
+	req, out := c.PutBucketNotificationConfigurationRequest(input)
 	return out, req.Send()
 }
 
-// PutBucketNoti***REMOVED***cationCon***REMOVED***gurationWithContext is the same as PutBucketNoti***REMOVED***cationCon***REMOVED***guration with the addition of
+// PutBucketNotificationConfigurationWithContext is the same as PutBucketNotificationConfiguration with the addition of
 // the ability to pass a context and additional request options.
 //
-// See PutBucketNoti***REMOVED***cationCon***REMOVED***guration for details on how to use this API operation.
+// See PutBucketNotificationConfiguration for details on how to use this API operation.
 //
 // The context must be non-nil and will be used for request cancellation. If
 // the context is nil a panic will occur. In the future the SDK may create
 // sub-contexts for http.Requests. See https://golang.org/pkg/context/
 // for more information on using Contexts.
-func (c *S3) PutBucketNoti***REMOVED***cationCon***REMOVED***gurationWithContext(ctx aws.Context, input *PutBucketNoti***REMOVED***cationCon***REMOVED***gurationInput, opts ...request.Option) (*PutBucketNoti***REMOVED***cationCon***REMOVED***gurationOutput, error) {
-	req, out := c.PutBucketNoti***REMOVED***cationCon***REMOVED***gurationRequest(input)
+func (c *S3) PutBucketNotificationConfigurationWithContext(ctx aws.Context, input *PutBucketNotificationConfigurationInput, opts ...request.Option) (*PutBucketNotificationConfigurationOutput, error) {
+	req, out := c.PutBucketNotificationConfigurationRequest(input)
 	req.SetContext(ctx)
 	req.ApplyOptions(opts...)
 	return out, req.Send()
@@ -5726,7 +5726,7 @@ const opPutBucketPolicy = "PutBucketPolicy"
 // See PutBucketPolicy for more information on using the PutBucketPolicy
 // API call, and error handling.
 //
-// This method is useful when you want to inject custom logic or con***REMOVED***guration
+// This method is useful when you want to inject custom logic or configuration
 // into the SDK's request lifecycle. Such as custom headers, or retry logic.
 //
 //
@@ -5734,7 +5734,7 @@ const opPutBucketPolicy = "PutBucketPolicy"
 //    req, resp := client.PutBucketPolicyRequest(params)
 //
 //    err := req.Send()
-//    if err == nil { // resp is now ***REMOVED***lled
+//    if err == nil { // resp is now filled
 //        fmt.Println(resp)
 //    }
 //
@@ -5801,7 +5801,7 @@ const opPutBucketReplication = "PutBucketReplication"
 // See PutBucketReplication for more information on using the PutBucketReplication
 // API call, and error handling.
 //
-// This method is useful when you want to inject custom logic or con***REMOVED***guration
+// This method is useful when you want to inject custom logic or configuration
 // into the SDK's request lifecycle. Such as custom headers, or retry logic.
 //
 //
@@ -5809,7 +5809,7 @@ const opPutBucketReplication = "PutBucketReplication"
 //    req, resp := client.PutBucketReplicationRequest(params)
 //
 //    err := req.Send()
-//    if err == nil { // resp is now ***REMOVED***lled
+//    if err == nil { // resp is now filled
 //        fmt.Println(resp)
 //    }
 //
@@ -5833,7 +5833,7 @@ func (c *S3) PutBucketReplicationRequest(input *PutBucketReplicationInput) (req 
 
 // PutBucketReplication API operation for Amazon Simple Storage Service.
 //
-// Creates a replication con***REMOVED***guration or replaces an existing one. For more
+// Creates a replication configuration or replaces an existing one. For more
 // information, see Cross-Region Replication (CRR) (https://docs.aws.amazon.com/AmazonS3/latest/dev/crr.html)
 // in the Amazon S3 Developer Guide.
 //
@@ -5878,7 +5878,7 @@ const opPutBucketRequestPayment = "PutBucketRequestPayment"
 // See PutBucketRequestPayment for more information on using the PutBucketRequestPayment
 // API call, and error handling.
 //
-// This method is useful when you want to inject custom logic or con***REMOVED***guration
+// This method is useful when you want to inject custom logic or configuration
 // into the SDK's request lifecycle. Such as custom headers, or retry logic.
 //
 //
@@ -5886,7 +5886,7 @@ const opPutBucketRequestPayment = "PutBucketRequestPayment"
 //    req, resp := client.PutBucketRequestPaymentRequest(params)
 //
 //    err := req.Send()
-//    if err == nil { // resp is now ***REMOVED***lled
+//    if err == nil { // resp is now filled
 //        fmt.Println(resp)
 //    }
 //
@@ -5910,8 +5910,8 @@ func (c *S3) PutBucketRequestPaymentRequest(input *PutBucketRequestPaymentInput)
 
 // PutBucketRequestPayment API operation for Amazon Simple Storage Service.
 //
-// Sets the request payment con***REMOVED***guration for a bucket. By default, the bucket
-// owner pays for downloads from the bucket. This con***REMOVED***guration parameter enables
+// Sets the request payment configuration for a bucket. By default, the bucket
+// owner pays for downloads from the bucket. This configuration parameter enables
 // the bucket owner (only) to specify that the person requesting the download
 // will be charged for the download. Documentation on requester pays buckets
 // can be found at http://docs.aws.amazon.com/AmazonS3/latest/dev/RequesterPaysBuckets.html
@@ -5957,7 +5957,7 @@ const opPutBucketTagging = "PutBucketTagging"
 // See PutBucketTagging for more information on using the PutBucketTagging
 // API call, and error handling.
 //
-// This method is useful when you want to inject custom logic or con***REMOVED***guration
+// This method is useful when you want to inject custom logic or configuration
 // into the SDK's request lifecycle. Such as custom headers, or retry logic.
 //
 //
@@ -5965,7 +5965,7 @@ const opPutBucketTagging = "PutBucketTagging"
 //    req, resp := client.PutBucketTaggingRequest(params)
 //
 //    err := req.Send()
-//    if err == nil { // resp is now ***REMOVED***lled
+//    if err == nil { // resp is now filled
 //        fmt.Println(resp)
 //    }
 //
@@ -6032,7 +6032,7 @@ const opPutBucketVersioning = "PutBucketVersioning"
 // See PutBucketVersioning for more information on using the PutBucketVersioning
 // API call, and error handling.
 //
-// This method is useful when you want to inject custom logic or con***REMOVED***guration
+// This method is useful when you want to inject custom logic or configuration
 // into the SDK's request lifecycle. Such as custom headers, or retry logic.
 //
 //
@@ -6040,7 +6040,7 @@ const opPutBucketVersioning = "PutBucketVersioning"
 //    req, resp := client.PutBucketVersioningRequest(params)
 //
 //    err := req.Send()
-//    if err == nil { // resp is now ***REMOVED***lled
+//    if err == nil { // resp is now filled
 //        fmt.Println(resp)
 //    }
 //
@@ -6108,7 +6108,7 @@ const opPutBucketWebsite = "PutBucketWebsite"
 // See PutBucketWebsite for more information on using the PutBucketWebsite
 // API call, and error handling.
 //
-// This method is useful when you want to inject custom logic or con***REMOVED***guration
+// This method is useful when you want to inject custom logic or configuration
 // into the SDK's request lifecycle. Such as custom headers, or retry logic.
 //
 //
@@ -6116,7 +6116,7 @@ const opPutBucketWebsite = "PutBucketWebsite"
 //    req, resp := client.PutBucketWebsiteRequest(params)
 //
 //    err := req.Send()
-//    if err == nil { // resp is now ***REMOVED***lled
+//    if err == nil { // resp is now filled
 //        fmt.Println(resp)
 //    }
 //
@@ -6140,7 +6140,7 @@ func (c *S3) PutBucketWebsiteRequest(input *PutBucketWebsiteInput) (req *request
 
 // PutBucketWebsite API operation for Amazon Simple Storage Service.
 //
-// Set the website con***REMOVED***guration for a bucket.
+// Set the website configuration for a bucket.
 //
 // Returns awserr.Error for service API and SDK errors. Use runtime type assertions
 // with awserr.Error's Code and Message methods to get detailed information about
@@ -6183,7 +6183,7 @@ const opPutObject = "PutObject"
 // See PutObject for more information on using the PutObject
 // API call, and error handling.
 //
-// This method is useful when you want to inject custom logic or con***REMOVED***guration
+// This method is useful when you want to inject custom logic or configuration
 // into the SDK's request lifecycle. Such as custom headers, or retry logic.
 //
 //
@@ -6191,7 +6191,7 @@ const opPutObject = "PutObject"
 //    req, resp := client.PutObjectRequest(params)
 //
 //    err := req.Send()
-//    if err == nil { // resp is now ***REMOVED***lled
+//    if err == nil { // resp is now filled
 //        fmt.Println(resp)
 //    }
 //
@@ -6257,7 +6257,7 @@ const opPutObjectAcl = "PutObjectAcl"
 // See PutObjectAcl for more information on using the PutObjectAcl
 // API call, and error handling.
 //
-// This method is useful when you want to inject custom logic or con***REMOVED***guration
+// This method is useful when you want to inject custom logic or configuration
 // into the SDK's request lifecycle. Such as custom headers, or retry logic.
 //
 //
@@ -6265,7 +6265,7 @@ const opPutObjectAcl = "PutObjectAcl"
 //    req, resp := client.PutObjectAclRequest(params)
 //
 //    err := req.Send()
-//    if err == nil { // resp is now ***REMOVED***lled
+//    if err == nil { // resp is now filled
 //        fmt.Println(resp)
 //    }
 //
@@ -6300,7 +6300,7 @@ func (c *S3) PutObjectAclRequest(input *PutObjectAclInput) (req *request.Request
 //
 // Returned Error Codes:
 //   * ErrCodeNoSuchKey "NoSuchKey"
-//   The speci***REMOVED***ed key does not exist.
+//   The specified key does not exist.
 //
 // See also, https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/PutObjectAcl
 func (c *S3) PutObjectAcl(input *PutObjectAclInput) (*PutObjectAclOutput, error) {
@@ -6337,7 +6337,7 @@ const opPutObjectLegalHold = "PutObjectLegalHold"
 // See PutObjectLegalHold for more information on using the PutObjectLegalHold
 // API call, and error handling.
 //
-// This method is useful when you want to inject custom logic or con***REMOVED***guration
+// This method is useful when you want to inject custom logic or configuration
 // into the SDK's request lifecycle. Such as custom headers, or retry logic.
 //
 //
@@ -6345,7 +6345,7 @@ const opPutObjectLegalHold = "PutObjectLegalHold"
 //    req, resp := client.PutObjectLegalHoldRequest(params)
 //
 //    err := req.Send()
-//    if err == nil { // resp is now ***REMOVED***lled
+//    if err == nil { // resp is now filled
 //        fmt.Println(resp)
 //    }
 //
@@ -6368,7 +6368,7 @@ func (c *S3) PutObjectLegalHoldRequest(input *PutObjectLegalHoldInput) (req *req
 
 // PutObjectLegalHold API operation for Amazon Simple Storage Service.
 //
-// Applies a Legal Hold con***REMOVED***guration to the speci***REMOVED***ed object.
+// Applies a Legal Hold configuration to the specified object.
 //
 // Returns awserr.Error for service API and SDK errors. Use runtime type assertions
 // with awserr.Error's Code and Message methods to get detailed information about
@@ -6398,77 +6398,77 @@ func (c *S3) PutObjectLegalHoldWithContext(ctx aws.Context, input *PutObjectLega
 	return out, req.Send()
 }
 
-const opPutObjectLockCon***REMOVED***guration = "PutObjectLockCon***REMOVED***guration"
+const opPutObjectLockConfiguration = "PutObjectLockConfiguration"
 
-// PutObjectLockCon***REMOVED***gurationRequest generates a "aws/request.Request" representing the
-// client's request for the PutObjectLockCon***REMOVED***guration operation. The "output" return
+// PutObjectLockConfigurationRequest generates a "aws/request.Request" representing the
+// client's request for the PutObjectLockConfiguration operation. The "output" return
 // value will be populated with the request's response once the request completes
 // successfully.
 //
 // Use "Send" method on the returned Request to send the API call to the service.
 // the "output" return value is not valid until after Send returns without error.
 //
-// See PutObjectLockCon***REMOVED***guration for more information on using the PutObjectLockCon***REMOVED***guration
+// See PutObjectLockConfiguration for more information on using the PutObjectLockConfiguration
 // API call, and error handling.
 //
-// This method is useful when you want to inject custom logic or con***REMOVED***guration
+// This method is useful when you want to inject custom logic or configuration
 // into the SDK's request lifecycle. Such as custom headers, or retry logic.
 //
 //
-//    // Example sending a request using the PutObjectLockCon***REMOVED***gurationRequest method.
-//    req, resp := client.PutObjectLockCon***REMOVED***gurationRequest(params)
+//    // Example sending a request using the PutObjectLockConfigurationRequest method.
+//    req, resp := client.PutObjectLockConfigurationRequest(params)
 //
 //    err := req.Send()
-//    if err == nil { // resp is now ***REMOVED***lled
+//    if err == nil { // resp is now filled
 //        fmt.Println(resp)
 //    }
 //
-// See also, https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/PutObjectLockCon***REMOVED***guration
-func (c *S3) PutObjectLockCon***REMOVED***gurationRequest(input *PutObjectLockCon***REMOVED***gurationInput) (req *request.Request, output *PutObjectLockCon***REMOVED***gurationOutput) {
+// See also, https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/PutObjectLockConfiguration
+func (c *S3) PutObjectLockConfigurationRequest(input *PutObjectLockConfigurationInput) (req *request.Request, output *PutObjectLockConfigurationOutput) {
 	op := &request.Operation{
-		Name:       opPutObjectLockCon***REMOVED***guration,
+		Name:       opPutObjectLockConfiguration,
 		HTTPMethod: "PUT",
 		HTTPPath:   "/{Bucket}?object-lock",
 	}
 
 	if input == nil {
-		input = &PutObjectLockCon***REMOVED***gurationInput{}
+		input = &PutObjectLockConfigurationInput{}
 	}
 
-	output = &PutObjectLockCon***REMOVED***gurationOutput{}
+	output = &PutObjectLockConfigurationOutput{}
 	req = c.newRequest(op, input, output)
 	return
 }
 
-// PutObjectLockCon***REMOVED***guration API operation for Amazon Simple Storage Service.
+// PutObjectLockConfiguration API operation for Amazon Simple Storage Service.
 //
-// Places an object lock con***REMOVED***guration on the speci***REMOVED***ed bucket. The rule speci***REMOVED***ed
-// in the object lock con***REMOVED***guration will be applied by default to every new
-// object placed in the speci***REMOVED***ed bucket.
+// Places an object lock configuration on the specified bucket. The rule specified
+// in the object lock configuration will be applied by default to every new
+// object placed in the specified bucket.
 //
 // Returns awserr.Error for service API and SDK errors. Use runtime type assertions
 // with awserr.Error's Code and Message methods to get detailed information about
 // the error.
 //
 // See the AWS API reference guide for Amazon Simple Storage Service's
-// API operation PutObjectLockCon***REMOVED***guration for usage and error information.
-// See also, https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/PutObjectLockCon***REMOVED***guration
-func (c *S3) PutObjectLockCon***REMOVED***guration(input *PutObjectLockCon***REMOVED***gurationInput) (*PutObjectLockCon***REMOVED***gurationOutput, error) {
-	req, out := c.PutObjectLockCon***REMOVED***gurationRequest(input)
+// API operation PutObjectLockConfiguration for usage and error information.
+// See also, https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/PutObjectLockConfiguration
+func (c *S3) PutObjectLockConfiguration(input *PutObjectLockConfigurationInput) (*PutObjectLockConfigurationOutput, error) {
+	req, out := c.PutObjectLockConfigurationRequest(input)
 	return out, req.Send()
 }
 
-// PutObjectLockCon***REMOVED***gurationWithContext is the same as PutObjectLockCon***REMOVED***guration with the addition of
+// PutObjectLockConfigurationWithContext is the same as PutObjectLockConfiguration with the addition of
 // the ability to pass a context and additional request options.
 //
-// See PutObjectLockCon***REMOVED***guration for details on how to use this API operation.
+// See PutObjectLockConfiguration for details on how to use this API operation.
 //
 // The context must be non-nil and will be used for request cancellation. If
 // the context is nil a panic will occur. In the future the SDK may create
 // sub-contexts for http.Requests. See https://golang.org/pkg/context/
 // for more information on using Contexts.
-func (c *S3) PutObjectLockCon***REMOVED***gurationWithContext(ctx aws.Context, input *PutObjectLockCon***REMOVED***gurationInput, opts ...request.Option) (*PutObjectLockCon***REMOVED***gurationOutput, error) {
-	req, out := c.PutObjectLockCon***REMOVED***gurationRequest(input)
+func (c *S3) PutObjectLockConfigurationWithContext(ctx aws.Context, input *PutObjectLockConfigurationInput, opts ...request.Option) (*PutObjectLockConfigurationOutput, error) {
+	req, out := c.PutObjectLockConfigurationRequest(input)
 	req.SetContext(ctx)
 	req.ApplyOptions(opts...)
 	return out, req.Send()
@@ -6487,7 +6487,7 @@ const opPutObjectRetention = "PutObjectRetention"
 // See PutObjectRetention for more information on using the PutObjectRetention
 // API call, and error handling.
 //
-// This method is useful when you want to inject custom logic or con***REMOVED***guration
+// This method is useful when you want to inject custom logic or configuration
 // into the SDK's request lifecycle. Such as custom headers, or retry logic.
 //
 //
@@ -6495,7 +6495,7 @@ const opPutObjectRetention = "PutObjectRetention"
 //    req, resp := client.PutObjectRetentionRequest(params)
 //
 //    err := req.Send()
-//    if err == nil { // resp is now ***REMOVED***lled
+//    if err == nil { // resp is now filled
 //        fmt.Println(resp)
 //    }
 //
@@ -6518,7 +6518,7 @@ func (c *S3) PutObjectRetentionRequest(input *PutObjectRetentionInput) (req *req
 
 // PutObjectRetention API operation for Amazon Simple Storage Service.
 //
-// Places an Object Retention con***REMOVED***guration on an object.
+// Places an Object Retention configuration on an object.
 //
 // Returns awserr.Error for service API and SDK errors. Use runtime type assertions
 // with awserr.Error's Code and Message methods to get detailed information about
@@ -6561,7 +6561,7 @@ const opPutObjectTagging = "PutObjectTagging"
 // See PutObjectTagging for more information on using the PutObjectTagging
 // API call, and error handling.
 //
-// This method is useful when you want to inject custom logic or con***REMOVED***guration
+// This method is useful when you want to inject custom logic or configuration
 // into the SDK's request lifecycle. Such as custom headers, or retry logic.
 //
 //
@@ -6569,7 +6569,7 @@ const opPutObjectTagging = "PutObjectTagging"
 //    req, resp := client.PutObjectTaggingRequest(params)
 //
 //    err := req.Send()
-//    if err == nil { // resp is now ***REMOVED***lled
+//    if err == nil { // resp is now filled
 //        fmt.Println(resp)
 //    }
 //
@@ -6635,7 +6635,7 @@ const opPutPublicAccessBlock = "PutPublicAccessBlock"
 // See PutPublicAccessBlock for more information on using the PutPublicAccessBlock
 // API call, and error handling.
 //
-// This method is useful when you want to inject custom logic or con***REMOVED***guration
+// This method is useful when you want to inject custom logic or configuration
 // into the SDK's request lifecycle. Such as custom headers, or retry logic.
 //
 //
@@ -6643,7 +6643,7 @@ const opPutPublicAccessBlock = "PutPublicAccessBlock"
 //    req, resp := client.PutPublicAccessBlockRequest(params)
 //
 //    err := req.Send()
-//    if err == nil { // resp is now ***REMOVED***lled
+//    if err == nil { // resp is now filled
 //        fmt.Println(resp)
 //    }
 //
@@ -6667,7 +6667,7 @@ func (c *S3) PutPublicAccessBlockRequest(input *PutPublicAccessBlockInput) (req 
 
 // PutPublicAccessBlock API operation for Amazon Simple Storage Service.
 //
-// Creates or modi***REMOVED***es the PublicAccessBlock con***REMOVED***guration for an Amazon S3
+// Creates or modifies the PublicAccessBlock configuration for an Amazon S3
 // bucket.
 //
 // Returns awserr.Error for service API and SDK errors. Use runtime type assertions
@@ -6711,7 +6711,7 @@ const opRestoreObject = "RestoreObject"
 // See RestoreObject for more information on using the RestoreObject
 // API call, and error handling.
 //
-// This method is useful when you want to inject custom logic or con***REMOVED***guration
+// This method is useful when you want to inject custom logic or configuration
 // into the SDK's request lifecycle. Such as custom headers, or retry logic.
 //
 //
@@ -6719,7 +6719,7 @@ const opRestoreObject = "RestoreObject"
 //    req, resp := client.RestoreObjectRequest(params)
 //
 //    err := req.Send()
-//    if err == nil { // resp is now ***REMOVED***lled
+//    if err == nil { // resp is now filled
 //        fmt.Println(resp)
 //    }
 //
@@ -6790,7 +6790,7 @@ const opSelectObjectContent = "SelectObjectContent"
 // See SelectObjectContent for more information on using the SelectObjectContent
 // API call, and error handling.
 //
-// This method is useful when you want to inject custom logic or con***REMOVED***guration
+// This method is useful when you want to inject custom logic or configuration
 // into the SDK's request lifecycle. Such as custom headers, or retry logic.
 //
 //
@@ -6798,7 +6798,7 @@ const opSelectObjectContent = "SelectObjectContent"
 //    req, resp := client.SelectObjectContentRequest(params)
 //
 //    err := req.Send()
-//    if err == nil { // resp is now ***REMOVED***lled
+//    if err == nil { // resp is now filled
 //        fmt.Println(resp)
 //    }
 //
@@ -6824,11 +6824,11 @@ func (c *S3) SelectObjectContentRequest(input *SelectObjectContentInput) (req *r
 
 // SelectObjectContent API operation for Amazon Simple Storage Service.
 //
-// This operation ***REMOVED***lters the contents of an Amazon S3 object based on a simple
+// This operation filters the contents of an Amazon S3 object based on a simple
 // Structured Query Language (SQL) statement. In the request, along with the
 // SQL expression, you must also specify a data serialization format (JSON or
 // CSV) of the object. Amazon S3 uses this to parse object data into records,
-// and returns only records that match the speci***REMOVED***ed SQL expression. You must
+// and returns only records that match the specified SQL expression. You must
 // also specify the data serialization format for the response.
 //
 // Returns awserr.Error for service API and SDK errors. Use runtime type assertions
@@ -6872,7 +6872,7 @@ const opUploadPart = "UploadPart"
 // See UploadPart for more information on using the UploadPart
 // API call, and error handling.
 //
-// This method is useful when you want to inject custom logic or con***REMOVED***guration
+// This method is useful when you want to inject custom logic or configuration
 // into the SDK's request lifecycle. Such as custom headers, or retry logic.
 //
 //
@@ -6880,7 +6880,7 @@ const opUploadPart = "UploadPart"
 //    req, resp := client.UploadPartRequest(params)
 //
 //    err := req.Send()
-//    if err == nil { // resp is now ***REMOVED***lled
+//    if err == nil { // resp is now filled
 //        fmt.Println(resp)
 //    }
 //
@@ -6952,7 +6952,7 @@ const opUploadPartCopy = "UploadPartCopy"
 // See UploadPartCopy for more information on using the UploadPartCopy
 // API call, and error handling.
 //
-// This method is useful when you want to inject custom logic or con***REMOVED***guration
+// This method is useful when you want to inject custom logic or configuration
 // into the SDK's request lifecycle. Such as custom headers, or retry logic.
 //
 //
@@ -6960,7 +6960,7 @@ const opUploadPartCopy = "UploadPartCopy"
 //    req, resp := client.UploadPartCopyRequest(params)
 //
 //    err := req.Send()
-//    if err == nil { // resp is now ***REMOVED***lled
+//    if err == nil { // resp is now filled
 //        fmt.Println(resp)
 //    }
 //
@@ -7013,15 +7013,15 @@ func (c *S3) UploadPartCopyWithContext(ctx aws.Context, input *UploadPartCopyInp
 	return out, req.Send()
 }
 
-// Speci***REMOVED***es the days since the initiation of an incomplete multipart upload
+// Specifies the days since the initiation of an incomplete multipart upload
 // that Amazon S3 will wait before permanently removing all parts of the upload.
 // For more information, see Aborting Incomplete Multipart Uploads Using a Bucket
-// Lifecycle Policy (https://docs.aws.amazon.com/AmazonS3/latest/dev/mpuoverview.html#mpu-abort-incomplete-mpu-lifecycle-con***REMOVED***g)
+// Lifecycle Policy (https://docs.aws.amazon.com/AmazonS3/latest/dev/mpuoverview.html#mpu-abort-incomplete-mpu-lifecycle-config)
 // in the Amazon Simple Storage Service Developer Guide.
 type AbortIncompleteMultipartUpload struct {
 	_ struct{} `type:"structure"`
 
-	// Speci***REMOVED***es the number of days after which Amazon S3 aborts an incomplete multipart
+	// Specifies the number of days after which Amazon S3 aborts an incomplete multipart
 	// upload.
 	DaysAfterInitiation *int64 `type:"integer"`
 }
@@ -7036,7 +7036,7 @@ func (s AbortIncompleteMultipartUpload) GoString() string {
 	return s.String()
 }
 
-// SetDaysAfterInitiation sets the DaysAfterInitiation ***REMOVED***eld's value.
+// SetDaysAfterInitiation sets the DaysAfterInitiation field's value.
 func (s *AbortIncompleteMultipartUpload) SetDaysAfterInitiation(v int64) *AbortIncompleteMultipartUpload {
 	s.DaysAfterInitiation = &v
 	return s
@@ -7047,23 +7047,23 @@ type AbortMultipartUploadInput struct {
 
 	// Name of the bucket to which the multipart upload was initiated.
 	//
-	// Bucket is a required ***REMOVED***eld
+	// Bucket is a required field
 	Bucket *string `location:"uri" locationName:"Bucket" type:"string" required:"true"`
 
 	// Key of the object for which the multipart upload was initiated.
 	//
-	// Key is a required ***REMOVED***eld
+	// Key is a required field
 	Key *string `location:"uri" locationName:"Key" min:"1" type:"string" required:"true"`
 
-	// Con***REMOVED***rms that the requester knows that she or he will be charged for the
+	// Confirms that the requester knows that she or he will be charged for the
 	// request. Bucket owners need not specify this parameter in their requests.
 	// Documentation on downloading objects from requester pays buckets can be found
 	// at http://docs.aws.amazon.com/AmazonS3/latest/dev/ObjectsinRequesterPaysBuckets.html
 	RequestPayer *string `location:"header" locationName:"x-amz-request-payer" type:"string" enum:"RequestPayer"`
 
-	// Upload ID that identi***REMOVED***es the multipart upload.
+	// Upload ID that identifies the multipart upload.
 	//
-	// UploadId is a required ***REMOVED***eld
+	// UploadId is a required field
 	UploadId *string `location:"querystring" locationName:"uploadId" type:"string" required:"true"`
 }
 
@@ -7077,7 +7077,7 @@ func (s AbortMultipartUploadInput) GoString() string {
 	return s.String()
 }
 
-// Validate inspects the ***REMOVED***elds of the type to determine if they are valid.
+// Validate inspects the fields of the type to determine if they are valid.
 func (s *AbortMultipartUploadInput) Validate() error {
 	invalidParams := request.ErrInvalidParams{Context: "AbortMultipartUploadInput"}
 	if s.Bucket == nil {
@@ -7102,7 +7102,7 @@ func (s *AbortMultipartUploadInput) Validate() error {
 	return nil
 }
 
-// SetBucket sets the Bucket ***REMOVED***eld's value.
+// SetBucket sets the Bucket field's value.
 func (s *AbortMultipartUploadInput) SetBucket(v string) *AbortMultipartUploadInput {
 	s.Bucket = &v
 	return s
@@ -7115,19 +7115,19 @@ func (s *AbortMultipartUploadInput) getBucket() (v string) {
 	return *s.Bucket
 }
 
-// SetKey sets the Key ***REMOVED***eld's value.
+// SetKey sets the Key field's value.
 func (s *AbortMultipartUploadInput) SetKey(v string) *AbortMultipartUploadInput {
 	s.Key = &v
 	return s
 }
 
-// SetRequestPayer sets the RequestPayer ***REMOVED***eld's value.
+// SetRequestPayer sets the RequestPayer field's value.
 func (s *AbortMultipartUploadInput) SetRequestPayer(v string) *AbortMultipartUploadInput {
 	s.RequestPayer = &v
 	return s
 }
 
-// SetUploadId sets the UploadId ***REMOVED***eld's value.
+// SetUploadId sets the UploadId field's value.
 func (s *AbortMultipartUploadInput) SetUploadId(v string) *AbortMultipartUploadInput {
 	s.UploadId = &v
 	return s
@@ -7151,34 +7151,34 @@ func (s AbortMultipartUploadOutput) GoString() string {
 	return s.String()
 }
 
-// SetRequestCharged sets the RequestCharged ***REMOVED***eld's value.
+// SetRequestCharged sets the RequestCharged field's value.
 func (s *AbortMultipartUploadOutput) SetRequestCharged(v string) *AbortMultipartUploadOutput {
 	s.RequestCharged = &v
 	return s
 }
 
-// Con***REMOVED***gures the transfer acceleration state for an Amazon S3 bucket. For more
+// Configures the transfer acceleration state for an Amazon S3 bucket. For more
 // information, see Amazon S3 Transfer Acceleration (https://docs.aws.amazon.com/AmazonS3/latest/dev/transfer-acceleration.html)
 // in the Amazon Simple Storage Service Developer Guide.
-type AccelerateCon***REMOVED***guration struct {
+type AccelerateConfiguration struct {
 	_ struct{} `type:"structure"`
 
-	// Speci***REMOVED***es the transfer acceleration status of the bucket.
+	// Specifies the transfer acceleration status of the bucket.
 	Status *string `type:"string" enum:"BucketAccelerateStatus"`
 }
 
 // String returns the string representation
-func (s AccelerateCon***REMOVED***guration) String() string {
+func (s AccelerateConfiguration) String() string {
 	return awsutil.Prettify(s)
 }
 
 // GoString returns the string representation
-func (s AccelerateCon***REMOVED***guration) GoString() string {
+func (s AccelerateConfiguration) GoString() string {
 	return s.String()
 }
 
-// SetStatus sets the Status ***REMOVED***eld's value.
-func (s *AccelerateCon***REMOVED***guration) SetStatus(v string) *AccelerateCon***REMOVED***guration {
+// SetStatus sets the Status field's value.
+func (s *AccelerateConfiguration) SetStatus(v string) *AccelerateConfiguration {
 	s.Status = &v
 	return s
 }
@@ -7204,7 +7204,7 @@ func (s AccessControlPolicy) GoString() string {
 	return s.String()
 }
 
-// Validate inspects the ***REMOVED***elds of the type to determine if they are valid.
+// Validate inspects the fields of the type to determine if they are valid.
 func (s *AccessControlPolicy) Validate() error {
 	invalidParams := request.ErrInvalidParams{Context: "AccessControlPolicy"}
 	if s.Grants != nil {
@@ -7224,13 +7224,13 @@ func (s *AccessControlPolicy) Validate() error {
 	return nil
 }
 
-// SetGrants sets the Grants ***REMOVED***eld's value.
+// SetGrants sets the Grants field's value.
 func (s *AccessControlPolicy) SetGrants(v []*Grant) *AccessControlPolicy {
 	s.Grants = v
 	return s
 }
 
-// SetOwner sets the Owner ***REMOVED***eld's value.
+// SetOwner sets the Owner field's value.
 func (s *AccessControlPolicy) SetOwner(v *Owner) *AccessControlPolicy {
 	s.Owner = v
 	return s
@@ -7240,11 +7240,11 @@ func (s *AccessControlPolicy) SetOwner(v *Owner) *AccessControlPolicy {
 type AccessControlTranslation struct {
 	_ struct{} `type:"structure"`
 
-	// Speci***REMOVED***es the replica ownership. For default and valid values, see PUT bucket
+	// Specifies the replica ownership. For default and valid values, see PUT bucket
 	// replication (https://docs.aws.amazon.com/AmazonS3/latest/API/RESTBucketPUTreplication.html)
 	// in the Amazon Simple Storage Service API Reference.
 	//
-	// Owner is a required ***REMOVED***eld
+	// Owner is a required field
 	Owner *string `type:"string" required:"true" enum:"OwnerOverride"`
 }
 
@@ -7258,7 +7258,7 @@ func (s AccessControlTranslation) GoString() string {
 	return s.String()
 }
 
-// Validate inspects the ***REMOVED***elds of the type to determine if they are valid.
+// Validate inspects the fields of the type to determine if they are valid.
 func (s *AccessControlTranslation) Validate() error {
 	invalidParams := request.ErrInvalidParams{Context: "AccessControlTranslation"}
 	if s.Owner == nil {
@@ -7271,21 +7271,21 @@ func (s *AccessControlTranslation) Validate() error {
 	return nil
 }
 
-// SetOwner sets the Owner ***REMOVED***eld's value.
+// SetOwner sets the Owner field's value.
 func (s *AccessControlTranslation) SetOwner(v string) *AccessControlTranslation {
 	s.Owner = &v
 	return s
 }
 
 // A conjunction (logical AND) of predicates, which is used in evaluating a
-// metrics ***REMOVED***lter. The operator must have at least two predicates in any combination,
-// and an object must match all of the predicates for the ***REMOVED***lter to apply.
+// metrics filter. The operator must have at least two predicates in any combination,
+// and an object must match all of the predicates for the filter to apply.
 type AnalyticsAndOperator struct {
 	_ struct{} `type:"structure"`
 
-	// The pre***REMOVED***x to use when evaluating an AND predicate: The pre***REMOVED***x that an object
+	// The prefix to use when evaluating an AND predicate: The prefix that an object
 	// must have to be included in the metrics results.
-	Pre***REMOVED***x *string `type:"string"`
+	Prefix *string `type:"string"`
 
 	// The list of tags to use when evaluating an AND predicate.
 	Tags []*Tag `locationName:"Tag" locationNameList:"Tag" type:"list" flattened:"true"`
@@ -7301,7 +7301,7 @@ func (s AnalyticsAndOperator) GoString() string {
 	return s.String()
 }
 
-// Validate inspects the ***REMOVED***elds of the type to determine if they are valid.
+// Validate inspects the fields of the type to determine if they are valid.
 func (s *AnalyticsAndOperator) Validate() error {
 	invalidParams := request.ErrInvalidParams{Context: "AnalyticsAndOperator"}
 	if s.Tags != nil {
@@ -7321,56 +7321,56 @@ func (s *AnalyticsAndOperator) Validate() error {
 	return nil
 }
 
-// SetPre***REMOVED***x sets the Pre***REMOVED***x ***REMOVED***eld's value.
-func (s *AnalyticsAndOperator) SetPre***REMOVED***x(v string) *AnalyticsAndOperator {
-	s.Pre***REMOVED***x = &v
+// SetPrefix sets the Prefix field's value.
+func (s *AnalyticsAndOperator) SetPrefix(v string) *AnalyticsAndOperator {
+	s.Prefix = &v
 	return s
 }
 
-// SetTags sets the Tags ***REMOVED***eld's value.
+// SetTags sets the Tags field's value.
 func (s *AnalyticsAndOperator) SetTags(v []*Tag) *AnalyticsAndOperator {
 	s.Tags = v
 	return s
 }
 
-// Speci***REMOVED***es the con***REMOVED***guration and any analyses for the analytics ***REMOVED***lter of
+// Specifies the configuration and any analyses for the analytics filter of
 // an Amazon S3 bucket.
 //
-// For more information, see GET Bucket analytics (https://docs.aws.amazon.com/AmazonS3/latest/API/RESTBucketGETAnalyticsCon***REMOVED***g.html)
+// For more information, see GET Bucket analytics (https://docs.aws.amazon.com/AmazonS3/latest/API/RESTBucketGETAnalyticsConfig.html)
 // in the Amazon Simple Storage Service API Reference.
-type AnalyticsCon***REMOVED***guration struct {
+type AnalyticsConfiguration struct {
 	_ struct{} `type:"structure"`
 
-	// The ***REMOVED***lter used to describe a set of objects for analyses. A ***REMOVED***lter must
-	// have exactly one pre***REMOVED***x, one tag, or one conjunction (AnalyticsAndOperator).
-	// If no ***REMOVED***lter is provided, all objects will be considered in any analysis.
+	// The filter used to describe a set of objects for analyses. A filter must
+	// have exactly one prefix, one tag, or one conjunction (AnalyticsAndOperator).
+	// If no filter is provided, all objects will be considered in any analysis.
 	Filter *AnalyticsFilter `type:"structure"`
 
-	// The ID that identi***REMOVED***es the analytics con***REMOVED***guration.
+	// The ID that identifies the analytics configuration.
 	//
-	// Id is a required ***REMOVED***eld
+	// Id is a required field
 	Id *string `type:"string" required:"true"`
 
 	// Contains data related to access patterns to be collected and made available
 	// to analyze the tradeoffs between different storage classes.
 	//
-	// StorageClassAnalysis is a required ***REMOVED***eld
+	// StorageClassAnalysis is a required field
 	StorageClassAnalysis *StorageClassAnalysis `type:"structure" required:"true"`
 }
 
 // String returns the string representation
-func (s AnalyticsCon***REMOVED***guration) String() string {
+func (s AnalyticsConfiguration) String() string {
 	return awsutil.Prettify(s)
 }
 
 // GoString returns the string representation
-func (s AnalyticsCon***REMOVED***guration) GoString() string {
+func (s AnalyticsConfiguration) GoString() string {
 	return s.String()
 }
 
-// Validate inspects the ***REMOVED***elds of the type to determine if they are valid.
-func (s *AnalyticsCon***REMOVED***guration) Validate() error {
-	invalidParams := request.ErrInvalidParams{Context: "AnalyticsCon***REMOVED***guration"}
+// Validate inspects the fields of the type to determine if they are valid.
+func (s *AnalyticsConfiguration) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "AnalyticsConfiguration"}
 	if s.Id == nil {
 		invalidParams.Add(request.NewErrParamRequired("Id"))
 	}
@@ -7394,20 +7394,20 @@ func (s *AnalyticsCon***REMOVED***guration) Validate() error {
 	return nil
 }
 
-// SetFilter sets the Filter ***REMOVED***eld's value.
-func (s *AnalyticsCon***REMOVED***guration) SetFilter(v *AnalyticsFilter) *AnalyticsCon***REMOVED***guration {
+// SetFilter sets the Filter field's value.
+func (s *AnalyticsConfiguration) SetFilter(v *AnalyticsFilter) *AnalyticsConfiguration {
 	s.Filter = v
 	return s
 }
 
-// SetId sets the Id ***REMOVED***eld's value.
-func (s *AnalyticsCon***REMOVED***guration) SetId(v string) *AnalyticsCon***REMOVED***guration {
+// SetId sets the Id field's value.
+func (s *AnalyticsConfiguration) SetId(v string) *AnalyticsConfiguration {
 	s.Id = &v
 	return s
 }
 
-// SetStorageClassAnalysis sets the StorageClassAnalysis ***REMOVED***eld's value.
-func (s *AnalyticsCon***REMOVED***guration) SetStorageClassAnalysis(v *StorageClassAnalysis) *AnalyticsCon***REMOVED***guration {
+// SetStorageClassAnalysis sets the StorageClassAnalysis field's value.
+func (s *AnalyticsConfiguration) SetStorageClassAnalysis(v *StorageClassAnalysis) *AnalyticsConfiguration {
 	s.StorageClassAnalysis = v
 	return s
 }
@@ -7418,7 +7418,7 @@ type AnalyticsExportDestination struct {
 
 	// A destination signifying output to an S3 bucket.
 	//
-	// S3BucketDestination is a required ***REMOVED***eld
+	// S3BucketDestination is a required field
 	S3BucketDestination *AnalyticsS3BucketDestination `type:"structure" required:"true"`
 }
 
@@ -7432,7 +7432,7 @@ func (s AnalyticsExportDestination) GoString() string {
 	return s.String()
 }
 
-// Validate inspects the ***REMOVED***elds of the type to determine if they are valid.
+// Validate inspects the fields of the type to determine if they are valid.
 func (s *AnalyticsExportDestination) Validate() error {
 	invalidParams := request.ErrInvalidParams{Context: "AnalyticsExportDestination"}
 	if s.S3BucketDestination == nil {
@@ -7450,7 +7450,7 @@ func (s *AnalyticsExportDestination) Validate() error {
 	return nil
 }
 
-// SetS3BucketDestination sets the S3BucketDestination ***REMOVED***eld's value.
+// SetS3BucketDestination sets the S3BucketDestination field's value.
 func (s *AnalyticsExportDestination) SetS3BucketDestination(v *AnalyticsS3BucketDestination) *AnalyticsExportDestination {
 	s.S3BucketDestination = v
 	return s
@@ -7460,13 +7460,13 @@ type AnalyticsFilter struct {
 	_ struct{} `type:"structure"`
 
 	// A conjunction (logical AND) of predicates, which is used in evaluating an
-	// analytics ***REMOVED***lter. The operator must have at least two predicates.
+	// analytics filter. The operator must have at least two predicates.
 	And *AnalyticsAndOperator `type:"structure"`
 
-	// The pre***REMOVED***x to use when evaluating an analytics ***REMOVED***lter.
-	Pre***REMOVED***x *string `type:"string"`
+	// The prefix to use when evaluating an analytics filter.
+	Prefix *string `type:"string"`
 
-	// The tag to use when evaluating an analytics ***REMOVED***lter.
+	// The tag to use when evaluating an analytics filter.
 	Tag *Tag `type:"structure"`
 }
 
@@ -7480,7 +7480,7 @@ func (s AnalyticsFilter) GoString() string {
 	return s.String()
 }
 
-// Validate inspects the ***REMOVED***elds of the type to determine if they are valid.
+// Validate inspects the fields of the type to determine if they are valid.
 func (s *AnalyticsFilter) Validate() error {
 	invalidParams := request.ErrInvalidParams{Context: "AnalyticsFilter"}
 	if s.And != nil {
@@ -7500,19 +7500,19 @@ func (s *AnalyticsFilter) Validate() error {
 	return nil
 }
 
-// SetAnd sets the And ***REMOVED***eld's value.
+// SetAnd sets the And field's value.
 func (s *AnalyticsFilter) SetAnd(v *AnalyticsAndOperator) *AnalyticsFilter {
 	s.And = v
 	return s
 }
 
-// SetPre***REMOVED***x sets the Pre***REMOVED***x ***REMOVED***eld's value.
-func (s *AnalyticsFilter) SetPre***REMOVED***x(v string) *AnalyticsFilter {
-	s.Pre***REMOVED***x = &v
+// SetPrefix sets the Prefix field's value.
+func (s *AnalyticsFilter) SetPrefix(v string) *AnalyticsFilter {
+	s.Prefix = &v
 	return s
 }
 
-// SetTag sets the Tag ***REMOVED***eld's value.
+// SetTag sets the Tag field's value.
 func (s *AnalyticsFilter) SetTag(v *Tag) *AnalyticsFilter {
 	s.Tag = v
 	return s
@@ -7523,20 +7523,20 @@ type AnalyticsS3BucketDestination struct {
 
 	// The Amazon Resource Name (ARN) of the bucket to which data is exported.
 	//
-	// Bucket is a required ***REMOVED***eld
+	// Bucket is a required field
 	Bucket *string `type:"string" required:"true"`
 
 	// The account ID that owns the destination bucket. If no account ID is provided,
 	// the owner will not be validated prior to exporting data.
 	BucketAccountId *string `type:"string"`
 
-	// Speci***REMOVED***es the ***REMOVED***le format used when exporting data to Amazon S3.
+	// Specifies the file format used when exporting data to Amazon S3.
 	//
-	// Format is a required ***REMOVED***eld
+	// Format is a required field
 	Format *string `type:"string" required:"true" enum:"AnalyticsS3ExportFileFormat"`
 
-	// The pre***REMOVED***x to use when exporting data. The pre***REMOVED***x is prepended to all results.
-	Pre***REMOVED***x *string `type:"string"`
+	// The prefix to use when exporting data. The prefix is prepended to all results.
+	Prefix *string `type:"string"`
 }
 
 // String returns the string representation
@@ -7549,7 +7549,7 @@ func (s AnalyticsS3BucketDestination) GoString() string {
 	return s.String()
 }
 
-// Validate inspects the ***REMOVED***elds of the type to determine if they are valid.
+// Validate inspects the fields of the type to determine if they are valid.
 func (s *AnalyticsS3BucketDestination) Validate() error {
 	invalidParams := request.ErrInvalidParams{Context: "AnalyticsS3BucketDestination"}
 	if s.Bucket == nil {
@@ -7565,7 +7565,7 @@ func (s *AnalyticsS3BucketDestination) Validate() error {
 	return nil
 }
 
-// SetBucket sets the Bucket ***REMOVED***eld's value.
+// SetBucket sets the Bucket field's value.
 func (s *AnalyticsS3BucketDestination) SetBucket(v string) *AnalyticsS3BucketDestination {
 	s.Bucket = &v
 	return s
@@ -7578,21 +7578,21 @@ func (s *AnalyticsS3BucketDestination) getBucket() (v string) {
 	return *s.Bucket
 }
 
-// SetBucketAccountId sets the BucketAccountId ***REMOVED***eld's value.
+// SetBucketAccountId sets the BucketAccountId field's value.
 func (s *AnalyticsS3BucketDestination) SetBucketAccountId(v string) *AnalyticsS3BucketDestination {
 	s.BucketAccountId = &v
 	return s
 }
 
-// SetFormat sets the Format ***REMOVED***eld's value.
+// SetFormat sets the Format field's value.
 func (s *AnalyticsS3BucketDestination) SetFormat(v string) *AnalyticsS3BucketDestination {
 	s.Format = &v
 	return s
 }
 
-// SetPre***REMOVED***x sets the Pre***REMOVED***x ***REMOVED***eld's value.
-func (s *AnalyticsS3BucketDestination) SetPre***REMOVED***x(v string) *AnalyticsS3BucketDestination {
-	s.Pre***REMOVED***x = &v
+// SetPrefix sets the Prefix field's value.
+func (s *AnalyticsS3BucketDestination) SetPrefix(v string) *AnalyticsS3BucketDestination {
+	s.Prefix = &v
 	return s
 }
 
@@ -7616,43 +7616,43 @@ func (s Bucket) GoString() string {
 	return s.String()
 }
 
-// SetCreationDate sets the CreationDate ***REMOVED***eld's value.
+// SetCreationDate sets the CreationDate field's value.
 func (s *Bucket) SetCreationDate(v time.Time) *Bucket {
 	s.CreationDate = &v
 	return s
 }
 
-// SetName sets the Name ***REMOVED***eld's value.
+// SetName sets the Name field's value.
 func (s *Bucket) SetName(v string) *Bucket {
 	s.Name = &v
 	return s
 }
 
-// Speci***REMOVED***es the lifecycle con***REMOVED***guration for objects in an Amazon S3 bucket.
+// Specifies the lifecycle configuration for objects in an Amazon S3 bucket.
 // For more information, see Object Lifecycle Management (https://docs.aws.amazon.com/AmazonS3/latest/dev/object-lifecycle-mgmt.html)
 // in the Amazon Simple Storage Service Developer Guide.
-type BucketLifecycleCon***REMOVED***guration struct {
+type BucketLifecycleConfiguration struct {
 	_ struct{} `type:"structure"`
 
 	// A lifecycle rule for individual objects in an Amazon S3 bucket.
 	//
-	// Rules is a required ***REMOVED***eld
+	// Rules is a required field
 	Rules []*LifecycleRule `locationName:"Rule" type:"list" flattened:"true" required:"true"`
 }
 
 // String returns the string representation
-func (s BucketLifecycleCon***REMOVED***guration) String() string {
+func (s BucketLifecycleConfiguration) String() string {
 	return awsutil.Prettify(s)
 }
 
 // GoString returns the string representation
-func (s BucketLifecycleCon***REMOVED***guration) GoString() string {
+func (s BucketLifecycleConfiguration) GoString() string {
 	return s.String()
 }
 
-// Validate inspects the ***REMOVED***elds of the type to determine if they are valid.
-func (s *BucketLifecycleCon***REMOVED***guration) Validate() error {
-	invalidParams := request.ErrInvalidParams{Context: "BucketLifecycleCon***REMOVED***guration"}
+// Validate inspects the fields of the type to determine if they are valid.
+func (s *BucketLifecycleConfiguration) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "BucketLifecycleConfiguration"}
 	if s.Rules == nil {
 		invalidParams.Add(request.NewErrParamRequired("Rules"))
 	}
@@ -7673,8 +7673,8 @@ func (s *BucketLifecycleCon***REMOVED***guration) Validate() error {
 	return nil
 }
 
-// SetRules sets the Rules ***REMOVED***eld's value.
-func (s *BucketLifecycleCon***REMOVED***guration) SetRules(v []*LifecycleRule) *BucketLifecycleCon***REMOVED***guration {
+// SetRules sets the Rules field's value.
+func (s *BucketLifecycleConfiguration) SetRules(v []*LifecycleRule) *BucketLifecycleConfiguration {
 	s.Rules = v
 	return s
 }
@@ -7682,7 +7682,7 @@ func (s *BucketLifecycleCon***REMOVED***guration) SetRules(v []*LifecycleRule) *
 type BucketLoggingStatus struct {
 	_ struct{} `type:"structure"`
 
-	// Describes where logs are stored and the pre***REMOVED***x that Amazon S3 assigns to
+	// Describes where logs are stored and the prefix that Amazon S3 assigns to
 	// all log object keys for a bucket. For more information, see PUT Bucket logging
 	// (https://docs.aws.amazon.com/AmazonS3/latest/API/RESTBucketPUTlogging.html)
 	// in the Amazon Simple Storage Service API Reference.
@@ -7699,7 +7699,7 @@ func (s BucketLoggingStatus) GoString() string {
 	return s.String()
 }
 
-// Validate inspects the ***REMOVED***elds of the type to determine if they are valid.
+// Validate inspects the fields of the type to determine if they are valid.
 func (s *BucketLoggingStatus) Validate() error {
 	invalidParams := request.ErrInvalidParams{Context: "BucketLoggingStatus"}
 	if s.LoggingEnabled != nil {
@@ -7714,38 +7714,38 @@ func (s *BucketLoggingStatus) Validate() error {
 	return nil
 }
 
-// SetLoggingEnabled sets the LoggingEnabled ***REMOVED***eld's value.
+// SetLoggingEnabled sets the LoggingEnabled field's value.
 func (s *BucketLoggingStatus) SetLoggingEnabled(v *LoggingEnabled) *BucketLoggingStatus {
 	s.LoggingEnabled = v
 	return s
 }
 
-// Describes the cross-origin access con***REMOVED***guration for objects in an Amazon
+// Describes the cross-origin access configuration for objects in an Amazon
 // S3 bucket. For more information, see Enabling Cross-Origin Resource Sharing
 // (https://docs.aws.amazon.com/AmazonS3/latest/dev/cors.html) in the Amazon
 // Simple Storage Service Developer Guide.
-type CORSCon***REMOVED***guration struct {
+type CORSConfiguration struct {
 	_ struct{} `type:"structure"`
 
 	// A set of allowed origins and methods.
 	//
-	// CORSRules is a required ***REMOVED***eld
+	// CORSRules is a required field
 	CORSRules []*CORSRule `locationName:"CORSRule" type:"list" flattened:"true" required:"true"`
 }
 
 // String returns the string representation
-func (s CORSCon***REMOVED***guration) String() string {
+func (s CORSConfiguration) String() string {
 	return awsutil.Prettify(s)
 }
 
 // GoString returns the string representation
-func (s CORSCon***REMOVED***guration) GoString() string {
+func (s CORSConfiguration) GoString() string {
 	return s.String()
 }
 
-// Validate inspects the ***REMOVED***elds of the type to determine if they are valid.
-func (s *CORSCon***REMOVED***guration) Validate() error {
-	invalidParams := request.ErrInvalidParams{Context: "CORSCon***REMOVED***guration"}
+// Validate inspects the fields of the type to determine if they are valid.
+func (s *CORSConfiguration) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "CORSConfiguration"}
 	if s.CORSRules == nil {
 		invalidParams.Add(request.NewErrParamRequired("CORSRules"))
 	}
@@ -7766,17 +7766,17 @@ func (s *CORSCon***REMOVED***guration) Validate() error {
 	return nil
 }
 
-// SetCORSRules sets the CORSRules ***REMOVED***eld's value.
-func (s *CORSCon***REMOVED***guration) SetCORSRules(v []*CORSRule) *CORSCon***REMOVED***guration {
+// SetCORSRules sets the CORSRules field's value.
+func (s *CORSConfiguration) SetCORSRules(v []*CORSRule) *CORSConfiguration {
 	s.CORSRules = v
 	return s
 }
 
-// Speci***REMOVED***es a cross-origin access rule for an Amazon S3 bucket.
+// Specifies a cross-origin access rule for an Amazon S3 bucket.
 type CORSRule struct {
 	_ struct{} `type:"structure"`
 
-	// Headers that are speci***REMOVED***ed in the Access-Control-Request-Headers header.
+	// Headers that are specified in the Access-Control-Request-Headers header.
 	// These headers are allowed in a preflight OPTIONS request. In response to
 	// any preflight OPTIONS request, Amazon S3 returns any requested headers that
 	// are allowed.
@@ -7785,12 +7785,12 @@ type CORSRule struct {
 	// An HTTP method that you allow the origin to execute. Valid values are GET,
 	// PUT, HEAD, POST, and DELETE.
 	//
-	// AllowedMethods is a required ***REMOVED***eld
+	// AllowedMethods is a required field
 	AllowedMethods []*string `locationName:"AllowedMethod" type:"list" flattened:"true" required:"true"`
 
 	// One or more origins you want customers to be able to access the bucket from.
 	//
-	// AllowedOrigins is a required ***REMOVED***eld
+	// AllowedOrigins is a required field
 	AllowedOrigins []*string `locationName:"AllowedOrigin" type:"list" flattened:"true" required:"true"`
 
 	// One or more headers in the response that you want customers to be able to
@@ -7799,7 +7799,7 @@ type CORSRule struct {
 	ExposeHeaders []*string `locationName:"ExposeHeader" type:"list" flattened:"true"`
 
 	// The time in seconds that your browser is to cache the preflight response
-	// for the speci***REMOVED***ed resource.
+	// for the specified resource.
 	MaxAgeSeconds *int64 `type:"integer"`
 }
 
@@ -7813,7 +7813,7 @@ func (s CORSRule) GoString() string {
 	return s.String()
 }
 
-// Validate inspects the ***REMOVED***elds of the type to determine if they are valid.
+// Validate inspects the fields of the type to determine if they are valid.
 func (s *CORSRule) Validate() error {
 	invalidParams := request.ErrInvalidParams{Context: "CORSRule"}
 	if s.AllowedMethods == nil {
@@ -7829,31 +7829,31 @@ func (s *CORSRule) Validate() error {
 	return nil
 }
 
-// SetAllowedHeaders sets the AllowedHeaders ***REMOVED***eld's value.
+// SetAllowedHeaders sets the AllowedHeaders field's value.
 func (s *CORSRule) SetAllowedHeaders(v []*string) *CORSRule {
 	s.AllowedHeaders = v
 	return s
 }
 
-// SetAllowedMethods sets the AllowedMethods ***REMOVED***eld's value.
+// SetAllowedMethods sets the AllowedMethods field's value.
 func (s *CORSRule) SetAllowedMethods(v []*string) *CORSRule {
 	s.AllowedMethods = v
 	return s
 }
 
-// SetAllowedOrigins sets the AllowedOrigins ***REMOVED***eld's value.
+// SetAllowedOrigins sets the AllowedOrigins field's value.
 func (s *CORSRule) SetAllowedOrigins(v []*string) *CORSRule {
 	s.AllowedOrigins = v
 	return s
 }
 
-// SetExposeHeaders sets the ExposeHeaders ***REMOVED***eld's value.
+// SetExposeHeaders sets the ExposeHeaders field's value.
 func (s *CORSRule) SetExposeHeaders(v []*string) *CORSRule {
 	s.ExposeHeaders = v
 	return s
 }
 
-// SetMaxAgeSeconds sets the MaxAgeSeconds ***REMOVED***eld's value.
+// SetMaxAgeSeconds sets the MaxAgeSeconds field's value.
 func (s *CORSRule) SetMaxAgeSeconds(v int64) *CORSRule {
 	s.MaxAgeSeconds = &v
 	return s
@@ -7863,7 +7863,7 @@ func (s *CORSRule) SetMaxAgeSeconds(v int64) *CORSRule {
 type CSVInput struct {
 	_ struct{} `type:"structure"`
 
-	// Speci***REMOVED***es that CSV ***REMOVED***eld values may contain quoted record delimiters and
+	// Specifies that CSV field values may contain quoted record delimiters and
 	// such records should be allowed. Default value is FALSE. Setting this value
 	// to TRUE may lower performance.
 	AllowQuotedRecordDelimiter *bool `type:"boolean"`
@@ -7872,13 +7872,13 @@ type CSVInput struct {
 	// at the start of a row.
 	Comments *string `type:"string"`
 
-	// The value used to separate individual ***REMOVED***elds in a record.
+	// The value used to separate individual fields in a record.
 	FieldDelimiter *string `type:"string"`
 
-	// Describes the ***REMOVED***rst line of input. Valid values: None, Ignore, Use.
+	// Describes the first line of input. Valid values: None, Ignore, Use.
 	FileHeaderInfo *string `type:"string" enum:"FileHeaderInfo"`
 
-	// Value used for escaping where the ***REMOVED***eld delimiter is part of the value.
+	// Value used for escaping where the field delimiter is part of the value.
 	QuoteCharacter *string `type:"string"`
 
 	// The single character used for escaping the quote character inside an already
@@ -7899,43 +7899,43 @@ func (s CSVInput) GoString() string {
 	return s.String()
 }
 
-// SetAllowQuotedRecordDelimiter sets the AllowQuotedRecordDelimiter ***REMOVED***eld's value.
+// SetAllowQuotedRecordDelimiter sets the AllowQuotedRecordDelimiter field's value.
 func (s *CSVInput) SetAllowQuotedRecordDelimiter(v bool) *CSVInput {
 	s.AllowQuotedRecordDelimiter = &v
 	return s
 }
 
-// SetComments sets the Comments ***REMOVED***eld's value.
+// SetComments sets the Comments field's value.
 func (s *CSVInput) SetComments(v string) *CSVInput {
 	s.Comments = &v
 	return s
 }
 
-// SetFieldDelimiter sets the FieldDelimiter ***REMOVED***eld's value.
+// SetFieldDelimiter sets the FieldDelimiter field's value.
 func (s *CSVInput) SetFieldDelimiter(v string) *CSVInput {
 	s.FieldDelimiter = &v
 	return s
 }
 
-// SetFileHeaderInfo sets the FileHeaderInfo ***REMOVED***eld's value.
+// SetFileHeaderInfo sets the FileHeaderInfo field's value.
 func (s *CSVInput) SetFileHeaderInfo(v string) *CSVInput {
 	s.FileHeaderInfo = &v
 	return s
 }
 
-// SetQuoteCharacter sets the QuoteCharacter ***REMOVED***eld's value.
+// SetQuoteCharacter sets the QuoteCharacter field's value.
 func (s *CSVInput) SetQuoteCharacter(v string) *CSVInput {
 	s.QuoteCharacter = &v
 	return s
 }
 
-// SetQuoteEscapeCharacter sets the QuoteEscapeCharacter ***REMOVED***eld's value.
+// SetQuoteEscapeCharacter sets the QuoteEscapeCharacter field's value.
 func (s *CSVInput) SetQuoteEscapeCharacter(v string) *CSVInput {
 	s.QuoteEscapeCharacter = &v
 	return s
 }
 
-// SetRecordDelimiter sets the RecordDelimiter ***REMOVED***eld's value.
+// SetRecordDelimiter sets the RecordDelimiter field's value.
 func (s *CSVInput) SetRecordDelimiter(v string) *CSVInput {
 	s.RecordDelimiter = &v
 	return s
@@ -7945,17 +7945,17 @@ func (s *CSVInput) SetRecordDelimiter(v string) *CSVInput {
 type CSVOutput struct {
 	_ struct{} `type:"structure"`
 
-	// The value used to separate individual ***REMOVED***elds in a record.
+	// The value used to separate individual fields in a record.
 	FieldDelimiter *string `type:"string"`
 
-	// The value used for escaping where the ***REMOVED***eld delimiter is part of the value.
+	// The value used for escaping where the field delimiter is part of the value.
 	QuoteCharacter *string `type:"string"`
 
 	// Th single character used for escaping the quote character inside an already
 	// escaped value.
 	QuoteEscapeCharacter *string `type:"string"`
 
-	// Indicates whether or not all output ***REMOVED***elds should be quoted.
+	// Indicates whether or not all output fields should be quoted.
 	QuoteFields *string `type:"string" enum:"QuoteFields"`
 
 	// The value used to separate individual records.
@@ -7972,49 +7972,49 @@ func (s CSVOutput) GoString() string {
 	return s.String()
 }
 
-// SetFieldDelimiter sets the FieldDelimiter ***REMOVED***eld's value.
+// SetFieldDelimiter sets the FieldDelimiter field's value.
 func (s *CSVOutput) SetFieldDelimiter(v string) *CSVOutput {
 	s.FieldDelimiter = &v
 	return s
 }
 
-// SetQuoteCharacter sets the QuoteCharacter ***REMOVED***eld's value.
+// SetQuoteCharacter sets the QuoteCharacter field's value.
 func (s *CSVOutput) SetQuoteCharacter(v string) *CSVOutput {
 	s.QuoteCharacter = &v
 	return s
 }
 
-// SetQuoteEscapeCharacter sets the QuoteEscapeCharacter ***REMOVED***eld's value.
+// SetQuoteEscapeCharacter sets the QuoteEscapeCharacter field's value.
 func (s *CSVOutput) SetQuoteEscapeCharacter(v string) *CSVOutput {
 	s.QuoteEscapeCharacter = &v
 	return s
 }
 
-// SetQuoteFields sets the QuoteFields ***REMOVED***eld's value.
+// SetQuoteFields sets the QuoteFields field's value.
 func (s *CSVOutput) SetQuoteFields(v string) *CSVOutput {
 	s.QuoteFields = &v
 	return s
 }
 
-// SetRecordDelimiter sets the RecordDelimiter ***REMOVED***eld's value.
+// SetRecordDelimiter sets the RecordDelimiter field's value.
 func (s *CSVOutput) SetRecordDelimiter(v string) *CSVOutput {
 	s.RecordDelimiter = &v
 	return s
 }
 
-type CloudFunctionCon***REMOVED***guration struct {
+type CloudFunctionConfiguration struct {
 	_ struct{} `type:"structure"`
 
 	CloudFunction *string `type:"string"`
 
-	// The bucket event for which to send noti***REMOVED***cations.
+	// The bucket event for which to send notifications.
 	//
 	// Deprecated: Event has been deprecated
 	Event *string `deprecated:"true" type:"string" enum:"Event"`
 
 	Events []*string `locationName:"Event" type:"list" flattened:"true"`
 
-	// An optional unique identi***REMOVED***er for con***REMOVED***gurations in a noti***REMOVED***cation con***REMOVED***guration.
+	// An optional unique identifier for configurations in a notification configuration.
 	// If you don't provide one, Amazon S3 will assign an ID.
 	Id *string `type:"string"`
 
@@ -8022,85 +8022,85 @@ type CloudFunctionCon***REMOVED***guration struct {
 }
 
 // String returns the string representation
-func (s CloudFunctionCon***REMOVED***guration) String() string {
+func (s CloudFunctionConfiguration) String() string {
 	return awsutil.Prettify(s)
 }
 
 // GoString returns the string representation
-func (s CloudFunctionCon***REMOVED***guration) GoString() string {
+func (s CloudFunctionConfiguration) GoString() string {
 	return s.String()
 }
 
-// SetCloudFunction sets the CloudFunction ***REMOVED***eld's value.
-func (s *CloudFunctionCon***REMOVED***guration) SetCloudFunction(v string) *CloudFunctionCon***REMOVED***guration {
+// SetCloudFunction sets the CloudFunction field's value.
+func (s *CloudFunctionConfiguration) SetCloudFunction(v string) *CloudFunctionConfiguration {
 	s.CloudFunction = &v
 	return s
 }
 
-// SetEvent sets the Event ***REMOVED***eld's value.
-func (s *CloudFunctionCon***REMOVED***guration) SetEvent(v string) *CloudFunctionCon***REMOVED***guration {
+// SetEvent sets the Event field's value.
+func (s *CloudFunctionConfiguration) SetEvent(v string) *CloudFunctionConfiguration {
 	s.Event = &v
 	return s
 }
 
-// SetEvents sets the Events ***REMOVED***eld's value.
-func (s *CloudFunctionCon***REMOVED***guration) SetEvents(v []*string) *CloudFunctionCon***REMOVED***guration {
+// SetEvents sets the Events field's value.
+func (s *CloudFunctionConfiguration) SetEvents(v []*string) *CloudFunctionConfiguration {
 	s.Events = v
 	return s
 }
 
-// SetId sets the Id ***REMOVED***eld's value.
-func (s *CloudFunctionCon***REMOVED***guration) SetId(v string) *CloudFunctionCon***REMOVED***guration {
+// SetId sets the Id field's value.
+func (s *CloudFunctionConfiguration) SetId(v string) *CloudFunctionConfiguration {
 	s.Id = &v
 	return s
 }
 
-// SetInvocationRole sets the InvocationRole ***REMOVED***eld's value.
-func (s *CloudFunctionCon***REMOVED***guration) SetInvocationRole(v string) *CloudFunctionCon***REMOVED***guration {
+// SetInvocationRole sets the InvocationRole field's value.
+func (s *CloudFunctionConfiguration) SetInvocationRole(v string) *CloudFunctionConfiguration {
 	s.InvocationRole = &v
 	return s
 }
 
-type CommonPre***REMOVED***x struct {
+type CommonPrefix struct {
 	_ struct{} `type:"structure"`
 
-	Pre***REMOVED***x *string `type:"string"`
+	Prefix *string `type:"string"`
 }
 
 // String returns the string representation
-func (s CommonPre***REMOVED***x) String() string {
+func (s CommonPrefix) String() string {
 	return awsutil.Prettify(s)
 }
 
 // GoString returns the string representation
-func (s CommonPre***REMOVED***x) GoString() string {
+func (s CommonPrefix) GoString() string {
 	return s.String()
 }
 
-// SetPre***REMOVED***x sets the Pre***REMOVED***x ***REMOVED***eld's value.
-func (s *CommonPre***REMOVED***x) SetPre***REMOVED***x(v string) *CommonPre***REMOVED***x {
-	s.Pre***REMOVED***x = &v
+// SetPrefix sets the Prefix field's value.
+func (s *CommonPrefix) SetPrefix(v string) *CommonPrefix {
+	s.Prefix = &v
 	return s
 }
 
 type CompleteMultipartUploadInput struct {
 	_ struct{} `locationName:"CompleteMultipartUploadRequest" type:"structure" payload:"MultipartUpload"`
 
-	// Bucket is a required ***REMOVED***eld
+	// Bucket is a required field
 	Bucket *string `location:"uri" locationName:"Bucket" type:"string" required:"true"`
 
-	// Key is a required ***REMOVED***eld
+	// Key is a required field
 	Key *string `location:"uri" locationName:"Key" min:"1" type:"string" required:"true"`
 
 	MultipartUpload *CompletedMultipartUpload `locationName:"CompleteMultipartUpload" type:"structure" xmlURI:"http://s3.amazonaws.com/doc/2006-03-01/"`
 
-	// Con***REMOVED***rms that the requester knows that she or he will be charged for the
+	// Confirms that the requester knows that she or he will be charged for the
 	// request. Bucket owners need not specify this parameter in their requests.
 	// Documentation on downloading objects from requester pays buckets can be found
 	// at http://docs.aws.amazon.com/AmazonS3/latest/dev/ObjectsinRequesterPaysBuckets.html
 	RequestPayer *string `location:"header" locationName:"x-amz-request-payer" type:"string" enum:"RequestPayer"`
 
-	// UploadId is a required ***REMOVED***eld
+	// UploadId is a required field
 	UploadId *string `location:"querystring" locationName:"uploadId" type:"string" required:"true"`
 }
 
@@ -8114,7 +8114,7 @@ func (s CompleteMultipartUploadInput) GoString() string {
 	return s.String()
 }
 
-// Validate inspects the ***REMOVED***elds of the type to determine if they are valid.
+// Validate inspects the fields of the type to determine if they are valid.
 func (s *CompleteMultipartUploadInput) Validate() error {
 	invalidParams := request.ErrInvalidParams{Context: "CompleteMultipartUploadInput"}
 	if s.Bucket == nil {
@@ -8139,7 +8139,7 @@ func (s *CompleteMultipartUploadInput) Validate() error {
 	return nil
 }
 
-// SetBucket sets the Bucket ***REMOVED***eld's value.
+// SetBucket sets the Bucket field's value.
 func (s *CompleteMultipartUploadInput) SetBucket(v string) *CompleteMultipartUploadInput {
 	s.Bucket = &v
 	return s
@@ -8152,25 +8152,25 @@ func (s *CompleteMultipartUploadInput) getBucket() (v string) {
 	return *s.Bucket
 }
 
-// SetKey sets the Key ***REMOVED***eld's value.
+// SetKey sets the Key field's value.
 func (s *CompleteMultipartUploadInput) SetKey(v string) *CompleteMultipartUploadInput {
 	s.Key = &v
 	return s
 }
 
-// SetMultipartUpload sets the MultipartUpload ***REMOVED***eld's value.
+// SetMultipartUpload sets the MultipartUpload field's value.
 func (s *CompleteMultipartUploadInput) SetMultipartUpload(v *CompletedMultipartUpload) *CompleteMultipartUploadInput {
 	s.MultipartUpload = v
 	return s
 }
 
-// SetRequestPayer sets the RequestPayer ***REMOVED***eld's value.
+// SetRequestPayer sets the RequestPayer field's value.
 func (s *CompleteMultipartUploadInput) SetRequestPayer(v string) *CompleteMultipartUploadInput {
 	s.RequestPayer = &v
 	return s
 }
 
-// SetUploadId sets the UploadId ***REMOVED***eld's value.
+// SetUploadId sets the UploadId field's value.
 func (s *CompleteMultipartUploadInput) SetUploadId(v string) *CompleteMultipartUploadInput {
 	s.UploadId = &v
 	return s
@@ -8184,7 +8184,7 @@ type CompleteMultipartUploadOutput struct {
 	// Entity tag of the object.
 	ETag *string `type:"string"`
 
-	// If the object expiration is con***REMOVED***gured, this will contain the expiration
+	// If the object expiration is configured, this will contain the expiration
 	// date (expiry-date) and rule ID (rule-id). The value of rule-id is URL encoded.
 	Expiration *string `location:"header" locationName:"x-amz-expiration" type:"string"`
 
@@ -8196,7 +8196,7 @@ type CompleteMultipartUploadOutput struct {
 	// request.
 	RequestCharged *string `location:"header" locationName:"x-amz-request-charged" type:"string" enum:"RequestCharged"`
 
-	// If present, speci***REMOVED***es the ID of the AWS Key Management Service (KMS) master
+	// If present, specifies the ID of the AWS Key Management Service (KMS) master
 	// encryption key that was used for the object.
 	SSEKMSKeyId *string `location:"header" locationName:"x-amz-server-side-encryption-aws-kms-key-id" type:"string" sensitive:"true"`
 
@@ -8218,7 +8218,7 @@ func (s CompleteMultipartUploadOutput) GoString() string {
 	return s.String()
 }
 
-// SetBucket sets the Bucket ***REMOVED***eld's value.
+// SetBucket sets the Bucket field's value.
 func (s *CompleteMultipartUploadOutput) SetBucket(v string) *CompleteMultipartUploadOutput {
 	s.Bucket = &v
 	return s
@@ -8231,49 +8231,49 @@ func (s *CompleteMultipartUploadOutput) getBucket() (v string) {
 	return *s.Bucket
 }
 
-// SetETag sets the ETag ***REMOVED***eld's value.
+// SetETag sets the ETag field's value.
 func (s *CompleteMultipartUploadOutput) SetETag(v string) *CompleteMultipartUploadOutput {
 	s.ETag = &v
 	return s
 }
 
-// SetExpiration sets the Expiration ***REMOVED***eld's value.
+// SetExpiration sets the Expiration field's value.
 func (s *CompleteMultipartUploadOutput) SetExpiration(v string) *CompleteMultipartUploadOutput {
 	s.Expiration = &v
 	return s
 }
 
-// SetKey sets the Key ***REMOVED***eld's value.
+// SetKey sets the Key field's value.
 func (s *CompleteMultipartUploadOutput) SetKey(v string) *CompleteMultipartUploadOutput {
 	s.Key = &v
 	return s
 }
 
-// SetLocation sets the Location ***REMOVED***eld's value.
+// SetLocation sets the Location field's value.
 func (s *CompleteMultipartUploadOutput) SetLocation(v string) *CompleteMultipartUploadOutput {
 	s.Location = &v
 	return s
 }
 
-// SetRequestCharged sets the RequestCharged ***REMOVED***eld's value.
+// SetRequestCharged sets the RequestCharged field's value.
 func (s *CompleteMultipartUploadOutput) SetRequestCharged(v string) *CompleteMultipartUploadOutput {
 	s.RequestCharged = &v
 	return s
 }
 
-// SetSSEKMSKeyId sets the SSEKMSKeyId ***REMOVED***eld's value.
+// SetSSEKMSKeyId sets the SSEKMSKeyId field's value.
 func (s *CompleteMultipartUploadOutput) SetSSEKMSKeyId(v string) *CompleteMultipartUploadOutput {
 	s.SSEKMSKeyId = &v
 	return s
 }
 
-// SetServerSideEncryption sets the ServerSideEncryption ***REMOVED***eld's value.
+// SetServerSideEncryption sets the ServerSideEncryption field's value.
 func (s *CompleteMultipartUploadOutput) SetServerSideEncryption(v string) *CompleteMultipartUploadOutput {
 	s.ServerSideEncryption = &v
 	return s
 }
 
-// SetVersionId sets the VersionId ***REMOVED***eld's value.
+// SetVersionId sets the VersionId field's value.
 func (s *CompleteMultipartUploadOutput) SetVersionId(v string) *CompleteMultipartUploadOutput {
 	s.VersionId = &v
 	return s
@@ -8295,7 +8295,7 @@ func (s CompletedMultipartUpload) GoString() string {
 	return s.String()
 }
 
-// SetParts sets the Parts ***REMOVED***eld's value.
+// SetParts sets the Parts field's value.
 func (s *CompletedMultipartUpload) SetParts(v []*CompletedPart) *CompletedMultipartUpload {
 	s.Parts = v
 	return s
@@ -8307,7 +8307,7 @@ type CompletedPart struct {
 	// Entity tag returned when the part was uploaded.
 	ETag *string `type:"string"`
 
-	// Part number that identi***REMOVED***es the part. This is a positive integer between
+	// Part number that identifies the part. This is a positive integer between
 	// 1 and 10,000.
 	PartNumber *int64 `type:"integer"`
 }
@@ -8322,37 +8322,37 @@ func (s CompletedPart) GoString() string {
 	return s.String()
 }
 
-// SetETag sets the ETag ***REMOVED***eld's value.
+// SetETag sets the ETag field's value.
 func (s *CompletedPart) SetETag(v string) *CompletedPart {
 	s.ETag = &v
 	return s
 }
 
-// SetPartNumber sets the PartNumber ***REMOVED***eld's value.
+// SetPartNumber sets the PartNumber field's value.
 func (s *CompletedPart) SetPartNumber(v int64) *CompletedPart {
 	s.PartNumber = &v
 	return s
 }
 
-// Speci***REMOVED***es a condition that must be met for a redirect to apply.
+// Specifies a condition that must be met for a redirect to apply.
 type Condition struct {
 	_ struct{} `type:"structure"`
 
 	// The HTTP error code when the redirect is applied. In the event of an error,
-	// if the error code equals this value, then the speci***REMOVED***ed redirect is applied.
-	// Required when parent element Condition is speci***REMOVED***ed and sibling KeyPre***REMOVED***xEquals
-	// is not speci***REMOVED***ed. If both are speci***REMOVED***ed, then both must be true for the redirect
+	// if the error code equals this value, then the specified redirect is applied.
+	// Required when parent element Condition is specified and sibling KeyPrefixEquals
+	// is not specified. If both are specified, then both must be true for the redirect
 	// to be applied.
 	HttpErrorCodeReturnedEquals *string `type:"string"`
 
-	// The object key name pre***REMOVED***x when the redirect is applied. For example, to
-	// redirect requests for ExamplePage.html, the key pre***REMOVED***x will be ExamplePage.html.
-	// To redirect request for all pages with the pre***REMOVED***x docs/, the key pre***REMOVED***x will
-	// be /docs, which identi***REMOVED***es all objects in the docs/ folder. Required when
-	// the parent element Condition is speci***REMOVED***ed and sibling HttpErrorCodeReturnedEquals
-	// is not speci***REMOVED***ed. If both conditions are speci***REMOVED***ed, both must be true for
+	// The object key name prefix when the redirect is applied. For example, to
+	// redirect requests for ExamplePage.html, the key prefix will be ExamplePage.html.
+	// To redirect request for all pages with the prefix docs/, the key prefix will
+	// be /docs, which identifies all objects in the docs/ folder. Required when
+	// the parent element Condition is specified and sibling HttpErrorCodeReturnedEquals
+	// is not specified. If both conditions are specified, both must be true for
 	// the redirect to be applied.
-	KeyPre***REMOVED***xEquals *string `type:"string"`
+	KeyPrefixEquals *string `type:"string"`
 }
 
 // String returns the string representation
@@ -8365,15 +8365,15 @@ func (s Condition) GoString() string {
 	return s.String()
 }
 
-// SetHttpErrorCodeReturnedEquals sets the HttpErrorCodeReturnedEquals ***REMOVED***eld's value.
+// SetHttpErrorCodeReturnedEquals sets the HttpErrorCodeReturnedEquals field's value.
 func (s *Condition) SetHttpErrorCodeReturnedEquals(v string) *Condition {
 	s.HttpErrorCodeReturnedEquals = &v
 	return s
 }
 
-// SetKeyPre***REMOVED***xEquals sets the KeyPre***REMOVED***xEquals ***REMOVED***eld's value.
-func (s *Condition) SetKeyPre***REMOVED***xEquals(v string) *Condition {
-	s.KeyPre***REMOVED***xEquals = &v
+// SetKeyPrefixEquals sets the KeyPrefixEquals field's value.
+func (s *Condition) SetKeyPrefixEquals(v string) *Condition {
+	s.KeyPrefixEquals = &v
 	return s
 }
 
@@ -8409,18 +8409,18 @@ type CopyObjectInput struct {
 	// The canned ACL to apply to the object.
 	ACL *string `location:"header" locationName:"x-amz-acl" type:"string" enum:"ObjectCannedACL"`
 
-	// Bucket is a required ***REMOVED***eld
+	// Bucket is a required field
 	Bucket *string `location:"uri" locationName:"Bucket" type:"string" required:"true"`
 
-	// Speci***REMOVED***es caching behavior along the request/reply chain.
+	// Specifies caching behavior along the request/reply chain.
 	CacheControl *string `location:"header" locationName:"Cache-Control" type:"string"`
 
-	// Speci***REMOVED***es presentational information for the object.
+	// Specifies presentational information for the object.
 	ContentDisposition *string `location:"header" locationName:"Content-Disposition" type:"string"`
 
-	// Speci***REMOVED***es what content encodings have been applied to the object and thus
+	// Specifies what content encodings have been applied to the object and thus
 	// what decoding mechanisms must be applied to obtain the media-type referenced
-	// by the Content-Type header ***REMOVED***eld.
+	// by the Content-Type header field.
 	ContentEncoding *string `location:"header" locationName:"Content-Encoding" type:"string"`
 
 	// The language the content is in.
@@ -8432,31 +8432,31 @@ type CopyObjectInput struct {
 	// The name of the source bucket and key name of the source object, separated
 	// by a slash (/). Must be URL-encoded.
 	//
-	// CopySource is a required ***REMOVED***eld
+	// CopySource is a required field
 	CopySource *string `location:"header" locationName:"x-amz-copy-source" type:"string" required:"true"`
 
-	// Copies the object if its entity tag (ETag) matches the speci***REMOVED***ed tag.
+	// Copies the object if its entity tag (ETag) matches the specified tag.
 	CopySourceIfMatch *string `location:"header" locationName:"x-amz-copy-source-if-match" type:"string"`
 
-	// Copies the object if it has been modi***REMOVED***ed since the speci***REMOVED***ed time.
-	CopySourceIfModi***REMOVED***edSince *time.Time `location:"header" locationName:"x-amz-copy-source-if-modi***REMOVED***ed-since" type:"timestamp"`
+	// Copies the object if it has been modified since the specified time.
+	CopySourceIfModifiedSince *time.Time `location:"header" locationName:"x-amz-copy-source-if-modified-since" type:"timestamp"`
 
-	// Copies the object if its entity tag (ETag) is different than the speci***REMOVED***ed
+	// Copies the object if its entity tag (ETag) is different than the specified
 	// ETag.
 	CopySourceIfNoneMatch *string `location:"header" locationName:"x-amz-copy-source-if-none-match" type:"string"`
 
-	// Copies the object if it hasn't been modi***REMOVED***ed since the speci***REMOVED***ed time.
-	CopySourceIfUnmodi***REMOVED***edSince *time.Time `location:"header" locationName:"x-amz-copy-source-if-unmodi***REMOVED***ed-since" type:"timestamp"`
+	// Copies the object if it hasn't been modified since the specified time.
+	CopySourceIfUnmodifiedSince *time.Time `location:"header" locationName:"x-amz-copy-source-if-unmodified-since" type:"timestamp"`
 
-	// Speci***REMOVED***es the algorithm to use when decrypting the source object (e.g., AES256).
+	// Specifies the algorithm to use when decrypting the source object (e.g., AES256).
 	CopySourceSSECustomerAlgorithm *string `location:"header" locationName:"x-amz-copy-source-server-side-encryption-customer-algorithm" type:"string"`
 
-	// Speci***REMOVED***es the customer-provided encryption key for Amazon S3 to use to decrypt
+	// Specifies the customer-provided encryption key for Amazon S3 to use to decrypt
 	// the source object. The encryption key provided in this header must be one
 	// that was used when the source object was created.
 	CopySourceSSECustomerKey *string `marshal-as:"blob" location:"header" locationName:"x-amz-copy-source-server-side-encryption-customer-key" type:"string" sensitive:"true"`
 
-	// Speci***REMOVED***es the 128-bit MD5 digest of the encryption key according to RFC 1321.
+	// Specifies the 128-bit MD5 digest of the encryption key according to RFC 1321.
 	// Amazon S3 uses this header for a message integrity check to ensure the encryption
 	// key was transmitted without error.
 	CopySourceSSECustomerKeyMD5 *string `location:"header" locationName:"x-amz-copy-source-server-side-encryption-customer-key-MD5" type:"string"`
@@ -8476,17 +8476,17 @@ type CopyObjectInput struct {
 	// Allows grantee to write the ACL for the applicable object.
 	GrantWriteACP *string `location:"header" locationName:"x-amz-grant-write-acp" type:"string"`
 
-	// Key is a required ***REMOVED***eld
+	// Key is a required field
 	Key *string `location:"uri" locationName:"Key" min:"1" type:"string" required:"true"`
 
 	// A map of metadata to store with the object in S3.
 	Metadata map[string]*string `location:"headers" locationName:"x-amz-meta-" type:"map"`
 
-	// Speci***REMOVED***es whether the metadata is copied from the source object or replaced
+	// Specifies whether the metadata is copied from the source object or replaced
 	// with metadata provided in the request.
 	MetadataDirective *string `location:"header" locationName:"x-amz-metadata-directive" type:"string" enum:"MetadataDirective"`
 
-	// Speci***REMOVED***es whether you want to apply a Legal Hold to the copied object.
+	// Specifies whether you want to apply a Legal Hold to the copied object.
 	ObjectLockLegalHoldStatus *string `location:"header" locationName:"x-amz-object-lock-legal-hold" type:"string" enum:"ObjectLockLegalHoldStatus"`
 
 	// The object lock mode that you want to apply to the copied object.
@@ -8495,35 +8495,35 @@ type CopyObjectInput struct {
 	// The date and time when you want the copied object's object lock to expire.
 	ObjectLockRetainUntilDate *time.Time `location:"header" locationName:"x-amz-object-lock-retain-until-date" type:"timestamp" timestampFormat:"iso8601"`
 
-	// Con***REMOVED***rms that the requester knows that she or he will be charged for the
+	// Confirms that the requester knows that she or he will be charged for the
 	// request. Bucket owners need not specify this parameter in their requests.
 	// Documentation on downloading objects from requester pays buckets can be found
 	// at http://docs.aws.amazon.com/AmazonS3/latest/dev/ObjectsinRequesterPaysBuckets.html
 	RequestPayer *string `location:"header" locationName:"x-amz-request-payer" type:"string" enum:"RequestPayer"`
 
-	// Speci***REMOVED***es the algorithm to use to when encrypting the object (e.g., AES256).
+	// Specifies the algorithm to use to when encrypting the object (e.g., AES256).
 	SSECustomerAlgorithm *string `location:"header" locationName:"x-amz-server-side-encryption-customer-algorithm" type:"string"`
 
-	// Speci***REMOVED***es the customer-provided encryption key for Amazon S3 to use in encrypting
+	// Specifies the customer-provided encryption key for Amazon S3 to use in encrypting
 	// data. This value is used to store the object and then it is discarded; Amazon
 	// does not store the encryption key. The key must be appropriate for use with
-	// the algorithm speci***REMOVED***ed in the x-amz-server-side​-encryption​-customer-algorithm
+	// the algorithm specified in the x-amz-server-side​-encryption​-customer-algorithm
 	// header.
 	SSECustomerKey *string `marshal-as:"blob" location:"header" locationName:"x-amz-server-side-encryption-customer-key" type:"string" sensitive:"true"`
 
-	// Speci***REMOVED***es the 128-bit MD5 digest of the encryption key according to RFC 1321.
+	// Specifies the 128-bit MD5 digest of the encryption key according to RFC 1321.
 	// Amazon S3 uses this header for a message integrity check to ensure the encryption
 	// key was transmitted without error.
 	SSECustomerKeyMD5 *string `location:"header" locationName:"x-amz-server-side-encryption-customer-key-MD5" type:"string"`
 
-	// Speci***REMOVED***es the AWS KMS Encryption Context to use for object encryption. The
+	// Specifies the AWS KMS Encryption Context to use for object encryption. The
 	// value of this header is a base64-encoded UTF-8 string holding JSON with the
 	// encryption context key-value pairs.
 	SSEKMSEncryptionContext *string `location:"header" locationName:"x-amz-server-side-encryption-context" type:"string" sensitive:"true"`
 
-	// Speci***REMOVED***es the AWS KMS key ID to use for object encryption. All GET and PUT
+	// Specifies the AWS KMS key ID to use for object encryption. All GET and PUT
 	// requests for an object protected by AWS KMS will fail if not made via SSL
-	// or using SigV4. Documentation on con***REMOVED***guring any of the of***REMOVED***cially supported
+	// or using SigV4. Documentation on configuring any of the officially supported
 	// AWS SDKs and CLI can be found at http://docs.aws.amazon.com/AmazonS3/latest/dev/UsingAWSSDK.html#specify-signature-version
 	SSEKMSKeyId *string `location:"header" locationName:"x-amz-server-side-encryption-aws-kms-key-id" type:"string" sensitive:"true"`
 
@@ -8539,11 +8539,11 @@ type CopyObjectInput struct {
 	// Query parameters
 	Tagging *string `location:"header" locationName:"x-amz-tagging" type:"string"`
 
-	// Speci***REMOVED***es whether the object tag-set are copied from the source object or
+	// Specifies whether the object tag-set are copied from the source object or
 	// replaced with tag-set provided in the request.
 	TaggingDirective *string `location:"header" locationName:"x-amz-tagging-directive" type:"string" enum:"TaggingDirective"`
 
-	// If the bucket is con***REMOVED***gured as a website, redirects requests for this object
+	// If the bucket is configured as a website, redirects requests for this object
 	// to another object in the same bucket or to an external URL. Amazon S3 stores
 	// the value of this header in the object metadata.
 	WebsiteRedirectLocation *string `location:"header" locationName:"x-amz-website-redirect-location" type:"string"`
@@ -8559,7 +8559,7 @@ func (s CopyObjectInput) GoString() string {
 	return s.String()
 }
 
-// Validate inspects the ***REMOVED***elds of the type to determine if they are valid.
+// Validate inspects the fields of the type to determine if they are valid.
 func (s *CopyObjectInput) Validate() error {
 	invalidParams := request.ErrInvalidParams{Context: "CopyObjectInput"}
 	if s.Bucket == nil {
@@ -8584,13 +8584,13 @@ func (s *CopyObjectInput) Validate() error {
 	return nil
 }
 
-// SetACL sets the ACL ***REMOVED***eld's value.
+// SetACL sets the ACL field's value.
 func (s *CopyObjectInput) SetACL(v string) *CopyObjectInput {
 	s.ACL = &v
 	return s
 }
 
-// SetBucket sets the Bucket ***REMOVED***eld's value.
+// SetBucket sets the Bucket field's value.
 func (s *CopyObjectInput) SetBucket(v string) *CopyObjectInput {
 	s.Bucket = &v
 	return s
@@ -8603,73 +8603,73 @@ func (s *CopyObjectInput) getBucket() (v string) {
 	return *s.Bucket
 }
 
-// SetCacheControl sets the CacheControl ***REMOVED***eld's value.
+// SetCacheControl sets the CacheControl field's value.
 func (s *CopyObjectInput) SetCacheControl(v string) *CopyObjectInput {
 	s.CacheControl = &v
 	return s
 }
 
-// SetContentDisposition sets the ContentDisposition ***REMOVED***eld's value.
+// SetContentDisposition sets the ContentDisposition field's value.
 func (s *CopyObjectInput) SetContentDisposition(v string) *CopyObjectInput {
 	s.ContentDisposition = &v
 	return s
 }
 
-// SetContentEncoding sets the ContentEncoding ***REMOVED***eld's value.
+// SetContentEncoding sets the ContentEncoding field's value.
 func (s *CopyObjectInput) SetContentEncoding(v string) *CopyObjectInput {
 	s.ContentEncoding = &v
 	return s
 }
 
-// SetContentLanguage sets the ContentLanguage ***REMOVED***eld's value.
+// SetContentLanguage sets the ContentLanguage field's value.
 func (s *CopyObjectInput) SetContentLanguage(v string) *CopyObjectInput {
 	s.ContentLanguage = &v
 	return s
 }
 
-// SetContentType sets the ContentType ***REMOVED***eld's value.
+// SetContentType sets the ContentType field's value.
 func (s *CopyObjectInput) SetContentType(v string) *CopyObjectInput {
 	s.ContentType = &v
 	return s
 }
 
-// SetCopySource sets the CopySource ***REMOVED***eld's value.
+// SetCopySource sets the CopySource field's value.
 func (s *CopyObjectInput) SetCopySource(v string) *CopyObjectInput {
 	s.CopySource = &v
 	return s
 }
 
-// SetCopySourceIfMatch sets the CopySourceIfMatch ***REMOVED***eld's value.
+// SetCopySourceIfMatch sets the CopySourceIfMatch field's value.
 func (s *CopyObjectInput) SetCopySourceIfMatch(v string) *CopyObjectInput {
 	s.CopySourceIfMatch = &v
 	return s
 }
 
-// SetCopySourceIfModi***REMOVED***edSince sets the CopySourceIfModi***REMOVED***edSince ***REMOVED***eld's value.
-func (s *CopyObjectInput) SetCopySourceIfModi***REMOVED***edSince(v time.Time) *CopyObjectInput {
-	s.CopySourceIfModi***REMOVED***edSince = &v
+// SetCopySourceIfModifiedSince sets the CopySourceIfModifiedSince field's value.
+func (s *CopyObjectInput) SetCopySourceIfModifiedSince(v time.Time) *CopyObjectInput {
+	s.CopySourceIfModifiedSince = &v
 	return s
 }
 
-// SetCopySourceIfNoneMatch sets the CopySourceIfNoneMatch ***REMOVED***eld's value.
+// SetCopySourceIfNoneMatch sets the CopySourceIfNoneMatch field's value.
 func (s *CopyObjectInput) SetCopySourceIfNoneMatch(v string) *CopyObjectInput {
 	s.CopySourceIfNoneMatch = &v
 	return s
 }
 
-// SetCopySourceIfUnmodi***REMOVED***edSince sets the CopySourceIfUnmodi***REMOVED***edSince ***REMOVED***eld's value.
-func (s *CopyObjectInput) SetCopySourceIfUnmodi***REMOVED***edSince(v time.Time) *CopyObjectInput {
-	s.CopySourceIfUnmodi***REMOVED***edSince = &v
+// SetCopySourceIfUnmodifiedSince sets the CopySourceIfUnmodifiedSince field's value.
+func (s *CopyObjectInput) SetCopySourceIfUnmodifiedSince(v time.Time) *CopyObjectInput {
+	s.CopySourceIfUnmodifiedSince = &v
 	return s
 }
 
-// SetCopySourceSSECustomerAlgorithm sets the CopySourceSSECustomerAlgorithm ***REMOVED***eld's value.
+// SetCopySourceSSECustomerAlgorithm sets the CopySourceSSECustomerAlgorithm field's value.
 func (s *CopyObjectInput) SetCopySourceSSECustomerAlgorithm(v string) *CopyObjectInput {
 	s.CopySourceSSECustomerAlgorithm = &v
 	return s
 }
 
-// SetCopySourceSSECustomerKey sets the CopySourceSSECustomerKey ***REMOVED***eld's value.
+// SetCopySourceSSECustomerKey sets the CopySourceSSECustomerKey field's value.
 func (s *CopyObjectInput) SetCopySourceSSECustomerKey(v string) *CopyObjectInput {
 	s.CopySourceSSECustomerKey = &v
 	return s
@@ -8682,91 +8682,91 @@ func (s *CopyObjectInput) getCopySourceSSECustomerKey() (v string) {
 	return *s.CopySourceSSECustomerKey
 }
 
-// SetCopySourceSSECustomerKeyMD5 sets the CopySourceSSECustomerKeyMD5 ***REMOVED***eld's value.
+// SetCopySourceSSECustomerKeyMD5 sets the CopySourceSSECustomerKeyMD5 field's value.
 func (s *CopyObjectInput) SetCopySourceSSECustomerKeyMD5(v string) *CopyObjectInput {
 	s.CopySourceSSECustomerKeyMD5 = &v
 	return s
 }
 
-// SetExpires sets the Expires ***REMOVED***eld's value.
+// SetExpires sets the Expires field's value.
 func (s *CopyObjectInput) SetExpires(v time.Time) *CopyObjectInput {
 	s.Expires = &v
 	return s
 }
 
-// SetGrantFullControl sets the GrantFullControl ***REMOVED***eld's value.
+// SetGrantFullControl sets the GrantFullControl field's value.
 func (s *CopyObjectInput) SetGrantFullControl(v string) *CopyObjectInput {
 	s.GrantFullControl = &v
 	return s
 }
 
-// SetGrantRead sets the GrantRead ***REMOVED***eld's value.
+// SetGrantRead sets the GrantRead field's value.
 func (s *CopyObjectInput) SetGrantRead(v string) *CopyObjectInput {
 	s.GrantRead = &v
 	return s
 }
 
-// SetGrantReadACP sets the GrantReadACP ***REMOVED***eld's value.
+// SetGrantReadACP sets the GrantReadACP field's value.
 func (s *CopyObjectInput) SetGrantReadACP(v string) *CopyObjectInput {
 	s.GrantReadACP = &v
 	return s
 }
 
-// SetGrantWriteACP sets the GrantWriteACP ***REMOVED***eld's value.
+// SetGrantWriteACP sets the GrantWriteACP field's value.
 func (s *CopyObjectInput) SetGrantWriteACP(v string) *CopyObjectInput {
 	s.GrantWriteACP = &v
 	return s
 }
 
-// SetKey sets the Key ***REMOVED***eld's value.
+// SetKey sets the Key field's value.
 func (s *CopyObjectInput) SetKey(v string) *CopyObjectInput {
 	s.Key = &v
 	return s
 }
 
-// SetMetadata sets the Metadata ***REMOVED***eld's value.
+// SetMetadata sets the Metadata field's value.
 func (s *CopyObjectInput) SetMetadata(v map[string]*string) *CopyObjectInput {
 	s.Metadata = v
 	return s
 }
 
-// SetMetadataDirective sets the MetadataDirective ***REMOVED***eld's value.
+// SetMetadataDirective sets the MetadataDirective field's value.
 func (s *CopyObjectInput) SetMetadataDirective(v string) *CopyObjectInput {
 	s.MetadataDirective = &v
 	return s
 }
 
-// SetObjectLockLegalHoldStatus sets the ObjectLockLegalHoldStatus ***REMOVED***eld's value.
+// SetObjectLockLegalHoldStatus sets the ObjectLockLegalHoldStatus field's value.
 func (s *CopyObjectInput) SetObjectLockLegalHoldStatus(v string) *CopyObjectInput {
 	s.ObjectLockLegalHoldStatus = &v
 	return s
 }
 
-// SetObjectLockMode sets the ObjectLockMode ***REMOVED***eld's value.
+// SetObjectLockMode sets the ObjectLockMode field's value.
 func (s *CopyObjectInput) SetObjectLockMode(v string) *CopyObjectInput {
 	s.ObjectLockMode = &v
 	return s
 }
 
-// SetObjectLockRetainUntilDate sets the ObjectLockRetainUntilDate ***REMOVED***eld's value.
+// SetObjectLockRetainUntilDate sets the ObjectLockRetainUntilDate field's value.
 func (s *CopyObjectInput) SetObjectLockRetainUntilDate(v time.Time) *CopyObjectInput {
 	s.ObjectLockRetainUntilDate = &v
 	return s
 }
 
-// SetRequestPayer sets the RequestPayer ***REMOVED***eld's value.
+// SetRequestPayer sets the RequestPayer field's value.
 func (s *CopyObjectInput) SetRequestPayer(v string) *CopyObjectInput {
 	s.RequestPayer = &v
 	return s
 }
 
-// SetSSECustomerAlgorithm sets the SSECustomerAlgorithm ***REMOVED***eld's value.
+// SetSSECustomerAlgorithm sets the SSECustomerAlgorithm field's value.
 func (s *CopyObjectInput) SetSSECustomerAlgorithm(v string) *CopyObjectInput {
 	s.SSECustomerAlgorithm = &v
 	return s
 }
 
-// SetSSECustomerKey sets the SSECustomerKey ***REMOVED***eld's value.
+// SetSSECustomerKey sets the SSECustomerKey field's value.
 func (s *CopyObjectInput) SetSSECustomerKey(v string) *CopyObjectInput {
 	s.SSECustomerKey = &v
 	return s
@@ -8779,49 +8779,49 @@ func (s *CopyObjectInput) getSSECustomerKey() (v string) {
 	return *s.SSECustomerKey
 }
 
-// SetSSECustomerKeyMD5 sets the SSECustomerKeyMD5 ***REMOVED***eld's value.
+// SetSSECustomerKeyMD5 sets the SSECustomerKeyMD5 field's value.
 func (s *CopyObjectInput) SetSSECustomerKeyMD5(v string) *CopyObjectInput {
 	s.SSECustomerKeyMD5 = &v
 	return s
 }
 
-// SetSSEKMSEncryptionContext sets the SSEKMSEncryptionContext ***REMOVED***eld's value.
+// SetSSEKMSEncryptionContext sets the SSEKMSEncryptionContext field's value.
 func (s *CopyObjectInput) SetSSEKMSEncryptionContext(v string) *CopyObjectInput {
 	s.SSEKMSEncryptionContext = &v
 	return s
 }
 
-// SetSSEKMSKeyId sets the SSEKMSKeyId ***REMOVED***eld's value.
+// SetSSEKMSKeyId sets the SSEKMSKeyId field's value.
 func (s *CopyObjectInput) SetSSEKMSKeyId(v string) *CopyObjectInput {
 	s.SSEKMSKeyId = &v
 	return s
 }
 
-// SetServerSideEncryption sets the ServerSideEncryption ***REMOVED***eld's value.
+// SetServerSideEncryption sets the ServerSideEncryption field's value.
 func (s *CopyObjectInput) SetServerSideEncryption(v string) *CopyObjectInput {
 	s.ServerSideEncryption = &v
 	return s
 }
 
-// SetStorageClass sets the StorageClass ***REMOVED***eld's value.
+// SetStorageClass sets the StorageClass field's value.
 func (s *CopyObjectInput) SetStorageClass(v string) *CopyObjectInput {
 	s.StorageClass = &v
 	return s
 }
 
-// SetTagging sets the Tagging ***REMOVED***eld's value.
+// SetTagging sets the Tagging field's value.
 func (s *CopyObjectInput) SetTagging(v string) *CopyObjectInput {
 	s.Tagging = &v
 	return s
 }
 
-// SetTaggingDirective sets the TaggingDirective ***REMOVED***eld's value.
+// SetTaggingDirective sets the TaggingDirective field's value.
 func (s *CopyObjectInput) SetTaggingDirective(v string) *CopyObjectInput {
 	s.TaggingDirective = &v
 	return s
 }
 
-// SetWebsiteRedirectLocation sets the WebsiteRedirectLocation ***REMOVED***eld's value.
+// SetWebsiteRedirectLocation sets the WebsiteRedirectLocation field's value.
 func (s *CopyObjectInput) SetWebsiteRedirectLocation(v string) *CopyObjectInput {
 	s.WebsiteRedirectLocation = &v
 	return s
@@ -8834,7 +8834,7 @@ type CopyObjectOutput struct {
 
 	CopySourceVersionId *string `location:"header" locationName:"x-amz-copy-source-version-id" type:"string"`
 
-	// If the object expiration is con***REMOVED***gured, the response includes this header.
+	// If the object expiration is configured, the response includes this header.
 	Expiration *string `location:"header" locationName:"x-amz-expiration" type:"string"`
 
 	// If present, indicates that the requester was successfully charged for the
@@ -8842,21 +8842,21 @@ type CopyObjectOutput struct {
 	RequestCharged *string `location:"header" locationName:"x-amz-request-charged" type:"string" enum:"RequestCharged"`
 
 	// If server-side encryption with a customer-provided encryption key was requested,
-	// the response will include this header con***REMOVED***rming the encryption algorithm
+	// the response will include this header confirming the encryption algorithm
 	// used.
 	SSECustomerAlgorithm *string `location:"header" locationName:"x-amz-server-side-encryption-customer-algorithm" type:"string"`
 
 	// If server-side encryption with a customer-provided encryption key was requested,
 	// the response will include this header to provide round trip message integrity
-	// veri***REMOVED***cation of the customer-provided encryption key.
+	// verification of the customer-provided encryption key.
 	SSECustomerKeyMD5 *string `location:"header" locationName:"x-amz-server-side-encryption-customer-key-MD5" type:"string"`
 
-	// If present, speci***REMOVED***es the AWS KMS Encryption Context to use for object encryption.
+	// If present, specifies the AWS KMS Encryption Context to use for object encryption.
 	// The value of this header is a base64-encoded UTF-8 string holding JSON with
 	// the encryption context key-value pairs.
 	SSEKMSEncryptionContext *string `location:"header" locationName:"x-amz-server-side-encryption-context" type:"string" sensitive:"true"`
 
-	// If present, speci***REMOVED***es the ID of the AWS Key Management Service (KMS) master
+	// If present, specifies the ID of the AWS Key Management Service (KMS) master
 	// encryption key that was used for the object.
 	SSEKMSKeyId *string `location:"header" locationName:"x-amz-server-side-encryption-aws-kms-key-id" type:"string" sensitive:"true"`
 
@@ -8878,61 +8878,61 @@ func (s CopyObjectOutput) GoString() string {
 	return s.String()
 }
 
-// SetCopyObjectResult sets the CopyObjectResult ***REMOVED***eld's value.
+// SetCopyObjectResult sets the CopyObjectResult field's value.
 func (s *CopyObjectOutput) SetCopyObjectResult(v *CopyObjectResult) *CopyObjectOutput {
 	s.CopyObjectResult = v
 	return s
 }
 
-// SetCopySourceVersionId sets the CopySourceVersionId ***REMOVED***eld's value.
+// SetCopySourceVersionId sets the CopySourceVersionId field's value.
 func (s *CopyObjectOutput) SetCopySourceVersionId(v string) *CopyObjectOutput {
 	s.CopySourceVersionId = &v
 	return s
 }
 
-// SetExpiration sets the Expiration ***REMOVED***eld's value.
+// SetExpiration sets the Expiration field's value.
 func (s *CopyObjectOutput) SetExpiration(v string) *CopyObjectOutput {
 	s.Expiration = &v
 	return s
 }
 
-// SetRequestCharged sets the RequestCharged ***REMOVED***eld's value.
+// SetRequestCharged sets the RequestCharged field's value.
 func (s *CopyObjectOutput) SetRequestCharged(v string) *CopyObjectOutput {
 	s.RequestCharged = &v
 	return s
 }
 
-// SetSSECustomerAlgorithm sets the SSECustomerAlgorithm ***REMOVED***eld's value.
+// SetSSECustomerAlgorithm sets the SSECustomerAlgorithm field's value.
 func (s *CopyObjectOutput) SetSSECustomerAlgorithm(v string) *CopyObjectOutput {
 	s.SSECustomerAlgorithm = &v
 	return s
 }
 
-// SetSSECustomerKeyMD5 sets the SSECustomerKeyMD5 ***REMOVED***eld's value.
+// SetSSECustomerKeyMD5 sets the SSECustomerKeyMD5 field's value.
 func (s *CopyObjectOutput) SetSSECustomerKeyMD5(v string) *CopyObjectOutput {
 	s.SSECustomerKeyMD5 = &v
 	return s
 }
 
-// SetSSEKMSEncryptionContext sets the SSEKMSEncryptionContext ***REMOVED***eld's value.
+// SetSSEKMSEncryptionContext sets the SSEKMSEncryptionContext field's value.
 func (s *CopyObjectOutput) SetSSEKMSEncryptionContext(v string) *CopyObjectOutput {
 	s.SSEKMSEncryptionContext = &v
 	return s
 }
 
-// SetSSEKMSKeyId sets the SSEKMSKeyId ***REMOVED***eld's value.
+// SetSSEKMSKeyId sets the SSEKMSKeyId field's value.
 func (s *CopyObjectOutput) SetSSEKMSKeyId(v string) *CopyObjectOutput {
 	s.SSEKMSKeyId = &v
 	return s
 }
 
-// SetServerSideEncryption sets the ServerSideEncryption ***REMOVED***eld's value.
+// SetServerSideEncryption sets the ServerSideEncryption field's value.
 func (s *CopyObjectOutput) SetServerSideEncryption(v string) *CopyObjectOutput {
 	s.ServerSideEncryption = &v
 	return s
 }
 
-// SetVersionId sets the VersionId ***REMOVED***eld's value.
+// SetVersionId sets the VersionId field's value.
 func (s *CopyObjectOutput) SetVersionId(v string) *CopyObjectOutput {
 	s.VersionId = &v
 	return s
@@ -8943,7 +8943,7 @@ type CopyObjectResult struct {
 
 	ETag *string `type:"string"`
 
-	LastModi***REMOVED***ed *time.Time `type:"timestamp"`
+	LastModified *time.Time `type:"timestamp"`
 }
 
 // String returns the string representation
@@ -8956,15 +8956,15 @@ func (s CopyObjectResult) GoString() string {
 	return s.String()
 }
 
-// SetETag sets the ETag ***REMOVED***eld's value.
+// SetETag sets the ETag field's value.
 func (s *CopyObjectResult) SetETag(v string) *CopyObjectResult {
 	s.ETag = &v
 	return s
 }
 
-// SetLastModi***REMOVED***ed sets the LastModi***REMOVED***ed ***REMOVED***eld's value.
-func (s *CopyObjectResult) SetLastModi***REMOVED***ed(v time.Time) *CopyObjectResult {
-	s.LastModi***REMOVED***ed = &v
+// SetLastModified sets the LastModified field's value.
+func (s *CopyObjectResult) SetLastModified(v time.Time) *CopyObjectResult {
+	s.LastModified = &v
 	return s
 }
 
@@ -8975,7 +8975,7 @@ type CopyPartResult struct {
 	ETag *string `type:"string"`
 
 	// Date and time at which the object was uploaded.
-	LastModi***REMOVED***ed *time.Time `type:"timestamp"`
+	LastModified *time.Time `type:"timestamp"`
 }
 
 // String returns the string representation
@@ -8988,52 +8988,52 @@ func (s CopyPartResult) GoString() string {
 	return s.String()
 }
 
-// SetETag sets the ETag ***REMOVED***eld's value.
+// SetETag sets the ETag field's value.
 func (s *CopyPartResult) SetETag(v string) *CopyPartResult {
 	s.ETag = &v
 	return s
 }
 
-// SetLastModi***REMOVED***ed sets the LastModi***REMOVED***ed ***REMOVED***eld's value.
-func (s *CopyPartResult) SetLastModi***REMOVED***ed(v time.Time) *CopyPartResult {
-	s.LastModi***REMOVED***ed = &v
+// SetLastModified sets the LastModified field's value.
+func (s *CopyPartResult) SetLastModified(v time.Time) *CopyPartResult {
+	s.LastModified = &v
 	return s
 }
 
-type CreateBucketCon***REMOVED***guration struct {
+type CreateBucketConfiguration struct {
 	_ struct{} `type:"structure"`
 
-	// Speci***REMOVED***es the region where the bucket will be created. If you don't specify
+	// Specifies the region where the bucket will be created. If you don't specify
 	// a region, the bucket is created in US East (N. Virginia) Region (us-east-1).
 	LocationConstraint *string `type:"string" enum:"BucketLocationConstraint"`
 }
 
 // String returns the string representation
-func (s CreateBucketCon***REMOVED***guration) String() string {
+func (s CreateBucketConfiguration) String() string {
 	return awsutil.Prettify(s)
 }
 
 // GoString returns the string representation
-func (s CreateBucketCon***REMOVED***guration) GoString() string {
+func (s CreateBucketConfiguration) GoString() string {
 	return s.String()
 }
 
-// SetLocationConstraint sets the LocationConstraint ***REMOVED***eld's value.
-func (s *CreateBucketCon***REMOVED***guration) SetLocationConstraint(v string) *CreateBucketCon***REMOVED***guration {
+// SetLocationConstraint sets the LocationConstraint field's value.
+func (s *CreateBucketConfiguration) SetLocationConstraint(v string) *CreateBucketConfiguration {
 	s.LocationConstraint = &v
 	return s
 }
 
 type CreateBucketInput struct {
-	_ struct{} `locationName:"CreateBucketRequest" type:"structure" payload:"CreateBucketCon***REMOVED***guration"`
+	_ struct{} `locationName:"CreateBucketRequest" type:"structure" payload:"CreateBucketConfiguration"`
 
 	// The canned ACL to apply to the bucket.
 	ACL *string `location:"header" locationName:"x-amz-acl" type:"string" enum:"BucketCannedACL"`
 
-	// Bucket is a required ***REMOVED***eld
+	// Bucket is a required field
 	Bucket *string `location:"uri" locationName:"Bucket" type:"string" required:"true"`
 
-	CreateBucketCon***REMOVED***guration *CreateBucketCon***REMOVED***guration `locationName:"CreateBucketCon***REMOVED***guration" type:"structure" xmlURI:"http://s3.amazonaws.com/doc/2006-03-01/"`
+	CreateBucketConfiguration *CreateBucketConfiguration `locationName:"CreateBucketConfiguration" type:"structure" xmlURI:"http://s3.amazonaws.com/doc/2006-03-01/"`
 
 	// Allows grantee the read, write, read ACP, and write ACP permissions on the
 	// bucket.
@@ -9051,7 +9051,7 @@ type CreateBucketInput struct {
 	// Allows grantee to write the ACL for the applicable bucket.
 	GrantWriteACP *string `location:"header" locationName:"x-amz-grant-write-acp" type:"string"`
 
-	// Speci***REMOVED***es whether you want Amazon S3 object lock to be enabled for the new
+	// Specifies whether you want Amazon S3 object lock to be enabled for the new
 	// bucket.
 	ObjectLockEnabledForBucket *bool `location:"header" locationName:"x-amz-bucket-object-lock-enabled" type:"boolean"`
 }
@@ -9066,7 +9066,7 @@ func (s CreateBucketInput) GoString() string {
 	return s.String()
 }
 
-// Validate inspects the ***REMOVED***elds of the type to determine if they are valid.
+// Validate inspects the fields of the type to determine if they are valid.
 func (s *CreateBucketInput) Validate() error {
 	invalidParams := request.ErrInvalidParams{Context: "CreateBucketInput"}
 	if s.Bucket == nil {
@@ -9082,13 +9082,13 @@ func (s *CreateBucketInput) Validate() error {
 	return nil
 }
 
-// SetACL sets the ACL ***REMOVED***eld's value.
+// SetACL sets the ACL field's value.
 func (s *CreateBucketInput) SetACL(v string) *CreateBucketInput {
 	s.ACL = &v
 	return s
 }
 
-// SetBucket sets the Bucket ***REMOVED***eld's value.
+// SetBucket sets the Bucket field's value.
 func (s *CreateBucketInput) SetBucket(v string) *CreateBucketInput {
 	s.Bucket = &v
 	return s
@@ -9101,43 +9101,43 @@ func (s *CreateBucketInput) getBucket() (v string) {
 	return *s.Bucket
 }
 
-// SetCreateBucketCon***REMOVED***guration sets the CreateBucketCon***REMOVED***guration ***REMOVED***eld's value.
-func (s *CreateBucketInput) SetCreateBucketCon***REMOVED***guration(v *CreateBucketCon***REMOVED***guration) *CreateBucketInput {
-	s.CreateBucketCon***REMOVED***guration = v
+// SetCreateBucketConfiguration sets the CreateBucketConfiguration field's value.
+func (s *CreateBucketInput) SetCreateBucketConfiguration(v *CreateBucketConfiguration) *CreateBucketInput {
+	s.CreateBucketConfiguration = v
 	return s
 }
 
-// SetGrantFullControl sets the GrantFullControl ***REMOVED***eld's value.
+// SetGrantFullControl sets the GrantFullControl field's value.
 func (s *CreateBucketInput) SetGrantFullControl(v string) *CreateBucketInput {
 	s.GrantFullControl = &v
 	return s
 }
 
-// SetGrantRead sets the GrantRead ***REMOVED***eld's value.
+// SetGrantRead sets the GrantRead field's value.
 func (s *CreateBucketInput) SetGrantRead(v string) *CreateBucketInput {
 	s.GrantRead = &v
 	return s
 }
 
-// SetGrantReadACP sets the GrantReadACP ***REMOVED***eld's value.
+// SetGrantReadACP sets the GrantReadACP field's value.
 func (s *CreateBucketInput) SetGrantReadACP(v string) *CreateBucketInput {
 	s.GrantReadACP = &v
 	return s
 }
 
-// SetGrantWrite sets the GrantWrite ***REMOVED***eld's value.
+// SetGrantWrite sets the GrantWrite field's value.
 func (s *CreateBucketInput) SetGrantWrite(v string) *CreateBucketInput {
 	s.GrantWrite = &v
 	return s
 }
 
-// SetGrantWriteACP sets the GrantWriteACP ***REMOVED***eld's value.
+// SetGrantWriteACP sets the GrantWriteACP field's value.
 func (s *CreateBucketInput) SetGrantWriteACP(v string) *CreateBucketInput {
 	s.GrantWriteACP = &v
 	return s
 }
 
-// SetObjectLockEnabledForBucket sets the ObjectLockEnabledForBucket ***REMOVED***eld's value.
+// SetObjectLockEnabledForBucket sets the ObjectLockEnabledForBucket field's value.
 func (s *CreateBucketInput) SetObjectLockEnabledForBucket(v bool) *CreateBucketInput {
 	s.ObjectLockEnabledForBucket = &v
 	return s
@@ -9159,7 +9159,7 @@ func (s CreateBucketOutput) GoString() string {
 	return s.String()
 }
 
-// SetLocation sets the Location ***REMOVED***eld's value.
+// SetLocation sets the Location field's value.
 func (s *CreateBucketOutput) SetLocation(v string) *CreateBucketOutput {
 	s.Location = &v
 	return s
@@ -9171,18 +9171,18 @@ type CreateMultipartUploadInput struct {
 	// The canned ACL to apply to the object.
 	ACL *string `location:"header" locationName:"x-amz-acl" type:"string" enum:"ObjectCannedACL"`
 
-	// Bucket is a required ***REMOVED***eld
+	// Bucket is a required field
 	Bucket *string `location:"uri" locationName:"Bucket" type:"string" required:"true"`
 
-	// Speci***REMOVED***es caching behavior along the request/reply chain.
+	// Specifies caching behavior along the request/reply chain.
 	CacheControl *string `location:"header" locationName:"Cache-Control" type:"string"`
 
-	// Speci***REMOVED***es presentational information for the object.
+	// Specifies presentational information for the object.
 	ContentDisposition *string `location:"header" locationName:"Content-Disposition" type:"string"`
 
-	// Speci***REMOVED***es what content encodings have been applied to the object and thus
+	// Specifies what content encodings have been applied to the object and thus
 	// what decoding mechanisms must be applied to obtain the media-type referenced
-	// by the Content-Type header ***REMOVED***eld.
+	// by the Content-Type header field.
 	ContentEncoding *string `location:"header" locationName:"Content-Encoding" type:"string"`
 
 	// The language the content is in.
@@ -9206,50 +9206,50 @@ type CreateMultipartUploadInput struct {
 	// Allows grantee to write the ACL for the applicable object.
 	GrantWriteACP *string `location:"header" locationName:"x-amz-grant-write-acp" type:"string"`
 
-	// Key is a required ***REMOVED***eld
+	// Key is a required field
 	Key *string `location:"uri" locationName:"Key" min:"1" type:"string" required:"true"`
 
 	// A map of metadata to store with the object in S3.
 	Metadata map[string]*string `location:"headers" locationName:"x-amz-meta-" type:"map"`
 
-	// Speci***REMOVED***es whether you want to apply a Legal Hold to the uploaded object.
+	// Specifies whether you want to apply a Legal Hold to the uploaded object.
 	ObjectLockLegalHoldStatus *string `location:"header" locationName:"x-amz-object-lock-legal-hold" type:"string" enum:"ObjectLockLegalHoldStatus"`
 
-	// Speci***REMOVED***es the object lock mode that you want to apply to the uploaded object.
+	// Specifies the object lock mode that you want to apply to the uploaded object.
 	ObjectLockMode *string `location:"header" locationName:"x-amz-object-lock-mode" type:"string" enum:"ObjectLockMode"`
 
-	// Speci***REMOVED***es the date and time when you want the object lock to expire.
+	// Specifies the date and time when you want the object lock to expire.
 	ObjectLockRetainUntilDate *time.Time `location:"header" locationName:"x-amz-object-lock-retain-until-date" type:"timestamp" timestampFormat:"iso8601"`
 
-	// Con***REMOVED***rms that the requester knows that she or he will be charged for the
+	// Confirms that the requester knows that she or he will be charged for the
 	// request. Bucket owners need not specify this parameter in their requests.
 	// Documentation on downloading objects from requester pays buckets can be found
 	// at http://docs.aws.amazon.com/AmazonS3/latest/dev/ObjectsinRequesterPaysBuckets.html
 	RequestPayer *string `location:"header" locationName:"x-amz-request-payer" type:"string" enum:"RequestPayer"`
 
-	// Speci***REMOVED***es the algorithm to use to when encrypting the object (e.g., AES256).
+	// Specifies the algorithm to use to when encrypting the object (e.g., AES256).
 	SSECustomerAlgorithm *string `location:"header" locationName:"x-amz-server-side-encryption-customer-algorithm" type:"string"`
 
-	// Speci***REMOVED***es the customer-provided encryption key for Amazon S3 to use in encrypting
+	// Specifies the customer-provided encryption key for Amazon S3 to use in encrypting
 	// data. This value is used to store the object and then it is discarded; Amazon
 	// does not store the encryption key. The key must be appropriate for use with
-	// the algorithm speci***REMOVED***ed in the x-amz-server-side​-encryption​-customer-algorithm
+	// the algorithm specified in the x-amz-server-side​-encryption​-customer-algorithm
 	// header.
 	SSECustomerKey *string `marshal-as:"blob" location:"header" locationName:"x-amz-server-side-encryption-customer-key" type:"string" sensitive:"true"`
 
-	// Speci***REMOVED***es the 128-bit MD5 digest of the encryption key according to RFC 1321.
+	// Specifies the 128-bit MD5 digest of the encryption key according to RFC 1321.
 	// Amazon S3 uses this header for a message integrity check to ensure the encryption
 	// key was transmitted without error.
 	SSECustomerKeyMD5 *string `location:"header" locationName:"x-amz-server-side-encryption-customer-key-MD5" type:"string"`
 
-	// Speci***REMOVED***es the AWS KMS Encryption Context to use for object encryption. The
+	// Specifies the AWS KMS Encryption Context to use for object encryption. The
 	// value of this header is a base64-encoded UTF-8 string holding JSON with the
 	// encryption context key-value pairs.
 	SSEKMSEncryptionContext *string `location:"header" locationName:"x-amz-server-side-encryption-context" type:"string" sensitive:"true"`
 
-	// Speci***REMOVED***es the AWS KMS key ID to use for object encryption. All GET and PUT
+	// Specifies the AWS KMS key ID to use for object encryption. All GET and PUT
 	// requests for an object protected by AWS KMS will fail if not made via SSL
-	// or using SigV4. Documentation on con***REMOVED***guring any of the of***REMOVED***cially supported
+	// or using SigV4. Documentation on configuring any of the officially supported
 	// AWS SDKs and CLI can be found at http://docs.aws.amazon.com/AmazonS3/latest/dev/UsingAWSSDK.html#specify-signature-version
 	SSEKMSKeyId *string `location:"header" locationName:"x-amz-server-side-encryption-aws-kms-key-id" type:"string" sensitive:"true"`
 
@@ -9263,7 +9263,7 @@ type CreateMultipartUploadInput struct {
 	// The tag-set for the object. The tag-set must be encoded as URL Query parameters
 	Tagging *string `location:"header" locationName:"x-amz-tagging" type:"string"`
 
-	// If the bucket is con***REMOVED***gured as a website, redirects requests for this object
+	// If the bucket is configured as a website, redirects requests for this object
 	// to another object in the same bucket or to an external URL. Amazon S3 stores
 	// the value of this header in the object metadata.
 	WebsiteRedirectLocation *string `location:"header" locationName:"x-amz-website-redirect-location" type:"string"`
@@ -9279,7 +9279,7 @@ func (s CreateMultipartUploadInput) GoString() string {
 	return s.String()
 }
 
-// Validate inspects the ***REMOVED***elds of the type to determine if they are valid.
+// Validate inspects the fields of the type to determine if they are valid.
 func (s *CreateMultipartUploadInput) Validate() error {
 	invalidParams := request.ErrInvalidParams{Context: "CreateMultipartUploadInput"}
 	if s.Bucket == nil {
@@ -9301,13 +9301,13 @@ func (s *CreateMultipartUploadInput) Validate() error {
 	return nil
 }
 
-// SetACL sets the ACL ***REMOVED***eld's value.
+// SetACL sets the ACL field's value.
 func (s *CreateMultipartUploadInput) SetACL(v string) *CreateMultipartUploadInput {
 	s.ACL = &v
 	return s
 }
 
-// SetBucket sets the Bucket ***REMOVED***eld's value.
+// SetBucket sets the Bucket field's value.
 func (s *CreateMultipartUploadInput) SetBucket(v string) *CreateMultipartUploadInput {
 	s.Bucket = &v
 	return s
@@ -9320,109 +9320,109 @@ func (s *CreateMultipartUploadInput) getBucket() (v string) {
 	return *s.Bucket
 }
 
-// SetCacheControl sets the CacheControl ***REMOVED***eld's value.
+// SetCacheControl sets the CacheControl field's value.
 func (s *CreateMultipartUploadInput) SetCacheControl(v string) *CreateMultipartUploadInput {
 	s.CacheControl = &v
 	return s
 }
 
-// SetContentDisposition sets the ContentDisposition ***REMOVED***eld's value.
+// SetContentDisposition sets the ContentDisposition field's value.
 func (s *CreateMultipartUploadInput) SetContentDisposition(v string) *CreateMultipartUploadInput {
 	s.ContentDisposition = &v
 	return s
 }
 
-// SetContentEncoding sets the ContentEncoding ***REMOVED***eld's value.
+// SetContentEncoding sets the ContentEncoding field's value.
 func (s *CreateMultipartUploadInput) SetContentEncoding(v string) *CreateMultipartUploadInput {
 	s.ContentEncoding = &v
 	return s
 }
 
-// SetContentLanguage sets the ContentLanguage ***REMOVED***eld's value.
+// SetContentLanguage sets the ContentLanguage field's value.
 func (s *CreateMultipartUploadInput) SetContentLanguage(v string) *CreateMultipartUploadInput {
 	s.ContentLanguage = &v
 	return s
 }
 
-// SetContentType sets the ContentType ***REMOVED***eld's value.
+// SetContentType sets the ContentType field's value.
 func (s *CreateMultipartUploadInput) SetContentType(v string) *CreateMultipartUploadInput {
 	s.ContentType = &v
 	return s
 }
 
-// SetExpires sets the Expires ***REMOVED***eld's value.
+// SetExpires sets the Expires field's value.
 func (s *CreateMultipartUploadInput) SetExpires(v time.Time) *CreateMultipartUploadInput {
 	s.Expires = &v
 	return s
 }
 
-// SetGrantFullControl sets the GrantFullControl ***REMOVED***eld's value.
+// SetGrantFullControl sets the GrantFullControl field's value.
 func (s *CreateMultipartUploadInput) SetGrantFullControl(v string) *CreateMultipartUploadInput {
 	s.GrantFullControl = &v
 	return s
 }
 
-// SetGrantRead sets the GrantRead ***REMOVED***eld's value.
+// SetGrantRead sets the GrantRead field's value.
 func (s *CreateMultipartUploadInput) SetGrantRead(v string) *CreateMultipartUploadInput {
 	s.GrantRead = &v
 	return s
 }
 
-// SetGrantReadACP sets the GrantReadACP ***REMOVED***eld's value.
+// SetGrantReadACP sets the GrantReadACP field's value.
 func (s *CreateMultipartUploadInput) SetGrantReadACP(v string) *CreateMultipartUploadInput {
 	s.GrantReadACP = &v
 	return s
 }
 
-// SetGrantWriteACP sets the GrantWriteACP ***REMOVED***eld's value.
+// SetGrantWriteACP sets the GrantWriteACP field's value.
 func (s *CreateMultipartUploadInput) SetGrantWriteACP(v string) *CreateMultipartUploadInput {
 	s.GrantWriteACP = &v
 	return s
 }
 
-// SetKey sets the Key ***REMOVED***eld's value.
+// SetKey sets the Key field's value.
 func (s *CreateMultipartUploadInput) SetKey(v string) *CreateMultipartUploadInput {
 	s.Key = &v
 	return s
 }
 
-// SetMetadata sets the Metadata ***REMOVED***eld's value.
+// SetMetadata sets the Metadata field's value.
 func (s *CreateMultipartUploadInput) SetMetadata(v map[string]*string) *CreateMultipartUploadInput {
 	s.Metadata = v
 	return s
 }
 
-// SetObjectLockLegalHoldStatus sets the ObjectLockLegalHoldStatus ***REMOVED***eld's value.
+// SetObjectLockLegalHoldStatus sets the ObjectLockLegalHoldStatus field's value.
 func (s *CreateMultipartUploadInput) SetObjectLockLegalHoldStatus(v string) *CreateMultipartUploadInput {
 	s.ObjectLockLegalHoldStatus = &v
 	return s
 }
 
-// SetObjectLockMode sets the ObjectLockMode ***REMOVED***eld's value.
+// SetObjectLockMode sets the ObjectLockMode field's value.
 func (s *CreateMultipartUploadInput) SetObjectLockMode(v string) *CreateMultipartUploadInput {
 	s.ObjectLockMode = &v
 	return s
 }
 
-// SetObjectLockRetainUntilDate sets the ObjectLockRetainUntilDate ***REMOVED***eld's value.
+// SetObjectLockRetainUntilDate sets the ObjectLockRetainUntilDate field's value.
 func (s *CreateMultipartUploadInput) SetObjectLockRetainUntilDate(v time.Time) *CreateMultipartUploadInput {
 	s.ObjectLockRetainUntilDate = &v
 	return s
 }
 
-// SetRequestPayer sets the RequestPayer ***REMOVED***eld's value.
+// SetRequestPayer sets the RequestPayer field's value.
 func (s *CreateMultipartUploadInput) SetRequestPayer(v string) *CreateMultipartUploadInput {
 	s.RequestPayer = &v
 	return s
 }
 
-// SetSSECustomerAlgorithm sets the SSECustomerAlgorithm ***REMOVED***eld's value.
+// SetSSECustomerAlgorithm sets the SSECustomerAlgorithm field's value.
 func (s *CreateMultipartUploadInput) SetSSECustomerAlgorithm(v string) *CreateMultipartUploadInput {
 	s.SSECustomerAlgorithm = &v
 	return s
 }
 
-// SetSSECustomerKey sets the SSECustomerKey ***REMOVED***eld's value.
+// SetSSECustomerKey sets the SSECustomerKey field's value.
 func (s *CreateMultipartUploadInput) SetSSECustomerKey(v string) *CreateMultipartUploadInput {
 	s.SSECustomerKey = &v
 	return s
@@ -9435,43 +9435,43 @@ func (s *CreateMultipartUploadInput) getSSECustomerKey() (v string) {
 	return *s.SSECustomerKey
 }
 
-// SetSSECustomerKeyMD5 sets the SSECustomerKeyMD5 ***REMOVED***eld's value.
+// SetSSECustomerKeyMD5 sets the SSECustomerKeyMD5 field's value.
 func (s *CreateMultipartUploadInput) SetSSECustomerKeyMD5(v string) *CreateMultipartUploadInput {
 	s.SSECustomerKeyMD5 = &v
 	return s
 }
 
-// SetSSEKMSEncryptionContext sets the SSEKMSEncryptionContext ***REMOVED***eld's value.
+// SetSSEKMSEncryptionContext sets the SSEKMSEncryptionContext field's value.
 func (s *CreateMultipartUploadInput) SetSSEKMSEncryptionContext(v string) *CreateMultipartUploadInput {
 	s.SSEKMSEncryptionContext = &v
 	return s
 }
 
-// SetSSEKMSKeyId sets the SSEKMSKeyId ***REMOVED***eld's value.
+// SetSSEKMSKeyId sets the SSEKMSKeyId field's value.
 func (s *CreateMultipartUploadInput) SetSSEKMSKeyId(v string) *CreateMultipartUploadInput {
 	s.SSEKMSKeyId = &v
 	return s
 }
 
-// SetServerSideEncryption sets the ServerSideEncryption ***REMOVED***eld's value.
+// SetServerSideEncryption sets the ServerSideEncryption field's value.
 func (s *CreateMultipartUploadInput) SetServerSideEncryption(v string) *CreateMultipartUploadInput {
 	s.ServerSideEncryption = &v
 	return s
 }
 
-// SetStorageClass sets the StorageClass ***REMOVED***eld's value.
+// SetStorageClass sets the StorageClass field's value.
 func (s *CreateMultipartUploadInput) SetStorageClass(v string) *CreateMultipartUploadInput {
 	s.StorageClass = &v
 	return s
 }
 
-// SetTagging sets the Tagging ***REMOVED***eld's value.
+// SetTagging sets the Tagging field's value.
 func (s *CreateMultipartUploadInput) SetTagging(v string) *CreateMultipartUploadInput {
 	s.Tagging = &v
 	return s
 }
 
-// SetWebsiteRedirectLocation sets the WebsiteRedirectLocation ***REMOVED***eld's value.
+// SetWebsiteRedirectLocation sets the WebsiteRedirectLocation field's value.
 func (s *CreateMultipartUploadInput) SetWebsiteRedirectLocation(v string) *CreateMultipartUploadInput {
 	s.WebsiteRedirectLocation = &v
 	return s
@@ -9498,21 +9498,21 @@ type CreateMultipartUploadOutput struct {
 	RequestCharged *string `location:"header" locationName:"x-amz-request-charged" type:"string" enum:"RequestCharged"`
 
 	// If server-side encryption with a customer-provided encryption key was requested,
-	// the response will include this header con***REMOVED***rming the encryption algorithm
+	// the response will include this header confirming the encryption algorithm
 	// used.
 	SSECustomerAlgorithm *string `location:"header" locationName:"x-amz-server-side-encryption-customer-algorithm" type:"string"`
 
 	// If server-side encryption with a customer-provided encryption key was requested,
 	// the response will include this header to provide round trip message integrity
-	// veri***REMOVED***cation of the customer-provided encryption key.
+	// verification of the customer-provided encryption key.
 	SSECustomerKeyMD5 *string `location:"header" locationName:"x-amz-server-side-encryption-customer-key-MD5" type:"string"`
 
-	// If present, speci***REMOVED***es the AWS KMS Encryption Context to use for object encryption.
+	// If present, specifies the AWS KMS Encryption Context to use for object encryption.
 	// The value of this header is a base64-encoded UTF-8 string holding JSON with
 	// the encryption context key-value pairs.
 	SSEKMSEncryptionContext *string `location:"header" locationName:"x-amz-server-side-encryption-context" type:"string" sensitive:"true"`
 
-	// If present, speci***REMOVED***es the ID of the AWS Key Management Service (KMS) master
+	// If present, specifies the ID of the AWS Key Management Service (KMS) master
 	// encryption key that was used for the object.
 	SSEKMSKeyId *string `location:"header" locationName:"x-amz-server-side-encryption-aws-kms-key-id" type:"string" sensitive:"true"`
 
@@ -9534,19 +9534,19 @@ func (s CreateMultipartUploadOutput) GoString() string {
 	return s.String()
 }
 
-// SetAbortDate sets the AbortDate ***REMOVED***eld's value.
+// SetAbortDate sets the AbortDate field's value.
 func (s *CreateMultipartUploadOutput) SetAbortDate(v time.Time) *CreateMultipartUploadOutput {
 	s.AbortDate = &v
 	return s
 }
 
-// SetAbortRuleId sets the AbortRuleId ***REMOVED***eld's value.
+// SetAbortRuleId sets the AbortRuleId field's value.
 func (s *CreateMultipartUploadOutput) SetAbortRuleId(v string) *CreateMultipartUploadOutput {
 	s.AbortRuleId = &v
 	return s
 }
 
-// SetBucket sets the Bucket ***REMOVED***eld's value.
+// SetBucket sets the Bucket field's value.
 func (s *CreateMultipartUploadOutput) SetBucket(v string) *CreateMultipartUploadOutput {
 	s.Bucket = &v
 	return s
@@ -9559,56 +9559,56 @@ func (s *CreateMultipartUploadOutput) getBucket() (v string) {
 	return *s.Bucket
 }
 
-// SetKey sets the Key ***REMOVED***eld's value.
+// SetKey sets the Key field's value.
 func (s *CreateMultipartUploadOutput) SetKey(v string) *CreateMultipartUploadOutput {
 	s.Key = &v
 	return s
 }
 
-// SetRequestCharged sets the RequestCharged ***REMOVED***eld's value.
+// SetRequestCharged sets the RequestCharged field's value.
 func (s *CreateMultipartUploadOutput) SetRequestCharged(v string) *CreateMultipartUploadOutput {
 	s.RequestCharged = &v
 	return s
 }
 
-// SetSSECustomerAlgorithm sets the SSECustomerAlgorithm ***REMOVED***eld's value.
+// SetSSECustomerAlgorithm sets the SSECustomerAlgorithm field's value.
 func (s *CreateMultipartUploadOutput) SetSSECustomerAlgorithm(v string) *CreateMultipartUploadOutput {
 	s.SSECustomerAlgorithm = &v
 	return s
 }
 
-// SetSSECustomerKeyMD5 sets the SSECustomerKeyMD5 ***REMOVED***eld's value.
+// SetSSECustomerKeyMD5 sets the SSECustomerKeyMD5 field's value.
 func (s *CreateMultipartUploadOutput) SetSSECustomerKeyMD5(v string) *CreateMultipartUploadOutput {
 	s.SSECustomerKeyMD5 = &v
 	return s
 }
 
-// SetSSEKMSEncryptionContext sets the SSEKMSEncryptionContext ***REMOVED***eld's value.
+// SetSSEKMSEncryptionContext sets the SSEKMSEncryptionContext field's value.
 func (s *CreateMultipartUploadOutput) SetSSEKMSEncryptionContext(v string) *CreateMultipartUploadOutput {
 	s.SSEKMSEncryptionContext = &v
 	return s
 }
 
-// SetSSEKMSKeyId sets the SSEKMSKeyId ***REMOVED***eld's value.
+// SetSSEKMSKeyId sets the SSEKMSKeyId field's value.
 func (s *CreateMultipartUploadOutput) SetSSEKMSKeyId(v string) *CreateMultipartUploadOutput {
 	s.SSEKMSKeyId = &v
 	return s
 }
 
-// SetServerSideEncryption sets the ServerSideEncryption ***REMOVED***eld's value.
+// SetServerSideEncryption sets the ServerSideEncryption field's value.
 func (s *CreateMultipartUploadOutput) SetServerSideEncryption(v string) *CreateMultipartUploadOutput {
 	s.ServerSideEncryption = &v
 	return s
 }
 
-// SetUploadId sets the UploadId ***REMOVED***eld's value.
+// SetUploadId sets the UploadId field's value.
 func (s *CreateMultipartUploadOutput) SetUploadId(v string) *CreateMultipartUploadOutput {
 	s.UploadId = &v
 	return s
 }
 
 // The container element for specifying the default object lock retention settings
-// for new objects placed in the speci***REMOVED***ed bucket.
+// for new objects placed in the specified bucket.
 type DefaultRetention struct {
 	_ struct{} `type:"structure"`
 
@@ -9616,7 +9616,7 @@ type DefaultRetention struct {
 	Days *int64 `type:"integer"`
 
 	// The default object lock retention mode you want to apply to new objects placed
-	// in the speci***REMOVED***ed bucket.
+	// in the specified bucket.
 	Mode *string `type:"string" enum:"ObjectLockRetentionMode"`
 
 	// The number of years that you want to specify for the default retention period.
@@ -9633,19 +9633,19 @@ func (s DefaultRetention) GoString() string {
 	return s.String()
 }
 
-// SetDays sets the Days ***REMOVED***eld's value.
+// SetDays sets the Days field's value.
 func (s *DefaultRetention) SetDays(v int64) *DefaultRetention {
 	s.Days = &v
 	return s
 }
 
-// SetMode sets the Mode ***REMOVED***eld's value.
+// SetMode sets the Mode field's value.
 func (s *DefaultRetention) SetMode(v string) *DefaultRetention {
 	s.Mode = &v
 	return s
 }
 
-// SetYears sets the Years ***REMOVED***eld's value.
+// SetYears sets the Years field's value.
 func (s *DefaultRetention) SetYears(v int64) *DefaultRetention {
 	s.Years = &v
 	return s
@@ -9654,8 +9654,8 @@ func (s *DefaultRetention) SetYears(v int64) *DefaultRetention {
 type Delete struct {
 	_ struct{} `type:"structure"`
 
-	// Objects is a required ***REMOVED***eld
-	Objects []*ObjectIdenti***REMOVED***er `locationName:"Object" type:"list" flattened:"true" required:"true"`
+	// Objects is a required field
+	Objects []*ObjectIdentifier `locationName:"Object" type:"list" flattened:"true" required:"true"`
 
 	// Element to enable quiet mode for the request. When you add this element,
 	// you must set its value to true.
@@ -9672,7 +9672,7 @@ func (s Delete) GoString() string {
 	return s.String()
 }
 
-// Validate inspects the ***REMOVED***elds of the type to determine if they are valid.
+// Validate inspects the fields of the type to determine if they are valid.
 func (s *Delete) Validate() error {
 	invalidParams := request.ErrInvalidParams{Context: "Delete"}
 	if s.Objects == nil {
@@ -9695,45 +9695,45 @@ func (s *Delete) Validate() error {
 	return nil
 }
 
-// SetObjects sets the Objects ***REMOVED***eld's value.
-func (s *Delete) SetObjects(v []*ObjectIdenti***REMOVED***er) *Delete {
+// SetObjects sets the Objects field's value.
+func (s *Delete) SetObjects(v []*ObjectIdentifier) *Delete {
 	s.Objects = v
 	return s
 }
 
-// SetQuiet sets the Quiet ***REMOVED***eld's value.
+// SetQuiet sets the Quiet field's value.
 func (s *Delete) SetQuiet(v bool) *Delete {
 	s.Quiet = &v
 	return s
 }
 
-type DeleteBucketAnalyticsCon***REMOVED***gurationInput struct {
-	_ struct{} `locationName:"DeleteBucketAnalyticsCon***REMOVED***gurationRequest" type:"structure"`
+type DeleteBucketAnalyticsConfigurationInput struct {
+	_ struct{} `locationName:"DeleteBucketAnalyticsConfigurationRequest" type:"structure"`
 
-	// The name of the bucket from which an analytics con***REMOVED***guration is deleted.
+	// The name of the bucket from which an analytics configuration is deleted.
 	//
-	// Bucket is a required ***REMOVED***eld
+	// Bucket is a required field
 	Bucket *string `location:"uri" locationName:"Bucket" type:"string" required:"true"`
 
-	// The ID that identi***REMOVED***es the analytics con***REMOVED***guration.
+	// The ID that identifies the analytics configuration.
 	//
-	// Id is a required ***REMOVED***eld
+	// Id is a required field
 	Id *string `location:"querystring" locationName:"id" type:"string" required:"true"`
 }
 
 // String returns the string representation
-func (s DeleteBucketAnalyticsCon***REMOVED***gurationInput) String() string {
+func (s DeleteBucketAnalyticsConfigurationInput) String() string {
 	return awsutil.Prettify(s)
 }
 
 // GoString returns the string representation
-func (s DeleteBucketAnalyticsCon***REMOVED***gurationInput) GoString() string {
+func (s DeleteBucketAnalyticsConfigurationInput) GoString() string {
 	return s.String()
 }
 
-// Validate inspects the ***REMOVED***elds of the type to determine if they are valid.
-func (s *DeleteBucketAnalyticsCon***REMOVED***gurationInput) Validate() error {
-	invalidParams := request.ErrInvalidParams{Context: "DeleteBucketAnalyticsCon***REMOVED***gurationInput"}
+// Validate inspects the fields of the type to determine if they are valid.
+func (s *DeleteBucketAnalyticsConfigurationInput) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "DeleteBucketAnalyticsConfigurationInput"}
 	if s.Bucket == nil {
 		invalidParams.Add(request.NewErrParamRequired("Bucket"))
 	}
@@ -9750,43 +9750,43 @@ func (s *DeleteBucketAnalyticsCon***REMOVED***gurationInput) Validate() error {
 	return nil
 }
 
-// SetBucket sets the Bucket ***REMOVED***eld's value.
-func (s *DeleteBucketAnalyticsCon***REMOVED***gurationInput) SetBucket(v string) *DeleteBucketAnalyticsCon***REMOVED***gurationInput {
+// SetBucket sets the Bucket field's value.
+func (s *DeleteBucketAnalyticsConfigurationInput) SetBucket(v string) *DeleteBucketAnalyticsConfigurationInput {
 	s.Bucket = &v
 	return s
 }
 
-func (s *DeleteBucketAnalyticsCon***REMOVED***gurationInput) getBucket() (v string) {
+func (s *DeleteBucketAnalyticsConfigurationInput) getBucket() (v string) {
 	if s.Bucket == nil {
 		return v
 	}
 	return *s.Bucket
 }
 
-// SetId sets the Id ***REMOVED***eld's value.
-func (s *DeleteBucketAnalyticsCon***REMOVED***gurationInput) SetId(v string) *DeleteBucketAnalyticsCon***REMOVED***gurationInput {
+// SetId sets the Id field's value.
+func (s *DeleteBucketAnalyticsConfigurationInput) SetId(v string) *DeleteBucketAnalyticsConfigurationInput {
 	s.Id = &v
 	return s
 }
 
-type DeleteBucketAnalyticsCon***REMOVED***gurationOutput struct {
+type DeleteBucketAnalyticsConfigurationOutput struct {
 	_ struct{} `type:"structure"`
 }
 
 // String returns the string representation
-func (s DeleteBucketAnalyticsCon***REMOVED***gurationOutput) String() string {
+func (s DeleteBucketAnalyticsConfigurationOutput) String() string {
 	return awsutil.Prettify(s)
 }
 
 // GoString returns the string representation
-func (s DeleteBucketAnalyticsCon***REMOVED***gurationOutput) GoString() string {
+func (s DeleteBucketAnalyticsConfigurationOutput) GoString() string {
 	return s.String()
 }
 
 type DeleteBucketCorsInput struct {
 	_ struct{} `locationName:"DeleteBucketCorsRequest" type:"structure"`
 
-	// Bucket is a required ***REMOVED***eld
+	// Bucket is a required field
 	Bucket *string `location:"uri" locationName:"Bucket" type:"string" required:"true"`
 }
 
@@ -9800,7 +9800,7 @@ func (s DeleteBucketCorsInput) GoString() string {
 	return s.String()
 }
 
-// Validate inspects the ***REMOVED***elds of the type to determine if they are valid.
+// Validate inspects the fields of the type to determine if they are valid.
 func (s *DeleteBucketCorsInput) Validate() error {
 	invalidParams := request.ErrInvalidParams{Context: "DeleteBucketCorsInput"}
 	if s.Bucket == nil {
@@ -9816,7 +9816,7 @@ func (s *DeleteBucketCorsInput) Validate() error {
 	return nil
 }
 
-// SetBucket sets the Bucket ***REMOVED***eld's value.
+// SetBucket sets the Bucket field's value.
 func (s *DeleteBucketCorsInput) SetBucket(v string) *DeleteBucketCorsInput {
 	s.Bucket = &v
 	return s
@@ -9846,10 +9846,10 @@ func (s DeleteBucketCorsOutput) GoString() string {
 type DeleteBucketEncryptionInput struct {
 	_ struct{} `locationName:"DeleteBucketEncryptionRequest" type:"structure"`
 
-	// The name of the bucket containing the server-side encryption con***REMOVED***guration
+	// The name of the bucket containing the server-side encryption configuration
 	// to delete.
 	//
-	// Bucket is a required ***REMOVED***eld
+	// Bucket is a required field
 	Bucket *string `location:"uri" locationName:"Bucket" type:"string" required:"true"`
 }
 
@@ -9863,7 +9863,7 @@ func (s DeleteBucketEncryptionInput) GoString() string {
 	return s.String()
 }
 
-// Validate inspects the ***REMOVED***elds of the type to determine if they are valid.
+// Validate inspects the fields of the type to determine if they are valid.
 func (s *DeleteBucketEncryptionInput) Validate() error {
 	invalidParams := request.ErrInvalidParams{Context: "DeleteBucketEncryptionInput"}
 	if s.Bucket == nil {
@@ -9879,7 +9879,7 @@ func (s *DeleteBucketEncryptionInput) Validate() error {
 	return nil
 }
 
-// SetBucket sets the Bucket ***REMOVED***eld's value.
+// SetBucket sets the Bucket field's value.
 func (s *DeleteBucketEncryptionInput) SetBucket(v string) *DeleteBucketEncryptionInput {
 	s.Bucket = &v
 	return s
@@ -9909,7 +9909,7 @@ func (s DeleteBucketEncryptionOutput) GoString() string {
 type DeleteBucketInput struct {
 	_ struct{} `locationName:"DeleteBucketRequest" type:"structure"`
 
-	// Bucket is a required ***REMOVED***eld
+	// Bucket is a required field
 	Bucket *string `location:"uri" locationName:"Bucket" type:"string" required:"true"`
 }
 
@@ -9923,7 +9923,7 @@ func (s DeleteBucketInput) GoString() string {
 	return s.String()
 }
 
-// Validate inspects the ***REMOVED***elds of the type to determine if they are valid.
+// Validate inspects the fields of the type to determine if they are valid.
 func (s *DeleteBucketInput) Validate() error {
 	invalidParams := request.ErrInvalidParams{Context: "DeleteBucketInput"}
 	if s.Bucket == nil {
@@ -9939,7 +9939,7 @@ func (s *DeleteBucketInput) Validate() error {
 	return nil
 }
 
-// SetBucket sets the Bucket ***REMOVED***eld's value.
+// SetBucket sets the Bucket field's value.
 func (s *DeleteBucketInput) SetBucket(v string) *DeleteBucketInput {
 	s.Bucket = &v
 	return s
@@ -9952,33 +9952,33 @@ func (s *DeleteBucketInput) getBucket() (v string) {
 	return *s.Bucket
 }
 
-type DeleteBucketInventoryCon***REMOVED***gurationInput struct {
-	_ struct{} `locationName:"DeleteBucketInventoryCon***REMOVED***gurationRequest" type:"structure"`
+type DeleteBucketInventoryConfigurationInput struct {
+	_ struct{} `locationName:"DeleteBucketInventoryConfigurationRequest" type:"structure"`
 
-	// The name of the bucket containing the inventory con***REMOVED***guration to delete.
+	// The name of the bucket containing the inventory configuration to delete.
 	//
-	// Bucket is a required ***REMOVED***eld
+	// Bucket is a required field
 	Bucket *string `location:"uri" locationName:"Bucket" type:"string" required:"true"`
 
-	// The ID used to identify the inventory con***REMOVED***guration.
+	// The ID used to identify the inventory configuration.
 	//
-	// Id is a required ***REMOVED***eld
+	// Id is a required field
 	Id *string `location:"querystring" locationName:"id" type:"string" required:"true"`
 }
 
 // String returns the string representation
-func (s DeleteBucketInventoryCon***REMOVED***gurationInput) String() string {
+func (s DeleteBucketInventoryConfigurationInput) String() string {
 	return awsutil.Prettify(s)
 }
 
 // GoString returns the string representation
-func (s DeleteBucketInventoryCon***REMOVED***gurationInput) GoString() string {
+func (s DeleteBucketInventoryConfigurationInput) GoString() string {
 	return s.String()
 }
 
-// Validate inspects the ***REMOVED***elds of the type to determine if they are valid.
-func (s *DeleteBucketInventoryCon***REMOVED***gurationInput) Validate() error {
-	invalidParams := request.ErrInvalidParams{Context: "DeleteBucketInventoryCon***REMOVED***gurationInput"}
+// Validate inspects the fields of the type to determine if they are valid.
+func (s *DeleteBucketInventoryConfigurationInput) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "DeleteBucketInventoryConfigurationInput"}
 	if s.Bucket == nil {
 		invalidParams.Add(request.NewErrParamRequired("Bucket"))
 	}
@@ -9995,43 +9995,43 @@ func (s *DeleteBucketInventoryCon***REMOVED***gurationInput) Validate() error {
 	return nil
 }
 
-// SetBucket sets the Bucket ***REMOVED***eld's value.
-func (s *DeleteBucketInventoryCon***REMOVED***gurationInput) SetBucket(v string) *DeleteBucketInventoryCon***REMOVED***gurationInput {
+// SetBucket sets the Bucket field's value.
+func (s *DeleteBucketInventoryConfigurationInput) SetBucket(v string) *DeleteBucketInventoryConfigurationInput {
 	s.Bucket = &v
 	return s
 }
 
-func (s *DeleteBucketInventoryCon***REMOVED***gurationInput) getBucket() (v string) {
+func (s *DeleteBucketInventoryConfigurationInput) getBucket() (v string) {
 	if s.Bucket == nil {
 		return v
 	}
 	return *s.Bucket
 }
 
-// SetId sets the Id ***REMOVED***eld's value.
-func (s *DeleteBucketInventoryCon***REMOVED***gurationInput) SetId(v string) *DeleteBucketInventoryCon***REMOVED***gurationInput {
+// SetId sets the Id field's value.
+func (s *DeleteBucketInventoryConfigurationInput) SetId(v string) *DeleteBucketInventoryConfigurationInput {
 	s.Id = &v
 	return s
 }
 
-type DeleteBucketInventoryCon***REMOVED***gurationOutput struct {
+type DeleteBucketInventoryConfigurationOutput struct {
 	_ struct{} `type:"structure"`
 }
 
 // String returns the string representation
-func (s DeleteBucketInventoryCon***REMOVED***gurationOutput) String() string {
+func (s DeleteBucketInventoryConfigurationOutput) String() string {
 	return awsutil.Prettify(s)
 }
 
 // GoString returns the string representation
-func (s DeleteBucketInventoryCon***REMOVED***gurationOutput) GoString() string {
+func (s DeleteBucketInventoryConfigurationOutput) GoString() string {
 	return s.String()
 }
 
 type DeleteBucketLifecycleInput struct {
 	_ struct{} `locationName:"DeleteBucketLifecycleRequest" type:"structure"`
 
-	// Bucket is a required ***REMOVED***eld
+	// Bucket is a required field
 	Bucket *string `location:"uri" locationName:"Bucket" type:"string" required:"true"`
 }
 
@@ -10045,7 +10045,7 @@ func (s DeleteBucketLifecycleInput) GoString() string {
 	return s.String()
 }
 
-// Validate inspects the ***REMOVED***elds of the type to determine if they are valid.
+// Validate inspects the fields of the type to determine if they are valid.
 func (s *DeleteBucketLifecycleInput) Validate() error {
 	invalidParams := request.ErrInvalidParams{Context: "DeleteBucketLifecycleInput"}
 	if s.Bucket == nil {
@@ -10061,7 +10061,7 @@ func (s *DeleteBucketLifecycleInput) Validate() error {
 	return nil
 }
 
-// SetBucket sets the Bucket ***REMOVED***eld's value.
+// SetBucket sets the Bucket field's value.
 func (s *DeleteBucketLifecycleInput) SetBucket(v string) *DeleteBucketLifecycleInput {
 	s.Bucket = &v
 	return s
@@ -10088,33 +10088,33 @@ func (s DeleteBucketLifecycleOutput) GoString() string {
 	return s.String()
 }
 
-type DeleteBucketMetricsCon***REMOVED***gurationInput struct {
-	_ struct{} `locationName:"DeleteBucketMetricsCon***REMOVED***gurationRequest" type:"structure"`
+type DeleteBucketMetricsConfigurationInput struct {
+	_ struct{} `locationName:"DeleteBucketMetricsConfigurationRequest" type:"structure"`
 
-	// The name of the bucket containing the metrics con***REMOVED***guration to delete.
+	// The name of the bucket containing the metrics configuration to delete.
 	//
-	// Bucket is a required ***REMOVED***eld
+	// Bucket is a required field
 	Bucket *string `location:"uri" locationName:"Bucket" type:"string" required:"true"`
 
-	// The ID used to identify the metrics con***REMOVED***guration.
+	// The ID used to identify the metrics configuration.
 	//
-	// Id is a required ***REMOVED***eld
+	// Id is a required field
 	Id *string `location:"querystring" locationName:"id" type:"string" required:"true"`
 }
 
 // String returns the string representation
-func (s DeleteBucketMetricsCon***REMOVED***gurationInput) String() string {
+func (s DeleteBucketMetricsConfigurationInput) String() string {
 	return awsutil.Prettify(s)
 }
 
 // GoString returns the string representation
-func (s DeleteBucketMetricsCon***REMOVED***gurationInput) GoString() string {
+func (s DeleteBucketMetricsConfigurationInput) GoString() string {
 	return s.String()
 }
 
-// Validate inspects the ***REMOVED***elds of the type to determine if they are valid.
-func (s *DeleteBucketMetricsCon***REMOVED***gurationInput) Validate() error {
-	invalidParams := request.ErrInvalidParams{Context: "DeleteBucketMetricsCon***REMOVED***gurationInput"}
+// Validate inspects the fields of the type to determine if they are valid.
+func (s *DeleteBucketMetricsConfigurationInput) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "DeleteBucketMetricsConfigurationInput"}
 	if s.Bucket == nil {
 		invalidParams.Add(request.NewErrParamRequired("Bucket"))
 	}
@@ -10131,36 +10131,36 @@ func (s *DeleteBucketMetricsCon***REMOVED***gurationInput) Validate() error {
 	return nil
 }
 
-// SetBucket sets the Bucket ***REMOVED***eld's value.
-func (s *DeleteBucketMetricsCon***REMOVED***gurationInput) SetBucket(v string) *DeleteBucketMetricsCon***REMOVED***gurationInput {
+// SetBucket sets the Bucket field's value.
+func (s *DeleteBucketMetricsConfigurationInput) SetBucket(v string) *DeleteBucketMetricsConfigurationInput {
 	s.Bucket = &v
 	return s
 }
 
-func (s *DeleteBucketMetricsCon***REMOVED***gurationInput) getBucket() (v string) {
+func (s *DeleteBucketMetricsConfigurationInput) getBucket() (v string) {
 	if s.Bucket == nil {
 		return v
 	}
 	return *s.Bucket
 }
 
-// SetId sets the Id ***REMOVED***eld's value.
-func (s *DeleteBucketMetricsCon***REMOVED***gurationInput) SetId(v string) *DeleteBucketMetricsCon***REMOVED***gurationInput {
+// SetId sets the Id field's value.
+func (s *DeleteBucketMetricsConfigurationInput) SetId(v string) *DeleteBucketMetricsConfigurationInput {
 	s.Id = &v
 	return s
 }
 
-type DeleteBucketMetricsCon***REMOVED***gurationOutput struct {
+type DeleteBucketMetricsConfigurationOutput struct {
 	_ struct{} `type:"structure"`
 }
 
 // String returns the string representation
-func (s DeleteBucketMetricsCon***REMOVED***gurationOutput) String() string {
+func (s DeleteBucketMetricsConfigurationOutput) String() string {
 	return awsutil.Prettify(s)
 }
 
 // GoString returns the string representation
-func (s DeleteBucketMetricsCon***REMOVED***gurationOutput) GoString() string {
+func (s DeleteBucketMetricsConfigurationOutput) GoString() string {
 	return s.String()
 }
 
@@ -10181,7 +10181,7 @@ func (s DeleteBucketOutput) GoString() string {
 type DeleteBucketPolicyInput struct {
 	_ struct{} `locationName:"DeleteBucketPolicyRequest" type:"structure"`
 
-	// Bucket is a required ***REMOVED***eld
+	// Bucket is a required field
 	Bucket *string `location:"uri" locationName:"Bucket" type:"string" required:"true"`
 }
 
@@ -10195,7 +10195,7 @@ func (s DeleteBucketPolicyInput) GoString() string {
 	return s.String()
 }
 
-// Validate inspects the ***REMOVED***elds of the type to determine if they are valid.
+// Validate inspects the fields of the type to determine if they are valid.
 func (s *DeleteBucketPolicyInput) Validate() error {
 	invalidParams := request.ErrInvalidParams{Context: "DeleteBucketPolicyInput"}
 	if s.Bucket == nil {
@@ -10211,7 +10211,7 @@ func (s *DeleteBucketPolicyInput) Validate() error {
 	return nil
 }
 
-// SetBucket sets the Bucket ***REMOVED***eld's value.
+// SetBucket sets the Bucket field's value.
 func (s *DeleteBucketPolicyInput) SetBucket(v string) *DeleteBucketPolicyInput {
 	s.Bucket = &v
 	return s
@@ -10243,10 +10243,10 @@ type DeleteBucketReplicationInput struct {
 
 	// The bucket name.
 	//
-	// It can take a while to propagate the deletion of a replication con***REMOVED***guration
+	// It can take a while to propagate the deletion of a replication configuration
 	// to all Amazon S3 systems.
 	//
-	// Bucket is a required ***REMOVED***eld
+	// Bucket is a required field
 	Bucket *string `location:"uri" locationName:"Bucket" type:"string" required:"true"`
 }
 
@@ -10260,7 +10260,7 @@ func (s DeleteBucketReplicationInput) GoString() string {
 	return s.String()
 }
 
-// Validate inspects the ***REMOVED***elds of the type to determine if they are valid.
+// Validate inspects the fields of the type to determine if they are valid.
 func (s *DeleteBucketReplicationInput) Validate() error {
 	invalidParams := request.ErrInvalidParams{Context: "DeleteBucketReplicationInput"}
 	if s.Bucket == nil {
@@ -10276,7 +10276,7 @@ func (s *DeleteBucketReplicationInput) Validate() error {
 	return nil
 }
 
-// SetBucket sets the Bucket ***REMOVED***eld's value.
+// SetBucket sets the Bucket field's value.
 func (s *DeleteBucketReplicationInput) SetBucket(v string) *DeleteBucketReplicationInput {
 	s.Bucket = &v
 	return s
@@ -10306,7 +10306,7 @@ func (s DeleteBucketReplicationOutput) GoString() string {
 type DeleteBucketTaggingInput struct {
 	_ struct{} `locationName:"DeleteBucketTaggingRequest" type:"structure"`
 
-	// Bucket is a required ***REMOVED***eld
+	// Bucket is a required field
 	Bucket *string `location:"uri" locationName:"Bucket" type:"string" required:"true"`
 }
 
@@ -10320,7 +10320,7 @@ func (s DeleteBucketTaggingInput) GoString() string {
 	return s.String()
 }
 
-// Validate inspects the ***REMOVED***elds of the type to determine if they are valid.
+// Validate inspects the fields of the type to determine if they are valid.
 func (s *DeleteBucketTaggingInput) Validate() error {
 	invalidParams := request.ErrInvalidParams{Context: "DeleteBucketTaggingInput"}
 	if s.Bucket == nil {
@@ -10336,7 +10336,7 @@ func (s *DeleteBucketTaggingInput) Validate() error {
 	return nil
 }
 
-// SetBucket sets the Bucket ***REMOVED***eld's value.
+// SetBucket sets the Bucket field's value.
 func (s *DeleteBucketTaggingInput) SetBucket(v string) *DeleteBucketTaggingInput {
 	s.Bucket = &v
 	return s
@@ -10366,7 +10366,7 @@ func (s DeleteBucketTaggingOutput) GoString() string {
 type DeleteBucketWebsiteInput struct {
 	_ struct{} `locationName:"DeleteBucketWebsiteRequest" type:"structure"`
 
-	// Bucket is a required ***REMOVED***eld
+	// Bucket is a required field
 	Bucket *string `location:"uri" locationName:"Bucket" type:"string" required:"true"`
 }
 
@@ -10380,7 +10380,7 @@ func (s DeleteBucketWebsiteInput) GoString() string {
 	return s.String()
 }
 
-// Validate inspects the ***REMOVED***elds of the type to determine if they are valid.
+// Validate inspects the fields of the type to determine if they are valid.
 func (s *DeleteBucketWebsiteInput) Validate() error {
 	invalidParams := request.ErrInvalidParams{Context: "DeleteBucketWebsiteInput"}
 	if s.Bucket == nil {
@@ -10396,7 +10396,7 @@ func (s *DeleteBucketWebsiteInput) Validate() error {
 	return nil
 }
 
-// SetBucket sets the Bucket ***REMOVED***eld's value.
+// SetBucket sets the Bucket field's value.
 func (s *DeleteBucketWebsiteInput) SetBucket(v string) *DeleteBucketWebsiteInput {
 	s.Bucket = &v
 	return s
@@ -10426,15 +10426,15 @@ func (s DeleteBucketWebsiteOutput) GoString() string {
 type DeleteMarkerEntry struct {
 	_ struct{} `type:"structure"`
 
-	// Speci***REMOVED***es whether the object is (true) or is not (false) the latest version
+	// Specifies whether the object is (true) or is not (false) the latest version
 	// of an object.
 	IsLatest *bool `type:"boolean"`
 
 	// The object key.
 	Key *string `min:"1" type:"string"`
 
-	// Date and time the object was last modi***REMOVED***ed.
-	LastModi***REMOVED***ed *time.Time `type:"timestamp"`
+	// Date and time the object was last modified.
+	LastModified *time.Time `type:"timestamp"`
 
 	Owner *Owner `type:"structure"`
 
@@ -10452,37 +10452,37 @@ func (s DeleteMarkerEntry) GoString() string {
 	return s.String()
 }
 
-// SetIsLatest sets the IsLatest ***REMOVED***eld's value.
+// SetIsLatest sets the IsLatest field's value.
 func (s *DeleteMarkerEntry) SetIsLatest(v bool) *DeleteMarkerEntry {
 	s.IsLatest = &v
 	return s
 }
 
-// SetKey sets the Key ***REMOVED***eld's value.
+// SetKey sets the Key field's value.
 func (s *DeleteMarkerEntry) SetKey(v string) *DeleteMarkerEntry {
 	s.Key = &v
 	return s
 }
 
-// SetLastModi***REMOVED***ed sets the LastModi***REMOVED***ed ***REMOVED***eld's value.
-func (s *DeleteMarkerEntry) SetLastModi***REMOVED***ed(v time.Time) *DeleteMarkerEntry {
-	s.LastModi***REMOVED***ed = &v
+// SetLastModified sets the LastModified field's value.
+func (s *DeleteMarkerEntry) SetLastModified(v time.Time) *DeleteMarkerEntry {
+	s.LastModified = &v
 	return s
 }
 
-// SetOwner sets the Owner ***REMOVED***eld's value.
+// SetOwner sets the Owner field's value.
 func (s *DeleteMarkerEntry) SetOwner(v *Owner) *DeleteMarkerEntry {
 	s.Owner = v
 	return s
 }
 
-// SetVersionId sets the VersionId ***REMOVED***eld's value.
+// SetVersionId sets the VersionId field's value.
 func (s *DeleteMarkerEntry) SetVersionId(v string) *DeleteMarkerEntry {
 	s.VersionId = &v
 	return s
 }
 
-// Speci***REMOVED***es whether Amazon S3 should replicate delete makers.
+// Specifies whether Amazon S3 should replicate delete makers.
 type DeleteMarkerReplication struct {
 	_ struct{} `type:"structure"`
 
@@ -10503,7 +10503,7 @@ func (s DeleteMarkerReplication) GoString() string {
 	return s.String()
 }
 
-// SetStatus sets the Status ***REMOVED***eld's value.
+// SetStatus sets the Status field's value.
 func (s *DeleteMarkerReplication) SetStatus(v string) *DeleteMarkerReplication {
 	s.Status = &v
 	return s
@@ -10512,27 +10512,27 @@ func (s *DeleteMarkerReplication) SetStatus(v string) *DeleteMarkerReplication {
 type DeleteObjectInput struct {
 	_ struct{} `locationName:"DeleteObjectRequest" type:"structure"`
 
-	// Bucket is a required ***REMOVED***eld
+	// Bucket is a required field
 	Bucket *string `location:"uri" locationName:"Bucket" type:"string" required:"true"`
 
 	// Indicates whether Amazon S3 object lock should bypass governance-mode restrictions
 	// to process this operation.
 	BypassGovernanceRetention *bool `location:"header" locationName:"x-amz-bypass-governance-retention" type:"boolean"`
 
-	// Key is a required ***REMOVED***eld
+	// Key is a required field
 	Key *string `location:"uri" locationName:"Key" min:"1" type:"string" required:"true"`
 
 	// The concatenation of the authentication device's serial number, a space,
 	// and the value that is displayed on your authentication device.
 	MFA *string `location:"header" locationName:"x-amz-mfa" type:"string"`
 
-	// Con***REMOVED***rms that the requester knows that she or he will be charged for the
+	// Confirms that the requester knows that she or he will be charged for the
 	// request. Bucket owners need not specify this parameter in their requests.
 	// Documentation on downloading objects from requester pays buckets can be found
 	// at http://docs.aws.amazon.com/AmazonS3/latest/dev/ObjectsinRequesterPaysBuckets.html
 	RequestPayer *string `location:"header" locationName:"x-amz-request-payer" type:"string" enum:"RequestPayer"`
 
-	// VersionId used to reference a speci***REMOVED***c version of the object.
+	// VersionId used to reference a specific version of the object.
 	VersionId *string `location:"querystring" locationName:"versionId" type:"string"`
 }
 
@@ -10546,7 +10546,7 @@ func (s DeleteObjectInput) GoString() string {
 	return s.String()
 }
 
-// Validate inspects the ***REMOVED***elds of the type to determine if they are valid.
+// Validate inspects the fields of the type to determine if they are valid.
 func (s *DeleteObjectInput) Validate() error {
 	invalidParams := request.ErrInvalidParams{Context: "DeleteObjectInput"}
 	if s.Bucket == nil {
@@ -10568,7 +10568,7 @@ func (s *DeleteObjectInput) Validate() error {
 	return nil
 }
 
-// SetBucket sets the Bucket ***REMOVED***eld's value.
+// SetBucket sets the Bucket field's value.
 func (s *DeleteObjectInput) SetBucket(v string) *DeleteObjectInput {
 	s.Bucket = &v
 	return s
@@ -10581,31 +10581,31 @@ func (s *DeleteObjectInput) getBucket() (v string) {
 	return *s.Bucket
 }
 
-// SetBypassGovernanceRetention sets the BypassGovernanceRetention ***REMOVED***eld's value.
+// SetBypassGovernanceRetention sets the BypassGovernanceRetention field's value.
 func (s *DeleteObjectInput) SetBypassGovernanceRetention(v bool) *DeleteObjectInput {
 	s.BypassGovernanceRetention = &v
 	return s
 }
 
-// SetKey sets the Key ***REMOVED***eld's value.
+// SetKey sets the Key field's value.
 func (s *DeleteObjectInput) SetKey(v string) *DeleteObjectInput {
 	s.Key = &v
 	return s
 }
 
-// SetMFA sets the MFA ***REMOVED***eld's value.
+// SetMFA sets the MFA field's value.
 func (s *DeleteObjectInput) SetMFA(v string) *DeleteObjectInput {
 	s.MFA = &v
 	return s
 }
 
-// SetRequestPayer sets the RequestPayer ***REMOVED***eld's value.
+// SetRequestPayer sets the RequestPayer field's value.
 func (s *DeleteObjectInput) SetRequestPayer(v string) *DeleteObjectInput {
 	s.RequestPayer = &v
 	return s
 }
 
-// SetVersionId sets the VersionId ***REMOVED***eld's value.
+// SetVersionId sets the VersionId field's value.
 func (s *DeleteObjectInput) SetVersionId(v string) *DeleteObjectInput {
 	s.VersionId = &v
 	return s
@@ -10614,7 +10614,7 @@ func (s *DeleteObjectInput) SetVersionId(v string) *DeleteObjectInput {
 type DeleteObjectOutput struct {
 	_ struct{} `type:"structure"`
 
-	// Speci***REMOVED***es whether the versioned object that was permanently deleted was (true)
+	// Specifies whether the versioned object that was permanently deleted was (true)
 	// or was not (false) a delete marker.
 	DeleteMarker *bool `location:"header" locationName:"x-amz-delete-marker" type:"boolean"`
 
@@ -10637,19 +10637,19 @@ func (s DeleteObjectOutput) GoString() string {
 	return s.String()
 }
 
-// SetDeleteMarker sets the DeleteMarker ***REMOVED***eld's value.
+// SetDeleteMarker sets the DeleteMarker field's value.
 func (s *DeleteObjectOutput) SetDeleteMarker(v bool) *DeleteObjectOutput {
 	s.DeleteMarker = &v
 	return s
 }
 
-// SetRequestCharged sets the RequestCharged ***REMOVED***eld's value.
+// SetRequestCharged sets the RequestCharged field's value.
 func (s *DeleteObjectOutput) SetRequestCharged(v string) *DeleteObjectOutput {
 	s.RequestCharged = &v
 	return s
 }
 
-// SetVersionId sets the VersionId ***REMOVED***eld's value.
+// SetVersionId sets the VersionId field's value.
 func (s *DeleteObjectOutput) SetVersionId(v string) *DeleteObjectOutput {
 	s.VersionId = &v
 	return s
@@ -10658,10 +10658,10 @@ func (s *DeleteObjectOutput) SetVersionId(v string) *DeleteObjectOutput {
 type DeleteObjectTaggingInput struct {
 	_ struct{} `locationName:"DeleteObjectTaggingRequest" type:"structure"`
 
-	// Bucket is a required ***REMOVED***eld
+	// Bucket is a required field
 	Bucket *string `location:"uri" locationName:"Bucket" type:"string" required:"true"`
 
-	// Key is a required ***REMOVED***eld
+	// Key is a required field
 	Key *string `location:"uri" locationName:"Key" min:"1" type:"string" required:"true"`
 
 	// The versionId of the object that the tag-set will be removed from.
@@ -10678,7 +10678,7 @@ func (s DeleteObjectTaggingInput) GoString() string {
 	return s.String()
 }
 
-// Validate inspects the ***REMOVED***elds of the type to determine if they are valid.
+// Validate inspects the fields of the type to determine if they are valid.
 func (s *DeleteObjectTaggingInput) Validate() error {
 	invalidParams := request.ErrInvalidParams{Context: "DeleteObjectTaggingInput"}
 	if s.Bucket == nil {
@@ -10700,7 +10700,7 @@ func (s *DeleteObjectTaggingInput) Validate() error {
 	return nil
 }
 
-// SetBucket sets the Bucket ***REMOVED***eld's value.
+// SetBucket sets the Bucket field's value.
 func (s *DeleteObjectTaggingInput) SetBucket(v string) *DeleteObjectTaggingInput {
 	s.Bucket = &v
 	return s
@@ -10713,13 +10713,13 @@ func (s *DeleteObjectTaggingInput) getBucket() (v string) {
 	return *s.Bucket
 }
 
-// SetKey sets the Key ***REMOVED***eld's value.
+// SetKey sets the Key field's value.
 func (s *DeleteObjectTaggingInput) SetKey(v string) *DeleteObjectTaggingInput {
 	s.Key = &v
 	return s
 }
 
-// SetVersionId sets the VersionId ***REMOVED***eld's value.
+// SetVersionId sets the VersionId field's value.
 func (s *DeleteObjectTaggingInput) SetVersionId(v string) *DeleteObjectTaggingInput {
 	s.VersionId = &v
 	return s
@@ -10742,7 +10742,7 @@ func (s DeleteObjectTaggingOutput) GoString() string {
 	return s.String()
 }
 
-// SetVersionId sets the VersionId ***REMOVED***eld's value.
+// SetVersionId sets the VersionId field's value.
 func (s *DeleteObjectTaggingOutput) SetVersionId(v string) *DeleteObjectTaggingOutput {
 	s.VersionId = &v
 	return s
@@ -10751,22 +10751,22 @@ func (s *DeleteObjectTaggingOutput) SetVersionId(v string) *DeleteObjectTaggingO
 type DeleteObjectsInput struct {
 	_ struct{} `locationName:"DeleteObjectsRequest" type:"structure" payload:"Delete"`
 
-	// Bucket is a required ***REMOVED***eld
+	// Bucket is a required field
 	Bucket *string `location:"uri" locationName:"Bucket" type:"string" required:"true"`
 
-	// Speci***REMOVED***es whether you want to delete this object even if it has a Governance-type
-	// object lock in place. You must have suf***REMOVED***cient permissions to perform this
+	// Specifies whether you want to delete this object even if it has a Governance-type
+	// object lock in place. You must have sufficient permissions to perform this
 	// operation.
 	BypassGovernanceRetention *bool `location:"header" locationName:"x-amz-bypass-governance-retention" type:"boolean"`
 
-	// Delete is a required ***REMOVED***eld
+	// Delete is a required field
 	Delete *Delete `locationName:"Delete" type:"structure" required:"true" xmlURI:"http://s3.amazonaws.com/doc/2006-03-01/"`
 
 	// The concatenation of the authentication device's serial number, a space,
 	// and the value that is displayed on your authentication device.
 	MFA *string `location:"header" locationName:"x-amz-mfa" type:"string"`
 
-	// Con***REMOVED***rms that the requester knows that she or he will be charged for the
+	// Confirms that the requester knows that she or he will be charged for the
 	// request. Bucket owners need not specify this parameter in their requests.
 	// Documentation on downloading objects from requester pays buckets can be found
 	// at http://docs.aws.amazon.com/AmazonS3/latest/dev/ObjectsinRequesterPaysBuckets.html
@@ -10783,7 +10783,7 @@ func (s DeleteObjectsInput) GoString() string {
 	return s.String()
 }
 
-// Validate inspects the ***REMOVED***elds of the type to determine if they are valid.
+// Validate inspects the fields of the type to determine if they are valid.
 func (s *DeleteObjectsInput) Validate() error {
 	invalidParams := request.ErrInvalidParams{Context: "DeleteObjectsInput"}
 	if s.Bucket == nil {
@@ -10807,7 +10807,7 @@ func (s *DeleteObjectsInput) Validate() error {
 	return nil
 }
 
-// SetBucket sets the Bucket ***REMOVED***eld's value.
+// SetBucket sets the Bucket field's value.
 func (s *DeleteObjectsInput) SetBucket(v string) *DeleteObjectsInput {
 	s.Bucket = &v
 	return s
@@ -10820,25 +10820,25 @@ func (s *DeleteObjectsInput) getBucket() (v string) {
 	return *s.Bucket
 }
 
-// SetBypassGovernanceRetention sets the BypassGovernanceRetention ***REMOVED***eld's value.
+// SetBypassGovernanceRetention sets the BypassGovernanceRetention field's value.
 func (s *DeleteObjectsInput) SetBypassGovernanceRetention(v bool) *DeleteObjectsInput {
 	s.BypassGovernanceRetention = &v
 	return s
 }
 
-// SetDelete sets the Delete ***REMOVED***eld's value.
+// SetDelete sets the Delete field's value.
 func (s *DeleteObjectsInput) SetDelete(v *Delete) *DeleteObjectsInput {
 	s.Delete = v
 	return s
 }
 
-// SetMFA sets the MFA ***REMOVED***eld's value.
+// SetMFA sets the MFA field's value.
 func (s *DeleteObjectsInput) SetMFA(v string) *DeleteObjectsInput {
 	s.MFA = &v
 	return s
 }
 
-// SetRequestPayer sets the RequestPayer ***REMOVED***eld's value.
+// SetRequestPayer sets the RequestPayer field's value.
 func (s *DeleteObjectsInput) SetRequestPayer(v string) *DeleteObjectsInput {
 	s.RequestPayer = &v
 	return s
@@ -10866,19 +10866,19 @@ func (s DeleteObjectsOutput) GoString() string {
 	return s.String()
 }
 
-// SetDeleted sets the Deleted ***REMOVED***eld's value.
+// SetDeleted sets the Deleted field's value.
 func (s *DeleteObjectsOutput) SetDeleted(v []*DeletedObject) *DeleteObjectsOutput {
 	s.Deleted = v
 	return s
 }
 
-// SetErrors sets the Errors ***REMOVED***eld's value.
+// SetErrors sets the Errors field's value.
 func (s *DeleteObjectsOutput) SetErrors(v []*Error) *DeleteObjectsOutput {
 	s.Errors = v
 	return s
 }
 
-// SetRequestCharged sets the RequestCharged ***REMOVED***eld's value.
+// SetRequestCharged sets the RequestCharged field's value.
 func (s *DeleteObjectsOutput) SetRequestCharged(v string) *DeleteObjectsOutput {
 	s.RequestCharged = &v
 	return s
@@ -10887,9 +10887,9 @@ func (s *DeleteObjectsOutput) SetRequestCharged(v string) *DeleteObjectsOutput {
 type DeletePublicAccessBlockInput struct {
 	_ struct{} `locationName:"DeletePublicAccessBlockRequest" type:"structure"`
 
-	// The Amazon S3 bucket whose PublicAccessBlock con***REMOVED***guration you want to delete.
+	// The Amazon S3 bucket whose PublicAccessBlock configuration you want to delete.
 	//
-	// Bucket is a required ***REMOVED***eld
+	// Bucket is a required field
 	Bucket *string `location:"uri" locationName:"Bucket" type:"string" required:"true"`
 }
 
@@ -10903,7 +10903,7 @@ func (s DeletePublicAccessBlockInput) GoString() string {
 	return s.String()
 }
 
-// Validate inspects the ***REMOVED***elds of the type to determine if they are valid.
+// Validate inspects the fields of the type to determine if they are valid.
 func (s *DeletePublicAccessBlockInput) Validate() error {
 	invalidParams := request.ErrInvalidParams{Context: "DeletePublicAccessBlockInput"}
 	if s.Bucket == nil {
@@ -10919,7 +10919,7 @@ func (s *DeletePublicAccessBlockInput) Validate() error {
 	return nil
 }
 
-// SetBucket sets the Bucket ***REMOVED***eld's value.
+// SetBucket sets the Bucket field's value.
 func (s *DeletePublicAccessBlockInput) SetBucket(v string) *DeletePublicAccessBlockInput {
 	s.Bucket = &v
 	return s
@@ -10968,39 +10968,39 @@ func (s DeletedObject) GoString() string {
 	return s.String()
 }
 
-// SetDeleteMarker sets the DeleteMarker ***REMOVED***eld's value.
+// SetDeleteMarker sets the DeleteMarker field's value.
 func (s *DeletedObject) SetDeleteMarker(v bool) *DeletedObject {
 	s.DeleteMarker = &v
 	return s
 }
 
-// SetDeleteMarkerVersionId sets the DeleteMarkerVersionId ***REMOVED***eld's value.
+// SetDeleteMarkerVersionId sets the DeleteMarkerVersionId field's value.
 func (s *DeletedObject) SetDeleteMarkerVersionId(v string) *DeletedObject {
 	s.DeleteMarkerVersionId = &v
 	return s
 }
 
-// SetKey sets the Key ***REMOVED***eld's value.
+// SetKey sets the Key field's value.
 func (s *DeletedObject) SetKey(v string) *DeletedObject {
 	s.Key = &v
 	return s
 }
 
-// SetVersionId sets the VersionId ***REMOVED***eld's value.
+// SetVersionId sets the VersionId field's value.
 func (s *DeletedObject) SetVersionId(v string) *DeletedObject {
 	s.VersionId = &v
 	return s
 }
 
-// Speci***REMOVED***es information about where to publish analysis or con***REMOVED***guration results
+// Specifies information about where to publish analysis or configuration results
 // for an Amazon S3 bucket.
 type Destination struct {
 	_ struct{} `type:"structure"`
 
 	// Specify this only in a cross-account scenario (where source and destination
 	// bucket owners are not the same), and you want to change replica ownership
-	// to the AWS account that owns the destination bucket. If this is not speci***REMOVED***ed
-	// in the replication con***REMOVED***guration, the replicas are owned by same AWS account
+	// to the AWS account that owns the destination bucket. If this is not specified
+	// in the replication configuration, the replicas are owned by same AWS account
 	// that owns the source object.
 	AccessControlTranslation *AccessControlTranslation `type:"structure"`
 
@@ -11008,24 +11008,24 @@ type Destination struct {
 	// direct Amazon S3 to change replica ownership to the AWS account that owns
 	// the destination bucket by specifying the AccessControlTranslation property,
 	// this is the account ID of the destination bucket owner. For more information,
-	// see Cross-Region Replication Additional Con***REMOVED***guration: Change Replica Owner
+	// see Cross-Region Replication Additional Configuration: Change Replica Owner
 	// (https://docs.aws.amazon.com/AmazonS3/latest/dev/crr-change-owner.html) in
 	// the Amazon Simple Storage Service Developer Guide.
 	Account *string `type:"string"`
 
 	// The Amazon Resource Name (ARN) of the bucket where you want Amazon S3 to
-	// store replicas of the object identi***REMOVED***ed by the rule.
+	// store replicas of the object identified by the rule.
 	//
-	// A replication con***REMOVED***guration can replicate objects to only one destination
-	// bucket. If there are multiple rules in your replication con***REMOVED***guration, all
+	// A replication configuration can replicate objects to only one destination
+	// bucket. If there are multiple rules in your replication configuration, all
 	// rules must specify the same destination bucket.
 	//
-	// Bucket is a required ***REMOVED***eld
+	// Bucket is a required field
 	Bucket *string `type:"string" required:"true"`
 
 	// A container that provides information about encryption. If SourceSelectionCriteria
-	// is speci***REMOVED***ed, you must specify this element.
-	EncryptionCon***REMOVED***guration *EncryptionCon***REMOVED***guration `type:"structure"`
+	// is specified, you must specify this element.
+	EncryptionConfiguration *EncryptionConfiguration `type:"structure"`
 
 	// The storage class to use when replicating objects, such as standard or reduced
 	// redundancy. By default, Amazon S3 uses the storage class of the source object
@@ -11047,7 +11047,7 @@ func (s Destination) GoString() string {
 	return s.String()
 }
 
-// Validate inspects the ***REMOVED***elds of the type to determine if they are valid.
+// Validate inspects the fields of the type to determine if they are valid.
 func (s *Destination) Validate() error {
 	invalidParams := request.ErrInvalidParams{Context: "Destination"}
 	if s.Bucket == nil {
@@ -11065,19 +11065,19 @@ func (s *Destination) Validate() error {
 	return nil
 }
 
-// SetAccessControlTranslation sets the AccessControlTranslation ***REMOVED***eld's value.
+// SetAccessControlTranslation sets the AccessControlTranslation field's value.
 func (s *Destination) SetAccessControlTranslation(v *AccessControlTranslation) *Destination {
 	s.AccessControlTranslation = v
 	return s
 }
 
-// SetAccount sets the Account ***REMOVED***eld's value.
+// SetAccount sets the Account field's value.
 func (s *Destination) SetAccount(v string) *Destination {
 	s.Account = &v
 	return s
 }
 
-// SetBucket sets the Bucket ***REMOVED***eld's value.
+// SetBucket sets the Bucket field's value.
 func (s *Destination) SetBucket(v string) *Destination {
 	s.Bucket = &v
 	return s
@@ -11090,13 +11090,13 @@ func (s *Destination) getBucket() (v string) {
 	return *s.Bucket
 }
 
-// SetEncryptionCon***REMOVED***guration sets the EncryptionCon***REMOVED***guration ***REMOVED***eld's value.
-func (s *Destination) SetEncryptionCon***REMOVED***guration(v *EncryptionCon***REMOVED***guration) *Destination {
-	s.EncryptionCon***REMOVED***guration = v
+// SetEncryptionConfiguration sets the EncryptionConfiguration field's value.
+func (s *Destination) SetEncryptionConfiguration(v *EncryptionConfiguration) *Destination {
+	s.EncryptionConfiguration = v
 	return s
 }
 
-// SetStorageClass sets the StorageClass ***REMOVED***eld's value.
+// SetStorageClass sets the StorageClass field's value.
 func (s *Destination) SetStorageClass(v string) *Destination {
 	s.StorageClass = &v
 	return s
@@ -11110,14 +11110,14 @@ type Encryption struct {
 	// The server-side encryption algorithm used when storing job results in Amazon
 	// S3 (e.g., AES256, aws:kms).
 	//
-	// EncryptionType is a required ***REMOVED***eld
+	// EncryptionType is a required field
 	EncryptionType *string `type:"string" required:"true" enum:"ServerSideEncryption"`
 
 	// If the encryption type is aws:kms, this optional value can be used to specify
 	// the encryption context for the restore results.
 	KMSContext *string `type:"string"`
 
-	// If the encryption type is aws:kms, this optional value speci***REMOVED***es the AWS
+	// If the encryption type is aws:kms, this optional value specifies the AWS
 	// KMS key ID to use for encryption of job results.
 	KMSKeyId *string `type:"string" sensitive:"true"`
 }
@@ -11132,7 +11132,7 @@ func (s Encryption) GoString() string {
 	return s.String()
 }
 
-// Validate inspects the ***REMOVED***elds of the type to determine if they are valid.
+// Validate inspects the fields of the type to determine if they are valid.
 func (s *Encryption) Validate() error {
 	invalidParams := request.ErrInvalidParams{Context: "Encryption"}
 	if s.EncryptionType == nil {
@@ -11145,46 +11145,46 @@ func (s *Encryption) Validate() error {
 	return nil
 }
 
-// SetEncryptionType sets the EncryptionType ***REMOVED***eld's value.
+// SetEncryptionType sets the EncryptionType field's value.
 func (s *Encryption) SetEncryptionType(v string) *Encryption {
 	s.EncryptionType = &v
 	return s
 }
 
-// SetKMSContext sets the KMSContext ***REMOVED***eld's value.
+// SetKMSContext sets the KMSContext field's value.
 func (s *Encryption) SetKMSContext(v string) *Encryption {
 	s.KMSContext = &v
 	return s
 }
 
-// SetKMSKeyId sets the KMSKeyId ***REMOVED***eld's value.
+// SetKMSKeyId sets the KMSKeyId field's value.
 func (s *Encryption) SetKMSKeyId(v string) *Encryption {
 	s.KMSKeyId = &v
 	return s
 }
 
-// Speci***REMOVED***es encryption-related information for an Amazon S3 bucket that is
+// Specifies encryption-related information for an Amazon S3 bucket that is
 // a destination for replicated objects.
-type EncryptionCon***REMOVED***guration struct {
+type EncryptionConfiguration struct {
 	_ struct{} `type:"structure"`
 
-	// Speci***REMOVED***es the AWS KMS Key ID (Key ARN or Alias ARN) for the destination bucket.
+	// Specifies the AWS KMS Key ID (Key ARN or Alias ARN) for the destination bucket.
 	// Amazon S3 uses this key to encrypt replica objects.
 	ReplicaKmsKeyID *string `type:"string"`
 }
 
 // String returns the string representation
-func (s EncryptionCon***REMOVED***guration) String() string {
+func (s EncryptionConfiguration) String() string {
 	return awsutil.Prettify(s)
 }
 
 // GoString returns the string representation
-func (s EncryptionCon***REMOVED***guration) GoString() string {
+func (s EncryptionConfiguration) GoString() string {
 	return s.String()
 }
 
-// SetReplicaKmsKeyID sets the ReplicaKmsKeyID ***REMOVED***eld's value.
-func (s *EncryptionCon***REMOVED***guration) SetReplicaKmsKeyID(v string) *EncryptionCon***REMOVED***guration {
+// SetReplicaKmsKeyID sets the ReplicaKmsKeyID field's value.
+func (s *EncryptionConfiguration) SetReplicaKmsKeyID(v string) *EncryptionConfiguration {
 	s.ReplicaKmsKeyID = &v
 	return s
 }
@@ -11237,25 +11237,25 @@ func (s Error) GoString() string {
 	return s.String()
 }
 
-// SetCode sets the Code ***REMOVED***eld's value.
+// SetCode sets the Code field's value.
 func (s *Error) SetCode(v string) *Error {
 	s.Code = &v
 	return s
 }
 
-// SetKey sets the Key ***REMOVED***eld's value.
+// SetKey sets the Key field's value.
 func (s *Error) SetKey(v string) *Error {
 	s.Key = &v
 	return s
 }
 
-// SetMessage sets the Message ***REMOVED***eld's value.
+// SetMessage sets the Message field's value.
 func (s *Error) SetMessage(v string) *Error {
 	s.Message = &v
 	return s
 }
 
-// SetVersionId sets the VersionId ***REMOVED***eld's value.
+// SetVersionId sets the VersionId field's value.
 func (s *Error) SetVersionId(v string) *Error {
 	s.VersionId = &v
 	return s
@@ -11266,7 +11266,7 @@ type ErrorDocument struct {
 
 	// The object key name to use when a 4XX class error occurs.
 	//
-	// Key is a required ***REMOVED***eld
+	// Key is a required field
 	Key *string `min:"1" type:"string" required:"true"`
 }
 
@@ -11280,7 +11280,7 @@ func (s ErrorDocument) GoString() string {
 	return s.String()
 }
 
-// Validate inspects the ***REMOVED***elds of the type to determine if they are valid.
+// Validate inspects the fields of the type to determine if they are valid.
 func (s *ErrorDocument) Validate() error {
 	invalidParams := request.ErrInvalidParams{Context: "ErrorDocument"}
 	if s.Key == nil {
@@ -11296,25 +11296,25 @@ func (s *ErrorDocument) Validate() error {
 	return nil
 }
 
-// SetKey sets the Key ***REMOVED***eld's value.
+// SetKey sets the Key field's value.
 func (s *ErrorDocument) SetKey(v string) *ErrorDocument {
 	s.Key = &v
 	return s
 }
 
-// Speci***REMOVED***es the Amazon S3 object key name to ***REMOVED***lter on and whether to ***REMOVED***lter
-// on the suf***REMOVED***x or pre***REMOVED***x of the key name.
+// Specifies the Amazon S3 object key name to filter on and whether to filter
+// on the suffix or prefix of the key name.
 type FilterRule struct {
 	_ struct{} `type:"structure"`
 
-	// The object key name pre***REMOVED***x or suf***REMOVED***x identifying one or more objects to which
-	// the ***REMOVED***ltering rule applies. The maximum length is 1,024 characters. Overlapping
-	// pre***REMOVED***xes and suf***REMOVED***xes are not supported. For more information, see Con***REMOVED***guring
-	// Event Noti***REMOVED***cations (https://docs.aws.amazon.com/AmazonS3/latest/dev/Noti***REMOVED***cationHowTo.html)
+	// The object key name prefix or suffix identifying one or more objects to which
+	// the filtering rule applies. The maximum length is 1,024 characters. Overlapping
+	// prefixes and suffixes are not supported. For more information, see Configuring
+	// Event Notifications (https://docs.aws.amazon.com/AmazonS3/latest/dev/NotificationHowTo.html)
 	// in the Amazon Simple Storage Service Developer Guide.
 	Name *string `type:"string" enum:"FilterRuleName"`
 
-	// The value that the ***REMOVED***lter searches for in object key names.
+	// The value that the filter searches for in object key names.
 	Value *string `type:"string"`
 }
 
@@ -11328,40 +11328,40 @@ func (s FilterRule) GoString() string {
 	return s.String()
 }
 
-// SetName sets the Name ***REMOVED***eld's value.
+// SetName sets the Name field's value.
 func (s *FilterRule) SetName(v string) *FilterRule {
 	s.Name = &v
 	return s
 }
 
-// SetValue sets the Value ***REMOVED***eld's value.
+// SetValue sets the Value field's value.
 func (s *FilterRule) SetValue(v string) *FilterRule {
 	s.Value = &v
 	return s
 }
 
-type GetBucketAccelerateCon***REMOVED***gurationInput struct {
-	_ struct{} `locationName:"GetBucketAccelerateCon***REMOVED***gurationRequest" type:"structure"`
+type GetBucketAccelerateConfigurationInput struct {
+	_ struct{} `locationName:"GetBucketAccelerateConfigurationRequest" type:"structure"`
 
-	// Name of the bucket for which the accelerate con***REMOVED***guration is retrieved.
+	// Name of the bucket for which the accelerate configuration is retrieved.
 	//
-	// Bucket is a required ***REMOVED***eld
+	// Bucket is a required field
 	Bucket *string `location:"uri" locationName:"Bucket" type:"string" required:"true"`
 }
 
 // String returns the string representation
-func (s GetBucketAccelerateCon***REMOVED***gurationInput) String() string {
+func (s GetBucketAccelerateConfigurationInput) String() string {
 	return awsutil.Prettify(s)
 }
 
 // GoString returns the string representation
-func (s GetBucketAccelerateCon***REMOVED***gurationInput) GoString() string {
+func (s GetBucketAccelerateConfigurationInput) GoString() string {
 	return s.String()
 }
 
-// Validate inspects the ***REMOVED***elds of the type to determine if they are valid.
-func (s *GetBucketAccelerateCon***REMOVED***gurationInput) Validate() error {
-	invalidParams := request.ErrInvalidParams{Context: "GetBucketAccelerateCon***REMOVED***gurationInput"}
+// Validate inspects the fields of the type to determine if they are valid.
+func (s *GetBucketAccelerateConfigurationInput) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "GetBucketAccelerateConfigurationInput"}
 	if s.Bucket == nil {
 		invalidParams.Add(request.NewErrParamRequired("Bucket"))
 	}
@@ -11375,38 +11375,38 @@ func (s *GetBucketAccelerateCon***REMOVED***gurationInput) Validate() error {
 	return nil
 }
 
-// SetBucket sets the Bucket ***REMOVED***eld's value.
-func (s *GetBucketAccelerateCon***REMOVED***gurationInput) SetBucket(v string) *GetBucketAccelerateCon***REMOVED***gurationInput {
+// SetBucket sets the Bucket field's value.
+func (s *GetBucketAccelerateConfigurationInput) SetBucket(v string) *GetBucketAccelerateConfigurationInput {
 	s.Bucket = &v
 	return s
 }
 
-func (s *GetBucketAccelerateCon***REMOVED***gurationInput) getBucket() (v string) {
+func (s *GetBucketAccelerateConfigurationInput) getBucket() (v string) {
 	if s.Bucket == nil {
 		return v
 	}
 	return *s.Bucket
 }
 
-type GetBucketAccelerateCon***REMOVED***gurationOutput struct {
+type GetBucketAccelerateConfigurationOutput struct {
 	_ struct{} `type:"structure"`
 
-	// The accelerate con***REMOVED***guration of the bucket.
+	// The accelerate configuration of the bucket.
 	Status *string `type:"string" enum:"BucketAccelerateStatus"`
 }
 
 // String returns the string representation
-func (s GetBucketAccelerateCon***REMOVED***gurationOutput) String() string {
+func (s GetBucketAccelerateConfigurationOutput) String() string {
 	return awsutil.Prettify(s)
 }
 
 // GoString returns the string representation
-func (s GetBucketAccelerateCon***REMOVED***gurationOutput) GoString() string {
+func (s GetBucketAccelerateConfigurationOutput) GoString() string {
 	return s.String()
 }
 
-// SetStatus sets the Status ***REMOVED***eld's value.
-func (s *GetBucketAccelerateCon***REMOVED***gurationOutput) SetStatus(v string) *GetBucketAccelerateCon***REMOVED***gurationOutput {
+// SetStatus sets the Status field's value.
+func (s *GetBucketAccelerateConfigurationOutput) SetStatus(v string) *GetBucketAccelerateConfigurationOutput {
 	s.Status = &v
 	return s
 }
@@ -11414,7 +11414,7 @@ func (s *GetBucketAccelerateCon***REMOVED***gurationOutput) SetStatus(v string) 
 type GetBucketAclInput struct {
 	_ struct{} `locationName:"GetBucketAclRequest" type:"structure"`
 
-	// Bucket is a required ***REMOVED***eld
+	// Bucket is a required field
 	Bucket *string `location:"uri" locationName:"Bucket" type:"string" required:"true"`
 }
 
@@ -11428,7 +11428,7 @@ func (s GetBucketAclInput) GoString() string {
 	return s.String()
 }
 
-// Validate inspects the ***REMOVED***elds of the type to determine if they are valid.
+// Validate inspects the fields of the type to determine if they are valid.
 func (s *GetBucketAclInput) Validate() error {
 	invalidParams := request.ErrInvalidParams{Context: "GetBucketAclInput"}
 	if s.Bucket == nil {
@@ -11444,7 +11444,7 @@ func (s *GetBucketAclInput) Validate() error {
 	return nil
 }
 
-// SetBucket sets the Bucket ***REMOVED***eld's value.
+// SetBucket sets the Bucket field's value.
 func (s *GetBucketAclInput) SetBucket(v string) *GetBucketAclInput {
 	s.Bucket = &v
 	return s
@@ -11476,45 +11476,45 @@ func (s GetBucketAclOutput) GoString() string {
 	return s.String()
 }
 
-// SetGrants sets the Grants ***REMOVED***eld's value.
+// SetGrants sets the Grants field's value.
 func (s *GetBucketAclOutput) SetGrants(v []*Grant) *GetBucketAclOutput {
 	s.Grants = v
 	return s
 }
 
-// SetOwner sets the Owner ***REMOVED***eld's value.
+// SetOwner sets the Owner field's value.
 func (s *GetBucketAclOutput) SetOwner(v *Owner) *GetBucketAclOutput {
 	s.Owner = v
 	return s
 }
 
-type GetBucketAnalyticsCon***REMOVED***gurationInput struct {
-	_ struct{} `locationName:"GetBucketAnalyticsCon***REMOVED***gurationRequest" type:"structure"`
+type GetBucketAnalyticsConfigurationInput struct {
+	_ struct{} `locationName:"GetBucketAnalyticsConfigurationRequest" type:"structure"`
 
-	// The name of the bucket from which an analytics con***REMOVED***guration is retrieved.
+	// The name of the bucket from which an analytics configuration is retrieved.
 	//
-	// Bucket is a required ***REMOVED***eld
+	// Bucket is a required field
 	Bucket *string `location:"uri" locationName:"Bucket" type:"string" required:"true"`
 
-	// The ID that identi***REMOVED***es the analytics con***REMOVED***guration.
+	// The ID that identifies the analytics configuration.
 	//
-	// Id is a required ***REMOVED***eld
+	// Id is a required field
 	Id *string `location:"querystring" locationName:"id" type:"string" required:"true"`
 }
 
 // String returns the string representation
-func (s GetBucketAnalyticsCon***REMOVED***gurationInput) String() string {
+func (s GetBucketAnalyticsConfigurationInput) String() string {
 	return awsutil.Prettify(s)
 }
 
 // GoString returns the string representation
-func (s GetBucketAnalyticsCon***REMOVED***gurationInput) GoString() string {
+func (s GetBucketAnalyticsConfigurationInput) GoString() string {
 	return s.String()
 }
 
-// Validate inspects the ***REMOVED***elds of the type to determine if they are valid.
-func (s *GetBucketAnalyticsCon***REMOVED***gurationInput) Validate() error {
-	invalidParams := request.ErrInvalidParams{Context: "GetBucketAnalyticsCon***REMOVED***gurationInput"}
+// Validate inspects the fields of the type to determine if they are valid.
+func (s *GetBucketAnalyticsConfigurationInput) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "GetBucketAnalyticsConfigurationInput"}
 	if s.Bucket == nil {
 		invalidParams.Add(request.NewErrParamRequired("Bucket"))
 	}
@@ -11531,52 +11531,52 @@ func (s *GetBucketAnalyticsCon***REMOVED***gurationInput) Validate() error {
 	return nil
 }
 
-// SetBucket sets the Bucket ***REMOVED***eld's value.
-func (s *GetBucketAnalyticsCon***REMOVED***gurationInput) SetBucket(v string) *GetBucketAnalyticsCon***REMOVED***gurationInput {
+// SetBucket sets the Bucket field's value.
+func (s *GetBucketAnalyticsConfigurationInput) SetBucket(v string) *GetBucketAnalyticsConfigurationInput {
 	s.Bucket = &v
 	return s
 }
 
-func (s *GetBucketAnalyticsCon***REMOVED***gurationInput) getBucket() (v string) {
+func (s *GetBucketAnalyticsConfigurationInput) getBucket() (v string) {
 	if s.Bucket == nil {
 		return v
 	}
 	return *s.Bucket
 }
 
-// SetId sets the Id ***REMOVED***eld's value.
-func (s *GetBucketAnalyticsCon***REMOVED***gurationInput) SetId(v string) *GetBucketAnalyticsCon***REMOVED***gurationInput {
+// SetId sets the Id field's value.
+func (s *GetBucketAnalyticsConfigurationInput) SetId(v string) *GetBucketAnalyticsConfigurationInput {
 	s.Id = &v
 	return s
 }
 
-type GetBucketAnalyticsCon***REMOVED***gurationOutput struct {
-	_ struct{} `type:"structure" payload:"AnalyticsCon***REMOVED***guration"`
+type GetBucketAnalyticsConfigurationOutput struct {
+	_ struct{} `type:"structure" payload:"AnalyticsConfiguration"`
 
-	// The con***REMOVED***guration and any analyses for the analytics ***REMOVED***lter.
-	AnalyticsCon***REMOVED***guration *AnalyticsCon***REMOVED***guration `type:"structure"`
+	// The configuration and any analyses for the analytics filter.
+	AnalyticsConfiguration *AnalyticsConfiguration `type:"structure"`
 }
 
 // String returns the string representation
-func (s GetBucketAnalyticsCon***REMOVED***gurationOutput) String() string {
+func (s GetBucketAnalyticsConfigurationOutput) String() string {
 	return awsutil.Prettify(s)
 }
 
 // GoString returns the string representation
-func (s GetBucketAnalyticsCon***REMOVED***gurationOutput) GoString() string {
+func (s GetBucketAnalyticsConfigurationOutput) GoString() string {
 	return s.String()
 }
 
-// SetAnalyticsCon***REMOVED***guration sets the AnalyticsCon***REMOVED***guration ***REMOVED***eld's value.
-func (s *GetBucketAnalyticsCon***REMOVED***gurationOutput) SetAnalyticsCon***REMOVED***guration(v *AnalyticsCon***REMOVED***guration) *GetBucketAnalyticsCon***REMOVED***gurationOutput {
-	s.AnalyticsCon***REMOVED***guration = v
+// SetAnalyticsConfiguration sets the AnalyticsConfiguration field's value.
+func (s *GetBucketAnalyticsConfigurationOutput) SetAnalyticsConfiguration(v *AnalyticsConfiguration) *GetBucketAnalyticsConfigurationOutput {
+	s.AnalyticsConfiguration = v
 	return s
 }
 
 type GetBucketCorsInput struct {
 	_ struct{} `locationName:"GetBucketCorsRequest" type:"structure"`
 
-	// Bucket is a required ***REMOVED***eld
+	// Bucket is a required field
 	Bucket *string `location:"uri" locationName:"Bucket" type:"string" required:"true"`
 }
 
@@ -11590,7 +11590,7 @@ func (s GetBucketCorsInput) GoString() string {
 	return s.String()
 }
 
-// Validate inspects the ***REMOVED***elds of the type to determine if they are valid.
+// Validate inspects the fields of the type to determine if they are valid.
 func (s *GetBucketCorsInput) Validate() error {
 	invalidParams := request.ErrInvalidParams{Context: "GetBucketCorsInput"}
 	if s.Bucket == nil {
@@ -11606,7 +11606,7 @@ func (s *GetBucketCorsInput) Validate() error {
 	return nil
 }
 
-// SetBucket sets the Bucket ***REMOVED***eld's value.
+// SetBucket sets the Bucket field's value.
 func (s *GetBucketCorsInput) SetBucket(v string) *GetBucketCorsInput {
 	s.Bucket = &v
 	return s
@@ -11635,7 +11635,7 @@ func (s GetBucketCorsOutput) GoString() string {
 	return s.String()
 }
 
-// SetCORSRules sets the CORSRules ***REMOVED***eld's value.
+// SetCORSRules sets the CORSRules field's value.
 func (s *GetBucketCorsOutput) SetCORSRules(v []*CORSRule) *GetBucketCorsOutput {
 	s.CORSRules = v
 	return s
@@ -11644,10 +11644,10 @@ func (s *GetBucketCorsOutput) SetCORSRules(v []*CORSRule) *GetBucketCorsOutput {
 type GetBucketEncryptionInput struct {
 	_ struct{} `locationName:"GetBucketEncryptionRequest" type:"structure"`
 
-	// The name of the bucket from which the server-side encryption con***REMOVED***guration
+	// The name of the bucket from which the server-side encryption configuration
 	// is retrieved.
 	//
-	// Bucket is a required ***REMOVED***eld
+	// Bucket is a required field
 	Bucket *string `location:"uri" locationName:"Bucket" type:"string" required:"true"`
 }
 
@@ -11661,7 +11661,7 @@ func (s GetBucketEncryptionInput) GoString() string {
 	return s.String()
 }
 
-// Validate inspects the ***REMOVED***elds of the type to determine if they are valid.
+// Validate inspects the fields of the type to determine if they are valid.
 func (s *GetBucketEncryptionInput) Validate() error {
 	invalidParams := request.ErrInvalidParams{Context: "GetBucketEncryptionInput"}
 	if s.Bucket == nil {
@@ -11677,7 +11677,7 @@ func (s *GetBucketEncryptionInput) Validate() error {
 	return nil
 }
 
-// SetBucket sets the Bucket ***REMOVED***eld's value.
+// SetBucket sets the Bucket field's value.
 func (s *GetBucketEncryptionInput) SetBucket(v string) *GetBucketEncryptionInput {
 	s.Bucket = &v
 	return s
@@ -11691,10 +11691,10 @@ func (s *GetBucketEncryptionInput) getBucket() (v string) {
 }
 
 type GetBucketEncryptionOutput struct {
-	_ struct{} `type:"structure" payload:"ServerSideEncryptionCon***REMOVED***guration"`
+	_ struct{} `type:"structure" payload:"ServerSideEncryptionConfiguration"`
 
-	// Speci***REMOVED***es the default server-side-encryption con***REMOVED***guration.
-	ServerSideEncryptionCon***REMOVED***guration *ServerSideEncryptionCon***REMOVED***guration `type:"structure"`
+	// Specifies the default server-side-encryption configuration.
+	ServerSideEncryptionConfiguration *ServerSideEncryptionConfiguration `type:"structure"`
 }
 
 // String returns the string representation
@@ -11707,39 +11707,39 @@ func (s GetBucketEncryptionOutput) GoString() string {
 	return s.String()
 }
 
-// SetServerSideEncryptionCon***REMOVED***guration sets the ServerSideEncryptionCon***REMOVED***guration ***REMOVED***eld's value.
-func (s *GetBucketEncryptionOutput) SetServerSideEncryptionCon***REMOVED***guration(v *ServerSideEncryptionCon***REMOVED***guration) *GetBucketEncryptionOutput {
-	s.ServerSideEncryptionCon***REMOVED***guration = v
+// SetServerSideEncryptionConfiguration sets the ServerSideEncryptionConfiguration field's value.
+func (s *GetBucketEncryptionOutput) SetServerSideEncryptionConfiguration(v *ServerSideEncryptionConfiguration) *GetBucketEncryptionOutput {
+	s.ServerSideEncryptionConfiguration = v
 	return s
 }
 
-type GetBucketInventoryCon***REMOVED***gurationInput struct {
-	_ struct{} `locationName:"GetBucketInventoryCon***REMOVED***gurationRequest" type:"structure"`
+type GetBucketInventoryConfigurationInput struct {
+	_ struct{} `locationName:"GetBucketInventoryConfigurationRequest" type:"structure"`
 
-	// The name of the bucket containing the inventory con***REMOVED***guration to retrieve.
+	// The name of the bucket containing the inventory configuration to retrieve.
 	//
-	// Bucket is a required ***REMOVED***eld
+	// Bucket is a required field
 	Bucket *string `location:"uri" locationName:"Bucket" type:"string" required:"true"`
 
-	// The ID used to identify the inventory con***REMOVED***guration.
+	// The ID used to identify the inventory configuration.
 	//
-	// Id is a required ***REMOVED***eld
+	// Id is a required field
 	Id *string `location:"querystring" locationName:"id" type:"string" required:"true"`
 }
 
 // String returns the string representation
-func (s GetBucketInventoryCon***REMOVED***gurationInput) String() string {
+func (s GetBucketInventoryConfigurationInput) String() string {
 	return awsutil.Prettify(s)
 }
 
 // GoString returns the string representation
-func (s GetBucketInventoryCon***REMOVED***gurationInput) GoString() string {
+func (s GetBucketInventoryConfigurationInput) GoString() string {
 	return s.String()
 }
 
-// Validate inspects the ***REMOVED***elds of the type to determine if they are valid.
-func (s *GetBucketInventoryCon***REMOVED***gurationInput) Validate() error {
-	invalidParams := request.ErrInvalidParams{Context: "GetBucketInventoryCon***REMOVED***gurationInput"}
+// Validate inspects the fields of the type to determine if they are valid.
+func (s *GetBucketInventoryConfigurationInput) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "GetBucketInventoryConfigurationInput"}
 	if s.Bucket == nil {
 		invalidParams.Add(request.NewErrParamRequired("Bucket"))
 	}
@@ -11756,68 +11756,68 @@ func (s *GetBucketInventoryCon***REMOVED***gurationInput) Validate() error {
 	return nil
 }
 
-// SetBucket sets the Bucket ***REMOVED***eld's value.
-func (s *GetBucketInventoryCon***REMOVED***gurationInput) SetBucket(v string) *GetBucketInventoryCon***REMOVED***gurationInput {
+// SetBucket sets the Bucket field's value.
+func (s *GetBucketInventoryConfigurationInput) SetBucket(v string) *GetBucketInventoryConfigurationInput {
 	s.Bucket = &v
 	return s
 }
 
-func (s *GetBucketInventoryCon***REMOVED***gurationInput) getBucket() (v string) {
+func (s *GetBucketInventoryConfigurationInput) getBucket() (v string) {
 	if s.Bucket == nil {
 		return v
 	}
 	return *s.Bucket
 }
 
-// SetId sets the Id ***REMOVED***eld's value.
-func (s *GetBucketInventoryCon***REMOVED***gurationInput) SetId(v string) *GetBucketInventoryCon***REMOVED***gurationInput {
+// SetId sets the Id field's value.
+func (s *GetBucketInventoryConfigurationInput) SetId(v string) *GetBucketInventoryConfigurationInput {
 	s.Id = &v
 	return s
 }
 
-type GetBucketInventoryCon***REMOVED***gurationOutput struct {
-	_ struct{} `type:"structure" payload:"InventoryCon***REMOVED***guration"`
+type GetBucketInventoryConfigurationOutput struct {
+	_ struct{} `type:"structure" payload:"InventoryConfiguration"`
 
-	// Speci***REMOVED***es the inventory con***REMOVED***guration.
-	InventoryCon***REMOVED***guration *InventoryCon***REMOVED***guration `type:"structure"`
+	// Specifies the inventory configuration.
+	InventoryConfiguration *InventoryConfiguration `type:"structure"`
 }
 
 // String returns the string representation
-func (s GetBucketInventoryCon***REMOVED***gurationOutput) String() string {
+func (s GetBucketInventoryConfigurationOutput) String() string {
 	return awsutil.Prettify(s)
 }
 
 // GoString returns the string representation
-func (s GetBucketInventoryCon***REMOVED***gurationOutput) GoString() string {
+func (s GetBucketInventoryConfigurationOutput) GoString() string {
 	return s.String()
 }
 
-// SetInventoryCon***REMOVED***guration sets the InventoryCon***REMOVED***guration ***REMOVED***eld's value.
-func (s *GetBucketInventoryCon***REMOVED***gurationOutput) SetInventoryCon***REMOVED***guration(v *InventoryCon***REMOVED***guration) *GetBucketInventoryCon***REMOVED***gurationOutput {
-	s.InventoryCon***REMOVED***guration = v
+// SetInventoryConfiguration sets the InventoryConfiguration field's value.
+func (s *GetBucketInventoryConfigurationOutput) SetInventoryConfiguration(v *InventoryConfiguration) *GetBucketInventoryConfigurationOutput {
+	s.InventoryConfiguration = v
 	return s
 }
 
-type GetBucketLifecycleCon***REMOVED***gurationInput struct {
-	_ struct{} `locationName:"GetBucketLifecycleCon***REMOVED***gurationRequest" type:"structure"`
+type GetBucketLifecycleConfigurationInput struct {
+	_ struct{} `locationName:"GetBucketLifecycleConfigurationRequest" type:"structure"`
 
-	// Bucket is a required ***REMOVED***eld
+	// Bucket is a required field
 	Bucket *string `location:"uri" locationName:"Bucket" type:"string" required:"true"`
 }
 
 // String returns the string representation
-func (s GetBucketLifecycleCon***REMOVED***gurationInput) String() string {
+func (s GetBucketLifecycleConfigurationInput) String() string {
 	return awsutil.Prettify(s)
 }
 
 // GoString returns the string representation
-func (s GetBucketLifecycleCon***REMOVED***gurationInput) GoString() string {
+func (s GetBucketLifecycleConfigurationInput) GoString() string {
 	return s.String()
 }
 
-// Validate inspects the ***REMOVED***elds of the type to determine if they are valid.
-func (s *GetBucketLifecycleCon***REMOVED***gurationInput) Validate() error {
-	invalidParams := request.ErrInvalidParams{Context: "GetBucketLifecycleCon***REMOVED***gurationInput"}
+// Validate inspects the fields of the type to determine if they are valid.
+func (s *GetBucketLifecycleConfigurationInput) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "GetBucketLifecycleConfigurationInput"}
 	if s.Bucket == nil {
 		invalidParams.Add(request.NewErrParamRequired("Bucket"))
 	}
@@ -11831,37 +11831,37 @@ func (s *GetBucketLifecycleCon***REMOVED***gurationInput) Validate() error {
 	return nil
 }
 
-// SetBucket sets the Bucket ***REMOVED***eld's value.
-func (s *GetBucketLifecycleCon***REMOVED***gurationInput) SetBucket(v string) *GetBucketLifecycleCon***REMOVED***gurationInput {
+// SetBucket sets the Bucket field's value.
+func (s *GetBucketLifecycleConfigurationInput) SetBucket(v string) *GetBucketLifecycleConfigurationInput {
 	s.Bucket = &v
 	return s
 }
 
-func (s *GetBucketLifecycleCon***REMOVED***gurationInput) getBucket() (v string) {
+func (s *GetBucketLifecycleConfigurationInput) getBucket() (v string) {
 	if s.Bucket == nil {
 		return v
 	}
 	return *s.Bucket
 }
 
-type GetBucketLifecycleCon***REMOVED***gurationOutput struct {
+type GetBucketLifecycleConfigurationOutput struct {
 	_ struct{} `type:"structure"`
 
 	Rules []*LifecycleRule `locationName:"Rule" type:"list" flattened:"true"`
 }
 
 // String returns the string representation
-func (s GetBucketLifecycleCon***REMOVED***gurationOutput) String() string {
+func (s GetBucketLifecycleConfigurationOutput) String() string {
 	return awsutil.Prettify(s)
 }
 
 // GoString returns the string representation
-func (s GetBucketLifecycleCon***REMOVED***gurationOutput) GoString() string {
+func (s GetBucketLifecycleConfigurationOutput) GoString() string {
 	return s.String()
 }
 
-// SetRules sets the Rules ***REMOVED***eld's value.
-func (s *GetBucketLifecycleCon***REMOVED***gurationOutput) SetRules(v []*LifecycleRule) *GetBucketLifecycleCon***REMOVED***gurationOutput {
+// SetRules sets the Rules field's value.
+func (s *GetBucketLifecycleConfigurationOutput) SetRules(v []*LifecycleRule) *GetBucketLifecycleConfigurationOutput {
 	s.Rules = v
 	return s
 }
@@ -11869,7 +11869,7 @@ func (s *GetBucketLifecycleCon***REMOVED***gurationOutput) SetRules(v []*Lifecyc
 type GetBucketLifecycleInput struct {
 	_ struct{} `locationName:"GetBucketLifecycleRequest" type:"structure"`
 
-	// Bucket is a required ***REMOVED***eld
+	// Bucket is a required field
 	Bucket *string `location:"uri" locationName:"Bucket" type:"string" required:"true"`
 }
 
@@ -11883,7 +11883,7 @@ func (s GetBucketLifecycleInput) GoString() string {
 	return s.String()
 }
 
-// Validate inspects the ***REMOVED***elds of the type to determine if they are valid.
+// Validate inspects the fields of the type to determine if they are valid.
 func (s *GetBucketLifecycleInput) Validate() error {
 	invalidParams := request.ErrInvalidParams{Context: "GetBucketLifecycleInput"}
 	if s.Bucket == nil {
@@ -11899,7 +11899,7 @@ func (s *GetBucketLifecycleInput) Validate() error {
 	return nil
 }
 
-// SetBucket sets the Bucket ***REMOVED***eld's value.
+// SetBucket sets the Bucket field's value.
 func (s *GetBucketLifecycleInput) SetBucket(v string) *GetBucketLifecycleInput {
 	s.Bucket = &v
 	return s
@@ -11928,7 +11928,7 @@ func (s GetBucketLifecycleOutput) GoString() string {
 	return s.String()
 }
 
-// SetRules sets the Rules ***REMOVED***eld's value.
+// SetRules sets the Rules field's value.
 func (s *GetBucketLifecycleOutput) SetRules(v []*Rule) *GetBucketLifecycleOutput {
 	s.Rules = v
 	return s
@@ -11937,7 +11937,7 @@ func (s *GetBucketLifecycleOutput) SetRules(v []*Rule) *GetBucketLifecycleOutput
 type GetBucketLocationInput struct {
 	_ struct{} `locationName:"GetBucketLocationRequest" type:"structure"`
 
-	// Bucket is a required ***REMOVED***eld
+	// Bucket is a required field
 	Bucket *string `location:"uri" locationName:"Bucket" type:"string" required:"true"`
 }
 
@@ -11951,7 +11951,7 @@ func (s GetBucketLocationInput) GoString() string {
 	return s.String()
 }
 
-// Validate inspects the ***REMOVED***elds of the type to determine if they are valid.
+// Validate inspects the fields of the type to determine if they are valid.
 func (s *GetBucketLocationInput) Validate() error {
 	invalidParams := request.ErrInvalidParams{Context: "GetBucketLocationInput"}
 	if s.Bucket == nil {
@@ -11967,7 +11967,7 @@ func (s *GetBucketLocationInput) Validate() error {
 	return nil
 }
 
-// SetBucket sets the Bucket ***REMOVED***eld's value.
+// SetBucket sets the Bucket field's value.
 func (s *GetBucketLocationInput) SetBucket(v string) *GetBucketLocationInput {
 	s.Bucket = &v
 	return s
@@ -11996,7 +11996,7 @@ func (s GetBucketLocationOutput) GoString() string {
 	return s.String()
 }
 
-// SetLocationConstraint sets the LocationConstraint ***REMOVED***eld's value.
+// SetLocationConstraint sets the LocationConstraint field's value.
 func (s *GetBucketLocationOutput) SetLocationConstraint(v string) *GetBucketLocationOutput {
 	s.LocationConstraint = &v
 	return s
@@ -12005,7 +12005,7 @@ func (s *GetBucketLocationOutput) SetLocationConstraint(v string) *GetBucketLoca
 type GetBucketLoggingInput struct {
 	_ struct{} `locationName:"GetBucketLoggingRequest" type:"structure"`
 
-	// Bucket is a required ***REMOVED***eld
+	// Bucket is a required field
 	Bucket *string `location:"uri" locationName:"Bucket" type:"string" required:"true"`
 }
 
@@ -12019,7 +12019,7 @@ func (s GetBucketLoggingInput) GoString() string {
 	return s.String()
 }
 
-// Validate inspects the ***REMOVED***elds of the type to determine if they are valid.
+// Validate inspects the fields of the type to determine if they are valid.
 func (s *GetBucketLoggingInput) Validate() error {
 	invalidParams := request.ErrInvalidParams{Context: "GetBucketLoggingInput"}
 	if s.Bucket == nil {
@@ -12035,7 +12035,7 @@ func (s *GetBucketLoggingInput) Validate() error {
 	return nil
 }
 
-// SetBucket sets the Bucket ***REMOVED***eld's value.
+// SetBucket sets the Bucket field's value.
 func (s *GetBucketLoggingInput) SetBucket(v string) *GetBucketLoggingInput {
 	s.Bucket = &v
 	return s
@@ -12051,7 +12051,7 @@ func (s *GetBucketLoggingInput) getBucket() (v string) {
 type GetBucketLoggingOutput struct {
 	_ struct{} `type:"structure"`
 
-	// Describes where logs are stored and the pre***REMOVED***x that Amazon S3 assigns to
+	// Describes where logs are stored and the prefix that Amazon S3 assigns to
 	// all log object keys for a bucket. For more information, see PUT Bucket logging
 	// (https://docs.aws.amazon.com/AmazonS3/latest/API/RESTBucketPUTlogging.html)
 	// in the Amazon Simple Storage Service API Reference.
@@ -12068,39 +12068,39 @@ func (s GetBucketLoggingOutput) GoString() string {
 	return s.String()
 }
 
-// SetLoggingEnabled sets the LoggingEnabled ***REMOVED***eld's value.
+// SetLoggingEnabled sets the LoggingEnabled field's value.
 func (s *GetBucketLoggingOutput) SetLoggingEnabled(v *LoggingEnabled) *GetBucketLoggingOutput {
 	s.LoggingEnabled = v
 	return s
 }
 
-type GetBucketMetricsCon***REMOVED***gurationInput struct {
-	_ struct{} `locationName:"GetBucketMetricsCon***REMOVED***gurationRequest" type:"structure"`
+type GetBucketMetricsConfigurationInput struct {
+	_ struct{} `locationName:"GetBucketMetricsConfigurationRequest" type:"structure"`
 
-	// The name of the bucket containing the metrics con***REMOVED***guration to retrieve.
+	// The name of the bucket containing the metrics configuration to retrieve.
 	//
-	// Bucket is a required ***REMOVED***eld
+	// Bucket is a required field
 	Bucket *string `location:"uri" locationName:"Bucket" type:"string" required:"true"`
 
-	// The ID used to identify the metrics con***REMOVED***guration.
+	// The ID used to identify the metrics configuration.
 	//
-	// Id is a required ***REMOVED***eld
+	// Id is a required field
 	Id *string `location:"querystring" locationName:"id" type:"string" required:"true"`
 }
 
 // String returns the string representation
-func (s GetBucketMetricsCon***REMOVED***gurationInput) String() string {
+func (s GetBucketMetricsConfigurationInput) String() string {
 	return awsutil.Prettify(s)
 }
 
 // GoString returns the string representation
-func (s GetBucketMetricsCon***REMOVED***gurationInput) GoString() string {
+func (s GetBucketMetricsConfigurationInput) GoString() string {
 	return s.String()
 }
 
-// Validate inspects the ***REMOVED***elds of the type to determine if they are valid.
-func (s *GetBucketMetricsCon***REMOVED***gurationInput) Validate() error {
-	invalidParams := request.ErrInvalidParams{Context: "GetBucketMetricsCon***REMOVED***gurationInput"}
+// Validate inspects the fields of the type to determine if they are valid.
+func (s *GetBucketMetricsConfigurationInput) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "GetBucketMetricsConfigurationInput"}
 	if s.Bucket == nil {
 		invalidParams.Add(request.NewErrParamRequired("Bucket"))
 	}
@@ -12117,70 +12117,70 @@ func (s *GetBucketMetricsCon***REMOVED***gurationInput) Validate() error {
 	return nil
 }
 
-// SetBucket sets the Bucket ***REMOVED***eld's value.
-func (s *GetBucketMetricsCon***REMOVED***gurationInput) SetBucket(v string) *GetBucketMetricsCon***REMOVED***gurationInput {
+// SetBucket sets the Bucket field's value.
+func (s *GetBucketMetricsConfigurationInput) SetBucket(v string) *GetBucketMetricsConfigurationInput {
 	s.Bucket = &v
 	return s
 }
 
-func (s *GetBucketMetricsCon***REMOVED***gurationInput) getBucket() (v string) {
+func (s *GetBucketMetricsConfigurationInput) getBucket() (v string) {
 	if s.Bucket == nil {
 		return v
 	}
 	return *s.Bucket
 }
 
-// SetId sets the Id ***REMOVED***eld's value.
-func (s *GetBucketMetricsCon***REMOVED***gurationInput) SetId(v string) *GetBucketMetricsCon***REMOVED***gurationInput {
+// SetId sets the Id field's value.
+func (s *GetBucketMetricsConfigurationInput) SetId(v string) *GetBucketMetricsConfigurationInput {
 	s.Id = &v
 	return s
 }
 
-type GetBucketMetricsCon***REMOVED***gurationOutput struct {
-	_ struct{} `type:"structure" payload:"MetricsCon***REMOVED***guration"`
+type GetBucketMetricsConfigurationOutput struct {
+	_ struct{} `type:"structure" payload:"MetricsConfiguration"`
 
-	// Speci***REMOVED***es the metrics con***REMOVED***guration.
-	MetricsCon***REMOVED***guration *MetricsCon***REMOVED***guration `type:"structure"`
+	// Specifies the metrics configuration.
+	MetricsConfiguration *MetricsConfiguration `type:"structure"`
 }
 
 // String returns the string representation
-func (s GetBucketMetricsCon***REMOVED***gurationOutput) String() string {
+func (s GetBucketMetricsConfigurationOutput) String() string {
 	return awsutil.Prettify(s)
 }
 
 // GoString returns the string representation
-func (s GetBucketMetricsCon***REMOVED***gurationOutput) GoString() string {
+func (s GetBucketMetricsConfigurationOutput) GoString() string {
 	return s.String()
 }
 
-// SetMetricsCon***REMOVED***guration sets the MetricsCon***REMOVED***guration ***REMOVED***eld's value.
-func (s *GetBucketMetricsCon***REMOVED***gurationOutput) SetMetricsCon***REMOVED***guration(v *MetricsCon***REMOVED***guration) *GetBucketMetricsCon***REMOVED***gurationOutput {
-	s.MetricsCon***REMOVED***guration = v
+// SetMetricsConfiguration sets the MetricsConfiguration field's value.
+func (s *GetBucketMetricsConfigurationOutput) SetMetricsConfiguration(v *MetricsConfiguration) *GetBucketMetricsConfigurationOutput {
+	s.MetricsConfiguration = v
 	return s
 }
 
-type GetBucketNoti***REMOVED***cationCon***REMOVED***gurationRequest struct {
-	_ struct{} `locationName:"GetBucketNoti***REMOVED***cationCon***REMOVED***gurationRequest" type:"structure"`
+type GetBucketNotificationConfigurationRequest struct {
+	_ struct{} `locationName:"GetBucketNotificationConfigurationRequest" type:"structure"`
 
-	// Name of the bucket to get the noti***REMOVED***cation con***REMOVED***guration for.
+	// Name of the bucket to get the notification configuration for.
 	//
-	// Bucket is a required ***REMOVED***eld
+	// Bucket is a required field
 	Bucket *string `location:"uri" locationName:"Bucket" type:"string" required:"true"`
 }
 
 // String returns the string representation
-func (s GetBucketNoti***REMOVED***cationCon***REMOVED***gurationRequest) String() string {
+func (s GetBucketNotificationConfigurationRequest) String() string {
 	return awsutil.Prettify(s)
 }
 
 // GoString returns the string representation
-func (s GetBucketNoti***REMOVED***cationCon***REMOVED***gurationRequest) GoString() string {
+func (s GetBucketNotificationConfigurationRequest) GoString() string {
 	return s.String()
 }
 
-// Validate inspects the ***REMOVED***elds of the type to determine if they are valid.
-func (s *GetBucketNoti***REMOVED***cationCon***REMOVED***gurationRequest) Validate() error {
-	invalidParams := request.ErrInvalidParams{Context: "GetBucketNoti***REMOVED***cationCon***REMOVED***gurationRequest"}
+// Validate inspects the fields of the type to determine if they are valid.
+func (s *GetBucketNotificationConfigurationRequest) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "GetBucketNotificationConfigurationRequest"}
 	if s.Bucket == nil {
 		invalidParams.Add(request.NewErrParamRequired("Bucket"))
 	}
@@ -12194,13 +12194,13 @@ func (s *GetBucketNoti***REMOVED***cationCon***REMOVED***gurationRequest) Valida
 	return nil
 }
 
-// SetBucket sets the Bucket ***REMOVED***eld's value.
-func (s *GetBucketNoti***REMOVED***cationCon***REMOVED***gurationRequest) SetBucket(v string) *GetBucketNoti***REMOVED***cationCon***REMOVED***gurationRequest {
+// SetBucket sets the Bucket field's value.
+func (s *GetBucketNotificationConfigurationRequest) SetBucket(v string) *GetBucketNotificationConfigurationRequest {
 	s.Bucket = &v
 	return s
 }
 
-func (s *GetBucketNoti***REMOVED***cationCon***REMOVED***gurationRequest) getBucket() (v string) {
+func (s *GetBucketNotificationConfigurationRequest) getBucket() (v string) {
 	if s.Bucket == nil {
 		return v
 	}
@@ -12210,7 +12210,7 @@ func (s *GetBucketNoti***REMOVED***cationCon***REMOVED***gurationRequest) getBuc
 type GetBucketPolicyInput struct {
 	_ struct{} `locationName:"GetBucketPolicyRequest" type:"structure"`
 
-	// Bucket is a required ***REMOVED***eld
+	// Bucket is a required field
 	Bucket *string `location:"uri" locationName:"Bucket" type:"string" required:"true"`
 }
 
@@ -12224,7 +12224,7 @@ func (s GetBucketPolicyInput) GoString() string {
 	return s.String()
 }
 
-// Validate inspects the ***REMOVED***elds of the type to determine if they are valid.
+// Validate inspects the fields of the type to determine if they are valid.
 func (s *GetBucketPolicyInput) Validate() error {
 	invalidParams := request.ErrInvalidParams{Context: "GetBucketPolicyInput"}
 	if s.Bucket == nil {
@@ -12240,7 +12240,7 @@ func (s *GetBucketPolicyInput) Validate() error {
 	return nil
 }
 
-// SetBucket sets the Bucket ***REMOVED***eld's value.
+// SetBucket sets the Bucket field's value.
 func (s *GetBucketPolicyInput) SetBucket(v string) *GetBucketPolicyInput {
 	s.Bucket = &v
 	return s
@@ -12270,7 +12270,7 @@ func (s GetBucketPolicyOutput) GoString() string {
 	return s.String()
 }
 
-// SetPolicy sets the Policy ***REMOVED***eld's value.
+// SetPolicy sets the Policy field's value.
 func (s *GetBucketPolicyOutput) SetPolicy(v string) *GetBucketPolicyOutput {
 	s.Policy = &v
 	return s
@@ -12281,7 +12281,7 @@ type GetBucketPolicyStatusInput struct {
 
 	// The name of the Amazon S3 bucket whose policy status you want to retrieve.
 	//
-	// Bucket is a required ***REMOVED***eld
+	// Bucket is a required field
 	Bucket *string `location:"uri" locationName:"Bucket" type:"string" required:"true"`
 }
 
@@ -12295,7 +12295,7 @@ func (s GetBucketPolicyStatusInput) GoString() string {
 	return s.String()
 }
 
-// Validate inspects the ***REMOVED***elds of the type to determine if they are valid.
+// Validate inspects the fields of the type to determine if they are valid.
 func (s *GetBucketPolicyStatusInput) Validate() error {
 	invalidParams := request.ErrInvalidParams{Context: "GetBucketPolicyStatusInput"}
 	if s.Bucket == nil {
@@ -12311,7 +12311,7 @@ func (s *GetBucketPolicyStatusInput) Validate() error {
 	return nil
 }
 
-// SetBucket sets the Bucket ***REMOVED***eld's value.
+// SetBucket sets the Bucket field's value.
 func (s *GetBucketPolicyStatusInput) SetBucket(v string) *GetBucketPolicyStatusInput {
 	s.Bucket = &v
 	return s
@@ -12327,7 +12327,7 @@ func (s *GetBucketPolicyStatusInput) getBucket() (v string) {
 type GetBucketPolicyStatusOutput struct {
 	_ struct{} `type:"structure" payload:"PolicyStatus"`
 
-	// The policy status for the speci***REMOVED***ed bucket.
+	// The policy status for the specified bucket.
 	PolicyStatus *PolicyStatus `type:"structure"`
 }
 
@@ -12341,7 +12341,7 @@ func (s GetBucketPolicyStatusOutput) GoString() string {
 	return s.String()
 }
 
-// SetPolicyStatus sets the PolicyStatus ***REMOVED***eld's value.
+// SetPolicyStatus sets the PolicyStatus field's value.
 func (s *GetBucketPolicyStatusOutput) SetPolicyStatus(v *PolicyStatus) *GetBucketPolicyStatusOutput {
 	s.PolicyStatus = v
 	return s
@@ -12350,7 +12350,7 @@ func (s *GetBucketPolicyStatusOutput) SetPolicyStatus(v *PolicyStatus) *GetBucke
 type GetBucketReplicationInput struct {
 	_ struct{} `locationName:"GetBucketReplicationRequest" type:"structure"`
 
-	// Bucket is a required ***REMOVED***eld
+	// Bucket is a required field
 	Bucket *string `location:"uri" locationName:"Bucket" type:"string" required:"true"`
 }
 
@@ -12364,7 +12364,7 @@ func (s GetBucketReplicationInput) GoString() string {
 	return s.String()
 }
 
-// Validate inspects the ***REMOVED***elds of the type to determine if they are valid.
+// Validate inspects the fields of the type to determine if they are valid.
 func (s *GetBucketReplicationInput) Validate() error {
 	invalidParams := request.ErrInvalidParams{Context: "GetBucketReplicationInput"}
 	if s.Bucket == nil {
@@ -12380,7 +12380,7 @@ func (s *GetBucketReplicationInput) Validate() error {
 	return nil
 }
 
-// SetBucket sets the Bucket ***REMOVED***eld's value.
+// SetBucket sets the Bucket field's value.
 func (s *GetBucketReplicationInput) SetBucket(v string) *GetBucketReplicationInput {
 	s.Bucket = &v
 	return s
@@ -12394,11 +12394,11 @@ func (s *GetBucketReplicationInput) getBucket() (v string) {
 }
 
 type GetBucketReplicationOutput struct {
-	_ struct{} `type:"structure" payload:"ReplicationCon***REMOVED***guration"`
+	_ struct{} `type:"structure" payload:"ReplicationConfiguration"`
 
 	// A container for replication rules. You can add up to 1,000 rules. The maximum
-	// size of a replication con***REMOVED***guration is 2 MB.
-	ReplicationCon***REMOVED***guration *ReplicationCon***REMOVED***guration `type:"structure"`
+	// size of a replication configuration is 2 MB.
+	ReplicationConfiguration *ReplicationConfiguration `type:"structure"`
 }
 
 // String returns the string representation
@@ -12411,16 +12411,16 @@ func (s GetBucketReplicationOutput) GoString() string {
 	return s.String()
 }
 
-// SetReplicationCon***REMOVED***guration sets the ReplicationCon***REMOVED***guration ***REMOVED***eld's value.
-func (s *GetBucketReplicationOutput) SetReplicationCon***REMOVED***guration(v *ReplicationCon***REMOVED***guration) *GetBucketReplicationOutput {
-	s.ReplicationCon***REMOVED***guration = v
+// SetReplicationConfiguration sets the ReplicationConfiguration field's value.
+func (s *GetBucketReplicationOutput) SetReplicationConfiguration(v *ReplicationConfiguration) *GetBucketReplicationOutput {
+	s.ReplicationConfiguration = v
 	return s
 }
 
 type GetBucketRequestPaymentInput struct {
 	_ struct{} `locationName:"GetBucketRequestPaymentRequest" type:"structure"`
 
-	// Bucket is a required ***REMOVED***eld
+	// Bucket is a required field
 	Bucket *string `location:"uri" locationName:"Bucket" type:"string" required:"true"`
 }
 
@@ -12434,7 +12434,7 @@ func (s GetBucketRequestPaymentInput) GoString() string {
 	return s.String()
 }
 
-// Validate inspects the ***REMOVED***elds of the type to determine if they are valid.
+// Validate inspects the fields of the type to determine if they are valid.
 func (s *GetBucketRequestPaymentInput) Validate() error {
 	invalidParams := request.ErrInvalidParams{Context: "GetBucketRequestPaymentInput"}
 	if s.Bucket == nil {
@@ -12450,7 +12450,7 @@ func (s *GetBucketRequestPaymentInput) Validate() error {
 	return nil
 }
 
-// SetBucket sets the Bucket ***REMOVED***eld's value.
+// SetBucket sets the Bucket field's value.
 func (s *GetBucketRequestPaymentInput) SetBucket(v string) *GetBucketRequestPaymentInput {
 	s.Bucket = &v
 	return s
@@ -12466,7 +12466,7 @@ func (s *GetBucketRequestPaymentInput) getBucket() (v string) {
 type GetBucketRequestPaymentOutput struct {
 	_ struct{} `type:"structure"`
 
-	// Speci***REMOVED***es who pays for the download and request fees.
+	// Specifies who pays for the download and request fees.
 	Payer *string `type:"string" enum:"Payer"`
 }
 
@@ -12480,7 +12480,7 @@ func (s GetBucketRequestPaymentOutput) GoString() string {
 	return s.String()
 }
 
-// SetPayer sets the Payer ***REMOVED***eld's value.
+// SetPayer sets the Payer field's value.
 func (s *GetBucketRequestPaymentOutput) SetPayer(v string) *GetBucketRequestPaymentOutput {
 	s.Payer = &v
 	return s
@@ -12489,7 +12489,7 @@ func (s *GetBucketRequestPaymentOutput) SetPayer(v string) *GetBucketRequestPaym
 type GetBucketTaggingInput struct {
 	_ struct{} `locationName:"GetBucketTaggingRequest" type:"structure"`
 
-	// Bucket is a required ***REMOVED***eld
+	// Bucket is a required field
 	Bucket *string `location:"uri" locationName:"Bucket" type:"string" required:"true"`
 }
 
@@ -12503,7 +12503,7 @@ func (s GetBucketTaggingInput) GoString() string {
 	return s.String()
 }
 
-// Validate inspects the ***REMOVED***elds of the type to determine if they are valid.
+// Validate inspects the fields of the type to determine if they are valid.
 func (s *GetBucketTaggingInput) Validate() error {
 	invalidParams := request.ErrInvalidParams{Context: "GetBucketTaggingInput"}
 	if s.Bucket == nil {
@@ -12519,7 +12519,7 @@ func (s *GetBucketTaggingInput) Validate() error {
 	return nil
 }
 
-// SetBucket sets the Bucket ***REMOVED***eld's value.
+// SetBucket sets the Bucket field's value.
 func (s *GetBucketTaggingInput) SetBucket(v string) *GetBucketTaggingInput {
 	s.Bucket = &v
 	return s
@@ -12535,7 +12535,7 @@ func (s *GetBucketTaggingInput) getBucket() (v string) {
 type GetBucketTaggingOutput struct {
 	_ struct{} `type:"structure"`
 
-	// TagSet is a required ***REMOVED***eld
+	// TagSet is a required field
 	TagSet []*Tag `locationNameList:"Tag" type:"list" required:"true"`
 }
 
@@ -12549,7 +12549,7 @@ func (s GetBucketTaggingOutput) GoString() string {
 	return s.String()
 }
 
-// SetTagSet sets the TagSet ***REMOVED***eld's value.
+// SetTagSet sets the TagSet field's value.
 func (s *GetBucketTaggingOutput) SetTagSet(v []*Tag) *GetBucketTaggingOutput {
 	s.TagSet = v
 	return s
@@ -12558,7 +12558,7 @@ func (s *GetBucketTaggingOutput) SetTagSet(v []*Tag) *GetBucketTaggingOutput {
 type GetBucketVersioningInput struct {
 	_ struct{} `locationName:"GetBucketVersioningRequest" type:"structure"`
 
-	// Bucket is a required ***REMOVED***eld
+	// Bucket is a required field
 	Bucket *string `location:"uri" locationName:"Bucket" type:"string" required:"true"`
 }
 
@@ -12572,7 +12572,7 @@ func (s GetBucketVersioningInput) GoString() string {
 	return s.String()
 }
 
-// Validate inspects the ***REMOVED***elds of the type to determine if they are valid.
+// Validate inspects the fields of the type to determine if they are valid.
 func (s *GetBucketVersioningInput) Validate() error {
 	invalidParams := request.ErrInvalidParams{Context: "GetBucketVersioningInput"}
 	if s.Bucket == nil {
@@ -12588,7 +12588,7 @@ func (s *GetBucketVersioningInput) Validate() error {
 	return nil
 }
 
-// SetBucket sets the Bucket ***REMOVED***eld's value.
+// SetBucket sets the Bucket field's value.
 func (s *GetBucketVersioningInput) SetBucket(v string) *GetBucketVersioningInput {
 	s.Bucket = &v
 	return s
@@ -12604,9 +12604,9 @@ func (s *GetBucketVersioningInput) getBucket() (v string) {
 type GetBucketVersioningOutput struct {
 	_ struct{} `type:"structure"`
 
-	// Speci***REMOVED***es whether MFA delete is enabled in the bucket versioning con***REMOVED***guration.
-	// This element is only returned if the bucket has been con***REMOVED***gured with MFA
-	// delete. If the bucket has never been so con***REMOVED***gured, this element is not returned.
+	// Specifies whether MFA delete is enabled in the bucket versioning configuration.
+	// This element is only returned if the bucket has been configured with MFA
+	// delete. If the bucket has never been so configured, this element is not returned.
 	MFADelete *string `locationName:"MfaDelete" type:"string" enum:"MFADeleteStatus"`
 
 	// The versioning state of the bucket.
@@ -12623,13 +12623,13 @@ func (s GetBucketVersioningOutput) GoString() string {
 	return s.String()
 }
 
-// SetMFADelete sets the MFADelete ***REMOVED***eld's value.
+// SetMFADelete sets the MFADelete field's value.
 func (s *GetBucketVersioningOutput) SetMFADelete(v string) *GetBucketVersioningOutput {
 	s.MFADelete = &v
 	return s
 }
 
-// SetStatus sets the Status ***REMOVED***eld's value.
+// SetStatus sets the Status field's value.
 func (s *GetBucketVersioningOutput) SetStatus(v string) *GetBucketVersioningOutput {
 	s.Status = &v
 	return s
@@ -12638,7 +12638,7 @@ func (s *GetBucketVersioningOutput) SetStatus(v string) *GetBucketVersioningOutp
 type GetBucketWebsiteInput struct {
 	_ struct{} `locationName:"GetBucketWebsiteRequest" type:"structure"`
 
-	// Bucket is a required ***REMOVED***eld
+	// Bucket is a required field
 	Bucket *string `location:"uri" locationName:"Bucket" type:"string" required:"true"`
 }
 
@@ -12652,7 +12652,7 @@ func (s GetBucketWebsiteInput) GoString() string {
 	return s.String()
 }
 
-// Validate inspects the ***REMOVED***elds of the type to determine if they are valid.
+// Validate inspects the fields of the type to determine if they are valid.
 func (s *GetBucketWebsiteInput) Validate() error {
 	invalidParams := request.ErrInvalidParams{Context: "GetBucketWebsiteInput"}
 	if s.Bucket == nil {
@@ -12668,7 +12668,7 @@ func (s *GetBucketWebsiteInput) Validate() error {
 	return nil
 }
 
-// SetBucket sets the Bucket ***REMOVED***eld's value.
+// SetBucket sets the Bucket field's value.
 func (s *GetBucketWebsiteInput) SetBucket(v string) *GetBucketWebsiteInput {
 	s.Bucket = &v
 	return s
@@ -12688,7 +12688,7 @@ type GetBucketWebsiteOutput struct {
 
 	IndexDocument *IndexDocument `type:"structure"`
 
-	// Speci***REMOVED***es the redirect behavior of all requests to a website endpoint of
+	// Specifies the redirect behavior of all requests to a website endpoint of
 	// an Amazon S3 bucket.
 	RedirectAllRequestsTo *RedirectAllRequestsTo `type:"structure"`
 
@@ -12705,25 +12705,25 @@ func (s GetBucketWebsiteOutput) GoString() string {
 	return s.String()
 }
 
-// SetErrorDocument sets the ErrorDocument ***REMOVED***eld's value.
+// SetErrorDocument sets the ErrorDocument field's value.
 func (s *GetBucketWebsiteOutput) SetErrorDocument(v *ErrorDocument) *GetBucketWebsiteOutput {
 	s.ErrorDocument = v
 	return s
 }
 
-// SetIndexDocument sets the IndexDocument ***REMOVED***eld's value.
+// SetIndexDocument sets the IndexDocument field's value.
 func (s *GetBucketWebsiteOutput) SetIndexDocument(v *IndexDocument) *GetBucketWebsiteOutput {
 	s.IndexDocument = v
 	return s
 }
 
-// SetRedirectAllRequestsTo sets the RedirectAllRequestsTo ***REMOVED***eld's value.
+// SetRedirectAllRequestsTo sets the RedirectAllRequestsTo field's value.
 func (s *GetBucketWebsiteOutput) SetRedirectAllRequestsTo(v *RedirectAllRequestsTo) *GetBucketWebsiteOutput {
 	s.RedirectAllRequestsTo = v
 	return s
 }
 
-// SetRoutingRules sets the RoutingRules ***REMOVED***eld's value.
+// SetRoutingRules sets the RoutingRules field's value.
 func (s *GetBucketWebsiteOutput) SetRoutingRules(v []*RoutingRule) *GetBucketWebsiteOutput {
 	s.RoutingRules = v
 	return s
@@ -12732,19 +12732,19 @@ func (s *GetBucketWebsiteOutput) SetRoutingRules(v []*RoutingRule) *GetBucketWeb
 type GetObjectAclInput struct {
 	_ struct{} `locationName:"GetObjectAclRequest" type:"structure"`
 
-	// Bucket is a required ***REMOVED***eld
+	// Bucket is a required field
 	Bucket *string `location:"uri" locationName:"Bucket" type:"string" required:"true"`
 
-	// Key is a required ***REMOVED***eld
+	// Key is a required field
 	Key *string `location:"uri" locationName:"Key" min:"1" type:"string" required:"true"`
 
-	// Con***REMOVED***rms that the requester knows that she or he will be charged for the
+	// Confirms that the requester knows that she or he will be charged for the
 	// request. Bucket owners need not specify this parameter in their requests.
 	// Documentation on downloading objects from requester pays buckets can be found
 	// at http://docs.aws.amazon.com/AmazonS3/latest/dev/ObjectsinRequesterPaysBuckets.html
 	RequestPayer *string `location:"header" locationName:"x-amz-request-payer" type:"string" enum:"RequestPayer"`
 
-	// VersionId used to reference a speci***REMOVED***c version of the object.
+	// VersionId used to reference a specific version of the object.
 	VersionId *string `location:"querystring" locationName:"versionId" type:"string"`
 }
 
@@ -12758,7 +12758,7 @@ func (s GetObjectAclInput) GoString() string {
 	return s.String()
 }
 
-// Validate inspects the ***REMOVED***elds of the type to determine if they are valid.
+// Validate inspects the fields of the type to determine if they are valid.
 func (s *GetObjectAclInput) Validate() error {
 	invalidParams := request.ErrInvalidParams{Context: "GetObjectAclInput"}
 	if s.Bucket == nil {
@@ -12780,7 +12780,7 @@ func (s *GetObjectAclInput) Validate() error {
 	return nil
 }
 
-// SetBucket sets the Bucket ***REMOVED***eld's value.
+// SetBucket sets the Bucket field's value.
 func (s *GetObjectAclInput) SetBucket(v string) *GetObjectAclInput {
 	s.Bucket = &v
 	return s
@@ -12793,19 +12793,19 @@ func (s *GetObjectAclInput) getBucket() (v string) {
 	return *s.Bucket
 }
 
-// SetKey sets the Key ***REMOVED***eld's value.
+// SetKey sets the Key field's value.
 func (s *GetObjectAclInput) SetKey(v string) *GetObjectAclInput {
 	s.Key = &v
 	return s
 }
 
-// SetRequestPayer sets the RequestPayer ***REMOVED***eld's value.
+// SetRequestPayer sets the RequestPayer field's value.
 func (s *GetObjectAclInput) SetRequestPayer(v string) *GetObjectAclInput {
 	s.RequestPayer = &v
 	return s
 }
 
-// SetVersionId sets the VersionId ***REMOVED***eld's value.
+// SetVersionId sets the VersionId field's value.
 func (s *GetObjectAclInput) SetVersionId(v string) *GetObjectAclInput {
 	s.VersionId = &v
 	return s
@@ -12834,19 +12834,19 @@ func (s GetObjectAclOutput) GoString() string {
 	return s.String()
 }
 
-// SetGrants sets the Grants ***REMOVED***eld's value.
+// SetGrants sets the Grants field's value.
 func (s *GetObjectAclOutput) SetGrants(v []*Grant) *GetObjectAclOutput {
 	s.Grants = v
 	return s
 }
 
-// SetOwner sets the Owner ***REMOVED***eld's value.
+// SetOwner sets the Owner field's value.
 func (s *GetObjectAclOutput) SetOwner(v *Owner) *GetObjectAclOutput {
 	s.Owner = v
 	return s
 }
 
-// SetRequestCharged sets the RequestCharged ***REMOVED***eld's value.
+// SetRequestCharged sets the RequestCharged field's value.
 func (s *GetObjectAclOutput) SetRequestCharged(v string) *GetObjectAclOutput {
 	s.RequestCharged = &v
 	return s
@@ -12855,38 +12855,38 @@ func (s *GetObjectAclOutput) SetRequestCharged(v string) *GetObjectAclOutput {
 type GetObjectInput struct {
 	_ struct{} `locationName:"GetObjectRequest" type:"structure"`
 
-	// Bucket is a required ***REMOVED***eld
+	// Bucket is a required field
 	Bucket *string `location:"uri" locationName:"Bucket" type:"string" required:"true"`
 
-	// Return the object only if its entity tag (ETag) is the same as the one speci***REMOVED***ed,
+	// Return the object only if its entity tag (ETag) is the same as the one specified,
 	// otherwise return a 412 (precondition failed).
 	IfMatch *string `location:"header" locationName:"If-Match" type:"string"`
 
-	// Return the object only if it has been modi***REMOVED***ed since the speci***REMOVED***ed time,
-	// otherwise return a 304 (not modi***REMOVED***ed).
-	IfModi***REMOVED***edSince *time.Time `location:"header" locationName:"If-Modi***REMOVED***ed-Since" type:"timestamp"`
+	// Return the object only if it has been modified since the specified time,
+	// otherwise return a 304 (not modified).
+	IfModifiedSince *time.Time `location:"header" locationName:"If-Modified-Since" type:"timestamp"`
 
 	// Return the object only if its entity tag (ETag) is different from the one
-	// speci***REMOVED***ed, otherwise return a 304 (not modi***REMOVED***ed).
+	// specified, otherwise return a 304 (not modified).
 	IfNoneMatch *string `location:"header" locationName:"If-None-Match" type:"string"`
 
-	// Return the object only if it has not been modi***REMOVED***ed since the speci***REMOVED***ed time,
+	// Return the object only if it has not been modified since the specified time,
 	// otherwise return a 412 (precondition failed).
-	IfUnmodi***REMOVED***edSince *time.Time `location:"header" locationName:"If-Unmodi***REMOVED***ed-Since" type:"timestamp"`
+	IfUnmodifiedSince *time.Time `location:"header" locationName:"If-Unmodified-Since" type:"timestamp"`
 
-	// Key is a required ***REMOVED***eld
+	// Key is a required field
 	Key *string `location:"uri" locationName:"Key" min:"1" type:"string" required:"true"`
 
 	// Part number of the object being read. This is a positive integer between
-	// 1 and 10,000. Effectively performs a 'ranged' GET request for the part speci***REMOVED***ed.
+	// 1 and 10,000. Effectively performs a 'ranged' GET request for the part specified.
 	// Useful for downloading just a part of an object.
 	PartNumber *int64 `location:"querystring" locationName:"partNumber" type:"integer"`
 
-	// Downloads the speci***REMOVED***ed range bytes of an object. For more information about
+	// Downloads the specified range bytes of an object. For more information about
 	// the HTTP Range header, go to http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.35.
 	Range *string `location:"header" locationName:"Range" type:"string"`
 
-	// Con***REMOVED***rms that the requester knows that she or he will be charged for the
+	// Confirms that the requester knows that she or he will be charged for the
 	// request. Bucket owners need not specify this parameter in their requests.
 	// Documentation on downloading objects from requester pays buckets can be found
 	// at http://docs.aws.amazon.com/AmazonS3/latest/dev/ObjectsinRequesterPaysBuckets.html
@@ -12910,22 +12910,22 @@ type GetObjectInput struct {
 	// Sets the Expires header of the response.
 	ResponseExpires *time.Time `location:"querystring" locationName:"response-expires" type:"timestamp"`
 
-	// Speci***REMOVED***es the algorithm to use to when encrypting the object (e.g., AES256).
+	// Specifies the algorithm to use to when encrypting the object (e.g., AES256).
 	SSECustomerAlgorithm *string `location:"header" locationName:"x-amz-server-side-encryption-customer-algorithm" type:"string"`
 
-	// Speci***REMOVED***es the customer-provided encryption key for Amazon S3 to use in encrypting
+	// Specifies the customer-provided encryption key for Amazon S3 to use in encrypting
 	// data. This value is used to store the object and then it is discarded; Amazon
 	// does not store the encryption key. The key must be appropriate for use with
-	// the algorithm speci***REMOVED***ed in the x-amz-server-side​-encryption​-customer-algorithm
+	// the algorithm specified in the x-amz-server-side​-encryption​-customer-algorithm
 	// header.
 	SSECustomerKey *string `marshal-as:"blob" location:"header" locationName:"x-amz-server-side-encryption-customer-key" type:"string" sensitive:"true"`
 
-	// Speci***REMOVED***es the 128-bit MD5 digest of the encryption key according to RFC 1321.
+	// Specifies the 128-bit MD5 digest of the encryption key according to RFC 1321.
 	// Amazon S3 uses this header for a message integrity check to ensure the encryption
 	// key was transmitted without error.
 	SSECustomerKeyMD5 *string `location:"header" locationName:"x-amz-server-side-encryption-customer-key-MD5" type:"string"`
 
-	// VersionId used to reference a speci***REMOVED***c version of the object.
+	// VersionId used to reference a specific version of the object.
 	VersionId *string `location:"querystring" locationName:"versionId" type:"string"`
 }
 
@@ -12939,7 +12939,7 @@ func (s GetObjectInput) GoString() string {
 	return s.String()
 }
 
-// Validate inspects the ***REMOVED***elds of the type to determine if they are valid.
+// Validate inspects the fields of the type to determine if they are valid.
 func (s *GetObjectInput) Validate() error {
 	invalidParams := request.ErrInvalidParams{Context: "GetObjectInput"}
 	if s.Bucket == nil {
@@ -12961,7 +12961,7 @@ func (s *GetObjectInput) Validate() error {
 	return nil
 }
 
-// SetBucket sets the Bucket ***REMOVED***eld's value.
+// SetBucket sets the Bucket field's value.
 func (s *GetObjectInput) SetBucket(v string) *GetObjectInput {
 	s.Bucket = &v
 	return s
@@ -12974,97 +12974,97 @@ func (s *GetObjectInput) getBucket() (v string) {
 	return *s.Bucket
 }
 
-// SetIfMatch sets the IfMatch ***REMOVED***eld's value.
+// SetIfMatch sets the IfMatch field's value.
 func (s *GetObjectInput) SetIfMatch(v string) *GetObjectInput {
 	s.IfMatch = &v
 	return s
 }
 
-// SetIfModi***REMOVED***edSince sets the IfModi***REMOVED***edSince ***REMOVED***eld's value.
-func (s *GetObjectInput) SetIfModi***REMOVED***edSince(v time.Time) *GetObjectInput {
-	s.IfModi***REMOVED***edSince = &v
+// SetIfModifiedSince sets the IfModifiedSince field's value.
+func (s *GetObjectInput) SetIfModifiedSince(v time.Time) *GetObjectInput {
+	s.IfModifiedSince = &v
 	return s
 }
 
-// SetIfNoneMatch sets the IfNoneMatch ***REMOVED***eld's value.
+// SetIfNoneMatch sets the IfNoneMatch field's value.
 func (s *GetObjectInput) SetIfNoneMatch(v string) *GetObjectInput {
 	s.IfNoneMatch = &v
 	return s
 }
 
-// SetIfUnmodi***REMOVED***edSince sets the IfUnmodi***REMOVED***edSince ***REMOVED***eld's value.
-func (s *GetObjectInput) SetIfUnmodi***REMOVED***edSince(v time.Time) *GetObjectInput {
-	s.IfUnmodi***REMOVED***edSince = &v
+// SetIfUnmodifiedSince sets the IfUnmodifiedSince field's value.
+func (s *GetObjectInput) SetIfUnmodifiedSince(v time.Time) *GetObjectInput {
+	s.IfUnmodifiedSince = &v
 	return s
 }
 
-// SetKey sets the Key ***REMOVED***eld's value.
+// SetKey sets the Key field's value.
 func (s *GetObjectInput) SetKey(v string) *GetObjectInput {
 	s.Key = &v
 	return s
 }
 
-// SetPartNumber sets the PartNumber ***REMOVED***eld's value.
+// SetPartNumber sets the PartNumber field's value.
 func (s *GetObjectInput) SetPartNumber(v int64) *GetObjectInput {
 	s.PartNumber = &v
 	return s
 }
 
-// SetRange sets the Range ***REMOVED***eld's value.
+// SetRange sets the Range field's value.
 func (s *GetObjectInput) SetRange(v string) *GetObjectInput {
 	s.Range = &v
 	return s
 }
 
-// SetRequestPayer sets the RequestPayer ***REMOVED***eld's value.
+// SetRequestPayer sets the RequestPayer field's value.
 func (s *GetObjectInput) SetRequestPayer(v string) *GetObjectInput {
 	s.RequestPayer = &v
 	return s
 }
 
-// SetResponseCacheControl sets the ResponseCacheControl ***REMOVED***eld's value.
+// SetResponseCacheControl sets the ResponseCacheControl field's value.
 func (s *GetObjectInput) SetResponseCacheControl(v string) *GetObjectInput {
 	s.ResponseCacheControl = &v
 	return s
 }
 
-// SetResponseContentDisposition sets the ResponseContentDisposition ***REMOVED***eld's value.
+// SetResponseContentDisposition sets the ResponseContentDisposition field's value.
 func (s *GetObjectInput) SetResponseContentDisposition(v string) *GetObjectInput {
 	s.ResponseContentDisposition = &v
 	return s
 }
 
-// SetResponseContentEncoding sets the ResponseContentEncoding ***REMOVED***eld's value.
+// SetResponseContentEncoding sets the ResponseContentEncoding field's value.
 func (s *GetObjectInput) SetResponseContentEncoding(v string) *GetObjectInput {
 	s.ResponseContentEncoding = &v
 	return s
 }
 
-// SetResponseContentLanguage sets the ResponseContentLanguage ***REMOVED***eld's value.
+// SetResponseContentLanguage sets the ResponseContentLanguage field's value.
 func (s *GetObjectInput) SetResponseContentLanguage(v string) *GetObjectInput {
 	s.ResponseContentLanguage = &v
 	return s
 }
 
-// SetResponseContentType sets the ResponseContentType ***REMOVED***eld's value.
+// SetResponseContentType sets the ResponseContentType field's value.
 func (s *GetObjectInput) SetResponseContentType(v string) *GetObjectInput {
 	s.ResponseContentType = &v
 	return s
 }
 
-// SetResponseExpires sets the ResponseExpires ***REMOVED***eld's value.
+// SetResponseExpires sets the ResponseExpires field's value.
 func (s *GetObjectInput) SetResponseExpires(v time.Time) *GetObjectInput {
 	s.ResponseExpires = &v
 	return s
 }
 
-// SetSSECustomerAlgorithm sets the SSECustomerAlgorithm ***REMOVED***eld's value.
+// SetSSECustomerAlgorithm sets the SSECustomerAlgorithm field's value.
 func (s *GetObjectInput) SetSSECustomerAlgorithm(v string) *GetObjectInput {
 	s.SSECustomerAlgorithm = &v
 	return s
 }
 
-// SetSSECustomerKey sets the SSECustomerKey ***REMOVED***eld's value.
+// SetSSECustomerKey sets the SSECustomerKey field's value.
 func (s *GetObjectInput) SetSSECustomerKey(v string) *GetObjectInput {
 	s.SSECustomerKey = &v
 	return s
@@ -13077,13 +13077,13 @@ func (s *GetObjectInput) getSSECustomerKey() (v string) {
 	return *s.SSECustomerKey
 }
 
-// SetSSECustomerKeyMD5 sets the SSECustomerKeyMD5 ***REMOVED***eld's value.
+// SetSSECustomerKeyMD5 sets the SSECustomerKeyMD5 field's value.
 func (s *GetObjectInput) SetSSECustomerKeyMD5(v string) *GetObjectInput {
 	s.SSECustomerKeyMD5 = &v
 	return s
 }
 
-// SetVersionId sets the VersionId ***REMOVED***eld's value.
+// SetVersionId sets the VersionId field's value.
 func (s *GetObjectInput) SetVersionId(v string) *GetObjectInput {
 	s.VersionId = &v
 	return s
@@ -13094,15 +13094,15 @@ type GetObjectLegalHoldInput struct {
 
 	// The bucket containing the object whose Legal Hold status you want to retrieve.
 	//
-	// Bucket is a required ***REMOVED***eld
+	// Bucket is a required field
 	Bucket *string `location:"uri" locationName:"Bucket" type:"string" required:"true"`
 
 	// The key name for the object whose Legal Hold status you want to retrieve.
 	//
-	// Key is a required ***REMOVED***eld
+	// Key is a required field
 	Key *string `location:"uri" locationName:"Key" min:"1" type:"string" required:"true"`
 
-	// Con***REMOVED***rms that the requester knows that she or he will be charged for the
+	// Confirms that the requester knows that she or he will be charged for the
 	// request. Bucket owners need not specify this parameter in their requests.
 	// Documentation on downloading objects from requester pays buckets can be found
 	// at http://docs.aws.amazon.com/AmazonS3/latest/dev/ObjectsinRequesterPaysBuckets.html
@@ -13122,7 +13122,7 @@ func (s GetObjectLegalHoldInput) GoString() string {
 	return s.String()
 }
 
-// Validate inspects the ***REMOVED***elds of the type to determine if they are valid.
+// Validate inspects the fields of the type to determine if they are valid.
 func (s *GetObjectLegalHoldInput) Validate() error {
 	invalidParams := request.ErrInvalidParams{Context: "GetObjectLegalHoldInput"}
 	if s.Bucket == nil {
@@ -13144,7 +13144,7 @@ func (s *GetObjectLegalHoldInput) Validate() error {
 	return nil
 }
 
-// SetBucket sets the Bucket ***REMOVED***eld's value.
+// SetBucket sets the Bucket field's value.
 func (s *GetObjectLegalHoldInput) SetBucket(v string) *GetObjectLegalHoldInput {
 	s.Bucket = &v
 	return s
@@ -13157,19 +13157,19 @@ func (s *GetObjectLegalHoldInput) getBucket() (v string) {
 	return *s.Bucket
 }
 
-// SetKey sets the Key ***REMOVED***eld's value.
+// SetKey sets the Key field's value.
 func (s *GetObjectLegalHoldInput) SetKey(v string) *GetObjectLegalHoldInput {
 	s.Key = &v
 	return s
 }
 
-// SetRequestPayer sets the RequestPayer ***REMOVED***eld's value.
+// SetRequestPayer sets the RequestPayer field's value.
 func (s *GetObjectLegalHoldInput) SetRequestPayer(v string) *GetObjectLegalHoldInput {
 	s.RequestPayer = &v
 	return s
 }
 
-// SetVersionId sets the VersionId ***REMOVED***eld's value.
+// SetVersionId sets the VersionId field's value.
 func (s *GetObjectLegalHoldInput) SetVersionId(v string) *GetObjectLegalHoldInput {
 	s.VersionId = &v
 	return s
@@ -13178,7 +13178,7 @@ func (s *GetObjectLegalHoldInput) SetVersionId(v string) *GetObjectLegalHoldInpu
 type GetObjectLegalHoldOutput struct {
 	_ struct{} `type:"structure" payload:"LegalHold"`
 
-	// The current Legal Hold status for the speci***REMOVED***ed object.
+	// The current Legal Hold status for the specified object.
 	LegalHold *ObjectLockLegalHold `type:"structure"`
 }
 
@@ -13192,34 +13192,34 @@ func (s GetObjectLegalHoldOutput) GoString() string {
 	return s.String()
 }
 
-// SetLegalHold sets the LegalHold ***REMOVED***eld's value.
+// SetLegalHold sets the LegalHold field's value.
 func (s *GetObjectLegalHoldOutput) SetLegalHold(v *ObjectLockLegalHold) *GetObjectLegalHoldOutput {
 	s.LegalHold = v
 	return s
 }
 
-type GetObjectLockCon***REMOVED***gurationInput struct {
-	_ struct{} `locationName:"GetObjectLockCon***REMOVED***gurationRequest" type:"structure"`
+type GetObjectLockConfigurationInput struct {
+	_ struct{} `locationName:"GetObjectLockConfigurationRequest" type:"structure"`
 
-	// The bucket whose object lock con***REMOVED***guration you want to retrieve.
+	// The bucket whose object lock configuration you want to retrieve.
 	//
-	// Bucket is a required ***REMOVED***eld
+	// Bucket is a required field
 	Bucket *string `location:"uri" locationName:"Bucket" type:"string" required:"true"`
 }
 
 // String returns the string representation
-func (s GetObjectLockCon***REMOVED***gurationInput) String() string {
+func (s GetObjectLockConfigurationInput) String() string {
 	return awsutil.Prettify(s)
 }
 
 // GoString returns the string representation
-func (s GetObjectLockCon***REMOVED***gurationInput) GoString() string {
+func (s GetObjectLockConfigurationInput) GoString() string {
 	return s.String()
 }
 
-// Validate inspects the ***REMOVED***elds of the type to determine if they are valid.
-func (s *GetObjectLockCon***REMOVED***gurationInput) Validate() error {
-	invalidParams := request.ErrInvalidParams{Context: "GetObjectLockCon***REMOVED***gurationInput"}
+// Validate inspects the fields of the type to determine if they are valid.
+func (s *GetObjectLockConfigurationInput) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "GetObjectLockConfigurationInput"}
 	if s.Bucket == nil {
 		invalidParams.Add(request.NewErrParamRequired("Bucket"))
 	}
@@ -13233,39 +13233,39 @@ func (s *GetObjectLockCon***REMOVED***gurationInput) Validate() error {
 	return nil
 }
 
-// SetBucket sets the Bucket ***REMOVED***eld's value.
-func (s *GetObjectLockCon***REMOVED***gurationInput) SetBucket(v string) *GetObjectLockCon***REMOVED***gurationInput {
+// SetBucket sets the Bucket field's value.
+func (s *GetObjectLockConfigurationInput) SetBucket(v string) *GetObjectLockConfigurationInput {
 	s.Bucket = &v
 	return s
 }
 
-func (s *GetObjectLockCon***REMOVED***gurationInput) getBucket() (v string) {
+func (s *GetObjectLockConfigurationInput) getBucket() (v string) {
 	if s.Bucket == nil {
 		return v
 	}
 	return *s.Bucket
 }
 
-type GetObjectLockCon***REMOVED***gurationOutput struct {
-	_ struct{} `type:"structure" payload:"ObjectLockCon***REMOVED***guration"`
+type GetObjectLockConfigurationOutput struct {
+	_ struct{} `type:"structure" payload:"ObjectLockConfiguration"`
 
-	// The speci***REMOVED***ed bucket's object lock con***REMOVED***guration.
-	ObjectLockCon***REMOVED***guration *ObjectLockCon***REMOVED***guration `type:"structure"`
+	// The specified bucket's object lock configuration.
+	ObjectLockConfiguration *ObjectLockConfiguration `type:"structure"`
 }
 
 // String returns the string representation
-func (s GetObjectLockCon***REMOVED***gurationOutput) String() string {
+func (s GetObjectLockConfigurationOutput) String() string {
 	return awsutil.Prettify(s)
 }
 
 // GoString returns the string representation
-func (s GetObjectLockCon***REMOVED***gurationOutput) GoString() string {
+func (s GetObjectLockConfigurationOutput) GoString() string {
 	return s.String()
 }
 
-// SetObjectLockCon***REMOVED***guration sets the ObjectLockCon***REMOVED***guration ***REMOVED***eld's value.
-func (s *GetObjectLockCon***REMOVED***gurationOutput) SetObjectLockCon***REMOVED***guration(v *ObjectLockCon***REMOVED***guration) *GetObjectLockCon***REMOVED***gurationOutput {
-	s.ObjectLockCon***REMOVED***guration = v
+// SetObjectLockConfiguration sets the ObjectLockConfiguration field's value.
+func (s *GetObjectLockConfigurationOutput) SetObjectLockConfiguration(v *ObjectLockConfiguration) *GetObjectLockConfigurationOutput {
+	s.ObjectLockConfiguration = v
 	return s
 }
 
@@ -13277,15 +13277,15 @@ type GetObjectOutput struct {
 	// Object data.
 	Body io.ReadCloser `type:"blob"`
 
-	// Speci***REMOVED***es caching behavior along the request/reply chain.
+	// Specifies caching behavior along the request/reply chain.
 	CacheControl *string `location:"header" locationName:"Cache-Control" type:"string"`
 
-	// Speci***REMOVED***es presentational information for the object.
+	// Specifies presentational information for the object.
 	ContentDisposition *string `location:"header" locationName:"Content-Disposition" type:"string"`
 
-	// Speci***REMOVED***es what content encodings have been applied to the object and thus
+	// Specifies what content encodings have been applied to the object and thus
 	// what decoding mechanisms must be applied to obtain the media-type referenced
-	// by the Content-Type header ***REMOVED***eld.
+	// by the Content-Type header field.
 	ContentEncoding *string `location:"header" locationName:"Content-Encoding" type:"string"`
 
 	// The language the content is in.
@@ -13300,15 +13300,15 @@ type GetObjectOutput struct {
 	// A standard MIME type describing the format of the object data.
 	ContentType *string `location:"header" locationName:"Content-Type" type:"string"`
 
-	// Speci***REMOVED***es whether the object retrieved was (true) or was not (false) a Delete
+	// Specifies whether the object retrieved was (true) or was not (false) a Delete
 	// Marker. If false, this response header does not appear in the response.
 	DeleteMarker *bool `location:"header" locationName:"x-amz-delete-marker" type:"boolean"`
 
-	// An ETag is an opaque identi***REMOVED***er assigned by a web server to a speci***REMOVED***c version
+	// An ETag is an opaque identifier assigned by a web server to a specific version
 	// of a resource found at a URL
 	ETag *string `location:"header" locationName:"ETag" type:"string"`
 
-	// If the object expiration is con***REMOVED***gured (see PUT Bucket lifecycle), the response
+	// If the object expiration is configured (see PUT Bucket lifecycle), the response
 	// includes this header. It includes the expiry-date and rule-id key value pairs
 	// providing object expiration information. The value of the rule-id is URL
 	// encoded.
@@ -13317,8 +13317,8 @@ type GetObjectOutput struct {
 	// The date and time at which the object is no longer cacheable.
 	Expires *string `location:"header" locationName:"Expires" type:"string"`
 
-	// Last modi***REMOVED***ed date of the object
-	LastModi***REMOVED***ed *time.Time `location:"header" locationName:"Last-Modi***REMOVED***ed" type:"timestamp"`
+	// Last modified date of the object
+	LastModified *time.Time `location:"header" locationName:"Last-Modified" type:"timestamp"`
 
 	// A map of metadata to store with the object in S3.
 	Metadata map[string]*string `location:"headers" locationName:"x-amz-meta-" type:"map"`
@@ -13329,7 +13329,7 @@ type GetObjectOutput struct {
 	// you can create metadata whose values are not legal HTTP headers.
 	MissingMeta *int64 `location:"header" locationName:"x-amz-missing-meta" type:"integer"`
 
-	// Indicates whether this object has an active legal hold. This ***REMOVED***eld is only
+	// Indicates whether this object has an active legal hold. This field is only
 	// returned if you have permission to view an object's legal hold status.
 	ObjectLockLegalHoldStatus *string `location:"header" locationName:"x-amz-object-lock-legal-hold" type:"string" enum:"ObjectLockLegalHoldStatus"`
 
@@ -13353,16 +13353,16 @@ type GetObjectOutput struct {
 	Restore *string `location:"header" locationName:"x-amz-restore" type:"string"`
 
 	// If server-side encryption with a customer-provided encryption key was requested,
-	// the response will include this header con***REMOVED***rming the encryption algorithm
+	// the response will include this header confirming the encryption algorithm
 	// used.
 	SSECustomerAlgorithm *string `location:"header" locationName:"x-amz-server-side-encryption-customer-algorithm" type:"string"`
 
 	// If server-side encryption with a customer-provided encryption key was requested,
 	// the response will include this header to provide round trip message integrity
-	// veri***REMOVED***cation of the customer-provided encryption key.
+	// verification of the customer-provided encryption key.
 	SSECustomerKeyMD5 *string `location:"header" locationName:"x-amz-server-side-encryption-customer-key-MD5" type:"string"`
 
-	// If present, speci***REMOVED***es the ID of the AWS Key Management Service (KMS) master
+	// If present, specifies the ID of the AWS Key Management Service (KMS) master
 	// encryption key that was used for the object.
 	SSEKMSKeyId *string `location:"header" locationName:"x-amz-server-side-encryption-aws-kms-key-id" type:"string" sensitive:"true"`
 
@@ -13378,7 +13378,7 @@ type GetObjectOutput struct {
 	// Version of the object.
 	VersionId *string `location:"header" locationName:"x-amz-version-id" type:"string"`
 
-	// If the bucket is con***REMOVED***gured as a website, redirects requests for this object
+	// If the bucket is configured as a website, redirects requests for this object
 	// to another object in the same bucket or to an external URL. Amazon S3 stores
 	// the value of this header in the object metadata.
 	WebsiteRedirectLocation *string `location:"header" locationName:"x-amz-website-redirect-location" type:"string"`
@@ -13394,187 +13394,187 @@ func (s GetObjectOutput) GoString() string {
 	return s.String()
 }
 
-// SetAcceptRanges sets the AcceptRanges ***REMOVED***eld's value.
+// SetAcceptRanges sets the AcceptRanges field's value.
 func (s *GetObjectOutput) SetAcceptRanges(v string) *GetObjectOutput {
 	s.AcceptRanges = &v
 	return s
 }
 
-// SetBody sets the Body ***REMOVED***eld's value.
+// SetBody sets the Body field's value.
 func (s *GetObjectOutput) SetBody(v io.ReadCloser) *GetObjectOutput {
 	s.Body = v
 	return s
 }
 
-// SetCacheControl sets the CacheControl ***REMOVED***eld's value.
+// SetCacheControl sets the CacheControl field's value.
 func (s *GetObjectOutput) SetCacheControl(v string) *GetObjectOutput {
 	s.CacheControl = &v
 	return s
 }
 
-// SetContentDisposition sets the ContentDisposition ***REMOVED***eld's value.
+// SetContentDisposition sets the ContentDisposition field's value.
 func (s *GetObjectOutput) SetContentDisposition(v string) *GetObjectOutput {
 	s.ContentDisposition = &v
 	return s
 }
 
-// SetContentEncoding sets the ContentEncoding ***REMOVED***eld's value.
+// SetContentEncoding sets the ContentEncoding field's value.
 func (s *GetObjectOutput) SetContentEncoding(v string) *GetObjectOutput {
 	s.ContentEncoding = &v
 	return s
 }
 
-// SetContentLanguage sets the ContentLanguage ***REMOVED***eld's value.
+// SetContentLanguage sets the ContentLanguage field's value.
 func (s *GetObjectOutput) SetContentLanguage(v string) *GetObjectOutput {
 	s.ContentLanguage = &v
 	return s
 }
 
-// SetContentLength sets the ContentLength ***REMOVED***eld's value.
+// SetContentLength sets the ContentLength field's value.
 func (s *GetObjectOutput) SetContentLength(v int64) *GetObjectOutput {
 	s.ContentLength = &v
 	return s
 }
 
-// SetContentRange sets the ContentRange ***REMOVED***eld's value.
+// SetContentRange sets the ContentRange field's value.
 func (s *GetObjectOutput) SetContentRange(v string) *GetObjectOutput {
 	s.ContentRange = &v
 	return s
 }
 
-// SetContentType sets the ContentType ***REMOVED***eld's value.
+// SetContentType sets the ContentType field's value.
 func (s *GetObjectOutput) SetContentType(v string) *GetObjectOutput {
 	s.ContentType = &v
 	return s
 }
 
-// SetDeleteMarker sets the DeleteMarker ***REMOVED***eld's value.
+// SetDeleteMarker sets the DeleteMarker field's value.
 func (s *GetObjectOutput) SetDeleteMarker(v bool) *GetObjectOutput {
 	s.DeleteMarker = &v
 	return s
 }
 
-// SetETag sets the ETag ***REMOVED***eld's value.
+// SetETag sets the ETag field's value.
 func (s *GetObjectOutput) SetETag(v string) *GetObjectOutput {
 	s.ETag = &v
 	return s
 }
 
-// SetExpiration sets the Expiration ***REMOVED***eld's value.
+// SetExpiration sets the Expiration field's value.
 func (s *GetObjectOutput) SetExpiration(v string) *GetObjectOutput {
 	s.Expiration = &v
 	return s
 }
 
-// SetExpires sets the Expires ***REMOVED***eld's value.
+// SetExpires sets the Expires field's value.
 func (s *GetObjectOutput) SetExpires(v string) *GetObjectOutput {
 	s.Expires = &v
 	return s
 }
 
-// SetLastModi***REMOVED***ed sets the LastModi***REMOVED***ed ***REMOVED***eld's value.
-func (s *GetObjectOutput) SetLastModi***REMOVED***ed(v time.Time) *GetObjectOutput {
-	s.LastModi***REMOVED***ed = &v
+// SetLastModified sets the LastModified field's value.
+func (s *GetObjectOutput) SetLastModified(v time.Time) *GetObjectOutput {
+	s.LastModified = &v
 	return s
 }
 
-// SetMetadata sets the Metadata ***REMOVED***eld's value.
+// SetMetadata sets the Metadata field's value.
 func (s *GetObjectOutput) SetMetadata(v map[string]*string) *GetObjectOutput {
 	s.Metadata = v
 	return s
 }
 
-// SetMissingMeta sets the MissingMeta ***REMOVED***eld's value.
+// SetMissingMeta sets the MissingMeta field's value.
 func (s *GetObjectOutput) SetMissingMeta(v int64) *GetObjectOutput {
 	s.MissingMeta = &v
 	return s
 }
 
-// SetObjectLockLegalHoldStatus sets the ObjectLockLegalHoldStatus ***REMOVED***eld's value.
+// SetObjectLockLegalHoldStatus sets the ObjectLockLegalHoldStatus field's value.
 func (s *GetObjectOutput) SetObjectLockLegalHoldStatus(v string) *GetObjectOutput {
 	s.ObjectLockLegalHoldStatus = &v
 	return s
 }
 
-// SetObjectLockMode sets the ObjectLockMode ***REMOVED***eld's value.
+// SetObjectLockMode sets the ObjectLockMode field's value.
 func (s *GetObjectOutput) SetObjectLockMode(v string) *GetObjectOutput {
 	s.ObjectLockMode = &v
 	return s
 }
 
-// SetObjectLockRetainUntilDate sets the ObjectLockRetainUntilDate ***REMOVED***eld's value.
+// SetObjectLockRetainUntilDate sets the ObjectLockRetainUntilDate field's value.
 func (s *GetObjectOutput) SetObjectLockRetainUntilDate(v time.Time) *GetObjectOutput {
 	s.ObjectLockRetainUntilDate = &v
 	return s
 }
 
-// SetPartsCount sets the PartsCount ***REMOVED***eld's value.
+// SetPartsCount sets the PartsCount field's value.
 func (s *GetObjectOutput) SetPartsCount(v int64) *GetObjectOutput {
 	s.PartsCount = &v
 	return s
 }
 
-// SetReplicationStatus sets the ReplicationStatus ***REMOVED***eld's value.
+// SetReplicationStatus sets the ReplicationStatus field's value.
 func (s *GetObjectOutput) SetReplicationStatus(v string) *GetObjectOutput {
 	s.ReplicationStatus = &v
 	return s
 }
 
-// SetRequestCharged sets the RequestCharged ***REMOVED***eld's value.
+// SetRequestCharged sets the RequestCharged field's value.
 func (s *GetObjectOutput) SetRequestCharged(v string) *GetObjectOutput {
 	s.RequestCharged = &v
 	return s
 }
 
-// SetRestore sets the Restore ***REMOVED***eld's value.
+// SetRestore sets the Restore field's value.
 func (s *GetObjectOutput) SetRestore(v string) *GetObjectOutput {
 	s.Restore = &v
 	return s
 }
 
-// SetSSECustomerAlgorithm sets the SSECustomerAlgorithm ***REMOVED***eld's value.
+// SetSSECustomerAlgorithm sets the SSECustomerAlgorithm field's value.
 func (s *GetObjectOutput) SetSSECustomerAlgorithm(v string) *GetObjectOutput {
 	s.SSECustomerAlgorithm = &v
 	return s
 }
 
-// SetSSECustomerKeyMD5 sets the SSECustomerKeyMD5 ***REMOVED***eld's value.
+// SetSSECustomerKeyMD5 sets the SSECustomerKeyMD5 field's value.
 func (s *GetObjectOutput) SetSSECustomerKeyMD5(v string) *GetObjectOutput {
 	s.SSECustomerKeyMD5 = &v
 	return s
 }
 
-// SetSSEKMSKeyId sets the SSEKMSKeyId ***REMOVED***eld's value.
+// SetSSEKMSKeyId sets the SSEKMSKeyId field's value.
 func (s *GetObjectOutput) SetSSEKMSKeyId(v string) *GetObjectOutput {
 	s.SSEKMSKeyId = &v
 	return s
 }
 
-// SetServerSideEncryption sets the ServerSideEncryption ***REMOVED***eld's value.
+// SetServerSideEncryption sets the ServerSideEncryption field's value.
 func (s *GetObjectOutput) SetServerSideEncryption(v string) *GetObjectOutput {
 	s.ServerSideEncryption = &v
 	return s
 }
 
-// SetStorageClass sets the StorageClass ***REMOVED***eld's value.
+// SetStorageClass sets the StorageClass field's value.
 func (s *GetObjectOutput) SetStorageClass(v string) *GetObjectOutput {
 	s.StorageClass = &v
 	return s
 }
 
-// SetTagCount sets the TagCount ***REMOVED***eld's value.
+// SetTagCount sets the TagCount field's value.
 func (s *GetObjectOutput) SetTagCount(v int64) *GetObjectOutput {
 	s.TagCount = &v
 	return s
 }
 
-// SetVersionId sets the VersionId ***REMOVED***eld's value.
+// SetVersionId sets the VersionId field's value.
 func (s *GetObjectOutput) SetVersionId(v string) *GetObjectOutput {
 	s.VersionId = &v
 	return s
 }
 
-// SetWebsiteRedirectLocation sets the WebsiteRedirectLocation ***REMOVED***eld's value.
+// SetWebsiteRedirectLocation sets the WebsiteRedirectLocation field's value.
 func (s *GetObjectOutput) SetWebsiteRedirectLocation(v string) *GetObjectOutput {
 	s.WebsiteRedirectLocation = &v
 	return s
@@ -13585,15 +13585,15 @@ type GetObjectRetentionInput struct {
 
 	// The bucket containing the object whose retention settings you want to retrieve.
 	//
-	// Bucket is a required ***REMOVED***eld
+	// Bucket is a required field
 	Bucket *string `location:"uri" locationName:"Bucket" type:"string" required:"true"`
 
 	// The key name for the object whose retention settings you want to retrieve.
 	//
-	// Key is a required ***REMOVED***eld
+	// Key is a required field
 	Key *string `location:"uri" locationName:"Key" min:"1" type:"string" required:"true"`
 
-	// Con***REMOVED***rms that the requester knows that she or he will be charged for the
+	// Confirms that the requester knows that she or he will be charged for the
 	// request. Bucket owners need not specify this parameter in their requests.
 	// Documentation on downloading objects from requester pays buckets can be found
 	// at http://docs.aws.amazon.com/AmazonS3/latest/dev/ObjectsinRequesterPaysBuckets.html
@@ -13613,7 +13613,7 @@ func (s GetObjectRetentionInput) GoString() string {
 	return s.String()
 }
 
-// Validate inspects the ***REMOVED***elds of the type to determine if they are valid.
+// Validate inspects the fields of the type to determine if they are valid.
 func (s *GetObjectRetentionInput) Validate() error {
 	invalidParams := request.ErrInvalidParams{Context: "GetObjectRetentionInput"}
 	if s.Bucket == nil {
@@ -13635,7 +13635,7 @@ func (s *GetObjectRetentionInput) Validate() error {
 	return nil
 }
 
-// SetBucket sets the Bucket ***REMOVED***eld's value.
+// SetBucket sets the Bucket field's value.
 func (s *GetObjectRetentionInput) SetBucket(v string) *GetObjectRetentionInput {
 	s.Bucket = &v
 	return s
@@ -13648,19 +13648,19 @@ func (s *GetObjectRetentionInput) getBucket() (v string) {
 	return *s.Bucket
 }
 
-// SetKey sets the Key ***REMOVED***eld's value.
+// SetKey sets the Key field's value.
 func (s *GetObjectRetentionInput) SetKey(v string) *GetObjectRetentionInput {
 	s.Key = &v
 	return s
 }
 
-// SetRequestPayer sets the RequestPayer ***REMOVED***eld's value.
+// SetRequestPayer sets the RequestPayer field's value.
 func (s *GetObjectRetentionInput) SetRequestPayer(v string) *GetObjectRetentionInput {
 	s.RequestPayer = &v
 	return s
 }
 
-// SetVersionId sets the VersionId ***REMOVED***eld's value.
+// SetVersionId sets the VersionId field's value.
 func (s *GetObjectRetentionInput) SetVersionId(v string) *GetObjectRetentionInput {
 	s.VersionId = &v
 	return s
@@ -13683,7 +13683,7 @@ func (s GetObjectRetentionOutput) GoString() string {
 	return s.String()
 }
 
-// SetRetention sets the Retention ***REMOVED***eld's value.
+// SetRetention sets the Retention field's value.
 func (s *GetObjectRetentionOutput) SetRetention(v *ObjectLockRetention) *GetObjectRetentionOutput {
 	s.Retention = v
 	return s
@@ -13692,10 +13692,10 @@ func (s *GetObjectRetentionOutput) SetRetention(v *ObjectLockRetention) *GetObje
 type GetObjectTaggingInput struct {
 	_ struct{} `locationName:"GetObjectTaggingRequest" type:"structure"`
 
-	// Bucket is a required ***REMOVED***eld
+	// Bucket is a required field
 	Bucket *string `location:"uri" locationName:"Bucket" type:"string" required:"true"`
 
-	// Key is a required ***REMOVED***eld
+	// Key is a required field
 	Key *string `location:"uri" locationName:"Key" min:"1" type:"string" required:"true"`
 
 	VersionId *string `location:"querystring" locationName:"versionId" type:"string"`
@@ -13711,7 +13711,7 @@ func (s GetObjectTaggingInput) GoString() string {
 	return s.String()
 }
 
-// Validate inspects the ***REMOVED***elds of the type to determine if they are valid.
+// Validate inspects the fields of the type to determine if they are valid.
 func (s *GetObjectTaggingInput) Validate() error {
 	invalidParams := request.ErrInvalidParams{Context: "GetObjectTaggingInput"}
 	if s.Bucket == nil {
@@ -13733,7 +13733,7 @@ func (s *GetObjectTaggingInput) Validate() error {
 	return nil
 }
 
-// SetBucket sets the Bucket ***REMOVED***eld's value.
+// SetBucket sets the Bucket field's value.
 func (s *GetObjectTaggingInput) SetBucket(v string) *GetObjectTaggingInput {
 	s.Bucket = &v
 	return s
@@ -13746,13 +13746,13 @@ func (s *GetObjectTaggingInput) getBucket() (v string) {
 	return *s.Bucket
 }
 
-// SetKey sets the Key ***REMOVED***eld's value.
+// SetKey sets the Key field's value.
 func (s *GetObjectTaggingInput) SetKey(v string) *GetObjectTaggingInput {
 	s.Key = &v
 	return s
 }
 
-// SetVersionId sets the VersionId ***REMOVED***eld's value.
+// SetVersionId sets the VersionId field's value.
 func (s *GetObjectTaggingInput) SetVersionId(v string) *GetObjectTaggingInput {
 	s.VersionId = &v
 	return s
@@ -13761,7 +13761,7 @@ func (s *GetObjectTaggingInput) SetVersionId(v string) *GetObjectTaggingInput {
 type GetObjectTaggingOutput struct {
 	_ struct{} `type:"structure"`
 
-	// TagSet is a required ***REMOVED***eld
+	// TagSet is a required field
 	TagSet []*Tag `locationNameList:"Tag" type:"list" required:"true"`
 
 	VersionId *string `location:"header" locationName:"x-amz-version-id" type:"string"`
@@ -13777,13 +13777,13 @@ func (s GetObjectTaggingOutput) GoString() string {
 	return s.String()
 }
 
-// SetTagSet sets the TagSet ***REMOVED***eld's value.
+// SetTagSet sets the TagSet field's value.
 func (s *GetObjectTaggingOutput) SetTagSet(v []*Tag) *GetObjectTaggingOutput {
 	s.TagSet = v
 	return s
 }
 
-// SetVersionId sets the VersionId ***REMOVED***eld's value.
+// SetVersionId sets the VersionId field's value.
 func (s *GetObjectTaggingOutput) SetVersionId(v string) *GetObjectTaggingOutput {
 	s.VersionId = &v
 	return s
@@ -13792,13 +13792,13 @@ func (s *GetObjectTaggingOutput) SetVersionId(v string) *GetObjectTaggingOutput 
 type GetObjectTorrentInput struct {
 	_ struct{} `locationName:"GetObjectTorrentRequest" type:"structure"`
 
-	// Bucket is a required ***REMOVED***eld
+	// Bucket is a required field
 	Bucket *string `location:"uri" locationName:"Bucket" type:"string" required:"true"`
 
-	// Key is a required ***REMOVED***eld
+	// Key is a required field
 	Key *string `location:"uri" locationName:"Key" min:"1" type:"string" required:"true"`
 
-	// Con***REMOVED***rms that the requester knows that she or he will be charged for the
+	// Confirms that the requester knows that she or he will be charged for the
 	// request. Bucket owners need not specify this parameter in their requests.
 	// Documentation on downloading objects from requester pays buckets can be found
 	// at http://docs.aws.amazon.com/AmazonS3/latest/dev/ObjectsinRequesterPaysBuckets.html
@@ -13815,7 +13815,7 @@ func (s GetObjectTorrentInput) GoString() string {
 	return s.String()
 }
 
-// Validate inspects the ***REMOVED***elds of the type to determine if they are valid.
+// Validate inspects the fields of the type to determine if they are valid.
 func (s *GetObjectTorrentInput) Validate() error {
 	invalidParams := request.ErrInvalidParams{Context: "GetObjectTorrentInput"}
 	if s.Bucket == nil {
@@ -13837,7 +13837,7 @@ func (s *GetObjectTorrentInput) Validate() error {
 	return nil
 }
 
-// SetBucket sets the Bucket ***REMOVED***eld's value.
+// SetBucket sets the Bucket field's value.
 func (s *GetObjectTorrentInput) SetBucket(v string) *GetObjectTorrentInput {
 	s.Bucket = &v
 	return s
@@ -13850,13 +13850,13 @@ func (s *GetObjectTorrentInput) getBucket() (v string) {
 	return *s.Bucket
 }
 
-// SetKey sets the Key ***REMOVED***eld's value.
+// SetKey sets the Key field's value.
 func (s *GetObjectTorrentInput) SetKey(v string) *GetObjectTorrentInput {
 	s.Key = &v
 	return s
 }
 
-// SetRequestPayer sets the RequestPayer ***REMOVED***eld's value.
+// SetRequestPayer sets the RequestPayer field's value.
 func (s *GetObjectTorrentInput) SetRequestPayer(v string) *GetObjectTorrentInput {
 	s.RequestPayer = &v
 	return s
@@ -13882,13 +13882,13 @@ func (s GetObjectTorrentOutput) GoString() string {
 	return s.String()
 }
 
-// SetBody sets the Body ***REMOVED***eld's value.
+// SetBody sets the Body field's value.
 func (s *GetObjectTorrentOutput) SetBody(v io.ReadCloser) *GetObjectTorrentOutput {
 	s.Body = v
 	return s
 }
 
-// SetRequestCharged sets the RequestCharged ***REMOVED***eld's value.
+// SetRequestCharged sets the RequestCharged field's value.
 func (s *GetObjectTorrentOutput) SetRequestCharged(v string) *GetObjectTorrentOutput {
 	s.RequestCharged = &v
 	return s
@@ -13897,10 +13897,10 @@ func (s *GetObjectTorrentOutput) SetRequestCharged(v string) *GetObjectTorrentOu
 type GetPublicAccessBlockInput struct {
 	_ struct{} `locationName:"GetPublicAccessBlockRequest" type:"structure"`
 
-	// The name of the Amazon S3 bucket whose PublicAccessBlock con***REMOVED***guration you
+	// The name of the Amazon S3 bucket whose PublicAccessBlock configuration you
 	// want to retrieve.
 	//
-	// Bucket is a required ***REMOVED***eld
+	// Bucket is a required field
 	Bucket *string `location:"uri" locationName:"Bucket" type:"string" required:"true"`
 }
 
@@ -13914,7 +13914,7 @@ func (s GetPublicAccessBlockInput) GoString() string {
 	return s.String()
 }
 
-// Validate inspects the ***REMOVED***elds of the type to determine if they are valid.
+// Validate inspects the fields of the type to determine if they are valid.
 func (s *GetPublicAccessBlockInput) Validate() error {
 	invalidParams := request.ErrInvalidParams{Context: "GetPublicAccessBlockInput"}
 	if s.Bucket == nil {
@@ -13930,7 +13930,7 @@ func (s *GetPublicAccessBlockInput) Validate() error {
 	return nil
 }
 
-// SetBucket sets the Bucket ***REMOVED***eld's value.
+// SetBucket sets the Bucket field's value.
 func (s *GetPublicAccessBlockInput) SetBucket(v string) *GetPublicAccessBlockInput {
 	s.Bucket = &v
 	return s
@@ -13944,11 +13944,11 @@ func (s *GetPublicAccessBlockInput) getBucket() (v string) {
 }
 
 type GetPublicAccessBlockOutput struct {
-	_ struct{} `type:"structure" payload:"PublicAccessBlockCon***REMOVED***guration"`
+	_ struct{} `type:"structure" payload:"PublicAccessBlockConfiguration"`
 
-	// The PublicAccessBlock con***REMOVED***guration currently in effect for this Amazon S3
+	// The PublicAccessBlock configuration currently in effect for this Amazon S3
 	// bucket.
-	PublicAccessBlockCon***REMOVED***guration *PublicAccessBlockCon***REMOVED***guration `type:"structure"`
+	PublicAccessBlockConfiguration *PublicAccessBlockConfiguration `type:"structure"`
 }
 
 // String returns the string representation
@@ -13961,9 +13961,9 @@ func (s GetPublicAccessBlockOutput) GoString() string {
 	return s.String()
 }
 
-// SetPublicAccessBlockCon***REMOVED***guration sets the PublicAccessBlockCon***REMOVED***guration ***REMOVED***eld's value.
-func (s *GetPublicAccessBlockOutput) SetPublicAccessBlockCon***REMOVED***guration(v *PublicAccessBlockCon***REMOVED***guration) *GetPublicAccessBlockOutput {
-	s.PublicAccessBlockCon***REMOVED***guration = v
+// SetPublicAccessBlockConfiguration sets the PublicAccessBlockConfiguration field's value.
+func (s *GetPublicAccessBlockOutput) SetPublicAccessBlockConfiguration(v *PublicAccessBlockConfiguration) *GetPublicAccessBlockOutput {
+	s.PublicAccessBlockConfiguration = v
 	return s
 }
 
@@ -13972,7 +13972,7 @@ type GlacierJobParameters struct {
 
 	// Glacier retrieval tier at which the restore will be processed.
 	//
-	// Tier is a required ***REMOVED***eld
+	// Tier is a required field
 	Tier *string `type:"string" required:"true" enum:"Tier"`
 }
 
@@ -13986,7 +13986,7 @@ func (s GlacierJobParameters) GoString() string {
 	return s.String()
 }
 
-// Validate inspects the ***REMOVED***elds of the type to determine if they are valid.
+// Validate inspects the fields of the type to determine if they are valid.
 func (s *GlacierJobParameters) Validate() error {
 	invalidParams := request.ErrInvalidParams{Context: "GlacierJobParameters"}
 	if s.Tier == nil {
@@ -13999,7 +13999,7 @@ func (s *GlacierJobParameters) Validate() error {
 	return nil
 }
 
-// SetTier sets the Tier ***REMOVED***eld's value.
+// SetTier sets the Tier field's value.
 func (s *GlacierJobParameters) SetTier(v string) *GlacierJobParameters {
 	s.Tier = &v
 	return s
@@ -14008,9 +14008,9 @@ func (s *GlacierJobParameters) SetTier(v string) *GlacierJobParameters {
 type Grant struct {
 	_ struct{} `type:"structure"`
 
-	Grantee *Grantee `type:"structure" xmlPre***REMOVED***x:"xsi" xmlURI:"http://www.w3.org/2001/XMLSchema-instance"`
+	Grantee *Grantee `type:"structure" xmlPrefix:"xsi" xmlURI:"http://www.w3.org/2001/XMLSchema-instance"`
 
-	// Speci***REMOVED***es the permission given to the grantee.
+	// Specifies the permission given to the grantee.
 	Permission *string `type:"string" enum:"Permission"`
 }
 
@@ -14024,7 +14024,7 @@ func (s Grant) GoString() string {
 	return s.String()
 }
 
-// Validate inspects the ***REMOVED***elds of the type to determine if they are valid.
+// Validate inspects the fields of the type to determine if they are valid.
 func (s *Grant) Validate() error {
 	invalidParams := request.ErrInvalidParams{Context: "Grant"}
 	if s.Grantee != nil {
@@ -14039,20 +14039,20 @@ func (s *Grant) Validate() error {
 	return nil
 }
 
-// SetGrantee sets the Grantee ***REMOVED***eld's value.
+// SetGrantee sets the Grantee field's value.
 func (s *Grant) SetGrantee(v *Grantee) *Grant {
 	s.Grantee = v
 	return s
 }
 
-// SetPermission sets the Permission ***REMOVED***eld's value.
+// SetPermission sets the Permission field's value.
 func (s *Grant) SetPermission(v string) *Grant {
 	s.Permission = &v
 	return s
 }
 
 type Grantee struct {
-	_ struct{} `type:"structure" xmlPre***REMOVED***x:"xsi" xmlURI:"http://www.w3.org/2001/XMLSchema-instance"`
+	_ struct{} `type:"structure" xmlPrefix:"xsi" xmlURI:"http://www.w3.org/2001/XMLSchema-instance"`
 
 	// Screen name of the grantee.
 	DisplayName *string `type:"string"`
@@ -14065,7 +14065,7 @@ type Grantee struct {
 
 	// Type of grantee
 	//
-	// Type is a required ***REMOVED***eld
+	// Type is a required field
 	Type *string `locationName:"xsi:type" type:"string" xmlAttribute:"true" required:"true" enum:"Type"`
 
 	// URI of the grantee group.
@@ -14082,7 +14082,7 @@ func (s Grantee) GoString() string {
 	return s.String()
 }
 
-// Validate inspects the ***REMOVED***elds of the type to determine if they are valid.
+// Validate inspects the fields of the type to determine if they are valid.
 func (s *Grantee) Validate() error {
 	invalidParams := request.ErrInvalidParams{Context: "Grantee"}
 	if s.Type == nil {
@@ -14095,31 +14095,31 @@ func (s *Grantee) Validate() error {
 	return nil
 }
 
-// SetDisplayName sets the DisplayName ***REMOVED***eld's value.
+// SetDisplayName sets the DisplayName field's value.
 func (s *Grantee) SetDisplayName(v string) *Grantee {
 	s.DisplayName = &v
 	return s
 }
 
-// SetEmailAddress sets the EmailAddress ***REMOVED***eld's value.
+// SetEmailAddress sets the EmailAddress field's value.
 func (s *Grantee) SetEmailAddress(v string) *Grantee {
 	s.EmailAddress = &v
 	return s
 }
 
-// SetID sets the ID ***REMOVED***eld's value.
+// SetID sets the ID field's value.
 func (s *Grantee) SetID(v string) *Grantee {
 	s.ID = &v
 	return s
 }
 
-// SetType sets the Type ***REMOVED***eld's value.
+// SetType sets the Type field's value.
 func (s *Grantee) SetType(v string) *Grantee {
 	s.Type = &v
 	return s
 }
 
-// SetURI sets the URI ***REMOVED***eld's value.
+// SetURI sets the URI field's value.
 func (s *Grantee) SetURI(v string) *Grantee {
 	s.URI = &v
 	return s
@@ -14128,7 +14128,7 @@ func (s *Grantee) SetURI(v string) *Grantee {
 type HeadBucketInput struct {
 	_ struct{} `locationName:"HeadBucketRequest" type:"structure"`
 
-	// Bucket is a required ***REMOVED***eld
+	// Bucket is a required field
 	Bucket *string `location:"uri" locationName:"Bucket" type:"string" required:"true"`
 }
 
@@ -14142,7 +14142,7 @@ func (s HeadBucketInput) GoString() string {
 	return s.String()
 }
 
-// Validate inspects the ***REMOVED***elds of the type to determine if they are valid.
+// Validate inspects the fields of the type to determine if they are valid.
 func (s *HeadBucketInput) Validate() error {
 	invalidParams := request.ErrInvalidParams{Context: "HeadBucketInput"}
 	if s.Bucket == nil {
@@ -14158,7 +14158,7 @@ func (s *HeadBucketInput) Validate() error {
 	return nil
 }
 
-// SetBucket sets the Bucket ***REMOVED***eld's value.
+// SetBucket sets the Bucket field's value.
 func (s *HeadBucketInput) SetBucket(v string) *HeadBucketInput {
 	s.Bucket = &v
 	return s
@@ -14188,60 +14188,60 @@ func (s HeadBucketOutput) GoString() string {
 type HeadObjectInput struct {
 	_ struct{} `locationName:"HeadObjectRequest" type:"structure"`
 
-	// Bucket is a required ***REMOVED***eld
+	// Bucket is a required field
 	Bucket *string `location:"uri" locationName:"Bucket" type:"string" required:"true"`
 
-	// Return the object only if its entity tag (ETag) is the same as the one speci***REMOVED***ed,
+	// Return the object only if its entity tag (ETag) is the same as the one specified,
 	// otherwise return a 412 (precondition failed).
 	IfMatch *string `location:"header" locationName:"If-Match" type:"string"`
 
-	// Return the object only if it has been modi***REMOVED***ed since the speci***REMOVED***ed time,
-	// otherwise return a 304 (not modi***REMOVED***ed).
-	IfModi***REMOVED***edSince *time.Time `location:"header" locationName:"If-Modi***REMOVED***ed-Since" type:"timestamp"`
+	// Return the object only if it has been modified since the specified time,
+	// otherwise return a 304 (not modified).
+	IfModifiedSince *time.Time `location:"header" locationName:"If-Modified-Since" type:"timestamp"`
 
 	// Return the object only if its entity tag (ETag) is different from the one
-	// speci***REMOVED***ed, otherwise return a 304 (not modi***REMOVED***ed).
+	// specified, otherwise return a 304 (not modified).
 	IfNoneMatch *string `location:"header" locationName:"If-None-Match" type:"string"`
 
-	// Return the object only if it has not been modi***REMOVED***ed since the speci***REMOVED***ed time,
+	// Return the object only if it has not been modified since the specified time,
 	// otherwise return a 412 (precondition failed).
-	IfUnmodi***REMOVED***edSince *time.Time `location:"header" locationName:"If-Unmodi***REMOVED***ed-Since" type:"timestamp"`
+	IfUnmodifiedSince *time.Time `location:"header" locationName:"If-Unmodified-Since" type:"timestamp"`
 
-	// Key is a required ***REMOVED***eld
+	// Key is a required field
 	Key *string `location:"uri" locationName:"Key" min:"1" type:"string" required:"true"`
 
 	// Part number of the object being read. This is a positive integer between
-	// 1 and 10,000. Effectively performs a 'ranged' HEAD request for the part speci***REMOVED***ed.
+	// 1 and 10,000. Effectively performs a 'ranged' HEAD request for the part specified.
 	// Useful querying about the size of the part and the number of parts in this
 	// object.
 	PartNumber *int64 `location:"querystring" locationName:"partNumber" type:"integer"`
 
-	// Downloads the speci***REMOVED***ed range bytes of an object. For more information about
+	// Downloads the specified range bytes of an object. For more information about
 	// the HTTP Range header, go to http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.35.
 	Range *string `location:"header" locationName:"Range" type:"string"`
 
-	// Con***REMOVED***rms that the requester knows that she or he will be charged for the
+	// Confirms that the requester knows that she or he will be charged for the
 	// request. Bucket owners need not specify this parameter in their requests.
 	// Documentation on downloading objects from requester pays buckets can be found
 	// at http://docs.aws.amazon.com/AmazonS3/latest/dev/ObjectsinRequesterPaysBuckets.html
 	RequestPayer *string `location:"header" locationName:"x-amz-request-payer" type:"string" enum:"RequestPayer"`
 
-	// Speci***REMOVED***es the algorithm to use to when encrypting the object (e.g., AES256).
+	// Specifies the algorithm to use to when encrypting the object (e.g., AES256).
 	SSECustomerAlgorithm *string `location:"header" locationName:"x-amz-server-side-encryption-customer-algorithm" type:"string"`
 
-	// Speci***REMOVED***es the customer-provided encryption key for Amazon S3 to use in encrypting
+	// Specifies the customer-provided encryption key for Amazon S3 to use in encrypting
 	// data. This value is used to store the object and then it is discarded; Amazon
 	// does not store the encryption key. The key must be appropriate for use with
-	// the algorithm speci***REMOVED***ed in the x-amz-server-side​-encryption​-customer-algorithm
+	// the algorithm specified in the x-amz-server-side​-encryption​-customer-algorithm
 	// header.
 	SSECustomerKey *string `marshal-as:"blob" location:"header" locationName:"x-amz-server-side-encryption-customer-key" type:"string" sensitive:"true"`
 
-	// Speci***REMOVED***es the 128-bit MD5 digest of the encryption key according to RFC 1321.
+	// Specifies the 128-bit MD5 digest of the encryption key according to RFC 1321.
 	// Amazon S3 uses this header for a message integrity check to ensure the encryption
 	// key was transmitted without error.
 	SSECustomerKeyMD5 *string `location:"header" locationName:"x-amz-server-side-encryption-customer-key-MD5" type:"string"`
 
-	// VersionId used to reference a speci***REMOVED***c version of the object.
+	// VersionId used to reference a specific version of the object.
 	VersionId *string `location:"querystring" locationName:"versionId" type:"string"`
 }
 
@@ -14255,7 +14255,7 @@ func (s HeadObjectInput) GoString() string {
 	return s.String()
 }
 
-// Validate inspects the ***REMOVED***elds of the type to determine if they are valid.
+// Validate inspects the fields of the type to determine if they are valid.
 func (s *HeadObjectInput) Validate() error {
 	invalidParams := request.ErrInvalidParams{Context: "HeadObjectInput"}
 	if s.Bucket == nil {
@@ -14277,7 +14277,7 @@ func (s *HeadObjectInput) Validate() error {
 	return nil
 }
 
-// SetBucket sets the Bucket ***REMOVED***eld's value.
+// SetBucket sets the Bucket field's value.
 func (s *HeadObjectInput) SetBucket(v string) *HeadObjectInput {
 	s.Bucket = &v
 	return s
@@ -14290,61 +14290,61 @@ func (s *HeadObjectInput) getBucket() (v string) {
 	return *s.Bucket
 }
 
-// SetIfMatch sets the IfMatch ***REMOVED***eld's value.
+// SetIfMatch sets the IfMatch field's value.
 func (s *HeadObjectInput) SetIfMatch(v string) *HeadObjectInput {
 	s.IfMatch = &v
 	return s
 }
 
-// SetIfModi***REMOVED***edSince sets the IfModi***REMOVED***edSince ***REMOVED***eld's value.
-func (s *HeadObjectInput) SetIfModi***REMOVED***edSince(v time.Time) *HeadObjectInput {
-	s.IfModi***REMOVED***edSince = &v
+// SetIfModifiedSince sets the IfModifiedSince field's value.
+func (s *HeadObjectInput) SetIfModifiedSince(v time.Time) *HeadObjectInput {
+	s.IfModifiedSince = &v
 	return s
 }
 
-// SetIfNoneMatch sets the IfNoneMatch ***REMOVED***eld's value.
+// SetIfNoneMatch sets the IfNoneMatch field's value.
 func (s *HeadObjectInput) SetIfNoneMatch(v string) *HeadObjectInput {
 	s.IfNoneMatch = &v
 	return s
 }
 
-// SetIfUnmodi***REMOVED***edSince sets the IfUnmodi***REMOVED***edSince ***REMOVED***eld's value.
-func (s *HeadObjectInput) SetIfUnmodi***REMOVED***edSince(v time.Time) *HeadObjectInput {
-	s.IfUnmodi***REMOVED***edSince = &v
+// SetIfUnmodifiedSince sets the IfUnmodifiedSince field's value.
+func (s *HeadObjectInput) SetIfUnmodifiedSince(v time.Time) *HeadObjectInput {
+	s.IfUnmodifiedSince = &v
 	return s
 }
 
-// SetKey sets the Key ***REMOVED***eld's value.
+// SetKey sets the Key field's value.
 func (s *HeadObjectInput) SetKey(v string) *HeadObjectInput {
 	s.Key = &v
 	return s
 }
 
-// SetPartNumber sets the PartNumber ***REMOVED***eld's value.
+// SetPartNumber sets the PartNumber field's value.
 func (s *HeadObjectInput) SetPartNumber(v int64) *HeadObjectInput {
 	s.PartNumber = &v
 	return s
 }
 
-// SetRange sets the Range ***REMOVED***eld's value.
+// SetRange sets the Range field's value.
 func (s *HeadObjectInput) SetRange(v string) *HeadObjectInput {
 	s.Range = &v
 	return s
 }
 
-// SetRequestPayer sets the RequestPayer ***REMOVED***eld's value.
+// SetRequestPayer sets the RequestPayer field's value.
 func (s *HeadObjectInput) SetRequestPayer(v string) *HeadObjectInput {
 	s.RequestPayer = &v
 	return s
 }
 
-// SetSSECustomerAlgorithm sets the SSECustomerAlgorithm ***REMOVED***eld's value.
+// SetSSECustomerAlgorithm sets the SSECustomerAlgorithm field's value.
 func (s *HeadObjectInput) SetSSECustomerAlgorithm(v string) *HeadObjectInput {
 	s.SSECustomerAlgorithm = &v
 	return s
 }
 
-// SetSSECustomerKey sets the SSECustomerKey ***REMOVED***eld's value.
+// SetSSECustomerKey sets the SSECustomerKey field's value.
 func (s *HeadObjectInput) SetSSECustomerKey(v string) *HeadObjectInput {
 	s.SSECustomerKey = &v
 	return s
@@ -14357,13 +14357,13 @@ func (s *HeadObjectInput) getSSECustomerKey() (v string) {
 	return *s.SSECustomerKey
 }
 
-// SetSSECustomerKeyMD5 sets the SSECustomerKeyMD5 ***REMOVED***eld's value.
+// SetSSECustomerKeyMD5 sets the SSECustomerKeyMD5 field's value.
 func (s *HeadObjectInput) SetSSECustomerKeyMD5(v string) *HeadObjectInput {
 	s.SSECustomerKeyMD5 = &v
 	return s
 }
 
-// SetVersionId sets the VersionId ***REMOVED***eld's value.
+// SetVersionId sets the VersionId field's value.
 func (s *HeadObjectInput) SetVersionId(v string) *HeadObjectInput {
 	s.VersionId = &v
 	return s
@@ -14374,15 +14374,15 @@ type HeadObjectOutput struct {
 
 	AcceptRanges *string `location:"header" locationName:"accept-ranges" type:"string"`
 
-	// Speci***REMOVED***es caching behavior along the request/reply chain.
+	// Specifies caching behavior along the request/reply chain.
 	CacheControl *string `location:"header" locationName:"Cache-Control" type:"string"`
 
-	// Speci***REMOVED***es presentational information for the object.
+	// Specifies presentational information for the object.
 	ContentDisposition *string `location:"header" locationName:"Content-Disposition" type:"string"`
 
-	// Speci***REMOVED***es what content encodings have been applied to the object and thus
+	// Specifies what content encodings have been applied to the object and thus
 	// what decoding mechanisms must be applied to obtain the media-type referenced
-	// by the Content-Type header ***REMOVED***eld.
+	// by the Content-Type header field.
 	ContentEncoding *string `location:"header" locationName:"Content-Encoding" type:"string"`
 
 	// The language the content is in.
@@ -14394,15 +14394,15 @@ type HeadObjectOutput struct {
 	// A standard MIME type describing the format of the object data.
 	ContentType *string `location:"header" locationName:"Content-Type" type:"string"`
 
-	// Speci***REMOVED***es whether the object retrieved was (true) or was not (false) a Delete
+	// Specifies whether the object retrieved was (true) or was not (false) a Delete
 	// Marker. If false, this response header does not appear in the response.
 	DeleteMarker *bool `location:"header" locationName:"x-amz-delete-marker" type:"boolean"`
 
-	// An ETag is an opaque identi***REMOVED***er assigned by a web server to a speci***REMOVED***c version
+	// An ETag is an opaque identifier assigned by a web server to a specific version
 	// of a resource found at a URL
 	ETag *string `location:"header" locationName:"ETag" type:"string"`
 
-	// If the object expiration is con***REMOVED***gured (see PUT Bucket lifecycle), the response
+	// If the object expiration is configured (see PUT Bucket lifecycle), the response
 	// includes this header. It includes the expiry-date and rule-id key value pairs
 	// providing object expiration information. The value of the rule-id is URL
 	// encoded.
@@ -14411,8 +14411,8 @@ type HeadObjectOutput struct {
 	// The date and time at which the object is no longer cacheable.
 	Expires *string `location:"header" locationName:"Expires" type:"string"`
 
-	// Last modi***REMOVED***ed date of the object
-	LastModi***REMOVED***ed *time.Time `location:"header" locationName:"Last-Modi***REMOVED***ed" type:"timestamp"`
+	// Last modified date of the object
+	LastModified *time.Time `location:"header" locationName:"Last-Modified" type:"timestamp"`
 
 	// A map of metadata to store with the object in S3.
 	Metadata map[string]*string `location:"headers" locationName:"x-amz-meta-" type:"map"`
@@ -14423,7 +14423,7 @@ type HeadObjectOutput struct {
 	// you can create metadata whose values are not legal HTTP headers.
 	MissingMeta *int64 `location:"header" locationName:"x-amz-missing-meta" type:"integer"`
 
-	// The Legal Hold status for the speci***REMOVED***ed object.
+	// The Legal Hold status for the specified object.
 	ObjectLockLegalHoldStatus *string `location:"header" locationName:"x-amz-object-lock-legal-hold" type:"string" enum:"ObjectLockLegalHoldStatus"`
 
 	// The object lock mode currently in place for this object.
@@ -14446,16 +14446,16 @@ type HeadObjectOutput struct {
 	Restore *string `location:"header" locationName:"x-amz-restore" type:"string"`
 
 	// If server-side encryption with a customer-provided encryption key was requested,
-	// the response will include this header con***REMOVED***rming the encryption algorithm
+	// the response will include this header confirming the encryption algorithm
 	// used.
 	SSECustomerAlgorithm *string `location:"header" locationName:"x-amz-server-side-encryption-customer-algorithm" type:"string"`
 
 	// If server-side encryption with a customer-provided encryption key was requested,
 	// the response will include this header to provide round trip message integrity
-	// veri***REMOVED***cation of the customer-provided encryption key.
+	// verification of the customer-provided encryption key.
 	SSECustomerKeyMD5 *string `location:"header" locationName:"x-amz-server-side-encryption-customer-key-MD5" type:"string"`
 
-	// If present, speci***REMOVED***es the ID of the AWS Key Management Service (KMS) master
+	// If present, specifies the ID of the AWS Key Management Service (KMS) master
 	// encryption key that was used for the object.
 	SSEKMSKeyId *string `location:"header" locationName:"x-amz-server-side-encryption-aws-kms-key-id" type:"string" sensitive:"true"`
 
@@ -14468,7 +14468,7 @@ type HeadObjectOutput struct {
 	// Version of the object.
 	VersionId *string `location:"header" locationName:"x-amz-version-id" type:"string"`
 
-	// If the bucket is con***REMOVED***gured as a website, redirects requests for this object
+	// If the bucket is configured as a website, redirects requests for this object
 	// to another object in the same bucket or to an external URL. Amazon S3 stores
 	// the value of this header in the object metadata.
 	WebsiteRedirectLocation *string `location:"header" locationName:"x-amz-website-redirect-location" type:"string"`
@@ -14484,169 +14484,169 @@ func (s HeadObjectOutput) GoString() string {
 	return s.String()
 }
 
-// SetAcceptRanges sets the AcceptRanges ***REMOVED***eld's value.
+// SetAcceptRanges sets the AcceptRanges field's value.
 func (s *HeadObjectOutput) SetAcceptRanges(v string) *HeadObjectOutput {
 	s.AcceptRanges = &v
 	return s
 }
 
-// SetCacheControl sets the CacheControl ***REMOVED***eld's value.
+// SetCacheControl sets the CacheControl field's value.
 func (s *HeadObjectOutput) SetCacheControl(v string) *HeadObjectOutput {
 	s.CacheControl = &v
 	return s
 }
 
-// SetContentDisposition sets the ContentDisposition ***REMOVED***eld's value.
+// SetContentDisposition sets the ContentDisposition field's value.
 func (s *HeadObjectOutput) SetContentDisposition(v string) *HeadObjectOutput {
 	s.ContentDisposition = &v
 	return s
 }
 
-// SetContentEncoding sets the ContentEncoding ***REMOVED***eld's value.
+// SetContentEncoding sets the ContentEncoding field's value.
 func (s *HeadObjectOutput) SetContentEncoding(v string) *HeadObjectOutput {
 	s.ContentEncoding = &v
 	return s
 }
 
-// SetContentLanguage sets the ContentLanguage ***REMOVED***eld's value.
+// SetContentLanguage sets the ContentLanguage field's value.
 func (s *HeadObjectOutput) SetContentLanguage(v string) *HeadObjectOutput {
 	s.ContentLanguage = &v
 	return s
 }
 
-// SetContentLength sets the ContentLength ***REMOVED***eld's value.
+// SetContentLength sets the ContentLength field's value.
 func (s *HeadObjectOutput) SetContentLength(v int64) *HeadObjectOutput {
 	s.ContentLength = &v
 	return s
 }
 
-// SetContentType sets the ContentType ***REMOVED***eld's value.
+// SetContentType sets the ContentType field's value.
 func (s *HeadObjectOutput) SetContentType(v string) *HeadObjectOutput {
 	s.ContentType = &v
 	return s
 }
 
-// SetDeleteMarker sets the DeleteMarker ***REMOVED***eld's value.
+// SetDeleteMarker sets the DeleteMarker field's value.
 func (s *HeadObjectOutput) SetDeleteMarker(v bool) *HeadObjectOutput {
 	s.DeleteMarker = &v
 	return s
 }
 
-// SetETag sets the ETag ***REMOVED***eld's value.
+// SetETag sets the ETag field's value.
 func (s *HeadObjectOutput) SetETag(v string) *HeadObjectOutput {
 	s.ETag = &v
 	return s
 }
 
-// SetExpiration sets the Expiration ***REMOVED***eld's value.
+// SetExpiration sets the Expiration field's value.
 func (s *HeadObjectOutput) SetExpiration(v string) *HeadObjectOutput {
 	s.Expiration = &v
 	return s
 }
 
-// SetExpires sets the Expires ***REMOVED***eld's value.
+// SetExpires sets the Expires field's value.
 func (s *HeadObjectOutput) SetExpires(v string) *HeadObjectOutput {
 	s.Expires = &v
 	return s
 }
 
-// SetLastModi***REMOVED***ed sets the LastModi***REMOVED***ed ***REMOVED***eld's value.
-func (s *HeadObjectOutput) SetLastModi***REMOVED***ed(v time.Time) *HeadObjectOutput {
-	s.LastModi***REMOVED***ed = &v
+// SetLastModified sets the LastModified field's value.
+func (s *HeadObjectOutput) SetLastModified(v time.Time) *HeadObjectOutput {
+	s.LastModified = &v
 	return s
 }
 
-// SetMetadata sets the Metadata ***REMOVED***eld's value.
+// SetMetadata sets the Metadata field's value.
 func (s *HeadObjectOutput) SetMetadata(v map[string]*string) *HeadObjectOutput {
 	s.Metadata = v
 	return s
 }
 
-// SetMissingMeta sets the MissingMeta ***REMOVED***eld's value.
+// SetMissingMeta sets the MissingMeta field's value.
 func (s *HeadObjectOutput) SetMissingMeta(v int64) *HeadObjectOutput {
 	s.MissingMeta = &v
 	return s
 }
 
-// SetObjectLockLegalHoldStatus sets the ObjectLockLegalHoldStatus ***REMOVED***eld's value.
+// SetObjectLockLegalHoldStatus sets the ObjectLockLegalHoldStatus field's value.
 func (s *HeadObjectOutput) SetObjectLockLegalHoldStatus(v string) *HeadObjectOutput {
 	s.ObjectLockLegalHoldStatus = &v
 	return s
 }
 
-// SetObjectLockMode sets the ObjectLockMode ***REMOVED***eld's value.
+// SetObjectLockMode sets the ObjectLockMode field's value.
 func (s *HeadObjectOutput) SetObjectLockMode(v string) *HeadObjectOutput {
 	s.ObjectLockMode = &v
 	return s
 }
 
-// SetObjectLockRetainUntilDate sets the ObjectLockRetainUntilDate ***REMOVED***eld's value.
+// SetObjectLockRetainUntilDate sets the ObjectLockRetainUntilDate field's value.
 func (s *HeadObjectOutput) SetObjectLockRetainUntilDate(v time.Time) *HeadObjectOutput {
 	s.ObjectLockRetainUntilDate = &v
 	return s
 }
 
-// SetPartsCount sets the PartsCount ***REMOVED***eld's value.
+// SetPartsCount sets the PartsCount field's value.
 func (s *HeadObjectOutput) SetPartsCount(v int64) *HeadObjectOutput {
 	s.PartsCount = &v
 	return s
 }
 
-// SetReplicationStatus sets the ReplicationStatus ***REMOVED***eld's value.
+// SetReplicationStatus sets the ReplicationStatus field's value.
 func (s *HeadObjectOutput) SetReplicationStatus(v string) *HeadObjectOutput {
 	s.ReplicationStatus = &v
 	return s
 }
 
-// SetRequestCharged sets the RequestCharged ***REMOVED***eld's value.
+// SetRequestCharged sets the RequestCharged field's value.
 func (s *HeadObjectOutput) SetRequestCharged(v string) *HeadObjectOutput {
 	s.RequestCharged = &v
 	return s
 }
 
-// SetRestore sets the Restore ***REMOVED***eld's value.
+// SetRestore sets the Restore field's value.
 func (s *HeadObjectOutput) SetRestore(v string) *HeadObjectOutput {
 	s.Restore = &v
 	return s
 }
 
-// SetSSECustomerAlgorithm sets the SSECustomerAlgorithm ***REMOVED***eld's value.
+// SetSSECustomerAlgorithm sets the SSECustomerAlgorithm field's value.
 func (s *HeadObjectOutput) SetSSECustomerAlgorithm(v string) *HeadObjectOutput {
 	s.SSECustomerAlgorithm = &v
 	return s
 }
 
-// SetSSECustomerKeyMD5 sets the SSECustomerKeyMD5 ***REMOVED***eld's value.
+// SetSSECustomerKeyMD5 sets the SSECustomerKeyMD5 field's value.
 func (s *HeadObjectOutput) SetSSECustomerKeyMD5(v string) *HeadObjectOutput {
 	s.SSECustomerKeyMD5 = &v
 	return s
 }
 
-// SetSSEKMSKeyId sets the SSEKMSKeyId ***REMOVED***eld's value.
+// SetSSEKMSKeyId sets the SSEKMSKeyId field's value.
 func (s *HeadObjectOutput) SetSSEKMSKeyId(v string) *HeadObjectOutput {
 	s.SSEKMSKeyId = &v
 	return s
 }
 
-// SetServerSideEncryption sets the ServerSideEncryption ***REMOVED***eld's value.
+// SetServerSideEncryption sets the ServerSideEncryption field's value.
 func (s *HeadObjectOutput) SetServerSideEncryption(v string) *HeadObjectOutput {
 	s.ServerSideEncryption = &v
 	return s
 }
 
-// SetStorageClass sets the StorageClass ***REMOVED***eld's value.
+// SetStorageClass sets the StorageClass field's value.
 func (s *HeadObjectOutput) SetStorageClass(v string) *HeadObjectOutput {
 	s.StorageClass = &v
 	return s
 }
 
-// SetVersionId sets the VersionId ***REMOVED***eld's value.
+// SetVersionId sets the VersionId field's value.
 func (s *HeadObjectOutput) SetVersionId(v string) *HeadObjectOutput {
 	s.VersionId = &v
 	return s
 }
 
-// SetWebsiteRedirectLocation sets the WebsiteRedirectLocation ***REMOVED***eld's value.
+// SetWebsiteRedirectLocation sets the WebsiteRedirectLocation field's value.
 func (s *HeadObjectOutput) SetWebsiteRedirectLocation(v string) *HeadObjectOutput {
 	s.WebsiteRedirectLocation = &v
 	return s
@@ -14655,13 +14655,13 @@ func (s *HeadObjectOutput) SetWebsiteRedirectLocation(v string) *HeadObjectOutpu
 type IndexDocument struct {
 	_ struct{} `type:"structure"`
 
-	// A suf***REMOVED***x that is appended to a request that is for a directory on the website
-	// endpoint (e.g. if the suf***REMOVED***x is index.html and you make a request to samplebucket/images/
+	// A suffix that is appended to a request that is for a directory on the website
+	// endpoint (e.g. if the suffix is index.html and you make a request to samplebucket/images/
 	// the data that is returned will be for the object with the key name images/index.html)
-	// The suf***REMOVED***x must not be empty and must not include a slash character.
+	// The suffix must not be empty and must not include a slash character.
 	//
-	// Suf***REMOVED***x is a required ***REMOVED***eld
-	Suf***REMOVED***x *string `type:"string" required:"true"`
+	// Suffix is a required field
+	Suffix *string `type:"string" required:"true"`
 }
 
 // String returns the string representation
@@ -14674,11 +14674,11 @@ func (s IndexDocument) GoString() string {
 	return s.String()
 }
 
-// Validate inspects the ***REMOVED***elds of the type to determine if they are valid.
+// Validate inspects the fields of the type to determine if they are valid.
 func (s *IndexDocument) Validate() error {
 	invalidParams := request.ErrInvalidParams{Context: "IndexDocument"}
-	if s.Suf***REMOVED***x == nil {
-		invalidParams.Add(request.NewErrParamRequired("Suf***REMOVED***x"))
+	if s.Suffix == nil {
+		invalidParams.Add(request.NewErrParamRequired("Suffix"))
 	}
 
 	if invalidParams.Len() > 0 {
@@ -14687,9 +14687,9 @@ func (s *IndexDocument) Validate() error {
 	return nil
 }
 
-// SetSuf***REMOVED***x sets the Suf***REMOVED***x ***REMOVED***eld's value.
-func (s *IndexDocument) SetSuf***REMOVED***x(v string) *IndexDocument {
-	s.Suf***REMOVED***x = &v
+// SetSuffix sets the Suffix field's value.
+func (s *IndexDocument) SetSuffix(v string) *IndexDocument {
+	s.Suffix = &v
 	return s
 }
 
@@ -14714,13 +14714,13 @@ func (s Initiator) GoString() string {
 	return s.String()
 }
 
-// SetDisplayName sets the DisplayName ***REMOVED***eld's value.
+// SetDisplayName sets the DisplayName field's value.
 func (s *Initiator) SetDisplayName(v string) *Initiator {
 	s.DisplayName = &v
 	return s
 }
 
-// SetID sets the ID ***REMOVED***eld's value.
+// SetID sets the ID field's value.
 func (s *Initiator) SetID(v string) *Initiator {
 	s.ID = &v
 	return s
@@ -14733,14 +14733,14 @@ type InputSerialization struct {
 	// Describes the serialization of a CSV-encoded object.
 	CSV *CSVInput `type:"structure"`
 
-	// Speci***REMOVED***es object's compression format. Valid values: NONE, GZIP, BZIP2. Default
+	// Specifies object's compression format. Valid values: NONE, GZIP, BZIP2. Default
 	// Value: NONE.
 	CompressionType *string `type:"string" enum:"CompressionType"`
 
-	// Speci***REMOVED***es JSON as object's input serialization format.
+	// Specifies JSON as object's input serialization format.
 	JSON *JSONInput `type:"structure"`
 
-	// Speci***REMOVED***es Parquet as object's input serialization format.
+	// Specifies Parquet as object's input serialization format.
 	Parquet *ParquetInput `type:"structure"`
 }
 
@@ -14754,86 +14754,86 @@ func (s InputSerialization) GoString() string {
 	return s.String()
 }
 
-// SetCSV sets the CSV ***REMOVED***eld's value.
+// SetCSV sets the CSV field's value.
 func (s *InputSerialization) SetCSV(v *CSVInput) *InputSerialization {
 	s.CSV = v
 	return s
 }
 
-// SetCompressionType sets the CompressionType ***REMOVED***eld's value.
+// SetCompressionType sets the CompressionType field's value.
 func (s *InputSerialization) SetCompressionType(v string) *InputSerialization {
 	s.CompressionType = &v
 	return s
 }
 
-// SetJSON sets the JSON ***REMOVED***eld's value.
+// SetJSON sets the JSON field's value.
 func (s *InputSerialization) SetJSON(v *JSONInput) *InputSerialization {
 	s.JSON = v
 	return s
 }
 
-// SetParquet sets the Parquet ***REMOVED***eld's value.
+// SetParquet sets the Parquet field's value.
 func (s *InputSerialization) SetParquet(v *ParquetInput) *InputSerialization {
 	s.Parquet = v
 	return s
 }
 
-// Speci***REMOVED***es the inventory con***REMOVED***guration for an Amazon S3 bucket. For more information,
-// see GET Bucket inventory (https://docs.aws.amazon.com/AmazonS3/latest/API/RESTBucketGETInventoryCon***REMOVED***g.html)
+// Specifies the inventory configuration for an Amazon S3 bucket. For more information,
+// see GET Bucket inventory (https://docs.aws.amazon.com/AmazonS3/latest/API/RESTBucketGETInventoryConfig.html)
 // in the Amazon Simple Storage Service API Reference.
-type InventoryCon***REMOVED***guration struct {
+type InventoryConfiguration struct {
 	_ struct{} `type:"structure"`
 
 	// Contains information about where to publish the inventory results.
 	//
-	// Destination is a required ***REMOVED***eld
+	// Destination is a required field
 	Destination *InventoryDestination `type:"structure" required:"true"`
 
-	// Speci***REMOVED***es an inventory ***REMOVED***lter. The inventory only includes objects that meet
-	// the ***REMOVED***lter's criteria.
+	// Specifies an inventory filter. The inventory only includes objects that meet
+	// the filter's criteria.
 	Filter *InventoryFilter `type:"structure"`
 
-	// The ID used to identify the inventory con***REMOVED***guration.
+	// The ID used to identify the inventory configuration.
 	//
-	// Id is a required ***REMOVED***eld
+	// Id is a required field
 	Id *string `type:"string" required:"true"`
 
 	// Object versions to include in the inventory list. If set to All, the list
-	// includes all the object versions, which adds the version-related ***REMOVED***elds VersionId,
+	// includes all the object versions, which adds the version-related fields VersionId,
 	// IsLatest, and DeleteMarker to the list. If set to Current, the list does
-	// not contain these version-related ***REMOVED***elds.
+	// not contain these version-related fields.
 	//
-	// IncludedObjectVersions is a required ***REMOVED***eld
+	// IncludedObjectVersions is a required field
 	IncludedObjectVersions *string `type:"string" required:"true" enum:"InventoryIncludedObjectVersions"`
 
-	// Speci***REMOVED***es whether the inventory is enabled or disabled. If set to True, an
+	// Specifies whether the inventory is enabled or disabled. If set to True, an
 	// inventory list is generated. If set to False, no inventory list is generated.
 	//
-	// IsEnabled is a required ***REMOVED***eld
+	// IsEnabled is a required field
 	IsEnabled *bool `type:"boolean" required:"true"`
 
-	// Contains the optional ***REMOVED***elds that are included in the inventory results.
+	// Contains the optional fields that are included in the inventory results.
 	OptionalFields []*string `locationNameList:"Field" type:"list"`
 
-	// Speci***REMOVED***es the schedule for generating inventory results.
+	// Specifies the schedule for generating inventory results.
 	//
-	// Schedule is a required ***REMOVED***eld
+	// Schedule is a required field
 	Schedule *InventorySchedule `type:"structure" required:"true"`
 }
 
 // String returns the string representation
-func (s InventoryCon***REMOVED***guration) String() string {
+func (s InventoryConfiguration) String() string {
 	return awsutil.Prettify(s)
 }
 
 // GoString returns the string representation
-func (s InventoryCon***REMOVED***guration) GoString() string {
+func (s InventoryConfiguration) GoString() string {
 	return s.String()
 }
 
-// Validate inspects the ***REMOVED***elds of the type to determine if they are valid.
-func (s *InventoryCon***REMOVED***guration) Validate() error {
-	invalidParams := request.ErrInvalidParams{Context: "InventoryCon***REMOVED***guration"}
+// Validate inspects the fields of the type to determine if they are valid.
+func (s *InventoryConfiguration) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "InventoryConfiguration"}
 	if s.Destination == nil {
 		invalidParams.Add(request.NewErrParamRequired("Destination"))
 	}
@@ -14871,44 +14871,44 @@ func (s *InventoryCon***REMOVED***guration) Validate() error {
 	return nil
 }
 
-// SetDestination sets the Destination ***REMOVED***eld's value.
-func (s *InventoryCon***REMOVED***guration) SetDestination(v *InventoryDestination) *InventoryCon***REMOVED***guration {
+// SetDestination sets the Destination field's value.
+func (s *InventoryConfiguration) SetDestination(v *InventoryDestination) *InventoryConfiguration {
 	s.Destination = v
 	return s
 }
 
-// SetFilter sets the Filter ***REMOVED***eld's value.
-func (s *InventoryCon***REMOVED***guration) SetFilter(v *InventoryFilter) *InventoryCon***REMOVED***guration {
+// SetFilter sets the Filter field's value.
+func (s *InventoryConfiguration) SetFilter(v *InventoryFilter) *InventoryConfiguration {
 	s.Filter = v
 	return s
 }
 
-// SetId sets the Id ***REMOVED***eld's value.
-func (s *InventoryCon***REMOVED***guration) SetId(v string) *InventoryCon***REMOVED***guration {
+// SetId sets the Id field's value.
+func (s *InventoryConfiguration) SetId(v string) *InventoryConfiguration {
 	s.Id = &v
 	return s
 }
 
-// SetIncludedObjectVersions sets the IncludedObjectVersions ***REMOVED***eld's value.
-func (s *InventoryCon***REMOVED***guration) SetIncludedObjectVersions(v string) *InventoryCon***REMOVED***guration {
+// SetIncludedObjectVersions sets the IncludedObjectVersions field's value.
+func (s *InventoryConfiguration) SetIncludedObjectVersions(v string) *InventoryConfiguration {
 	s.IncludedObjectVersions = &v
 	return s
 }
 
-// SetIsEnabled sets the IsEnabled ***REMOVED***eld's value.
-func (s *InventoryCon***REMOVED***guration) SetIsEnabled(v bool) *InventoryCon***REMOVED***guration {
+// SetIsEnabled sets the IsEnabled field's value.
+func (s *InventoryConfiguration) SetIsEnabled(v bool) *InventoryConfiguration {
 	s.IsEnabled = &v
 	return s
 }
 
-// SetOptionalFields sets the OptionalFields ***REMOVED***eld's value.
-func (s *InventoryCon***REMOVED***guration) SetOptionalFields(v []*string) *InventoryCon***REMOVED***guration {
+// SetOptionalFields sets the OptionalFields field's value.
+func (s *InventoryConfiguration) SetOptionalFields(v []*string) *InventoryConfiguration {
 	s.OptionalFields = v
 	return s
 }
 
-// SetSchedule sets the Schedule ***REMOVED***eld's value.
-func (s *InventoryCon***REMOVED***guration) SetSchedule(v *InventorySchedule) *InventoryCon***REMOVED***guration {
+// SetSchedule sets the Schedule field's value.
+func (s *InventoryConfiguration) SetSchedule(v *InventorySchedule) *InventoryConfiguration {
 	s.Schedule = v
 	return s
 }
@@ -14916,10 +14916,10 @@ func (s *InventoryCon***REMOVED***guration) SetSchedule(v *InventorySchedule) *I
 type InventoryDestination struct {
 	_ struct{} `type:"structure"`
 
-	// Contains the bucket name, ***REMOVED***le format, bucket owner (optional), and pre***REMOVED***x
+	// Contains the bucket name, file format, bucket owner (optional), and prefix
 	// (optional) where inventory results are published.
 	//
-	// S3BucketDestination is a required ***REMOVED***eld
+	// S3BucketDestination is a required field
 	S3BucketDestination *InventoryS3BucketDestination `type:"structure" required:"true"`
 }
 
@@ -14933,7 +14933,7 @@ func (s InventoryDestination) GoString() string {
 	return s.String()
 }
 
-// Validate inspects the ***REMOVED***elds of the type to determine if they are valid.
+// Validate inspects the fields of the type to determine if they are valid.
 func (s *InventoryDestination) Validate() error {
 	invalidParams := request.ErrInvalidParams{Context: "InventoryDestination"}
 	if s.S3BucketDestination == nil {
@@ -14951,7 +14951,7 @@ func (s *InventoryDestination) Validate() error {
 	return nil
 }
 
-// SetS3BucketDestination sets the S3BucketDestination ***REMOVED***eld's value.
+// SetS3BucketDestination sets the S3BucketDestination field's value.
 func (s *InventoryDestination) SetS3BucketDestination(v *InventoryS3BucketDestination) *InventoryDestination {
 	s.S3BucketDestination = v
 	return s
@@ -14962,10 +14962,10 @@ func (s *InventoryDestination) SetS3BucketDestination(v *InventoryS3BucketDestin
 type InventoryEncryption struct {
 	_ struct{} `type:"structure"`
 
-	// Speci***REMOVED***es the use of SSE-KMS to encrypt delivered Inventory reports.
+	// Specifies the use of SSE-KMS to encrypt delivered Inventory reports.
 	SSEKMS *SSEKMS `locationName:"SSE-KMS" type:"structure"`
 
-	// Speci***REMOVED***es the use of SSE-S3 to encrypt delivered Inventory reports.
+	// Specifies the use of SSE-S3 to encrypt delivered Inventory reports.
 	SSES3 *SSES3 `locationName:"SSE-S3" type:"structure"`
 }
 
@@ -14979,7 +14979,7 @@ func (s InventoryEncryption) GoString() string {
 	return s.String()
 }
 
-// Validate inspects the ***REMOVED***elds of the type to determine if they are valid.
+// Validate inspects the fields of the type to determine if they are valid.
 func (s *InventoryEncryption) Validate() error {
 	invalidParams := request.ErrInvalidParams{Context: "InventoryEncryption"}
 	if s.SSEKMS != nil {
@@ -14994,13 +14994,13 @@ func (s *InventoryEncryption) Validate() error {
 	return nil
 }
 
-// SetSSEKMS sets the SSEKMS ***REMOVED***eld's value.
+// SetSSEKMS sets the SSEKMS field's value.
 func (s *InventoryEncryption) SetSSEKMS(v *SSEKMS) *InventoryEncryption {
 	s.SSEKMS = v
 	return s
 }
 
-// SetSSES3 sets the SSES3 ***REMOVED***eld's value.
+// SetSSES3 sets the SSES3 field's value.
 func (s *InventoryEncryption) SetSSES3(v *SSES3) *InventoryEncryption {
 	s.SSES3 = v
 	return s
@@ -15009,10 +15009,10 @@ func (s *InventoryEncryption) SetSSES3(v *SSES3) *InventoryEncryption {
 type InventoryFilter struct {
 	_ struct{} `type:"structure"`
 
-	// The pre***REMOVED***x that an object must have to be included in the inventory results.
+	// The prefix that an object must have to be included in the inventory results.
 	//
-	// Pre***REMOVED***x is a required ***REMOVED***eld
-	Pre***REMOVED***x *string `type:"string" required:"true"`
+	// Prefix is a required field
+	Prefix *string `type:"string" required:"true"`
 }
 
 // String returns the string representation
@@ -15025,11 +15025,11 @@ func (s InventoryFilter) GoString() string {
 	return s.String()
 }
 
-// Validate inspects the ***REMOVED***elds of the type to determine if they are valid.
+// Validate inspects the fields of the type to determine if they are valid.
 func (s *InventoryFilter) Validate() error {
 	invalidParams := request.ErrInvalidParams{Context: "InventoryFilter"}
-	if s.Pre***REMOVED***x == nil {
-		invalidParams.Add(request.NewErrParamRequired("Pre***REMOVED***x"))
+	if s.Prefix == nil {
+		invalidParams.Add(request.NewErrParamRequired("Prefix"))
 	}
 
 	if invalidParams.Len() > 0 {
@@ -15038,9 +15038,9 @@ func (s *InventoryFilter) Validate() error {
 	return nil
 }
 
-// SetPre***REMOVED***x sets the Pre***REMOVED***x ***REMOVED***eld's value.
-func (s *InventoryFilter) SetPre***REMOVED***x(v string) *InventoryFilter {
-	s.Pre***REMOVED***x = &v
+// SetPrefix sets the Prefix field's value.
+func (s *InventoryFilter) SetPrefix(v string) *InventoryFilter {
+	s.Prefix = &v
 	return s
 }
 
@@ -15053,20 +15053,20 @@ type InventoryS3BucketDestination struct {
 	// The Amazon resource name (ARN) of the bucket where inventory results will
 	// be published.
 	//
-	// Bucket is a required ***REMOVED***eld
+	// Bucket is a required field
 	Bucket *string `type:"string" required:"true"`
 
 	// Contains the type of server-side encryption used to encrypt the inventory
 	// results.
 	Encryption *InventoryEncryption `type:"structure"`
 
-	// Speci***REMOVED***es the output format of the inventory results.
+	// Specifies the output format of the inventory results.
 	//
-	// Format is a required ***REMOVED***eld
+	// Format is a required field
 	Format *string `type:"string" required:"true" enum:"InventoryFormat"`
 
-	// The pre***REMOVED***x that is prepended to all inventory results.
-	Pre***REMOVED***x *string `type:"string"`
+	// The prefix that is prepended to all inventory results.
+	Prefix *string `type:"string"`
 }
 
 // String returns the string representation
@@ -15079,7 +15079,7 @@ func (s InventoryS3BucketDestination) GoString() string {
 	return s.String()
 }
 
-// Validate inspects the ***REMOVED***elds of the type to determine if they are valid.
+// Validate inspects the fields of the type to determine if they are valid.
 func (s *InventoryS3BucketDestination) Validate() error {
 	invalidParams := request.ErrInvalidParams{Context: "InventoryS3BucketDestination"}
 	if s.Bucket == nil {
@@ -15100,13 +15100,13 @@ func (s *InventoryS3BucketDestination) Validate() error {
 	return nil
 }
 
-// SetAccountId sets the AccountId ***REMOVED***eld's value.
+// SetAccountId sets the AccountId field's value.
 func (s *InventoryS3BucketDestination) SetAccountId(v string) *InventoryS3BucketDestination {
 	s.AccountId = &v
 	return s
 }
 
-// SetBucket sets the Bucket ***REMOVED***eld's value.
+// SetBucket sets the Bucket field's value.
 func (s *InventoryS3BucketDestination) SetBucket(v string) *InventoryS3BucketDestination {
 	s.Bucket = &v
 	return s
@@ -15119,30 +15119,30 @@ func (s *InventoryS3BucketDestination) getBucket() (v string) {
 	return *s.Bucket
 }
 
-// SetEncryption sets the Encryption ***REMOVED***eld's value.
+// SetEncryption sets the Encryption field's value.
 func (s *InventoryS3BucketDestination) SetEncryption(v *InventoryEncryption) *InventoryS3BucketDestination {
 	s.Encryption = v
 	return s
 }
 
-// SetFormat sets the Format ***REMOVED***eld's value.
+// SetFormat sets the Format field's value.
 func (s *InventoryS3BucketDestination) SetFormat(v string) *InventoryS3BucketDestination {
 	s.Format = &v
 	return s
 }
 
-// SetPre***REMOVED***x sets the Pre***REMOVED***x ***REMOVED***eld's value.
-func (s *InventoryS3BucketDestination) SetPre***REMOVED***x(v string) *InventoryS3BucketDestination {
-	s.Pre***REMOVED***x = &v
+// SetPrefix sets the Prefix field's value.
+func (s *InventoryS3BucketDestination) SetPrefix(v string) *InventoryS3BucketDestination {
+	s.Prefix = &v
 	return s
 }
 
 type InventorySchedule struct {
 	_ struct{} `type:"structure"`
 
-	// Speci***REMOVED***es how frequently inventory results are produced.
+	// Specifies how frequently inventory results are produced.
 	//
-	// Frequency is a required ***REMOVED***eld
+	// Frequency is a required field
 	Frequency *string `type:"string" required:"true" enum:"InventoryFrequency"`
 }
 
@@ -15156,7 +15156,7 @@ func (s InventorySchedule) GoString() string {
 	return s.String()
 }
 
-// Validate inspects the ***REMOVED***elds of the type to determine if they are valid.
+// Validate inspects the fields of the type to determine if they are valid.
 func (s *InventorySchedule) Validate() error {
 	invalidParams := request.ErrInvalidParams{Context: "InventorySchedule"}
 	if s.Frequency == nil {
@@ -15169,7 +15169,7 @@ func (s *InventorySchedule) Validate() error {
 	return nil
 }
 
-// SetFrequency sets the Frequency ***REMOVED***eld's value.
+// SetFrequency sets the Frequency field's value.
 func (s *InventorySchedule) SetFrequency(v string) *InventorySchedule {
 	s.Frequency = &v
 	return s
@@ -15192,7 +15192,7 @@ func (s JSONInput) GoString() string {
 	return s.String()
 }
 
-// SetType sets the Type ***REMOVED***eld's value.
+// SetType sets the Type field's value.
 func (s *JSONInput) SetType(v string) *JSONInput {
 	s.Type = &v
 	return s
@@ -15215,18 +15215,18 @@ func (s JSONOutput) GoString() string {
 	return s.String()
 }
 
-// SetRecordDelimiter sets the RecordDelimiter ***REMOVED***eld's value.
+// SetRecordDelimiter sets the RecordDelimiter field's value.
 func (s *JSONOutput) SetRecordDelimiter(v string) *JSONOutput {
 	s.RecordDelimiter = &v
 	return s
 }
 
-// A container for object key name pre***REMOVED***x and suf***REMOVED***x ***REMOVED***ltering rules.
+// A container for object key name prefix and suffix filtering rules.
 type KeyFilter struct {
 	_ struct{} `type:"structure"`
 
-	// A list of containers for the key value pair that de***REMOVED***nes the criteria for
-	// the ***REMOVED***lter rule.
+	// A list of containers for the key value pair that defines the criteria for
+	// the filter rule.
 	FilterRules []*FilterRule `locationName:"FilterRule" type:"list" flattened:"true"`
 }
 
@@ -15240,52 +15240,52 @@ func (s KeyFilter) GoString() string {
 	return s.String()
 }
 
-// SetFilterRules sets the FilterRules ***REMOVED***eld's value.
+// SetFilterRules sets the FilterRules field's value.
 func (s *KeyFilter) SetFilterRules(v []*FilterRule) *KeyFilter {
 	s.FilterRules = v
 	return s
 }
 
-// A container for specifying the con***REMOVED***guration for AWS Lambda noti***REMOVED***cations.
-type LambdaFunctionCon***REMOVED***guration struct {
+// A container for specifying the configuration for AWS Lambda notifications.
+type LambdaFunctionConfiguration struct {
 	_ struct{} `type:"structure"`
 
 	// The Amazon S3 bucket event for which to invoke the AWS Lambda function. For
-	// more information, see Supported Event Types (https://docs.aws.amazon.com/AmazonS3/latest/dev/Noti***REMOVED***cationHowTo.html)
+	// more information, see Supported Event Types (https://docs.aws.amazon.com/AmazonS3/latest/dev/NotificationHowTo.html)
 	// in the Amazon Simple Storage Service Developer Guide.
 	//
-	// Events is a required ***REMOVED***eld
+	// Events is a required field
 	Events []*string `locationName:"Event" type:"list" flattened:"true" required:"true"`
 
-	// Speci***REMOVED***es object key name ***REMOVED***ltering rules. For information about key name
-	// ***REMOVED***ltering, see Con***REMOVED***guring Event Noti***REMOVED***cations (https://docs.aws.amazon.com/AmazonS3/latest/dev/Noti***REMOVED***cationHowTo.html)
+	// Specifies object key name filtering rules. For information about key name
+	// filtering, see Configuring Event Notifications (https://docs.aws.amazon.com/AmazonS3/latest/dev/NotificationHowTo.html)
 	// in the Amazon Simple Storage Service Developer Guide.
-	Filter *Noti***REMOVED***cationCon***REMOVED***gurationFilter `type:"structure"`
+	Filter *NotificationConfigurationFilter `type:"structure"`
 
-	// An optional unique identi***REMOVED***er for con***REMOVED***gurations in a noti***REMOVED***cation con***REMOVED***guration.
+	// An optional unique identifier for configurations in a notification configuration.
 	// If you don't provide one, Amazon S3 will assign an ID.
 	Id *string `type:"string"`
 
 	// The Amazon Resource Name (ARN) of the AWS Lambda function that Amazon S3
-	// invokes when the speci***REMOVED***ed event type occurs.
+	// invokes when the specified event type occurs.
 	//
-	// LambdaFunctionArn is a required ***REMOVED***eld
+	// LambdaFunctionArn is a required field
 	LambdaFunctionArn *string `locationName:"CloudFunction" type:"string" required:"true"`
 }
 
 // String returns the string representation
-func (s LambdaFunctionCon***REMOVED***guration) String() string {
+func (s LambdaFunctionConfiguration) String() string {
 	return awsutil.Prettify(s)
 }
 
 // GoString returns the string representation
-func (s LambdaFunctionCon***REMOVED***guration) GoString() string {
+func (s LambdaFunctionConfiguration) GoString() string {
 	return s.String()
 }
 
-// Validate inspects the ***REMOVED***elds of the type to determine if they are valid.
-func (s *LambdaFunctionCon***REMOVED***guration) Validate() error {
-	invalidParams := request.ErrInvalidParams{Context: "LambdaFunctionCon***REMOVED***guration"}
+// Validate inspects the fields of the type to determine if they are valid.
+func (s *LambdaFunctionConfiguration) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "LambdaFunctionConfiguration"}
 	if s.Events == nil {
 		invalidParams.Add(request.NewErrParamRequired("Events"))
 	}
@@ -15299,50 +15299,50 @@ func (s *LambdaFunctionCon***REMOVED***guration) Validate() error {
 	return nil
 }
 
-// SetEvents sets the Events ***REMOVED***eld's value.
-func (s *LambdaFunctionCon***REMOVED***guration) SetEvents(v []*string) *LambdaFunctionCon***REMOVED***guration {
+// SetEvents sets the Events field's value.
+func (s *LambdaFunctionConfiguration) SetEvents(v []*string) *LambdaFunctionConfiguration {
 	s.Events = v
 	return s
 }
 
-// SetFilter sets the Filter ***REMOVED***eld's value.
-func (s *LambdaFunctionCon***REMOVED***guration) SetFilter(v *Noti***REMOVED***cationCon***REMOVED***gurationFilter) *LambdaFunctionCon***REMOVED***guration {
+// SetFilter sets the Filter field's value.
+func (s *LambdaFunctionConfiguration) SetFilter(v *NotificationConfigurationFilter) *LambdaFunctionConfiguration {
 	s.Filter = v
 	return s
 }
 
-// SetId sets the Id ***REMOVED***eld's value.
-func (s *LambdaFunctionCon***REMOVED***guration) SetId(v string) *LambdaFunctionCon***REMOVED***guration {
+// SetId sets the Id field's value.
+func (s *LambdaFunctionConfiguration) SetId(v string) *LambdaFunctionConfiguration {
 	s.Id = &v
 	return s
 }
 
-// SetLambdaFunctionArn sets the LambdaFunctionArn ***REMOVED***eld's value.
-func (s *LambdaFunctionCon***REMOVED***guration) SetLambdaFunctionArn(v string) *LambdaFunctionCon***REMOVED***guration {
+// SetLambdaFunctionArn sets the LambdaFunctionArn field's value.
+func (s *LambdaFunctionConfiguration) SetLambdaFunctionArn(v string) *LambdaFunctionConfiguration {
 	s.LambdaFunctionArn = &v
 	return s
 }
 
-type LifecycleCon***REMOVED***guration struct {
+type LifecycleConfiguration struct {
 	_ struct{} `type:"structure"`
 
-	// Rules is a required ***REMOVED***eld
+	// Rules is a required field
 	Rules []*Rule `locationName:"Rule" type:"list" flattened:"true" required:"true"`
 }
 
 // String returns the string representation
-func (s LifecycleCon***REMOVED***guration) String() string {
+func (s LifecycleConfiguration) String() string {
 	return awsutil.Prettify(s)
 }
 
 // GoString returns the string representation
-func (s LifecycleCon***REMOVED***guration) GoString() string {
+func (s LifecycleConfiguration) GoString() string {
 	return s.String()
 }
 
-// Validate inspects the ***REMOVED***elds of the type to determine if they are valid.
-func (s *LifecycleCon***REMOVED***guration) Validate() error {
-	invalidParams := request.ErrInvalidParams{Context: "LifecycleCon***REMOVED***guration"}
+// Validate inspects the fields of the type to determine if they are valid.
+func (s *LifecycleConfiguration) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "LifecycleConfiguration"}
 	if s.Rules == nil {
 		invalidParams.Add(request.NewErrParamRequired("Rules"))
 	}
@@ -15363,8 +15363,8 @@ func (s *LifecycleCon***REMOVED***guration) Validate() error {
 	return nil
 }
 
-// SetRules sets the Rules ***REMOVED***eld's value.
-func (s *LifecycleCon***REMOVED***guration) SetRules(v []*Rule) *LifecycleCon***REMOVED***guration {
+// SetRules sets the Rules field's value.
+func (s *LifecycleConfiguration) SetRules(v []*Rule) *LifecycleConfiguration {
 	s.Rules = v
 	return s
 }
@@ -15382,7 +15382,7 @@ type LifecycleExpiration struct {
 
 	// Indicates whether Amazon S3 will remove a delete marker with no noncurrent
 	// versions. If set to true, the delete marker will be expired; if set to false
-	// the policy takes no action. This cannot be speci***REMOVED***ed with Days or Date in
+	// the policy takes no action. This cannot be specified with Days or Date in
 	// a Lifecycle Expiration Policy.
 	ExpiredObjectDeleteMarker *bool `type:"boolean"`
 }
@@ -15397,19 +15397,19 @@ func (s LifecycleExpiration) GoString() string {
 	return s.String()
 }
 
-// SetDate sets the Date ***REMOVED***eld's value.
+// SetDate sets the Date field's value.
 func (s *LifecycleExpiration) SetDate(v time.Time) *LifecycleExpiration {
 	s.Date = &v
 	return s
 }
 
-// SetDays sets the Days ***REMOVED***eld's value.
+// SetDays sets the Days field's value.
 func (s *LifecycleExpiration) SetDays(v int64) *LifecycleExpiration {
 	s.Days = &v
 	return s
 }
 
-// SetExpiredObjectDeleteMarker sets the ExpiredObjectDeleteMarker ***REMOVED***eld's value.
+// SetExpiredObjectDeleteMarker sets the ExpiredObjectDeleteMarker field's value.
 func (s *LifecycleExpiration) SetExpiredObjectDeleteMarker(v bool) *LifecycleExpiration {
 	s.ExpiredObjectDeleteMarker = &v
 	return s
@@ -15418,41 +15418,41 @@ func (s *LifecycleExpiration) SetExpiredObjectDeleteMarker(v bool) *LifecycleExp
 type LifecycleRule struct {
 	_ struct{} `type:"structure"`
 
-	// Speci***REMOVED***es the days since the initiation of an incomplete multipart upload
+	// Specifies the days since the initiation of an incomplete multipart upload
 	// that Amazon S3 will wait before permanently removing all parts of the upload.
 	// For more information, see Aborting Incomplete Multipart Uploads Using a Bucket
-	// Lifecycle Policy (https://docs.aws.amazon.com/AmazonS3/latest/dev/mpuoverview.html#mpu-abort-incomplete-mpu-lifecycle-con***REMOVED***g)
+	// Lifecycle Policy (https://docs.aws.amazon.com/AmazonS3/latest/dev/mpuoverview.html#mpu-abort-incomplete-mpu-lifecycle-config)
 	// in the Amazon Simple Storage Service Developer Guide.
 	AbortIncompleteMultipartUpload *AbortIncompleteMultipartUpload `type:"structure"`
 
 	Expiration *LifecycleExpiration `type:"structure"`
 
 	// The Filter is used to identify objects that a Lifecycle Rule applies to.
-	// A Filter must have exactly one of Pre***REMOVED***x, Tag, or And speci***REMOVED***ed.
+	// A Filter must have exactly one of Prefix, Tag, or And specified.
 	Filter *LifecycleRuleFilter `type:"structure"`
 
-	// Unique identi***REMOVED***er for the rule. The value cannot be longer than 255 characters.
+	// Unique identifier for the rule. The value cannot be longer than 255 characters.
 	ID *string `type:"string"`
 
-	// Speci***REMOVED***es when noncurrent object versions expire. Upon expiration, Amazon
+	// Specifies when noncurrent object versions expire. Upon expiration, Amazon
 	// S3 permanently deletes the noncurrent object versions. You set this lifecycle
-	// con***REMOVED***guration action on a bucket that has versioning enabled (or suspended)
-	// to request that Amazon S3 delete noncurrent object versions at a speci***REMOVED***c
+	// configuration action on a bucket that has versioning enabled (or suspended)
+	// to request that Amazon S3 delete noncurrent object versions at a specific
 	// period in the object's lifetime.
 	NoncurrentVersionExpiration *NoncurrentVersionExpiration `type:"structure"`
 
 	NoncurrentVersionTransitions []*NoncurrentVersionTransition `locationName:"NoncurrentVersionTransition" type:"list" flattened:"true"`
 
-	// Pre***REMOVED***x identifying one or more objects to which the rule applies. This is
+	// Prefix identifying one or more objects to which the rule applies. This is
 	// No longer used; use Filter instead.
 	//
-	// Deprecated: Pre***REMOVED***x has been deprecated
-	Pre***REMOVED***x *string `deprecated:"true" type:"string"`
+	// Deprecated: Prefix has been deprecated
+	Prefix *string `deprecated:"true" type:"string"`
 
 	// If 'Enabled', the rule is currently being applied. If 'Disabled', the rule
 	// is not currently being applied.
 	//
-	// Status is a required ***REMOVED***eld
+	// Status is a required field
 	Status *string `type:"string" required:"true" enum:"ExpirationStatus"`
 
 	Transitions []*Transition `locationName:"Transition" type:"list" flattened:"true"`
@@ -15468,7 +15468,7 @@ func (s LifecycleRule) GoString() string {
 	return s.String()
 }
 
-// Validate inspects the ***REMOVED***elds of the type to determine if they are valid.
+// Validate inspects the fields of the type to determine if they are valid.
 func (s *LifecycleRule) Validate() error {
 	invalidParams := request.ErrInvalidParams{Context: "LifecycleRule"}
 	if s.Status == nil {
@@ -15486,55 +15486,55 @@ func (s *LifecycleRule) Validate() error {
 	return nil
 }
 
-// SetAbortIncompleteMultipartUpload sets the AbortIncompleteMultipartUpload ***REMOVED***eld's value.
+// SetAbortIncompleteMultipartUpload sets the AbortIncompleteMultipartUpload field's value.
 func (s *LifecycleRule) SetAbortIncompleteMultipartUpload(v *AbortIncompleteMultipartUpload) *LifecycleRule {
 	s.AbortIncompleteMultipartUpload = v
 	return s
 }
 
-// SetExpiration sets the Expiration ***REMOVED***eld's value.
+// SetExpiration sets the Expiration field's value.
 func (s *LifecycleRule) SetExpiration(v *LifecycleExpiration) *LifecycleRule {
 	s.Expiration = v
 	return s
 }
 
-// SetFilter sets the Filter ***REMOVED***eld's value.
+// SetFilter sets the Filter field's value.
 func (s *LifecycleRule) SetFilter(v *LifecycleRuleFilter) *LifecycleRule {
 	s.Filter = v
 	return s
 }
 
-// SetID sets the ID ***REMOVED***eld's value.
+// SetID sets the ID field's value.
 func (s *LifecycleRule) SetID(v string) *LifecycleRule {
 	s.ID = &v
 	return s
 }
 
-// SetNoncurrentVersionExpiration sets the NoncurrentVersionExpiration ***REMOVED***eld's value.
+// SetNoncurrentVersionExpiration sets the NoncurrentVersionExpiration field's value.
 func (s *LifecycleRule) SetNoncurrentVersionExpiration(v *NoncurrentVersionExpiration) *LifecycleRule {
 	s.NoncurrentVersionExpiration = v
 	return s
 }
 
-// SetNoncurrentVersionTransitions sets the NoncurrentVersionTransitions ***REMOVED***eld's value.
+// SetNoncurrentVersionTransitions sets the NoncurrentVersionTransitions field's value.
 func (s *LifecycleRule) SetNoncurrentVersionTransitions(v []*NoncurrentVersionTransition) *LifecycleRule {
 	s.NoncurrentVersionTransitions = v
 	return s
 }
 
-// SetPre***REMOVED***x sets the Pre***REMOVED***x ***REMOVED***eld's value.
-func (s *LifecycleRule) SetPre***REMOVED***x(v string) *LifecycleRule {
-	s.Pre***REMOVED***x = &v
+// SetPrefix sets the Prefix field's value.
+func (s *LifecycleRule) SetPrefix(v string) *LifecycleRule {
+	s.Prefix = &v
 	return s
 }
 
-// SetStatus sets the Status ***REMOVED***eld's value.
+// SetStatus sets the Status field's value.
 func (s *LifecycleRule) SetStatus(v string) *LifecycleRule {
 	s.Status = &v
 	return s
 }
 
-// SetTransitions sets the Transitions ***REMOVED***eld's value.
+// SetTransitions sets the Transitions field's value.
 func (s *LifecycleRule) SetTransitions(v []*Transition) *LifecycleRule {
 	s.Transitions = v
 	return s
@@ -15542,11 +15542,11 @@ func (s *LifecycleRule) SetTransitions(v []*Transition) *LifecycleRule {
 
 // This is used in a Lifecycle Rule Filter to apply a logical AND to two or
 // more predicates. The Lifecycle Rule will apply to any object matching all
-// of the predicates con***REMOVED***gured inside the And operator.
+// of the predicates configured inside the And operator.
 type LifecycleRuleAndOperator struct {
 	_ struct{} `type:"structure"`
 
-	Pre***REMOVED***x *string `type:"string"`
+	Prefix *string `type:"string"`
 
 	// All of these tags must exist in the object's tag set in order for the rule
 	// to apply.
@@ -15563,7 +15563,7 @@ func (s LifecycleRuleAndOperator) GoString() string {
 	return s.String()
 }
 
-// Validate inspects the ***REMOVED***elds of the type to determine if they are valid.
+// Validate inspects the fields of the type to determine if they are valid.
 func (s *LifecycleRuleAndOperator) Validate() error {
 	invalidParams := request.ErrInvalidParams{Context: "LifecycleRuleAndOperator"}
 	if s.Tags != nil {
@@ -15583,30 +15583,30 @@ func (s *LifecycleRuleAndOperator) Validate() error {
 	return nil
 }
 
-// SetPre***REMOVED***x sets the Pre***REMOVED***x ***REMOVED***eld's value.
-func (s *LifecycleRuleAndOperator) SetPre***REMOVED***x(v string) *LifecycleRuleAndOperator {
-	s.Pre***REMOVED***x = &v
+// SetPrefix sets the Prefix field's value.
+func (s *LifecycleRuleAndOperator) SetPrefix(v string) *LifecycleRuleAndOperator {
+	s.Prefix = &v
 	return s
 }
 
-// SetTags sets the Tags ***REMOVED***eld's value.
+// SetTags sets the Tags field's value.
 func (s *LifecycleRuleAndOperator) SetTags(v []*Tag) *LifecycleRuleAndOperator {
 	s.Tags = v
 	return s
 }
 
 // The Filter is used to identify objects that a Lifecycle Rule applies to.
-// A Filter must have exactly one of Pre***REMOVED***x, Tag, or And speci***REMOVED***ed.
+// A Filter must have exactly one of Prefix, Tag, or And specified.
 type LifecycleRuleFilter struct {
 	_ struct{} `type:"structure"`
 
 	// This is used in a Lifecycle Rule Filter to apply a logical AND to two or
 	// more predicates. The Lifecycle Rule will apply to any object matching all
-	// of the predicates con***REMOVED***gured inside the And operator.
+	// of the predicates configured inside the And operator.
 	And *LifecycleRuleAndOperator `type:"structure"`
 
-	// Pre***REMOVED***x identifying one or more objects to which the rule applies.
-	Pre***REMOVED***x *string `type:"string"`
+	// Prefix identifying one or more objects to which the rule applies.
+	Prefix *string `type:"string"`
 
 	// This tag must exist in the object's tag set in order for the rule to apply.
 	Tag *Tag `type:"structure"`
@@ -15622,7 +15622,7 @@ func (s LifecycleRuleFilter) GoString() string {
 	return s.String()
 }
 
-// Validate inspects the ***REMOVED***elds of the type to determine if they are valid.
+// Validate inspects the fields of the type to determine if they are valid.
 func (s *LifecycleRuleFilter) Validate() error {
 	invalidParams := request.ErrInvalidParams{Context: "LifecycleRuleFilter"}
 	if s.And != nil {
@@ -15642,30 +15642,30 @@ func (s *LifecycleRuleFilter) Validate() error {
 	return nil
 }
 
-// SetAnd sets the And ***REMOVED***eld's value.
+// SetAnd sets the And field's value.
 func (s *LifecycleRuleFilter) SetAnd(v *LifecycleRuleAndOperator) *LifecycleRuleFilter {
 	s.And = v
 	return s
 }
 
-// SetPre***REMOVED***x sets the Pre***REMOVED***x ***REMOVED***eld's value.
-func (s *LifecycleRuleFilter) SetPre***REMOVED***x(v string) *LifecycleRuleFilter {
-	s.Pre***REMOVED***x = &v
+// SetPrefix sets the Prefix field's value.
+func (s *LifecycleRuleFilter) SetPrefix(v string) *LifecycleRuleFilter {
+	s.Prefix = &v
 	return s
 }
 
-// SetTag sets the Tag ***REMOVED***eld's value.
+// SetTag sets the Tag field's value.
 func (s *LifecycleRuleFilter) SetTag(v *Tag) *LifecycleRuleFilter {
 	s.Tag = v
 	return s
 }
 
-type ListBucketAnalyticsCon***REMOVED***gurationsInput struct {
-	_ struct{} `locationName:"ListBucketAnalyticsCon***REMOVED***gurationsRequest" type:"structure"`
+type ListBucketAnalyticsConfigurationsInput struct {
+	_ struct{} `locationName:"ListBucketAnalyticsConfigurationsRequest" type:"structure"`
 
-	// The name of the bucket from which analytics con***REMOVED***gurations are retrieved.
+	// The name of the bucket from which analytics configurations are retrieved.
 	//
-	// Bucket is a required ***REMOVED***eld
+	// Bucket is a required field
 	Bucket *string `location:"uri" locationName:"Bucket" type:"string" required:"true"`
 
 	// The ContinuationToken that represents a placeholder from where this request
@@ -15674,18 +15674,18 @@ type ListBucketAnalyticsCon***REMOVED***gurationsInput struct {
 }
 
 // String returns the string representation
-func (s ListBucketAnalyticsCon***REMOVED***gurationsInput) String() string {
+func (s ListBucketAnalyticsConfigurationsInput) String() string {
 	return awsutil.Prettify(s)
 }
 
 // GoString returns the string representation
-func (s ListBucketAnalyticsCon***REMOVED***gurationsInput) GoString() string {
+func (s ListBucketAnalyticsConfigurationsInput) GoString() string {
 	return s.String()
 }
 
-// Validate inspects the ***REMOVED***elds of the type to determine if they are valid.
-func (s *ListBucketAnalyticsCon***REMOVED***gurationsInput) Validate() error {
-	invalidParams := request.ErrInvalidParams{Context: "ListBucketAnalyticsCon***REMOVED***gurationsInput"}
+// Validate inspects the fields of the type to determine if they are valid.
+func (s *ListBucketAnalyticsConfigurationsInput) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "ListBucketAnalyticsConfigurationsInput"}
 	if s.Bucket == nil {
 		invalidParams.Add(request.NewErrParamRequired("Bucket"))
 	}
@@ -15699,88 +15699,88 @@ func (s *ListBucketAnalyticsCon***REMOVED***gurationsInput) Validate() error {
 	return nil
 }
 
-// SetBucket sets the Bucket ***REMOVED***eld's value.
-func (s *ListBucketAnalyticsCon***REMOVED***gurationsInput) SetBucket(v string) *ListBucketAnalyticsCon***REMOVED***gurationsInput {
+// SetBucket sets the Bucket field's value.
+func (s *ListBucketAnalyticsConfigurationsInput) SetBucket(v string) *ListBucketAnalyticsConfigurationsInput {
 	s.Bucket = &v
 	return s
 }
 
-func (s *ListBucketAnalyticsCon***REMOVED***gurationsInput) getBucket() (v string) {
+func (s *ListBucketAnalyticsConfigurationsInput) getBucket() (v string) {
 	if s.Bucket == nil {
 		return v
 	}
 	return *s.Bucket
 }
 
-// SetContinuationToken sets the ContinuationToken ***REMOVED***eld's value.
-func (s *ListBucketAnalyticsCon***REMOVED***gurationsInput) SetContinuationToken(v string) *ListBucketAnalyticsCon***REMOVED***gurationsInput {
+// SetContinuationToken sets the ContinuationToken field's value.
+func (s *ListBucketAnalyticsConfigurationsInput) SetContinuationToken(v string) *ListBucketAnalyticsConfigurationsInput {
 	s.ContinuationToken = &v
 	return s
 }
 
-type ListBucketAnalyticsCon***REMOVED***gurationsOutput struct {
+type ListBucketAnalyticsConfigurationsOutput struct {
 	_ struct{} `type:"structure"`
 
-	// The list of analytics con***REMOVED***gurations for a bucket.
-	AnalyticsCon***REMOVED***gurationList []*AnalyticsCon***REMOVED***guration `locationName:"AnalyticsCon***REMOVED***guration" type:"list" flattened:"true"`
+	// The list of analytics configurations for a bucket.
+	AnalyticsConfigurationList []*AnalyticsConfiguration `locationName:"AnalyticsConfiguration" type:"list" flattened:"true"`
 
 	// The ContinuationToken that represents where this request began.
 	ContinuationToken *string `type:"string"`
 
-	// Indicates whether the returned list of analytics con***REMOVED***gurations is complete.
+	// Indicates whether the returned list of analytics configurations is complete.
 	// A value of true indicates that the list is not complete and the NextContinuationToken
 	// will be provided for a subsequent request.
 	IsTruncated *bool `type:"boolean"`
 
 	// NextContinuationToken is sent when isTruncated is true, which indicates that
-	// there are more analytics con***REMOVED***gurations to list. The next request must include
+	// there are more analytics configurations to list. The next request must include
 	// this NextContinuationToken. The token is obfuscated and is not a usable value.
 	NextContinuationToken *string `type:"string"`
 }
 
 // String returns the string representation
-func (s ListBucketAnalyticsCon***REMOVED***gurationsOutput) String() string {
+func (s ListBucketAnalyticsConfigurationsOutput) String() string {
 	return awsutil.Prettify(s)
 }
 
 // GoString returns the string representation
-func (s ListBucketAnalyticsCon***REMOVED***gurationsOutput) GoString() string {
+func (s ListBucketAnalyticsConfigurationsOutput) GoString() string {
 	return s.String()
 }
 
-// SetAnalyticsCon***REMOVED***gurationList sets the AnalyticsCon***REMOVED***gurationList ***REMOVED***eld's value.
-func (s *ListBucketAnalyticsCon***REMOVED***gurationsOutput) SetAnalyticsCon***REMOVED***gurationList(v []*AnalyticsCon***REMOVED***guration) *ListBucketAnalyticsCon***REMOVED***gurationsOutput {
-	s.AnalyticsCon***REMOVED***gurationList = v
+// SetAnalyticsConfigurationList sets the AnalyticsConfigurationList field's value.
+func (s *ListBucketAnalyticsConfigurationsOutput) SetAnalyticsConfigurationList(v []*AnalyticsConfiguration) *ListBucketAnalyticsConfigurationsOutput {
+	s.AnalyticsConfigurationList = v
 	return s
 }
 
-// SetContinuationToken sets the ContinuationToken ***REMOVED***eld's value.
-func (s *ListBucketAnalyticsCon***REMOVED***gurationsOutput) SetContinuationToken(v string) *ListBucketAnalyticsCon***REMOVED***gurationsOutput {
+// SetContinuationToken sets the ContinuationToken field's value.
+func (s *ListBucketAnalyticsConfigurationsOutput) SetContinuationToken(v string) *ListBucketAnalyticsConfigurationsOutput {
 	s.ContinuationToken = &v
 	return s
 }
 
-// SetIsTruncated sets the IsTruncated ***REMOVED***eld's value.
-func (s *ListBucketAnalyticsCon***REMOVED***gurationsOutput) SetIsTruncated(v bool) *ListBucketAnalyticsCon***REMOVED***gurationsOutput {
+// SetIsTruncated sets the IsTruncated field's value.
+func (s *ListBucketAnalyticsConfigurationsOutput) SetIsTruncated(v bool) *ListBucketAnalyticsConfigurationsOutput {
 	s.IsTruncated = &v
 	return s
 }
 
-// SetNextContinuationToken sets the NextContinuationToken ***REMOVED***eld's value.
-func (s *ListBucketAnalyticsCon***REMOVED***gurationsOutput) SetNextContinuationToken(v string) *ListBucketAnalyticsCon***REMOVED***gurationsOutput {
+// SetNextContinuationToken sets the NextContinuationToken field's value.
+func (s *ListBucketAnalyticsConfigurationsOutput) SetNextContinuationToken(v string) *ListBucketAnalyticsConfigurationsOutput {
 	s.NextContinuationToken = &v
 	return s
 }
 
-type ListBucketInventoryCon***REMOVED***gurationsInput struct {
-	_ struct{} `locationName:"ListBucketInventoryCon***REMOVED***gurationsRequest" type:"structure"`
+type ListBucketInventoryConfigurationsInput struct {
+	_ struct{} `locationName:"ListBucketInventoryConfigurationsRequest" type:"structure"`
 
-	// The name of the bucket containing the inventory con***REMOVED***gurations to retrieve.
+	// The name of the bucket containing the inventory configurations to retrieve.
 	//
-	// Bucket is a required ***REMOVED***eld
+	// Bucket is a required field
 	Bucket *string `location:"uri" locationName:"Bucket" type:"string" required:"true"`
 
-	// The marker used to continue an inventory con***REMOVED***guration listing that has been
+	// The marker used to continue an inventory configuration listing that has been
 	// truncated. Use the NextContinuationToken from a previously truncated list
 	// response to continue the listing. The continuation token is an opaque value
 	// that Amazon S3 understands.
@@ -15788,18 +15788,18 @@ type ListBucketInventoryCon***REMOVED***gurationsInput struct {
 }
 
 // String returns the string representation
-func (s ListBucketInventoryCon***REMOVED***gurationsInput) String() string {
+func (s ListBucketInventoryConfigurationsInput) String() string {
 	return awsutil.Prettify(s)
 }
 
 // GoString returns the string representation
-func (s ListBucketInventoryCon***REMOVED***gurationsInput) GoString() string {
+func (s ListBucketInventoryConfigurationsInput) GoString() string {
 	return s.String()
 }
 
-// Validate inspects the ***REMOVED***elds of the type to determine if they are valid.
-func (s *ListBucketInventoryCon***REMOVED***gurationsInput) Validate() error {
-	invalidParams := request.ErrInvalidParams{Context: "ListBucketInventoryCon***REMOVED***gurationsInput"}
+// Validate inspects the fields of the type to determine if they are valid.
+func (s *ListBucketInventoryConfigurationsInput) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "ListBucketInventoryConfigurationsInput"}
 	if s.Bucket == nil {
 		invalidParams.Add(request.NewErrParamRequired("Bucket"))
 	}
@@ -15813,88 +15813,88 @@ func (s *ListBucketInventoryCon***REMOVED***gurationsInput) Validate() error {
 	return nil
 }
 
-// SetBucket sets the Bucket ***REMOVED***eld's value.
-func (s *ListBucketInventoryCon***REMOVED***gurationsInput) SetBucket(v string) *ListBucketInventoryCon***REMOVED***gurationsInput {
+// SetBucket sets the Bucket field's value.
+func (s *ListBucketInventoryConfigurationsInput) SetBucket(v string) *ListBucketInventoryConfigurationsInput {
 	s.Bucket = &v
 	return s
 }
 
-func (s *ListBucketInventoryCon***REMOVED***gurationsInput) getBucket() (v string) {
+func (s *ListBucketInventoryConfigurationsInput) getBucket() (v string) {
 	if s.Bucket == nil {
 		return v
 	}
 	return *s.Bucket
 }
 
-// SetContinuationToken sets the ContinuationToken ***REMOVED***eld's value.
-func (s *ListBucketInventoryCon***REMOVED***gurationsInput) SetContinuationToken(v string) *ListBucketInventoryCon***REMOVED***gurationsInput {
+// SetContinuationToken sets the ContinuationToken field's value.
+func (s *ListBucketInventoryConfigurationsInput) SetContinuationToken(v string) *ListBucketInventoryConfigurationsInput {
 	s.ContinuationToken = &v
 	return s
 }
 
-type ListBucketInventoryCon***REMOVED***gurationsOutput struct {
+type ListBucketInventoryConfigurationsOutput struct {
 	_ struct{} `type:"structure"`
 
 	// If sent in the request, the marker that is used as a starting point for this
-	// inventory con***REMOVED***guration list response.
+	// inventory configuration list response.
 	ContinuationToken *string `type:"string"`
 
-	// The list of inventory con***REMOVED***gurations for a bucket.
-	InventoryCon***REMOVED***gurationList []*InventoryCon***REMOVED***guration `locationName:"InventoryCon***REMOVED***guration" type:"list" flattened:"true"`
+	// The list of inventory configurations for a bucket.
+	InventoryConfigurationList []*InventoryConfiguration `locationName:"InventoryConfiguration" type:"list" flattened:"true"`
 
-	// Indicates whether the returned list of inventory con***REMOVED***gurations is truncated
+	// Indicates whether the returned list of inventory configurations is truncated
 	// in this response. A value of true indicates that the list is truncated.
 	IsTruncated *bool `type:"boolean"`
 
-	// The marker used to continue this inventory con***REMOVED***guration listing. Use the
+	// The marker used to continue this inventory configuration listing. Use the
 	// NextContinuationToken from this response to continue the listing in a subsequent
 	// request. The continuation token is an opaque value that Amazon S3 understands.
 	NextContinuationToken *string `type:"string"`
 }
 
 // String returns the string representation
-func (s ListBucketInventoryCon***REMOVED***gurationsOutput) String() string {
+func (s ListBucketInventoryConfigurationsOutput) String() string {
 	return awsutil.Prettify(s)
 }
 
 // GoString returns the string representation
-func (s ListBucketInventoryCon***REMOVED***gurationsOutput) GoString() string {
+func (s ListBucketInventoryConfigurationsOutput) GoString() string {
 	return s.String()
 }
 
-// SetContinuationToken sets the ContinuationToken ***REMOVED***eld's value.
-func (s *ListBucketInventoryCon***REMOVED***gurationsOutput) SetContinuationToken(v string) *ListBucketInventoryCon***REMOVED***gurationsOutput {
+// SetContinuationToken sets the ContinuationToken field's value.
+func (s *ListBucketInventoryConfigurationsOutput) SetContinuationToken(v string) *ListBucketInventoryConfigurationsOutput {
 	s.ContinuationToken = &v
 	return s
 }
 
-// SetInventoryCon***REMOVED***gurationList sets the InventoryCon***REMOVED***gurationList ***REMOVED***eld's value.
-func (s *ListBucketInventoryCon***REMOVED***gurationsOutput) SetInventoryCon***REMOVED***gurationList(v []*InventoryCon***REMOVED***guration) *ListBucketInventoryCon***REMOVED***gurationsOutput {
-	s.InventoryCon***REMOVED***gurationList = v
+// SetInventoryConfigurationList sets the InventoryConfigurationList field's value.
+func (s *ListBucketInventoryConfigurationsOutput) SetInventoryConfigurationList(v []*InventoryConfiguration) *ListBucketInventoryConfigurationsOutput {
+	s.InventoryConfigurationList = v
 	return s
 }
 
-// SetIsTruncated sets the IsTruncated ***REMOVED***eld's value.
-func (s *ListBucketInventoryCon***REMOVED***gurationsOutput) SetIsTruncated(v bool) *ListBucketInventoryCon***REMOVED***gurationsOutput {
+// SetIsTruncated sets the IsTruncated field's value.
+func (s *ListBucketInventoryConfigurationsOutput) SetIsTruncated(v bool) *ListBucketInventoryConfigurationsOutput {
 	s.IsTruncated = &v
 	return s
 }
 
-// SetNextContinuationToken sets the NextContinuationToken ***REMOVED***eld's value.
-func (s *ListBucketInventoryCon***REMOVED***gurationsOutput) SetNextContinuationToken(v string) *ListBucketInventoryCon***REMOVED***gurationsOutput {
+// SetNextContinuationToken sets the NextContinuationToken field's value.
+func (s *ListBucketInventoryConfigurationsOutput) SetNextContinuationToken(v string) *ListBucketInventoryConfigurationsOutput {
 	s.NextContinuationToken = &v
 	return s
 }
 
-type ListBucketMetricsCon***REMOVED***gurationsInput struct {
-	_ struct{} `locationName:"ListBucketMetricsCon***REMOVED***gurationsRequest" type:"structure"`
+type ListBucketMetricsConfigurationsInput struct {
+	_ struct{} `locationName:"ListBucketMetricsConfigurationsRequest" type:"structure"`
 
-	// The name of the bucket containing the metrics con***REMOVED***gurations to retrieve.
+	// The name of the bucket containing the metrics configurations to retrieve.
 	//
-	// Bucket is a required ***REMOVED***eld
+	// Bucket is a required field
 	Bucket *string `location:"uri" locationName:"Bucket" type:"string" required:"true"`
 
-	// The marker that is used to continue a metrics con***REMOVED***guration listing that
+	// The marker that is used to continue a metrics configuration listing that
 	// has been truncated. Use the NextContinuationToken from a previously truncated
 	// list response to continue the listing. The continuation token is an opaque
 	// value that Amazon S3 understands.
@@ -15902,18 +15902,18 @@ type ListBucketMetricsCon***REMOVED***gurationsInput struct {
 }
 
 // String returns the string representation
-func (s ListBucketMetricsCon***REMOVED***gurationsInput) String() string {
+func (s ListBucketMetricsConfigurationsInput) String() string {
 	return awsutil.Prettify(s)
 }
 
 // GoString returns the string representation
-func (s ListBucketMetricsCon***REMOVED***gurationsInput) GoString() string {
+func (s ListBucketMetricsConfigurationsInput) GoString() string {
 	return s.String()
 }
 
-// Validate inspects the ***REMOVED***elds of the type to determine if they are valid.
-func (s *ListBucketMetricsCon***REMOVED***gurationsInput) Validate() error {
-	invalidParams := request.ErrInvalidParams{Context: "ListBucketMetricsCon***REMOVED***gurationsInput"}
+// Validate inspects the fields of the type to determine if they are valid.
+func (s *ListBucketMetricsConfigurationsInput) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "ListBucketMetricsConfigurationsInput"}
 	if s.Bucket == nil {
 		invalidParams.Add(request.NewErrParamRequired("Bucket"))
 	}
@@ -15927,41 +15927,41 @@ func (s *ListBucketMetricsCon***REMOVED***gurationsInput) Validate() error {
 	return nil
 }
 
-// SetBucket sets the Bucket ***REMOVED***eld's value.
-func (s *ListBucketMetricsCon***REMOVED***gurationsInput) SetBucket(v string) *ListBucketMetricsCon***REMOVED***gurationsInput {
+// SetBucket sets the Bucket field's value.
+func (s *ListBucketMetricsConfigurationsInput) SetBucket(v string) *ListBucketMetricsConfigurationsInput {
 	s.Bucket = &v
 	return s
 }
 
-func (s *ListBucketMetricsCon***REMOVED***gurationsInput) getBucket() (v string) {
+func (s *ListBucketMetricsConfigurationsInput) getBucket() (v string) {
 	if s.Bucket == nil {
 		return v
 	}
 	return *s.Bucket
 }
 
-// SetContinuationToken sets the ContinuationToken ***REMOVED***eld's value.
-func (s *ListBucketMetricsCon***REMOVED***gurationsInput) SetContinuationToken(v string) *ListBucketMetricsCon***REMOVED***gurationsInput {
+// SetContinuationToken sets the ContinuationToken field's value.
+func (s *ListBucketMetricsConfigurationsInput) SetContinuationToken(v string) *ListBucketMetricsConfigurationsInput {
 	s.ContinuationToken = &v
 	return s
 }
 
-type ListBucketMetricsCon***REMOVED***gurationsOutput struct {
+type ListBucketMetricsConfigurationsOutput struct {
 	_ struct{} `type:"structure"`
 
-	// The marker that is used as a starting point for this metrics con***REMOVED***guration
+	// The marker that is used as a starting point for this metrics configuration
 	// list response. This value is present if it was sent in the request.
 	ContinuationToken *string `type:"string"`
 
-	// Indicates whether the returned list of metrics con***REMOVED***gurations is complete.
+	// Indicates whether the returned list of metrics configurations is complete.
 	// A value of true indicates that the list is not complete and the NextContinuationToken
 	// will be provided for a subsequent request.
 	IsTruncated *bool `type:"boolean"`
 
-	// The list of metrics con***REMOVED***gurations for a bucket.
-	MetricsCon***REMOVED***gurationList []*MetricsCon***REMOVED***guration `locationName:"MetricsCon***REMOVED***guration" type:"list" flattened:"true"`
+	// The list of metrics configurations for a bucket.
+	MetricsConfigurationList []*MetricsConfiguration `locationName:"MetricsConfiguration" type:"list" flattened:"true"`
 
-	// The marker used to continue a metrics con***REMOVED***guration listing that has been
+	// The marker used to continue a metrics configuration listing that has been
 	// truncated. Use the NextContinuationToken from a previously truncated list
 	// response to continue the listing. The continuation token is an opaque value
 	// that Amazon S3 understands.
@@ -15969,35 +15969,35 @@ type ListBucketMetricsCon***REMOVED***gurationsOutput struct {
 }
 
 // String returns the string representation
-func (s ListBucketMetricsCon***REMOVED***gurationsOutput) String() string {
+func (s ListBucketMetricsConfigurationsOutput) String() string {
 	return awsutil.Prettify(s)
 }
 
 // GoString returns the string representation
-func (s ListBucketMetricsCon***REMOVED***gurationsOutput) GoString() string {
+func (s ListBucketMetricsConfigurationsOutput) GoString() string {
 	return s.String()
 }
 
-// SetContinuationToken sets the ContinuationToken ***REMOVED***eld's value.
-func (s *ListBucketMetricsCon***REMOVED***gurationsOutput) SetContinuationToken(v string) *ListBucketMetricsCon***REMOVED***gurationsOutput {
+// SetContinuationToken sets the ContinuationToken field's value.
+func (s *ListBucketMetricsConfigurationsOutput) SetContinuationToken(v string) *ListBucketMetricsConfigurationsOutput {
 	s.ContinuationToken = &v
 	return s
 }
 
-// SetIsTruncated sets the IsTruncated ***REMOVED***eld's value.
-func (s *ListBucketMetricsCon***REMOVED***gurationsOutput) SetIsTruncated(v bool) *ListBucketMetricsCon***REMOVED***gurationsOutput {
+// SetIsTruncated sets the IsTruncated field's value.
+func (s *ListBucketMetricsConfigurationsOutput) SetIsTruncated(v bool) *ListBucketMetricsConfigurationsOutput {
 	s.IsTruncated = &v
 	return s
 }
 
-// SetMetricsCon***REMOVED***gurationList sets the MetricsCon***REMOVED***gurationList ***REMOVED***eld's value.
-func (s *ListBucketMetricsCon***REMOVED***gurationsOutput) SetMetricsCon***REMOVED***gurationList(v []*MetricsCon***REMOVED***guration) *ListBucketMetricsCon***REMOVED***gurationsOutput {
-	s.MetricsCon***REMOVED***gurationList = v
+// SetMetricsConfigurationList sets the MetricsConfigurationList field's value.
+func (s *ListBucketMetricsConfigurationsOutput) SetMetricsConfigurationList(v []*MetricsConfiguration) *ListBucketMetricsConfigurationsOutput {
+	s.MetricsConfigurationList = v
 	return s
 }
 
-// SetNextContinuationToken sets the NextContinuationToken ***REMOVED***eld's value.
-func (s *ListBucketMetricsCon***REMOVED***gurationsOutput) SetNextContinuationToken(v string) *ListBucketMetricsCon***REMOVED***gurationsOutput {
+// SetNextContinuationToken sets the NextContinuationToken field's value.
+func (s *ListBucketMetricsConfigurationsOutput) SetNextContinuationToken(v string) *ListBucketMetricsConfigurationsOutput {
 	s.NextContinuationToken = &v
 	return s
 }
@@ -16034,13 +16034,13 @@ func (s ListBucketsOutput) GoString() string {
 	return s.String()
 }
 
-// SetBuckets sets the Buckets ***REMOVED***eld's value.
+// SetBuckets sets the Buckets field's value.
 func (s *ListBucketsOutput) SetBuckets(v []*Bucket) *ListBucketsOutput {
 	s.Buckets = v
 	return s
 }
 
-// SetOwner sets the Owner ***REMOVED***eld's value.
+// SetOwner sets the Owner field's value.
 func (s *ListBucketsOutput) SetOwner(v *Owner) *ListBucketsOutput {
 	s.Owner = v
 	return s
@@ -16049,13 +16049,13 @@ func (s *ListBucketsOutput) SetOwner(v *Owner) *ListBucketsOutput {
 type ListMultipartUploadsInput struct {
 	_ struct{} `locationName:"ListMultipartUploadsRequest" type:"structure"`
 
-	// Bucket is a required ***REMOVED***eld
+	// Bucket is a required field
 	Bucket *string `location:"uri" locationName:"Bucket" type:"string" required:"true"`
 
 	// Character you use to group keys.
 	Delimiter *string `location:"querystring" locationName:"delimiter" type:"string"`
 
-	// Requests Amazon S3 to encode the object keys in the response and speci***REMOVED***es
+	// Requests Amazon S3 to encode the object keys in the response and specifies
 	// the encoding method to use. An object key may contain any Unicode character;
 	// however, XML 1.0 parser cannot parse some characters, such as characters
 	// with an ASCII value from 0 to 10. For characters that are not supported in
@@ -16063,7 +16063,7 @@ type ListMultipartUploadsInput struct {
 	// keys in the response.
 	EncodingType *string `location:"querystring" locationName:"encoding-type" type:"string" enum:"EncodingType"`
 
-	// Together with upload-id-marker, this parameter speci***REMOVED***es the multipart upload
+	// Together with upload-id-marker, this parameter specifies the multipart upload
 	// after which listing should begin.
 	KeyMarker *string `location:"querystring" locationName:"key-marker" type:"string"`
 
@@ -16072,12 +16072,12 @@ type ListMultipartUploadsInput struct {
 	// returned in a response.
 	MaxUploads *int64 `location:"querystring" locationName:"max-uploads" type:"integer"`
 
-	// Lists in-progress uploads only for those keys that begin with the speci***REMOVED***ed
-	// pre***REMOVED***x.
-	Pre***REMOVED***x *string `location:"querystring" locationName:"pre***REMOVED***x" type:"string"`
+	// Lists in-progress uploads only for those keys that begin with the specified
+	// prefix.
+	Prefix *string `location:"querystring" locationName:"prefix" type:"string"`
 
-	// Together with key-marker, speci***REMOVED***es the multipart upload after which listing
-	// should begin. If key-marker is not speci***REMOVED***ed, the upload-id-marker parameter
+	// Together with key-marker, specifies the multipart upload after which listing
+	// should begin. If key-marker is not specified, the upload-id-marker parameter
 	// is ignored.
 	UploadIdMarker *string `location:"querystring" locationName:"upload-id-marker" type:"string"`
 }
@@ -16092,7 +16092,7 @@ func (s ListMultipartUploadsInput) GoString() string {
 	return s.String()
 }
 
-// Validate inspects the ***REMOVED***elds of the type to determine if they are valid.
+// Validate inspects the fields of the type to determine if they are valid.
 func (s *ListMultipartUploadsInput) Validate() error {
 	invalidParams := request.ErrInvalidParams{Context: "ListMultipartUploadsInput"}
 	if s.Bucket == nil {
@@ -16108,7 +16108,7 @@ func (s *ListMultipartUploadsInput) Validate() error {
 	return nil
 }
 
-// SetBucket sets the Bucket ***REMOVED***eld's value.
+// SetBucket sets the Bucket field's value.
 func (s *ListMultipartUploadsInput) SetBucket(v string) *ListMultipartUploadsInput {
 	s.Bucket = &v
 	return s
@@ -16121,37 +16121,37 @@ func (s *ListMultipartUploadsInput) getBucket() (v string) {
 	return *s.Bucket
 }
 
-// SetDelimiter sets the Delimiter ***REMOVED***eld's value.
+// SetDelimiter sets the Delimiter field's value.
 func (s *ListMultipartUploadsInput) SetDelimiter(v string) *ListMultipartUploadsInput {
 	s.Delimiter = &v
 	return s
 }
 
-// SetEncodingType sets the EncodingType ***REMOVED***eld's value.
+// SetEncodingType sets the EncodingType field's value.
 func (s *ListMultipartUploadsInput) SetEncodingType(v string) *ListMultipartUploadsInput {
 	s.EncodingType = &v
 	return s
 }
 
-// SetKeyMarker sets the KeyMarker ***REMOVED***eld's value.
+// SetKeyMarker sets the KeyMarker field's value.
 func (s *ListMultipartUploadsInput) SetKeyMarker(v string) *ListMultipartUploadsInput {
 	s.KeyMarker = &v
 	return s
 }
 
-// SetMaxUploads sets the MaxUploads ***REMOVED***eld's value.
+// SetMaxUploads sets the MaxUploads field's value.
 func (s *ListMultipartUploadsInput) SetMaxUploads(v int64) *ListMultipartUploadsInput {
 	s.MaxUploads = &v
 	return s
 }
 
-// SetPre***REMOVED***x sets the Pre***REMOVED***x ***REMOVED***eld's value.
-func (s *ListMultipartUploadsInput) SetPre***REMOVED***x(v string) *ListMultipartUploadsInput {
-	s.Pre***REMOVED***x = &v
+// SetPrefix sets the Prefix field's value.
+func (s *ListMultipartUploadsInput) SetPrefix(v string) *ListMultipartUploadsInput {
+	s.Prefix = &v
 	return s
 }
 
-// SetUploadIdMarker sets the UploadIdMarker ***REMOVED***eld's value.
+// SetUploadIdMarker sets the UploadIdMarker field's value.
 func (s *ListMultipartUploadsInput) SetUploadIdMarker(v string) *ListMultipartUploadsInput {
 	s.UploadIdMarker = &v
 	return s
@@ -16163,7 +16163,7 @@ type ListMultipartUploadsOutput struct {
 	// Name of the bucket to which the multipart upload was initiated.
 	Bucket *string `type:"string"`
 
-	CommonPre***REMOVED***xes []*CommonPre***REMOVED***x `type:"list" flattened:"true"`
+	CommonPrefixes []*CommonPrefix `type:"list" flattened:"true"`
 
 	Delimiter *string `type:"string"`
 
@@ -16172,7 +16172,7 @@ type ListMultipartUploadsOutput struct {
 
 	// Indicates whether the returned list of multipart uploads is truncated. A
 	// value of true indicates that the list was truncated. The list can be truncated
-	// if the number of multipart uploads exceeds the limit allowed or speci***REMOVED***ed
+	// if the number of multipart uploads exceeds the limit allowed or specified
 	// by max uploads.
 	IsTruncated *bool `type:"boolean"`
 
@@ -16183,17 +16183,17 @@ type ListMultipartUploadsOutput struct {
 	// response.
 	MaxUploads *int64 `type:"integer"`
 
-	// When a list is truncated, this element speci***REMOVED***es the value that should be
+	// When a list is truncated, this element specifies the value that should be
 	// used for the key-marker request parameter in a subsequent request.
 	NextKeyMarker *string `type:"string"`
 
-	// When a list is truncated, this element speci***REMOVED***es the value that should be
+	// When a list is truncated, this element specifies the value that should be
 	// used for the upload-id-marker request parameter in a subsequent request.
 	NextUploadIdMarker *string `type:"string"`
 
-	// When a pre***REMOVED***x is provided in the request, this ***REMOVED***eld contains the speci***REMOVED***ed
-	// pre***REMOVED***x. The result contains only keys starting with the speci***REMOVED***ed pre***REMOVED***x.
-	Pre***REMOVED***x *string `type:"string"`
+	// When a prefix is provided in the request, this field contains the specified
+	// prefix. The result contains only keys starting with the specified prefix.
+	Prefix *string `type:"string"`
 
 	// Upload ID after which listing began.
 	UploadIdMarker *string `type:"string"`
@@ -16211,7 +16211,7 @@ func (s ListMultipartUploadsOutput) GoString() string {
 	return s.String()
 }
 
-// SetBucket sets the Bucket ***REMOVED***eld's value.
+// SetBucket sets the Bucket field's value.
 func (s *ListMultipartUploadsOutput) SetBucket(v string) *ListMultipartUploadsOutput {
 	s.Bucket = &v
 	return s
@@ -16224,67 +16224,67 @@ func (s *ListMultipartUploadsOutput) getBucket() (v string) {
 	return *s.Bucket
 }
 
-// SetCommonPre***REMOVED***xes sets the CommonPre***REMOVED***xes ***REMOVED***eld's value.
-func (s *ListMultipartUploadsOutput) SetCommonPre***REMOVED***xes(v []*CommonPre***REMOVED***x) *ListMultipartUploadsOutput {
-	s.CommonPre***REMOVED***xes = v
+// SetCommonPrefixes sets the CommonPrefixes field's value.
+func (s *ListMultipartUploadsOutput) SetCommonPrefixes(v []*CommonPrefix) *ListMultipartUploadsOutput {
+	s.CommonPrefixes = v
 	return s
 }
 
-// SetDelimiter sets the Delimiter ***REMOVED***eld's value.
+// SetDelimiter sets the Delimiter field's value.
 func (s *ListMultipartUploadsOutput) SetDelimiter(v string) *ListMultipartUploadsOutput {
 	s.Delimiter = &v
 	return s
 }
 
-// SetEncodingType sets the EncodingType ***REMOVED***eld's value.
+// SetEncodingType sets the EncodingType field's value.
 func (s *ListMultipartUploadsOutput) SetEncodingType(v string) *ListMultipartUploadsOutput {
 	s.EncodingType = &v
 	return s
 }
 
-// SetIsTruncated sets the IsTruncated ***REMOVED***eld's value.
+// SetIsTruncated sets the IsTruncated field's value.
 func (s *ListMultipartUploadsOutput) SetIsTruncated(v bool) *ListMultipartUploadsOutput {
 	s.IsTruncated = &v
 	return s
 }
 
-// SetKeyMarker sets the KeyMarker ***REMOVED***eld's value.
+// SetKeyMarker sets the KeyMarker field's value.
 func (s *ListMultipartUploadsOutput) SetKeyMarker(v string) *ListMultipartUploadsOutput {
 	s.KeyMarker = &v
 	return s
 }
 
-// SetMaxUploads sets the MaxUploads ***REMOVED***eld's value.
+// SetMaxUploads sets the MaxUploads field's value.
 func (s *ListMultipartUploadsOutput) SetMaxUploads(v int64) *ListMultipartUploadsOutput {
 	s.MaxUploads = &v
 	return s
 }
 
-// SetNextKeyMarker sets the NextKeyMarker ***REMOVED***eld's value.
+// SetNextKeyMarker sets the NextKeyMarker field's value.
 func (s *ListMultipartUploadsOutput) SetNextKeyMarker(v string) *ListMultipartUploadsOutput {
 	s.NextKeyMarker = &v
 	return s
 }
 
-// SetNextUploadIdMarker sets the NextUploadIdMarker ***REMOVED***eld's value.
+// SetNextUploadIdMarker sets the NextUploadIdMarker field's value.
 func (s *ListMultipartUploadsOutput) SetNextUploadIdMarker(v string) *ListMultipartUploadsOutput {
 	s.NextUploadIdMarker = &v
 	return s
 }
 
-// SetPre***REMOVED***x sets the Pre***REMOVED***x ***REMOVED***eld's value.
-func (s *ListMultipartUploadsOutput) SetPre***REMOVED***x(v string) *ListMultipartUploadsOutput {
-	s.Pre***REMOVED***x = &v
+// SetPrefix sets the Prefix field's value.
+func (s *ListMultipartUploadsOutput) SetPrefix(v string) *ListMultipartUploadsOutput {
+	s.Prefix = &v
 	return s
 }
 
-// SetUploadIdMarker sets the UploadIdMarker ***REMOVED***eld's value.
+// SetUploadIdMarker sets the UploadIdMarker field's value.
 func (s *ListMultipartUploadsOutput) SetUploadIdMarker(v string) *ListMultipartUploadsOutput {
 	s.UploadIdMarker = &v
 	return s
 }
 
-// SetUploads sets the Uploads ***REMOVED***eld's value.
+// SetUploads sets the Uploads field's value.
 func (s *ListMultipartUploadsOutput) SetUploads(v []*MultipartUpload) *ListMultipartUploadsOutput {
 	s.Uploads = v
 	return s
@@ -16293,13 +16293,13 @@ func (s *ListMultipartUploadsOutput) SetUploads(v []*MultipartUpload) *ListMulti
 type ListObjectVersionsInput struct {
 	_ struct{} `locationName:"ListObjectVersionsRequest" type:"structure"`
 
-	// Bucket is a required ***REMOVED***eld
+	// Bucket is a required field
 	Bucket *string `location:"uri" locationName:"Bucket" type:"string" required:"true"`
 
 	// A delimiter is a character you use to group keys.
 	Delimiter *string `location:"querystring" locationName:"delimiter" type:"string"`
 
-	// Requests Amazon S3 to encode the object keys in the response and speci***REMOVED***es
+	// Requests Amazon S3 to encode the object keys in the response and specifies
 	// the encoding method to use. An object key may contain any Unicode character;
 	// however, XML 1.0 parser cannot parse some characters, such as characters
 	// with an ASCII value from 0 to 10. For characters that are not supported in
@@ -16307,17 +16307,17 @@ type ListObjectVersionsInput struct {
 	// keys in the response.
 	EncodingType *string `location:"querystring" locationName:"encoding-type" type:"string" enum:"EncodingType"`
 
-	// Speci***REMOVED***es the key to start with when listing objects in a bucket.
+	// Specifies the key to start with when listing objects in a bucket.
 	KeyMarker *string `location:"querystring" locationName:"key-marker" type:"string"`
 
 	// Sets the maximum number of keys returned in the response. The response might
 	// contain fewer keys but will never contain more.
 	MaxKeys *int64 `location:"querystring" locationName:"max-keys" type:"integer"`
 
-	// Limits the response to keys that begin with the speci***REMOVED***ed pre***REMOVED***x.
-	Pre***REMOVED***x *string `location:"querystring" locationName:"pre***REMOVED***x" type:"string"`
+	// Limits the response to keys that begin with the specified prefix.
+	Prefix *string `location:"querystring" locationName:"prefix" type:"string"`
 
-	// Speci***REMOVED***es the object version you want to start listing from.
+	// Specifies the object version you want to start listing from.
 	VersionIdMarker *string `location:"querystring" locationName:"version-id-marker" type:"string"`
 }
 
@@ -16331,7 +16331,7 @@ func (s ListObjectVersionsInput) GoString() string {
 	return s.String()
 }
 
-// Validate inspects the ***REMOVED***elds of the type to determine if they are valid.
+// Validate inspects the fields of the type to determine if they are valid.
 func (s *ListObjectVersionsInput) Validate() error {
 	invalidParams := request.ErrInvalidParams{Context: "ListObjectVersionsInput"}
 	if s.Bucket == nil {
@@ -16347,7 +16347,7 @@ func (s *ListObjectVersionsInput) Validate() error {
 	return nil
 }
 
-// SetBucket sets the Bucket ***REMOVED***eld's value.
+// SetBucket sets the Bucket field's value.
 func (s *ListObjectVersionsInput) SetBucket(v string) *ListObjectVersionsInput {
 	s.Bucket = &v
 	return s
@@ -16360,37 +16360,37 @@ func (s *ListObjectVersionsInput) getBucket() (v string) {
 	return *s.Bucket
 }
 
-// SetDelimiter sets the Delimiter ***REMOVED***eld's value.
+// SetDelimiter sets the Delimiter field's value.
 func (s *ListObjectVersionsInput) SetDelimiter(v string) *ListObjectVersionsInput {
 	s.Delimiter = &v
 	return s
 }
 
-// SetEncodingType sets the EncodingType ***REMOVED***eld's value.
+// SetEncodingType sets the EncodingType field's value.
 func (s *ListObjectVersionsInput) SetEncodingType(v string) *ListObjectVersionsInput {
 	s.EncodingType = &v
 	return s
 }
 
-// SetKeyMarker sets the KeyMarker ***REMOVED***eld's value.
+// SetKeyMarker sets the KeyMarker field's value.
 func (s *ListObjectVersionsInput) SetKeyMarker(v string) *ListObjectVersionsInput {
 	s.KeyMarker = &v
 	return s
 }
 
-// SetMaxKeys sets the MaxKeys ***REMOVED***eld's value.
+// SetMaxKeys sets the MaxKeys field's value.
 func (s *ListObjectVersionsInput) SetMaxKeys(v int64) *ListObjectVersionsInput {
 	s.MaxKeys = &v
 	return s
 }
 
-// SetPre***REMOVED***x sets the Pre***REMOVED***x ***REMOVED***eld's value.
-func (s *ListObjectVersionsInput) SetPre***REMOVED***x(v string) *ListObjectVersionsInput {
-	s.Pre***REMOVED***x = &v
+// SetPrefix sets the Prefix field's value.
+func (s *ListObjectVersionsInput) SetPrefix(v string) *ListObjectVersionsInput {
+	s.Prefix = &v
 	return s
 }
 
-// SetVersionIdMarker sets the VersionIdMarker ***REMOVED***eld's value.
+// SetVersionIdMarker sets the VersionIdMarker field's value.
 func (s *ListObjectVersionsInput) SetVersionIdMarker(v string) *ListObjectVersionsInput {
 	s.VersionIdMarker = &v
 	return s
@@ -16399,7 +16399,7 @@ func (s *ListObjectVersionsInput) SetVersionIdMarker(v string) *ListObjectVersio
 type ListObjectVersionsOutput struct {
 	_ struct{} `type:"structure"`
 
-	CommonPre***REMOVED***xes []*CommonPre***REMOVED***x `type:"list" flattened:"true"`
+	CommonPrefixes []*CommonPrefix `type:"list" flattened:"true"`
 
 	DeleteMarkers []*DeleteMarkerEntry `locationName:"DeleteMarker" type:"list" flattened:"true"`
 
@@ -16409,7 +16409,7 @@ type ListObjectVersionsOutput struct {
 	EncodingType *string `type:"string" enum:"EncodingType"`
 
 	// A flag that indicates whether or not Amazon S3 returned all of the results
-	// that satis***REMOVED***ed the search criteria. If your results were truncated, you can
+	// that satisfied the search criteria. If your results were truncated, you can
 	// make a follow-up paginated request using the NextKeyMarker and NextVersionIdMarker
 	// response parameters as a starting place in another request to return the
 	// rest of the results.
@@ -16428,7 +16428,7 @@ type ListObjectVersionsOutput struct {
 	// Use this value for the next version id marker parameter in a subsequent request.
 	NextVersionIdMarker *string `type:"string"`
 
-	Pre***REMOVED***x *string `type:"string"`
+	Prefix *string `type:"string"`
 
 	VersionIdMarker *string `type:"string"`
 
@@ -16445,79 +16445,79 @@ func (s ListObjectVersionsOutput) GoString() string {
 	return s.String()
 }
 
-// SetCommonPre***REMOVED***xes sets the CommonPre***REMOVED***xes ***REMOVED***eld's value.
-func (s *ListObjectVersionsOutput) SetCommonPre***REMOVED***xes(v []*CommonPre***REMOVED***x) *ListObjectVersionsOutput {
-	s.CommonPre***REMOVED***xes = v
+// SetCommonPrefixes sets the CommonPrefixes field's value.
+func (s *ListObjectVersionsOutput) SetCommonPrefixes(v []*CommonPrefix) *ListObjectVersionsOutput {
+	s.CommonPrefixes = v
 	return s
 }
 
-// SetDeleteMarkers sets the DeleteMarkers ***REMOVED***eld's value.
+// SetDeleteMarkers sets the DeleteMarkers field's value.
 func (s *ListObjectVersionsOutput) SetDeleteMarkers(v []*DeleteMarkerEntry) *ListObjectVersionsOutput {
 	s.DeleteMarkers = v
 	return s
 }
 
-// SetDelimiter sets the Delimiter ***REMOVED***eld's value.
+// SetDelimiter sets the Delimiter field's value.
 func (s *ListObjectVersionsOutput) SetDelimiter(v string) *ListObjectVersionsOutput {
 	s.Delimiter = &v
 	return s
 }
 
-// SetEncodingType sets the EncodingType ***REMOVED***eld's value.
+// SetEncodingType sets the EncodingType field's value.
 func (s *ListObjectVersionsOutput) SetEncodingType(v string) *ListObjectVersionsOutput {
 	s.EncodingType = &v
 	return s
 }
 
-// SetIsTruncated sets the IsTruncated ***REMOVED***eld's value.
+// SetIsTruncated sets the IsTruncated field's value.
 func (s *ListObjectVersionsOutput) SetIsTruncated(v bool) *ListObjectVersionsOutput {
 	s.IsTruncated = &v
 	return s
 }
 
-// SetKeyMarker sets the KeyMarker ***REMOVED***eld's value.
+// SetKeyMarker sets the KeyMarker field's value.
 func (s *ListObjectVersionsOutput) SetKeyMarker(v string) *ListObjectVersionsOutput {
 	s.KeyMarker = &v
 	return s
 }
 
-// SetMaxKeys sets the MaxKeys ***REMOVED***eld's value.
+// SetMaxKeys sets the MaxKeys field's value.
 func (s *ListObjectVersionsOutput) SetMaxKeys(v int64) *ListObjectVersionsOutput {
 	s.MaxKeys = &v
 	return s
 }
 
-// SetName sets the Name ***REMOVED***eld's value.
+// SetName sets the Name field's value.
 func (s *ListObjectVersionsOutput) SetName(v string) *ListObjectVersionsOutput {
 	s.Name = &v
 	return s
 }
 
-// SetNextKeyMarker sets the NextKeyMarker ***REMOVED***eld's value.
+// SetNextKeyMarker sets the NextKeyMarker field's value.
 func (s *ListObjectVersionsOutput) SetNextKeyMarker(v string) *ListObjectVersionsOutput {
 	s.NextKeyMarker = &v
 	return s
 }
 
-// SetNextVersionIdMarker sets the NextVersionIdMarker ***REMOVED***eld's value.
+// SetNextVersionIdMarker sets the NextVersionIdMarker field's value.
 func (s *ListObjectVersionsOutput) SetNextVersionIdMarker(v string) *ListObjectVersionsOutput {
 	s.NextVersionIdMarker = &v
 	return s
 }
 
-// SetPre***REMOVED***x sets the Pre***REMOVED***x ***REMOVED***eld's value.
-func (s *ListObjectVersionsOutput) SetPre***REMOVED***x(v string) *ListObjectVersionsOutput {
-	s.Pre***REMOVED***x = &v
+// SetPrefix sets the Prefix field's value.
+func (s *ListObjectVersionsOutput) SetPrefix(v string) *ListObjectVersionsOutput {
+	s.Prefix = &v
 	return s
 }
 
-// SetVersionIdMarker sets the VersionIdMarker ***REMOVED***eld's value.
+// SetVersionIdMarker sets the VersionIdMarker field's value.
 func (s *ListObjectVersionsOutput) SetVersionIdMarker(v string) *ListObjectVersionsOutput {
 	s.VersionIdMarker = &v
 	return s
 }
 
-// SetVersions sets the Versions ***REMOVED***eld's value.
+// SetVersions sets the Versions field's value.
 func (s *ListObjectVersionsOutput) SetVersions(v []*ObjectVersion) *ListObjectVersionsOutput {
 	s.Versions = v
 	return s
@@ -16526,13 +16526,13 @@ func (s *ListObjectVersionsOutput) SetVersions(v []*ObjectVersion) *ListObjectVe
 type ListObjectsInput struct {
 	_ struct{} `locationName:"ListObjectsRequest" type:"structure"`
 
-	// Bucket is a required ***REMOVED***eld
+	// Bucket is a required field
 	Bucket *string `location:"uri" locationName:"Bucket" type:"string" required:"true"`
 
 	// A delimiter is a character you use to group keys.
 	Delimiter *string `location:"querystring" locationName:"delimiter" type:"string"`
 
-	// Requests Amazon S3 to encode the object keys in the response and speci***REMOVED***es
+	// Requests Amazon S3 to encode the object keys in the response and specifies
 	// the encoding method to use. An object key may contain any Unicode character;
 	// however, XML 1.0 parser cannot parse some characters, such as characters
 	// with an ASCII value from 0 to 10. For characters that are not supported in
@@ -16540,17 +16540,17 @@ type ListObjectsInput struct {
 	// keys in the response.
 	EncodingType *string `location:"querystring" locationName:"encoding-type" type:"string" enum:"EncodingType"`
 
-	// Speci***REMOVED***es the key to start with when listing objects in a bucket.
+	// Specifies the key to start with when listing objects in a bucket.
 	Marker *string `location:"querystring" locationName:"marker" type:"string"`
 
 	// Sets the maximum number of keys returned in the response. The response might
 	// contain fewer keys but will never contain more.
 	MaxKeys *int64 `location:"querystring" locationName:"max-keys" type:"integer"`
 
-	// Limits the response to keys that begin with the speci***REMOVED***ed pre***REMOVED***x.
-	Pre***REMOVED***x *string `location:"querystring" locationName:"pre***REMOVED***x" type:"string"`
+	// Limits the response to keys that begin with the specified prefix.
+	Prefix *string `location:"querystring" locationName:"prefix" type:"string"`
 
-	// Con***REMOVED***rms that the requester knows that she or he will be charged for the
+	// Confirms that the requester knows that she or he will be charged for the
 	// list objects request. Bucket owners need not specify this parameter in their
 	// requests.
 	RequestPayer *string `location:"header" locationName:"x-amz-request-payer" type:"string" enum:"RequestPayer"`
@@ -16566,7 +16566,7 @@ func (s ListObjectsInput) GoString() string {
 	return s.String()
 }
 
-// Validate inspects the ***REMOVED***elds of the type to determine if they are valid.
+// Validate inspects the fields of the type to determine if they are valid.
 func (s *ListObjectsInput) Validate() error {
 	invalidParams := request.ErrInvalidParams{Context: "ListObjectsInput"}
 	if s.Bucket == nil {
@@ -16582,7 +16582,7 @@ func (s *ListObjectsInput) Validate() error {
 	return nil
 }
 
-// SetBucket sets the Bucket ***REMOVED***eld's value.
+// SetBucket sets the Bucket field's value.
 func (s *ListObjectsInput) SetBucket(v string) *ListObjectsInput {
 	s.Bucket = &v
 	return s
@@ -16595,37 +16595,37 @@ func (s *ListObjectsInput) getBucket() (v string) {
 	return *s.Bucket
 }
 
-// SetDelimiter sets the Delimiter ***REMOVED***eld's value.
+// SetDelimiter sets the Delimiter field's value.
 func (s *ListObjectsInput) SetDelimiter(v string) *ListObjectsInput {
 	s.Delimiter = &v
 	return s
 }
 
-// SetEncodingType sets the EncodingType ***REMOVED***eld's value.
+// SetEncodingType sets the EncodingType field's value.
 func (s *ListObjectsInput) SetEncodingType(v string) *ListObjectsInput {
 	s.EncodingType = &v
 	return s
 }
 
-// SetMarker sets the Marker ***REMOVED***eld's value.
+// SetMarker sets the Marker field's value.
 func (s *ListObjectsInput) SetMarker(v string) *ListObjectsInput {
 	s.Marker = &v
 	return s
 }
 
-// SetMaxKeys sets the MaxKeys ***REMOVED***eld's value.
+// SetMaxKeys sets the MaxKeys field's value.
 func (s *ListObjectsInput) SetMaxKeys(v int64) *ListObjectsInput {
 	s.MaxKeys = &v
 	return s
 }
 
-// SetPre***REMOVED***x sets the Pre***REMOVED***x ***REMOVED***eld's value.
-func (s *ListObjectsInput) SetPre***REMOVED***x(v string) *ListObjectsInput {
-	s.Pre***REMOVED***x = &v
+// SetPrefix sets the Prefix field's value.
+func (s *ListObjectsInput) SetPrefix(v string) *ListObjectsInput {
+	s.Prefix = &v
 	return s
 }
 
-// SetRequestPayer sets the RequestPayer ***REMOVED***eld's value.
+// SetRequestPayer sets the RequestPayer field's value.
 func (s *ListObjectsInput) SetRequestPayer(v string) *ListObjectsInput {
 	s.RequestPayer = &v
 	return s
@@ -16634,7 +16634,7 @@ func (s *ListObjectsInput) SetRequestPayer(v string) *ListObjectsInput {
 type ListObjectsOutput struct {
 	_ struct{} `type:"structure"`
 
-	CommonPre***REMOVED***xes []*CommonPre***REMOVED***x `type:"list" flattened:"true"`
+	CommonPrefixes []*CommonPrefix `type:"list" flattened:"true"`
 
 	Contents []*Object `type:"list" flattened:"true"`
 
@@ -16644,7 +16644,7 @@ type ListObjectsOutput struct {
 	EncodingType *string `type:"string" enum:"EncodingType"`
 
 	// A flag that indicates whether or not Amazon S3 returned all of the results
-	// that satis***REMOVED***ed the search criteria.
+	// that satisfied the search criteria.
 	IsTruncated *bool `type:"boolean"`
 
 	Marker *string `type:"string"`
@@ -16654,15 +16654,15 @@ type ListObjectsOutput struct {
 	Name *string `type:"string"`
 
 	// When response is truncated (the IsTruncated element value in the response
-	// is true), you can use the key name in this ***REMOVED***eld as marker in the subsequent
+	// is true), you can use the key name in this field as marker in the subsequent
 	// request to get next set of objects. Amazon S3 lists objects in alphabetical
 	// order Note: This element is returned only if you have delimiter request parameter
-	// speci***REMOVED***ed. If response does not include the NextMaker and it is truncated,
+	// specified. If response does not include the NextMaker and it is truncated,
 	// you can use the value of the last Key in the response as the marker in the
 	// subsequent request to get the next set of object keys.
 	NextMarker *string `type:"string"`
 
-	Pre***REMOVED***x *string `type:"string"`
+	Prefix *string `type:"string"`
 }
 
 // String returns the string representation
@@ -16675,63 +16675,63 @@ func (s ListObjectsOutput) GoString() string {
 	return s.String()
 }
 
-// SetCommonPre***REMOVED***xes sets the CommonPre***REMOVED***xes ***REMOVED***eld's value.
-func (s *ListObjectsOutput) SetCommonPre***REMOVED***xes(v []*CommonPre***REMOVED***x) *ListObjectsOutput {
-	s.CommonPre***REMOVED***xes = v
+// SetCommonPrefixes sets the CommonPrefixes field's value.
+func (s *ListObjectsOutput) SetCommonPrefixes(v []*CommonPrefix) *ListObjectsOutput {
+	s.CommonPrefixes = v
 	return s
 }
 
-// SetContents sets the Contents ***REMOVED***eld's value.
+// SetContents sets the Contents field's value.
 func (s *ListObjectsOutput) SetContents(v []*Object) *ListObjectsOutput {
 	s.Contents = v
 	return s
 }
 
-// SetDelimiter sets the Delimiter ***REMOVED***eld's value.
+// SetDelimiter sets the Delimiter field's value.
 func (s *ListObjectsOutput) SetDelimiter(v string) *ListObjectsOutput {
 	s.Delimiter = &v
 	return s
 }
 
-// SetEncodingType sets the EncodingType ***REMOVED***eld's value.
+// SetEncodingType sets the EncodingType field's value.
 func (s *ListObjectsOutput) SetEncodingType(v string) *ListObjectsOutput {
 	s.EncodingType = &v
 	return s
 }
 
-// SetIsTruncated sets the IsTruncated ***REMOVED***eld's value.
+// SetIsTruncated sets the IsTruncated field's value.
 func (s *ListObjectsOutput) SetIsTruncated(v bool) *ListObjectsOutput {
 	s.IsTruncated = &v
 	return s
 }
 
-// SetMarker sets the Marker ***REMOVED***eld's value.
+// SetMarker sets the Marker field's value.
 func (s *ListObjectsOutput) SetMarker(v string) *ListObjectsOutput {
 	s.Marker = &v
 	return s
 }
 
-// SetMaxKeys sets the MaxKeys ***REMOVED***eld's value.
+// SetMaxKeys sets the MaxKeys field's value.
 func (s *ListObjectsOutput) SetMaxKeys(v int64) *ListObjectsOutput {
 	s.MaxKeys = &v
 	return s
 }
 
-// SetName sets the Name ***REMOVED***eld's value.
+// SetName sets the Name field's value.
 func (s *ListObjectsOutput) SetName(v string) *ListObjectsOutput {
 	s.Name = &v
 	return s
 }
 
-// SetNextMarker sets the NextMarker ***REMOVED***eld's value.
+// SetNextMarker sets the NextMarker field's value.
 func (s *ListObjectsOutput) SetNextMarker(v string) *ListObjectsOutput {
 	s.NextMarker = &v
 	return s
 }
 
-// SetPre***REMOVED***x sets the Pre***REMOVED***x ***REMOVED***eld's value.
-func (s *ListObjectsOutput) SetPre***REMOVED***x(v string) *ListObjectsOutput {
-	s.Pre***REMOVED***x = &v
+// SetPrefix sets the Prefix field's value.
+func (s *ListObjectsOutput) SetPrefix(v string) *ListObjectsOutput {
+	s.Prefix = &v
 	return s
 }
 
@@ -16740,7 +16740,7 @@ type ListObjectsV2Input struct {
 
 	// Name of the bucket to list.
 	//
-	// Bucket is a required ***REMOVED***eld
+	// Bucket is a required field
 	Bucket *string `location:"uri" locationName:"Bucket" type:"string" required:"true"`
 
 	// ContinuationToken indicates Amazon S3 that the list is being continued on
@@ -16754,8 +16754,8 @@ type ListObjectsV2Input struct {
 	// Encoding type used by Amazon S3 to encode object keys in the response.
 	EncodingType *string `location:"querystring" locationName:"encoding-type" type:"string" enum:"EncodingType"`
 
-	// The owner ***REMOVED***eld is not present in listV2 by default, if you want to return
-	// owner ***REMOVED***eld with each key in the result then set the fetch owner ***REMOVED***eld to
+	// The owner field is not present in listV2 by default, if you want to return
+	// owner field with each key in the result then set the fetch owner field to
 	// true
 	FetchOwner *bool `location:"querystring" locationName:"fetch-owner" type:"boolean"`
 
@@ -16763,16 +16763,16 @@ type ListObjectsV2Input struct {
 	// contain fewer keys but will never contain more.
 	MaxKeys *int64 `location:"querystring" locationName:"max-keys" type:"integer"`
 
-	// Limits the response to keys that begin with the speci***REMOVED***ed pre***REMOVED***x.
-	Pre***REMOVED***x *string `location:"querystring" locationName:"pre***REMOVED***x" type:"string"`
+	// Limits the response to keys that begin with the specified prefix.
+	Prefix *string `location:"querystring" locationName:"prefix" type:"string"`
 
-	// Con***REMOVED***rms that the requester knows that she or he will be charged for the
+	// Confirms that the requester knows that she or he will be charged for the
 	// list objects request in V2 style. Bucket owners need not specify this parameter
 	// in their requests.
 	RequestPayer *string `location:"header" locationName:"x-amz-request-payer" type:"string" enum:"RequestPayer"`
 
 	// StartAfter is where you want Amazon S3 to start listing from. Amazon S3 starts
-	// listing after this speci***REMOVED***ed key. StartAfter can be any key in the bucket
+	// listing after this specified key. StartAfter can be any key in the bucket
 	StartAfter *string `location:"querystring" locationName:"start-after" type:"string"`
 }
 
@@ -16786,7 +16786,7 @@ func (s ListObjectsV2Input) GoString() string {
 	return s.String()
 }
 
-// Validate inspects the ***REMOVED***elds of the type to determine if they are valid.
+// Validate inspects the fields of the type to determine if they are valid.
 func (s *ListObjectsV2Input) Validate() error {
 	invalidParams := request.ErrInvalidParams{Context: "ListObjectsV2Input"}
 	if s.Bucket == nil {
@@ -16802,7 +16802,7 @@ func (s *ListObjectsV2Input) Validate() error {
 	return nil
 }
 
-// SetBucket sets the Bucket ***REMOVED***eld's value.
+// SetBucket sets the Bucket field's value.
 func (s *ListObjectsV2Input) SetBucket(v string) *ListObjectsV2Input {
 	s.Bucket = &v
 	return s
@@ -16815,49 +16815,49 @@ func (s *ListObjectsV2Input) getBucket() (v string) {
 	return *s.Bucket
 }
 
-// SetContinuationToken sets the ContinuationToken ***REMOVED***eld's value.
+// SetContinuationToken sets the ContinuationToken field's value.
 func (s *ListObjectsV2Input) SetContinuationToken(v string) *ListObjectsV2Input {
 	s.ContinuationToken = &v
 	return s
 }
 
-// SetDelimiter sets the Delimiter ***REMOVED***eld's value.
+// SetDelimiter sets the Delimiter field's value.
 func (s *ListObjectsV2Input) SetDelimiter(v string) *ListObjectsV2Input {
 	s.Delimiter = &v
 	return s
 }
 
-// SetEncodingType sets the EncodingType ***REMOVED***eld's value.
+// SetEncodingType sets the EncodingType field's value.
 func (s *ListObjectsV2Input) SetEncodingType(v string) *ListObjectsV2Input {
 	s.EncodingType = &v
 	return s
 }
 
-// SetFetchOwner sets the FetchOwner ***REMOVED***eld's value.
+// SetFetchOwner sets the FetchOwner field's value.
 func (s *ListObjectsV2Input) SetFetchOwner(v bool) *ListObjectsV2Input {
 	s.FetchOwner = &v
 	return s
 }
 
-// SetMaxKeys sets the MaxKeys ***REMOVED***eld's value.
+// SetMaxKeys sets the MaxKeys field's value.
 func (s *ListObjectsV2Input) SetMaxKeys(v int64) *ListObjectsV2Input {
 	s.MaxKeys = &v
 	return s
 }
 
-// SetPre***REMOVED***x sets the Pre***REMOVED***x ***REMOVED***eld's value.
-func (s *ListObjectsV2Input) SetPre***REMOVED***x(v string) *ListObjectsV2Input {
-	s.Pre***REMOVED***x = &v
+// SetPrefix sets the Prefix field's value.
+func (s *ListObjectsV2Input) SetPrefix(v string) *ListObjectsV2Input {
+	s.Prefix = &v
 	return s
 }
 
-// SetRequestPayer sets the RequestPayer ***REMOVED***eld's value.
+// SetRequestPayer sets the RequestPayer field's value.
 func (s *ListObjectsV2Input) SetRequestPayer(v string) *ListObjectsV2Input {
 	s.RequestPayer = &v
 	return s
 }
 
-// SetStartAfter sets the StartAfter ***REMOVED***eld's value.
+// SetStartAfter sets the StartAfter field's value.
 func (s *ListObjectsV2Input) SetStartAfter(v string) *ListObjectsV2Input {
 	s.StartAfter = &v
 	return s
@@ -16866,9 +16866,9 @@ func (s *ListObjectsV2Input) SetStartAfter(v string) *ListObjectsV2Input {
 type ListObjectsV2Output struct {
 	_ struct{} `type:"structure"`
 
-	// CommonPre***REMOVED***xes contains all (if there are any) keys between Pre***REMOVED***x and the
-	// next occurrence of the string speci***REMOVED***ed by delimiter
-	CommonPre***REMOVED***xes []*CommonPre***REMOVED***x `type:"list" flattened:"true"`
+	// CommonPrefixes contains all (if there are any) keys between Prefix and the
+	// next occurrence of the string specified by delimiter
+	CommonPrefixes []*CommonPrefix `type:"list" flattened:"true"`
 
 	// Metadata about each object returned.
 	Contents []*Object `type:"list" flattened:"true"`
@@ -16885,11 +16885,11 @@ type ListObjectsV2Output struct {
 	EncodingType *string `type:"string" enum:"EncodingType"`
 
 	// A flag that indicates whether or not Amazon S3 returned all of the results
-	// that satis***REMOVED***ed the search criteria.
+	// that satisfied the search criteria.
 	IsTruncated *bool `type:"boolean"`
 
 	// KeyCount is the number of keys returned with this request. KeyCount will
-	// always be less than equals to MaxKeys ***REMOVED***eld. Say you ask for 50 keys, your
+	// always be less than equals to MaxKeys field. Say you ask for 50 keys, your
 	// result will include less than equals 50 keys
 	KeyCount *int64 `type:"integer"`
 
@@ -16906,11 +16906,11 @@ type ListObjectsV2Output struct {
 	// is obfuscated and is not a real key
 	NextContinuationToken *string `type:"string"`
 
-	// Limits the response to keys that begin with the speci***REMOVED***ed pre***REMOVED***x.
-	Pre***REMOVED***x *string `type:"string"`
+	// Limits the response to keys that begin with the specified prefix.
+	Prefix *string `type:"string"`
 
 	// StartAfter is where you want Amazon S3 to start listing from. Amazon S3 starts
-	// listing after this speci***REMOVED***ed key. StartAfter can be any key in the bucket
+	// listing after this specified key. StartAfter can be any key in the bucket
 	StartAfter *string `type:"string"`
 }
 
@@ -16924,73 +16924,73 @@ func (s ListObjectsV2Output) GoString() string {
 	return s.String()
 }
 
-// SetCommonPre***REMOVED***xes sets the CommonPre***REMOVED***xes ***REMOVED***eld's value.
-func (s *ListObjectsV2Output) SetCommonPre***REMOVED***xes(v []*CommonPre***REMOVED***x) *ListObjectsV2Output {
-	s.CommonPre***REMOVED***xes = v
+// SetCommonPrefixes sets the CommonPrefixes field's value.
+func (s *ListObjectsV2Output) SetCommonPrefixes(v []*CommonPrefix) *ListObjectsV2Output {
+	s.CommonPrefixes = v
 	return s
 }
 
-// SetContents sets the Contents ***REMOVED***eld's value.
+// SetContents sets the Contents field's value.
 func (s *ListObjectsV2Output) SetContents(v []*Object) *ListObjectsV2Output {
 	s.Contents = v
 	return s
 }
 
-// SetContinuationToken sets the ContinuationToken ***REMOVED***eld's value.
+// SetContinuationToken sets the ContinuationToken field's value.
 func (s *ListObjectsV2Output) SetContinuationToken(v string) *ListObjectsV2Output {
 	s.ContinuationToken = &v
 	return s
 }
 
-// SetDelimiter sets the Delimiter ***REMOVED***eld's value.
+// SetDelimiter sets the Delimiter field's value.
 func (s *ListObjectsV2Output) SetDelimiter(v string) *ListObjectsV2Output {
 	s.Delimiter = &v
 	return s
 }
 
-// SetEncodingType sets the EncodingType ***REMOVED***eld's value.
+// SetEncodingType sets the EncodingType field's value.
 func (s *ListObjectsV2Output) SetEncodingType(v string) *ListObjectsV2Output {
 	s.EncodingType = &v
 	return s
 }
 
-// SetIsTruncated sets the IsTruncated ***REMOVED***eld's value.
+// SetIsTruncated sets the IsTruncated field's value.
 func (s *ListObjectsV2Output) SetIsTruncated(v bool) *ListObjectsV2Output {
 	s.IsTruncated = &v
 	return s
 }
 
-// SetKeyCount sets the KeyCount ***REMOVED***eld's value.
+// SetKeyCount sets the KeyCount field's value.
 func (s *ListObjectsV2Output) SetKeyCount(v int64) *ListObjectsV2Output {
 	s.KeyCount = &v
 	return s
 }
 
-// SetMaxKeys sets the MaxKeys ***REMOVED***eld's value.
+// SetMaxKeys sets the MaxKeys field's value.
 func (s *ListObjectsV2Output) SetMaxKeys(v int64) *ListObjectsV2Output {
 	s.MaxKeys = &v
 	return s
 }
 
-// SetName sets the Name ***REMOVED***eld's value.
+// SetName sets the Name field's value.
 func (s *ListObjectsV2Output) SetName(v string) *ListObjectsV2Output {
 	s.Name = &v
 	return s
 }
 
-// SetNextContinuationToken sets the NextContinuationToken ***REMOVED***eld's value.
+// SetNextContinuationToken sets the NextContinuationToken field's value.
 func (s *ListObjectsV2Output) SetNextContinuationToken(v string) *ListObjectsV2Output {
 	s.NextContinuationToken = &v
 	return s
 }
 
-// SetPre***REMOVED***x sets the Pre***REMOVED***x ***REMOVED***eld's value.
-func (s *ListObjectsV2Output) SetPre***REMOVED***x(v string) *ListObjectsV2Output {
-	s.Pre***REMOVED***x = &v
+// SetPrefix sets the Prefix field's value.
+func (s *ListObjectsV2Output) SetPrefix(v string) *ListObjectsV2Output {
+	s.Prefix = &v
 	return s
 }
 
-// SetStartAfter sets the StartAfter ***REMOVED***eld's value.
+// SetStartAfter sets the StartAfter field's value.
 func (s *ListObjectsV2Output) SetStartAfter(v string) *ListObjectsV2Output {
 	s.StartAfter = &v
 	return s
@@ -16999,20 +16999,20 @@ func (s *ListObjectsV2Output) SetStartAfter(v string) *ListObjectsV2Output {
 type ListPartsInput struct {
 	_ struct{} `locationName:"ListPartsRequest" type:"structure"`
 
-	// Bucket is a required ***REMOVED***eld
+	// Bucket is a required field
 	Bucket *string `location:"uri" locationName:"Bucket" type:"string" required:"true"`
 
-	// Key is a required ***REMOVED***eld
+	// Key is a required field
 	Key *string `location:"uri" locationName:"Key" min:"1" type:"string" required:"true"`
 
 	// Sets the maximum number of parts to return.
 	MaxParts *int64 `location:"querystring" locationName:"max-parts" type:"integer"`
 
-	// Speci***REMOVED***es the part after which listing should begin. Only parts with higher
+	// Specifies the part after which listing should begin. Only parts with higher
 	// part numbers will be listed.
 	PartNumberMarker *int64 `location:"querystring" locationName:"part-number-marker" type:"integer"`
 
-	// Con***REMOVED***rms that the requester knows that she or he will be charged for the
+	// Confirms that the requester knows that she or he will be charged for the
 	// request. Bucket owners need not specify this parameter in their requests.
 	// Documentation on downloading objects from requester pays buckets can be found
 	// at http://docs.aws.amazon.com/AmazonS3/latest/dev/ObjectsinRequesterPaysBuckets.html
@@ -17020,7 +17020,7 @@ type ListPartsInput struct {
 
 	// Upload ID identifying the multipart upload whose parts are being listed.
 	//
-	// UploadId is a required ***REMOVED***eld
+	// UploadId is a required field
 	UploadId *string `location:"querystring" locationName:"uploadId" type:"string" required:"true"`
 }
 
@@ -17034,7 +17034,7 @@ func (s ListPartsInput) GoString() string {
 	return s.String()
 }
 
-// Validate inspects the ***REMOVED***elds of the type to determine if they are valid.
+// Validate inspects the fields of the type to determine if they are valid.
 func (s *ListPartsInput) Validate() error {
 	invalidParams := request.ErrInvalidParams{Context: "ListPartsInput"}
 	if s.Bucket == nil {
@@ -17059,7 +17059,7 @@ func (s *ListPartsInput) Validate() error {
 	return nil
 }
 
-// SetBucket sets the Bucket ***REMOVED***eld's value.
+// SetBucket sets the Bucket field's value.
 func (s *ListPartsInput) SetBucket(v string) *ListPartsInput {
 	s.Bucket = &v
 	return s
@@ -17072,31 +17072,31 @@ func (s *ListPartsInput) getBucket() (v string) {
 	return *s.Bucket
 }
 
-// SetKey sets the Key ***REMOVED***eld's value.
+// SetKey sets the Key field's value.
 func (s *ListPartsInput) SetKey(v string) *ListPartsInput {
 	s.Key = &v
 	return s
 }
 
-// SetMaxParts sets the MaxParts ***REMOVED***eld's value.
+// SetMaxParts sets the MaxParts field's value.
 func (s *ListPartsInput) SetMaxParts(v int64) *ListPartsInput {
 	s.MaxParts = &v
 	return s
 }
 
-// SetPartNumberMarker sets the PartNumberMarker ***REMOVED***eld's value.
+// SetPartNumberMarker sets the PartNumberMarker field's value.
 func (s *ListPartsInput) SetPartNumberMarker(v int64) *ListPartsInput {
 	s.PartNumberMarker = &v
 	return s
 }
 
-// SetRequestPayer sets the RequestPayer ***REMOVED***eld's value.
+// SetRequestPayer sets the RequestPayer field's value.
 func (s *ListPartsInput) SetRequestPayer(v string) *ListPartsInput {
 	s.RequestPayer = &v
 	return s
 }
 
-// SetUploadId sets the UploadId ***REMOVED***eld's value.
+// SetUploadId sets the UploadId field's value.
 func (s *ListPartsInput) SetUploadId(v string) *ListPartsInput {
 	s.UploadId = &v
 	return s
@@ -17115,7 +17115,7 @@ type ListPartsOutput struct {
 	// Name of the bucket to which the multipart upload was initiated.
 	Bucket *string `type:"string"`
 
-	// Identi***REMOVED***es who initiated the multipart upload.
+	// Identifies who initiated the multipart upload.
 	Initiator *Initiator `type:"structure"`
 
 	// Indicates whether the returned list of parts is truncated.
@@ -17127,7 +17127,7 @@ type ListPartsOutput struct {
 	// Maximum number of parts that were allowed in the response.
 	MaxParts *int64 `type:"integer"`
 
-	// When a list is truncated, this element speci***REMOVED***es the last part in the list,
+	// When a list is truncated, this element specifies the last part in the list,
 	// as well as the value to use for the part-number-marker request parameter
 	// in a subsequent request.
 	NextPartNumberMarker *int64 `type:"integer"`
@@ -17160,19 +17160,19 @@ func (s ListPartsOutput) GoString() string {
 	return s.String()
 }
 
-// SetAbortDate sets the AbortDate ***REMOVED***eld's value.
+// SetAbortDate sets the AbortDate field's value.
 func (s *ListPartsOutput) SetAbortDate(v time.Time) *ListPartsOutput {
 	s.AbortDate = &v
 	return s
 }
 
-// SetAbortRuleId sets the AbortRuleId ***REMOVED***eld's value.
+// SetAbortRuleId sets the AbortRuleId field's value.
 func (s *ListPartsOutput) SetAbortRuleId(v string) *ListPartsOutput {
 	s.AbortRuleId = &v
 	return s
 }
 
-// SetBucket sets the Bucket ***REMOVED***eld's value.
+// SetBucket sets the Bucket field's value.
 func (s *ListPartsOutput) SetBucket(v string) *ListPartsOutput {
 	s.Bucket = &v
 	return s
@@ -17185,67 +17185,67 @@ func (s *ListPartsOutput) getBucket() (v string) {
 	return *s.Bucket
 }
 
-// SetInitiator sets the Initiator ***REMOVED***eld's value.
+// SetInitiator sets the Initiator field's value.
 func (s *ListPartsOutput) SetInitiator(v *Initiator) *ListPartsOutput {
 	s.Initiator = v
 	return s
 }
 
-// SetIsTruncated sets the IsTruncated ***REMOVED***eld's value.
+// SetIsTruncated sets the IsTruncated field's value.
 func (s *ListPartsOutput) SetIsTruncated(v bool) *ListPartsOutput {
 	s.IsTruncated = &v
 	return s
 }
 
-// SetKey sets the Key ***REMOVED***eld's value.
+// SetKey sets the Key field's value.
 func (s *ListPartsOutput) SetKey(v string) *ListPartsOutput {
 	s.Key = &v
 	return s
 }
 
-// SetMaxParts sets the MaxParts ***REMOVED***eld's value.
+// SetMaxParts sets the MaxParts field's value.
 func (s *ListPartsOutput) SetMaxParts(v int64) *ListPartsOutput {
 	s.MaxParts = &v
 	return s
 }
 
-// SetNextPartNumberMarker sets the NextPartNumberMarker ***REMOVED***eld's value.
+// SetNextPartNumberMarker sets the NextPartNumberMarker field's value.
 func (s *ListPartsOutput) SetNextPartNumberMarker(v int64) *ListPartsOutput {
 	s.NextPartNumberMarker = &v
 	return s
 }
 
-// SetOwner sets the Owner ***REMOVED***eld's value.
+// SetOwner sets the Owner field's value.
 func (s *ListPartsOutput) SetOwner(v *Owner) *ListPartsOutput {
 	s.Owner = v
 	return s
 }
 
-// SetPartNumberMarker sets the PartNumberMarker ***REMOVED***eld's value.
+// SetPartNumberMarker sets the PartNumberMarker field's value.
 func (s *ListPartsOutput) SetPartNumberMarker(v int64) *ListPartsOutput {
 	s.PartNumberMarker = &v
 	return s
 }
 
-// SetParts sets the Parts ***REMOVED***eld's value.
+// SetParts sets the Parts field's value.
 func (s *ListPartsOutput) SetParts(v []*Part) *ListPartsOutput {
 	s.Parts = v
 	return s
 }
 
-// SetRequestCharged sets the RequestCharged ***REMOVED***eld's value.
+// SetRequestCharged sets the RequestCharged field's value.
 func (s *ListPartsOutput) SetRequestCharged(v string) *ListPartsOutput {
 	s.RequestCharged = &v
 	return s
 }
 
-// SetStorageClass sets the StorageClass ***REMOVED***eld's value.
+// SetStorageClass sets the StorageClass field's value.
 func (s *ListPartsOutput) SetStorageClass(v string) *ListPartsOutput {
 	s.StorageClass = &v
 	return s
 }
 
-// SetUploadId sets the UploadId ***REMOVED***eld's value.
+// SetUploadId sets the UploadId field's value.
 func (s *ListPartsOutput) SetUploadId(v string) *ListPartsOutput {
 	s.UploadId = &v
 	return s
@@ -17260,7 +17260,7 @@ type Location struct {
 
 	// The name of the bucket where the restore results will be placed.
 	//
-	// BucketName is a required ***REMOVED***eld
+	// BucketName is a required field
 	BucketName *string `type:"string" required:"true"`
 
 	// The canned ACL to apply to the restore results.
@@ -17270,10 +17270,10 @@ type Location struct {
 	// results.
 	Encryption *Encryption `type:"structure"`
 
-	// The pre***REMOVED***x that is prepended to the restore results for this request.
+	// The prefix that is prepended to the restore results for this request.
 	//
-	// Pre***REMOVED***x is a required ***REMOVED***eld
-	Pre***REMOVED***x *string `type:"string" required:"true"`
+	// Prefix is a required field
+	Prefix *string `type:"string" required:"true"`
 
 	// The class of storage used to store the restore results.
 	StorageClass *string `type:"string" enum:"StorageClass"`
@@ -17295,14 +17295,14 @@ func (s Location) GoString() string {
 	return s.String()
 }
 
-// Validate inspects the ***REMOVED***elds of the type to determine if they are valid.
+// Validate inspects the fields of the type to determine if they are valid.
 func (s *Location) Validate() error {
 	invalidParams := request.ErrInvalidParams{Context: "Location"}
 	if s.BucketName == nil {
 		invalidParams.Add(request.NewErrParamRequired("BucketName"))
 	}
-	if s.Pre***REMOVED***x == nil {
-		invalidParams.Add(request.NewErrParamRequired("Pre***REMOVED***x"))
+	if s.Prefix == nil {
+		invalidParams.Add(request.NewErrParamRequired("Prefix"))
 	}
 	if s.AccessControlList != nil {
 		for i, v := range s.AccessControlList {
@@ -17331,79 +17331,79 @@ func (s *Location) Validate() error {
 	return nil
 }
 
-// SetAccessControlList sets the AccessControlList ***REMOVED***eld's value.
+// SetAccessControlList sets the AccessControlList field's value.
 func (s *Location) SetAccessControlList(v []*Grant) *Location {
 	s.AccessControlList = v
 	return s
 }
 
-// SetBucketName sets the BucketName ***REMOVED***eld's value.
+// SetBucketName sets the BucketName field's value.
 func (s *Location) SetBucketName(v string) *Location {
 	s.BucketName = &v
 	return s
 }
 
-// SetCannedACL sets the CannedACL ***REMOVED***eld's value.
+// SetCannedACL sets the CannedACL field's value.
 func (s *Location) SetCannedACL(v string) *Location {
 	s.CannedACL = &v
 	return s
 }
 
-// SetEncryption sets the Encryption ***REMOVED***eld's value.
+// SetEncryption sets the Encryption field's value.
 func (s *Location) SetEncryption(v *Encryption) *Location {
 	s.Encryption = v
 	return s
 }
 
-// SetPre***REMOVED***x sets the Pre***REMOVED***x ***REMOVED***eld's value.
-func (s *Location) SetPre***REMOVED***x(v string) *Location {
-	s.Pre***REMOVED***x = &v
+// SetPrefix sets the Prefix field's value.
+func (s *Location) SetPrefix(v string) *Location {
+	s.Prefix = &v
 	return s
 }
 
-// SetStorageClass sets the StorageClass ***REMOVED***eld's value.
+// SetStorageClass sets the StorageClass field's value.
 func (s *Location) SetStorageClass(v string) *Location {
 	s.StorageClass = &v
 	return s
 }
 
-// SetTagging sets the Tagging ***REMOVED***eld's value.
+// SetTagging sets the Tagging field's value.
 func (s *Location) SetTagging(v *Tagging) *Location {
 	s.Tagging = v
 	return s
 }
 
-// SetUserMetadata sets the UserMetadata ***REMOVED***eld's value.
+// SetUserMetadata sets the UserMetadata field's value.
 func (s *Location) SetUserMetadata(v []*MetadataEntry) *Location {
 	s.UserMetadata = v
 	return s
 }
 
-// Describes where logs are stored and the pre***REMOVED***x that Amazon S3 assigns to
+// Describes where logs are stored and the prefix that Amazon S3 assigns to
 // all log object keys for a bucket. For more information, see PUT Bucket logging
 // (https://docs.aws.amazon.com/AmazonS3/latest/API/RESTBucketPUTlogging.html)
 // in the Amazon Simple Storage Service API Reference.
 type LoggingEnabled struct {
 	_ struct{} `type:"structure"`
 
-	// Speci***REMOVED***es the bucket where you want Amazon S3 to store server access logs.
+	// Specifies the bucket where you want Amazon S3 to store server access logs.
 	// You can have your logs delivered to any bucket that you own, including the
-	// same bucket that is being logged. You can also con***REMOVED***gure multiple buckets
+	// same bucket that is being logged. You can also configure multiple buckets
 	// to deliver their logs to the same target bucket. In this case you should
-	// choose a different TargetPre***REMOVED***x for each source bucket so that the delivered
-	// log ***REMOVED***les can be distinguished by key.
+	// choose a different TargetPrefix for each source bucket so that the delivered
+	// log files can be distinguished by key.
 	//
-	// TargetBucket is a required ***REMOVED***eld
+	// TargetBucket is a required field
 	TargetBucket *string `type:"string" required:"true"`
 
 	TargetGrants []*TargetGrant `locationNameList:"Grant" type:"list"`
 
-	// A pre***REMOVED***x for all log object keys. If you store log ***REMOVED***les from multiple Amazon
-	// S3 buckets in a single bucket, you can use a pre***REMOVED***x to distinguish which
-	// log ***REMOVED***les came from which bucket.
+	// A prefix for all log object keys. If you store log files from multiple Amazon
+	// S3 buckets in a single bucket, you can use a prefix to distinguish which
+	// log files came from which bucket.
 	//
-	// TargetPre***REMOVED***x is a required ***REMOVED***eld
-	TargetPre***REMOVED***x *string `type:"string" required:"true"`
+	// TargetPrefix is a required field
+	TargetPrefix *string `type:"string" required:"true"`
 }
 
 // String returns the string representation
@@ -17416,14 +17416,14 @@ func (s LoggingEnabled) GoString() string {
 	return s.String()
 }
 
-// Validate inspects the ***REMOVED***elds of the type to determine if they are valid.
+// Validate inspects the fields of the type to determine if they are valid.
 func (s *LoggingEnabled) Validate() error {
 	invalidParams := request.ErrInvalidParams{Context: "LoggingEnabled"}
 	if s.TargetBucket == nil {
 		invalidParams.Add(request.NewErrParamRequired("TargetBucket"))
 	}
-	if s.TargetPre***REMOVED***x == nil {
-		invalidParams.Add(request.NewErrParamRequired("TargetPre***REMOVED***x"))
+	if s.TargetPrefix == nil {
+		invalidParams.Add(request.NewErrParamRequired("TargetPrefix"))
 	}
 	if s.TargetGrants != nil {
 		for i, v := range s.TargetGrants {
@@ -17442,21 +17442,21 @@ func (s *LoggingEnabled) Validate() error {
 	return nil
 }
 
-// SetTargetBucket sets the TargetBucket ***REMOVED***eld's value.
+// SetTargetBucket sets the TargetBucket field's value.
 func (s *LoggingEnabled) SetTargetBucket(v string) *LoggingEnabled {
 	s.TargetBucket = &v
 	return s
 }
 
-// SetTargetGrants sets the TargetGrants ***REMOVED***eld's value.
+// SetTargetGrants sets the TargetGrants field's value.
 func (s *LoggingEnabled) SetTargetGrants(v []*TargetGrant) *LoggingEnabled {
 	s.TargetGrants = v
 	return s
 }
 
-// SetTargetPre***REMOVED***x sets the TargetPre***REMOVED***x ***REMOVED***eld's value.
-func (s *LoggingEnabled) SetTargetPre***REMOVED***x(v string) *LoggingEnabled {
-	s.TargetPre***REMOVED***x = &v
+// SetTargetPrefix sets the TargetPrefix field's value.
+func (s *LoggingEnabled) SetTargetPrefix(v string) *LoggingEnabled {
+	s.TargetPrefix = &v
 	return s
 }
 
@@ -17479,13 +17479,13 @@ func (s MetadataEntry) GoString() string {
 	return s.String()
 }
 
-// SetName sets the Name ***REMOVED***eld's value.
+// SetName sets the Name field's value.
 func (s *MetadataEntry) SetName(v string) *MetadataEntry {
 	s.Name = &v
 	return s
 }
 
-// SetValue sets the Value ***REMOVED***eld's value.
+// SetValue sets the Value field's value.
 func (s *MetadataEntry) SetValue(v string) *MetadataEntry {
 	s.Value = &v
 	return s
@@ -17494,8 +17494,8 @@ func (s *MetadataEntry) SetValue(v string) *MetadataEntry {
 type MetricsAndOperator struct {
 	_ struct{} `type:"structure"`
 
-	// The pre***REMOVED***x used when evaluating an AND predicate.
-	Pre***REMOVED***x *string `type:"string"`
+	// The prefix used when evaluating an AND predicate.
+	Prefix *string `type:"string"`
 
 	// The list of tags used when evaluating an AND predicate.
 	Tags []*Tag `locationName:"Tag" locationNameList:"Tag" type:"list" flattened:"true"`
@@ -17511,7 +17511,7 @@ func (s MetricsAndOperator) GoString() string {
 	return s.String()
 }
 
-// Validate inspects the ***REMOVED***elds of the type to determine if they are valid.
+// Validate inspects the fields of the type to determine if they are valid.
 func (s *MetricsAndOperator) Validate() error {
 	invalidParams := request.ErrInvalidParams{Context: "MetricsAndOperator"}
 	if s.Tags != nil {
@@ -17531,52 +17531,52 @@ func (s *MetricsAndOperator) Validate() error {
 	return nil
 }
 
-// SetPre***REMOVED***x sets the Pre***REMOVED***x ***REMOVED***eld's value.
-func (s *MetricsAndOperator) SetPre***REMOVED***x(v string) *MetricsAndOperator {
-	s.Pre***REMOVED***x = &v
+// SetPrefix sets the Prefix field's value.
+func (s *MetricsAndOperator) SetPrefix(v string) *MetricsAndOperator {
+	s.Prefix = &v
 	return s
 }
 
-// SetTags sets the Tags ***REMOVED***eld's value.
+// SetTags sets the Tags field's value.
 func (s *MetricsAndOperator) SetTags(v []*Tag) *MetricsAndOperator {
 	s.Tags = v
 	return s
 }
 
-// Speci***REMOVED***es a metrics con***REMOVED***guration for the CloudWatch request metrics (speci***REMOVED***ed
-// by the metrics con***REMOVED***guration ID) from an Amazon S3 bucket. If you're updating
-// an existing metrics con***REMOVED***guration, note that this is a full replacement of
-// the existing metrics con***REMOVED***guration. If you don't include the elements you
+// Specifies a metrics configuration for the CloudWatch request metrics (specified
+// by the metrics configuration ID) from an Amazon S3 bucket. If you're updating
+// an existing metrics configuration, note that this is a full replacement of
+// the existing metrics configuration. If you don't include the elements you
 // want to keep, they are erased. For more information, see PUT Bucket metrics
-// (https://docs.aws.amazon.com/AmazonS3/latest/API/RESTBucketPUTMetricCon***REMOVED***guration.html)
+// (https://docs.aws.amazon.com/AmazonS3/latest/API/RESTBucketPUTMetricConfiguration.html)
 // in the Amazon Simple Storage Service API Reference.
-type MetricsCon***REMOVED***guration struct {
+type MetricsConfiguration struct {
 	_ struct{} `type:"structure"`
 
-	// Speci***REMOVED***es a metrics con***REMOVED***guration ***REMOVED***lter. The metrics con***REMOVED***guration will
-	// only include objects that meet the ***REMOVED***lter's criteria. A ***REMOVED***lter must be a
-	// pre***REMOVED***x, a tag, or a conjunction (MetricsAndOperator).
+	// Specifies a metrics configuration filter. The metrics configuration will
+	// only include objects that meet the filter's criteria. A filter must be a
+	// prefix, a tag, or a conjunction (MetricsAndOperator).
 	Filter *MetricsFilter `type:"structure"`
 
-	// The ID used to identify the metrics con***REMOVED***guration.
+	// The ID used to identify the metrics configuration.
 	//
-	// Id is a required ***REMOVED***eld
+	// Id is a required field
 	Id *string `type:"string" required:"true"`
 }
 
 // String returns the string representation
-func (s MetricsCon***REMOVED***guration) String() string {
+func (s MetricsConfiguration) String() string {
 	return awsutil.Prettify(s)
 }
 
 // GoString returns the string representation
-func (s MetricsCon***REMOVED***guration) GoString() string {
+func (s MetricsConfiguration) GoString() string {
 	return s.String()
 }
 
-// Validate inspects the ***REMOVED***elds of the type to determine if they are valid.
-func (s *MetricsCon***REMOVED***guration) Validate() error {
-	invalidParams := request.ErrInvalidParams{Context: "MetricsCon***REMOVED***guration"}
+// Validate inspects the fields of the type to determine if they are valid.
+func (s *MetricsConfiguration) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "MetricsConfiguration"}
 	if s.Id == nil {
 		invalidParams.Add(request.NewErrParamRequired("Id"))
 	}
@@ -17592,14 +17592,14 @@ func (s *MetricsCon***REMOVED***guration) Validate() error {
 	return nil
 }
 
-// SetFilter sets the Filter ***REMOVED***eld's value.
-func (s *MetricsCon***REMOVED***guration) SetFilter(v *MetricsFilter) *MetricsCon***REMOVED***guration {
+// SetFilter sets the Filter field's value.
+func (s *MetricsConfiguration) SetFilter(v *MetricsFilter) *MetricsConfiguration {
 	s.Filter = v
 	return s
 }
 
-// SetId sets the Id ***REMOVED***eld's value.
-func (s *MetricsCon***REMOVED***guration) SetId(v string) *MetricsCon***REMOVED***guration {
+// SetId sets the Id field's value.
+func (s *MetricsConfiguration) SetId(v string) *MetricsConfiguration {
 	s.Id = &v
 	return s
 }
@@ -17608,14 +17608,14 @@ type MetricsFilter struct {
 	_ struct{} `type:"structure"`
 
 	// A conjunction (logical AND) of predicates, which is used in evaluating a
-	// metrics ***REMOVED***lter. The operator must have at least two predicates, and an object
-	// must match all of the predicates in order for the ***REMOVED***lter to apply.
+	// metrics filter. The operator must have at least two predicates, and an object
+	// must match all of the predicates in order for the filter to apply.
 	And *MetricsAndOperator `type:"structure"`
 
-	// The pre***REMOVED***x used when evaluating a metrics ***REMOVED***lter.
-	Pre***REMOVED***x *string `type:"string"`
+	// The prefix used when evaluating a metrics filter.
+	Prefix *string `type:"string"`
 
-	// The tag used when evaluating a metrics ***REMOVED***lter.
+	// The tag used when evaluating a metrics filter.
 	Tag *Tag `type:"structure"`
 }
 
@@ -17629,7 +17629,7 @@ func (s MetricsFilter) GoString() string {
 	return s.String()
 }
 
-// Validate inspects the ***REMOVED***elds of the type to determine if they are valid.
+// Validate inspects the fields of the type to determine if they are valid.
 func (s *MetricsFilter) Validate() error {
 	invalidParams := request.ErrInvalidParams{Context: "MetricsFilter"}
 	if s.And != nil {
@@ -17649,19 +17649,19 @@ func (s *MetricsFilter) Validate() error {
 	return nil
 }
 
-// SetAnd sets the And ***REMOVED***eld's value.
+// SetAnd sets the And field's value.
 func (s *MetricsFilter) SetAnd(v *MetricsAndOperator) *MetricsFilter {
 	s.And = v
 	return s
 }
 
-// SetPre***REMOVED***x sets the Pre***REMOVED***x ***REMOVED***eld's value.
-func (s *MetricsFilter) SetPre***REMOVED***x(v string) *MetricsFilter {
-	s.Pre***REMOVED***x = &v
+// SetPrefix sets the Prefix field's value.
+func (s *MetricsFilter) SetPrefix(v string) *MetricsFilter {
+	s.Prefix = &v
 	return s
 }
 
-// SetTag sets the Tag ***REMOVED***eld's value.
+// SetTag sets the Tag field's value.
 func (s *MetricsFilter) SetTag(v *Tag) *MetricsFilter {
 	s.Tag = v
 	return s
@@ -17673,7 +17673,7 @@ type MultipartUpload struct {
 	// Date and time at which the multipart upload was initiated.
 	Initiated *time.Time `type:"timestamp"`
 
-	// Identi***REMOVED***es who initiated the multipart upload.
+	// Identifies who initiated the multipart upload.
 	Initiator *Initiator `type:"structure"`
 
 	// Key of the object for which the multipart upload was initiated.
@@ -17684,7 +17684,7 @@ type MultipartUpload struct {
 	// The class of storage used to store the object.
 	StorageClass *string `type:"string" enum:"StorageClass"`
 
-	// Upload ID that identi***REMOVED***es the multipart upload.
+	// Upload ID that identifies the multipart upload.
 	UploadId *string `type:"string"`
 }
 
@@ -17698,51 +17698,51 @@ func (s MultipartUpload) GoString() string {
 	return s.String()
 }
 
-// SetInitiated sets the Initiated ***REMOVED***eld's value.
+// SetInitiated sets the Initiated field's value.
 func (s *MultipartUpload) SetInitiated(v time.Time) *MultipartUpload {
 	s.Initiated = &v
 	return s
 }
 
-// SetInitiator sets the Initiator ***REMOVED***eld's value.
+// SetInitiator sets the Initiator field's value.
 func (s *MultipartUpload) SetInitiator(v *Initiator) *MultipartUpload {
 	s.Initiator = v
 	return s
 }
 
-// SetKey sets the Key ***REMOVED***eld's value.
+// SetKey sets the Key field's value.
 func (s *MultipartUpload) SetKey(v string) *MultipartUpload {
 	s.Key = &v
 	return s
 }
 
-// SetOwner sets the Owner ***REMOVED***eld's value.
+// SetOwner sets the Owner field's value.
 func (s *MultipartUpload) SetOwner(v *Owner) *MultipartUpload {
 	s.Owner = v
 	return s
 }
 
-// SetStorageClass sets the StorageClass ***REMOVED***eld's value.
+// SetStorageClass sets the StorageClass field's value.
 func (s *MultipartUpload) SetStorageClass(v string) *MultipartUpload {
 	s.StorageClass = &v
 	return s
 }
 
-// SetUploadId sets the UploadId ***REMOVED***eld's value.
+// SetUploadId sets the UploadId field's value.
 func (s *MultipartUpload) SetUploadId(v string) *MultipartUpload {
 	s.UploadId = &v
 	return s
 }
 
-// Speci***REMOVED***es when noncurrent object versions expire. Upon expiration, Amazon
+// Specifies when noncurrent object versions expire. Upon expiration, Amazon
 // S3 permanently deletes the noncurrent object versions. You set this lifecycle
-// con***REMOVED***guration action on a bucket that has versioning enabled (or suspended)
-// to request that Amazon S3 delete noncurrent object versions at a speci***REMOVED***c
+// configuration action on a bucket that has versioning enabled (or suspended)
+// to request that Amazon S3 delete noncurrent object versions at a specific
 // period in the object's lifetime.
 type NoncurrentVersionExpiration struct {
 	_ struct{} `type:"structure"`
 
-	// Speci***REMOVED***es the number of days an object is noncurrent before Amazon S3 can
+	// Specifies the number of days an object is noncurrent before Amazon S3 can
 	// perform the associated action. For information about the noncurrent days
 	// calculations, see How Amazon S3 Calculates When an Object Became Noncurrent
 	// (https://docs.aws.amazon.com/AmazonS3/latest/dev/intro-lifecycle-rules.html#non-current-days-calculations)
@@ -17760,7 +17760,7 @@ func (s NoncurrentVersionExpiration) GoString() string {
 	return s.String()
 }
 
-// SetNoncurrentDays sets the NoncurrentDays ***REMOVED***eld's value.
+// SetNoncurrentDays sets the NoncurrentDays field's value.
 func (s *NoncurrentVersionExpiration) SetNoncurrentDays(v int64) *NoncurrentVersionExpiration {
 	s.NoncurrentDays = &v
 	return s
@@ -17771,12 +17771,12 @@ func (s *NoncurrentVersionExpiration) SetNoncurrentDays(v int64) *NoncurrentVers
 // or DEEP_ARCHIVE storage class. If your bucket is versioning-enabled (or versioning
 // is suspended), you can set this action to request that Amazon S3 transition
 // noncurrent object versions to the STANDARD_IA, ONEZONE_IA, INTELLIGENT_TIERING,
-// GLACIER, or DEEP_ARCHIVE storage class at a speci***REMOVED***c period in the object's
+// GLACIER, or DEEP_ARCHIVE storage class at a specific period in the object's
 // lifetime.
 type NoncurrentVersionTransition struct {
 	_ struct{} `type:"structure"`
 
-	// Speci***REMOVED***es the number of days an object is noncurrent before Amazon S3 can
+	// Specifies the number of days an object is noncurrent before Amazon S3 can
 	// perform the associated action. For information about the noncurrent days
 	// calculations, see How Amazon S3 Calculates When an Object Became Noncurrent
 	// (https://docs.aws.amazon.com/AmazonS3/latest/dev/s3-access-control.html)
@@ -17797,76 +17797,76 @@ func (s NoncurrentVersionTransition) GoString() string {
 	return s.String()
 }
 
-// SetNoncurrentDays sets the NoncurrentDays ***REMOVED***eld's value.
+// SetNoncurrentDays sets the NoncurrentDays field's value.
 func (s *NoncurrentVersionTransition) SetNoncurrentDays(v int64) *NoncurrentVersionTransition {
 	s.NoncurrentDays = &v
 	return s
 }
 
-// SetStorageClass sets the StorageClass ***REMOVED***eld's value.
+// SetStorageClass sets the StorageClass field's value.
 func (s *NoncurrentVersionTransition) SetStorageClass(v string) *NoncurrentVersionTransition {
 	s.StorageClass = &v
 	return s
 }
 
-// A container for specifying the noti***REMOVED***cation con***REMOVED***guration of the bucket.
-// If this element is empty, noti***REMOVED***cations are turned off for the bucket.
-type Noti***REMOVED***cationCon***REMOVED***guration struct {
+// A container for specifying the notification configuration of the bucket.
+// If this element is empty, notifications are turned off for the bucket.
+type NotificationConfiguration struct {
 	_ struct{} `type:"structure"`
 
 	// Describes the AWS Lambda functions to invoke and the events for which to
 	// invoke them.
-	LambdaFunctionCon***REMOVED***gurations []*LambdaFunctionCon***REMOVED***guration `locationName:"CloudFunctionCon***REMOVED***guration" type:"list" flattened:"true"`
+	LambdaFunctionConfigurations []*LambdaFunctionConfiguration `locationName:"CloudFunctionConfiguration" type:"list" flattened:"true"`
 
 	// The Amazon Simple Queue Service queues to publish messages to and the events
 	// for which to publish messages.
-	QueueCon***REMOVED***gurations []*QueueCon***REMOVED***guration `locationName:"QueueCon***REMOVED***guration" type:"list" flattened:"true"`
+	QueueConfigurations []*QueueConfiguration `locationName:"QueueConfiguration" type:"list" flattened:"true"`
 
-	// The topic to which noti***REMOVED***cations are sent and the events for which noti***REMOVED***cations
+	// The topic to which notifications are sent and the events for which notifications
 	// are generated.
-	TopicCon***REMOVED***gurations []*TopicCon***REMOVED***guration `locationName:"TopicCon***REMOVED***guration" type:"list" flattened:"true"`
+	TopicConfigurations []*TopicConfiguration `locationName:"TopicConfiguration" type:"list" flattened:"true"`
 }
 
 // String returns the string representation
-func (s Noti***REMOVED***cationCon***REMOVED***guration) String() string {
+func (s NotificationConfiguration) String() string {
 	return awsutil.Prettify(s)
 }
 
 // GoString returns the string representation
-func (s Noti***REMOVED***cationCon***REMOVED***guration) GoString() string {
+func (s NotificationConfiguration) GoString() string {
 	return s.String()
 }
 
-// Validate inspects the ***REMOVED***elds of the type to determine if they are valid.
-func (s *Noti***REMOVED***cationCon***REMOVED***guration) Validate() error {
-	invalidParams := request.ErrInvalidParams{Context: "Noti***REMOVED***cationCon***REMOVED***guration"}
-	if s.LambdaFunctionCon***REMOVED***gurations != nil {
-		for i, v := range s.LambdaFunctionCon***REMOVED***gurations {
+// Validate inspects the fields of the type to determine if they are valid.
+func (s *NotificationConfiguration) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "NotificationConfiguration"}
+	if s.LambdaFunctionConfigurations != nil {
+		for i, v := range s.LambdaFunctionConfigurations {
 			if v == nil {
 				continue
 			}
 			if err := v.Validate(); err != nil {
-				invalidParams.AddNested(fmt.Sprintf("%s[%v]", "LambdaFunctionCon***REMOVED***gurations", i), err.(request.ErrInvalidParams))
+				invalidParams.AddNested(fmt.Sprintf("%s[%v]", "LambdaFunctionConfigurations", i), err.(request.ErrInvalidParams))
 			}
 		}
 	}
-	if s.QueueCon***REMOVED***gurations != nil {
-		for i, v := range s.QueueCon***REMOVED***gurations {
+	if s.QueueConfigurations != nil {
+		for i, v := range s.QueueConfigurations {
 			if v == nil {
 				continue
 			}
 			if err := v.Validate(); err != nil {
-				invalidParams.AddNested(fmt.Sprintf("%s[%v]", "QueueCon***REMOVED***gurations", i), err.(request.ErrInvalidParams))
+				invalidParams.AddNested(fmt.Sprintf("%s[%v]", "QueueConfigurations", i), err.(request.ErrInvalidParams))
 			}
 		}
 	}
-	if s.TopicCon***REMOVED***gurations != nil {
-		for i, v := range s.TopicCon***REMOVED***gurations {
+	if s.TopicConfigurations != nil {
+		for i, v := range s.TopicConfigurations {
 			if v == nil {
 				continue
 			}
 			if err := v.Validate(); err != nil {
-				invalidParams.AddNested(fmt.Sprintf("%s[%v]", "TopicCon***REMOVED***gurations", i), err.(request.ErrInvalidParams))
+				invalidParams.AddNested(fmt.Sprintf("%s[%v]", "TopicConfigurations", i), err.(request.ErrInvalidParams))
 			}
 		}
 	}
@@ -17877,84 +17877,84 @@ func (s *Noti***REMOVED***cationCon***REMOVED***guration) Validate() error {
 	return nil
 }
 
-// SetLambdaFunctionCon***REMOVED***gurations sets the LambdaFunctionCon***REMOVED***gurations ***REMOVED***eld's value.
-func (s *Noti***REMOVED***cationCon***REMOVED***guration) SetLambdaFunctionCon***REMOVED***gurations(v []*LambdaFunctionCon***REMOVED***guration) *Noti***REMOVED***cationCon***REMOVED***guration {
-	s.LambdaFunctionCon***REMOVED***gurations = v
+// SetLambdaFunctionConfigurations sets the LambdaFunctionConfigurations field's value.
+func (s *NotificationConfiguration) SetLambdaFunctionConfigurations(v []*LambdaFunctionConfiguration) *NotificationConfiguration {
+	s.LambdaFunctionConfigurations = v
 	return s
 }
 
-// SetQueueCon***REMOVED***gurations sets the QueueCon***REMOVED***gurations ***REMOVED***eld's value.
-func (s *Noti***REMOVED***cationCon***REMOVED***guration) SetQueueCon***REMOVED***gurations(v []*QueueCon***REMOVED***guration) *Noti***REMOVED***cationCon***REMOVED***guration {
-	s.QueueCon***REMOVED***gurations = v
+// SetQueueConfigurations sets the QueueConfigurations field's value.
+func (s *NotificationConfiguration) SetQueueConfigurations(v []*QueueConfiguration) *NotificationConfiguration {
+	s.QueueConfigurations = v
 	return s
 }
 
-// SetTopicCon***REMOVED***gurations sets the TopicCon***REMOVED***gurations ***REMOVED***eld's value.
-func (s *Noti***REMOVED***cationCon***REMOVED***guration) SetTopicCon***REMOVED***gurations(v []*TopicCon***REMOVED***guration) *Noti***REMOVED***cationCon***REMOVED***guration {
-	s.TopicCon***REMOVED***gurations = v
+// SetTopicConfigurations sets the TopicConfigurations field's value.
+func (s *NotificationConfiguration) SetTopicConfigurations(v []*TopicConfiguration) *NotificationConfiguration {
+	s.TopicConfigurations = v
 	return s
 }
 
-type Noti***REMOVED***cationCon***REMOVED***gurationDeprecated struct {
+type NotificationConfigurationDeprecated struct {
 	_ struct{} `type:"structure"`
 
-	CloudFunctionCon***REMOVED***guration *CloudFunctionCon***REMOVED***guration `type:"structure"`
+	CloudFunctionConfiguration *CloudFunctionConfiguration `type:"structure"`
 
-	QueueCon***REMOVED***guration *QueueCon***REMOVED***gurationDeprecated `type:"structure"`
+	QueueConfiguration *QueueConfigurationDeprecated `type:"structure"`
 
-	TopicCon***REMOVED***guration *TopicCon***REMOVED***gurationDeprecated `type:"structure"`
+	TopicConfiguration *TopicConfigurationDeprecated `type:"structure"`
 }
 
 // String returns the string representation
-func (s Noti***REMOVED***cationCon***REMOVED***gurationDeprecated) String() string {
+func (s NotificationConfigurationDeprecated) String() string {
 	return awsutil.Prettify(s)
 }
 
 // GoString returns the string representation
-func (s Noti***REMOVED***cationCon***REMOVED***gurationDeprecated) GoString() string {
+func (s NotificationConfigurationDeprecated) GoString() string {
 	return s.String()
 }
 
-// SetCloudFunctionCon***REMOVED***guration sets the CloudFunctionCon***REMOVED***guration ***REMOVED***eld's value.
-func (s *Noti***REMOVED***cationCon***REMOVED***gurationDeprecated) SetCloudFunctionCon***REMOVED***guration(v *CloudFunctionCon***REMOVED***guration) *Noti***REMOVED***cationCon***REMOVED***gurationDeprecated {
-	s.CloudFunctionCon***REMOVED***guration = v
+// SetCloudFunctionConfiguration sets the CloudFunctionConfiguration field's value.
+func (s *NotificationConfigurationDeprecated) SetCloudFunctionConfiguration(v *CloudFunctionConfiguration) *NotificationConfigurationDeprecated {
+	s.CloudFunctionConfiguration = v
 	return s
 }
 
-// SetQueueCon***REMOVED***guration sets the QueueCon***REMOVED***guration ***REMOVED***eld's value.
-func (s *Noti***REMOVED***cationCon***REMOVED***gurationDeprecated) SetQueueCon***REMOVED***guration(v *QueueCon***REMOVED***gurationDeprecated) *Noti***REMOVED***cationCon***REMOVED***gurationDeprecated {
-	s.QueueCon***REMOVED***guration = v
+// SetQueueConfiguration sets the QueueConfiguration field's value.
+func (s *NotificationConfigurationDeprecated) SetQueueConfiguration(v *QueueConfigurationDeprecated) *NotificationConfigurationDeprecated {
+	s.QueueConfiguration = v
 	return s
 }
 
-// SetTopicCon***REMOVED***guration sets the TopicCon***REMOVED***guration ***REMOVED***eld's value.
-func (s *Noti***REMOVED***cationCon***REMOVED***gurationDeprecated) SetTopicCon***REMOVED***guration(v *TopicCon***REMOVED***gurationDeprecated) *Noti***REMOVED***cationCon***REMOVED***gurationDeprecated {
-	s.TopicCon***REMOVED***guration = v
+// SetTopicConfiguration sets the TopicConfiguration field's value.
+func (s *NotificationConfigurationDeprecated) SetTopicConfiguration(v *TopicConfigurationDeprecated) *NotificationConfigurationDeprecated {
+	s.TopicConfiguration = v
 	return s
 }
 
-// Speci***REMOVED***es object key name ***REMOVED***ltering rules. For information about key name
-// ***REMOVED***ltering, see Con***REMOVED***guring Event Noti***REMOVED***cations (https://docs.aws.amazon.com/AmazonS3/latest/dev/Noti***REMOVED***cationHowTo.html)
+// Specifies object key name filtering rules. For information about key name
+// filtering, see Configuring Event Notifications (https://docs.aws.amazon.com/AmazonS3/latest/dev/NotificationHowTo.html)
 // in the Amazon Simple Storage Service Developer Guide.
-type Noti***REMOVED***cationCon***REMOVED***gurationFilter struct {
+type NotificationConfigurationFilter struct {
 	_ struct{} `type:"structure"`
 
-	// A container for object key name pre***REMOVED***x and suf***REMOVED***x ***REMOVED***ltering rules.
+	// A container for object key name prefix and suffix filtering rules.
 	Key *KeyFilter `locationName:"S3Key" type:"structure"`
 }
 
 // String returns the string representation
-func (s Noti***REMOVED***cationCon***REMOVED***gurationFilter) String() string {
+func (s NotificationConfigurationFilter) String() string {
 	return awsutil.Prettify(s)
 }
 
 // GoString returns the string representation
-func (s Noti***REMOVED***cationCon***REMOVED***gurationFilter) GoString() string {
+func (s NotificationConfigurationFilter) GoString() string {
 	return s.String()
 }
 
-// SetKey sets the Key ***REMOVED***eld's value.
-func (s *Noti***REMOVED***cationCon***REMOVED***gurationFilter) SetKey(v *KeyFilter) *Noti***REMOVED***cationCon***REMOVED***gurationFilter {
+// SetKey sets the Key field's value.
+func (s *NotificationConfigurationFilter) SetKey(v *KeyFilter) *NotificationConfigurationFilter {
 	s.Key = v
 	return s
 }
@@ -17966,7 +17966,7 @@ type Object struct {
 
 	Key *string `min:"1" type:"string"`
 
-	LastModi***REMOVED***ed *time.Time `type:"timestamp"`
+	LastModified *time.Time `type:"timestamp"`
 
 	Owner *Owner `type:"structure"`
 
@@ -17986,67 +17986,67 @@ func (s Object) GoString() string {
 	return s.String()
 }
 
-// SetETag sets the ETag ***REMOVED***eld's value.
+// SetETag sets the ETag field's value.
 func (s *Object) SetETag(v string) *Object {
 	s.ETag = &v
 	return s
 }
 
-// SetKey sets the Key ***REMOVED***eld's value.
+// SetKey sets the Key field's value.
 func (s *Object) SetKey(v string) *Object {
 	s.Key = &v
 	return s
 }
 
-// SetLastModi***REMOVED***ed sets the LastModi***REMOVED***ed ***REMOVED***eld's value.
-func (s *Object) SetLastModi***REMOVED***ed(v time.Time) *Object {
-	s.LastModi***REMOVED***ed = &v
+// SetLastModified sets the LastModified field's value.
+func (s *Object) SetLastModified(v time.Time) *Object {
+	s.LastModified = &v
 	return s
 }
 
-// SetOwner sets the Owner ***REMOVED***eld's value.
+// SetOwner sets the Owner field's value.
 func (s *Object) SetOwner(v *Owner) *Object {
 	s.Owner = v
 	return s
 }
 
-// SetSize sets the Size ***REMOVED***eld's value.
+// SetSize sets the Size field's value.
 func (s *Object) SetSize(v int64) *Object {
 	s.Size = &v
 	return s
 }
 
-// SetStorageClass sets the StorageClass ***REMOVED***eld's value.
+// SetStorageClass sets the StorageClass field's value.
 func (s *Object) SetStorageClass(v string) *Object {
 	s.StorageClass = &v
 	return s
 }
 
-type ObjectIdenti***REMOVED***er struct {
+type ObjectIdentifier struct {
 	_ struct{} `type:"structure"`
 
 	// Key name of the object to delete.
 	//
-	// Key is a required ***REMOVED***eld
+	// Key is a required field
 	Key *string `min:"1" type:"string" required:"true"`
 
-	// VersionId for the speci***REMOVED***c version of the object to delete.
+	// VersionId for the specific version of the object to delete.
 	VersionId *string `type:"string"`
 }
 
 // String returns the string representation
-func (s ObjectIdenti***REMOVED***er) String() string {
+func (s ObjectIdentifier) String() string {
 	return awsutil.Prettify(s)
 }
 
 // GoString returns the string representation
-func (s ObjectIdenti***REMOVED***er) GoString() string {
+func (s ObjectIdentifier) GoString() string {
 	return s.String()
 }
 
-// Validate inspects the ***REMOVED***elds of the type to determine if they are valid.
-func (s *ObjectIdenti***REMOVED***er) Validate() error {
-	invalidParams := request.ErrInvalidParams{Context: "ObjectIdenti***REMOVED***er"}
+// Validate inspects the fields of the type to determine if they are valid.
+func (s *ObjectIdentifier) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "ObjectIdentifier"}
 	if s.Key == nil {
 		invalidParams.Add(request.NewErrParamRequired("Key"))
 	}
@@ -18060,56 +18060,56 @@ func (s *ObjectIdenti***REMOVED***er) Validate() error {
 	return nil
 }
 
-// SetKey sets the Key ***REMOVED***eld's value.
-func (s *ObjectIdenti***REMOVED***er) SetKey(v string) *ObjectIdenti***REMOVED***er {
+// SetKey sets the Key field's value.
+func (s *ObjectIdentifier) SetKey(v string) *ObjectIdentifier {
 	s.Key = &v
 	return s
 }
 
-// SetVersionId sets the VersionId ***REMOVED***eld's value.
-func (s *ObjectIdenti***REMOVED***er) SetVersionId(v string) *ObjectIdenti***REMOVED***er {
+// SetVersionId sets the VersionId field's value.
+func (s *ObjectIdentifier) SetVersionId(v string) *ObjectIdentifier {
 	s.VersionId = &v
 	return s
 }
 
-// The container element for object lock con***REMOVED***guration parameters.
-type ObjectLockCon***REMOVED***guration struct {
+// The container element for object lock configuration parameters.
+type ObjectLockConfiguration struct {
 	_ struct{} `type:"structure"`
 
-	// Indicates whether this bucket has an object lock con***REMOVED***guration enabled.
+	// Indicates whether this bucket has an object lock configuration enabled.
 	ObjectLockEnabled *string `type:"string" enum:"ObjectLockEnabled"`
 
-	// The object lock rule in place for the speci***REMOVED***ed object.
+	// The object lock rule in place for the specified object.
 	Rule *ObjectLockRule `type:"structure"`
 }
 
 // String returns the string representation
-func (s ObjectLockCon***REMOVED***guration) String() string {
+func (s ObjectLockConfiguration) String() string {
 	return awsutil.Prettify(s)
 }
 
 // GoString returns the string representation
-func (s ObjectLockCon***REMOVED***guration) GoString() string {
+func (s ObjectLockConfiguration) GoString() string {
 	return s.String()
 }
 
-// SetObjectLockEnabled sets the ObjectLockEnabled ***REMOVED***eld's value.
-func (s *ObjectLockCon***REMOVED***guration) SetObjectLockEnabled(v string) *ObjectLockCon***REMOVED***guration {
+// SetObjectLockEnabled sets the ObjectLockEnabled field's value.
+func (s *ObjectLockConfiguration) SetObjectLockEnabled(v string) *ObjectLockConfiguration {
 	s.ObjectLockEnabled = &v
 	return s
 }
 
-// SetRule sets the Rule ***REMOVED***eld's value.
-func (s *ObjectLockCon***REMOVED***guration) SetRule(v *ObjectLockRule) *ObjectLockCon***REMOVED***guration {
+// SetRule sets the Rule field's value.
+func (s *ObjectLockConfiguration) SetRule(v *ObjectLockRule) *ObjectLockConfiguration {
 	s.Rule = v
 	return s
 }
 
-// A Legal Hold con***REMOVED***guration for an object.
+// A Legal Hold configuration for an object.
 type ObjectLockLegalHold struct {
 	_ struct{} `type:"structure"`
 
-	// Indicates whether the speci***REMOVED***ed object has a Legal Hold in place.
+	// Indicates whether the specified object has a Legal Hold in place.
 	Status *string `type:"string" enum:"ObjectLockLegalHoldStatus"`
 }
 
@@ -18123,17 +18123,17 @@ func (s ObjectLockLegalHold) GoString() string {
 	return s.String()
 }
 
-// SetStatus sets the Status ***REMOVED***eld's value.
+// SetStatus sets the Status field's value.
 func (s *ObjectLockLegalHold) SetStatus(v string) *ObjectLockLegalHold {
 	s.Status = &v
 	return s
 }
 
-// A Retention con***REMOVED***guration for an object.
+// A Retention configuration for an object.
 type ObjectLockRetention struct {
 	_ struct{} `type:"structure"`
 
-	// Indicates the Retention mode for the speci***REMOVED***ed object.
+	// Indicates the Retention mode for the specified object.
 	Mode *string `type:"string" enum:"ObjectLockRetentionMode"`
 
 	// The date on which this object lock retention expires.
@@ -18150,13 +18150,13 @@ func (s ObjectLockRetention) GoString() string {
 	return s.String()
 }
 
-// SetMode sets the Mode ***REMOVED***eld's value.
+// SetMode sets the Mode field's value.
 func (s *ObjectLockRetention) SetMode(v string) *ObjectLockRetention {
 	s.Mode = &v
 	return s
 }
 
-// SetRetainUntilDate sets the RetainUntilDate ***REMOVED***eld's value.
+// SetRetainUntilDate sets the RetainUntilDate field's value.
 func (s *ObjectLockRetention) SetRetainUntilDate(v time.Time) *ObjectLockRetention {
 	s.RetainUntilDate = &v
 	return s
@@ -18167,7 +18167,7 @@ type ObjectLockRule struct {
 	_ struct{} `type:"structure"`
 
 	// The default retention period that you want to apply to new objects placed
-	// in the speci***REMOVED***ed bucket.
+	// in the specified bucket.
 	DefaultRetention *DefaultRetention `type:"structure"`
 }
 
@@ -18181,7 +18181,7 @@ func (s ObjectLockRule) GoString() string {
 	return s.String()
 }
 
-// SetDefaultRetention sets the DefaultRetention ***REMOVED***eld's value.
+// SetDefaultRetention sets the DefaultRetention field's value.
 func (s *ObjectLockRule) SetDefaultRetention(v *DefaultRetention) *ObjectLockRule {
 	s.DefaultRetention = v
 	return s
@@ -18192,15 +18192,15 @@ type ObjectVersion struct {
 
 	ETag *string `type:"string"`
 
-	// Speci***REMOVED***es whether the object is (true) or is not (false) the latest version
+	// Specifies whether the object is (true) or is not (false) the latest version
 	// of an object.
 	IsLatest *bool `type:"boolean"`
 
 	// The object key.
 	Key *string `min:"1" type:"string"`
 
-	// Date and time the object was last modi***REMOVED***ed.
-	LastModi***REMOVED***ed *time.Time `type:"timestamp"`
+	// Date and time the object was last modified.
+	LastModified *time.Time `type:"timestamp"`
 
 	Owner *Owner `type:"structure"`
 
@@ -18224,49 +18224,49 @@ func (s ObjectVersion) GoString() string {
 	return s.String()
 }
 
-// SetETag sets the ETag ***REMOVED***eld's value.
+// SetETag sets the ETag field's value.
 func (s *ObjectVersion) SetETag(v string) *ObjectVersion {
 	s.ETag = &v
 	return s
 }
 
-// SetIsLatest sets the IsLatest ***REMOVED***eld's value.
+// SetIsLatest sets the IsLatest field's value.
 func (s *ObjectVersion) SetIsLatest(v bool) *ObjectVersion {
 	s.IsLatest = &v
 	return s
 }
 
-// SetKey sets the Key ***REMOVED***eld's value.
+// SetKey sets the Key field's value.
 func (s *ObjectVersion) SetKey(v string) *ObjectVersion {
 	s.Key = &v
 	return s
 }
 
-// SetLastModi***REMOVED***ed sets the LastModi***REMOVED***ed ***REMOVED***eld's value.
-func (s *ObjectVersion) SetLastModi***REMOVED***ed(v time.Time) *ObjectVersion {
-	s.LastModi***REMOVED***ed = &v
+// SetLastModified sets the LastModified field's value.
+func (s *ObjectVersion) SetLastModified(v time.Time) *ObjectVersion {
+	s.LastModified = &v
 	return s
 }
 
-// SetOwner sets the Owner ***REMOVED***eld's value.
+// SetOwner sets the Owner field's value.
 func (s *ObjectVersion) SetOwner(v *Owner) *ObjectVersion {
 	s.Owner = v
 	return s
 }
 
-// SetSize sets the Size ***REMOVED***eld's value.
+// SetSize sets the Size field's value.
 func (s *ObjectVersion) SetSize(v int64) *ObjectVersion {
 	s.Size = &v
 	return s
 }
 
-// SetStorageClass sets the StorageClass ***REMOVED***eld's value.
+// SetStorageClass sets the StorageClass field's value.
 func (s *ObjectVersion) SetStorageClass(v string) *ObjectVersion {
 	s.StorageClass = &v
 	return s
 }
 
-// SetVersionId sets the VersionId ***REMOVED***eld's value.
+// SetVersionId sets the VersionId field's value.
 func (s *ObjectVersion) SetVersionId(v string) *ObjectVersion {
 	s.VersionId = &v
 	return s
@@ -18290,7 +18290,7 @@ func (s OutputLocation) GoString() string {
 	return s.String()
 }
 
-// Validate inspects the ***REMOVED***elds of the type to determine if they are valid.
+// Validate inspects the fields of the type to determine if they are valid.
 func (s *OutputLocation) Validate() error {
 	invalidParams := request.ErrInvalidParams{Context: "OutputLocation"}
 	if s.S3 != nil {
@@ -18305,7 +18305,7 @@ func (s *OutputLocation) Validate() error {
 	return nil
 }
 
-// SetS3 sets the S3 ***REMOVED***eld's value.
+// SetS3 sets the S3 field's value.
 func (s *OutputLocation) SetS3(v *Location) *OutputLocation {
 	s.S3 = v
 	return s
@@ -18318,7 +18318,7 @@ type OutputSerialization struct {
 	// Describes the serialization of CSV-encoded Select results.
 	CSV *CSVOutput `type:"structure"`
 
-	// Speci***REMOVED***es JSON as request's output serialization format.
+	// Specifies JSON as request's output serialization format.
 	JSON *JSONOutput `type:"structure"`
 }
 
@@ -18332,13 +18332,13 @@ func (s OutputSerialization) GoString() string {
 	return s.String()
 }
 
-// SetCSV sets the CSV ***REMOVED***eld's value.
+// SetCSV sets the CSV field's value.
 func (s *OutputSerialization) SetCSV(v *CSVOutput) *OutputSerialization {
 	s.CSV = v
 	return s
 }
 
-// SetJSON sets the JSON ***REMOVED***eld's value.
+// SetJSON sets the JSON field's value.
 func (s *OutputSerialization) SetJSON(v *JSONOutput) *OutputSerialization {
 	s.JSON = v
 	return s
@@ -18362,13 +18362,13 @@ func (s Owner) GoString() string {
 	return s.String()
 }
 
-// SetDisplayName sets the DisplayName ***REMOVED***eld's value.
+// SetDisplayName sets the DisplayName field's value.
 func (s *Owner) SetDisplayName(v string) *Owner {
 	s.DisplayName = &v
 	return s
 }
 
-// SetID sets the ID ***REMOVED***eld's value.
+// SetID sets the ID field's value.
 func (s *Owner) SetID(v string) *Owner {
 	s.ID = &v
 	return s
@@ -18395,7 +18395,7 @@ type Part struct {
 	ETag *string `type:"string"`
 
 	// Date and time at which the part was uploaded.
-	LastModi***REMOVED***ed *time.Time `type:"timestamp"`
+	LastModified *time.Time `type:"timestamp"`
 
 	// Part number identifying the part. This is a positive integer between 1 and
 	// 10,000.
@@ -18415,25 +18415,25 @@ func (s Part) GoString() string {
 	return s.String()
 }
 
-// SetETag sets the ETag ***REMOVED***eld's value.
+// SetETag sets the ETag field's value.
 func (s *Part) SetETag(v string) *Part {
 	s.ETag = &v
 	return s
 }
 
-// SetLastModi***REMOVED***ed sets the LastModi***REMOVED***ed ***REMOVED***eld's value.
-func (s *Part) SetLastModi***REMOVED***ed(v time.Time) *Part {
-	s.LastModi***REMOVED***ed = &v
+// SetLastModified sets the LastModified field's value.
+func (s *Part) SetLastModified(v time.Time) *Part {
+	s.LastModified = &v
 	return s
 }
 
-// SetPartNumber sets the PartNumber ***REMOVED***eld's value.
+// SetPartNumber sets the PartNumber field's value.
 func (s *Part) SetPartNumber(v int64) *Part {
 	s.PartNumber = &v
 	return s
 }
 
-// SetSize sets the Size ***REMOVED***eld's value.
+// SetSize sets the Size field's value.
 func (s *Part) SetSize(v int64) *Part {
 	s.Size = &v
 	return s
@@ -18458,7 +18458,7 @@ func (s PolicyStatus) GoString() string {
 	return s.String()
 }
 
-// SetIsPublic sets the IsPublic ***REMOVED***eld's value.
+// SetIsPublic sets the IsPublic field's value.
 func (s *PolicyStatus) SetIsPublic(v bool) *PolicyStatus {
 	s.IsPublic = &v
 	return s
@@ -18487,19 +18487,19 @@ func (s Progress) GoString() string {
 	return s.String()
 }
 
-// SetBytesProcessed sets the BytesProcessed ***REMOVED***eld's value.
+// SetBytesProcessed sets the BytesProcessed field's value.
 func (s *Progress) SetBytesProcessed(v int64) *Progress {
 	s.BytesProcessed = &v
 	return s
 }
 
-// SetBytesReturned sets the BytesReturned ***REMOVED***eld's value.
+// SetBytesReturned sets the BytesReturned field's value.
 func (s *Progress) SetBytesReturned(v int64) *Progress {
 	s.BytesReturned = &v
 	return s
 }
 
-// SetBytesScanned sets the BytesScanned ***REMOVED***eld's value.
+// SetBytesScanned sets the BytesScanned field's value.
 func (s *Progress) SetBytesScanned(v int64) *Progress {
 	s.BytesScanned = &v
 	return s
@@ -18522,7 +18522,7 @@ func (s ProgressEvent) GoString() string {
 	return s.String()
 }
 
-// SetDetails sets the Details ***REMOVED***eld's value.
+// SetDetails sets the Details field's value.
 func (s *ProgressEvent) SetDetails(v *Progress) *ProgressEvent {
 	s.Details = v
 	return s
@@ -18545,15 +18545,15 @@ func (s *ProgressEvent) UnmarshalEvent(
 	return nil
 }
 
-// Speci***REMOVED***es the Block Public Access con***REMOVED***guration for an Amazon S3 bucket.
-type PublicAccessBlockCon***REMOVED***guration struct {
+// Specifies the Block Public Access configuration for an Amazon S3 bucket.
+type PublicAccessBlockConfiguration struct {
 	_ struct{} `type:"structure"`
 
-	// Speci***REMOVED***es whether Amazon S3 should block public access control lists (ACLs)
+	// Specifies whether Amazon S3 should block public access control lists (ACLs)
 	// for this bucket and objects in this bucket. Setting this element to TRUE
 	// causes the following behavior:
 	//
-	//    * PUT Bucket acl and PUT Object acl calls fail if the speci***REMOVED***ed ACL is
+	//    * PUT Bucket acl and PUT Object acl calls fail if the specified ACL is
 	//    public.
 	//
 	//    * PUT Object calls fail if the request includes a public ACL.
@@ -18561,14 +18561,14 @@ type PublicAccessBlockCon***REMOVED***guration struct {
 	// Enabling this setting doesn't affect existing policies or ACLs.
 	BlockPublicAcls *bool `locationName:"BlockPublicAcls" type:"boolean"`
 
-	// Speci***REMOVED***es whether Amazon S3 should block public bucket policies for this
+	// Specifies whether Amazon S3 should block public bucket policies for this
 	// bucket. Setting this element to TRUE causes Amazon S3 to reject calls to
-	// PUT Bucket policy if the speci***REMOVED***ed bucket policy allows public access.
+	// PUT Bucket policy if the specified bucket policy allows public access.
 	//
 	// Enabling this setting doesn't affect existing bucket policies.
 	BlockPublicPolicy *bool `locationName:"BlockPublicPolicy" type:"boolean"`
 
-	// Speci***REMOVED***es whether Amazon S3 should ignore public ACLs for this bucket and
+	// Specifies whether Amazon S3 should ignore public ACLs for this bucket and
 	// objects in this bucket. Setting this element to TRUE causes Amazon S3 to
 	// ignore all public ACLs on this bucket and objects in this bucket.
 	//
@@ -18576,80 +18576,80 @@ type PublicAccessBlockCon***REMOVED***guration struct {
 	// and doesn't prevent new public ACLs from being set.
 	IgnorePublicAcls *bool `locationName:"IgnorePublicAcls" type:"boolean"`
 
-	// Speci***REMOVED***es whether Amazon S3 should restrict public bucket policies for this
+	// Specifies whether Amazon S3 should restrict public bucket policies for this
 	// bucket. Setting this element to TRUE restricts access to this bucket to only
 	// AWS services and authorized users within this account if the bucket has a
 	// public policy.
 	//
 	// Enabling this setting doesn't affect previously stored bucket policies, except
 	// that public and cross-account access within any public bucket policy, including
-	// non-public delegation to speci***REMOVED***c accounts, is blocked.
+	// non-public delegation to specific accounts, is blocked.
 	RestrictPublicBuckets *bool `locationName:"RestrictPublicBuckets" type:"boolean"`
 }
 
 // String returns the string representation
-func (s PublicAccessBlockCon***REMOVED***guration) String() string {
+func (s PublicAccessBlockConfiguration) String() string {
 	return awsutil.Prettify(s)
 }
 
 // GoString returns the string representation
-func (s PublicAccessBlockCon***REMOVED***guration) GoString() string {
+func (s PublicAccessBlockConfiguration) GoString() string {
 	return s.String()
 }
 
-// SetBlockPublicAcls sets the BlockPublicAcls ***REMOVED***eld's value.
-func (s *PublicAccessBlockCon***REMOVED***guration) SetBlockPublicAcls(v bool) *PublicAccessBlockCon***REMOVED***guration {
+// SetBlockPublicAcls sets the BlockPublicAcls field's value.
+func (s *PublicAccessBlockConfiguration) SetBlockPublicAcls(v bool) *PublicAccessBlockConfiguration {
 	s.BlockPublicAcls = &v
 	return s
 }
 
-// SetBlockPublicPolicy sets the BlockPublicPolicy ***REMOVED***eld's value.
-func (s *PublicAccessBlockCon***REMOVED***guration) SetBlockPublicPolicy(v bool) *PublicAccessBlockCon***REMOVED***guration {
+// SetBlockPublicPolicy sets the BlockPublicPolicy field's value.
+func (s *PublicAccessBlockConfiguration) SetBlockPublicPolicy(v bool) *PublicAccessBlockConfiguration {
 	s.BlockPublicPolicy = &v
 	return s
 }
 
-// SetIgnorePublicAcls sets the IgnorePublicAcls ***REMOVED***eld's value.
-func (s *PublicAccessBlockCon***REMOVED***guration) SetIgnorePublicAcls(v bool) *PublicAccessBlockCon***REMOVED***guration {
+// SetIgnorePublicAcls sets the IgnorePublicAcls field's value.
+func (s *PublicAccessBlockConfiguration) SetIgnorePublicAcls(v bool) *PublicAccessBlockConfiguration {
 	s.IgnorePublicAcls = &v
 	return s
 }
 
-// SetRestrictPublicBuckets sets the RestrictPublicBuckets ***REMOVED***eld's value.
-func (s *PublicAccessBlockCon***REMOVED***guration) SetRestrictPublicBuckets(v bool) *PublicAccessBlockCon***REMOVED***guration {
+// SetRestrictPublicBuckets sets the RestrictPublicBuckets field's value.
+func (s *PublicAccessBlockConfiguration) SetRestrictPublicBuckets(v bool) *PublicAccessBlockConfiguration {
 	s.RestrictPublicBuckets = &v
 	return s
 }
 
-type PutBucketAccelerateCon***REMOVED***gurationInput struct {
-	_ struct{} `locationName:"PutBucketAccelerateCon***REMOVED***gurationRequest" type:"structure" payload:"AccelerateCon***REMOVED***guration"`
+type PutBucketAccelerateConfigurationInput struct {
+	_ struct{} `locationName:"PutBucketAccelerateConfigurationRequest" type:"structure" payload:"AccelerateConfiguration"`
 
-	// Speci***REMOVED***es the Accelerate Con***REMOVED***guration you want to set for the bucket.
+	// Specifies the Accelerate Configuration you want to set for the bucket.
 	//
-	// AccelerateCon***REMOVED***guration is a required ***REMOVED***eld
-	AccelerateCon***REMOVED***guration *AccelerateCon***REMOVED***guration `locationName:"AccelerateCon***REMOVED***guration" type:"structure" required:"true" xmlURI:"http://s3.amazonaws.com/doc/2006-03-01/"`
+	// AccelerateConfiguration is a required field
+	AccelerateConfiguration *AccelerateConfiguration `locationName:"AccelerateConfiguration" type:"structure" required:"true" xmlURI:"http://s3.amazonaws.com/doc/2006-03-01/"`
 
-	// Name of the bucket for which the accelerate con***REMOVED***guration is set.
+	// Name of the bucket for which the accelerate configuration is set.
 	//
-	// Bucket is a required ***REMOVED***eld
+	// Bucket is a required field
 	Bucket *string `location:"uri" locationName:"Bucket" type:"string" required:"true"`
 }
 
 // String returns the string representation
-func (s PutBucketAccelerateCon***REMOVED***gurationInput) String() string {
+func (s PutBucketAccelerateConfigurationInput) String() string {
 	return awsutil.Prettify(s)
 }
 
 // GoString returns the string representation
-func (s PutBucketAccelerateCon***REMOVED***gurationInput) GoString() string {
+func (s PutBucketAccelerateConfigurationInput) GoString() string {
 	return s.String()
 }
 
-// Validate inspects the ***REMOVED***elds of the type to determine if they are valid.
-func (s *PutBucketAccelerateCon***REMOVED***gurationInput) Validate() error {
-	invalidParams := request.ErrInvalidParams{Context: "PutBucketAccelerateCon***REMOVED***gurationInput"}
-	if s.AccelerateCon***REMOVED***guration == nil {
-		invalidParams.Add(request.NewErrParamRequired("AccelerateCon***REMOVED***guration"))
+// Validate inspects the fields of the type to determine if they are valid.
+func (s *PutBucketAccelerateConfigurationInput) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "PutBucketAccelerateConfigurationInput"}
+	if s.AccelerateConfiguration == nil {
+		invalidParams.Add(request.NewErrParamRequired("AccelerateConfiguration"))
 	}
 	if s.Bucket == nil {
 		invalidParams.Add(request.NewErrParamRequired("Bucket"))
@@ -18664,36 +18664,36 @@ func (s *PutBucketAccelerateCon***REMOVED***gurationInput) Validate() error {
 	return nil
 }
 
-// SetAccelerateCon***REMOVED***guration sets the AccelerateCon***REMOVED***guration ***REMOVED***eld's value.
-func (s *PutBucketAccelerateCon***REMOVED***gurationInput) SetAccelerateCon***REMOVED***guration(v *AccelerateCon***REMOVED***guration) *PutBucketAccelerateCon***REMOVED***gurationInput {
-	s.AccelerateCon***REMOVED***guration = v
+// SetAccelerateConfiguration sets the AccelerateConfiguration field's value.
+func (s *PutBucketAccelerateConfigurationInput) SetAccelerateConfiguration(v *AccelerateConfiguration) *PutBucketAccelerateConfigurationInput {
+	s.AccelerateConfiguration = v
 	return s
 }
 
-// SetBucket sets the Bucket ***REMOVED***eld's value.
-func (s *PutBucketAccelerateCon***REMOVED***gurationInput) SetBucket(v string) *PutBucketAccelerateCon***REMOVED***gurationInput {
+// SetBucket sets the Bucket field's value.
+func (s *PutBucketAccelerateConfigurationInput) SetBucket(v string) *PutBucketAccelerateConfigurationInput {
 	s.Bucket = &v
 	return s
 }
 
-func (s *PutBucketAccelerateCon***REMOVED***gurationInput) getBucket() (v string) {
+func (s *PutBucketAccelerateConfigurationInput) getBucket() (v string) {
 	if s.Bucket == nil {
 		return v
 	}
 	return *s.Bucket
 }
 
-type PutBucketAccelerateCon***REMOVED***gurationOutput struct {
+type PutBucketAccelerateConfigurationOutput struct {
 	_ struct{} `type:"structure"`
 }
 
 // String returns the string representation
-func (s PutBucketAccelerateCon***REMOVED***gurationOutput) String() string {
+func (s PutBucketAccelerateConfigurationOutput) String() string {
 	return awsutil.Prettify(s)
 }
 
 // GoString returns the string representation
-func (s PutBucketAccelerateCon***REMOVED***gurationOutput) GoString() string {
+func (s PutBucketAccelerateConfigurationOutput) GoString() string {
 	return s.String()
 }
 
@@ -18706,7 +18706,7 @@ type PutBucketAclInput struct {
 	// Contains the elements that set the ACL permissions for an object per grantee.
 	AccessControlPolicy *AccessControlPolicy `locationName:"AccessControlPolicy" type:"structure" xmlURI:"http://s3.amazonaws.com/doc/2006-03-01/"`
 
-	// Bucket is a required ***REMOVED***eld
+	// Bucket is a required field
 	Bucket *string `location:"uri" locationName:"Bucket" type:"string" required:"true"`
 
 	// Allows grantee the read, write, read ACP, and write ACP permissions on the
@@ -18736,7 +18736,7 @@ func (s PutBucketAclInput) GoString() string {
 	return s.String()
 }
 
-// Validate inspects the ***REMOVED***elds of the type to determine if they are valid.
+// Validate inspects the fields of the type to determine if they are valid.
 func (s *PutBucketAclInput) Validate() error {
 	invalidParams := request.ErrInvalidParams{Context: "PutBucketAclInput"}
 	if s.Bucket == nil {
@@ -18757,19 +18757,19 @@ func (s *PutBucketAclInput) Validate() error {
 	return nil
 }
 
-// SetACL sets the ACL ***REMOVED***eld's value.
+// SetACL sets the ACL field's value.
 func (s *PutBucketAclInput) SetACL(v string) *PutBucketAclInput {
 	s.ACL = &v
 	return s
 }
 
-// SetAccessControlPolicy sets the AccessControlPolicy ***REMOVED***eld's value.
+// SetAccessControlPolicy sets the AccessControlPolicy field's value.
 func (s *PutBucketAclInput) SetAccessControlPolicy(v *AccessControlPolicy) *PutBucketAclInput {
 	s.AccessControlPolicy = v
 	return s
 }
 
-// SetBucket sets the Bucket ***REMOVED***eld's value.
+// SetBucket sets the Bucket field's value.
 func (s *PutBucketAclInput) SetBucket(v string) *PutBucketAclInput {
 	s.Bucket = &v
 	return s
@@ -18782,31 +18782,31 @@ func (s *PutBucketAclInput) getBucket() (v string) {
 	return *s.Bucket
 }
 
-// SetGrantFullControl sets the GrantFullControl ***REMOVED***eld's value.
+// SetGrantFullControl sets the GrantFullControl field's value.
 func (s *PutBucketAclInput) SetGrantFullControl(v string) *PutBucketAclInput {
 	s.GrantFullControl = &v
 	return s
 }
 
-// SetGrantRead sets the GrantRead ***REMOVED***eld's value.
+// SetGrantRead sets the GrantRead field's value.
 func (s *PutBucketAclInput) SetGrantRead(v string) *PutBucketAclInput {
 	s.GrantRead = &v
 	return s
 }
 
-// SetGrantReadACP sets the GrantReadACP ***REMOVED***eld's value.
+// SetGrantReadACP sets the GrantReadACP field's value.
 func (s *PutBucketAclInput) SetGrantReadACP(v string) *PutBucketAclInput {
 	s.GrantReadACP = &v
 	return s
 }
 
-// SetGrantWrite sets the GrantWrite ***REMOVED***eld's value.
+// SetGrantWrite sets the GrantWrite field's value.
 func (s *PutBucketAclInput) SetGrantWrite(v string) *PutBucketAclInput {
 	s.GrantWrite = &v
 	return s
 }
 
-// SetGrantWriteACP sets the GrantWriteACP ***REMOVED***eld's value.
+// SetGrantWriteACP sets the GrantWriteACP field's value.
 func (s *PutBucketAclInput) SetGrantWriteACP(v string) *PutBucketAclInput {
 	s.GrantWriteACP = &v
 	return s
@@ -18826,40 +18826,40 @@ func (s PutBucketAclOutput) GoString() string {
 	return s.String()
 }
 
-type PutBucketAnalyticsCon***REMOVED***gurationInput struct {
-	_ struct{} `locationName:"PutBucketAnalyticsCon***REMOVED***gurationRequest" type:"structure" payload:"AnalyticsCon***REMOVED***guration"`
+type PutBucketAnalyticsConfigurationInput struct {
+	_ struct{} `locationName:"PutBucketAnalyticsConfigurationRequest" type:"structure" payload:"AnalyticsConfiguration"`
 
-	// The con***REMOVED***guration and any analyses for the analytics ***REMOVED***lter.
+	// The configuration and any analyses for the analytics filter.
 	//
-	// AnalyticsCon***REMOVED***guration is a required ***REMOVED***eld
-	AnalyticsCon***REMOVED***guration *AnalyticsCon***REMOVED***guration `locationName:"AnalyticsCon***REMOVED***guration" type:"structure" required:"true" xmlURI:"http://s3.amazonaws.com/doc/2006-03-01/"`
+	// AnalyticsConfiguration is a required field
+	AnalyticsConfiguration *AnalyticsConfiguration `locationName:"AnalyticsConfiguration" type:"structure" required:"true" xmlURI:"http://s3.amazonaws.com/doc/2006-03-01/"`
 
-	// The name of the bucket to which an analytics con***REMOVED***guration is stored.
+	// The name of the bucket to which an analytics configuration is stored.
 	//
-	// Bucket is a required ***REMOVED***eld
+	// Bucket is a required field
 	Bucket *string `location:"uri" locationName:"Bucket" type:"string" required:"true"`
 
-	// The ID that identi***REMOVED***es the analytics con***REMOVED***guration.
+	// The ID that identifies the analytics configuration.
 	//
-	// Id is a required ***REMOVED***eld
+	// Id is a required field
 	Id *string `location:"querystring" locationName:"id" type:"string" required:"true"`
 }
 
 // String returns the string representation
-func (s PutBucketAnalyticsCon***REMOVED***gurationInput) String() string {
+func (s PutBucketAnalyticsConfigurationInput) String() string {
 	return awsutil.Prettify(s)
 }
 
 // GoString returns the string representation
-func (s PutBucketAnalyticsCon***REMOVED***gurationInput) GoString() string {
+func (s PutBucketAnalyticsConfigurationInput) GoString() string {
 	return s.String()
 }
 
-// Validate inspects the ***REMOVED***elds of the type to determine if they are valid.
-func (s *PutBucketAnalyticsCon***REMOVED***gurationInput) Validate() error {
-	invalidParams := request.ErrInvalidParams{Context: "PutBucketAnalyticsCon***REMOVED***gurationInput"}
-	if s.AnalyticsCon***REMOVED***guration == nil {
-		invalidParams.Add(request.NewErrParamRequired("AnalyticsCon***REMOVED***guration"))
+// Validate inspects the fields of the type to determine if they are valid.
+func (s *PutBucketAnalyticsConfigurationInput) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "PutBucketAnalyticsConfigurationInput"}
+	if s.AnalyticsConfiguration == nil {
+		invalidParams.Add(request.NewErrParamRequired("AnalyticsConfiguration"))
 	}
 	if s.Bucket == nil {
 		invalidParams.Add(request.NewErrParamRequired("Bucket"))
@@ -18870,9 +18870,9 @@ func (s *PutBucketAnalyticsCon***REMOVED***gurationInput) Validate() error {
 	if s.Id == nil {
 		invalidParams.Add(request.NewErrParamRequired("Id"))
 	}
-	if s.AnalyticsCon***REMOVED***guration != nil {
-		if err := s.AnalyticsCon***REMOVED***guration.Validate(); err != nil {
-			invalidParams.AddNested("AnalyticsCon***REMOVED***guration", err.(request.ErrInvalidParams))
+	if s.AnalyticsConfiguration != nil {
+		if err := s.AnalyticsConfiguration.Validate(); err != nil {
+			invalidParams.AddNested("AnalyticsConfiguration", err.(request.ErrInvalidParams))
 		}
 	}
 
@@ -18882,58 +18882,58 @@ func (s *PutBucketAnalyticsCon***REMOVED***gurationInput) Validate() error {
 	return nil
 }
 
-// SetAnalyticsCon***REMOVED***guration sets the AnalyticsCon***REMOVED***guration ***REMOVED***eld's value.
-func (s *PutBucketAnalyticsCon***REMOVED***gurationInput) SetAnalyticsCon***REMOVED***guration(v *AnalyticsCon***REMOVED***guration) *PutBucketAnalyticsCon***REMOVED***gurationInput {
-	s.AnalyticsCon***REMOVED***guration = v
+// SetAnalyticsConfiguration sets the AnalyticsConfiguration field's value.
+func (s *PutBucketAnalyticsConfigurationInput) SetAnalyticsConfiguration(v *AnalyticsConfiguration) *PutBucketAnalyticsConfigurationInput {
+	s.AnalyticsConfiguration = v
 	return s
 }
 
-// SetBucket sets the Bucket ***REMOVED***eld's value.
-func (s *PutBucketAnalyticsCon***REMOVED***gurationInput) SetBucket(v string) *PutBucketAnalyticsCon***REMOVED***gurationInput {
+// SetBucket sets the Bucket field's value.
+func (s *PutBucketAnalyticsConfigurationInput) SetBucket(v string) *PutBucketAnalyticsConfigurationInput {
 	s.Bucket = &v
 	return s
 }
 
-func (s *PutBucketAnalyticsCon***REMOVED***gurationInput) getBucket() (v string) {
+func (s *PutBucketAnalyticsConfigurationInput) getBucket() (v string) {
 	if s.Bucket == nil {
 		return v
 	}
 	return *s.Bucket
 }
 
-// SetId sets the Id ***REMOVED***eld's value.
-func (s *PutBucketAnalyticsCon***REMOVED***gurationInput) SetId(v string) *PutBucketAnalyticsCon***REMOVED***gurationInput {
+// SetId sets the Id field's value.
+func (s *PutBucketAnalyticsConfigurationInput) SetId(v string) *PutBucketAnalyticsConfigurationInput {
 	s.Id = &v
 	return s
 }
 
-type PutBucketAnalyticsCon***REMOVED***gurationOutput struct {
+type PutBucketAnalyticsConfigurationOutput struct {
 	_ struct{} `type:"structure"`
 }
 
 // String returns the string representation
-func (s PutBucketAnalyticsCon***REMOVED***gurationOutput) String() string {
+func (s PutBucketAnalyticsConfigurationOutput) String() string {
 	return awsutil.Prettify(s)
 }
 
 // GoString returns the string representation
-func (s PutBucketAnalyticsCon***REMOVED***gurationOutput) GoString() string {
+func (s PutBucketAnalyticsConfigurationOutput) GoString() string {
 	return s.String()
 }
 
 type PutBucketCorsInput struct {
-	_ struct{} `locationName:"PutBucketCorsRequest" type:"structure" payload:"CORSCon***REMOVED***guration"`
+	_ struct{} `locationName:"PutBucketCorsRequest" type:"structure" payload:"CORSConfiguration"`
 
-	// Bucket is a required ***REMOVED***eld
+	// Bucket is a required field
 	Bucket *string `location:"uri" locationName:"Bucket" type:"string" required:"true"`
 
-	// Describes the cross-origin access con***REMOVED***guration for objects in an Amazon
+	// Describes the cross-origin access configuration for objects in an Amazon
 	// S3 bucket. For more information, see Enabling Cross-Origin Resource Sharing
 	// (https://docs.aws.amazon.com/AmazonS3/latest/dev/cors.html) in the Amazon
 	// Simple Storage Service Developer Guide.
 	//
-	// CORSCon***REMOVED***guration is a required ***REMOVED***eld
-	CORSCon***REMOVED***guration *CORSCon***REMOVED***guration `locationName:"CORSCon***REMOVED***guration" type:"structure" required:"true" xmlURI:"http://s3.amazonaws.com/doc/2006-03-01/"`
+	// CORSConfiguration is a required field
+	CORSConfiguration *CORSConfiguration `locationName:"CORSConfiguration" type:"structure" required:"true" xmlURI:"http://s3.amazonaws.com/doc/2006-03-01/"`
 }
 
 // String returns the string representation
@@ -18946,7 +18946,7 @@ func (s PutBucketCorsInput) GoString() string {
 	return s.String()
 }
 
-// Validate inspects the ***REMOVED***elds of the type to determine if they are valid.
+// Validate inspects the fields of the type to determine if they are valid.
 func (s *PutBucketCorsInput) Validate() error {
 	invalidParams := request.ErrInvalidParams{Context: "PutBucketCorsInput"}
 	if s.Bucket == nil {
@@ -18955,12 +18955,12 @@ func (s *PutBucketCorsInput) Validate() error {
 	if s.Bucket != nil && len(*s.Bucket) < 1 {
 		invalidParams.Add(request.NewErrParamMinLen("Bucket", 1))
 	}
-	if s.CORSCon***REMOVED***guration == nil {
-		invalidParams.Add(request.NewErrParamRequired("CORSCon***REMOVED***guration"))
+	if s.CORSConfiguration == nil {
+		invalidParams.Add(request.NewErrParamRequired("CORSConfiguration"))
 	}
-	if s.CORSCon***REMOVED***guration != nil {
-		if err := s.CORSCon***REMOVED***guration.Validate(); err != nil {
-			invalidParams.AddNested("CORSCon***REMOVED***guration", err.(request.ErrInvalidParams))
+	if s.CORSConfiguration != nil {
+		if err := s.CORSConfiguration.Validate(); err != nil {
+			invalidParams.AddNested("CORSConfiguration", err.(request.ErrInvalidParams))
 		}
 	}
 
@@ -18970,7 +18970,7 @@ func (s *PutBucketCorsInput) Validate() error {
 	return nil
 }
 
-// SetBucket sets the Bucket ***REMOVED***eld's value.
+// SetBucket sets the Bucket field's value.
 func (s *PutBucketCorsInput) SetBucket(v string) *PutBucketCorsInput {
 	s.Bucket = &v
 	return s
@@ -18983,9 +18983,9 @@ func (s *PutBucketCorsInput) getBucket() (v string) {
 	return *s.Bucket
 }
 
-// SetCORSCon***REMOVED***guration sets the CORSCon***REMOVED***guration ***REMOVED***eld's value.
-func (s *PutBucketCorsInput) SetCORSCon***REMOVED***guration(v *CORSCon***REMOVED***guration) *PutBucketCorsInput {
-	s.CORSCon***REMOVED***guration = v
+// SetCORSConfiguration sets the CORSConfiguration field's value.
+func (s *PutBucketCorsInput) SetCORSConfiguration(v *CORSConfiguration) *PutBucketCorsInput {
+	s.CORSConfiguration = v
 	return s
 }
 
@@ -19004,21 +19004,21 @@ func (s PutBucketCorsOutput) GoString() string {
 }
 
 type PutBucketEncryptionInput struct {
-	_ struct{} `locationName:"PutBucketEncryptionRequest" type:"structure" payload:"ServerSideEncryptionCon***REMOVED***guration"`
+	_ struct{} `locationName:"PutBucketEncryptionRequest" type:"structure" payload:"ServerSideEncryptionConfiguration"`
 
-	// Speci***REMOVED***es default encryption for a bucket using server-side encryption with
+	// Specifies default encryption for a bucket using server-side encryption with
 	// Amazon S3-managed keys (SSE-S3) or AWS KMS-managed keys (SSE-KMS). For information
 	// about the Amazon S3 default encryption feature, see Amazon S3 Default Bucket
 	// Encryption (https://docs.aws.amazon.com/AmazonS3/latest/dev/bucket-encryption.html)
 	// in the Amazon Simple Storage Service Developer Guide.
 	//
-	// Bucket is a required ***REMOVED***eld
+	// Bucket is a required field
 	Bucket *string `location:"uri" locationName:"Bucket" type:"string" required:"true"`
 
-	// Speci***REMOVED***es the default server-side-encryption con***REMOVED***guration.
+	// Specifies the default server-side-encryption configuration.
 	//
-	// ServerSideEncryptionCon***REMOVED***guration is a required ***REMOVED***eld
-	ServerSideEncryptionCon***REMOVED***guration *ServerSideEncryptionCon***REMOVED***guration `locationName:"ServerSideEncryptionCon***REMOVED***guration" type:"structure" required:"true" xmlURI:"http://s3.amazonaws.com/doc/2006-03-01/"`
+	// ServerSideEncryptionConfiguration is a required field
+	ServerSideEncryptionConfiguration *ServerSideEncryptionConfiguration `locationName:"ServerSideEncryptionConfiguration" type:"structure" required:"true" xmlURI:"http://s3.amazonaws.com/doc/2006-03-01/"`
 }
 
 // String returns the string representation
@@ -19031,7 +19031,7 @@ func (s PutBucketEncryptionInput) GoString() string {
 	return s.String()
 }
 
-// Validate inspects the ***REMOVED***elds of the type to determine if they are valid.
+// Validate inspects the fields of the type to determine if they are valid.
 func (s *PutBucketEncryptionInput) Validate() error {
 	invalidParams := request.ErrInvalidParams{Context: "PutBucketEncryptionInput"}
 	if s.Bucket == nil {
@@ -19040,12 +19040,12 @@ func (s *PutBucketEncryptionInput) Validate() error {
 	if s.Bucket != nil && len(*s.Bucket) < 1 {
 		invalidParams.Add(request.NewErrParamMinLen("Bucket", 1))
 	}
-	if s.ServerSideEncryptionCon***REMOVED***guration == nil {
-		invalidParams.Add(request.NewErrParamRequired("ServerSideEncryptionCon***REMOVED***guration"))
+	if s.ServerSideEncryptionConfiguration == nil {
+		invalidParams.Add(request.NewErrParamRequired("ServerSideEncryptionConfiguration"))
 	}
-	if s.ServerSideEncryptionCon***REMOVED***guration != nil {
-		if err := s.ServerSideEncryptionCon***REMOVED***guration.Validate(); err != nil {
-			invalidParams.AddNested("ServerSideEncryptionCon***REMOVED***guration", err.(request.ErrInvalidParams))
+	if s.ServerSideEncryptionConfiguration != nil {
+		if err := s.ServerSideEncryptionConfiguration.Validate(); err != nil {
+			invalidParams.AddNested("ServerSideEncryptionConfiguration", err.(request.ErrInvalidParams))
 		}
 	}
 
@@ -19055,7 +19055,7 @@ func (s *PutBucketEncryptionInput) Validate() error {
 	return nil
 }
 
-// SetBucket sets the Bucket ***REMOVED***eld's value.
+// SetBucket sets the Bucket field's value.
 func (s *PutBucketEncryptionInput) SetBucket(v string) *PutBucketEncryptionInput {
 	s.Bucket = &v
 	return s
@@ -19068,9 +19068,9 @@ func (s *PutBucketEncryptionInput) getBucket() (v string) {
 	return *s.Bucket
 }
 
-// SetServerSideEncryptionCon***REMOVED***guration sets the ServerSideEncryptionCon***REMOVED***guration ***REMOVED***eld's value.
-func (s *PutBucketEncryptionInput) SetServerSideEncryptionCon***REMOVED***guration(v *ServerSideEncryptionCon***REMOVED***guration) *PutBucketEncryptionInput {
-	s.ServerSideEncryptionCon***REMOVED***guration = v
+// SetServerSideEncryptionConfiguration sets the ServerSideEncryptionConfiguration field's value.
+func (s *PutBucketEncryptionInput) SetServerSideEncryptionConfiguration(v *ServerSideEncryptionConfiguration) *PutBucketEncryptionInput {
+	s.ServerSideEncryptionConfiguration = v
 	return s
 }
 
@@ -19088,38 +19088,38 @@ func (s PutBucketEncryptionOutput) GoString() string {
 	return s.String()
 }
 
-type PutBucketInventoryCon***REMOVED***gurationInput struct {
-	_ struct{} `locationName:"PutBucketInventoryCon***REMOVED***gurationRequest" type:"structure" payload:"InventoryCon***REMOVED***guration"`
+type PutBucketInventoryConfigurationInput struct {
+	_ struct{} `locationName:"PutBucketInventoryConfigurationRequest" type:"structure" payload:"InventoryConfiguration"`
 
-	// The name of the bucket where the inventory con***REMOVED***guration will be stored.
+	// The name of the bucket where the inventory configuration will be stored.
 	//
-	// Bucket is a required ***REMOVED***eld
+	// Bucket is a required field
 	Bucket *string `location:"uri" locationName:"Bucket" type:"string" required:"true"`
 
-	// The ID used to identify the inventory con***REMOVED***guration.
+	// The ID used to identify the inventory configuration.
 	//
-	// Id is a required ***REMOVED***eld
+	// Id is a required field
 	Id *string `location:"querystring" locationName:"id" type:"string" required:"true"`
 
-	// Speci***REMOVED***es the inventory con***REMOVED***guration.
+	// Specifies the inventory configuration.
 	//
-	// InventoryCon***REMOVED***guration is a required ***REMOVED***eld
-	InventoryCon***REMOVED***guration *InventoryCon***REMOVED***guration `locationName:"InventoryCon***REMOVED***guration" type:"structure" required:"true" xmlURI:"http://s3.amazonaws.com/doc/2006-03-01/"`
+	// InventoryConfiguration is a required field
+	InventoryConfiguration *InventoryConfiguration `locationName:"InventoryConfiguration" type:"structure" required:"true" xmlURI:"http://s3.amazonaws.com/doc/2006-03-01/"`
 }
 
 // String returns the string representation
-func (s PutBucketInventoryCon***REMOVED***gurationInput) String() string {
+func (s PutBucketInventoryConfigurationInput) String() string {
 	return awsutil.Prettify(s)
 }
 
 // GoString returns the string representation
-func (s PutBucketInventoryCon***REMOVED***gurationInput) GoString() string {
+func (s PutBucketInventoryConfigurationInput) GoString() string {
 	return s.String()
 }
 
-// Validate inspects the ***REMOVED***elds of the type to determine if they are valid.
-func (s *PutBucketInventoryCon***REMOVED***gurationInput) Validate() error {
-	invalidParams := request.ErrInvalidParams{Context: "PutBucketInventoryCon***REMOVED***gurationInput"}
+// Validate inspects the fields of the type to determine if they are valid.
+func (s *PutBucketInventoryConfigurationInput) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "PutBucketInventoryConfigurationInput"}
 	if s.Bucket == nil {
 		invalidParams.Add(request.NewErrParamRequired("Bucket"))
 	}
@@ -19129,12 +19129,12 @@ func (s *PutBucketInventoryCon***REMOVED***gurationInput) Validate() error {
 	if s.Id == nil {
 		invalidParams.Add(request.NewErrParamRequired("Id"))
 	}
-	if s.InventoryCon***REMOVED***guration == nil {
-		invalidParams.Add(request.NewErrParamRequired("InventoryCon***REMOVED***guration"))
+	if s.InventoryConfiguration == nil {
+		invalidParams.Add(request.NewErrParamRequired("InventoryConfiguration"))
 	}
-	if s.InventoryCon***REMOVED***guration != nil {
-		if err := s.InventoryCon***REMOVED***guration.Validate(); err != nil {
-			invalidParams.AddNested("InventoryCon***REMOVED***guration", err.(request.ErrInvalidParams))
+	if s.InventoryConfiguration != nil {
+		if err := s.InventoryConfiguration.Validate(); err != nil {
+			invalidParams.AddNested("InventoryConfiguration", err.(request.ErrInvalidParams))
 		}
 	}
 
@@ -19144,79 +19144,79 @@ func (s *PutBucketInventoryCon***REMOVED***gurationInput) Validate() error {
 	return nil
 }
 
-// SetBucket sets the Bucket ***REMOVED***eld's value.
-func (s *PutBucketInventoryCon***REMOVED***gurationInput) SetBucket(v string) *PutBucketInventoryCon***REMOVED***gurationInput {
+// SetBucket sets the Bucket field's value.
+func (s *PutBucketInventoryConfigurationInput) SetBucket(v string) *PutBucketInventoryConfigurationInput {
 	s.Bucket = &v
 	return s
 }
 
-func (s *PutBucketInventoryCon***REMOVED***gurationInput) getBucket() (v string) {
+func (s *PutBucketInventoryConfigurationInput) getBucket() (v string) {
 	if s.Bucket == nil {
 		return v
 	}
 	return *s.Bucket
 }
 
-// SetId sets the Id ***REMOVED***eld's value.
-func (s *PutBucketInventoryCon***REMOVED***gurationInput) SetId(v string) *PutBucketInventoryCon***REMOVED***gurationInput {
+// SetId sets the Id field's value.
+func (s *PutBucketInventoryConfigurationInput) SetId(v string) *PutBucketInventoryConfigurationInput {
 	s.Id = &v
 	return s
 }
 
-// SetInventoryCon***REMOVED***guration sets the InventoryCon***REMOVED***guration ***REMOVED***eld's value.
-func (s *PutBucketInventoryCon***REMOVED***gurationInput) SetInventoryCon***REMOVED***guration(v *InventoryCon***REMOVED***guration) *PutBucketInventoryCon***REMOVED***gurationInput {
-	s.InventoryCon***REMOVED***guration = v
+// SetInventoryConfiguration sets the InventoryConfiguration field's value.
+func (s *PutBucketInventoryConfigurationInput) SetInventoryConfiguration(v *InventoryConfiguration) *PutBucketInventoryConfigurationInput {
+	s.InventoryConfiguration = v
 	return s
 }
 
-type PutBucketInventoryCon***REMOVED***gurationOutput struct {
+type PutBucketInventoryConfigurationOutput struct {
 	_ struct{} `type:"structure"`
 }
 
 // String returns the string representation
-func (s PutBucketInventoryCon***REMOVED***gurationOutput) String() string {
+func (s PutBucketInventoryConfigurationOutput) String() string {
 	return awsutil.Prettify(s)
 }
 
 // GoString returns the string representation
-func (s PutBucketInventoryCon***REMOVED***gurationOutput) GoString() string {
+func (s PutBucketInventoryConfigurationOutput) GoString() string {
 	return s.String()
 }
 
-type PutBucketLifecycleCon***REMOVED***gurationInput struct {
-	_ struct{} `locationName:"PutBucketLifecycleCon***REMOVED***gurationRequest" type:"structure" payload:"LifecycleCon***REMOVED***guration"`
+type PutBucketLifecycleConfigurationInput struct {
+	_ struct{} `locationName:"PutBucketLifecycleConfigurationRequest" type:"structure" payload:"LifecycleConfiguration"`
 
-	// Bucket is a required ***REMOVED***eld
+	// Bucket is a required field
 	Bucket *string `location:"uri" locationName:"Bucket" type:"string" required:"true"`
 
-	// Speci***REMOVED***es the lifecycle con***REMOVED***guration for objects in an Amazon S3 bucket.
+	// Specifies the lifecycle configuration for objects in an Amazon S3 bucket.
 	// For more information, see Object Lifecycle Management (https://docs.aws.amazon.com/AmazonS3/latest/dev/object-lifecycle-mgmt.html)
 	// in the Amazon Simple Storage Service Developer Guide.
-	LifecycleCon***REMOVED***guration *BucketLifecycleCon***REMOVED***guration `locationName:"LifecycleCon***REMOVED***guration" type:"structure" xmlURI:"http://s3.amazonaws.com/doc/2006-03-01/"`
+	LifecycleConfiguration *BucketLifecycleConfiguration `locationName:"LifecycleConfiguration" type:"structure" xmlURI:"http://s3.amazonaws.com/doc/2006-03-01/"`
 }
 
 // String returns the string representation
-func (s PutBucketLifecycleCon***REMOVED***gurationInput) String() string {
+func (s PutBucketLifecycleConfigurationInput) String() string {
 	return awsutil.Prettify(s)
 }
 
 // GoString returns the string representation
-func (s PutBucketLifecycleCon***REMOVED***gurationInput) GoString() string {
+func (s PutBucketLifecycleConfigurationInput) GoString() string {
 	return s.String()
 }
 
-// Validate inspects the ***REMOVED***elds of the type to determine if they are valid.
-func (s *PutBucketLifecycleCon***REMOVED***gurationInput) Validate() error {
-	invalidParams := request.ErrInvalidParams{Context: "PutBucketLifecycleCon***REMOVED***gurationInput"}
+// Validate inspects the fields of the type to determine if they are valid.
+func (s *PutBucketLifecycleConfigurationInput) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "PutBucketLifecycleConfigurationInput"}
 	if s.Bucket == nil {
 		invalidParams.Add(request.NewErrParamRequired("Bucket"))
 	}
 	if s.Bucket != nil && len(*s.Bucket) < 1 {
 		invalidParams.Add(request.NewErrParamMinLen("Bucket", 1))
 	}
-	if s.LifecycleCon***REMOVED***guration != nil {
-		if err := s.LifecycleCon***REMOVED***guration.Validate(); err != nil {
-			invalidParams.AddNested("LifecycleCon***REMOVED***guration", err.(request.ErrInvalidParams))
+	if s.LifecycleConfiguration != nil {
+		if err := s.LifecycleConfiguration.Validate(); err != nil {
+			invalidParams.AddNested("LifecycleConfiguration", err.(request.ErrInvalidParams))
 		}
 	}
 
@@ -19226,46 +19226,46 @@ func (s *PutBucketLifecycleCon***REMOVED***gurationInput) Validate() error {
 	return nil
 }
 
-// SetBucket sets the Bucket ***REMOVED***eld's value.
-func (s *PutBucketLifecycleCon***REMOVED***gurationInput) SetBucket(v string) *PutBucketLifecycleCon***REMOVED***gurationInput {
+// SetBucket sets the Bucket field's value.
+func (s *PutBucketLifecycleConfigurationInput) SetBucket(v string) *PutBucketLifecycleConfigurationInput {
 	s.Bucket = &v
 	return s
 }
 
-func (s *PutBucketLifecycleCon***REMOVED***gurationInput) getBucket() (v string) {
+func (s *PutBucketLifecycleConfigurationInput) getBucket() (v string) {
 	if s.Bucket == nil {
 		return v
 	}
 	return *s.Bucket
 }
 
-// SetLifecycleCon***REMOVED***guration sets the LifecycleCon***REMOVED***guration ***REMOVED***eld's value.
-func (s *PutBucketLifecycleCon***REMOVED***gurationInput) SetLifecycleCon***REMOVED***guration(v *BucketLifecycleCon***REMOVED***guration) *PutBucketLifecycleCon***REMOVED***gurationInput {
-	s.LifecycleCon***REMOVED***guration = v
+// SetLifecycleConfiguration sets the LifecycleConfiguration field's value.
+func (s *PutBucketLifecycleConfigurationInput) SetLifecycleConfiguration(v *BucketLifecycleConfiguration) *PutBucketLifecycleConfigurationInput {
+	s.LifecycleConfiguration = v
 	return s
 }
 
-type PutBucketLifecycleCon***REMOVED***gurationOutput struct {
+type PutBucketLifecycleConfigurationOutput struct {
 	_ struct{} `type:"structure"`
 }
 
 // String returns the string representation
-func (s PutBucketLifecycleCon***REMOVED***gurationOutput) String() string {
+func (s PutBucketLifecycleConfigurationOutput) String() string {
 	return awsutil.Prettify(s)
 }
 
 // GoString returns the string representation
-func (s PutBucketLifecycleCon***REMOVED***gurationOutput) GoString() string {
+func (s PutBucketLifecycleConfigurationOutput) GoString() string {
 	return s.String()
 }
 
 type PutBucketLifecycleInput struct {
-	_ struct{} `locationName:"PutBucketLifecycleRequest" type:"structure" payload:"LifecycleCon***REMOVED***guration"`
+	_ struct{} `locationName:"PutBucketLifecycleRequest" type:"structure" payload:"LifecycleConfiguration"`
 
-	// Bucket is a required ***REMOVED***eld
+	// Bucket is a required field
 	Bucket *string `location:"uri" locationName:"Bucket" type:"string" required:"true"`
 
-	LifecycleCon***REMOVED***guration *LifecycleCon***REMOVED***guration `locationName:"LifecycleCon***REMOVED***guration" type:"structure" xmlURI:"http://s3.amazonaws.com/doc/2006-03-01/"`
+	LifecycleConfiguration *LifecycleConfiguration `locationName:"LifecycleConfiguration" type:"structure" xmlURI:"http://s3.amazonaws.com/doc/2006-03-01/"`
 }
 
 // String returns the string representation
@@ -19278,7 +19278,7 @@ func (s PutBucketLifecycleInput) GoString() string {
 	return s.String()
 }
 
-// Validate inspects the ***REMOVED***elds of the type to determine if they are valid.
+// Validate inspects the fields of the type to determine if they are valid.
 func (s *PutBucketLifecycleInput) Validate() error {
 	invalidParams := request.ErrInvalidParams{Context: "PutBucketLifecycleInput"}
 	if s.Bucket == nil {
@@ -19287,9 +19287,9 @@ func (s *PutBucketLifecycleInput) Validate() error {
 	if s.Bucket != nil && len(*s.Bucket) < 1 {
 		invalidParams.Add(request.NewErrParamMinLen("Bucket", 1))
 	}
-	if s.LifecycleCon***REMOVED***guration != nil {
-		if err := s.LifecycleCon***REMOVED***guration.Validate(); err != nil {
-			invalidParams.AddNested("LifecycleCon***REMOVED***guration", err.(request.ErrInvalidParams))
+	if s.LifecycleConfiguration != nil {
+		if err := s.LifecycleConfiguration.Validate(); err != nil {
+			invalidParams.AddNested("LifecycleConfiguration", err.(request.ErrInvalidParams))
 		}
 	}
 
@@ -19299,7 +19299,7 @@ func (s *PutBucketLifecycleInput) Validate() error {
 	return nil
 }
 
-// SetBucket sets the Bucket ***REMOVED***eld's value.
+// SetBucket sets the Bucket field's value.
 func (s *PutBucketLifecycleInput) SetBucket(v string) *PutBucketLifecycleInput {
 	s.Bucket = &v
 	return s
@@ -19312,9 +19312,9 @@ func (s *PutBucketLifecycleInput) getBucket() (v string) {
 	return *s.Bucket
 }
 
-// SetLifecycleCon***REMOVED***guration sets the LifecycleCon***REMOVED***guration ***REMOVED***eld's value.
-func (s *PutBucketLifecycleInput) SetLifecycleCon***REMOVED***guration(v *LifecycleCon***REMOVED***guration) *PutBucketLifecycleInput {
-	s.LifecycleCon***REMOVED***guration = v
+// SetLifecycleConfiguration sets the LifecycleConfiguration field's value.
+func (s *PutBucketLifecycleInput) SetLifecycleConfiguration(v *LifecycleConfiguration) *PutBucketLifecycleInput {
+	s.LifecycleConfiguration = v
 	return s
 }
 
@@ -19335,10 +19335,10 @@ func (s PutBucketLifecycleOutput) GoString() string {
 type PutBucketLoggingInput struct {
 	_ struct{} `locationName:"PutBucketLoggingRequest" type:"structure" payload:"BucketLoggingStatus"`
 
-	// Bucket is a required ***REMOVED***eld
+	// Bucket is a required field
 	Bucket *string `location:"uri" locationName:"Bucket" type:"string" required:"true"`
 
-	// BucketLoggingStatus is a required ***REMOVED***eld
+	// BucketLoggingStatus is a required field
 	BucketLoggingStatus *BucketLoggingStatus `locationName:"BucketLoggingStatus" type:"structure" required:"true" xmlURI:"http://s3.amazonaws.com/doc/2006-03-01/"`
 }
 
@@ -19352,7 +19352,7 @@ func (s PutBucketLoggingInput) GoString() string {
 	return s.String()
 }
 
-// Validate inspects the ***REMOVED***elds of the type to determine if they are valid.
+// Validate inspects the fields of the type to determine if they are valid.
 func (s *PutBucketLoggingInput) Validate() error {
 	invalidParams := request.ErrInvalidParams{Context: "PutBucketLoggingInput"}
 	if s.Bucket == nil {
@@ -19376,7 +19376,7 @@ func (s *PutBucketLoggingInput) Validate() error {
 	return nil
 }
 
-// SetBucket sets the Bucket ***REMOVED***eld's value.
+// SetBucket sets the Bucket field's value.
 func (s *PutBucketLoggingInput) SetBucket(v string) *PutBucketLoggingInput {
 	s.Bucket = &v
 	return s
@@ -19389,7 +19389,7 @@ func (s *PutBucketLoggingInput) getBucket() (v string) {
 	return *s.Bucket
 }
 
-// SetBucketLoggingStatus sets the BucketLoggingStatus ***REMOVED***eld's value.
+// SetBucketLoggingStatus sets the BucketLoggingStatus field's value.
 func (s *PutBucketLoggingInput) SetBucketLoggingStatus(v *BucketLoggingStatus) *PutBucketLoggingInput {
 	s.BucketLoggingStatus = v
 	return s
@@ -19409,38 +19409,38 @@ func (s PutBucketLoggingOutput) GoString() string {
 	return s.String()
 }
 
-type PutBucketMetricsCon***REMOVED***gurationInput struct {
-	_ struct{} `locationName:"PutBucketMetricsCon***REMOVED***gurationRequest" type:"structure" payload:"MetricsCon***REMOVED***guration"`
+type PutBucketMetricsConfigurationInput struct {
+	_ struct{} `locationName:"PutBucketMetricsConfigurationRequest" type:"structure" payload:"MetricsConfiguration"`
 
-	// The name of the bucket for which the metrics con***REMOVED***guration is set.
+	// The name of the bucket for which the metrics configuration is set.
 	//
-	// Bucket is a required ***REMOVED***eld
+	// Bucket is a required field
 	Bucket *string `location:"uri" locationName:"Bucket" type:"string" required:"true"`
 
-	// The ID used to identify the metrics con***REMOVED***guration.
+	// The ID used to identify the metrics configuration.
 	//
-	// Id is a required ***REMOVED***eld
+	// Id is a required field
 	Id *string `location:"querystring" locationName:"id" type:"string" required:"true"`
 
-	// Speci***REMOVED***es the metrics con***REMOVED***guration.
+	// Specifies the metrics configuration.
 	//
-	// MetricsCon***REMOVED***guration is a required ***REMOVED***eld
-	MetricsCon***REMOVED***guration *MetricsCon***REMOVED***guration `locationName:"MetricsCon***REMOVED***guration" type:"structure" required:"true" xmlURI:"http://s3.amazonaws.com/doc/2006-03-01/"`
+	// MetricsConfiguration is a required field
+	MetricsConfiguration *MetricsConfiguration `locationName:"MetricsConfiguration" type:"structure" required:"true" xmlURI:"http://s3.amazonaws.com/doc/2006-03-01/"`
 }
 
 // String returns the string representation
-func (s PutBucketMetricsCon***REMOVED***gurationInput) String() string {
+func (s PutBucketMetricsConfigurationInput) String() string {
 	return awsutil.Prettify(s)
 }
 
 // GoString returns the string representation
-func (s PutBucketMetricsCon***REMOVED***gurationInput) GoString() string {
+func (s PutBucketMetricsConfigurationInput) GoString() string {
 	return s.String()
 }
 
-// Validate inspects the ***REMOVED***elds of the type to determine if they are valid.
-func (s *PutBucketMetricsCon***REMOVED***gurationInput) Validate() error {
-	invalidParams := request.ErrInvalidParams{Context: "PutBucketMetricsCon***REMOVED***gurationInput"}
+// Validate inspects the fields of the type to determine if they are valid.
+func (s *PutBucketMetricsConfigurationInput) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "PutBucketMetricsConfigurationInput"}
 	if s.Bucket == nil {
 		invalidParams.Add(request.NewErrParamRequired("Bucket"))
 	}
@@ -19450,12 +19450,12 @@ func (s *PutBucketMetricsCon***REMOVED***gurationInput) Validate() error {
 	if s.Id == nil {
 		invalidParams.Add(request.NewErrParamRequired("Id"))
 	}
-	if s.MetricsCon***REMOVED***guration == nil {
-		invalidParams.Add(request.NewErrParamRequired("MetricsCon***REMOVED***guration"))
+	if s.MetricsConfiguration == nil {
+		invalidParams.Add(request.NewErrParamRequired("MetricsConfiguration"))
 	}
-	if s.MetricsCon***REMOVED***guration != nil {
-		if err := s.MetricsCon***REMOVED***guration.Validate(); err != nil {
-			invalidParams.AddNested("MetricsCon***REMOVED***guration", err.(request.ErrInvalidParams))
+	if s.MetricsConfiguration != nil {
+		if err := s.MetricsConfiguration.Validate(); err != nil {
+			invalidParams.AddNested("MetricsConfiguration", err.(request.ErrInvalidParams))
 		}
 	}
 
@@ -19465,83 +19465,83 @@ func (s *PutBucketMetricsCon***REMOVED***gurationInput) Validate() error {
 	return nil
 }
 
-// SetBucket sets the Bucket ***REMOVED***eld's value.
-func (s *PutBucketMetricsCon***REMOVED***gurationInput) SetBucket(v string) *PutBucketMetricsCon***REMOVED***gurationInput {
+// SetBucket sets the Bucket field's value.
+func (s *PutBucketMetricsConfigurationInput) SetBucket(v string) *PutBucketMetricsConfigurationInput {
 	s.Bucket = &v
 	return s
 }
 
-func (s *PutBucketMetricsCon***REMOVED***gurationInput) getBucket() (v string) {
+func (s *PutBucketMetricsConfigurationInput) getBucket() (v string) {
 	if s.Bucket == nil {
 		return v
 	}
 	return *s.Bucket
 }
 
-// SetId sets the Id ***REMOVED***eld's value.
-func (s *PutBucketMetricsCon***REMOVED***gurationInput) SetId(v string) *PutBucketMetricsCon***REMOVED***gurationInput {
+// SetId sets the Id field's value.
+func (s *PutBucketMetricsConfigurationInput) SetId(v string) *PutBucketMetricsConfigurationInput {
 	s.Id = &v
 	return s
 }
 
-// SetMetricsCon***REMOVED***guration sets the MetricsCon***REMOVED***guration ***REMOVED***eld's value.
-func (s *PutBucketMetricsCon***REMOVED***gurationInput) SetMetricsCon***REMOVED***guration(v *MetricsCon***REMOVED***guration) *PutBucketMetricsCon***REMOVED***gurationInput {
-	s.MetricsCon***REMOVED***guration = v
+// SetMetricsConfiguration sets the MetricsConfiguration field's value.
+func (s *PutBucketMetricsConfigurationInput) SetMetricsConfiguration(v *MetricsConfiguration) *PutBucketMetricsConfigurationInput {
+	s.MetricsConfiguration = v
 	return s
 }
 
-type PutBucketMetricsCon***REMOVED***gurationOutput struct {
+type PutBucketMetricsConfigurationOutput struct {
 	_ struct{} `type:"structure"`
 }
 
 // String returns the string representation
-func (s PutBucketMetricsCon***REMOVED***gurationOutput) String() string {
+func (s PutBucketMetricsConfigurationOutput) String() string {
 	return awsutil.Prettify(s)
 }
 
 // GoString returns the string representation
-func (s PutBucketMetricsCon***REMOVED***gurationOutput) GoString() string {
+func (s PutBucketMetricsConfigurationOutput) GoString() string {
 	return s.String()
 }
 
-type PutBucketNoti***REMOVED***cationCon***REMOVED***gurationInput struct {
-	_ struct{} `locationName:"PutBucketNoti***REMOVED***cationCon***REMOVED***gurationRequest" type:"structure" payload:"Noti***REMOVED***cationCon***REMOVED***guration"`
+type PutBucketNotificationConfigurationInput struct {
+	_ struct{} `locationName:"PutBucketNotificationConfigurationRequest" type:"structure" payload:"NotificationConfiguration"`
 
-	// Bucket is a required ***REMOVED***eld
+	// Bucket is a required field
 	Bucket *string `location:"uri" locationName:"Bucket" type:"string" required:"true"`
 
-	// A container for specifying the noti***REMOVED***cation con***REMOVED***guration of the bucket.
-	// If this element is empty, noti***REMOVED***cations are turned off for the bucket.
+	// A container for specifying the notification configuration of the bucket.
+	// If this element is empty, notifications are turned off for the bucket.
 	//
-	// Noti***REMOVED***cationCon***REMOVED***guration is a required ***REMOVED***eld
-	Noti***REMOVED***cationCon***REMOVED***guration *Noti***REMOVED***cationCon***REMOVED***guration `locationName:"Noti***REMOVED***cationCon***REMOVED***guration" type:"structure" required:"true" xmlURI:"http://s3.amazonaws.com/doc/2006-03-01/"`
+	// NotificationConfiguration is a required field
+	NotificationConfiguration *NotificationConfiguration `locationName:"NotificationConfiguration" type:"structure" required:"true" xmlURI:"http://s3.amazonaws.com/doc/2006-03-01/"`
 }
 
 // String returns the string representation
-func (s PutBucketNoti***REMOVED***cationCon***REMOVED***gurationInput) String() string {
+func (s PutBucketNotificationConfigurationInput) String() string {
 	return awsutil.Prettify(s)
 }
 
 // GoString returns the string representation
-func (s PutBucketNoti***REMOVED***cationCon***REMOVED***gurationInput) GoString() string {
+func (s PutBucketNotificationConfigurationInput) GoString() string {
 	return s.String()
 }
 
-// Validate inspects the ***REMOVED***elds of the type to determine if they are valid.
-func (s *PutBucketNoti***REMOVED***cationCon***REMOVED***gurationInput) Validate() error {
-	invalidParams := request.ErrInvalidParams{Context: "PutBucketNoti***REMOVED***cationCon***REMOVED***gurationInput"}
+// Validate inspects the fields of the type to determine if they are valid.
+func (s *PutBucketNotificationConfigurationInput) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "PutBucketNotificationConfigurationInput"}
 	if s.Bucket == nil {
 		invalidParams.Add(request.NewErrParamRequired("Bucket"))
 	}
 	if s.Bucket != nil && len(*s.Bucket) < 1 {
 		invalidParams.Add(request.NewErrParamMinLen("Bucket", 1))
 	}
-	if s.Noti***REMOVED***cationCon***REMOVED***guration == nil {
-		invalidParams.Add(request.NewErrParamRequired("Noti***REMOVED***cationCon***REMOVED***guration"))
+	if s.NotificationConfiguration == nil {
+		invalidParams.Add(request.NewErrParamRequired("NotificationConfiguration"))
 	}
-	if s.Noti***REMOVED***cationCon***REMOVED***guration != nil {
-		if err := s.Noti***REMOVED***cationCon***REMOVED***guration.Validate(); err != nil {
-			invalidParams.AddNested("Noti***REMOVED***cationCon***REMOVED***guration", err.(request.ErrInvalidParams))
+	if s.NotificationConfiguration != nil {
+		if err := s.NotificationConfiguration.Validate(); err != nil {
+			invalidParams.AddNested("NotificationConfiguration", err.(request.ErrInvalidParams))
 		}
 	}
 
@@ -19551,70 +19551,70 @@ func (s *PutBucketNoti***REMOVED***cationCon***REMOVED***gurationInput) Validate
 	return nil
 }
 
-// SetBucket sets the Bucket ***REMOVED***eld's value.
-func (s *PutBucketNoti***REMOVED***cationCon***REMOVED***gurationInput) SetBucket(v string) *PutBucketNoti***REMOVED***cationCon***REMOVED***gurationInput {
+// SetBucket sets the Bucket field's value.
+func (s *PutBucketNotificationConfigurationInput) SetBucket(v string) *PutBucketNotificationConfigurationInput {
 	s.Bucket = &v
 	return s
 }
 
-func (s *PutBucketNoti***REMOVED***cationCon***REMOVED***gurationInput) getBucket() (v string) {
+func (s *PutBucketNotificationConfigurationInput) getBucket() (v string) {
 	if s.Bucket == nil {
 		return v
 	}
 	return *s.Bucket
 }
 
-// SetNoti***REMOVED***cationCon***REMOVED***guration sets the Noti***REMOVED***cationCon***REMOVED***guration ***REMOVED***eld's value.
-func (s *PutBucketNoti***REMOVED***cationCon***REMOVED***gurationInput) SetNoti***REMOVED***cationCon***REMOVED***guration(v *Noti***REMOVED***cationCon***REMOVED***guration) *PutBucketNoti***REMOVED***cationCon***REMOVED***gurationInput {
-	s.Noti***REMOVED***cationCon***REMOVED***guration = v
+// SetNotificationConfiguration sets the NotificationConfiguration field's value.
+func (s *PutBucketNotificationConfigurationInput) SetNotificationConfiguration(v *NotificationConfiguration) *PutBucketNotificationConfigurationInput {
+	s.NotificationConfiguration = v
 	return s
 }
 
-type PutBucketNoti***REMOVED***cationCon***REMOVED***gurationOutput struct {
+type PutBucketNotificationConfigurationOutput struct {
 	_ struct{} `type:"structure"`
 }
 
 // String returns the string representation
-func (s PutBucketNoti***REMOVED***cationCon***REMOVED***gurationOutput) String() string {
+func (s PutBucketNotificationConfigurationOutput) String() string {
 	return awsutil.Prettify(s)
 }
 
 // GoString returns the string representation
-func (s PutBucketNoti***REMOVED***cationCon***REMOVED***gurationOutput) GoString() string {
+func (s PutBucketNotificationConfigurationOutput) GoString() string {
 	return s.String()
 }
 
-type PutBucketNoti***REMOVED***cationInput struct {
-	_ struct{} `locationName:"PutBucketNoti***REMOVED***cationRequest" type:"structure" payload:"Noti***REMOVED***cationCon***REMOVED***guration"`
+type PutBucketNotificationInput struct {
+	_ struct{} `locationName:"PutBucketNotificationRequest" type:"structure" payload:"NotificationConfiguration"`
 
-	// Bucket is a required ***REMOVED***eld
+	// Bucket is a required field
 	Bucket *string `location:"uri" locationName:"Bucket" type:"string" required:"true"`
 
-	// Noti***REMOVED***cationCon***REMOVED***guration is a required ***REMOVED***eld
-	Noti***REMOVED***cationCon***REMOVED***guration *Noti***REMOVED***cationCon***REMOVED***gurationDeprecated `locationName:"Noti***REMOVED***cationCon***REMOVED***guration" type:"structure" required:"true" xmlURI:"http://s3.amazonaws.com/doc/2006-03-01/"`
+	// NotificationConfiguration is a required field
+	NotificationConfiguration *NotificationConfigurationDeprecated `locationName:"NotificationConfiguration" type:"structure" required:"true" xmlURI:"http://s3.amazonaws.com/doc/2006-03-01/"`
 }
 
 // String returns the string representation
-func (s PutBucketNoti***REMOVED***cationInput) String() string {
+func (s PutBucketNotificationInput) String() string {
 	return awsutil.Prettify(s)
 }
 
 // GoString returns the string representation
-func (s PutBucketNoti***REMOVED***cationInput) GoString() string {
+func (s PutBucketNotificationInput) GoString() string {
 	return s.String()
 }
 
-// Validate inspects the ***REMOVED***elds of the type to determine if they are valid.
-func (s *PutBucketNoti***REMOVED***cationInput) Validate() error {
-	invalidParams := request.ErrInvalidParams{Context: "PutBucketNoti***REMOVED***cationInput"}
+// Validate inspects the fields of the type to determine if they are valid.
+func (s *PutBucketNotificationInput) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "PutBucketNotificationInput"}
 	if s.Bucket == nil {
 		invalidParams.Add(request.NewErrParamRequired("Bucket"))
 	}
 	if s.Bucket != nil && len(*s.Bucket) < 1 {
 		invalidParams.Add(request.NewErrParamMinLen("Bucket", 1))
 	}
-	if s.Noti***REMOVED***cationCon***REMOVED***guration == nil {
-		invalidParams.Add(request.NewErrParamRequired("Noti***REMOVED***cationCon***REMOVED***guration"))
+	if s.NotificationConfiguration == nil {
+		invalidParams.Add(request.NewErrParamRequired("NotificationConfiguration"))
 	}
 
 	if invalidParams.Len() > 0 {
@@ -19623,52 +19623,52 @@ func (s *PutBucketNoti***REMOVED***cationInput) Validate() error {
 	return nil
 }
 
-// SetBucket sets the Bucket ***REMOVED***eld's value.
-func (s *PutBucketNoti***REMOVED***cationInput) SetBucket(v string) *PutBucketNoti***REMOVED***cationInput {
+// SetBucket sets the Bucket field's value.
+func (s *PutBucketNotificationInput) SetBucket(v string) *PutBucketNotificationInput {
 	s.Bucket = &v
 	return s
 }
 
-func (s *PutBucketNoti***REMOVED***cationInput) getBucket() (v string) {
+func (s *PutBucketNotificationInput) getBucket() (v string) {
 	if s.Bucket == nil {
 		return v
 	}
 	return *s.Bucket
 }
 
-// SetNoti***REMOVED***cationCon***REMOVED***guration sets the Noti***REMOVED***cationCon***REMOVED***guration ***REMOVED***eld's value.
-func (s *PutBucketNoti***REMOVED***cationInput) SetNoti***REMOVED***cationCon***REMOVED***guration(v *Noti***REMOVED***cationCon***REMOVED***gurationDeprecated) *PutBucketNoti***REMOVED***cationInput {
-	s.Noti***REMOVED***cationCon***REMOVED***guration = v
+// SetNotificationConfiguration sets the NotificationConfiguration field's value.
+func (s *PutBucketNotificationInput) SetNotificationConfiguration(v *NotificationConfigurationDeprecated) *PutBucketNotificationInput {
+	s.NotificationConfiguration = v
 	return s
 }
 
-type PutBucketNoti***REMOVED***cationOutput struct {
+type PutBucketNotificationOutput struct {
 	_ struct{} `type:"structure"`
 }
 
 // String returns the string representation
-func (s PutBucketNoti***REMOVED***cationOutput) String() string {
+func (s PutBucketNotificationOutput) String() string {
 	return awsutil.Prettify(s)
 }
 
 // GoString returns the string representation
-func (s PutBucketNoti***REMOVED***cationOutput) GoString() string {
+func (s PutBucketNotificationOutput) GoString() string {
 	return s.String()
 }
 
 type PutBucketPolicyInput struct {
 	_ struct{} `locationName:"PutBucketPolicyRequest" type:"structure" payload:"Policy"`
 
-	// Bucket is a required ***REMOVED***eld
+	// Bucket is a required field
 	Bucket *string `location:"uri" locationName:"Bucket" type:"string" required:"true"`
 
-	// Set this parameter to true to con***REMOVED***rm that you want to remove your permissions
+	// Set this parameter to true to confirm that you want to remove your permissions
 	// to change this bucket policy in the future.
-	Con***REMOVED***rmRemoveSelfBucketAccess *bool `location:"header" locationName:"x-amz-con***REMOVED***rm-remove-self-bucket-access" type:"boolean"`
+	ConfirmRemoveSelfBucketAccess *bool `location:"header" locationName:"x-amz-confirm-remove-self-bucket-access" type:"boolean"`
 
 	// The bucket policy as a JSON document.
 	//
-	// Policy is a required ***REMOVED***eld
+	// Policy is a required field
 	Policy *string `type:"string" required:"true"`
 }
 
@@ -19682,7 +19682,7 @@ func (s PutBucketPolicyInput) GoString() string {
 	return s.String()
 }
 
-// Validate inspects the ***REMOVED***elds of the type to determine if they are valid.
+// Validate inspects the fields of the type to determine if they are valid.
 func (s *PutBucketPolicyInput) Validate() error {
 	invalidParams := request.ErrInvalidParams{Context: "PutBucketPolicyInput"}
 	if s.Bucket == nil {
@@ -19701,7 +19701,7 @@ func (s *PutBucketPolicyInput) Validate() error {
 	return nil
 }
 
-// SetBucket sets the Bucket ***REMOVED***eld's value.
+// SetBucket sets the Bucket field's value.
 func (s *PutBucketPolicyInput) SetBucket(v string) *PutBucketPolicyInput {
 	s.Bucket = &v
 	return s
@@ -19714,13 +19714,13 @@ func (s *PutBucketPolicyInput) getBucket() (v string) {
 	return *s.Bucket
 }
 
-// SetCon***REMOVED***rmRemoveSelfBucketAccess sets the Con***REMOVED***rmRemoveSelfBucketAccess ***REMOVED***eld's value.
-func (s *PutBucketPolicyInput) SetCon***REMOVED***rmRemoveSelfBucketAccess(v bool) *PutBucketPolicyInput {
-	s.Con***REMOVED***rmRemoveSelfBucketAccess = &v
+// SetConfirmRemoveSelfBucketAccess sets the ConfirmRemoveSelfBucketAccess field's value.
+func (s *PutBucketPolicyInput) SetConfirmRemoveSelfBucketAccess(v bool) *PutBucketPolicyInput {
+	s.ConfirmRemoveSelfBucketAccess = &v
 	return s
 }
 
-// SetPolicy sets the Policy ***REMOVED***eld's value.
+// SetPolicy sets the Policy field's value.
 func (s *PutBucketPolicyInput) SetPolicy(v string) *PutBucketPolicyInput {
 	s.Policy = &v
 	return s
@@ -19741,16 +19741,16 @@ func (s PutBucketPolicyOutput) GoString() string {
 }
 
 type PutBucketReplicationInput struct {
-	_ struct{} `locationName:"PutBucketReplicationRequest" type:"structure" payload:"ReplicationCon***REMOVED***guration"`
+	_ struct{} `locationName:"PutBucketReplicationRequest" type:"structure" payload:"ReplicationConfiguration"`
 
-	// Bucket is a required ***REMOVED***eld
+	// Bucket is a required field
 	Bucket *string `location:"uri" locationName:"Bucket" type:"string" required:"true"`
 
 	// A container for replication rules. You can add up to 1,000 rules. The maximum
-	// size of a replication con***REMOVED***guration is 2 MB.
+	// size of a replication configuration is 2 MB.
 	//
-	// ReplicationCon***REMOVED***guration is a required ***REMOVED***eld
-	ReplicationCon***REMOVED***guration *ReplicationCon***REMOVED***guration `locationName:"ReplicationCon***REMOVED***guration" type:"structure" required:"true" xmlURI:"http://s3.amazonaws.com/doc/2006-03-01/"`
+	// ReplicationConfiguration is a required field
+	ReplicationConfiguration *ReplicationConfiguration `locationName:"ReplicationConfiguration" type:"structure" required:"true" xmlURI:"http://s3.amazonaws.com/doc/2006-03-01/"`
 
 	// A token that allows Amazon S3 object lock to be enabled for an existing bucket.
 	Token *string `location:"header" locationName:"x-amz-bucket-object-lock-token" type:"string"`
@@ -19766,7 +19766,7 @@ func (s PutBucketReplicationInput) GoString() string {
 	return s.String()
 }
 
-// Validate inspects the ***REMOVED***elds of the type to determine if they are valid.
+// Validate inspects the fields of the type to determine if they are valid.
 func (s *PutBucketReplicationInput) Validate() error {
 	invalidParams := request.ErrInvalidParams{Context: "PutBucketReplicationInput"}
 	if s.Bucket == nil {
@@ -19775,12 +19775,12 @@ func (s *PutBucketReplicationInput) Validate() error {
 	if s.Bucket != nil && len(*s.Bucket) < 1 {
 		invalidParams.Add(request.NewErrParamMinLen("Bucket", 1))
 	}
-	if s.ReplicationCon***REMOVED***guration == nil {
-		invalidParams.Add(request.NewErrParamRequired("ReplicationCon***REMOVED***guration"))
+	if s.ReplicationConfiguration == nil {
+		invalidParams.Add(request.NewErrParamRequired("ReplicationConfiguration"))
 	}
-	if s.ReplicationCon***REMOVED***guration != nil {
-		if err := s.ReplicationCon***REMOVED***guration.Validate(); err != nil {
-			invalidParams.AddNested("ReplicationCon***REMOVED***guration", err.(request.ErrInvalidParams))
+	if s.ReplicationConfiguration != nil {
+		if err := s.ReplicationConfiguration.Validate(); err != nil {
+			invalidParams.AddNested("ReplicationConfiguration", err.(request.ErrInvalidParams))
 		}
 	}
 
@@ -19790,7 +19790,7 @@ func (s *PutBucketReplicationInput) Validate() error {
 	return nil
 }
 
-// SetBucket sets the Bucket ***REMOVED***eld's value.
+// SetBucket sets the Bucket field's value.
 func (s *PutBucketReplicationInput) SetBucket(v string) *PutBucketReplicationInput {
 	s.Bucket = &v
 	return s
@@ -19803,13 +19803,13 @@ func (s *PutBucketReplicationInput) getBucket() (v string) {
 	return *s.Bucket
 }
 
-// SetReplicationCon***REMOVED***guration sets the ReplicationCon***REMOVED***guration ***REMOVED***eld's value.
-func (s *PutBucketReplicationInput) SetReplicationCon***REMOVED***guration(v *ReplicationCon***REMOVED***guration) *PutBucketReplicationInput {
-	s.ReplicationCon***REMOVED***guration = v
+// SetReplicationConfiguration sets the ReplicationConfiguration field's value.
+func (s *PutBucketReplicationInput) SetReplicationConfiguration(v *ReplicationConfiguration) *PutBucketReplicationInput {
+	s.ReplicationConfiguration = v
 	return s
 }
 
-// SetToken sets the Token ***REMOVED***eld's value.
+// SetToken sets the Token field's value.
 func (s *PutBucketReplicationInput) SetToken(v string) *PutBucketReplicationInput {
 	s.Token = &v
 	return s
@@ -19830,13 +19830,13 @@ func (s PutBucketReplicationOutput) GoString() string {
 }
 
 type PutBucketRequestPaymentInput struct {
-	_ struct{} `locationName:"PutBucketRequestPaymentRequest" type:"structure" payload:"RequestPaymentCon***REMOVED***guration"`
+	_ struct{} `locationName:"PutBucketRequestPaymentRequest" type:"structure" payload:"RequestPaymentConfiguration"`
 
-	// Bucket is a required ***REMOVED***eld
+	// Bucket is a required field
 	Bucket *string `location:"uri" locationName:"Bucket" type:"string" required:"true"`
 
-	// RequestPaymentCon***REMOVED***guration is a required ***REMOVED***eld
-	RequestPaymentCon***REMOVED***guration *RequestPaymentCon***REMOVED***guration `locationName:"RequestPaymentCon***REMOVED***guration" type:"structure" required:"true" xmlURI:"http://s3.amazonaws.com/doc/2006-03-01/"`
+	// RequestPaymentConfiguration is a required field
+	RequestPaymentConfiguration *RequestPaymentConfiguration `locationName:"RequestPaymentConfiguration" type:"structure" required:"true" xmlURI:"http://s3.amazonaws.com/doc/2006-03-01/"`
 }
 
 // String returns the string representation
@@ -19849,7 +19849,7 @@ func (s PutBucketRequestPaymentInput) GoString() string {
 	return s.String()
 }
 
-// Validate inspects the ***REMOVED***elds of the type to determine if they are valid.
+// Validate inspects the fields of the type to determine if they are valid.
 func (s *PutBucketRequestPaymentInput) Validate() error {
 	invalidParams := request.ErrInvalidParams{Context: "PutBucketRequestPaymentInput"}
 	if s.Bucket == nil {
@@ -19858,12 +19858,12 @@ func (s *PutBucketRequestPaymentInput) Validate() error {
 	if s.Bucket != nil && len(*s.Bucket) < 1 {
 		invalidParams.Add(request.NewErrParamMinLen("Bucket", 1))
 	}
-	if s.RequestPaymentCon***REMOVED***guration == nil {
-		invalidParams.Add(request.NewErrParamRequired("RequestPaymentCon***REMOVED***guration"))
+	if s.RequestPaymentConfiguration == nil {
+		invalidParams.Add(request.NewErrParamRequired("RequestPaymentConfiguration"))
 	}
-	if s.RequestPaymentCon***REMOVED***guration != nil {
-		if err := s.RequestPaymentCon***REMOVED***guration.Validate(); err != nil {
-			invalidParams.AddNested("RequestPaymentCon***REMOVED***guration", err.(request.ErrInvalidParams))
+	if s.RequestPaymentConfiguration != nil {
+		if err := s.RequestPaymentConfiguration.Validate(); err != nil {
+			invalidParams.AddNested("RequestPaymentConfiguration", err.(request.ErrInvalidParams))
 		}
 	}
 
@@ -19873,7 +19873,7 @@ func (s *PutBucketRequestPaymentInput) Validate() error {
 	return nil
 }
 
-// SetBucket sets the Bucket ***REMOVED***eld's value.
+// SetBucket sets the Bucket field's value.
 func (s *PutBucketRequestPaymentInput) SetBucket(v string) *PutBucketRequestPaymentInput {
 	s.Bucket = &v
 	return s
@@ -19886,9 +19886,9 @@ func (s *PutBucketRequestPaymentInput) getBucket() (v string) {
 	return *s.Bucket
 }
 
-// SetRequestPaymentCon***REMOVED***guration sets the RequestPaymentCon***REMOVED***guration ***REMOVED***eld's value.
-func (s *PutBucketRequestPaymentInput) SetRequestPaymentCon***REMOVED***guration(v *RequestPaymentCon***REMOVED***guration) *PutBucketRequestPaymentInput {
-	s.RequestPaymentCon***REMOVED***guration = v
+// SetRequestPaymentConfiguration sets the RequestPaymentConfiguration field's value.
+func (s *PutBucketRequestPaymentInput) SetRequestPaymentConfiguration(v *RequestPaymentConfiguration) *PutBucketRequestPaymentInput {
+	s.RequestPaymentConfiguration = v
 	return s
 }
 
@@ -19909,10 +19909,10 @@ func (s PutBucketRequestPaymentOutput) GoString() string {
 type PutBucketTaggingInput struct {
 	_ struct{} `locationName:"PutBucketTaggingRequest" type:"structure" payload:"Tagging"`
 
-	// Bucket is a required ***REMOVED***eld
+	// Bucket is a required field
 	Bucket *string `location:"uri" locationName:"Bucket" type:"string" required:"true"`
 
-	// Tagging is a required ***REMOVED***eld
+	// Tagging is a required field
 	Tagging *Tagging `locationName:"Tagging" type:"structure" required:"true" xmlURI:"http://s3.amazonaws.com/doc/2006-03-01/"`
 }
 
@@ -19926,7 +19926,7 @@ func (s PutBucketTaggingInput) GoString() string {
 	return s.String()
 }
 
-// Validate inspects the ***REMOVED***elds of the type to determine if they are valid.
+// Validate inspects the fields of the type to determine if they are valid.
 func (s *PutBucketTaggingInput) Validate() error {
 	invalidParams := request.ErrInvalidParams{Context: "PutBucketTaggingInput"}
 	if s.Bucket == nil {
@@ -19950,7 +19950,7 @@ func (s *PutBucketTaggingInput) Validate() error {
 	return nil
 }
 
-// SetBucket sets the Bucket ***REMOVED***eld's value.
+// SetBucket sets the Bucket field's value.
 func (s *PutBucketTaggingInput) SetBucket(v string) *PutBucketTaggingInput {
 	s.Bucket = &v
 	return s
@@ -19963,7 +19963,7 @@ func (s *PutBucketTaggingInput) getBucket() (v string) {
 	return *s.Bucket
 }
 
-// SetTagging sets the Tagging ***REMOVED***eld's value.
+// SetTagging sets the Tagging field's value.
 func (s *PutBucketTaggingInput) SetTagging(v *Tagging) *PutBucketTaggingInput {
 	s.Tagging = v
 	return s
@@ -19984,9 +19984,9 @@ func (s PutBucketTaggingOutput) GoString() string {
 }
 
 type PutBucketVersioningInput struct {
-	_ struct{} `locationName:"PutBucketVersioningRequest" type:"structure" payload:"VersioningCon***REMOVED***guration"`
+	_ struct{} `locationName:"PutBucketVersioningRequest" type:"structure" payload:"VersioningConfiguration"`
 
-	// Bucket is a required ***REMOVED***eld
+	// Bucket is a required field
 	Bucket *string `location:"uri" locationName:"Bucket" type:"string" required:"true"`
 
 	// The concatenation of the authentication device's serial number, a space,
@@ -19997,8 +19997,8 @@ type PutBucketVersioningInput struct {
 	// see PUT Bucket versioning (https://docs.aws.amazon.com/AmazonS3/latest/API/RESTBucketPUTVersioningStatus.html)
 	// in the Amazon Simple Storage Service API Reference.
 	//
-	// VersioningCon***REMOVED***guration is a required ***REMOVED***eld
-	VersioningCon***REMOVED***guration *VersioningCon***REMOVED***guration `locationName:"VersioningCon***REMOVED***guration" type:"structure" required:"true" xmlURI:"http://s3.amazonaws.com/doc/2006-03-01/"`
+	// VersioningConfiguration is a required field
+	VersioningConfiguration *VersioningConfiguration `locationName:"VersioningConfiguration" type:"structure" required:"true" xmlURI:"http://s3.amazonaws.com/doc/2006-03-01/"`
 }
 
 // String returns the string representation
@@ -20011,7 +20011,7 @@ func (s PutBucketVersioningInput) GoString() string {
 	return s.String()
 }
 
-// Validate inspects the ***REMOVED***elds of the type to determine if they are valid.
+// Validate inspects the fields of the type to determine if they are valid.
 func (s *PutBucketVersioningInput) Validate() error {
 	invalidParams := request.ErrInvalidParams{Context: "PutBucketVersioningInput"}
 	if s.Bucket == nil {
@@ -20020,8 +20020,8 @@ func (s *PutBucketVersioningInput) Validate() error {
 	if s.Bucket != nil && len(*s.Bucket) < 1 {
 		invalidParams.Add(request.NewErrParamMinLen("Bucket", 1))
 	}
-	if s.VersioningCon***REMOVED***guration == nil {
-		invalidParams.Add(request.NewErrParamRequired("VersioningCon***REMOVED***guration"))
+	if s.VersioningConfiguration == nil {
+		invalidParams.Add(request.NewErrParamRequired("VersioningConfiguration"))
 	}
 
 	if invalidParams.Len() > 0 {
@@ -20030,7 +20030,7 @@ func (s *PutBucketVersioningInput) Validate() error {
 	return nil
 }
 
-// SetBucket sets the Bucket ***REMOVED***eld's value.
+// SetBucket sets the Bucket field's value.
 func (s *PutBucketVersioningInput) SetBucket(v string) *PutBucketVersioningInput {
 	s.Bucket = &v
 	return s
@@ -20043,15 +20043,15 @@ func (s *PutBucketVersioningInput) getBucket() (v string) {
 	return *s.Bucket
 }
 
-// SetMFA sets the MFA ***REMOVED***eld's value.
+// SetMFA sets the MFA field's value.
 func (s *PutBucketVersioningInput) SetMFA(v string) *PutBucketVersioningInput {
 	s.MFA = &v
 	return s
 }
 
-// SetVersioningCon***REMOVED***guration sets the VersioningCon***REMOVED***guration ***REMOVED***eld's value.
-func (s *PutBucketVersioningInput) SetVersioningCon***REMOVED***guration(v *VersioningCon***REMOVED***guration) *PutBucketVersioningInput {
-	s.VersioningCon***REMOVED***guration = v
+// SetVersioningConfiguration sets the VersioningConfiguration field's value.
+func (s *PutBucketVersioningInput) SetVersioningConfiguration(v *VersioningConfiguration) *PutBucketVersioningInput {
+	s.VersioningConfiguration = v
 	return s
 }
 
@@ -20070,15 +20070,15 @@ func (s PutBucketVersioningOutput) GoString() string {
 }
 
 type PutBucketWebsiteInput struct {
-	_ struct{} `locationName:"PutBucketWebsiteRequest" type:"structure" payload:"WebsiteCon***REMOVED***guration"`
+	_ struct{} `locationName:"PutBucketWebsiteRequest" type:"structure" payload:"WebsiteConfiguration"`
 
-	// Bucket is a required ***REMOVED***eld
+	// Bucket is a required field
 	Bucket *string `location:"uri" locationName:"Bucket" type:"string" required:"true"`
 
-	// Speci***REMOVED***es website con***REMOVED***guration parameters for an Amazon S3 bucket.
+	// Specifies website configuration parameters for an Amazon S3 bucket.
 	//
-	// WebsiteCon***REMOVED***guration is a required ***REMOVED***eld
-	WebsiteCon***REMOVED***guration *WebsiteCon***REMOVED***guration `locationName:"WebsiteCon***REMOVED***guration" type:"structure" required:"true" xmlURI:"http://s3.amazonaws.com/doc/2006-03-01/"`
+	// WebsiteConfiguration is a required field
+	WebsiteConfiguration *WebsiteConfiguration `locationName:"WebsiteConfiguration" type:"structure" required:"true" xmlURI:"http://s3.amazonaws.com/doc/2006-03-01/"`
 }
 
 // String returns the string representation
@@ -20091,7 +20091,7 @@ func (s PutBucketWebsiteInput) GoString() string {
 	return s.String()
 }
 
-// Validate inspects the ***REMOVED***elds of the type to determine if they are valid.
+// Validate inspects the fields of the type to determine if they are valid.
 func (s *PutBucketWebsiteInput) Validate() error {
 	invalidParams := request.ErrInvalidParams{Context: "PutBucketWebsiteInput"}
 	if s.Bucket == nil {
@@ -20100,12 +20100,12 @@ func (s *PutBucketWebsiteInput) Validate() error {
 	if s.Bucket != nil && len(*s.Bucket) < 1 {
 		invalidParams.Add(request.NewErrParamMinLen("Bucket", 1))
 	}
-	if s.WebsiteCon***REMOVED***guration == nil {
-		invalidParams.Add(request.NewErrParamRequired("WebsiteCon***REMOVED***guration"))
+	if s.WebsiteConfiguration == nil {
+		invalidParams.Add(request.NewErrParamRequired("WebsiteConfiguration"))
 	}
-	if s.WebsiteCon***REMOVED***guration != nil {
-		if err := s.WebsiteCon***REMOVED***guration.Validate(); err != nil {
-			invalidParams.AddNested("WebsiteCon***REMOVED***guration", err.(request.ErrInvalidParams))
+	if s.WebsiteConfiguration != nil {
+		if err := s.WebsiteConfiguration.Validate(); err != nil {
+			invalidParams.AddNested("WebsiteConfiguration", err.(request.ErrInvalidParams))
 		}
 	}
 
@@ -20115,7 +20115,7 @@ func (s *PutBucketWebsiteInput) Validate() error {
 	return nil
 }
 
-// SetBucket sets the Bucket ***REMOVED***eld's value.
+// SetBucket sets the Bucket field's value.
 func (s *PutBucketWebsiteInput) SetBucket(v string) *PutBucketWebsiteInput {
 	s.Bucket = &v
 	return s
@@ -20128,9 +20128,9 @@ func (s *PutBucketWebsiteInput) getBucket() (v string) {
 	return *s.Bucket
 }
 
-// SetWebsiteCon***REMOVED***guration sets the WebsiteCon***REMOVED***guration ***REMOVED***eld's value.
-func (s *PutBucketWebsiteInput) SetWebsiteCon***REMOVED***guration(v *WebsiteCon***REMOVED***guration) *PutBucketWebsiteInput {
-	s.WebsiteCon***REMOVED***guration = v
+// SetWebsiteConfiguration sets the WebsiteConfiguration field's value.
+func (s *PutBucketWebsiteInput) SetWebsiteConfiguration(v *WebsiteConfiguration) *PutBucketWebsiteInput {
+	s.WebsiteConfiguration = v
 	return s
 }
 
@@ -20157,7 +20157,7 @@ type PutObjectAclInput struct {
 	// Contains the elements that set the ACL permissions for an object per grantee.
 	AccessControlPolicy *AccessControlPolicy `locationName:"AccessControlPolicy" type:"structure" xmlURI:"http://s3.amazonaws.com/doc/2006-03-01/"`
 
-	// Bucket is a required ***REMOVED***eld
+	// Bucket is a required field
 	Bucket *string `location:"uri" locationName:"Bucket" type:"string" required:"true"`
 
 	// Allows grantee the read, write, read ACP, and write ACP permissions on the
@@ -20176,16 +20176,16 @@ type PutObjectAclInput struct {
 	// Allows grantee to write the ACL for the applicable bucket.
 	GrantWriteACP *string `location:"header" locationName:"x-amz-grant-write-acp" type:"string"`
 
-	// Key is a required ***REMOVED***eld
+	// Key is a required field
 	Key *string `location:"uri" locationName:"Key" min:"1" type:"string" required:"true"`
 
-	// Con***REMOVED***rms that the requester knows that she or he will be charged for the
+	// Confirms that the requester knows that she or he will be charged for the
 	// request. Bucket owners need not specify this parameter in their requests.
 	// Documentation on downloading objects from requester pays buckets can be found
 	// at http://docs.aws.amazon.com/AmazonS3/latest/dev/ObjectsinRequesterPaysBuckets.html
 	RequestPayer *string `location:"header" locationName:"x-amz-request-payer" type:"string" enum:"RequestPayer"`
 
-	// VersionId used to reference a speci***REMOVED***c version of the object.
+	// VersionId used to reference a specific version of the object.
 	VersionId *string `location:"querystring" locationName:"versionId" type:"string"`
 }
 
@@ -20199,7 +20199,7 @@ func (s PutObjectAclInput) GoString() string {
 	return s.String()
 }
 
-// Validate inspects the ***REMOVED***elds of the type to determine if they are valid.
+// Validate inspects the fields of the type to determine if they are valid.
 func (s *PutObjectAclInput) Validate() error {
 	invalidParams := request.ErrInvalidParams{Context: "PutObjectAclInput"}
 	if s.Bucket == nil {
@@ -20226,19 +20226,19 @@ func (s *PutObjectAclInput) Validate() error {
 	return nil
 }
 
-// SetACL sets the ACL ***REMOVED***eld's value.
+// SetACL sets the ACL field's value.
 func (s *PutObjectAclInput) SetACL(v string) *PutObjectAclInput {
 	s.ACL = &v
 	return s
 }
 
-// SetAccessControlPolicy sets the AccessControlPolicy ***REMOVED***eld's value.
+// SetAccessControlPolicy sets the AccessControlPolicy field's value.
 func (s *PutObjectAclInput) SetAccessControlPolicy(v *AccessControlPolicy) *PutObjectAclInput {
 	s.AccessControlPolicy = v
 	return s
 }
 
-// SetBucket sets the Bucket ***REMOVED***eld's value.
+// SetBucket sets the Bucket field's value.
 func (s *PutObjectAclInput) SetBucket(v string) *PutObjectAclInput {
 	s.Bucket = &v
 	return s
@@ -20251,49 +20251,49 @@ func (s *PutObjectAclInput) getBucket() (v string) {
 	return *s.Bucket
 }
 
-// SetGrantFullControl sets the GrantFullControl ***REMOVED***eld's value.
+// SetGrantFullControl sets the GrantFullControl field's value.
 func (s *PutObjectAclInput) SetGrantFullControl(v string) *PutObjectAclInput {
 	s.GrantFullControl = &v
 	return s
 }
 
-// SetGrantRead sets the GrantRead ***REMOVED***eld's value.
+// SetGrantRead sets the GrantRead field's value.
 func (s *PutObjectAclInput) SetGrantRead(v string) *PutObjectAclInput {
 	s.GrantRead = &v
 	return s
 }
 
-// SetGrantReadACP sets the GrantReadACP ***REMOVED***eld's value.
+// SetGrantReadACP sets the GrantReadACP field's value.
 func (s *PutObjectAclInput) SetGrantReadACP(v string) *PutObjectAclInput {
 	s.GrantReadACP = &v
 	return s
 }
 
-// SetGrantWrite sets the GrantWrite ***REMOVED***eld's value.
+// SetGrantWrite sets the GrantWrite field's value.
 func (s *PutObjectAclInput) SetGrantWrite(v string) *PutObjectAclInput {
 	s.GrantWrite = &v
 	return s
 }
 
-// SetGrantWriteACP sets the GrantWriteACP ***REMOVED***eld's value.
+// SetGrantWriteACP sets the GrantWriteACP field's value.
 func (s *PutObjectAclInput) SetGrantWriteACP(v string) *PutObjectAclInput {
 	s.GrantWriteACP = &v
 	return s
 }
 
-// SetKey sets the Key ***REMOVED***eld's value.
+// SetKey sets the Key field's value.
 func (s *PutObjectAclInput) SetKey(v string) *PutObjectAclInput {
 	s.Key = &v
 	return s
 }
 
-// SetRequestPayer sets the RequestPayer ***REMOVED***eld's value.
+// SetRequestPayer sets the RequestPayer field's value.
 func (s *PutObjectAclInput) SetRequestPayer(v string) *PutObjectAclInput {
 	s.RequestPayer = &v
 	return s
 }
 
-// SetVersionId sets the VersionId ***REMOVED***eld's value.
+// SetVersionId sets the VersionId field's value.
 func (s *PutObjectAclInput) SetVersionId(v string) *PutObjectAclInput {
 	s.VersionId = &v
 	return s
@@ -20317,7 +20317,7 @@ func (s PutObjectAclOutput) GoString() string {
 	return s.String()
 }
 
-// SetRequestCharged sets the RequestCharged ***REMOVED***eld's value.
+// SetRequestCharged sets the RequestCharged field's value.
 func (s *PutObjectAclOutput) SetRequestCharged(v string) *PutObjectAclOutput {
 	s.RequestCharged = &v
 	return s
@@ -20334,18 +20334,18 @@ type PutObjectInput struct {
 
 	// Name of the bucket to which the PUT operation was initiated.
 	//
-	// Bucket is a required ***REMOVED***eld
+	// Bucket is a required field
 	Bucket *string `location:"uri" locationName:"Bucket" type:"string" required:"true"`
 
-	// Speci***REMOVED***es caching behavior along the request/reply chain.
+	// Specifies caching behavior along the request/reply chain.
 	CacheControl *string `location:"header" locationName:"Cache-Control" type:"string"`
 
-	// Speci***REMOVED***es presentational information for the object.
+	// Specifies presentational information for the object.
 	ContentDisposition *string `location:"header" locationName:"Content-Disposition" type:"string"`
 
-	// Speci***REMOVED***es what content encodings have been applied to the object and thus
+	// Specifies what content encodings have been applied to the object and thus
 	// what decoding mechanisms must be applied to obtain the media-type referenced
-	// by the Content-Type header ***REMOVED***eld.
+	// by the Content-Type header field.
 	ContentEncoding *string `location:"header" locationName:"Content-Encoding" type:"string"`
 
 	// The language the content is in.
@@ -20357,7 +20357,7 @@ type PutObjectInput struct {
 
 	// The base64-encoded 128-bit MD5 digest of the part data. This parameter is
 	// auto-populated when using the command from the CLI. This parameted is required
-	// if object lock parameters are speci***REMOVED***ed.
+	// if object lock parameters are specified.
 	ContentMD5 *string `location:"header" locationName:"Content-MD5" type:"string"`
 
 	// A standard MIME type describing the format of the object data.
@@ -20380,13 +20380,13 @@ type PutObjectInput struct {
 
 	// Object key for which the PUT operation was initiated.
 	//
-	// Key is a required ***REMOVED***eld
+	// Key is a required field
 	Key *string `location:"uri" locationName:"Key" min:"1" type:"string" required:"true"`
 
 	// A map of metadata to store with the object in S3.
 	Metadata map[string]*string `location:"headers" locationName:"x-amz-meta-" type:"map"`
 
-	// The Legal Hold status that you want to apply to the speci***REMOVED***ed object.
+	// The Legal Hold status that you want to apply to the specified object.
 	ObjectLockLegalHoldStatus *string `location:"header" locationName:"x-amz-object-lock-legal-hold" type:"string" enum:"ObjectLockLegalHoldStatus"`
 
 	// The object lock mode that you want to apply to this object.
@@ -20395,35 +20395,35 @@ type PutObjectInput struct {
 	// The date and time when you want this object's object lock to expire.
 	ObjectLockRetainUntilDate *time.Time `location:"header" locationName:"x-amz-object-lock-retain-until-date" type:"timestamp" timestampFormat:"iso8601"`
 
-	// Con***REMOVED***rms that the requester knows that she or he will be charged for the
+	// Confirms that the requester knows that she or he will be charged for the
 	// request. Bucket owners need not specify this parameter in their requests.
 	// Documentation on downloading objects from requester pays buckets can be found
 	// at http://docs.aws.amazon.com/AmazonS3/latest/dev/ObjectsinRequesterPaysBuckets.html
 	RequestPayer *string `location:"header" locationName:"x-amz-request-payer" type:"string" enum:"RequestPayer"`
 
-	// Speci***REMOVED***es the algorithm to use to when encrypting the object (e.g., AES256).
+	// Specifies the algorithm to use to when encrypting the object (e.g., AES256).
 	SSECustomerAlgorithm *string `location:"header" locationName:"x-amz-server-side-encryption-customer-algorithm" type:"string"`
 
-	// Speci***REMOVED***es the customer-provided encryption key for Amazon S3 to use in encrypting
+	// Specifies the customer-provided encryption key for Amazon S3 to use in encrypting
 	// data. This value is used to store the object and then it is discarded; Amazon
 	// does not store the encryption key. The key must be appropriate for use with
-	// the algorithm speci***REMOVED***ed in the x-amz-server-side​-encryption​-customer-algorithm
+	// the algorithm specified in the x-amz-server-side​-encryption​-customer-algorithm
 	// header.
 	SSECustomerKey *string `marshal-as:"blob" location:"header" locationName:"x-amz-server-side-encryption-customer-key" type:"string" sensitive:"true"`
 
-	// Speci***REMOVED***es the 128-bit MD5 digest of the encryption key according to RFC 1321.
+	// Specifies the 128-bit MD5 digest of the encryption key according to RFC 1321.
 	// Amazon S3 uses this header for a message integrity check to ensure the encryption
 	// key was transmitted without error.
 	SSECustomerKeyMD5 *string `location:"header" locationName:"x-amz-server-side-encryption-customer-key-MD5" type:"string"`
 
-	// Speci***REMOVED***es the AWS KMS Encryption Context to use for object encryption. The
+	// Specifies the AWS KMS Encryption Context to use for object encryption. The
 	// value of this header is a base64-encoded UTF-8 string holding JSON with the
 	// encryption context key-value pairs.
 	SSEKMSEncryptionContext *string `location:"header" locationName:"x-amz-server-side-encryption-context" type:"string" sensitive:"true"`
 
-	// Speci***REMOVED***es the AWS KMS key ID to use for object encryption. All GET and PUT
+	// Specifies the AWS KMS key ID to use for object encryption. All GET and PUT
 	// requests for an object protected by AWS KMS will fail if not made via SSL
-	// or using SigV4. Documentation on con***REMOVED***guring any of the of***REMOVED***cially supported
+	// or using SigV4. Documentation on configuring any of the officially supported
 	// AWS SDKs and CLI can be found at http://docs.aws.amazon.com/AmazonS3/latest/dev/UsingAWSSDK.html#specify-signature-version
 	SSEKMSKeyId *string `location:"header" locationName:"x-amz-server-side-encryption-aws-kms-key-id" type:"string" sensitive:"true"`
 
@@ -20438,7 +20438,7 @@ type PutObjectInput struct {
 	// (For example, "Key1=Value1")
 	Tagging *string `location:"header" locationName:"x-amz-tagging" type:"string"`
 
-	// If the bucket is con***REMOVED***gured as a website, redirects requests for this object
+	// If the bucket is configured as a website, redirects requests for this object
 	// to another object in the same bucket or to an external URL. Amazon S3 stores
 	// the value of this header in the object metadata.
 	WebsiteRedirectLocation *string `location:"header" locationName:"x-amz-website-redirect-location" type:"string"`
@@ -20454,7 +20454,7 @@ func (s PutObjectInput) GoString() string {
 	return s.String()
 }
 
-// Validate inspects the ***REMOVED***elds of the type to determine if they are valid.
+// Validate inspects the fields of the type to determine if they are valid.
 func (s *PutObjectInput) Validate() error {
 	invalidParams := request.ErrInvalidParams{Context: "PutObjectInput"}
 	if s.Bucket == nil {
@@ -20476,19 +20476,19 @@ func (s *PutObjectInput) Validate() error {
 	return nil
 }
 
-// SetACL sets the ACL ***REMOVED***eld's value.
+// SetACL sets the ACL field's value.
 func (s *PutObjectInput) SetACL(v string) *PutObjectInput {
 	s.ACL = &v
 	return s
 }
 
-// SetBody sets the Body ***REMOVED***eld's value.
+// SetBody sets the Body field's value.
 func (s *PutObjectInput) SetBody(v io.ReadSeeker) *PutObjectInput {
 	s.Body = v
 	return s
 }
 
-// SetBucket sets the Bucket ***REMOVED***eld's value.
+// SetBucket sets the Bucket field's value.
 func (s *PutObjectInput) SetBucket(v string) *PutObjectInput {
 	s.Bucket = &v
 	return s
@@ -20501,121 +20501,121 @@ func (s *PutObjectInput) getBucket() (v string) {
 	return *s.Bucket
 }
 
-// SetCacheControl sets the CacheControl ***REMOVED***eld's value.
+// SetCacheControl sets the CacheControl field's value.
 func (s *PutObjectInput) SetCacheControl(v string) *PutObjectInput {
 	s.CacheControl = &v
 	return s
 }
 
-// SetContentDisposition sets the ContentDisposition ***REMOVED***eld's value.
+// SetContentDisposition sets the ContentDisposition field's value.
 func (s *PutObjectInput) SetContentDisposition(v string) *PutObjectInput {
 	s.ContentDisposition = &v
 	return s
 }
 
-// SetContentEncoding sets the ContentEncoding ***REMOVED***eld's value.
+// SetContentEncoding sets the ContentEncoding field's value.
 func (s *PutObjectInput) SetContentEncoding(v string) *PutObjectInput {
 	s.ContentEncoding = &v
 	return s
 }
 
-// SetContentLanguage sets the ContentLanguage ***REMOVED***eld's value.
+// SetContentLanguage sets the ContentLanguage field's value.
 func (s *PutObjectInput) SetContentLanguage(v string) *PutObjectInput {
 	s.ContentLanguage = &v
 	return s
 }
 
-// SetContentLength sets the ContentLength ***REMOVED***eld's value.
+// SetContentLength sets the ContentLength field's value.
 func (s *PutObjectInput) SetContentLength(v int64) *PutObjectInput {
 	s.ContentLength = &v
 	return s
 }
 
-// SetContentMD5 sets the ContentMD5 ***REMOVED***eld's value.
+// SetContentMD5 sets the ContentMD5 field's value.
 func (s *PutObjectInput) SetContentMD5(v string) *PutObjectInput {
 	s.ContentMD5 = &v
 	return s
 }
 
-// SetContentType sets the ContentType ***REMOVED***eld's value.
+// SetContentType sets the ContentType field's value.
 func (s *PutObjectInput) SetContentType(v string) *PutObjectInput {
 	s.ContentType = &v
 	return s
 }
 
-// SetExpires sets the Expires ***REMOVED***eld's value.
+// SetExpires sets the Expires field's value.
 func (s *PutObjectInput) SetExpires(v time.Time) *PutObjectInput {
 	s.Expires = &v
 	return s
 }
 
-// SetGrantFullControl sets the GrantFullControl ***REMOVED***eld's value.
+// SetGrantFullControl sets the GrantFullControl field's value.
 func (s *PutObjectInput) SetGrantFullControl(v string) *PutObjectInput {
 	s.GrantFullControl = &v
 	return s
 }
 
-// SetGrantRead sets the GrantRead ***REMOVED***eld's value.
+// SetGrantRead sets the GrantRead field's value.
 func (s *PutObjectInput) SetGrantRead(v string) *PutObjectInput {
 	s.GrantRead = &v
 	return s
 }
 
-// SetGrantReadACP sets the GrantReadACP ***REMOVED***eld's value.
+// SetGrantReadACP sets the GrantReadACP field's value.
 func (s *PutObjectInput) SetGrantReadACP(v string) *PutObjectInput {
 	s.GrantReadACP = &v
 	return s
 }
 
-// SetGrantWriteACP sets the GrantWriteACP ***REMOVED***eld's value.
+// SetGrantWriteACP sets the GrantWriteACP field's value.
 func (s *PutObjectInput) SetGrantWriteACP(v string) *PutObjectInput {
 	s.GrantWriteACP = &v
 	return s
 }
 
-// SetKey sets the Key ***REMOVED***eld's value.
+// SetKey sets the Key field's value.
 func (s *PutObjectInput) SetKey(v string) *PutObjectInput {
 	s.Key = &v
 	return s
 }
 
-// SetMetadata sets the Metadata ***REMOVED***eld's value.
+// SetMetadata sets the Metadata field's value.
 func (s *PutObjectInput) SetMetadata(v map[string]*string) *PutObjectInput {
 	s.Metadata = v
 	return s
 }
 
-// SetObjectLockLegalHoldStatus sets the ObjectLockLegalHoldStatus ***REMOVED***eld's value.
+// SetObjectLockLegalHoldStatus sets the ObjectLockLegalHoldStatus field's value.
 func (s *PutObjectInput) SetObjectLockLegalHoldStatus(v string) *PutObjectInput {
 	s.ObjectLockLegalHoldStatus = &v
 	return s
 }
 
-// SetObjectLockMode sets the ObjectLockMode ***REMOVED***eld's value.
+// SetObjectLockMode sets the ObjectLockMode field's value.
 func (s *PutObjectInput) SetObjectLockMode(v string) *PutObjectInput {
 	s.ObjectLockMode = &v
 	return s
 }
 
-// SetObjectLockRetainUntilDate sets the ObjectLockRetainUntilDate ***REMOVED***eld's value.
+// SetObjectLockRetainUntilDate sets the ObjectLockRetainUntilDate field's value.
 func (s *PutObjectInput) SetObjectLockRetainUntilDate(v time.Time) *PutObjectInput {
 	s.ObjectLockRetainUntilDate = &v
 	return s
 }
 
-// SetRequestPayer sets the RequestPayer ***REMOVED***eld's value.
+// SetRequestPayer sets the RequestPayer field's value.
 func (s *PutObjectInput) SetRequestPayer(v string) *PutObjectInput {
 	s.RequestPayer = &v
 	return s
 }
 
-// SetSSECustomerAlgorithm sets the SSECustomerAlgorithm ***REMOVED***eld's value.
+// SetSSECustomerAlgorithm sets the SSECustomerAlgorithm field's value.
 func (s *PutObjectInput) SetSSECustomerAlgorithm(v string) *PutObjectInput {
 	s.SSECustomerAlgorithm = &v
 	return s
 }
 
-// SetSSECustomerKey sets the SSECustomerKey ***REMOVED***eld's value.
+// SetSSECustomerKey sets the SSECustomerKey field's value.
 func (s *PutObjectInput) SetSSECustomerKey(v string) *PutObjectInput {
 	s.SSECustomerKey = &v
 	return s
@@ -20628,43 +20628,43 @@ func (s *PutObjectInput) getSSECustomerKey() (v string) {
 	return *s.SSECustomerKey
 }
 
-// SetSSECustomerKeyMD5 sets the SSECustomerKeyMD5 ***REMOVED***eld's value.
+// SetSSECustomerKeyMD5 sets the SSECustomerKeyMD5 field's value.
 func (s *PutObjectInput) SetSSECustomerKeyMD5(v string) *PutObjectInput {
 	s.SSECustomerKeyMD5 = &v
 	return s
 }
 
-// SetSSEKMSEncryptionContext sets the SSEKMSEncryptionContext ***REMOVED***eld's value.
+// SetSSEKMSEncryptionContext sets the SSEKMSEncryptionContext field's value.
 func (s *PutObjectInput) SetSSEKMSEncryptionContext(v string) *PutObjectInput {
 	s.SSEKMSEncryptionContext = &v
 	return s
 }
 
-// SetSSEKMSKeyId sets the SSEKMSKeyId ***REMOVED***eld's value.
+// SetSSEKMSKeyId sets the SSEKMSKeyId field's value.
 func (s *PutObjectInput) SetSSEKMSKeyId(v string) *PutObjectInput {
 	s.SSEKMSKeyId = &v
 	return s
 }
 
-// SetServerSideEncryption sets the ServerSideEncryption ***REMOVED***eld's value.
+// SetServerSideEncryption sets the ServerSideEncryption field's value.
 func (s *PutObjectInput) SetServerSideEncryption(v string) *PutObjectInput {
 	s.ServerSideEncryption = &v
 	return s
 }
 
-// SetStorageClass sets the StorageClass ***REMOVED***eld's value.
+// SetStorageClass sets the StorageClass field's value.
 func (s *PutObjectInput) SetStorageClass(v string) *PutObjectInput {
 	s.StorageClass = &v
 	return s
 }
 
-// SetTagging sets the Tagging ***REMOVED***eld's value.
+// SetTagging sets the Tagging field's value.
 func (s *PutObjectInput) SetTagging(v string) *PutObjectInput {
 	s.Tagging = &v
 	return s
 }
 
-// SetWebsiteRedirectLocation sets the WebsiteRedirectLocation ***REMOVED***eld's value.
+// SetWebsiteRedirectLocation sets the WebsiteRedirectLocation field's value.
 func (s *PutObjectInput) SetWebsiteRedirectLocation(v string) *PutObjectInput {
 	s.WebsiteRedirectLocation = &v
 	return s
@@ -20675,19 +20675,19 @@ type PutObjectLegalHoldInput struct {
 
 	// The bucket containing the object that you want to place a Legal Hold on.
 	//
-	// Bucket is a required ***REMOVED***eld
+	// Bucket is a required field
 	Bucket *string `location:"uri" locationName:"Bucket" type:"string" required:"true"`
 
 	// The key name for the object that you want to place a Legal Hold on.
 	//
-	// Key is a required ***REMOVED***eld
+	// Key is a required field
 	Key *string `location:"uri" locationName:"Key" min:"1" type:"string" required:"true"`
 
-	// Container element for the Legal Hold con***REMOVED***guration you want to apply to the
-	// speci***REMOVED***ed object.
+	// Container element for the Legal Hold configuration you want to apply to the
+	// specified object.
 	LegalHold *ObjectLockLegalHold `locationName:"LegalHold" type:"structure" xmlURI:"http://s3.amazonaws.com/doc/2006-03-01/"`
 
-	// Con***REMOVED***rms that the requester knows that she or he will be charged for the
+	// Confirms that the requester knows that she or he will be charged for the
 	// request. Bucket owners need not specify this parameter in their requests.
 	// Documentation on downloading objects from requester pays buckets can be found
 	// at http://docs.aws.amazon.com/AmazonS3/latest/dev/ObjectsinRequesterPaysBuckets.html
@@ -20707,7 +20707,7 @@ func (s PutObjectLegalHoldInput) GoString() string {
 	return s.String()
 }
 
-// Validate inspects the ***REMOVED***elds of the type to determine if they are valid.
+// Validate inspects the fields of the type to determine if they are valid.
 func (s *PutObjectLegalHoldInput) Validate() error {
 	invalidParams := request.ErrInvalidParams{Context: "PutObjectLegalHoldInput"}
 	if s.Bucket == nil {
@@ -20729,7 +20729,7 @@ func (s *PutObjectLegalHoldInput) Validate() error {
 	return nil
 }
 
-// SetBucket sets the Bucket ***REMOVED***eld's value.
+// SetBucket sets the Bucket field's value.
 func (s *PutObjectLegalHoldInput) SetBucket(v string) *PutObjectLegalHoldInput {
 	s.Bucket = &v
 	return s
@@ -20742,25 +20742,25 @@ func (s *PutObjectLegalHoldInput) getBucket() (v string) {
 	return *s.Bucket
 }
 
-// SetKey sets the Key ***REMOVED***eld's value.
+// SetKey sets the Key field's value.
 func (s *PutObjectLegalHoldInput) SetKey(v string) *PutObjectLegalHoldInput {
 	s.Key = &v
 	return s
 }
 
-// SetLegalHold sets the LegalHold ***REMOVED***eld's value.
+// SetLegalHold sets the LegalHold field's value.
 func (s *PutObjectLegalHoldInput) SetLegalHold(v *ObjectLockLegalHold) *PutObjectLegalHoldInput {
 	s.LegalHold = v
 	return s
 }
 
-// SetRequestPayer sets the RequestPayer ***REMOVED***eld's value.
+// SetRequestPayer sets the RequestPayer field's value.
 func (s *PutObjectLegalHoldInput) SetRequestPayer(v string) *PutObjectLegalHoldInput {
 	s.RequestPayer = &v
 	return s
 }
 
-// SetVersionId sets the VersionId ***REMOVED***eld's value.
+// SetVersionId sets the VersionId field's value.
 func (s *PutObjectLegalHoldInput) SetVersionId(v string) *PutObjectLegalHoldInput {
 	s.VersionId = &v
 	return s
@@ -20784,24 +20784,24 @@ func (s PutObjectLegalHoldOutput) GoString() string {
 	return s.String()
 }
 
-// SetRequestCharged sets the RequestCharged ***REMOVED***eld's value.
+// SetRequestCharged sets the RequestCharged field's value.
 func (s *PutObjectLegalHoldOutput) SetRequestCharged(v string) *PutObjectLegalHoldOutput {
 	s.RequestCharged = &v
 	return s
 }
 
-type PutObjectLockCon***REMOVED***gurationInput struct {
-	_ struct{} `locationName:"PutObjectLockCon***REMOVED***gurationRequest" type:"structure" payload:"ObjectLockCon***REMOVED***guration"`
+type PutObjectLockConfigurationInput struct {
+	_ struct{} `locationName:"PutObjectLockConfigurationRequest" type:"structure" payload:"ObjectLockConfiguration"`
 
-	// The bucket whose object lock con***REMOVED***guration you want to create or replace.
+	// The bucket whose object lock configuration you want to create or replace.
 	//
-	// Bucket is a required ***REMOVED***eld
+	// Bucket is a required field
 	Bucket *string `location:"uri" locationName:"Bucket" type:"string" required:"true"`
 
-	// The object lock con***REMOVED***guration that you want to apply to the speci***REMOVED***ed bucket.
-	ObjectLockCon***REMOVED***guration *ObjectLockCon***REMOVED***guration `locationName:"ObjectLockCon***REMOVED***guration" type:"structure" xmlURI:"http://s3.amazonaws.com/doc/2006-03-01/"`
+	// The object lock configuration that you want to apply to the specified bucket.
+	ObjectLockConfiguration *ObjectLockConfiguration `locationName:"ObjectLockConfiguration" type:"structure" xmlURI:"http://s3.amazonaws.com/doc/2006-03-01/"`
 
-	// Con***REMOVED***rms that the requester knows that she or he will be charged for the
+	// Confirms that the requester knows that she or he will be charged for the
 	// request. Bucket owners need not specify this parameter in their requests.
 	// Documentation on downloading objects from requester pays buckets can be found
 	// at http://docs.aws.amazon.com/AmazonS3/latest/dev/ObjectsinRequesterPaysBuckets.html
@@ -20812,18 +20812,18 @@ type PutObjectLockCon***REMOVED***gurationInput struct {
 }
 
 // String returns the string representation
-func (s PutObjectLockCon***REMOVED***gurationInput) String() string {
+func (s PutObjectLockConfigurationInput) String() string {
 	return awsutil.Prettify(s)
 }
 
 // GoString returns the string representation
-func (s PutObjectLockCon***REMOVED***gurationInput) GoString() string {
+func (s PutObjectLockConfigurationInput) GoString() string {
 	return s.String()
 }
 
-// Validate inspects the ***REMOVED***elds of the type to determine if they are valid.
-func (s *PutObjectLockCon***REMOVED***gurationInput) Validate() error {
-	invalidParams := request.ErrInvalidParams{Context: "PutObjectLockCon***REMOVED***gurationInput"}
+// Validate inspects the fields of the type to determine if they are valid.
+func (s *PutObjectLockConfigurationInput) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "PutObjectLockConfigurationInput"}
 	if s.Bucket == nil {
 		invalidParams.Add(request.NewErrParamRequired("Bucket"))
 	}
@@ -20837,38 +20837,38 @@ func (s *PutObjectLockCon***REMOVED***gurationInput) Validate() error {
 	return nil
 }
 
-// SetBucket sets the Bucket ***REMOVED***eld's value.
-func (s *PutObjectLockCon***REMOVED***gurationInput) SetBucket(v string) *PutObjectLockCon***REMOVED***gurationInput {
+// SetBucket sets the Bucket field's value.
+func (s *PutObjectLockConfigurationInput) SetBucket(v string) *PutObjectLockConfigurationInput {
 	s.Bucket = &v
 	return s
 }
 
-func (s *PutObjectLockCon***REMOVED***gurationInput) getBucket() (v string) {
+func (s *PutObjectLockConfigurationInput) getBucket() (v string) {
 	if s.Bucket == nil {
 		return v
 	}
 	return *s.Bucket
 }
 
-// SetObjectLockCon***REMOVED***guration sets the ObjectLockCon***REMOVED***guration ***REMOVED***eld's value.
-func (s *PutObjectLockCon***REMOVED***gurationInput) SetObjectLockCon***REMOVED***guration(v *ObjectLockCon***REMOVED***guration) *PutObjectLockCon***REMOVED***gurationInput {
-	s.ObjectLockCon***REMOVED***guration = v
+// SetObjectLockConfiguration sets the ObjectLockConfiguration field's value.
+func (s *PutObjectLockConfigurationInput) SetObjectLockConfiguration(v *ObjectLockConfiguration) *PutObjectLockConfigurationInput {
+	s.ObjectLockConfiguration = v
 	return s
 }
 
-// SetRequestPayer sets the RequestPayer ***REMOVED***eld's value.
-func (s *PutObjectLockCon***REMOVED***gurationInput) SetRequestPayer(v string) *PutObjectLockCon***REMOVED***gurationInput {
+// SetRequestPayer sets the RequestPayer field's value.
+func (s *PutObjectLockConfigurationInput) SetRequestPayer(v string) *PutObjectLockConfigurationInput {
 	s.RequestPayer = &v
 	return s
 }
 
-// SetToken sets the Token ***REMOVED***eld's value.
-func (s *PutObjectLockCon***REMOVED***gurationInput) SetToken(v string) *PutObjectLockCon***REMOVED***gurationInput {
+// SetToken sets the Token field's value.
+func (s *PutObjectLockConfigurationInput) SetToken(v string) *PutObjectLockConfigurationInput {
 	s.Token = &v
 	return s
 }
 
-type PutObjectLockCon***REMOVED***gurationOutput struct {
+type PutObjectLockConfigurationOutput struct {
 	_ struct{} `type:"structure"`
 
 	// If present, indicates that the requester was successfully charged for the
@@ -20877,17 +20877,17 @@ type PutObjectLockCon***REMOVED***gurationOutput struct {
 }
 
 // String returns the string representation
-func (s PutObjectLockCon***REMOVED***gurationOutput) String() string {
+func (s PutObjectLockConfigurationOutput) String() string {
 	return awsutil.Prettify(s)
 }
 
 // GoString returns the string representation
-func (s PutObjectLockCon***REMOVED***gurationOutput) GoString() string {
+func (s PutObjectLockConfigurationOutput) GoString() string {
 	return s.String()
 }
 
-// SetRequestCharged sets the RequestCharged ***REMOVED***eld's value.
-func (s *PutObjectLockCon***REMOVED***gurationOutput) SetRequestCharged(v string) *PutObjectLockCon***REMOVED***gurationOutput {
+// SetRequestCharged sets the RequestCharged field's value.
+func (s *PutObjectLockConfigurationOutput) SetRequestCharged(v string) *PutObjectLockConfigurationOutput {
 	s.RequestCharged = &v
 	return s
 }
@@ -20898,7 +20898,7 @@ type PutObjectOutput struct {
 	// Entity tag for the uploaded object.
 	ETag *string `location:"header" locationName:"ETag" type:"string"`
 
-	// If the object expiration is con***REMOVED***gured, this will contain the expiration
+	// If the object expiration is configured, this will contain the expiration
 	// date (expiry-date) and rule ID (rule-id). The value of rule-id is URL encoded.
 	Expiration *string `location:"header" locationName:"x-amz-expiration" type:"string"`
 
@@ -20907,21 +20907,21 @@ type PutObjectOutput struct {
 	RequestCharged *string `location:"header" locationName:"x-amz-request-charged" type:"string" enum:"RequestCharged"`
 
 	// If server-side encryption with a customer-provided encryption key was requested,
-	// the response will include this header con***REMOVED***rming the encryption algorithm
+	// the response will include this header confirming the encryption algorithm
 	// used.
 	SSECustomerAlgorithm *string `location:"header" locationName:"x-amz-server-side-encryption-customer-algorithm" type:"string"`
 
 	// If server-side encryption with a customer-provided encryption key was requested,
 	// the response will include this header to provide round trip message integrity
-	// veri***REMOVED***cation of the customer-provided encryption key.
+	// verification of the customer-provided encryption key.
 	SSECustomerKeyMD5 *string `location:"header" locationName:"x-amz-server-side-encryption-customer-key-MD5" type:"string"`
 
-	// If present, speci***REMOVED***es the AWS KMS Encryption Context to use for object encryption.
+	// If present, specifies the AWS KMS Encryption Context to use for object encryption.
 	// The value of this header is a base64-encoded UTF-8 string holding JSON with
 	// the encryption context key-value pairs.
 	SSEKMSEncryptionContext *string `location:"header" locationName:"x-amz-server-side-encryption-context" type:"string" sensitive:"true"`
 
-	// If present, speci***REMOVED***es the ID of the AWS Key Management Service (KMS) master
+	// If present, specifies the ID of the AWS Key Management Service (KMS) master
 	// encryption key that was used for the object.
 	SSEKMSKeyId *string `location:"header" locationName:"x-amz-server-side-encryption-aws-kms-key-id" type:"string" sensitive:"true"`
 
@@ -20943,55 +20943,55 @@ func (s PutObjectOutput) GoString() string {
 	return s.String()
 }
 
-// SetETag sets the ETag ***REMOVED***eld's value.
+// SetETag sets the ETag field's value.
 func (s *PutObjectOutput) SetETag(v string) *PutObjectOutput {
 	s.ETag = &v
 	return s
 }
 
-// SetExpiration sets the Expiration ***REMOVED***eld's value.
+// SetExpiration sets the Expiration field's value.
 func (s *PutObjectOutput) SetExpiration(v string) *PutObjectOutput {
 	s.Expiration = &v
 	return s
 }
 
-// SetRequestCharged sets the RequestCharged ***REMOVED***eld's value.
+// SetRequestCharged sets the RequestCharged field's value.
 func (s *PutObjectOutput) SetRequestCharged(v string) *PutObjectOutput {
 	s.RequestCharged = &v
 	return s
 }
 
-// SetSSECustomerAlgorithm sets the SSECustomerAlgorithm ***REMOVED***eld's value.
+// SetSSECustomerAlgorithm sets the SSECustomerAlgorithm field's value.
 func (s *PutObjectOutput) SetSSECustomerAlgorithm(v string) *PutObjectOutput {
 	s.SSECustomerAlgorithm = &v
 	return s
 }
 
-// SetSSECustomerKeyMD5 sets the SSECustomerKeyMD5 ***REMOVED***eld's value.
+// SetSSECustomerKeyMD5 sets the SSECustomerKeyMD5 field's value.
 func (s *PutObjectOutput) SetSSECustomerKeyMD5(v string) *PutObjectOutput {
 	s.SSECustomerKeyMD5 = &v
 	return s
 }
 
-// SetSSEKMSEncryptionContext sets the SSEKMSEncryptionContext ***REMOVED***eld's value.
+// SetSSEKMSEncryptionContext sets the SSEKMSEncryptionContext field's value.
 func (s *PutObjectOutput) SetSSEKMSEncryptionContext(v string) *PutObjectOutput {
 	s.SSEKMSEncryptionContext = &v
 	return s
 }
 
-// SetSSEKMSKeyId sets the SSEKMSKeyId ***REMOVED***eld's value.
+// SetSSEKMSKeyId sets the SSEKMSKeyId field's value.
 func (s *PutObjectOutput) SetSSEKMSKeyId(v string) *PutObjectOutput {
 	s.SSEKMSKeyId = &v
 	return s
 }
 
-// SetServerSideEncryption sets the ServerSideEncryption ***REMOVED***eld's value.
+// SetServerSideEncryption sets the ServerSideEncryption field's value.
 func (s *PutObjectOutput) SetServerSideEncryption(v string) *PutObjectOutput {
 	s.ServerSideEncryption = &v
 	return s
 }
 
-// SetVersionId sets the VersionId ***REMOVED***eld's value.
+// SetVersionId sets the VersionId field's value.
 func (s *PutObjectOutput) SetVersionId(v string) *PutObjectOutput {
 	s.VersionId = &v
 	return s
@@ -21001,31 +21001,31 @@ type PutObjectRetentionInput struct {
 	_ struct{} `locationName:"PutObjectRetentionRequest" type:"structure" payload:"Retention"`
 
 	// The bucket that contains the object you want to apply this Object Retention
-	// con***REMOVED***guration to.
+	// configuration to.
 	//
-	// Bucket is a required ***REMOVED***eld
+	// Bucket is a required field
 	Bucket *string `location:"uri" locationName:"Bucket" type:"string" required:"true"`
 
 	// Indicates whether this operation should bypass Governance-mode restrictions.j
 	BypassGovernanceRetention *bool `location:"header" locationName:"x-amz-bypass-governance-retention" type:"boolean"`
 
 	// The key name for the object that you want to apply this Object Retention
-	// con***REMOVED***guration to.
+	// configuration to.
 	//
-	// Key is a required ***REMOVED***eld
+	// Key is a required field
 	Key *string `location:"uri" locationName:"Key" min:"1" type:"string" required:"true"`
 
-	// Con***REMOVED***rms that the requester knows that she or he will be charged for the
+	// Confirms that the requester knows that she or he will be charged for the
 	// request. Bucket owners need not specify this parameter in their requests.
 	// Documentation on downloading objects from requester pays buckets can be found
 	// at http://docs.aws.amazon.com/AmazonS3/latest/dev/ObjectsinRequesterPaysBuckets.html
 	RequestPayer *string `location:"header" locationName:"x-amz-request-payer" type:"string" enum:"RequestPayer"`
 
-	// The container element for the Object Retention con***REMOVED***guration.
+	// The container element for the Object Retention configuration.
 	Retention *ObjectLockRetention `locationName:"Retention" type:"structure" xmlURI:"http://s3.amazonaws.com/doc/2006-03-01/"`
 
 	// The version ID for the object that you want to apply this Object Retention
-	// con***REMOVED***guration to.
+	// configuration to.
 	VersionId *string `location:"querystring" locationName:"versionId" type:"string"`
 }
 
@@ -21039,7 +21039,7 @@ func (s PutObjectRetentionInput) GoString() string {
 	return s.String()
 }
 
-// Validate inspects the ***REMOVED***elds of the type to determine if they are valid.
+// Validate inspects the fields of the type to determine if they are valid.
 func (s *PutObjectRetentionInput) Validate() error {
 	invalidParams := request.ErrInvalidParams{Context: "PutObjectRetentionInput"}
 	if s.Bucket == nil {
@@ -21061,7 +21061,7 @@ func (s *PutObjectRetentionInput) Validate() error {
 	return nil
 }
 
-// SetBucket sets the Bucket ***REMOVED***eld's value.
+// SetBucket sets the Bucket field's value.
 func (s *PutObjectRetentionInput) SetBucket(v string) *PutObjectRetentionInput {
 	s.Bucket = &v
 	return s
@@ -21074,31 +21074,31 @@ func (s *PutObjectRetentionInput) getBucket() (v string) {
 	return *s.Bucket
 }
 
-// SetBypassGovernanceRetention sets the BypassGovernanceRetention ***REMOVED***eld's value.
+// SetBypassGovernanceRetention sets the BypassGovernanceRetention field's value.
 func (s *PutObjectRetentionInput) SetBypassGovernanceRetention(v bool) *PutObjectRetentionInput {
 	s.BypassGovernanceRetention = &v
 	return s
 }
 
-// SetKey sets the Key ***REMOVED***eld's value.
+// SetKey sets the Key field's value.
 func (s *PutObjectRetentionInput) SetKey(v string) *PutObjectRetentionInput {
 	s.Key = &v
 	return s
 }
 
-// SetRequestPayer sets the RequestPayer ***REMOVED***eld's value.
+// SetRequestPayer sets the RequestPayer field's value.
 func (s *PutObjectRetentionInput) SetRequestPayer(v string) *PutObjectRetentionInput {
 	s.RequestPayer = &v
 	return s
 }
 
-// SetRetention sets the Retention ***REMOVED***eld's value.
+// SetRetention sets the Retention field's value.
 func (s *PutObjectRetentionInput) SetRetention(v *ObjectLockRetention) *PutObjectRetentionInput {
 	s.Retention = v
 	return s
 }
 
-// SetVersionId sets the VersionId ***REMOVED***eld's value.
+// SetVersionId sets the VersionId field's value.
 func (s *PutObjectRetentionInput) SetVersionId(v string) *PutObjectRetentionInput {
 	s.VersionId = &v
 	return s
@@ -21122,7 +21122,7 @@ func (s PutObjectRetentionOutput) GoString() string {
 	return s.String()
 }
 
-// SetRequestCharged sets the RequestCharged ***REMOVED***eld's value.
+// SetRequestCharged sets the RequestCharged field's value.
 func (s *PutObjectRetentionOutput) SetRequestCharged(v string) *PutObjectRetentionOutput {
 	s.RequestCharged = &v
 	return s
@@ -21131,13 +21131,13 @@ func (s *PutObjectRetentionOutput) SetRequestCharged(v string) *PutObjectRetenti
 type PutObjectTaggingInput struct {
 	_ struct{} `locationName:"PutObjectTaggingRequest" type:"structure" payload:"Tagging"`
 
-	// Bucket is a required ***REMOVED***eld
+	// Bucket is a required field
 	Bucket *string `location:"uri" locationName:"Bucket" type:"string" required:"true"`
 
-	// Key is a required ***REMOVED***eld
+	// Key is a required field
 	Key *string `location:"uri" locationName:"Key" min:"1" type:"string" required:"true"`
 
-	// Tagging is a required ***REMOVED***eld
+	// Tagging is a required field
 	Tagging *Tagging `locationName:"Tagging" type:"structure" required:"true" xmlURI:"http://s3.amazonaws.com/doc/2006-03-01/"`
 
 	VersionId *string `location:"querystring" locationName:"versionId" type:"string"`
@@ -21153,7 +21153,7 @@ func (s PutObjectTaggingInput) GoString() string {
 	return s.String()
 }
 
-// Validate inspects the ***REMOVED***elds of the type to determine if they are valid.
+// Validate inspects the fields of the type to determine if they are valid.
 func (s *PutObjectTaggingInput) Validate() error {
 	invalidParams := request.ErrInvalidParams{Context: "PutObjectTaggingInput"}
 	if s.Bucket == nil {
@@ -21183,7 +21183,7 @@ func (s *PutObjectTaggingInput) Validate() error {
 	return nil
 }
 
-// SetBucket sets the Bucket ***REMOVED***eld's value.
+// SetBucket sets the Bucket field's value.
 func (s *PutObjectTaggingInput) SetBucket(v string) *PutObjectTaggingInput {
 	s.Bucket = &v
 	return s
@@ -21196,19 +21196,19 @@ func (s *PutObjectTaggingInput) getBucket() (v string) {
 	return *s.Bucket
 }
 
-// SetKey sets the Key ***REMOVED***eld's value.
+// SetKey sets the Key field's value.
 func (s *PutObjectTaggingInput) SetKey(v string) *PutObjectTaggingInput {
 	s.Key = &v
 	return s
 }
 
-// SetTagging sets the Tagging ***REMOVED***eld's value.
+// SetTagging sets the Tagging field's value.
 func (s *PutObjectTaggingInput) SetTagging(v *Tagging) *PutObjectTaggingInput {
 	s.Tagging = v
 	return s
 }
 
-// SetVersionId sets the VersionId ***REMOVED***eld's value.
+// SetVersionId sets the VersionId field's value.
 func (s *PutObjectTaggingInput) SetVersionId(v string) *PutObjectTaggingInput {
 	s.VersionId = &v
 	return s
@@ -21230,29 +21230,29 @@ func (s PutObjectTaggingOutput) GoString() string {
 	return s.String()
 }
 
-// SetVersionId sets the VersionId ***REMOVED***eld's value.
+// SetVersionId sets the VersionId field's value.
 func (s *PutObjectTaggingOutput) SetVersionId(v string) *PutObjectTaggingOutput {
 	s.VersionId = &v
 	return s
 }
 
 type PutPublicAccessBlockInput struct {
-	_ struct{} `locationName:"PutPublicAccessBlockRequest" type:"structure" payload:"PublicAccessBlockCon***REMOVED***guration"`
+	_ struct{} `locationName:"PutPublicAccessBlockRequest" type:"structure" payload:"PublicAccessBlockConfiguration"`
 
-	// The name of the Amazon S3 bucket whose PublicAccessBlock con***REMOVED***guration you
+	// The name of the Amazon S3 bucket whose PublicAccessBlock configuration you
 	// want to set.
 	//
-	// Bucket is a required ***REMOVED***eld
+	// Bucket is a required field
 	Bucket *string `location:"uri" locationName:"Bucket" type:"string" required:"true"`
 
-	// The PublicAccessBlock con***REMOVED***guration that you want to apply to this Amazon
-	// S3 bucket. You can enable the con***REMOVED***guration options in any combination. For
+	// The PublicAccessBlock configuration that you want to apply to this Amazon
+	// S3 bucket. You can enable the configuration options in any combination. For
 	// more information about when Amazon S3 considers a bucket or object public,
 	// see The Meaning of "Public" (https://docs.aws.amazon.com/AmazonS3/latest/dev/access-control-block-public-access.html#access-control-block-public-access-policy-status)
 	// in the Amazon Simple Storage Service Developer Guide.
 	//
-	// PublicAccessBlockCon***REMOVED***guration is a required ***REMOVED***eld
-	PublicAccessBlockCon***REMOVED***guration *PublicAccessBlockCon***REMOVED***guration `locationName:"PublicAccessBlockCon***REMOVED***guration" type:"structure" required:"true" xmlURI:"http://s3.amazonaws.com/doc/2006-03-01/"`
+	// PublicAccessBlockConfiguration is a required field
+	PublicAccessBlockConfiguration *PublicAccessBlockConfiguration `locationName:"PublicAccessBlockConfiguration" type:"structure" required:"true" xmlURI:"http://s3.amazonaws.com/doc/2006-03-01/"`
 }
 
 // String returns the string representation
@@ -21265,7 +21265,7 @@ func (s PutPublicAccessBlockInput) GoString() string {
 	return s.String()
 }
 
-// Validate inspects the ***REMOVED***elds of the type to determine if they are valid.
+// Validate inspects the fields of the type to determine if they are valid.
 func (s *PutPublicAccessBlockInput) Validate() error {
 	invalidParams := request.ErrInvalidParams{Context: "PutPublicAccessBlockInput"}
 	if s.Bucket == nil {
@@ -21274,8 +21274,8 @@ func (s *PutPublicAccessBlockInput) Validate() error {
 	if s.Bucket != nil && len(*s.Bucket) < 1 {
 		invalidParams.Add(request.NewErrParamMinLen("Bucket", 1))
 	}
-	if s.PublicAccessBlockCon***REMOVED***guration == nil {
-		invalidParams.Add(request.NewErrParamRequired("PublicAccessBlockCon***REMOVED***guration"))
+	if s.PublicAccessBlockConfiguration == nil {
+		invalidParams.Add(request.NewErrParamRequired("PublicAccessBlockConfiguration"))
 	}
 
 	if invalidParams.Len() > 0 {
@@ -21284,7 +21284,7 @@ func (s *PutPublicAccessBlockInput) Validate() error {
 	return nil
 }
 
-// SetBucket sets the Bucket ***REMOVED***eld's value.
+// SetBucket sets the Bucket field's value.
 func (s *PutPublicAccessBlockInput) SetBucket(v string) *PutPublicAccessBlockInput {
 	s.Bucket = &v
 	return s
@@ -21297,9 +21297,9 @@ func (s *PutPublicAccessBlockInput) getBucket() (v string) {
 	return *s.Bucket
 }
 
-// SetPublicAccessBlockCon***REMOVED***guration sets the PublicAccessBlockCon***REMOVED***guration ***REMOVED***eld's value.
-func (s *PutPublicAccessBlockInput) SetPublicAccessBlockCon***REMOVED***guration(v *PublicAccessBlockCon***REMOVED***guration) *PutPublicAccessBlockInput {
-	s.PublicAccessBlockCon***REMOVED***guration = v
+// SetPublicAccessBlockConfiguration sets the PublicAccessBlockConfiguration field's value.
+func (s *PutPublicAccessBlockInput) SetPublicAccessBlockConfiguration(v *PublicAccessBlockConfiguration) *PutPublicAccessBlockInput {
+	s.PublicAccessBlockConfiguration = v
 	return s
 }
 
@@ -21317,43 +21317,43 @@ func (s PutPublicAccessBlockOutput) GoString() string {
 	return s.String()
 }
 
-// Speci***REMOVED***es the con***REMOVED***guration for publishing messages to an Amazon Simple Queue
-// Service (Amazon SQS) queue when Amazon S3 detects speci***REMOVED***ed events.
-type QueueCon***REMOVED***guration struct {
+// Specifies the configuration for publishing messages to an Amazon Simple Queue
+// Service (Amazon SQS) queue when Amazon S3 detects specified events.
+type QueueConfiguration struct {
 	_ struct{} `type:"structure"`
 
-	// Events is a required ***REMOVED***eld
+	// Events is a required field
 	Events []*string `locationName:"Event" type:"list" flattened:"true" required:"true"`
 
-	// Speci***REMOVED***es object key name ***REMOVED***ltering rules. For information about key name
-	// ***REMOVED***ltering, see Con***REMOVED***guring Event Noti***REMOVED***cations (https://docs.aws.amazon.com/AmazonS3/latest/dev/Noti***REMOVED***cationHowTo.html)
+	// Specifies object key name filtering rules. For information about key name
+	// filtering, see Configuring Event Notifications (https://docs.aws.amazon.com/AmazonS3/latest/dev/NotificationHowTo.html)
 	// in the Amazon Simple Storage Service Developer Guide.
-	Filter *Noti***REMOVED***cationCon***REMOVED***gurationFilter `type:"structure"`
+	Filter *NotificationConfigurationFilter `type:"structure"`
 
-	// An optional unique identi***REMOVED***er for con***REMOVED***gurations in a noti***REMOVED***cation con***REMOVED***guration.
+	// An optional unique identifier for configurations in a notification configuration.
 	// If you don't provide one, Amazon S3 will assign an ID.
 	Id *string `type:"string"`
 
 	// The Amazon Resource Name (ARN) of the Amazon SQS queue to which Amazon S3
-	// publishes a message when it detects events of the speci***REMOVED***ed type.
+	// publishes a message when it detects events of the specified type.
 	//
-	// QueueArn is a required ***REMOVED***eld
+	// QueueArn is a required field
 	QueueArn *string `locationName:"Queue" type:"string" required:"true"`
 }
 
 // String returns the string representation
-func (s QueueCon***REMOVED***guration) String() string {
+func (s QueueConfiguration) String() string {
 	return awsutil.Prettify(s)
 }
 
 // GoString returns the string representation
-func (s QueueCon***REMOVED***guration) GoString() string {
+func (s QueueConfiguration) GoString() string {
 	return s.String()
 }
 
-// Validate inspects the ***REMOVED***elds of the type to determine if they are valid.
-func (s *QueueCon***REMOVED***guration) Validate() error {
-	invalidParams := request.ErrInvalidParams{Context: "QueueCon***REMOVED***guration"}
+// Validate inspects the fields of the type to determine if they are valid.
+func (s *QueueConfiguration) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "QueueConfiguration"}
 	if s.Events == nil {
 		invalidParams.Add(request.NewErrParamRequired("Events"))
 	}
@@ -21367,41 +21367,41 @@ func (s *QueueCon***REMOVED***guration) Validate() error {
 	return nil
 }
 
-// SetEvents sets the Events ***REMOVED***eld's value.
-func (s *QueueCon***REMOVED***guration) SetEvents(v []*string) *QueueCon***REMOVED***guration {
+// SetEvents sets the Events field's value.
+func (s *QueueConfiguration) SetEvents(v []*string) *QueueConfiguration {
 	s.Events = v
 	return s
 }
 
-// SetFilter sets the Filter ***REMOVED***eld's value.
-func (s *QueueCon***REMOVED***guration) SetFilter(v *Noti***REMOVED***cationCon***REMOVED***gurationFilter) *QueueCon***REMOVED***guration {
+// SetFilter sets the Filter field's value.
+func (s *QueueConfiguration) SetFilter(v *NotificationConfigurationFilter) *QueueConfiguration {
 	s.Filter = v
 	return s
 }
 
-// SetId sets the Id ***REMOVED***eld's value.
-func (s *QueueCon***REMOVED***guration) SetId(v string) *QueueCon***REMOVED***guration {
+// SetId sets the Id field's value.
+func (s *QueueConfiguration) SetId(v string) *QueueConfiguration {
 	s.Id = &v
 	return s
 }
 
-// SetQueueArn sets the QueueArn ***REMOVED***eld's value.
-func (s *QueueCon***REMOVED***guration) SetQueueArn(v string) *QueueCon***REMOVED***guration {
+// SetQueueArn sets the QueueArn field's value.
+func (s *QueueConfiguration) SetQueueArn(v string) *QueueConfiguration {
 	s.QueueArn = &v
 	return s
 }
 
-type QueueCon***REMOVED***gurationDeprecated struct {
+type QueueConfigurationDeprecated struct {
 	_ struct{} `type:"structure"`
 
-	// The bucket event for which to send noti***REMOVED***cations.
+	// The bucket event for which to send notifications.
 	//
 	// Deprecated: Event has been deprecated
 	Event *string `deprecated:"true" type:"string" enum:"Event"`
 
 	Events []*string `locationName:"Event" type:"list" flattened:"true"`
 
-	// An optional unique identi***REMOVED***er for con***REMOVED***gurations in a noti***REMOVED***cation con***REMOVED***guration.
+	// An optional unique identifier for configurations in a notification configuration.
 	// If you don't provide one, Amazon S3 will assign an ID.
 	Id *string `type:"string"`
 
@@ -21409,35 +21409,35 @@ type QueueCon***REMOVED***gurationDeprecated struct {
 }
 
 // String returns the string representation
-func (s QueueCon***REMOVED***gurationDeprecated) String() string {
+func (s QueueConfigurationDeprecated) String() string {
 	return awsutil.Prettify(s)
 }
 
 // GoString returns the string representation
-func (s QueueCon***REMOVED***gurationDeprecated) GoString() string {
+func (s QueueConfigurationDeprecated) GoString() string {
 	return s.String()
 }
 
-// SetEvent sets the Event ***REMOVED***eld's value.
-func (s *QueueCon***REMOVED***gurationDeprecated) SetEvent(v string) *QueueCon***REMOVED***gurationDeprecated {
+// SetEvent sets the Event field's value.
+func (s *QueueConfigurationDeprecated) SetEvent(v string) *QueueConfigurationDeprecated {
 	s.Event = &v
 	return s
 }
 
-// SetEvents sets the Events ***REMOVED***eld's value.
-func (s *QueueCon***REMOVED***gurationDeprecated) SetEvents(v []*string) *QueueCon***REMOVED***gurationDeprecated {
+// SetEvents sets the Events field's value.
+func (s *QueueConfigurationDeprecated) SetEvents(v []*string) *QueueConfigurationDeprecated {
 	s.Events = v
 	return s
 }
 
-// SetId sets the Id ***REMOVED***eld's value.
-func (s *QueueCon***REMOVED***gurationDeprecated) SetId(v string) *QueueCon***REMOVED***gurationDeprecated {
+// SetId sets the Id field's value.
+func (s *QueueConfigurationDeprecated) SetId(v string) *QueueConfigurationDeprecated {
 	s.Id = &v
 	return s
 }
 
-// SetQueue sets the Queue ***REMOVED***eld's value.
-func (s *QueueCon***REMOVED***gurationDeprecated) SetQueue(v string) *QueueCon***REMOVED***gurationDeprecated {
+// SetQueue sets the Queue field's value.
+func (s *QueueConfigurationDeprecated) SetQueue(v string) *QueueConfigurationDeprecated {
 	s.Queue = &v
 	return s
 }
@@ -21461,7 +21461,7 @@ func (s RecordsEvent) GoString() string {
 	return s.String()
 }
 
-// SetPayload sets the Payload ***REMOVED***eld's value.
+// SetPayload sets the Payload field's value.
 func (s *RecordsEvent) SetPayload(v []byte) *RecordsEvent {
 	s.Payload = v
 	return s
@@ -21481,7 +21481,7 @@ func (s *RecordsEvent) UnmarshalEvent(
 	return nil
 }
 
-// Speci***REMOVED***es how requests are redirected. In the event of an error, you can
+// Specifies how requests are redirected. In the event of an error, you can
 // specify a different error code to return.
 type Redirect struct {
 	_ struct{} `type:"structure"`
@@ -21497,17 +21497,17 @@ type Redirect struct {
 	// is used in the original request.
 	Protocol *string `type:"string" enum:"Protocol"`
 
-	// The object key pre***REMOVED***x to use in the redirect request. For example, to redirect
-	// requests for all pages with pre***REMOVED***x docs/ (objects in the docs/ folder) to
-	// documents/, you can set a condition block with KeyPre***REMOVED***xEquals set to docs/
-	// and in the Redirect set ReplaceKeyPre***REMOVED***xWith to /documents. Not required
+	// The object key prefix to use in the redirect request. For example, to redirect
+	// requests for all pages with prefix docs/ (objects in the docs/ folder) to
+	// documents/, you can set a condition block with KeyPrefixEquals set to docs/
+	// and in the Redirect set ReplaceKeyPrefixWith to /documents. Not required
 	// if one of the siblings is present. Can be present only if ReplaceKeyWith
 	// is not provided.
-	ReplaceKeyPre***REMOVED***xWith *string `type:"string"`
+	ReplaceKeyPrefixWith *string `type:"string"`
 
-	// The speci***REMOVED***c object key to use in the redirect request. For example, redirect
+	// The specific object key to use in the redirect request. For example, redirect
 	// request to error.html. Not required if one of the siblings is present. Can
-	// be present only if ReplaceKeyPre***REMOVED***xWith is not provided.
+	// be present only if ReplaceKeyPrefixWith is not provided.
 	ReplaceKeyWith *string `type:"string"`
 }
 
@@ -21521,44 +21521,44 @@ func (s Redirect) GoString() string {
 	return s.String()
 }
 
-// SetHostName sets the HostName ***REMOVED***eld's value.
+// SetHostName sets the HostName field's value.
 func (s *Redirect) SetHostName(v string) *Redirect {
 	s.HostName = &v
 	return s
 }
 
-// SetHttpRedirectCode sets the HttpRedirectCode ***REMOVED***eld's value.
+// SetHttpRedirectCode sets the HttpRedirectCode field's value.
 func (s *Redirect) SetHttpRedirectCode(v string) *Redirect {
 	s.HttpRedirectCode = &v
 	return s
 }
 
-// SetProtocol sets the Protocol ***REMOVED***eld's value.
+// SetProtocol sets the Protocol field's value.
 func (s *Redirect) SetProtocol(v string) *Redirect {
 	s.Protocol = &v
 	return s
 }
 
-// SetReplaceKeyPre***REMOVED***xWith sets the ReplaceKeyPre***REMOVED***xWith ***REMOVED***eld's value.
-func (s *Redirect) SetReplaceKeyPre***REMOVED***xWith(v string) *Redirect {
-	s.ReplaceKeyPre***REMOVED***xWith = &v
+// SetReplaceKeyPrefixWith sets the ReplaceKeyPrefixWith field's value.
+func (s *Redirect) SetReplaceKeyPrefixWith(v string) *Redirect {
+	s.ReplaceKeyPrefixWith = &v
 	return s
 }
 
-// SetReplaceKeyWith sets the ReplaceKeyWith ***REMOVED***eld's value.
+// SetReplaceKeyWith sets the ReplaceKeyWith field's value.
 func (s *Redirect) SetReplaceKeyWith(v string) *Redirect {
 	s.ReplaceKeyWith = &v
 	return s
 }
 
-// Speci***REMOVED***es the redirect behavior of all requests to a website endpoint of
+// Specifies the redirect behavior of all requests to a website endpoint of
 // an Amazon S3 bucket.
 type RedirectAllRequestsTo struct {
 	_ struct{} `type:"structure"`
 
 	// Name of the host where requests are redirected.
 	//
-	// HostName is a required ***REMOVED***eld
+	// HostName is a required field
 	HostName *string `type:"string" required:"true"`
 
 	// Protocol to use when redirecting requests. The default is the protocol that
@@ -21576,7 +21576,7 @@ func (s RedirectAllRequestsTo) GoString() string {
 	return s.String()
 }
 
-// Validate inspects the ***REMOVED***elds of the type to determine if they are valid.
+// Validate inspects the fields of the type to determine if they are valid.
 func (s *RedirectAllRequestsTo) Validate() error {
 	invalidParams := request.ErrInvalidParams{Context: "RedirectAllRequestsTo"}
 	if s.HostName == nil {
@@ -21589,21 +21589,21 @@ func (s *RedirectAllRequestsTo) Validate() error {
 	return nil
 }
 
-// SetHostName sets the HostName ***REMOVED***eld's value.
+// SetHostName sets the HostName field's value.
 func (s *RedirectAllRequestsTo) SetHostName(v string) *RedirectAllRequestsTo {
 	s.HostName = &v
 	return s
 }
 
-// SetProtocol sets the Protocol ***REMOVED***eld's value.
+// SetProtocol sets the Protocol field's value.
 func (s *RedirectAllRequestsTo) SetProtocol(v string) *RedirectAllRequestsTo {
 	s.Protocol = &v
 	return s
 }
 
 // A container for replication rules. You can add up to 1,000 rules. The maximum
-// size of a replication con***REMOVED***guration is 2 MB.
-type ReplicationCon***REMOVED***guration struct {
+// size of a replication configuration is 2 MB.
+type ReplicationConfiguration struct {
 	_ struct{} `type:"structure"`
 
 	// The Amazon Resource Name (ARN) of the AWS Identity and Access Management
@@ -21611,29 +21611,29 @@ type ReplicationCon***REMOVED***guration struct {
 	// see How to Set Up Cross-Region Replication (https://docs.aws.amazon.com/AmazonS3/latest/dev/crr-how-setup.html)
 	// in the Amazon Simple Storage Service Developer Guide.
 	//
-	// Role is a required ***REMOVED***eld
+	// Role is a required field
 	Role *string `type:"string" required:"true"`
 
-	// A container for one or more replication rules. A replication con***REMOVED***guration
+	// A container for one or more replication rules. A replication configuration
 	// must have at least one rule and can contain a maximum of 1,000 rules.
 	//
-	// Rules is a required ***REMOVED***eld
+	// Rules is a required field
 	Rules []*ReplicationRule `locationName:"Rule" type:"list" flattened:"true" required:"true"`
 }
 
 // String returns the string representation
-func (s ReplicationCon***REMOVED***guration) String() string {
+func (s ReplicationConfiguration) String() string {
 	return awsutil.Prettify(s)
 }
 
 // GoString returns the string representation
-func (s ReplicationCon***REMOVED***guration) GoString() string {
+func (s ReplicationConfiguration) GoString() string {
 	return s.String()
 }
 
-// Validate inspects the ***REMOVED***elds of the type to determine if they are valid.
-func (s *ReplicationCon***REMOVED***guration) Validate() error {
-	invalidParams := request.ErrInvalidParams{Context: "ReplicationCon***REMOVED***guration"}
+// Validate inspects the fields of the type to determine if they are valid.
+func (s *ReplicationConfiguration) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "ReplicationConfiguration"}
 	if s.Role == nil {
 		invalidParams.Add(request.NewErrParamRequired("Role"))
 	}
@@ -21657,69 +21657,69 @@ func (s *ReplicationCon***REMOVED***guration) Validate() error {
 	return nil
 }
 
-// SetRole sets the Role ***REMOVED***eld's value.
-func (s *ReplicationCon***REMOVED***guration) SetRole(v string) *ReplicationCon***REMOVED***guration {
+// SetRole sets the Role field's value.
+func (s *ReplicationConfiguration) SetRole(v string) *ReplicationConfiguration {
 	s.Role = &v
 	return s
 }
 
-// SetRules sets the Rules ***REMOVED***eld's value.
-func (s *ReplicationCon***REMOVED***guration) SetRules(v []*ReplicationRule) *ReplicationCon***REMOVED***guration {
+// SetRules sets the Rules field's value.
+func (s *ReplicationConfiguration) SetRules(v []*ReplicationRule) *ReplicationConfiguration {
 	s.Rules = v
 	return s
 }
 
-// Speci***REMOVED***es which Amazon S3 objects to replicate and where to store the replicas.
+// Specifies which Amazon S3 objects to replicate and where to store the replicas.
 type ReplicationRule struct {
 	_ struct{} `type:"structure"`
 
-	// Speci***REMOVED***es whether Amazon S3 should replicate delete makers.
+	// Specifies whether Amazon S3 should replicate delete makers.
 	DeleteMarkerReplication *DeleteMarkerReplication `type:"structure"`
 
 	// A container for information about the replication destination.
 	//
-	// Destination is a required ***REMOVED***eld
+	// Destination is a required field
 	Destination *Destination `type:"structure" required:"true"`
 
-	// A ***REMOVED***lter that identi***REMOVED***es the subset of objects to which the replication rule
-	// applies. A Filter must specify exactly one Pre***REMOVED***x, Tag, or an And child element.
+	// A filter that identifies the subset of objects to which the replication rule
+	// applies. A Filter must specify exactly one Prefix, Tag, or an And child element.
 	Filter *ReplicationRuleFilter `type:"structure"`
 
-	// A unique identi***REMOVED***er for the rule. The maximum value is 255 characters.
+	// A unique identifier for the rule. The maximum value is 255 characters.
 	ID *string `type:"string"`
 
-	// An object keyname pre***REMOVED***x that identi***REMOVED***es the object or objects to which the
-	// rule applies. The maximum pre***REMOVED***x length is 1,024 characters. To include all
+	// An object keyname prefix that identifies the object or objects to which the
+	// rule applies. The maximum prefix length is 1,024 characters. To include all
 	// objects in a bucket, specify an empty string.
 	//
-	// Deprecated: Pre***REMOVED***x has been deprecated
-	Pre***REMOVED***x *string `deprecated:"true" type:"string"`
+	// Deprecated: Prefix has been deprecated
+	Prefix *string `deprecated:"true" type:"string"`
 
 	// The priority associated with the rule. If you specify multiple rules in a
-	// replication con***REMOVED***guration, Amazon S3 prioritizes the rules to prevent conflicts
-	// when ***REMOVED***ltering. If two or more rules identify the same object based on a
-	// speci***REMOVED***ed ***REMOVED***lter, the rule with higher priority takes precedence. For example:
+	// replication configuration, Amazon S3 prioritizes the rules to prevent conflicts
+	// when filtering. If two or more rules identify the same object based on a
+	// specified filter, the rule with higher priority takes precedence. For example:
 	//
-	//    * Same object quality pre***REMOVED***x based ***REMOVED***lter criteria If pre***REMOVED***xes you speci***REMOVED***ed
+	//    * Same object quality prefix based filter criteria If prefixes you specified
 	//    in multiple rules overlap
 	//
-	//    * Same object qualify tag based ***REMOVED***lter criteria speci***REMOVED***ed in multiple
+	//    * Same object qualify tag based filter criteria specified in multiple
 	//    rules
 	//
 	// For more information, see Cross-Region Replication (CRR) (https://docs.aws.amazon.com/AmazonS3/latest/dev/crr.html)
 	// in the Amazon S3 Developer Guide.
 	Priority *int64 `type:"integer"`
 
-	// A container that describes additional ***REMOVED***lters for identifying the source
+	// A container that describes additional filters for identifying the source
 	// objects that you want to replicate. You can choose to enable or disable the
-	// replication of these objects. Currently, Amazon S3 supports only the ***REMOVED***lter
+	// replication of these objects. Currently, Amazon S3 supports only the filter
 	// that you can specify for objects created with server-side encryption using
 	// an AWS KMS-Managed Key (SSE-KMS).
 	SourceSelectionCriteria *SourceSelectionCriteria `type:"structure"`
 
-	// Speci***REMOVED***es whether the rule is enabled.
+	// Specifies whether the rule is enabled.
 	//
-	// Status is a required ***REMOVED***eld
+	// Status is a required field
 	Status *string `type:"string" required:"true" enum:"ReplicationRuleStatus"`
 }
 
@@ -21733,7 +21733,7 @@ func (s ReplicationRule) GoString() string {
 	return s.String()
 }
 
-// Validate inspects the ***REMOVED***elds of the type to determine if they are valid.
+// Validate inspects the fields of the type to determine if they are valid.
 func (s *ReplicationRule) Validate() error {
 	invalidParams := request.ErrInvalidParams{Context: "ReplicationRule"}
 	if s.Destination == nil {
@@ -21764,49 +21764,49 @@ func (s *ReplicationRule) Validate() error {
 	return nil
 }
 
-// SetDeleteMarkerReplication sets the DeleteMarkerReplication ***REMOVED***eld's value.
+// SetDeleteMarkerReplication sets the DeleteMarkerReplication field's value.
 func (s *ReplicationRule) SetDeleteMarkerReplication(v *DeleteMarkerReplication) *ReplicationRule {
 	s.DeleteMarkerReplication = v
 	return s
 }
 
-// SetDestination sets the Destination ***REMOVED***eld's value.
+// SetDestination sets the Destination field's value.
 func (s *ReplicationRule) SetDestination(v *Destination) *ReplicationRule {
 	s.Destination = v
 	return s
 }
 
-// SetFilter sets the Filter ***REMOVED***eld's value.
+// SetFilter sets the Filter field's value.
 func (s *ReplicationRule) SetFilter(v *ReplicationRuleFilter) *ReplicationRule {
 	s.Filter = v
 	return s
 }
 
-// SetID sets the ID ***REMOVED***eld's value.
+// SetID sets the ID field's value.
 func (s *ReplicationRule) SetID(v string) *ReplicationRule {
 	s.ID = &v
 	return s
 }
 
-// SetPre***REMOVED***x sets the Pre***REMOVED***x ***REMOVED***eld's value.
-func (s *ReplicationRule) SetPre***REMOVED***x(v string) *ReplicationRule {
-	s.Pre***REMOVED***x = &v
+// SetPrefix sets the Prefix field's value.
+func (s *ReplicationRule) SetPrefix(v string) *ReplicationRule {
+	s.Prefix = &v
 	return s
 }
 
-// SetPriority sets the Priority ***REMOVED***eld's value.
+// SetPriority sets the Priority field's value.
 func (s *ReplicationRule) SetPriority(v int64) *ReplicationRule {
 	s.Priority = &v
 	return s
 }
 
-// SetSourceSelectionCriteria sets the SourceSelectionCriteria ***REMOVED***eld's value.
+// SetSourceSelectionCriteria sets the SourceSelectionCriteria field's value.
 func (s *ReplicationRule) SetSourceSelectionCriteria(v *SourceSelectionCriteria) *ReplicationRule {
 	s.SourceSelectionCriteria = v
 	return s
 }
 
-// SetStatus sets the Status ***REMOVED***eld's value.
+// SetStatus sets the Status field's value.
 func (s *ReplicationRule) SetStatus(v string) *ReplicationRule {
 	s.Status = &v
 	return s
@@ -21815,7 +21815,7 @@ func (s *ReplicationRule) SetStatus(v string) *ReplicationRule {
 type ReplicationRuleAndOperator struct {
 	_ struct{} `type:"structure"`
 
-	Pre***REMOVED***x *string `type:"string"`
+	Prefix *string `type:"string"`
 
 	Tags []*Tag `locationName:"Tag" locationNameList:"Tag" type:"list" flattened:"true"`
 }
@@ -21830,7 +21830,7 @@ func (s ReplicationRuleAndOperator) GoString() string {
 	return s.String()
 }
 
-// Validate inspects the ***REMOVED***elds of the type to determine if they are valid.
+// Validate inspects the fields of the type to determine if they are valid.
 func (s *ReplicationRuleAndOperator) Validate() error {
 	invalidParams := request.ErrInvalidParams{Context: "ReplicationRuleAndOperator"}
 	if s.Tags != nil {
@@ -21850,37 +21850,37 @@ func (s *ReplicationRuleAndOperator) Validate() error {
 	return nil
 }
 
-// SetPre***REMOVED***x sets the Pre***REMOVED***x ***REMOVED***eld's value.
-func (s *ReplicationRuleAndOperator) SetPre***REMOVED***x(v string) *ReplicationRuleAndOperator {
-	s.Pre***REMOVED***x = &v
+// SetPrefix sets the Prefix field's value.
+func (s *ReplicationRuleAndOperator) SetPrefix(v string) *ReplicationRuleAndOperator {
+	s.Prefix = &v
 	return s
 }
 
-// SetTags sets the Tags ***REMOVED***eld's value.
+// SetTags sets the Tags field's value.
 func (s *ReplicationRuleAndOperator) SetTags(v []*Tag) *ReplicationRuleAndOperator {
 	s.Tags = v
 	return s
 }
 
-// A ***REMOVED***lter that identi***REMOVED***es the subset of objects to which the replication rule
-// applies. A Filter must specify exactly one Pre***REMOVED***x, Tag, or an And child element.
+// A filter that identifies the subset of objects to which the replication rule
+// applies. A Filter must specify exactly one Prefix, Tag, or an And child element.
 type ReplicationRuleFilter struct {
 	_ struct{} `type:"structure"`
 
-	// A container for specifying rule ***REMOVED***lters. The ***REMOVED***lters determine the subset
+	// A container for specifying rule filters. The filters determine the subset
 	// of objects to which the rule applies. This element is required only if you
-	// specify more than one ***REMOVED***lter. For example:
+	// specify more than one filter. For example:
 	//
-	//    * If you specify both a Pre***REMOVED***x and a Tag ***REMOVED***lter, wrap these ***REMOVED***lters in
+	//    * If you specify both a Prefix and a Tag filter, wrap these filters in
 	//    an And tag.
 	//
-	//    * If you specify a ***REMOVED***lter based on multiple tags, wrap the Tag elements
+	//    * If you specify a filter based on multiple tags, wrap the Tag elements
 	//    in an And tag.
 	And *ReplicationRuleAndOperator `type:"structure"`
 
-	// An object keyname pre***REMOVED***x that identi***REMOVED***es the subset of objects to which the
+	// An object keyname prefix that identifies the subset of objects to which the
 	// rule applies.
-	Pre***REMOVED***x *string `type:"string"`
+	Prefix *string `type:"string"`
 
 	// A container for specifying a tag key and value.
 	//
@@ -21898,7 +21898,7 @@ func (s ReplicationRuleFilter) GoString() string {
 	return s.String()
 }
 
-// Validate inspects the ***REMOVED***elds of the type to determine if they are valid.
+// Validate inspects the fields of the type to determine if they are valid.
 func (s *ReplicationRuleFilter) Validate() error {
 	invalidParams := request.ErrInvalidParams{Context: "ReplicationRuleFilter"}
 	if s.And != nil {
@@ -21918,46 +21918,46 @@ func (s *ReplicationRuleFilter) Validate() error {
 	return nil
 }
 
-// SetAnd sets the And ***REMOVED***eld's value.
+// SetAnd sets the And field's value.
 func (s *ReplicationRuleFilter) SetAnd(v *ReplicationRuleAndOperator) *ReplicationRuleFilter {
 	s.And = v
 	return s
 }
 
-// SetPre***REMOVED***x sets the Pre***REMOVED***x ***REMOVED***eld's value.
-func (s *ReplicationRuleFilter) SetPre***REMOVED***x(v string) *ReplicationRuleFilter {
-	s.Pre***REMOVED***x = &v
+// SetPrefix sets the Prefix field's value.
+func (s *ReplicationRuleFilter) SetPrefix(v string) *ReplicationRuleFilter {
+	s.Prefix = &v
 	return s
 }
 
-// SetTag sets the Tag ***REMOVED***eld's value.
+// SetTag sets the Tag field's value.
 func (s *ReplicationRuleFilter) SetTag(v *Tag) *ReplicationRuleFilter {
 	s.Tag = v
 	return s
 }
 
-type RequestPaymentCon***REMOVED***guration struct {
+type RequestPaymentConfiguration struct {
 	_ struct{} `type:"structure"`
 
-	// Speci***REMOVED***es who pays for the download and request fees.
+	// Specifies who pays for the download and request fees.
 	//
-	// Payer is a required ***REMOVED***eld
+	// Payer is a required field
 	Payer *string `type:"string" required:"true" enum:"Payer"`
 }
 
 // String returns the string representation
-func (s RequestPaymentCon***REMOVED***guration) String() string {
+func (s RequestPaymentConfiguration) String() string {
 	return awsutil.Prettify(s)
 }
 
 // GoString returns the string representation
-func (s RequestPaymentCon***REMOVED***guration) GoString() string {
+func (s RequestPaymentConfiguration) GoString() string {
 	return s.String()
 }
 
-// Validate inspects the ***REMOVED***elds of the type to determine if they are valid.
-func (s *RequestPaymentCon***REMOVED***guration) Validate() error {
-	invalidParams := request.ErrInvalidParams{Context: "RequestPaymentCon***REMOVED***guration"}
+// Validate inspects the fields of the type to determine if they are valid.
+func (s *RequestPaymentConfiguration) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "RequestPaymentConfiguration"}
 	if s.Payer == nil {
 		invalidParams.Add(request.NewErrParamRequired("Payer"))
 	}
@@ -21968,8 +21968,8 @@ func (s *RequestPaymentCon***REMOVED***guration) Validate() error {
 	return nil
 }
 
-// SetPayer sets the Payer ***REMOVED***eld's value.
-func (s *RequestPaymentCon***REMOVED***guration) SetPayer(v string) *RequestPaymentCon***REMOVED***guration {
+// SetPayer sets the Payer field's value.
+func (s *RequestPaymentConfiguration) SetPayer(v string) *RequestPaymentConfiguration {
 	s.Payer = &v
 	return s
 }
@@ -21977,7 +21977,7 @@ func (s *RequestPaymentCon***REMOVED***guration) SetPayer(v string) *RequestPaym
 type RequestProgress struct {
 	_ struct{} `type:"structure"`
 
-	// Speci***REMOVED***es whether periodic QueryProgress frames should be sent. Valid values:
+	// Specifies whether periodic QueryProgress frames should be sent. Valid values:
 	// TRUE, FALSE. Default value: FALSE.
 	Enabled *bool `type:"boolean"`
 }
@@ -21992,7 +21992,7 @@ func (s RequestProgress) GoString() string {
 	return s.String()
 }
 
-// SetEnabled sets the Enabled ***REMOVED***eld's value.
+// SetEnabled sets the Enabled field's value.
 func (s *RequestProgress) SetEnabled(v bool) *RequestProgress {
 	s.Enabled = &v
 	return s
@@ -22001,13 +22001,13 @@ func (s *RequestProgress) SetEnabled(v bool) *RequestProgress {
 type RestoreObjectInput struct {
 	_ struct{} `locationName:"RestoreObjectRequest" type:"structure" payload:"RestoreRequest"`
 
-	// Bucket is a required ***REMOVED***eld
+	// Bucket is a required field
 	Bucket *string `location:"uri" locationName:"Bucket" type:"string" required:"true"`
 
-	// Key is a required ***REMOVED***eld
+	// Key is a required field
 	Key *string `location:"uri" locationName:"Key" min:"1" type:"string" required:"true"`
 
-	// Con***REMOVED***rms that the requester knows that she or he will be charged for the
+	// Confirms that the requester knows that she or he will be charged for the
 	// request. Bucket owners need not specify this parameter in their requests.
 	// Documentation on downloading objects from requester pays buckets can be found
 	// at http://docs.aws.amazon.com/AmazonS3/latest/dev/ObjectsinRequesterPaysBuckets.html
@@ -22029,7 +22029,7 @@ func (s RestoreObjectInput) GoString() string {
 	return s.String()
 }
 
-// Validate inspects the ***REMOVED***elds of the type to determine if they are valid.
+// Validate inspects the fields of the type to determine if they are valid.
 func (s *RestoreObjectInput) Validate() error {
 	invalidParams := request.ErrInvalidParams{Context: "RestoreObjectInput"}
 	if s.Bucket == nil {
@@ -22056,7 +22056,7 @@ func (s *RestoreObjectInput) Validate() error {
 	return nil
 }
 
-// SetBucket sets the Bucket ***REMOVED***eld's value.
+// SetBucket sets the Bucket field's value.
 func (s *RestoreObjectInput) SetBucket(v string) *RestoreObjectInput {
 	s.Bucket = &v
 	return s
@@ -22069,25 +22069,25 @@ func (s *RestoreObjectInput) getBucket() (v string) {
 	return *s.Bucket
 }
 
-// SetKey sets the Key ***REMOVED***eld's value.
+// SetKey sets the Key field's value.
 func (s *RestoreObjectInput) SetKey(v string) *RestoreObjectInput {
 	s.Key = &v
 	return s
 }
 
-// SetRequestPayer sets the RequestPayer ***REMOVED***eld's value.
+// SetRequestPayer sets the RequestPayer field's value.
 func (s *RestoreObjectInput) SetRequestPayer(v string) *RestoreObjectInput {
 	s.RequestPayer = &v
 	return s
 }
 
-// SetRestoreRequest sets the RestoreRequest ***REMOVED***eld's value.
+// SetRestoreRequest sets the RestoreRequest field's value.
 func (s *RestoreObjectInput) SetRestoreRequest(v *RestoreRequest) *RestoreObjectInput {
 	s.RestoreRequest = v
 	return s
 }
 
-// SetVersionId sets the VersionId ***REMOVED***eld's value.
+// SetVersionId sets the VersionId field's value.
 func (s *RestoreObjectInput) SetVersionId(v string) *RestoreObjectInput {
 	s.VersionId = &v
 	return s
@@ -22115,13 +22115,13 @@ func (s RestoreObjectOutput) GoString() string {
 	return s.String()
 }
 
-// SetRequestCharged sets the RequestCharged ***REMOVED***eld's value.
+// SetRequestCharged sets the RequestCharged field's value.
 func (s *RestoreObjectOutput) SetRequestCharged(v string) *RestoreObjectOutput {
 	s.RequestCharged = &v
 	return s
 }
 
-// SetRestoreOutputPath sets the RestoreOutputPath ***REMOVED***eld's value.
+// SetRestoreOutputPath sets the RestoreOutputPath field's value.
 func (s *RestoreObjectOutput) SetRestoreOutputPath(v string) *RestoreObjectOutput {
 	s.RestoreOutputPath = &v
 	return s
@@ -22165,7 +22165,7 @@ func (s RestoreRequest) GoString() string {
 	return s.String()
 }
 
-// Validate inspects the ***REMOVED***elds of the type to determine if they are valid.
+// Validate inspects the fields of the type to determine if they are valid.
 func (s *RestoreRequest) Validate() error {
 	invalidParams := request.ErrInvalidParams{Context: "RestoreRequest"}
 	if s.GlacierJobParameters != nil {
@@ -22190,53 +22190,53 @@ func (s *RestoreRequest) Validate() error {
 	return nil
 }
 
-// SetDays sets the Days ***REMOVED***eld's value.
+// SetDays sets the Days field's value.
 func (s *RestoreRequest) SetDays(v int64) *RestoreRequest {
 	s.Days = &v
 	return s
 }
 
-// SetDescription sets the Description ***REMOVED***eld's value.
+// SetDescription sets the Description field's value.
 func (s *RestoreRequest) SetDescription(v string) *RestoreRequest {
 	s.Description = &v
 	return s
 }
 
-// SetGlacierJobParameters sets the GlacierJobParameters ***REMOVED***eld's value.
+// SetGlacierJobParameters sets the GlacierJobParameters field's value.
 func (s *RestoreRequest) SetGlacierJobParameters(v *GlacierJobParameters) *RestoreRequest {
 	s.GlacierJobParameters = v
 	return s
 }
 
-// SetOutputLocation sets the OutputLocation ***REMOVED***eld's value.
+// SetOutputLocation sets the OutputLocation field's value.
 func (s *RestoreRequest) SetOutputLocation(v *OutputLocation) *RestoreRequest {
 	s.OutputLocation = v
 	return s
 }
 
-// SetSelectParameters sets the SelectParameters ***REMOVED***eld's value.
+// SetSelectParameters sets the SelectParameters field's value.
 func (s *RestoreRequest) SetSelectParameters(v *SelectParameters) *RestoreRequest {
 	s.SelectParameters = v
 	return s
 }
 
-// SetTier sets the Tier ***REMOVED***eld's value.
+// SetTier sets the Tier field's value.
 func (s *RestoreRequest) SetTier(v string) *RestoreRequest {
 	s.Tier = &v
 	return s
 }
 
-// SetType sets the Type ***REMOVED***eld's value.
+// SetType sets the Type field's value.
 func (s *RestoreRequest) SetType(v string) *RestoreRequest {
 	s.Type = &v
 	return s
 }
 
-// Speci***REMOVED***es the redirect behavior and when a redirect is applied.
+// Specifies the redirect behavior and when a redirect is applied.
 type RoutingRule struct {
 	_ struct{} `type:"structure"`
 
-	// A container for describing a condition that must be met for the speci***REMOVED***ed
+	// A container for describing a condition that must be met for the specified
 	// redirect to apply. For example, 1. If request is for pages in the /docs folder,
 	// redirect to the /documents folder. 2. If request results in HTTP error 4xx,
 	// redirect request to another host where you might process the error.
@@ -22246,7 +22246,7 @@ type RoutingRule struct {
 	// host, to another page, or with another protocol. In the event of an error,
 	// you can specify a different error code to return.
 	//
-	// Redirect is a required ***REMOVED***eld
+	// Redirect is a required field
 	Redirect *Redirect `type:"structure" required:"true"`
 }
 
@@ -22260,7 +22260,7 @@ func (s RoutingRule) GoString() string {
 	return s.String()
 }
 
-// Validate inspects the ***REMOVED***elds of the type to determine if they are valid.
+// Validate inspects the fields of the type to determine if they are valid.
 func (s *RoutingRule) Validate() error {
 	invalidParams := request.ErrInvalidParams{Context: "RoutingRule"}
 	if s.Redirect == nil {
@@ -22273,40 +22273,40 @@ func (s *RoutingRule) Validate() error {
 	return nil
 }
 
-// SetCondition sets the Condition ***REMOVED***eld's value.
+// SetCondition sets the Condition field's value.
 func (s *RoutingRule) SetCondition(v *Condition) *RoutingRule {
 	s.Condition = v
 	return s
 }
 
-// SetRedirect sets the Redirect ***REMOVED***eld's value.
+// SetRedirect sets the Redirect field's value.
 func (s *RoutingRule) SetRedirect(v *Redirect) *RoutingRule {
 	s.Redirect = v
 	return s
 }
 
-// Speci***REMOVED***es lifecycle rules for an Amazon S3 bucket. For more information,
+// Specifies lifecycle rules for an Amazon S3 bucket. For more information,
 // see PUT Bucket lifecycle (https://docs.aws.amazon.com/AmazonS3/latest/API/RESTBucketPUTlifecycle.html)
 // in the Amazon Simple Storage Service API Reference.
 type Rule struct {
 	_ struct{} `type:"structure"`
 
-	// Speci***REMOVED***es the days since the initiation of an incomplete multipart upload
+	// Specifies the days since the initiation of an incomplete multipart upload
 	// that Amazon S3 will wait before permanently removing all parts of the upload.
 	// For more information, see Aborting Incomplete Multipart Uploads Using a Bucket
-	// Lifecycle Policy (https://docs.aws.amazon.com/AmazonS3/latest/dev/mpuoverview.html#mpu-abort-incomplete-mpu-lifecycle-con***REMOVED***g)
+	// Lifecycle Policy (https://docs.aws.amazon.com/AmazonS3/latest/dev/mpuoverview.html#mpu-abort-incomplete-mpu-lifecycle-config)
 	// in the Amazon Simple Storage Service Developer Guide.
 	AbortIncompleteMultipartUpload *AbortIncompleteMultipartUpload `type:"structure"`
 
 	Expiration *LifecycleExpiration `type:"structure"`
 
-	// Unique identi***REMOVED***er for the rule. The value can't be longer than 255 characters.
+	// Unique identifier for the rule. The value can't be longer than 255 characters.
 	ID *string `type:"string"`
 
-	// Speci***REMOVED***es when noncurrent object versions expire. Upon expiration, Amazon
+	// Specifies when noncurrent object versions expire. Upon expiration, Amazon
 	// S3 permanently deletes the noncurrent object versions. You set this lifecycle
-	// con***REMOVED***guration action on a bucket that has versioning enabled (or suspended)
-	// to request that Amazon S3 delete noncurrent object versions at a speci***REMOVED***c
+	// configuration action on a bucket that has versioning enabled (or suspended)
+	// to request that Amazon S3 delete noncurrent object versions at a specific
 	// period in the object's lifetime.
 	NoncurrentVersionExpiration *NoncurrentVersionExpiration `type:"structure"`
 
@@ -22315,23 +22315,23 @@ type Rule struct {
 	// or DEEP_ARCHIVE storage class. If your bucket is versioning-enabled (or versioning
 	// is suspended), you can set this action to request that Amazon S3 transition
 	// noncurrent object versions to the STANDARD_IA, ONEZONE_IA, INTELLIGENT_TIERING,
-	// GLACIER, or DEEP_ARCHIVE storage class at a speci***REMOVED***c period in the object's
+	// GLACIER, or DEEP_ARCHIVE storage class at a specific period in the object's
 	// lifetime.
 	NoncurrentVersionTransition *NoncurrentVersionTransition `type:"structure"`
 
-	// Object key pre***REMOVED***x that identi***REMOVED***es one or more objects to which this rule
+	// Object key prefix that identifies one or more objects to which this rule
 	// applies.
 	//
-	// Pre***REMOVED***x is a required ***REMOVED***eld
-	Pre***REMOVED***x *string `type:"string" required:"true"`
+	// Prefix is a required field
+	Prefix *string `type:"string" required:"true"`
 
 	// If Enabled, the rule is currently being applied. If Disabled, the rule is
 	// not currently being applied.
 	//
-	// Status is a required ***REMOVED***eld
+	// Status is a required field
 	Status *string `type:"string" required:"true" enum:"ExpirationStatus"`
 
-	// Speci***REMOVED***es when an object transitions to a speci***REMOVED***ed storage class.
+	// Specifies when an object transitions to a specified storage class.
 	Transition *Transition `type:"structure"`
 }
 
@@ -22345,11 +22345,11 @@ func (s Rule) GoString() string {
 	return s.String()
 }
 
-// Validate inspects the ***REMOVED***elds of the type to determine if they are valid.
+// Validate inspects the fields of the type to determine if they are valid.
 func (s *Rule) Validate() error {
 	invalidParams := request.ErrInvalidParams{Context: "Rule"}
-	if s.Pre***REMOVED***x == nil {
-		invalidParams.Add(request.NewErrParamRequired("Pre***REMOVED***x"))
+	if s.Prefix == nil {
+		invalidParams.Add(request.NewErrParamRequired("Prefix"))
 	}
 	if s.Status == nil {
 		invalidParams.Add(request.NewErrParamRequired("Status"))
@@ -22361,62 +22361,62 @@ func (s *Rule) Validate() error {
 	return nil
 }
 
-// SetAbortIncompleteMultipartUpload sets the AbortIncompleteMultipartUpload ***REMOVED***eld's value.
+// SetAbortIncompleteMultipartUpload sets the AbortIncompleteMultipartUpload field's value.
 func (s *Rule) SetAbortIncompleteMultipartUpload(v *AbortIncompleteMultipartUpload) *Rule {
 	s.AbortIncompleteMultipartUpload = v
 	return s
 }
 
-// SetExpiration sets the Expiration ***REMOVED***eld's value.
+// SetExpiration sets the Expiration field's value.
 func (s *Rule) SetExpiration(v *LifecycleExpiration) *Rule {
 	s.Expiration = v
 	return s
 }
 
-// SetID sets the ID ***REMOVED***eld's value.
+// SetID sets the ID field's value.
 func (s *Rule) SetID(v string) *Rule {
 	s.ID = &v
 	return s
 }
 
-// SetNoncurrentVersionExpiration sets the NoncurrentVersionExpiration ***REMOVED***eld's value.
+// SetNoncurrentVersionExpiration sets the NoncurrentVersionExpiration field's value.
 func (s *Rule) SetNoncurrentVersionExpiration(v *NoncurrentVersionExpiration) *Rule {
 	s.NoncurrentVersionExpiration = v
 	return s
 }
 
-// SetNoncurrentVersionTransition sets the NoncurrentVersionTransition ***REMOVED***eld's value.
+// SetNoncurrentVersionTransition sets the NoncurrentVersionTransition field's value.
 func (s *Rule) SetNoncurrentVersionTransition(v *NoncurrentVersionTransition) *Rule {
 	s.NoncurrentVersionTransition = v
 	return s
 }
 
-// SetPre***REMOVED***x sets the Pre***REMOVED***x ***REMOVED***eld's value.
-func (s *Rule) SetPre***REMOVED***x(v string) *Rule {
-	s.Pre***REMOVED***x = &v
+// SetPrefix sets the Prefix field's value.
+func (s *Rule) SetPrefix(v string) *Rule {
+	s.Prefix = &v
 	return s
 }
 
-// SetStatus sets the Status ***REMOVED***eld's value.
+// SetStatus sets the Status field's value.
 func (s *Rule) SetStatus(v string) *Rule {
 	s.Status = &v
 	return s
 }
 
-// SetTransition sets the Transition ***REMOVED***eld's value.
+// SetTransition sets the Transition field's value.
 func (s *Rule) SetTransition(v *Transition) *Rule {
 	s.Transition = v
 	return s
 }
 
-// Speci***REMOVED***es the use of SSE-KMS to encrypt delivered Inventory reports.
+// Specifies the use of SSE-KMS to encrypt delivered Inventory reports.
 type SSEKMS struct {
 	_ struct{} `locationName:"SSE-KMS" type:"structure"`
 
-	// Speci***REMOVED***es the ID of the AWS Key Management Service (KMS) master encryption
+	// Specifies the ID of the AWS Key Management Service (KMS) master encryption
 	// key to use for encrypting Inventory reports.
 	//
-	// KeyId is a required ***REMOVED***eld
+	// KeyId is a required field
 	KeyId *string `type:"string" required:"true" sensitive:"true"`
 }
 
@@ -22430,7 +22430,7 @@ func (s SSEKMS) GoString() string {
 	return s.String()
 }
 
-// Validate inspects the ***REMOVED***elds of the type to determine if they are valid.
+// Validate inspects the fields of the type to determine if they are valid.
 func (s *SSEKMS) Validate() error {
 	invalidParams := request.ErrInvalidParams{Context: "SSEKMS"}
 	if s.KeyId == nil {
@@ -22443,13 +22443,13 @@ func (s *SSEKMS) Validate() error {
 	return nil
 }
 
-// SetKeyId sets the KeyId ***REMOVED***eld's value.
+// SetKeyId sets the KeyId field's value.
 func (s *SSEKMS) SetKeyId(v string) *SSEKMS {
 	s.KeyId = &v
 	return s
 }
 
-// Speci***REMOVED***es the use of SSE-S3 to encrypt delivered Inventory reports.
+// Specifies the use of SSE-S3 to encrypt delivered Inventory reports.
 type SSES3 struct {
 	_ struct{} `locationName:"SSE-S3" type:"structure"`
 }
@@ -22684,11 +22684,11 @@ func (r *readSelectObjectContentEventStream) unmarshalerForEventType(
 	}
 }
 
-// Request to ***REMOVED***lter the contents of an Amazon S3 object based on a simple Structured
+// Request to filter the contents of an Amazon S3 object based on a simple Structured
 // Query Language (SQL) statement. In the request, along with the SQL expression,
 // you must specify a data serialization format (JSON or CSV) of the object.
 // Amazon S3 uses this to parse object data into records. It returns only records
-// that match the speci***REMOVED***ed SQL expression. You must also specify the data serialization
+// that match the specified SQL expression. You must also specify the data serialization
 // format for the response. For more information, see S3Select API Documentation
 // (https://docs.aws.amazon.com/AmazonS3/latest/API/RESTObjectSELECTContent.html).
 type SelectObjectContentInput struct {
@@ -22696,35 +22696,35 @@ type SelectObjectContentInput struct {
 
 	// The S3 bucket.
 	//
-	// Bucket is a required ***REMOVED***eld
+	// Bucket is a required field
 	Bucket *string `location:"uri" locationName:"Bucket" type:"string" required:"true"`
 
 	// The expression that is used to query the object.
 	//
-	// Expression is a required ***REMOVED***eld
+	// Expression is a required field
 	Expression *string `type:"string" required:"true"`
 
 	// The type of the provided expression (for example., SQL).
 	//
-	// ExpressionType is a required ***REMOVED***eld
+	// ExpressionType is a required field
 	ExpressionType *string `type:"string" required:"true" enum:"ExpressionType"`
 
 	// Describes the format of the data in the object that is being queried.
 	//
-	// InputSerialization is a required ***REMOVED***eld
+	// InputSerialization is a required field
 	InputSerialization *InputSerialization `type:"structure" required:"true"`
 
 	// The object key.
 	//
-	// Key is a required ***REMOVED***eld
+	// Key is a required field
 	Key *string `location:"uri" locationName:"Key" min:"1" type:"string" required:"true"`
 
 	// Describes the format of the data that you want Amazon S3 to return in response.
 	//
-	// OutputSerialization is a required ***REMOVED***eld
+	// OutputSerialization is a required field
 	OutputSerialization *OutputSerialization `type:"structure" required:"true"`
 
-	// Speci***REMOVED***es if periodic request progress information should be enabled.
+	// Specifies if periodic request progress information should be enabled.
 	RequestProgress *RequestProgress `type:"structure"`
 
 	// The SSE Algorithm used to encrypt the object. For more information, see Server-Side
@@ -22750,7 +22750,7 @@ func (s SelectObjectContentInput) GoString() string {
 	return s.String()
 }
 
-// Validate inspects the ***REMOVED***elds of the type to determine if they are valid.
+// Validate inspects the fields of the type to determine if they are valid.
 func (s *SelectObjectContentInput) Validate() error {
 	invalidParams := request.ErrInvalidParams{Context: "SelectObjectContentInput"}
 	if s.Bucket == nil {
@@ -22784,7 +22784,7 @@ func (s *SelectObjectContentInput) Validate() error {
 	return nil
 }
 
-// SetBucket sets the Bucket ***REMOVED***eld's value.
+// SetBucket sets the Bucket field's value.
 func (s *SelectObjectContentInput) SetBucket(v string) *SelectObjectContentInput {
 	s.Bucket = &v
 	return s
@@ -22797,49 +22797,49 @@ func (s *SelectObjectContentInput) getBucket() (v string) {
 	return *s.Bucket
 }
 
-// SetExpression sets the Expression ***REMOVED***eld's value.
+// SetExpression sets the Expression field's value.
 func (s *SelectObjectContentInput) SetExpression(v string) *SelectObjectContentInput {
 	s.Expression = &v
 	return s
 }
 
-// SetExpressionType sets the ExpressionType ***REMOVED***eld's value.
+// SetExpressionType sets the ExpressionType field's value.
 func (s *SelectObjectContentInput) SetExpressionType(v string) *SelectObjectContentInput {
 	s.ExpressionType = &v
 	return s
 }
 
-// SetInputSerialization sets the InputSerialization ***REMOVED***eld's value.
+// SetInputSerialization sets the InputSerialization field's value.
 func (s *SelectObjectContentInput) SetInputSerialization(v *InputSerialization) *SelectObjectContentInput {
 	s.InputSerialization = v
 	return s
 }
 
-// SetKey sets the Key ***REMOVED***eld's value.
+// SetKey sets the Key field's value.
 func (s *SelectObjectContentInput) SetKey(v string) *SelectObjectContentInput {
 	s.Key = &v
 	return s
 }
 
-// SetOutputSerialization sets the OutputSerialization ***REMOVED***eld's value.
+// SetOutputSerialization sets the OutputSerialization field's value.
 func (s *SelectObjectContentInput) SetOutputSerialization(v *OutputSerialization) *SelectObjectContentInput {
 	s.OutputSerialization = v
 	return s
 }
 
-// SetRequestProgress sets the RequestProgress ***REMOVED***eld's value.
+// SetRequestProgress sets the RequestProgress field's value.
 func (s *SelectObjectContentInput) SetRequestProgress(v *RequestProgress) *SelectObjectContentInput {
 	s.RequestProgress = v
 	return s
 }
 
-// SetSSECustomerAlgorithm sets the SSECustomerAlgorithm ***REMOVED***eld's value.
+// SetSSECustomerAlgorithm sets the SSECustomerAlgorithm field's value.
 func (s *SelectObjectContentInput) SetSSECustomerAlgorithm(v string) *SelectObjectContentInput {
 	s.SSECustomerAlgorithm = &v
 	return s
 }
 
-// SetSSECustomerKey sets the SSECustomerKey ***REMOVED***eld's value.
+// SetSSECustomerKey sets the SSECustomerKey field's value.
 func (s *SelectObjectContentInput) SetSSECustomerKey(v string) *SelectObjectContentInput {
 	s.SSECustomerKey = &v
 	return s
@@ -22852,7 +22852,7 @@ func (s *SelectObjectContentInput) getSSECustomerKey() (v string) {
 	return *s.SSECustomerKey
 }
 
-// SetSSECustomerKeyMD5 sets the SSECustomerKeyMD5 ***REMOVED***eld's value.
+// SetSSECustomerKeyMD5 sets the SSECustomerKeyMD5 field's value.
 func (s *SelectObjectContentInput) SetSSECustomerKeyMD5(v string) *SelectObjectContentInput {
 	s.SSECustomerKeyMD5 = &v
 	return s
@@ -22875,7 +22875,7 @@ func (s SelectObjectContentOutput) GoString() string {
 	return s.String()
 }
 
-// SetEventStream sets the EventStream ***REMOVED***eld's value.
+// SetEventStream sets the EventStream field's value.
 func (s *SelectObjectContentOutput) SetEventStream(v *SelectObjectContentEventStream) *SelectObjectContentOutput {
 	s.EventStream = v
 	return s
@@ -22888,8 +22888,8 @@ func (s *SelectObjectContentOutput) runEventStreamLoop(r *request.Request) {
 	reader := newReadSelectObjectContentEventStream(
 		r.HTTPResponse.Body,
 		r.Handlers.UnmarshalStream,
-		r.Con***REMOVED***g.Logger,
-		r.Con***REMOVED***g.LogLevel.Value(),
+		r.Config.Logger,
+		r.Config.LogLevel.Value(),
 	)
 	go reader.readEventStream()
 
@@ -22906,22 +22906,22 @@ type SelectParameters struct {
 
 	// The expression that is used to query the object.
 	//
-	// Expression is a required ***REMOVED***eld
+	// Expression is a required field
 	Expression *string `type:"string" required:"true"`
 
 	// The type of the provided expression (e.g., SQL).
 	//
-	// ExpressionType is a required ***REMOVED***eld
+	// ExpressionType is a required field
 	ExpressionType *string `type:"string" required:"true" enum:"ExpressionType"`
 
 	// Describes the serialization format of the object.
 	//
-	// InputSerialization is a required ***REMOVED***eld
+	// InputSerialization is a required field
 	InputSerialization *InputSerialization `type:"structure" required:"true"`
 
 	// Describes how the results of the Select job are serialized.
 	//
-	// OutputSerialization is a required ***REMOVED***eld
+	// OutputSerialization is a required field
 	OutputSerialization *OutputSerialization `type:"structure" required:"true"`
 }
 
@@ -22935,7 +22935,7 @@ func (s SelectParameters) GoString() string {
 	return s.String()
 }
 
-// Validate inspects the ***REMOVED***elds of the type to determine if they are valid.
+// Validate inspects the fields of the type to determine if they are valid.
 func (s *SelectParameters) Validate() error {
 	invalidParams := request.ErrInvalidParams{Context: "SelectParameters"}
 	if s.Expression == nil {
@@ -22957,25 +22957,25 @@ func (s *SelectParameters) Validate() error {
 	return nil
 }
 
-// SetExpression sets the Expression ***REMOVED***eld's value.
+// SetExpression sets the Expression field's value.
 func (s *SelectParameters) SetExpression(v string) *SelectParameters {
 	s.Expression = &v
 	return s
 }
 
-// SetExpressionType sets the ExpressionType ***REMOVED***eld's value.
+// SetExpressionType sets the ExpressionType field's value.
 func (s *SelectParameters) SetExpressionType(v string) *SelectParameters {
 	s.ExpressionType = &v
 	return s
 }
 
-// SetInputSerialization sets the InputSerialization ***REMOVED***eld's value.
+// SetInputSerialization sets the InputSerialization field's value.
 func (s *SelectParameters) SetInputSerialization(v *InputSerialization) *SelectParameters {
 	s.InputSerialization = v
 	return s
 }
 
-// SetOutputSerialization sets the OutputSerialization ***REMOVED***eld's value.
+// SetOutputSerialization sets the OutputSerialization field's value.
 func (s *SelectParameters) SetOutputSerialization(v *OutputSerialization) *SelectParameters {
 	s.OutputSerialization = v
 	return s
@@ -22995,7 +22995,7 @@ type ServerSideEncryptionByDefault struct {
 
 	// Server-side encryption algorithm to use for the default encryption.
 	//
-	// SSEAlgorithm is a required ***REMOVED***eld
+	// SSEAlgorithm is a required field
 	SSEAlgorithm *string `type:"string" required:"true" enum:"ServerSideEncryption"`
 }
 
@@ -23009,7 +23009,7 @@ func (s ServerSideEncryptionByDefault) GoString() string {
 	return s.String()
 }
 
-// Validate inspects the ***REMOVED***elds of the type to determine if they are valid.
+// Validate inspects the fields of the type to determine if they are valid.
 func (s *ServerSideEncryptionByDefault) Validate() error {
 	invalidParams := request.ErrInvalidParams{Context: "ServerSideEncryptionByDefault"}
 	if s.SSEAlgorithm == nil {
@@ -23022,42 +23022,42 @@ func (s *ServerSideEncryptionByDefault) Validate() error {
 	return nil
 }
 
-// SetKMSMasterKeyID sets the KMSMasterKeyID ***REMOVED***eld's value.
+// SetKMSMasterKeyID sets the KMSMasterKeyID field's value.
 func (s *ServerSideEncryptionByDefault) SetKMSMasterKeyID(v string) *ServerSideEncryptionByDefault {
 	s.KMSMasterKeyID = &v
 	return s
 }
 
-// SetSSEAlgorithm sets the SSEAlgorithm ***REMOVED***eld's value.
+// SetSSEAlgorithm sets the SSEAlgorithm field's value.
 func (s *ServerSideEncryptionByDefault) SetSSEAlgorithm(v string) *ServerSideEncryptionByDefault {
 	s.SSEAlgorithm = &v
 	return s
 }
 
-// Speci***REMOVED***es the default server-side-encryption con***REMOVED***guration.
-type ServerSideEncryptionCon***REMOVED***guration struct {
+// Specifies the default server-side-encryption configuration.
+type ServerSideEncryptionConfiguration struct {
 	_ struct{} `type:"structure"`
 
-	// Container for information about a particular server-side encryption con***REMOVED***guration
+	// Container for information about a particular server-side encryption configuration
 	// rule.
 	//
-	// Rules is a required ***REMOVED***eld
+	// Rules is a required field
 	Rules []*ServerSideEncryptionRule `locationName:"Rule" type:"list" flattened:"true" required:"true"`
 }
 
 // String returns the string representation
-func (s ServerSideEncryptionCon***REMOVED***guration) String() string {
+func (s ServerSideEncryptionConfiguration) String() string {
 	return awsutil.Prettify(s)
 }
 
 // GoString returns the string representation
-func (s ServerSideEncryptionCon***REMOVED***guration) GoString() string {
+func (s ServerSideEncryptionConfiguration) GoString() string {
 	return s.String()
 }
 
-// Validate inspects the ***REMOVED***elds of the type to determine if they are valid.
-func (s *ServerSideEncryptionCon***REMOVED***guration) Validate() error {
-	invalidParams := request.ErrInvalidParams{Context: "ServerSideEncryptionCon***REMOVED***guration"}
+// Validate inspects the fields of the type to determine if they are valid.
+func (s *ServerSideEncryptionConfiguration) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "ServerSideEncryptionConfiguration"}
 	if s.Rules == nil {
 		invalidParams.Add(request.NewErrParamRequired("Rules"))
 	}
@@ -23078,17 +23078,17 @@ func (s *ServerSideEncryptionCon***REMOVED***guration) Validate() error {
 	return nil
 }
 
-// SetRules sets the Rules ***REMOVED***eld's value.
-func (s *ServerSideEncryptionCon***REMOVED***guration) SetRules(v []*ServerSideEncryptionRule) *ServerSideEncryptionCon***REMOVED***guration {
+// SetRules sets the Rules field's value.
+func (s *ServerSideEncryptionConfiguration) SetRules(v []*ServerSideEncryptionRule) *ServerSideEncryptionConfiguration {
 	s.Rules = v
 	return s
 }
 
-// Speci***REMOVED***es the default server-side encryption con***REMOVED***guration.
+// Specifies the default server-side encryption configuration.
 type ServerSideEncryptionRule struct {
 	_ struct{} `type:"structure"`
 
-	// Speci***REMOVED***es the default server-side encryption to apply to new objects in the
+	// Specifies the default server-side encryption to apply to new objects in the
 	// bucket. If a PUT Object request doesn't specify any server-side encryption,
 	// this default encryption will be applied.
 	ApplyServerSideEncryptionByDefault *ServerSideEncryptionByDefault `type:"structure"`
@@ -23104,7 +23104,7 @@ func (s ServerSideEncryptionRule) GoString() string {
 	return s.String()
 }
 
-// Validate inspects the ***REMOVED***elds of the type to determine if they are valid.
+// Validate inspects the fields of the type to determine if they are valid.
 func (s *ServerSideEncryptionRule) Validate() error {
 	invalidParams := request.ErrInvalidParams{Context: "ServerSideEncryptionRule"}
 	if s.ApplyServerSideEncryptionByDefault != nil {
@@ -23119,23 +23119,23 @@ func (s *ServerSideEncryptionRule) Validate() error {
 	return nil
 }
 
-// SetApplyServerSideEncryptionByDefault sets the ApplyServerSideEncryptionByDefault ***REMOVED***eld's value.
+// SetApplyServerSideEncryptionByDefault sets the ApplyServerSideEncryptionByDefault field's value.
 func (s *ServerSideEncryptionRule) SetApplyServerSideEncryptionByDefault(v *ServerSideEncryptionByDefault) *ServerSideEncryptionRule {
 	s.ApplyServerSideEncryptionByDefault = v
 	return s
 }
 
-// A container that describes additional ***REMOVED***lters for identifying the source
+// A container that describes additional filters for identifying the source
 // objects that you want to replicate. You can choose to enable or disable the
-// replication of these objects. Currently, Amazon S3 supports only the ***REMOVED***lter
+// replication of these objects. Currently, Amazon S3 supports only the filter
 // that you can specify for objects created with server-side encryption using
 // an AWS KMS-Managed Key (SSE-KMS).
 type SourceSelectionCriteria struct {
 	_ struct{} `type:"structure"`
 
-	// A container for ***REMOVED***lter information for the selection of Amazon S3 objects
+	// A container for filter information for the selection of Amazon S3 objects
 	// encrypted with AWS KMS. If you include SourceSelectionCriteria in the replication
-	// con***REMOVED***guration, this element is required.
+	// configuration, this element is required.
 	SseKmsEncryptedObjects *SseKmsEncryptedObjects `type:"structure"`
 }
 
@@ -23149,7 +23149,7 @@ func (s SourceSelectionCriteria) GoString() string {
 	return s.String()
 }
 
-// Validate inspects the ***REMOVED***elds of the type to determine if they are valid.
+// Validate inspects the fields of the type to determine if they are valid.
 func (s *SourceSelectionCriteria) Validate() error {
 	invalidParams := request.ErrInvalidParams{Context: "SourceSelectionCriteria"}
 	if s.SseKmsEncryptedObjects != nil {
@@ -23164,21 +23164,21 @@ func (s *SourceSelectionCriteria) Validate() error {
 	return nil
 }
 
-// SetSseKmsEncryptedObjects sets the SseKmsEncryptedObjects ***REMOVED***eld's value.
+// SetSseKmsEncryptedObjects sets the SseKmsEncryptedObjects field's value.
 func (s *SourceSelectionCriteria) SetSseKmsEncryptedObjects(v *SseKmsEncryptedObjects) *SourceSelectionCriteria {
 	s.SseKmsEncryptedObjects = v
 	return s
 }
 
-// A container for ***REMOVED***lter information for the selection of S3 objects encrypted
+// A container for filter information for the selection of S3 objects encrypted
 // with AWS KMS.
 type SseKmsEncryptedObjects struct {
 	_ struct{} `type:"structure"`
 
-	// Speci***REMOVED***es whether Amazon S3 replicates objects created with server-side encryption
+	// Specifies whether Amazon S3 replicates objects created with server-side encryption
 	// using an AWS KMS-managed key.
 	//
-	// Status is a required ***REMOVED***eld
+	// Status is a required field
 	Status *string `type:"string" required:"true" enum:"SseKmsEncryptedObjectsStatus"`
 }
 
@@ -23192,7 +23192,7 @@ func (s SseKmsEncryptedObjects) GoString() string {
 	return s.String()
 }
 
-// Validate inspects the ***REMOVED***elds of the type to determine if they are valid.
+// Validate inspects the fields of the type to determine if they are valid.
 func (s *SseKmsEncryptedObjects) Validate() error {
 	invalidParams := request.ErrInvalidParams{Context: "SseKmsEncryptedObjects"}
 	if s.Status == nil {
@@ -23205,7 +23205,7 @@ func (s *SseKmsEncryptedObjects) Validate() error {
 	return nil
 }
 
-// SetStatus sets the Status ***REMOVED***eld's value.
+// SetStatus sets the Status field's value.
 func (s *SseKmsEncryptedObjects) SetStatus(v string) *SseKmsEncryptedObjects {
 	s.Status = &v
 	return s
@@ -23234,19 +23234,19 @@ func (s Stats) GoString() string {
 	return s.String()
 }
 
-// SetBytesProcessed sets the BytesProcessed ***REMOVED***eld's value.
+// SetBytesProcessed sets the BytesProcessed field's value.
 func (s *Stats) SetBytesProcessed(v int64) *Stats {
 	s.BytesProcessed = &v
 	return s
 }
 
-// SetBytesReturned sets the BytesReturned ***REMOVED***eld's value.
+// SetBytesReturned sets the BytesReturned field's value.
 func (s *Stats) SetBytesReturned(v int64) *Stats {
 	s.BytesReturned = &v
 	return s
 }
 
-// SetBytesScanned sets the BytesScanned ***REMOVED***eld's value.
+// SetBytesScanned sets the BytesScanned field's value.
 func (s *Stats) SetBytesScanned(v int64) *Stats {
 	s.BytesScanned = &v
 	return s
@@ -23269,7 +23269,7 @@ func (s StatsEvent) GoString() string {
 	return s.String()
 }
 
-// SetDetails sets the Details ***REMOVED***eld's value.
+// SetDetails sets the Details field's value.
 func (s *StatsEvent) SetDetails(v *Stats) *StatsEvent {
 	s.Details = v
 	return s
@@ -23292,13 +23292,13 @@ func (s *StatsEvent) UnmarshalEvent(
 	return nil
 }
 
-// Speci***REMOVED***es data related to access patterns to be collected and made available
+// Specifies data related to access patterns to be collected and made available
 // to analyze the tradeoffs between different storage classes for an Amazon
 // S3 bucket.
 type StorageClassAnalysis struct {
 	_ struct{} `type:"structure"`
 
-	// Speci***REMOVED***es how data related to the storage class analysis for an Amazon S3
+	// Specifies how data related to the storage class analysis for an Amazon S3
 	// bucket should be exported.
 	DataExport *StorageClassAnalysisDataExport `type:"structure"`
 }
@@ -23313,7 +23313,7 @@ func (s StorageClassAnalysis) GoString() string {
 	return s.String()
 }
 
-// Validate inspects the ***REMOVED***elds of the type to determine if they are valid.
+// Validate inspects the fields of the type to determine if they are valid.
 func (s *StorageClassAnalysis) Validate() error {
 	invalidParams := request.ErrInvalidParams{Context: "StorageClassAnalysis"}
 	if s.DataExport != nil {
@@ -23328,7 +23328,7 @@ func (s *StorageClassAnalysis) Validate() error {
 	return nil
 }
 
-// SetDataExport sets the DataExport ***REMOVED***eld's value.
+// SetDataExport sets the DataExport field's value.
 func (s *StorageClassAnalysis) SetDataExport(v *StorageClassAnalysisDataExport) *StorageClassAnalysis {
 	s.DataExport = v
 	return s
@@ -23339,12 +23339,12 @@ type StorageClassAnalysisDataExport struct {
 
 	// The place to store the data for an analysis.
 	//
-	// Destination is a required ***REMOVED***eld
+	// Destination is a required field
 	Destination *AnalyticsExportDestination `type:"structure" required:"true"`
 
 	// The version of the output schema to use when exporting data. Must be V_1.
 	//
-	// OutputSchemaVersion is a required ***REMOVED***eld
+	// OutputSchemaVersion is a required field
 	OutputSchemaVersion *string `type:"string" required:"true" enum:"StorageClassAnalysisSchemaVersion"`
 }
 
@@ -23358,7 +23358,7 @@ func (s StorageClassAnalysisDataExport) GoString() string {
 	return s.String()
 }
 
-// Validate inspects the ***REMOVED***elds of the type to determine if they are valid.
+// Validate inspects the fields of the type to determine if they are valid.
 func (s *StorageClassAnalysisDataExport) Validate() error {
 	invalidParams := request.ErrInvalidParams{Context: "StorageClassAnalysisDataExport"}
 	if s.Destination == nil {
@@ -23379,13 +23379,13 @@ func (s *StorageClassAnalysisDataExport) Validate() error {
 	return nil
 }
 
-// SetDestination sets the Destination ***REMOVED***eld's value.
+// SetDestination sets the Destination field's value.
 func (s *StorageClassAnalysisDataExport) SetDestination(v *AnalyticsExportDestination) *StorageClassAnalysisDataExport {
 	s.Destination = v
 	return s
 }
 
-// SetOutputSchemaVersion sets the OutputSchemaVersion ***REMOVED***eld's value.
+// SetOutputSchemaVersion sets the OutputSchemaVersion field's value.
 func (s *StorageClassAnalysisDataExport) SetOutputSchemaVersion(v string) *StorageClassAnalysisDataExport {
 	s.OutputSchemaVersion = &v
 	return s
@@ -23396,12 +23396,12 @@ type Tag struct {
 
 	// Name of the tag.
 	//
-	// Key is a required ***REMOVED***eld
+	// Key is a required field
 	Key *string `min:"1" type:"string" required:"true"`
 
 	// Value of the tag.
 	//
-	// Value is a required ***REMOVED***eld
+	// Value is a required field
 	Value *string `type:"string" required:"true"`
 }
 
@@ -23415,7 +23415,7 @@ func (s Tag) GoString() string {
 	return s.String()
 }
 
-// Validate inspects the ***REMOVED***elds of the type to determine if they are valid.
+// Validate inspects the fields of the type to determine if they are valid.
 func (s *Tag) Validate() error {
 	invalidParams := request.ErrInvalidParams{Context: "Tag"}
 	if s.Key == nil {
@@ -23434,13 +23434,13 @@ func (s *Tag) Validate() error {
 	return nil
 }
 
-// SetKey sets the Key ***REMOVED***eld's value.
+// SetKey sets the Key field's value.
 func (s *Tag) SetKey(v string) *Tag {
 	s.Key = &v
 	return s
 }
 
-// SetValue sets the Value ***REMOVED***eld's value.
+// SetValue sets the Value field's value.
 func (s *Tag) SetValue(v string) *Tag {
 	s.Value = &v
 	return s
@@ -23449,7 +23449,7 @@ func (s *Tag) SetValue(v string) *Tag {
 type Tagging struct {
 	_ struct{} `type:"structure"`
 
-	// TagSet is a required ***REMOVED***eld
+	// TagSet is a required field
 	TagSet []*Tag `locationNameList:"Tag" type:"list" required:"true"`
 }
 
@@ -23463,7 +23463,7 @@ func (s Tagging) GoString() string {
 	return s.String()
 }
 
-// Validate inspects the ***REMOVED***elds of the type to determine if they are valid.
+// Validate inspects the fields of the type to determine if they are valid.
 func (s *Tagging) Validate() error {
 	invalidParams := request.ErrInvalidParams{Context: "Tagging"}
 	if s.TagSet == nil {
@@ -23486,7 +23486,7 @@ func (s *Tagging) Validate() error {
 	return nil
 }
 
-// SetTagSet sets the TagSet ***REMOVED***eld's value.
+// SetTagSet sets the TagSet field's value.
 func (s *Tagging) SetTagSet(v []*Tag) *Tagging {
 	s.TagSet = v
 	return s
@@ -23495,7 +23495,7 @@ func (s *Tagging) SetTagSet(v []*Tag) *Tagging {
 type TargetGrant struct {
 	_ struct{} `type:"structure"`
 
-	Grantee *Grantee `type:"structure" xmlPre***REMOVED***x:"xsi" xmlURI:"http://www.w3.org/2001/XMLSchema-instance"`
+	Grantee *Grantee `type:"structure" xmlPrefix:"xsi" xmlURI:"http://www.w3.org/2001/XMLSchema-instance"`
 
 	// Logging permissions assigned to the Grantee for the bucket.
 	Permission *string `type:"string" enum:"BucketLogsPermission"`
@@ -23511,7 +23511,7 @@ func (s TargetGrant) GoString() string {
 	return s.String()
 }
 
-// Validate inspects the ***REMOVED***elds of the type to determine if they are valid.
+// Validate inspects the fields of the type to determine if they are valid.
 func (s *TargetGrant) Validate() error {
 	invalidParams := request.ErrInvalidParams{Context: "TargetGrant"}
 	if s.Grantee != nil {
@@ -23526,60 +23526,60 @@ func (s *TargetGrant) Validate() error {
 	return nil
 }
 
-// SetGrantee sets the Grantee ***REMOVED***eld's value.
+// SetGrantee sets the Grantee field's value.
 func (s *TargetGrant) SetGrantee(v *Grantee) *TargetGrant {
 	s.Grantee = v
 	return s
 }
 
-// SetPermission sets the Permission ***REMOVED***eld's value.
+// SetPermission sets the Permission field's value.
 func (s *TargetGrant) SetPermission(v string) *TargetGrant {
 	s.Permission = &v
 	return s
 }
 
-// A container for specifying the con***REMOVED***guration for publication of messages
-// to an Amazon Simple Noti***REMOVED***cation Service (Amazon SNS) topic when Amazon S3
-// detects speci***REMOVED***ed events.
-type TopicCon***REMOVED***guration struct {
+// A container for specifying the configuration for publication of messages
+// to an Amazon Simple Notification Service (Amazon SNS) topic when Amazon S3
+// detects specified events.
+type TopicConfiguration struct {
 	_ struct{} `type:"structure"`
 
-	// The Amazon S3 bucket event about which to send noti***REMOVED***cations. For more information,
-	// see Supported Event Types (https://docs.aws.amazon.com/AmazonS3/latest/dev/Noti***REMOVED***cationHowTo.html)
+	// The Amazon S3 bucket event about which to send notifications. For more information,
+	// see Supported Event Types (https://docs.aws.amazon.com/AmazonS3/latest/dev/NotificationHowTo.html)
 	// in the Amazon Simple Storage Service Developer Guide.
 	//
-	// Events is a required ***REMOVED***eld
+	// Events is a required field
 	Events []*string `locationName:"Event" type:"list" flattened:"true" required:"true"`
 
-	// Speci***REMOVED***es object key name ***REMOVED***ltering rules. For information about key name
-	// ***REMOVED***ltering, see Con***REMOVED***guring Event Noti***REMOVED***cations (https://docs.aws.amazon.com/AmazonS3/latest/dev/Noti***REMOVED***cationHowTo.html)
+	// Specifies object key name filtering rules. For information about key name
+	// filtering, see Configuring Event Notifications (https://docs.aws.amazon.com/AmazonS3/latest/dev/NotificationHowTo.html)
 	// in the Amazon Simple Storage Service Developer Guide.
-	Filter *Noti***REMOVED***cationCon***REMOVED***gurationFilter `type:"structure"`
+	Filter *NotificationConfigurationFilter `type:"structure"`
 
-	// An optional unique identi***REMOVED***er for con***REMOVED***gurations in a noti***REMOVED***cation con***REMOVED***guration.
+	// An optional unique identifier for configurations in a notification configuration.
 	// If you don't provide one, Amazon S3 will assign an ID.
 	Id *string `type:"string"`
 
 	// The Amazon Resource Name (ARN) of the Amazon SNS topic to which Amazon S3
-	// publishes a message when it detects events of the speci***REMOVED***ed type.
+	// publishes a message when it detects events of the specified type.
 	//
-	// TopicArn is a required ***REMOVED***eld
+	// TopicArn is a required field
 	TopicArn *string `locationName:"Topic" type:"string" required:"true"`
 }
 
 // String returns the string representation
-func (s TopicCon***REMOVED***guration) String() string {
+func (s TopicConfiguration) String() string {
 	return awsutil.Prettify(s)
 }
 
 // GoString returns the string representation
-func (s TopicCon***REMOVED***guration) GoString() string {
+func (s TopicConfiguration) GoString() string {
 	return s.String()
 }
 
-// Validate inspects the ***REMOVED***elds of the type to determine if they are valid.
-func (s *TopicCon***REMOVED***guration) Validate() error {
-	invalidParams := request.ErrInvalidParams{Context: "TopicCon***REMOVED***guration"}
+// Validate inspects the fields of the type to determine if they are valid.
+func (s *TopicConfiguration) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "TopicConfiguration"}
 	if s.Events == nil {
 		invalidParams.Add(request.NewErrParamRequired("Events"))
 	}
@@ -23593,93 +23593,93 @@ func (s *TopicCon***REMOVED***guration) Validate() error {
 	return nil
 }
 
-// SetEvents sets the Events ***REMOVED***eld's value.
-func (s *TopicCon***REMOVED***guration) SetEvents(v []*string) *TopicCon***REMOVED***guration {
+// SetEvents sets the Events field's value.
+func (s *TopicConfiguration) SetEvents(v []*string) *TopicConfiguration {
 	s.Events = v
 	return s
 }
 
-// SetFilter sets the Filter ***REMOVED***eld's value.
-func (s *TopicCon***REMOVED***guration) SetFilter(v *Noti***REMOVED***cationCon***REMOVED***gurationFilter) *TopicCon***REMOVED***guration {
+// SetFilter sets the Filter field's value.
+func (s *TopicConfiguration) SetFilter(v *NotificationConfigurationFilter) *TopicConfiguration {
 	s.Filter = v
 	return s
 }
 
-// SetId sets the Id ***REMOVED***eld's value.
-func (s *TopicCon***REMOVED***guration) SetId(v string) *TopicCon***REMOVED***guration {
+// SetId sets the Id field's value.
+func (s *TopicConfiguration) SetId(v string) *TopicConfiguration {
 	s.Id = &v
 	return s
 }
 
-// SetTopicArn sets the TopicArn ***REMOVED***eld's value.
-func (s *TopicCon***REMOVED***guration) SetTopicArn(v string) *TopicCon***REMOVED***guration {
+// SetTopicArn sets the TopicArn field's value.
+func (s *TopicConfiguration) SetTopicArn(v string) *TopicConfiguration {
 	s.TopicArn = &v
 	return s
 }
 
-type TopicCon***REMOVED***gurationDeprecated struct {
+type TopicConfigurationDeprecated struct {
 	_ struct{} `type:"structure"`
 
-	// Bucket event for which to send noti***REMOVED***cations.
+	// Bucket event for which to send notifications.
 	//
 	// Deprecated: Event has been deprecated
 	Event *string `deprecated:"true" type:"string" enum:"Event"`
 
 	Events []*string `locationName:"Event" type:"list" flattened:"true"`
 
-	// An optional unique identi***REMOVED***er for con***REMOVED***gurations in a noti***REMOVED***cation con***REMOVED***guration.
+	// An optional unique identifier for configurations in a notification configuration.
 	// If you don't provide one, Amazon S3 will assign an ID.
 	Id *string `type:"string"`
 
 	// Amazon SNS topic to which Amazon S3 will publish a message to report the
-	// speci***REMOVED***ed events for the bucket.
+	// specified events for the bucket.
 	Topic *string `type:"string"`
 }
 
 // String returns the string representation
-func (s TopicCon***REMOVED***gurationDeprecated) String() string {
+func (s TopicConfigurationDeprecated) String() string {
 	return awsutil.Prettify(s)
 }
 
 // GoString returns the string representation
-func (s TopicCon***REMOVED***gurationDeprecated) GoString() string {
+func (s TopicConfigurationDeprecated) GoString() string {
 	return s.String()
 }
 
-// SetEvent sets the Event ***REMOVED***eld's value.
-func (s *TopicCon***REMOVED***gurationDeprecated) SetEvent(v string) *TopicCon***REMOVED***gurationDeprecated {
+// SetEvent sets the Event field's value.
+func (s *TopicConfigurationDeprecated) SetEvent(v string) *TopicConfigurationDeprecated {
 	s.Event = &v
 	return s
 }
 
-// SetEvents sets the Events ***REMOVED***eld's value.
-func (s *TopicCon***REMOVED***gurationDeprecated) SetEvents(v []*string) *TopicCon***REMOVED***gurationDeprecated {
+// SetEvents sets the Events field's value.
+func (s *TopicConfigurationDeprecated) SetEvents(v []*string) *TopicConfigurationDeprecated {
 	s.Events = v
 	return s
 }
 
-// SetId sets the Id ***REMOVED***eld's value.
-func (s *TopicCon***REMOVED***gurationDeprecated) SetId(v string) *TopicCon***REMOVED***gurationDeprecated {
+// SetId sets the Id field's value.
+func (s *TopicConfigurationDeprecated) SetId(v string) *TopicConfigurationDeprecated {
 	s.Id = &v
 	return s
 }
 
-// SetTopic sets the Topic ***REMOVED***eld's value.
-func (s *TopicCon***REMOVED***gurationDeprecated) SetTopic(v string) *TopicCon***REMOVED***gurationDeprecated {
+// SetTopic sets the Topic field's value.
+func (s *TopicConfigurationDeprecated) SetTopic(v string) *TopicConfigurationDeprecated {
 	s.Topic = &v
 	return s
 }
 
-// Speci***REMOVED***es when an object transitions to a speci***REMOVED***ed storage class.
+// Specifies when an object transitions to a specified storage class.
 type Transition struct {
 	_ struct{} `type:"structure"`
 
-	// Indicates when objects are transitioned to the speci***REMOVED***ed storage class. The
+	// Indicates when objects are transitioned to the specified storage class. The
 	// date value must be in ISO 8601 format. The time is always midnight UTC.
 	Date *time.Time `type:"timestamp" timestampFormat:"iso8601"`
 
 	// Indicates the number of days after creation when objects are transitioned
-	// to the speci***REMOVED***ed storage class. The value must be a positive integer.
+	// to the specified storage class. The value must be a positive integer.
 	Days *int64 `type:"integer"`
 
 	// The storage class to which you want the object to transition.
@@ -23696,19 +23696,19 @@ func (s Transition) GoString() string {
 	return s.String()
 }
 
-// SetDate sets the Date ***REMOVED***eld's value.
+// SetDate sets the Date field's value.
 func (s *Transition) SetDate(v time.Time) *Transition {
 	s.Date = &v
 	return s
 }
 
-// SetDays sets the Days ***REMOVED***eld's value.
+// SetDays sets the Days field's value.
 func (s *Transition) SetDays(v int64) *Transition {
 	s.Days = &v
 	return s
 }
 
-// SetStorageClass sets the StorageClass ***REMOVED***eld's value.
+// SetStorageClass sets the StorageClass field's value.
 func (s *Transition) SetStorageClass(v string) *Transition {
 	s.StorageClass = &v
 	return s
@@ -23717,82 +23717,82 @@ func (s *Transition) SetStorageClass(v string) *Transition {
 type UploadPartCopyInput struct {
 	_ struct{} `locationName:"UploadPartCopyRequest" type:"structure"`
 
-	// Bucket is a required ***REMOVED***eld
+	// Bucket is a required field
 	Bucket *string `location:"uri" locationName:"Bucket" type:"string" required:"true"`
 
 	// The name of the source bucket and key name of the source object, separated
 	// by a slash (/). Must be URL-encoded.
 	//
-	// CopySource is a required ***REMOVED***eld
+	// CopySource is a required field
 	CopySource *string `location:"header" locationName:"x-amz-copy-source" type:"string" required:"true"`
 
-	// Copies the object if its entity tag (ETag) matches the speci***REMOVED***ed tag.
+	// Copies the object if its entity tag (ETag) matches the specified tag.
 	CopySourceIfMatch *string `location:"header" locationName:"x-amz-copy-source-if-match" type:"string"`
 
-	// Copies the object if it has been modi***REMOVED***ed since the speci***REMOVED***ed time.
-	CopySourceIfModi***REMOVED***edSince *time.Time `location:"header" locationName:"x-amz-copy-source-if-modi***REMOVED***ed-since" type:"timestamp"`
+	// Copies the object if it has been modified since the specified time.
+	CopySourceIfModifiedSince *time.Time `location:"header" locationName:"x-amz-copy-source-if-modified-since" type:"timestamp"`
 
-	// Copies the object if its entity tag (ETag) is different than the speci***REMOVED***ed
+	// Copies the object if its entity tag (ETag) is different than the specified
 	// ETag.
 	CopySourceIfNoneMatch *string `location:"header" locationName:"x-amz-copy-source-if-none-match" type:"string"`
 
-	// Copies the object if it hasn't been modi***REMOVED***ed since the speci***REMOVED***ed time.
-	CopySourceIfUnmodi***REMOVED***edSince *time.Time `location:"header" locationName:"x-amz-copy-source-if-unmodi***REMOVED***ed-since" type:"timestamp"`
+	// Copies the object if it hasn't been modified since the specified time.
+	CopySourceIfUnmodifiedSince *time.Time `location:"header" locationName:"x-amz-copy-source-if-unmodified-since" type:"timestamp"`
 
 	// The range of bytes to copy from the source object. The range value must use
-	// the form bytes=***REMOVED***rst-last, where the ***REMOVED***rst and last are the zero-based byte
+	// the form bytes=first-last, where the first and last are the zero-based byte
 	// offsets to copy. For example, bytes=0-9 indicates that you want to copy the
-	// ***REMOVED***rst ten bytes of the source. You can copy a range only if the source object
+	// first ten bytes of the source. You can copy a range only if the source object
 	// is greater than 5 MB.
 	CopySourceRange *string `location:"header" locationName:"x-amz-copy-source-range" type:"string"`
 
-	// Speci***REMOVED***es the algorithm to use when decrypting the source object (e.g., AES256).
+	// Specifies the algorithm to use when decrypting the source object (e.g., AES256).
 	CopySourceSSECustomerAlgorithm *string `location:"header" locationName:"x-amz-copy-source-server-side-encryption-customer-algorithm" type:"string"`
 
-	// Speci***REMOVED***es the customer-provided encryption key for Amazon S3 to use to decrypt
+	// Specifies the customer-provided encryption key for Amazon S3 to use to decrypt
 	// the source object. The encryption key provided in this header must be one
 	// that was used when the source object was created.
 	CopySourceSSECustomerKey *string `marshal-as:"blob" location:"header" locationName:"x-amz-copy-source-server-side-encryption-customer-key" type:"string" sensitive:"true"`
 
-	// Speci***REMOVED***es the 128-bit MD5 digest of the encryption key according to RFC 1321.
+	// Specifies the 128-bit MD5 digest of the encryption key according to RFC 1321.
 	// Amazon S3 uses this header for a message integrity check to ensure the encryption
 	// key was transmitted without error.
 	CopySourceSSECustomerKeyMD5 *string `location:"header" locationName:"x-amz-copy-source-server-side-encryption-customer-key-MD5" type:"string"`
 
-	// Key is a required ***REMOVED***eld
+	// Key is a required field
 	Key *string `location:"uri" locationName:"Key" min:"1" type:"string" required:"true"`
 
 	// Part number of part being copied. This is a positive integer between 1 and
 	// 10,000.
 	//
-	// PartNumber is a required ***REMOVED***eld
+	// PartNumber is a required field
 	PartNumber *int64 `location:"querystring" locationName:"partNumber" type:"integer" required:"true"`
 
-	// Con***REMOVED***rms that the requester knows that she or he will be charged for the
+	// Confirms that the requester knows that she or he will be charged for the
 	// request. Bucket owners need not specify this parameter in their requests.
 	// Documentation on downloading objects from requester pays buckets can be found
 	// at http://docs.aws.amazon.com/AmazonS3/latest/dev/ObjectsinRequesterPaysBuckets.html
 	RequestPayer *string `location:"header" locationName:"x-amz-request-payer" type:"string" enum:"RequestPayer"`
 
-	// Speci***REMOVED***es the algorithm to use to when encrypting the object (e.g., AES256).
+	// Specifies the algorithm to use to when encrypting the object (e.g., AES256).
 	SSECustomerAlgorithm *string `location:"header" locationName:"x-amz-server-side-encryption-customer-algorithm" type:"string"`
 
-	// Speci***REMOVED***es the customer-provided encryption key for Amazon S3 to use in encrypting
+	// Specifies the customer-provided encryption key for Amazon S3 to use in encrypting
 	// data. This value is used to store the object and then it is discarded; Amazon
 	// does not store the encryption key. The key must be appropriate for use with
-	// the algorithm speci***REMOVED***ed in the x-amz-server-side​-encryption​-customer-algorithm
-	// header. This must be the same encryption key speci***REMOVED***ed in the initiate multipart
+	// the algorithm specified in the x-amz-server-side​-encryption​-customer-algorithm
+	// header. This must be the same encryption key specified in the initiate multipart
 	// upload request.
 	SSECustomerKey *string `marshal-as:"blob" location:"header" locationName:"x-amz-server-side-encryption-customer-key" type:"string" sensitive:"true"`
 
-	// Speci***REMOVED***es the 128-bit MD5 digest of the encryption key according to RFC 1321.
+	// Specifies the 128-bit MD5 digest of the encryption key according to RFC 1321.
 	// Amazon S3 uses this header for a message integrity check to ensure the encryption
 	// key was transmitted without error.
 	SSECustomerKeyMD5 *string `location:"header" locationName:"x-amz-server-side-encryption-customer-key-MD5" type:"string"`
 
 	// Upload ID identifying the multipart upload whose part is being copied.
 	//
-	// UploadId is a required ***REMOVED***eld
+	// UploadId is a required field
 	UploadId *string `location:"querystring" locationName:"uploadId" type:"string" required:"true"`
 }
 
@@ -23806,7 +23806,7 @@ func (s UploadPartCopyInput) GoString() string {
 	return s.String()
 }
 
-// Validate inspects the ***REMOVED***elds of the type to determine if they are valid.
+// Validate inspects the fields of the type to determine if they are valid.
 func (s *UploadPartCopyInput) Validate() error {
 	invalidParams := request.ErrInvalidParams{Context: "UploadPartCopyInput"}
 	if s.Bucket == nil {
@@ -23837,7 +23837,7 @@ func (s *UploadPartCopyInput) Validate() error {
 	return nil
 }
 
-// SetBucket sets the Bucket ***REMOVED***eld's value.
+// SetBucket sets the Bucket field's value.
 func (s *UploadPartCopyInput) SetBucket(v string) *UploadPartCopyInput {
 	s.Bucket = &v
 	return s
@@ -23850,49 +23850,49 @@ func (s *UploadPartCopyInput) getBucket() (v string) {
 	return *s.Bucket
 }
 
-// SetCopySource sets the CopySource ***REMOVED***eld's value.
+// SetCopySource sets the CopySource field's value.
 func (s *UploadPartCopyInput) SetCopySource(v string) *UploadPartCopyInput {
 	s.CopySource = &v
 	return s
 }
 
-// SetCopySourceIfMatch sets the CopySourceIfMatch ***REMOVED***eld's value.
+// SetCopySourceIfMatch sets the CopySourceIfMatch field's value.
 func (s *UploadPartCopyInput) SetCopySourceIfMatch(v string) *UploadPartCopyInput {
 	s.CopySourceIfMatch = &v
 	return s
 }
 
-// SetCopySourceIfModi***REMOVED***edSince sets the CopySourceIfModi***REMOVED***edSince ***REMOVED***eld's value.
-func (s *UploadPartCopyInput) SetCopySourceIfModi***REMOVED***edSince(v time.Time) *UploadPartCopyInput {
-	s.CopySourceIfModi***REMOVED***edSince = &v
+// SetCopySourceIfModifiedSince sets the CopySourceIfModifiedSince field's value.
+func (s *UploadPartCopyInput) SetCopySourceIfModifiedSince(v time.Time) *UploadPartCopyInput {
+	s.CopySourceIfModifiedSince = &v
 	return s
 }
 
-// SetCopySourceIfNoneMatch sets the CopySourceIfNoneMatch ***REMOVED***eld's value.
+// SetCopySourceIfNoneMatch sets the CopySourceIfNoneMatch field's value.
 func (s *UploadPartCopyInput) SetCopySourceIfNoneMatch(v string) *UploadPartCopyInput {
 	s.CopySourceIfNoneMatch = &v
 	return s
 }
 
-// SetCopySourceIfUnmodi***REMOVED***edSince sets the CopySourceIfUnmodi***REMOVED***edSince ***REMOVED***eld's value.
-func (s *UploadPartCopyInput) SetCopySourceIfUnmodi***REMOVED***edSince(v time.Time) *UploadPartCopyInput {
-	s.CopySourceIfUnmodi***REMOVED***edSince = &v
+// SetCopySourceIfUnmodifiedSince sets the CopySourceIfUnmodifiedSince field's value.
+func (s *UploadPartCopyInput) SetCopySourceIfUnmodifiedSince(v time.Time) *UploadPartCopyInput {
+	s.CopySourceIfUnmodifiedSince = &v
 	return s
 }
 
-// SetCopySourceRange sets the CopySourceRange ***REMOVED***eld's value.
+// SetCopySourceRange sets the CopySourceRange field's value.
 func (s *UploadPartCopyInput) SetCopySourceRange(v string) *UploadPartCopyInput {
 	s.CopySourceRange = &v
 	return s
 }
 
-// SetCopySourceSSECustomerAlgorithm sets the CopySourceSSECustomerAlgorithm ***REMOVED***eld's value.
+// SetCopySourceSSECustomerAlgorithm sets the CopySourceSSECustomerAlgorithm field's value.
 func (s *UploadPartCopyInput) SetCopySourceSSECustomerAlgorithm(v string) *UploadPartCopyInput {
 	s.CopySourceSSECustomerAlgorithm = &v
 	return s
 }
 
-// SetCopySourceSSECustomerKey sets the CopySourceSSECustomerKey ***REMOVED***eld's value.
+// SetCopySourceSSECustomerKey sets the CopySourceSSECustomerKey field's value.
 func (s *UploadPartCopyInput) SetCopySourceSSECustomerKey(v string) *UploadPartCopyInput {
 	s.CopySourceSSECustomerKey = &v
 	return s
@@ -23905,37 +23905,37 @@ func (s *UploadPartCopyInput) getCopySourceSSECustomerKey() (v string) {
 	return *s.CopySourceSSECustomerKey
 }
 
-// SetCopySourceSSECustomerKeyMD5 sets the CopySourceSSECustomerKeyMD5 ***REMOVED***eld's value.
+// SetCopySourceSSECustomerKeyMD5 sets the CopySourceSSECustomerKeyMD5 field's value.
 func (s *UploadPartCopyInput) SetCopySourceSSECustomerKeyMD5(v string) *UploadPartCopyInput {
 	s.CopySourceSSECustomerKeyMD5 = &v
 	return s
 }
 
-// SetKey sets the Key ***REMOVED***eld's value.
+// SetKey sets the Key field's value.
 func (s *UploadPartCopyInput) SetKey(v string) *UploadPartCopyInput {
 	s.Key = &v
 	return s
 }
 
-// SetPartNumber sets the PartNumber ***REMOVED***eld's value.
+// SetPartNumber sets the PartNumber field's value.
 func (s *UploadPartCopyInput) SetPartNumber(v int64) *UploadPartCopyInput {
 	s.PartNumber = &v
 	return s
 }
 
-// SetRequestPayer sets the RequestPayer ***REMOVED***eld's value.
+// SetRequestPayer sets the RequestPayer field's value.
 func (s *UploadPartCopyInput) SetRequestPayer(v string) *UploadPartCopyInput {
 	s.RequestPayer = &v
 	return s
 }
 
-// SetSSECustomerAlgorithm sets the SSECustomerAlgorithm ***REMOVED***eld's value.
+// SetSSECustomerAlgorithm sets the SSECustomerAlgorithm field's value.
 func (s *UploadPartCopyInput) SetSSECustomerAlgorithm(v string) *UploadPartCopyInput {
 	s.SSECustomerAlgorithm = &v
 	return s
 }
 
-// SetSSECustomerKey sets the SSECustomerKey ***REMOVED***eld's value.
+// SetSSECustomerKey sets the SSECustomerKey field's value.
 func (s *UploadPartCopyInput) SetSSECustomerKey(v string) *UploadPartCopyInput {
 	s.SSECustomerKey = &v
 	return s
@@ -23948,13 +23948,13 @@ func (s *UploadPartCopyInput) getSSECustomerKey() (v string) {
 	return *s.SSECustomerKey
 }
 
-// SetSSECustomerKeyMD5 sets the SSECustomerKeyMD5 ***REMOVED***eld's value.
+// SetSSECustomerKeyMD5 sets the SSECustomerKeyMD5 field's value.
 func (s *UploadPartCopyInput) SetSSECustomerKeyMD5(v string) *UploadPartCopyInput {
 	s.SSECustomerKeyMD5 = &v
 	return s
 }
 
-// SetUploadId sets the UploadId ***REMOVED***eld's value.
+// SetUploadId sets the UploadId field's value.
 func (s *UploadPartCopyInput) SetUploadId(v string) *UploadPartCopyInput {
 	s.UploadId = &v
 	return s
@@ -23974,16 +23974,16 @@ type UploadPartCopyOutput struct {
 	RequestCharged *string `location:"header" locationName:"x-amz-request-charged" type:"string" enum:"RequestCharged"`
 
 	// If server-side encryption with a customer-provided encryption key was requested,
-	// the response will include this header con***REMOVED***rming the encryption algorithm
+	// the response will include this header confirming the encryption algorithm
 	// used.
 	SSECustomerAlgorithm *string `location:"header" locationName:"x-amz-server-side-encryption-customer-algorithm" type:"string"`
 
 	// If server-side encryption with a customer-provided encryption key was requested,
 	// the response will include this header to provide round trip message integrity
-	// veri***REMOVED***cation of the customer-provided encryption key.
+	// verification of the customer-provided encryption key.
 	SSECustomerKeyMD5 *string `location:"header" locationName:"x-amz-server-side-encryption-customer-key-MD5" type:"string"`
 
-	// If present, speci***REMOVED***es the ID of the AWS Key Management Service (KMS) master
+	// If present, specifies the ID of the AWS Key Management Service (KMS) master
 	// encryption key that was used for the object.
 	SSEKMSKeyId *string `location:"header" locationName:"x-amz-server-side-encryption-aws-kms-key-id" type:"string" sensitive:"true"`
 
@@ -24002,43 +24002,43 @@ func (s UploadPartCopyOutput) GoString() string {
 	return s.String()
 }
 
-// SetCopyPartResult sets the CopyPartResult ***REMOVED***eld's value.
+// SetCopyPartResult sets the CopyPartResult field's value.
 func (s *UploadPartCopyOutput) SetCopyPartResult(v *CopyPartResult) *UploadPartCopyOutput {
 	s.CopyPartResult = v
 	return s
 }
 
-// SetCopySourceVersionId sets the CopySourceVersionId ***REMOVED***eld's value.
+// SetCopySourceVersionId sets the CopySourceVersionId field's value.
 func (s *UploadPartCopyOutput) SetCopySourceVersionId(v string) *UploadPartCopyOutput {
 	s.CopySourceVersionId = &v
 	return s
 }
 
-// SetRequestCharged sets the RequestCharged ***REMOVED***eld's value.
+// SetRequestCharged sets the RequestCharged field's value.
 func (s *UploadPartCopyOutput) SetRequestCharged(v string) *UploadPartCopyOutput {
 	s.RequestCharged = &v
 	return s
 }
 
-// SetSSECustomerAlgorithm sets the SSECustomerAlgorithm ***REMOVED***eld's value.
+// SetSSECustomerAlgorithm sets the SSECustomerAlgorithm field's value.
 func (s *UploadPartCopyOutput) SetSSECustomerAlgorithm(v string) *UploadPartCopyOutput {
 	s.SSECustomerAlgorithm = &v
 	return s
 }
 
-// SetSSECustomerKeyMD5 sets the SSECustomerKeyMD5 ***REMOVED***eld's value.
+// SetSSECustomerKeyMD5 sets the SSECustomerKeyMD5 field's value.
 func (s *UploadPartCopyOutput) SetSSECustomerKeyMD5(v string) *UploadPartCopyOutput {
 	s.SSECustomerKeyMD5 = &v
 	return s
 }
 
-// SetSSEKMSKeyId sets the SSEKMSKeyId ***REMOVED***eld's value.
+// SetSSEKMSKeyId sets the SSEKMSKeyId field's value.
 func (s *UploadPartCopyOutput) SetSSEKMSKeyId(v string) *UploadPartCopyOutput {
 	s.SSEKMSKeyId = &v
 	return s
 }
 
-// SetServerSideEncryption sets the ServerSideEncryption ***REMOVED***eld's value.
+// SetServerSideEncryption sets the ServerSideEncryption field's value.
 func (s *UploadPartCopyOutput) SetServerSideEncryption(v string) *UploadPartCopyOutput {
 	s.ServerSideEncryption = &v
 	return s
@@ -24052,7 +24052,7 @@ type UploadPartInput struct {
 
 	// Name of the bucket to which the multipart upload was initiated.
 	//
-	// Bucket is a required ***REMOVED***eld
+	// Bucket is a required field
 	Bucket *string `location:"uri" locationName:"Bucket" type:"string" required:"true"`
 
 	// Size of the body in bytes. This parameter is useful when the size of the
@@ -24061,45 +24061,45 @@ type UploadPartInput struct {
 
 	// The base64-encoded 128-bit MD5 digest of the part data. This parameter is
 	// auto-populated when using the command from the CLI. This parameted is required
-	// if object lock parameters are speci***REMOVED***ed.
+	// if object lock parameters are specified.
 	ContentMD5 *string `location:"header" locationName:"Content-MD5" type:"string"`
 
 	// Object key for which the multipart upload was initiated.
 	//
-	// Key is a required ***REMOVED***eld
+	// Key is a required field
 	Key *string `location:"uri" locationName:"Key" min:"1" type:"string" required:"true"`
 
 	// Part number of part being uploaded. This is a positive integer between 1
 	// and 10,000.
 	//
-	// PartNumber is a required ***REMOVED***eld
+	// PartNumber is a required field
 	PartNumber *int64 `location:"querystring" locationName:"partNumber" type:"integer" required:"true"`
 
-	// Con***REMOVED***rms that the requester knows that she or he will be charged for the
+	// Confirms that the requester knows that she or he will be charged for the
 	// request. Bucket owners need not specify this parameter in their requests.
 	// Documentation on downloading objects from requester pays buckets can be found
 	// at http://docs.aws.amazon.com/AmazonS3/latest/dev/ObjectsinRequesterPaysBuckets.html
 	RequestPayer *string `location:"header" locationName:"x-amz-request-payer" type:"string" enum:"RequestPayer"`
 
-	// Speci***REMOVED***es the algorithm to use to when encrypting the object (e.g., AES256).
+	// Specifies the algorithm to use to when encrypting the object (e.g., AES256).
 	SSECustomerAlgorithm *string `location:"header" locationName:"x-amz-server-side-encryption-customer-algorithm" type:"string"`
 
-	// Speci***REMOVED***es the customer-provided encryption key for Amazon S3 to use in encrypting
+	// Specifies the customer-provided encryption key for Amazon S3 to use in encrypting
 	// data. This value is used to store the object and then it is discarded; Amazon
 	// does not store the encryption key. The key must be appropriate for use with
-	// the algorithm speci***REMOVED***ed in the x-amz-server-side​-encryption​-customer-algorithm
-	// header. This must be the same encryption key speci***REMOVED***ed in the initiate multipart
+	// the algorithm specified in the x-amz-server-side​-encryption​-customer-algorithm
+	// header. This must be the same encryption key specified in the initiate multipart
 	// upload request.
 	SSECustomerKey *string `marshal-as:"blob" location:"header" locationName:"x-amz-server-side-encryption-customer-key" type:"string" sensitive:"true"`
 
-	// Speci***REMOVED***es the 128-bit MD5 digest of the encryption key according to RFC 1321.
+	// Specifies the 128-bit MD5 digest of the encryption key according to RFC 1321.
 	// Amazon S3 uses this header for a message integrity check to ensure the encryption
 	// key was transmitted without error.
 	SSECustomerKeyMD5 *string `location:"header" locationName:"x-amz-server-side-encryption-customer-key-MD5" type:"string"`
 
 	// Upload ID identifying the multipart upload whose part is being uploaded.
 	//
-	// UploadId is a required ***REMOVED***eld
+	// UploadId is a required field
 	UploadId *string `location:"querystring" locationName:"uploadId" type:"string" required:"true"`
 }
 
@@ -24113,7 +24113,7 @@ func (s UploadPartInput) GoString() string {
 	return s.String()
 }
 
-// Validate inspects the ***REMOVED***elds of the type to determine if they are valid.
+// Validate inspects the fields of the type to determine if they are valid.
 func (s *UploadPartInput) Validate() error {
 	invalidParams := request.ErrInvalidParams{Context: "UploadPartInput"}
 	if s.Bucket == nil {
@@ -24141,13 +24141,13 @@ func (s *UploadPartInput) Validate() error {
 	return nil
 }
 
-// SetBody sets the Body ***REMOVED***eld's value.
+// SetBody sets the Body field's value.
 func (s *UploadPartInput) SetBody(v io.ReadSeeker) *UploadPartInput {
 	s.Body = v
 	return s
 }
 
-// SetBucket sets the Bucket ***REMOVED***eld's value.
+// SetBucket sets the Bucket field's value.
 func (s *UploadPartInput) SetBucket(v string) *UploadPartInput {
 	s.Bucket = &v
 	return s
@@ -24160,43 +24160,43 @@ func (s *UploadPartInput) getBucket() (v string) {
 	return *s.Bucket
 }
 
-// SetContentLength sets the ContentLength ***REMOVED***eld's value.
+// SetContentLength sets the ContentLength field's value.
 func (s *UploadPartInput) SetContentLength(v int64) *UploadPartInput {
 	s.ContentLength = &v
 	return s
 }
 
-// SetContentMD5 sets the ContentMD5 ***REMOVED***eld's value.
+// SetContentMD5 sets the ContentMD5 field's value.
 func (s *UploadPartInput) SetContentMD5(v string) *UploadPartInput {
 	s.ContentMD5 = &v
 	return s
 }
 
-// SetKey sets the Key ***REMOVED***eld's value.
+// SetKey sets the Key field's value.
 func (s *UploadPartInput) SetKey(v string) *UploadPartInput {
 	s.Key = &v
 	return s
 }
 
-// SetPartNumber sets the PartNumber ***REMOVED***eld's value.
+// SetPartNumber sets the PartNumber field's value.
 func (s *UploadPartInput) SetPartNumber(v int64) *UploadPartInput {
 	s.PartNumber = &v
 	return s
 }
 
-// SetRequestPayer sets the RequestPayer ***REMOVED***eld's value.
+// SetRequestPayer sets the RequestPayer field's value.
 func (s *UploadPartInput) SetRequestPayer(v string) *UploadPartInput {
 	s.RequestPayer = &v
 	return s
 }
 
-// SetSSECustomerAlgorithm sets the SSECustomerAlgorithm ***REMOVED***eld's value.
+// SetSSECustomerAlgorithm sets the SSECustomerAlgorithm field's value.
 func (s *UploadPartInput) SetSSECustomerAlgorithm(v string) *UploadPartInput {
 	s.SSECustomerAlgorithm = &v
 	return s
 }
 
-// SetSSECustomerKey sets the SSECustomerKey ***REMOVED***eld's value.
+// SetSSECustomerKey sets the SSECustomerKey field's value.
 func (s *UploadPartInput) SetSSECustomerKey(v string) *UploadPartInput {
 	s.SSECustomerKey = &v
 	return s
@@ -24209,13 +24209,13 @@ func (s *UploadPartInput) getSSECustomerKey() (v string) {
 	return *s.SSECustomerKey
 }
 
-// SetSSECustomerKeyMD5 sets the SSECustomerKeyMD5 ***REMOVED***eld's value.
+// SetSSECustomerKeyMD5 sets the SSECustomerKeyMD5 field's value.
 func (s *UploadPartInput) SetSSECustomerKeyMD5(v string) *UploadPartInput {
 	s.SSECustomerKeyMD5 = &v
 	return s
 }
 
-// SetUploadId sets the UploadId ***REMOVED***eld's value.
+// SetUploadId sets the UploadId field's value.
 func (s *UploadPartInput) SetUploadId(v string) *UploadPartInput {
 	s.UploadId = &v
 	return s
@@ -24232,16 +24232,16 @@ type UploadPartOutput struct {
 	RequestCharged *string `location:"header" locationName:"x-amz-request-charged" type:"string" enum:"RequestCharged"`
 
 	// If server-side encryption with a customer-provided encryption key was requested,
-	// the response will include this header con***REMOVED***rming the encryption algorithm
+	// the response will include this header confirming the encryption algorithm
 	// used.
 	SSECustomerAlgorithm *string `location:"header" locationName:"x-amz-server-side-encryption-customer-algorithm" type:"string"`
 
 	// If server-side encryption with a customer-provided encryption key was requested,
 	// the response will include this header to provide round trip message integrity
-	// veri***REMOVED***cation of the customer-provided encryption key.
+	// verification of the customer-provided encryption key.
 	SSECustomerKeyMD5 *string `location:"header" locationName:"x-amz-server-side-encryption-customer-key-MD5" type:"string"`
 
-	// If present, speci***REMOVED***es the ID of the AWS Key Management Service (KMS) master
+	// If present, specifies the ID of the AWS Key Management Service (KMS) master
 	// encryption key that was used for the object.
 	SSEKMSKeyId *string `location:"header" locationName:"x-amz-server-side-encryption-aws-kms-key-id" type:"string" sensitive:"true"`
 
@@ -24260,37 +24260,37 @@ func (s UploadPartOutput) GoString() string {
 	return s.String()
 }
 
-// SetETag sets the ETag ***REMOVED***eld's value.
+// SetETag sets the ETag field's value.
 func (s *UploadPartOutput) SetETag(v string) *UploadPartOutput {
 	s.ETag = &v
 	return s
 }
 
-// SetRequestCharged sets the RequestCharged ***REMOVED***eld's value.
+// SetRequestCharged sets the RequestCharged field's value.
 func (s *UploadPartOutput) SetRequestCharged(v string) *UploadPartOutput {
 	s.RequestCharged = &v
 	return s
 }
 
-// SetSSECustomerAlgorithm sets the SSECustomerAlgorithm ***REMOVED***eld's value.
+// SetSSECustomerAlgorithm sets the SSECustomerAlgorithm field's value.
 func (s *UploadPartOutput) SetSSECustomerAlgorithm(v string) *UploadPartOutput {
 	s.SSECustomerAlgorithm = &v
 	return s
 }
 
-// SetSSECustomerKeyMD5 sets the SSECustomerKeyMD5 ***REMOVED***eld's value.
+// SetSSECustomerKeyMD5 sets the SSECustomerKeyMD5 field's value.
 func (s *UploadPartOutput) SetSSECustomerKeyMD5(v string) *UploadPartOutput {
 	s.SSECustomerKeyMD5 = &v
 	return s
 }
 
-// SetSSEKMSKeyId sets the SSEKMSKeyId ***REMOVED***eld's value.
+// SetSSEKMSKeyId sets the SSEKMSKeyId field's value.
 func (s *UploadPartOutput) SetSSEKMSKeyId(v string) *UploadPartOutput {
 	s.SSEKMSKeyId = &v
 	return s
 }
 
-// SetServerSideEncryption sets the ServerSideEncryption ***REMOVED***eld's value.
+// SetServerSideEncryption sets the ServerSideEncryption field's value.
 func (s *UploadPartOutput) SetServerSideEncryption(v string) *UploadPartOutput {
 	s.ServerSideEncryption = &v
 	return s
@@ -24299,12 +24299,12 @@ func (s *UploadPartOutput) SetServerSideEncryption(v string) *UploadPartOutput {
 // Describes the versioning state of an Amazon S3 bucket. For more information,
 // see PUT Bucket versioning (https://docs.aws.amazon.com/AmazonS3/latest/API/RESTBucketPUTVersioningStatus.html)
 // in the Amazon Simple Storage Service API Reference.
-type VersioningCon***REMOVED***guration struct {
+type VersioningConfiguration struct {
 	_ struct{} `type:"structure"`
 
-	// Speci***REMOVED***es whether MFA delete is enabled in the bucket versioning con***REMOVED***guration.
-	// This element is only returned if the bucket has been con***REMOVED***gured with MFA
-	// delete. If the bucket has never been so con***REMOVED***gured, this element is not returned.
+	// Specifies whether MFA delete is enabled in the bucket versioning configuration.
+	// This element is only returned if the bucket has been configured with MFA
+	// delete. If the bucket has never been so configured, this element is not returned.
 	MFADelete *string `locationName:"MfaDelete" type:"string" enum:"MFADelete"`
 
 	// The versioning state of the bucket.
@@ -24312,29 +24312,29 @@ type VersioningCon***REMOVED***guration struct {
 }
 
 // String returns the string representation
-func (s VersioningCon***REMOVED***guration) String() string {
+func (s VersioningConfiguration) String() string {
 	return awsutil.Prettify(s)
 }
 
 // GoString returns the string representation
-func (s VersioningCon***REMOVED***guration) GoString() string {
+func (s VersioningConfiguration) GoString() string {
 	return s.String()
 }
 
-// SetMFADelete sets the MFADelete ***REMOVED***eld's value.
-func (s *VersioningCon***REMOVED***guration) SetMFADelete(v string) *VersioningCon***REMOVED***guration {
+// SetMFADelete sets the MFADelete field's value.
+func (s *VersioningConfiguration) SetMFADelete(v string) *VersioningConfiguration {
 	s.MFADelete = &v
 	return s
 }
 
-// SetStatus sets the Status ***REMOVED***eld's value.
-func (s *VersioningCon***REMOVED***guration) SetStatus(v string) *VersioningCon***REMOVED***guration {
+// SetStatus sets the Status field's value.
+func (s *VersioningConfiguration) SetStatus(v string) *VersioningConfiguration {
 	s.Status = &v
 	return s
 }
 
-// Speci***REMOVED***es website con***REMOVED***guration parameters for an Amazon S3 bucket.
-type WebsiteCon***REMOVED***guration struct {
+// Specifies website configuration parameters for an Amazon S3 bucket.
+type WebsiteConfiguration struct {
 	_ struct{} `type:"structure"`
 
 	// The name of the error document for the website.
@@ -24348,23 +24348,23 @@ type WebsiteCon***REMOVED***guration struct {
 	// If you specify this property, you can't specify any other property.
 	RedirectAllRequestsTo *RedirectAllRequestsTo `type:"structure"`
 
-	// Rules that de***REMOVED***ne when a redirect is applied and the redirect behavior.
+	// Rules that define when a redirect is applied and the redirect behavior.
 	RoutingRules []*RoutingRule `locationNameList:"RoutingRule" type:"list"`
 }
 
 // String returns the string representation
-func (s WebsiteCon***REMOVED***guration) String() string {
+func (s WebsiteConfiguration) String() string {
 	return awsutil.Prettify(s)
 }
 
 // GoString returns the string representation
-func (s WebsiteCon***REMOVED***guration) GoString() string {
+func (s WebsiteConfiguration) GoString() string {
 	return s.String()
 }
 
-// Validate inspects the ***REMOVED***elds of the type to determine if they are valid.
-func (s *WebsiteCon***REMOVED***guration) Validate() error {
-	invalidParams := request.ErrInvalidParams{Context: "WebsiteCon***REMOVED***guration"}
+// Validate inspects the fields of the type to determine if they are valid.
+func (s *WebsiteConfiguration) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "WebsiteConfiguration"}
 	if s.ErrorDocument != nil {
 		if err := s.ErrorDocument.Validate(); err != nil {
 			invalidParams.AddNested("ErrorDocument", err.(request.ErrInvalidParams))
@@ -24397,26 +24397,26 @@ func (s *WebsiteCon***REMOVED***guration) Validate() error {
 	return nil
 }
 
-// SetErrorDocument sets the ErrorDocument ***REMOVED***eld's value.
-func (s *WebsiteCon***REMOVED***guration) SetErrorDocument(v *ErrorDocument) *WebsiteCon***REMOVED***guration {
+// SetErrorDocument sets the ErrorDocument field's value.
+func (s *WebsiteConfiguration) SetErrorDocument(v *ErrorDocument) *WebsiteConfiguration {
 	s.ErrorDocument = v
 	return s
 }
 
-// SetIndexDocument sets the IndexDocument ***REMOVED***eld's value.
-func (s *WebsiteCon***REMOVED***guration) SetIndexDocument(v *IndexDocument) *WebsiteCon***REMOVED***guration {
+// SetIndexDocument sets the IndexDocument field's value.
+func (s *WebsiteConfiguration) SetIndexDocument(v *IndexDocument) *WebsiteConfiguration {
 	s.IndexDocument = v
 	return s
 }
 
-// SetRedirectAllRequestsTo sets the RedirectAllRequestsTo ***REMOVED***eld's value.
-func (s *WebsiteCon***REMOVED***guration) SetRedirectAllRequestsTo(v *RedirectAllRequestsTo) *WebsiteCon***REMOVED***guration {
+// SetRedirectAllRequestsTo sets the RedirectAllRequestsTo field's value.
+func (s *WebsiteConfiguration) SetRedirectAllRequestsTo(v *RedirectAllRequestsTo) *WebsiteConfiguration {
 	s.RedirectAllRequestsTo = v
 	return s
 }
 
-// SetRoutingRules sets the RoutingRules ***REMOVED***eld's value.
-func (s *WebsiteCon***REMOVED***guration) SetRoutingRules(v []*RoutingRule) *WebsiteCon***REMOVED***guration {
+// SetRoutingRules sets the RoutingRules field's value.
+func (s *WebsiteConfiguration) SetRoutingRules(v []*RoutingRule) *WebsiteConfiguration {
 	s.RoutingRules = v
 	return s
 }
@@ -24521,7 +24521,7 @@ const (
 	DeleteMarkerReplicationStatusDisabled = "Disabled"
 )
 
-// Requests Amazon S3 to encode the object keys in the response and speci***REMOVED***es
+// Requests Amazon S3 to encode the object keys in the response and specifies
 // the encoding method to use. An object key may contain any Unicode character;
 // however, XML 1.0 parser cannot parse some characters, such as characters
 // with an ASCII value from 0 to 10. For characters that are not supported in
@@ -24532,7 +24532,7 @@ const (
 	EncodingTypeUrl = "url"
 )
 
-// The bucket event for which to send noti***REMOVED***cations.
+// The bucket event for which to send notifications.
 const (
 	// EventS3ReducedRedundancyLostObject is a Event enum value
 	EventS3ReducedRedundancyLostObject = "s3:ReducedRedundancyLostObject"
@@ -24593,11 +24593,11 @@ const (
 )
 
 const (
-	// FilterRuleNamePre***REMOVED***x is a FilterRuleName enum value
-	FilterRuleNamePre***REMOVED***x = "pre***REMOVED***x"
+	// FilterRuleNamePrefix is a FilterRuleName enum value
+	FilterRuleNamePrefix = "prefix"
 
-	// FilterRuleNameSuf***REMOVED***x is a FilterRuleName enum value
-	FilterRuleNameSuf***REMOVED***x = "suf***REMOVED***x"
+	// FilterRuleNameSuffix is a FilterRuleName enum value
+	FilterRuleNameSuffix = "suffix"
 )
 
 const (
@@ -24631,8 +24631,8 @@ const (
 	// InventoryOptionalFieldSize is a InventoryOptionalField enum value
 	InventoryOptionalFieldSize = "Size"
 
-	// InventoryOptionalFieldLastModi***REMOVED***edDate is a InventoryOptionalField enum value
-	InventoryOptionalFieldLastModi***REMOVED***edDate = "LastModi***REMOVED***edDate"
+	// InventoryOptionalFieldLastModifiedDate is a InventoryOptionalField enum value
+	InventoryOptionalFieldLastModifiedDate = "LastModifiedDate"
 
 	// InventoryOptionalFieldStorageClass is a InventoryOptionalField enum value
 	InventoryOptionalFieldStorageClass = "StorageClass"
@@ -24846,7 +24846,7 @@ const (
 	RequestChargedRequester = "requester"
 )
 
-// Con***REMOVED***rms that the requester knows that she or he will be charged for the
+// Confirms that the requester knows that she or he will be charged for the
 // request. Bucket owners need not specify this parameter in their requests.
 // Documentation on downloading objects from requester pays buckets can be found
 // at http://docs.aws.amazon.com/AmazonS3/latest/dev/ObjectsinRequesterPaysBuckets.html

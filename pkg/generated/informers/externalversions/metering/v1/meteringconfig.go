@@ -15,59 +15,59 @@ import (
 	cache "k8s.io/client-go/tools/cache"
 )
 
-// MeteringCon***REMOVED***gInformer provides access to a shared informer and lister for
-// MeteringCon***REMOVED***gs.
-type MeteringCon***REMOVED***gInformer interface {
+// MeteringConfigInformer provides access to a shared informer and lister for
+// MeteringConfigs.
+type MeteringConfigInformer interface {
 	Informer() cache.SharedIndexInformer
-	Lister() v1.MeteringCon***REMOVED***gLister
+	Lister() v1.MeteringConfigLister
 }
 
-type meteringCon***REMOVED***gInformer struct {
+type meteringConfigInformer struct {
 	factory          internalinterfaces.SharedInformerFactory
 	tweakListOptions internalinterfaces.TweakListOptionsFunc
 	namespace        string
 }
 
-// NewMeteringCon***REMOVED***gInformer constructs a new informer for MeteringCon***REMOVED***g type.
+// NewMeteringConfigInformer constructs a new informer for MeteringConfig type.
 // Always prefer using an informer factory to get a shared informer instead of getting an independent
 // one. This reduces memory footprint and number of connections to the server.
-func NewMeteringCon***REMOVED***gInformer(client versioned.Interface, namespace string, resyncPeriod time.Duration, indexers cache.Indexers) cache.SharedIndexInformer {
-	return NewFilteredMeteringCon***REMOVED***gInformer(client, namespace, resyncPeriod, indexers, nil)
+func NewMeteringConfigInformer(client versioned.Interface, namespace string, resyncPeriod time.Duration, indexers cache.Indexers) cache.SharedIndexInformer {
+	return NewFilteredMeteringConfigInformer(client, namespace, resyncPeriod, indexers, nil)
 }
 
-// NewFilteredMeteringCon***REMOVED***gInformer constructs a new informer for MeteringCon***REMOVED***g type.
+// NewFilteredMeteringConfigInformer constructs a new informer for MeteringConfig type.
 // Always prefer using an informer factory to get a shared informer instead of getting an independent
 // one. This reduces memory footprint and number of connections to the server.
-func NewFilteredMeteringCon***REMOVED***gInformer(client versioned.Interface, namespace string, resyncPeriod time.Duration, indexers cache.Indexers, tweakListOptions internalinterfaces.TweakListOptionsFunc) cache.SharedIndexInformer {
+func NewFilteredMeteringConfigInformer(client versioned.Interface, namespace string, resyncPeriod time.Duration, indexers cache.Indexers, tweakListOptions internalinterfaces.TweakListOptionsFunc) cache.SharedIndexInformer {
 	return cache.NewSharedIndexInformer(
 		&cache.ListWatch{
 			ListFunc: func(options metav1.ListOptions) (runtime.Object, error) {
 				if tweakListOptions != nil {
 					tweakListOptions(&options)
 				}
-				return client.MeteringV1().MeteringCon***REMOVED***gs(namespace).List(options)
+				return client.MeteringV1().MeteringConfigs(namespace).List(options)
 			},
 			WatchFunc: func(options metav1.ListOptions) (watch.Interface, error) {
 				if tweakListOptions != nil {
 					tweakListOptions(&options)
 				}
-				return client.MeteringV1().MeteringCon***REMOVED***gs(namespace).Watch(options)
+				return client.MeteringV1().MeteringConfigs(namespace).Watch(options)
 			},
 		},
-		&meteringv1.MeteringCon***REMOVED***g{},
+		&meteringv1.MeteringConfig{},
 		resyncPeriod,
 		indexers,
 	)
 }
 
-func (f *meteringCon***REMOVED***gInformer) defaultInformer(client versioned.Interface, resyncPeriod time.Duration) cache.SharedIndexInformer {
-	return NewFilteredMeteringCon***REMOVED***gInformer(client, f.namespace, resyncPeriod, cache.Indexers{cache.NamespaceIndex: cache.MetaNamespaceIndexFunc}, f.tweakListOptions)
+func (f *meteringConfigInformer) defaultInformer(client versioned.Interface, resyncPeriod time.Duration) cache.SharedIndexInformer {
+	return NewFilteredMeteringConfigInformer(client, f.namespace, resyncPeriod, cache.Indexers{cache.NamespaceIndex: cache.MetaNamespaceIndexFunc}, f.tweakListOptions)
 }
 
-func (f *meteringCon***REMOVED***gInformer) Informer() cache.SharedIndexInformer {
-	return f.factory.InformerFor(&meteringv1.MeteringCon***REMOVED***g{}, f.defaultInformer)
+func (f *meteringConfigInformer) Informer() cache.SharedIndexInformer {
+	return f.factory.InformerFor(&meteringv1.MeteringConfig{}, f.defaultInformer)
 }
 
-func (f *meteringCon***REMOVED***gInformer) Lister() v1.MeteringCon***REMOVED***gLister {
-	return v1.NewMeteringCon***REMOVED***gLister(f.Informer().GetIndexer())
+func (f *meteringConfigInformer) Lister() v1.MeteringConfigLister {
+	return v1.NewMeteringConfigLister(f.Informer().GetIndexer())
 }

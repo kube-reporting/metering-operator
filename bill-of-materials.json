@@ -4,7 +4,7 @@
 		"licenses": [
 			{
 				"type": "Apache License 2.0",
-				"con***REMOVED***dence": 0.9576271186440678
+				"confidence": 0.9576271186440678
 			}
 		]
 	},
@@ -13,7 +13,7 @@
 		"licenses": [
 			{
 				"type": "BSD 3-clause \"New\" or \"Revised\" License",
-				"con***REMOVED***dence": 0.9916666666666667
+				"confidence": 0.9916666666666667
 			}
 		]
 	},
@@ -22,7 +22,7 @@
 		"licenses": [
 			{
 				"type": "BSD 3-clause \"New\" or \"Revised\" License",
-				"con***REMOVED***dence": 0.9663865546218487
+				"confidence": 0.9663865546218487
 			}
 		]
 	},
@@ -31,7 +31,7 @@
 		"licenses": [
 			{
 				"type": "Apache License 2.0",
-				"con***REMOVED***dence": 1
+				"confidence": 1
 			}
 		]
 	},
@@ -40,7 +40,7 @@
 		"licenses": [
 			{
 				"type": "Apache License 2.0",
-				"con***REMOVED***dence": 1
+				"confidence": 1
 			}
 		]
 	},
@@ -49,7 +49,7 @@
 		"licenses": [
 			{
 				"type": "ISC License",
-				"con***REMOVED***dence": 0.9850746268656716
+				"confidence": 0.9850746268656716
 			}
 		]
 	},
@@ -58,7 +58,7 @@
 		"licenses": [
 			{
 				"type": "MIT License",
-				"con***REMOVED***dence": 1
+				"confidence": 1
 			}
 		]
 	},
@@ -67,7 +67,7 @@
 		"licenses": [
 			{
 				"type": "MIT License and BSD 3-clause \"New\" or \"Revised\" License",
-				"con***REMOVED***dence": 1
+				"confidence": 1
 			}
 		]
 	},
@@ -76,7 +76,7 @@
 		"licenses": [
 			{
 				"type": "MIT License",
-				"con***REMOVED***dence": 1
+				"confidence": 1
 			}
 		]
 	},
@@ -85,7 +85,7 @@
 		"licenses": [
 			{
 				"type": "Apache License 2.0",
-				"con***REMOVED***dence": 0.9955555555555555
+				"confidence": 0.9955555555555555
 			}
 		]
 	},
@@ -94,7 +94,7 @@
 		"licenses": [
 			{
 				"type": "Apache License 2.0",
-				"con***REMOVED***dence": 1
+				"confidence": 1
 			}
 		]
 	},
@@ -103,7 +103,7 @@
 		"licenses": [
 			{
 				"type": "Apache License 2.0",
-				"con***REMOVED***dence": 1
+				"confidence": 1
 			}
 		]
 	},
@@ -112,11 +112,11 @@
 		"licenses": [
 			{
 				"type": "MIT License and BSD 3-clause \"New\" or \"Revised\" License",
-				"con***REMOVED***dence": 1
+				"confidence": 1
 			},
 			{
 				"type": "Apache License 2.0",
-				"con***REMOVED***dence": 1
+				"confidence": 1
 			}
 		]
 	},
@@ -125,7 +125,7 @@
 		"licenses": [
 			{
 				"type": "Apache License 2.0",
-				"con***REMOVED***dence": 1
+				"confidence": 1
 			}
 		]
 	},
@@ -134,7 +134,7 @@
 		"licenses": [
 			{
 				"type": "BSD 3-clause \"New\" or \"Revised\" License",
-				"con***REMOVED***dence": 0.9090909090909091
+				"confidence": 0.9090909090909091
 			}
 		]
 	},
@@ -143,7 +143,7 @@
 		"licenses": [
 			{
 				"type": "Apache License 2.0",
-				"con***REMOVED***dence": 0.9966703662597114
+				"confidence": 0.9966703662597114
 			}
 		]
 	},
@@ -152,7 +152,7 @@
 		"licenses": [
 			{
 				"type": "BSD 3-clause \"New\" or \"Revised\" License",
-				"con***REMOVED***dence": 0.92
+				"confidence": 0.92
 			}
 		]
 	},
@@ -161,7 +161,7 @@
 		"licenses": [
 			{
 				"type": "Apache License 2.0",
-				"con***REMOVED***dence": 1
+				"confidence": 1
 			}
 		]
 	},
@@ -170,7 +170,7 @@
 		"licenses": [
 			{
 				"type": "Apache License 2.0",
-				"con***REMOVED***dence": 1
+				"confidence": 1
 			}
 		]
 	},
@@ -179,7 +179,7 @@
 		"licenses": [
 			{
 				"type": "Apache License 2.0",
-				"con***REMOVED***dence": 1
+				"confidence": 1
 			}
 		]
 	},
@@ -188,7 +188,7 @@
 		"licenses": [
 			{
 				"type": "MIT License",
-				"con***REMOVED***dence": 0.9891304347826086
+				"confidence": 0.9891304347826086
 			}
 		]
 	},
@@ -197,7 +197,7 @@
 		"licenses": [
 			{
 				"type": "Mozilla Public License 2.0",
-				"con***REMOVED***dence": 1
+				"confidence": 1
 			}
 		]
 	},
@@ -206,7 +206,7 @@
 		"licenses": [
 			{
 				"type": "ISC License",
-				"con***REMOVED***dence": 0.9850746268656716
+				"confidence": 0.9850746268656716
 			}
 		]
 	},
@@ -215,7 +215,7 @@
 		"licenses": [
 			{
 				"type": "BSD 3-clause \"New\" or \"Revised\" License",
-				"con***REMOVED***dence": 0.9663865546218487
+				"confidence": 0.9663865546218487
 			}
 		]
 	},
@@ -224,15 +224,15 @@
 		"licenses": [
 			{
 				"type": "MIT License and BSD 3-clause \"New\" or \"Revised\" License",
-				"con***REMOVED***dence": 1
+				"confidence": 1
 			},
 			{
 				"type": "Apache License 2.0",
-				"con***REMOVED***dence": 1
+				"confidence": 1
 			},
 			{
 				"type": "Apache License 2.0",
-				"con***REMOVED***dence": 1
+				"confidence": 1
 			}
 		]
 	},
@@ -241,7 +241,7 @@
 		"licenses": [
 			{
 				"type": "MIT License",
-				"con***REMOVED***dence": 1
+				"confidence": 1
 			}
 		]
 	},
@@ -250,7 +250,7 @@
 		"licenses": [
 			{
 				"type": "GNU Lesser General Public License v3.0",
-				"con***REMOVED***dence": 0.9409937888198758
+				"confidence": 0.9409937888198758
 			}
 		]
 	},
@@ -259,7 +259,7 @@
 		"licenses": [
 			{
 				"type": "MIT License",
-				"con***REMOVED***dence": 0.9891304347826086
+				"confidence": 0.9891304347826086
 			}
 		]
 	},
@@ -268,7 +268,7 @@
 		"licenses": [
 			{
 				"type": "MIT License",
-				"con***REMOVED***dence": 0.9891304347826086
+				"confidence": 0.9891304347826086
 			}
 		]
 	},
@@ -277,7 +277,7 @@
 		"licenses": [
 			{
 				"type": "Apache License 2.0",
-				"con***REMOVED***dence": 1
+				"confidence": 1
 			}
 		]
 	},
@@ -286,7 +286,7 @@
 		"licenses": [
 			{
 				"type": "Apache License 2.0",
-				"con***REMOVED***dence": 1
+				"confidence": 1
 			}
 		]
 	},
@@ -295,16 +295,16 @@
 		"licenses": [
 			{
 				"type": "Apache License 2.0",
-				"con***REMOVED***dence": 1
+				"confidence": 1
 			}
 		]
 	},
 	{
-		"project": "github.com/rob***REMOVED***g/cron",
+		"project": "github.com/robfig/cron",
 		"licenses": [
 			{
 				"type": "MIT License",
-				"con***REMOVED***dence": 0.9946524064171123
+				"confidence": 0.9946524064171123
 			}
 		]
 	},
@@ -313,7 +313,7 @@
 		"licenses": [
 			{
 				"type": "MIT License",
-				"con***REMOVED***dence": 1
+				"confidence": 1
 			}
 		]
 	},
@@ -322,7 +322,7 @@
 		"licenses": [
 			{
 				"type": "BSD 3-clause \"New\" or \"Revised\" License",
-				"con***REMOVED***dence": 0.9663865546218487
+				"confidence": 0.9663865546218487
 			}
 		]
 	},
@@ -331,7 +331,7 @@
 		"licenses": [
 			{
 				"type": "BSD 3-clause \"New\" or \"Revised\" License",
-				"con***REMOVED***dence": 0.9663865546218487
+				"confidence": 0.9663865546218487
 			}
 		]
 	},
@@ -340,7 +340,7 @@
 		"licenses": [
 			{
 				"type": "BSD 3-clause \"New\" or \"Revised\" License",
-				"con***REMOVED***dence": 0.9663865546218487
+				"confidence": 0.9663865546218487
 			}
 		]
 	},
@@ -349,7 +349,7 @@
 		"licenses": [
 			{
 				"type": "BSD 3-clause \"New\" or \"Revised\" License",
-				"con***REMOVED***dence": 0.9663865546218487
+				"confidence": 0.9663865546218487
 			}
 		]
 	},
@@ -358,7 +358,7 @@
 		"licenses": [
 			{
 				"type": "BSD 3-clause \"New\" or \"Revised\" License",
-				"con***REMOVED***dence": 0.9663865546218487
+				"confidence": 0.9663865546218487
 			}
 		]
 	},
@@ -367,7 +367,7 @@
 		"licenses": [
 			{
 				"type": "BSD 3-clause \"New\" or \"Revised\" License",
-				"con***REMOVED***dence": 0.9663865546218487
+				"confidence": 0.9663865546218487
 			}
 		]
 	},
@@ -376,7 +376,7 @@
 		"licenses": [
 			{
 				"type": "BSD 3-clause \"New\" or \"Revised\" License",
-				"con***REMOVED***dence": 0.9752066115702479
+				"confidence": 0.9752066115702479
 			}
 		]
 	},
@@ -385,11 +385,11 @@
 		"licenses": [
 			{
 				"type": "GNU Lesser General Public License v3.0",
-				"con***REMOVED***dence": 0.9528301886792453
+				"confidence": 0.9528301886792453
 			},
 			{
 				"type": "MIT License",
-				"con***REMOVED***dence": 0.8975609756097561
+				"confidence": 0.8975609756097561
 			}
 		]
 	},
@@ -398,7 +398,7 @@
 		"licenses": [
 			{
 				"type": "Apache License 2.0",
-				"con***REMOVED***dence": 1
+				"confidence": 1
 			}
 		]
 	},
@@ -407,7 +407,7 @@
 		"licenses": [
 			{
 				"type": "Apache License 2.0",
-				"con***REMOVED***dence": 1
+				"confidence": 1
 			}
 		]
 	},
@@ -416,7 +416,7 @@
 		"licenses": [
 			{
 				"type": "Apache License 2.0",
-				"con***REMOVED***dence": 1
+				"confidence": 1
 			}
 		]
 	},
@@ -425,7 +425,7 @@
 		"licenses": [
 			{
 				"type": "Apache License 2.0",
-				"con***REMOVED***dence": 1
+				"confidence": 1
 			}
 		]
 	}

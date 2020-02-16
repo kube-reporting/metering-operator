@@ -2,7 +2,7 @@
 Copyright 2014 The Kubernetes Authors.
 
 Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this ***REMOVED***le except in compliance with the License.
+you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
 
     http://www.apache.org/licenses/LICENSE-2.0
@@ -10,7 +10,7 @@ You may obtain a copy of the License at
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the speci***REMOVED***c language governing permissions and
+See the License for the specific language governing permissions and
 limitations under the License.
 */
 
@@ -52,7 +52,7 @@ func addConversionFuncs(scheme *runtime.Scheme) error {
 			return s.DefaultConvert(in, out, conversion.IgnoreMissingFields)
 		},
 
-		func(in *Con***REMOVED***g, out *api.Con***REMOVED***g, s conversion.Scope) error {
+		func(in *Config, out *api.Config, s conversion.Scope) error {
 			out.CurrentContext = in.CurrentContext
 			if err := s.Convert(&in.Preferences, &out.Preferences, 0); err != nil {
 				return err
@@ -76,7 +76,7 @@ func addConversionFuncs(scheme *runtime.Scheme) error {
 			}
 			return nil
 		},
-		func(in *api.Con***REMOVED***g, out *Con***REMOVED***g, s conversion.Scope) error {
+		func(in *api.Config, out *Config, s conversion.Scope) error {
 			out.CurrentContext = in.CurrentContext
 			if err := s.Convert(&in.Preferences, &out.Preferences, 0); err != nil {
 				return err
@@ -108,7 +108,7 @@ func addConversionFuncs(scheme *runtime.Scheme) error {
 				}
 				if (*out)[curr.Name] == nil {
 					(*out)[curr.Name] = newCluster
-				} ***REMOVED*** {
+				} else {
 					return fmt.Errorf("error converting *[]NamedCluster into *map[string]*api.Cluster: duplicate name \"%v\" in list: %v", curr.Name, *in)
 				}
 			}
@@ -143,7 +143,7 @@ func addConversionFuncs(scheme *runtime.Scheme) error {
 				}
 				if (*out)[curr.Name] == nil {
 					(*out)[curr.Name] = newAuthInfo
-				} ***REMOVED*** {
+				} else {
 					return fmt.Errorf("error converting *[]NamedAuthInfo into *map[string]*api.AuthInfo: duplicate name \"%v\" in list: %v", curr.Name, *in)
 				}
 			}
@@ -178,7 +178,7 @@ func addConversionFuncs(scheme *runtime.Scheme) error {
 				}
 				if (*out)[curr.Name] == nil {
 					(*out)[curr.Name] = newContext
-				} ***REMOVED*** {
+				} else {
 					return fmt.Errorf("error converting *[]NamedContext into *map[string]*api.Context: duplicate name \"%v\" in list: %v", curr.Name, *in)
 				}
 			}
@@ -213,7 +213,7 @@ func addConversionFuncs(scheme *runtime.Scheme) error {
 				}
 				if (*out)[curr.Name] == nil {
 					(*out)[curr.Name] = newExtension
-				} ***REMOVED*** {
+				} else {
 					return fmt.Errorf("error converting *[]NamedExtension into *map[string]runtime.Object: duplicate name \"%v\" in list: %v", curr.Name, *in)
 				}
 			}

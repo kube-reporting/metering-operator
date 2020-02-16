@@ -14,7 +14,7 @@ import (
 // For bool, false is unset.
 // Structs are never considered unset.
 //
-// For everything ***REMOVED***, including pointers, a nil value is unset.
+// For everything else, including pointers, a nil value is unset.
 func dfault(d interface{}, given ...interface{}) interface{} {
 
 	if empty(given) || empty(given[0]) {
@@ -51,7 +51,7 @@ func empty(given interface{}) bool {
 	}
 }
 
-// coalesce returns the ***REMOVED***rst non-empty value.
+// coalesce returns the first non-empty value.
 func coalesce(v ...interface{}) interface{} {
 	for _, val := range v {
 		if !empty(val) {
@@ -73,7 +73,7 @@ func toPrettyJson(v interface{}) string {
 	return string(output)
 }
 
-// ternary returns the ***REMOVED***rst value if the last value is true, otherwise returns the second value.
+// ternary returns the first value if the last value is true, otherwise returns the second value.
 func ternary(vt interface{}, vf interface{}, v bool) interface{} {
 	if v {
 		return vt

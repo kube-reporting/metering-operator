@@ -40,12 +40,12 @@ spec:
           value: "true"
         - name: WATCH_NAMESPACE
           valueFrom:
-            ***REMOVED***eldRef:
-              ***REMOVED***eldPath: metadata.namespace
+            fieldRef:
+              fieldPath: metadata.namespace
         - name: POD_NAME
           valueFrom:
-            ***REMOVED***eldRef:
-              ***REMOVED***eldPath: metadata.name
+            fieldRef:
+              fieldPath: metadata.name
         - name: METERING_ANSIBLE_OPERATOR_IMAGE
           value: "quay.io/coreos/metering-ansible-operator:release-4.4"
         - name: METERING_REPORTING_OPERATOR_IMAGE

@@ -1,4 +1,4 @@
-***REMOVED***
+#! /bin/bash
 
 echo "Performing cleanup"
 echo "Storing pod descriptions and logs at $LOG_DIR"
@@ -10,15 +10,15 @@ while read -r pod; do
         echo "Capturing pod $pod description"
         if ! kubectl describe pod --namespace "$METERING_TEST_NAMESPACE" "$pod" > "$LOG_DIR/${pod}-description.txt"; then
             echo "Error capturing pod $pod description"
-        ***REMOVED***
-    ***REMOVED***
+        fi
+    fi
 done <<< "$PODS"
 
 echo "Capturing pod logs"
 while read -r pod; do
     if [[ -z "$pod" ]]; then
         continue
-    ***REMOVED***
+    fi
     # There can be multiple containers within a pod. We need to iterate
     # over each of those
     containers=$(kubectl get pods -o jsonpath="{.spec.containers[*].name}" --namespace "$METERING_TEST_NAMESPACE" "$pod")
@@ -26,19 +26,19 @@ while read -r pod; do
         echo "Capturing pod $pod container $container logs"
         if ! kubectl logs --namespace "$METERING_TEST_NAMESPACE" -c "$container" "$pod" > "$LOG_DIR/${pod}-${container}.log"; then
             echo "Error capturing pod $pod container $container logs"
-        ***REMOVED***
+        fi
     done
 done <<< "$PODS"
 
-echo "Capturing MeteringCon***REMOVED***gs"
-METERINGCONFIGS="$(kubectl get meteringcon***REMOVED***gs --no-headers --namespace "$METERING_TEST_NAMESPACE" -o name | cut -d/ -f2)"
-while read -r meteringcon***REMOVED***g; do
-    if [[ -n "$meteringcon***REMOVED***g" ]]; then
-        echo "Capturing MeteringCon***REMOVED***g $meteringcon***REMOVED***g as json"
-        if ! kubectl get meteringcon***REMOVED***g "$meteringcon***REMOVED***g" --namespace "$METERING_TEST_NAMESPACE" -o json > "$METERINGCONFIGS_DIR/${meteringcon***REMOVED***g}.json"; then
-            echo "Error getting $meteringcon***REMOVED***g as json"
-        ***REMOVED***
-    ***REMOVED***
+echo "Capturing MeteringConfigs"
+METERINGCONFIGS="$(kubectl get meteringconfigs --no-headers --namespace "$METERING_TEST_NAMESPACE" -o name | cut -d/ -f2)"
+while read -r meteringconfig; do
+    if [[ -n "$meteringconfig" ]]; then
+        echo "Capturing MeteringConfig $meteringconfig as json"
+        if ! kubectl get meteringconfig "$meteringconfig" --namespace "$METERING_TEST_NAMESPACE" -o json > "$METERINGCONFIGS_DIR/${meteringconfig}.json"; then
+            echo "Error getting $meteringconfig as json"
+        fi
+    fi
 done <<< "$METERINGCONFIGS"
 
 echo "Capturing Metering StorageLocations"
@@ -48,8 +48,8 @@ while read -r storagelocation; do
         echo "Capturing StorageLocation $storagelocation as json"
         if ! kubectl get storagelocation "$storagelocation" --namespace "$METERING_TEST_NAMESPACE" -o json > "$STORAGELOCATIONS_DIR/${storagelocation}.json"; then
             echo "Error getting $storagelocation as json"
-        ***REMOVED***
-    ***REMOVED***
+        fi
+    fi
 done <<< "$STORAGELOCATIONS"
 
 echo "Capturing Metering PrestoTables"
@@ -59,8 +59,8 @@ while read -r prestotable; do
         echo "Capturing PrestoTable $prestotable as json"
         if ! kubectl get prestotable "$prestotable" --namespace "$METERING_TEST_NAMESPACE" -o json > "$PRESTOTABLES_DIR/${prestotable}.json"; then
             echo "Error getting $prestotable as json"
-        ***REMOVED***
-    ***REMOVED***
+        fi
+    fi
 done <<< "$PRESTOTABLES"
 
 echo "Capturing Metering HiveTables"
@@ -70,8 +70,8 @@ while read -r hivetable; do
         echo "Capturing HiveTable $hivetable as json"
         if ! kubectl get hivetable "$hivetable" --namespace "$METERING_TEST_NAMESPACE" -o json > "$HIVETABLES_DIR/${hivetable}.json"; then
             echo "Error getting $hivetable as json"
-        ***REMOVED***
-    ***REMOVED***
+        fi
+    fi
 done <<< "$HIVETABLES"
 
 echo "Capturing Metering ReportDataSources"
@@ -81,8 +81,8 @@ while read -r datasource; do
         echo "Capturing ReportDataSource $datasource as json"
         if ! kubectl get reportdatasource "$datasource" --namespace "$METERING_TEST_NAMESPACE" -o json > "$DATASOURCES_DIR/${datasource}.json"; then
             echo "Error getting $datasource as json"
-        ***REMOVED***
-    ***REMOVED***
+        fi
+    fi
 done <<< "$DATASOURCES"
 
 echo "Capturing Metering ReportQueries"
@@ -92,8 +92,8 @@ while read -r rgq; do
         echo "Capturing ReportQuery $rgq as json"
         if ! kubectl get reportquery "$rgq" --namespace "$METERING_TEST_NAMESPACE" -o json > "$REPORTQUERIES_DIR/${rgq}.json"; then
             echo "Error getting $rgq as json"
-        ***REMOVED***
-    ***REMOVED***
+        fi
+    fi
 done <<< "$RGQS"
 
 echo "Capturing Metering Reports"
@@ -103,6 +103,6 @@ while read -r report; do
         echo "Capturing Report $report as json"
         if ! kubectl get report "$report" --namespace "$METERING_TEST_NAMESPACE" -o json > "$REPORTS_DIR/${report}.json"; then
             echo "Error getting $report as json"
-        ***REMOVED***
-    ***REMOVED***
+        fi
+    fi
 done <<< "$REPORTS"

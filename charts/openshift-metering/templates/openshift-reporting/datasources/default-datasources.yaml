@@ -16,7 +16,7 @@
 {{- include "new-report-datasource" $body -}}
 {{- end }}{{/* end range */}}
 
-{{- ***REMOVED*** }}
+{{- else }}
 
 # pre-kubernetes 1.14 reportDataSources
 {{- range $_, $body := $reportingValues.spec.defaultReportDataSources.preKube_1_14.items }}

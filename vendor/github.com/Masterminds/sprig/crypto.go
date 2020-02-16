@@ -72,7 +72,7 @@ var template_characters = map[byte]string{
 func derivePassword(counter uint32, password_type, password, user, site string) string {
 	var templates = password_type_templates[password_type]
 	if templates == nil {
-		return fmt.Sprintf("cannot ***REMOVED***nd password template %s", password_type)
+		return fmt.Sprintf("cannot find password template %s", password_type)
 	}
 
 	var buffer bytes.Buffer
@@ -158,17 +158,17 @@ func pemBlockForKey(priv interface{}) *pem.Block {
 	}
 }
 
-type certi***REMOVED***cate struct {
+type certificate struct {
 	Cert string
 	Key  string
 }
 
-func buildCustomCerti***REMOVED***cate(b64cert string, b64key string) (certi***REMOVED***cate, error) {
-	crt := certi***REMOVED***cate{}
+func buildCustomCertificate(b64cert string, b64key string) (certificate, error) {
+	crt := certificate{}
 
 	cert, err := base64.StdEncoding.DecodeString(b64cert)
 	if err != nil {
-		return crt, errors.New("unable to decode base64 certi***REMOVED***cate")
+		return crt, errors.New("unable to decode base64 certificate")
 	}
 
 	key, err := base64.StdEncoding.DecodeString(b64key)
@@ -178,12 +178,12 @@ func buildCustomCerti***REMOVED***cate(b64cert string, b64key string) (certi***R
 
 	decodedCert, _ := pem.Decode(cert)
 	if decodedCert == nil {
-		return crt, errors.New("unable to decode certi***REMOVED***cate")
+		return crt, errors.New("unable to decode certificate")
 	}
-	_, err = x509.ParseCerti***REMOVED***cate(decodedCert.Bytes)
+	_, err = x509.ParseCertificate(decodedCert.Bytes)
 	if err != nil {
 		return crt, fmt.Errorf(
-			"error parsing certi***REMOVED***cate: decodedCert.Bytes: %s",
+			"error parsing certificate: decodedCert.Bytes: %s",
 			err,
 		)
 	}
@@ -206,11 +206,11 @@ func buildCustomCerti***REMOVED***cate(b64cert string, b64key string) (certi***R
 	return crt, nil
 }
 
-func generateCerti***REMOVED***cateAuthority(
+func generateCertificateAuthority(
 	cn string,
 	daysValid int,
-) (certi***REMOVED***cate, error) {
-	ca := certi***REMOVED***cate{}
+) (certificate, error) {
+	ca := certificate{}
 
 	template, err := getBaseCertTemplate(cn, nil, nil, daysValid)
 	if err != nil {
@@ -235,13 +235,13 @@ func generateCerti***REMOVED***cateAuthority(
 	return ca, nil
 }
 
-func generateSelfSignedCerti***REMOVED***cate(
+func generateSelfSignedCertificate(
 	cn string,
 	ips []interface{},
 	alternateDNS []interface{},
 	daysValid int,
-) (certi***REMOVED***cate, error) {
-	cert := certi***REMOVED***cate{}
+) (certificate, error) {
+	cert := certificate{}
 
 	template, err := getBaseCertTemplate(cn, ips, alternateDNS, daysValid)
 	if err != nil {
@@ -261,23 +261,23 @@ func generateSelfSignedCerti***REMOVED***cate(
 	return cert, nil
 }
 
-func generateSignedCerti***REMOVED***cate(
+func generateSignedCertificate(
 	cn string,
 	ips []interface{},
 	alternateDNS []interface{},
 	daysValid int,
-	ca certi***REMOVED***cate,
-) (certi***REMOVED***cate, error) {
-	cert := certi***REMOVED***cate{}
+	ca certificate,
+) (certificate, error) {
+	cert := certificate{}
 
 	decodedSignerCert, _ := pem.Decode([]byte(ca.Cert))
 	if decodedSignerCert == nil {
-		return cert, errors.New("unable to decode certi***REMOVED***cate")
+		return cert, errors.New("unable to decode certificate")
 	}
-	signerCert, err := x509.ParseCerti***REMOVED***cate(decodedSignerCert.Bytes)
+	signerCert, err := x509.ParseCertificate(decodedSignerCert.Bytes)
 	if err != nil {
 		return cert, fmt.Errorf(
-			"error parsing certi***REMOVED***cate: decodedSignerCert.Bytes: %s",
+			"error parsing certificate: decodedSignerCert.Bytes: %s",
 			err,
 		)
 	}
@@ -317,12 +317,12 @@ func generateSignedCerti***REMOVED***cate(
 }
 
 func getCertAndKey(
-	template *x509.Certi***REMOVED***cate,
+	template *x509.Certificate,
 	signeeKey *rsa.PrivateKey,
-	parent *x509.Certi***REMOVED***cate,
+	parent *x509.Certificate,
 	signingKey *rsa.PrivateKey,
 ) (string, string, error) {
-	derBytes, err := x509.CreateCerti***REMOVED***cate(
+	derBytes, err := x509.CreateCertificate(
 		rand.Reader,
 		template,
 		parent,
@@ -330,7 +330,7 @@ func getCertAndKey(
 		signingKey,
 	)
 	if err != nil {
-		return "", "", fmt.Errorf("error creating certi***REMOVED***cate: %s", err)
+		return "", "", fmt.Errorf("error creating certificate: %s", err)
 	}
 
 	certBuffer := bytes.Buffer{}
@@ -338,7 +338,7 @@ func getCertAndKey(
 		&certBuffer,
 		&pem.Block{Type: "CERTIFICATE", Bytes: derBytes},
 	); err != nil {
-		return "", "", fmt.Errorf("error pem-encoding certi***REMOVED***cate: %s", err)
+		return "", "", fmt.Errorf("error pem-encoding certificate: %s", err)
 	}
 
 	keyBuffer := bytes.Buffer{}
@@ -360,7 +360,7 @@ func getBaseCertTemplate(
 	ips []interface{},
 	alternateDNS []interface{},
 	daysValid int,
-) (*x509.Certi***REMOVED***cate, error) {
+) (*x509.Certificate, error) {
 	ipAddresses, err := getNetIPs(ips)
 	if err != nil {
 		return nil, err
@@ -374,7 +374,7 @@ func getBaseCertTemplate(
 	if err != nil {
 		return nil, err
 	}
-	return &x509.Certi***REMOVED***cate{
+	return &x509.Certificate{
 		SerialNumber: serialNumber,
 		Subject: pkix.Name{
 			CommonName: cn,

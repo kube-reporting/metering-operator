@@ -1,10 +1,10 @@
 // Copyright 2014 Google Inc. All rights reserved.
 // Use of this source code is governed by the Apache 2.0
-// license that can be found in the LICENSE ***REMOVED***le.
+// license that can be found in the LICENSE file.
 
 package internal
 
-// This ***REMOVED***le implements hooks for applying datastore transactions.
+// This file implements hooks for applying datastore transactions.
 
 import (
 	"errors"
@@ -21,7 +21,7 @@ var transactionSetters = make(map[reflect.Type]reflect.Value)
 
 // RegisterTransactionSetter registers a function that sets transaction information
 // in a protocol buffer message. f should be a function with two arguments,
-// the ***REMOVED***rst being a protocol buffer type, and the second being *datastore.Transaction.
+// the first being a protocol buffer type, and the second being *datastore.Transaction.
 func RegisterTransactionSetter(f interface{}) {
 	v := reflect.ValueOf(f)
 	transactionSetters[v.Type().In(0)] = v
@@ -49,7 +49,7 @@ func withTransaction(ctx netcontext.Context, t *transaction) netcontext.Context 
 
 type transaction struct {
 	transaction pb.Transaction
-	***REMOVED***nished    bool
+	finished    bool
 }
 
 var ErrConcurrentTransaction = errors.New("internal: concurrent transaction")
@@ -62,7 +62,7 @@ func RunTransactionOnce(c netcontext.Context, f func(netcontext.Context) error, 
 	// Begin the transaction.
 	t := &transaction{}
 	req := &pb.BeginTransactionRequest{
-		App: proto.String(FullyQuali***REMOVED***edAppID(c)),
+		App: proto.String(FullyQualifiedAppID(c)),
 	}
 	if xg {
 		req.AllowMultipleEg = proto.Bool(true)
@@ -74,10 +74,10 @@ func RunTransactionOnce(c netcontext.Context, f func(netcontext.Context) error, 
 	// Call f, rolling back the transaction if f returns a non-nil error, or panics.
 	// The panic is not recovered.
 	defer func() {
-		if t.***REMOVED***nished {
+		if t.finished {
 			return
 		}
-		t.***REMOVED***nished = true
+		t.finished = true
 		// Ignore the error return value, since we are already returning a non-nil
 		// error (or we're panicking).
 		Call(c, "datastore_v3", "Rollback", &t.transaction, &basepb.VoidProto{})
@@ -85,7 +85,7 @@ func RunTransactionOnce(c netcontext.Context, f func(netcontext.Context) error, 
 	if err := f(withTransaction(c, t)); err != nil {
 		return err
 	}
-	t.***REMOVED***nished = true
+	t.finished = true
 
 	// Commit the transaction.
 	res := &pb.CommitResponse{}

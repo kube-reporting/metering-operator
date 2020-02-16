@@ -14,7 +14,7 @@ type yaml_version_directive_t struct {
 // The tag directive data.
 type yaml_tag_directive_t struct {
 	handle []byte // The tag handle.
-	pre***REMOVED***x []byte // The tag pre***REMOVED***x.
+	prefix []byte // The tag prefix.
 }
 
 type yaml_encoding_t int
@@ -206,11 +206,11 @@ type yaml_token_t struct {
 	// (for yaml_ALIAS_TOKEN, yaml_ANCHOR_TOKEN, yaml_SCALAR_TOKEN, yaml_TAG_TOKEN, yaml_TAG_DIRECTIVE_TOKEN).
 	value []byte
 
-	// The tag suf***REMOVED***x (for yaml_TAG_TOKEN).
-	suf***REMOVED***x []byte
+	// The tag suffix (for yaml_TAG_TOKEN).
+	suffix []byte
 
-	// The tag directive pre***REMOVED***x (for yaml_TAG_DIRECTIVE_TOKEN).
-	pre***REMOVED***x []byte
+	// The tag directive prefix (for yaml_TAG_DIRECTIVE_TOKEN).
+	prefix []byte
 
 	// The scalar style (for yaml_SCALAR_TOKEN).
 	style yaml_scalar_style_t
@@ -407,7 +407,7 @@ type yaml_document_t struct {
 // source. The handler should write not more than size bytes to the buffer.
 // The number of written bytes should be set to the size_read variable.
 //
-// [in,out]   data        A pointer to an application data speci***REMOVED***ed by
+// [in,out]   data        A pointer to an application data specified by
 //                        yaml_parser_set_input().
 // [out]      buffer      The buffer to write the data from the source.
 // [in]       size        The size of the buffer.
@@ -439,18 +439,18 @@ const (
 	yaml_PARSE_BLOCK_NODE_STATE                        // Expect a block node.
 	yaml_PARSE_BLOCK_NODE_OR_INDENTLESS_SEQUENCE_STATE // Expect a block node or indentless sequence.
 	yaml_PARSE_FLOW_NODE_STATE                         // Expect a flow node.
-	yaml_PARSE_BLOCK_SEQUENCE_FIRST_ENTRY_STATE        // Expect the ***REMOVED***rst entry of a block sequence.
+	yaml_PARSE_BLOCK_SEQUENCE_FIRST_ENTRY_STATE        // Expect the first entry of a block sequence.
 	yaml_PARSE_BLOCK_SEQUENCE_ENTRY_STATE              // Expect an entry of a block sequence.
 	yaml_PARSE_INDENTLESS_SEQUENCE_ENTRY_STATE         // Expect an entry of an indentless sequence.
-	yaml_PARSE_BLOCK_MAPPING_FIRST_KEY_STATE           // Expect the ***REMOVED***rst key of a block mapping.
+	yaml_PARSE_BLOCK_MAPPING_FIRST_KEY_STATE           // Expect the first key of a block mapping.
 	yaml_PARSE_BLOCK_MAPPING_KEY_STATE                 // Expect a block mapping key.
 	yaml_PARSE_BLOCK_MAPPING_VALUE_STATE               // Expect a block mapping value.
-	yaml_PARSE_FLOW_SEQUENCE_FIRST_ENTRY_STATE         // Expect the ***REMOVED***rst entry of a flow sequence.
+	yaml_PARSE_FLOW_SEQUENCE_FIRST_ENTRY_STATE         // Expect the first entry of a flow sequence.
 	yaml_PARSE_FLOW_SEQUENCE_ENTRY_STATE               // Expect an entry of a flow sequence.
 	yaml_PARSE_FLOW_SEQUENCE_ENTRY_MAPPING_KEY_STATE   // Expect a key of an ordered mapping.
 	yaml_PARSE_FLOW_SEQUENCE_ENTRY_MAPPING_VALUE_STATE // Expect a value of an ordered mapping.
 	yaml_PARSE_FLOW_SEQUENCE_ENTRY_MAPPING_END_STATE   // Expect the and of an ordered mapping entry.
-	yaml_PARSE_FLOW_MAPPING_FIRST_KEY_STATE            // Expect the ***REMOVED***rst key of a flow mapping.
+	yaml_PARSE_FLOW_MAPPING_FIRST_KEY_STATE            // Expect the first key of a flow mapping.
 	yaml_PARSE_FLOW_MAPPING_KEY_STATE                  // Expect a key of a flow mapping.
 	yaml_PARSE_FLOW_MAPPING_VALUE_STATE                // Expect a value of a flow mapping.
 	yaml_PARSE_FLOW_MAPPING_EMPTY_VALUE_STATE          // Expect an empty value of a flow mapping.
@@ -594,7 +594,7 @@ type yaml_parser_t struct {
 	document *yaml_document_t // The currently parsed document.
 }
 
-// Emitter De***REMOVED***nitions
+// Emitter Definitions
 
 // The prototype of a write handler.
 //
@@ -602,7 +602,7 @@ type yaml_parser_t struct {
 // characters to the output.  The handler should write @a size bytes of the
 // @a buffer to the output.
 //
-// @param[in,out]   data        A pointer to an application data speci***REMOVED***ed by
+// @param[in,out]   data        A pointer to an application data specified by
 //                              yaml_emitter_set_output().
 // @param[in]       buffer      The buffer with bytes to be written.
 // @param[in]       size        The size of the buffer.
@@ -619,19 +619,19 @@ const (
 	// Expect STREAM-START.
 	yaml_EMIT_STREAM_START_STATE yaml_emitter_state_t = iota
 
-	yaml_EMIT_FIRST_DOCUMENT_START_STATE       // Expect the ***REMOVED***rst DOCUMENT-START or STREAM-END.
+	yaml_EMIT_FIRST_DOCUMENT_START_STATE       // Expect the first DOCUMENT-START or STREAM-END.
 	yaml_EMIT_DOCUMENT_START_STATE             // Expect DOCUMENT-START or STREAM-END.
 	yaml_EMIT_DOCUMENT_CONTENT_STATE           // Expect the content of a document.
 	yaml_EMIT_DOCUMENT_END_STATE               // Expect DOCUMENT-END.
-	yaml_EMIT_FLOW_SEQUENCE_FIRST_ITEM_STATE   // Expect the ***REMOVED***rst item of a flow sequence.
+	yaml_EMIT_FLOW_SEQUENCE_FIRST_ITEM_STATE   // Expect the first item of a flow sequence.
 	yaml_EMIT_FLOW_SEQUENCE_ITEM_STATE         // Expect an item of a flow sequence.
-	yaml_EMIT_FLOW_MAPPING_FIRST_KEY_STATE     // Expect the ***REMOVED***rst key of a flow mapping.
+	yaml_EMIT_FLOW_MAPPING_FIRST_KEY_STATE     // Expect the first key of a flow mapping.
 	yaml_EMIT_FLOW_MAPPING_KEY_STATE           // Expect a key of a flow mapping.
 	yaml_EMIT_FLOW_MAPPING_SIMPLE_VALUE_STATE  // Expect a value for a simple key of a flow mapping.
 	yaml_EMIT_FLOW_MAPPING_VALUE_STATE         // Expect a value of a flow mapping.
-	yaml_EMIT_BLOCK_SEQUENCE_FIRST_ITEM_STATE  // Expect the ***REMOVED***rst item of a block sequence.
+	yaml_EMIT_BLOCK_SEQUENCE_FIRST_ITEM_STATE  // Expect the first item of a block sequence.
 	yaml_EMIT_BLOCK_SEQUENCE_ITEM_STATE        // Expect an item of a block sequence.
-	yaml_EMIT_BLOCK_MAPPING_FIRST_KEY_STATE    // Expect the ***REMOVED***rst key of a block mapping.
+	yaml_EMIT_BLOCK_MAPPING_FIRST_KEY_STATE    // Expect the first key of a block mapping.
 	yaml_EMIT_BLOCK_MAPPING_KEY_STATE          // Expect the key of a block mapping.
 	yaml_EMIT_BLOCK_MAPPING_SIMPLE_VALUE_STATE // Expect a value for a simple key of a block mapping.
 	yaml_EMIT_BLOCK_MAPPING_VALUE_STATE        // Expect a value of a block mapping.
@@ -706,7 +706,7 @@ type yaml_emitter_t struct {
 	// Tag analysis.
 	tag_data struct {
 		handle []byte // The tag handle.
-		suf***REMOVED***x []byte // The tag suf***REMOVED***x.
+		suffix []byte // The tag suffix.
 	}
 
 	// Scalar analysis.

@@ -2,7 +2,7 @@
 Copyright 2014 The Kubernetes Authors.
 
 Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this ***REMOVED***le except in compliance with the License.
+you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
 
     http://www.apache.org/licenses/LICENSE-2.0
@@ -10,7 +10,7 @@ You may obtain a copy of the License at
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the speci***REMOVED***c language governing permissions and
+See the License for the specific language governing permissions and
 limitations under the License.
 */
 
@@ -43,9 +43,9 @@ import (
 	"k8s.io/klog"
 )
 
-// Reflector watches a speci***REMOVED***ed resource and causes all changes to be reflected in the given store.
+// Reflector watches a specified resource and causes all changes to be reflected in the given store.
 type Reflector struct {
-	// name identi***REMOVED***es this reflector. By default it will be a ***REMOVED***le:line if possible.
+	// name identifies this reflector. By default it will be a file:line if possible.
 	name string
 	// metrics tracks basic metric information about the reflector
 	metrics *reflectorMetrics
@@ -78,7 +78,7 @@ var (
 )
 
 // NewNamespaceKeyedIndexerAndReflector creates an Indexer and a Reflector
-// The indexer is con***REMOVED***gured to key on namespace
+// The indexer is configured to key on namespace
 func NewNamespaceKeyedIndexerAndReflector(lw ListerWatcher, expectedType interface{}, resyncPeriod time.Duration) (indexer Indexer, reflector *Reflector) {
 	indexer = NewIndexer(MetaNamespaceKeyFunc, Indexers{"namespace": MetaNamespaceIndexFunc})
 	reflector = NewReflector(lw, expectedType, indexer, resyncPeriod)
@@ -96,16 +96,16 @@ func NewReflector(lw ListerWatcher, expectedType interface{}, store Store, resyn
 }
 
 // reflectorDisambiguator is used to disambiguate started reflectors.
-// initialized to an unstable value to ensure meaning isn't attributed to the suf***REMOVED***x.
+// initialized to an unstable value to ensure meaning isn't attributed to the suffix.
 var reflectorDisambiguator = int64(time.Now().UnixNano() % 12345)
 
-// NewNamedReflector same as NewReflector, but with a speci***REMOVED***ed name for logging
+// NewNamedReflector same as NewReflector, but with a specified name for logging
 func NewNamedReflector(name string, lw ListerWatcher, expectedType interface{}, store Store, resyncPeriod time.Duration) *Reflector {
-	reflectorSuf***REMOVED***x := atomic.AddInt64(&reflectorDisambiguator, 1)
+	reflectorSuffix := atomic.AddInt64(&reflectorDisambiguator, 1)
 	r := &Reflector{
 		name: name,
 		// we need this to be unique per process (some names are still the same) but obvious who it belongs to
-		metrics:       newReflectorMetrics(makeValidPrometheusMetricLabel(fmt.Sprintf("reflector_"+name+"_%d", reflectorSuf***REMOVED***x))),
+		metrics:       newReflectorMetrics(makeValidPrometheusMetricLabel(fmt.Sprintf("reflector_"+name+"_%d", reflectorSuffix))),
 		listerWatcher: lw,
 		store:         store,
 		expectedType:  reflect.TypeOf(expectedType),
@@ -141,7 +141,7 @@ var (
 	neverExitWatch <-chan time.Time = make(chan time.Time)
 
 	// Used to indicate that watching stopped so that a resync could happen.
-	errorResyncRequested = errors.New("resync channel ***REMOVED***red")
+	errorResyncRequested = errors.New("resync channel fired")
 
 	// Used to indicate that watching stopped because of a signal from the stop
 	// channel passed in from a client of the reflector.
@@ -162,14 +162,14 @@ func (r *Reflector) resyncChan() (<-chan time.Time, func() bool) {
 	return t.C(), t.Stop
 }
 
-// ListAndWatch ***REMOVED***rst lists all items and get the resource version at the moment of call,
+// ListAndWatch first lists all items and get the resource version at the moment of call,
 // and then use the resource version to watch.
 // It returns error if ListAndWatch didn't even try to initialize watch.
 func (r *Reflector) ListAndWatch(stopCh <-chan struct{}) error {
 	klog.V(3).Infof("Listing and watching %v from %s", r.expectedType, r.name)
 	var resourceVersion string
 
-	// Explicitly set "0" as resource version - it's ***REMOVED***ne for the List()
+	// Explicitly set "0" as resource version - it's fine for the List()
 	// to be served from cache and potentially be delayed relative to
 	// etcd contents. Reflector framework will catch up via Watch() eventually.
 	options := metav1.ListOptions{ResourceVersion: "0"}
@@ -327,7 +327,7 @@ loop:
 				if err != nil {
 					utilruntime.HandleError(fmt.Errorf("%s: unable to add watch event object (%#v) to store: %v", r.name, event.Object, err))
 				}
-			case watch.Modi***REMOVED***ed:
+			case watch.Modified:
 				err := r.store.Update(event.Object)
 				if err != nil {
 					utilruntime.HandleError(fmt.Errorf("%s: unable to update watch event object (%#v) to store: %v", r.name, event.Object, err))

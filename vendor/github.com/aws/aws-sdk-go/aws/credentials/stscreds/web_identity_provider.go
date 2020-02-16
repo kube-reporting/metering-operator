@@ -42,8 +42,8 @@ type WebIdentityRoleProvider struct {
 }
 
 // NewWebIdentityCredentials will return a new set of credentials with a given
-// con***REMOVED***guration, role arn, and token ***REMOVED***le path.
-func NewWebIdentityCredentials(c client.Con***REMOVED***gProvider, roleARN, roleSessionName, path string) *credentials.Credentials {
+// configuration, role arn, and token file path.
+func NewWebIdentityCredentials(c client.ConfigProvider, roleARN, roleSessionName, path string) *credentials.Credentials {
 	svc := sts.New(c)
 	p := NewWebIdentityRoleProvider(svc, roleARN, roleSessionName, path)
 	return credentials.NewCredentials(p)
@@ -61,12 +61,12 @@ func NewWebIdentityRoleProvider(svc stsiface.STSAPI, roleARN, roleSessionName, p
 }
 
 // Retrieve will attempt to assume a role from a token which is located at
-// 'WebIdentityTokenFilePath' speci***REMOVED***ed destination and if that is empty an
+// 'WebIdentityTokenFilePath' specified destination and if that is empty an
 // error will be returned.
 func (p *WebIdentityRoleProvider) Retrieve() (credentials.Value, error) {
 	b, err := ioutil.ReadFile(p.tokenFilePath)
 	if err != nil {
-		errMsg := fmt.Sprintf("unable to read ***REMOVED***le at %s", p.tokenFilePath)
+		errMsg := fmt.Sprintf("unable to read file at %s", p.tokenFilePath)
 		return credentials.Value{}, awserr.New(ErrCodeWebIdentity, errMsg, err)
 	}
 

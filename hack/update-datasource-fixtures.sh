@@ -5,7 +5,7 @@ ROOT_DIR=$(dirname "${BASH_SOURCE}")/..
 if [ $# -ne 5 ]; then
     echo "usage: reporting_operator_base_url namespace data_start data_end out_dir"
     exit 1
-***REMOVED***
+fi
 
 base_url=$1
 namespace=$2
@@ -22,5 +22,5 @@ while read -r ds; do
         url="$base_url/api/v1/datasources/prometheus/fetch/$namespace/$ds?start=$data_start&end=$data_end"
         echo "fetching results from $url"
         curl -k "$url" | faq -f json -o json -M -r '.' > "$out_dir/$ds.json"
-    ***REMOVED***
+    fi
 done <<< "$DATASOURCES"

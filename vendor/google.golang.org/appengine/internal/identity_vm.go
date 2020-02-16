@@ -1,6 +1,6 @@
 // Copyright 2011 Google Inc. All rights reserved.
 // Use of this source code is governed by the Apache 2.0
-// license that can be found in the LICENSE ***REMOVED***le.
+// license that can be found in the LICENSE file.
 
 // +build !appengine
 
@@ -14,7 +14,7 @@ import (
 )
 
 // These functions are implementations of the wrapper functions
-// in ../appengine/identity.go. See that ***REMOVED***le for commentary.
+// in ../appengine/identity.go. See that file for commentary.
 
 const (
 	hDefaultVersionHostname = "X-AppEngine-Default-Version-Hostname"
@@ -39,7 +39,7 @@ func Datacenter(ctx netcontext.Context) string {
 }
 
 func ServerSoftware() string {
-	// TODO(dsymonds): Remove fallback when we've veri***REMOVED***ed this.
+	// TODO(dsymonds): Remove fallback when we've verified this.
 	if s := os.Getenv("SERVER_SOFTWARE"); s != "" {
 		return s
 	}
@@ -70,7 +70,7 @@ func InstanceID() string {
 }
 
 func partitionlessAppID() string {
-	// gae_project has everything except the partition pre***REMOVED***x.
+	// gae_project has everything except the partition prefix.
 	appID := os.Getenv("GAE_LONG_APP_ID")
 	if appID == "" {
 		appID = string(mustGetMetadata("instance/attributes/gae_project"))
@@ -78,7 +78,7 @@ func partitionlessAppID() string {
 	return appID
 }
 
-func fullyQuali***REMOVED***edAppID(_ netcontext.Context) string {
+func fullyQualifiedAppID(_ netcontext.Context) string {
 	appID := partitionlessAppID()
 
 	part := os.Getenv("GAE_PARTITION")

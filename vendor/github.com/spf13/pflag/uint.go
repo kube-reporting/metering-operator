@@ -39,7 +39,7 @@ func (f *FlagSet) GetUint(name string) (uint, error) {
 	return val.(uint), nil
 }
 
-// UintVar de***REMOVED***nes a uint flag with speci***REMOVED***ed name, default value, and usage string.
+// UintVar defines a uint flag with specified name, default value, and usage string.
 // The argument p points to a uint variable in which to store the value of the flag.
 func (f *FlagSet) UintVar(p *uint, name string, value uint, usage string) {
 	f.VarP(newUintValue(value, p), name, "", usage)
@@ -50,7 +50,7 @@ func (f *FlagSet) UintVarP(p *uint, name, shorthand string, value uint, usage st
 	f.VarP(newUintValue(value, p), name, shorthand, usage)
 }
 
-// UintVar de***REMOVED***nes a uint flag with speci***REMOVED***ed name, default value, and usage string.
+// UintVar defines a uint flag with specified name, default value, and usage string.
 // The argument p points to a uint  variable in which to store the value of the flag.
 func UintVar(p *uint, name string, value uint, usage string) {
 	CommandLine.VarP(newUintValue(value, p), name, "", usage)
@@ -61,7 +61,7 @@ func UintVarP(p *uint, name, shorthand string, value uint, usage string) {
 	CommandLine.VarP(newUintValue(value, p), name, shorthand, usage)
 }
 
-// Uint de***REMOVED***nes a uint flag with speci***REMOVED***ed name, default value, and usage string.
+// Uint defines a uint flag with specified name, default value, and usage string.
 // The return value is the address of a uint  variable that stores the value of the flag.
 func (f *FlagSet) Uint(name string, value uint, usage string) *uint {
 	p := new(uint)
@@ -76,7 +76,7 @@ func (f *FlagSet) UintP(name, shorthand string, value uint, usage string) *uint 
 	return p
 }
 
-// Uint de***REMOVED***nes a uint flag with speci***REMOVED***ed name, default value, and usage string.
+// Uint defines a uint flag with specified name, default value, and usage string.
 // The return value is the address of a uint  variable that stores the value of the flag.
 func Uint(name string, value uint, usage string) *uint {
 	return CommandLine.UintP(name, "", value, usage)

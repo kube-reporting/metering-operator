@@ -1,10 +1,10 @@
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements. See the NOTICE ***REMOVED***le
+ * or more contributor license agreements. See the NOTICE file
  * distributed with this work for additional information
- * regarding copyright ownership. The ASF licenses this ***REMOVED***le
+ * regarding copyright ownership. The ASF licenses this file
  * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this ***REMOVED***le except in compliance
+ * "License"); you may not use this file except in compliance
  * with the License. You may obtain a copy of the License at
  *
  *   http://www.apache.org/licenses/LICENSE-2.0
@@ -13,7 +13,7 @@
  * software distributed under the License is distributed on an
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
  * KIND, either express or implied. See the License for the
- * speci***REMOVED***c language governing permissions and limitations
+ * specific language governing permissions and limitations
  * under the License.
  */
 
@@ -89,8 +89,8 @@ func NewTHttpClient(urlstr string) (TTransport, error) {
 	return NewTHttpClientWithOptions(urlstr, THttpClientOptions{})
 }
 
-// Set the HTTP Header for this speci***REMOVED***c Thrift Transport
-// It is important that you ***REMOVED***rst assert the TTransport as a THttpClient type
+// Set the HTTP Header for this specific Thrift Transport
+// It is important that you first assert the TTransport as a THttpClient type
 // like so:
 //
 // httpTrans := trans.(THttpClient)
@@ -99,8 +99,8 @@ func (p *THttpClient) SetHeader(key string, value string) {
 	p.header.Add(key, value)
 }
 
-// Get the HTTP Header represented by the supplied Header Key for this speci***REMOVED***c Thrift Transport
-// It is important that you ***REMOVED***rst assert the TTransport as a THttpClient type
+// Get the HTTP Header represented by the supplied Header Key for this specific Thrift Transport
+// It is important that you first assert the TTransport as a THttpClient type
 // like so:
 //
 // httpTrans := trans.(THttpClient)
@@ -109,8 +109,8 @@ func (p *THttpClient) GetHeader(key string) string {
 	return p.header.Get(key)
 }
 
-// Deletes the HTTP Header given a Header Key for this speci***REMOVED***c Thrift Transport
-// It is important that you ***REMOVED***rst assert the TTransport as a THttpClient type
+// Deletes the HTTP Header given a Header Key for this specific Thrift Transport
+// It is important that you first assert the TTransport as a THttpClient type
 // like so:
 //
 // httpTrans := trans.(THttpClient)
@@ -195,7 +195,7 @@ func (p *THttpClient) Flush() error {
 		return NewTTransportExceptionFromError(err)
 	}
 	if response.StatusCode != http.StatusOK {
-		// Close the response to avoid leaking ***REMOVED***le descriptors. closeResponse does
+		// Close the response to avoid leaking file descriptors. closeResponse does
 		// more than just call Close(), so temporarily assign it and reuse the logic.
 		p.response = response
 		p.closeResponse()

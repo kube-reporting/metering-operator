@@ -2,7 +2,7 @@
 Copyright 2017 The Kubernetes Authors.
 
 Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this ***REMOVED***le except in compliance with the License.
+you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
 
     http://www.apache.org/licenses/LICENSE-2.0
@@ -10,7 +10,7 @@ You may obtain a copy of the License at
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the speci***REMOVED***c language governing permissions and
+See the License for the specific language governing permissions and
 limitations under the License.
 */
 
@@ -24,8 +24,8 @@ import (
 // +genclient:nonNamespaced
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
 
-// InitializerCon***REMOVED***guration describes the con***REMOVED***guration of initializers.
-type InitializerCon***REMOVED***guration struct {
+// InitializerConfiguration describes the configuration of initializers.
+type InitializerConfiguration struct {
 	metav1.TypeMeta `json:",inline"`
 	// Standard object metadata; More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#metadata.
 	// +optional
@@ -33,10 +33,10 @@ type InitializerCon***REMOVED***guration struct {
 
 	// Initializers is a list of resources and their default initializers
 	// Order-sensitive.
-	// When merging multiple InitializerCon***REMOVED***gurations, we sort the initializers
-	// from different InitializerCon***REMOVED***gurations by the name of the
-	// InitializerCon***REMOVED***gurations; the order of the initializers from the same
-	// InitializerCon***REMOVED***guration is preserved.
+	// When merging multiple InitializerConfigurations, we sort the initializers
+	// from different InitializerConfigurations by the name of the
+	// InitializerConfigurations; the order of the initializers from the same
+	// InitializerConfiguration is preserved.
 	// +patchMergeKey=name
 	// +patchStrategy=merge
 	// +optional
@@ -45,24 +45,24 @@ type InitializerCon***REMOVED***guration struct {
 
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
 
-// InitializerCon***REMOVED***gurationList is a list of InitializerCon***REMOVED***guration.
-type InitializerCon***REMOVED***gurationList struct {
+// InitializerConfigurationList is a list of InitializerConfiguration.
+type InitializerConfigurationList struct {
 	metav1.TypeMeta `json:",inline"`
 	// Standard list metadata.
 	// More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#types-kinds
 	// +optional
 	metav1.ListMeta `json:"metadata,omitempty" protobuf:"bytes,1,opt,name=metadata"`
 
-	// List of InitializerCon***REMOVED***guration.
-	Items []InitializerCon***REMOVED***guration `json:"items" protobuf:"bytes,2,rep,name=items"`
+	// List of InitializerConfiguration.
+	Items []InitializerConfiguration `json:"items" protobuf:"bytes,2,rep,name=items"`
 }
 
 // Initializer describes the name and the failure policy of an initializer, and
 // what resources it applies to.
 type Initializer struct {
-	// Name is the identi***REMOVED***er of the initializer. It will be added to the
+	// Name is the identifier of the initializer. It will be added to the
 	// object that needs to be initialized.
-	// Name should be fully quali***REMOVED***ed, e.g., alwayspullimages.kubernetes.io, where
+	// Name should be fully qualified, e.g., alwayspullimages.kubernetes.io, where
 	// "alwayspullimages" is the name of the webhook, and kubernetes.io is the name
 	// of the organization.
 	// Required

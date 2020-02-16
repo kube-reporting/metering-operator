@@ -1,6 +1,6 @@
 // Copyright 2014 The Go Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE ***REMOVED***le.
+// license that can be found in the LICENSE file.
 
 // Package jwt implements the OAuth 2.0 JSON Web Token flow, commonly
 // known as "two-legged OAuth 2.0".
@@ -29,18 +29,18 @@ var (
 	defaultHeader    = &jws.Header{Algorithm: "RS256", Typ: "JWT"}
 )
 
-// Con***REMOVED***g is the con***REMOVED***guration for using JWT to fetch tokens,
+// Config is the configuration for using JWT to fetch tokens,
 // commonly known as "two-legged OAuth 2.0".
-type Con***REMOVED***g struct {
-	// Email is the OAuth client identi***REMOVED***er used when communicating with
-	// the con***REMOVED***gured OAuth provider.
+type Config struct {
+	// Email is the OAuth client identifier used when communicating with
+	// the configured OAuth provider.
 	Email string
 
 	// PrivateKey contains the contents of an RSA private key or the
-	// contents of a PEM ***REMOVED***le that contains a private key. The provided
+	// contents of a PEM file that contains a private key. The provided
 	// private key is used to sign JWT payloads.
 	// PEM containers with a passphrase are not supported.
-	// Use the following command to convert a PKCS 12 ***REMOVED***le into a PEM.
+	// Use the following command to convert a PKCS 12 file into a PEM.
 	//
 	//    $ openssl pkcs12 -in key.p12 -out key.pem -nodes
 	//
@@ -53,19 +53,19 @@ type Con***REMOVED***g struct {
 	// Subject is the optional user to impersonate.
 	Subject string
 
-	// Scopes optionally speci***REMOVED***es a list of requested permission scopes.
+	// Scopes optionally specifies a list of requested permission scopes.
 	Scopes []string
 
 	// TokenURL is the endpoint required to complete the 2-legged JWT flow.
 	TokenURL string
 
-	// Expires optionally speci***REMOVED***es how long the token is valid for.
+	// Expires optionally specifies how long the token is valid for.
 	Expires time.Duration
 }
 
-// TokenSource returns a JWT TokenSource using the con***REMOVED***guration
+// TokenSource returns a JWT TokenSource using the configuration
 // in c and the HTTP client from the provided context.
-func (c *Con***REMOVED***g) TokenSource(ctx context.Context) oauth2.TokenSource {
+func (c *Config) TokenSource(ctx context.Context) oauth2.TokenSource {
 	return oauth2.ReuseTokenSource(nil, jwtSource{ctx, c})
 }
 
@@ -73,8 +73,8 @@ func (c *Con***REMOVED***g) TokenSource(ctx context.Context) oauth2.TokenSource 
 // HTTP transport and adding Authorization headers with tokens
 // obtained from c.
 //
-// The returned client and its Transport should not be modi***REMOVED***ed.
-func (c *Con***REMOVED***g) Client(ctx context.Context) *http.Client {
+// The returned client and its Transport should not be modified.
+func (c *Config) Client(ctx context.Context) *http.Client {
 	return oauth2.NewClient(ctx, c.TokenSource(ctx))
 }
 
@@ -82,7 +82,7 @@ func (c *Con***REMOVED***g) Client(ctx context.Context) *http.Client {
 // It should typically be wrapped with a reuseTokenSource.
 type jwtSource struct {
 	ctx  context.Context
-	conf *Con***REMOVED***g
+	conf *Config
 }
 
 func (js jwtSource) Token() (*oauth2.Token, error) {
@@ -144,7 +144,7 @@ func (js jwtSource) Token() (*oauth2.Token, error) {
 		TokenType:   tokenRes.TokenType,
 	}
 	raw := make(map[string]interface{})
-	json.Unmarshal(body, &raw) // no error checks for optional ***REMOVED***elds
+	json.Unmarshal(body, &raw) // no error checks for optional fields
 	token = token.WithExtra(raw)
 
 	if secs := tokenRes.ExpiresIn; secs > 0 {

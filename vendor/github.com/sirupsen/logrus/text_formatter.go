@@ -45,12 +45,12 @@ type TextFormatter struct {
 	// TimestampFormat to use for display when a full timestamp is printed
 	TimestampFormat string
 
-	// The ***REMOVED***elds are sorted by default for a consistent output. For applications
+	// The fields are sorted by default for a consistent output. For applications
 	// that log extremely frequently and don't use the JSON formatter this may not
 	// be desired.
 	DisableSorting bool
 
-	// QuoteEmptyFields will wrap empty ***REMOVED***elds in quotes if true
+	// QuoteEmptyFields will wrap empty fields in quotes if true
 	QuoteEmptyFields bool
 
 	// Whether the logger's out is to a terminal
@@ -78,11 +78,11 @@ func (f *TextFormatter) Format(entry *Entry) ([]byte, error) {
 	}
 	if entry.Buffer != nil {
 		b = entry.Buffer
-	} ***REMOVED*** {
+	} else {
 		b = &bytes.Buffer{}
 	}
 
-	pre***REMOVED***xFieldClashes(entry.Data)
+	prefixFieldClashes(entry.Data)
 
 	f.Do(func() { f.init(entry) })
 
@@ -94,7 +94,7 @@ func (f *TextFormatter) Format(entry *Entry) ([]byte, error) {
 	}
 	if isColored {
 		f.printColored(b, entry, keys, timestampFormat)
-	} ***REMOVED*** {
+	} else {
 		if !f.DisableTimestamp {
 			f.appendKeyValue(b, "time", entry.Time.Format(timestampFormat))
 		}
@@ -128,9 +128,9 @@ func (f *TextFormatter) printColored(b *bytes.Buffer, entry *Entry, keys []strin
 
 	if f.DisableTimestamp {
 		fmt.Fprintf(b, "\x1b[%dm%s\x1b[0m %-44s ", levelColor, levelText, entry.Message)
-	} ***REMOVED*** if !f.FullTimestamp {
+	} else if !f.FullTimestamp {
 		fmt.Fprintf(b, "\x1b[%dm%s\x1b[0m[%04d] %-44s ", levelColor, levelText, int(entry.Time.Sub(baseTimestamp)/time.Second), entry.Message)
-	} ***REMOVED*** {
+	} else {
 		fmt.Fprintf(b, "\x1b[%dm%s\x1b[0m[%s] %-44s ", levelColor, levelText, entry.Time.Format(timestampFormat), entry.Message)
 	}
 	for _, k := range keys {
@@ -172,7 +172,7 @@ func (f *TextFormatter) appendValue(b *bytes.Buffer, value interface{}) {
 
 	if !f.needsQuoting(stringVal) {
 		b.WriteString(stringVal)
-	} ***REMOVED*** {
+	} else {
 		b.WriteString(fmt.Sprintf("%q", stringVal))
 	}
 }

@@ -1,6 +1,6 @@
 // Copyright 2013 The Go Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE ***REMOVED***le.
+// license that can be found in the LICENSE file.
 
 package language
 
@@ -13,9 +13,9 @@ import (
 	"golang.org/x/text/internal/tag"
 )
 
-// ***REMOVED***ndIndex tries to ***REMOVED***nd the given tag in idx and returns a standardized error
+// findIndex tries to find the given tag in idx and returns a standardized error
 // if it could not be found.
-func ***REMOVED***ndIndex(idx tag.Index, key []byte, form string) (index int, err error) {
+func findIndex(idx tag.Index, key []byte, form string) (index int, err error) {
 	if !tag.FixCase(form, key) {
 		return 0, errSyntax
 	}
@@ -90,12 +90,12 @@ func intToStr(v uint, s []byte) {
 // or unknownLang if this does not exist.
 func getLangISO3(s []byte) (langID, error) {
 	if tag.FixCase("und", s) {
-		// ***REMOVED***rst try to match canonical 3-letter entries
+		// first try to match canonical 3-letter entries
 		for i := lang.Index(s[:2]); i != -1; i = lang.Next(s[:2], i) {
 			if e := lang.Elem(i); e[3] == 0 && e[2] == s[2] {
-				// We treat "und" as special and always translate it to "unspeci***REMOVED***ed".
+				// We treat "und" as special and always translate it to "unspecified".
 				// Note that ZZ and Zzzz are private use and are not treated as
-				// unspeci***REMOVED***ed by default.
+				// unspecified by default.
 				id := langID(i)
 				if id == nonCanonicalUnd {
 					return 0, nil
@@ -127,7 +127,7 @@ func (id langID) stringToBuf(b []byte) int {
 	if id >= langNoIndexOffset {
 		intToStr(uint(id)-langNoIndexOffset, b[:3])
 		return 3
-	} ***REMOVED*** if id == 0 {
+	} else if id == 0 {
 		return copy(b, "und")
 	}
 	l := lang[id<<2:]
@@ -143,7 +143,7 @@ func (id langID) stringToBuf(b []byte) int {
 func (b langID) String() string {
 	if b == 0 {
 		return "und"
-	} ***REMOVED*** if b >= langNoIndexOffset {
+	} else if b >= langNoIndexOffset {
 		b -= langNoIndexOffset
 		buf := [3]byte{}
 		intToStr(uint(b), buf[:])
@@ -164,11 +164,11 @@ func (b langID) ISO3() string {
 	l := lang.Elem(int(b))
 	if l[3] == 0 {
 		return l[:3]
-	} ***REMOVED*** if l[2] == 0 {
+	} else if l[2] == 0 {
 		return altLangISO3.Elem(int(l[3]))[:3]
 	}
 	// This allocation will only happen for 3-letter ISO codes
-	// that are non-canonical BCP 47 language identi***REMOVED***ers.
+	// that are non-canonical BCP 47 language identifiers.
 	return l[0:1] + l[2:4]
 }
 
@@ -196,7 +196,7 @@ func getRegionID(s []byte) (regionID, error) {
 // getRegionISO2 returns the regionID for the given 2-letter ISO country code
 // or unknownRegion if this does not exist.
 func getRegionISO2(s []byte) (regionID, error) {
-	i, err := ***REMOVED***ndIndex(regionISO, s, "ZZ")
+	i, err := findIndex(regionISO, s, "ZZ")
 	if err != nil {
 		return 0, err
 	}
@@ -269,7 +269,7 @@ func (r regionID) typ() byte {
 }
 
 // String returns the BCP 47 representation for the region.
-// It returns "ZZ" for an unspeci***REMOVED***ed region.
+// It returns "ZZ" for an unspecified region.
 func (r regionID) String() string {
 	if r < isoRegionOffset {
 		if r == 0 {
@@ -300,7 +300,7 @@ func (r regionID) ISO3() string {
 }
 
 // M49 returns the UN M.49 encoding of r, or 0 if this encoding
-// is not de***REMOVED***ned for r.
+// is not defined for r.
 func (r regionID) M49() int {
 	return int(m49[r])
 }
@@ -317,12 +317,12 @@ type scriptID uint8
 // getScriptID returns the script id for string s. It assumes that s
 // is of the format [A-Z][a-z]{3}.
 func getScriptID(idx tag.Index, s []byte) (scriptID, error) {
-	i, err := ***REMOVED***ndIndex(idx, s, "Zzzz")
+	i, err := findIndex(idx, s, "Zzzz")
 	return scriptID(i), err
 }
 
 // String returns the script code in title case.
-// It returns "Zzzz" for an unspeci***REMOVED***ed script.
+// It returns "Zzzz" for an unspecified script.
 func (s scriptID) String() string {
 	if s == 0 {
 		return "Zzzz"
@@ -374,7 +374,7 @@ var (
 		[maxLen]byte{'i', '-', 'm', 'i', 'n', 'g', 'o'}:                     -5, // i-mingo
 		[maxLen]byte{'z', 'h', '-', 'm', 'i', 'n'}:                          -6, // zh-min
 
-		// CLDR-speci***REMOVED***c tag.
+		// CLDR-specific tag.
 		[maxLen]byte{'r', 'o', 'o', 't'}:                                    0,  // root
 		[maxLen]byte{'e', 'n', '-', 'u', 's', '-', 'p', 'o', 's', 'i', 'x'}: -7, // en_US_POSIX"
 	}

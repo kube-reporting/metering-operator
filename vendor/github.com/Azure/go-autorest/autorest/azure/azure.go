@@ -1,11 +1,11 @@
-// Package azure provides Azure-speci***REMOVED***c implementations used with AutoRest.
+// Package azure provides Azure-specific implementations used with AutoRest.
 // See the included examples for more detail.
 package azure
 
 // Copyright 2017 Microsoft Corporation
 //
 //  Licensed under the Apache License, Version 2.0 (the "License");
-//  you may not use this ***REMOVED***le except in compliance with the License.
+//  you may not use this file except in compliance with the License.
 //  You may obtain a copy of the License at
 //
 //      http://www.apache.org/licenses/LICENSE-2.0
@@ -13,7 +13,7 @@ package azure
 //  Unless required by applicable law or agreed to in writing, software
 //  distributed under the License is distributed on an "AS IS" BASIS,
 //  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-//  See the License for the speci***REMOVED***c language governing permissions and
+//  See the License for the specific language governing permissions and
 //  limitations under the License.
 
 import (
@@ -29,10 +29,10 @@ import (
 )
 
 const (
-	// HeaderClientID is the Azure extension header to set a user-speci***REMOVED***ed request ID.
+	// HeaderClientID is the Azure extension header to set a user-specified request ID.
 	HeaderClientID = "x-ms-client-request-id"
 
-	// HeaderReturnClientID is the Azure extension header to set if the user-speci***REMOVED***ed request ID
+	// HeaderReturnClientID is the Azure extension header to set if the user-specified request ID
 	// should be included in the response.
 	HeaderReturnClientID = "x-ms-return-client-request-id"
 
@@ -42,7 +42,7 @@ const (
 )
 
 // ServiceError encapsulates the error response from an Azure service.
-// It adhears to the OData v4 speci***REMOVED***cation for error responses.
+// It adhears to the OData v4 specification for error responses.
 type ServiceError struct {
 	Code           string                   `json:"code"`
 	Message        string                   `json:"message"`
@@ -88,7 +88,7 @@ func (se ServiceError) Error() string {
 
 // UnmarshalJSON implements the json.Unmarshaler interface for the ServiceError type.
 func (se *ServiceError) UnmarshalJSON(b []byte) error {
-	// per the OData v4 spec the details ***REMOVED***eld must be an array of JSON objects.
+	// per the OData v4 spec the details field must be an array of JSON objects.
 	// unfortunately not all services adhear to the spec and just return a single
 	// object instead of an array with one object.  so we have to perform some
 	// shenanigans to accommodate both cases.
@@ -197,7 +197,7 @@ func ParseResourceID(resourceID string) (Resource, error) {
 }
 
 // NewErrorWithError creates a new Error conforming object from the
-// passed packageType, method, statusCode of the given resp (Unde***REMOVED***nedStatusCode
+// passed packageType, method, statusCode of the given resp (UndefinedStatusCode
 // if resp is nil), message, and original error. message is treated as a format
 // string to which the optional args apply.
 func NewErrorWithError(original error, packageType string, method string, resp *http.Response, message string, args ...interface{}) RequestError {
@@ -205,7 +205,7 @@ func NewErrorWithError(original error, packageType string, method string, resp *
 		return *v
 	}
 
-	statusCode := autorest.Unde***REMOVED***nedStatusCode
+	statusCode := autorest.UndefinedStatusCode
 	if resp != nil {
 		statusCode = resp.StatusCode
 	}
@@ -254,13 +254,13 @@ func WithReturnClientID(b bool) autorest.PrepareDecorator {
 	return autorest.WithHeader(HeaderReturnClientID, strconv.FormatBool(b))
 }
 
-// ExtractClientID extracts the client identi***REMOVED***er from the x-ms-client-request-id header set on the
+// ExtractClientID extracts the client identifier from the x-ms-client-request-id header set on the
 // http.Request sent to the service (and returned in the http.Response)
 func ExtractClientID(resp *http.Response) string {
 	return autorest.ExtractHeaderValue(HeaderClientID, resp)
 }
 
-// ExtractRequestID extracts the Azure server generated request identi***REMOVED***er from the
+// ExtractRequestID extracts the Azure server generated request identifier from the
 // x-ms-request-id header.
 func ExtractRequestID(resp *http.Response) string {
 	return autorest.ExtractHeaderValue(HeaderRequestID, resp)
@@ -273,7 +273,7 @@ func ExtractRequestID(resp *http.Response) string {
 // If there is a chance service may return responses other than the Azure error
 // format and the response cannot be parsed into an error, a decoding error will
 // be returned containing the response body. In any case, the Responder will
-// return an error if the status code is not satis***REMOVED***ed.
+// return an error if the status code is not satisfied.
 //
 // If this Responder returns an error, the response body will be replaced with
 // an in-memory reader, which needs no further closing.

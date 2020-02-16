@@ -13,7 +13,7 @@ import (
 
 // Annotations for Bash completion.
 const (
-	BashCompFilenameExt     = "cobra_annotation_bash_completion_***REMOVED***lename_extensions"
+	BashCompFilenameExt     = "cobra_annotation_bash_completion_filename_extensions"
 	BashCompCustom          = "cobra_annotation_bash_completion_custom"
 	BashCompOneRequiredFlag = "cobra_annotation_bash_completion_one_required_flag"
 	BashCompSubdirsInDir    = "cobra_annotation_bash_completion_subdirs_in_dir"
@@ -26,7 +26,7 @@ __%[1]s_debug()
 {
     if [[ -n ${BASH_COMP_DEBUG_FILE} ]]; then
         echo "$*" >> "${BASH_COMP_DEBUG_FILE}"
-    ***REMOVED***
+    fi
 }
 
 # Homebrew on Macs have version 1.3 of bash-completion which doesn't include
@@ -65,23 +65,23 @@ __%[1]s_handle_reply()
         -*)
             if [[ $(type -t compopt) = "builtin" ]]; then
                 compopt -o nospace
-            ***REMOVED***
+            fi
             local allflags
             if [ ${#must_have_one_flag[@]} -ne 0 ]; then
                 allflags=("${must_have_one_flag[@]}")
-            ***REMOVED***
+            else
                 allflags=("${flags[*]} ${two_word_flags[*]}")
-            ***REMOVED***
+            fi
             COMPREPLY=( $(compgen -W "${allflags[*]}" -- "$cur") )
             if [[ $(type -t compopt) = "builtin" ]]; then
                 [[ "${COMPREPLY[0]}" == *= ]] || compopt +o nospace
-            ***REMOVED***
+            fi
 
             # complete after --flag=abc
             if [[ $cur == *=* ]]; then
                 if [[ $(type -t compopt) = "builtin" ]]; then
                     compopt +o nospace
-                ***REMOVED***
+                fi
 
                 local index flag
                 flag="${cur%%=*}"
@@ -92,11 +92,11 @@ __%[1]s_handle_reply()
                     cur="${cur#*=}"
                     ${flags_completion[${index}]}
                     if [ -n "${ZSH_VERSION}" ]; then
-                        # zsh completion needs --flag= pre***REMOVED***x
+                        # zsh completion needs --flag= prefix
                         eval "COMPREPLY=( \"\${COMPREPLY[@]/#/${flag}=}\" )"
-                    ***REMOVED***
-                ***REMOVED***
-            ***REMOVED***
+                    fi
+                fi
+            fi
             return 0;
             ;;
     esac
@@ -107,54 +107,54 @@ __%[1]s_handle_reply()
     if [[ ${index} -ge 0 ]]; then
         ${flags_completion[${index}]}
         return
-    ***REMOVED***
+    fi
 
     # we are parsing a flag and don't have a special handler, no completion
     if [[ ${cur} != "${words[cword]}" ]]; then
         return
-    ***REMOVED***
+    fi
 
     local completions
     completions=("${commands[@]}")
     if [[ ${#must_have_one_noun[@]} -ne 0 ]]; then
         completions=("${must_have_one_noun[@]}")
-    ***REMOVED***
+    fi
     if [[ ${#must_have_one_flag[@]} -ne 0 ]]; then
         completions+=("${must_have_one_flag[@]}")
-    ***REMOVED***
+    fi
     COMPREPLY=( $(compgen -W "${completions[*]}" -- "$cur") )
 
     if [[ ${#COMPREPLY[@]} -eq 0 && ${#noun_aliases[@]} -gt 0 && ${#must_have_one_noun[@]} -ne 0 ]]; then
         COMPREPLY=( $(compgen -W "${noun_aliases[*]}" -- "$cur") )
-    ***REMOVED***
+    fi
 
     if [[ ${#COMPREPLY[@]} -eq 0 ]]; then
         declare -F __custom_func >/dev/null && __custom_func
-    ***REMOVED***
+    fi
 
     # available in bash-completion >= 2, not always present on macOS
     if declare -F __ltrim_colon_completions >/dev/null; then
         __ltrim_colon_completions "$cur"
-    ***REMOVED***
+    fi
 
     # If there is only 1 completion and it is a flag with an = it will be completed
     # but we don't want a space after the =
     if [[ "${#COMPREPLY[@]}" -eq "1" ]] && [[ $(type -t compopt) = "builtin" ]] && [[ "${COMPREPLY[0]}" == --*= ]]; then
        compopt -o nospace
-    ***REMOVED***
+    fi
 }
 
 # The arguments should be in the form "ext1|ext2|extn"
-__%[1]s_handle_***REMOVED***lename_extension_flag()
+__%[1]s_handle_filename_extension_flag()
 {
     local ext="$1"
-    _***REMOVED***ledir "@(${ext})"
+    _filedir "@(${ext})"
 }
 
 __%[1]s_handle_subdirs_in_dir_flag()
 {
     local dir="$1"
-    pushd "${dir}" >/dev/null 2>&1 && _***REMOVED***ledir -d && popd >/dev/null 2>&1
+    pushd "${dir}" >/dev/null 2>&1 && _filedir -d && popd >/dev/null 2>&1
 }
 
 __%[1]s_handle_flag()
@@ -169,16 +169,16 @@ __%[1]s_handle_flag()
         flagvalue=${flagname#*=} # take in as flagvalue after the =
         flagname=${flagname%%=*} # strip everything after the =
         flagname="${flagname}=" # but put the = back
-    ***REMOVED***
+    fi
     __%[1]s_debug "${FUNCNAME[0]}: looking for ${flagname}"
     if __%[1]s_contains_word "${flagname}" "${must_have_one_flag[@]}"; then
         must_have_one_flag=()
-    ***REMOVED***
+    fi
 
     # if you set a flag which only applies to this command, don't show subcommands
     if __%[1]s_contains_word "${flagname}" "${local_nonpersistent_flags[@]}"; then
       commands=()
-    ***REMOVED***
+    fi
 
     # keep flag value with flagname as flaghash
     # flaghash variable is an associative array which is only supported in bash > 3.
@@ -187,10 +187,10 @@ __%[1]s_handle_flag()
             flaghash[${flagname}]=${flagvalue}
         elif [ -n "${words[ $((c+1)) ]}" ] ; then
             flaghash[${flagname}]=${words[ $((c+1)) ]}
-        ***REMOVED***
+        else
             flaghash[${flagname}]="true" # pad "true" for bool flag
-        ***REMOVED***
-    ***REMOVED***
+        fi
+    fi
 
     # skip the argument to a two word flag
     if __%[1]s_contains_word "${words[c]}" "${two_word_flags[@]}"; then
@@ -198,8 +198,8 @@ __%[1]s_handle_flag()
         # if we are looking for a flags value, don't show commands
         if [[ $c -eq $cword ]]; then
             commands=()
-        ***REMOVED***
-    ***REMOVED***
+        fi
+    fi
 
     c=$((c+1))
 
@@ -213,7 +213,7 @@ __%[1]s_handle_noun()
         must_have_one_noun=()
     elif __%[1]s_contains_word "${words[c]}" "${noun_aliases[@]}"; then
         must_have_one_noun=()
-    ***REMOVED***
+    fi
 
     nouns+=("${words[c]}")
     c=$((c+1))
@@ -226,13 +226,13 @@ __%[1]s_handle_command()
     local next_command
     if [[ -n ${last_command} ]]; then
         next_command="_${last_command}_${words[c]//:/__}"
-    ***REMOVED***
+    else
         if [[ $c -eq 0 ]]; then
             next_command="_%[1]s_root_command"
-        ***REMOVED***
+        else
             next_command="_${words[c]//:/__}"
-        ***REMOVED***
-    ***REMOVED***
+        fi
+    fi
     c=$((c+1))
     __%[1]s_debug "${FUNCNAME[0]}: looking for ${next_command}"
     declare -F "$next_command" >/dev/null && $next_command
@@ -243,7 +243,7 @@ __%[1]s_handle_word()
     if [[ $c -ge $cword ]]; then
         __%[1]s_handle_reply
         return
-    ***REMOVED***
+    fi
     __%[1]s_debug "${FUNCNAME[0]}: c is $c words[c] is ${words[c]}"
     if [[ "${words[c]}" == -* ]]; then
         __%[1]s_handle_flag
@@ -251,9 +251,9 @@ __%[1]s_handle_word()
         __%[1]s_handle_command
     elif [[ $c -eq 0 ]]; then
         __%[1]s_handle_command
-    ***REMOVED***
+    else
         __%[1]s_handle_noun
-    ***REMOVED***
+    fi
     __%[1]s_handle_word
 }
 
@@ -268,9 +268,9 @@ func writePostscript(buf *bytes.Buffer, name string) {
     declare -A flaghash 2>/dev/null || :
     if declare -F _init_completion >/dev/null 2>&1; then
         _init_completion -s || return
-    ***REMOVED***
+    else
         __%[1]s_init_completion -n "=" || return
-    ***REMOVED***
+    fi
 
     local c=0
     local flags=()
@@ -290,12 +290,12 @@ func writePostscript(buf *bytes.Buffer, name string) {
 `, name))
 	buf.WriteString(fmt.Sprintf(`if [[ $(type -t compopt) = "builtin" ]]; then
     complete -o default -F __start_%s %s
-***REMOVED***
+else
     complete -o default -o nospace -F __start_%s %s
-***REMOVED***
+fi
 
 `, name, name, name, name))
-	buf.WriteString("# ex: ts=4 sw=4 et ***REMOVED***letype=sh\n")
+	buf.WriteString("# ex: ts=4 sw=4 et filetype=sh\n")
 }
 
 func writeCommands(buf *bytes.Buffer, cmd *Command) {
@@ -317,9 +317,9 @@ func writeFlagHandler(buf *bytes.Buffer, name string, annotations map[string][]s
 
 			var ext string
 			if len(value) > 0 {
-				ext = fmt.Sprintf("__%s_handle_***REMOVED***lename_extension_flag ", cmd.Root().Name()) + strings.Join(value, "|")
-			} ***REMOVED*** {
-				ext = "_***REMOVED***ledir"
+				ext = fmt.Sprintf("__%s_handle_filename_extension_flag ", cmd.Root().Name()) + strings.Join(value, "|")
+			} else {
+				ext = "_filedir"
 			}
 			buf.WriteString(fmt.Sprintf("    flags_completion+=(%q)\n", ext))
 		case BashCompCustom:
@@ -327,7 +327,7 @@ func writeFlagHandler(buf *bytes.Buffer, name string, annotations map[string][]s
 			if len(value) > 0 {
 				handlers := strings.Join(value, "; ")
 				buf.WriteString(fmt.Sprintf("    flags_completion+=(%q)\n", handlers))
-			} ***REMOVED*** {
+			} else {
 				buf.WriteString("    flags_completion+=(:)\n")
 			}
 		case BashCompSubdirsInDir:
@@ -336,8 +336,8 @@ func writeFlagHandler(buf *bytes.Buffer, name string, annotations map[string][]s
 			var ext string
 			if len(value) == 1 {
 				ext = fmt.Sprintf("__%s_handle_subdirs_in_dir_flag ", cmd.Root().Name()) + value[0]
-			} ***REMOVED*** {
-				ext = "_***REMOVED***ledir -d"
+			} else {
+				ext = "_filedir -d"
 			}
 			buf.WriteString(fmt.Sprintf("    flags_completion+=(%q)\n", ext))
 		}
@@ -464,7 +464,7 @@ func gen(buf *bytes.Buffer, cmd *Command) {
 
 	if cmd.Root() == cmd {
 		buf.WriteString(fmt.Sprintf("_%s_root_command()\n{\n", commandName))
-	} ***REMOVED*** {
+	} else {
 		buf.WriteString(fmt.Sprintf("_%s()\n{\n", commandName))
 	}
 
@@ -477,7 +477,7 @@ func gen(buf *bytes.Buffer, cmd *Command) {
 	buf.WriteString("}\n\n")
 }
 
-// GenBashCompletion generates bash completion ***REMOVED***le and writes to the passed writer.
+// GenBashCompletion generates bash completion file and writes to the passed writer.
 func (c *Command) GenBashCompletion(w io.Writer) error {
 	buf := new(bytes.Buffer)
 	writePreamble(buf, c.Name())
@@ -495,9 +495,9 @@ func nonCompletableFlag(flag *pflag.Flag) bool {
 	return flag.Hidden || len(flag.Deprecated) > 0
 }
 
-// GenBashCompletionFile generates bash completion ***REMOVED***le.
-func (c *Command) GenBashCompletionFile(***REMOVED***lename string) error {
-	outFile, err := os.Create(***REMOVED***lename)
+// GenBashCompletionFile generates bash completion file.
+func (c *Command) GenBashCompletionFile(filename string) error {
+	outFile, err := os.Create(filename)
 	if err != nil {
 		return err
 	}
@@ -525,7 +525,7 @@ func MarkFlagRequired(flags *pflag.FlagSet, name string) error {
 }
 
 // MarkFlagFilename adds the BashCompFilenameExt annotation to the named flag, if it exists.
-// Generated bash autocompletion will select ***REMOVED***lenames for the flag, limiting to named extensions if provided.
+// Generated bash autocompletion will select filenames for the flag, limiting to named extensions if provided.
 func (c *Command) MarkFlagFilename(name string, extensions ...string) error {
 	return MarkFlagFilename(c.Flags(), name, extensions...)
 }
@@ -537,13 +537,13 @@ func (c *Command) MarkFlagCustom(name string, f string) error {
 }
 
 // MarkPersistentFlagFilename adds the BashCompFilenameExt annotation to the named persistent flag, if it exists.
-// Generated bash autocompletion will select ***REMOVED***lenames for the flag, limiting to named extensions if provided.
+// Generated bash autocompletion will select filenames for the flag, limiting to named extensions if provided.
 func (c *Command) MarkPersistentFlagFilename(name string, extensions ...string) error {
 	return MarkFlagFilename(c.PersistentFlags(), name, extensions...)
 }
 
 // MarkFlagFilename adds the BashCompFilenameExt annotation to the named flag in the flag set, if it exists.
-// Generated bash autocompletion will select ***REMOVED***lenames for the flag, limiting to named extensions if provided.
+// Generated bash autocompletion will select filenames for the flag, limiting to named extensions if provided.
 func MarkFlagFilename(flags *pflag.FlagSet, name string, extensions ...string) error {
 	return flags.SetAnnotation(name, BashCompFilenameExt, extensions)
 }

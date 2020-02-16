@@ -1,11 +1,11 @@
 apiVersion: v1
-kind: Con***REMOVED***gMap
+kind: ConfigMap
 metadata:
-  name: presto-jmx-con***REMOVED***g
+  name: presto-jmx-config
   labels:
     app: presto
 data:
-  con***REMOVED***g.yml: |
+  config.yml: |
     ---
     lowercaseOutputName: true
     lowercaseOutputLabelNames: true

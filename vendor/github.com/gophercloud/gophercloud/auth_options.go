@@ -7,7 +7,7 @@ to read relevant information from the standard environment variables. Pass one
 to a provider's AuthenticatedClient function to authenticate and obtain a
 ProviderClient representing an active session on that provider.
 
-Its ***REMOVED***elds are the union of those recognized by each identity implementation and
+Its fields are the union of those recognized by each identity implementation and
 provider.
 
 An example of manually providing authentication information:
@@ -22,13 +22,13 @@ An example of manually providing authentication information:
   provider, err := openstack.AuthenticatedClient(opts)
 
 An example of using AuthOptionsFromEnv(), where the environment variables can
-be read from a ***REMOVED***le, such as a standard openrc ***REMOVED***le:
+be read from a file, such as a standard openrc file:
 
   opts, err := openstack.AuthOptionsFromEnv()
   provider, err := openstack.AuthenticatedClient(opts)
 */
 type AuthOptions struct {
-	// IdentityEndpoint speci***REMOVED***es the HTTP endpoint that is required to work with
+	// IdentityEndpoint specifies the HTTP endpoint that is required to work with
 	// the Identity API of the appropriate version. While it's ultimately needed by
 	// all of the identity services, it will often be populated by a provider-level
 	// function.
@@ -50,12 +50,12 @@ type AuthOptions struct {
 	DomainID   string `json:"-"`
 	DomainName string `json:"name,omitempty"`
 
-	// The TenantID and TenantName ***REMOVED***elds are optional for the Identity V2 API.
-	// The same ***REMOVED***elds are known as project_id and project_name in the Identity
+	// The TenantID and TenantName fields are optional for the Identity V2 API.
+	// The same fields are known as project_id and project_name in the Identity
 	// V3 API, but are collected as TenantID and TenantName here in both cases.
 	// Some providers allow you to specify a TenantName instead of the TenantId.
 	// Some require both. Your provider's authentication policies will determine
-	// how these ***REMOVED***elds influence authentication.
+	// how these fields influence authentication.
 	// If DomainID or DomainName are provided, they will also apply to TenantName.
 	// It is not currently possible to authenticate with Username and a Domain
 	// and scope to a Project in a different Domain by using TenantName. To
@@ -92,7 +92,7 @@ type AuthOptions struct {
 	ApplicationCredentialSecret string `json:"-"`
 }
 
-// AuthScope allows a created token to be limited to a speci***REMOVED***c domain or project.
+// AuthScope allows a created token to be limited to a specific domain or project.
 type AuthScope struct {
 	ProjectID   string
 	ProjectName string
@@ -112,14 +112,14 @@ func (opts AuthOptions) ToTokenV2CreateMap() (map[string]interface{}, error) {
 				"username": opts.Username,
 				"password": opts.Password,
 			}
-		} ***REMOVED*** {
+		} else {
 			return nil, ErrMissingInput{Argument: "Password"}
 		}
-	} ***REMOVED*** if opts.TokenID != "" {
+	} else if opts.TokenID != "" {
 		authMap["token"] = map[string]interface{}{
 			"id": opts.TokenID,
 		}
-	} ***REMOVED*** {
+	} else {
 		return nil, ErrMissingInput{Argument: "Username"}
 	}
 
@@ -183,7 +183,7 @@ func (opts *AuthOptions) ToTokenV3CreateMap(scope map[string]interface{}) (map[s
 	}
 
 	// Populate the request structure based on the provided arguments. Create and return an error
-	// if insuf***REMOVED***cient or incompatible information is present.
+	// if insufficient or incompatible information is present.
 	var req request
 
 	if opts.Password == "" {
@@ -203,14 +203,14 @@ func (opts *AuthOptions) ToTokenV3CreateMap(scope map[string]interface{}) (map[s
 				return nil, ErrDomainNameWithToken{}
 			}
 
-			// Con***REMOVED***gure the request for Token authentication.
+			// Configure the request for Token authentication.
 			req.Auth.Identity.Methods = []string{"token"}
 			req.Auth.Identity.Token = &tokenReq{
 				ID: opts.TokenID,
 			}
 
-		} ***REMOVED*** if opts.ApplicationCredentialID != "" {
-			// Con***REMOVED***gure the request for ApplicationCredentialID authentication.
+		} else if opts.ApplicationCredentialID != "" {
+			// Configure the request for ApplicationCredentialID authentication.
 			// https://github.com/openstack/keystoneauth/blob/stable/rocky/keystoneauth1/identity/v3/application_credential.py#L48-L67
 			// There are three kinds of possible application_credential requests
 			// 1. application_credential id + secret
@@ -224,7 +224,7 @@ func (opts *AuthOptions) ToTokenV3CreateMap(scope map[string]interface{}) (map[s
 				ID:     &opts.ApplicationCredentialID,
 				Secret: &opts.ApplicationCredentialSecret,
 			}
-		} ***REMOVED*** if opts.ApplicationCredentialName != "" {
+		} else if opts.ApplicationCredentialName != "" {
 			if opts.ApplicationCredentialSecret == "" {
 				return nil, ErrAppCredMissingSecret{}
 			}
@@ -268,15 +268,15 @@ func (opts *AuthOptions) ToTokenV3CreateMap(scope map[string]interface{}) (map[s
 				User:   userRequest,
 				Secret: &opts.ApplicationCredentialSecret,
 			}
-		} ***REMOVED*** {
+		} else {
 			// If no password or token ID or ApplicationCredential are available, authentication can't continue.
 			return nil, ErrMissingPassword{}
 		}
-	} ***REMOVED*** {
+	} else {
 		// Password authentication.
 		req.Auth.Identity.Methods = []string{"password"}
 
-		// At least one of Username and UserID must be speci***REMOVED***ed.
+		// At least one of Username and UserID must be specified.
 		if opts.Username == "" && opts.UserID == "" {
 			return nil, ErrUsernameOrUserID{}
 		}
@@ -287,7 +287,7 @@ func (opts *AuthOptions) ToTokenV3CreateMap(scope map[string]interface{}) (map[s
 				return nil, ErrUsernameOrUserID{}
 			}
 
-			// Either DomainID or DomainName must also be speci***REMOVED***ed.
+			// Either DomainID or DomainName must also be specified.
 			if opts.DomainID == "" && opts.DomainName == "" {
 				return nil, ErrDomainIDOrDomainName{}
 			}
@@ -297,7 +297,7 @@ func (opts *AuthOptions) ToTokenV3CreateMap(scope map[string]interface{}) (map[s
 					return nil, ErrDomainIDOrDomainName{}
 				}
 
-				// Con***REMOVED***gure the request for Username and Password authentication with a DomainID.
+				// Configure the request for Username and Password authentication with a DomainID.
 				req.Auth.Identity.Password = &passwordReq{
 					User: userReq{
 						Name:     &opts.Username,
@@ -308,7 +308,7 @@ func (opts *AuthOptions) ToTokenV3CreateMap(scope map[string]interface{}) (map[s
 			}
 
 			if opts.DomainName != "" {
-				// Con***REMOVED***gure the request for Username and Password authentication with a DomainName.
+				// Configure the request for Username and Password authentication with a DomainName.
 				req.Auth.Identity.Password = &passwordReq{
 					User: userReq{
 						Name:     &opts.Username,
@@ -320,7 +320,7 @@ func (opts *AuthOptions) ToTokenV3CreateMap(scope map[string]interface{}) (map[s
 		}
 
 		if opts.UserID != "" {
-			// If UserID is speci***REMOVED***ed, neither DomainID nor DomainName may be.
+			// If UserID is specified, neither DomainID nor DomainName may be.
 			if opts.DomainID != "" {
 				return nil, ErrDomainIDWithUserID{}
 			}
@@ -328,7 +328,7 @@ func (opts *AuthOptions) ToTokenV3CreateMap(scope map[string]interface{}) (map[s
 				return nil, ErrDomainNameWithUserID{}
 			}
 
-			// Con***REMOVED***gure the request for UserID and Password authentication.
+			// Configure the request for UserID and Password authentication.
 			req.Auth.Identity.Password = &passwordReq{
 				User: userReq{ID: &opts.UserID, Password: opts.Password},
 			}
@@ -355,7 +355,7 @@ func (opts *AuthOptions) ToTokenV3ScopeMap() (map[string]interface{}, error) {
 		opts.Scope = new(AuthScope)
 		if opts.TenantID != "" {
 			opts.Scope.ProjectID = opts.TenantID
-		} ***REMOVED*** {
+		} else {
 			if opts.TenantName != "" {
 				opts.Scope.ProjectName = opts.TenantName
 				opts.Scope.DomainID = opts.DomainID
@@ -393,7 +393,7 @@ func (opts *AuthOptions) ToTokenV3ScopeMap() (map[string]interface{}, error) {
 				},
 			}, nil
 		}
-	} ***REMOVED*** if opts.Scope.ProjectID != "" {
+	} else if opts.Scope.ProjectID != "" {
 		// ProjectID provided. ProjectName, DomainID, and DomainName may not be provided.
 		if opts.Scope.DomainID != "" {
 			return nil, ErrScopeProjectIDAlone{}
@@ -408,7 +408,7 @@ func (opts *AuthOptions) ToTokenV3ScopeMap() (map[string]interface{}, error) {
 				"id": &opts.Scope.ProjectID,
 			},
 		}, nil
-	} ***REMOVED*** if opts.Scope.DomainID != "" {
+	} else if opts.Scope.DomainID != "" {
 		// DomainID provided. ProjectID, ProjectName, and DomainName may not be provided.
 		if opts.Scope.DomainName != "" {
 			return nil, ErrScopeDomainIDOrDomainName{}
@@ -420,7 +420,7 @@ func (opts *AuthOptions) ToTokenV3ScopeMap() (map[string]interface{}, error) {
 				"id": &opts.Scope.DomainID,
 			},
 		}, nil
-	} ***REMOVED*** if opts.Scope.DomainName != "" {
+	} else if opts.Scope.DomainName != "" {
 		// DomainName
 		return map[string]interface{}{
 			"domain": map[string]interface{}{

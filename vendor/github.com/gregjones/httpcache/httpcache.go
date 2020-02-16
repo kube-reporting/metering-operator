@@ -7,7 +7,7 @@
 package httpcache
 
 import (
-	"bu***REMOVED***o"
+	"bufio"
 	"bytes"
 	"errors"
 	"io"
@@ -42,7 +42,7 @@ type Cache interface {
 func cacheKey(req *http.Request) string {
 	if req.Method == http.MethodGet {
 		return req.URL.String()
-	} ***REMOVED*** {
+	} else {
 		return req.Method + " " + req.URL.String()
 	}
 }
@@ -56,7 +56,7 @@ func CachedResponse(c Cache, req *http.Request) (resp *http.Response, err error)
 	}
 
 	b := bytes.NewBuffer(cachedVal)
-	return http.ReadResponse(bu***REMOVED***o.NewReader(b), req)
+	return http.ReadResponse(bufio.NewReader(b), req)
 }
 
 // MemoryCache is an implemtation of Cache that stores responses in an in-memory map.
@@ -94,8 +94,8 @@ func NewMemoryCache() *MemoryCache {
 }
 
 // Transport is an implementation of http.RoundTripper that will return values from a cache
-// where possible (avoiding a network request) and will additionally add validators (etag/if-modi***REMOVED***ed-since)
-// to repeated requests allowing servers to return 304 / Not Modi***REMOVED***ed
+// where possible (avoiding a network request) and will additionally add validators (etag/if-modified-since)
+// to repeated requests allowing servers to return 304 / Not Modified
 type Transport struct {
 	// The RoundTripper interface actually used to make requests
 	// If nil, http.DefaultTransport is used
@@ -134,7 +134,7 @@ func varyMatches(cachedResp *http.Response, req *http.Request) bool {
 // the server.
 //
 // If there is a stale Response, then any validators it contains will be set on the new request
-// to give the server a chance to respond with NotModi***REMOVED***ed. If this happens, then the cached Response
+// to give the server a chance to respond with NotModified. If this happens, then the cached Response
 // will be returned.
 func (t *Transport) RoundTrip(req *http.Request) (resp *http.Response, err error) {
 	cacheKey := cacheKey(req)
@@ -142,7 +142,7 @@ func (t *Transport) RoundTrip(req *http.Request) (resp *http.Response, err error
 	var cachedResp *http.Response
 	if cacheable {
 		cachedResp, err = CachedResponse(t.Cache, req)
-	} ***REMOVED*** {
+	} else {
 		// Need to invalidate an existing value
 		t.Cache.Delete(cacheKey)
 	}
@@ -158,7 +158,7 @@ func (t *Transport) RoundTrip(req *http.Request) (resp *http.Response, err error
 		}
 
 		if varyMatches(cachedResp, req) {
-			// Can only use cached value if the new request doesn't Vary signi***REMOVED***cantly
+			// Can only use cached value if the new request doesn't Vary significantly
 			freshness := getFreshness(cachedResp.Header, req.Header)
 			if freshness == fresh {
 				return cachedResp, nil
@@ -172,12 +172,12 @@ func (t *Transport) RoundTrip(req *http.Request) (resp *http.Response, err error
 					req2 = cloneRequest(req)
 					req2.Header.Set("if-none-match", etag)
 				}
-				lastModi***REMOVED***ed := cachedResp.Header.Get("last-modi***REMOVED***ed")
-				if lastModi***REMOVED***ed != "" && req.Header.Get("last-modi***REMOVED***ed") == "" {
+				lastModified := cachedResp.Header.Get("last-modified")
+				if lastModified != "" && req.Header.Get("last-modified") == "" {
 					if req2 == nil {
 						req2 = cloneRequest(req)
 					}
-					req2.Header.Set("if-modi***REMOVED***ed-since", lastModi***REMOVED***ed)
+					req2.Header.Set("if-modified-since", lastModified)
 				}
 				if req2 != nil {
 					req = req2
@@ -186,19 +186,19 @@ func (t *Transport) RoundTrip(req *http.Request) (resp *http.Response, err error
 		}
 
 		resp, err = transport.RoundTrip(req)
-		if err == nil && req.Method == "GET" && resp.StatusCode == http.StatusNotModi***REMOVED***ed {
+		if err == nil && req.Method == "GET" && resp.StatusCode == http.StatusNotModified {
 			// Replace the 304 response with the one from cache, but update with some new headers
 			endToEndHeaders := getEndToEndHeaders(resp.Header)
 			for _, header := range endToEndHeaders {
 				cachedResp.Header[header] = resp.Header[header]
 			}
 			resp = cachedResp
-		} ***REMOVED*** if (err != nil || (cachedResp != nil && resp.StatusCode >= 500)) &&
+		} else if (err != nil || (cachedResp != nil && resp.StatusCode >= 500)) &&
 			req.Method == "GET" && canStaleOnError(cachedResp.Header, req.Header) {
 			// In case of transport failure and stale-if-error activated, returns cached content
 			// when available
 			return cachedResp, nil
-		} ***REMOVED*** {
+		} else {
 			if err != nil || resp.StatusCode != http.StatusOK {
 				t.Cache.Delete(cacheKey)
 			}
@@ -206,11 +206,11 @@ func (t *Transport) RoundTrip(req *http.Request) (resp *http.Response, err error
 				return nil, err
 			}
 		}
-	} ***REMOVED*** {
+	} else {
 		reqCacheControl := parseCacheControl(req.Header)
 		if _, ok := reqCacheControl["only-if-cached"]; ok {
 			resp = newGatewayTimeoutResponse(req)
-		} ***REMOVED*** {
+		} else {
 			resp, err = transport.RoundTrip(req)
 			if err != nil {
 				return nil, err
@@ -247,7 +247,7 @@ func (t *Transport) RoundTrip(req *http.Request) (resp *http.Response, err error
 				t.Cache.Set(cacheKey, respBytes)
 			}
 		}
-	} ***REMOVED*** {
+	} else {
 		t.Cache.Delete(cacheKey)
 	}
 	return resp, nil
@@ -284,10 +284,10 @@ var clock timer = &realClock{}
 //
 // fresh indicates the response can be returned
 // stale indicates that the response needs validating before it is returned
-// transparent indicates the response should not be used to ful***REMOVED***l the request
+// transparent indicates the response should not be used to fulfil the request
 //
 // Because this is only a private cache, 'public' and 'private' in cache-control aren't
-// sign***REMOVED***cant. Similarly, smax-age isn't used.
+// signficant. Similarly, smax-age isn't used.
 func getFreshness(respHeaders, reqHeaders http.Header) (freshness int) {
 	respCacheControl := parseCacheControl(respHeaders)
 	reqCacheControl := parseCacheControl(reqHeaders)
@@ -317,27 +317,27 @@ func getFreshness(respHeaders, reqHeaders http.Header) (freshness int) {
 		if err != nil {
 			lifetime = zeroDuration
 		}
-	} ***REMOVED*** {
+	} else {
 		expiresHeader := respHeaders.Get("Expires")
 		if expiresHeader != "" {
 			expires, err := time.Parse(time.RFC1123, expiresHeader)
 			if err != nil {
 				lifetime = zeroDuration
-			} ***REMOVED*** {
+			} else {
 				lifetime = expires.Sub(date)
 			}
 		}
 	}
 
 	if maxAge, ok := reqCacheControl["max-age"]; ok {
-		// the client is willing to accept a response whose age is no greater than the speci***REMOVED***ed time in seconds
+		// the client is willing to accept a response whose age is no greater than the specified time in seconds
 		lifetime, err = time.ParseDuration(maxAge + "s")
 		if err != nil {
 			lifetime = zeroDuration
 		}
 	}
 	if minfresh, ok := reqCacheControl["min-fresh"]; ok {
-		//  the client wants a response that will still be fresh for at least the speci***REMOVED***ed number of seconds.
+		//  the client wants a response that will still be fresh for at least the specified number of seconds.
 		minfreshDuration, err := time.ParseDuration(minfresh + "s")
 		if err == nil {
 			currentAge = time.Duration(currentAge + minfreshDuration)
@@ -347,7 +347,7 @@ func getFreshness(respHeaders, reqHeaders http.Header) (freshness int) {
 	if maxstale, ok := reqCacheControl["max-stale"]; ok {
 		// Indicates that the client is willing to accept a response that has exceeded its expiration time.
 		// If max-stale is assigned a value, then the client is willing to accept a response that has exceeded
-		// its expiration time by no more than the speci***REMOVED***ed number of seconds.
+		// its expiration time by no more than the specified number of seconds.
 		// If no value is assigned to max-stale, then the client is willing to accept a stale response of any age.
 		//
 		// Responses served only because of a max-stale value are supposed to have a Warning header added to them,
@@ -384,7 +384,7 @@ func canStaleOnError(respHeaders, reqHeaders http.Header) bool {
 			if err != nil {
 				return false
 			}
-		} ***REMOVED*** {
+		} else {
 			return true
 		}
 	}
@@ -394,7 +394,7 @@ func canStaleOnError(respHeaders, reqHeaders http.Header) bool {
 			if err != nil {
 				return false
 			}
-		} ***REMOVED*** {
+		} else {
 			return true
 		}
 	}
@@ -454,7 +454,7 @@ func canStore(reqCacheControl, respCacheControl cacheControl) (canStore bool) {
 func newGatewayTimeoutResponse(req *http.Request) *http.Response {
 	var braw bytes.Buffer
 	braw.WriteString("HTTP/1.1 504 Gateway Timeout\r\n\r\n")
-	resp, err := http.ReadResponse(bu***REMOVED***o.NewReader(&braw), req)
+	resp, err := http.ReadResponse(bufio.NewReader(&braw), req)
 	if err != nil {
 		panic(err)
 	}
@@ -489,7 +489,7 @@ func parseCacheControl(headers http.Header) cacheControl {
 		if strings.ContainsRune(part, '=') {
 			keyval := strings.Split(part, "=")
 			cc[strings.Trim(keyval[0], " ")] = strings.Trim(keyval[1], ",")
-		} ***REMOVED*** {
+		} else {
 			cc[part] = ""
 		}
 	}
@@ -505,11 +505,11 @@ func parseCacheControl(headers http.Header) cacheControl {
 func headerAllCommaSepValues(headers http.Header, name string) []string {
 	var vals []string
 	for _, val := range headers[http.CanonicalHeaderKey(name)] {
-		***REMOVED***elds := strings.Split(val, ",")
-		for i, f := range ***REMOVED***elds {
-			***REMOVED***elds[i] = strings.TrimSpace(f)
+		fields := strings.Split(val, ",")
+		for i, f := range fields {
+			fields[i] = strings.TrimSpace(f)
 		}
-		vals = append(vals, ***REMOVED***elds...)
+		vals = append(vals, fields...)
 	}
 	return vals
 }

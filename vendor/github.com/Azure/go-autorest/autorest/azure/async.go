@@ -3,7 +3,7 @@ package azure
 // Copyright 2017 Microsoft Corporation
 //
 //  Licensed under the Apache License, Version 2.0 (the "License");
-//  you may not use this ***REMOVED***le except in compliance with the License.
+//  you may not use this file except in compliance with the License.
 //  You may obtain a copy of the License at
 //
 //      http://www.apache.org/licenses/LICENSE-2.0
@@ -11,7 +11,7 @@ package azure
 //  Unless required by applicable law or agreed to in writing, software
 //  distributed under the License is distributed on an "AS IS" BASIS,
 //  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-//  See the License for the speci***REMOVED***c language governing permissions and
+//  See the License for the specific language governing permissions and
 //  limitations under the License.
 
 import (
@@ -144,8 +144,8 @@ func (f Future) GetPollingDelay() (time.Duration, bool) {
 // WaitForCompletionRef will return when one of the following conditions is met: the long
 // running operation has completed, the provided context is cancelled, or the client's
 // polling duration has been exceeded.  It will retry failed polling attempts based on
-// the retry value de***REMOVED***ned in the client up to the maximum retry attempts.
-// If no deadline is speci***REMOVED***ed in the context then the client.PollingDuration will be
+// the retry value defined in the client up to the maximum retry attempts.
+// If no deadline is specified in the context then the client.PollingDuration will be
 // used to determine if a default deadline should be used.
 // If PollingDuration is greater than zero the value will be used as the context's timeout.
 // If PollingDuration is zero then no default deadline will be used.
@@ -184,7 +184,7 @@ func (f *Future) WaitForCompletionRef(ctx context.Context, client autorest.Clien
 			if !ok {
 				delay = client.PollingDelay
 			}
-		} ***REMOVED*** {
+		} else {
 			// there was an error polling for status so perform exponential
 			// back-off based on the number of attempts using the client's retry
 			// duration.  update attempts after delayAttempt to avoid off-by-one.
@@ -243,9 +243,9 @@ func (f Future) PollingURL() string {
 }
 
 // GetResult should be called once polling has completed successfully.
-// It makes the ***REMOVED***nal GET call to retrieve the resultant payload.
+// It makes the final GET call to retrieve the resultant payload.
 func (f Future) GetResult(sender autorest.Sender) (*http.Response, error) {
-	if f.pt.***REMOVED***nalGetURL() == "" {
+	if f.pt.finalGetURL() == "" {
 		// we can end up in this situation if the async operation returns a 200
 		// with no polling URLs.  in that case return the response which should
 		// contain the JSON payload (only do this for successful terminal cases).
@@ -254,7 +254,7 @@ func (f Future) GetResult(sender autorest.Sender) (*http.Response, error) {
 		}
 		return nil, autorest.NewError("Future", "GetResult", "missing URL for retrieving result")
 	}
-	req, err := http.NewRequest(http.MethodGet, f.pt.***REMOVED***nalGetURL(), nil)
+	req, err := http.NewRequest(http.MethodGet, f.pt.finalGetURL(), nil)
 	if err != nil {
 		return nil, err
 	}
@@ -267,7 +267,7 @@ type pollingTracker interface {
 	// checks the response headers and status code to determine the polling mechanism
 	updatePollingMethod() error
 
-	// checks the response for tracker-speci***REMOVED***c error conditions
+	// checks the response for tracker-specific error conditions
 	checkForErrors() error
 
 	// returns true if provisioning state should be checked
@@ -300,8 +300,8 @@ type pollingTracker interface {
 	// returns the URL used for polling status
 	pollingURL() string
 
-	// returns the URL used for the ***REMOVED***nal GET to retrieve the resource
-	***REMOVED***nalGetURL() string
+	// returns the URL used for the final GET to retrieve the resource
+	finalGetURL() string
 
 	// returns true if the LRO is in a terminal state
 	hasTerminated() bool
@@ -335,7 +335,7 @@ type pollingTrackerBase struct {
 	// the state of the LRO as returned from the service
 	State string `json:"lroState"`
 
-	// the URL to GET for the ***REMOVED***nal result
+	// the URL to GET for the final result
 	FinalGetURI string `json:"resultURI"`
 
 	// used to hold an error object returned from the service
@@ -357,13 +357,13 @@ func (pt *pollingTrackerBase) initializeState() error {
 				pt.updateErrorFromResponse()
 				return pt.pollingError()
 			}
-		} ***REMOVED*** {
+		} else {
 			pt.State = operationSucceeded
 		}
 	case http.StatusCreated:
 		if ps := pt.getProvisioningState(); ps != nil {
 			pt.State = *ps
-		} ***REMOVED*** {
+		} else {
 			pt.State = operationInProgress
 		}
 	case http.StatusAccepted:
@@ -430,7 +430,7 @@ func (pt *pollingTrackerBase) pollForStatus(ctx context.Context, sender autorest
 		// reset the service error on success case
 		pt.Err = nil
 		err = pt.updateRawBody()
-	} ***REMOVED*** {
+	} else {
 		// check response body for error content
 		pt.updateErrorFromResponse()
 		err = pt.pollingError()
@@ -492,16 +492,16 @@ Default:
 func (pt *pollingTrackerBase) updatePollingState(provStateApl bool) error {
 	if pt.Pm == PollingAsyncOperation && pt.rawBody["status"] != nil {
 		pt.State = pt.rawBody["status"].(string)
-	} ***REMOVED*** {
+	} else {
 		if pt.resp.StatusCode == http.StatusAccepted {
 			pt.State = operationInProgress
-		} ***REMOVED*** if provStateApl {
+		} else if provStateApl {
 			if ps := pt.getProvisioningState(); ps != nil {
 				pt.State = *ps
-			} ***REMOVED*** {
+			} else {
 				pt.State = operationSucceeded
 			}
-		} ***REMOVED*** {
+		} else {
 			return autorest.NewError("pollingTrackerBase", "updatePollingState", "the response from the async operation has an invalid status code")
 		}
 	}
@@ -531,7 +531,7 @@ func (pt pollingTrackerBase) pollingURL() string {
 	return pt.URI
 }
 
-func (pt pollingTrackerBase) ***REMOVED***nalGetURL() string {
+func (pt pollingTrackerBase) finalGetURL() string {
 	return pt.FinalGetURI
 }
 
@@ -569,19 +569,19 @@ func (pt pollingTrackerBase) baseCheckForErrors() error {
 func (pt *pollingTrackerBase) initPollingMethod() error {
 	if ao, err := getURLFromAsyncOpHeader(pt.resp); err != nil {
 		return err
-	} ***REMOVED*** if ao != "" {
+	} else if ao != "" {
 		pt.URI = ao
 		pt.Pm = PollingAsyncOperation
 		return nil
 	}
 	if lh, err := getURLFromLocationHeader(pt.resp); err != nil {
 		return err
-	} ***REMOVED*** if lh != "" {
+	} else if lh != "" {
 		pt.URI = lh
 		pt.Pm = PollingLocation
 		return nil
 	}
-	// it's ok if we didn't ***REMOVED***nd a polling header, this will be handled ***REMOVED***where
+	// it's ok if we didn't find a polling header, this will be handled elsewhere
 	return nil
 }
 
@@ -596,9 +596,9 @@ func (pt *pollingTrackerDelete) updatePollingMethod() error {
 	if pt.resp.StatusCode == http.StatusCreated {
 		if lh, err := getURLFromLocationHeader(pt.resp); err != nil {
 			return err
-		} ***REMOVED*** if lh == "" {
+		} else if lh == "" {
 			return autorest.NewError("pollingTrackerDelete", "updateHeaders", "missing Location header in 201 response")
-		} ***REMOVED*** {
+		} else {
 			pt.URI = lh
 		}
 		pt.Pm = PollingLocation
@@ -609,7 +609,7 @@ func (pt *pollingTrackerDelete) updatePollingMethod() error {
 		ao, err := getURLFromAsyncOpHeader(pt.resp)
 		if err != nil {
 			return err
-		} ***REMOVED*** if ao != "" {
+		} else if ao != "" {
 			pt.URI = ao
 			pt.Pm = PollingAsyncOperation
 		}
@@ -617,12 +617,12 @@ func (pt *pollingTrackerDelete) updatePollingMethod() error {
 		// then we don't care if the Location header URL is malformed.
 		if lh, err := getURLFromLocationHeader(pt.resp); err != nil && pt.URI == "" {
 			return err
-		} ***REMOVED*** if lh != "" {
+		} else if lh != "" {
 			if ao == "" {
 				pt.URI = lh
 				pt.Pm = PollingLocation
 			}
-			// when both headers are returned we use the value in the Location header for the ***REMOVED***nal GET
+			// when both headers are returned we use the value in the Location header for the final GET
 			pt.FinalGetURI = lh
 		}
 		// make sure a polling URL was found
@@ -648,7 +648,7 @@ type pollingTrackerPatch struct {
 }
 
 func (pt *pollingTrackerPatch) updatePollingMethod() error {
-	// by default we can use the original URL for polling and ***REMOVED***nal GET
+	// by default we can use the original URL for polling and final GET
 	if pt.URI == "" {
 		pt.URI = pt.resp.Request.URL.String()
 	}
@@ -662,27 +662,27 @@ func (pt *pollingTrackerPatch) updatePollingMethod() error {
 	if pt.resp.StatusCode == http.StatusCreated {
 		if ao, err := getURLFromAsyncOpHeader(pt.resp); err != nil {
 			return err
-		} ***REMOVED*** if ao != "" {
+		} else if ao != "" {
 			pt.URI = ao
 			pt.Pm = PollingAsyncOperation
 		}
 	}
 	// for 202 prefer the Azure-AsyncOperation header but fall back to Location if necessary
-	// note the absence of the "***REMOVED***nal GET" mechanism for PATCH
+	// note the absence of the "final GET" mechanism for PATCH
 	if pt.resp.StatusCode == http.StatusAccepted {
 		ao, err := getURLFromAsyncOpHeader(pt.resp)
 		if err != nil {
 			return err
-		} ***REMOVED*** if ao != "" {
+		} else if ao != "" {
 			pt.URI = ao
 			pt.Pm = PollingAsyncOperation
 		}
 		if ao == "" {
 			if lh, err := getURLFromLocationHeader(pt.resp); err != nil {
 				return err
-			} ***REMOVED*** if lh == "" {
+			} else if lh == "" {
 				return autorest.NewError("pollingTrackerPatch", "updateHeaders", "didn't get any suitable polling URLs in 202 response")
-			} ***REMOVED*** {
+			} else {
 				pt.URI = lh
 				pt.Pm = PollingLocation
 			}
@@ -710,9 +710,9 @@ func (pt *pollingTrackerPost) updatePollingMethod() error {
 	if pt.resp.StatusCode == http.StatusCreated {
 		if lh, err := getURLFromLocationHeader(pt.resp); err != nil {
 			return err
-		} ***REMOVED*** if lh == "" {
+		} else if lh == "" {
 			return autorest.NewError("pollingTrackerPost", "updateHeaders", "missing Location header in 201 response")
-		} ***REMOVED*** {
+		} else {
 			pt.URI = lh
 			pt.FinalGetURI = lh
 			pt.Pm = PollingLocation
@@ -723,7 +723,7 @@ func (pt *pollingTrackerPost) updatePollingMethod() error {
 		ao, err := getURLFromAsyncOpHeader(pt.resp)
 		if err != nil {
 			return err
-		} ***REMOVED*** if ao != "" {
+		} else if ao != "" {
 			pt.URI = ao
 			pt.Pm = PollingAsyncOperation
 		}
@@ -731,12 +731,12 @@ func (pt *pollingTrackerPost) updatePollingMethod() error {
 		// then we don't care if the Location header URL is malformed.
 		if lh, err := getURLFromLocationHeader(pt.resp); err != nil && pt.URI == "" {
 			return err
-		} ***REMOVED*** if lh != "" {
+		} else if lh != "" {
 			if ao == "" {
 				pt.URI = lh
 				pt.Pm = PollingLocation
 			}
-			// when both headers are returned we use the value in the Location header for the ***REMOVED***nal GET
+			// when both headers are returned we use the value in the Location header for the final GET
 			pt.FinalGetURI = lh
 		}
 		// make sure a polling URL was found
@@ -762,7 +762,7 @@ type pollingTrackerPut struct {
 }
 
 func (pt *pollingTrackerPut) updatePollingMethod() error {
-	// by default we can use the original URL for polling and ***REMOVED***nal GET
+	// by default we can use the original URL for polling and final GET
 	if pt.URI == "" {
 		pt.URI = pt.resp.Request.URL.String()
 	}
@@ -776,7 +776,7 @@ func (pt *pollingTrackerPut) updatePollingMethod() error {
 	if pt.resp.StatusCode == http.StatusCreated {
 		if ao, err := getURLFromAsyncOpHeader(pt.resp); err != nil {
 			return err
-		} ***REMOVED*** if ao != "" {
+		} else if ao != "" {
 			pt.URI = ao
 			pt.Pm = PollingAsyncOperation
 		}
@@ -786,7 +786,7 @@ func (pt *pollingTrackerPut) updatePollingMethod() error {
 		ao, err := getURLFromAsyncOpHeader(pt.resp)
 		if err != nil {
 			return err
-		} ***REMOVED*** if ao != "" {
+		} else if ao != "" {
 			pt.URI = ao
 			pt.Pm = PollingAsyncOperation
 		}
@@ -794,7 +794,7 @@ func (pt *pollingTrackerPut) updatePollingMethod() error {
 		// then we don't care if the Location header URL is malformed.
 		if lh, err := getURLFromLocationHeader(pt.resp); err != nil && pt.URI == "" {
 			return err
-		} ***REMOVED*** if lh != "" {
+		} else if lh != "" {
 			if ao == "" {
 				pt.URI = lh
 				pt.Pm = PollingLocation
@@ -888,7 +888,7 @@ func isValidURL(s string) bool {
 	return err == nil && u.IsAbs()
 }
 
-// PollingMethodType de***REMOVED***nes a type used for enumerating polling mechanisms.
+// PollingMethodType defines a type used for enumerating polling mechanisms.
 type PollingMethodType string
 
 const (
@@ -916,7 +916,7 @@ func (e AsyncOpIncompleteError) Error() string {
 	return fmt.Sprintf("%s: asynchronous operation has not completed", e.FutureType)
 }
 
-// NewAsyncOpIncompleteError creates a new AsyncOpIncompleteError with the speci***REMOVED***ed parameters.
+// NewAsyncOpIncompleteError creates a new AsyncOpIncompleteError with the specified parameters.
 func NewAsyncOpIncompleteError(futureType string) AsyncOpIncompleteError {
 	return AsyncOpIncompleteError{
 		FutureType: futureType,

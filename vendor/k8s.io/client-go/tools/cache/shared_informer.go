@@ -2,7 +2,7 @@
 Copyright 2015 The Kubernetes Authors.
 
 Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this ***REMOVED***le except in compliance with the License.
+you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
 
     http://www.apache.org/licenses/LICENSE-2.0
@@ -10,7 +10,7 @@ You may obtain a copy of the License at
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the speci***REMOVED***c language governing permissions and
+See the License for the specific language governing permissions and
 limitations under the License.
 */
 
@@ -31,11 +31,11 @@ import (
 	"k8s.io/klog"
 )
 
-// SharedInformer has a shared data cache and is capable of distributing noti***REMOVED***cations for changes
+// SharedInformer has a shared data cache and is capable of distributing notifications for changes
 // to the cache to multiple listeners who registered via AddEventHandler. If you use this, there is
-// one behavior change compared to a standard Informer.  When you receive a noti***REMOVED***cation, the cache
-// will be AT LEAST as fresh as the noti***REMOVED***cation, but it MAY be more fresh.  You should NOT depend
-// on the contents of the cache exactly matching the noti***REMOVED***cation you've received in handler
+// one behavior change compared to a standard Informer.  When you receive a notification, the cache
+// will be AT LEAST as fresh as the notification, but it MAY be more fresh.  You should NOT depend
+// on the contents of the cache exactly matching the notification you've received in handler
 // functions.  If there was a create, followed by a delete, the cache may NOT have your item.  This
 // has advantages over the broadcaster since it allows us to share a common cache across many
 // controllers. Extending the broadcaster would have required us keep duplicate caches for each
@@ -46,7 +46,7 @@ type SharedInformer interface {
 	// between different handlers.
 	AddEventHandler(handler ResourceEventHandler)
 	// AddEventHandlerWithResyncPeriod adds an event handler to the shared informer using the
-	// speci***REMOVED***ed resync period.  Events to a single handler are delivered sequentially, but there is
+	// specified resync period.  Events to a single handler are delivered sequentially, but there is
 	// no coordination between different handlers.
 	AddEventHandlerWithResyncPeriod(handler ResourceEventHandler, resyncPeriod time.Duration)
 	// GetStore returns the Store.
@@ -98,7 +98,7 @@ const (
 	// syncedPollPeriod controls how often you look at the status of your sync funcs
 	syncedPollPeriod = 100 * time.Millisecond
 
-	// initialBufferSize is the initial number of event noti***REMOVED***cations that can be buffered.
+	// initialBufferSize is the initial number of event notifications that can be buffered.
 	initialBufferSize = 1024
 )
 
@@ -135,7 +135,7 @@ type sharedIndexInformer struct {
 	listerWatcher ListerWatcher
 	objectType    runtime.Object
 
-	// resyncCheckPeriod is how often we want the reflector's resync timer to ***REMOVED***re so it can call
+	// resyncCheckPeriod is how often we want the reflector's resync timer to fire so it can call
 	// shouldResync to check if any of our listeners need a resync.
 	resyncCheckPeriod time.Duration
 	// defaultEventHandlerResyncPeriod is the default resync period for any handlers added via
@@ -173,26 +173,26 @@ func (c *dummyController) LastSyncResourceVersion() string {
 	return ""
 }
 
-type updateNoti***REMOVED***cation struct {
+type updateNotification struct {
 	oldObj interface{}
 	newObj interface{}
 }
 
-type addNoti***REMOVED***cation struct {
+type addNotification struct {
 	newObj interface{}
 }
 
-type deleteNoti***REMOVED***cation struct {
+type deleteNotification struct {
 	oldObj interface{}
 }
 
 func (s *sharedIndexInformer) Run(stopCh <-chan struct{}) {
 	defer utilruntime.HandleCrash()
 
-	***REMOVED***fo := NewDeltaFIFO(MetaNamespaceKeyFunc, s.indexer)
+	fifo := NewDeltaFIFO(MetaNamespaceKeyFunc, s.indexer)
 
-	cfg := &Con***REMOVED***g{
-		Queue:            ***REMOVED***fo,
+	cfg := &Config{
+		Queue:            fifo,
 		ListerWatcher:    s.listerWatcher,
 		ObjectType:       s.objectType,
 		FullResyncPeriod: s.resyncCheckPeriod,
@@ -279,11 +279,11 @@ func determineResyncPeriod(desired, check time.Duration) time.Duration {
 		return desired
 	}
 	if check == 0 {
-		klog.Warningf("The speci***REMOVED***ed resyncPeriod %v is invalid because this shared informer doesn't support resyncing", desired)
+		klog.Warningf("The specified resyncPeriod %v is invalid because this shared informer doesn't support resyncing", desired)
 		return 0
 	}
 	if desired < check {
-		klog.Warningf("The speci***REMOVED***ed resyncPeriod %v is being increased to the minimum resyncCheckPeriod %v", desired, check)
+		klog.Warningf("The specified resyncPeriod %v is being increased to the minimum resyncCheckPeriod %v", desired, check)
 		return check
 	}
 	return desired
@@ -310,7 +310,7 @@ func (s *sharedIndexInformer) AddEventHandlerWithResyncPeriod(handler ResourceEv
 			if s.started {
 				klog.Warningf("resyncPeriod %d is smaller than resyncCheckPeriod %d and the informer has already started. Changing it to %d", resyncPeriod, s.resyncCheckPeriod, s.resyncCheckPeriod)
 				resyncPeriod = s.resyncCheckPeriod
-			} ***REMOVED*** {
+			} else {
 				// if the event handler's resyncPeriod is smaller than the current resyncCheckPeriod, update
 				// resyncCheckPeriod to match resyncPeriod and adjust the resync periods of all the listeners
 				// accordingly
@@ -328,7 +328,7 @@ func (s *sharedIndexInformer) AddEventHandlerWithResyncPeriod(handler ResourceEv
 	}
 
 	// in order to safely join, we have to
-	// 1. stop sending add/update/delete noti***REMOVED***cations
+	// 1. stop sending add/update/delete notifications
 	// 2. do a list against the store
 	// 3. send synthetic "Add" events to the new handler
 	// 4. unblock
@@ -337,7 +337,7 @@ func (s *sharedIndexInformer) AddEventHandlerWithResyncPeriod(handler ResourceEv
 
 	s.processor.addListener(listener)
 	for _, item := range s.indexer.List() {
-		listener.add(addNoti***REMOVED***cation{newObj: item})
+		listener.add(addNotification{newObj: item})
 	}
 }
 
@@ -355,18 +355,18 @@ func (s *sharedIndexInformer) HandleDeltas(obj interface{}) error {
 				if err := s.indexer.Update(d.Object); err != nil {
 					return err
 				}
-				s.processor.distribute(updateNoti***REMOVED***cation{oldObj: old, newObj: d.Object}, isSync)
-			} ***REMOVED*** {
+				s.processor.distribute(updateNotification{oldObj: old, newObj: d.Object}, isSync)
+			} else {
 				if err := s.indexer.Add(d.Object); err != nil {
 					return err
 				}
-				s.processor.distribute(addNoti***REMOVED***cation{newObj: d.Object}, isSync)
+				s.processor.distribute(addNotification{newObj: d.Object}, isSync)
 			}
 		case Deleted:
 			if err := s.indexer.Delete(d.Object); err != nil {
 				return err
 			}
-			s.processor.distribute(deleteNoti***REMOVED***cation{oldObj: d.Object}, false)
+			s.processor.distribute(deleteNotification{oldObj: d.Object}, false)
 		}
 	}
 	return nil
@@ -405,7 +405,7 @@ func (p *sharedProcessor) distribute(obj interface{}, sync bool) {
 		for _, listener := range p.syncingListeners {
 			listener.add(obj)
 		}
-	} ***REMOVED*** {
+	} else {
 		for _, listener := range p.listeners {
 			listener.add(obj)
 		}
@@ -469,12 +469,12 @@ type processorListener struct {
 
 	handler ResourceEventHandler
 
-	// pendingNoti***REMOVED***cations is an unbounded ring buffer that holds all noti***REMOVED***cations not yet distributed.
-	// There is one per listener, but a failing/stalled listener will have in***REMOVED***nite pendingNoti***REMOVED***cations
+	// pendingNotifications is an unbounded ring buffer that holds all notifications not yet distributed.
+	// There is one per listener, but a failing/stalled listener will have infinite pendingNotifications
 	// added until we OOM.
 	// TODO: This is no worse than before, since reflectors were backed by unbounded DeltaFIFOs, but
 	// we should try to do something better.
-	pendingNoti***REMOVED***cations buffer.RingGrowing
+	pendingNotifications buffer.RingGrowing
 
 	// requestedResyncPeriod is how frequently the listener wants a full resync from the shared informer
 	requestedResyncPeriod time.Duration
@@ -493,7 +493,7 @@ func newProcessListener(handler ResourceEventHandler, requestedResyncPeriod, res
 		nextCh:                make(chan interface{}),
 		addCh:                 make(chan interface{}),
 		handler:               handler,
-		pendingNoti***REMOVED***cations:  *buffer.NewRingGrowing(bufferSize),
+		pendingNotifications:  *buffer.NewRingGrowing(bufferSize),
 		requestedResyncPeriod: requestedResyncPeriod,
 		resyncPeriod:          resyncPeriod,
 	}
@@ -503,8 +503,8 @@ func newProcessListener(handler ResourceEventHandler, requestedResyncPeriod, res
 	return ret
 }
 
-func (p *processorListener) add(noti***REMOVED***cation interface{}) {
-	p.addCh <- noti***REMOVED***cation
+func (p *processorListener) add(notification interface{}) {
+	p.addCh <- notification
 }
 
 func (p *processorListener) pop() {
@@ -512,50 +512,50 @@ func (p *processorListener) pop() {
 	defer close(p.nextCh) // Tell .run() to stop
 
 	var nextCh chan<- interface{}
-	var noti***REMOVED***cation interface{}
+	var notification interface{}
 	for {
 		select {
-		case nextCh <- noti***REMOVED***cation:
-			// Noti***REMOVED***cation dispatched
+		case nextCh <- notification:
+			// Notification dispatched
 			var ok bool
-			noti***REMOVED***cation, ok = p.pendingNoti***REMOVED***cations.ReadOne()
+			notification, ok = p.pendingNotifications.ReadOne()
 			if !ok { // Nothing to pop
 				nextCh = nil // Disable this select case
 			}
-		case noti***REMOVED***cationToAdd, ok := <-p.addCh:
+		case notificationToAdd, ok := <-p.addCh:
 			if !ok {
 				return
 			}
-			if noti***REMOVED***cation == nil { // No noti***REMOVED***cation to pop (and pendingNoti***REMOVED***cations is empty)
-				// Optimize the case - skip adding to pendingNoti***REMOVED***cations
-				noti***REMOVED***cation = noti***REMOVED***cationToAdd
+			if notification == nil { // No notification to pop (and pendingNotifications is empty)
+				// Optimize the case - skip adding to pendingNotifications
+				notification = notificationToAdd
 				nextCh = p.nextCh
-			} ***REMOVED*** { // There is already a noti***REMOVED***cation waiting to be dispatched
-				p.pendingNoti***REMOVED***cations.WriteOne(noti***REMOVED***cationToAdd)
+			} else { // There is already a notification waiting to be dispatched
+				p.pendingNotifications.WriteOne(notificationToAdd)
 			}
 		}
 	}
 }
 
 func (p *processorListener) run() {
-	// this call blocks until the channel is closed.  When a panic happens during the noti***REMOVED***cation
+	// this call blocks until the channel is closed.  When a panic happens during the notification
 	// we will catch it, **the offending item will be skipped!**, and after a short delay (one second)
-	// the next noti***REMOVED***cation will be attempted.  This is usually better than the alternative of never
+	// the next notification will be attempted.  This is usually better than the alternative of never
 	// delivering again.
 	stopCh := make(chan struct{})
 	wait.Until(func() {
 		// this gives us a few quick retries before a long pause and then a few more quick retries
 		err := wait.ExponentialBackoff(retry.DefaultRetry, func() (bool, error) {
 			for next := range p.nextCh {
-				switch noti***REMOVED***cation := next.(type) {
-				case updateNoti***REMOVED***cation:
-					p.handler.OnUpdate(noti***REMOVED***cation.oldObj, noti***REMOVED***cation.newObj)
-				case addNoti***REMOVED***cation:
-					p.handler.OnAdd(noti***REMOVED***cation.newObj)
-				case deleteNoti***REMOVED***cation:
-					p.handler.OnDelete(noti***REMOVED***cation.oldObj)
+				switch notification := next.(type) {
+				case updateNotification:
+					p.handler.OnUpdate(notification.oldObj, notification.newObj)
+				case addNotification:
+					p.handler.OnAdd(notification.newObj)
+				case deleteNotification:
+					p.handler.OnDelete(notification.oldObj)
 				default:
-					utilruntime.HandleError(fmt.Errorf("unrecognized noti***REMOVED***cation: %#v", next))
+					utilruntime.HandleError(fmt.Errorf("unrecognized notification: %#v", next))
 				}
 			}
 			// the only way to get here is if the p.nextCh is empty and closed

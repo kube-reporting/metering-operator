@@ -1,6 +1,6 @@
 // Copyright 2017 The Prometheus Authors
 // Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this ***REMOVED***le except in compliance with the License.
+// you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 //
 // http://www.apache.org/licenses/LICENSE-2.0
@@ -8,13 +8,13 @@
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the speci***REMOVED***c language governing permissions and
+// See the License for the specific language governing permissions and
 // limitations under the License.
 
 package xfs
 
 import (
-	"bu***REMOVED***o"
+	"bufio"
 	"fmt"
 	"io"
 	"strings"
@@ -27,36 +27,36 @@ import (
 func ParseStats(r io.Reader) (*Stats, error) {
 	const (
 		// Fields parsed into stats structures.
-		***REMOVED***eldExtentAlloc = "extent_alloc"
-		***REMOVED***eldAbt         = "abt"
-		***REMOVED***eldBlkMap      = "blk_map"
-		***REMOVED***eldBmbt        = "bmbt"
-		***REMOVED***eldDir         = "dir"
-		***REMOVED***eldTrans       = "trans"
-		***REMOVED***eldIg          = "ig"
-		***REMOVED***eldLog         = "log"
-		***REMOVED***eldRw          = "rw"
-		***REMOVED***eldAttr        = "attr"
-		***REMOVED***eldIcluster    = "icluster"
-		***REMOVED***eldVnodes      = "vnodes"
-		***REMOVED***eldBuf         = "buf"
-		***REMOVED***eldXpc         = "xpc"
+		fieldExtentAlloc = "extent_alloc"
+		fieldAbt         = "abt"
+		fieldBlkMap      = "blk_map"
+		fieldBmbt        = "bmbt"
+		fieldDir         = "dir"
+		fieldTrans       = "trans"
+		fieldIg          = "ig"
+		fieldLog         = "log"
+		fieldRw          = "rw"
+		fieldAttr        = "attr"
+		fieldIcluster    = "icluster"
+		fieldVnodes      = "vnodes"
+		fieldBuf         = "buf"
+		fieldXpc         = "xpc"
 
 		// Unimplemented at this time due to lack of documentation.
-		***REMOVED***eldPushAil = "push_ail"
-		***REMOVED***eldXstrat  = "xstrat"
-		***REMOVED***eldAbtb2   = "abtb2"
-		***REMOVED***eldAbtc2   = "abtc2"
-		***REMOVED***eldBmbt2   = "bmbt2"
-		***REMOVED***eldIbt2    = "ibt2"
-		***REMOVED***eldFibt2   = "***REMOVED***bt2"
-		***REMOVED***eldQm      = "qm"
-		***REMOVED***eldDebug   = "debug"
+		fieldPushAil = "push_ail"
+		fieldXstrat  = "xstrat"
+		fieldAbtb2   = "abtb2"
+		fieldAbtc2   = "abtc2"
+		fieldBmbt2   = "bmbt2"
+		fieldIbt2    = "ibt2"
+		fieldFibt2   = "fibt2"
+		fieldQm      = "qm"
+		fieldDebug   = "debug"
 	)
 
 	var xfss Stats
 
-	s := bu***REMOVED***o.NewScanner(r)
+	s := bufio.NewScanner(r)
 	for s.Scan() {
 		// Expect at least a string label and a single integer value, ex:
 		//   - abt 0
@@ -68,7 +68,7 @@ func ParseStats(r io.Reader) (*Stats, error) {
 		label := ss[0]
 
 		// Extended precision counters are uint64 values.
-		if label == ***REMOVED***eldXpc {
+		if label == fieldXpc {
 			us, err := util.ParseUint64s(ss[1:])
 			if err != nil {
 				return nil, err
@@ -89,31 +89,31 @@ func ParseStats(r io.Reader) (*Stats, error) {
 		}
 
 		switch label {
-		case ***REMOVED***eldExtentAlloc:
+		case fieldExtentAlloc:
 			xfss.ExtentAllocation, err = extentAllocationStats(us)
-		case ***REMOVED***eldAbt:
+		case fieldAbt:
 			xfss.AllocationBTree, err = btreeStats(us)
-		case ***REMOVED***eldBlkMap:
+		case fieldBlkMap:
 			xfss.BlockMapping, err = blockMappingStats(us)
-		case ***REMOVED***eldBmbt:
+		case fieldBmbt:
 			xfss.BlockMapBTree, err = btreeStats(us)
-		case ***REMOVED***eldDir:
+		case fieldDir:
 			xfss.DirectoryOperation, err = directoryOperationStats(us)
-		case ***REMOVED***eldTrans:
+		case fieldTrans:
 			xfss.Transaction, err = transactionStats(us)
-		case ***REMOVED***eldIg:
+		case fieldIg:
 			xfss.InodeOperation, err = inodeOperationStats(us)
-		case ***REMOVED***eldLog:
+		case fieldLog:
 			xfss.LogOperation, err = logOperationStats(us)
-		case ***REMOVED***eldRw:
+		case fieldRw:
 			xfss.ReadWrite, err = readWriteStats(us)
-		case ***REMOVED***eldAttr:
+		case fieldAttr:
 			xfss.AttributeOperation, err = attributeOperationStats(us)
-		case ***REMOVED***eldIcluster:
+		case fieldIcluster:
 			xfss.InodeClustering, err = inodeClusteringStats(us)
-		case ***REMOVED***eldVnodes:
+		case fieldVnodes:
 			xfss.Vnode, err = vnodeStats(us)
-		case ***REMOVED***eldBuf:
+		case fieldBuf:
 			xfss.Buffer, err = bufferStats(us)
 		}
 		if err != nil {

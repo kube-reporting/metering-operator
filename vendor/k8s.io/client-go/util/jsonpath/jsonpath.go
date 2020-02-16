@@ -2,7 +2,7 @@
 Copyright 2015 The Kubernetes Authors.
 
 Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this ***REMOVED***le except in compliance with the License.
+you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
 
     http://www.apache.org/licenses/LICENSE-2.0
@@ -10,7 +10,7 @@ You may obtain a copy of the License at
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the speci***REMOVED***c language governing permissions and
+See the License for the specific language governing permissions and
 limitations under the License.
 */
 
@@ -48,7 +48,7 @@ func New(name string) *JSONPath {
 	}
 }
 
-// AllowMissingKeys allows a caller to specify whether they want an error if a ***REMOVED***eld or map key
+// AllowMissingKeys allows a caller to specify whether they want an error if a field or map key
 // cannot be located, or simply an empty result. The receiver is returned for chaining.
 func (j *JSONPath) AllowMissingKeys(allow bool) *JSONPath {
 	j.allowMissingKeys = allow
@@ -160,8 +160,8 @@ func (j *JSONPath) walk(value []reflect.Value, node Node) ([]reflect.Value, erro
 		return j.evalRecursive(value, node)
 	case *UnionNode:
 		return j.evalUnion(value, node)
-	case *Identi***REMOVED***erNode:
-		return j.evalIdenti***REMOVED***er(value, node)
+	case *IdentifierNode:
+		return j.evalIdentifier(value, node)
 	default:
 		return value, fmt.Errorf("unexpected Node %v", node)
 	}
@@ -207,8 +207,8 @@ func (j *JSONPath) evalList(value []reflect.Value, node *ListNode) ([]reflect.Va
 	return curValue, nil
 }
 
-// evalIdenti***REMOVED***er evaluates Identi***REMOVED***erNode
-func (j *JSONPath) evalIdenti***REMOVED***er(input []reflect.Value, node *Identi***REMOVED***erNode) ([]reflect.Value, error) {
+// evalIdentifier evaluates IdentifierNode
+func (j *JSONPath) evalIdentifier(input []reflect.Value, node *IdentifierNode) ([]reflect.Value, error) {
 	results := []reflect.Value{}
 	switch node.Name {
 	case "range":
@@ -223,11 +223,11 @@ func (j *JSONPath) evalIdenti***REMOVED***er(input []reflect.Value, node *Identi
 		// the loop is about to end, pop value and continue the following execution
 		if len(j.stack) > 0 {
 			j.cur, j.stack = j.stack[len(j.stack)-1], j.stack[:len(j.stack)-1]
-		} ***REMOVED*** {
+		} else {
 			return results, fmt.Errorf("not in range, nothing to end")
 		}
 	default:
-		return input, fmt.Errorf("unrecognized identi***REMOVED***er %v", node.Name)
+		return input, fmt.Errorf("unrecognized identifier %v", node.Name)
 	}
 	return results, nil
 }
@@ -271,7 +271,7 @@ func (j *JSONPath) evalArray(input []reflect.Value, node *ArrayNode) ([]reflect.
 
 		if !params[2].Known {
 			value = value.Slice(params[0].Value, params[1].Value)
-		} ***REMOVED*** {
+		} else {
 			value = value.Slice3(params[0].Value, params[1].Value, params[2].Value)
 		}
 		for i := 0; i < value.Len(); i++ {
@@ -294,7 +294,7 @@ func (j *JSONPath) evalUnion(input []reflect.Value, node *UnionNode) ([]reflect.
 	return result, nil
 }
 
-func (j *JSONPath) ***REMOVED***ndFieldInValue(value *reflect.Value, node *FieldNode) (reflect.Value, error) {
+func (j *JSONPath) findFieldInValue(value *reflect.Value, node *FieldNode) (reflect.Value, error) {
 	t := value.Type()
 	var inlineValue *reflect.Value
 	for ix := 0; ix < t.NumField(); ix++ {
@@ -315,7 +315,7 @@ func (j *JSONPath) ***REMOVED***ndFieldInValue(value *reflect.Value, node *Field
 	if inlineValue != nil {
 		if inlineValue.Kind() == reflect.Struct {
 			// handle 'inline'
-			match, err := j.***REMOVED***ndFieldInValue(inlineValue, node)
+			match, err := j.findFieldInValue(inlineValue, node)
 			if err != nil {
 				return reflect.Value{}, err
 			}
@@ -327,7 +327,7 @@ func (j *JSONPath) ***REMOVED***ndFieldInValue(value *reflect.Value, node *Field
 	return value.FieldByName(node.Value), nil
 }
 
-// evalField evaluates ***REMOVED***eld of struct or key of map.
+// evalField evaluates field of struct or key of map.
 func (j *JSONPath) evalField(input []reflect.Value, node *FieldNode) ([]reflect.Value, error) {
 	results := []reflect.Value{}
 	// If there's no input, there's no output
@@ -343,10 +343,10 @@ func (j *JSONPath) evalField(input []reflect.Value, node *FieldNode) ([]reflect.
 
 		if value.Kind() == reflect.Struct {
 			var err error
-			if result, err = j.***REMOVED***ndFieldInValue(&value, node); err != nil {
+			if result, err = j.findFieldInValue(&value, node); err != nil {
 				return nil, err
 			}
-		} ***REMOVED*** if value.Kind() == reflect.Map {
+		} else if value.Kind() == reflect.Map {
 			mapKeyType := value.Type().Key()
 			nodeValue := reflect.ValueOf(node.Value)
 			// node value type must be convertible to map key type
@@ -382,11 +382,11 @@ func (j *JSONPath) evalWildcard(input []reflect.Value, node *WildcardNode) ([]re
 			for i := 0; i < value.NumField(); i++ {
 				results = append(results, value.Field(i))
 			}
-		} ***REMOVED*** if kind == reflect.Map {
+		} else if kind == reflect.Map {
 			for _, key := range value.MapKeys() {
 				results = append(results, value.MapIndex(key))
 			}
-		} ***REMOVED*** if kind == reflect.Array || kind == reflect.Slice || kind == reflect.String {
+		} else if kind == reflect.Array || kind == reflect.Slice || kind == reflect.String {
 			for i := 0; i < value.Len(); i++ {
 				results = append(results, value.Index(i))
 			}
@@ -410,11 +410,11 @@ func (j *JSONPath) evalRecursive(input []reflect.Value, node *RecursiveNode) ([]
 			for i := 0; i < value.NumField(); i++ {
 				results = append(results, value.Field(i))
 			}
-		} ***REMOVED*** if kind == reflect.Map {
+		} else if kind == reflect.Map {
 			for _, key := range value.MapKeys() {
 				results = append(results, value.MapIndex(key))
 			}
-		} ***REMOVED*** if kind == reflect.Array || kind == reflect.Slice || kind == reflect.String {
+		} else if kind == reflect.Array || kind == reflect.Slice || kind == reflect.String {
 			for i := 0; i < value.Len(); i++ {
 				results = append(results, value.Index(i))
 			}
@@ -431,14 +431,14 @@ func (j *JSONPath) evalRecursive(input []reflect.Value, node *RecursiveNode) ([]
 	return result, nil
 }
 
-// evalFilter ***REMOVED***lters array according to FilterNode
+// evalFilter filters array according to FilterNode
 func (j *JSONPath) evalFilter(input []reflect.Value, node *FilterNode) ([]reflect.Value, error) {
 	results := []reflect.Value{}
 	for _, value := range input {
 		value, _ = template.Indirect(value)
 
 		if value.Kind() != reflect.Array && value.Kind() != reflect.Slice {
-			return input, fmt.Errorf("%v is not array or slice and cannot be ***REMOVED***ltered", value)
+			return input, fmt.Errorf("%v is not array or slice and cannot be filtered", value)
 		}
 		for i := 0; i < value.Len(); i++ {
 			temp := []reflect.Value{value.Index(i)}
@@ -492,7 +492,7 @@ func (j *JSONPath) evalFilter(input []reflect.Value, node *FilterNode) ([]reflec
 			case ">=":
 				pass, err = template.GreaterEqual(left, right)
 			default:
-				return results, fmt.Errorf("unrecognized ***REMOVED***lter operator %s", node.Operator)
+				return results, fmt.Errorf("unrecognized filter operator %s", node.Operator)
 			}
 			if err != nil {
 				return results, err

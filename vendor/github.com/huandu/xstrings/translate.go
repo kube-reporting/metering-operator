@@ -1,5 +1,5 @@
 // Copyright 2015 Huan Du. All rights reserved.
-// Licensed under the MIT license that can be found in the LICENSE ***REMOVED***le.
+// Licensed under the MIT license that can be found in the LICENSE file.
 
 package xstrings
 
@@ -85,7 +85,7 @@ func NewTranslator(from, to string) *Translator {
 	if deletion {
 		toStart = utf8.RuneError
 		toEnd = utf8.RuneError
-	} ***REMOVED*** {
+	} else {
 		// If from pattern is reverted, only the last rune in the to pattern will be used.
 		if reverted {
 			var size int
@@ -96,7 +96,7 @@ func NewTranslator(from, to string) *Translator {
 			}
 
 			toEnd = utf8.RuneError
-		} ***REMOVED*** {
+		} else {
 			to, toStart, toEnd, toRangeStep = nextRuneRange(to, utf8.RuneError)
 		}
 	}
@@ -114,7 +114,7 @@ func NewTranslator(from, to string) *Translator {
 		}
 
 		for toEnd != utf8.RuneError && fromStart != fromEnd {
-			// If mapped rune is a single character instead of a range, simply shift ***REMOVED***rst
+			// If mapped rune is a single character instead of a range, simply shift first
 			// rune in the range.
 			if toRangeStep == 0 {
 				singleRunes = tr.addRune(fromStart, toStart, singleRunes)
@@ -179,7 +179,7 @@ func (tr *Translator) addRune(from, to rune, singleRunes []rune) []rune {
 		}
 
 		tr.quickDict.Dict[from] = to
-	} ***REMOVED*** {
+	} else {
 		if tr.runeMap == nil {
 			tr.runeMap = make(runeMap)
 		}
@@ -202,7 +202,7 @@ func (tr *Translator) addRuneRange(fromLo, fromHi, toLo, toHi rune, singleRunes 
 			ToLo:   toLo,
 			ToHi:   toHi,
 		}
-	} ***REMOVED*** {
+	} else {
 		rrm = &runeRangeMap{
 			FromLo: fromHi,
 			FromHi: fromLo,
@@ -216,7 +216,7 @@ func (tr *Translator) addRuneRange(fromLo, fromHi, toLo, toHi rune, singleRunes 
 		if rrm.FromLo <= r && r <= rrm.FromHi {
 			if r <= unicode.MaxASCII {
 				tr.quickDict.Dict[r] = 0
-			} ***REMOVED*** {
+			} else {
 				delete(tr.runeMap, r)
 			}
 		}
@@ -273,7 +273,7 @@ func nextRuneRange(str string, last rune) (remaining string, start, end rune, ra
 			if isRange {
 				if start < end {
 					rangeStep = 1
-				} ***REMOVED*** {
+				} else {
 					rangeStep = -1
 				}
 			}
@@ -381,10 +381,10 @@ func (tr *Translator) TranslateRune(r rune) (result rune, translated bool) {
 
 				if rrm.ToLo < rrm.ToHi {
 					result = rrm.ToLo + r - rrm.FromLo
-				} ***REMOVED*** if rrm.ToLo > rrm.ToHi {
+				} else if rrm.ToLo > rrm.ToHi {
 					// ToHi can be smaller than ToLo if range is from higher to lower.
 					result = rrm.ToLo - r + rrm.FromLo
-				} ***REMOVED*** {
+				} else {
 					result = rrm.ToLo
 				}
 
@@ -413,20 +413,20 @@ func (tr *Translator) HasPattern() bool {
 	return tr.hasPattern
 }
 
-// Translate str with the characters de***REMOVED***ned in from replaced by characters de***REMOVED***ned in to.
+// Translate str with the characters defined in from replaced by characters defined in to.
 //
-// From and to are patterns representing a set of characters. Pattern is de***REMOVED***ned as following.
+// From and to are patterns representing a set of characters. Pattern is defined as following.
 //
 //     * Special characters
 //       * '-' means a range of runes, e.g.
 //         * "a-z" means all characters from 'a' to 'z' inclusive;
 //         * "z-a" means all characters from 'z' to 'a' inclusive.
-//       * '^' as ***REMOVED***rst character means a set of all runes excepted listed, e.g.
+//       * '^' as first character means a set of all runes excepted listed, e.g.
 //         * "^a-z" means all characters except 'a' to 'z' inclusive.
 //       * '\' escapes special characters.
 //     * Normal character represents itself, e.g. "abc" is a set including 'a', 'b' and 'c'.
 //
-// Translate will try to ***REMOVED***nd a 1:1 mapping from from to to.
+// Translate will try to find a 1:1 mapping from from to to.
 // If to is smaller than from, last rune in to will be used to map "out of range" characters in from.
 //
 // Note that '^' only works in the from pattern. It will be considered as a normal character in the to pattern.
@@ -446,7 +446,7 @@ func Translate(str, from, to string) string {
 }
 
 // Delete runes in str matching the pattern.
-// Pattern is de***REMOVED***ned in Translate function.
+// Pattern is defined in Translate function.
 //
 // Samples:
 //     Delete("hello", "aeiou") => "hll"
@@ -458,7 +458,7 @@ func Delete(str, pattern string) string {
 }
 
 // Count how many runes in str match the pattern.
-// Pattern is de***REMOVED***ned in Translate function.
+// Pattern is defined in Translate function.
 //
 // Samples:
 //     Count("hello", "aeiou") => 3
@@ -527,7 +527,7 @@ func Squeeze(str, pattern string) string {
 			if skipSqueeze {
 				output.WriteRune(r)
 			}
-		} ***REMOVED*** {
+		} else {
 			if output != nil {
 				output.WriteRune(r)
 			}

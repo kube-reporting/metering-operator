@@ -13,7 +13,7 @@ import (
 	"github.com/aws/aws-sdk-go/private/protocol"
 )
 
-// Parse parses an object i and ***REMOVED***lls a url.Values object. The isEC2 flag
+// Parse parses an object i and fills a url.Values object. The isEC2 flag
 // indicates if this is the EC2 Query sub-protocol.
 func Parse(body url.Values, i interface{}, isEC2 bool) error {
 	q := queryParser{isEC2: isEC2}
@@ -31,7 +31,7 @@ type queryParser struct {
 	isEC2 bool
 }
 
-func (q *queryParser) parseValue(v url.Values, value reflect.Value, pre***REMOVED***x string, tag reflect.StructTag) error {
+func (q *queryParser) parseValue(v url.Values, value reflect.Value, prefix string, tag reflect.StructTag) error {
 	value = elemOf(value)
 
 	// no need to handle zero values
@@ -53,17 +53,17 @@ func (q *queryParser) parseValue(v url.Values, value reflect.Value, pre***REMOVE
 
 	switch t {
 	case "structure":
-		return q.parseStruct(v, value, pre***REMOVED***x)
+		return q.parseStruct(v, value, prefix)
 	case "list":
-		return q.parseList(v, value, pre***REMOVED***x, tag)
+		return q.parseList(v, value, prefix, tag)
 	case "map":
-		return q.parseMap(v, value, pre***REMOVED***x, tag)
+		return q.parseMap(v, value, prefix, tag)
 	default:
-		return q.parseScalar(v, value, pre***REMOVED***x, tag)
+		return q.parseScalar(v, value, prefix, tag)
 	}
 }
 
-func (q *queryParser) parseStruct(v url.Values, value reflect.Value, pre***REMOVED***x string) error {
+func (q *queryParser) parseStruct(v url.Values, value reflect.Value, prefix string) error {
 	if !value.IsValid() {
 		return nil
 	}
@@ -71,28 +71,28 @@ func (q *queryParser) parseStruct(v url.Values, value reflect.Value, pre***REMOV
 	t := value.Type()
 	for i := 0; i < value.NumField(); i++ {
 		elemValue := elemOf(value.Field(i))
-		***REMOVED***eld := t.Field(i)
+		field := t.Field(i)
 
-		if ***REMOVED***eld.PkgPath != "" {
-			continue // ignore unexported ***REMOVED***elds
+		if field.PkgPath != "" {
+			continue // ignore unexported fields
 		}
-		if ***REMOVED***eld.Tag.Get("ignore") != "" {
+		if field.Tag.Get("ignore") != "" {
 			continue
 		}
 
-		if protocol.CanSetIdempotencyToken(value.Field(i), ***REMOVED***eld) {
+		if protocol.CanSetIdempotencyToken(value.Field(i), field) {
 			token := protocol.GetIdempotencyToken()
 			elemValue = reflect.ValueOf(token)
 		}
 
 		var name string
 		if q.isEC2 {
-			name = ***REMOVED***eld.Tag.Get("queryName")
+			name = field.Tag.Get("queryName")
 		}
 		if name == "" {
-			if ***REMOVED***eld.Tag.Get("flattened") != "" && ***REMOVED***eld.Tag.Get("locationNameList") != "" {
-				name = ***REMOVED***eld.Tag.Get("locationNameList")
-			} ***REMOVED*** if locName := ***REMOVED***eld.Tag.Get("locationName"); locName != "" {
+			if field.Tag.Get("flattened") != "" && field.Tag.Get("locationNameList") != "" {
+				name = field.Tag.Get("locationNameList")
+			} else if locName := field.Tag.Get("locationName"); locName != "" {
 				name = locName
 			}
 			if name != "" && q.isEC2 {
@@ -100,64 +100,64 @@ func (q *queryParser) parseStruct(v url.Values, value reflect.Value, pre***REMOV
 			}
 		}
 		if name == "" {
-			name = ***REMOVED***eld.Name
+			name = field.Name
 		}
 
-		if pre***REMOVED***x != "" {
-			name = pre***REMOVED***x + "." + name
+		if prefix != "" {
+			name = prefix + "." + name
 		}
 
-		if err := q.parseValue(v, elemValue, name, ***REMOVED***eld.Tag); err != nil {
+		if err := q.parseValue(v, elemValue, name, field.Tag); err != nil {
 			return err
 		}
 	}
 	return nil
 }
 
-func (q *queryParser) parseList(v url.Values, value reflect.Value, pre***REMOVED***x string, tag reflect.StructTag) error {
+func (q *queryParser) parseList(v url.Values, value reflect.Value, prefix string, tag reflect.StructTag) error {
 	// If it's empty, generate an empty value
 	if !value.IsNil() && value.Len() == 0 {
-		v.Set(pre***REMOVED***x, "")
+		v.Set(prefix, "")
 		return nil
 	}
 
 	if _, ok := value.Interface().([]byte); ok {
-		return q.parseScalar(v, value, pre***REMOVED***x, tag)
+		return q.parseScalar(v, value, prefix, tag)
 	}
 
 	// check for unflattened list member
 	if !q.isEC2 && tag.Get("flattened") == "" {
 		if listName := tag.Get("locationNameList"); listName == "" {
-			pre***REMOVED***x += ".member"
-		} ***REMOVED*** {
-			pre***REMOVED***x += "." + listName
+			prefix += ".member"
+		} else {
+			prefix += "." + listName
 		}
 	}
 
 	for i := 0; i < value.Len(); i++ {
-		slicePre***REMOVED***x := pre***REMOVED***x
-		if slicePre***REMOVED***x == "" {
-			slicePre***REMOVED***x = strconv.Itoa(i + 1)
-		} ***REMOVED*** {
-			slicePre***REMOVED***x = slicePre***REMOVED***x + "." + strconv.Itoa(i+1)
+		slicePrefix := prefix
+		if slicePrefix == "" {
+			slicePrefix = strconv.Itoa(i + 1)
+		} else {
+			slicePrefix = slicePrefix + "." + strconv.Itoa(i+1)
 		}
-		if err := q.parseValue(v, value.Index(i), slicePre***REMOVED***x, ""); err != nil {
+		if err := q.parseValue(v, value.Index(i), slicePrefix, ""); err != nil {
 			return err
 		}
 	}
 	return nil
 }
 
-func (q *queryParser) parseMap(v url.Values, value reflect.Value, pre***REMOVED***x string, tag reflect.StructTag) error {
+func (q *queryParser) parseMap(v url.Values, value reflect.Value, prefix string, tag reflect.StructTag) error {
 	// If it's empty, generate an empty value
 	if !value.IsNil() && value.Len() == 0 {
-		v.Set(pre***REMOVED***x, "")
+		v.Set(prefix, "")
 		return nil
 	}
 
 	// check for unflattened list member
 	if !q.isEC2 && tag.Get("flattened") == "" {
-		pre***REMOVED***x += ".entry"
+		prefix += ".entry"
 	}
 
 	// sort keys for improved serialization consistency.
@@ -187,10 +187,10 @@ func (q *queryParser) parseMap(v url.Values, value reflect.Value, pre***REMOVED*
 
 		// serialize key
 		var keyName string
-		if pre***REMOVED***x == "" {
+		if prefix == "" {
 			keyName = strconv.Itoa(i+1) + "." + kname
-		} ***REMOVED*** {
-			keyName = pre***REMOVED***x + "." + strconv.Itoa(i+1) + "." + kname
+		} else {
+			keyName = prefix + "." + strconv.Itoa(i+1) + "." + kname
 		}
 
 		if err := q.parseValue(v, mapKey, keyName, ""); err != nil {
@@ -199,10 +199,10 @@ func (q *queryParser) parseMap(v url.Values, value reflect.Value, pre***REMOVED*
 
 		// serialize value
 		var valueName string
-		if pre***REMOVED***x == "" {
+		if prefix == "" {
 			valueName = strconv.Itoa(i+1) + "." + vname
-		} ***REMOVED*** {
-			valueName = pre***REMOVED***x + "." + strconv.Itoa(i+1) + "." + vname
+		} else {
+			valueName = prefix + "." + strconv.Itoa(i+1) + "." + vname
 		}
 
 		if err := q.parseValue(v, mapValue, valueName, ""); err != nil {

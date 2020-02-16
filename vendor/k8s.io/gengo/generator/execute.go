@@ -2,7 +2,7 @@
 Copyright 2015 The Kubernetes Authors.
 
 Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this ***REMOVED***le except in compliance with the License.
+you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
 
     http://www.apache.org/licenses/LICENSE-2.0
@@ -10,7 +10,7 @@ You may obtain a copy of the License at
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the speci***REMOVED***c language governing permissions and
+See the License for the specific language governing permissions and
 limitations under the License.
 */
 
@@ -22,7 +22,7 @@ import (
 	"io"
 	"io/ioutil"
 	"os"
-	"path/***REMOVED***lepath"
+	"path/filepath"
 	"strings"
 
 	"golang.org/x/tools/imports"
@@ -64,7 +64,7 @@ type DefaultFileType struct {
 }
 
 func (ft DefaultFileType) AssembleFile(f *File, pathname string) error {
-	klog.V(2).Infof("Assembling ***REMOVED***le %q", pathname)
+	klog.V(2).Infof("Assembling file %q", pathname)
 	destFile, err := os.Create(pathname)
 	if err != nil {
 		return err
@@ -78,21 +78,21 @@ func (ft DefaultFileType) AssembleFile(f *File, pathname string) error {
 		return et.Error()
 	}
 	if formatted, err := ft.Format(b.Bytes()); err != nil {
-		err = fmt.Errorf("unable to format ***REMOVED***le %q (%v).", pathname, err)
-		// Write the ***REMOVED***le anyway, so they can see what's going wrong and ***REMOVED***x the generator.
+		err = fmt.Errorf("unable to format file %q (%v).", pathname, err)
+		// Write the file anyway, so they can see what's going wrong and fix the generator.
 		if _, err2 := destFile.Write(b.Bytes()); err2 != nil {
 			return err2
 		}
 		return err
-	} ***REMOVED*** {
+	} else {
 		_, err = destFile.Write(formatted)
 		return err
 	}
 }
 
 func (ft DefaultFileType) VerifyFile(f *File, pathname string) error {
-	klog.V(2).Infof("Verifying ***REMOVED***le %q", pathname)
-	friendlyName := ***REMOVED***lepath.Join(f.PackageName, f.Name)
+	klog.V(2).Infof("Verifying file %q", pathname)
+	friendlyName := filepath.Join(f.PackageName, f.Name)
 	b := &bytes.Buffer{}
 	et := NewErrorTracker(b)
 	ft.Assemble(et, f)
@@ -105,12 +105,12 @@ func (ft DefaultFileType) VerifyFile(f *File, pathname string) error {
 	}
 	existing, err := ioutil.ReadFile(pathname)
 	if err != nil {
-		return fmt.Errorf("unable to read ***REMOVED***le %q for comparison: %v", friendlyName, err)
+		return fmt.Errorf("unable to read file %q for comparison: %v", friendlyName, err)
 	}
 	if bytes.Compare(formatted, existing) == 0 {
 		return nil
 	}
-	// Be nice and ***REMOVED***nd the ***REMOVED***rst place where they differ
+	// Be nice and find the first place where they differ
 	i := 0
 	for i < len(formatted) && i < len(existing) && formatted[i] == existing[i] {
 		i++
@@ -122,7 +122,7 @@ func (ft DefaultFileType) VerifyFile(f *File, pathname string) error {
 	if len(fDiff) > 100 {
 		fDiff = fDiff[:100]
 	}
-	return fmt.Errorf("output for %q differs; ***REMOVED***rst existing/expected diff: \n  %q\n  %q", friendlyName, string(eDiff), string(fDiff))
+	return fmt.Errorf("output for %q differs; first existing/expected diff: \n  %q\n  %q", friendlyName, string(eDiff), string(fDiff))
 }
 
 func assembleGolangFile(w io.Writer, f *File) {
@@ -136,7 +136,7 @@ func assembleGolangFile(w io.Writer, f *File) {
 				// they included quotes, or are using the
 				// `name "path/to/pkg"` format.
 				fmt.Fprintf(w, "\t%s\n", i)
-			} ***REMOVED*** {
+			} else {
 				fmt.Fprintf(w, "\t%q\n", i)
 			}
 		}
@@ -173,12 +173,12 @@ func NewGolangFile() *DefaultFileType {
 func addIndentHeaderComment(b *bytes.Buffer, format string, args ...interface{}) {
 	if b.Len() > 0 {
 		fmt.Fprintf(b, "\n// "+format+"\n", args...)
-	} ***REMOVED*** {
+	} else {
 		fmt.Fprintf(b, "// "+format+"\n", args...)
 	}
 }
 
-func (c *Context) ***REMOVED***lteredBy(f func(*Context, *types.Type) bool) *Context {
+func (c *Context) filteredBy(f func(*Context, *types.Type) bool) *Context {
 	c2 := *c
 	c2.Order = []*types.Type{}
 	for _, t := range c.Order {
@@ -213,36 +213,36 @@ func (c *Context) addNameSystems(namers namer.NameSystems) *Context {
 // import path. e.g.: '/path/to/home/path/to/gopath/src/' The package knows its
 // import path already, this will be appended to 'outDir'.
 func (c *Context) ExecutePackage(outDir string, p Package) error {
-	path := ***REMOVED***lepath.Join(outDir, p.Path())
+	path := filepath.Join(outDir, p.Path())
 	klog.V(2).Infof("Processing package %q, disk location %q", p.Name(), path)
 	// Filter out any types the *package* doesn't care about.
-	packageContext := c.***REMOVED***lteredBy(p.Filter)
+	packageContext := c.filteredBy(p.Filter)
 	os.MkdirAll(path, 0755)
-	***REMOVED***les := map[string]*File{}
+	files := map[string]*File{}
 	for _, g := range p.Generators(packageContext) {
 		// Filter out types the *generator* doesn't care about.
-		genContext := packageContext.***REMOVED***lteredBy(g.Filter)
-		// Now add any extra name systems de***REMOVED***ned by this generator
+		genContext := packageContext.filteredBy(g.Filter)
+		// Now add any extra name systems defined by this generator
 		genContext = genContext.addNameSystems(g.Namers(genContext))
 
-		***REMOVED***leType := g.FileType()
-		if len(***REMOVED***leType) == 0 {
-			return fmt.Errorf("generator %q must specify a ***REMOVED***le type", g.Name())
+		fileType := g.FileType()
+		if len(fileType) == 0 {
+			return fmt.Errorf("generator %q must specify a file type", g.Name())
 		}
-		f := ***REMOVED***les[g.Filename()]
+		f := files[g.Filename()]
 		if f == nil {
-			// This is the ***REMOVED***rst generator to reference this ***REMOVED***le, so start it.
+			// This is the first generator to reference this file, so start it.
 			f = &File{
 				Name:        g.Filename(),
-				FileType:    ***REMOVED***leType,
+				FileType:    fileType,
 				PackageName: p.Name(),
 				Header:      p.Header(g.Filename()),
 				Imports:     map[string]struct{}{},
 			}
-			***REMOVED***les[f.Name] = f
-		} ***REMOVED*** {
+			files[f.Name] = f
+		} else {
 			if f.FileType != g.FileType() {
-				return fmt.Errorf("***REMOVED***le %q already has type %q, but generator %q wants to use type %q", f.Name, f.FileType, g.Name(), g.FileType())
+				return fmt.Errorf("file %q already has type %q, but generator %q wants to use type %q", f.Name, f.FileType, g.Name(), g.FileType())
 			}
 		}
 
@@ -273,17 +273,17 @@ func (c *Context) ExecutePackage(outDir string, p Package) error {
 	}
 
 	var errors []error
-	for _, f := range ***REMOVED***les {
-		***REMOVED***nalPath := ***REMOVED***lepath.Join(path, f.Name)
+	for _, f := range files {
+		finalPath := filepath.Join(path, f.Name)
 		assembler, ok := c.FileTypes[f.FileType]
 		if !ok {
-			return fmt.Errorf("the ***REMOVED***le type %q registered for ***REMOVED***le %q does not exist in the context", f.FileType, f.Name)
+			return fmt.Errorf("the file type %q registered for file %q does not exist in the context", f.FileType, f.Name)
 		}
 		var err error
 		if c.Verify {
-			err = assembler.VerifyFile(f, ***REMOVED***nalPath)
-		} ***REMOVED*** {
-			err = assembler.AssembleFile(f, ***REMOVED***nalPath)
+			err = assembler.VerifyFile(f, finalPath)
+		} else {
+			err = assembler.AssembleFile(f, finalPath)
 		}
 		if err != nil {
 			errors = append(errors, err)

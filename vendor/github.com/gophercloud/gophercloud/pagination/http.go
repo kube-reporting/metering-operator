@@ -27,12 +27,12 @@ func PageResultFrom(resp *http.Response) (PageResult, error) {
 		return PageResult{}, err
 	}
 
-	if strings.HasPre***REMOVED***x(resp.Header.Get("Content-Type"), "application/json") {
+	if strings.HasPrefix(resp.Header.Get("Content-Type"), "application/json") {
 		err = json.Unmarshal(rawBody, &parsedBody)
 		if err != nil {
 			return PageResult{}, err
 		}
-	} ***REMOVED*** {
+	} else {
 		parsedBody = rawBody
 	}
 

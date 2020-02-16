@@ -1,4 +1,4 @@
-{{- de***REMOVED***ne "new-report-datasource" }}
+{{- define "new-report-datasource" }}
 apiVersion: metering.openshift.io/v1
 kind: ReportDataSource
 metadata:

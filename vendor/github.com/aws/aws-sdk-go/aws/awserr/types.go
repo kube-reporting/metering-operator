@@ -20,13 +20,13 @@ func SprintError(code, message, extra string, origErr error) string {
 	return msg
 }
 
-// A baseError wraps the code and message which de***REMOVED***nes an error. It also
+// A baseError wraps the code and message which defines an error. It also
 // can be used to wrap an original error object.
 //
 // Should be used as the root for errors satisfying the awserr.Error. Also
-// for any error which does not ***REMOVED***t into a speci***REMOVED***c error wrapper type.
+// for any error which does not fit into a specific error wrapper type.
 type baseError struct {
-	// Classi***REMOVED***cation of error
+	// Classification of error
 	code string
 
 	// Detailed information about error
@@ -39,7 +39,7 @@ type baseError struct {
 
 // newBaseError returns an error object for the code, message, and errors.
 //
-// code is a short no whitespace phrase depicting the classi***REMOVED***cation of
+// code is a short no whitespace phrase depicting the classification of
 // the error that is being created.
 //
 // message is the free flow string containing detailed information about the
@@ -61,7 +61,7 @@ func newBaseError(code, message string, origErrs []error) *baseError {
 //
 // See ErrorWithExtra for formatting.
 //
-// Satis***REMOVED***es the error interface.
+// Satisfies the error interface.
 func (b baseError) Error() string {
 	size := len(b.errs)
 	if size > 0 {
@@ -77,7 +77,7 @@ func (b baseError) String() string {
 	return b.Error()
 }
 
-// Code returns the short phrase depicting the classi***REMOVED***cation of the error.
+// Code returns the short phrase depicting the classification of the error.
 func (b baseError) Code() string {
 	return b.code
 }
@@ -88,7 +88,7 @@ func (b baseError) Message() string {
 }
 
 // OrigErr returns the original error if one was set. Nil is returned if no
-// error was set. This only returns the ***REMOVED***rst element in the list. If the full
+// error was set. This only returns the first element in the list. If the full
 // list is needed, use BatchedErrors.
 func (b baseError) OrigErr() error {
 	switch len(b.errs) {
@@ -111,7 +111,7 @@ func (b baseError) OrigErrs() []error {
 	return b.errs
 }
 
-// So that the Error interface type can be included as an anonymous ***REMOVED***eld
+// So that the Error interface type can be included as an anonymous field
 // in the requestError struct and not conflict with the error.Error() method.
 type awsError Error
 
@@ -142,7 +142,7 @@ func newRequestError(err Error, statusCode int, requestID string) *requestError 
 }
 
 // Error returns the string representation of the error.
-// Satis***REMOVED***es the error interface.
+// Satisfies the error interface.
 func (r requestError) Error() string {
 	extra := fmt.Sprintf("status code: %d, request id: %s",
 		r.statusCode, r.requestID)
@@ -180,7 +180,7 @@ type unmarshalError struct {
 }
 
 // Error returns the string representation of the error.
-// Satis***REMOVED***es the error interface.
+// Satisfies the error interface.
 func (e unmarshalError) Error() string {
 	extra := hex.Dump(e.bytes)
 	return SprintError(e.Code(), e.Message(), extra, e.OrigErr())
@@ -197,12 +197,12 @@ func (e unmarshalError) Bytes() []byte {
 	return e.bytes
 }
 
-// An error list that satis***REMOVED***es the golang interface
+// An error list that satisfies the golang interface
 type errorList []error
 
 // Error returns the string representation of the error.
 //
-// Satis***REMOVED***es the error interface.
+// Satisfies the error interface.
 func (e errorList) Error() string {
 	msg := ""
 	// How do we want to handle the array size being zero

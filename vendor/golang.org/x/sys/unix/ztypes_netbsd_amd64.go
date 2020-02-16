@@ -203,7 +203,7 @@ type Cmsghdr struct {
 
 type Inet6Pktinfo struct {
 	Addr    [16]byte /* in6_addr */
-	I***REMOVED***ndex uint32
+	Ifindex uint32
 }
 
 type IPv6MTUInfo struct {

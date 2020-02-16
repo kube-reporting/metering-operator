@@ -1,10 +1,10 @@
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements. See the NOTICE ***REMOVED***le
+ * or more contributor license agreements. See the NOTICE file
  * distributed with this work for additional information
- * regarding copyright ownership. The ASF licenses this ***REMOVED***le
+ * regarding copyright ownership. The ASF licenses this file
  * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this ***REMOVED***le except in compliance
+ * "License"); you may not use this file except in compliance
  * with the License. You may obtain a copy of the License at
  *
  *   http://www.apache.org/licenses/LICENSE-2.0
@@ -13,7 +13,7 @@
  * software distributed under the License is distributed on an
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
  * KIND, either express or implied. See the License for the
- * speci***REMOVED***c language governing permissions and limitations
+ * specific language governing permissions and limitations
  * under the License.
  */
 
@@ -198,7 +198,7 @@ func (p *TJSONProtocol) WriteString(v string) error {
 func (p *TJSONProtocol) WriteBinary(v []byte) error {
 	// JSON library only takes in a string,
 	// not an arbitrary byte array, to ensure bytes are transmitted
-	// ef***REMOVED***ciently we must convert this into a valid JSON string
+	// efficiently we must convert this into a valid JSON string
 	// therefore we use base64 encoding to avoid excessive escaping/quoting
 	if e := p.OutputPreValue(); e != nil {
 		return e
@@ -268,19 +268,19 @@ func (p *TJSONProtocol) ReadFieldBegin() (string, TType, int16, error) {
 	if len(b) < 1 || b[0] == JSON_RBRACE[0] || b[0] == JSON_RBRACKET[0] {
 		return "", STOP, -1, nil
 	}
-	***REMOVED***eldId, err := p.ReadI16()
+	fieldId, err := p.ReadI16()
 	if err != nil {
-		return "", STOP, ***REMOVED***eldId, err
+		return "", STOP, fieldId, err
 	}
 	if _, err = p.ParseObjectStart(); err != nil {
-		return "", STOP, ***REMOVED***eldId, err
+		return "", STOP, fieldId, err
 	}
 	sType, err := p.ReadString()
 	if err != nil {
-		return "", STOP, ***REMOVED***eldId, err
+		return "", STOP, fieldId, err
 	}
 	fType, err := p.StringToTypeId(sType)
-	return "", fType, ***REMOVED***eldId, err
+	return "", fType, fieldId, err
 }
 
 func (p *TJSONProtocol) ReadFieldEnd() error {
@@ -390,7 +390,7 @@ func (p *TJSONProtocol) ReadString() (string, error) {
 		if err != nil {
 			return v, err
 		}
-	} ***REMOVED*** if len(f) > 0 && f[0] == JSON_NULL[0] {
+	} else if len(f) > 0 && f[0] == JSON_NULL[0] {
 		b := make([]byte, len(JSON_NULL))
 		_, err := p.reader.Read(b)
 		if err != nil {
@@ -400,7 +400,7 @@ func (p *TJSONProtocol) ReadString() (string, error) {
 			e := fmt.Errorf("Expected a JSON string, found unquoted data started with %s", string(b))
 			return v, NewTProtocolExceptionWithType(INVALID_DATA, e)
 		}
-	} ***REMOVED*** {
+	} else {
 		e := fmt.Errorf("Expected a JSON string, found unquoted data started with %s", string(f))
 		return v, NewTProtocolExceptionWithType(INVALID_DATA, e)
 	}
@@ -420,7 +420,7 @@ func (p *TJSONProtocol) ReadBinary() ([]byte, error) {
 		if err != nil {
 			return v, err
 		}
-	} ***REMOVED*** if len(f) > 0 && f[0] == JSON_NULL[0] {
+	} else if len(f) > 0 && f[0] == JSON_NULL[0] {
 		b := make([]byte, len(JSON_NULL))
 		_, err := p.reader.Read(b)
 		if err != nil {
@@ -430,7 +430,7 @@ func (p *TJSONProtocol) ReadBinary() ([]byte, error) {
 			e := fmt.Errorf("Expected a JSON string, found unquoted data started with %s", string(b))
 			return v, NewTProtocolExceptionWithType(INVALID_DATA, e)
 		}
-	} ***REMOVED*** {
+	} else {
 		e := fmt.Errorf("Expected a JSON string, found unquoted data started with %s", string(f))
 		return v, NewTProtocolExceptionWithType(INVALID_DATA, e)
 	}
@@ -446,8 +446,8 @@ func (p *TJSONProtocol) Flush() (err error) {
 	return NewTProtocolException(err)
 }
 
-func (p *TJSONProtocol) Skip(***REMOVED***eldType TType) (err error) {
-	return SkipDefaultDepth(p, ***REMOVED***eldType)
+func (p *TJSONProtocol) Skip(fieldType TType) (err error) {
+	return SkipDefaultDepth(p, fieldType)
 }
 
 func (p *TJSONProtocol) Transport() TTransport {
@@ -522,8 +522,8 @@ func (p *TJSONProtocol) writeElemListBegin(elemType TType, size int) error {
 	return nil
 }
 
-func (p *TJSONProtocol) TypeIdToString(***REMOVED***eldType TType) (string, error) {
-	switch byte(***REMOVED***eldType) {
+func (p *TJSONProtocol) TypeIdToString(fieldType TType) (string, error) {
+	switch byte(fieldType) {
 	case BOOL:
 		return "tf", nil
 	case BYTE:
@@ -548,12 +548,12 @@ func (p *TJSONProtocol) TypeIdToString(***REMOVED***eldType TType) (string, erro
 		return "lst", nil
 	}
 
-	e := fmt.Errorf("Unknown ***REMOVED***eldType: %d", int(***REMOVED***eldType))
+	e := fmt.Errorf("Unknown fieldType: %d", int(fieldType))
 	return "", NewTProtocolExceptionWithType(INVALID_DATA, e)
 }
 
-func (p *TJSONProtocol) StringToTypeId(***REMOVED***eldType string) (TType, error) {
-	switch ***REMOVED***eldType {
+func (p *TJSONProtocol) StringToTypeId(fieldType string) (TType, error) {
+	switch fieldType {
 	case "tf":
 		return TType(BOOL), nil
 	case "i8":
@@ -578,6 +578,6 @@ func (p *TJSONProtocol) StringToTypeId(***REMOVED***eldType string) (TType, erro
 		return TType(LIST), nil
 	}
 
-	e := fmt.Errorf("Unknown type identi***REMOVED***er: %s", ***REMOVED***eldType)
+	e := fmt.Errorf("Unknown type identifier: %s", fieldType)
 	return TType(STOP), NewTProtocolExceptionWithType(INVALID_DATA, e)
 }

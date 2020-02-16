@@ -22,13 +22,13 @@ type UserAgent struct {
 	prepend []string
 }
 
-// Prepend prepends a user-de***REMOVED***ned string to the default User-Agent string. Users
+// Prepend prepends a user-defined string to the default User-Agent string. Users
 // may pass in one or more strings to prepend.
 func (ua *UserAgent) Prepend(s ...string) {
 	ua.prepend = append(s, ua.prepend...)
 }
 
-// Join concatenates all the user-de***REMOVED***ned User-Agend strings with the default
+// Join concatenates all the user-defined User-Agend strings with the default
 // Gophercloud User-Agent string.
 func (ua *UserAgent) Join() string {
 	uaSlice := append(ua.prepend, DefaultUserAgent)
@@ -36,7 +36,7 @@ func (ua *UserAgent) Join() string {
 }
 
 // ProviderClient stores details that are required to interact with any
-// services within a speci***REMOVED***c provider's API.
+// services within a specific provider's API.
 //
 // Generally, you acquire a ProviderClient by calling the NewClient method in
 // the appropriate provider's child package, providing whatever authentication
@@ -44,17 +44,17 @@ func (ua *UserAgent) Join() string {
 type ProviderClient struct {
 	// IdentityBase is the base URL used for a particular provider's identity
 	// service - it will be used when issuing authenticatation requests. It
-	// should point to the root resource of the identity service, not a speci***REMOVED***c
+	// should point to the root resource of the identity service, not a specific
 	// identity version.
 	IdentityBase string
 
-	// IdentityEndpoint is the identity endpoint. This may be a speci***REMOVED***c version
+	// IdentityEndpoint is the identity endpoint. This may be a specific version
 	// of the identity service. If this is the case, this endpoint is used rather
-	// than querying versions ***REMOVED***rst.
+	// than querying versions first.
 	IdentityEndpoint string
 
 	// TokenID is the ID of the most recently issued valid token.
-	// NOTE: Aside from within a custom ReauthFunc, this ***REMOVED***eld shouldn't be set by an application.
+	// NOTE: Aside from within a custom ReauthFunc, this field shouldn't be set by an application.
 	// To safely read or write this value, call `Token` or `SetToken`, respectively
 	TokenID string
 
@@ -141,7 +141,7 @@ func (client *ProviderClient) GetAuthResult() AuthResult {
 }
 
 // Token safely reads the value of the auth token from the ProviderClient. Applications should
-// call this method to access the token instead of the TokenID ***REMOVED***eld
+// call this method to access the token instead of the TokenID field
 func (client *ProviderClient) Token() string {
 	if client.mut != nil {
 		client.mut.RLock()
@@ -200,7 +200,7 @@ func (client *ProviderClient) CopyTokenFrom(other *ProviderClient) {
 	client.authResult = other.authResult
 }
 
-// IsThrowaway safely reads the value of the client Throwaway ***REMOVED***eld.
+// IsThrowaway safely reads the value of the client Throwaway field.
 func (client *ProviderClient) IsThrowaway() bool {
 	if client.reauthmut != nil {
 		client.reauthmut.RLock()
@@ -209,7 +209,7 @@ func (client *ProviderClient) IsThrowaway() bool {
 	return client.Throwaway
 }
 
-// SetThrowaway safely sets the value of the client Throwaway ***REMOVED***eld.
+// SetThrowaway safely sets the value of the client Throwaway field.
 func (client *ProviderClient) SetThrowaway(v bool) {
 	if client.reauthmut != nil {
 		client.reauthmut.Lock()
@@ -276,11 +276,11 @@ type RequestOpts struct {
 	// OkCodes contains a list of numeric HTTP status codes that should be interpreted as success. If
 	// the response has a different code, an error will be returned.
 	OkCodes []int
-	// MoreHeaders speci***REMOVED***es additional HTTP headers to be provide on the request. If a header is
+	// MoreHeaders specifies additional HTTP headers to be provide on the request. If a header is
 	// provided with a blank value (""), that header will be *omitted* instead: use this to suppress
 	// the default Accept header or an inferred Content-Type, for example.
 	MoreHeaders map[string]string
-	// ErrorContext speci***REMOVED***es the resource error type to return if an error is encountered.
+	// ErrorContext specifies the resource error type to return if an error is encountered.
 	// This lets resources override default error messages based on the response status code.
 	ErrorContext error
 }
@@ -336,7 +336,7 @@ func (client *ProviderClient) Request(method, url string, options *RequestOpts) 
 		for k, v := range options.MoreHeaders {
 			if v != "" {
 				req.Header.Set(k, v)
-			} ***REMOVED*** {
+			} else {
 				req.Header.Del(k)
 			}
 		}

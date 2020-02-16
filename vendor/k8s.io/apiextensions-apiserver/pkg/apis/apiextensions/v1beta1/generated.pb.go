@@ -2,7 +2,7 @@
 Copyright The Kubernetes Authors.
 
 Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this ***REMOVED***le except in compliance with the License.
+you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
 
     http://www.apache.org/licenses/LICENSE-2.0
@@ -10,7 +10,7 @@ You may obtain a copy of the License at
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the speci***REMOVED***c language governing permissions and
+See the License for the specific language governing permissions and
 limitations under the License.
 */
 
@@ -20,22 +20,22 @@ limitations under the License.
 /*
 	Package v1beta1 is a generated protocol buffer package.
 
-	It is generated from these ***REMOVED***les:
+	It is generated from these files:
 		k8s.io/kubernetes/vendor/k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1beta1/generated.proto
 
 	It has these top-level messages:
 		ConversionRequest
 		ConversionResponse
 		ConversionReview
-		CustomResourceColumnDe***REMOVED***nition
+		CustomResourceColumnDefinition
 		CustomResourceConversion
-		CustomResourceDe***REMOVED***nition
-		CustomResourceDe***REMOVED***nitionCondition
-		CustomResourceDe***REMOVED***nitionList
-		CustomResourceDe***REMOVED***nitionNames
-		CustomResourceDe***REMOVED***nitionSpec
-		CustomResourceDe***REMOVED***nitionStatus
-		CustomResourceDe***REMOVED***nitionVersion
+		CustomResourceDefinition
+		CustomResourceDefinitionCondition
+		CustomResourceDefinitionList
+		CustomResourceDefinitionNames
+		CustomResourceDefinitionSpec
+		CustomResourceDefinitionStatus
+		CustomResourceDefinitionVersion
 		CustomResourceSubresourceScale
 		CustomResourceSubresourceStatus
 		CustomResourceSubresources
@@ -47,7 +47,7 @@ limitations under the License.
 		JSONSchemaPropsOrBool
 		JSONSchemaPropsOrStringArray
 		ServiceReference
-		WebhookClientCon***REMOVED***g
+		WebhookClientConfig
 */
 package v1beta1
 
@@ -72,7 +72,7 @@ var _ = proto.Marshal
 var _ = fmt.Errorf
 var _ = math.Inf
 
-// This is a compile-time assertion to ensure that this generated ***REMOVED***le
+// This is a compile-time assertion to ensure that this generated file
 // is compatible with the proto package it is being compiled against.
 // A compilation error at this line likely means your copy of the
 // proto package needs to be updated.
@@ -80,141 +80,141 @@ const _ = proto.GoGoProtoPackageIsVersion2 // please upgrade the proto package
 
 func (m *ConversionRequest) Reset()                    { *m = ConversionRequest{} }
 func (*ConversionRequest) ProtoMessage()               {}
-func (*ConversionRequest) Descriptor() ([]byte, []int) { return ***REMOVED***leDescriptorGenerated, []int{0} }
+func (*ConversionRequest) Descriptor() ([]byte, []int) { return fileDescriptorGenerated, []int{0} }
 
 func (m *ConversionResponse) Reset()                    { *m = ConversionResponse{} }
 func (*ConversionResponse) ProtoMessage()               {}
-func (*ConversionResponse) Descriptor() ([]byte, []int) { return ***REMOVED***leDescriptorGenerated, []int{1} }
+func (*ConversionResponse) Descriptor() ([]byte, []int) { return fileDescriptorGenerated, []int{1} }
 
 func (m *ConversionReview) Reset()                    { *m = ConversionReview{} }
 func (*ConversionReview) ProtoMessage()               {}
-func (*ConversionReview) Descriptor() ([]byte, []int) { return ***REMOVED***leDescriptorGenerated, []int{2} }
+func (*ConversionReview) Descriptor() ([]byte, []int) { return fileDescriptorGenerated, []int{2} }
 
-func (m *CustomResourceColumnDe***REMOVED***nition) Reset()      { *m = CustomResourceColumnDe***REMOVED***nition{} }
-func (*CustomResourceColumnDe***REMOVED***nition) ProtoMessage() {}
-func (*CustomResourceColumnDe***REMOVED***nition) Descriptor() ([]byte, []int) {
-	return ***REMOVED***leDescriptorGenerated, []int{3}
+func (m *CustomResourceColumnDefinition) Reset()      { *m = CustomResourceColumnDefinition{} }
+func (*CustomResourceColumnDefinition) ProtoMessage() {}
+func (*CustomResourceColumnDefinition) Descriptor() ([]byte, []int) {
+	return fileDescriptorGenerated, []int{3}
 }
 
 func (m *CustomResourceConversion) Reset()      { *m = CustomResourceConversion{} }
 func (*CustomResourceConversion) ProtoMessage() {}
 func (*CustomResourceConversion) Descriptor() ([]byte, []int) {
-	return ***REMOVED***leDescriptorGenerated, []int{4}
+	return fileDescriptorGenerated, []int{4}
 }
 
-func (m *CustomResourceDe***REMOVED***nition) Reset()      { *m = CustomResourceDe***REMOVED***nition{} }
-func (*CustomResourceDe***REMOVED***nition) ProtoMessage() {}
-func (*CustomResourceDe***REMOVED***nition) Descriptor() ([]byte, []int) {
-	return ***REMOVED***leDescriptorGenerated, []int{5}
+func (m *CustomResourceDefinition) Reset()      { *m = CustomResourceDefinition{} }
+func (*CustomResourceDefinition) ProtoMessage() {}
+func (*CustomResourceDefinition) Descriptor() ([]byte, []int) {
+	return fileDescriptorGenerated, []int{5}
 }
 
-func (m *CustomResourceDe***REMOVED***nitionCondition) Reset()      { *m = CustomResourceDe***REMOVED***nitionCondition{} }
-func (*CustomResourceDe***REMOVED***nitionCondition) ProtoMessage() {}
-func (*CustomResourceDe***REMOVED***nitionCondition) Descriptor() ([]byte, []int) {
-	return ***REMOVED***leDescriptorGenerated, []int{6}
+func (m *CustomResourceDefinitionCondition) Reset()      { *m = CustomResourceDefinitionCondition{} }
+func (*CustomResourceDefinitionCondition) ProtoMessage() {}
+func (*CustomResourceDefinitionCondition) Descriptor() ([]byte, []int) {
+	return fileDescriptorGenerated, []int{6}
 }
 
-func (m *CustomResourceDe***REMOVED***nitionList) Reset()      { *m = CustomResourceDe***REMOVED***nitionList{} }
-func (*CustomResourceDe***REMOVED***nitionList) ProtoMessage() {}
-func (*CustomResourceDe***REMOVED***nitionList) Descriptor() ([]byte, []int) {
-	return ***REMOVED***leDescriptorGenerated, []int{7}
+func (m *CustomResourceDefinitionList) Reset()      { *m = CustomResourceDefinitionList{} }
+func (*CustomResourceDefinitionList) ProtoMessage() {}
+func (*CustomResourceDefinitionList) Descriptor() ([]byte, []int) {
+	return fileDescriptorGenerated, []int{7}
 }
 
-func (m *CustomResourceDe***REMOVED***nitionNames) Reset()      { *m = CustomResourceDe***REMOVED***nitionNames{} }
-func (*CustomResourceDe***REMOVED***nitionNames) ProtoMessage() {}
-func (*CustomResourceDe***REMOVED***nitionNames) Descriptor() ([]byte, []int) {
-	return ***REMOVED***leDescriptorGenerated, []int{8}
+func (m *CustomResourceDefinitionNames) Reset()      { *m = CustomResourceDefinitionNames{} }
+func (*CustomResourceDefinitionNames) ProtoMessage() {}
+func (*CustomResourceDefinitionNames) Descriptor() ([]byte, []int) {
+	return fileDescriptorGenerated, []int{8}
 }
 
-func (m *CustomResourceDe***REMOVED***nitionSpec) Reset()      { *m = CustomResourceDe***REMOVED***nitionSpec{} }
-func (*CustomResourceDe***REMOVED***nitionSpec) ProtoMessage() {}
-func (*CustomResourceDe***REMOVED***nitionSpec) Descriptor() ([]byte, []int) {
-	return ***REMOVED***leDescriptorGenerated, []int{9}
+func (m *CustomResourceDefinitionSpec) Reset()      { *m = CustomResourceDefinitionSpec{} }
+func (*CustomResourceDefinitionSpec) ProtoMessage() {}
+func (*CustomResourceDefinitionSpec) Descriptor() ([]byte, []int) {
+	return fileDescriptorGenerated, []int{9}
 }
 
-func (m *CustomResourceDe***REMOVED***nitionStatus) Reset()      { *m = CustomResourceDe***REMOVED***nitionStatus{} }
-func (*CustomResourceDe***REMOVED***nitionStatus) ProtoMessage() {}
-func (*CustomResourceDe***REMOVED***nitionStatus) Descriptor() ([]byte, []int) {
-	return ***REMOVED***leDescriptorGenerated, []int{10}
+func (m *CustomResourceDefinitionStatus) Reset()      { *m = CustomResourceDefinitionStatus{} }
+func (*CustomResourceDefinitionStatus) ProtoMessage() {}
+func (*CustomResourceDefinitionStatus) Descriptor() ([]byte, []int) {
+	return fileDescriptorGenerated, []int{10}
 }
 
-func (m *CustomResourceDe***REMOVED***nitionVersion) Reset()      { *m = CustomResourceDe***REMOVED***nitionVersion{} }
-func (*CustomResourceDe***REMOVED***nitionVersion) ProtoMessage() {}
-func (*CustomResourceDe***REMOVED***nitionVersion) Descriptor() ([]byte, []int) {
-	return ***REMOVED***leDescriptorGenerated, []int{11}
+func (m *CustomResourceDefinitionVersion) Reset()      { *m = CustomResourceDefinitionVersion{} }
+func (*CustomResourceDefinitionVersion) ProtoMessage() {}
+func (*CustomResourceDefinitionVersion) Descriptor() ([]byte, []int) {
+	return fileDescriptorGenerated, []int{11}
 }
 
 func (m *CustomResourceSubresourceScale) Reset()      { *m = CustomResourceSubresourceScale{} }
 func (*CustomResourceSubresourceScale) ProtoMessage() {}
 func (*CustomResourceSubresourceScale) Descriptor() ([]byte, []int) {
-	return ***REMOVED***leDescriptorGenerated, []int{12}
+	return fileDescriptorGenerated, []int{12}
 }
 
 func (m *CustomResourceSubresourceStatus) Reset()      { *m = CustomResourceSubresourceStatus{} }
 func (*CustomResourceSubresourceStatus) ProtoMessage() {}
 func (*CustomResourceSubresourceStatus) Descriptor() ([]byte, []int) {
-	return ***REMOVED***leDescriptorGenerated, []int{13}
+	return fileDescriptorGenerated, []int{13}
 }
 
 func (m *CustomResourceSubresources) Reset()      { *m = CustomResourceSubresources{} }
 func (*CustomResourceSubresources) ProtoMessage() {}
 func (*CustomResourceSubresources) Descriptor() ([]byte, []int) {
-	return ***REMOVED***leDescriptorGenerated, []int{14}
+	return fileDescriptorGenerated, []int{14}
 }
 
 func (m *CustomResourceValidation) Reset()      { *m = CustomResourceValidation{} }
 func (*CustomResourceValidation) ProtoMessage() {}
 func (*CustomResourceValidation) Descriptor() ([]byte, []int) {
-	return ***REMOVED***leDescriptorGenerated, []int{15}
+	return fileDescriptorGenerated, []int{15}
 }
 
 func (m *ExternalDocumentation) Reset()                    { *m = ExternalDocumentation{} }
 func (*ExternalDocumentation) ProtoMessage()               {}
-func (*ExternalDocumentation) Descriptor() ([]byte, []int) { return ***REMOVED***leDescriptorGenerated, []int{16} }
+func (*ExternalDocumentation) Descriptor() ([]byte, []int) { return fileDescriptorGenerated, []int{16} }
 
 func (m *JSON) Reset()                    { *m = JSON{} }
 func (*JSON) ProtoMessage()               {}
-func (*JSON) Descriptor() ([]byte, []int) { return ***REMOVED***leDescriptorGenerated, []int{17} }
+func (*JSON) Descriptor() ([]byte, []int) { return fileDescriptorGenerated, []int{17} }
 
 func (m *JSONSchemaProps) Reset()                    { *m = JSONSchemaProps{} }
 func (*JSONSchemaProps) ProtoMessage()               {}
-func (*JSONSchemaProps) Descriptor() ([]byte, []int) { return ***REMOVED***leDescriptorGenerated, []int{18} }
+func (*JSONSchemaProps) Descriptor() ([]byte, []int) { return fileDescriptorGenerated, []int{18} }
 
 func (m *JSONSchemaPropsOrArray) Reset()                    { *m = JSONSchemaPropsOrArray{} }
 func (*JSONSchemaPropsOrArray) ProtoMessage()               {}
-func (*JSONSchemaPropsOrArray) Descriptor() ([]byte, []int) { return ***REMOVED***leDescriptorGenerated, []int{19} }
+func (*JSONSchemaPropsOrArray) Descriptor() ([]byte, []int) { return fileDescriptorGenerated, []int{19} }
 
 func (m *JSONSchemaPropsOrBool) Reset()                    { *m = JSONSchemaPropsOrBool{} }
 func (*JSONSchemaPropsOrBool) ProtoMessage()               {}
-func (*JSONSchemaPropsOrBool) Descriptor() ([]byte, []int) { return ***REMOVED***leDescriptorGenerated, []int{20} }
+func (*JSONSchemaPropsOrBool) Descriptor() ([]byte, []int) { return fileDescriptorGenerated, []int{20} }
 
 func (m *JSONSchemaPropsOrStringArray) Reset()      { *m = JSONSchemaPropsOrStringArray{} }
 func (*JSONSchemaPropsOrStringArray) ProtoMessage() {}
 func (*JSONSchemaPropsOrStringArray) Descriptor() ([]byte, []int) {
-	return ***REMOVED***leDescriptorGenerated, []int{21}
+	return fileDescriptorGenerated, []int{21}
 }
 
 func (m *ServiceReference) Reset()                    { *m = ServiceReference{} }
 func (*ServiceReference) ProtoMessage()               {}
-func (*ServiceReference) Descriptor() ([]byte, []int) { return ***REMOVED***leDescriptorGenerated, []int{22} }
+func (*ServiceReference) Descriptor() ([]byte, []int) { return fileDescriptorGenerated, []int{22} }
 
-func (m *WebhookClientCon***REMOVED***g) Reset()                    { *m = WebhookClientCon***REMOVED***g{} }
-func (*WebhookClientCon***REMOVED***g) ProtoMessage()               {}
-func (*WebhookClientCon***REMOVED***g) Descriptor() ([]byte, []int) { return ***REMOVED***leDescriptorGenerated, []int{23} }
+func (m *WebhookClientConfig) Reset()                    { *m = WebhookClientConfig{} }
+func (*WebhookClientConfig) ProtoMessage()               {}
+func (*WebhookClientConfig) Descriptor() ([]byte, []int) { return fileDescriptorGenerated, []int{23} }
 
 func init() {
 	proto.RegisterType((*ConversionRequest)(nil), "k8s.io.apiextensions_apiserver.pkg.apis.apiextensions.v1beta1.ConversionRequest")
 	proto.RegisterType((*ConversionResponse)(nil), "k8s.io.apiextensions_apiserver.pkg.apis.apiextensions.v1beta1.ConversionResponse")
 	proto.RegisterType((*ConversionReview)(nil), "k8s.io.apiextensions_apiserver.pkg.apis.apiextensions.v1beta1.ConversionReview")
-	proto.RegisterType((*CustomResourceColumnDe***REMOVED***nition)(nil), "k8s.io.apiextensions_apiserver.pkg.apis.apiextensions.v1beta1.CustomResourceColumnDe***REMOVED***nition")
+	proto.RegisterType((*CustomResourceColumnDefinition)(nil), "k8s.io.apiextensions_apiserver.pkg.apis.apiextensions.v1beta1.CustomResourceColumnDefinition")
 	proto.RegisterType((*CustomResourceConversion)(nil), "k8s.io.apiextensions_apiserver.pkg.apis.apiextensions.v1beta1.CustomResourceConversion")
-	proto.RegisterType((*CustomResourceDe***REMOVED***nition)(nil), "k8s.io.apiextensions_apiserver.pkg.apis.apiextensions.v1beta1.CustomResourceDe***REMOVED***nition")
-	proto.RegisterType((*CustomResourceDe***REMOVED***nitionCondition)(nil), "k8s.io.apiextensions_apiserver.pkg.apis.apiextensions.v1beta1.CustomResourceDe***REMOVED***nitionCondition")
-	proto.RegisterType((*CustomResourceDe***REMOVED***nitionList)(nil), "k8s.io.apiextensions_apiserver.pkg.apis.apiextensions.v1beta1.CustomResourceDe***REMOVED***nitionList")
-	proto.RegisterType((*CustomResourceDe***REMOVED***nitionNames)(nil), "k8s.io.apiextensions_apiserver.pkg.apis.apiextensions.v1beta1.CustomResourceDe***REMOVED***nitionNames")
-	proto.RegisterType((*CustomResourceDe***REMOVED***nitionSpec)(nil), "k8s.io.apiextensions_apiserver.pkg.apis.apiextensions.v1beta1.CustomResourceDe***REMOVED***nitionSpec")
-	proto.RegisterType((*CustomResourceDe***REMOVED***nitionStatus)(nil), "k8s.io.apiextensions_apiserver.pkg.apis.apiextensions.v1beta1.CustomResourceDe***REMOVED***nitionStatus")
-	proto.RegisterType((*CustomResourceDe***REMOVED***nitionVersion)(nil), "k8s.io.apiextensions_apiserver.pkg.apis.apiextensions.v1beta1.CustomResourceDe***REMOVED***nitionVersion")
+	proto.RegisterType((*CustomResourceDefinition)(nil), "k8s.io.apiextensions_apiserver.pkg.apis.apiextensions.v1beta1.CustomResourceDefinition")
+	proto.RegisterType((*CustomResourceDefinitionCondition)(nil), "k8s.io.apiextensions_apiserver.pkg.apis.apiextensions.v1beta1.CustomResourceDefinitionCondition")
+	proto.RegisterType((*CustomResourceDefinitionList)(nil), "k8s.io.apiextensions_apiserver.pkg.apis.apiextensions.v1beta1.CustomResourceDefinitionList")
+	proto.RegisterType((*CustomResourceDefinitionNames)(nil), "k8s.io.apiextensions_apiserver.pkg.apis.apiextensions.v1beta1.CustomResourceDefinitionNames")
+	proto.RegisterType((*CustomResourceDefinitionSpec)(nil), "k8s.io.apiextensions_apiserver.pkg.apis.apiextensions.v1beta1.CustomResourceDefinitionSpec")
+	proto.RegisterType((*CustomResourceDefinitionStatus)(nil), "k8s.io.apiextensions_apiserver.pkg.apis.apiextensions.v1beta1.CustomResourceDefinitionStatus")
+	proto.RegisterType((*CustomResourceDefinitionVersion)(nil), "k8s.io.apiextensions_apiserver.pkg.apis.apiextensions.v1beta1.CustomResourceDefinitionVersion")
 	proto.RegisterType((*CustomResourceSubresourceScale)(nil), "k8s.io.apiextensions_apiserver.pkg.apis.apiextensions.v1beta1.CustomResourceSubresourceScale")
 	proto.RegisterType((*CustomResourceSubresourceStatus)(nil), "k8s.io.apiextensions_apiserver.pkg.apis.apiextensions.v1beta1.CustomResourceSubresourceStatus")
 	proto.RegisterType((*CustomResourceSubresources)(nil), "k8s.io.apiextensions_apiserver.pkg.apis.apiextensions.v1beta1.CustomResourceSubresources")
@@ -226,7 +226,7 @@ func init() {
 	proto.RegisterType((*JSONSchemaPropsOrBool)(nil), "k8s.io.apiextensions_apiserver.pkg.apis.apiextensions.v1beta1.JSONSchemaPropsOrBool")
 	proto.RegisterType((*JSONSchemaPropsOrStringArray)(nil), "k8s.io.apiextensions_apiserver.pkg.apis.apiextensions.v1beta1.JSONSchemaPropsOrStringArray")
 	proto.RegisterType((*ServiceReference)(nil), "k8s.io.apiextensions_apiserver.pkg.apis.apiextensions.v1beta1.ServiceReference")
-	proto.RegisterType((*WebhookClientCon***REMOVED***g)(nil), "k8s.io.apiextensions_apiserver.pkg.apis.apiextensions.v1beta1.WebhookClientCon***REMOVED***g")
+	proto.RegisterType((*WebhookClientConfig)(nil), "k8s.io.apiextensions_apiserver.pkg.apis.apiextensions.v1beta1.WebhookClientConfig")
 }
 func (m *ConversionRequest) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
@@ -346,7 +346,7 @@ func (m *ConversionReview) MarshalTo(dAtA []byte) (int, error) {
 	return i, nil
 }
 
-func (m *CustomResourceColumnDe***REMOVED***nition) Marshal() (dAtA []byte, err error) {
+func (m *CustomResourceColumnDefinition) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalTo(dAtA)
@@ -356,7 +356,7 @@ func (m *CustomResourceColumnDe***REMOVED***nition) Marshal() (dAtA []byte, err 
 	return dAtA[:n], nil
 }
 
-func (m *CustomResourceColumnDe***REMOVED***nition) MarshalTo(dAtA []byte) (int, error) {
+func (m *CustomResourceColumnDefinition) MarshalTo(dAtA []byte) (int, error) {
 	var i int
 	_ = i
 	var l int
@@ -406,11 +406,11 @@ func (m *CustomResourceConversion) MarshalTo(dAtA []byte) (int, error) {
 	i++
 	i = encodeVarintGenerated(dAtA, i, uint64(len(m.Strategy)))
 	i += copy(dAtA[i:], m.Strategy)
-	if m.WebhookClientCon***REMOVED***g != nil {
+	if m.WebhookClientConfig != nil {
 		dAtA[i] = 0x12
 		i++
-		i = encodeVarintGenerated(dAtA, i, uint64(m.WebhookClientCon***REMOVED***g.Size()))
-		n4, err := m.WebhookClientCon***REMOVED***g.MarshalTo(dAtA[i:])
+		i = encodeVarintGenerated(dAtA, i, uint64(m.WebhookClientConfig.Size()))
+		n4, err := m.WebhookClientConfig.MarshalTo(dAtA[i:])
 		if err != nil {
 			return 0, err
 		}
@@ -419,7 +419,7 @@ func (m *CustomResourceConversion) MarshalTo(dAtA []byte) (int, error) {
 	return i, nil
 }
 
-func (m *CustomResourceDe***REMOVED***nition) Marshal() (dAtA []byte, err error) {
+func (m *CustomResourceDefinition) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalTo(dAtA)
@@ -429,7 +429,7 @@ func (m *CustomResourceDe***REMOVED***nition) Marshal() (dAtA []byte, err error)
 	return dAtA[:n], nil
 }
 
-func (m *CustomResourceDe***REMOVED***nition) MarshalTo(dAtA []byte) (int, error) {
+func (m *CustomResourceDefinition) MarshalTo(dAtA []byte) (int, error) {
 	var i int
 	_ = i
 	var l int
@@ -461,7 +461,7 @@ func (m *CustomResourceDe***REMOVED***nition) MarshalTo(dAtA []byte) (int, error
 	return i, nil
 }
 
-func (m *CustomResourceDe***REMOVED***nitionCondition) Marshal() (dAtA []byte, err error) {
+func (m *CustomResourceDefinitionCondition) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalTo(dAtA)
@@ -471,7 +471,7 @@ func (m *CustomResourceDe***REMOVED***nitionCondition) Marshal() (dAtA []byte, e
 	return dAtA[:n], nil
 }
 
-func (m *CustomResourceDe***REMOVED***nitionCondition) MarshalTo(dAtA []byte) (int, error) {
+func (m *CustomResourceDefinitionCondition) MarshalTo(dAtA []byte) (int, error) {
 	var i int
 	_ = i
 	var l int
@@ -503,7 +503,7 @@ func (m *CustomResourceDe***REMOVED***nitionCondition) MarshalTo(dAtA []byte) (i
 	return i, nil
 }
 
-func (m *CustomResourceDe***REMOVED***nitionList) Marshal() (dAtA []byte, err error) {
+func (m *CustomResourceDefinitionList) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalTo(dAtA)
@@ -513,7 +513,7 @@ func (m *CustomResourceDe***REMOVED***nitionList) Marshal() (dAtA []byte, err er
 	return dAtA[:n], nil
 }
 
-func (m *CustomResourceDe***REMOVED***nitionList) MarshalTo(dAtA []byte) (int, error) {
+func (m *CustomResourceDefinitionList) MarshalTo(dAtA []byte) (int, error) {
 	var i int
 	_ = i
 	var l int
@@ -541,7 +541,7 @@ func (m *CustomResourceDe***REMOVED***nitionList) MarshalTo(dAtA []byte) (int, e
 	return i, nil
 }
 
-func (m *CustomResourceDe***REMOVED***nitionNames) Marshal() (dAtA []byte, err error) {
+func (m *CustomResourceDefinitionNames) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalTo(dAtA)
@@ -551,7 +551,7 @@ func (m *CustomResourceDe***REMOVED***nitionNames) Marshal() (dAtA []byte, err e
 	return dAtA[:n], nil
 }
 
-func (m *CustomResourceDe***REMOVED***nitionNames) MarshalTo(dAtA []byte) (int, error) {
+func (m *CustomResourceDefinitionNames) MarshalTo(dAtA []byte) (int, error) {
 	var i int
 	_ = i
 	var l int
@@ -605,7 +605,7 @@ func (m *CustomResourceDe***REMOVED***nitionNames) MarshalTo(dAtA []byte) (int, 
 	return i, nil
 }
 
-func (m *CustomResourceDe***REMOVED***nitionSpec) Marshal() (dAtA []byte, err error) {
+func (m *CustomResourceDefinitionSpec) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalTo(dAtA)
@@ -615,7 +615,7 @@ func (m *CustomResourceDe***REMOVED***nitionSpec) Marshal() (dAtA []byte, err er
 	return dAtA[:n], nil
 }
 
-func (m *CustomResourceDe***REMOVED***nitionSpec) MarshalTo(dAtA []byte) (int, error) {
+func (m *CustomResourceDefinitionSpec) MarshalTo(dAtA []byte) (int, error) {
 	var i int
 	_ = i
 	var l int
@@ -697,7 +697,7 @@ func (m *CustomResourceDe***REMOVED***nitionSpec) MarshalTo(dAtA []byte) (int, e
 	return i, nil
 }
 
-func (m *CustomResourceDe***REMOVED***nitionStatus) Marshal() (dAtA []byte, err error) {
+func (m *CustomResourceDefinitionStatus) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalTo(dAtA)
@@ -707,7 +707,7 @@ func (m *CustomResourceDe***REMOVED***nitionStatus) Marshal() (dAtA []byte, err 
 	return dAtA[:n], nil
 }
 
-func (m *CustomResourceDe***REMOVED***nitionStatus) MarshalTo(dAtA []byte) (int, error) {
+func (m *CustomResourceDefinitionStatus) MarshalTo(dAtA []byte) (int, error) {
 	var i int
 	_ = i
 	var l int
@@ -750,7 +750,7 @@ func (m *CustomResourceDe***REMOVED***nitionStatus) MarshalTo(dAtA []byte) (int,
 	return i, nil
 }
 
-func (m *CustomResourceDe***REMOVED***nitionVersion) Marshal() (dAtA []byte, err error) {
+func (m *CustomResourceDefinitionVersion) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalTo(dAtA)
@@ -760,7 +760,7 @@ func (m *CustomResourceDe***REMOVED***nitionVersion) Marshal() (dAtA []byte, err
 	return dAtA[:n], nil
 }
 
-func (m *CustomResourceDe***REMOVED***nitionVersion) MarshalTo(dAtA []byte) (int, error) {
+func (m *CustomResourceDefinitionVersion) MarshalTo(dAtA []byte) (int, error) {
 	var i int
 	_ = i
 	var l int
@@ -773,7 +773,7 @@ func (m *CustomResourceDe***REMOVED***nitionVersion) MarshalTo(dAtA []byte) (int
 	i++
 	if m.Served {
 		dAtA[i] = 1
-	} ***REMOVED*** {
+	} else {
 		dAtA[i] = 0
 	}
 	i++
@@ -781,7 +781,7 @@ func (m *CustomResourceDe***REMOVED***nitionVersion) MarshalTo(dAtA []byte) (int
 	i++
 	if m.Storage {
 		dAtA[i] = 1
-	} ***REMOVED*** {
+	} else {
 		dAtA[i] = 0
 	}
 	i++
@@ -1051,7 +1051,7 @@ func (m *JSONSchemaProps) MarshalTo(dAtA []byte) (int, error) {
 	i++
 	if m.ExclusiveMaximum {
 		dAtA[i] = 1
-	} ***REMOVED*** {
+	} else {
 		dAtA[i] = 0
 	}
 	i++
@@ -1065,7 +1065,7 @@ func (m *JSONSchemaProps) MarshalTo(dAtA []byte) (int, error) {
 	i++
 	if m.ExclusiveMinimum {
 		dAtA[i] = 1
-	} ***REMOVED*** {
+	} else {
 		dAtA[i] = 0
 	}
 	i++
@@ -1103,7 +1103,7 @@ func (m *JSONSchemaProps) MarshalTo(dAtA []byte) (int, error) {
 	i++
 	if m.UniqueItems {
 		dAtA[i] = 1
-	} ***REMOVED*** {
+	} else {
 		dAtA[i] = 0
 	}
 	i++
@@ -1349,18 +1349,18 @@ func (m *JSONSchemaProps) MarshalTo(dAtA []byte) (int, error) {
 		}
 		i += n27
 	}
-	if len(m.De***REMOVED***nitions) > 0 {
-		keysForDe***REMOVED***nitions := make([]string, 0, len(m.De***REMOVED***nitions))
-		for k := range m.De***REMOVED***nitions {
-			keysForDe***REMOVED***nitions = append(keysForDe***REMOVED***nitions, string(k))
+	if len(m.Definitions) > 0 {
+		keysForDefinitions := make([]string, 0, len(m.Definitions))
+		for k := range m.Definitions {
+			keysForDefinitions = append(keysForDefinitions, string(k))
 		}
-		github_com_gogo_protobuf_sortkeys.Strings(keysForDe***REMOVED***nitions)
-		for _, k := range keysForDe***REMOVED***nitions {
+		github_com_gogo_protobuf_sortkeys.Strings(keysForDefinitions)
+		for _, k := range keysForDefinitions {
 			dAtA[i] = 0x92
 			i++
 			dAtA[i] = 0x2
 			i++
-			v := m.De***REMOVED***nitions[string(k)]
+			v := m.Definitions[string(k)]
 			msgSize := 0
 			if (&v) != nil {
 				msgSize = (&v).Size()
@@ -1468,7 +1468,7 @@ func (m *JSONSchemaPropsOrBool) MarshalTo(dAtA []byte) (int, error) {
 	i++
 	if m.Allows {
 		dAtA[i] = 1
-	} ***REMOVED*** {
+	} else {
 		dAtA[i] = 0
 	}
 	i++
@@ -1560,7 +1560,7 @@ func (m *ServiceReference) MarshalTo(dAtA []byte) (int, error) {
 	return i, nil
 }
 
-func (m *WebhookClientCon***REMOVED***g) Marshal() (dAtA []byte, err error) {
+func (m *WebhookClientConfig) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalTo(dAtA)
@@ -1570,7 +1570,7 @@ func (m *WebhookClientCon***REMOVED***g) Marshal() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *WebhookClientCon***REMOVED***g) MarshalTo(dAtA []byte) (int, error) {
+func (m *WebhookClientConfig) MarshalTo(dAtA []byte) (int, error) {
 	var i int
 	_ = i
 	var l int
@@ -1655,7 +1655,7 @@ func (m *ConversionReview) Size() (n int) {
 	return n
 }
 
-func (m *CustomResourceColumnDe***REMOVED***nition) Size() (n int) {
+func (m *CustomResourceColumnDefinition) Size() (n int) {
 	var l int
 	_ = l
 	l = len(m.Name)
@@ -1677,14 +1677,14 @@ func (m *CustomResourceConversion) Size() (n int) {
 	_ = l
 	l = len(m.Strategy)
 	n += 1 + l + sovGenerated(uint64(l))
-	if m.WebhookClientCon***REMOVED***g != nil {
-		l = m.WebhookClientCon***REMOVED***g.Size()
+	if m.WebhookClientConfig != nil {
+		l = m.WebhookClientConfig.Size()
 		n += 1 + l + sovGenerated(uint64(l))
 	}
 	return n
 }
 
-func (m *CustomResourceDe***REMOVED***nition) Size() (n int) {
+func (m *CustomResourceDefinition) Size() (n int) {
 	var l int
 	_ = l
 	l = m.ObjectMeta.Size()
@@ -1696,7 +1696,7 @@ func (m *CustomResourceDe***REMOVED***nition) Size() (n int) {
 	return n
 }
 
-func (m *CustomResourceDe***REMOVED***nitionCondition) Size() (n int) {
+func (m *CustomResourceDefinitionCondition) Size() (n int) {
 	var l int
 	_ = l
 	l = len(m.Type)
@@ -1712,7 +1712,7 @@ func (m *CustomResourceDe***REMOVED***nitionCondition) Size() (n int) {
 	return n
 }
 
-func (m *CustomResourceDe***REMOVED***nitionList) Size() (n int) {
+func (m *CustomResourceDefinitionList) Size() (n int) {
 	var l int
 	_ = l
 	l = m.ListMeta.Size()
@@ -1726,7 +1726,7 @@ func (m *CustomResourceDe***REMOVED***nitionList) Size() (n int) {
 	return n
 }
 
-func (m *CustomResourceDe***REMOVED***nitionNames) Size() (n int) {
+func (m *CustomResourceDefinitionNames) Size() (n int) {
 	var l int
 	_ = l
 	l = len(m.Plural)
@@ -1752,7 +1752,7 @@ func (m *CustomResourceDe***REMOVED***nitionNames) Size() (n int) {
 	return n
 }
 
-func (m *CustomResourceDe***REMOVED***nitionSpec) Size() (n int) {
+func (m *CustomResourceDefinitionSpec) Size() (n int) {
 	var l int
 	_ = l
 	l = len(m.Group)
@@ -1790,7 +1790,7 @@ func (m *CustomResourceDe***REMOVED***nitionSpec) Size() (n int) {
 	return n
 }
 
-func (m *CustomResourceDe***REMOVED***nitionStatus) Size() (n int) {
+func (m *CustomResourceDefinitionStatus) Size() (n int) {
 	var l int
 	_ = l
 	if len(m.Conditions) > 0 {
@@ -1810,7 +1810,7 @@ func (m *CustomResourceDe***REMOVED***nitionStatus) Size() (n int) {
 	return n
 }
 
-func (m *CustomResourceDe***REMOVED***nitionVersion) Size() (n int) {
+func (m *CustomResourceDefinitionVersion) Size() (n int) {
 	var l int
 	_ = l
 	l = len(m.Name)
@@ -2026,8 +2026,8 @@ func (m *JSONSchemaProps) Size() (n int) {
 		l = m.AdditionalItems.Size()
 		n += 2 + l + sovGenerated(uint64(l))
 	}
-	if len(m.De***REMOVED***nitions) > 0 {
-		for k, v := range m.De***REMOVED***nitions {
+	if len(m.Definitions) > 0 {
+		for k, v := range m.Definitions {
 			_ = k
 			_ = v
 			l = v.Size()
@@ -2103,7 +2103,7 @@ func (m *ServiceReference) Size() (n int) {
 	return n
 }
 
-func (m *WebhookClientCon***REMOVED***g) Size() (n int) {
+func (m *WebhookClientConfig) Size() (n int) {
 	var l int
 	_ = l
 	if m.Service != nil {
@@ -2169,11 +2169,11 @@ func (this *ConversionReview) String() string {
 	}, "")
 	return s
 }
-func (this *CustomResourceColumnDe***REMOVED***nition) String() string {
+func (this *CustomResourceColumnDefinition) String() string {
 	if this == nil {
 		return "nil"
 	}
-	s := strings.Join([]string{`&CustomResourceColumnDe***REMOVED***nition{`,
+	s := strings.Join([]string{`&CustomResourceColumnDefinition{`,
 		`Name:` + fmt.Sprintf("%v", this.Name) + `,`,
 		`Type:` + fmt.Sprintf("%v", this.Type) + `,`,
 		`Format:` + fmt.Sprintf("%v", this.Format) + `,`,
@@ -2190,28 +2190,28 @@ func (this *CustomResourceConversion) String() string {
 	}
 	s := strings.Join([]string{`&CustomResourceConversion{`,
 		`Strategy:` + fmt.Sprintf("%v", this.Strategy) + `,`,
-		`WebhookClientCon***REMOVED***g:` + strings.Replace(fmt.Sprintf("%v", this.WebhookClientCon***REMOVED***g), "WebhookClientCon***REMOVED***g", "WebhookClientCon***REMOVED***g", 1) + `,`,
+		`WebhookClientConfig:` + strings.Replace(fmt.Sprintf("%v", this.WebhookClientConfig), "WebhookClientConfig", "WebhookClientConfig", 1) + `,`,
 		`}`,
 	}, "")
 	return s
 }
-func (this *CustomResourceDe***REMOVED***nition) String() string {
+func (this *CustomResourceDefinition) String() string {
 	if this == nil {
 		return "nil"
 	}
-	s := strings.Join([]string{`&CustomResourceDe***REMOVED***nition{`,
+	s := strings.Join([]string{`&CustomResourceDefinition{`,
 		`ObjectMeta:` + strings.Replace(strings.Replace(this.ObjectMeta.String(), "ObjectMeta", "k8s_io_apimachinery_pkg_apis_meta_v1.ObjectMeta", 1), `&`, ``, 1) + `,`,
-		`Spec:` + strings.Replace(strings.Replace(this.Spec.String(), "CustomResourceDe***REMOVED***nitionSpec", "CustomResourceDe***REMOVED***nitionSpec", 1), `&`, ``, 1) + `,`,
-		`Status:` + strings.Replace(strings.Replace(this.Status.String(), "CustomResourceDe***REMOVED***nitionStatus", "CustomResourceDe***REMOVED***nitionStatus", 1), `&`, ``, 1) + `,`,
+		`Spec:` + strings.Replace(strings.Replace(this.Spec.String(), "CustomResourceDefinitionSpec", "CustomResourceDefinitionSpec", 1), `&`, ``, 1) + `,`,
+		`Status:` + strings.Replace(strings.Replace(this.Status.String(), "CustomResourceDefinitionStatus", "CustomResourceDefinitionStatus", 1), `&`, ``, 1) + `,`,
 		`}`,
 	}, "")
 	return s
 }
-func (this *CustomResourceDe***REMOVED***nitionCondition) String() string {
+func (this *CustomResourceDefinitionCondition) String() string {
 	if this == nil {
 		return "nil"
 	}
-	s := strings.Join([]string{`&CustomResourceDe***REMOVED***nitionCondition{`,
+	s := strings.Join([]string{`&CustomResourceDefinitionCondition{`,
 		`Type:` + fmt.Sprintf("%v", this.Type) + `,`,
 		`Status:` + fmt.Sprintf("%v", this.Status) + `,`,
 		`LastTransitionTime:` + strings.Replace(strings.Replace(this.LastTransitionTime.String(), "Time", "k8s_io_apimachinery_pkg_apis_meta_v1.Time", 1), `&`, ``, 1) + `,`,
@@ -2221,22 +2221,22 @@ func (this *CustomResourceDe***REMOVED***nitionCondition) String() string {
 	}, "")
 	return s
 }
-func (this *CustomResourceDe***REMOVED***nitionList) String() string {
+func (this *CustomResourceDefinitionList) String() string {
 	if this == nil {
 		return "nil"
 	}
-	s := strings.Join([]string{`&CustomResourceDe***REMOVED***nitionList{`,
+	s := strings.Join([]string{`&CustomResourceDefinitionList{`,
 		`ListMeta:` + strings.Replace(strings.Replace(this.ListMeta.String(), "ListMeta", "k8s_io_apimachinery_pkg_apis_meta_v1.ListMeta", 1), `&`, ``, 1) + `,`,
-		`Items:` + strings.Replace(strings.Replace(fmt.Sprintf("%v", this.Items), "CustomResourceDe***REMOVED***nition", "CustomResourceDe***REMOVED***nition", 1), `&`, ``, 1) + `,`,
+		`Items:` + strings.Replace(strings.Replace(fmt.Sprintf("%v", this.Items), "CustomResourceDefinition", "CustomResourceDefinition", 1), `&`, ``, 1) + `,`,
 		`}`,
 	}, "")
 	return s
 }
-func (this *CustomResourceDe***REMOVED***nitionNames) String() string {
+func (this *CustomResourceDefinitionNames) String() string {
 	if this == nil {
 		return "nil"
 	}
-	s := strings.Join([]string{`&CustomResourceDe***REMOVED***nitionNames{`,
+	s := strings.Join([]string{`&CustomResourceDefinitionNames{`,
 		`Plural:` + fmt.Sprintf("%v", this.Plural) + `,`,
 		`Singular:` + fmt.Sprintf("%v", this.Singular) + `,`,
 		`ShortNames:` + fmt.Sprintf("%v", this.ShortNames) + `,`,
@@ -2247,47 +2247,47 @@ func (this *CustomResourceDe***REMOVED***nitionNames) String() string {
 	}, "")
 	return s
 }
-func (this *CustomResourceDe***REMOVED***nitionSpec) String() string {
+func (this *CustomResourceDefinitionSpec) String() string {
 	if this == nil {
 		return "nil"
 	}
-	s := strings.Join([]string{`&CustomResourceDe***REMOVED***nitionSpec{`,
+	s := strings.Join([]string{`&CustomResourceDefinitionSpec{`,
 		`Group:` + fmt.Sprintf("%v", this.Group) + `,`,
 		`Version:` + fmt.Sprintf("%v", this.Version) + `,`,
-		`Names:` + strings.Replace(strings.Replace(this.Names.String(), "CustomResourceDe***REMOVED***nitionNames", "CustomResourceDe***REMOVED***nitionNames", 1), `&`, ``, 1) + `,`,
+		`Names:` + strings.Replace(strings.Replace(this.Names.String(), "CustomResourceDefinitionNames", "CustomResourceDefinitionNames", 1), `&`, ``, 1) + `,`,
 		`Scope:` + fmt.Sprintf("%v", this.Scope) + `,`,
 		`Validation:` + strings.Replace(fmt.Sprintf("%v", this.Validation), "CustomResourceValidation", "CustomResourceValidation", 1) + `,`,
 		`Subresources:` + strings.Replace(fmt.Sprintf("%v", this.Subresources), "CustomResourceSubresources", "CustomResourceSubresources", 1) + `,`,
-		`Versions:` + strings.Replace(strings.Replace(fmt.Sprintf("%v", this.Versions), "CustomResourceDe***REMOVED***nitionVersion", "CustomResourceDe***REMOVED***nitionVersion", 1), `&`, ``, 1) + `,`,
-		`AdditionalPrinterColumns:` + strings.Replace(strings.Replace(fmt.Sprintf("%v", this.AdditionalPrinterColumns), "CustomResourceColumnDe***REMOVED***nition", "CustomResourceColumnDe***REMOVED***nition", 1), `&`, ``, 1) + `,`,
+		`Versions:` + strings.Replace(strings.Replace(fmt.Sprintf("%v", this.Versions), "CustomResourceDefinitionVersion", "CustomResourceDefinitionVersion", 1), `&`, ``, 1) + `,`,
+		`AdditionalPrinterColumns:` + strings.Replace(strings.Replace(fmt.Sprintf("%v", this.AdditionalPrinterColumns), "CustomResourceColumnDefinition", "CustomResourceColumnDefinition", 1), `&`, ``, 1) + `,`,
 		`Conversion:` + strings.Replace(fmt.Sprintf("%v", this.Conversion), "CustomResourceConversion", "CustomResourceConversion", 1) + `,`,
 		`}`,
 	}, "")
 	return s
 }
-func (this *CustomResourceDe***REMOVED***nitionStatus) String() string {
+func (this *CustomResourceDefinitionStatus) String() string {
 	if this == nil {
 		return "nil"
 	}
-	s := strings.Join([]string{`&CustomResourceDe***REMOVED***nitionStatus{`,
-		`Conditions:` + strings.Replace(strings.Replace(fmt.Sprintf("%v", this.Conditions), "CustomResourceDe***REMOVED***nitionCondition", "CustomResourceDe***REMOVED***nitionCondition", 1), `&`, ``, 1) + `,`,
-		`AcceptedNames:` + strings.Replace(strings.Replace(this.AcceptedNames.String(), "CustomResourceDe***REMOVED***nitionNames", "CustomResourceDe***REMOVED***nitionNames", 1), `&`, ``, 1) + `,`,
+	s := strings.Join([]string{`&CustomResourceDefinitionStatus{`,
+		`Conditions:` + strings.Replace(strings.Replace(fmt.Sprintf("%v", this.Conditions), "CustomResourceDefinitionCondition", "CustomResourceDefinitionCondition", 1), `&`, ``, 1) + `,`,
+		`AcceptedNames:` + strings.Replace(strings.Replace(this.AcceptedNames.String(), "CustomResourceDefinitionNames", "CustomResourceDefinitionNames", 1), `&`, ``, 1) + `,`,
 		`StoredVersions:` + fmt.Sprintf("%v", this.StoredVersions) + `,`,
 		`}`,
 	}, "")
 	return s
 }
-func (this *CustomResourceDe***REMOVED***nitionVersion) String() string {
+func (this *CustomResourceDefinitionVersion) String() string {
 	if this == nil {
 		return "nil"
 	}
-	s := strings.Join([]string{`&CustomResourceDe***REMOVED***nitionVersion{`,
+	s := strings.Join([]string{`&CustomResourceDefinitionVersion{`,
 		`Name:` + fmt.Sprintf("%v", this.Name) + `,`,
 		`Served:` + fmt.Sprintf("%v", this.Served) + `,`,
 		`Storage:` + fmt.Sprintf("%v", this.Storage) + `,`,
 		`Schema:` + strings.Replace(fmt.Sprintf("%v", this.Schema), "CustomResourceValidation", "CustomResourceValidation", 1) + `,`,
 		`Subresources:` + strings.Replace(fmt.Sprintf("%v", this.Subresources), "CustomResourceSubresources", "CustomResourceSubresources", 1) + `,`,
-		`AdditionalPrinterColumns:` + strings.Replace(strings.Replace(fmt.Sprintf("%v", this.AdditionalPrinterColumns), "CustomResourceColumnDe***REMOVED***nition", "CustomResourceColumnDe***REMOVED***nition", 1), `&`, ``, 1) + `,`,
+		`AdditionalPrinterColumns:` + strings.Replace(strings.Replace(fmt.Sprintf("%v", this.AdditionalPrinterColumns), "CustomResourceColumnDefinition", "CustomResourceColumnDefinition", 1), `&`, ``, 1) + `,`,
 		`}`,
 	}, "")
 	return s
@@ -2389,16 +2389,16 @@ func (this *JSONSchemaProps) String() string {
 		mapStringForDependencies += fmt.Sprintf("%v: %v,", k, this.Dependencies[k])
 	}
 	mapStringForDependencies += "}"
-	keysForDe***REMOVED***nitions := make([]string, 0, len(this.De***REMOVED***nitions))
-	for k := range this.De***REMOVED***nitions {
-		keysForDe***REMOVED***nitions = append(keysForDe***REMOVED***nitions, k)
+	keysForDefinitions := make([]string, 0, len(this.Definitions))
+	for k := range this.Definitions {
+		keysForDefinitions = append(keysForDefinitions, k)
 	}
-	github_com_gogo_protobuf_sortkeys.Strings(keysForDe***REMOVED***nitions)
-	mapStringForDe***REMOVED***nitions := "JSONSchemaDe***REMOVED***nitions{"
-	for _, k := range keysForDe***REMOVED***nitions {
-		mapStringForDe***REMOVED***nitions += fmt.Sprintf("%v: %v,", k, this.De***REMOVED***nitions[k])
+	github_com_gogo_protobuf_sortkeys.Strings(keysForDefinitions)
+	mapStringForDefinitions := "JSONSchemaDefinitions{"
+	for _, k := range keysForDefinitions {
+		mapStringForDefinitions += fmt.Sprintf("%v: %v,", k, this.Definitions[k])
 	}
-	mapStringForDe***REMOVED***nitions += "}"
+	mapStringForDefinitions += "}"
 	s := strings.Join([]string{`&JSONSchemaProps{`,
 		`ID:` + fmt.Sprintf("%v", this.ID) + `,`,
 		`Schema:` + fmt.Sprintf("%v", this.Schema) + `,`,
@@ -2433,7 +2433,7 @@ func (this *JSONSchemaProps) String() string {
 		`PatternProperties:` + mapStringForPatternProperties + `,`,
 		`Dependencies:` + mapStringForDependencies + `,`,
 		`AdditionalItems:` + strings.Replace(fmt.Sprintf("%v", this.AdditionalItems), "JSONSchemaPropsOrBool", "JSONSchemaPropsOrBool", 1) + `,`,
-		`De***REMOVED***nitions:` + mapStringForDe***REMOVED***nitions + `,`,
+		`Definitions:` + mapStringForDefinitions + `,`,
 		`ExternalDocs:` + strings.Replace(fmt.Sprintf("%v", this.ExternalDocs), "ExternalDocumentation", "ExternalDocumentation", 1) + `,`,
 		`Example:` + strings.Replace(fmt.Sprintf("%v", this.Example), "JSON", "JSON", 1) + `,`,
 		`}`,
@@ -2485,11 +2485,11 @@ func (this *ServiceReference) String() string {
 	}, "")
 	return s
 }
-func (this *WebhookClientCon***REMOVED***g) String() string {
+func (this *WebhookClientConfig) String() string {
 	if this == nil {
 		return "nil"
 	}
-	s := strings.Join([]string{`&WebhookClientCon***REMOVED***g{`,
+	s := strings.Join([]string{`&WebhookClientConfig{`,
 		`Service:` + strings.Replace(fmt.Sprintf("%v", this.Service), "ServiceReference", "ServiceReference", 1) + `,`,
 		`CABundle:` + valueToStringGenerated(this.CABundle) + `,`,
 		`URL:` + valueToStringGenerated(this.URL) + `,`,
@@ -2525,18 +2525,18 @@ func (m *ConversionRequest) Unmarshal(dAtA []byte) error {
 				break
 			}
 		}
-		***REMOVED***eldNum := int32(wire >> 3)
+		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
 			return fmt.Errorf("proto: ConversionRequest: wiretype end group for non-group")
 		}
-		if ***REMOVED***eldNum <= 0 {
-			return fmt.Errorf("proto: ConversionRequest: illegal tag %d (wire type %d)", ***REMOVED***eldNum, wire)
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: ConversionRequest: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
-		switch ***REMOVED***eldNum {
+		switch fieldNum {
 		case 1:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for ***REMOVED***eld UID", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field UID", wireType)
 			}
 			var stringLen uint64
 			for shift := uint(0); ; shift += 7 {
@@ -2565,7 +2565,7 @@ func (m *ConversionRequest) Unmarshal(dAtA []byte) error {
 			iNdEx = postIndex
 		case 2:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for ***REMOVED***eld DesiredAPIVersion", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field DesiredAPIVersion", wireType)
 			}
 			var stringLen uint64
 			for shift := uint(0); ; shift += 7 {
@@ -2594,7 +2594,7 @@ func (m *ConversionRequest) Unmarshal(dAtA []byte) error {
 			iNdEx = postIndex
 		case 3:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for ***REMOVED***eld Objects", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field Objects", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -2664,18 +2664,18 @@ func (m *ConversionResponse) Unmarshal(dAtA []byte) error {
 				break
 			}
 		}
-		***REMOVED***eldNum := int32(wire >> 3)
+		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
 			return fmt.Errorf("proto: ConversionResponse: wiretype end group for non-group")
 		}
-		if ***REMOVED***eldNum <= 0 {
-			return fmt.Errorf("proto: ConversionResponse: illegal tag %d (wire type %d)", ***REMOVED***eldNum, wire)
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: ConversionResponse: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
-		switch ***REMOVED***eldNum {
+		switch fieldNum {
 		case 1:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for ***REMOVED***eld UID", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field UID", wireType)
 			}
 			var stringLen uint64
 			for shift := uint(0); ; shift += 7 {
@@ -2704,7 +2704,7 @@ func (m *ConversionResponse) Unmarshal(dAtA []byte) error {
 			iNdEx = postIndex
 		case 2:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for ***REMOVED***eld ConvertedObjects", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field ConvertedObjects", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -2735,7 +2735,7 @@ func (m *ConversionResponse) Unmarshal(dAtA []byte) error {
 			iNdEx = postIndex
 		case 3:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for ***REMOVED***eld Result", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field Result", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -2804,18 +2804,18 @@ func (m *ConversionReview) Unmarshal(dAtA []byte) error {
 				break
 			}
 		}
-		***REMOVED***eldNum := int32(wire >> 3)
+		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
 			return fmt.Errorf("proto: ConversionReview: wiretype end group for non-group")
 		}
-		if ***REMOVED***eldNum <= 0 {
-			return fmt.Errorf("proto: ConversionReview: illegal tag %d (wire type %d)", ***REMOVED***eldNum, wire)
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: ConversionReview: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
-		switch ***REMOVED***eldNum {
+		switch fieldNum {
 		case 1:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for ***REMOVED***eld Request", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field Request", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -2848,7 +2848,7 @@ func (m *ConversionReview) Unmarshal(dAtA []byte) error {
 			iNdEx = postIndex
 		case 2:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for ***REMOVED***eld Response", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field Response", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -2900,7 +2900,7 @@ func (m *ConversionReview) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *CustomResourceColumnDe***REMOVED***nition) Unmarshal(dAtA []byte) error {
+func (m *CustomResourceColumnDefinition) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -2920,18 +2920,18 @@ func (m *CustomResourceColumnDe***REMOVED***nition) Unmarshal(dAtA []byte) error
 				break
 			}
 		}
-		***REMOVED***eldNum := int32(wire >> 3)
+		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: CustomResourceColumnDe***REMOVED***nition: wiretype end group for non-group")
+			return fmt.Errorf("proto: CustomResourceColumnDefinition: wiretype end group for non-group")
 		}
-		if ***REMOVED***eldNum <= 0 {
-			return fmt.Errorf("proto: CustomResourceColumnDe***REMOVED***nition: illegal tag %d (wire type %d)", ***REMOVED***eldNum, wire)
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: CustomResourceColumnDefinition: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
-		switch ***REMOVED***eldNum {
+		switch fieldNum {
 		case 1:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for ***REMOVED***eld Name", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field Name", wireType)
 			}
 			var stringLen uint64
 			for shift := uint(0); ; shift += 7 {
@@ -2960,7 +2960,7 @@ func (m *CustomResourceColumnDe***REMOVED***nition) Unmarshal(dAtA []byte) error
 			iNdEx = postIndex
 		case 2:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for ***REMOVED***eld Type", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field Type", wireType)
 			}
 			var stringLen uint64
 			for shift := uint(0); ; shift += 7 {
@@ -2989,7 +2989,7 @@ func (m *CustomResourceColumnDe***REMOVED***nition) Unmarshal(dAtA []byte) error
 			iNdEx = postIndex
 		case 3:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for ***REMOVED***eld Format", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field Format", wireType)
 			}
 			var stringLen uint64
 			for shift := uint(0); ; shift += 7 {
@@ -3018,7 +3018,7 @@ func (m *CustomResourceColumnDe***REMOVED***nition) Unmarshal(dAtA []byte) error
 			iNdEx = postIndex
 		case 4:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for ***REMOVED***eld Description", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field Description", wireType)
 			}
 			var stringLen uint64
 			for shift := uint(0); ; shift += 7 {
@@ -3047,7 +3047,7 @@ func (m *CustomResourceColumnDe***REMOVED***nition) Unmarshal(dAtA []byte) error
 			iNdEx = postIndex
 		case 5:
 			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for ***REMOVED***eld Priority", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field Priority", wireType)
 			}
 			m.Priority = 0
 			for shift := uint(0); ; shift += 7 {
@@ -3066,7 +3066,7 @@ func (m *CustomResourceColumnDe***REMOVED***nition) Unmarshal(dAtA []byte) error
 			}
 		case 6:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for ***REMOVED***eld JSONPath", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field JSONPath", wireType)
 			}
 			var stringLen uint64
 			for shift := uint(0); ; shift += 7 {
@@ -3134,18 +3134,18 @@ func (m *CustomResourceConversion) Unmarshal(dAtA []byte) error {
 				break
 			}
 		}
-		***REMOVED***eldNum := int32(wire >> 3)
+		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
 			return fmt.Errorf("proto: CustomResourceConversion: wiretype end group for non-group")
 		}
-		if ***REMOVED***eldNum <= 0 {
-			return fmt.Errorf("proto: CustomResourceConversion: illegal tag %d (wire type %d)", ***REMOVED***eldNum, wire)
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: CustomResourceConversion: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
-		switch ***REMOVED***eldNum {
+		switch fieldNum {
 		case 1:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for ***REMOVED***eld Strategy", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field Strategy", wireType)
 			}
 			var stringLen uint64
 			for shift := uint(0); ; shift += 7 {
@@ -3174,7 +3174,7 @@ func (m *CustomResourceConversion) Unmarshal(dAtA []byte) error {
 			iNdEx = postIndex
 		case 2:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for ***REMOVED***eld WebhookClientCon***REMOVED***g", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field WebhookClientConfig", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -3198,10 +3198,10 @@ func (m *CustomResourceConversion) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			if m.WebhookClientCon***REMOVED***g == nil {
-				m.WebhookClientCon***REMOVED***g = &WebhookClientCon***REMOVED***g{}
+			if m.WebhookClientConfig == nil {
+				m.WebhookClientConfig = &WebhookClientConfig{}
 			}
-			if err := m.WebhookClientCon***REMOVED***g.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+			if err := m.WebhookClientConfig.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
 			iNdEx = postIndex
@@ -3226,7 +3226,7 @@ func (m *CustomResourceConversion) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *CustomResourceDe***REMOVED***nition) Unmarshal(dAtA []byte) error {
+func (m *CustomResourceDefinition) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -3246,18 +3246,18 @@ func (m *CustomResourceDe***REMOVED***nition) Unmarshal(dAtA []byte) error {
 				break
 			}
 		}
-		***REMOVED***eldNum := int32(wire >> 3)
+		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: CustomResourceDe***REMOVED***nition: wiretype end group for non-group")
+			return fmt.Errorf("proto: CustomResourceDefinition: wiretype end group for non-group")
 		}
-		if ***REMOVED***eldNum <= 0 {
-			return fmt.Errorf("proto: CustomResourceDe***REMOVED***nition: illegal tag %d (wire type %d)", ***REMOVED***eldNum, wire)
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: CustomResourceDefinition: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
-		switch ***REMOVED***eldNum {
+		switch fieldNum {
 		case 1:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for ***REMOVED***eld ObjectMeta", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field ObjectMeta", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -3287,7 +3287,7 @@ func (m *CustomResourceDe***REMOVED***nition) Unmarshal(dAtA []byte) error {
 			iNdEx = postIndex
 		case 2:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for ***REMOVED***eld Spec", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field Spec", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -3317,7 +3317,7 @@ func (m *CustomResourceDe***REMOVED***nition) Unmarshal(dAtA []byte) error {
 			iNdEx = postIndex
 		case 3:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for ***REMOVED***eld Status", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field Status", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -3366,7 +3366,7 @@ func (m *CustomResourceDe***REMOVED***nition) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *CustomResourceDe***REMOVED***nitionCondition) Unmarshal(dAtA []byte) error {
+func (m *CustomResourceDefinitionCondition) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -3386,18 +3386,18 @@ func (m *CustomResourceDe***REMOVED***nitionCondition) Unmarshal(dAtA []byte) er
 				break
 			}
 		}
-		***REMOVED***eldNum := int32(wire >> 3)
+		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: CustomResourceDe***REMOVED***nitionCondition: wiretype end group for non-group")
+			return fmt.Errorf("proto: CustomResourceDefinitionCondition: wiretype end group for non-group")
 		}
-		if ***REMOVED***eldNum <= 0 {
-			return fmt.Errorf("proto: CustomResourceDe***REMOVED***nitionCondition: illegal tag %d (wire type %d)", ***REMOVED***eldNum, wire)
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: CustomResourceDefinitionCondition: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
-		switch ***REMOVED***eldNum {
+		switch fieldNum {
 		case 1:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for ***REMOVED***eld Type", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field Type", wireType)
 			}
 			var stringLen uint64
 			for shift := uint(0); ; shift += 7 {
@@ -3422,11 +3422,11 @@ func (m *CustomResourceDe***REMOVED***nitionCondition) Unmarshal(dAtA []byte) er
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.Type = CustomResourceDe***REMOVED***nitionConditionType(dAtA[iNdEx:postIndex])
+			m.Type = CustomResourceDefinitionConditionType(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		case 2:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for ***REMOVED***eld Status", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field Status", wireType)
 			}
 			var stringLen uint64
 			for shift := uint(0); ; shift += 7 {
@@ -3455,7 +3455,7 @@ func (m *CustomResourceDe***REMOVED***nitionCondition) Unmarshal(dAtA []byte) er
 			iNdEx = postIndex
 		case 3:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for ***REMOVED***eld LastTransitionTime", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field LastTransitionTime", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -3485,7 +3485,7 @@ func (m *CustomResourceDe***REMOVED***nitionCondition) Unmarshal(dAtA []byte) er
 			iNdEx = postIndex
 		case 4:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for ***REMOVED***eld Reason", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field Reason", wireType)
 			}
 			var stringLen uint64
 			for shift := uint(0); ; shift += 7 {
@@ -3514,7 +3514,7 @@ func (m *CustomResourceDe***REMOVED***nitionCondition) Unmarshal(dAtA []byte) er
 			iNdEx = postIndex
 		case 5:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for ***REMOVED***eld Message", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field Message", wireType)
 			}
 			var stringLen uint64
 			for shift := uint(0); ; shift += 7 {
@@ -3562,7 +3562,7 @@ func (m *CustomResourceDe***REMOVED***nitionCondition) Unmarshal(dAtA []byte) er
 	}
 	return nil
 }
-func (m *CustomResourceDe***REMOVED***nitionList) Unmarshal(dAtA []byte) error {
+func (m *CustomResourceDefinitionList) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -3582,18 +3582,18 @@ func (m *CustomResourceDe***REMOVED***nitionList) Unmarshal(dAtA []byte) error {
 				break
 			}
 		}
-		***REMOVED***eldNum := int32(wire >> 3)
+		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: CustomResourceDe***REMOVED***nitionList: wiretype end group for non-group")
+			return fmt.Errorf("proto: CustomResourceDefinitionList: wiretype end group for non-group")
 		}
-		if ***REMOVED***eldNum <= 0 {
-			return fmt.Errorf("proto: CustomResourceDe***REMOVED***nitionList: illegal tag %d (wire type %d)", ***REMOVED***eldNum, wire)
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: CustomResourceDefinitionList: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
-		switch ***REMOVED***eldNum {
+		switch fieldNum {
 		case 1:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for ***REMOVED***eld ListMeta", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field ListMeta", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -3623,7 +3623,7 @@ func (m *CustomResourceDe***REMOVED***nitionList) Unmarshal(dAtA []byte) error {
 			iNdEx = postIndex
 		case 2:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for ***REMOVED***eld Items", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field Items", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -3647,7 +3647,7 @@ func (m *CustomResourceDe***REMOVED***nitionList) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.Items = append(m.Items, CustomResourceDe***REMOVED***nition{})
+			m.Items = append(m.Items, CustomResourceDefinition{})
 			if err := m.Items[len(m.Items)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
@@ -3673,7 +3673,7 @@ func (m *CustomResourceDe***REMOVED***nitionList) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *CustomResourceDe***REMOVED***nitionNames) Unmarshal(dAtA []byte) error {
+func (m *CustomResourceDefinitionNames) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -3693,18 +3693,18 @@ func (m *CustomResourceDe***REMOVED***nitionNames) Unmarshal(dAtA []byte) error 
 				break
 			}
 		}
-		***REMOVED***eldNum := int32(wire >> 3)
+		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: CustomResourceDe***REMOVED***nitionNames: wiretype end group for non-group")
+			return fmt.Errorf("proto: CustomResourceDefinitionNames: wiretype end group for non-group")
 		}
-		if ***REMOVED***eldNum <= 0 {
-			return fmt.Errorf("proto: CustomResourceDe***REMOVED***nitionNames: illegal tag %d (wire type %d)", ***REMOVED***eldNum, wire)
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: CustomResourceDefinitionNames: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
-		switch ***REMOVED***eldNum {
+		switch fieldNum {
 		case 1:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for ***REMOVED***eld Plural", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field Plural", wireType)
 			}
 			var stringLen uint64
 			for shift := uint(0); ; shift += 7 {
@@ -3733,7 +3733,7 @@ func (m *CustomResourceDe***REMOVED***nitionNames) Unmarshal(dAtA []byte) error 
 			iNdEx = postIndex
 		case 2:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for ***REMOVED***eld Singular", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field Singular", wireType)
 			}
 			var stringLen uint64
 			for shift := uint(0); ; shift += 7 {
@@ -3762,7 +3762,7 @@ func (m *CustomResourceDe***REMOVED***nitionNames) Unmarshal(dAtA []byte) error 
 			iNdEx = postIndex
 		case 3:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for ***REMOVED***eld ShortNames", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field ShortNames", wireType)
 			}
 			var stringLen uint64
 			for shift := uint(0); ; shift += 7 {
@@ -3791,7 +3791,7 @@ func (m *CustomResourceDe***REMOVED***nitionNames) Unmarshal(dAtA []byte) error 
 			iNdEx = postIndex
 		case 4:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for ***REMOVED***eld Kind", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field Kind", wireType)
 			}
 			var stringLen uint64
 			for shift := uint(0); ; shift += 7 {
@@ -3820,7 +3820,7 @@ func (m *CustomResourceDe***REMOVED***nitionNames) Unmarshal(dAtA []byte) error 
 			iNdEx = postIndex
 		case 5:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for ***REMOVED***eld ListKind", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field ListKind", wireType)
 			}
 			var stringLen uint64
 			for shift := uint(0); ; shift += 7 {
@@ -3849,7 +3849,7 @@ func (m *CustomResourceDe***REMOVED***nitionNames) Unmarshal(dAtA []byte) error 
 			iNdEx = postIndex
 		case 6:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for ***REMOVED***eld Categories", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field Categories", wireType)
 			}
 			var stringLen uint64
 			for shift := uint(0); ; shift += 7 {
@@ -3897,7 +3897,7 @@ func (m *CustomResourceDe***REMOVED***nitionNames) Unmarshal(dAtA []byte) error 
 	}
 	return nil
 }
-func (m *CustomResourceDe***REMOVED***nitionSpec) Unmarshal(dAtA []byte) error {
+func (m *CustomResourceDefinitionSpec) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -3917,18 +3917,18 @@ func (m *CustomResourceDe***REMOVED***nitionSpec) Unmarshal(dAtA []byte) error {
 				break
 			}
 		}
-		***REMOVED***eldNum := int32(wire >> 3)
+		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: CustomResourceDe***REMOVED***nitionSpec: wiretype end group for non-group")
+			return fmt.Errorf("proto: CustomResourceDefinitionSpec: wiretype end group for non-group")
 		}
-		if ***REMOVED***eldNum <= 0 {
-			return fmt.Errorf("proto: CustomResourceDe***REMOVED***nitionSpec: illegal tag %d (wire type %d)", ***REMOVED***eldNum, wire)
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: CustomResourceDefinitionSpec: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
-		switch ***REMOVED***eldNum {
+		switch fieldNum {
 		case 1:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for ***REMOVED***eld Group", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field Group", wireType)
 			}
 			var stringLen uint64
 			for shift := uint(0); ; shift += 7 {
@@ -3957,7 +3957,7 @@ func (m *CustomResourceDe***REMOVED***nitionSpec) Unmarshal(dAtA []byte) error {
 			iNdEx = postIndex
 		case 2:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for ***REMOVED***eld Version", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field Version", wireType)
 			}
 			var stringLen uint64
 			for shift := uint(0); ; shift += 7 {
@@ -3986,7 +3986,7 @@ func (m *CustomResourceDe***REMOVED***nitionSpec) Unmarshal(dAtA []byte) error {
 			iNdEx = postIndex
 		case 3:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for ***REMOVED***eld Names", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field Names", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -4016,7 +4016,7 @@ func (m *CustomResourceDe***REMOVED***nitionSpec) Unmarshal(dAtA []byte) error {
 			iNdEx = postIndex
 		case 4:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for ***REMOVED***eld Scope", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field Scope", wireType)
 			}
 			var stringLen uint64
 			for shift := uint(0); ; shift += 7 {
@@ -4045,7 +4045,7 @@ func (m *CustomResourceDe***REMOVED***nitionSpec) Unmarshal(dAtA []byte) error {
 			iNdEx = postIndex
 		case 5:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for ***REMOVED***eld Validation", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field Validation", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -4078,7 +4078,7 @@ func (m *CustomResourceDe***REMOVED***nitionSpec) Unmarshal(dAtA []byte) error {
 			iNdEx = postIndex
 		case 6:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for ***REMOVED***eld Subresources", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field Subresources", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -4111,7 +4111,7 @@ func (m *CustomResourceDe***REMOVED***nitionSpec) Unmarshal(dAtA []byte) error {
 			iNdEx = postIndex
 		case 7:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for ***REMOVED***eld Versions", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field Versions", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -4135,14 +4135,14 @@ func (m *CustomResourceDe***REMOVED***nitionSpec) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.Versions = append(m.Versions, CustomResourceDe***REMOVED***nitionVersion{})
+			m.Versions = append(m.Versions, CustomResourceDefinitionVersion{})
 			if err := m.Versions[len(m.Versions)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
 			iNdEx = postIndex
 		case 8:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for ***REMOVED***eld AdditionalPrinterColumns", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field AdditionalPrinterColumns", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -4166,14 +4166,14 @@ func (m *CustomResourceDe***REMOVED***nitionSpec) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.AdditionalPrinterColumns = append(m.AdditionalPrinterColumns, CustomResourceColumnDe***REMOVED***nition{})
+			m.AdditionalPrinterColumns = append(m.AdditionalPrinterColumns, CustomResourceColumnDefinition{})
 			if err := m.AdditionalPrinterColumns[len(m.AdditionalPrinterColumns)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
 			iNdEx = postIndex
 		case 9:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for ***REMOVED***eld Conversion", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field Conversion", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -4225,7 +4225,7 @@ func (m *CustomResourceDe***REMOVED***nitionSpec) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *CustomResourceDe***REMOVED***nitionStatus) Unmarshal(dAtA []byte) error {
+func (m *CustomResourceDefinitionStatus) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -4245,18 +4245,18 @@ func (m *CustomResourceDe***REMOVED***nitionStatus) Unmarshal(dAtA []byte) error
 				break
 			}
 		}
-		***REMOVED***eldNum := int32(wire >> 3)
+		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: CustomResourceDe***REMOVED***nitionStatus: wiretype end group for non-group")
+			return fmt.Errorf("proto: CustomResourceDefinitionStatus: wiretype end group for non-group")
 		}
-		if ***REMOVED***eldNum <= 0 {
-			return fmt.Errorf("proto: CustomResourceDe***REMOVED***nitionStatus: illegal tag %d (wire type %d)", ***REMOVED***eldNum, wire)
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: CustomResourceDefinitionStatus: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
-		switch ***REMOVED***eldNum {
+		switch fieldNum {
 		case 1:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for ***REMOVED***eld Conditions", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field Conditions", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -4280,14 +4280,14 @@ func (m *CustomResourceDe***REMOVED***nitionStatus) Unmarshal(dAtA []byte) error
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.Conditions = append(m.Conditions, CustomResourceDe***REMOVED***nitionCondition{})
+			m.Conditions = append(m.Conditions, CustomResourceDefinitionCondition{})
 			if err := m.Conditions[len(m.Conditions)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
 			iNdEx = postIndex
 		case 2:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for ***REMOVED***eld AcceptedNames", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field AcceptedNames", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -4317,7 +4317,7 @@ func (m *CustomResourceDe***REMOVED***nitionStatus) Unmarshal(dAtA []byte) error
 			iNdEx = postIndex
 		case 3:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for ***REMOVED***eld StoredVersions", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field StoredVersions", wireType)
 			}
 			var stringLen uint64
 			for shift := uint(0); ; shift += 7 {
@@ -4365,7 +4365,7 @@ func (m *CustomResourceDe***REMOVED***nitionStatus) Unmarshal(dAtA []byte) error
 	}
 	return nil
 }
-func (m *CustomResourceDe***REMOVED***nitionVersion) Unmarshal(dAtA []byte) error {
+func (m *CustomResourceDefinitionVersion) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -4385,18 +4385,18 @@ func (m *CustomResourceDe***REMOVED***nitionVersion) Unmarshal(dAtA []byte) erro
 				break
 			}
 		}
-		***REMOVED***eldNum := int32(wire >> 3)
+		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: CustomResourceDe***REMOVED***nitionVersion: wiretype end group for non-group")
+			return fmt.Errorf("proto: CustomResourceDefinitionVersion: wiretype end group for non-group")
 		}
-		if ***REMOVED***eldNum <= 0 {
-			return fmt.Errorf("proto: CustomResourceDe***REMOVED***nitionVersion: illegal tag %d (wire type %d)", ***REMOVED***eldNum, wire)
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: CustomResourceDefinitionVersion: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
-		switch ***REMOVED***eldNum {
+		switch fieldNum {
 		case 1:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for ***REMOVED***eld Name", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field Name", wireType)
 			}
 			var stringLen uint64
 			for shift := uint(0); ; shift += 7 {
@@ -4425,7 +4425,7 @@ func (m *CustomResourceDe***REMOVED***nitionVersion) Unmarshal(dAtA []byte) erro
 			iNdEx = postIndex
 		case 2:
 			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for ***REMOVED***eld Served", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field Served", wireType)
 			}
 			var v int
 			for shift := uint(0); ; shift += 7 {
@@ -4445,7 +4445,7 @@ func (m *CustomResourceDe***REMOVED***nitionVersion) Unmarshal(dAtA []byte) erro
 			m.Served = bool(v != 0)
 		case 3:
 			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for ***REMOVED***eld Storage", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field Storage", wireType)
 			}
 			var v int
 			for shift := uint(0); ; shift += 7 {
@@ -4465,7 +4465,7 @@ func (m *CustomResourceDe***REMOVED***nitionVersion) Unmarshal(dAtA []byte) erro
 			m.Storage = bool(v != 0)
 		case 4:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for ***REMOVED***eld Schema", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field Schema", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -4498,7 +4498,7 @@ func (m *CustomResourceDe***REMOVED***nitionVersion) Unmarshal(dAtA []byte) erro
 			iNdEx = postIndex
 		case 5:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for ***REMOVED***eld Subresources", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field Subresources", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -4531,7 +4531,7 @@ func (m *CustomResourceDe***REMOVED***nitionVersion) Unmarshal(dAtA []byte) erro
 			iNdEx = postIndex
 		case 6:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for ***REMOVED***eld AdditionalPrinterColumns", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field AdditionalPrinterColumns", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -4555,7 +4555,7 @@ func (m *CustomResourceDe***REMOVED***nitionVersion) Unmarshal(dAtA []byte) erro
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.AdditionalPrinterColumns = append(m.AdditionalPrinterColumns, CustomResourceColumnDe***REMOVED***nition{})
+			m.AdditionalPrinterColumns = append(m.AdditionalPrinterColumns, CustomResourceColumnDefinition{})
 			if err := m.AdditionalPrinterColumns[len(m.AdditionalPrinterColumns)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
@@ -4601,18 +4601,18 @@ func (m *CustomResourceSubresourceScale) Unmarshal(dAtA []byte) error {
 				break
 			}
 		}
-		***REMOVED***eldNum := int32(wire >> 3)
+		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
 			return fmt.Errorf("proto: CustomResourceSubresourceScale: wiretype end group for non-group")
 		}
-		if ***REMOVED***eldNum <= 0 {
-			return fmt.Errorf("proto: CustomResourceSubresourceScale: illegal tag %d (wire type %d)", ***REMOVED***eldNum, wire)
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: CustomResourceSubresourceScale: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
-		switch ***REMOVED***eldNum {
+		switch fieldNum {
 		case 1:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for ***REMOVED***eld SpecReplicasPath", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field SpecReplicasPath", wireType)
 			}
 			var stringLen uint64
 			for shift := uint(0); ; shift += 7 {
@@ -4641,7 +4641,7 @@ func (m *CustomResourceSubresourceScale) Unmarshal(dAtA []byte) error {
 			iNdEx = postIndex
 		case 2:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for ***REMOVED***eld StatusReplicasPath", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field StatusReplicasPath", wireType)
 			}
 			var stringLen uint64
 			for shift := uint(0); ; shift += 7 {
@@ -4670,7 +4670,7 @@ func (m *CustomResourceSubresourceScale) Unmarshal(dAtA []byte) error {
 			iNdEx = postIndex
 		case 3:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for ***REMOVED***eld LabelSelectorPath", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field LabelSelectorPath", wireType)
 			}
 			var stringLen uint64
 			for shift := uint(0); ; shift += 7 {
@@ -4739,15 +4739,15 @@ func (m *CustomResourceSubresourceStatus) Unmarshal(dAtA []byte) error {
 				break
 			}
 		}
-		***REMOVED***eldNum := int32(wire >> 3)
+		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
 			return fmt.Errorf("proto: CustomResourceSubresourceStatus: wiretype end group for non-group")
 		}
-		if ***REMOVED***eldNum <= 0 {
-			return fmt.Errorf("proto: CustomResourceSubresourceStatus: illegal tag %d (wire type %d)", ***REMOVED***eldNum, wire)
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: CustomResourceSubresourceStatus: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
-		switch ***REMOVED***eldNum {
+		switch fieldNum {
 		default:
 			iNdEx = preIndex
 			skippy, err := skipGenerated(dAtA[iNdEx:])
@@ -4789,18 +4789,18 @@ func (m *CustomResourceSubresources) Unmarshal(dAtA []byte) error {
 				break
 			}
 		}
-		***REMOVED***eldNum := int32(wire >> 3)
+		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
 			return fmt.Errorf("proto: CustomResourceSubresources: wiretype end group for non-group")
 		}
-		if ***REMOVED***eldNum <= 0 {
-			return fmt.Errorf("proto: CustomResourceSubresources: illegal tag %d (wire type %d)", ***REMOVED***eldNum, wire)
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: CustomResourceSubresources: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
-		switch ***REMOVED***eldNum {
+		switch fieldNum {
 		case 1:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for ***REMOVED***eld Status", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field Status", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -4833,7 +4833,7 @@ func (m *CustomResourceSubresources) Unmarshal(dAtA []byte) error {
 			iNdEx = postIndex
 		case 2:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for ***REMOVED***eld Scale", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field Scale", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -4905,18 +4905,18 @@ func (m *CustomResourceValidation) Unmarshal(dAtA []byte) error {
 				break
 			}
 		}
-		***REMOVED***eldNum := int32(wire >> 3)
+		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
 			return fmt.Errorf("proto: CustomResourceValidation: wiretype end group for non-group")
 		}
-		if ***REMOVED***eldNum <= 0 {
-			return fmt.Errorf("proto: CustomResourceValidation: illegal tag %d (wire type %d)", ***REMOVED***eldNum, wire)
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: CustomResourceValidation: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
-		switch ***REMOVED***eldNum {
+		switch fieldNum {
 		case 1:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for ***REMOVED***eld OpenAPIV3Schema", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field OpenAPIV3Schema", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -4988,18 +4988,18 @@ func (m *ExternalDocumentation) Unmarshal(dAtA []byte) error {
 				break
 			}
 		}
-		***REMOVED***eldNum := int32(wire >> 3)
+		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
 			return fmt.Errorf("proto: ExternalDocumentation: wiretype end group for non-group")
 		}
-		if ***REMOVED***eldNum <= 0 {
-			return fmt.Errorf("proto: ExternalDocumentation: illegal tag %d (wire type %d)", ***REMOVED***eldNum, wire)
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: ExternalDocumentation: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
-		switch ***REMOVED***eldNum {
+		switch fieldNum {
 		case 1:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for ***REMOVED***eld Description", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field Description", wireType)
 			}
 			var stringLen uint64
 			for shift := uint(0); ; shift += 7 {
@@ -5028,7 +5028,7 @@ func (m *ExternalDocumentation) Unmarshal(dAtA []byte) error {
 			iNdEx = postIndex
 		case 2:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for ***REMOVED***eld URL", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field URL", wireType)
 			}
 			var stringLen uint64
 			for shift := uint(0); ; shift += 7 {
@@ -5096,18 +5096,18 @@ func (m *JSON) Unmarshal(dAtA []byte) error {
 				break
 			}
 		}
-		***REMOVED***eldNum := int32(wire >> 3)
+		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
 			return fmt.Errorf("proto: JSON: wiretype end group for non-group")
 		}
-		if ***REMOVED***eldNum <= 0 {
-			return fmt.Errorf("proto: JSON: illegal tag %d (wire type %d)", ***REMOVED***eldNum, wire)
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: JSON: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
-		switch ***REMOVED***eldNum {
+		switch fieldNum {
 		case 1:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for ***REMOVED***eld Raw", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field Raw", wireType)
 			}
 			var byteLen int
 			for shift := uint(0); ; shift += 7 {
@@ -5177,18 +5177,18 @@ func (m *JSONSchemaProps) Unmarshal(dAtA []byte) error {
 				break
 			}
 		}
-		***REMOVED***eldNum := int32(wire >> 3)
+		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
 			return fmt.Errorf("proto: JSONSchemaProps: wiretype end group for non-group")
 		}
-		if ***REMOVED***eldNum <= 0 {
-			return fmt.Errorf("proto: JSONSchemaProps: illegal tag %d (wire type %d)", ***REMOVED***eldNum, wire)
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: JSONSchemaProps: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
-		switch ***REMOVED***eldNum {
+		switch fieldNum {
 		case 1:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for ***REMOVED***eld ID", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field ID", wireType)
 			}
 			var stringLen uint64
 			for shift := uint(0); ; shift += 7 {
@@ -5217,7 +5217,7 @@ func (m *JSONSchemaProps) Unmarshal(dAtA []byte) error {
 			iNdEx = postIndex
 		case 2:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for ***REMOVED***eld Schema", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field Schema", wireType)
 			}
 			var stringLen uint64
 			for shift := uint(0); ; shift += 7 {
@@ -5246,7 +5246,7 @@ func (m *JSONSchemaProps) Unmarshal(dAtA []byte) error {
 			iNdEx = postIndex
 		case 3:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for ***REMOVED***eld Ref", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field Ref", wireType)
 			}
 			var stringLen uint64
 			for shift := uint(0); ; shift += 7 {
@@ -5276,7 +5276,7 @@ func (m *JSONSchemaProps) Unmarshal(dAtA []byte) error {
 			iNdEx = postIndex
 		case 4:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for ***REMOVED***eld Description", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field Description", wireType)
 			}
 			var stringLen uint64
 			for shift := uint(0); ; shift += 7 {
@@ -5305,7 +5305,7 @@ func (m *JSONSchemaProps) Unmarshal(dAtA []byte) error {
 			iNdEx = postIndex
 		case 5:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for ***REMOVED***eld Type", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field Type", wireType)
 			}
 			var stringLen uint64
 			for shift := uint(0); ; shift += 7 {
@@ -5334,7 +5334,7 @@ func (m *JSONSchemaProps) Unmarshal(dAtA []byte) error {
 			iNdEx = postIndex
 		case 6:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for ***REMOVED***eld Format", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field Format", wireType)
 			}
 			var stringLen uint64
 			for shift := uint(0); ; shift += 7 {
@@ -5363,7 +5363,7 @@ func (m *JSONSchemaProps) Unmarshal(dAtA []byte) error {
 			iNdEx = postIndex
 		case 7:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for ***REMOVED***eld Title", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field Title", wireType)
 			}
 			var stringLen uint64
 			for shift := uint(0); ; shift += 7 {
@@ -5392,7 +5392,7 @@ func (m *JSONSchemaProps) Unmarshal(dAtA []byte) error {
 			iNdEx = postIndex
 		case 8:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for ***REMOVED***eld Default", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field Default", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -5425,7 +5425,7 @@ func (m *JSONSchemaProps) Unmarshal(dAtA []byte) error {
 			iNdEx = postIndex
 		case 9:
 			if wireType != 1 {
-				return fmt.Errorf("proto: wrong wireType = %d for ***REMOVED***eld Maximum", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field Maximum", wireType)
 			}
 			var v uint64
 			if (iNdEx + 8) > l {
@@ -5437,7 +5437,7 @@ func (m *JSONSchemaProps) Unmarshal(dAtA []byte) error {
 			m.Maximum = &v2
 		case 10:
 			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for ***REMOVED***eld ExclusiveMaximum", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field ExclusiveMaximum", wireType)
 			}
 			var v int
 			for shift := uint(0); ; shift += 7 {
@@ -5457,7 +5457,7 @@ func (m *JSONSchemaProps) Unmarshal(dAtA []byte) error {
 			m.ExclusiveMaximum = bool(v != 0)
 		case 11:
 			if wireType != 1 {
-				return fmt.Errorf("proto: wrong wireType = %d for ***REMOVED***eld Minimum", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field Minimum", wireType)
 			}
 			var v uint64
 			if (iNdEx + 8) > l {
@@ -5469,7 +5469,7 @@ func (m *JSONSchemaProps) Unmarshal(dAtA []byte) error {
 			m.Minimum = &v2
 		case 12:
 			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for ***REMOVED***eld ExclusiveMinimum", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field ExclusiveMinimum", wireType)
 			}
 			var v int
 			for shift := uint(0); ; shift += 7 {
@@ -5489,7 +5489,7 @@ func (m *JSONSchemaProps) Unmarshal(dAtA []byte) error {
 			m.ExclusiveMinimum = bool(v != 0)
 		case 13:
 			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for ***REMOVED***eld MaxLength", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field MaxLength", wireType)
 			}
 			var v int64
 			for shift := uint(0); ; shift += 7 {
@@ -5509,7 +5509,7 @@ func (m *JSONSchemaProps) Unmarshal(dAtA []byte) error {
 			m.MaxLength = &v
 		case 14:
 			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for ***REMOVED***eld MinLength", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field MinLength", wireType)
 			}
 			var v int64
 			for shift := uint(0); ; shift += 7 {
@@ -5529,7 +5529,7 @@ func (m *JSONSchemaProps) Unmarshal(dAtA []byte) error {
 			m.MinLength = &v
 		case 15:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for ***REMOVED***eld Pattern", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field Pattern", wireType)
 			}
 			var stringLen uint64
 			for shift := uint(0); ; shift += 7 {
@@ -5558,7 +5558,7 @@ func (m *JSONSchemaProps) Unmarshal(dAtA []byte) error {
 			iNdEx = postIndex
 		case 16:
 			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for ***REMOVED***eld MaxItems", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field MaxItems", wireType)
 			}
 			var v int64
 			for shift := uint(0); ; shift += 7 {
@@ -5578,7 +5578,7 @@ func (m *JSONSchemaProps) Unmarshal(dAtA []byte) error {
 			m.MaxItems = &v
 		case 17:
 			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for ***REMOVED***eld MinItems", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field MinItems", wireType)
 			}
 			var v int64
 			for shift := uint(0); ; shift += 7 {
@@ -5598,7 +5598,7 @@ func (m *JSONSchemaProps) Unmarshal(dAtA []byte) error {
 			m.MinItems = &v
 		case 18:
 			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for ***REMOVED***eld UniqueItems", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field UniqueItems", wireType)
 			}
 			var v int
 			for shift := uint(0); ; shift += 7 {
@@ -5618,7 +5618,7 @@ func (m *JSONSchemaProps) Unmarshal(dAtA []byte) error {
 			m.UniqueItems = bool(v != 0)
 		case 19:
 			if wireType != 1 {
-				return fmt.Errorf("proto: wrong wireType = %d for ***REMOVED***eld MultipleOf", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field MultipleOf", wireType)
 			}
 			var v uint64
 			if (iNdEx + 8) > l {
@@ -5630,7 +5630,7 @@ func (m *JSONSchemaProps) Unmarshal(dAtA []byte) error {
 			m.MultipleOf = &v2
 		case 20:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for ***REMOVED***eld Enum", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field Enum", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -5661,7 +5661,7 @@ func (m *JSONSchemaProps) Unmarshal(dAtA []byte) error {
 			iNdEx = postIndex
 		case 21:
 			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for ***REMOVED***eld MaxProperties", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field MaxProperties", wireType)
 			}
 			var v int64
 			for shift := uint(0); ; shift += 7 {
@@ -5681,7 +5681,7 @@ func (m *JSONSchemaProps) Unmarshal(dAtA []byte) error {
 			m.MaxProperties = &v
 		case 22:
 			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for ***REMOVED***eld MinProperties", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field MinProperties", wireType)
 			}
 			var v int64
 			for shift := uint(0); ; shift += 7 {
@@ -5701,7 +5701,7 @@ func (m *JSONSchemaProps) Unmarshal(dAtA []byte) error {
 			m.MinProperties = &v
 		case 23:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for ***REMOVED***eld Required", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field Required", wireType)
 			}
 			var stringLen uint64
 			for shift := uint(0); ; shift += 7 {
@@ -5730,7 +5730,7 @@ func (m *JSONSchemaProps) Unmarshal(dAtA []byte) error {
 			iNdEx = postIndex
 		case 24:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for ***REMOVED***eld Items", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field Items", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -5763,7 +5763,7 @@ func (m *JSONSchemaProps) Unmarshal(dAtA []byte) error {
 			iNdEx = postIndex
 		case 25:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for ***REMOVED***eld AllOf", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field AllOf", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -5794,7 +5794,7 @@ func (m *JSONSchemaProps) Unmarshal(dAtA []byte) error {
 			iNdEx = postIndex
 		case 26:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for ***REMOVED***eld OneOf", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field OneOf", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -5825,7 +5825,7 @@ func (m *JSONSchemaProps) Unmarshal(dAtA []byte) error {
 			iNdEx = postIndex
 		case 27:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for ***REMOVED***eld AnyOf", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field AnyOf", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -5856,7 +5856,7 @@ func (m *JSONSchemaProps) Unmarshal(dAtA []byte) error {
 			iNdEx = postIndex
 		case 28:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for ***REMOVED***eld Not", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field Not", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -5889,7 +5889,7 @@ func (m *JSONSchemaProps) Unmarshal(dAtA []byte) error {
 			iNdEx = postIndex
 		case 29:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for ***REMOVED***eld Properties", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field Properties", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -5935,8 +5935,8 @@ func (m *JSONSchemaProps) Unmarshal(dAtA []byte) error {
 						break
 					}
 				}
-				***REMOVED***eldNum := int32(wire >> 3)
-				if ***REMOVED***eldNum == 1 {
+				fieldNum := int32(wire >> 3)
+				if fieldNum == 1 {
 					var stringLenmapkey uint64
 					for shift := uint(0); ; shift += 7 {
 						if shift >= 64 {
@@ -5962,7 +5962,7 @@ func (m *JSONSchemaProps) Unmarshal(dAtA []byte) error {
 					}
 					mapkey = string(dAtA[iNdEx:postStringIndexmapkey])
 					iNdEx = postStringIndexmapkey
-				} ***REMOVED*** if ***REMOVED***eldNum == 2 {
+				} else if fieldNum == 2 {
 					var mapmsglen int
 					for shift := uint(0); ; shift += 7 {
 						if shift >= 64 {
@@ -5993,7 +5993,7 @@ func (m *JSONSchemaProps) Unmarshal(dAtA []byte) error {
 						return err
 					}
 					iNdEx = postmsgIndex
-				} ***REMOVED*** {
+				} else {
 					iNdEx = entryPreIndex
 					skippy, err := skipGenerated(dAtA[iNdEx:])
 					if err != nil {
@@ -6012,7 +6012,7 @@ func (m *JSONSchemaProps) Unmarshal(dAtA []byte) error {
 			iNdEx = postIndex
 		case 30:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for ***REMOVED***eld AdditionalProperties", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field AdditionalProperties", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -6045,7 +6045,7 @@ func (m *JSONSchemaProps) Unmarshal(dAtA []byte) error {
 			iNdEx = postIndex
 		case 31:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for ***REMOVED***eld PatternProperties", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field PatternProperties", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -6091,8 +6091,8 @@ func (m *JSONSchemaProps) Unmarshal(dAtA []byte) error {
 						break
 					}
 				}
-				***REMOVED***eldNum := int32(wire >> 3)
-				if ***REMOVED***eldNum == 1 {
+				fieldNum := int32(wire >> 3)
+				if fieldNum == 1 {
 					var stringLenmapkey uint64
 					for shift := uint(0); ; shift += 7 {
 						if shift >= 64 {
@@ -6118,7 +6118,7 @@ func (m *JSONSchemaProps) Unmarshal(dAtA []byte) error {
 					}
 					mapkey = string(dAtA[iNdEx:postStringIndexmapkey])
 					iNdEx = postStringIndexmapkey
-				} ***REMOVED*** if ***REMOVED***eldNum == 2 {
+				} else if fieldNum == 2 {
 					var mapmsglen int
 					for shift := uint(0); ; shift += 7 {
 						if shift >= 64 {
@@ -6149,7 +6149,7 @@ func (m *JSONSchemaProps) Unmarshal(dAtA []byte) error {
 						return err
 					}
 					iNdEx = postmsgIndex
-				} ***REMOVED*** {
+				} else {
 					iNdEx = entryPreIndex
 					skippy, err := skipGenerated(dAtA[iNdEx:])
 					if err != nil {
@@ -6168,7 +6168,7 @@ func (m *JSONSchemaProps) Unmarshal(dAtA []byte) error {
 			iNdEx = postIndex
 		case 32:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for ***REMOVED***eld Dependencies", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field Dependencies", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -6214,8 +6214,8 @@ func (m *JSONSchemaProps) Unmarshal(dAtA []byte) error {
 						break
 					}
 				}
-				***REMOVED***eldNum := int32(wire >> 3)
-				if ***REMOVED***eldNum == 1 {
+				fieldNum := int32(wire >> 3)
+				if fieldNum == 1 {
 					var stringLenmapkey uint64
 					for shift := uint(0); ; shift += 7 {
 						if shift >= 64 {
@@ -6241,7 +6241,7 @@ func (m *JSONSchemaProps) Unmarshal(dAtA []byte) error {
 					}
 					mapkey = string(dAtA[iNdEx:postStringIndexmapkey])
 					iNdEx = postStringIndexmapkey
-				} ***REMOVED*** if ***REMOVED***eldNum == 2 {
+				} else if fieldNum == 2 {
 					var mapmsglen int
 					for shift := uint(0); ; shift += 7 {
 						if shift >= 64 {
@@ -6272,7 +6272,7 @@ func (m *JSONSchemaProps) Unmarshal(dAtA []byte) error {
 						return err
 					}
 					iNdEx = postmsgIndex
-				} ***REMOVED*** {
+				} else {
 					iNdEx = entryPreIndex
 					skippy, err := skipGenerated(dAtA[iNdEx:])
 					if err != nil {
@@ -6291,7 +6291,7 @@ func (m *JSONSchemaProps) Unmarshal(dAtA []byte) error {
 			iNdEx = postIndex
 		case 33:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for ***REMOVED***eld AdditionalItems", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field AdditionalItems", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -6324,7 +6324,7 @@ func (m *JSONSchemaProps) Unmarshal(dAtA []byte) error {
 			iNdEx = postIndex
 		case 34:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for ***REMOVED***eld De***REMOVED***nitions", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field Definitions", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -6348,8 +6348,8 @@ func (m *JSONSchemaProps) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			if m.De***REMOVED***nitions == nil {
-				m.De***REMOVED***nitions = make(JSONSchemaDe***REMOVED***nitions)
+			if m.Definitions == nil {
+				m.Definitions = make(JSONSchemaDefinitions)
 			}
 			var mapkey string
 			mapvalue := &JSONSchemaProps{}
@@ -6370,8 +6370,8 @@ func (m *JSONSchemaProps) Unmarshal(dAtA []byte) error {
 						break
 					}
 				}
-				***REMOVED***eldNum := int32(wire >> 3)
-				if ***REMOVED***eldNum == 1 {
+				fieldNum := int32(wire >> 3)
+				if fieldNum == 1 {
 					var stringLenmapkey uint64
 					for shift := uint(0); ; shift += 7 {
 						if shift >= 64 {
@@ -6397,7 +6397,7 @@ func (m *JSONSchemaProps) Unmarshal(dAtA []byte) error {
 					}
 					mapkey = string(dAtA[iNdEx:postStringIndexmapkey])
 					iNdEx = postStringIndexmapkey
-				} ***REMOVED*** if ***REMOVED***eldNum == 2 {
+				} else if fieldNum == 2 {
 					var mapmsglen int
 					for shift := uint(0); ; shift += 7 {
 						if shift >= 64 {
@@ -6428,7 +6428,7 @@ func (m *JSONSchemaProps) Unmarshal(dAtA []byte) error {
 						return err
 					}
 					iNdEx = postmsgIndex
-				} ***REMOVED*** {
+				} else {
 					iNdEx = entryPreIndex
 					skippy, err := skipGenerated(dAtA[iNdEx:])
 					if err != nil {
@@ -6443,11 +6443,11 @@ func (m *JSONSchemaProps) Unmarshal(dAtA []byte) error {
 					iNdEx += skippy
 				}
 			}
-			m.De***REMOVED***nitions[mapkey] = *mapvalue
+			m.Definitions[mapkey] = *mapvalue
 			iNdEx = postIndex
 		case 35:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for ***REMOVED***eld ExternalDocs", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field ExternalDocs", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -6480,7 +6480,7 @@ func (m *JSONSchemaProps) Unmarshal(dAtA []byte) error {
 			iNdEx = postIndex
 		case 36:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for ***REMOVED***eld Example", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field Example", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -6552,18 +6552,18 @@ func (m *JSONSchemaPropsOrArray) Unmarshal(dAtA []byte) error {
 				break
 			}
 		}
-		***REMOVED***eldNum := int32(wire >> 3)
+		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
 			return fmt.Errorf("proto: JSONSchemaPropsOrArray: wiretype end group for non-group")
 		}
-		if ***REMOVED***eldNum <= 0 {
-			return fmt.Errorf("proto: JSONSchemaPropsOrArray: illegal tag %d (wire type %d)", ***REMOVED***eldNum, wire)
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: JSONSchemaPropsOrArray: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
-		switch ***REMOVED***eldNum {
+		switch fieldNum {
 		case 1:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for ***REMOVED***eld Schema", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field Schema", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -6596,7 +6596,7 @@ func (m *JSONSchemaPropsOrArray) Unmarshal(dAtA []byte) error {
 			iNdEx = postIndex
 		case 2:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for ***REMOVED***eld JSONSchemas", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field JSONSchemas", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -6666,18 +6666,18 @@ func (m *JSONSchemaPropsOrBool) Unmarshal(dAtA []byte) error {
 				break
 			}
 		}
-		***REMOVED***eldNum := int32(wire >> 3)
+		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
 			return fmt.Errorf("proto: JSONSchemaPropsOrBool: wiretype end group for non-group")
 		}
-		if ***REMOVED***eldNum <= 0 {
-			return fmt.Errorf("proto: JSONSchemaPropsOrBool: illegal tag %d (wire type %d)", ***REMOVED***eldNum, wire)
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: JSONSchemaPropsOrBool: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
-		switch ***REMOVED***eldNum {
+		switch fieldNum {
 		case 1:
 			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for ***REMOVED***eld Allows", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field Allows", wireType)
 			}
 			var v int
 			for shift := uint(0); ; shift += 7 {
@@ -6697,7 +6697,7 @@ func (m *JSONSchemaPropsOrBool) Unmarshal(dAtA []byte) error {
 			m.Allows = bool(v != 0)
 		case 2:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for ***REMOVED***eld Schema", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field Schema", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -6769,18 +6769,18 @@ func (m *JSONSchemaPropsOrStringArray) Unmarshal(dAtA []byte) error {
 				break
 			}
 		}
-		***REMOVED***eldNum := int32(wire >> 3)
+		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
 			return fmt.Errorf("proto: JSONSchemaPropsOrStringArray: wiretype end group for non-group")
 		}
-		if ***REMOVED***eldNum <= 0 {
-			return fmt.Errorf("proto: JSONSchemaPropsOrStringArray: illegal tag %d (wire type %d)", ***REMOVED***eldNum, wire)
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: JSONSchemaPropsOrStringArray: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
-		switch ***REMOVED***eldNum {
+		switch fieldNum {
 		case 1:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for ***REMOVED***eld Schema", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field Schema", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -6813,7 +6813,7 @@ func (m *JSONSchemaPropsOrStringArray) Unmarshal(dAtA []byte) error {
 			iNdEx = postIndex
 		case 2:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for ***REMOVED***eld Property", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field Property", wireType)
 			}
 			var stringLen uint64
 			for shift := uint(0); ; shift += 7 {
@@ -6881,18 +6881,18 @@ func (m *ServiceReference) Unmarshal(dAtA []byte) error {
 				break
 			}
 		}
-		***REMOVED***eldNum := int32(wire >> 3)
+		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
 			return fmt.Errorf("proto: ServiceReference: wiretype end group for non-group")
 		}
-		if ***REMOVED***eldNum <= 0 {
-			return fmt.Errorf("proto: ServiceReference: illegal tag %d (wire type %d)", ***REMOVED***eldNum, wire)
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: ServiceReference: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
-		switch ***REMOVED***eldNum {
+		switch fieldNum {
 		case 1:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for ***REMOVED***eld Namespace", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field Namespace", wireType)
 			}
 			var stringLen uint64
 			for shift := uint(0); ; shift += 7 {
@@ -6921,7 +6921,7 @@ func (m *ServiceReference) Unmarshal(dAtA []byte) error {
 			iNdEx = postIndex
 		case 2:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for ***REMOVED***eld Name", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field Name", wireType)
 			}
 			var stringLen uint64
 			for shift := uint(0); ; shift += 7 {
@@ -6950,7 +6950,7 @@ func (m *ServiceReference) Unmarshal(dAtA []byte) error {
 			iNdEx = postIndex
 		case 3:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for ***REMOVED***eld Path", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field Path", wireType)
 			}
 			var stringLen uint64
 			for shift := uint(0); ; shift += 7 {
@@ -6999,7 +6999,7 @@ func (m *ServiceReference) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *WebhookClientCon***REMOVED***g) Unmarshal(dAtA []byte) error {
+func (m *WebhookClientConfig) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -7019,18 +7019,18 @@ func (m *WebhookClientCon***REMOVED***g) Unmarshal(dAtA []byte) error {
 				break
 			}
 		}
-		***REMOVED***eldNum := int32(wire >> 3)
+		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: WebhookClientCon***REMOVED***g: wiretype end group for non-group")
+			return fmt.Errorf("proto: WebhookClientConfig: wiretype end group for non-group")
 		}
-		if ***REMOVED***eldNum <= 0 {
-			return fmt.Errorf("proto: WebhookClientCon***REMOVED***g: illegal tag %d (wire type %d)", ***REMOVED***eldNum, wire)
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: WebhookClientConfig: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
-		switch ***REMOVED***eldNum {
+		switch fieldNum {
 		case 1:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for ***REMOVED***eld Service", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field Service", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -7063,7 +7063,7 @@ func (m *WebhookClientCon***REMOVED***g) Unmarshal(dAtA []byte) error {
 			iNdEx = postIndex
 		case 2:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for ***REMOVED***eld CABundle", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field CABundle", wireType)
 			}
 			var byteLen int
 			for shift := uint(0); ; shift += 7 {
@@ -7094,7 +7094,7 @@ func (m *WebhookClientCon***REMOVED***g) Unmarshal(dAtA []byte) error {
 			iNdEx = postIndex
 		case 3:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for ***REMOVED***eld URL", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field URL", wireType)
 			}
 			var stringLen uint64
 			for shift := uint(0); ; shift += 7 {
@@ -7249,10 +7249,10 @@ var (
 )
 
 func init() {
-	proto.RegisterFile("k8s.io/kubernetes/vendor/k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1beta1/generated.proto", ***REMOVED***leDescriptorGenerated)
+	proto.RegisterFile("k8s.io/kubernetes/vendor/k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1beta1/generated.proto", fileDescriptorGenerated)
 }
 
-var ***REMOVED***leDescriptorGenerated = []byte{
+var fileDescriptorGenerated = []byte{
 	// 2740 bytes of a gzipped FileDescriptorProto
 	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xcc, 0x5a, 0xcd, 0x73, 0x1c, 0x47,
 	0x15, 0xf7, 0xec, 0x6a, 0xa5, 0x55, 0x4b, 0xb2, 0xa4, 0xb6, 0xe5, 0x8c, 0x85, 0xbd, 0x2b, 0xad,

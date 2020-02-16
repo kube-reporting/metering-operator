@@ -1,6 +1,6 @@
 //This package is copied from Go library reflect/type.go.
 //The struct tag library provides no way to extract the list of struct tags, only
-//a speci***REMOVED***c tag
+//a specific tag
 package reflect
 
 import (
@@ -38,7 +38,7 @@ func (tags StructTags) Has(name string) bool {
 	return false
 }
 
-// ParseStructTags returns the full set of ***REMOVED***elds in a struct tag in the order they appear in
+// ParseStructTags returns the full set of fields in a struct tag in the order they appear in
 // the struct tag.
 func ParseStructTags(tag string) (StructTags, error) {
 	tags := StructTags{}
@@ -67,7 +67,7 @@ func ParseStructTags(tag string) (StructTags, error) {
 		name := string(tag[:i])
 		tag = tag[i+1:]
 
-		// Scan quoted string to ***REMOVED***nd value.
+		// Scan quoted string to find value.
 		i = 1
 		for i < len(tag) && tag[i] != '"' {
 			if tag[i] == '\\' {

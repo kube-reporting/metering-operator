@@ -2,7 +2,7 @@
 Copyright 2015 The Kubernetes Authors.
 
 Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this ***REMOVED***le except in compliance with the License.
+you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
 
     http://www.apache.org/licenses/LICENSE-2.0
@@ -10,7 +10,7 @@ You may obtain a copy of the License at
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the speci***REMOVED***c language governing permissions and
+See the License for the specific language governing permissions and
 limitations under the License.
 */
 
@@ -51,15 +51,15 @@ type lengthDelimitedFrameReader struct {
 	remaining int
 }
 
-// NewLengthDelimitedFrameReader returns an io.Reader that will decode length-pre***REMOVED***xed
+// NewLengthDelimitedFrameReader returns an io.Reader that will decode length-prefixed
 // frames off of a stream.
 //
 // The protocol is:
 //
 //   stream: message ...
-//   message: pre***REMOVED***x body
-//   pre***REMOVED***x: 4 byte uint32 in BigEndian order, denotes length of body
-//   body: bytes (0..pre***REMOVED***x)
+//   message: prefix body
+//   prefix: 4 byte uint32 in BigEndian order, denotes length of body
+//   body: bytes (0..prefix)
 //
 // If the buffer passed to Read is not long enough to contain an entire frame, io.ErrShortRead
 // will be returned along with the number of bytes read.
@@ -127,7 +127,7 @@ func NewJSONFramedReader(r io.ReadCloser) io.ReadCloser {
 }
 
 // ReadFrame decodes the next JSON object in the stream, or returns an error. The returned
-// byte slice will be modi***REMOVED***ed the next time ReadFrame is invoked and should not be altered.
+// byte slice will be modified the next time ReadFrame is invoked and should not be altered.
 func (r *jsonFrameReader) Read(data []byte) (int, error) {
 	// Return whatever remaining data exists from an in progress frame
 	if n := len(r.remaining); n > 0 {

@@ -5,7 +5,7 @@
 /*
 Package remote_api is a generated protocol buffer package.
 
-It is generated from these ***REMOVED***les:
+It is generated from these files:
 	google.golang.org/appengine/internal/remote_api/remote_api.proto
 
 It has these top-level messages:

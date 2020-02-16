@@ -4,7 +4,7 @@
 // https://github.com/golang/protobuf
 //
 // Redistribution and use in source and binary forms, with or without
-// modi***REMOVED***cation, are permitted provided that the following conditions are
+// modification, are permitted provided that the following conditions are
 // met:
 //
 //     * Redistributions of source code must retain the above copyright
@@ -15,7 +15,7 @@
 // distribution.
 //     * Neither the name of Google Inc. nor the names of its
 // contributors may be used to endorse or promote products derived from
-// this software without speci***REMOVED***c prior written permission.
+// this software without specific prior written permission.
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
 // "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
@@ -32,51 +32,51 @@
 /*
 Package proto converts data structures to and from the wire format of
 protocol buffers.  It works in concert with the Go source code generated
-for .proto ***REMOVED***les by the protocol compiler.
+for .proto files by the protocol compiler.
 
 A summary of the properties of the protocol buffer interface
 for a protocol buffer variable v:
 
   - Names are turned from camel_case to CamelCase for export.
-  - There are no methods on v to set ***REMOVED***elds; just treat
-	them as structure ***REMOVED***elds.
-  - There are getters that return a ***REMOVED***eld's value if set,
-	and return the ***REMOVED***eld's default value if unset.
+  - There are no methods on v to set fields; just treat
+	them as structure fields.
+  - There are getters that return a field's value if set,
+	and return the field's default value if unset.
 	The getters work even if the receiver is a nil message.
   - The zero value for a struct is its correct initialization state.
-	All desired ***REMOVED***elds must be set before marshaling.
+	All desired fields must be set before marshaling.
   - A Reset() method will restore a protobuf struct to its zero state.
-  - Non-repeated ***REMOVED***elds are pointers to the values; nil means unset.
-	That is, optional or required ***REMOVED***eld int32 f becomes F *int32.
-  - Repeated ***REMOVED***elds are slices.
-  - Helper functions are available to aid the setting of ***REMOVED***elds.
-	msg.Foo = proto.String("hello") // set ***REMOVED***eld
-  - Constants are de***REMOVED***ned to hold the default values of all ***REMOVED***elds that
+  - Non-repeated fields are pointers to the values; nil means unset.
+	That is, optional or required field int32 f becomes F *int32.
+  - Repeated fields are slices.
+  - Helper functions are available to aid the setting of fields.
+	msg.Foo = proto.String("hello") // set field
+  - Constants are defined to hold the default values of all fields that
 	have them.  They have the form Default_StructName_FieldName.
 	Because the getter methods handle defaulted values,
 	direct use of these constants should be rare.
   - Enums are given type names and maps from names to values.
-	Enum values are pre***REMOVED***xed by the enclosing message's name, or by the
+	Enum values are prefixed by the enclosing message's name, or by the
 	enum's type name if it is a top-level enum. Enum types have a String
 	method, and a Enum method to assist in message construction.
-  - Nested messages, groups and enums have type names pre***REMOVED***xed with the name of
+  - Nested messages, groups and enums have type names prefixed with the name of
 	the surrounding message type.
   - Extensions are given descriptor names that start with E_,
 	followed by an underscore-delimited list of the nested messages
 	that contain it (if any) followed by the CamelCased name of the
-	extension ***REMOVED***eld itself.  HasExtension, ClearExtension, GetExtension
+	extension field itself.  HasExtension, ClearExtension, GetExtension
 	and SetExtension are functions for manipulating extensions.
-  - Oneof ***REMOVED***eld sets are given a single ***REMOVED***eld in their message,
-	with distinguished wrapper types for each possible ***REMOVED***eld value.
+  - Oneof field sets are given a single field in their message,
+	with distinguished wrapper types for each possible field value.
   - Marshal and Unmarshal are functions to encode and decode the wire format.
 
-When the .proto ***REMOVED***le speci***REMOVED***es `syntax="proto3"`, there are some differences:
+When the .proto file specifies `syntax="proto3"`, there are some differences:
 
-  - Non-repeated ***REMOVED***elds of non-message type are values instead of pointers.
+  - Non-repeated fields of non-message type are values instead of pointers.
   - Enum types do not get an Enum method.
 
 The simplest way to describe this is to see an example.
-Given ***REMOVED***le test.proto, containing
+Given file test.proto, containing
 
 	package example;
 
@@ -95,7 +95,7 @@ Given ***REMOVED***le test.proto, containing
 	  }
 	}
 
-The resulting ***REMOVED***le, test.pb.go, is:
+The resulting file, test.pb.go, is:
 
 	package example
 
@@ -307,7 +307,7 @@ func GetStats() Stats { return stats }
 // protocol buffers.  It may be reused between invocations to
 // reduce memory usage.  It is not necessary to use a Buffer;
 // the global functions Marshal and Unmarshal create a
-// temporary Buffer and are ***REMOVED***ne for most applications.
+// temporary Buffer and are fine for most applications.
 type Buffer struct {
 	buf   []byte // encode/decode byte stream
 	index int    // read point
@@ -348,10 +348,10 @@ func (p *Buffer) Bytes() []byte { return p.buf }
 //
 // Note that the deterministic serialization is NOT canonical across
 // languages. It is not guaranteed to remain stable over time. It is unstable
-// across different builds with schema changes due to unknown ***REMOVED***elds.
+// across different builds with schema changes due to unknown fields.
 // Users who need canonical serialization (e.g., persistent storage in a
-// canonical form, ***REMOVED***ngerprinting, etc.) should de***REMOVED***ne their own
-// canonicalization speci***REMOVED***cation and implement their own serializer rather
+// canonical form, fingerprinting, etc.) should define their own
+// canonicalization specification and implement their own serializer rather
 // than relying on this API.
 //
 // If deterministic serialization is requested, map entries will be sorted
@@ -362,7 +362,7 @@ func (p *Buffer) SetDeterministic(deterministic bool) {
 }
 
 /*
- * Helper routines for simplifying the creation of optional ***REMOVED***elds of basic type.
+ * Helper routines for simplifying the creation of optional fields of basic type.
  */
 
 // Bool is a helper routine that allocates a new bool value
@@ -509,7 +509,7 @@ out:
 				for i := 0; i < len(r); i++ {
 					fmt.Printf(" %.2x", r[i])
 				}
-			} ***REMOVED*** {
+			} else {
 				for i := 0; i < 3; i++ {
 					fmt.Printf(" %.2x", r[i])
 				}
@@ -523,18 +523,18 @@ out:
 		case WireFixed32:
 			u, err = p.DecodeFixed32()
 			if err != nil {
-				fmt.Printf("%3d: t=%3d ***REMOVED***x32 err %v\n", index, tag, err)
+				fmt.Printf("%3d: t=%3d fix32 err %v\n", index, tag, err)
 				break out
 			}
-			fmt.Printf("%3d: t=%3d ***REMOVED***x32 %d\n", index, tag, u)
+			fmt.Printf("%3d: t=%3d fix32 %d\n", index, tag, u)
 
 		case WireFixed64:
 			u, err = p.DecodeFixed64()
 			if err != nil {
-				fmt.Printf("%3d: t=%3d ***REMOVED***x64 err %v\n", index, tag, err)
+				fmt.Printf("%3d: t=%3d fix64 err %v\n", index, tag, err)
 				break out
 			}
-			fmt.Printf("%3d: t=%3d ***REMOVED***x64 %d\n", index, tag, u)
+			fmt.Printf("%3d: t=%3d fix64 %d\n", index, tag, u)
 
 		case WireVarint:
 			u, err = p.DecodeVarint()
@@ -563,8 +563,8 @@ out:
 	p.index = index
 }
 
-// SetDefaults sets unset protocol buffer ***REMOVED***elds to their default values.
-// It only modi***REMOVED***es ***REMOVED***elds that are both unset and have de***REMOVED***ned defaults.
+// SetDefaults sets unset protocol buffer fields to their default values.
+// It only modifies fields that are both unset and have defined defaults.
 // It recursively sets default values in any non-nil sub-messages.
 func SetDefaults(pb Message) {
 	setDefaults(reflect.ValueOf(pb), true, false)
@@ -587,7 +587,7 @@ func setDefaults(v reflect.Value, recur, zeros bool) {
 	for _, sf := range dm.scalars {
 		f := v.Field(sf.index)
 		if !f.IsNil() {
-			// ***REMOVED***eld already set
+			// field already set
 			continue
 		}
 		dv := sf.value
@@ -624,8 +624,8 @@ func setDefaults(v reflect.Value, recur, zeros bool) {
 				if dv != nil {
 					f.Elem().SetInt(int64(dv.(int32)))
 				}
-			} ***REMOVED*** {
-				// int32 ***REMOVED***eld
+			} else {
+				// int32 field
 				i := new(int32)
 				if dv != nil {
 					*i = dv.(int32)
@@ -651,7 +651,7 @@ func setDefaults(v reflect.Value, recur, zeros bool) {
 				db := dv.([]byte)
 				b = make([]byte, len(db))
 				copy(b, db)
-			} ***REMOVED*** {
+			} else {
 				b = []byte{}
 			}
 			*(fptr.(*[]byte)) = b
@@ -668,7 +668,7 @@ func setDefaults(v reflect.Value, recur, zeros bool) {
 			}
 			*(fptr.(**uint64)) = u
 		default:
-			log.Printf("proto: can't set default for ***REMOVED***eld %v (sf.kind=%v)", f, sf.kind)
+			log.Printf("proto: can't set default for field %v (sf.kind=%v)", f, sf.kind)
 		}
 	}
 
@@ -704,8 +704,8 @@ func setDefaults(v reflect.Value, recur, zeros bool) {
 }
 
 var (
-	// defaults maps a protocol buffer struct type to a slice of the ***REMOVED***elds,
-	// with its scalar ***REMOVED***elds set to their proto-declared non-zero default values.
+	// defaults maps a protocol buffer struct type to a slice of the fields,
+	// with its scalar fields set to their proto-declared non-zero default values.
 	defaultMu sync.RWMutex
 	defaults  = make(map[reflect.Type]defaultMessage)
 
@@ -715,11 +715,11 @@ var (
 // defaultMessage represents information about the default values of a message.
 type defaultMessage struct {
 	scalars []scalarField
-	nested  []int // struct ***REMOVED***eld index of nested messages
+	nested  []int // struct field index of nested messages
 }
 
 type scalarField struct {
-	index int          // struct ***REMOVED***eld index
+	index int          // struct field index
 	kind  reflect.Kind // element type (the T in *T or []T)
 	value interface{}  // the proto-declared default value, or nil
 }
@@ -728,21 +728,21 @@ type scalarField struct {
 func buildDefaultMessage(t reflect.Type) (dm defaultMessage) {
 	sprop := GetProperties(t)
 	for _, prop := range sprop.Prop {
-		***REMOVED***, ok := sprop.decoderTags.get(prop.Tag)
+		fi, ok := sprop.decoderTags.get(prop.Tag)
 		if !ok {
 			// XXX_unrecognized
 			continue
 		}
-		ft := t.Field(***REMOVED***).Type
+		ft := t.Field(fi).Type
 
-		sf, nested, err := ***REMOVED***eldDefault(ft, prop)
+		sf, nested, err := fieldDefault(ft, prop)
 		switch {
 		case err != nil:
 			log.Print(err)
 		case nested:
-			dm.nested = append(dm.nested, ***REMOVED***)
+			dm.nested = append(dm.nested, fi)
 		case sf != nil:
-			sf.index = ***REMOVED***
+			sf.index = fi
 			dm.scalars = append(dm.scalars, *sf)
 		}
 	}
@@ -750,18 +750,18 @@ func buildDefaultMessage(t reflect.Type) (dm defaultMessage) {
 	return dm
 }
 
-// ***REMOVED***eldDefault returns the scalarField for ***REMOVED***eld type ft.
-// sf will be nil if the ***REMOVED***eld can not have a default.
+// fieldDefault returns the scalarField for field type ft.
+// sf will be nil if the field can not have a default.
 // nestedMessage will be true if this is a nested message.
 // Note that sf.index is not set on return.
-func ***REMOVED***eldDefault(ft reflect.Type, prop *Properties) (sf *scalarField, nestedMessage bool, err error) {
+func fieldDefault(ft reflect.Type, prop *Properties) (sf *scalarField, nestedMessage bool, err error) {
 	var canHaveDefault bool
 	switch ft.Kind() {
 	case reflect.Ptr:
 		if ft.Elem().Kind() == reflect.Struct {
 			nestedMessage = true
-		} ***REMOVED*** {
-			canHaveDefault = true // proto2 scalar ***REMOVED***eld
+		} else {
+			canHaveDefault = true // proto2 scalar field
 		}
 
 	case reflect.Slice:
@@ -769,7 +769,7 @@ func ***REMOVED***eldDefault(ft reflect.Type, prop *Properties) (sf *scalarField
 		case reflect.Ptr:
 			nestedMessage = true // repeated message
 		case reflect.Uint8:
-			canHaveDefault = true // bytes ***REMOVED***eld
+			canHaveDefault = true // bytes field
 		}
 
 	case reflect.Map:
@@ -788,12 +788,12 @@ func ***REMOVED***eldDefault(ft reflect.Type, prop *Properties) (sf *scalarField
 	// We now know that ft is a pointer or slice.
 	sf = &scalarField{kind: ft.Elem().Kind()}
 
-	// scalar ***REMOVED***elds without defaults
+	// scalar fields without defaults
 	if !prop.HasDefault {
 		return sf, false, nil
 	}
 
-	// a scalar ***REMOVED***eld: either *T or []byte
+	// a scalar field: either *T or []byte
 	switch ft.Elem().Kind() {
 	case reflect.Bool:
 		x, err := strconv.ParseBool(prop.Default)
@@ -850,7 +850,7 @@ func ***REMOVED***eldDefault(ft reflect.Type, prop *Properties) (sf *scalarField
 }
 
 // mapKeys returns a sort.Interface to be used for sorting the map keys.
-// Map ***REMOVED***elds may have key types of non-float scalars, strings and enums.
+// Map fields may have key types of non-float scalars, strings and enums.
 func mapKeys(vs []reflect.Value) sort.Interface {
 	s := mapKeySorter{vs: vs}
 
@@ -902,15 +902,15 @@ func isProto3Zero(v reflect.Value) bool {
 	return false
 }
 
-// ProtoPackageIsVersion2 is referenced from generated protocol buffer ***REMOVED***les
+// ProtoPackageIsVersion2 is referenced from generated protocol buffer files
 // to assert that that code is compatible with this version of the proto package.
 const ProtoPackageIsVersion2 = true
 
-// ProtoPackageIsVersion1 is referenced from generated protocol buffer ***REMOVED***les
+// ProtoPackageIsVersion1 is referenced from generated protocol buffer files
 // to assert that that code is compatible with this version of the proto package.
 const ProtoPackageIsVersion1 = true
 
-// InternalMessageInfo is a type used internally by generated .pb.go ***REMOVED***les.
+// InternalMessageInfo is a type used internally by generated .pb.go files.
 // This type is not intended to be used by non-generated code.
 // This type is not subject to any compatibility guarantee.
 type InternalMessageInfo struct {

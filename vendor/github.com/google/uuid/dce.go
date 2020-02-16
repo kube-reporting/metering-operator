@@ -1,6 +1,6 @@
 // Copyright 2016 Google Inc.  All rights reserved.
 // Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE ***REMOVED***le.
+// license that can be found in the LICENSE file.
 
 package uuid
 
@@ -25,7 +25,7 @@ const (
 // The domain should be one of Person, Group or Org.
 // On a POSIX system the id should be the users UID for the Person
 // domain and the users GID for the Group.  The meaning of id for
-// the domain Org or on non-POSIX systems is site de***REMOVED***ned.
+// the domain Org or on non-POSIX systems is site defined.
 //
 // For a given domain/id pair the same token may be returned for up to
 // 7 minutes and 10 seconds.
@@ -55,13 +55,13 @@ func NewDCEGroup() (UUID, error) {
 	return NewDCESecurity(Group, uint32(os.Getgid()))
 }
 
-// Domain returns the domain for a Version 2 UUID.  Domains are only de***REMOVED***ned
+// Domain returns the domain for a Version 2 UUID.  Domains are only defined
 // for Version 2 UUIDs.
 func (uuid UUID) Domain() Domain {
 	return Domain(uuid[9])
 }
 
-// ID returns the id for a Version 2 UUID. IDs are only de***REMOVED***ned for Version 2
+// ID returns the id for a Version 2 UUID. IDs are only defined for Version 2
 // UUIDs.
 func (uuid UUID) ID() uint32 {
 	return binary.BigEndian.Uint32(uuid[0:4])

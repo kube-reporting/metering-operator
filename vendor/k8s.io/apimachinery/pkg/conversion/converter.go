@@ -2,7 +2,7 @@
 Copyright 2014 The Kubernetes Authors.
 
 Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this ***REMOVED***le except in compliance with the License.
+you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
 
     http://www.apache.org/licenses/LICENSE-2.0
@@ -10,7 +10,7 @@ You may obtain a copy of the License at
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the speci***REMOVED***c language governing permissions and
+See the License for the specific language governing permissions and
 limitations under the License.
 */
 
@@ -27,8 +27,8 @@ type typePair struct {
 }
 
 type typeNamePair struct {
-	***REMOVED***eldType reflect.Type
-	***REMOVED***eldName string
+	fieldType reflect.Type
+	fieldName string
 }
 
 // DebugLogger allows you to get debugging messages if necessary.
@@ -42,7 +42,7 @@ var DefaultNameFunc = func(t reflect.Type) string { return t.Name() }
 
 // ConversionFunc converts the object a into the object b, reusing arrays or objects
 // or pointers if necessary. It should return an error if the object cannot be converted
-// or if some data is invalid. If you do not wish a and b to share ***REMOVED***elds or nested
+// or if some data is invalid. If you do not wish a and b to share fields or nested
 // objects, you must copy a before calling this function.
 type ConversionFunc func(a, b interface{}, scope Scope) error
 
@@ -56,13 +56,13 @@ type Converter struct {
 	// Set of conversions that should be treated as a no-op
 	ignoredConversions map[typePair]struct{}
 
-	// This is a map from a source ***REMOVED***eld type and name, to a list of destination
-	// ***REMOVED***eld type and name.
+	// This is a map from a source field type and name, to a list of destination
+	// field type and name.
 	structFieldDests map[typeNamePair][]typeNamePair
 
 	// Allows for the opposite lookup of structFieldDests. So that SourceFromDest
-	// copy flag also works. So this is a map of destination ***REMOVED***eld name, to potential
-	// source ***REMOVED***eld name and type to look for.
+	// copy flag also works. So this is a map of destination field name, to potential
+	// source field name and type to look for.
 	structFieldSources map[typeNamePair][]typeNamePair
 
 	// Map from an input type to a function which can apply a key name mapping
@@ -147,7 +147,7 @@ type Scope interface {
 	Meta() *Meta
 }
 
-// FieldMappingFunc can convert an input ***REMOVED***eld value into different values, depending on
+// FieldMappingFunc can convert an input field value into different values, depending on
 // the value of the source or destination struct tags.
 type FieldMappingFunc func(key string, sourceTag, destTag reflect.StructTag) (source string, dest string)
 
@@ -180,7 +180,7 @@ func (c ConversionFuncs) Add(fns ...interface{}) error {
 
 // AddUntyped adds the provided conversion function to the lookup table for the types that are
 // supplied as a and b. a and b must be pointers or an error is returned. This method overwrites
-// previously de***REMOVED***ned functions.
+// previously defined functions.
 func (c ConversionFuncs) AddUntyped(a, b interface{}, fn ConversionFunc) error {
 	tA, tB := reflect.TypeOf(a), reflect.TypeOf(b)
 	if tA.Kind() != reflect.Ptr {
@@ -214,10 +214,10 @@ func (c ConversionFuncs) Merge(other ConversionFuncs) ConversionFuncs {
 
 // Meta is supplied by Scheme, when it calls Convert.
 type Meta struct {
-	// KeyNameMapping is an optional function which may map the listed key (***REMOVED***eld name)
+	// KeyNameMapping is an optional function which may map the listed key (field name)
 	// into a source and destination value.
 	KeyNameMapping FieldMappingFunc
-	// Context is an optional ***REMOVED***eld that callers may use to pass info to conversion functions.
+	// Context is an optional field that callers may use to pass info to conversion functions.
 	Context interface{}
 }
 
@@ -266,7 +266,7 @@ func (s scopeStack) describe() string {
 		}
 		if v.key == "" {
 			desc += fmt.Sprintf(".%v", v.value.Type())
-		} ***REMOVED*** {
+		} else {
 			desc += fmt.Sprintf(".%v", v.key)
 		}
 	}
@@ -329,7 +329,7 @@ func (s *scope) errorf(message string, args ...interface{}) error {
 	return fmt.Errorf(where+message, args...)
 }
 
-// Veri***REMOVED***es whether a conversion function has a correct signature.
+// Verifies whether a conversion function has a correct signature.
 func verifyConversionFunctionSignature(ft reflect.Type) error {
 	if ft.Kind() != reflect.Func {
 		return fmt.Errorf("expected func, got: %v", ft)
@@ -412,7 +412,7 @@ func (c *Converter) RegisterIgnoredConversion(from, to interface{}) error {
 	return nil
 }
 
-// RegisterInputDefaults registers a ***REMOVED***eld name mapping function, used when converting
+// RegisterInputDefaults registers a field name mapping function, used when converting
 // from maps to structs. Inputs to the conversion methods are checked for this type and a mapping
 // applied automatically if the input matches in. A set of default flags for the input conversion
 // may also be provided, which will be used when no explicit flags are requested.
@@ -427,23 +427,23 @@ func (c *Converter) RegisterInputDefaults(in interface{}, fn FieldMappingFunc, d
 	return nil
 }
 
-// FieldMatchingFlags contains a list of ways in which struct ***REMOVED***elds could be
+// FieldMatchingFlags contains a list of ways in which struct fields could be
 // copied. These constants may be | combined.
 type FieldMatchingFlags int
 
 const (
-	// Loop through destination ***REMOVED***elds, search for matching source
-	// ***REMOVED***eld to copy it from. Source ***REMOVED***elds with no corresponding
-	// destination ***REMOVED***eld will be ignored. If SourceToDest is
-	// speci***REMOVED***ed, this flag is ignored. If neither is speci***REMOVED***ed,
+	// Loop through destination fields, search for matching source
+	// field to copy it from. Source fields with no corresponding
+	// destination field will be ignored. If SourceToDest is
+	// specified, this flag is ignored. If neither is specified,
 	// or no flags are passed, this flag is the default.
 	DestFromSource FieldMatchingFlags = 0
-	// Loop through source ***REMOVED***elds, search for matching dest ***REMOVED***eld
-	// to copy it into. Destination ***REMOVED***elds with no corresponding
-	// source ***REMOVED***eld will be ignored.
+	// Loop through source fields, search for matching dest field
+	// to copy it into. Destination fields with no corresponding
+	// source field will be ignored.
 	SourceToDest FieldMatchingFlags = 1 << iota
 	// Don't treat it as an error if the corresponding source or
-	// dest ***REMOVED***eld can't be found.
+	// dest field can't be found.
 	IgnoreMissingFields
 	// Don't require type names to match.
 	AllowDifferentFieldTypeNames
@@ -523,7 +523,7 @@ func (c *Converter) callCustom(sv, dv, custom reflect.Value, scope *scope) error
 		sv2 := reflect.New(sv.Type())
 		sv2.Elem().Set(sv)
 		sv = sv2
-	} ***REMOVED*** {
+	} else {
 		sv = sv.Addr()
 	}
 	if !dv.CanAddr() {
@@ -533,7 +533,7 @@ func (c *Converter) callCustom(sv, dv, custom reflect.Value, scope *scope) error
 		dvOrig := dv
 		dv := reflect.New(dvOrig.Type())
 		defer func() { dvOrig.Set(dv) }()
-	} ***REMOVED*** {
+	} else {
 		dv = dv.Addr()
 	}
 	args := []reflect.Value{sv, dv, reflect.ValueOf(scope)}
@@ -583,7 +583,7 @@ func (c *Converter) defaultConvert(sv, dv reflect.Value, scope *scope) error {
 	dt, st := dv.Type(), sv.Type()
 
 	if !dv.CanSet() {
-		return scope.errorf("Cannot set dest. (Tried to deep copy something with unexported ***REMOVED***elds?)")
+		return scope.errorf("Cannot set dest. (Tried to deep copy something with unexported fields?)")
 	}
 
 	if !scope.flags.IsSet(AllowDifferentFieldTypeNames) && c.nameFunc(dt) != c.nameFunc(st) {
@@ -661,7 +661,7 @@ func (c *Converter) defaultConvert(sv, dv reflect.Value, scope *scope) error {
 			scope.setKeys(sk.Interface(), dk.Interface())
 			// TODO:  sv.MapIndex(sk) may return a value with CanAddr() == false,
 			// because a map[string]struct{} does not allow a pointer reference.
-			// Calling a custom conversion function de***REMOVED***ned for the map value
+			// Calling a custom conversion function defined for the map value
 			// will panic. Example is PodInfo map[string]ContainerStatus.
 			if err := c.convert(sv.MapIndex(sk), dkv, scope); err != nil {
 				return err
@@ -712,7 +712,7 @@ type kvValue interface {
 	value(key string) reflect.Value
 	// Maps require explicit setting-- will do nothing for structs.
 	// Returns false on failure.
-	con***REMOVED***rmSet(key string, v reflect.Value) bool
+	confirmSet(key string, v reflect.Value) bool
 }
 
 type stringMapAdaptor reflect.Value
@@ -744,7 +744,7 @@ func (a stringMapAdaptor) value(key string) reflect.Value {
 	return reflect.Value(a).MapIndex(reflect.ValueOf(key))
 }
 
-func (a stringMapAdaptor) con***REMOVED***rmSet(key string, v reflect.Value) bool {
+func (a stringMapAdaptor) confirmSet(key string, v reflect.Value) bool {
 	return true
 }
 
@@ -767,9 +767,9 @@ func (a structAdaptor) keys() []string {
 
 func (a structAdaptor) tagOf(key string) reflect.StructTag {
 	v := reflect.Value(a)
-	***REMOVED***eld, ok := v.Type().FieldByName(key)
+	field, ok := v.Type().FieldByName(key)
 	if ok {
-		return ***REMOVED***eld.Tag
+		return field.Tag
 	}
 	return ""
 }
@@ -779,7 +779,7 @@ func (a structAdaptor) value(key string) reflect.Value {
 	return v.FieldByName(key)
 }
 
-func (a structAdaptor) con***REMOVED***rmSet(key string, v reflect.Value) bool {
+func (a structAdaptor) confirmSet(key string, v reflect.Value) bool {
 	return true
 }
 
@@ -840,57 +840,57 @@ func (c *Converter) convertKV(skv, dkv kvValue, scope *scope) error {
 	return nil
 }
 
-// checkField returns true if the ***REMOVED***eld name matches any of the struct
-// ***REMOVED***eld copying rules. The error should be ignored if it returns false.
-func (c *Converter) checkField(***REMOVED***eldName string, skv, dkv kvValue, scope *scope) (bool, error) {
+// checkField returns true if the field name matches any of the struct
+// field copying rules. The error should be ignored if it returns false.
+func (c *Converter) checkField(fieldName string, skv, dkv kvValue, scope *scope) (bool, error) {
 	replacementMade := false
 	if scope.flags.IsSet(DestFromSource) {
-		df := dkv.value(***REMOVED***eldName)
+		df := dkv.value(fieldName)
 		if !df.IsValid() {
 			return false, nil
 		}
-		destKey := typeNamePair{df.Type(), ***REMOVED***eldName}
+		destKey := typeNamePair{df.Type(), fieldName}
 		// Check each of the potential source (type, name) pairs to see if they're
 		// present in sv.
 		for _, potentialSourceKey := range c.structFieldSources[destKey] {
-			sf := skv.value(potentialSourceKey.***REMOVED***eldName)
+			sf := skv.value(potentialSourceKey.fieldName)
 			if !sf.IsValid() {
 				continue
 			}
-			if sf.Type() == potentialSourceKey.***REMOVED***eldType {
+			if sf.Type() == potentialSourceKey.fieldType {
 				// Both the source's name and type matched, so copy.
-				scope.srcStack.top().key = potentialSourceKey.***REMOVED***eldName
-				scope.destStack.top().key = ***REMOVED***eldName
+				scope.srcStack.top().key = potentialSourceKey.fieldName
+				scope.destStack.top().key = fieldName
 				if err := c.convert(sf, df, scope); err != nil {
 					return true, err
 				}
-				dkv.con***REMOVED***rmSet(***REMOVED***eldName, df)
+				dkv.confirmSet(fieldName, df)
 				replacementMade = true
 			}
 		}
 		return replacementMade, nil
 	}
 
-	sf := skv.value(***REMOVED***eldName)
+	sf := skv.value(fieldName)
 	if !sf.IsValid() {
 		return false, nil
 	}
-	srcKey := typeNamePair{sf.Type(), ***REMOVED***eldName}
+	srcKey := typeNamePair{sf.Type(), fieldName}
 	// Check each of the potential dest (type, name) pairs to see if they're
 	// present in dv.
 	for _, potentialDestKey := range c.structFieldDests[srcKey] {
-		df := dkv.value(potentialDestKey.***REMOVED***eldName)
+		df := dkv.value(potentialDestKey.fieldName)
 		if !df.IsValid() {
 			continue
 		}
-		if df.Type() == potentialDestKey.***REMOVED***eldType {
+		if df.Type() == potentialDestKey.fieldType {
 			// Both the dest's name and type matched, so copy.
-			scope.srcStack.top().key = ***REMOVED***eldName
-			scope.destStack.top().key = potentialDestKey.***REMOVED***eldName
+			scope.srcStack.top().key = fieldName
+			scope.destStack.top().key = potentialDestKey.fieldName
 			if err := c.convert(sf, df, scope); err != nil {
 				return true, err
 			}
-			dkv.con***REMOVED***rmSet(potentialDestKey.***REMOVED***eldName, df)
+			dkv.confirmSet(potentialDestKey.fieldName, df)
 			replacementMade = true
 		}
 	}

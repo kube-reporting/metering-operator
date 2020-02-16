@@ -1,6 +1,6 @@
 # Patterns to ignore when building packages.
 # This supports shell glob matching, relative path matching, and
-# negation (pre***REMOVED***xed with !). Only one pattern per line.
+# negation (prefixed with !). Only one pattern per line.
 .DS_Store
 # Common VCS dirs
 .git/
@@ -10,7 +10,7 @@
 .hg/
 .hgignore
 .svn/
-# Common backup ***REMOVED***les
+# Common backup files
 *.swp
 *.bak
 *.tmp

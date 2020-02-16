@@ -17,8 +17,8 @@ const (
 
 	// Assume Role Credentials group
 	roleArnKey          = `role_arn`          // group required
-	sourcePro***REMOVED***leKey    = `source_pro***REMOVED***le`    // group required (or credential_source)
-	credentialSourceKey = `credential_source` // group required (or source_pro***REMOVED***le)
+	sourceProfileKey    = `source_profile`    // group required (or credential_source)
+	credentialSourceKey = `credential_source` // group required (or source_profile)
 	externalIDKey       = `external_id`       // optional
 	mfaSerialKey        = `mfa_serial`        // optional
 	roleSessionNameKey  = `role_session_name` // optional
@@ -29,7 +29,7 @@ const (
 	csmPortKey     = `csm_port`
 	csmClientIDKey = `csm_client_id`
 
-	// Additional Con***REMOVED***g ***REMOVED***elds
+	// Additional Config fields
 	regionKey = `region`
 
 	// endpoint discovery group
@@ -39,24 +39,24 @@ const (
 	credentialProcessKey = `credential_process` // optional
 
 	// Web Identity Token File
-	webIdentityTokenFileKey = `web_identity_token_***REMOVED***le` // optional
+	webIdentityTokenFileKey = `web_identity_token_file` // optional
 
-	// Additional con***REMOVED***g ***REMOVED***elds for regional or legacy endpoints
+	// Additional config fields for regional or legacy endpoints
 	stsRegionalEndpointSharedKey = `sts_regional_endpoints`
 
-	// DefaultSharedCon***REMOVED***gPro***REMOVED***le is the default pro***REMOVED***le to be used when
-	// loading con***REMOVED***guration from the con***REMOVED***g ***REMOVED***les if another pro***REMOVED***le name
+	// DefaultSharedConfigProfile is the default profile to be used when
+	// loading configuration from the config files if another profile name
 	// is not provided.
-	DefaultSharedCon***REMOVED***gPro***REMOVED***le = `default`
+	DefaultSharedConfigProfile = `default`
 )
 
-// sharedCon***REMOVED***g represents the con***REMOVED***guration ***REMOVED***elds of the SDK con***REMOVED***g ***REMOVED***les.
-type sharedCon***REMOVED***g struct {
-	// Credentials values from the con***REMOVED***g ***REMOVED***le. Both aws_access_key_id and
-	// aws_secret_access_key must be provided together in the same ***REMOVED***le to be
+// sharedConfig represents the configuration fields of the SDK config files.
+type sharedConfig struct {
+	// Credentials values from the config file. Both aws_access_key_id and
+	// aws_secret_access_key must be provided together in the same file to be
 	// considered valid. The values will be ignored if not a complete group.
-	// aws_session_token is an optional ***REMOVED***eld that can be provided if both of
-	// the other two ***REMOVED***elds are also provided.
+	// aws_session_token is an optional field that can be provided if both of
+	// the other two fields are also provided.
 	//
 	//	aws_access_key_id
 	//	aws_secret_access_key
@@ -72,8 +72,8 @@ type sharedCon***REMOVED***g struct {
 	ExternalID      string
 	MFASerial       string
 
-	SourcePro***REMOVED***leName string
-	SourcePro***REMOVED***le     *sharedCon***REMOVED***g
+	SourceProfileName string
+	SourceProfile     *sharedConfig
 
 	// Region is the region the SDK should use for looking up AWS service
 	// endpoints and signing requests.
@@ -81,7 +81,7 @@ type sharedCon***REMOVED***g struct {
 	//	region
 	Region string
 
-	// EnableEndpointDiscovery can be enabled in the shared con***REMOVED***g by setting
+	// EnableEndpointDiscovery can be enabled in the shared config by setting
 	// endpoint_discovery_enabled to true
 	//
 	//	endpoint_discovery_enabled = true
@@ -92,156 +92,156 @@ type sharedCon***REMOVED***g struct {
 	CSMPort     string
 	CSMClientID string
 
-	// Speci***REMOVED***es the Regional Endpoint flag for the sdk to resolve the endpoint for a service
+	// Specifies the Regional Endpoint flag for the sdk to resolve the endpoint for a service
 	//
 	// sts_regional_endpoints = sts_regional_endpoint
 	// This can take value as `LegacySTSEndpoint` or `RegionalSTSEndpoint`
 	STSRegionalEndpoint endpoints.STSRegionalEndpoint
 }
 
-type sharedCon***REMOVED***gFile struct {
+type sharedConfigFile struct {
 	Filename string
 	IniData  ini.Sections
 }
 
-// loadSharedCon***REMOVED***g retrieves the con***REMOVED***guration from the list of ***REMOVED***les using
-// the pro***REMOVED***le provided. The order the ***REMOVED***les are listed will determine
-// precedence. Values in subsequent ***REMOVED***les will overwrite values de***REMOVED***ned in
-// earlier ***REMOVED***les.
+// loadSharedConfig retrieves the configuration from the list of files using
+// the profile provided. The order the files are listed will determine
+// precedence. Values in subsequent files will overwrite values defined in
+// earlier files.
 //
-// For example, given two ***REMOVED***les A and B. Both de***REMOVED***ne credentials. If the order
-// of the ***REMOVED***les are A then B, B's credential values will be used instead of
+// For example, given two files A and B. Both define credentials. If the order
+// of the files are A then B, B's credential values will be used instead of
 // A's.
 //
-// See sharedCon***REMOVED***g.setFromFile for information how the con***REMOVED***g ***REMOVED***les
+// See sharedConfig.setFromFile for information how the config files
 // will be loaded.
-func loadSharedCon***REMOVED***g(pro***REMOVED***le string, ***REMOVED***lenames []string, exOpts bool) (sharedCon***REMOVED***g, error) {
-	if len(pro***REMOVED***le) == 0 {
-		pro***REMOVED***le = DefaultSharedCon***REMOVED***gPro***REMOVED***le
+func loadSharedConfig(profile string, filenames []string, exOpts bool) (sharedConfig, error) {
+	if len(profile) == 0 {
+		profile = DefaultSharedConfigProfile
 	}
 
-	***REMOVED***les, err := loadSharedCon***REMOVED***gIniFiles(***REMOVED***lenames)
+	files, err := loadSharedConfigIniFiles(filenames)
 	if err != nil {
-		return sharedCon***REMOVED***g{}, err
+		return sharedConfig{}, err
 	}
 
-	cfg := sharedCon***REMOVED***g{}
-	pro***REMOVED***les := map[string]struct{}{}
-	if err = cfg.setFromIniFiles(pro***REMOVED***les, pro***REMOVED***le, ***REMOVED***les, exOpts); err != nil {
-		return sharedCon***REMOVED***g{}, err
+	cfg := sharedConfig{}
+	profiles := map[string]struct{}{}
+	if err = cfg.setFromIniFiles(profiles, profile, files, exOpts); err != nil {
+		return sharedConfig{}, err
 	}
 
 	return cfg, nil
 }
 
-func loadSharedCon***REMOVED***gIniFiles(***REMOVED***lenames []string) ([]sharedCon***REMOVED***gFile, error) {
-	***REMOVED***les := make([]sharedCon***REMOVED***gFile, 0, len(***REMOVED***lenames))
+func loadSharedConfigIniFiles(filenames []string) ([]sharedConfigFile, error) {
+	files := make([]sharedConfigFile, 0, len(filenames))
 
-	for _, ***REMOVED***lename := range ***REMOVED***lenames {
-		sections, err := ini.OpenFile(***REMOVED***lename)
+	for _, filename := range filenames {
+		sections, err := ini.OpenFile(filename)
 		if aerr, ok := err.(awserr.Error); ok && aerr.Code() == ini.ErrCodeUnableToReadFile {
-			// Skip ***REMOVED***les which can't be opened and read for whatever reason
+			// Skip files which can't be opened and read for whatever reason
 			continue
-		} ***REMOVED*** if err != nil {
-			return nil, SharedCon***REMOVED***gLoadError{Filename: ***REMOVED***lename, Err: err}
+		} else if err != nil {
+			return nil, SharedConfigLoadError{Filename: filename, Err: err}
 		}
 
-		***REMOVED***les = append(***REMOVED***les, sharedCon***REMOVED***gFile{
-			Filename: ***REMOVED***lename, IniData: sections,
+		files = append(files, sharedConfigFile{
+			Filename: filename, IniData: sections,
 		})
 	}
 
-	return ***REMOVED***les, nil
+	return files, nil
 }
 
-func (cfg *sharedCon***REMOVED***g) setFromIniFiles(pro***REMOVED***les map[string]struct{}, pro***REMOVED***le string, ***REMOVED***les []sharedCon***REMOVED***gFile, exOpts bool) error {
-	// Trim ***REMOVED***les from the list that don't exist.
+func (cfg *sharedConfig) setFromIniFiles(profiles map[string]struct{}, profile string, files []sharedConfigFile, exOpts bool) error {
+	// Trim files from the list that don't exist.
 	var skippedFiles int
-	var pro***REMOVED***leNotFoundErr error
-	for _, f := range ***REMOVED***les {
-		if err := cfg.setFromIniFile(pro***REMOVED***le, f, exOpts); err != nil {
-			if _, ok := err.(SharedCon***REMOVED***gPro***REMOVED***leNotExistsError); ok {
-				// Ignore pro***REMOVED***les not de***REMOVED***ned in individual ***REMOVED***les.
-				pro***REMOVED***leNotFoundErr = err
+	var profileNotFoundErr error
+	for _, f := range files {
+		if err := cfg.setFromIniFile(profile, f, exOpts); err != nil {
+			if _, ok := err.(SharedConfigProfileNotExistsError); ok {
+				// Ignore profiles not defined in individual files.
+				profileNotFoundErr = err
 				skippedFiles++
 				continue
 			}
 			return err
 		}
 	}
-	if skippedFiles == len(***REMOVED***les) {
-		// If all ***REMOVED***les were skipped because the pro***REMOVED***le is not found, return
-		// the original pro***REMOVED***le not found error.
-		return pro***REMOVED***leNotFoundErr
+	if skippedFiles == len(files) {
+		// If all files were skipped because the profile is not found, return
+		// the original profile not found error.
+		return profileNotFoundErr
 	}
 
-	if _, ok := pro***REMOVED***les[pro***REMOVED***le]; ok {
-		// if this is the second instance of the pro***REMOVED***le the Assume Role
+	if _, ok := profiles[profile]; ok {
+		// if this is the second instance of the profile the Assume Role
 		// options must be cleared because they are only valid for the
-		// ***REMOVED***rst reference of a pro***REMOVED***le. The self linked instance of the
-		// pro***REMOVED***le only have credential provider options.
+		// first reference of a profile. The self linked instance of the
+		// profile only have credential provider options.
 		cfg.clearAssumeRoleOptions()
-	} ***REMOVED*** {
-		// First time a pro***REMOVED***le has been seen, It must either be a assume role
+	} else {
+		// First time a profile has been seen, It must either be a assume role
 		// or credentials. Assert if the credential type requires a role ARN,
 		// the ARN is also set.
-		if err := cfg.validateCredentialsRequireARN(pro***REMOVED***le); err != nil {
+		if err := cfg.validateCredentialsRequireARN(profile); err != nil {
 			return err
 		}
 	}
-	pro***REMOVED***les[pro***REMOVED***le] = struct{}{}
+	profiles[profile] = struct{}{}
 
 	if err := cfg.validateCredentialType(); err != nil {
 		return err
 	}
 
-	// Link source pro***REMOVED***les for assume roles
-	if len(cfg.SourcePro***REMOVED***leName) != 0 {
-		// Linked pro***REMOVED***le via source_pro***REMOVED***le ignore credential provider
-		// options, the source pro***REMOVED***le must provide the credentials.
+	// Link source profiles for assume roles
+	if len(cfg.SourceProfileName) != 0 {
+		// Linked profile via source_profile ignore credential provider
+		// options, the source profile must provide the credentials.
 		cfg.clearCredentialOptions()
 
-		srcCfg := &sharedCon***REMOVED***g{}
-		err := srcCfg.setFromIniFiles(pro***REMOVED***les, cfg.SourcePro***REMOVED***leName, ***REMOVED***les, exOpts)
+		srcCfg := &sharedConfig{}
+		err := srcCfg.setFromIniFiles(profiles, cfg.SourceProfileName, files, exOpts)
 		if err != nil {
-			// SourcePro***REMOVED***le that doesn't exist is an error in con***REMOVED***guration.
-			if _, ok := err.(SharedCon***REMOVED***gPro***REMOVED***leNotExistsError); ok {
-				err = SharedCon***REMOVED***gAssumeRoleError{
+			// SourceProfile that doesn't exist is an error in configuration.
+			if _, ok := err.(SharedConfigProfileNotExistsError); ok {
+				err = SharedConfigAssumeRoleError{
 					RoleARN:       cfg.RoleARN,
-					SourcePro***REMOVED***le: cfg.SourcePro***REMOVED***leName,
+					SourceProfile: cfg.SourceProfileName,
 				}
 			}
 			return err
 		}
 
 		if !srcCfg.hasCredentials() {
-			return SharedCon***REMOVED***gAssumeRoleError{
+			return SharedConfigAssumeRoleError{
 				RoleARN:       cfg.RoleARN,
-				SourcePro***REMOVED***le: cfg.SourcePro***REMOVED***leName,
+				SourceProfile: cfg.SourceProfileName,
 			}
 		}
 
-		cfg.SourcePro***REMOVED***le = srcCfg
+		cfg.SourceProfile = srcCfg
 	}
 
 	return nil
 }
 
-// setFromFile loads the con***REMOVED***guration from the ***REMOVED***le using the pro***REMOVED***le
-// provided. A sharedCon***REMOVED***g pointer type value is used so that multiple con***REMOVED***g
-// ***REMOVED***le loadings can be chained.
+// setFromFile loads the configuration from the file using the profile
+// provided. A sharedConfig pointer type value is used so that multiple config
+// file loadings can be chained.
 //
-// Only loads complete logically grouped values, and will not set ***REMOVED***elds in cfg
-// for incomplete grouped values in the con***REMOVED***g. Such as credentials. For
-// example if a con***REMOVED***g ***REMOVED***le only includes aws_access_key_id but no
+// Only loads complete logically grouped values, and will not set fields in cfg
+// for incomplete grouped values in the config. Such as credentials. For
+// example if a config file only includes aws_access_key_id but no
 // aws_secret_access_key the aws_access_key_id will be ignored.
-func (cfg *sharedCon***REMOVED***g) setFromIniFile(pro***REMOVED***le string, ***REMOVED***le sharedCon***REMOVED***gFile, exOpts bool) error {
-	section, ok := ***REMOVED***le.IniData.GetSection(pro***REMOVED***le)
+func (cfg *sharedConfig) setFromIniFile(profile string, file sharedConfigFile, exOpts bool) error {
+	section, ok := file.IniData.GetSection(profile)
 	if !ok {
-		// Fallback to to alternate pro***REMOVED***le name: pro***REMOVED***le <name>
-		section, ok = ***REMOVED***le.IniData.GetSection(fmt.Sprintf("pro***REMOVED***le %s", pro***REMOVED***le))
+		// Fallback to to alternate profile name: profile <name>
+		section, ok = file.IniData.GetSection(fmt.Sprintf("profile %s", profile))
 		if !ok {
-			return SharedCon***REMOVED***gPro***REMOVED***leNotExistsError{Pro***REMOVED***le: pro***REMOVED***le, Err: nil}
+			return SharedConfigProfileNotExistsError{Profile: profile, Err: nil}
 		}
 	}
 
@@ -251,15 +251,15 @@ func (cfg *sharedCon***REMOVED***g) setFromIniFile(pro***REMOVED***le string, **
 		updateString(&cfg.ExternalID, section, externalIDKey)
 		updateString(&cfg.MFASerial, section, mfaSerialKey)
 		updateString(&cfg.RoleSessionName, section, roleSessionNameKey)
-		updateString(&cfg.SourcePro***REMOVED***leName, section, sourcePro***REMOVED***leKey)
+		updateString(&cfg.SourceProfileName, section, sourceProfileKey)
 		updateString(&cfg.CredentialSource, section, credentialSourceKey)
 		updateString(&cfg.Region, section, regionKey)
 
 		if v := section.String(stsRegionalEndpointSharedKey); len(v) != 0 {
 			sre, err := endpoints.GetSTSRegionalEndpoint(v)
 			if err != nil {
-				return fmt.Errorf("failed to load %s from shared con***REMOVED***g, %s, %v",
-					stsRegionalEndpointKey, ***REMOVED***le.Filename, err)
+				return fmt.Errorf("failed to load %s from shared config, %s, %v",
+					stsRegionalEndpointKey, file.Filename, err)
 			}
 			cfg.STSRegionalEndpoint = sre
 		}
@@ -273,7 +273,7 @@ func (cfg *sharedCon***REMOVED***g) setFromIniFile(pro***REMOVED***le string, **
 		AccessKeyID:     section.String(accessKeyIDKey),
 		SecretAccessKey: section.String(secretAccessKey),
 		SessionToken:    section.String(sessionTokenKey),
-		ProviderName:    fmt.Sprintf("SharedCon***REMOVED***gCredentials: %s", ***REMOVED***le.Filename),
+		ProviderName:    fmt.Sprintf("SharedConfigCredentials: %s", file.Filename),
 	}
 	if creds.HasKeys() {
 		cfg.Creds = creds
@@ -291,12 +291,12 @@ func (cfg *sharedCon***REMOVED***g) setFromIniFile(pro***REMOVED***le string, **
 	return nil
 }
 
-func (cfg *sharedCon***REMOVED***g) validateCredentialsRequireARN(pro***REMOVED***le string) error {
+func (cfg *sharedConfig) validateCredentialsRequireARN(profile string) error {
 	var credSource string
 
 	switch {
-	case len(cfg.SourcePro***REMOVED***leName) != 0:
-		credSource = sourcePro***REMOVED***leKey
+	case len(cfg.SourceProfileName) != 0:
+		credSource = sourceProfileKey
 	case len(cfg.CredentialSource) != 0:
 		credSource = credentialSourceKey
 	case len(cfg.WebIdentityTokenFile) != 0:
@@ -306,30 +306,30 @@ func (cfg *sharedCon***REMOVED***g) validateCredentialsRequireARN(pro***REMOVED*
 	if len(credSource) != 0 && len(cfg.RoleARN) == 0 {
 		return CredentialRequiresARNError{
 			Type:    credSource,
-			Pro***REMOVED***le: pro***REMOVED***le,
+			Profile: profile,
 		}
 	}
 
 	return nil
 }
 
-func (cfg *sharedCon***REMOVED***g) validateCredentialType() error {
-	// Only one or no credential type can be de***REMOVED***ned.
+func (cfg *sharedConfig) validateCredentialType() error {
+	// Only one or no credential type can be defined.
 	if !oneOrNone(
-		len(cfg.SourcePro***REMOVED***leName) != 0,
+		len(cfg.SourceProfileName) != 0,
 		len(cfg.CredentialSource) != 0,
 		len(cfg.CredentialProcess) != 0,
 		len(cfg.WebIdentityTokenFile) != 0,
 	) {
-		return ErrSharedCon***REMOVED***gSourceCollision
+		return ErrSharedConfigSourceCollision
 	}
 
 	return nil
 }
 
-func (cfg *sharedCon***REMOVED***g) hasCredentials() bool {
+func (cfg *sharedConfig) hasCredentials() bool {
 	switch {
-	case len(cfg.SourcePro***REMOVED***leName) != 0:
+	case len(cfg.SourceProfileName) != 0:
 	case len(cfg.CredentialSource) != 0:
 	case len(cfg.CredentialProcess) != 0:
 	case len(cfg.WebIdentityTokenFile) != 0:
@@ -341,19 +341,19 @@ func (cfg *sharedCon***REMOVED***g) hasCredentials() bool {
 	return true
 }
 
-func (cfg *sharedCon***REMOVED***g) clearCredentialOptions() {
+func (cfg *sharedConfig) clearCredentialOptions() {
 	cfg.CredentialSource = ""
 	cfg.CredentialProcess = ""
 	cfg.WebIdentityTokenFile = ""
 	cfg.Creds = credentials.Value{}
 }
 
-func (cfg *sharedCon***REMOVED***g) clearAssumeRoleOptions() {
+func (cfg *sharedConfig) clearAssumeRoleOptions() {
 	cfg.RoleARN = ""
 	cfg.ExternalID = ""
 	cfg.MFASerial = ""
 	cfg.RoleSessionName = ""
-	cfg.SourcePro***REMOVED***leName = ""
+	cfg.SourceProfileName = ""
 }
 
 func oneOrNone(bs ...bool) bool {
@@ -390,98 +390,98 @@ func updateBoolPtr(dst **bool, section ini.Section, key string) {
 	**dst = section.Bool(key)
 }
 
-// SharedCon***REMOVED***gLoadError is an error for the shared con***REMOVED***g ***REMOVED***le failed to load.
-type SharedCon***REMOVED***gLoadError struct {
+// SharedConfigLoadError is an error for the shared config file failed to load.
+type SharedConfigLoadError struct {
 	Filename string
 	Err      error
 }
 
 // Code is the short id of the error.
-func (e SharedCon***REMOVED***gLoadError) Code() string {
-	return "SharedCon***REMOVED***gLoadError"
+func (e SharedConfigLoadError) Code() string {
+	return "SharedConfigLoadError"
 }
 
 // Message is the description of the error
-func (e SharedCon***REMOVED***gLoadError) Message() string {
-	return fmt.Sprintf("failed to load con***REMOVED***g ***REMOVED***le, %s", e.Filename)
+func (e SharedConfigLoadError) Message() string {
+	return fmt.Sprintf("failed to load config file, %s", e.Filename)
 }
 
 // OrigErr is the underlying error that caused the failure.
-func (e SharedCon***REMOVED***gLoadError) OrigErr() error {
+func (e SharedConfigLoadError) OrigErr() error {
 	return e.Err
 }
 
-// Error satis***REMOVED***es the error interface.
-func (e SharedCon***REMOVED***gLoadError) Error() string {
+// Error satisfies the error interface.
+func (e SharedConfigLoadError) Error() string {
 	return awserr.SprintError(e.Code(), e.Message(), "", e.Err)
 }
 
-// SharedCon***REMOVED***gPro***REMOVED***leNotExistsError is an error for the shared con***REMOVED***g when
-// the pro***REMOVED***le was not ***REMOVED***nd in the con***REMOVED***g ***REMOVED***le.
-type SharedCon***REMOVED***gPro***REMOVED***leNotExistsError struct {
-	Pro***REMOVED***le string
+// SharedConfigProfileNotExistsError is an error for the shared config when
+// the profile was not find in the config file.
+type SharedConfigProfileNotExistsError struct {
+	Profile string
 	Err     error
 }
 
 // Code is the short id of the error.
-func (e SharedCon***REMOVED***gPro***REMOVED***leNotExistsError) Code() string {
-	return "SharedCon***REMOVED***gPro***REMOVED***leNotExistsError"
+func (e SharedConfigProfileNotExistsError) Code() string {
+	return "SharedConfigProfileNotExistsError"
 }
 
 // Message is the description of the error
-func (e SharedCon***REMOVED***gPro***REMOVED***leNotExistsError) Message() string {
-	return fmt.Sprintf("failed to get pro***REMOVED***le, %s", e.Pro***REMOVED***le)
+func (e SharedConfigProfileNotExistsError) Message() string {
+	return fmt.Sprintf("failed to get profile, %s", e.Profile)
 }
 
 // OrigErr is the underlying error that caused the failure.
-func (e SharedCon***REMOVED***gPro***REMOVED***leNotExistsError) OrigErr() error {
+func (e SharedConfigProfileNotExistsError) OrigErr() error {
 	return e.Err
 }
 
-// Error satis***REMOVED***es the error interface.
-func (e SharedCon***REMOVED***gPro***REMOVED***leNotExistsError) Error() string {
+// Error satisfies the error interface.
+func (e SharedConfigProfileNotExistsError) Error() string {
 	return awserr.SprintError(e.Code(), e.Message(), "", e.Err)
 }
 
-// SharedCon***REMOVED***gAssumeRoleError is an error for the shared con***REMOVED***g when the
-// pro***REMOVED***le contains assume role information, but that information is invalid
+// SharedConfigAssumeRoleError is an error for the shared config when the
+// profile contains assume role information, but that information is invalid
 // or not complete.
-type SharedCon***REMOVED***gAssumeRoleError struct {
+type SharedConfigAssumeRoleError struct {
 	RoleARN       string
-	SourcePro***REMOVED***le string
+	SourceProfile string
 }
 
 // Code is the short id of the error.
-func (e SharedCon***REMOVED***gAssumeRoleError) Code() string {
-	return "SharedCon***REMOVED***gAssumeRoleError"
+func (e SharedConfigAssumeRoleError) Code() string {
+	return "SharedConfigAssumeRoleError"
 }
 
 // Message is the description of the error
-func (e SharedCon***REMOVED***gAssumeRoleError) Message() string {
+func (e SharedConfigAssumeRoleError) Message() string {
 	return fmt.Sprintf(
-		"failed to load assume role for %s, source pro***REMOVED***le %s has no shared credentials",
-		e.RoleARN, e.SourcePro***REMOVED***le,
+		"failed to load assume role for %s, source profile %s has no shared credentials",
+		e.RoleARN, e.SourceProfile,
 	)
 }
 
 // OrigErr is the underlying error that caused the failure.
-func (e SharedCon***REMOVED***gAssumeRoleError) OrigErr() error {
+func (e SharedConfigAssumeRoleError) OrigErr() error {
 	return nil
 }
 
-// Error satis***REMOVED***es the error interface.
-func (e SharedCon***REMOVED***gAssumeRoleError) Error() string {
+// Error satisfies the error interface.
+func (e SharedConfigAssumeRoleError) Error() string {
 	return awserr.SprintError(e.Code(), e.Message(), "", nil)
 }
 
-// CredentialRequiresARNError provides the error for shared con***REMOVED***g credentials
-// that are incorrectly con***REMOVED***gured in the shared con***REMOVED***g or credentials ***REMOVED***le.
+// CredentialRequiresARNError provides the error for shared config credentials
+// that are incorrectly configured in the shared config or credentials file.
 type CredentialRequiresARNError struct {
-	// type of credentials that were con***REMOVED***gured.
+	// type of credentials that were configured.
 	Type string
 
-	// Pro***REMOVED***le name the credentials were in.
-	Pro***REMOVED***le string
+	// Profile name the credentials were in.
+	Profile string
 }
 
 // Code is the short id of the error.
@@ -492,8 +492,8 @@ func (e CredentialRequiresARNError) Code() string {
 // Message is the description of the error
 func (e CredentialRequiresARNError) Message() string {
 	return fmt.Sprintf(
-		"credential type %s requires role_arn, pro***REMOVED***le %s",
-		e.Type, e.Pro***REMOVED***le,
+		"credential type %s requires role_arn, profile %s",
+		e.Type, e.Profile,
 	)
 }
 
@@ -502,7 +502,7 @@ func (e CredentialRequiresARNError) OrigErr() error {
 	return nil
 }
 
-// Error satis***REMOVED***es the error interface.
+// Error satisfies the error interface.
 func (e CredentialRequiresARNError) Error() string {
 	return awserr.SprintError(e.Code(), e.Message(), "", nil)
 }

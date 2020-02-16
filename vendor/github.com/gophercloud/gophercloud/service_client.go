@@ -6,7 +6,7 @@ import (
 	"strings"
 )
 
-// ServiceClient stores details required to interact with a speci***REMOVED***c service API implemented by a provider.
+// ServiceClient stores details required to interact with a specific service API implemented by a provider.
 // Generally, you'll acquire these by calling the appropriate `New` method on a ProviderClient.
 type ServiceClient struct {
 	// ProviderClient is a reference to the provider that implements this service.
@@ -30,7 +30,7 @@ type ServiceClient struct {
 	Microversion string
 
 	// MoreHeaders allows users (or Gophercloud) to set service-wide headers on requests. Put another way,
-	// values set in this ***REMOVED***eld will be set on all the HTTP requests the service client sends.
+	// values set in this field will be set on all the HTTP requests the service client sends.
 	MoreHeaders map[string]string
 }
 
@@ -50,7 +50,7 @@ func (client *ServiceClient) ServiceURL(parts ...string) string {
 func (client *ServiceClient) initReqOpts(url string, JSONBody interface{}, JSONResponse interface{}, opts *RequestOpts) {
 	if v, ok := (JSONBody).(io.Reader); ok {
 		opts.RawBody = v
-	} ***REMOVED*** if JSONBody != nil {
+	} else if JSONBody != nil {
 		opts.JSONBody = JSONBody
 	}
 

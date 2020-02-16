@@ -2,12 +2,12 @@
 
 // Copyright 2016 The Go Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE ***REMOVED***le.
+// license that can be found in the LICENSE file.
 
 package idna
 
 // appendMapping appends the mapping for the respective rune. isMapped must be
-// true. A mapping is a categorization of a rune as de***REMOVED***ned in UTS #46.
+// true. A mapping is a categorization of a rune as defined in UTS #46.
 func (c info) appendMapping(b []byte, s string) []byte {
 	index := int(c >> indexShift)
 	if c&xorBit == 0 {
@@ -18,7 +18,7 @@ func (c info) appendMapping(b []byte, s string) []byte {
 	if c&inlineXOR == inlineXOR {
 		// TODO: support and handle two-byte inline masks
 		b[len(b)-1] ^= byte(index)
-	} ***REMOVED*** {
+	} else {
 		for p := len(b) - int(xorData[index]); p < len(b); p++ {
 			index++
 			b[p] ^= xorData[index]
@@ -64,7 +64,7 @@ func (t *sparseBlocks) lookup(n uint32, b byte) uint16 {
 		}
 		if b < r.lo {
 			hi = m
-		} ***REMOVED*** {
+		} else {
 			lo = m + 1
 		}
 	}

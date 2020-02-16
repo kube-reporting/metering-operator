@@ -2,7 +2,7 @@
 Copyright 2014 The Kubernetes Authors.
 
 Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this ***REMOVED***le except in compliance with the License.
+you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
 
     http://www.apache.org/licenses/LICENSE-2.0
@@ -10,7 +10,7 @@ You may obtain a copy of the License at
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the speci***REMOVED***c language governing permissions and
+See the License for the specific language governing permissions and
 limitations under the License.
 */
 
@@ -97,7 +97,7 @@ var errNotObject = fmt.Errorf("object does not implement the Object interfaces")
 
 // Accessor takes an arbitrary object pointer and returns meta.Interface.
 // obj must be a pointer to an API type. An error is returned if the minimum
-// required ***REMOVED***elds are missing. Fields that are not required return the default
+// required fields are missing. Fields that are not required return the default
 // value and are a no-op if set.
 func Accessor(obj interface{}) (metav1.Object, error) {
 	switch t := obj.(type) {
@@ -146,7 +146,7 @@ func AsPartialObjectMetadata(m metav1.Object) *metav1beta1.PartialObjectMetadata
 // TypeAccessor returns an interface that allows retrieving and modifying the APIVersion
 // and Kind of an in-memory internal object.
 // TODO: this interface is used to test code that does not have ObjectMeta or ListMeta
-// in round tripping (objects which can use apiVersion/kind, but do not ***REMOVED***t the Kube
+// in round tripping (objects which can use apiVersion/kind, but do not fit the Kube
 // api conventions).
 func TypeAccessor(obj interface{}) (Type, error) {
 	if typed, ok := obj.(runtime.Object); ok {
@@ -167,7 +167,7 @@ func TypeAccessor(obj interface{}) (Type, error) {
 	}
 	a := &genericAccessor{}
 	if err := extractFromTypeMeta(typeMeta, a); err != nil {
-		return nil, fmt.Errorf("unable to ***REMOVED***nd type ***REMOVED***elds on %#v: %v", typeMeta, err)
+		return nil, fmt.Errorf("unable to find type fields on %#v: %v", typeMeta, err)
 	}
 	return a, nil
 }
@@ -381,7 +381,7 @@ func (resourceAccessor) SetContinue(obj runtime.Object, version string) error {
 	return nil
 }
 
-// extractFromOwnerReference extracts v to o. v is the OwnerReferences ***REMOVED***eld of an object.
+// extractFromOwnerReference extracts v to o. v is the OwnerReferences field of an object.
 func extractFromOwnerReference(v reflect.Value, o *metav1.OwnerReference) error {
 	if err := runtime.Field(v, "APIVersion", &o.APIVersion); err != nil {
 		return err
@@ -414,7 +414,7 @@ func extractFromOwnerReference(v reflect.Value, o *metav1.OwnerReference) error 
 	return nil
 }
 
-// setOwnerReference sets v to o. v is the OwnerReferences ***REMOVED***eld of an object.
+// setOwnerReference sets v to o. v is the OwnerReferences field of an object.
 func setOwnerReference(v reflect.Value, o *metav1.OwnerReference) error {
 	if err := runtime.SetField(o.APIVersion, v, "APIVersion"); err != nil {
 		return err
@@ -459,7 +459,7 @@ type genericAccessor struct {
 	labels            *map[string]string
 	annotations       *map[string]string
 	ownerReferences   reflect.Value
-	***REMOVED***nalizers        *[]string
+	finalizers        *[]string
 }
 
 func (a genericAccessor) GetNamespace() string {
@@ -593,14 +593,14 @@ func (a genericAccessor) SetAnnotations(annotations map[string]string) {
 }
 
 func (a genericAccessor) GetFinalizers() []string {
-	if a.***REMOVED***nalizers == nil {
+	if a.finalizers == nil {
 		return nil
 	}
-	return *a.***REMOVED***nalizers
+	return *a.finalizers
 }
 
-func (a genericAccessor) SetFinalizers(***REMOVED***nalizers []string) {
-	*a.***REMOVED***nalizers = ***REMOVED***nalizers
+func (a genericAccessor) SetFinalizers(finalizers []string) {
+	*a.finalizers = finalizers
 }
 
 func (a genericAccessor) GetOwnerReferences() []metav1.OwnerReference {
@@ -638,7 +638,7 @@ func (a genericAccessor) SetOwnerReferences(references []metav1.OwnerReference) 
 	s.Set(newReferences)
 }
 
-// extractFromTypeMeta extracts pointers to version and kind ***REMOVED***elds from an object
+// extractFromTypeMeta extracts pointers to version and kind fields from an object
 func extractFromTypeMeta(v reflect.Value, a *genericAccessor) error {
 	if err := runtime.FieldPtr(v, "APIVersion", &a.apiVersion); err != nil {
 		return err

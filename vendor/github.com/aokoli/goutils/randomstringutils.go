@@ -2,7 +2,7 @@
 Copyright 2014 Alexander Okoli
 
 Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this ***REMOVED***le except in compliance with the License.
+you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
 
     http://www.apache.org/licenses/LICENSE-2.0
@@ -10,7 +10,7 @@ You may obtain a copy of the License at
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the speci***REMOVED***c language governing permissions and
+See the License for the specific language governing permissions and
 limitations under the License.
 */
 
@@ -29,7 +29,7 @@ import (
 var RANDOM = rand.New(rand.NewSource(time.Now().UnixNano()))
 
 /*
-RandomNonAlphaNumeric creates a random string whose length is the number of characters speci***REMOVED***ed.
+RandomNonAlphaNumeric creates a random string whose length is the number of characters specified.
 Characters will be chosen from the set of all characters (ASCII/Unicode values between 0 to 2,147,483,647 (math.MaxInt32)).
 
 Parameter:
@@ -44,7 +44,7 @@ func RandomNonAlphaNumeric(count int) (string, error) {
 }
 
 /*
-RandomAscii creates a random string whose length is the number of characters speci***REMOVED***ed.
+RandomAscii creates a random string whose length is the number of characters specified.
 Characters will be chosen from the set of characters whose ASCII value is between 32 and 126 (inclusive).
 
 Parameter:
@@ -59,7 +59,7 @@ func RandomAscii(count int) (string, error) {
 }
 
 /*
-RandomNumeric creates a random string whose length is the number of characters speci***REMOVED***ed.
+RandomNumeric creates a random string whose length is the number of characters specified.
 Characters will be chosen from the set of numeric characters.
 
 Parameter:
@@ -74,7 +74,7 @@ func RandomNumeric(count int) (string, error) {
 }
 
 /*
-RandomAlphabetic creates a random string whose length is the number of characters speci***REMOVED***ed.
+RandomAlphabetic creates a random string whose length is the number of characters specified.
 Characters will be chosen from the set of alpha-numeric characters as indicated by the arguments.
 
 Parameters:
@@ -91,7 +91,7 @@ func RandomAlphabetic(count int) (string, error) {
 }
 
 /*
-RandomAlphaNumeric creates a random string whose length is the number of characters speci***REMOVED***ed.
+RandomAlphaNumeric creates a random string whose length is the number of characters specified.
 Characters will be chosen from the set of alpha-numeric characters.
 
 Parameter:
@@ -123,7 +123,7 @@ func RandomAlphaNumeric(count int) (string, error) {
 }
 
 /*
-RandomAlphaNumericCustom creates a random string whose length is the number of characters speci***REMOVED***ed.
+RandomAlphaNumericCustom creates a random string whose length is the number of characters specified.
 Characters will be chosen from the set of alpha-numeric characters as indicated by the arguments.
 
 Parameters:
@@ -166,7 +166,7 @@ If the parameters start and end are both 0, start and end are set to ' ' and 'z'
 unless letters and numbers are both false, in which case, start and end are set to 0 and math.MaxInt32, respectively.
 If chars is not nil, characters stored in chars that are between start and end are chosen.
 This method accepts a user-supplied *rand.Rand instance to use as a source of randomness. By seeding a single *rand.Rand instance
-with a ***REMOVED***xed seed and using it for each call, the same random sequence of strings can be generated repeatedly and predictably.
+with a fixed seed and using it for each call, the same random sequence of strings can be generated repeatedly and predictably.
 
 Parameters:
 	count - the length of random string to create
@@ -185,7 +185,7 @@ func RandomSeed(count int, start int, end int, letters bool, numbers bool, chars
 
 	if count == 0 {
 		return "", nil
-	} ***REMOVED*** if count < 0 {
+	} else if count < 0 {
 		err := fmt.Errorf("randomstringutils illegal argument: Requested random string length %v is less than 0.", count) // equiv to err := errors.New("...")
 		return "", err
 	}
@@ -197,15 +197,15 @@ func RandomSeed(count int, start int, end int, letters bool, numbers bool, chars
 	if start == 0 && end == 0 {
 		if chars != nil {
 			end = len(chars)
-		} ***REMOVED*** {
+		} else {
 			if !letters && !numbers {
 				end = math.MaxInt32
-			} ***REMOVED*** {
+			} else {
 				end = 'z' + 1
 				start = ' '
 			}
 		}
-	} ***REMOVED*** {
+	} else {
 		if end <= start {
 			err := fmt.Errorf("randomstringutils illegal argument: Parameter end (%v) must be greater than start (%v)", end, start)
 			return "", err
@@ -228,7 +228,7 @@ func RandomSeed(count int, start int, end int, letters bool, numbers bool, chars
 		var ch rune
 		if chars == nil {
 			ch = rune(random.Intn(gap) + start)
-		} ***REMOVED*** {
+		} else {
 			ch = chars[random.Intn(gap)+start]
 		}
 
@@ -236,31 +236,31 @@ func RandomSeed(count int, start int, end int, letters bool, numbers bool, chars
 			if ch >= 56320 && ch <= 57343 { // low surrogate range
 				if count == 0 {
 					count++
-				} ***REMOVED*** {
+				} else {
 					// Insert low surrogate
 					buffer[count] = ch
 					count--
 					// Insert high surrogate
 					buffer[count] = rune(55296 + random.Intn(128))
 				}
-			} ***REMOVED*** if ch >= 55296 && ch <= 56191 { // High surrogates range (Partial)
+			} else if ch >= 55296 && ch <= 56191 { // High surrogates range (Partial)
 				if count == 0 {
 					count++
-				} ***REMOVED*** {
+				} else {
 					// Insert low surrogate
 					buffer[count] = rune(56320 + random.Intn(128))
 					count--
 					// Insert high surrogate
 					buffer[count] = ch
 				}
-			} ***REMOVED*** if ch >= 56192 && ch <= 56319 {
+			} else if ch >= 56192 && ch <= 56319 {
 				// private high surrogate, skip it
 				count++
-			} ***REMOVED*** {
+			} else {
 				// not one of the surrogates*
 				buffer[count] = ch
 			}
-		} ***REMOVED*** {
+		} else {
 			count++
 		}
 	}

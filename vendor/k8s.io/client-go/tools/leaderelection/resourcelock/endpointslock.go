@@ -2,7 +2,7 @@
 Copyright 2016 The Kubernetes Authors.
 
 Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this ***REMOVED***le except in compliance with the License.
+you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
 
     http://www.apache.org/licenses/LICENSE-2.0
@@ -10,7 +10,7 @@ You may obtain a copy of the License at
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the speci***REMOVED***c language governing permissions and
+See the License for the specific language governing permissions and
 limitations under the License.
 */
 
@@ -31,7 +31,7 @@ type EndpointsLock struct {
 	// Endpoints object that the LeaderElector will attempt to lead.
 	EndpointsMeta metav1.ObjectMeta
 	Client        corev1client.EndpointsGetter
-	LockCon***REMOVED***g    ResourceLockCon***REMOVED***g
+	LockConfig    ResourceLockConfig
 	e             *v1.Endpoints
 }
 
@@ -75,7 +75,7 @@ func (el *EndpointsLock) Create(ler LeaderElectionRecord) error {
 // Update will update and existing annotation on a given resource.
 func (el *EndpointsLock) Update(ler LeaderElectionRecord) error {
 	if el.e == nil {
-		return errors.New("endpoint not initialized, call get or create ***REMOVED***rst")
+		return errors.New("endpoint not initialized, call get or create first")
 	}
 	recordBytes, err := json.Marshal(ler)
 	if err != nil {
@@ -88,8 +88,8 @@ func (el *EndpointsLock) Update(ler LeaderElectionRecord) error {
 
 // RecordEvent in leader election while adding meta-data
 func (el *EndpointsLock) RecordEvent(s string) {
-	events := fmt.Sprintf("%v %v", el.LockCon***REMOVED***g.Identity, s)
-	el.LockCon***REMOVED***g.EventRecorder.Eventf(&v1.Endpoints{ObjectMeta: el.e.ObjectMeta}, v1.EventTypeNormal, "LeaderElection", events)
+	events := fmt.Sprintf("%v %v", el.LockConfig.Identity, s)
+	el.LockConfig.EventRecorder.Eventf(&v1.Endpoints{ObjectMeta: el.e.ObjectMeta}, v1.EventTypeNormal, "LeaderElection", events)
 }
 
 // Describe is used to convert details on current resource lock
@@ -100,5 +100,5 @@ func (el *EndpointsLock) Describe() string {
 
 // returns the Identity of the lock
 func (el *EndpointsLock) Identity() string {
-	return el.LockCon***REMOVED***g.Identity
+	return el.LockConfig.Identity
 }

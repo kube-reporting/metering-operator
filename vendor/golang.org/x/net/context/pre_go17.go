@@ -1,6 +1,6 @@
 // Copyright 2014 The Go Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE ***REMOVED***le.
+// license that can be found in the LICENSE file.
 
 // +build !go1.7
 
@@ -57,7 +57,7 @@ var DeadlineExceeded = errors.New("context deadline exceeded")
 
 // WithCancel returns a copy of parent with a new Done channel. The returned
 // context's Done channel is closed when the returned cancel function is called
-// or when the parent context's Done channel is closed, whichever happens ***REMOVED***rst.
+// or when the parent context's Done channel is closed, whichever happens first.
 //
 // Canceling this context releases resources associated with it, so code should
 // call cancel as soon as the operations running in this Context complete.
@@ -85,14 +85,14 @@ func propagateCancel(parent Context, child canceler) {
 		if p.err != nil {
 			// parent has already been canceled
 			child.cancel(false, p.err)
-		} ***REMOVED*** {
+		} else {
 			if p.children == nil {
 				p.children = make(map[canceler]bool)
 			}
 			p.children[child] = true
 		}
 		p.mu.Unlock()
-	} ***REMOVED*** {
+	} else {
 		go func() {
 			select {
 			case <-parent.Done():
@@ -103,7 +103,7 @@ func propagateCancel(parent Context, child canceler) {
 	}
 }
 
-// parentCancelCtx follows a chain of parent references until it ***REMOVED***nds a
+// parentCancelCtx follows a chain of parent references until it finds a
 // *cancelCtx. This function understands how each of the concrete types in this
 // package represents its parent.
 func parentCancelCtx(parent Context) (*cancelCtx, bool) {
@@ -146,11 +146,11 @@ type canceler interface {
 type cancelCtx struct {
 	Context
 
-	done chan struct{} // closed by the ***REMOVED***rst cancel call.
+	done chan struct{} // closed by the first cancel call.
 
 	mu       sync.Mutex
-	children map[canceler]bool // set to nil by the ***REMOVED***rst cancel call
-	err      error             // set to non-nil by the ***REMOVED***rst cancel call
+	children map[canceler]bool // set to nil by the first cancel call
+	err      error             // set to non-nil by the first cancel call
 }
 
 func (c *cancelCtx) Done() <-chan struct{} {
@@ -197,7 +197,7 @@ func (c *cancelCtx) cancel(removeFromParent bool, err error) {
 // WithDeadline(parent, d) is semantically equivalent to parent. The returned
 // context's Done channel is closed when the deadline expires, when the returned
 // cancel function is called, or when the parent context's Done channel is
-// closed, whichever happens ***REMOVED***rst.
+// closed, whichever happens first.
 //
 // Canceling this context releases resources associated with it, so code should
 // call cancel as soon as the operations running in this Context complete.

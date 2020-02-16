@@ -17,7 +17,7 @@ const (
 	Default2QGhostEntries = 0.50
 )
 
-// TwoQueueCache is a thread-safe ***REMOVED***xed size 2Q cache.
+// TwoQueueCache is a thread-safe fixed size 2Q cache.
 // 2Q is an enhancement over the standard LRU cache
 // in that it tracks both frequently and recently used
 // entries separately. This avoids a burst in access to new
@@ -170,7 +170,7 @@ func (c *TwoQueueCache) Len() int {
 }
 
 // Keys returns a slice of the keys in the cache.
-// The frequently used keys are ***REMOVED***rst in the returned slice.
+// The frequently used keys are first in the returned slice.
 func (c *TwoQueueCache) Keys() []interface{} {
 	c.lock.RLock()
 	defer c.lock.RUnlock()

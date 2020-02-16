@@ -5,25 +5,25 @@ credentials.
 WARNING: The following describes a method of sourcing credentials from an external
 process. This can potentially be dangerous, so proceed with caution. Other
 credential providers should be preferred if at all possible. If using this
-option, you should make sure that the con***REMOVED***g ***REMOVED***le is as locked down as possible
+option, you should make sure that the config file is as locked down as possible
 using security best practices for your operating system.
 
 You can use credentials from a `credential_process` in a variety of ways.
 
-One way is to setup your shared con***REMOVED***g ***REMOVED***le, located in the default
+One way is to setup your shared config file, located in the default
 location, with the `credential_process` key and the command you want to be
 called. You also need to set the AWS_SDK_LOAD_CONFIG environment variable
-(e.g., `export AWS_SDK_LOAD_CONFIG=1`) to use the shared con***REMOVED***g ***REMOVED***le.
+(e.g., `export AWS_SDK_LOAD_CONFIG=1`) to use the shared config file.
 
     [default]
     credential_process = /command/to/call
 
 Creating a new session will use the credential process to retrieve credentials.
-NOTE: If there are credentials in the pro***REMOVED***le you are using, the credential
+NOTE: If there are credentials in the profile you are using, the credential
 process will not be used.
 
     // Initialize a session to load credentials.
-    sess, _ := session.NewSession(&aws.Con***REMOVED***g{
+    sess, _ := session.NewSession(&aws.Config{
         Region: aws.String("us-east-1")},
     )
 
@@ -37,8 +37,8 @@ retrieve credentials:
     // Create credentials using the ProcessProvider.
     creds := processcreds.NewCredentials("/path/to/command")
 
-    // Create service client value con***REMOVED***gured for credentials.
-    svc := s3.New(sess, &aws.Con***REMOVED***g{Credentials: creds})
+    // Create service client value configured for credentials.
+    svc := s3.New(sess, &aws.Config{Credentials: creds})
 
 You can set a non-default timeout for the `credential_process` with another
 constructor, `credentials.NewCredentialsTimeout()`, providing the timeout. To
@@ -49,7 +49,7 @@ set a one minute timeout:
         "/path/to/command",
         time.Duration(500) * time.Millisecond)
 
-If you need more control, you can set any con***REMOVED***gurable options in the
+If you need more control, you can set any configurable options in the
 credentials using one or more option functions. For example, you can set a two
 minute timeout, a credential duration of 60 minutes, and a maximum stdout
 buffer size of 2k.
@@ -148,7 +148,7 @@ const (
 	DefaultTimeout = time.Duration(1) * time.Minute
 )
 
-// ProcessProvider satis***REMOVED***es the credentials.Provider interface, and is a
+// ProcessProvider satisfies the credentials.Provider interface, and is a
 // client to retrieve credentials from a process.
 type ProcessProvider struct {
 	staticCreds bool
@@ -159,7 +159,7 @@ type ProcessProvider struct {
 	Duration time.Duration
 
 	// ExpiryWindow will allow the credentials to trigger refreshing prior to
-	// the credentials actually expiring. This is bene***REMOVED***cial so race conditions
+	// the credentials actually expiring. This is beneficial so race conditions
 	// with expiring credentials do not cause request to fail unexpectedly
 	// due to ExpiredTokenException exceptions.
 	//
@@ -199,7 +199,7 @@ func NewCredentials(command string, options ...func(*ProcessProvider)) *credenti
 }
 
 // NewCredentialsTimeout returns a pointer to a new Credentials object with
-// the speci***REMOVED***ed command and timeout, and default duration and max buffer size.
+// the specified command and timeout, and default duration and max buffer size.
 func NewCredentialsTimeout(command string, timeout time.Duration) *credentials.Credentials {
 	p := NewCredentials(command, func(opt *ProcessProvider) {
 		opt.Timeout = timeout
@@ -209,7 +209,7 @@ func NewCredentialsTimeout(command string, timeout time.Duration) *credentials.C
 }
 
 // NewCredentialsCommand returns a pointer to a new Credentials object with
-// the speci***REMOVED***ed command, and default timeout, duration and max buffer size.
+// the specified command, and default timeout, duration and max buffer size.
 func NewCredentialsCommand(command *exec.Cmd, options ...func(*ProcessProvider)) *credentials.Credentials {
 	p := &ProcessProvider{
 		command:    command,
@@ -299,7 +299,7 @@ func (p *ProcessProvider) prepareCommand() error {
 	var cmdArgs []string
 	if runtime.GOOS == "windows" {
 		cmdArgs = []string{"cmd.exe", "/C"}
-	} ***REMOVED*** {
+	} else {
 		cmdArgs = []string{"sh", "-c"}
 	}
 
@@ -358,13 +358,13 @@ func (p *ProcessProvider) executeCredentialProcess() ([]byte, error) {
 	execCh := make(chan error, 1)
 	go executeCommand(*p.command, execCh)
 
-	***REMOVED***nished := false
+	finished := false
 	var errors []error
-	for !***REMOVED***nished {
+	for !finished {
 		select {
 		case readError := <-stdoutCh:
 			errors = appendError(errors, readError)
-			***REMOVED***nished = true
+			finished = true
 		case execError := <-execCh:
 			err := outWritePipe.Close()
 			errors = appendError(errors, err)
@@ -376,7 +376,7 @@ func (p *ProcessProvider) executeCredentialProcess() ([]byte, error) {
 					errors)
 			}
 		case <-time.After(p.Timeout):
-			***REMOVED***nished = true
+			finished = true
 			return output.Bytes(), awserr.NewBatchError(
 				ErrCodeProcessProviderExecution,
 				errMsgProcessProviderTimeout,

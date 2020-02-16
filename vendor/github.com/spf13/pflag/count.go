@@ -11,7 +11,7 @@ func newCountValue(val int, p *int) *countValue {
 }
 
 func (i *countValue) Set(s string) error {
-	// "+1" means that no speci***REMOVED***c value was passed, so increment
+	// "+1" means that no specific value was passed, so increment
 	if s == "+1" {
 		*i = countValue(*i + 1)
 		return nil
@@ -44,7 +44,7 @@ func (f *FlagSet) GetCount(name string) (int, error) {
 	return val.(int), nil
 }
 
-// CountVar de***REMOVED***nes a count flag with speci***REMOVED***ed name, default value, and usage string.
+// CountVar defines a count flag with specified name, default value, and usage string.
 // The argument p points to an int variable in which to store the value of the flag.
 // A count flag will add 1 to its value evey time it is found on the command line
 func (f *FlagSet) CountVar(p *int, name string, usage string) {
@@ -67,7 +67,7 @@ func CountVarP(p *int, name, shorthand string, usage string) {
 	CommandLine.CountVarP(p, name, shorthand, usage)
 }
 
-// Count de***REMOVED***nes a count flag with speci***REMOVED***ed name, default value, and usage string.
+// Count defines a count flag with specified name, default value, and usage string.
 // The return value is the address of an int variable that stores the value of the flag.
 // A count flag will add 1 to its value evey time it is found on the command line
 func (f *FlagSet) Count(name string, usage string) *int {
@@ -83,7 +83,7 @@ func (f *FlagSet) CountP(name, shorthand string, usage string) *int {
 	return p
 }
 
-// Count de***REMOVED***nes a count flag with speci***REMOVED***ed name, default value, and usage string.
+// Count defines a count flag with specified name, default value, and usage string.
 // The return value is the address of an int variable that stores the value of the flag.
 // A count flag will add 1 to its value evey time it is found on the command line
 func Count(name string, usage string) *int {

@@ -14,8 +14,8 @@ var (
 	LogEntryCtxKey = &contextKey{"LogEntry"}
 
 	// DefaultLogger is called by the Logger middleware handler to log each request.
-	// Its made a package-level variable so that it can be recon***REMOVED***gured for custom
-	// logging con***REMOVED***gurations.
+	// Its made a package-level variable so that it can be reconfigured for custom
+	// logging configurations.
 	DefaultLogger = RequestLogger(&DefaultLogFormatter{Logger: log.New(os.Stdout, "", log.LstdFlags)})
 )
 
@@ -55,7 +55,7 @@ type LogFormatter interface {
 	NewLogEntry(r *http.Request) LogEntry
 }
 
-// LogEntry records the ***REMOVED***nal log when a request completes.
+// LogEntry records the final log when a request completes.
 // See defaultLogEntry for an example implementation.
 type LogEntry interface {
 	Write(status, bytes int, elapsed time.Duration)
@@ -137,9 +137,9 @@ func (l *defaultLogEntry) Write(status, bytes int, elapsed time.Duration) {
 	l.buf.WriteString(" in ")
 	if elapsed < 500*time.Millisecond {
 		cW(l.buf, nGreen, "%s", elapsed)
-	} ***REMOVED*** if elapsed < 5*time.Second {
+	} else if elapsed < 5*time.Second {
 		cW(l.buf, nYellow, "%s", elapsed)
-	} ***REMOVED*** {
+	} else {
 		cW(l.buf, nRed, "%s", elapsed)
 	}
 

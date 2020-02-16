@@ -2,7 +2,7 @@
 Copyright 2014 The Kubernetes Authors.
 
 Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this ***REMOVED***le except in compliance with the License.
+you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
 
     http://www.apache.org/licenses/LICENSE-2.0
@@ -10,7 +10,7 @@ You may obtain a copy of the License at
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the speci***REMOVED***c language governing permissions and
+See the License for the specific language governing permissions and
 limitations under the License.
 */
 
@@ -167,7 +167,7 @@ func Jitter(duration time.Duration, maxFactor float64) time.Duration {
 // ErrWaitTimeout is returned when the condition exited without success.
 var ErrWaitTimeout = errors.New("timed out waiting for the condition")
 
-// ConditionFunc returns true if the condition is satis***REMOVED***ed, or an error
+// ConditionFunc returns true if the condition is satisfied, or an error
 // if the loop should be aborted.
 type ConditionFunc func() (done bool, err error)
 
@@ -216,7 +216,7 @@ func ExponentialBackoff(backoff Backoff, condition ConditionFunc) error {
 // Some intervals may be missed if the condition takes too long or the time
 // window is too short.
 //
-// If you want to Poll something forever, see PollIn***REMOVED***nite.
+// If you want to Poll something forever, see PollInfinite.
 func Poll(interval, timeout time.Duration, condition ConditionFunc) error {
 	return pollInternal(poller(interval, timeout), condition)
 }
@@ -236,7 +236,7 @@ func pollInternal(wait WaitFunc, condition ConditionFunc) error {
 // Some intervals may be missed if the condition takes too long or the time
 // window is too short.
 //
-// If you want to immediately Poll something forever, see PollImmediateIn***REMOVED***nite.
+// If you want to immediately Poll something forever, see PollImmediateInfinite.
 func PollImmediate(interval, timeout time.Duration, condition ConditionFunc) error {
 	return pollImmediateInternal(poller(interval, timeout), condition)
 }
@@ -252,25 +252,25 @@ func pollImmediateInternal(wait WaitFunc, condition ConditionFunc) error {
 	return pollInternal(wait, condition)
 }
 
-// PollIn***REMOVED***nite tries a condition func until it returns true or an error
+// PollInfinite tries a condition func until it returns true or an error
 //
-// PollIn***REMOVED***nite always waits the interval before the run of 'condition'.
+// PollInfinite always waits the interval before the run of 'condition'.
 //
 // Some intervals may be missed if the condition takes too long or the time
 // window is too short.
-func PollIn***REMOVED***nite(interval time.Duration, condition ConditionFunc) error {
+func PollInfinite(interval time.Duration, condition ConditionFunc) error {
 	done := make(chan struct{})
 	defer close(done)
 	return PollUntil(interval, condition, done)
 }
 
-// PollImmediateIn***REMOVED***nite tries a condition func until it returns true or an error
+// PollImmediateInfinite tries a condition func until it returns true or an error
 //
-// PollImmediateIn***REMOVED***nite runs the 'condition' before waiting for the interval.
+// PollImmediateInfinite runs the 'condition' before waiting for the interval.
 //
 // Some intervals may be missed if the condition takes too long or the time
 // window is too short.
-func PollImmediateIn***REMOVED***nite(interval time.Duration, condition ConditionFunc) error {
+func PollImmediateInfinite(interval time.Duration, condition ConditionFunc) error {
 	done, err := condition()
 	if err != nil {
 		return err
@@ -278,13 +278,13 @@ func PollImmediateIn***REMOVED***nite(interval time.Duration, condition Conditio
 	if done {
 		return nil
 	}
-	return PollIn***REMOVED***nite(interval, condition)
+	return PollInfinite(interval, condition)
 }
 
 // PollUntil tries a condition func until it returns true, an error or stopCh is
 // closed.
 //
-// PollUntil always waits interval before the ***REMOVED***rst run of 'condition'.
+// PollUntil always waits interval before the first run of 'condition'.
 // 'condition' will always be invoked at least once.
 func PollUntil(interval time.Duration, condition ConditionFunc, stopCh <-chan struct{}) error {
 	return WaitFor(poller(interval, 0), condition, stopCh)
@@ -346,7 +346,7 @@ func WaitFor(wait WaitFunc, fn ConditionFunc, done <-chan struct{}) error {
 // timeout has elapsed and then closes the channel.
 //
 // Over very short intervals you may receive no ticks before the channel is
-// closed. A timeout of 0 is interpreted as an in***REMOVED***nity.
+// closed. A timeout of 0 is interpreted as an infinity.
 //
 // Output ticks are not buffered. If the channel is not ready to receive an
 // item, the tick is skipped.

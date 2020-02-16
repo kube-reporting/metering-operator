@@ -2,7 +2,7 @@ package chi
 
 // Radix tree implementation below is a based on the original work by
 // Armon Dadgar in https://github.com/armon/go-radix/blob/master/radix.go
-// (MIT licensed). It's been heavily modi***REMOVED***ed for use as a HTTP routing tree.
+// (MIT licensed). It's been heavily modified for use as a HTTP routing tree.
 
 import (
 	"fmt"
@@ -76,14 +76,14 @@ type node struct {
 	// node type: static, regexp, param, catchAll
 	typ nodeTyp
 
-	// ***REMOVED***rst byte of the pre***REMOVED***x
+	// first byte of the prefix
 	label byte
 
-	// ***REMOVED***rst byte of the child pre***REMOVED***x
+	// first byte of the child prefix
 	tail byte
 
-	// pre***REMOVED***x is the common pre***REMOVED***x we ignore
-	pre***REMOVED***x string
+	// prefix is the common prefix we ignore
+	prefix string
 
 	// regexp matcher for regexp nodes
 	rex *regexp.Regexp
@@ -146,18 +146,18 @@ func (n *node) InsertRoute(method methodTyp, pattern string, handler http.Handle
 			segTyp, _, segRexpat, segTail, _, segEndIdx = patNextSegment(search)
 		}
 
-		var pre***REMOVED***x string
+		var prefix string
 		if segTyp == ntRegexp {
-			pre***REMOVED***x = segRexpat
+			prefix = segRexpat
 		}
 
 		// Look for the edge to attach to
 		parent = n
-		n = n.getEdge(segTyp, label, segTail, pre***REMOVED***x)
+		n = n.getEdge(segTyp, label, segTail, prefix)
 
 		// No edge, create one
 		if n == nil {
-			child := &node{label: label, tail: segTail, pre***REMOVED***x: search}
+			child := &node{label: label, tail: segTail, prefix: search}
 			hn := parent.addChild(child, search)
 			hn.setEndpoint(method, handler, pattern)
 
@@ -175,29 +175,29 @@ func (n *node) InsertRoute(method methodTyp, pattern string, handler http.Handle
 		}
 
 		// Static nodes fall below here.
-		// Determine longest pre***REMOVED***x of the search key on match.
-		commonPre***REMOVED***x := longestPre***REMOVED***x(search, n.pre***REMOVED***x)
-		if commonPre***REMOVED***x == len(n.pre***REMOVED***x) {
-			// the common pre***REMOVED***x is as long as the current node's pre***REMOVED***x we're attempting to insert.
+		// Determine longest prefix of the search key on match.
+		commonPrefix := longestPrefix(search, n.prefix)
+		if commonPrefix == len(n.prefix) {
+			// the common prefix is as long as the current node's prefix we're attempting to insert.
 			// keep the search going.
-			search = search[commonPre***REMOVED***x:]
+			search = search[commonPrefix:]
 			continue
 		}
 
 		// Split the node
 		child := &node{
 			typ:    ntStatic,
-			pre***REMOVED***x: search[:commonPre***REMOVED***x],
+			prefix: search[:commonPrefix],
 		}
 		parent.replaceChild(search[0], segTail, child)
 
 		// Restore the existing node
-		n.label = n.pre***REMOVED***x[commonPre***REMOVED***x]
-		n.pre***REMOVED***x = n.pre***REMOVED***x[commonPre***REMOVED***x:]
-		child.addChild(n, n.pre***REMOVED***x)
+		n.label = n.prefix[commonPrefix]
+		n.prefix = n.prefix[commonPrefix:]
+		child.addChild(n, n.prefix)
 
-		// If the new key is a subset, set the method/handler on this node and ***REMOVED***nish.
-		search = search[commonPre***REMOVED***x:]
+		// If the new key is a subset, set the method/handler on this node and finish.
+		search = search[commonPrefix:]
 		if len(search) == 0 {
 			child.setEndpoint(method, handler, pattern)
 			return child
@@ -207,7 +207,7 @@ func (n *node) InsertRoute(method methodTyp, pattern string, handler http.Handle
 		subchild := &node{
 			typ:    ntStatic,
 			label:  search[0],
-			pre***REMOVED***x: search,
+			prefix: search,
 		}
 		hn := child.addChild(subchild, search)
 		hn.setEndpoint(method, handler, pattern)
@@ -219,8 +219,8 @@ func (n *node) InsertRoute(method methodTyp, pattern string, handler http.Handle
 // For a URL router like chi's, we split the static, param, regexp and wildcard segments
 // into different nodes. In addition, addChild will recursively call itself until every
 // pattern segment is added to the url pattern tree as individual nodes, depending on type.
-func (n *node) addChild(child *node, pre***REMOVED***x string) *node {
-	search := pre***REMOVED***x
+func (n *node) addChild(child *node, prefix string) *node {
+	search := prefix
 
 	// handler leaf node added to the tree is the child.
 	// this may be overridden later down the flow
@@ -233,18 +233,18 @@ func (n *node) addChild(child *node, pre***REMOVED***x string) *node {
 	switch segTyp {
 
 	case ntStatic:
-		// Search pre***REMOVED***x is all static (that is, has no params in path)
+		// Search prefix is all static (that is, has no params in path)
 		// noop
 
 	default:
-		// Search pre***REMOVED***x contains a param, regexp or wildcard
+		// Search prefix contains a param, regexp or wildcard
 
 		if segTyp == ntRegexp {
 			rex, err := regexp.Compile(segRexpat)
 			if err != nil {
 				panic(fmt.Sprintf("chi: invalid regexp pattern '%s' in route param", segRexpat))
 			}
-			child.pre***REMOVED***x = segRexpat
+			child.prefix = segRexpat
 			child.rex = rex
 		}
 
@@ -254,7 +254,7 @@ func (n *node) addChild(child *node, pre***REMOVED***x string) *node {
 
 			if segTyp == ntCatchAll {
 				segStartIdx = -1
-			} ***REMOVED*** {
+			} else {
 				segStartIdx = segEndIdx
 			}
 			if segStartIdx < 0 {
@@ -272,17 +272,17 @@ func (n *node) addChild(child *node, pre***REMOVED***x string) *node {
 				nn := &node{
 					typ:    ntStatic,
 					label:  search[0],
-					pre***REMOVED***x: search,
+					prefix: search,
 				}
 				hn = child.addChild(nn, search)
 			}
 
-		} ***REMOVED*** if segStartIdx > 0 {
+		} else if segStartIdx > 0 {
 			// Route has some param
 
 			// starts with a static segment
 			child.typ = ntStatic
-			child.pre***REMOVED***x = search[:segStartIdx]
+			child.prefix = search[:segStartIdx]
 			child.rex = nil
 
 			// add the param edge node
@@ -315,11 +315,11 @@ func (n *node) replaceChild(label, tail byte, child *node) {
 	panic("chi: replacing missing child")
 }
 
-func (n *node) getEdge(ntyp nodeTyp, label, tail byte, pre***REMOVED***x string) *node {
+func (n *node) getEdge(ntyp nodeTyp, label, tail byte, prefix string) *node {
 	nds := n.children[ntyp]
 	for i := 0; i < len(nds); i++ {
 		if nds[i].label == label && nds[i].tail == tail {
-			if ntyp == ntRegexp && nds[i].pre***REMOVED***x != pre***REMOVED***x {
+			if ntyp == ntRegexp && nds[i].prefix != prefix {
 				continue
 			}
 			return nds[i]
@@ -350,7 +350,7 @@ func (n *node) setEndpoint(method methodTyp, handler http.Handler, pattern strin
 			h.pattern = pattern
 			h.paramKeys = paramKeys
 		}
-	} ***REMOVED*** {
+	} else {
 		h := n.endpoints.Value(method)
 		h.handler = handler
 		h.pattern = pattern
@@ -365,7 +365,7 @@ func (n *node) FindRoute(rctx *Context, method methodTyp, path string) (*node, e
 	rctx.routeParams.Values = rctx.routeParams.Values[:0]
 
 	// Find the routing handlers for the path
-	rn := n.***REMOVED***ndRoute(rctx, method, path)
+	rn := n.findRoute(rctx, method, path)
 	if rn == nil {
 		return nil, nil, nil
 	}
@@ -385,7 +385,7 @@ func (n *node) FindRoute(rctx *Context, method methodTyp, path string) (*node, e
 
 // Recursive edge traversal by checking all nodeTyp groups along the way.
 // It's like searching through a multi-dimensional radix trie.
-func (n *node) ***REMOVED***ndRoute(rctx *Context, method methodTyp, path string) *node {
+func (n *node) findRoute(rctx *Context, method methodTyp, path string) *node {
 	nn := n
 	search := path
 
@@ -405,11 +405,11 @@ func (n *node) ***REMOVED***ndRoute(rctx *Context, method methodTyp, path string
 
 		switch ntyp {
 		case ntStatic:
-			xn = nds.***REMOVED***ndEdge(label)
-			if xn == nil || !strings.HasPre***REMOVED***x(xsearch, xn.pre***REMOVED***x) {
+			xn = nds.findEdge(label)
+			if xn == nil || !strings.HasPrefix(xsearch, xn.prefix) {
 				continue
 			}
-			xsearch = xsearch[len(xn.pre***REMOVED***x):]
+			xsearch = xsearch[len(xn.prefix):]
 
 		case ntParam, ntRegexp:
 			// short-circuit and return no matching route for empty param values
@@ -427,7 +427,7 @@ func (n *node) ***REMOVED***ndRoute(rctx *Context, method methodTyp, path string
 				if p < 0 {
 					if xn.tail == '/' {
 						p = len(xsearch)
-					} ***REMOVED*** {
+					} else {
 						continue
 					}
 				}
@@ -436,7 +436,7 @@ func (n *node) ***REMOVED***ndRoute(rctx *Context, method methodTyp, path string
 					if xn.rex.Match([]byte(xsearch[:p])) == false {
 						continue
 					}
-				} ***REMOVED*** if strings.IndexByte(xsearch[:p], '/') != -1 {
+				} else if strings.IndexByte(xsearch[:p], '/') != -1 {
 					// avoid a match across path segments
 					continue
 				}
@@ -457,7 +457,7 @@ func (n *node) ***REMOVED***ndRoute(rctx *Context, method methodTyp, path string
 			continue
 		}
 
-		// did we ***REMOVED***nd it yet?
+		// did we find it yet?
 		if len(xsearch) == 0 {
 			if xn.isLeaf() {
 				h, _ := xn.endpoints[method]
@@ -472,13 +472,13 @@ func (n *node) ***REMOVED***ndRoute(rctx *Context, method methodTyp, path string
 			}
 		}
 
-		// recursively ***REMOVED***nd the next node..
-		***REMOVED***n := xn.***REMOVED***ndRoute(rctx, method, xsearch)
-		if ***REMOVED***n != nil {
-			return ***REMOVED***n
+		// recursively find the next node..
+		fin := xn.findRoute(rctx, method, xsearch)
+		if fin != nil {
+			return fin
 		}
 
-		// Did not ***REMOVED***nd ***REMOVED***nal handler, let's remove the param here if it was set
+		// Did not find final handler, let's remove the param here if it was set
 		if xn.typ > ntStatic {
 			if len(rctx.routeParams.Values) > 0 {
 				rctx.routeParams.Values = rctx.routeParams.Values[:len(rctx.routeParams.Values)-1]
@@ -490,7 +490,7 @@ func (n *node) ***REMOVED***ndRoute(rctx *Context, method methodTyp, path string
 	return nil
 }
 
-func (n *node) ***REMOVED***ndEdge(ntyp nodeTyp, label byte) *node {
+func (n *node) findEdge(ntyp nodeTyp, label byte) *node {
 	nds := n.children[ntyp]
 	num := len(nds)
 	idx := 0
@@ -502,9 +502,9 @@ func (n *node) ***REMOVED***ndEdge(ntyp nodeTyp, label byte) *node {
 			idx = i + (j-i)/2
 			if label > nds[idx].label {
 				i = idx + 1
-			} ***REMOVED*** if label < nds[idx].label {
+			} else if label < nds[idx].label {
 				j = idx - 1
-			} ***REMOVED*** {
+			} else {
 				i = num // breaks cond
 			}
 		}
@@ -531,14 +531,14 @@ func (n *node) isLeaf() bool {
 	return n.endpoints != nil
 }
 
-func (n *node) ***REMOVED***ndPattern(pattern string) bool {
+func (n *node) findPattern(pattern string) bool {
 	nn := n
 	for _, nds := range nn.children {
 		if len(nds) == 0 {
 			continue
 		}
 
-		n = nn.***REMOVED***ndEdge(nds[0].typ, pattern[0])
+		n = nn.findEdge(nds[0].typ, pattern[0])
 		if n == nil {
 			continue
 		}
@@ -548,8 +548,8 @@ func (n *node) ***REMOVED***ndPattern(pattern string) bool {
 
 		switch n.typ {
 		case ntStatic:
-			idx = longestPre***REMOVED***x(pattern, n.pre***REMOVED***x)
-			if idx < len(n.pre***REMOVED***x) {
+			idx = longestPrefix(pattern, n.prefix)
+			if idx < len(n.prefix) {
 				continue
 			}
 
@@ -557,7 +557,7 @@ func (n *node) ***REMOVED***ndPattern(pattern string) bool {
 			idx = strings.IndexByte(pattern, '}') + 1
 
 		case ntCatchAll:
-			idx = longestPre***REMOVED***x(pattern, "*")
+			idx = longestPrefix(pattern, "*")
 
 		default:
 			panic("chi: unknown node type")
@@ -568,7 +568,7 @@ func (n *node) ***REMOVED***ndPattern(pattern string) bool {
 			return true
 		}
 
-		return n.***REMOVED***ndPattern(xpattern)
+		return n.findPattern(xpattern)
 	}
 	return false
 }
@@ -667,7 +667,7 @@ func patNextSegment(pattern string) (nodeTyp, string, string, byte, int, int) {
 		for i, c := range pattern[ps:] {
 			if c == '{' {
 				cc++
-			} ***REMOVED*** if c == '}' {
+			} else if c == '}' {
 				cc--
 				if cc == 0 {
 					pe = ps + i
@@ -705,7 +705,7 @@ func patNextSegment(pattern string) (nodeTyp, string, string, byte, int, int) {
 		return nt, key, rexpat, tail, ps, pe
 	}
 
-	// Wildcard pattern as ***REMOVED***nale
+	// Wildcard pattern as finale
 	// TODO: should we panic if there is stuff after the * ???
 	return ntCatchAll, "*", "", 0, ws, len(pattern)
 }
@@ -728,9 +728,9 @@ func patParamKeys(pattern string) []string {
 	}
 }
 
-// longestPre***REMOVED***x ***REMOVED***nds the length of the shared pre***REMOVED***x
+// longestPrefix finds the length of the shared prefix
 // of two strings
-func longestPre***REMOVED***x(k1, k2 string) int {
+func longestPrefix(k1, k2 string) int {
 	max := len(k1)
 	if l := len(k2); l < max {
 		max = l
@@ -772,7 +772,7 @@ func (ns nodes) tailSort() {
 	}
 }
 
-func (ns nodes) ***REMOVED***ndEdge(label byte) *node {
+func (ns nodes) findEdge(label byte) *node {
 	num := len(ns)
 	idx := 0
 	i, j := 0, num-1
@@ -780,9 +780,9 @@ func (ns nodes) ***REMOVED***ndEdge(label byte) *node {
 		idx = i + (j-i)/2
 		if label > ns[idx].label {
 			i = idx + 1
-		} ***REMOVED*** if label < ns[idx].label {
+		} else if label < ns[idx].label {
 			j = idx - 1
-		} ***REMOVED*** {
+		} else {
 			i = num // breaks cond
 		}
 	}
@@ -822,7 +822,7 @@ func walk(r Routes, walkFn WalkFunc, parentRoute string, parentMw ...func(http.H
 
 		for method, handler := range route.Handlers {
 			if method == "*" {
-				// Ignore a "catchAll" method, since we pass down all the speci***REMOVED***c methods for each route.
+				// Ignore a "catchAll" method, since we pass down all the specific methods for each route.
 				continue
 			}
 
@@ -832,7 +832,7 @@ func walk(r Routes, walkFn WalkFunc, parentRoute string, parentMw ...func(http.H
 				if err := walkFn(method, fullRoute, chain.Endpoint, append(mws, chain.Middlewares...)...); err != nil {
 					return err
 				}
-			} ***REMOVED*** {
+			} else {
 				if err := walkFn(method, fullRoute, handler, mws...); err != nil {
 					return err
 				}

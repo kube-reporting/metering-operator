@@ -1,6 +1,6 @@
 // Copyright 2014 The Prometheus Authors
 // Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this ***REMOVED***le except in compliance with the License.
+// you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 //
 // http://www.apache.org/licenses/LICENSE-2.0
@@ -8,7 +8,7 @@
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the speci***REMOVED***c language governing permissions and
+// See the License for the specific language governing permissions and
 // limitations under the License.
 
 package model
@@ -19,7 +19,7 @@ import (
 
 // SeparatorByte is a byte that cannot occur in valid UTF-8 sequences and is
 // used to separate label names, label values, and other strings from each other
-// when calculating their combined hash value (aka signature aka ***REMOVED***ngerprint).
+// when calculating their combined hash value (aka signature aka fingerprint).
 const SeparatorByte byte = 255
 
 var (
@@ -27,7 +27,7 @@ var (
 	emptyLabelSignature = hashNew()
 )
 
-// LabelsToSignature returns a quasi-unique signature (i.e., ***REMOVED***ngerprint) for a
+// LabelsToSignature returns a quasi-unique signature (i.e., fingerprint) for a
 // given label set. (Collisions are possible but unlikely if the number of label
 // sets the function is applied to is small.)
 func LabelsToSignature(labels map[string]string) uint64 {
@@ -95,7 +95,7 @@ func labelSetToFastFingerprint(ls LabelSet) Fingerprint {
 
 // SignatureForLabels works like LabelsToSignature but takes a Metric as
 // parameter (rather than a label map) and only includes the labels with the
-// speci***REMOVED***ed LabelNames into the signature calculation. The labels passed in
+// specified LabelNames into the signature calculation. The labels passed in
 // will be sorted by this function.
 func SignatureForLabels(m Metric, labels ...LabelName) uint64 {
 	if len(labels) == 0 {
@@ -116,7 +116,7 @@ func SignatureForLabels(m Metric, labels ...LabelName) uint64 {
 
 // SignatureWithoutLabels works like LabelsToSignature but takes a Metric as
 // parameter (rather than a label map) and excludes the labels with any of the
-// speci***REMOVED***ed LabelNames from the signature calculation.
+// specified LabelNames from the signature calculation.
 func SignatureWithoutLabels(m Metric, labels map[LabelName]struct{}) uint64 {
 	if len(m) == 0 {
 		return emptyLabelSignature

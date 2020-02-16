@@ -1,7 +1,7 @@
 apiVersion: v1
-kind: Con***REMOVED***gMap
+kind: ConfigMap
 metadata:
-  name: presto-common-con***REMOVED***g
+  name: presto-common-config
 data:
   initialize_presto.sh: |
     #!/bin/bash
@@ -15,10 +15,10 @@ data:
       PEM_FILE=$1
       PASSWORD=$2
       KEYSTORE=$3
-      # number of certs in the PEM ***REMOVED***le
+      # number of certs in the PEM file
       CERTS=$(grep 'END CERTIFICATE' $PEM_FILE| wc -l)
 
-      # For every cert in the PEM ***REMOVED***le, extract it and import into the JKS keystore
+      # For every cert in the PEM file, extract it and import into the JKS keystore
       # awk command: step 1, if line is in the desired cert, print the line
       #              step 2, increment counter when last line of cert is found
       for N in $(seq 0 $(($CERTS - 1))); do
@@ -35,48 +35,48 @@ data:
     if [ -a /s3-compatible-ca/ca-bundle.crt ]; then
       echo "Adding /s3-compatible-ca/ca-bundle.crt to $JAVA_HOME/lib/security/cacerts"
       importCert /s3-compatible-ca/ca-bundle.crt changeit $JAVA_HOME/lib/security/cacerts
-    ***REMOVED***
+    fi
     # always add the openshift service-ca.crt if it exists
     if [ -a /var/run/secrets/kubernetes.io/serviceaccount/service-ca.crt ]; then
       echo "Adding /var/run/secrets/kubernetes.io/serviceaccount/service-ca.crt to $JAVA_HOME/lib/security/cacerts"
       importCert /var/run/secrets/kubernetes.io/serviceaccount/service-ca.crt changeit $JAVA_HOME/lib/security/cacerts
-    ***REMOVED***
+    fi
 
-    # add node id to node con***REMOVED***g
+    # add node id to node config
     NODE_CONFIG="${PRESTO_HOME}/etc/node.properties"
-    # ensure there's a newline between the last item in the con***REMOVED***g and what we add
+    # ensure there's a newline between the last item in the config and what we add
     echo "" >> $NODE_CONFIG
     if ! grep -q -F 'node.id' "$NODE_CONFIG"; then
       NODE_ID="node.id=$MY_NODE_ID"
       echo "Adding $NODE_ID to $NODE_CONFIG"
       echo "$NODE_ID" >> "$NODE_CONFIG"
-    ***REMOVED***
+    fi
 
     # add AWS creds to hive catalog properties
     HIVE_CATALOG_CONFIG="${PRESTO_HOME}/etc/catalog/hive.properties"
-    # ensure there's a newline between the last item in the con***REMOVED***g and what we add
+    # ensure there's a newline between the last item in the config and what we add
     echo "" >> $HIVE_CATALOG_CONFIG
     if ! grep -q -F 'hive.s3.aws-access-key' "$HIVE_CATALOG_CONFIG"; then
       echo "Adding hive.s3.aws-access-key and hive.s3.aws-secret-key to $HIVE_CATALOG_CONFIG"
       echo "hive.s3.aws-access-key=$AWS_ACCESS_KEY_ID" >> "$HIVE_CATALOG_CONFIG"
       echo "hive.s3.aws-secret-key=$AWS_SECRET_ACCESS_KEY" >> "$HIVE_CATALOG_CONFIG"
-    ***REMOVED***
+    fi
 
     # add UID to /etc/passwd if missing
     if ! whoami &> /dev/null; then
         if [ -w /etc/passwd ]; then
             echo "Adding user ${USER_NAME:-presto} with current UID $(id -u) to /etc/passwd"
-            # Remove existing entry with user ***REMOVED***rst.
+            # Remove existing entry with user first.
             # cannot use sed -i because we do not have permission to write new
-            # ***REMOVED***les into /etc
+            # files into /etc
             sed  "/${USER_NAME:-presto}:x/d" /etc/passwd > /tmp/passwd
             # add our user with our current user ID into passwd
             echo "${USER_NAME:-presto}:x:$(id -u):0:${USER_NAME:-presto} user:${HOME}:/sbin/nologin" >> /tmp/passwd
             # overwrite existing contents with new contents (cannot replace the
-            # ***REMOVED***le due to permissions)
+            # file due to permissions)
             cat /tmp/passwd > /etc/passwd
             rm /tmp/passwd
-        ***REMOVED***
-    ***REMOVED***
+        fi
+    fi
 
     exec "$@"

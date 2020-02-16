@@ -7,7 +7,7 @@ import (
 
 type numberLazyAny struct {
 	baseAny
-	cfg *frozenCon***REMOVED***g
+	cfg *frozenConfig
 	buf []byte
 	err error
 }

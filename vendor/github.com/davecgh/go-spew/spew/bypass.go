@@ -12,7 +12,7 @@
 // ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 // OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
-// NOTE: Due to the following build constraints, this ***REMOVED***le will only be compiled
+// NOTE: Due to the following build constraints, this file will only be compiled
 // when the code is not running on Google App Engine, compiled by GopherJS, and
 // "-tags safe" is not added to the go build command line.  The "disableunsafe"
 // tag is deprecated and thus should not be used.
@@ -26,7 +26,7 @@ import (
 )
 
 const (
-	// UnsafeDisabled is a build-time constant which speci***REMOVED***es whether or
+	// UnsafeDisabled is a build-time constant which specifies whether or
 	// not access to the unsafe package is available.
 	UnsafeDisabled = false
 
@@ -36,7 +36,7 @@ const (
 
 var (
 	// offsetPtr, offsetScalar, and offsetFlag are the offsets for the
-	// internal reflect.Value ***REMOVED***elds.  These values are valid before golang
+	// internal reflect.Value fields.  These values are valid before golang
 	// commit ecccf07e7f9d which changed the format.  The are also valid
 	// after commit 82f48826c6c7 which changed the format again to mirror
 	// the original format.  Code in the init function updates these offsets
@@ -48,10 +48,10 @@ var (
 	// flagKindWidth and flagKindShift indicate various bits that the
 	// reflect package uses internally to track kind information.
 	//
-	// flagRO indicates whether or not the value ***REMOVED***eld of a reflect.Value is
+	// flagRO indicates whether or not the value field of a reflect.Value is
 	// read-only.
 	//
-	// flagIndir indicates whether the value ***REMOVED***eld of a reflect.Value is
+	// flagIndir indicates whether the value field of a reflect.Value is
 	// the actual data or a pointer to the data.
 	//
 	// These values are valid before golang commit 90a7c3c86944 which
@@ -65,15 +65,15 @@ var (
 
 func init() {
 	// Older versions of reflect.Value stored small integers directly in the
-	// ptr ***REMOVED***eld (which is named val in the older versions).  Versions
-	// between commits ecccf07e7f9d and 82f48826c6c7 added a new ***REMOVED***eld named
+	// ptr field (which is named val in the older versions).  Versions
+	// between commits ecccf07e7f9d and 82f48826c6c7 added a new field named
 	// scalar for this purpose which unfortunately came before the flag
-	// ***REMOVED***eld, so the offset of the flag ***REMOVED***eld is different for those
+	// field, so the offset of the flag field is different for those
 	// versions.
 	//
 	// This code constructs a new reflect.Value from a known small integer
 	// and checks if the size of the reflect.Value struct indicates it has
-	// the scalar ***REMOVED***eld. When it does, the offsets are updated accordingly.
+	// the scalar field. When it does, the offsets are updated accordingly.
 	vv := reflect.ValueOf(0xf00)
 	if unsafe.Sizeof(vv) == (ptrSize * 4) {
 		offsetScalar = ptrSize * 2
@@ -82,7 +82,7 @@ func init() {
 
 	// Commit 90a7c3c86944 changed the flag positions such that the low
 	// order bits are the kind.  This code extracts the kind from the flags
-	// ***REMOVED***eld and ensures it's the correct type.  When it's not, the flag
+	// field and ensures it's the correct type.  When it's not, the flag
 	// order has been changed to the newer format, so the flags are updated
 	// accordingly.
 	upf := unsafe.Pointer(uintptr(unsafe.Pointer(&vv)) + offsetFlag)
@@ -93,9 +93,9 @@ func init() {
 		flagRO = 1 << 5
 		flagIndir = 1 << 6
 
-		// Commit adf9b30e5594 modi***REMOVED***ed the flags to separate the
-		// flagRO flag into two bits which speci***REMOVED***es whether or not the
-		// ***REMOVED***eld is embedded.  This causes flagIndir to move over a bit
+		// Commit adf9b30e5594 modified the flags to separate the
+		// flagRO flag into two bits which specifies whether or not the
+		// field is embedded.  This causes flagIndir to move over a bit
 		// and means that flagRO is the combination of either of the
 		// original flagRO bit and the new bit.
 		//
@@ -118,7 +118,7 @@ func init() {
 //
 // This allows us to check for implementations of the Stringer and error
 // interfaces to be used for pretty printing ordinarily unaddressable and
-// inaccessible values such as unexported struct ***REMOVED***elds.
+// inaccessible values such as unexported struct fields.
 func unsafeReflectValue(v reflect.Value) (rv reflect.Value) {
 	indirects := 1
 	vt := v.Type()
@@ -127,8 +127,8 @@ func unsafeReflectValue(v reflect.Value) (rv reflect.Value) {
 	if rvf&flagIndir != 0 {
 		vt = reflect.PtrTo(v.Type())
 		indirects++
-	} ***REMOVED*** if offsetScalar != 0 {
-		// The value is in the scalar ***REMOVED***eld when it's not one of the
+	} else if offsetScalar != 0 {
+		// The value is in the scalar field when it's not one of the
 		// reference types.
 		switch vt.Kind() {
 		case reflect.Uintptr:

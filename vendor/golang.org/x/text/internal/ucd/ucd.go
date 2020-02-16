@@ -1,16 +1,16 @@
 // Copyright 2014 The Go Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE ***REMOVED***le.
+// license that can be found in the LICENSE file.
 
-// Package ucd provides a parser for Unicode Character Database ***REMOVED***les, the
-// format of which is de***REMOVED***ned in http://www.unicode.org/reports/tr44/. See
-// http://www.unicode.org/Public/UCD/latest/ucd/ for example ***REMOVED***les.
+// Package ucd provides a parser for Unicode Character Database files, the
+// format of which is defined in http://www.unicode.org/reports/tr44/. See
+// http://www.unicode.org/Public/UCD/latest/ucd/ for example files.
 //
-// It currently does not support substitutions of missing ***REMOVED***elds.
+// It currently does not support substitutions of missing fields.
 package ucd // import "golang.org/x/text/internal/ucd"
 
 import (
-	"bu***REMOVED***o"
+	"bufio"
 	"errors"
 	"fmt"
 	"io"
@@ -20,7 +20,7 @@ import (
 	"strings"
 )
 
-// UnicodeData.txt ***REMOVED***elds.
+// UnicodeData.txt fields.
 const (
 	CodePoint = iota
 	Name
@@ -39,7 +39,7 @@ const (
 	SimpleTitlecaseMapping
 )
 
-// Parse calls f for each entry in the given reader of a UCD ***REMOVED***le. It will close
+// Parse calls f for each entry in the given reader of a UCD file. It will close
 // the reader upon return. It will call log.Fatal if any error occurred.
 //
 // This implements the most common usage pattern of using Parser.
@@ -56,7 +56,7 @@ func Parse(r io.ReadCloser, f func(p *Parser)) {
 	}
 }
 
-// An Option is used to con***REMOVED***gure a Parser.
+// An Option is used to configure a Parser.
 type Option func(p *Parser)
 
 func keepRanges(p *Parser) {
@@ -70,7 +70,7 @@ var (
 )
 
 // The Part option register a handler for lines starting with a '@'. The text
-// after a '@' is available as the ***REMOVED***rst ***REMOVED***eld. Comments are handled as usual.
+// after a '@' is available as the first field. Comments are handled as usual.
 func Part(f func(p *Parser)) Option {
 	return func(p *Parser) {
 		p.partHandler = f
@@ -85,17 +85,17 @@ func CommentHandler(f func(s string)) Option {
 	}
 }
 
-// A Parser parses Unicode Character Database (UCD) ***REMOVED***les.
+// A Parser parses Unicode Character Database (UCD) files.
 type Parser struct {
-	scanner *bu***REMOVED***o.Scanner
+	scanner *bufio.Scanner
 
-	keepRanges bool // Don't expand rune ranges in ***REMOVED***eld 0.
+	keepRanges bool // Don't expand rune ranges in field 0.
 
 	err     error
 	comment string
-	***REMOVED***eld   []string
+	field   []string
 	// parsedRange is needed in case Range(0) is called more than once for one
-	// ***REMOVED***eld. In some cases this requires scanning ahead.
+	// field. In some cases this requires scanning ahead.
 	line                 int
 	parsedRange          bool
 	rangeStart, rangeEnd rune
@@ -108,17 +108,17 @@ func (p *Parser) setError(err error, msg string) {
 	if p.err == nil && err != nil {
 		if msg == "" {
 			p.err = fmt.Errorf("ucd:line:%d: %v", p.line, err)
-		} ***REMOVED*** {
+		} else {
 			p.err = fmt.Errorf("ucd:line:%d:%s: %v", p.line, msg, err)
 		}
 	}
 }
 
 func (p *Parser) getField(i int) string {
-	if i >= len(p.***REMOVED***eld) {
+	if i >= len(p.field) {
 		return ""
 	}
-	return p.***REMOVED***eld[i]
+	return p.field[i]
 }
 
 // Err returns a non-nil error if any error occurred during parsing.
@@ -129,7 +129,7 @@ func (p *Parser) Err() error {
 // New returns a Parser for the given Reader.
 func New(r io.Reader, o ...Option) *Parser {
 	p := &Parser{
-		scanner: bu***REMOVED***o.NewScanner(r),
+		scanner: bufio.NewScanner(r),
 	}
 	for _, f := range o {
 		f(p)
@@ -137,15 +137,15 @@ func New(r io.Reader, o ...Option) *Parser {
 	return p
 }
 
-// Next parses the next line in the ***REMOVED***le. It returns true if a line was parsed
-// and false if it reached the end of the ***REMOVED***le.
+// Next parses the next line in the file. It returns true if a line was parsed
+// and false if it reached the end of the file.
 func (p *Parser) Next() bool {
 	if !p.keepRanges && p.rangeStart < p.rangeEnd {
 		p.rangeStart++
 		return true
 	}
 	p.comment = ""
-	p.***REMOVED***eld = p.***REMOVED***eld[:0]
+	p.field = p.field[:0]
 	p.parsedRange = false
 
 	for p.scanner.Scan() && p.err == nil {
@@ -168,9 +168,9 @@ func (p *Parser) Next() bool {
 		}
 		if s[0] == '@' {
 			if p.partHandler != nil {
-				p.***REMOVED***eld = append(p.***REMOVED***eld, strings.TrimSpace(s[1:]))
+				p.field = append(p.field, strings.TrimSpace(s[1:]))
 				p.partHandler(p)
-				p.***REMOVED***eld = p.***REMOVED***eld[:0]
+				p.field = p.field[:0]
 			}
 			p.comment = ""
 			continue
@@ -178,10 +178,10 @@ func (p *Parser) Next() bool {
 		for {
 			i := strings.IndexByte(s, ';')
 			if i == -1 {
-				p.***REMOVED***eld = append(p.***REMOVED***eld, strings.TrimSpace(s))
+				p.field = append(p.field, strings.TrimSpace(s))
 				break
 			}
-			p.***REMOVED***eld = append(p.***REMOVED***eld, strings.TrimSpace(s[:i]))
+			p.field = append(p.field, strings.TrimSpace(s[:i]))
 			s = s[i+1:]
 		}
 		if !p.keepRanges {
@@ -207,7 +207,7 @@ func (p *Parser) parseRune(s string) rune {
 	return x
 }
 
-// Rune parses and returns ***REMOVED***eld i as a rune.
+// Rune parses and returns field i as a rune.
 func (p *Parser) Rune(i int) rune {
 	if i > 0 || p.keepRanges {
 		return p.parseRune(p.getField(i))
@@ -215,7 +215,7 @@ func (p *Parser) Rune(i int) rune {
 	return p.rangeStart
 }
 
-// Runes interprets and returns ***REMOVED***eld i as a sequence of runes.
+// Runes interprets and returns field i as a sequence of runes.
 func (p *Parser) Runes(i int) (runes []rune) {
 	add := func(s string) {
 		if s = strings.TrimSpace(s); len(s) > 0 {
@@ -241,32 +241,32 @@ var (
 	reRange = regexp.MustCompile("^([0-9A-F]*);<([^,]*), ([^>]*)>(.*)$")
 )
 
-// Range parses and returns ***REMOVED***eld i as a rune range. A range is inclusive at
-// both ends. If the ***REMOVED***eld only has one rune, ***REMOVED***rst and last will be identical.
+// Range parses and returns field i as a rune range. A range is inclusive at
+// both ends. If the field only has one rune, first and last will be identical.
 // It supports the legacy format for ranges used in UnicodeData.txt.
-func (p *Parser) Range(i int) (***REMOVED***rst, last rune) {
+func (p *Parser) Range(i int) (first, last rune) {
 	if !p.keepRanges {
 		return p.rangeStart, p.rangeStart
 	}
 	return p.getRange(i)
 }
 
-func (p *Parser) getRange(i int) (***REMOVED***rst, last rune) {
+func (p *Parser) getRange(i int) (first, last rune) {
 	b := p.getField(i)
 	if k := strings.Index(b, ".."); k != -1 {
 		return p.parseRune(b[:k]), p.parseRune(b[k+2:])
 	}
-	// The ***REMOVED***rst ***REMOVED***eld may not be a rune, in which case we may ignore any error
+	// The first field may not be a rune, in which case we may ignore any error
 	// and set the range as 0..0.
 	x, err := parseRune(b)
 	if err != nil {
 		// Disable range parsing henceforth. This ensures that an error will be
-		// returned if the user subsequently will try to parse this ***REMOVED***eld as
+		// returned if the user subsequently will try to parse this field as
 		// a Rune.
 		p.keepRanges = true
 	}
 	// Special case for UnicodeData that was retained for backwards compatibility.
-	if i == 0 && len(p.***REMOVED***eld) > 1 && strings.HasSuf***REMOVED***x(p.***REMOVED***eld[1], "First>") {
+	if i == 0 && len(p.field) > 1 && strings.HasSuffix(p.field[1], "First>") {
 		if p.parsedRange {
 			return p.rangeStart, p.rangeEnd
 		}
@@ -276,7 +276,7 @@ func (p *Parser) getRange(i int) (***REMOVED***rst, last rune) {
 			p.setError(errIncorrectLegacyRange, "")
 			return x, x
 		}
-		// Using Bytes would be more ef***REMOVED***cient here, but Text is a lot easier
+		// Using Bytes would be more efficient here, but Text is a lot easier
 		// and this is not a frequent case.
 		ml := reRange.FindStringSubmatch(p.scanner.Text())
 		if ml == nil || mf[2] != ml[2] || ml[3] != "Last" || mf[4] != ml[4] {
@@ -303,7 +303,7 @@ var bools = map[string]bool{
 	"True":  true,
 }
 
-// Bool parses and returns ***REMOVED***eld i as a boolean value.
+// Bool parses and returns field i as a boolean value.
 func (p *Parser) Bool(i int) bool {
 	f := p.getField(i)
 	for s, v := range bools {
@@ -315,33 +315,33 @@ func (p *Parser) Bool(i int) bool {
 	return false
 }
 
-// Int parses and returns ***REMOVED***eld i as an integer value.
+// Int parses and returns field i as an integer value.
 func (p *Parser) Int(i int) int {
 	x, err := strconv.ParseInt(string(p.getField(i)), 10, 64)
 	p.setError(err, "error parsing int")
 	return int(x)
 }
 
-// Uint parses and returns ***REMOVED***eld i as an unsigned integer value.
+// Uint parses and returns field i as an unsigned integer value.
 func (p *Parser) Uint(i int) uint {
 	x, err := strconv.ParseUint(string(p.getField(i)), 10, 64)
 	p.setError(err, "error parsing uint")
 	return uint(x)
 }
 
-// Float parses and returns ***REMOVED***eld i as a decimal value.
+// Float parses and returns field i as a decimal value.
 func (p *Parser) Float(i int) float64 {
 	x, err := strconv.ParseFloat(string(p.getField(i)), 64)
 	p.setError(err, "error parsing float")
 	return x
 }
 
-// String parses and returns ***REMOVED***eld i as a string value.
+// String parses and returns field i as a string value.
 func (p *Parser) String(i int) string {
 	return string(p.getField(i))
 }
 
-// Strings parses and returns ***REMOVED***eld i as a space-separated list of strings.
+// Strings parses and returns field i as a space-separated list of strings.
 func (p *Parser) Strings(i int) []string {
 	ss := strings.Split(string(p.getField(i)), " ")
 	for i, s := range ss {
@@ -355,9 +355,9 @@ func (p *Parser) Comment() string {
 	return string(p.comment)
 }
 
-var errUnde***REMOVED***nedEnum = errors.New("ucd: unde***REMOVED***ned enum value")
+var errUndefinedEnum = errors.New("ucd: undefined enum value")
 
-// Enum interprets and returns ***REMOVED***eld i as a value that must be one of the values
+// Enum interprets and returns field i as a value that must be one of the values
 // in enum.
 func (p *Parser) Enum(i int, enum ...string) string {
 	f := p.getField(i)
@@ -366,6 +366,6 @@ func (p *Parser) Enum(i int, enum ...string) string {
 			return s
 		}
 	}
-	p.setError(errUnde***REMOVED***nedEnum, "error parsing enum")
+	p.setError(errUndefinedEnum, "error parsing enum")
 	return ""
 }

@@ -13,17 +13,17 @@ type RawMessage []byte
 // Unmarshal parses the JSON-encoded data and stores the result in the value pointed to by v.
 // Refer to https://godoc.org/encoding/json#Unmarshal for more information
 func Unmarshal(data []byte, v interface{}) error {
-	return Con***REMOVED***gDefault.Unmarshal(data, v)
+	return ConfigDefault.Unmarshal(data, v)
 }
 
 // UnmarshalFromString convenient method to read from string instead of []byte
 func UnmarshalFromString(str string, v interface{}) error {
-	return Con***REMOVED***gDefault.UnmarshalFromString(str, v)
+	return ConfigDefault.UnmarshalFromString(str, v)
 }
 
 // Get quick method to get value from deeply nested JSON structure
 func Get(data []byte, path ...interface{}) Any {
-	return Con***REMOVED***gDefault.Get(data, path...)
+	return ConfigDefault.Get(data, path...)
 }
 
 // Marshal adapts to json/encoding Marshal API
@@ -31,17 +31,17 @@ func Get(data []byte, path ...interface{}) Any {
 // Marshal returns the JSON encoding of v, adapts to json/encoding Marshal API
 // Refer to https://godoc.org/encoding/json#Marshal for more information
 func Marshal(v interface{}) ([]byte, error) {
-	return Con***REMOVED***gDefault.Marshal(v)
+	return ConfigDefault.Marshal(v)
 }
 
-// MarshalIndent same as json.MarshalIndent. Pre***REMOVED***x is not supported.
-func MarshalIndent(v interface{}, pre***REMOVED***x, indent string) ([]byte, error) {
-	return Con***REMOVED***gDefault.MarshalIndent(v, pre***REMOVED***x, indent)
+// MarshalIndent same as json.MarshalIndent. Prefix is not supported.
+func MarshalIndent(v interface{}, prefix, indent string) ([]byte, error) {
+	return ConfigDefault.MarshalIndent(v, prefix, indent)
 }
 
 // MarshalToString convenient method to write as string instead of []byte
 func MarshalToString(v interface{}) (string, error) {
-	return Con***REMOVED***gDefault.MarshalToString(v)
+	return ConfigDefault.MarshalToString(v)
 }
 
 // NewDecoder adapts to json/stream NewDecoder API.
@@ -51,7 +51,7 @@ func MarshalToString(v interface{}) (string, error) {
 // Instead of a json/encoding Decoder, an Decoder is returned
 // Refer to https://godoc.org/encoding/json#NewDecoder for more information
 func NewDecoder(reader io.Reader) *Decoder {
-	return Con***REMOVED***gDefault.NewDecoder(reader)
+	return ConfigDefault.NewDecoder(reader)
 }
 
 // Decoder reads and decodes JSON values from an input stream.
@@ -98,23 +98,23 @@ func (adapter *Decoder) Buffered() io.Reader {
 // UseNumber causes the Decoder to unmarshal a number into an interface{} as a
 // Number instead of as a float64.
 func (adapter *Decoder) UseNumber() {
-	cfg := adapter.iter.cfg.con***REMOVED***gBeforeFrozen
+	cfg := adapter.iter.cfg.configBeforeFrozen
 	cfg.UseNumber = true
 	adapter.iter.cfg = cfg.frozeWithCacheReuse(adapter.iter.cfg.extraExtensions)
 }
 
 // DisallowUnknownFields causes the Decoder to return an error when the destination
 // is a struct and the input contains object keys which do not match any
-// non-ignored, exported ***REMOVED***elds in the destination.
+// non-ignored, exported fields in the destination.
 func (adapter *Decoder) DisallowUnknownFields() {
-	cfg := adapter.iter.cfg.con***REMOVED***gBeforeFrozen
+	cfg := adapter.iter.cfg.configBeforeFrozen
 	cfg.DisallowUnknownFields = true
 	adapter.iter.cfg = cfg.frozeWithCacheReuse(adapter.iter.cfg.extraExtensions)
 }
 
 // NewEncoder same as json.NewEncoder
 func NewEncoder(writer io.Writer) *Encoder {
-	return Con***REMOVED***gDefault.NewEncoder(writer)
+	return ConfigDefault.NewEncoder(writer)
 }
 
 // Encoder same as json.Encoder
@@ -130,21 +130,21 @@ func (adapter *Encoder) Encode(val interface{}) error {
 	return adapter.stream.Error
 }
 
-// SetIndent set the indention. Pre***REMOVED***x is not supported
-func (adapter *Encoder) SetIndent(pre***REMOVED***x, indent string) {
-	con***REMOVED***g := adapter.stream.cfg.con***REMOVED***gBeforeFrozen
-	con***REMOVED***g.IndentionStep = len(indent)
-	adapter.stream.cfg = con***REMOVED***g.frozeWithCacheReuse(adapter.stream.cfg.extraExtensions)
+// SetIndent set the indention. Prefix is not supported
+func (adapter *Encoder) SetIndent(prefix, indent string) {
+	config := adapter.stream.cfg.configBeforeFrozen
+	config.IndentionStep = len(indent)
+	adapter.stream.cfg = config.frozeWithCacheReuse(adapter.stream.cfg.extraExtensions)
 }
 
 // SetEscapeHTML escape html by default, set to false to disable
 func (adapter *Encoder) SetEscapeHTML(escapeHTML bool) {
-	con***REMOVED***g := adapter.stream.cfg.con***REMOVED***gBeforeFrozen
-	con***REMOVED***g.EscapeHTML = escapeHTML
-	adapter.stream.cfg = con***REMOVED***g.frozeWithCacheReuse(adapter.stream.cfg.extraExtensions)
+	config := adapter.stream.cfg.configBeforeFrozen
+	config.EscapeHTML = escapeHTML
+	adapter.stream.cfg = config.frozeWithCacheReuse(adapter.stream.cfg.extraExtensions)
 }
 
 // Valid reports whether data is a valid JSON encoding.
 func Valid(data []byte) bool {
-	return Con***REMOVED***gDefault.Valid(data)
+	return ConfigDefault.Valid(data)
 }

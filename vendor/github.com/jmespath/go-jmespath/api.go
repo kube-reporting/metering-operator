@@ -22,7 +22,7 @@ func Compile(expression string) (*JMESPath, error) {
 }
 
 // MustCompile is like Compile but panics if the expression cannot be parsed.
-// It simpli***REMOVED***es safe initialization of global variables holding compiled
+// It simplifies safe initialization of global variables holding compiled
 // JMESPaths.
 func MustCompile(expression string) *JMESPath {
 	jmespath, err := Compile(expression)

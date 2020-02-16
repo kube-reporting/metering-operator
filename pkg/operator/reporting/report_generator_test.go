@@ -29,7 +29,7 @@ func TestGenerateReport(t *testing.T) {
 			query:       testSQL,
 			expectedErr: errInvalidTableName.Error(),
 		},
-		"a table name and a ReportQuery with a query ***REMOVED***eld and deleteExistingData=true will succeed": {
+		"a table name and a ReportQuery with a query field and deleteExistingData=true will succeed": {
 			tableName:          tableName,
 			query:              testSQL,
 			deleteExistingData: true,
@@ -56,7 +56,7 @@ func TestGenerateReport(t *testing.T) {
 			err := reportGenerator.GenerateReport(tt.tableName, tt.query, tt.deleteExistingData)
 			if tt.expectedErr == "" {
 				assert.NoError(t, err, "expected GenerateReport to not error")
-			} ***REMOVED*** {
+			} else {
 				assert.EqualError(t, err, tt.expectedErr, "expected GenerateReport to error")
 			}
 		})

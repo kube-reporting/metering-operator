@@ -2,7 +2,7 @@
 Copyright 2018 The Kubernetes Authors.
 
 Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this ***REMOVED***le except in compliance with the License.
+you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
 
     http://www.apache.org/licenses/LICENSE-2.0
@@ -10,7 +10,7 @@ You may obtain a copy of the License at
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the speci***REMOVED***c language governing permissions and
+See the License for the specific language governing permissions and
 limitations under the License.
 */
 
@@ -43,12 +43,12 @@ func TokenSourceWrapTransport(ts oauth2.TokenSource) func(http.RoundTripper) htt
 }
 
 // NewCachedFileTokenSource returns a oauth2.TokenSource reads a token from a
-// ***REMOVED***le at a speci***REMOVED***ed path and periodically reloads it.
+// file at a specified path and periodically reloads it.
 func NewCachedFileTokenSource(path string) oauth2.TokenSource {
 	return &cachingTokenSource{
 		now:    time.Now,
 		leeway: 10 * time.Second,
-		base: &***REMOVED***leTokenSource{
+		base: &fileTokenSource{
 			path: path,
 			// This period was picked because it is half of the duration between when the kubelet
 			// refreshes a projected service account token and when the original token expires.
@@ -72,21 +72,21 @@ func (tst *tokenSourceTransport) RoundTrip(req *http.Request) (*http.Response, e
 	return tst.ort.RoundTrip(req)
 }
 
-type ***REMOVED***leTokenSource struct {
+type fileTokenSource struct {
 	path   string
 	period time.Duration
 }
 
-var _ = oauth2.TokenSource(&***REMOVED***leTokenSource{})
+var _ = oauth2.TokenSource(&fileTokenSource{})
 
-func (ts ****REMOVED***leTokenSource) Token() (*oauth2.Token, error) {
+func (ts *fileTokenSource) Token() (*oauth2.Token, error) {
 	tokb, err := ioutil.ReadFile(ts.path)
 	if err != nil {
-		return nil, fmt.Errorf("failed to read token ***REMOVED***le %q: %v", ts.path, err)
+		return nil, fmt.Errorf("failed to read token file %q: %v", ts.path, err)
 	}
 	tok := strings.TrimSpace(string(tokb))
 	if len(tok) == 0 {
-		return nil, fmt.Errorf("read empty token from ***REMOVED***le %q", ts.path)
+		return nil, fmt.Errorf("read empty token from file %q", ts.path)
 	}
 
 	return &oauth2.Token{

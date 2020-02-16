@@ -13,7 +13,7 @@ func PathJoin(elems ...string) string {
 		return ""
 	}
 
-	hasTrailing := strings.HasSuf***REMOVED***x(elems[len(elems)-1], "/")
+	hasTrailing := strings.HasSuffix(elems[len(elems)-1], "/")
 	str := path.Join(elems...)
 	if hasTrailing && str != "/" {
 		str += "/"

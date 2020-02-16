@@ -1,10 +1,10 @@
 // Copyright 2014 Google Inc. All rights reserved.
 // Use of this source code is governed by the Apache 2.0
-// license that can be found in the LICENSE ***REMOVED***le.
+// license that can be found in the LICENSE file.
 
 package internal
 
-// This ***REMOVED***le implements a network dialer that limits the number of concurrent connections.
+// This file implements a network dialer that limits the number of concurrent connections.
 // It is only used for API calls.
 
 import (

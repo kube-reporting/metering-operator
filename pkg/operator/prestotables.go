@@ -41,7 +41,7 @@ func (op *Reporting) processPrestoTable(logger log.FieldLogger) bool {
 	}
 	defer op.prestoTableQueue.Done(obj)
 
-	logger = logger.WithFields(newLogIdenti***REMOVED***er(op.rand))
+	logger = logger.WithFields(newLogIdentifier(op.rand))
 	if key, ok := op.getKeyFromQueueObj(logger, "PrestoTable", obj, op.prestoTableQueue); ok {
 		err := op.syncPrestoTable(logger, key)
 		const maxRequeues = 10
@@ -135,7 +135,7 @@ func (op *Reporting) handlePrestoTable(logger log.FieldLogger, prestoTable *mete
 		}
 
 		needsUpdate = copyPrestoTableSpecToStatus(prestoTable)
-	} ***REMOVED*** {
+	} else {
 		var tableStr string
 		switch {
 		case prestoTable.Spec.View:
@@ -230,10 +230,10 @@ func (op *Reporting) addPrestoTableFinalizer(prestoTable *metering.PrestoTable) 
 	newPrestoTable, err := op.meteringClient.MeteringV1().PrestoTables(prestoTable.Namespace).Update(prestoTable)
 	logger := op.logger.WithFields(log.Fields{"prestoTable": prestoTable.Name, "namespace": prestoTable.Namespace})
 	if err != nil {
-		logger.WithError(err).Errorf("error adding %s ***REMOVED***nalizer to PrestoTable: %s/%s", prestoTableFinalizer, prestoTable.Namespace, prestoTable.Name)
+		logger.WithError(err).Errorf("error adding %s finalizer to PrestoTable: %s/%s", prestoTableFinalizer, prestoTable.Namespace, prestoTable.Name)
 		return nil, err
 	}
-	logger.Infof("added %s ***REMOVED***nalizer to PrestoTable: %s/%s", prestoTableFinalizer, prestoTable.Namespace, prestoTable.Name)
+	logger.Infof("added %s finalizer to PrestoTable: %s/%s", prestoTableFinalizer, prestoTable.Namespace, prestoTable.Name)
 	return newPrestoTable, nil
 }
 
@@ -245,10 +245,10 @@ func (op *Reporting) removePrestoTableFinalizer(prestoTable *metering.PrestoTabl
 	newPrestoTable, err := op.meteringClient.MeteringV1().PrestoTables(prestoTable.Namespace).Update(prestoTable)
 	logger := op.logger.WithFields(log.Fields{"prestoTable": prestoTable.Name, "namespace": prestoTable.Namespace})
 	if err != nil {
-		logger.WithError(err).Errorf("error removing %s ***REMOVED***nalizer from PrestoTable: %s/%s", prestoTableFinalizer, prestoTable.Namespace, prestoTable.Name)
+		logger.WithError(err).Errorf("error removing %s finalizer from PrestoTable: %s/%s", prestoTableFinalizer, prestoTable.Namespace, prestoTable.Name)
 		return nil, err
 	}
-	logger.Infof("removed %s ***REMOVED***nalizer from PrestoTable: %s/%s", prestoTableFinalizer, prestoTable.Namespace, prestoTable.Name)
+	logger.Infof("removed %s finalizer from PrestoTable: %s/%s", prestoTableFinalizer, prestoTable.Namespace, prestoTable.Name)
 	return newPrestoTable, nil
 }
 
@@ -263,7 +263,7 @@ func (op *Reporting) dropPrestoTable(prestoTable *metering.PrestoTable) error {
 		}
 		if prestoTable.Status.View {
 			return op.prestoTableManager.DropView(prestoTable.Status.Catalog, prestoTable.Status.Schema, prestoTable.Status.TableName, true)
-		} ***REMOVED*** {
+		} else {
 			return op.prestoTableManager.DropTable(prestoTable.Status.Catalog, prestoTable.Status.Schema, prestoTable.Status.TableName, true)
 		}
 	}
@@ -273,7 +273,7 @@ func (op *Reporting) dropPrestoTable(prestoTable *metering.PrestoTable) error {
 	return errors.New("dropping PrestoTables is currently unsupported")
 }
 
-func (op *Reporting) createPrestoTableCR(obj metav1.Object, gvk schema.GroupVersionKind, catalog, schema, tableName string, columns []presto.Column, unmanaged, view bool, query string) (*metering.PrestoTable, error) {
+func (op *Reporting) createPrestoTableCR(obj metav1.Object, gvk schema.GroupVersionKind, catalog, schema, tableName string, columns []presto.Column, unmanaged, view, createTableAs bool, query string) (*metering.PrestoTable, error) {
 	apiVersion := gvk.GroupVersion().String()
 	kind := gvk.Kind
 	name := obj.GetName()
@@ -281,9 +281,9 @@ func (op *Reporting) createPrestoTableCR(obj metav1.Object, gvk schema.GroupVers
 	objLabels := obj.GetLabels()
 	ownerRef := metav1.NewControllerRef(obj, gvk)
 
-	var ***REMOVED***nalizers []string
+	var finalizers []string
 	if op.cfg.EnableFinalizers {
-		***REMOVED***nalizers = []string{prestoTableFinalizer}
+		finalizers = []string{prestoTableFinalizer}
 	}
 
 	resourceName := reportingutil.TableResourceNameFromKind(kind, namespace, name)
@@ -299,16 +299,17 @@ func (op *Reporting) createPrestoTableCR(obj metav1.Object, gvk schema.GroupVers
 			OwnerReferences: []metav1.OwnerReference{
 				*ownerRef,
 			},
-			Finalizers: ***REMOVED***nalizers,
+			Finalizers: finalizers,
 		},
 		Spec: metering.PrestoTableSpec{
-			Unmanaged: unmanaged,
-			Catalog:   catalog,
-			Schema:    schema,
-			TableName: tableName,
-			Columns:   columns,
-			View:      view,
-			Query:     query,
+			Unmanaged:     unmanaged,
+			Catalog:       catalog,
+			Schema:        schema,
+			TableName:     tableName,
+			Columns:       columns,
+			View:          view,
+			CreateTableAs: createTableAs,
+			Query:         query,
 		},
 	}
 	var err error

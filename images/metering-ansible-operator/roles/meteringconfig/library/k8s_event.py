@@ -32,22 +32,22 @@ extends_documentation_fragment:
   - k8s_auth_options
 
 options:
-  resource_de***REMOVED***nition:
+  resource_definition:
     description:
-    - A partial YAML de***REMOVED***nition of the Event object being created/updated. Here you can de***REMOVED***ne Kubernetes
+    - A partial YAML definition of the Event object being created/updated. Here you can define Kubernetes
       Event Resource parameters not covered by this module's parameters.
-    - "NOTE: I(resource_de***REMOVED***nition) has lower priority than module parameters. If you try to de***REMOVED***ne e.g.
+    - "NOTE: I(resource_definition) has lower priority than module parameters. If you try to define e.g.
       I(metadata.namespace) here, that value will be ignored and I(metadata) used instead."
     aliases:
-    - de***REMOVED***nition
+    - definition
     - inline
     type: dict
   state:
     description:
     - Determines if an object should be created, patched, or deleted. When set to C(present), an object will be
       created, if it does not already exist. If set to C(absent), an existing object will be deleted. If set to
-      C(present), an existing object will be patched, if its attributes differ from those speci***REMOVED***ed using
-      module options and I(resource_de***REMOVED***nition).
+      C(present), an existing object will be patched, if its attributes differ from those specified using
+      module options and I(resource_definition).
     default: present
     choices:
     - present
@@ -59,9 +59,9 @@ options:
     type: bool
   merge_type:
     description:
-    - Whether to override the default patch merge approach with a speci***REMOVED***c type. By default, the strategic
+    - Whether to override the default patch merge approach with a specific type. By default, the strategic
       merge will typically be used.
-    - For example, Custom Resource De***REMOVED***nitions typically aren't updatable by the usual strategic merge. You may
+    - For example, Custom Resource Definitions typically aren't updatable by the usual strategic merge. You may
       want to use C(merge) if you see "strategic merge patch format is not supported"
     - See U(https://kubernetes.io/docs/tasks/run-application/update-api-object-kubectl-patch/#use-a-json-merge-patch-to-update-a-deployment)
     - Requires openshift >= 0.6.2
@@ -167,8 +167,8 @@ result:
        description: Count of Event occurance
        returned: success
        type: int
-     ***REMOVED***rstTimestamp:
-       description: Timestamp of ***REMOVED***rst occurance of Event
+     firstTimestamp:
+       description: Timestamp of first occurance of Event
        returned: success
        type: timestamp
      involvedObject:
@@ -213,7 +213,7 @@ result:
 import copy
 import traceback
 import datetime
-import kubernetes.con***REMOVED***g.dateutil
+import kubernetes.config.dateutil
 import openshift
 
 from collections import defaultdict
@@ -265,15 +265,15 @@ class KubernetesEvent(KubernetesRawModule):
         event_type = self.params.get("type")
         source = self.params.get("source")
 
-        de***REMOVED***nition = defaultdict(defaultdict)
+        definition = defaultdict(defaultdict)
 
-        meta = de***REMOVED***nition["metadata"]
+        meta = definition["metadata"]
         meta["name"] = self.params.get("name")
         meta["namespace"] = self.params.get("namespace")
 
         involved_obj = self.params.get("involvedObject")
 
-        resource = self.***REMOVED***nd_resource("Event", "v1", fail=True)
+        resource = self.find_resource("Event", "v1", fail=True)
 
         prior_event = None
         try:
@@ -286,16 +286,16 @@ class KubernetesEvent(KubernetesRawModule):
 
         prior_count = 1
         now = datetime.datetime.now()
-        rfc = kubernetes.con***REMOVED***g.dateutil.format_rfc3339(now)
-        ***REMOVED***rst_timestamp = rfc
+        rfc = kubernetes.config.dateutil.format_rfc3339(now)
+        first_timestamp = rfc
         last_timestamp = rfc
 
         if prior_event and prior_event["reason"] == reason:
             prior_count = prior_event["count"] + 1
-            ***REMOVED***rst_timestamp = prior_event["***REMOVED***rstTimestamp"]
+            first_timestamp = prior_event["firstTimestamp"]
             last_timestamp = rfc
 
-        involved_object_resource = self.***REMOVED***nd_resource(involved_obj["kind"], "v1", fail=True)
+        involved_object_resource = self.find_resource(involved_obj["kind"], "v1", fail=True)
 
         if involved_object_resource:
             try:
@@ -312,7 +312,7 @@ class KubernetesEvent(KubernetesRawModule):
             "kind": "Event",
             "count": prior_count,
             "eventTime": None,
-            "***REMOVED***rstTimestamp": ***REMOVED***rst_timestamp,
+            "firstTimestamp": first_timestamp,
             "involvedObject": involved_obj,
             "lastTimestamp": last_timestamp,
             "message": message,

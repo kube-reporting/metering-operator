@@ -2,7 +2,7 @@
 Copyright 2015 The Kubernetes Authors.
 
 Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this ***REMOVED***le except in compliance with the License.
+you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
 
     http://www.apache.org/licenses/LICENSE-2.0
@@ -10,7 +10,7 @@ You may obtain a copy of the License at
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the speci***REMOVED***c language governing permissions and
+See the License for the specific language governing permissions and
 limitations under the License.
 */
 
@@ -18,7 +18,7 @@ package generators
 
 import (
 	"io"
-	"path/***REMOVED***lepath"
+	"path/filepath"
 	"strings"
 
 	"k8s.io/gengo/generator"
@@ -28,7 +28,7 @@ import (
 	"k8s.io/code-generator/cmd/client-gen/generators/util"
 )
 
-// genClientForType produces a ***REMOVED***le for each top-level type.
+// genClientForType produces a file for each top-level type.
 type genClientForType struct {
 	generator.DefaultGen
 	outputPackage    string
@@ -42,7 +42,7 @@ type genClientForType struct {
 
 var _ generator.Generator = &genClientForType{}
 
-// Filter ignores all but one type because we're making a single ***REMOVED***le per type.
+// Filter ignores all but one type because we're making a single file per type.
 func (g *genClientForType) Filter(c *generator.Context, t *types.Type) bool { return t == g.typeToMatch }
 
 func (g *genClientForType) Namers(c *generator.Context) namer.NameSystems {
@@ -57,7 +57,7 @@ func (g *genClientForType) Imports(c *generator.Context) (imports []string) {
 
 // Ideally, we'd like genStatus to return true if there is a subresource path
 // registered for "status" in the API server, but we do not have that
-// information, so genStatus returns true if the type has a status ***REMOVED***eld.
+// information, so genStatus returns true if the type has a status field.
 func genStatus(t *types.Type) bool {
 	// Default to true if we have a Status member
 	hasStatus := false
@@ -70,10 +70,10 @@ func genStatus(t *types.Type) bool {
 	return hasStatus && !util.MustParseClientGenTags(append(t.SecondClosestCommentLines, t.CommentLines...)).NoStatus
 }
 
-// GenerateType makes the body of a ***REMOVED***le implementing the individual typed client for type t.
+// GenerateType makes the body of a file implementing the individual typed client for type t.
 func (g *genClientForType) GenerateType(c *generator.Context, t *types.Type, w io.Writer) error {
 	sw := generator.NewSnippetWriter(w, c, "$", "$")
-	pkg := ***REMOVED***lepath.Base(t.Name.Package)
+	pkg := filepath.Base(t.Name.Package)
 	tags, err := util.ParseClientGenTags(append(t.SecondClosestCommentLines, t.CommentLines...))
 	if err != nil {
 		return err
@@ -92,7 +92,7 @@ func (g *genClientForType) GenerateType(c *generator.Context, t *types.Type, w i
 			if name, pkg := e.Input(); len(pkg) > 0 {
 				newType := c.Universe.Type(types.Name{Package: pkg, Name: name})
 				inputType = *newType
-			} ***REMOVED*** {
+			} else {
 				inputType.Name.Name = e.InputTypeOverride
 			}
 		}
@@ -100,15 +100,15 @@ func (g *genClientForType) GenerateType(c *generator.Context, t *types.Type, w i
 			if name, pkg := e.Result(); len(pkg) > 0 {
 				newType := c.Universe.Type(types.Name{Package: pkg, Name: name})
 				resultType = *newType
-			} ***REMOVED*** {
+			} else {
 				resultType.Name.Name = e.ResultTypeOverride
 			}
 		}
 		var updatedVerbtemplate string
 		if _, exists := subresourceDefaultVerbTemplates[e.VerbType]; e.IsSubresource() && exists {
-			updatedVerbtemplate = e.VerbName + "(" + strings.TrimPre***REMOVED***x(subresourceDefaultVerbTemplates[e.VerbType], strings.Title(e.VerbType)+"(")
-		} ***REMOVED*** {
-			updatedVerbtemplate = e.VerbName + "(" + strings.TrimPre***REMOVED***x(defaultVerbTemplates[e.VerbType], strings.Title(e.VerbType)+"(")
+			updatedVerbtemplate = e.VerbName + "(" + strings.TrimPrefix(subresourceDefaultVerbTemplates[e.VerbType], strings.Title(e.VerbType)+"(")
+		} else {
+			updatedVerbtemplate = e.VerbName + "(" + strings.TrimPrefix(defaultVerbTemplates[e.VerbType], strings.Title(e.VerbType)+"(")
 		}
 		extendedMethods = append(extendedMethods, extendedInterfaceMethod{
 			template: updatedVerbtemplate,
@@ -141,13 +141,13 @@ func (g *genClientForType) GenerateType(c *generator.Context, t *types.Type, w i
 		"PatchType":            c.Universe.Type(types.Name{Package: "k8s.io/apimachinery/pkg/types", Name: "PatchType"}),
 		"watchInterface":       c.Universe.Type(types.Name{Package: "k8s.io/apimachinery/pkg/watch", Name: "Interface"}),
 		"RESTClientInterface":  c.Universe.Type(types.Name{Package: "k8s.io/client-go/rest", Name: "Interface"}),
-		"schemeParameterCodec": c.Universe.Variable(types.Name{Package: ***REMOVED***lepath.Join(g.clientsetPackage, "scheme"), Name: "ParameterCodec"}),
+		"schemeParameterCodec": c.Universe.Variable(types.Name{Package: filepath.Join(g.clientsetPackage, "scheme"), Name: "ParameterCodec"}),
 	}
 
 	sw.Do(getterComment, m)
 	if tags.NonNamespaced {
 		sw.Do(getterNonNamespaced, m)
-	} ***REMOVED*** {
+	} else {
 		sw.Do(getterNamespaced, m)
 	}
 
@@ -156,14 +156,14 @@ func (g *genClientForType) GenerateType(c *generator.Context, t *types.Type, w i
 		if !genStatus(t) {
 			tags.SkipVerbs = append(tags.SkipVerbs, "updateStatus")
 		}
-		interfaceSuf***REMOVED***x := ""
+		interfaceSuffix := ""
 		if len(extendedMethods) > 0 {
-			interfaceSuf***REMOVED***x = "\n"
+			interfaceSuffix = "\n"
 		}
-		sw.Do("\n"+generateInterface(tags)+interfaceSuf***REMOVED***x, m)
+		sw.Do("\n"+generateInterface(tags)+interfaceSuffix, m)
 		// add extended verbs into interface
 		for _, v := range extendedMethods {
-			sw.Do(v.template+interfaceSuf***REMOVED***x, v.args)
+			sw.Do(v.template+interfaceSuffix, v.args)
 		}
 
 	}
@@ -172,7 +172,7 @@ func (g *genClientForType) GenerateType(c *generator.Context, t *types.Type, w i
 	if tags.NonNamespaced {
 		sw.Do(structNonNamespaced, m)
 		sw.Do(newStructNonNamespaced, m)
-	} ***REMOVED*** {
+	} else {
 		sw.Do(structNamespaced, m)
 		sw.Do(newStructNamespaced, m)
 	}
@@ -218,7 +218,7 @@ func (g *genClientForType) GenerateType(c *generator.Context, t *types.Type, w i
 			if name, pkg := e.Input(); len(pkg) > 0 {
 				newType := c.Universe.Type(types.Name{Package: pkg, Name: name})
 				inputType = *newType
-			} ***REMOVED*** {
+			} else {
 				inputType.Name.Name = e.InputTypeOverride
 			}
 		}
@@ -226,7 +226,7 @@ func (g *genClientForType) GenerateType(c *generator.Context, t *types.Type, w i
 			if name, pkg := e.Result(); len(pkg) > 0 {
 				newType := c.Universe.Type(types.Name{Package: pkg, Name: name})
 				resultType = *newType
-			} ***REMOVED*** {
+			} else {
 				resultType.Name.Name = e.ResultTypeOverride
 			}
 		}
@@ -237,7 +237,7 @@ func (g *genClientForType) GenerateType(c *generator.Context, t *types.Type, w i
 		if e.HasVerb("get") {
 			if e.IsSubresource() {
 				sw.Do(adjustTemplate(e.VerbName, e.VerbType, getSubresourceTemplate), m)
-			} ***REMOVED*** {
+			} else {
 				sw.Do(adjustTemplate(e.VerbName, e.VerbType, getTemplate), m)
 			}
 		}
@@ -245,7 +245,7 @@ func (g *genClientForType) GenerateType(c *generator.Context, t *types.Type, w i
 		if e.HasVerb("list") {
 			if e.IsSubresource() {
 				sw.Do(adjustTemplate(e.VerbName, e.VerbType, listSubresourceTemplate), m)
-			} ***REMOVED*** {
+			} else {
 				sw.Do(adjustTemplate(e.VerbName, e.VerbType, listTemplate), m)
 			}
 		}
@@ -258,7 +258,7 @@ func (g *genClientForType) GenerateType(c *generator.Context, t *types.Type, w i
 		if e.HasVerb("create") {
 			if e.IsSubresource() {
 				sw.Do(adjustTemplate(e.VerbName, e.VerbType, createSubresourceTemplate), m)
-			} ***REMOVED*** {
+			} else {
 				sw.Do(adjustTemplate(e.VerbName, e.VerbType, createTemplate), m)
 			}
 		}
@@ -266,7 +266,7 @@ func (g *genClientForType) GenerateType(c *generator.Context, t *types.Type, w i
 		if e.HasVerb("update") {
 			if e.IsSubresource() {
 				sw.Do(adjustTemplate(e.VerbName, e.VerbType, updateSubresourceTemplate), m)
-			} ***REMOVED*** {
+			} else {
 				sw.Do(adjustTemplate(e.VerbName, e.VerbType, updateTemplate), m)
 			}
 		}
@@ -385,7 +385,7 @@ func new$.type|publicPlural$(c *$.GroupGoName$$.Version$Client) *$.type|privateP
 }
 `
 var listTemplate = `
-// List takes label and ***REMOVED***eld selectors, and returns the list of $.resultType|publicPlural$ that match those selectors.
+// List takes label and field selectors, and returns the list of $.resultType|publicPlural$ that match those selectors.
 func (c *$.type|privatePlural$) List(opts $.ListOptions|raw$) (result *$.resultType|raw$List, err error) {
 	var timeout time.Duration
 	if opts.TimeoutSeconds != nil{
@@ -404,7 +404,7 @@ func (c *$.type|privatePlural$) List(opts $.ListOptions|raw$) (result *$.resultT
 `
 
 var listSubresourceTemplate = `
-// List takes $.type|raw$ name, label and ***REMOVED***eld selectors, and returns the list of $.resultType|publicPlural$ that match those selectors.
+// List takes $.type|raw$ name, label and field selectors, and returns the list of $.resultType|publicPlural$ that match those selectors.
 func (c *$.type|privatePlural$) List($.type|private$Name string, opts $.ListOptions|raw$) (result *$.resultType|raw$List, err error) {
 	var timeout time.Duration
 	if opts.TimeoutSeconds != nil{

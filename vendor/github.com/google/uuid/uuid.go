@@ -1,6 +1,6 @@
 // Copyright 2016 Google Inc.  All rights reserved.
 // Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE ***REMOVED***le.
+// license that can be found in the LICENSE file.
 
 package uuid
 
@@ -14,7 +14,7 @@ import (
 	"strings"
 )
 
-// A UUID is a 128 bit (16 byte) Universal Unique IDenti***REMOVED***er as de***REMOVED***ned in RFC
+// A UUID is a 128 bit (16 byte) Universal Unique IDentifier as defined in RFC
 // 4122.
 type UUID [16]byte
 
@@ -27,10 +27,10 @@ type Variant byte
 // Constants returned by Variant.
 const (
 	Invalid   = Variant(iota) // Invalid UUID
-	RFC4122                   // The variant speci***REMOVED***ed in RFC4122
+	RFC4122                   // The variant specified in RFC4122
 	Reserved                  // Reserved, NCS backward compatibility.
 	Microsoft                 // Reserved, Microsoft Corporation backward compatibility.
-	Future                    // Reserved for future de***REMOVED***nition.
+	Future                    // Reserved for future definition.
 )
 
 var rander = rand.Reader // random function
@@ -45,7 +45,7 @@ func Parse(s string) (UUID, error) {
 			return uuid, fmt.Errorf("invalid UUID length: %d", len(s))
 		}
 		if strings.ToLower(s[:9]) != "urn:uuid:" {
-			return uuid, fmt.Errorf("invalid urn pre***REMOVED***x: %q", s[:9])
+			return uuid, fmt.Errorf("invalid urn prefix: %q", s[:9])
 		}
 		s = s[9:]
 	}
@@ -75,7 +75,7 @@ func ParseBytes(b []byte) (UUID, error) {
 			return uuid, fmt.Errorf("invalid UUID length: %d", len(b))
 		}
 		if !bytes.Equal(bytes.ToLower(b[:9]), []byte("urn:uuid:")) {
-			return uuid, fmt.Errorf("invalid urn pre***REMOVED***x: %q", b[:9])
+			return uuid, fmt.Errorf("invalid urn prefix: %q", b[:9])
 		}
 		b = b[9:]
 	}

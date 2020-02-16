@@ -177,7 +177,7 @@ func yaml_parser_parse_stream_start(parser *yaml_parser_t, event *yaml_event_t) 
 		return false
 	}
 	if token.typ != yaml_STREAM_START_TOKEN {
-		return yaml_parser_set_parser_error(parser, "did not ***REMOVED***nd expected <stream-start>", token.start_mark)
+		return yaml_parser_set_parser_error(parser, "did not find expected <stream-start>", token.start_mark)
 	}
 	parser.state = yaml_PARSE_IMPLICIT_DOCUMENT_START_STATE
 	*event = yaml_event_t{
@@ -230,7 +230,7 @@ func yaml_parser_parse_document_start(parser *yaml_parser_t, event *yaml_event_t
 			end_mark:   token.end_mark,
 		}
 
-	} ***REMOVED*** if token.typ != yaml_STREAM_END_TOKEN {
+	} else if token.typ != yaml_STREAM_END_TOKEN {
 		// Parse an explicit document.
 		var version_directive *yaml_version_directive_t
 		var tag_directives []yaml_tag_directive_t
@@ -244,7 +244,7 @@ func yaml_parser_parse_document_start(parser *yaml_parser_t, event *yaml_event_t
 		}
 		if token.typ != yaml_DOCUMENT_START_TOKEN {
 			yaml_parser_set_parser_error(parser,
-				"did not ***REMOVED***nd expected <document start>", token.start_mark)
+				"did not find expected <document start>", token.start_mark)
 			return false
 		}
 		parser.states = append(parser.states, yaml_PARSE_DOCUMENT_END_STATE)
@@ -261,7 +261,7 @@ func yaml_parser_parse_document_start(parser *yaml_parser_t, event *yaml_event_t
 		}
 		skip_token(parser)
 
-	} ***REMOVED*** {
+	} else {
 		// Parse the stream end.
 		parser.state = yaml_PARSE_END_STATE
 		*event = yaml_event_t{
@@ -381,7 +381,7 @@ func yaml_parser_parse_node(parser *yaml_parser_t, event *yaml_event_t, block, i
 	end_mark := token.start_mark
 
 	var tag_token bool
-	var tag_handle, tag_suf***REMOVED***x, anchor []byte
+	var tag_handle, tag_suffix, anchor []byte
 	var tag_mark yaml_mark_t
 	if token.typ == yaml_ANCHOR_TOKEN {
 		anchor = token.value
@@ -395,7 +395,7 @@ func yaml_parser_parse_node(parser *yaml_parser_t, event *yaml_event_t, block, i
 		if token.typ == yaml_TAG_TOKEN {
 			tag_token = true
 			tag_handle = token.value
-			tag_suf***REMOVED***x = token.suf***REMOVED***x
+			tag_suffix = token.suffix
 			tag_mark = token.start_mark
 			end_mark = token.end_mark
 			skip_token(parser)
@@ -404,10 +404,10 @@ func yaml_parser_parse_node(parser *yaml_parser_t, event *yaml_event_t, block, i
 				return false
 			}
 		}
-	} ***REMOVED*** if token.typ == yaml_TAG_TOKEN {
+	} else if token.typ == yaml_TAG_TOKEN {
 		tag_token = true
 		tag_handle = token.value
-		tag_suf***REMOVED***x = token.suf***REMOVED***x
+		tag_suffix = token.suffix
 		start_mark = token.start_mark
 		tag_mark = token.start_mark
 		end_mark = token.end_mark
@@ -430,20 +430,20 @@ func yaml_parser_parse_node(parser *yaml_parser_t, event *yaml_event_t, block, i
 	var tag []byte
 	if tag_token {
 		if len(tag_handle) == 0 {
-			tag = tag_suf***REMOVED***x
-			tag_suf***REMOVED***x = nil
-		} ***REMOVED*** {
+			tag = tag_suffix
+			tag_suffix = nil
+		} else {
 			for i := range parser.tag_directives {
 				if bytes.Equal(parser.tag_directives[i].handle, tag_handle) {
-					tag = append([]byte(nil), parser.tag_directives[i].pre***REMOVED***x...)
-					tag = append(tag, tag_suf***REMOVED***x...)
+					tag = append([]byte(nil), parser.tag_directives[i].prefix...)
+					tag = append(tag, tag_suffix...)
 					break
 				}
 			}
 			if len(tag) == 0 {
 				yaml_parser_set_parser_error_context(parser,
 					"while parsing a node", start_mark,
-					"found unde***REMOVED***ned tag handle", tag_mark)
+					"found undefined tag handle", tag_mark)
 				return false
 			}
 		}
@@ -469,7 +469,7 @@ func yaml_parser_parse_node(parser *yaml_parser_t, event *yaml_event_t, block, i
 		end_mark = token.end_mark
 		if (len(tag) == 0 && token.style == yaml_PLAIN_SCALAR_STYLE) || (len(tag) == 1 && tag[0] == '!') {
 			plain_implicit = true
-		} ***REMOVED*** if len(tag) == 0 {
+		} else if len(tag) == 0 {
 			quoted_implicit = true
 		}
 		parser.state = parser.states[len(parser.states)-1]
@@ -568,7 +568,7 @@ func yaml_parser_parse_node(parser *yaml_parser_t, event *yaml_event_t, block, i
 		context = "while parsing a block node"
 	}
 	yaml_parser_set_parser_error_context(parser, context, start_mark,
-		"did not ***REMOVED***nd expected node content", token.start_mark)
+		"did not find expected node content", token.start_mark)
 	return false
 }
 
@@ -576,8 +576,8 @@ func yaml_parser_parse_node(parser *yaml_parser_t, event *yaml_event_t, block, i
 // block_sequence ::= BLOCK-SEQUENCE-START (BLOCK-ENTRY block_node?)* BLOCK-END
 //                    ********************  *********** *             *********
 //
-func yaml_parser_parse_block_sequence_entry(parser *yaml_parser_t, event *yaml_event_t, ***REMOVED***rst bool) bool {
-	if ***REMOVED***rst {
+func yaml_parser_parse_block_sequence_entry(parser *yaml_parser_t, event *yaml_event_t, first bool) bool {
+	if first {
 		token := peek_token(parser)
 		parser.marks = append(parser.marks, token.start_mark)
 		skip_token(parser)
@@ -598,7 +598,7 @@ func yaml_parser_parse_block_sequence_entry(parser *yaml_parser_t, event *yaml_e
 		if token.typ != yaml_BLOCK_ENTRY_TOKEN && token.typ != yaml_BLOCK_END_TOKEN {
 			parser.states = append(parser.states, yaml_PARSE_BLOCK_SEQUENCE_ENTRY_STATE)
 			return yaml_parser_parse_node(parser, event, true, false)
-		} ***REMOVED*** {
+		} else {
 			parser.state = yaml_PARSE_BLOCK_SEQUENCE_ENTRY_STATE
 			return yaml_parser_process_empty_scalar(parser, event, mark)
 		}
@@ -622,7 +622,7 @@ func yaml_parser_parse_block_sequence_entry(parser *yaml_parser_t, event *yaml_e
 	parser.marks = parser.marks[:len(parser.marks)-1]
 	return yaml_parser_set_parser_error_context(parser,
 		"while parsing a block collection", context_mark,
-		"did not ***REMOVED***nd expected '-' indicator", token.start_mark)
+		"did not find expected '-' indicator", token.start_mark)
 }
 
 // Parse the productions:
@@ -672,8 +672,8 @@ func yaml_parser_parse_indentless_sequence_entry(parser *yaml_parser_t, event *y
 //                          BLOCK-END
 //                          *********
 //
-func yaml_parser_parse_block_mapping_key(parser *yaml_parser_t, event *yaml_event_t, ***REMOVED***rst bool) bool {
-	if ***REMOVED***rst {
+func yaml_parser_parse_block_mapping_key(parser *yaml_parser_t, event *yaml_event_t, first bool) bool {
+	if first {
 		token := peek_token(parser)
 		parser.marks = append(parser.marks, token.start_mark)
 		skip_token(parser)
@@ -696,11 +696,11 @@ func yaml_parser_parse_block_mapping_key(parser *yaml_parser_t, event *yaml_even
 			token.typ != yaml_BLOCK_END_TOKEN {
 			parser.states = append(parser.states, yaml_PARSE_BLOCK_MAPPING_VALUE_STATE)
 			return yaml_parser_parse_node(parser, event, true, true)
-		} ***REMOVED*** {
+		} else {
 			parser.state = yaml_PARSE_BLOCK_MAPPING_VALUE_STATE
 			return yaml_parser_process_empty_scalar(parser, event, mark)
 		}
-	} ***REMOVED*** if token.typ == yaml_BLOCK_END_TOKEN {
+	} else if token.typ == yaml_BLOCK_END_TOKEN {
 		parser.state = parser.states[len(parser.states)-1]
 		parser.states = parser.states[:len(parser.states)-1]
 		parser.marks = parser.marks[:len(parser.marks)-1]
@@ -717,7 +717,7 @@ func yaml_parser_parse_block_mapping_key(parser *yaml_parser_t, event *yaml_even
 	parser.marks = parser.marks[:len(parser.marks)-1]
 	return yaml_parser_set_parser_error_context(parser,
 		"while parsing a block mapping", context_mark,
-		"did not ***REMOVED***nd expected key", token.start_mark)
+		"did not find expected key", token.start_mark)
 }
 
 // Parse the productions:
@@ -767,8 +767,8 @@ func yaml_parser_parse_block_mapping_value(parser *yaml_parser_t, event *yaml_ev
 // flow_sequence_entry  ::= flow_node | KEY flow_node? (VALUE flow_node?)?
 //                          *
 //
-func yaml_parser_parse_flow_sequence_entry(parser *yaml_parser_t, event *yaml_event_t, ***REMOVED***rst bool) bool {
-	if ***REMOVED***rst {
+func yaml_parser_parse_flow_sequence_entry(parser *yaml_parser_t, event *yaml_event_t, first bool) bool {
+	if first {
 		token := peek_token(parser)
 		parser.marks = append(parser.marks, token.start_mark)
 		skip_token(parser)
@@ -778,19 +778,19 @@ func yaml_parser_parse_flow_sequence_entry(parser *yaml_parser_t, event *yaml_ev
 		return false
 	}
 	if token.typ != yaml_FLOW_SEQUENCE_END_TOKEN {
-		if !***REMOVED***rst {
+		if !first {
 			if token.typ == yaml_FLOW_ENTRY_TOKEN {
 				skip_token(parser)
 				token = peek_token(parser)
 				if token == nil {
 					return false
 				}
-			} ***REMOVED*** {
+			} else {
 				context_mark := parser.marks[len(parser.marks)-1]
 				parser.marks = parser.marks[:len(parser.marks)-1]
 				return yaml_parser_set_parser_error_context(parser,
 					"while parsing a flow sequence", context_mark,
-					"did not ***REMOVED***nd expected ',' or ']'", token.start_mark)
+					"did not find expected ',' or ']'", token.start_mark)
 			}
 		}
 
@@ -805,7 +805,7 @@ func yaml_parser_parse_flow_sequence_entry(parser *yaml_parser_t, event *yaml_ev
 			}
 			skip_token(parser)
 			return true
-		} ***REMOVED*** if token.typ != yaml_FLOW_SEQUENCE_END_TOKEN {
+		} else if token.typ != yaml_FLOW_SEQUENCE_END_TOKEN {
 			parser.states = append(parser.states, yaml_PARSE_FLOW_SEQUENCE_ENTRY_STATE)
 			return yaml_parser_parse_node(parser, event, false, false)
 		}
@@ -901,8 +901,8 @@ func yaml_parser_parse_flow_sequence_entry_mapping_end(parser *yaml_parser_t, ev
 // flow_mapping_entry   ::= flow_node | KEY flow_node? (VALUE flow_node?)?
 //                          *           *** *
 //
-func yaml_parser_parse_flow_mapping_key(parser *yaml_parser_t, event *yaml_event_t, ***REMOVED***rst bool) bool {
-	if ***REMOVED***rst {
+func yaml_parser_parse_flow_mapping_key(parser *yaml_parser_t, event *yaml_event_t, first bool) bool {
+	if first {
 		token := peek_token(parser)
 		parser.marks = append(parser.marks, token.start_mark)
 		skip_token(parser)
@@ -914,19 +914,19 @@ func yaml_parser_parse_flow_mapping_key(parser *yaml_parser_t, event *yaml_event
 	}
 
 	if token.typ != yaml_FLOW_MAPPING_END_TOKEN {
-		if !***REMOVED***rst {
+		if !first {
 			if token.typ == yaml_FLOW_ENTRY_TOKEN {
 				skip_token(parser)
 				token = peek_token(parser)
 				if token == nil {
 					return false
 				}
-			} ***REMOVED*** {
+			} else {
 				context_mark := parser.marks[len(parser.marks)-1]
 				parser.marks = parser.marks[:len(parser.marks)-1]
 				return yaml_parser_set_parser_error_context(parser,
 					"while parsing a flow mapping", context_mark,
-					"did not ***REMOVED***nd expected ',' or '}'", token.start_mark)
+					"did not find expected ',' or '}'", token.start_mark)
 			}
 		}
 
@@ -941,11 +941,11 @@ func yaml_parser_parse_flow_mapping_key(parser *yaml_parser_t, event *yaml_event
 				token.typ != yaml_FLOW_MAPPING_END_TOKEN {
 				parser.states = append(parser.states, yaml_PARSE_FLOW_MAPPING_VALUE_STATE)
 				return yaml_parser_parse_node(parser, event, false, false)
-			} ***REMOVED*** {
+			} else {
 				parser.state = yaml_PARSE_FLOW_MAPPING_VALUE_STATE
 				return yaml_parser_process_empty_scalar(parser, event, token.start_mark)
 			}
-		} ***REMOVED*** if token.typ != yaml_FLOW_MAPPING_END_TOKEN {
+		} else if token.typ != yaml_FLOW_MAPPING_END_TOKEN {
 			parser.states = append(parser.states, yaml_PARSE_FLOW_MAPPING_EMPTY_VALUE_STATE)
 			return yaml_parser_parse_node(parser, event, false, false)
 		}
@@ -1038,10 +1038,10 @@ func yaml_parser_process_directives(parser *yaml_parser_t,
 				major: token.major,
 				minor: token.minor,
 			}
-		} ***REMOVED*** if token.typ == yaml_TAG_DIRECTIVE_TOKEN {
+		} else if token.typ == yaml_TAG_DIRECTIVE_TOKEN {
 			value := yaml_tag_directive_t{
 				handle: token.value,
-				pre***REMOVED***x: token.pre***REMOVED***x,
+				prefix: token.prefix,
 			}
 			if !yaml_parser_append_tag_directive(parser, value, false, token.start_mark) {
 				return false
@@ -1086,10 +1086,10 @@ func yaml_parser_append_tag_directive(parser *yaml_parser_t, value yaml_tag_dire
 	// because there was no way to track ownership of the data.
 	value_copy := yaml_tag_directive_t{
 		handle: make([]byte, len(value.handle)),
-		pre***REMOVED***x: make([]byte, len(value.pre***REMOVED***x)),
+		prefix: make([]byte, len(value.prefix)),
 	}
 	copy(value_copy.handle, value.handle)
-	copy(value_copy.pre***REMOVED***x, value.pre***REMOVED***x)
+	copy(value_copy.prefix, value.prefix)
 	parser.tag_directives = append(parser.tag_directives, value_copy)
 	return true
 }

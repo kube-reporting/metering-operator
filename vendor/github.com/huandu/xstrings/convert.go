@@ -1,5 +1,5 @@
 // Copyright 2015 Huan Du. All rights reserved.
-// Licensed under the MIT license that can be found in the LICENSE ***REMOVED***le.
+// Licensed under the MIT license that can be found in the LICENSE file.
 
 package xstrings
 
@@ -58,7 +58,7 @@ func ToCamelCase(str string) string {
 
 		if r1 == '_' {
 			r0 = unicode.ToUpper(r0)
-		} ***REMOVED*** {
+		} else {
 			r0 = unicode.ToLower(r0)
 		}
 
@@ -75,7 +75,7 @@ func ToCamelCase(str string) string {
 // snake case format.
 //
 // Some samples.
-//     "FirstName"  => "***REMOVED***rst_name"
+//     "FirstName"  => "first_name"
 //     "HTTPServer" => "http_server"
 //     "NoHTTPS"    => "no_https"
 //     "GO_PATH"    => "go_path"
@@ -92,7 +92,7 @@ func ToSnakeCase(str string) string {
 // kebab case format.
 //
 // Some samples.
-//     "FirstName"  => "***REMOVED***rst-name"
+//     "FirstName"  => "first-name"
 //     "HTTPServer" => "http-server"
 //     "NoHTTPS"    => "no-https"
 //     "GO_PATH"    => "go-path"
@@ -144,7 +144,7 @@ func camelCaseToLowerCase(str string, connector rune) string {
 				break
 			}
 
-			// ***REMOVED***nd next non-upper-case character and insert connector properly.
+			// find next non-upper-case character and insert connector properly.
 			// it's designed to convert `HTTPServer` to `http_server`.
 			// if there are more than 2 adjacent upper case characters in a word,
 			// treat them as an abbreviation plus a normal word.
@@ -164,13 +164,13 @@ func camelCaseToLowerCase(str string, connector rune) string {
 						r0 = connector
 
 						buf.WriteRune(unicode.ToLower(r1))
-					} ***REMOVED*** if unicode.IsNumber(r0) {
+					} else if unicode.IsNumber(r0) {
 						// treat a number as an upper case rune
 						// so that both `http2xx` and `HTTP2XX` can be converted to `http_2xx`.
 						buf.WriteRune(unicode.ToLower(r1))
 						buf.WriteRune(connector)
 						buf.WriteRune(r0)
-					} ***REMOVED*** {
+					} else {
 						buf.WriteRune(connector)
 						buf.WriteRune(unicode.ToLower(r1))
 						buf.WriteRune(r0)
@@ -232,7 +232,7 @@ func SwapCase(str string) string {
 	return buf.String()
 }
 
-// FirstRuneToUpper converts ***REMOVED***rst rune to upper case if necessary.
+// FirstRuneToUpper converts first rune to upper case if necessary.
 func FirstRuneToUpper(str string) string {
 	if str == "" {
 		return str
@@ -250,7 +250,7 @@ func FirstRuneToUpper(str string) string {
 	return buf.String()
 }
 
-// FirstRuneToLower converts ***REMOVED***rst rune to lower case if necessary.
+// FirstRuneToLower converts first rune to lower case if necessary.
 func FirstRuneToLower(str string) string {
 	if str == "" {
 		return str

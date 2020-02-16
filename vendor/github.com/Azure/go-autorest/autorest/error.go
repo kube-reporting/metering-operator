@@ -3,7 +3,7 @@ package autorest
 // Copyright 2017 Microsoft Corporation
 //
 //  Licensed under the Apache License, Version 2.0 (the "License");
-//  you may not use this ***REMOVED***le except in compliance with the License.
+//  you may not use this file except in compliance with the License.
 //  You may obtain a copy of the License at
 //
 //      http://www.apache.org/licenses/LICENSE-2.0
@@ -11,7 +11,7 @@ package autorest
 //  Unless required by applicable law or agreed to in writing, software
 //  distributed under the License is distributed on an "AS IS" BASIS,
 //  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-//  See the License for the speci***REMOVED***c language governing permissions and
+//  See the License for the specific language governing permissions and
 //  limitations under the License.
 
 import (
@@ -20,8 +20,8 @@ import (
 )
 
 const (
-	// Unde***REMOVED***nedStatusCode is used when HTTP status code is not available for an error.
-	Unde***REMOVED***nedStatusCode = 0
+	// UndefinedStatusCode is used when HTTP status code is not available for an error.
+	UndefinedStatusCode = 0
 )
 
 // DetailedError encloses a error with details of the package, method, and associated HTTP
@@ -30,7 +30,7 @@ type DetailedError struct {
 	Original error
 
 	// PackageType is the package type of the object emitting the error. For types, the value
-	// matches that produced the the '%T' format speci***REMOVED***er of the fmt package. For other elements,
+	// matches that produced the the '%T' format specifier of the fmt package. For other elements,
 	// such as functions, it is just the package name (e.g., "autorest").
 	PackageType string
 
@@ -57,7 +57,7 @@ func NewError(packageType string, method string, message string, args ...interfa
 }
 
 // NewErrorWithResponse creates a new Error conforming object from the passed
-// packageType, method, statusCode of the given resp (Unde***REMOVED***nedStatusCode if
+// packageType, method, statusCode of the given resp (UndefinedStatusCode if
 // resp is nil), and message. message is treated as a format string to which the
 // optional args apply.
 func NewErrorWithResponse(packageType string, method string, resp *http.Response, message string, args ...interface{}) DetailedError {
@@ -65,7 +65,7 @@ func NewErrorWithResponse(packageType string, method string, resp *http.Response
 }
 
 // NewErrorWithError creates a new Error conforming object from the
-// passed packageType, method, statusCode of the given resp (Unde***REMOVED***nedStatusCode
+// passed packageType, method, statusCode of the given resp (UndefinedStatusCode
 // if resp is nil), message, and original error. message is treated as a format
 // string to which the optional args apply.
 func NewErrorWithError(original error, packageType string, method string, resp *http.Response, message string, args ...interface{}) DetailedError {
@@ -73,7 +73,7 @@ func NewErrorWithError(original error, packageType string, method string, resp *
 		return v
 	}
 
-	statusCode := Unde***REMOVED***nedStatusCode
+	statusCode := UndefinedStatusCode
 	if resp != nil {
 		statusCode = resp.StatusCode
 	}

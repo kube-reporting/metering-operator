@@ -1,6 +1,6 @@
 // Copyright 2011 The Go Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE ***REMOVED***le.
+// license that can be found in the LICENSE file.
 
 // +build darwin dragonfly freebsd linux,!appengine netbsd openbsd
 
@@ -25,13 +25,13 @@ type State struct {
 	termios unix.Termios
 }
 
-// IsTerminal returns true if the given ***REMOVED***le descriptor is a terminal.
+// IsTerminal returns true if the given file descriptor is a terminal.
 func IsTerminal(fd int) bool {
 	_, err := unix.IoctlGetTermios(fd, ioctlReadTermios)
 	return err == nil
 }
 
-// MakeRaw put the terminal connected to the given ***REMOVED***le descriptor into raw
+// MakeRaw put the terminal connected to the given file descriptor into raw
 // mode and returns the previous state of the terminal so that it can be
 // restored.
 func MakeRaw(fd int) (*State, error) {
@@ -69,7 +69,7 @@ func GetState(fd int) (*State, error) {
 	return &State{termios: *termios}, nil
 }
 
-// Restore restores the terminal connected to the given ***REMOVED***le descriptor to a
+// Restore restores the terminal connected to the given file descriptor to a
 // previous state.
 func Restore(fd int, state *State) error {
 	return unix.IoctlSetTermios(fd, ioctlWriteTermios, &state.termios)
@@ -84,7 +84,7 @@ func GetSize(fd int) (width, height int, err error) {
 	return int(ws.Col), int(ws.Row), nil
 }
 
-// passwordReader is an io.Reader that reads from a speci***REMOVED***c ***REMOVED***le descriptor.
+// passwordReader is an io.Reader that reads from a specific file descriptor.
 type passwordReader int
 
 func (r passwordReader) Read(buf []byte) (int, error) {

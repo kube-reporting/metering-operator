@@ -61,7 +61,7 @@ func (r ReaderSeekerCloser) Read(p []byte) (int, error) {
 }
 
 // Seek sets the offset for the next Read to offset, interpreted according to
-// whence: 0 means relative to the origin of the ***REMOVED***le, 1 means relative to the
+// whence: 0 means relative to the origin of the file, 1 means relative to the
 // current offset, and 2 means relative to the end. Seek returns the new offset
 // and an error, if any.
 //
@@ -95,7 +95,7 @@ func (r ReaderSeekerCloser) HasLen() (int, bool) {
 }
 
 // GetLen returns the length of the bytes remaining in the underlying reader.
-// Checks ***REMOVED***rst for Len(), then io.Seeker to determine the size of the
+// Checks first for Len(), then io.Seeker to determine the size of the
 // underlying reader.
 //
 // Will return -1 if the length cannot be determined.
@@ -163,9 +163,9 @@ type WriteAtBuffer struct {
 	buf []byte
 	m   sync.Mutex
 
-	// GrowthCoeff de***REMOVED***nes the growth rate of the internal buffer. By
+	// GrowthCoeff defines the growth rate of the internal buffer. By
 	// default, the growth rate is 1, where expanding the internal
-	// buffer will allocate only enough capacity to ***REMOVED***t the new expected
+	// buffer will allocate only enough capacity to fit the new expected
 	// length.
 	GrowthCoeff float64
 }

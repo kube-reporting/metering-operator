@@ -40,7 +40,7 @@ const (
 
 // A Request is the service request to be made.
 type Request struct {
-	Con***REMOVED***g     aws.Con***REMOVED***g
+	Config     aws.Config
 	ClientInfo metadata.ClientInfo
 	Handlers   Handlers
 
@@ -74,7 +74,7 @@ type Request struct {
 	ThrottleErrorCodes []string
 
 	// A value greater than 0 instructs the request to be signed as Presigned URL
-	// You should not set this ***REMOVED***eld directly. Instead use Request's
+	// You should not set this field directly. Instead use Request's
 	// Presign or PresignRequest methods.
 	ExpireTime time.Duration
 
@@ -105,7 +105,7 @@ type Operation struct {
 // Params is any value of input parameters to be the request payload.
 // Data is pointer value to an object which the request's response
 // payload will be deserialized to.
-func New(cfg aws.Con***REMOVED***g, clientInfo metadata.ClientInfo, handlers Handlers,
+func New(cfg aws.Config, clientInfo metadata.ClientInfo, handlers Handlers,
 	retryer Retryer, operation *Operation, params interface{}, data interface{}) *Request {
 
 	method := operation.HTTPMethod
@@ -125,7 +125,7 @@ func New(cfg aws.Con***REMOVED***g, clientInfo metadata.ClientInfo, handlers Han
 	SanitizeHostForHeader(httpReq)
 
 	r := &Request{
-		Con***REMOVED***g:     cfg,
+		Config:     cfg,
 		ClientInfo: clientInfo,
 		Handlers:   handlers.Copy(),
 
@@ -182,13 +182,13 @@ func WithGetResponseHeaders(headers *http.Header) Option {
 	}
 }
 
-// WithLogLevel is a request option that will set the request to use a speci***REMOVED***c
+// WithLogLevel is a request option that will set the request to use a specific
 // log level when the request is made.
 //
 //     svc.PutObjectWithContext(ctx, params, request.WithLogLevel(aws.LogDebugWithHTTPBody)
 func WithLogLevel(l aws.LogLevelType) Option {
 	return func(r *Request) {
-		r.Con***REMOVED***g.LogLevel = aws.LogLevel(l)
+		r.Config.LogLevel = aws.LogLevel(l)
 	}
 }
 
@@ -218,8 +218,8 @@ func (r *Request) Context() aws.Context {
 // requests. A new Request should be created for each API operation request.
 //
 // Go 1.6 and below:
-// The http.Request's Cancel ***REMOVED***eld will be set to the Done() value of
-// the context. This will overwrite the Cancel ***REMOVED***eld's value.
+// The http.Request's Cancel field will be set to the Done() value of
+// the context. This will overwrite the Cancel field's value.
 //
 // Go 1.7 and above:
 // The http.Request.WithContext will be used to set the context on the underlying
@@ -289,7 +289,7 @@ func (r *Request) SetReaderBody(reader io.ReadSeeker) {
 
 // Presign returns the request's signed URL. Error will be returned
 // if the signing fails. The expire parameter is only used for presigned Amazon
-// S3 API requests. All other AWS services will use a ***REMOVED***xed expiration
+// S3 API requests. All other AWS services will use a fixed expiration
 // time of 15 minutes.
 //
 // It is invalid to create a presigned URL with a expire duration 0 or less. An
@@ -308,7 +308,7 @@ func (r *Request) Presign(expire time.Duration) (string, error) {
 
 // PresignRequest behaves just like presign, with the addition of returning a
 // set of headers that were signed. The expire parameter is only used for
-// presigned Amazon S3 API requests. All other AWS services will use a ***REMOVED***xed
+// presigned Amazon S3 API requests. All other AWS services will use a fixed
 // expiration time of 15 minutes.
 //
 // It is invalid to create a presigned URL with a expire duration 0 or less. An
@@ -359,11 +359,11 @@ const (
 )
 
 func debugLogReqError(r *Request, stage, retryStr string, err error) {
-	if !r.Con***REMOVED***g.LogLevel.Matches(aws.LogDebugWithRequestErrors) {
+	if !r.Config.LogLevel.Matches(aws.LogDebugWithRequestErrors) {
 		return
 	}
 
-	r.Con***REMOVED***g.Logger.Log(fmt.Sprintf("DEBUG: %s %s/%s failed, %s, error %v",
+	r.Config.Logger.Log(fmt.Sprintf("DEBUG: %s %s/%s failed, %s, error %v",
 		stage, r.ClientInfo.ServiceName, r.Operation.Name, retryStr, err))
 }
 
@@ -421,7 +421,7 @@ func (r *Request) getNextRequestBody() (body io.ReadCloser, err error) {
 			"failed to get next request body reader", err)
 	}
 
-	// Go 1.8 tightened and clari***REMOVED***ed the rules code needs to use when building
+	// Go 1.8 tightened and clarified the rules code needs to use when building
 	// requests with the http package. Go 1.8 removed the automatic detection
 	// of if the Request.Body was empty, or actually had bytes in it. The SDK
 	// always sets the Request.Body even if it is empty and should not actually
@@ -430,8 +430,8 @@ func (r *Request) getNextRequestBody() (body io.ReadCloser, err error) {
 	// Go 1.8 did add a http.NoBody value that the SDK can use to tell the http
 	// client that the request really should be sent without a body. The
 	// Request.Body cannot be set to nil, which is preferable, because the
-	// ***REMOVED***eld is exported and could introduce nil pointer dereferences for users
-	// of the SDK if they used that ***REMOVED***eld.
+	// field is exported and could introduce nil pointer dereferences for users
+	// of the SDK if they used that field.
 	//
 	// Related golang/go#18257
 	l, err := aws.SeekerLen(r.Body)
@@ -442,9 +442,9 @@ func (r *Request) getNextRequestBody() (body io.ReadCloser, err error) {
 
 	if l == 0 {
 		body = NoBody
-	} ***REMOVED*** if l > 0 {
+	} else if l > 0 {
 		body = r.safeBody
-	} ***REMOVED*** {
+	} else {
 		// Hack to prevent sending bodies for methods where the body
 		// should be ignored by the server. Sending bodies on these
 		// methods without an associated ContentLength will cause the
@@ -522,8 +522,8 @@ func (r *Request) Send() error {
 }
 
 func (r *Request) prepareRetry() error {
-	if r.Con***REMOVED***g.LogLevel.Matches(aws.LogDebugWithRequestRetries) {
-		r.Con***REMOVED***g.Logger.Log(fmt.Sprintf("DEBUG: Retrying Request %s/%s, attempt %d",
+	if r.Config.LogLevel.Matches(aws.LogDebugWithRequestRetries) {
+		r.Config.Logger.Log(fmt.Sprintf("DEBUG: Retrying Request %s/%s, attempt %d",
 			r.ClientInfo.ServiceName, r.Operation.Name, r.RetryCount))
 	}
 
@@ -622,7 +622,7 @@ func getHost(r *http.Request) string {
 //
 // If Host is an IPv6 literal with a port number, Hostname returns the
 // IPv6 literal without the square brackets. IPv6 literals may include
-// a zone identi***REMOVED***er.
+// a zone identifier.
 //
 // Copied from the Go 1.8 standard library (net/url)
 func stripPort(hostport string) string {
@@ -631,7 +631,7 @@ func stripPort(hostport string) string {
 		return hostport
 	}
 	if i := strings.IndexByte(hostport, ']'); i != -1 {
-		return strings.TrimPre***REMOVED***x(hostport[:i], "[")
+		return strings.TrimPrefix(hostport[:i], "[")
 	}
 	return hostport[:colon]
 }
@@ -654,7 +654,7 @@ func portOnly(hostport string) string {
 	return hostport[colon+len(":"):]
 }
 
-// Returns true if the speci***REMOVED***ed URI is using the standard port
+// Returns true if the specified URI is using the standard port
 // (i.e. port 80 for HTTP URIs or 443 for HTTPS URIs)
 func isDefaultPort(scheme, port string) bool {
 	if port == "" {

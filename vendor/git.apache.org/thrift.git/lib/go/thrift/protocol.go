@@ -1,10 +1,10 @@
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements. See the NOTICE ***REMOVED***le
+ * or more contributor license agreements. See the NOTICE file
  * distributed with this work for additional information
- * regarding copyright ownership. The ASF licenses this ***REMOVED***le
+ * regarding copyright ownership. The ASF licenses this file
  * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this ***REMOVED***le except in compliance
+ * "License"); you may not use this file except in compliance
  * with the License. You may obtain a copy of the License at
  *
  *   http://www.apache.org/licenses/LICENSE-2.0
@@ -13,7 +13,7 @@
  * software distributed under the License is distributed on an
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
  * KIND, either express or implied. See the License for the
- * speci***REMOVED***c language governing permissions and limitations
+ * specific language governing permissions and limitations
  * under the License.
  */
 
@@ -73,7 +73,7 @@ type TProtocol interface {
 	ReadString() (value string, err error)
 	ReadBinary() (value []byte, err error)
 
-	Skip(***REMOVED***eldType TType) (err error)
+	Skip(fieldType TType) (err error)
 	Flush() (err error)
 
 	Transport() TTransport
@@ -88,13 +88,13 @@ func SkipDefaultDepth(prot TProtocol, typeId TType) (err error) {
 }
 
 // Skips over the next data element from the provided input TProtocol object.
-func Skip(self TProtocol, ***REMOVED***eldType TType, maxDepth int) (err error) {
+func Skip(self TProtocol, fieldType TType, maxDepth int) (err error) {
 
 	if maxDepth <= 0 {
 		return NewTProtocolExceptionWithType(DEPTH_LIMIT, errors.New("Depth limit exceeded"))
 	}
 
-	switch ***REMOVED***eldType {
+	switch fieldType {
 	case STOP:
 		return
 	case BOOL:
@@ -172,7 +172,7 @@ func Skip(self TProtocol, ***REMOVED***eldType TType, maxDepth int) (err error) 
 		}
 		return self.ReadListEnd()
 	default:
-		return NewTProtocolExceptionWithType(INVALID_DATA, errors.New(fmt.Sprintf("Unknown data type %d", ***REMOVED***eldType)))
+		return NewTProtocolExceptionWithType(INVALID_DATA, errors.New(fmt.Sprintf("Unknown data type %d", fieldType)))
 	}
 	return nil
 }

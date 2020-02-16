@@ -1,9 +1,9 @@
 // Copyright 2014 The Go Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE ***REMOVED***le.
+// license that can be found in the LICENSE file.
 
 // Package hpack implements HPACK, a compression format for
-// ef***REMOVED***ciently representing HTTP header ***REMOVED***elds in the context of HTTP/2.
+// efficiently representing HTTP header fields in the context of HTTP/2.
 //
 // See http://tools.ietf.org/html/draft-ietf-httpbis-header-compression-09
 package hpack
@@ -14,7 +14,7 @@ import (
 	"fmt"
 )
 
-// A DecodingError is something the spec de***REMOVED***nes as a decoding error.
+// A DecodingError is something the spec defines as a decoding error.
 type DecodingError struct {
 	Err error
 }
@@ -36,25 +36,25 @@ func (e InvalidIndexError) Error() string {
 type HeaderField struct {
 	Name, Value string
 
-	// Sensitive means that this header ***REMOVED***eld should never be
+	// Sensitive means that this header field should never be
 	// indexed.
 	Sensitive bool
 }
 
-// IsPseudo reports whether the header ***REMOVED***eld is an http2 pseudo header.
+// IsPseudo reports whether the header field is an http2 pseudo header.
 // That is, it reports whether it starts with a colon.
-// It is not otherwise guaranteed to be a valid pseudo header ***REMOVED***eld,
+// It is not otherwise guaranteed to be a valid pseudo header field,
 // though.
 func (hf HeaderField) IsPseudo() bool {
 	return len(hf.Name) != 0 && hf.Name[0] == ':'
 }
 
 func (hf HeaderField) String() string {
-	var suf***REMOVED***x string
+	var suffix string
 	if hf.Sensitive {
-		suf***REMOVED***x = " (sensitive)"
+		suffix = " (sensitive)"
 	}
-	return fmt.Sprintf("header ***REMOVED***eld %q = %q%s", hf.Name, hf.Value, suf***REMOVED***x)
+	return fmt.Sprintf("header field %q = %q%s", hf.Name, hf.Value, suffix)
 }
 
 // Size returns the size of an entry per RFC 7541 section 4.1.
@@ -62,7 +62,7 @@ func (hf HeaderField) Size() uint32 {
 	// http://http2.github.io/http2-spec/compression.html#rfc.section.4.1
 	// "The size of the dynamic table is the sum of the size of
 	// its entries. The size of an entry is the sum of its name's
-	// length in octets (as de***REMOVED***ned in Section 5.2), its value's
+	// length in octets (as defined in Section 5.2), its value's
 	// length in octets (see Section 5.2), plus 32.  The size of
 	// an entry is calculated using the length of the name and
 	// value without any Huffman encoding applied."
@@ -95,7 +95,7 @@ type Decoder struct {
 }
 
 // NewDecoder returns a new decoder with the provided maximum dynamic
-// table size. The emitFunc will be called for each valid ***REMOVED***eld
+// table size. The emitFunc will be called for each valid field
 // parsed, in the same goroutine as calls to Write, before Write returns.
 func NewDecoder(maxDynamicTableSize uint32, emitFunc func(f HeaderField)) *Decoder {
 	d := &Decoder{
@@ -109,7 +109,7 @@ func NewDecoder(maxDynamicTableSize uint32, emitFunc func(f HeaderField)) *Decod
 }
 
 // ErrStringLength is returned by Decoder.Write when the max string length
-// (as con***REMOVED***gured by Decoder.SetMaxStringLength) would be violated.
+// (as configured by Decoder.SetMaxStringLength) would be violated.
 var ErrStringLength = errors.New("hpack: string too long")
 
 // SetMaxStringLength sets the maximum size of a HeaderField name or
@@ -120,7 +120,7 @@ func (d *Decoder) SetMaxStringLength(n int) {
 	d.maxStrLen = n
 }
 
-// SetEmitFunc changes the callback used when new header ***REMOVED***elds
+// SetEmitFunc changes the callback used when new header fields
 // are decoded.
 // It must be non-nil. It does not affect EmitEnabled.
 func (d *Decoder) SetEmitFunc(emitFunc func(f HeaderField)) {
@@ -133,7 +133,7 @@ func (d *Decoder) SetEmitFunc(emitFunc func(f HeaderField)) {
 // This facility exists to let servers enforce MAX_HEADER_LIST_SIZE
 // while still decoding and keeping in-sync with decoder state, but
 // without doing unnecessary decompression or generating unnecessary
-// garbage for header ***REMOVED***elds past the limit.
+// garbage for header fields past the limit.
 func (d *Decoder) SetEmitEnabled(v bool) { d.emitEnabled = v }
 
 // EmitEnabled reports whether calls to the emitFunc provided to NewDecoder
@@ -186,7 +186,7 @@ func (dt *dynamicTable) evict() {
 func (d *Decoder) maxTableIndex() int {
 	// This should never overflow. RFC 7540 Section 6.5.2 limits the size of
 	// the dynamic table to 2^32 bytes, where each entry will occupy more than
-	// one byte. Further, the staticTable has a ***REMOVED***xed, small length.
+	// one byte. Further, the staticTable has a fixed, small length.
 	return d.dynTab.table.len() + staticTable.len()
 }
 
@@ -237,7 +237,7 @@ func (d *Decoder) Close() error {
 func (d *Decoder) Write(p []byte) (n int, err error) {
 	if len(p) == 0 {
 		// Prevent state machine CPU attacks (making us redo
-		// work up to the point of ***REMOVED***nding out we don't have
+		// work up to the point of finding out we don't have
 		// enough data)
 		return
 	}
@@ -245,7 +245,7 @@ func (d *Decoder) Write(p []byte) (n int, err error) {
 	// that p will contain a complete header block.
 	if d.saveBuf.Len() == 0 {
 		d.buf = p
-	} ***REMOVED*** {
+	} else {
 		d.saveBuf.Write(p)
 		d.buf = d.saveBuf.Bytes()
 		d.saveBuf.Reset()
@@ -357,7 +357,7 @@ func (d *Decoder) parseFieldLiteral(n uint8, it indexType) error {
 			return DecodingError{InvalidIndexError(nameIdx)}
 		}
 		hf.Name = ihf.Name
-	} ***REMOVED*** {
+	} else {
 		hf.Name, buf, err = d.readString(buf, wantStr)
 		if err != nil {
 			return err
@@ -410,7 +410,7 @@ var errVarintOverflow = DecodingError{errors.New("varint integer overflow")}
 //
 // n must always be between 1 and 8.
 //
-// The returned remain buffer is either a smaller suf***REMOVED***x of p, or err != nil.
+// The returned remain buffer is either a smaller suffix of p, or err != nil.
 // The error is errNeedMore if p doesn't contain a complete integer.
 func readVarInt(n byte, p []byte) (i uint64, remain []byte, err error) {
 	if n < 1 || n > 8 {

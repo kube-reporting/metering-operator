@@ -1,11 +1,11 @@
 apiVersion: v1
-kind: Con***REMOVED***gMap
+kind: ConfigMap
 metadata:
-  name: hive-jmx-con***REMOVED***g
+  name: hive-jmx-config
   labels:
     app: hive
 data:
-  con***REMOVED***g.yml: |
+  config.yml: |
     ---
     lowercaseOutputName: true
     lowercaseOutputLabelNames: true

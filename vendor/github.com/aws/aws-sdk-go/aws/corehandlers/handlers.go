@@ -22,8 +22,8 @@ type lener interface {
 }
 
 // BuildContentLengthHandler builds the content length of a request based on the body,
-// or will use the HTTPRequest.Header's "Content-Length" if de***REMOVED***ned. If unable
-// to determine request body length and no "Content-Length" was speci***REMOVED***ed it will panic.
+// or will use the HTTPRequest.Header's "Content-Length" if defined. If unable
+// to determine request body length and no "Content-Length" was specified it will panic.
 //
 // The Content-Length will only be added to the request if the length of the body
 // is greater than 0. If the body is empty or the current `Content-Length`
@@ -33,7 +33,7 @@ var BuildContentLengthHandler = request.NamedHandler{Name: "core.BuildContentLen
 
 	if slength := r.HTTPRequest.Header.Get("Content-Length"); slength != "" {
 		length, _ = strconv.ParseInt(slength, 10, 64)
-	} ***REMOVED*** {
+	} else {
 		if r.Body != nil {
 			var err error
 			length, err = aws.SeekerLen(r.Body)
@@ -47,7 +47,7 @@ var BuildContentLengthHandler = request.NamedHandler{Name: "core.BuildContentLen
 	if length > 0 {
 		r.HTTPRequest.ContentLength = length
 		r.HTTPRequest.Header.Set("Content-Length", fmt.Sprintf("%d", length))
-	} ***REMOVED*** {
+	} else {
 		r.HTTPRequest.ContentLength = 0
 		r.HTTPRequest.Header.Del("Content-Length")
 	}
@@ -57,13 +57,13 @@ var reStatusCode = regexp.MustCompile(`^(\d{3})`)
 
 // ValidateReqSigHandler is a request handler to ensure that the request's
 // signature doesn't expire before it is sent. This can happen when a request
-// is built and signed signi***REMOVED***cantly before it is sent. Or signi***REMOVED***cant delays
+// is built and signed significantly before it is sent. Or significant delays
 // occur when retrying requests that would cause the signature to expire.
 var ValidateReqSigHandler = request.NamedHandler{
 	Name: "core.ValidateReqSigHandler",
 	Fn: func(r *request.Request) {
 		// Unsigned requests are not signed
-		if r.Con***REMOVED***g.Credentials == credentials.AnonymousCredentials {
+		if r.Config.Credentials == credentials.AnonymousCredentials {
 			return
 		}
 
@@ -117,11 +117,11 @@ var SendHandler = request.NamedHandler{
 }
 
 func sendFollowRedirects(r *request.Request) (*http.Response, error) {
-	return r.Con***REMOVED***g.HTTPClient.Do(r.HTTPRequest)
+	return r.Config.HTTPClient.Do(r.HTTPRequest)
 }
 
 func sendWithoutFollowRedirects(r *request.Request) (*http.Response, error) {
-	transport := r.Con***REMOVED***g.HTTPClient.Transport
+	transport := r.Config.HTTPClient.Transport
 	if transport == nil {
 		transport = http.DefaultTransport
 	}
@@ -182,24 +182,24 @@ var ValidateResponseHandler = request.NamedHandler{Name: "core.ValidateResponseH
 	}
 }}
 
-// AfterRetryHandler performs ***REMOVED***nal checks to determine if the request should
+// AfterRetryHandler performs final checks to determine if the request should
 // be retried and how long to delay.
 var AfterRetryHandler = request.NamedHandler{
 	Name: "core.AfterRetryHandler",
 	Fn: func(r *request.Request) {
 		// If one of the other handlers already set the retry state
 		// we don't want to override it based on the service's state
-		if r.Retryable == nil || aws.BoolValue(r.Con***REMOVED***g.EnforceShouldRetryCheck) {
+		if r.Retryable == nil || aws.BoolValue(r.Config.EnforceShouldRetryCheck) {
 			r.Retryable = aws.Bool(r.ShouldRetry(r))
 		}
 
 		if r.WillRetry() {
 			r.RetryDelay = r.RetryRules(r)
 
-			if sleepFn := r.Con***REMOVED***g.SleepDelay; sleepFn != nil {
+			if sleepFn := r.Config.SleepDelay; sleepFn != nil {
 				// Support SleepDelay for backwards compatibility and testing
 				sleepFn(r.RetryDelay)
-			} ***REMOVED*** if err := aws.SleepWithContext(r.Context(), r.RetryDelay); err != nil {
+			} else if err := aws.SleepWithContext(r.Context(), r.RetryDelay); err != nil {
 				r.Error = awserr.New(request.CanceledErrorCode,
 					"request context canceled", err)
 				r.Retryable = aws.Bool(false)
@@ -210,7 +210,7 @@ var AfterRetryHandler = request.NamedHandler{
 			// need to be expired locally so that the next request to
 			// get credentials will trigger a credentials refresh.
 			if r.IsErrorExpired() {
-				r.Con***REMOVED***g.Credentials.Expire()
+				r.Config.Credentials.Expire()
 			}
 
 			r.RetryCount++
@@ -222,9 +222,9 @@ var AfterRetryHandler = request.NamedHandler{
 // appropriate Region and Endpoint set. Will set r.Error if the endpoint or
 // region is not valid.
 var ValidateEndpointHandler = request.NamedHandler{Name: "core.ValidateEndpointHandler", Fn: func(r *request.Request) {
-	if r.ClientInfo.SigningRegion == "" && aws.StringValue(r.Con***REMOVED***g.Region) == "" {
+	if r.ClientInfo.SigningRegion == "" && aws.StringValue(r.Config.Region) == "" {
 		r.Error = aws.ErrMissingRegion
-	} ***REMOVED*** if r.ClientInfo.Endpoint == "" {
+	} else if r.ClientInfo.Endpoint == "" {
 		r.Error = aws.ErrMissingEndpoint
 	}
 }}

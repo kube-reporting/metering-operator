@@ -14,17 +14,17 @@
 
     - name: Set default ReportDataSources to use based on Kubernetes version
       set_fact:
-        meteringcon***REMOVED***g_reporting_enable_post_kube_1_14_datasources: "{{ kube_version_at_least_1_14 }}"
+        meteringconfig_reporting_enable_post_kube_1_14_datasources: "{{ kube_version_at_least_1_14 }}"
   vars:
     kube_minor_version: "{{ (kube_version.stdout | from_json | json_query('serverVersion.minor')).rstrip('+') }}"
     kube_version_at_least_1_14: "{{ ((kube_minor_version | int) >= 14) | bool }}"
 
-- name: Log Events for Con***REMOVED***guring Reporting
+- name: Log Events for Configuring Reporting
   k8s_event:
     state: present
-    name: Con***REMOVED***gure Reporting resources
+    name: Configure Reporting resources
     namespace: "{{ meta.namespace }}"
-    message: Con***REMOVED***gure reporting
+    message: Configure reporting
     reason: Created
     reportingComponent: Reporting components
     type: Normal
@@ -32,7 +32,7 @@
       component: Metering components
     involvedObject:
       apiVersion: metering.openshift.io
-      kind: MeteringCon***REMOVED***g
+      kind: MeteringConfig
       name: "{{ meta.name }}"
       namespace: "{{ meta.namespace }}"
 

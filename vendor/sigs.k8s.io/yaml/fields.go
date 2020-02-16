@@ -1,6 +1,6 @@
 // Copyright 2013 The Go Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE ***REMOVED***le.
+// license that can be found in the LICENSE file.
 
 package yaml
 
@@ -23,7 +23,7 @@ import (
 func indirect(v reflect.Value, decodingNull bool) (json.Unmarshaler, encoding.TextUnmarshaler, reflect.Value) {
 	// If v is a named type and is addressable,
 	// start with its address, so that if the type has pointer methods,
-	// we ***REMOVED***nd them.
+	// we find them.
 	if v.Kind() != reflect.Ptr && v.Type().Name() != "" && v.CanAddr() {
 		v = v.Addr()
 	}
@@ -48,7 +48,7 @@ func indirect(v reflect.Value, decodingNull bool) (json.Unmarshaler, encoding.Te
 		if v.IsNil() {
 			if v.CanSet() {
 				v.Set(reflect.New(v.Type().Elem()))
-			} ***REMOVED*** {
+			} else {
 				v = reflect.New(v.Type().Elem())
 			}
 		}
@@ -65,8 +65,8 @@ func indirect(v reflect.Value, decodingNull bool) (json.Unmarshaler, encoding.Te
 	return nil, nil, v
 }
 
-// A ***REMOVED***eld represents a single ***REMOVED***eld found in a struct.
-type ***REMOVED***eld struct {
+// A field represents a single field found in a struct.
+type field struct {
 	name      string
 	nameBytes []byte                 // []byte(name)
 	equalFold func(s, t []byte) bool // bytes.EqualFold or equivalent
@@ -78,16 +78,16 @@ type ***REMOVED***eld struct {
 	quoted    bool
 }
 
-func ***REMOVED***llField(f ***REMOVED***eld) ***REMOVED***eld {
+func fillField(f field) field {
 	f.nameBytes = []byte(f.name)
 	f.equalFold = foldFunc(f.nameBytes)
 	return f
 }
 
-// byName sorts ***REMOVED***eld by name, breaking ties with depth,
+// byName sorts field by name, breaking ties with depth,
 // then breaking ties with "name came from json tag", then
 // breaking ties with index sequence.
-type byName []***REMOVED***eld
+type byName []field
 
 func (x byName) Len() int { return len(x) }
 
@@ -106,8 +106,8 @@ func (x byName) Less(i, j int) bool {
 	return byIndex(x).Less(i, j)
 }
 
-// byIndex sorts ***REMOVED***eld by index sequence.
-type byIndex []***REMOVED***eld
+// byIndex sorts field by index sequence.
+type byIndex []field
 
 func (x byIndex) Len() int { return len(x) }
 
@@ -125,13 +125,13 @@ func (x byIndex) Less(i, j int) bool {
 	return len(x[i].index) < len(x[j].index)
 }
 
-// typeFields returns a list of ***REMOVED***elds that JSON should recognize for the given type.
-// The algorithm is breadth-***REMOVED***rst search over the set of structs to include - the top struct
+// typeFields returns a list of fields that JSON should recognize for the given type.
+// The algorithm is breadth-first search over the set of structs to include - the top struct
 // and then any reachable anonymous structs.
-func typeFields(t reflect.Type) []***REMOVED***eld {
-	// Anonymous ***REMOVED***elds to explore at the current level and the next.
-	current := []***REMOVED***eld{}
-	next := []***REMOVED***eld{{typ: t}}
+func typeFields(t reflect.Type) []field {
+	// Anonymous fields to explore at the current level and the next.
+	current := []field{}
+	next := []field{{typ: t}}
 
 	// Count of queued names for current level and the next.
 	count := map[reflect.Type]int{}
@@ -141,7 +141,7 @@ func typeFields(t reflect.Type) []***REMOVED***eld {
 	visited := map[reflect.Type]bool{}
 
 	// Fields found.
-	var ***REMOVED***elds []***REMOVED***eld
+	var fields []field
 
 	for len(next) > 0 {
 		current, next = next, current[:0]
@@ -153,7 +153,7 @@ func typeFields(t reflect.Type) []***REMOVED***eld {
 			}
 			visited[f.typ] = true
 
-			// Scan f.typ for ***REMOVED***elds to include.
+			// Scan f.typ for fields to include.
 			for i := 0; i < f.typ.NumField(); i++ {
 				sf := f.typ.Field(i)
 				if sf.PkgPath != "" { // unexported
@@ -177,13 +177,13 @@ func typeFields(t reflect.Type) []***REMOVED***eld {
 					ft = ft.Elem()
 				}
 
-				// Record found ***REMOVED***eld and index sequence.
+				// Record found field and index sequence.
 				if name != "" || !sf.Anonymous || ft.Kind() != reflect.Struct {
 					tagged := name != ""
 					if name == "" {
 						name = sf.Name
 					}
-					***REMOVED***elds = append(***REMOVED***elds, ***REMOVED***llField(***REMOVED***eld{
+					fields = append(fields, fillField(field{
 						name:      name,
 						tag:       tagged,
 						index:     index,
@@ -196,7 +196,7 @@ func typeFields(t reflect.Type) []***REMOVED***eld {
 						// so that the annihilation code will see a duplicate.
 						// It only cares about the distinction between 1 or 2,
 						// so don't bother generating any more copies.
-						***REMOVED***elds = append(***REMOVED***elds, ***REMOVED***elds[len(***REMOVED***elds)-1])
+						fields = append(fields, fields[len(fields)-1])
 					}
 					continue
 				}
@@ -204,113 +204,113 @@ func typeFields(t reflect.Type) []***REMOVED***eld {
 				// Record new anonymous struct to explore in next round.
 				nextCount[ft]++
 				if nextCount[ft] == 1 {
-					next = append(next, ***REMOVED***llField(***REMOVED***eld{name: ft.Name(), index: index, typ: ft}))
+					next = append(next, fillField(field{name: ft.Name(), index: index, typ: ft}))
 				}
 			}
 		}
 	}
 
-	sort.Sort(byName(***REMOVED***elds))
+	sort.Sort(byName(fields))
 
-	// Delete all ***REMOVED***elds that are hidden by the Go rules for embedded ***REMOVED***elds,
-	// except that ***REMOVED***elds with JSON tags are promoted.
+	// Delete all fields that are hidden by the Go rules for embedded fields,
+	// except that fields with JSON tags are promoted.
 
-	// The ***REMOVED***elds are sorted in primary order of name, secondary order
-	// of ***REMOVED***eld index length. Loop over names; for each name, delete
-	// hidden ***REMOVED***elds by choosing the one dominant ***REMOVED***eld that survives.
-	out := ***REMOVED***elds[:0]
-	for advance, i := 0, 0; i < len(***REMOVED***elds); i += advance {
+	// The fields are sorted in primary order of name, secondary order
+	// of field index length. Loop over names; for each name, delete
+	// hidden fields by choosing the one dominant field that survives.
+	out := fields[:0]
+	for advance, i := 0, 0; i < len(fields); i += advance {
 		// One iteration per name.
-		// Find the sequence of ***REMOVED***elds with the name of this ***REMOVED***rst ***REMOVED***eld.
-		***REMOVED*** := ***REMOVED***elds[i]
-		name := ***REMOVED***.name
-		for advance = 1; i+advance < len(***REMOVED***elds); advance++ {
-			fj := ***REMOVED***elds[i+advance]
+		// Find the sequence of fields with the name of this first field.
+		fi := fields[i]
+		name := fi.name
+		for advance = 1; i+advance < len(fields); advance++ {
+			fj := fields[i+advance]
 			if fj.name != name {
 				break
 			}
 		}
-		if advance == 1 { // Only one ***REMOVED***eld with this name
-			out = append(out, ***REMOVED***)
+		if advance == 1 { // Only one field with this name
+			out = append(out, fi)
 			continue
 		}
-		dominant, ok := dominantField(***REMOVED***elds[i : i+advance])
+		dominant, ok := dominantField(fields[i : i+advance])
 		if ok {
 			out = append(out, dominant)
 		}
 	}
 
-	***REMOVED***elds = out
-	sort.Sort(byIndex(***REMOVED***elds))
+	fields = out
+	sort.Sort(byIndex(fields))
 
-	return ***REMOVED***elds
+	return fields
 }
 
-// dominantField looks through the ***REMOVED***elds, all of which are known to
-// have the same name, to ***REMOVED***nd the single ***REMOVED***eld that dominates the
-// others using Go's embedding rules, modi***REMOVED***ed by the presence of
-// JSON tags. If there are multiple top-level ***REMOVED***elds, the boolean
+// dominantField looks through the fields, all of which are known to
+// have the same name, to find the single field that dominates the
+// others using Go's embedding rules, modified by the presence of
+// JSON tags. If there are multiple top-level fields, the boolean
 // will be false: This condition is an error in Go and we skip all
-// the ***REMOVED***elds.
-func dominantField(***REMOVED***elds []***REMOVED***eld) (***REMOVED***eld, bool) {
-	// The ***REMOVED***elds are sorted in increasing index-length order. The winner
+// the fields.
+func dominantField(fields []field) (field, bool) {
+	// The fields are sorted in increasing index-length order. The winner
 	// must therefore be one with the shortest index length. Drop all
 	// longer entries, which is easy: just truncate the slice.
-	length := len(***REMOVED***elds[0].index)
-	tagged := -1 // Index of ***REMOVED***rst tagged ***REMOVED***eld.
-	for i, f := range ***REMOVED***elds {
+	length := len(fields[0].index)
+	tagged := -1 // Index of first tagged field.
+	for i, f := range fields {
 		if len(f.index) > length {
-			***REMOVED***elds = ***REMOVED***elds[:i]
+			fields = fields[:i]
 			break
 		}
 		if f.tag {
 			if tagged >= 0 {
-				// Multiple tagged ***REMOVED***elds at the same level: conflict.
-				// Return no ***REMOVED***eld.
-				return ***REMOVED***eld{}, false
+				// Multiple tagged fields at the same level: conflict.
+				// Return no field.
+				return field{}, false
 			}
 			tagged = i
 		}
 	}
 	if tagged >= 0 {
-		return ***REMOVED***elds[tagged], true
+		return fields[tagged], true
 	}
-	// All remaining ***REMOVED***elds have the same length. If there's more than one,
-	// we have a conflict (two ***REMOVED***elds named "X" at the same level) and we
-	// return no ***REMOVED***eld.
-	if len(***REMOVED***elds) > 1 {
-		return ***REMOVED***eld{}, false
+	// All remaining fields have the same length. If there's more than one,
+	// we have a conflict (two fields named "X" at the same level) and we
+	// return no field.
+	if len(fields) > 1 {
+		return field{}, false
 	}
-	return ***REMOVED***elds[0], true
+	return fields[0], true
 }
 
-var ***REMOVED***eldCache struct {
+var fieldCache struct {
 	sync.RWMutex
-	m map[reflect.Type][]***REMOVED***eld
+	m map[reflect.Type][]field
 }
 
 // cachedTypeFields is like typeFields but uses a cache to avoid repeated work.
-func cachedTypeFields(t reflect.Type) []***REMOVED***eld {
-	***REMOVED***eldCache.RLock()
-	f := ***REMOVED***eldCache.m[t]
-	***REMOVED***eldCache.RUnlock()
+func cachedTypeFields(t reflect.Type) []field {
+	fieldCache.RLock()
+	f := fieldCache.m[t]
+	fieldCache.RUnlock()
 	if f != nil {
 		return f
 	}
 
-	// Compute ***REMOVED***elds without lock.
+	// Compute fields without lock.
 	// Might duplicate effort but won't hold other computations back.
 	f = typeFields(t)
 	if f == nil {
-		f = []***REMOVED***eld{}
+		f = []field{}
 	}
 
-	***REMOVED***eldCache.Lock()
-	if ***REMOVED***eldCache.m == nil {
-		***REMOVED***eldCache.m = map[reflect.Type][]***REMOVED***eld{}
+	fieldCache.Lock()
+	if fieldCache.m == nil {
+		fieldCache.m = map[reflect.Type][]field{}
 	}
-	***REMOVED***eldCache.m[t] = f
-	***REMOVED***eldCache.Unlock()
+	fieldCache.m[t] = f
+	fieldCache.Unlock()
 	return f
 }
 
@@ -364,7 +364,7 @@ func foldFunc(s []byte) func(s, t []byte) bool {
 		upper := b & caseMask
 		if upper < 'A' || upper > 'Z' {
 			nonLetter = true
-		} ***REMOVED*** if upper == 'K' || upper == 'S' {
+		} else if upper == 'K' || upper == 'S' {
 			// See above for why these letters are special.
 			special = true
 		}
@@ -395,7 +395,7 @@ func equalFoldRight(s, t []byte) bool {
 					if sbUpper != tb&caseMask {
 						return false
 					}
-				} ***REMOVED*** {
+				} else {
 					return false
 				}
 			}
@@ -443,7 +443,7 @@ func asciiEqualFold(s, t []byte) bool {
 			if sb&caseMask != tb&caseMask {
 				return false
 			}
-		} ***REMOVED*** {
+		} else {
 			return false
 		}
 	}
@@ -466,11 +466,11 @@ func simpleLetterEqualFold(s, t []byte) bool {
 	return true
 }
 
-// tagOptions is the string following a comma in a struct ***REMOVED***eld's "json"
+// tagOptions is the string following a comma in a struct field's "json"
 // tag, or the empty string. It does not include the leading comma.
 type tagOptions string
 
-// parseTag splits a struct ***REMOVED***eld's json tag into its name and
+// parseTag splits a struct field's json tag into its name and
 // comma-separated options.
 func parseTag(tag string) (string, tagOptions) {
 	if idx := strings.Index(tag, ","); idx != -1 {

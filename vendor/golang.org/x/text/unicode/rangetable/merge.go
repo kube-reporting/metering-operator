@@ -1,6 +1,6 @@
 // Copyright 2015 The Go Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE ***REMOVED***le.
+// license that can be found in the LICENSE file.
 
 package rangetable
 
@@ -46,8 +46,8 @@ func Merge(ranges ...*unicode.RangeTable) *unicode.RangeTable {
 				// Fully merge the next range into the previous one.
 				r0.Hi, r0.Stride = r1.Hi, stride
 				continue
-			} ***REMOVED*** if stride == r0.Stride {
-				// Move the ***REMOVED***rst element of r1 to r0. This may eliminate an
+			} else if stride == r0.Stride {
+				// Move the first element of r1 to r0. This may eliminate an
 				// entry.
 				r0.Hi = r1.Lo
 				r0.Stride = stride
@@ -80,8 +80,8 @@ func Merge(ranges ...*unicode.RangeTable) *unicode.RangeTable {
 				// Fully merge the next range into the previous one.
 				r0.Hi, r0.Stride = r1.Hi, stride
 				continue
-			} ***REMOVED*** if stride == r0.Stride {
-				// Move the ***REMOVED***rst element of r1 to r0. This may eliminate an
+			} else if stride == r0.Stride {
+				// Move the first element of r1 to r0. This may eliminate an
 				// entry.
 				r0.Hi = r1.Lo
 				r1.Lo = r1.Lo + r1.Stride
@@ -109,7 +109,7 @@ type tableIndex struct {
 
 type tablesIter []tableIndex
 
-// sortIter does an insertion sort using the next ***REMOVED***eld of tableIndex. Insertion
+// sortIter does an insertion sort using the next field of tableIndex. Insertion
 // sort is a good sorting algorithm for this case.
 func sortIter(t []tableIndex) {
 	for i := range t {
@@ -119,7 +119,7 @@ func sortIter(t []tableIndex) {
 	}
 }
 
-// next16 ***REMOVED***nds the ranged to be added to the table. If ranges overlap between
+// next16 finds the ranged to be added to the table. If ranges overlap between
 // multiple tables it clips the result to a non-overlapping range if the
 // elements are not fully subsumed. It returns a zero range if there are no more
 // ranges.
@@ -137,7 +137,7 @@ func (ti tablesIter) next16() unicode.Range16 {
 	for i := range ti {
 		tn := ti[i]
 		// Since our tableIndices are sorted by next, we can break if the there
-		// is no overlap. The ***REMOVED***rst value of a next range can always be merged
+		// is no overlap. The first value of a next range can always be merged
 		// into the current one, so we can break in case of equality as well.
 		if rune(r0.Hi) <= tn.next {
 			break
@@ -154,7 +154,7 @@ func (ti tablesIter) next16() unicode.Range16 {
 			if r0.Hi > rn.Hi {
 				r0.Hi = rn.Hi
 			}
-		} ***REMOVED*** {
+		} else {
 			// Not a compatible stride. Set to the last possible value before
 			// rn.Lo, but ensure there is at least one value.
 			if x := rn.Lo - m; r0.Lo <= x {
@@ -176,7 +176,7 @@ func (ti tablesIter) next16() unicode.Range16 {
 		if rune(rn.Hi) < tn.next {
 			if tn.p++; int(tn.p) == len(tn.t.R16) {
 				tn.next = atEnd
-			} ***REMOVED*** {
+			} else {
 				tn.next = rune(tn.t.R16[tn.p].Lo)
 			}
 		}
@@ -189,7 +189,7 @@ func (ti tablesIter) next16() unicode.Range16 {
 	return r0
 }
 
-// next32 ***REMOVED***nds the ranged to be added to the table. If ranges overlap between
+// next32 finds the ranged to be added to the table. If ranges overlap between
 // multiple tables it clips the result to a non-overlapping range if the
 // elements are not fully subsumed. It returns a zero range if there are no more
 // ranges.
@@ -207,7 +207,7 @@ func (ti tablesIter) next32() unicode.Range32 {
 	for i := range ti {
 		tn := ti[i]
 		// Since our tableIndices are sorted by next, we can break if the there
-		// is no overlap. The ***REMOVED***rst value of a next range can always be merged
+		// is no overlap. The first value of a next range can always be merged
 		// into the current one, so we can break in case of equality as well.
 		if rune(r0.Hi) <= tn.next {
 			break
@@ -224,7 +224,7 @@ func (ti tablesIter) next32() unicode.Range32 {
 			if r0.Hi > rn.Hi {
 				r0.Hi = rn.Hi
 			}
-		} ***REMOVED*** {
+		} else {
 			// Not a compatible stride. Set to the last possible value before
 			// rn.Lo, but ensure there is at least one value.
 			if x := rn.Lo - m; r0.Lo <= x {
@@ -246,7 +246,7 @@ func (ti tablesIter) next32() unicode.Range32 {
 		if rune(rn.Hi) < tn.next {
 			if tn.p++; int(tn.p) == len(tn.t.R32) {
 				tn.next = atEnd
-			} ***REMOVED*** {
+			} else {
 				tn.next = rune(tn.t.R32[tn.p].Lo)
 			}
 		}

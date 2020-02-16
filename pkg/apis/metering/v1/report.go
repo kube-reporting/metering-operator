@@ -27,20 +27,20 @@ type Report struct {
 }
 
 type ReportSpec struct {
-	// QueryName speci***REMOVED***es the ReportQuery to execute when
+	// QueryName specifies the ReportQuery to execute when
 	// the report runs.
 	QueryName string `json:"query"`
 
-	// Schedule con***REMOVED***gures when the report runs.
+	// Schedule configures when the report runs.
 	Schedule *ReportSchedule `json:"schedule,omitempty"`
 
-	// ReportingStart speci***REMOVED***es the time this Report should start from
+	// ReportingStart specifies the time this Report should start from
 	// instead of the current time.
 	// This is intended for allowing a Report to start from the past
 	// and report on data collected before the Report was created.
 	ReportingStart *meta.Time `json:"reportingStart,omitempty"`
 
-	// ReportingEnd speci***REMOVED***es the time this Report should stop
+	// ReportingEnd specifies the time this Report should stop
 	// running. Once a Report has reached ReportingEnd, no new results
 	// will be generated.
 	ReportingEnd *meta.Time `json:"reportingEnd,omitempty"`

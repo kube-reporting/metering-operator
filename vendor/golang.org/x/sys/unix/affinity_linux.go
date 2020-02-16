@@ -1,8 +1,8 @@
 // Copyright 2018 The Go Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE ***REMOVED***le.
+// license that can be found in the LICENSE file.
 
-// CPU af***REMOVED***nity functions
+// CPU affinity functions
 
 package unix
 
@@ -12,10 +12,10 @@ import (
 
 const cpuSetSize = _CPU_SETSIZE / _NCPUBITS
 
-// CPUSet represents a CPU af***REMOVED***nity mask.
+// CPUSet represents a CPU affinity mask.
 type CPUSet [cpuSetSize]cpuMask
 
-func schedAf***REMOVED***nity(trap uintptr, pid int, set *CPUSet) error {
+func schedAffinity(trap uintptr, pid int, set *CPUSet) error {
 	_, _, e := RawSyscall(trap, uintptr(pid), uintptr(unsafe.Sizeof(*set)), uintptr(unsafe.Pointer(set)))
 	if e != 0 {
 		return errnoErr(e)
@@ -23,16 +23,16 @@ func schedAf***REMOVED***nity(trap uintptr, pid int, set *CPUSet) error {
 	return nil
 }
 
-// SchedGetaf***REMOVED***nity gets the CPU af***REMOVED***nity mask of the thread speci***REMOVED***ed by pid.
+// SchedGetaffinity gets the CPU affinity mask of the thread specified by pid.
 // If pid is 0 the calling thread is used.
-func SchedGetaf***REMOVED***nity(pid int, set *CPUSet) error {
-	return schedAf***REMOVED***nity(SYS_SCHED_GETAFFINITY, pid, set)
+func SchedGetaffinity(pid int, set *CPUSet) error {
+	return schedAffinity(SYS_SCHED_GETAFFINITY, pid, set)
 }
 
-// SchedSetaf***REMOVED***nity sets the CPU af***REMOVED***nity mask of the thread speci***REMOVED***ed by pid.
+// SchedSetaffinity sets the CPU affinity mask of the thread specified by pid.
 // If pid is 0 the calling thread is used.
-func SchedSetaf***REMOVED***nity(pid int, set *CPUSet) error {
-	return schedAf***REMOVED***nity(SYS_SCHED_SETAFFINITY, pid, set)
+func SchedSetaffinity(pid int, set *CPUSet) error {
+	return schedAffinity(SYS_SCHED_SETAFFINITY, pid, set)
 }
 
 // Zero clears the set s, so that it contains no CPUs.
@@ -107,10 +107,10 @@ func onesCount64(x uint64) int {
 	//   return int(x)
 	//
 	// Masking (& operations) can be left away when there's no
-	// danger that a ***REMOVED***eld's sum will carry over into the next
-	// ***REMOVED***eld: Since the result cannot be > 64, 8 bits is enough
+	// danger that a field's sum will carry over into the next
+	// field: Since the result cannot be > 64, 8 bits is enough
 	// and we can ignore the masks for the shifts by 8 and up.
-	// Per "Hacker's Delight", the ***REMOVED***rst line can be simpli***REMOVED***ed
+	// Per "Hacker's Delight", the first line can be simplified
 	// more, but it saves at best one instruction, so we leave
 	// it alone for clarity.
 	const m = 1<<64 - 1

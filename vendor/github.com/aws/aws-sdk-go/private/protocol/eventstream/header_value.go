@@ -121,7 +121,7 @@ func (r rawValue) encodeString(w io.Writer, v string) error {
 
 	if sw, ok := w.(stringWriter); ok {
 		_, err = sw.WriteString(v)
-	} ***REMOVED*** {
+	} else {
 		_, err = w.Write([]byte(v))
 	}
 

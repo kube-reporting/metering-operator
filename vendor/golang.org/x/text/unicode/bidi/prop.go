@@ -1,6 +1,6 @@
 // Copyright 2016 The Go Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE ***REMOVED***le.
+// license that can be found in the LICENSE file.
 
 package bidi
 
@@ -15,7 +15,7 @@ type Properties struct {
 var trie = newBidiTrie(0)
 
 // TODO: using this for bidirule reduces the running time by about 5%. Consider
-// if this is worth exposing or if we can ***REMOVED***nd a way to speed up the Class
+// if this is worth exposing or if we can find a way to speed up the Class
 // method.
 //
 // // CompactClass is like Class, but maps all of the BiDi control classes
@@ -40,7 +40,7 @@ func (p Properties) IsBracket() bool { return p.entry&0xF0 != 0 }
 // IsBracket must return true.
 func (p Properties) IsOpeningBracket() bool { return p.entry&openMask != 0 }
 
-// TODO: ***REMOVED***nd a better API and expose.
+// TODO: find a better API and expose.
 func (p Properties) reverseBracket(r rune) rune {
 	return xorMasks[p.entry>>xorMaskShift] ^ r
 }
@@ -68,7 +68,7 @@ func LookupRune(r rune) (p Properties, size int) {
 // sizes have slightly different semantics from the generated code, in that it
 // always returns size==1 for an illegal UTF-8 byte (instead of the length
 // of the maximum invalid subsequence). Most Transformers, like unicode/norm,
-// leave invalid UTF-8 untouched, in which case it has performance bene***REMOVED***ts to
+// leave invalid UTF-8 untouched, in which case it has performance benefits to
 // do so (without changing the semantics). Bidi requires the semantics used here
 // for the bidirule implementation to be compatible with the Go semantics.
 //  They ultimately should perhaps be adopted by all trie implementations, for
@@ -76,10 +76,10 @@ func LookupRune(r rune) (p Properties, size int) {
 // This unrolled code also boosts performance of the secure/bidirule package by
 // about 30%.
 // So, to remove this code:
-//   - add option to trie generator to de***REMOVED***ne return type.
+//   - add option to trie generator to define return type.
 //   - always return 1 byte size for ill-formed UTF-8 runes.
 
-// Lookup returns properties for the ***REMOVED***rst rune in s and the width in bytes of
+// Lookup returns properties for the first rune in s and the width in bytes of
 // its encoding. The size will be 0 if s does not hold enough bytes to complete
 // the encoding.
 func Lookup(s []byte) (p Properties, sz int) {
@@ -142,7 +142,7 @@ func Lookup(s []byte) (p Properties, sz int) {
 	return Properties{}, 1
 }
 
-// LookupString returns properties for the ***REMOVED***rst rune in s and the width in
+// LookupString returns properties for the first rune in s and the width in
 // bytes of its encoding. The size will be 0 if s does not hold enough bytes to
 // complete the encoding.
 func LookupString(s string) (p Properties, sz int) {

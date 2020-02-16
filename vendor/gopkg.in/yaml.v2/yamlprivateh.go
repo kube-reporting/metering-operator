@@ -21,13 +21,13 @@ const (
 	initial_string_size = 16
 )
 
-// Check if the character at the speci***REMOVED***ed position is an alphabetical
+// Check if the character at the specified position is an alphabetical
 // character, a digit, '_', or '-'.
 func is_alpha(b []byte, i int) bool {
 	return b[i] >= '0' && b[i] <= '9' || b[i] >= 'A' && b[i] <= 'Z' || b[i] >= 'a' && b[i] <= 'z' || b[i] == '_' || b[i] == '-'
 }
 
-// Check if the character at the speci***REMOVED***ed position is a digit.
+// Check if the character at the specified position is a digit.
 func is_digit(b []byte, i int) bool {
 	return b[i] >= '0' && b[i] <= '9'
 }
@@ -37,7 +37,7 @@ func as_digit(b []byte, i int) int {
 	return int(b[i]) - '0'
 }
 
-// Check if the character at the speci***REMOVED***ed position is a hex-digit.
+// Check if the character at the specified position is a hex-digit.
 func is_hex(b []byte, i int) bool {
 	return b[i] >= '0' && b[i] <= '9' || b[i] >= 'A' && b[i] <= 'F' || b[i] >= 'a' && b[i] <= 'f'
 }
@@ -72,7 +72,7 @@ func is_printable(b []byte, i int) bool {
 			!(b[i+1] == 0xBF && (b[i+2] == 0xBE || b[i+2] == 0xBF))))
 }
 
-// Check if the character at the speci***REMOVED***ed position is NUL.
+// Check if the character at the specified position is NUL.
 func is_z(b []byte, i int) bool {
 	return b[i] == 0x00
 }
@@ -82,23 +82,23 @@ func is_bom(b []byte, i int) bool {
 	return b[0] == 0xEF && b[1] == 0xBB && b[2] == 0xBF
 }
 
-// Check if the character at the speci***REMOVED***ed position is space.
+// Check if the character at the specified position is space.
 func is_space(b []byte, i int) bool {
 	return b[i] == ' '
 }
 
-// Check if the character at the speci***REMOVED***ed position is tab.
+// Check if the character at the specified position is tab.
 func is_tab(b []byte, i int) bool {
 	return b[i] == '\t'
 }
 
-// Check if the character at the speci***REMOVED***ed position is blank (space or tab).
+// Check if the character at the specified position is blank (space or tab).
 func is_blank(b []byte, i int) bool {
 	//return is_space(b, i) || is_tab(b, i)
 	return b[i] == ' ' || b[i] == '\t'
 }
 
-// Check if the character at the speci***REMOVED***ed position is a line break.
+// Check if the character at the specified position is a line break.
 func is_break(b []byte, i int) bool {
 	return (b[i] == '\r' || // CR (#xD)
 		b[i] == '\n' || // LF (#xA)
@@ -154,8 +154,8 @@ func is_blankz(b []byte, i int) bool {
 
 // Determine the width of the character.
 func width(b byte) int {
-	// Don't replace these by a switch without ***REMOVED***rst
-	// con***REMOVED***rming that it is being inlined.
+	// Don't replace these by a switch without first
+	// confirming that it is being inlined.
 	if b&0x80 == 0x00 {
 		return 1
 	}

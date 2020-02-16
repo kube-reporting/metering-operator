@@ -3,7 +3,7 @@ package date
 // Copyright 2017 Microsoft Corporation
 //
 //  Licensed under the Apache License, Version 2.0 (the "License");
-//  you may not use this ***REMOVED***le except in compliance with the License.
+//  you may not use this file except in compliance with the License.
 //  You may obtain a copy of the License at
 //
 //      http://www.apache.org/licenses/LICENSE-2.0
@@ -11,7 +11,7 @@ package date
 //  Unless required by applicable law or agreed to in writing, software
 //  distributed under the License is distributed on an "AS IS" BASIS,
 //  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-//  See the License for the speci***REMOVED***c language governing permissions and
+//  See the License for the specific language governing permissions and
 //  limitations under the License.
 
 import (
@@ -19,7 +19,7 @@ import (
 	"time"
 )
 
-// Azure reports time in UTC but it doesn't include the 'Z' time zone suf***REMOVED***x in some cases.
+// Azure reports time in UTC but it doesn't include the 'Z' time zone suffix in some cases.
 const (
 	azureUtcFormatJSON = `"2006-01-02T15:04:05.999999999"`
 	azureUtcFormat     = "2006-01-02T15:04:05.999999999"
@@ -28,7 +28,7 @@ const (
 	tzOffsetRegex      = `(Z|z|\+|-)(\d+:\d+)*"*$`
 )
 
-// Time de***REMOVED***nes a type similar to time.Time but assumes a layout of RFC3339 date-time (i.e.,
+// Time defines a type similar to time.Time but assumes a layout of RFC3339 date-time (i.e.,
 // 2006-01-02T15:04:05Z).
 type Time struct {
 	time.Time
@@ -59,7 +59,7 @@ func (t *Time) UnmarshalJSON(data []byte) (err error) {
 	match, err := regexp.Match(tzOffsetRegex, data)
 	if err != nil {
 		return err
-	} ***REMOVED*** if match {
+	} else if match {
 		timeFormat = rfc3339JSON
 	}
 	t.Time, err = ParseTime(timeFormat, string(data))
@@ -79,7 +79,7 @@ func (t *Time) UnmarshalText(data []byte) (err error) {
 	match, err := regexp.Match(tzOffsetRegex, data)
 	if err != nil {
 		return err
-	} ***REMOVED*** if match {
+	} else if match {
 		timeFormat = rfc3339
 	}
 	t.Time, err = ParseTime(timeFormat, string(data))

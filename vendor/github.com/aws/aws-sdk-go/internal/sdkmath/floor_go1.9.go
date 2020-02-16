@@ -42,11 +42,11 @@ func Round(x float64) float64 {
 		if e == bias-1 {
 			bits |= uvone // +-1
 		}
-	} ***REMOVED*** if e < bias+shift {
+	} else if e < bias+shift {
 		// Round any abs(x) >= 1 containing a fractional component [0,1).
 		//
 		// Numbers with larger exponents are returned unchanged since they
-		// must be either an integer, in***REMOVED***nity, or NaN.
+		// must be either an integer, infinity, or NaN.
 		const half = 1 << (shift - 1)
 		e -= bias
 		bits += half >> e

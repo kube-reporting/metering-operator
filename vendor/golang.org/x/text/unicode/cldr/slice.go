@@ -1,6 +1,6 @@
 // Copyright 2013 The Go Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE ***REMOVED***le.
+// license that can be found in the LICENSE file.
 
 package cldr
 
@@ -24,7 +24,7 @@ func (s *Slice) Value() reflect.Value {
 }
 
 // MakeSlice wraps a pointer to a slice of Elems.
-// It replaces the array pointed to by the slice so that subsequent modi***REMOVED***cations
+// It replaces the array pointed to by the slice so that subsequent modifications
 // do not alter the data in a CLDR type.
 // It panics if an incorrect type is passed.
 func MakeSlice(slicePtr interface{}) Slice {
@@ -51,14 +51,14 @@ func MakeSlice(slicePtr interface{}) Slice {
 
 func (s Slice) indexForAttr(a string) []int {
 	for i := iter(reflect.Zero(s.typ)); !i.done(); i.next() {
-		if n, _ := xmlName(i.***REMOVED***eld()); n == a {
+		if n, _ := xmlName(i.field()); n == a {
 			return i.index
 		}
 	}
 	panic(fmt.Sprintf("MakeSlice: no attribute %q for type %v", a, s.typ))
 }
 
-// Filter ***REMOVED***lters s to only include elements for which fn returns true.
+// Filter filters s to only include elements for which fn returns true.
 func (s Slice) Filter(fn func(e Elem) bool) {
 	k := 0
 	sl := s.Value()
@@ -72,7 +72,7 @@ func (s Slice) Filter(fn func(e Elem) bool) {
 	sl.Set(sl.Slice(0, k))
 }
 
-// Group ***REMOVED***nds elements in s for which fn returns the same value and groups
+// Group finds elements in s for which fn returns the same value and groups
 // them in a new Slice.
 func (s Slice) Group(fn func(e Elem) string) []Slice {
 	m := make(map[string][]reflect.Value)
@@ -96,7 +96,7 @@ func (s Slice) Group(fn func(e Elem) string) []Slice {
 	return res
 }
 
-// SelectAnyOf ***REMOVED***lters s to contain only elements for which attr matches
+// SelectAnyOf filters s to contain only elements for which attr matches
 // any of the values.
 func (s Slice) SelectAnyOf(attr string, values ...string) {
 	index := s.indexForAttr(attr)
@@ -106,11 +106,11 @@ func (s Slice) SelectAnyOf(attr string, values ...string) {
 	})
 }
 
-// SelectOnePerGroup ***REMOVED***lters s to include at most one element e per group of
+// SelectOnePerGroup filters s to include at most one element e per group of
 // elements matching Key(attr), where e has an attribute a that matches any
 // the values in v.
 // If more than one element in a group matches a value in v preference
-// is given to the element that matches the ***REMOVED***rst value in v.
+// is given to the element that matches the first value in v.
 func (s Slice) SelectOnePerGroup(a string, v []string) {
 	index := s.indexForAttr(a)
 	grouped := s.Group(func(e Elem) string { return Key(e, a) })

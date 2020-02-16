@@ -1,6 +1,6 @@
 // Copyright 2016 The Go Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE ***REMOVED***le.
+// license that can be found in the LICENSE file.
 
 // +build appengine !linux,!darwin,!freebsd,!openbsd,!netbsd
 
@@ -16,12 +16,12 @@ import (
 // If fn returns a non-nil error, readDir returns with that error
 // immediately.
 func readDir(dirName string, fn func(dirName, entName string, typ os.FileMode) error) error {
-	***REMOVED***s, err := ioutil.ReadDir(dirName)
+	fis, err := ioutil.ReadDir(dirName)
 	if err != nil {
 		return err
 	}
-	for _, ***REMOVED*** := range ***REMOVED***s {
-		if err := fn(dirName, ***REMOVED***.Name(), ***REMOVED***.Mode()&os.ModeType); err != nil {
+	for _, fi := range fis {
+		if err := fn(dirName, fi.Name(), fi.Mode()&os.ModeType); err != nil {
 			return err
 		}
 	}

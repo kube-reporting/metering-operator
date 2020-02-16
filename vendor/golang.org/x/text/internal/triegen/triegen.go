@@ -1,6 +1,6 @@
 // Copyright 2014 The Go Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE ***REMOVED***le.
+// license that can be found in the LICENSE file.
 
 // Package triegen implements a code generator for a trie for associating
 // unsigned integer values with UTF-8 encoded runes.
@@ -15,7 +15,7 @@
 // runes and contributes a little bit to better performance. It also naturally
 // provides a fast path for ASCII.
 //
-// Space is also an issue. There are many code points de***REMOVED***ned in Unicode and as
+// Space is also an issue. There are many code points defined in Unicode and as
 // a result tables can get quite large. So every byte counts. The triegen
 // package automatically chooses the smallest integer values to represent the
 // tables. Compacters allow further compression of the trie by allowing for
@@ -28,7 +28,7 @@
 // chunk. The go.text packages are designed with the assumption that the user
 // typically wants to compile in support for all supported languages, in line
 // with the approach common to Go to create a single standalone binary. The
-// multi-root trie approach can give signi***REMOVED***cant storage savings in this
+// multi-root trie approach can give significant storage savings in this
 // scenario.
 //
 // triegen generates both tables and code. The code is optimized to use the
@@ -109,7 +109,7 @@ type builder struct {
 	valueBlockIdx map[uint64]nodeIndex
 	asciiBlockIdx map[uint64]int
 
-	// Stats are used to ***REMOVED***ll out the template.
+	// Stats are used to fill out the template.
 	Stats struct {
 		NValueEntries int
 		NValueBytes   int
@@ -121,7 +121,7 @@ type builder struct {
 	err error
 }
 
-// A nodeIndex encodes the index of a node, which is de***REMOVED***ned by the compaction
+// A nodeIndex encodes the index of a node, which is defined by the compaction
 // which stores it and an index within the compaction. For internal nodes, the
 // compaction is always 0.
 type nodeIndex struct {
@@ -151,7 +151,7 @@ func (b *builder) setError(err error) {
 // An Option can be passed to Gen.
 type Option func(b *builder) error
 
-// Compact con***REMOVED***gures the trie generator to use the given Compacter.
+// Compact configures the trie generator to use the given Compacter.
 func Compact(c Compacter) Option {
 	return func(b *builder) error {
 		b.Compactions = append(b.Compactions, compaction{
@@ -164,7 +164,7 @@ func Compact(c Compacter) Option {
 // Gen writes Go code for a shared trie lookup structure to w for the given
 // Tries. The generated trie type will be called nameTrie. newNameTrie(x) will
 // return the *nameTrie for tries[x]. A value can be looked up by using one of
-// the various lookup methods de***REMOVED***ned on nameTrie. It returns the table size of
+// the various lookup methods defined on nameTrie. It returns the table size of
 // the generated trie.
 func Gen(w io.Writer, name string, tries []*Trie, opts ...Option) (sz int, err error) {
 	// The index contains two dummy blocks, followed by the zero block. The zero
@@ -301,7 +301,7 @@ func (b *builder) Size() int {
 	// Index blocks.
 	sz := len(b.IndexBlocks) * blockSize * b.IndexSize
 
-	// Skip the ***REMOVED***rst compaction, which represents the normal value blocks, as
+	// Skip the first compaction, which represents the normal value blocks, as
 	// its totalSize does not account for the ASCII blocks, which are managed
 	// separately.
 	sz += len(b.ValueBlocks) * blockSize * b.ValueSize
@@ -309,7 +309,7 @@ func (b *builder) Size() int {
 		sz += c.totalSize
 	}
 
-	// TODO: this computation does not account for the ***REMOVED***xed overhead of a using
+	// TODO: this computation does not account for the fixed overhead of a using
 	// a compaction, either code or data. As for data, though, the typical
 	// overhead of data is in the order of bytes (2 bytes for cases). Further,
 	// the savings of using a compaction should anyway be substantial for it to
@@ -331,9 +331,9 @@ func (b *builder) build() {
 	b.ValueType, b.ValueSize = getIntType(vmax)
 
 	// Compute all block allocations.
-	// TODO: ***REMOVED***rst compute the ASCII blocks for all tries and then the other
+	// TODO: first compute the ASCII blocks for all tries and then the other
 	// nodes. ASCII blocks are more restricted in placement, as they require two
-	// blocks to be placed consecutively. Processing them ***REMOVED***rst may improve
+	// blocks to be placed consecutively. Processing them first may improve
 	// sharing (at least one zero block can be expected to be saved.)
 	for _, t := range b.Trie {
 		b.Checksum += b.buildTrie(t)
@@ -350,7 +350,7 @@ func (b *builder) build() {
 
 	// Compute the sizes of indexes.
 	// TODO: different byte positions could have different sizes. So far we have
-	// not found a case where this is bene***REMOVED***cial.
+	// not found a case where this is beneficial.
 	imax := uint64(b.Compactions[len(b.Compactions)-1].Cutoff)
 	for _, ib := range b.IndexBlocks {
 		if x := uint64(ib.index.index); x > imax {
@@ -390,10 +390,10 @@ func getIntType(v uint64) (string, int) {
 const (
 	blockSize = 64
 
-	// Subtract two blocks to offset 0x80, the ***REMOVED***rst continuation byte.
+	// Subtract two blocks to offset 0x80, the first continuation byte.
 	blockOffset = 2
 
-	// Subtract three blocks to offset 0xC0, the ***REMOVED***rst non-ASCII starter.
+	// Subtract three blocks to offset 0xC0, the first non-ASCII starter.
 	rootBlockOffset = 3
 )
 
@@ -402,7 +402,7 @@ var crcTable = crc64.MakeTable(crc64.ISO)
 func (b *builder) buildTrie(t *Trie) uint64 {
 	n := t.root
 
-	// Get the ASCII offset. For the ***REMOVED***rst trie, the ASCII block will be at
+	// Get the ASCII offset. For the first trie, the ASCII block will be at
 	// position 0.
 	hasher := crc64.New(crcTable)
 	binary.Write(hasher, binary.BigEndian, n.values)
@@ -434,10 +434,10 @@ func (b *builder) buildTrie(t *Trie) uint64 {
 }
 
 func (b *builder) computeOffsets(n *node, root bool) uint64 {
-	// For the ***REMOVED***rst trie, the root lookup block will be at position 3, which is
+	// For the first trie, the root lookup block will be at position 3, which is
 	// the offset for UTF-8 non-ASCII starter bytes.
-	***REMOVED***rst := len(b.IndexBlocks) == rootBlockOffset
-	if ***REMOVED***rst {
+	first := len(b.IndexBlocks) == rootBlockOffset
+	if first {
 		b.IndexBlocks = append(b.IndexBlocks, n)
 	}
 
@@ -457,7 +457,7 @@ func (b *builder) computeOffsets(n *node, root bool) uint64 {
 		hash = hasher.Sum64()
 	}
 
-	if ***REMOVED***rst {
+	if first {
 		b.indexBlockIdx[hash] = rootBlockOffset - blockOffset
 	}
 
@@ -470,7 +470,7 @@ func (b *builder) computeOffsets(n *node, root bool) uint64 {
 			b.indexBlockIdx[hash] = v
 		}
 		n.index = nodeIndex{0, v}
-	} ***REMOVED*** {
+	} else {
 		h, ok := b.valueBlockIdx[hash]
 		if !ok {
 			bestI, bestSize := 0, blockSize*b.ValueSize

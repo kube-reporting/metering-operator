@@ -1,7 +1,7 @@
 // Copyright 2014 Google Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this ***REMOVED***le except in compliance with the License.
+// you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 //
 //     http://www.apache.org/licenses/LICENSE-2.0
@@ -9,7 +9,7 @@
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the speci***REMOVED***c language governing permissions and
+// See the License for the specific language governing permissions and
 // limitations under the License.
 
 // Package btree implements in-memory B-Trees of arbitrary degree.
@@ -26,7 +26,7 @@
 //
 // Within this tree, each node contains a slice of items and a (possibly nil)
 // slice of children.  For basic numeric values or raw structs, this can cause
-// ef***REMOVED***ciency differences when compared to equivalent C++ template code that
+// efficiency differences when compared to equivalent C++ template code that
 // stores values in arrays within the node:
 //   * Due to the overhead of storing values as interfaces (each
 //     value needs to be stored as the value itself, then 2 words for the
@@ -172,7 +172,7 @@ func (s *items) pop() (out Item) {
 }
 
 // truncate truncates this instance at index so that it contains only the
-// ***REMOVED***rst index items. index must be less than or equal to length.
+// first index items. index must be less than or equal to length.
 func (s *items) truncate(index int) {
 	var toClear items
 	*s, toClear = (*s)[:index], (*s)[index:]
@@ -181,10 +181,10 @@ func (s *items) truncate(index int) {
 	}
 }
 
-// ***REMOVED***nd returns the index where the given item should be inserted into this
+// find returns the index where the given item should be inserted into this
 // list.  'found' is true if the item already exists in the list at the given
 // index.
-func (s items) ***REMOVED***nd(item Item) (index int, found bool) {
+func (s items) find(item Item) (index int, found bool) {
 	i := sort.Search(len(s), func(i int) bool {
 		return item.Less(s[i])
 	})
@@ -227,7 +227,7 @@ func (s *children) pop() (out *node) {
 }
 
 // truncate truncates this instance at index so that it contains only the
-// ***REMOVED***rst index children. index must be less than or equal to length.
+// first index children. index must be less than or equal to length.
 func (s *children) truncate(index int) {
 	var toClear children
 	*s, toClear = (*s)[:index], (*s)[index:]
@@ -254,14 +254,14 @@ func (n *node) mutableFor(cow *copyOnWriteContext) *node {
 	out := cow.newNode()
 	if cap(out.items) >= len(n.items) {
 		out.items = out.items[:len(n.items)]
-	} ***REMOVED*** {
+	} else {
 		out.items = make(items, len(n.items), cap(n.items))
 	}
 	copy(out.items, n.items)
 	// Copy children
 	if cap(out.children) >= len(n.children) {
 		out.children = out.children[:len(n.children)]
-	} ***REMOVED*** {
+	} else {
 		out.children = make(children, len(n.children), cap(n.children))
 	}
 	copy(out.children, n.children)
@@ -295,8 +295,8 @@ func (n *node) maybeSplitChild(i, maxItems int) bool {
 	if len(n.children[i].items) < maxItems {
 		return false
 	}
-	***REMOVED***rst := n.mutableChild(i)
-	item, second := ***REMOVED***rst.split(maxItems / 2)
+	first := n.mutableChild(i)
+	item, second := first.split(maxItems / 2)
 	n.items.insertAt(i, item)
 	n.children.insertAt(i+1, second)
 	return true
@@ -306,7 +306,7 @@ func (n *node) maybeSplitChild(i, maxItems int) bool {
 // no nodes in the subtree exceed maxItems items.  Should an equivalent item be
 // be found/replaced by insert, it will be returned.
 func (n *node) insert(item Item, maxItems int) Item {
-	i, found := n.items.***REMOVED***nd(item)
+	i, found := n.items.find(item)
 	if found {
 		out := n.items[i]
 		n.items[i] = item
@@ -320,7 +320,7 @@ func (n *node) insert(item Item, maxItems int) Item {
 		inTree := n.items[i]
 		switch {
 		case item.Less(inTree):
-			// no change, we want ***REMOVED***rst split node
+			// no change, we want first split node
 		case inTree.Less(item):
 			i++ // we want second split node
 		default:
@@ -332,18 +332,18 @@ func (n *node) insert(item Item, maxItems int) Item {
 	return n.mutableChild(i).insert(item, maxItems)
 }
 
-// get ***REMOVED***nds the given key in the subtree and returns it.
+// get finds the given key in the subtree and returns it.
 func (n *node) get(key Item) Item {
-	i, found := n.items.***REMOVED***nd(key)
+	i, found := n.items.find(key)
 	if found {
 		return n.items[i]
-	} ***REMOVED*** if len(n.children) > 0 {
+	} else if len(n.children) > 0 {
 		return n.children[i].get(key)
 	}
 	return nil
 }
 
-// min returns the ***REMOVED***rst item in the subtree.
+// min returns the first item in the subtree.
 func min(n *node) Item {
 	if n == nil {
 		return nil
@@ -396,7 +396,7 @@ func (n *node) remove(item Item, minItems int, typ toRemove) Item {
 		}
 		i = 0
 	case removeItem:
-		i, found = n.items.***REMOVED***nd(item)
+		i, found = n.items.find(item)
 		if len(n.children) == 0 {
 			if found {
 				return n.items.removeAt(i)
@@ -459,7 +459,7 @@ func (n *node) growChildAndRemove(i int, item Item, minItems int, typ toRemove) 
 		if len(stealFrom.children) > 0 {
 			child.children.insertAt(0, stealFrom.children.pop())
 		}
-	} ***REMOVED*** if i < len(n.items) && len(n.children[i+1].items) > minItems {
+	} else if i < len(n.items) && len(n.children[i+1].items) > minItems {
 		// steal from right child
 		child := n.mutableChild(i)
 		stealFrom := n.mutableChild(i + 1)
@@ -469,7 +469,7 @@ func (n *node) growChildAndRemove(i int, item Item, minItems int, typ toRemove) 
 		if len(stealFrom.children) > 0 {
 			child.children = append(child.children, stealFrom.children.removeAt(0))
 		}
-	} ***REMOVED*** {
+	} else {
 		if i >= len(n.items) {
 			i--
 		}
@@ -496,7 +496,7 @@ const (
 //
 // When ascending, the 'start' should be less than 'stop' and when descending,
 // the 'start' should be greater than 'stop'. Setting 'includeStart' to true
-// will force the iterator to include the ***REMOVED***rst item when it equals 'start',
+// will force the iterator to include the first item when it equals 'start',
 // thus creating a "greaterOrEqual" or "lessThanEqual" rather than just a
 // "greaterThan" or "lessThan" queries.
 func (n *node) iterate(dir direction, start, stop Item, includeStart bool, hit bool, iter ItemIterator) (bool, bool) {
@@ -591,7 +591,7 @@ type BTree struct {
 // correct context if the contexts don't match.
 //
 // Since the node we're currently visiting on any write has the requesting
-// tree's context, that node is modi***REMOVED***able in place.  Children of that node may
+// tree's context, that node is modifiable in place.  Children of that node may
 // not share context, but before we descend into them, we'll make a mutable
 // copy.
 type copyOnWriteContext struct {
@@ -604,7 +604,7 @@ type copyOnWriteContext struct {
 //
 // The internal tree structure of b is marked read-only and shared between t and
 // t2.  Writes to both t and t2 use copy-on-write logic, creating new nodes
-// whenever one of b's original nodes would have been modi***REMOVED***ed.  Read operations
+// whenever one of b's original nodes would have been modified.  Read operations
 // should have no performance degredation.  Write operations for both t and t2
 // will initially experience minor slow-downs caused by additional allocs and
 // copies due to the aforementioned copy-on-write logic, but should converge to
@@ -658,10 +658,10 @@ func (c *copyOnWriteContext) freeNode(n *node) freeType {
 		n.cow = nil
 		if c.freelist.freeNode(n) {
 			return ftStored
-		} ***REMOVED*** {
+		} else {
 			return ftFreelistFull
 		}
-	} ***REMOVED*** {
+	} else {
 		return ftNotOwned
 	}
 }
@@ -680,7 +680,7 @@ func (t *BTree) ReplaceOrInsert(item Item) Item {
 		t.root.items = append(t.root.items, item)
 		t.length++
 		return nil
-	} ***REMOVED*** {
+	} else {
 		t.root = t.root.mutableFor(t.cow)
 		if len(t.root.items) >= t.maxItems() {
 			item2, second := t.root.split(t.maxItems() / 2)
@@ -742,7 +742,7 @@ func (t *BTree) AscendRange(greaterOrEqual, lessThan Item, iterator ItemIterator
 }
 
 // AscendLessThan calls the iterator for every value in the tree within the range
-// [***REMOVED***rst, pivot), until iterator returns false.
+// [first, pivot), until iterator returns false.
 func (t *BTree) AscendLessThan(pivot Item, iterator ItemIterator) {
 	if t.root == nil {
 		return
@@ -760,7 +760,7 @@ func (t *BTree) AscendGreaterOrEqual(pivot Item, iterator ItemIterator) {
 }
 
 // Ascend calls the iterator for every value in the tree within the range
-// [***REMOVED***rst, last], until iterator returns false.
+// [first, last], until iterator returns false.
 func (t *BTree) Ascend(iterator ItemIterator) {
 	if t.root == nil {
 		return
@@ -778,7 +778,7 @@ func (t *BTree) DescendRange(lessOrEqual, greaterThan Item, iterator ItemIterato
 }
 
 // DescendLessOrEqual calls the iterator for every value in the tree within the range
-// [pivot, ***REMOVED***rst], until iterator returns false.
+// [pivot, first], until iterator returns false.
 func (t *BTree) DescendLessOrEqual(pivot Item, iterator ItemIterator) {
 	if t.root == nil {
 		return
@@ -796,7 +796,7 @@ func (t *BTree) DescendGreaterThan(pivot Item, iterator ItemIterator) {
 }
 
 // Descend calls the iterator for every value in the tree within the range
-// [last, ***REMOVED***rst], until iterator returns false.
+// [last, first], until iterator returns false.
 func (t *BTree) Descend(iterator ItemIterator) {
 	if t.root == nil {
 		return
@@ -805,7 +805,7 @@ func (t *BTree) Descend(iterator ItemIterator) {
 }
 
 // Get looks for the key item in the tree, returning it.  It returns nil if
-// unable to ***REMOVED***nd that item.
+// unable to find that item.
 func (t *BTree) Get(key Item) Item {
 	if t.root == nil {
 		return nil
@@ -839,7 +839,7 @@ func (t *BTree) Len() int {
 // left to Go's normal GC processes.
 //
 // This can be much faster
-// than calling Delete on all elements, because that requires ***REMOVED***nding/removing
+// than calling Delete on all elements, because that requires finding/removing
 // each element in the tree and updating the tree accordingly.  It also is
 // somewhat faster than creating a new tree to replace the old one, because
 // nodes from the old tree are reclaimed into the freelist for use by the new
@@ -861,7 +861,7 @@ func (t *BTree) Clear(addNodesToFreelist bool) {
 }
 
 // reset returns a subtree to the freelist.  It breaks out immediately if the
-// freelist is full, since the only bene***REMOVED***t of iterating is to ***REMOVED***ll that
+// freelist is full, since the only benefit of iterating is to fill that
 // freelist up.  Returns true if parent reset call should continue.
 func (n *node) reset(c *copyOnWriteContext) bool {
 	for _, child := range n.children {

@@ -2,7 +2,7 @@
 Copyright 2014 The Kubernetes Authors.
 
 Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this ***REMOVED***le except in compliance with the License.
+you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
 
     http://www.apache.org/licenses/LICENSE-2.0
@@ -10,7 +10,7 @@ You may obtain a copy of the License at
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the speci***REMOVED***c language governing permissions and
+See the License for the specific language governing permissions and
 limitations under the License.
 */
 
@@ -78,7 +78,7 @@ func newSerializersForScheme(scheme *runtime.Scheme, mf json.MetaFactory) []seri
 	return serializers
 }
 
-// CodecFactory provides methods for retrieving codecs and serializers for speci***REMOVED***c
+// CodecFactory provides methods for retrieving codecs and serializers for specific
 // versions and content types.
 type CodecFactory struct {
 	scheme      *runtime.Scheme
@@ -90,7 +90,7 @@ type CodecFactory struct {
 }
 
 // NewCodecFactory provides methods for retrieving serializers for the supported wire formats
-// and conversion wrappers to de***REMOVED***ne preferred internal and external versions. In the future,
+// and conversion wrappers to define preferred internal and external versions. In the future,
 // as the internal version is used less, callers may instead use a defaulting serializer and
 // only convert objects which are shared internally (Status, common API machinery).
 // TODO: allow other codecs to be compiled in?
@@ -100,7 +100,7 @@ func NewCodecFactory(scheme *runtime.Scheme) CodecFactory {
 	return newCodecFactory(scheme, serializers)
 }
 
-// newCodecFactory is a helper for testing that allows a different metafactory to be speci***REMOVED***ed.
+// newCodecFactory is a helper for testing that allows a different metafactory to be specified.
 func newCodecFactory(scheme *runtime.Scheme, serializers []serializerType) CodecFactory {
 	decoders := make([]runtime.Decoder, 0, len(serializers))
 	var accepts []runtime.SerializerInfo
@@ -166,7 +166,7 @@ func (f CodecFactory) LegacyCodec(version ...schema.GroupVersion) runtime.Codec 
 	return versioning.NewDefaultingCodecForScheme(f.scheme, f.legacySerializer, f.universal, schema.GroupVersions(version), runtime.InternalGroupVersioner)
 }
 
-// UniversalDeserializer can convert any stored data recognized by this factory into a Go object that satis***REMOVED***es
+// UniversalDeserializer can convert any stored data recognized by this factory into a Go object that satisfies
 // runtime.Object. It does not perform conversion. It does not perform defaulting.
 func (f CodecFactory) UniversalDeserializer() runtime.Decoder {
 	return f.universal
@@ -175,7 +175,7 @@ func (f CodecFactory) UniversalDeserializer() runtime.Decoder {
 // UniversalDecoder returns a runtime.Decoder capable of decoding all known API objects in all known formats. Used
 // by clients that do not need to encode objects but want to deserialize API objects stored on disk. Only decodes
 // objects in groups registered with the scheme. The GroupVersions passed may be used to select alternate
-// versions of objects to return - by default, runtime.APIVersionInternal is used. If any versions are speci***REMOVED***ed,
+// versions of objects to return - by default, runtime.APIVersionInternal is used. If any versions are specified,
 // unrecognized groups will be returned in the version they are encoded as (no conversion). This decoder performs
 // defaulting.
 //
@@ -185,14 +185,14 @@ func (f CodecFactory) UniversalDecoder(versions ...schema.GroupVersion) runtime.
 	var versioner runtime.GroupVersioner
 	if len(versions) == 0 {
 		versioner = runtime.InternalGroupVersioner
-	} ***REMOVED*** {
+	} else {
 		versioner = schema.GroupVersions(versions)
 	}
 	return f.CodecForVersions(nil, f.universal, nil, versioner)
 }
 
 // CodecForVersions creates a codec with the provided serializer. If an object is decoded and its group is not in the list,
-// it will default to runtime.APIVersionInternal. If encode is not speci***REMOVED***ed for an object's group, the object is not
+// it will default to runtime.APIVersionInternal. If encode is not specified for an object's group, the object is not
 // converted. If encode or decode are nil, no conversion is performed.
 func (f CodecFactory) CodecForVersions(encoder runtime.Encoder, decoder runtime.Decoder, encode runtime.GroupVersioner, decode runtime.GroupVersioner) runtime.Codec {
 	// TODO: these are for backcompat, remove them in the future

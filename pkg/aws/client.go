@@ -17,8 +17,8 @@ const (
 	// BillingDateFormat is the layout for parsing the AWS date format of 'yyyymmdd'.
 	BillingDateFormat = "20060102"
 
-	// ManifestSuf***REMOVED***x is the extension of AWS Usage Data manifests.
-	ManifestSuf***REMOVED***x = ".json"
+	// ManifestSuffix is the extension of AWS Usage Data manifests.
+	ManifestSuffix = ".json"
 
 	// defaultS3Region is used to make the API call used to determine a bucket's region.
 	defaultS3Region = "us-east-1"
@@ -35,35 +35,35 @@ type ManifestRetriever interface {
 type manifestRetriever struct {
 	logger         log.FieldLogger
 	s3API          s3iface.S3API
-	bucket, pre***REMOVED***x string
+	bucket, prefix string
 }
 
-func NewManifestRetriever(logger log.FieldLogger, region, bucket, pre***REMOVED***x string) ManifestRetriever {
+func NewManifestRetriever(logger log.FieldLogger, region, bucket, prefix string) ManifestRetriever {
 	awsSession := session.Must(session.NewSession())
-	client := s3.New(awsSession, aws.NewCon***REMOVED***g().WithRegion(region))
+	client := s3.New(awsSession, aws.NewConfig().WithRegion(region))
 	return &manifestRetriever{
 		logger: logger,
 		s3API:  client,
 		bucket: bucket,
-		pre***REMOVED***x: pre***REMOVED***x,
+		prefix: prefix,
 	}
 }
 
 // RetrieveManifests downloads the billing manifest for the given bucket and
-// pre***REMOVED***x. It includes only the top level manifest ***REMOVED***les, and ignores manifest
-// ***REMOVED***les that are within assemblyId subdirectories, as the top level manifest
+// prefix. It includes only the top level manifest files, and ignores manifest
+// files that are within assemblyId subdirectories, as the top level manifest
 // points to the directory containing the most up to date billing report data.
 func (r *manifestRetriever) RetrieveManifests() ([]*Manifest, error) {
 	// ensure that there is a slash at end of location
-	pre***REMOVED***x := r.pre***REMOVED***x
-	if len(pre***REMOVED***x) == 0 {
-		pre***REMOVED***x = "/"
-	} ***REMOVED*** if pre***REMOVED***x[len(pre***REMOVED***x)-1] != '/' {
-		pre***REMOVED***x += "/"
+	prefix := r.prefix
+	if len(prefix) == 0 {
+		prefix = "/"
+	} else if prefix[len(prefix)-1] != '/' {
+		prefix += "/"
 	}
 	logger := r.logger.WithFields(log.Fields{
 		"bucket": r.bucket,
-		"pre***REMOVED***x": pre***REMOVED***x,
+		"prefix": prefix,
 	})
 
 	var (
@@ -73,7 +73,7 @@ func (r *manifestRetriever) RetrieveManifests() ([]*Manifest, error) {
 	)
 	pageFn := func(out *s3.ListObjectsV2Output, lastPage bool) bool {
 		page++
-		keys := r.***REMOVED***lterObjects(pre***REMOVED***x, out.Contents)
+		keys := r.filterObjects(prefix, out.Contents)
 		if len(keys) == 0 {
 			logger.Debugf("page %d had no manifests", page)
 			return true
@@ -92,10 +92,10 @@ func (r *manifestRetriever) RetrieveManifests() ([]*Manifest, error) {
 		return true
 	}
 
-	// list all in <report-pre***REMOVED***x>/<report-name>/ of bucket
+	// list all in <report-prefix>/<report-name>/ of bucket
 	err := r.s3API.ListObjectsV2Pages(&s3.ListObjectsV2Input{
 		Bucket:  aws.String(r.bucket),
-		Pre***REMOVED***x:  aws.String(pre***REMOVED***x),
+		Prefix:  aws.String(prefix),
 		MaxKeys: aws.Int64(maxS3Keys),
 	}, pageFn)
 	if err != nil {
@@ -108,13 +108,13 @@ func (r *manifestRetriever) RetrieveManifests() ([]*Manifest, error) {
 	return manifests, nil
 }
 
-func (r *manifestRetriever) ***REMOVED***lterObjects(pre***REMOVED***x string, objects []*s3.Object) []string {
+func (r *manifestRetriever) filterObjects(prefix string, objects []*s3.Object) []string {
 	var keys []string
 	for _, obj := range objects {
 		key := *obj.Key
 
-		// only look for manifest ***REMOVED***les
-		if !strings.HasSuf***REMOVED***x(key, ManifestSuf***REMOVED***x) {
+		// only look for manifest files
+		if !strings.HasSuffix(key, ManifestSuffix) {
 			continue
 		}
 
@@ -124,12 +124,12 @@ func (r *manifestRetriever) ***REMOVED***lterObjects(pre***REMOVED***x string, o
 		// period is run. We use these to determine the "most up to date" set
 		// of data.
 		// We're looking for manifests in the following format:
-		// <report-pre***REMOVED***x>/<report-name>/YYYYMMDD-YYYYMMDD/<report-name>-Manifest.json
+		// <report-prefix>/<report-name>/YYYYMMDD-YYYYMMDD/<report-name>-Manifest.json
 		// We ignore the following manifests:
-		// <report-pre***REMOVED***x>/<report-name>/YYYYMMDD-YYYYMMDD/<assemblyId>/<report-name>-Manifest.json
+		// <report-prefix>/<report-name>/YYYYMMDD-YYYYMMDD/<assemblyId>/<report-name>-Manifest.json
 
-		// Strip off <report-pre***REMOVED***x>/<report-name>
-		trimmedPath := strings.TrimPre***REMOVED***x(key, pre***REMOVED***x)
+		// Strip off <report-prefix>/<report-name>
+		trimmedPath := strings.TrimPrefix(key, prefix)
 		// manifestDir will be <YYYYMMDD-YYYYMMDD>/<assemblyId> or <YYYYMMDD-YYYYMMDD>
 		// The latter is what we're looking for (without the assemblyId subdir)
 		manifestDir := path.Dir(trimmedPath)

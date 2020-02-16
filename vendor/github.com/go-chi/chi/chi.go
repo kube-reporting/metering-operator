@@ -105,11 +105,11 @@ type Router interface {
 	Put(pattern string, h http.HandlerFunc)
 	Trace(pattern string, h http.HandlerFunc)
 
-	// NotFound de***REMOVED***nes a handler to respond whenever a route could
+	// NotFound defines a handler to respond whenever a route could
 	// not be found.
 	NotFound(h http.HandlerFunc)
 
-	// MethodNotAllowed de***REMOVED***nes a handler to respond whenever a method is
+	// MethodNotAllowed defines a handler to respond whenever a method is
 	// not allowed.
 	MethodNotAllowed(h http.HandlerFunc)
 }

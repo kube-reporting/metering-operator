@@ -9,7 +9,7 @@ import (
 	"github.com/aws/aws-sdk-go/aws/request"
 )
 
-var errSSERequiresSSL = awserr.New("Con***REMOVED***gError", "cannot send SSE keys over HTTP.", nil)
+var errSSERequiresSSL = awserr.New("ConfigError", "cannot send SSE keys over HTTP.", nil)
 
 func validateSSERequiresSSL(r *request.Request) {
 	if r.HTTPRequest.URL.Scheme == "https" {

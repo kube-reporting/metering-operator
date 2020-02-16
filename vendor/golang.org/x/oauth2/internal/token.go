@@ -1,6 +1,6 @@
 // Copyright 2014 The Go Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE ***REMOVED***le.
+// license that can be found in the LICENSE file.
 
 package internal
 
@@ -125,7 +125,7 @@ var brokenAuthHeaderProviders = []string{
 	"https://sandbox.codeswholesale.com/oauth/token",
 	"https://api.sipgate.com/v1/authorization/oauth",
 	"https://api.medium.com/v1/tokens",
-	"https://log.***REMOVED***nalsurge.com/oauth/token",
+	"https://log.finalsurge.com/oauth/token",
 }
 
 // brokenAuthHeaderDomains lists broken providers that issue dynamic endpoints.
@@ -141,7 +141,7 @@ func RegisterBrokenAuthHeaderProvider(tokenURL string) {
 	brokenAuthHeaderProviders = append(brokenAuthHeaderProviders, tokenURL)
 }
 
-// providerAuthHeaderWorks reports whether the OAuth2 server identi***REMOVED***ed by the tokenURL
+// providerAuthHeaderWorks reports whether the OAuth2 server identified by the tokenURL
 // implements the OAuth2 spec correctly
 // See https://code.google.com/p/goauth2/issues/detail?id=31 for background.
 // In summary:
@@ -151,7 +151,7 @@ func RegisterBrokenAuthHeaderProvider(tokenURL string) {
 // - Stripe only accepts client secret in Auth header with Bearer method, not Basic
 func providerAuthHeaderWorks(tokenURL string) bool {
 	for _, s := range brokenAuthHeaderProviders {
-		if strings.HasPre***REMOVED***x(tokenURL, s) {
+		if strings.HasPrefix(tokenURL, s) {
 			// Some sites fail to implement the OAuth2 spec fully.
 			return false
 		}
@@ -159,7 +159,7 @@ func providerAuthHeaderWorks(tokenURL string) bool {
 
 	if u, err := url.Parse(tokenURL); err == nil {
 		for _, s := range brokenAuthHeaderDomains {
-			if strings.HasSuf***REMOVED***x(u.Host, s) {
+			if strings.HasSuffix(u.Host, s) {
 				return false
 			}
 		}
@@ -167,7 +167,7 @@ func providerAuthHeaderWorks(tokenURL string) bool {
 
 	// Assume the provider implements the spec properly
 	// otherwise. We can add more exceptions as they're
-	// discovered. We will _not_ be adding con***REMOVED***gurable hooks
+	// discovered. We will _not_ be adding configurable hooks
 	// to this package to let users select server bugs.
 	return true
 }
@@ -223,8 +223,8 @@ func RetrieveToken(ctx context.Context, clientID, clientSecret, tokenURL string,
 		e := vals.Get("expires_in")
 		if e == "" {
 			// TODO(jbd): Facebook's OAuth2 implementation is broken and
-			// returns expires_in ***REMOVED***eld in expires. Remove the fallback to expires,
-			// when Facebook ***REMOVED***xes their implementation.
+			// returns expires_in field in expires. Remove the fallback to expires,
+			// when Facebook fixes their implementation.
 			e = vals.Get("expires")
 		}
 		expires, _ := strconv.Atoi(e)
@@ -243,7 +243,7 @@ func RetrieveToken(ctx context.Context, clientID, clientSecret, tokenURL string,
 			Expiry:       tj.expiry(),
 			Raw:          make(map[string]interface{}),
 		}
-		json.Unmarshal(body, &token.Raw) // no error checks for optional ***REMOVED***elds
+		json.Unmarshal(body, &token.Raw) // no error checks for optional fields
 	}
 	// Don't overwrite `RefreshToken` with an empty value
 	// if this was a token refreshing request.

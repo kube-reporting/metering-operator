@@ -1,12 +1,12 @@
 // Copyright 2009 The Go Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE ***REMOVED***le.
+// license that can be found in the LICENSE file.
 
 // +build darwin dragonfly freebsd netbsd openbsd
 
 // BSD system call wrappers shared by *BSD based systems
 // including OS X (Darwin) and FreeBSD.  Like the other
-// syscall_*.go ***REMOVED***les it is compiled as Go code but also
+// syscall_*.go files it is compiled as Go code but also
 // used as input to mksyscall which parses the //sys
 // lines and generates system call stubs.
 
@@ -354,7 +354,7 @@ func Recvmsg(fd int, p, oob []byte, flags int) (n, oobn int, recvflags int, from
 	}
 	oobn = int(msg.Controllen)
 	recvflags = int(msg.Flags)
-	// source address is only speci***REMOVED***ed if the socket is unconnected
+	// source address is only specified if the socket is unconnected
 	if rsa.Addr.Family != AF_UNSPEC {
 		from, err = anyToSockaddr(&rsa)
 	}
@@ -550,7 +550,7 @@ func UtimesNano(path string, ts []Timespec) error {
 	if err != ENOSYS {
 		return err
 	}
-	// Not as ef***REMOVED***cient as it could be because Timespec and
+	// Not as efficient as it could be because Timespec and
 	// Timeval have different types in the different OSes
 	tv := [2]Timeval{
 		NsecToTimeval(TimespecToNsec(ts[0])),

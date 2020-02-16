@@ -1,6 +1,6 @@
 // Copyright 2015 The Go Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE ***REMOVED***le.
+// license that can be found in the LICENSE file.
 
 // +build gccgo
 
@@ -8,9 +8,9 @@
 #include <stdint.h>
 #include <unistd.h>
 
-#de***REMOVED***ne _STRINGIFY2_(x) #x
-#de***REMOVED***ne _STRINGIFY_(x) _STRINGIFY2_(x)
-#de***REMOVED***ne GOSYM_PREFIX _STRINGIFY_(__USER_LABEL_PREFIX__)
+#define _STRINGIFY2_(x) #x
+#define _STRINGIFY_(x) _STRINGIFY2_(x)
+#define GOSYM_PREFIX _STRINGIFY_(__USER_LABEL_PREFIX__)
 
 // Call syscall from C code because the gccgo support for calling from
 // Go to C does not support varargs functions.
@@ -37,7 +37,7 @@ gccgoRealSyscallNoError(uintptr_t trap, uintptr_t a1, uintptr_t a2, uintptr_t a3
 	return syscall(trap, a1, a2, a3, a4, a5, a6, a7, a8, a9);
 }
 
-// De***REMOVED***ne the use function in C so that it is not inlined.
+// Define the use function in C so that it is not inlined.
 
 extern void use(void *) __asm__ (GOSYM_PREFIX GOPKGPATH ".use") __attribute__((noinline));
 

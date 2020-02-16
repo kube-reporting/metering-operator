@@ -44,7 +44,7 @@ func (s *boolSliceValue) Set(val string) error {
 
 	if !s.changed {
 		*s.value = out
-	} ***REMOVED*** {
+	} else {
 		*s.value = append(*s.value, out...)
 	}
 
@@ -58,7 +58,7 @@ func (s *boolSliceValue) Type() string {
 	return "boolSlice"
 }
 
-// String de***REMOVED***nes a "native" format for this boolean slice flag value.
+// String defines a "native" format for this boolean slice flag value.
 func (s *boolSliceValue) String() string {
 
 	boolStrSlice := make([]string, len(*s.value))
@@ -98,7 +98,7 @@ func (f *FlagSet) GetBoolSlice(name string) ([]bool, error) {
 	return val.([]bool), nil
 }
 
-// BoolSliceVar de***REMOVED***nes a boolSlice flag with speci***REMOVED***ed name, default value, and usage string.
+// BoolSliceVar defines a boolSlice flag with specified name, default value, and usage string.
 // The argument p points to a []bool variable in which to store the value of the flag.
 func (f *FlagSet) BoolSliceVar(p *[]bool, name string, value []bool, usage string) {
 	f.VarP(newBoolSliceValue(value, p), name, "", usage)
@@ -109,7 +109,7 @@ func (f *FlagSet) BoolSliceVarP(p *[]bool, name, shorthand string, value []bool,
 	f.VarP(newBoolSliceValue(value, p), name, shorthand, usage)
 }
 
-// BoolSliceVar de***REMOVED***nes a []bool flag with speci***REMOVED***ed name, default value, and usage string.
+// BoolSliceVar defines a []bool flag with specified name, default value, and usage string.
 // The argument p points to a []bool variable in which to store the value of the flag.
 func BoolSliceVar(p *[]bool, name string, value []bool, usage string) {
 	CommandLine.VarP(newBoolSliceValue(value, p), name, "", usage)
@@ -120,7 +120,7 @@ func BoolSliceVarP(p *[]bool, name, shorthand string, value []bool, usage string
 	CommandLine.VarP(newBoolSliceValue(value, p), name, shorthand, usage)
 }
 
-// BoolSlice de***REMOVED***nes a []bool flag with speci***REMOVED***ed name, default value, and usage string.
+// BoolSlice defines a []bool flag with specified name, default value, and usage string.
 // The return value is the address of a []bool variable that stores the value of the flag.
 func (f *FlagSet) BoolSlice(name string, value []bool, usage string) *[]bool {
 	p := []bool{}
@@ -135,7 +135,7 @@ func (f *FlagSet) BoolSliceP(name, shorthand string, value []bool, usage string)
 	return &p
 }
 
-// BoolSlice de***REMOVED***nes a []bool flag with speci***REMOVED***ed name, default value, and usage string.
+// BoolSlice defines a []bool flag with specified name, default value, and usage string.
 // The return value is the address of a []bool variable that stores the value of the flag.
 func BoolSlice(name string, value []bool, usage string) *[]bool {
 	return CommandLine.BoolSliceP(name, "", value, usage)

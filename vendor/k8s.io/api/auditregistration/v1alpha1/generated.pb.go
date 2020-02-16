@@ -2,7 +2,7 @@
 Copyright The Kubernetes Authors.
 
 Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this ***REMOVED***le except in compliance with the License.
+you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
 
     http://www.apache.org/licenses/LICENSE-2.0
@@ -10,7 +10,7 @@ You may obtain a copy of the License at
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the speci***REMOVED***c language governing permissions and
+See the License for the specific language governing permissions and
 limitations under the License.
 */
 
@@ -20,7 +20,7 @@ limitations under the License.
 /*
 	Package v1alpha1 is a generated protocol buffer package.
 
-	It is generated from these ***REMOVED***les:
+	It is generated from these files:
 		k8s.io/kubernetes/vendor/k8s.io/api/auditregistration/v1alpha1/generated.proto
 
 	It has these top-level messages:
@@ -30,8 +30,8 @@ limitations under the License.
 		Policy
 		ServiceReference
 		Webhook
-		WebhookClientCon***REMOVED***g
-		WebhookThrottleCon***REMOVED***g
+		WebhookClientConfig
+		WebhookThrottleConfig
 */
 package v1alpha1
 
@@ -49,7 +49,7 @@ var _ = proto.Marshal
 var _ = fmt.Errorf
 var _ = math.Inf
 
-// This is a compile-time assertion to ensure that this generated ***REMOVED***le
+// This is a compile-time assertion to ensure that this generated file
 // is compatible with the proto package it is being compiled against.
 // A compilation error at this line likely means your copy of the
 // proto package needs to be updated.
@@ -57,35 +57,35 @@ const _ = proto.GoGoProtoPackageIsVersion2 // please upgrade the proto package
 
 func (m *AuditSink) Reset()                    { *m = AuditSink{} }
 func (*AuditSink) ProtoMessage()               {}
-func (*AuditSink) Descriptor() ([]byte, []int) { return ***REMOVED***leDescriptorGenerated, []int{0} }
+func (*AuditSink) Descriptor() ([]byte, []int) { return fileDescriptorGenerated, []int{0} }
 
 func (m *AuditSinkList) Reset()                    { *m = AuditSinkList{} }
 func (*AuditSinkList) ProtoMessage()               {}
-func (*AuditSinkList) Descriptor() ([]byte, []int) { return ***REMOVED***leDescriptorGenerated, []int{1} }
+func (*AuditSinkList) Descriptor() ([]byte, []int) { return fileDescriptorGenerated, []int{1} }
 
 func (m *AuditSinkSpec) Reset()                    { *m = AuditSinkSpec{} }
 func (*AuditSinkSpec) ProtoMessage()               {}
-func (*AuditSinkSpec) Descriptor() ([]byte, []int) { return ***REMOVED***leDescriptorGenerated, []int{2} }
+func (*AuditSinkSpec) Descriptor() ([]byte, []int) { return fileDescriptorGenerated, []int{2} }
 
 func (m *Policy) Reset()                    { *m = Policy{} }
 func (*Policy) ProtoMessage()               {}
-func (*Policy) Descriptor() ([]byte, []int) { return ***REMOVED***leDescriptorGenerated, []int{3} }
+func (*Policy) Descriptor() ([]byte, []int) { return fileDescriptorGenerated, []int{3} }
 
 func (m *ServiceReference) Reset()                    { *m = ServiceReference{} }
 func (*ServiceReference) ProtoMessage()               {}
-func (*ServiceReference) Descriptor() ([]byte, []int) { return ***REMOVED***leDescriptorGenerated, []int{4} }
+func (*ServiceReference) Descriptor() ([]byte, []int) { return fileDescriptorGenerated, []int{4} }
 
 func (m *Webhook) Reset()                    { *m = Webhook{} }
 func (*Webhook) ProtoMessage()               {}
-func (*Webhook) Descriptor() ([]byte, []int) { return ***REMOVED***leDescriptorGenerated, []int{5} }
+func (*Webhook) Descriptor() ([]byte, []int) { return fileDescriptorGenerated, []int{5} }
 
-func (m *WebhookClientCon***REMOVED***g) Reset()                    { *m = WebhookClientCon***REMOVED***g{} }
-func (*WebhookClientCon***REMOVED***g) ProtoMessage()               {}
-func (*WebhookClientCon***REMOVED***g) Descriptor() ([]byte, []int) { return ***REMOVED***leDescriptorGenerated, []int{6} }
+func (m *WebhookClientConfig) Reset()                    { *m = WebhookClientConfig{} }
+func (*WebhookClientConfig) ProtoMessage()               {}
+func (*WebhookClientConfig) Descriptor() ([]byte, []int) { return fileDescriptorGenerated, []int{6} }
 
-func (m *WebhookThrottleCon***REMOVED***g) Reset()                    { *m = WebhookThrottleCon***REMOVED***g{} }
-func (*WebhookThrottleCon***REMOVED***g) ProtoMessage()               {}
-func (*WebhookThrottleCon***REMOVED***g) Descriptor() ([]byte, []int) { return ***REMOVED***leDescriptorGenerated, []int{7} }
+func (m *WebhookThrottleConfig) Reset()                    { *m = WebhookThrottleConfig{} }
+func (*WebhookThrottleConfig) ProtoMessage()               {}
+func (*WebhookThrottleConfig) Descriptor() ([]byte, []int) { return fileDescriptorGenerated, []int{7} }
 
 func init() {
 	proto.RegisterType((*AuditSink)(nil), "k8s.io.api.auditregistration.v1alpha1.AuditSink")
@@ -94,8 +94,8 @@ func init() {
 	proto.RegisterType((*Policy)(nil), "k8s.io.api.auditregistration.v1alpha1.Policy")
 	proto.RegisterType((*ServiceReference)(nil), "k8s.io.api.auditregistration.v1alpha1.ServiceReference")
 	proto.RegisterType((*Webhook)(nil), "k8s.io.api.auditregistration.v1alpha1.Webhook")
-	proto.RegisterType((*WebhookClientCon***REMOVED***g)(nil), "k8s.io.api.auditregistration.v1alpha1.WebhookClientCon***REMOVED***g")
-	proto.RegisterType((*WebhookThrottleCon***REMOVED***g)(nil), "k8s.io.api.auditregistration.v1alpha1.WebhookThrottleCon***REMOVED***g")
+	proto.RegisterType((*WebhookClientConfig)(nil), "k8s.io.api.auditregistration.v1alpha1.WebhookClientConfig")
+	proto.RegisterType((*WebhookThrottleConfig)(nil), "k8s.io.api.auditregistration.v1alpha1.WebhookThrottleConfig")
 }
 func (m *AuditSink) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
@@ -299,8 +299,8 @@ func (m *Webhook) MarshalTo(dAtA []byte) (int, error) {
 	}
 	dAtA[i] = 0x12
 	i++
-	i = encodeVarintGenerated(dAtA, i, uint64(m.ClientCon***REMOVED***g.Size()))
-	n7, err := m.ClientCon***REMOVED***g.MarshalTo(dAtA[i:])
+	i = encodeVarintGenerated(dAtA, i, uint64(m.ClientConfig.Size()))
+	n7, err := m.ClientConfig.MarshalTo(dAtA[i:])
 	if err != nil {
 		return 0, err
 	}
@@ -308,7 +308,7 @@ func (m *Webhook) MarshalTo(dAtA []byte) (int, error) {
 	return i, nil
 }
 
-func (m *WebhookClientCon***REMOVED***g) Marshal() (dAtA []byte, err error) {
+func (m *WebhookClientConfig) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalTo(dAtA)
@@ -318,7 +318,7 @@ func (m *WebhookClientCon***REMOVED***g) Marshal() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *WebhookClientCon***REMOVED***g) MarshalTo(dAtA []byte) (int, error) {
+func (m *WebhookClientConfig) MarshalTo(dAtA []byte) (int, error) {
 	var i int
 	_ = i
 	var l int
@@ -348,7 +348,7 @@ func (m *WebhookClientCon***REMOVED***g) MarshalTo(dAtA []byte) (int, error) {
 	return i, nil
 }
 
-func (m *WebhookThrottleCon***REMOVED***g) Marshal() (dAtA []byte, err error) {
+func (m *WebhookThrottleConfig) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalTo(dAtA)
@@ -358,7 +358,7 @@ func (m *WebhookThrottleCon***REMOVED***g) Marshal() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *WebhookThrottleCon***REMOVED***g) MarshalTo(dAtA []byte) (int, error) {
+func (m *WebhookThrottleConfig) MarshalTo(dAtA []byte) (int, error) {
 	var i int
 	_ = i
 	var l int
@@ -454,12 +454,12 @@ func (m *Webhook) Size() (n int) {
 		l = m.Throttle.Size()
 		n += 1 + l + sovGenerated(uint64(l))
 	}
-	l = m.ClientCon***REMOVED***g.Size()
+	l = m.ClientConfig.Size()
 	n += 1 + l + sovGenerated(uint64(l))
 	return n
 }
 
-func (m *WebhookClientCon***REMOVED***g) Size() (n int) {
+func (m *WebhookClientConfig) Size() (n int) {
 	var l int
 	_ = l
 	if m.URL != nil {
@@ -477,7 +477,7 @@ func (m *WebhookClientCon***REMOVED***g) Size() (n int) {
 	return n
 }
 
-func (m *WebhookThrottleCon***REMOVED***g) Size() (n int) {
+func (m *WebhookThrottleConfig) Size() (n int) {
 	var l int
 	_ = l
 	if m.QPS != nil {
@@ -563,17 +563,17 @@ func (this *Webhook) String() string {
 		return "nil"
 	}
 	s := strings.Join([]string{`&Webhook{`,
-		`Throttle:` + strings.Replace(fmt.Sprintf("%v", this.Throttle), "WebhookThrottleCon***REMOVED***g", "WebhookThrottleCon***REMOVED***g", 1) + `,`,
-		`ClientCon***REMOVED***g:` + strings.Replace(strings.Replace(this.ClientCon***REMOVED***g.String(), "WebhookClientCon***REMOVED***g", "WebhookClientCon***REMOVED***g", 1), `&`, ``, 1) + `,`,
+		`Throttle:` + strings.Replace(fmt.Sprintf("%v", this.Throttle), "WebhookThrottleConfig", "WebhookThrottleConfig", 1) + `,`,
+		`ClientConfig:` + strings.Replace(strings.Replace(this.ClientConfig.String(), "WebhookClientConfig", "WebhookClientConfig", 1), `&`, ``, 1) + `,`,
 		`}`,
 	}, "")
 	return s
 }
-func (this *WebhookClientCon***REMOVED***g) String() string {
+func (this *WebhookClientConfig) String() string {
 	if this == nil {
 		return "nil"
 	}
-	s := strings.Join([]string{`&WebhookClientCon***REMOVED***g{`,
+	s := strings.Join([]string{`&WebhookClientConfig{`,
 		`URL:` + valueToStringGenerated(this.URL) + `,`,
 		`Service:` + strings.Replace(fmt.Sprintf("%v", this.Service), "ServiceReference", "ServiceReference", 1) + `,`,
 		`CABundle:` + valueToStringGenerated(this.CABundle) + `,`,
@@ -581,11 +581,11 @@ func (this *WebhookClientCon***REMOVED***g) String() string {
 	}, "")
 	return s
 }
-func (this *WebhookThrottleCon***REMOVED***g) String() string {
+func (this *WebhookThrottleConfig) String() string {
 	if this == nil {
 		return "nil"
 	}
-	s := strings.Join([]string{`&WebhookThrottleCon***REMOVED***g{`,
+	s := strings.Join([]string{`&WebhookThrottleConfig{`,
 		`QPS:` + valueToStringGenerated(this.QPS) + `,`,
 		`Burst:` + valueToStringGenerated(this.Burst) + `,`,
 		`}`,
@@ -620,18 +620,18 @@ func (m *AuditSink) Unmarshal(dAtA []byte) error {
 				break
 			}
 		}
-		***REMOVED***eldNum := int32(wire >> 3)
+		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
 			return fmt.Errorf("proto: AuditSink: wiretype end group for non-group")
 		}
-		if ***REMOVED***eldNum <= 0 {
-			return fmt.Errorf("proto: AuditSink: illegal tag %d (wire type %d)", ***REMOVED***eldNum, wire)
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: AuditSink: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
-		switch ***REMOVED***eldNum {
+		switch fieldNum {
 		case 1:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for ***REMOVED***eld ObjectMeta", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field ObjectMeta", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -661,7 +661,7 @@ func (m *AuditSink) Unmarshal(dAtA []byte) error {
 			iNdEx = postIndex
 		case 2:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for ***REMOVED***eld Spec", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field Spec", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -730,18 +730,18 @@ func (m *AuditSinkList) Unmarshal(dAtA []byte) error {
 				break
 			}
 		}
-		***REMOVED***eldNum := int32(wire >> 3)
+		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
 			return fmt.Errorf("proto: AuditSinkList: wiretype end group for non-group")
 		}
-		if ***REMOVED***eldNum <= 0 {
-			return fmt.Errorf("proto: AuditSinkList: illegal tag %d (wire type %d)", ***REMOVED***eldNum, wire)
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: AuditSinkList: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
-		switch ***REMOVED***eldNum {
+		switch fieldNum {
 		case 1:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for ***REMOVED***eld ListMeta", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field ListMeta", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -771,7 +771,7 @@ func (m *AuditSinkList) Unmarshal(dAtA []byte) error {
 			iNdEx = postIndex
 		case 2:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for ***REMOVED***eld Items", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field Items", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -841,18 +841,18 @@ func (m *AuditSinkSpec) Unmarshal(dAtA []byte) error {
 				break
 			}
 		}
-		***REMOVED***eldNum := int32(wire >> 3)
+		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
 			return fmt.Errorf("proto: AuditSinkSpec: wiretype end group for non-group")
 		}
-		if ***REMOVED***eldNum <= 0 {
-			return fmt.Errorf("proto: AuditSinkSpec: illegal tag %d (wire type %d)", ***REMOVED***eldNum, wire)
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: AuditSinkSpec: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
-		switch ***REMOVED***eldNum {
+		switch fieldNum {
 		case 1:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for ***REMOVED***eld Policy", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field Policy", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -882,7 +882,7 @@ func (m *AuditSinkSpec) Unmarshal(dAtA []byte) error {
 			iNdEx = postIndex
 		case 2:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for ***REMOVED***eld Webhook", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field Webhook", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -951,18 +951,18 @@ func (m *Policy) Unmarshal(dAtA []byte) error {
 				break
 			}
 		}
-		***REMOVED***eldNum := int32(wire >> 3)
+		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
 			return fmt.Errorf("proto: Policy: wiretype end group for non-group")
 		}
-		if ***REMOVED***eldNum <= 0 {
-			return fmt.Errorf("proto: Policy: illegal tag %d (wire type %d)", ***REMOVED***eldNum, wire)
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: Policy: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
-		switch ***REMOVED***eldNum {
+		switch fieldNum {
 		case 1:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for ***REMOVED***eld Level", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field Level", wireType)
 			}
 			var stringLen uint64
 			for shift := uint(0); ; shift += 7 {
@@ -991,7 +991,7 @@ func (m *Policy) Unmarshal(dAtA []byte) error {
 			iNdEx = postIndex
 		case 2:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for ***REMOVED***eld Stages", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field Stages", wireType)
 			}
 			var stringLen uint64
 			for shift := uint(0); ; shift += 7 {
@@ -1059,18 +1059,18 @@ func (m *ServiceReference) Unmarshal(dAtA []byte) error {
 				break
 			}
 		}
-		***REMOVED***eldNum := int32(wire >> 3)
+		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
 			return fmt.Errorf("proto: ServiceReference: wiretype end group for non-group")
 		}
-		if ***REMOVED***eldNum <= 0 {
-			return fmt.Errorf("proto: ServiceReference: illegal tag %d (wire type %d)", ***REMOVED***eldNum, wire)
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: ServiceReference: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
-		switch ***REMOVED***eldNum {
+		switch fieldNum {
 		case 1:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for ***REMOVED***eld Namespace", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field Namespace", wireType)
 			}
 			var stringLen uint64
 			for shift := uint(0); ; shift += 7 {
@@ -1099,7 +1099,7 @@ func (m *ServiceReference) Unmarshal(dAtA []byte) error {
 			iNdEx = postIndex
 		case 2:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for ***REMOVED***eld Name", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field Name", wireType)
 			}
 			var stringLen uint64
 			for shift := uint(0); ; shift += 7 {
@@ -1128,7 +1128,7 @@ func (m *ServiceReference) Unmarshal(dAtA []byte) error {
 			iNdEx = postIndex
 		case 3:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for ***REMOVED***eld Path", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field Path", wireType)
 			}
 			var stringLen uint64
 			for shift := uint(0); ; shift += 7 {
@@ -1197,18 +1197,18 @@ func (m *Webhook) Unmarshal(dAtA []byte) error {
 				break
 			}
 		}
-		***REMOVED***eldNum := int32(wire >> 3)
+		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
 			return fmt.Errorf("proto: Webhook: wiretype end group for non-group")
 		}
-		if ***REMOVED***eldNum <= 0 {
-			return fmt.Errorf("proto: Webhook: illegal tag %d (wire type %d)", ***REMOVED***eldNum, wire)
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: Webhook: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
-		switch ***REMOVED***eldNum {
+		switch fieldNum {
 		case 1:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for ***REMOVED***eld Throttle", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field Throttle", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -1233,7 +1233,7 @@ func (m *Webhook) Unmarshal(dAtA []byte) error {
 				return io.ErrUnexpectedEOF
 			}
 			if m.Throttle == nil {
-				m.Throttle = &WebhookThrottleCon***REMOVED***g{}
+				m.Throttle = &WebhookThrottleConfig{}
 			}
 			if err := m.Throttle.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
@@ -1241,7 +1241,7 @@ func (m *Webhook) Unmarshal(dAtA []byte) error {
 			iNdEx = postIndex
 		case 2:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for ***REMOVED***eld ClientCon***REMOVED***g", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field ClientConfig", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -1265,7 +1265,7 @@ func (m *Webhook) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			if err := m.ClientCon***REMOVED***g.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+			if err := m.ClientConfig.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
 			iNdEx = postIndex
@@ -1290,7 +1290,7 @@ func (m *Webhook) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *WebhookClientCon***REMOVED***g) Unmarshal(dAtA []byte) error {
+func (m *WebhookClientConfig) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -1310,18 +1310,18 @@ func (m *WebhookClientCon***REMOVED***g) Unmarshal(dAtA []byte) error {
 				break
 			}
 		}
-		***REMOVED***eldNum := int32(wire >> 3)
+		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: WebhookClientCon***REMOVED***g: wiretype end group for non-group")
+			return fmt.Errorf("proto: WebhookClientConfig: wiretype end group for non-group")
 		}
-		if ***REMOVED***eldNum <= 0 {
-			return fmt.Errorf("proto: WebhookClientCon***REMOVED***g: illegal tag %d (wire type %d)", ***REMOVED***eldNum, wire)
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: WebhookClientConfig: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
-		switch ***REMOVED***eldNum {
+		switch fieldNum {
 		case 1:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for ***REMOVED***eld URL", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field URL", wireType)
 			}
 			var stringLen uint64
 			for shift := uint(0); ; shift += 7 {
@@ -1351,7 +1351,7 @@ func (m *WebhookClientCon***REMOVED***g) Unmarshal(dAtA []byte) error {
 			iNdEx = postIndex
 		case 2:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for ***REMOVED***eld Service", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field Service", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -1384,7 +1384,7 @@ func (m *WebhookClientCon***REMOVED***g) Unmarshal(dAtA []byte) error {
 			iNdEx = postIndex
 		case 3:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for ***REMOVED***eld CABundle", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field CABundle", wireType)
 			}
 			var byteLen int
 			for shift := uint(0); ; shift += 7 {
@@ -1434,7 +1434,7 @@ func (m *WebhookClientCon***REMOVED***g) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *WebhookThrottleCon***REMOVED***g) Unmarshal(dAtA []byte) error {
+func (m *WebhookThrottleConfig) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -1454,18 +1454,18 @@ func (m *WebhookThrottleCon***REMOVED***g) Unmarshal(dAtA []byte) error {
 				break
 			}
 		}
-		***REMOVED***eldNum := int32(wire >> 3)
+		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: WebhookThrottleCon***REMOVED***g: wiretype end group for non-group")
+			return fmt.Errorf("proto: WebhookThrottleConfig: wiretype end group for non-group")
 		}
-		if ***REMOVED***eldNum <= 0 {
-			return fmt.Errorf("proto: WebhookThrottleCon***REMOVED***g: illegal tag %d (wire type %d)", ***REMOVED***eldNum, wire)
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: WebhookThrottleConfig: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
-		switch ***REMOVED***eldNum {
+		switch fieldNum {
 		case 1:
 			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for ***REMOVED***eld QPS", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field QPS", wireType)
 			}
 			var v int64
 			for shift := uint(0); ; shift += 7 {
@@ -1485,7 +1485,7 @@ func (m *WebhookThrottleCon***REMOVED***g) Unmarshal(dAtA []byte) error {
 			m.QPS = &v
 		case 2:
 			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for ***REMOVED***eld Burst", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field Burst", wireType)
 			}
 			var v int64
 			for shift := uint(0); ; shift += 7 {
@@ -1630,10 +1630,10 @@ var (
 )
 
 func init() {
-	proto.RegisterFile("k8s.io/kubernetes/vendor/k8s.io/api/auditregistration/v1alpha1/generated.proto", ***REMOVED***leDescriptorGenerated)
+	proto.RegisterFile("k8s.io/kubernetes/vendor/k8s.io/api/auditregistration/v1alpha1/generated.proto", fileDescriptorGenerated)
 }
 
-var ***REMOVED***leDescriptorGenerated = []byte{
+var fileDescriptorGenerated = []byte{
 	// 747 bytes of a gzipped FileDescriptorProto
 	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x94, 0x52, 0x41, 0x6f, 0xd3, 0x48,
 	0x14, 0x8e, 0x9b, 0xa4, 0x49, 0xa6, 0xe9, 0x6e, 0x77, 0xba, 0xbb, 0xca, 0x56, 0x2b, 0xa7, 0xb2,

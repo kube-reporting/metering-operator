@@ -23,23 +23,23 @@ func (c *RouteV1Client) Routes(namespace string) RouteInterface {
 	return newRoutes(c, namespace)
 }
 
-// NewForCon***REMOVED***g creates a new RouteV1Client for the given con***REMOVED***g.
-func NewForCon***REMOVED***g(c *rest.Con***REMOVED***g) (*RouteV1Client, error) {
-	con***REMOVED***g := *c
-	if err := setCon***REMOVED***gDefaults(&con***REMOVED***g); err != nil {
+// NewForConfig creates a new RouteV1Client for the given config.
+func NewForConfig(c *rest.Config) (*RouteV1Client, error) {
+	config := *c
+	if err := setConfigDefaults(&config); err != nil {
 		return nil, err
 	}
-	client, err := rest.RESTClientFor(&con***REMOVED***g)
+	client, err := rest.RESTClientFor(&config)
 	if err != nil {
 		return nil, err
 	}
 	return &RouteV1Client{client}, nil
 }
 
-// NewForCon***REMOVED***gOrDie creates a new RouteV1Client for the given con***REMOVED***g and
-// panics if there is an error in the con***REMOVED***g.
-func NewForCon***REMOVED***gOrDie(c *rest.Con***REMOVED***g) *RouteV1Client {
-	client, err := NewForCon***REMOVED***g(c)
+// NewForConfigOrDie creates a new RouteV1Client for the given config and
+// panics if there is an error in the config.
+func NewForConfigOrDie(c *rest.Config) *RouteV1Client {
+	client, err := NewForConfig(c)
 	if err != nil {
 		panic(err)
 	}
@@ -51,14 +51,14 @@ func New(c rest.Interface) *RouteV1Client {
 	return &RouteV1Client{c}
 }
 
-func setCon***REMOVED***gDefaults(con***REMOVED***g *rest.Con***REMOVED***g) error {
+func setConfigDefaults(config *rest.Config) error {
 	gv := v1.SchemeGroupVersion
-	con***REMOVED***g.GroupVersion = &gv
-	con***REMOVED***g.APIPath = "/apis"
-	con***REMOVED***g.NegotiatedSerializer = serializer.DirectCodecFactory{CodecFactory: scheme.Codecs}
+	config.GroupVersion = &gv
+	config.APIPath = "/apis"
+	config.NegotiatedSerializer = serializer.DirectCodecFactory{CodecFactory: scheme.Codecs}
 
-	if con***REMOVED***g.UserAgent == "" {
-		con***REMOVED***g.UserAgent = rest.DefaultKubernetesUserAgent()
+	if config.UserAgent == "" {
+		config.UserAgent = rest.DefaultKubernetesUserAgent()
 	}
 
 	return nil

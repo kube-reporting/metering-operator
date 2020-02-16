@@ -2,7 +2,7 @@
 Copyright 2015 The Kubernetes Authors.
 
 Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this ***REMOVED***le except in compliance with the License.
+you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
 
     http://www.apache.org/licenses/LICENSE-2.0
@@ -10,20 +10,20 @@ You may obtain a copy of the License at
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the speci***REMOVED***c language governing permissions and
+See the License for the specific language governing permissions and
 limitations under the License.
 */
 
 package types
 
-// NodeName is a type that holds a api.Node's Name identi***REMOVED***er.
+// NodeName is a type that holds a api.Node's Name identifier.
 // Being a type captures intent and helps make sure that the node name
 // is not confused with similar concepts (the hostname, the cloud provider id,
 // the cloud provider name etc)
 //
 // To clarify the various types:
 //
-// * Node.Name is the Name ***REMOVED***eld of the Node in the API.  This should be stored in a NodeName.
+// * Node.Name is the Name field of the Node in the API.  This should be stored in a NodeName.
 //   Unfortunately, because Name is part of ObjectMeta, we can't store it as a NodeName at the API level.
 //
 // * Hostname is the hostname of the local machine (from uname -n).
@@ -34,7 +34,7 @@ package types
 // * The cloudproviders have the own names: GCE has InstanceName, AWS has InstanceId.
 //
 //   For GCE, InstanceName is the Name of an Instance object in the GCE API.  On GCE, Instance.Name becomes the
-//   Hostname, and thus it makes sense also to use it as the Node.Name.  But that is GCE speci***REMOVED***c, and it is up
+//   Hostname, and thus it makes sense also to use it as the Node.Name.  But that is GCE specific, and it is up
 //   to the cloudprovider how to do this mapping.
 //
 //   For AWS, the InstanceID is not yet suitable for use as a Node.Name, so we actually use the

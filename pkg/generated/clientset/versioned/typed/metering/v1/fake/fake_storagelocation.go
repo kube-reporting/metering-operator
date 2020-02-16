@@ -33,7 +33,7 @@ func (c *FakeStorageLocations) Get(name string, options v1.GetOptions) (result *
 	return obj.(*meteringv1.StorageLocation), err
 }
 
-// List takes label and ***REMOVED***eld selectors, and returns the list of StorageLocations that match those selectors.
+// List takes label and field selectors, and returns the list of StorageLocations that match those selectors.
 func (c *FakeStorageLocations) List(opts v1.ListOptions) (result *meteringv1.StorageLocationList, err error) {
 	obj, err := c.Fake.
 		Invokes(testing.NewListAction(storagelocationsResource, storagelocationsKind, c.ns, opts), &meteringv1.StorageLocationList{})

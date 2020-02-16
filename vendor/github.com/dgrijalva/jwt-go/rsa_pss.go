@@ -14,7 +14,7 @@ type SigningMethodRSAPSS struct {
 	Options *rsa.PSSOptions
 }
 
-// Speci***REMOVED***c instances for RS/PS and company
+// Specific instances for RS/PS and company
 var (
 	SigningMethodPS256 *SigningMethodRSAPSS
 	SigningMethodPS384 *SigningMethodRSAPSS
@@ -120,7 +120,7 @@ func (m *SigningMethodRSAPSS) Sign(signingString string, key interface{}) (strin
 	// Sign the string and return the encoded bytes
 	if sigBytes, err := rsa.SignPSS(rand.Reader, rsaKey, m.Hash, hasher.Sum(nil), m.Options); err == nil {
 		return EncodeSegment(sigBytes), nil
-	} ***REMOVED*** {
+	} else {
 		return "", err
 	}
 }

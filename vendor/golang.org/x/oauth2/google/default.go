@@ -1,6 +1,6 @@
 // Copyright 2015 The Go Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE ***REMOVED***le.
+// license that can be found in the LICENSE file.
 
 package google
 
@@ -10,7 +10,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"os"
-	"path/***REMOVED***lepath"
+	"path/filepath"
 	"runtime"
 
 	"cloud.google.com/go/compute/metadata"
@@ -40,23 +40,23 @@ func DefaultTokenSource(ctx context.Context, scope ...string) (oauth2.TokenSourc
 }
 
 // Common implementation for FindDefaultCredentials.
-func ***REMOVED***ndDefaultCredentials(ctx context.Context, scopes []string) (*DefaultCredentials, error) {
+func findDefaultCredentials(ctx context.Context, scopes []string) (*DefaultCredentials, error) {
 	// First, try the environment variable.
 	const envVar = "GOOGLE_APPLICATION_CREDENTIALS"
-	if ***REMOVED***lename := os.Getenv(envVar); ***REMOVED***lename != "" {
-		creds, err := readCredentialsFile(ctx, ***REMOVED***lename, scopes)
+	if filename := os.Getenv(envVar); filename != "" {
+		creds, err := readCredentialsFile(ctx, filename, scopes)
 		if err != nil {
 			return nil, fmt.Errorf("google: error getting credentials using %v environment variable: %v", envVar, err)
 		}
 		return creds, nil
 	}
 
-	// Second, try a well-known ***REMOVED***le.
-	***REMOVED***lename := wellKnownFile()
-	if creds, err := readCredentialsFile(ctx, ***REMOVED***lename, scopes); err == nil {
+	// Second, try a well-known file.
+	filename := wellKnownFile()
+	if creds, err := readCredentialsFile(ctx, filename, scopes); err == nil {
 		return creds, nil
-	} ***REMOVED*** if !os.IsNotExist(err) {
-		return nil, fmt.Errorf("google: error getting credentials using well-known ***REMOVED***le (%v): %v", ***REMOVED***lename, err)
+	} else if !os.IsNotExist(err) {
+		return nil, fmt.Errorf("google: error getting credentials using well-known file (%v): %v", filename, err)
 	}
 
 	// Third, if we're on Google App Engine use those credentials.
@@ -78,7 +78,7 @@ func ***REMOVED***ndDefaultCredentials(ctx context.Context, scopes []string) (*D
 
 	// None are found; return helpful error.
 	const url = "https://developers.google.com/accounts/docs/application-default-credentials"
-	return nil, fmt.Errorf("google: could not ***REMOVED***nd default credentials. See %v for more information.", url)
+	return nil, fmt.Errorf("google: could not find default credentials. See %v for more information.", url)
 }
 
 // Common implementation for CredentialsFromJSON.
@@ -101,13 +101,13 @@ func credentialsFromJSON(ctx context.Context, jsonData []byte, scopes []string) 
 func wellKnownFile() string {
 	const f = "application_default_credentials.json"
 	if runtime.GOOS == "windows" {
-		return ***REMOVED***lepath.Join(os.Getenv("APPDATA"), "gcloud", f)
+		return filepath.Join(os.Getenv("APPDATA"), "gcloud", f)
 	}
-	return ***REMOVED***lepath.Join(guessUnixHomeDir(), ".con***REMOVED***g", "gcloud", f)
+	return filepath.Join(guessUnixHomeDir(), ".config", "gcloud", f)
 }
 
-func readCredentialsFile(ctx context.Context, ***REMOVED***lename string, scopes []string) (*DefaultCredentials, error) {
-	b, err := ioutil.ReadFile(***REMOVED***lename)
+func readCredentialsFile(ctx context.Context, filename string, scopes []string) (*DefaultCredentials, error) {
+	b, err := ioutil.ReadFile(filename)
 	if err != nil {
 		return nil, err
 	}

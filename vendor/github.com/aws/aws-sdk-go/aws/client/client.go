@@ -8,9 +8,9 @@ import (
 	"github.com/aws/aws-sdk-go/aws/request"
 )
 
-// A Con***REMOVED***g provides con***REMOVED***guration to a service client instance.
-type Con***REMOVED***g struct {
-	Con***REMOVED***g        *aws.Con***REMOVED***g
+// A Config provides configuration to a service client instance.
+type Config struct {
+	Config        *aws.Config
 	Handlers      request.Handlers
 	Endpoint      string
 	SigningRegion string
@@ -23,17 +23,17 @@ type Con***REMOVED***g struct {
 	SigningNameDerived bool
 }
 
-// Con***REMOVED***gProvider provides a generic way for a service client to receive
-// the ClientCon***REMOVED***g without circular dependencies.
-type Con***REMOVED***gProvider interface {
-	ClientCon***REMOVED***g(serviceName string, cfgs ...*aws.Con***REMOVED***g) Con***REMOVED***g
+// ConfigProvider provides a generic way for a service client to receive
+// the ClientConfig without circular dependencies.
+type ConfigProvider interface {
+	ClientConfig(serviceName string, cfgs ...*aws.Config) Config
 }
 
-// Con***REMOVED***gNoResolveEndpointProvider same as Con***REMOVED***gProvider except it will not
+// ConfigNoResolveEndpointProvider same as ConfigProvider except it will not
 // resolve the endpoint automatically. The service client's endpoint must be
-// provided via the aws.Con***REMOVED***g.Endpoint ***REMOVED***eld.
-type Con***REMOVED***gNoResolveEndpointProvider interface {
-	ClientCon***REMOVED***gNoResolveEndpoint(cfgs ...*aws.Con***REMOVED***g) Con***REMOVED***g
+// provided via the aws.Config.Endpoint field.
+type ConfigNoResolveEndpointProvider interface {
+	ClientConfigNoResolveEndpoint(cfgs ...*aws.Config) Config
 }
 
 // A Client implements the base client request and response handling
@@ -42,14 +42,14 @@ type Client struct {
 	request.Retryer
 	metadata.ClientInfo
 
-	Con***REMOVED***g   aws.Con***REMOVED***g
+	Config   aws.Config
 	Handlers request.Handlers
 }
 
 // New will return a pointer to a new initialized service client.
-func New(cfg aws.Con***REMOVED***g, info metadata.ClientInfo, handlers request.Handlers, options ...func(*Client)) *Client {
+func New(cfg aws.Config, info metadata.ClientInfo, handlers request.Handlers, options ...func(*Client)) *Client {
 	svc := &Client{
-		Con***REMOVED***g:     cfg,
+		Config:     cfg,
 		ClientInfo: info,
 		Handlers:   handlers.Copy(),
 	}
@@ -81,13 +81,13 @@ func New(cfg aws.Con***REMOVED***g, info metadata.ClientInfo, handlers request.H
 // NewRequest returns a new Request pointer for the service API
 // operation and parameters.
 func (c *Client) NewRequest(operation *request.Operation, params interface{}, data interface{}) *request.Request {
-	return request.New(c.Con***REMOVED***g, c.ClientInfo, c.Handlers, c.Retryer, operation, params, data)
+	return request.New(c.Config, c.ClientInfo, c.Handlers, c.Retryer, operation, params, data)
 }
 
 // AddDebugHandlers injects debug logging handlers into the service to log request
 // debug information.
 func (c *Client) AddDebugHandlers() {
-	if !c.Con***REMOVED***g.LogLevel.AtLeast(aws.LogDebug) {
+	if !c.Config.LogLevel.AtLeast(aws.LogDebug) {
 		return
 	}
 

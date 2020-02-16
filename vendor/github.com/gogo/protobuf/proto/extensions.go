@@ -4,7 +4,7 @@
 // https://github.com/golang/protobuf
 //
 // Redistribution and use in source and binary forms, with or without
-// modi***REMOVED***cation, are permitted provided that the following conditions are
+// modification, are permitted provided that the following conditions are
 // met:
 //
 //     * Redistributions of source code must retain the above copyright
@@ -15,7 +15,7 @@
 // distribution.
 //     * Neither the name of Google Inc. nor the names of its
 // contributors may be used to endorse or promote products derived from
-// this software without speci***REMOVED***c prior written permission.
+// this software without specific prior written permission.
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
 // "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
@@ -107,7 +107,7 @@ func extendable(p interface{}) (extendableProto, error) {
 	case extensionsBytes:
 		return slowExtensionAdapter{p}, nil
 	}
-	// Don't allocate a speci***REMOVED***c error containing %T:
+	// Don't allocate a specific error containing %T:
 	// this is the hot path for Clone and MarshalText.
 	return nil, errNotExtendable
 }
@@ -121,7 +121,7 @@ func isNilPtr(x interface{}) bool {
 
 // XXX_InternalExtensions is an internal representation of proto extensions.
 //
-// Each generated message struct type embeds an anonymous XXX_InternalExtensions ***REMOVED***eld,
+// Each generated message struct type embeds an anonymous XXX_InternalExtensions field,
 // thus gaining the unexported 'extensions' method, which can be called only from the proto package.
 //
 // The methods of XXX_InternalExtensions are not concurrency safe in general,
@@ -140,7 +140,7 @@ type XXX_InternalExtensions struct {
 	}
 }
 
-// extensionsWrite returns the extension map, creating it on ***REMOVED***rst use.
+// extensionsWrite returns the extension map, creating it on first use.
 func (e *XXX_InternalExtensions) extensionsWrite() map[int32]Extension {
 	if e.p == nil {
 		e.p = new(struct {
@@ -161,15 +161,15 @@ func (e *XXX_InternalExtensions) extensionsRead() (map[int32]Extension, sync.Loc
 	return e.p.extensionMap, &e.p.mu
 }
 
-// ExtensionDesc represents an extension speci***REMOVED***cation.
+// ExtensionDesc represents an extension specification.
 // Used in generated code from the protocol compiler.
 type ExtensionDesc struct {
 	ExtendedType  Message     // nil pointer to the type that is being extended
 	ExtensionType interface{} // nil pointer to the extension type
-	Field         int32       // ***REMOVED***eld number
-	Name          string      // fully-quali***REMOVED***ed name of extension, for text formatting
+	Field         int32       // field number
+	Name          string      // fully-qualified name of extension, for text formatting
 	Tag           string      // protobuf tag style
-	Filename      string      // name of the ***REMOVED***le in which the extension is de***REMOVED***ned
+	Filename      string      // name of the file in which the extension is defined
 }
 
 func (ed *ExtensionDesc) repeated() bool {
@@ -208,10 +208,10 @@ func SetRawExtension(base Message, id int32, b []byte) {
 	extmap[id] = Extension{enc: b}
 }
 
-// isExtensionField returns true iff the given ***REMOVED***eld number is in an extension range.
-func isExtensionField(pb extendableProto, ***REMOVED***eld int32) bool {
+// isExtensionField returns true iff the given field number is in an extension range.
+func isExtensionField(pb extendableProto, field int32) bool {
 	for _, er := range pb.ExtensionRangeArray() {
-		if er.Start <= ***REMOVED***eld && ***REMOVED***eld <= er.End {
+		if er.Start <= field && field <= er.End {
 			return true
 		}
 	}
@@ -238,10 +238,10 @@ func checkExtensionTypes(pb extendableProto, extension *ExtensionDesc) error {
 	return nil
 }
 
-// extPropKey is suf***REMOVED***cient to uniquely identify an extension.
+// extPropKey is sufficient to uniquely identify an extension.
 type extPropKey struct {
 	base  reflect.Type
-	***REMOVED***eld int32
+	field int32
 }
 
 var extProp = struct {
@@ -252,7 +252,7 @@ var extProp = struct {
 }
 
 func extensionProperties(ed *ExtensionDesc) *Properties {
-	key := extPropKey{base: reflect.TypeOf(ed.ExtendedType), ***REMOVED***eld: ed.Field}
+	key := extPropKey{base: reflect.TypeOf(ed.ExtendedType), field: ed.Field}
 
 	extProp.RLock()
 	if prop, ok := extProp.m[key]; ok {
@@ -282,8 +282,8 @@ func HasExtension(pb Message, extension *ExtensionDesc) bool {
 		o := 0
 		for o < len(buf) {
 			tag, n := DecodeVarint(buf[o:])
-			***REMOVED***eldNum := int32(tag >> 3)
-			if int32(***REMOVED***eldNum) == extension.Field {
+			fieldNum := int32(tag >> 3)
+			if int32(fieldNum) == extension.Field {
 				return true
 			}
 			wireType := int(tag & 0x7)
@@ -296,7 +296,7 @@ func HasExtension(pb Message, extension *ExtensionDesc) bool {
 		}
 		return false
 	}
-	// TODO: Check types, ***REMOVED***eld numbers, etc.?
+	// TODO: Check types, field numbers, etc.?
 	epb, err := extendable(pb)
 	if err != nil {
 		return false
@@ -316,11 +316,11 @@ func ClearExtension(pb Message, extension *ExtensionDesc) {
 	clearExtension(pb, extension.Field)
 }
 
-func clearExtension(pb Message, ***REMOVED***eldNum int32) {
+func clearExtension(pb Message, fieldNum int32) {
 	if epb, ok := pb.(extensionsBytes); ok {
 		offset := 0
 		for offset != -1 {
-			offset = deleteExtension(epb, ***REMOVED***eldNum, offset)
+			offset = deleteExtension(epb, fieldNum, offset)
 		}
 		return
 	}
@@ -328,20 +328,20 @@ func clearExtension(pb Message, ***REMOVED***eldNum int32) {
 	if err != nil {
 		return
 	}
-	// TODO: Check types, ***REMOVED***eld numbers, etc.?
+	// TODO: Check types, field numbers, etc.?
 	extmap := epb.extensionsWrite()
-	delete(extmap, ***REMOVED***eldNum)
+	delete(extmap, fieldNum)
 }
 
-// GetExtension retrieves a proto2 extended ***REMOVED***eld from pb.
+// GetExtension retrieves a proto2 extended field from pb.
 //
 // If the descriptor is type complete (i.e., ExtensionDesc.ExtensionType is non-nil),
-// then GetExtension parses the encoded ***REMOVED***eld and returns a Go value of the speci***REMOVED***ed type.
-// If the ***REMOVED***eld is not present, then the default value is returned (if one is speci***REMOVED***ed),
+// then GetExtension parses the encoded field and returns a Go value of the specified type.
+// If the field is not present, then the default value is returned (if one is specified),
 // otherwise ErrMissingExtension is reported.
 //
 // If the descriptor is not type complete (i.e., ExtensionDesc.ExtensionType is nil),
-// then GetExtension returns the raw encoded bytes of the ***REMOVED***eld extension.
+// then GetExtension returns the raw encoded bytes of the field extension.
 func GetExtension(pb Message, extension *ExtensionDesc) (interface{}, error) {
 	if epb, doki := pb.(extensionsBytes); doki {
 		ext := epb.GetExtensions()
@@ -378,7 +378,7 @@ func GetExtension(pb Message, extension *ExtensionDesc) (interface{}, error) {
 		if e.desc != extension {
 			// This shouldn't happen. If it does, it means that
 			// GetExtension was called twice with two different
-			// descriptors with the same ***REMOVED***eld number.
+			// descriptors with the same field number.
 			return nil, errors.New("proto: descriptor conflict")
 		}
 		return e.value, nil
@@ -404,7 +404,7 @@ func GetExtension(pb Message, extension *ExtensionDesc) (interface{}, error) {
 }
 
 // defaultExtensionValue returns the default value for extension.
-// If no default for an extension is de***REMOVED***ned ErrMissingExtension is returned.
+// If no default for an extension is defined ErrMissingExtension is returned.
 func defaultExtensionValue(extension *ExtensionDesc) (interface{}, error) {
 	if extension.ExtensionType == nil {
 		// incomplete descriptor, so no default
@@ -414,7 +414,7 @@ func defaultExtensionValue(extension *ExtensionDesc) (interface{}, error) {
 	t := reflect.TypeOf(extension.ExtensionType)
 	props := extensionProperties(extension)
 
-	sf, _, err := ***REMOVED***eldDefault(t, props)
+	sf, _, err := fieldDefault(t, props)
 	if err != nil {
 		return nil, err
 	}
@@ -437,7 +437,7 @@ func defaultExtensionValue(extension *ExtensionDesc) (interface{}, error) {
 		// Since we can't set an int32 into a non int32 reflect.value directly
 		// set it as a int32.
 		value.Elem().SetInt(int64(sf.value.(int32)))
-	} ***REMOVED*** {
+	} else {
 		value.Elem().Set(reflect.ValueOf(sf.value))
 	}
 	return value.Interface(), nil
@@ -493,9 +493,9 @@ func GetExtensions(pb Message, es []*ExtensionDesc) (extensions []interface{}, e
 	return
 }
 
-// ExtensionDescs returns a new slice containing pb's extension descriptors, in unde***REMOVED***ned order.
+// ExtensionDescs returns a new slice containing pb's extension descriptors, in undefined order.
 // For non-registered extensions, ExtensionDescs returns an incomplete descriptor containing
-// just the Field ***REMOVED***eld, which de***REMOVED***nes the extension's ***REMOVED***eld number.
+// just the Field field, which defines the extension's field number.
 func ExtensionDescs(pb Message) ([]*ExtensionDesc, error) {
 	epb, err := extendable(pb)
 	if err != nil {
@@ -524,7 +524,7 @@ func ExtensionDescs(pb Message) ([]*ExtensionDesc, error) {
 	return extensions, nil
 }
 
-// SetExtension sets the speci***REMOVED***ed extension of pb to the speci***REMOVED***ed value.
+// SetExtension sets the specified extension of pb to the specified value.
 func SetExtension(pb Message, extension *ExtensionDesc, value interface{}) error {
 	if epb, ok := pb.(extensionsBytes); ok {
 		newb, err := encodeExtension(extension, value)
@@ -548,7 +548,7 @@ func SetExtension(pb Message, extension *ExtensionDesc, value interface{}) error
 	}
 	// nil extension values need to be caught early, because the
 	// encoder can't distinguish an ErrNil due to a nil extension
-	// from an ErrNil due to a missing ***REMOVED***eld. Extensions are
+	// from an ErrNil due to a missing field. Extensions are
 	// always optional, so the encoder would just swallow the error
 	// and drop all the extensions from the encoded message.
 	if reflect.ValueOf(value).IsNil() {

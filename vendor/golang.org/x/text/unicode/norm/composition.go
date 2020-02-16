@@ -1,6 +1,6 @@
 // Copyright 2011 The Go Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE ***REMOVED***le.
+// license that can be found in the LICENSE file.
 
 package norm
 
@@ -33,9 +33,9 @@ const (
 // streamSafe implements the policy of when a CGJ should be inserted.
 type streamSafe uint8
 
-// ***REMOVED***rst inserts the ***REMOVED***rst rune of a segment. It is a faster version of next if
-// it is known p represents the ***REMOVED***rst rune in a segment.
-func (ss *streamSafe) ***REMOVED***rst(p Properties) {
+// first inserts the first rune of a segment. It is a faster version of next if
+// it is known p represents the first rune in a segment.
+func (ss *streamSafe) first(p Properties) {
 	*ss = streamSafe(p.nTrailingNonStarters())
 }
 
@@ -65,8 +65,8 @@ func (ss *streamSafe) next(p Properties) ssState {
 }
 
 // backwards is used for checking for overflow and segment starts
-// when traversing a string backwards. Users do not need to call ***REMOVED***rst
-// for the ***REMOVED***rst rune. The state of the streamSafe retains the count of
+// when traversing a string backwards. Users do not need to call first
+// for the first rune. The state of the streamSafe retains the count of
 // the non-starters loaded.
 func (ss *streamSafe) backwards(p Properties) ssState {
 	if *ss > maxNonStarters {
@@ -228,7 +228,7 @@ func (rb *reorderBuffer) insertFlush(src input, i int, info Properties) insertEr
 }
 
 // insertUnsafe inserts the given rune in the buffer ordered by CCC.
-// It is assumed there is suf***REMOVED***cient space to hold the runes. It is the
+// It is assumed there is sufficient space to hold the runes. It is the
 // responsibility of the caller to ensure this. This can be done by checking
 // the state returned by the streamSafe type.
 func (rb *reorderBuffer) insertUnsafe(src input, i int, info Properties) {
@@ -238,7 +238,7 @@ func (rb *reorderBuffer) insertUnsafe(src input, i int, info Properties) {
 	if info.hasDecomposition() {
 		// TODO: inline.
 		rb.insertDecomposed(info.Decomposition())
-	} ***REMOVED*** {
+	} else {
 		rb.insertSingle(src, i, info)
 	}
 }
@@ -248,7 +248,7 @@ func (rb *reorderBuffer) insertUnsafe(src input, i int, info Properties) {
 // It flushes the buffer on each new segment start.
 func (rb *reorderBuffer) insertDecomposed(dcomp []byte) insertErr {
 	rb.tmpBytes.setBytes(dcomp)
-	// As the streamSafe accounting already handles the counting for modi***REMOVED***ers,
+	// As the streamSafe accounting already handles the counting for modifiers,
 	// we don't have to call next. However, we do need to keep the accounting
 	// intact when flushing the buffer.
 	for i := 0; i < len(dcomp); {
@@ -434,7 +434,7 @@ func (rb *reorderBuffer) combineHangul(s, i, k int) {
 			// b[i] is blocked by greater-equal cccX below it
 			b[k] = b[i]
 			k++
-		} ***REMOVED*** {
+		} else {
 			l := rb.runeAt(s) // also used to compare to hangulBase
 			v := rb.runeAt(i) // also used to compare to jamoT
 			switch {
@@ -480,9 +480,9 @@ func (rb *reorderBuffer) compose() {
 			return
 		}
 		ii := b[i]
-		// We can only use combineForward as a ***REMOVED***lter if we later
+		// We can only use combineForward as a filter if we later
 		// get the info for the combined character. This is more
-		// expensive than using the ***REMOVED***lter. Using combinesBackward()
+		// expensive than using the filter. Using combinesBackward()
 		// is safe.
 		if ii.combinesBackward() {
 			cccB := b[k-1].ccc
@@ -490,7 +490,7 @@ func (rb *reorderBuffer) compose() {
 			blocked := false // b[i] blocked by starter or greater or equal CCC?
 			if cccB == 0 {
 				s = k - 1
-			} ***REMOVED*** {
+			} else {
 				blocked = s != k-1 && cccB >= cccC
 			}
 			if !blocked {

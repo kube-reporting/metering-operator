@@ -1,6 +1,6 @@
 // Copyright 2018 The Prometheus Authors
 // Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this ***REMOVED***le except in compliance with the License.
+// you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 //
 // http://www.apache.org/licenses/LICENSE-2.0
@@ -8,13 +8,13 @@
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the speci***REMOVED***c language governing permissions and
+// See the License for the specific language governing permissions and
 // limitations under the License.
 
 package procfs
 
 import (
-	"bu***REMOVED***o"
+	"bufio"
 	"fmt"
 	"io"
 	"os"
@@ -36,7 +36,7 @@ type CPUStat struct {
 	GuestNice float64
 }
 
-// SoftIRQStat represent the softirq statistics as exported in the procfs stat ***REMOVED***le.
+// SoftIRQStat represent the softirq statistics as exported in the procfs stat file.
 // A nice introduction can be found at https://0xax.gitbooks.io/linux-insides/content/interrupts/interrupts-9.html
 // It is possible to get per-cpu stats by reading /proc/softirqs
 type SoftIRQStat struct {
@@ -133,10 +133,10 @@ func parseCPUStat(line string) (CPUStat, int64, error) {
 func parseSoftIRQStat(line string) (SoftIRQStat, uint64, error) {
 	softIRQStat := SoftIRQStat{}
 	var total uint64
-	var pre***REMOVED***x string
+	var prefix string
 
 	_, err := fmt.Sscanf(line, "%s %d %d %d %d %d %d %d %d %d %d %d",
-		&pre***REMOVED***x, &total,
+		&prefix, &total,
 		&softIRQStat.Hi, &softIRQStat.Timer, &softIRQStat.NetTx, &softIRQStat.NetRx,
 		&softIRQStat.Block, &softIRQStat.BlockIoPoll,
 		&softIRQStat.Tasklet, &softIRQStat.Sched,
@@ -151,7 +151,7 @@ func parseSoftIRQStat(line string) (SoftIRQStat, uint64, error) {
 
 // NewStat returns an information about current kernel/system statistics.
 func (fs FS) NewStat() (Stat, error) {
-	// See https://www.kernel.org/doc/Documentation/***REMOVED***lesystems/proc.txt
+	// See https://www.kernel.org/doc/Documentation/filesystems/proc.txt
 
 	f, err := os.Open(fs.Path("stat"))
 	if err != nil {
@@ -161,7 +161,7 @@ func (fs FS) NewStat() (Stat, error) {
 
 	stat := Stat{}
 
-	scanner := bu***REMOVED***o.NewScanner(f)
+	scanner := bufio.NewScanner(f)
 	for scanner.Scan() {
 		line := scanner.Text()
 		parts := strings.Fields(scanner.Text())
@@ -208,14 +208,14 @@ func (fs FS) NewStat() (Stat, error) {
 			}
 			stat.SoftIRQTotal = total
 			stat.SoftIRQ = softIRQStats
-		case strings.HasPre***REMOVED***x(parts[0], "cpu"):
+		case strings.HasPrefix(parts[0], "cpu"):
 			cpuStat, cpuID, err := parseCPUStat(line)
 			if err != nil {
 				return Stat{}, err
 			}
 			if cpuID == -1 {
 				stat.CPUTotal = cpuStat
-			} ***REMOVED*** {
+			} else {
 				for int64(len(stat.CPU)) <= cpuID {
 					stat.CPU = append(stat.CPU, CPUStat{})
 				}

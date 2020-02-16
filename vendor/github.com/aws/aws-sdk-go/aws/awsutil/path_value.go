@@ -33,9 +33,9 @@ func rValuesAtPath(v interface{}, path string, createPath, caseSensitive, nilTer
 		c := strings.TrimSpace(components[0])
 		if c == "" { // no actual component, illegal syntax
 			return nil
-		} ***REMOVED*** if caseSensitive && c != "*" && strings.ToLower(c[0:1]) == c[0:1] {
+		} else if caseSensitive && c != "*" && strings.ToLower(c[0:1]) == c[0:1] {
 			// TODO normalize case for user
-			return nil // don't support unexported ***REMOVED***elds
+			return nil // don't support unexported fields
 		}
 
 		// parse this component
@@ -44,7 +44,7 @@ func rValuesAtPath(v interface{}, path string, createPath, caseSensitive, nilTer
 			if m[2] == "" {
 				index = nil
 				indexStar = true
-			} ***REMOVED*** {
+			} else {
 				i, _ := strconv.ParseInt(m[2], 10, 32)
 				index = &i
 				indexStar = false
@@ -70,7 +70,7 @@ func rValuesAtPath(v interface{}, path string, createPath, caseSensitive, nilTer
 			value = value.FieldByNameFunc(func(name string) bool {
 				if c == name {
 					return true
-				} ***REMOVED*** if !caseSensitive && strings.ToLower(name) == strings.ToLower(c) {
+				} else if !caseSensitive && strings.ToLower(name) == strings.ToLower(c) {
 					return true
 				}
 				return false
@@ -88,7 +88,7 @@ func rValuesAtPath(v interface{}, path string, createPath, caseSensitive, nilTer
 				// if the value to be set to its position is nil.
 				value.Set(reflect.New(value.Type().Elem()))
 				value = value.Elem()
-			} ***REMOVED*** {
+			} else {
 				value = reflect.Indirect(value)
 			}
 
@@ -127,10 +127,10 @@ func rValuesAtPath(v interface{}, path string, createPath, caseSensitive, nilTer
 				if i >= value.Len() { // check out of bounds
 					if createPath {
 						// TODO resize slice
-					} ***REMOVED*** {
+					} else {
 						continue
 					}
-				} ***REMOVED*** if i < 0 { // support negative indexing
+				} else if i < 0 { // support negative indexing
 					i = value.Len() + i
 				}
 				value = reflect.Indirect(value.Index(i))
@@ -207,14 +207,14 @@ func setValue(dstVal reflect.Value, src interface{}) {
 		}
 		dstVal.Set(reflect.Zero(dstVal.Type()))
 
-	} ***REMOVED*** if srcVal.Kind() == reflect.Ptr {
+	} else if srcVal.Kind() == reflect.Ptr {
 		if srcVal.IsNil() {
 			srcVal = reflect.Zero(dstVal.Type())
-		} ***REMOVED*** {
+		} else {
 			srcVal = reflect.ValueOf(src).Elem()
 		}
 		dstVal.Set(srcVal)
-	} ***REMOVED*** {
+	} else {
 		dstVal.Set(srcVal)
 	}
 

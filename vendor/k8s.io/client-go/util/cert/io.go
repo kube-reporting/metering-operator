@@ -2,7 +2,7 @@
 Copyright 2014 The Kubernetes Authors.
 
 Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this ***REMOVED***le except in compliance with the License.
+you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
 
     http://www.apache.org/licenses/LICENSE-2.0
@@ -10,7 +10,7 @@ You may obtain a copy of the License at
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the speci***REMOVED***c language governing permissions and
+See the License for the specific language governing permissions and
 limitations under the License.
 */
 
@@ -25,10 +25,10 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
-	"path/***REMOVED***lepath"
+	"path/filepath"
 )
 
-// CanReadCertAndKey returns true if the certi***REMOVED***cate and key ***REMOVED***les already exists,
+// CanReadCertAndKey returns true if the certificate and key files already exists,
 // otherwise returns false. If lost one of cert and key, returns error.
 func CanReadCertAndKey(certPath, keyPath string) (bool, error) {
 	certReadable := canReadFile(certPath)
@@ -39,17 +39,17 @@ func CanReadCertAndKey(certPath, keyPath string) (bool, error) {
 	}
 
 	if certReadable == false {
-		return false, fmt.Errorf("error reading %s, certi***REMOVED***cate and key must be supplied as a pair", certPath)
+		return false, fmt.Errorf("error reading %s, certificate and key must be supplied as a pair", certPath)
 	}
 
 	if keyReadable == false {
-		return false, fmt.Errorf("error reading %s, certi***REMOVED***cate and key must be supplied as a pair", keyPath)
+		return false, fmt.Errorf("error reading %s, certificate and key must be supplied as a pair", keyPath)
 	}
 
 	return true, nil
 }
 
-// If the ***REMOVED***le represented by path exists and
+// If the file represented by path exists and
 // readable, returns true otherwise returns false.
 func canReadFile(path string) bool {
 	f, err := os.Open(path)
@@ -62,33 +62,33 @@ func canReadFile(path string) bool {
 	return true
 }
 
-// WriteCert writes the pem-encoded certi***REMOVED***cate data to certPath.
-// The certi***REMOVED***cate ***REMOVED***le will be created with ***REMOVED***le mode 0644.
-// If the certi***REMOVED***cate ***REMOVED***le already exists, it will be overwritten.
-// The parent directory of the certPath will be created as needed with ***REMOVED***le mode 0755.
+// WriteCert writes the pem-encoded certificate data to certPath.
+// The certificate file will be created with file mode 0644.
+// If the certificate file already exists, it will be overwritten.
+// The parent directory of the certPath will be created as needed with file mode 0755.
 func WriteCert(certPath string, data []byte) error {
-	if err := os.MkdirAll(***REMOVED***lepath.Dir(certPath), os.FileMode(0755)); err != nil {
+	if err := os.MkdirAll(filepath.Dir(certPath), os.FileMode(0755)); err != nil {
 		return err
 	}
 	return ioutil.WriteFile(certPath, data, os.FileMode(0644))
 }
 
 // WriteKey writes the pem-encoded key data to keyPath.
-// The key ***REMOVED***le will be created with ***REMOVED***le mode 0600.
-// If the key ***REMOVED***le already exists, it will be overwritten.
-// The parent directory of the keyPath will be created as needed with ***REMOVED***le mode 0755.
+// The key file will be created with file mode 0600.
+// If the key file already exists, it will be overwritten.
+// The parent directory of the keyPath will be created as needed with file mode 0755.
 func WriteKey(keyPath string, data []byte) error {
-	if err := os.MkdirAll(***REMOVED***lepath.Dir(keyPath), os.FileMode(0755)); err != nil {
+	if err := os.MkdirAll(filepath.Dir(keyPath), os.FileMode(0755)); err != nil {
 		return err
 	}
 	return ioutil.WriteFile(keyPath, data, os.FileMode(0600))
 }
 
-// LoadOrGenerateKeyFile looks for a key in the ***REMOVED***le at the given path. If it
-// can't ***REMOVED***nd one, it will generate a new key and store it there.
+// LoadOrGenerateKeyFile looks for a key in the file at the given path. If it
+// can't find one, it will generate a new key and store it there.
 func LoadOrGenerateKeyFile(keyPath string) (data []byte, wasGenerated bool, err error) {
 	loadedData, err := ioutil.ReadFile(keyPath)
-	// Call verifyKeyData to ensure the ***REMOVED***le wasn't empty/corrupt.
+	// Call verifyKeyData to ensure the file wasn't empty/corrupt.
 	if err == nil && verifyKeyData(loadedData) {
 		return loadedData, false, err
 	}
@@ -127,10 +127,10 @@ func MarshalPrivateKeyToPEM(privateKey crypto.PrivateKey) ([]byte, error) {
 	}
 }
 
-// NewPool returns an x509.CertPool containing the certi***REMOVED***cates in the given PEM-encoded ***REMOVED***le.
-// Returns an error if the ***REMOVED***le could not be read, a certi***REMOVED***cate could not be parsed, or if the ***REMOVED***le does not contain any certi***REMOVED***cates
-func NewPool(***REMOVED***lename string) (*x509.CertPool, error) {
-	certs, err := CertsFromFile(***REMOVED***lename)
+// NewPool returns an x509.CertPool containing the certificates in the given PEM-encoded file.
+// Returns an error if the file could not be read, a certificate could not be parsed, or if the file does not contain any certificates
+func NewPool(filename string) (*x509.CertPool, error) {
+	certs, err := CertsFromFile(filename)
 	if err != nil {
 		return nil, err
 	}
@@ -141,44 +141,44 @@ func NewPool(***REMOVED***lename string) (*x509.CertPool, error) {
 	return pool, nil
 }
 
-// CertsFromFile returns the x509.Certi***REMOVED***cates contained in the given PEM-encoded ***REMOVED***le.
-// Returns an error if the ***REMOVED***le could not be read, a certi***REMOVED***cate could not be parsed, or if the ***REMOVED***le does not contain any certi***REMOVED***cates
-func CertsFromFile(***REMOVED***le string) ([]*x509.Certi***REMOVED***cate, error) {
-	pemBlock, err := ioutil.ReadFile(***REMOVED***le)
+// CertsFromFile returns the x509.Certificates contained in the given PEM-encoded file.
+// Returns an error if the file could not be read, a certificate could not be parsed, or if the file does not contain any certificates
+func CertsFromFile(file string) ([]*x509.Certificate, error) {
+	pemBlock, err := ioutil.ReadFile(file)
 	if err != nil {
 		return nil, err
 	}
 	certs, err := ParseCertsPEM(pemBlock)
 	if err != nil {
-		return nil, fmt.Errorf("error reading %s: %s", ***REMOVED***le, err)
+		return nil, fmt.Errorf("error reading %s: %s", file, err)
 	}
 	return certs, nil
 }
 
-// PrivateKeyFromFile returns the private key in rsa.PrivateKey or ecdsa.PrivateKey format from a given PEM-encoded ***REMOVED***le.
-// Returns an error if the ***REMOVED***le could not be read or if the private key could not be parsed.
-func PrivateKeyFromFile(***REMOVED***le string) (interface{}, error) {
-	data, err := ioutil.ReadFile(***REMOVED***le)
+// PrivateKeyFromFile returns the private key in rsa.PrivateKey or ecdsa.PrivateKey format from a given PEM-encoded file.
+// Returns an error if the file could not be read or if the private key could not be parsed.
+func PrivateKeyFromFile(file string) (interface{}, error) {
+	data, err := ioutil.ReadFile(file)
 	if err != nil {
 		return nil, err
 	}
 	key, err := ParsePrivateKeyPEM(data)
 	if err != nil {
-		return nil, fmt.Errorf("error reading private key ***REMOVED***le %s: %v", ***REMOVED***le, err)
+		return nil, fmt.Errorf("error reading private key file %s: %v", file, err)
 	}
 	return key, nil
 }
 
-// PublicKeysFromFile returns the public keys in rsa.PublicKey or ecdsa.PublicKey format from a given PEM-encoded ***REMOVED***le.
-// Reads public keys from both public and private key ***REMOVED***les.
-func PublicKeysFromFile(***REMOVED***le string) ([]interface{}, error) {
-	data, err := ioutil.ReadFile(***REMOVED***le)
+// PublicKeysFromFile returns the public keys in rsa.PublicKey or ecdsa.PublicKey format from a given PEM-encoded file.
+// Reads public keys from both public and private key files.
+func PublicKeysFromFile(file string) ([]interface{}, error) {
+	data, err := ioutil.ReadFile(file)
 	if err != nil {
 		return nil, err
 	}
 	keys, err := ParsePublicKeysPEM(data)
 	if err != nil {
-		return nil, fmt.Errorf("error reading public key ***REMOVED***le %s: %v", ***REMOVED***le, err)
+		return nil, fmt.Errorf("error reading public key file %s: %v", file, err)
 	}
 	return keys, nil
 }

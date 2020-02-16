@@ -6,7 +6,7 @@ import (
 	"github.com/hashicorp/golang-lru/simplelru"
 )
 
-// ARCCache is a thread-safe ***REMOVED***xed size Adaptive Replacement Cache (ARC).
+// ARCCache is a thread-safe fixed size Adaptive Replacement Cache (ARC).
 // ARC is an enhancement over the standard LRU cache in that tracks both
 // frequency and recency of use. This avoids a burst in access to new
 // entries from evicting the frequently used older entries. It adds some
@@ -112,7 +112,7 @@ func (c *ARCCache) Add(key, value interface{}) {
 		}
 		if c.p+delta >= c.size {
 			c.p = c.size
-		} ***REMOVED*** {
+		} else {
 			c.p += delta
 		}
 
@@ -141,7 +141,7 @@ func (c *ARCCache) Add(key, value interface{}) {
 		}
 		if delta >= c.p {
 			c.p = 0
-		} ***REMOVED*** {
+		} else {
 			c.p -= delta
 		}
 
@@ -185,7 +185,7 @@ func (c *ARCCache) replace(b2ContainsKey bool) {
 		if ok {
 			c.b1.Add(k, nil)
 		}
-	} ***REMOVED*** {
+	} else {
 		k, _, ok := c.t2.RemoveOldest()
 		if ok {
 			c.b2.Add(k, nil)

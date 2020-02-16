@@ -1,6 +1,6 @@
 // Copyright 2015 The Go Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE ***REMOVED***le.
+// license that can be found in the LICENSE file.
 
 // Package tag contains functionality handling tags and related data.
 package tag // import "golang.org/x/text/internal/tag"
@@ -19,11 +19,11 @@ func (s Index) Elem(x int) string {
 }
 
 // Index reports the index of the given key or -1 if it could not be found.
-// Only the ***REMOVED***rst len(key) bytes from the start of the 4-byte entries will be
-// considered for the search and the ***REMOVED***rst match in Index will be returned.
+// Only the first len(key) bytes from the start of the 4-byte entries will be
+// considered for the search and the first match in Index will be returned.
 func (s Index) Index(key []byte) int {
 	n := len(key)
-	// search the index of the ***REMOVED***rst entry with an equal or higher value than
+	// search the index of the first entry with an equal or higher value than
 	// key in s.
 	index := sort.Search(len(s)/4, func(i int) bool {
 		return cmp(s[i*4:i*4+n], key) != -1
@@ -35,7 +35,7 @@ func (s Index) Index(key []byte) int {
 	return index
 }
 
-// Next ***REMOVED***nds the next occurrence of key after index x, which must have been
+// Next finds the next occurrence of key after index x, which must have been
 // obtained from a call to Index using the same key. It returns x+1 or -1.
 func (s Index) Next(key []byte, x int) int {
 	if x++; x*4 < len(s) && cmp(s[x*4:x*4+len(key)], key) == 0 {
@@ -86,7 +86,7 @@ func FixCase(form string, b []byte) bool {
 			if c < 'A' || 'Z' < c {
 				return false
 			}
-		} ***REMOVED*** {
+		} else {
 			if c <= 'Z' {
 				c += 'z' - 'Z'
 			}

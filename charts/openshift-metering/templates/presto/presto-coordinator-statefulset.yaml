@@ -24,32 +24,32 @@ spec:
 {{ toYaml .Values.presto.spec.labels | indent 8 }}
 {{- end }}
       annotations:
-        presto-coordinator-con***REMOVED***g-hash: {{ include (print $.Template.BasePath "/presto/presto-coordinator-con***REMOVED***g.yaml") . | sha256sum }}
-        presto-common-con***REMOVED***g-hash: {{ include (print $.Template.BasePath "/presto/presto-common-con***REMOVED***g.yaml") . | sha256sum }}
-        presto-catalog-con***REMOVED***g-hash: {{ include (print $.Template.BasePath "/presto/presto-catalog-con***REMOVED***g-secret.yaml") . | sha256sum }}
-        presto-jmx-con***REMOVED***g-hash: {{ include (print $.Template.BasePath "/presto/presto-jmx-con***REMOVED***g.yaml") . | sha256sum }}
-{{- if .Values.presto.spec.con***REMOVED***g.aws.createSecret }}
+        presto-coordinator-config-hash: {{ include (print $.Template.BasePath "/presto/presto-coordinator-config.yaml") . | sha256sum }}
+        presto-common-config-hash: {{ include (print $.Template.BasePath "/presto/presto-common-config.yaml") . | sha256sum }}
+        presto-catalog-config-hash: {{ include (print $.Template.BasePath "/presto/presto-catalog-config-secret.yaml") . | sha256sum }}
+        presto-jmx-config-hash: {{ include (print $.Template.BasePath "/presto/presto-jmx-config.yaml") . | sha256sum }}
+{{- if .Values.presto.spec.config.aws.createSecret }}
         presto-aws-credentials-hash: {{ include (print $.Template.BasePath "/presto/presto-aws-credentials-secret.yaml") . | sha256sum }}
 {{- end }}
-{{- if .Values.presto.spec.con***REMOVED***g.azure.createSecret }}
+{{- if .Values.presto.spec.config.azure.createSecret }}
         presto-azure-credentials-secret-hash: {{ include (print $.Template.BasePath "/presto/presto-azure-credentials-secret.yaml") . | sha256sum }}
 {{- end }}
-{{- if .Values.presto.spec.con***REMOVED***g.gcs.createSecret }}
+{{- if .Values.presto.spec.config.gcs.createSecret }}
         presto-gcs-credentials-secret-hash: {{ include (print $.Template.BasePath "/presto/presto-gcs-credentials-secret.yaml") . | sha256sum }}
 {{- end }}
-{{- if .Values.presto.spec.con***REMOVED***g.s3Compatible.createSecret }}
+{{- if .Values.presto.spec.config.s3Compatible.createSecret }}
         presto-s3-compatible-credentials-secret-hash: {{ include (print $.Template.BasePath "/presto/presto-s3-compatible-credentials-secret.yaml") . | sha256sum }}
 {{- end }}
-{{- if .Values.presto.spec.con***REMOVED***g.s3Compatible.ca.createSecret }}
+{{- if .Values.presto.spec.config.s3Compatible.ca.createSecret }}
         presto-s3-compatible-ca-secret-hash: {{ include (print $.Template.BasePath "/presto/presto-s3-compatible-ca-secret.yaml") . | sha256sum }}
 {{- end }}
-{{- if and .Values.presto.spec.con***REMOVED***g.tls.enabled .Values.presto.spec.con***REMOVED***g.tls.createSecret }}
+{{- if and .Values.presto.spec.config.tls.enabled .Values.presto.spec.config.tls.createSecret }}
         presto-server-tls-hash: {{ include (print $.Template.BasePath "/presto/presto-tls-secrets.yaml") . | sha256sum }}
-{{- if and .Values.presto.spec.con***REMOVED***g.auth.enabled .Values.presto.spec.con***REMOVED***g.auth.createSecret }}
+{{- if and .Values.presto.spec.config.auth.enabled .Values.presto.spec.config.auth.createSecret }}
         presto-client-tls-hash: {{ include (print $.Template.BasePath "/presto/presto-auth-secrets.yaml") . | sha256sum }}
 {{- end }}
 {{- end }}
-{{- if and .Values.presto.spec.con***REMOVED***g.connectors.hive.tls.enabled .Values.presto.spec.con***REMOVED***g.connectors.hive.tls.createSecret }}
+{{- if and .Values.presto.spec.config.connectors.hive.tls.enabled .Values.presto.spec.config.connectors.hive.tls.createSecret }}
         presto-hive-metastore-tls-hash: {{ include (print $.Template.BasePath "/presto/presto-hive-metastore-tls-secrets.yaml") . | sha256sum }}
 {{- end }}
 {{- if .Values.presto.spec.annotations }}
@@ -67,9 +67,9 @@ spec:
       securityContext:
 {{ toYaml .Values.presto.spec.securityContext | indent 8 }}
 {{- end }}
-{{- if .Values.presto.spec.coordinator.af***REMOVED***nity }}
-      af***REMOVED***nity:
-{{ toYaml .Values.presto.spec.coordinator.af***REMOVED***nity | indent 8 }}
+{{- if .Values.presto.spec.coordinator.affinity }}
+      affinity:
+{{ toYaml .Values.presto.spec.coordinator.affinity | indent 8 }}
 {{- end }}
 {{- if .Values.presto.spec.coordinator.nodeSelector }}
       nodeSelector:
@@ -80,30 +80,30 @@ spec:
 {{ toYaml .Values.presto.spec.coordinator.tolerations | indent 8 }}
 {{- end }}
       initContainers:
-      - name: copy-presto-con***REMOVED***g
+      - name: copy-presto-config
         image: "{{ include "presto-image" . }}"
         imagePullPolicy: {{ .Values.presto.spec.image.pullPolicy }}
         command: ['/presto-common/initialize_presto.sh']
-        # Copy the mounted con***REMOVED***guration data into the presto-etc emptyDir volume so we can write to the con***REMOVED***g ***REMOVED***les
+        # Copy the mounted configuration data into the presto-etc emptyDir volume so we can write to the config files
         env:
-{{- if .Values.presto.spec.con***REMOVED***g.connectors.prometheus.enabled }}
+{{- if .Values.presto.spec.config.connectors.prometheus.enabled }}
         - name: PRESTO_PROMETHEUS_CONNECTOR_BEARER_TOKEN_FILE
           valueFrom:
-            con***REMOVED***gMapKeyRef:
-              name: presto-coordinator-con***REMOVED***g
-              key: prometheus-connector-bearer-token-***REMOVED***le
+            configMapKeyRef:
+              name: presto-coordinator-config
+              key: prometheus-connector-bearer-token-file
 {{- end }}
 {{- include "presto-common-env" . | indent 8 }}
         volumeMounts:
         - name: presto-etc
           mountPath: /opt/presto/presto-server/etc
-        - name: presto-coordinator-con***REMOVED***g
+        - name: presto-coordinator-config
           mountPath: /presto-etc
-        - name: presto-catalog-con***REMOVED***g
+        - name: presto-catalog-config
           mountPath: /presto-etc/catalog
         - name: presto-data
           mountPath: /var/presto/data
-        - name: presto-common-con***REMOVED***g
+        - name: presto-common-config
           mountPath: /presto-common
         resources:
           limits:
@@ -130,39 +130,39 @@ spec:
         volumeMounts:
         - name: presto-etc
           mountPath: /opt/presto/presto-server/etc
-        - name: presto-common-con***REMOVED***g
+        - name: presto-common-config
           mountPath: /presto-common
-        - name: presto-jmx-con***REMOVED***g
-          mountPath: /opt/jmx_exporter/con***REMOVED***g
+        - name: presto-jmx-config
+          mountPath: /opt/jmx_exporter/config
         - name: presto-data
           mountPath: /var/presto/data
         - name: presto-logs
           mountPath: /var/presto/logs
         # TODO: this should be a shared PVC or some long-term storage
         # TODO: what happens when AWS billing is used?
-        # TODO: should we always use this local ***REMOVED***le-based metastore?
+        # TODO: should we always use this local file-based metastore?
         - name: presto-hive
           mountPath: /var/presto-hive/
-{{- if .Values.hive.spec.con***REMOVED***g.sharedVolume.enabled }}
+{{- if .Values.hive.spec.config.sharedVolume.enabled }}
         - name: hive-warehouse-data
           mountPath: /var/presto-hive/
 {{- end }}
         resources:
 {{ toYaml .Values.presto.spec.coordinator.resources | indent 10 }}
       volumes:
-      - name: presto-coordinator-con***REMOVED***g
-        con***REMOVED***gMap:
-          name: presto-coordinator-con***REMOVED***g
-      - name: presto-common-con***REMOVED***g
-        con***REMOVED***gMap:
-          name: presto-common-con***REMOVED***g
+      - name: presto-coordinator-config
+        configMap:
+          name: presto-coordinator-config
+      - name: presto-common-config
+        configMap:
+          name: presto-common-config
           defaultMode: 0775
-      - name: presto-catalog-con***REMOVED***g
+      - name: presto-catalog-config
         secret:
-          secretName: presto-catalog-con***REMOVED***g
-      - name: presto-jmx-con***REMOVED***g
-        con***REMOVED***gMap:
-          name: presto-jmx-con***REMOVED***g
+          secretName: presto-catalog-config
+      - name: presto-jmx-config
+        configMap:
+          name: presto-jmx-config
       - name: presto-etc
         emptyDir: {}
       - name: presto-data
@@ -171,32 +171,32 @@ spec:
         emptyDir: {}
       - name: presto-hive
         emptyDir: {}
-{{- if or .Values.presto.spec.con***REMOVED***g.gcs.secretName .Values.presto.spec.con***REMOVED***g.gcs.createSecret }}
+{{- if or .Values.presto.spec.config.gcs.secretName .Values.presto.spec.config.gcs.createSecret }}
       - name: gcs-json
         secret:
-          secretName: {{ .Values.presto.spec.con***REMOVED***g.gcs.secretName | default "presto-gcs-credentials" }}
+          secretName: {{ .Values.presto.spec.config.gcs.secretName | default "presto-gcs-credentials" }}
 {{- end }}
-{{- if or .Values.presto.spec.con***REMOVED***g.s3Compatible.ca.secretName .Values.presto.spec.con***REMOVED***g.s3Compatible.ca.createSecret }}
+{{- if or .Values.presto.spec.config.s3Compatible.ca.secretName .Values.presto.spec.config.s3Compatible.ca.createSecret }}
       - name: s3-compatible-ca
         secret:
-          secretName: {{ .Values.presto.spec.con***REMOVED***g.s3Compatible.ca.secretName | default "presto-s3-compatible-ca" }}
+          secretName: {{ .Values.presto.spec.config.s3Compatible.ca.secretName | default "presto-s3-compatible-ca" }}
 {{- end }}
-{{- if .Values.presto.spec.con***REMOVED***g.tls.enabled }}
+{{- if .Values.presto.spec.config.tls.enabled }}
       - name: presto-tls
         emptyDir: {}
       - name: presto-server-pem
         secret:
-          secretName: {{ .Values.presto.spec.con***REMOVED***g.tls.secretName }}
-{{- if .Values.presto.spec.con***REMOVED***g.auth.enabled }}
+          secretName: {{ .Values.presto.spec.config.tls.secretName }}
+{{- if .Values.presto.spec.config.auth.enabled }}
       - name: presto-client-pem
         secret:
-          secretName: {{ .Values.presto.spec.con***REMOVED***g.auth.secretName }}
+          secretName: {{ .Values.presto.spec.config.auth.secretName }}
 {{- end }}
 {{- end }}
-{{- if .Values.hive.spec.con***REMOVED***g.sharedVolume.enabled }}
+{{- if .Values.hive.spec.config.sharedVolume.enabled }}
       - name: hive-warehouse-data
         persistentVolumeClaim:
-          claimName: {{ .Values.hive.spec.con***REMOVED***g.sharedVolume.claimName }}
+          claimName: {{ .Values.hive.spec.config.sharedVolume.claimName }}
 {{- end }}
       dnsPolicy: ClusterFirst
       restartPolicy: Always

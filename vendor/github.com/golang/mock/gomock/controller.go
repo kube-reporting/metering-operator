@@ -1,7 +1,7 @@
 // Copyright 2010 Google Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this ***REMOVED***le except in compliance with the License.
+// you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 //
 //     http://www.apache.org/licenses/LICENSE-2.0
@@ -9,13 +9,13 @@
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the speci***REMOVED***c language governing permissions and
+// See the License for the specific language governing permissions and
 // limitations under the License.
 
 // GoMock - a mock framework for Go.
 //
 // Standard usage:
-//   (1) De***REMOVED***ne an interface that you wish to mock.
+//   (1) Define an interface that you wish to mock.
 //         type MyInterface interface {
 //           SomeMethod(x int64, y string)
 //         }
@@ -39,14 +39,14 @@
 //
 // Example of using Call.After to chain expected call order:
 //
-//     ***REMOVED***rstCall := mockObj.EXPECT().SomeMethod(1, "***REMOVED***rst")
-//     secondCall := mockObj.EXPECT().SomeMethod(2, "second").After(***REMOVED***rstCall)
+//     firstCall := mockObj.EXPECT().SomeMethod(1, "first")
+//     secondCall := mockObj.EXPECT().SomeMethod(2, "second").After(firstCall)
 //     mockObj.EXPECT().SomeMethod(3, "third").After(secondCall)
 //
 // Example of using InOrder to declare expected call order:
 //
 //     gomock.InOrder(
-//         mockObj.EXPECT().SomeMethod(1, "***REMOVED***rst"),
+//         mockObj.EXPECT().SomeMethod(1, "first"),
 //         mockObj.EXPECT().SomeMethod(2, "second"),
 //         mockObj.EXPECT().SomeMethod(3, "third"),
 //     )
@@ -64,20 +64,20 @@ import (
 )
 
 // A TestReporter is something that can be used to report test failures.
-// It is satis***REMOVED***ed by the standard library's *testing.T.
+// It is satisfied by the standard library's *testing.T.
 type TestReporter interface {
 	Errorf(format string, args ...interface{})
 	Fatalf(format string, args ...interface{})
 }
 
 // A Controller represents the top-level control of a mock ecosystem.
-// It de***REMOVED***nes the scope and lifetime of mock objects, as well as their expectations.
+// It defines the scope and lifetime of mock objects, as well as their expectations.
 // It is safe to call Controller's methods from multiple goroutines.
 type Controller struct {
 	mu            sync.Mutex
 	t             TestReporter
 	expectedCalls *callSet
-	***REMOVED***nished      bool
+	finished      bool
 }
 
 func NewController(t TestReporter) *Controller {
@@ -116,7 +116,7 @@ func (ctrl *Controller) RecordCall(receiver interface{}, method string, args ...
 			return ctrl.RecordCallWithMethodType(receiver, method, recv.Method(i).Type(), args...)
 		}
 	}
-	ctrl.t.Fatalf("gomock: failed ***REMOVED***nding method %s on %T", method, receiver)
+	ctrl.t.Fatalf("gomock: failed finding method %s on %T", method, receiver)
 	panic("unreachable")
 }
 
@@ -183,10 +183,10 @@ func (ctrl *Controller) Finish() {
 	ctrl.mu.Lock()
 	defer ctrl.mu.Unlock()
 
-	if ctrl.***REMOVED***nished {
+	if ctrl.finished {
 		ctrl.t.Fatalf("Controller.Finish was called more than once. It has to be called exactly once.")
 	}
-	ctrl.***REMOVED***nished = true
+	ctrl.finished = true
 
 	// If we're currently panicking, probably because this is a deferred call,
 	// pass through the panic.
@@ -194,7 +194,7 @@ func (ctrl *Controller) Finish() {
 		panic(err)
 	}
 
-	// Check that all remaining expected calls are satis***REMOVED***ed.
+	// Check that all remaining expected calls are satisfied.
 	failures := ctrl.expectedCalls.Failures()
 	for _, call := range failures {
 		ctrl.t.Errorf("missing call(s) to %v", call)
@@ -205,10 +205,10 @@ func (ctrl *Controller) Finish() {
 }
 
 func callerInfo(skip int) string {
-	if _, ***REMOVED***le, line, ok := runtime.Caller(skip + 1); ok {
-		return fmt.Sprintf("%s:%d", ***REMOVED***le, line)
+	if _, file, line, ok := runtime.Caller(skip + 1); ok {
+		return fmt.Sprintf("%s:%d", file, line)
 	}
-	return "unknown ***REMOVED***le"
+	return "unknown file"
 }
 
 type testHelper interface {

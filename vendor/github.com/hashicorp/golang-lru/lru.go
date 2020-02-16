@@ -6,7 +6,7 @@ import (
 	"github.com/hashicorp/golang-lru/simplelru"
 )
 
-// Cache is a thread-safe ***REMOVED***xed size LRU cache.
+// Cache is a thread-safe fixed size LRU cache.
 type Cache struct {
 	lru  simplelru.LRUCache
 	lock sync.RWMutex
@@ -17,7 +17,7 @@ func New(size int) (*Cache, error) {
 	return NewWithEvict(size, nil)
 }
 
-// NewWithEvict constructs a ***REMOVED***xed size cache with the given eviction
+// NewWithEvict constructs a fixed size cache with the given eviction
 // callback.
 func NewWithEvict(size int, onEvicted func(key interface{}, value interface{})) (*Cache, error) {
 	lru, err := simplelru.NewLRU(size, simplelru.EvictCallback(onEvicted))
@@ -59,7 +59,7 @@ func (c *Cache) Contains(key interface{}) bool {
 	return c.lru.Contains(key)
 }
 
-// Peek returns the key value (or unde***REMOVED***ned if not found) without updating
+// Peek returns the key value (or undefined if not found) without updating
 // the "recently used"-ness of the key.
 func (c *Cache) Peek(key interface{}) (value interface{}, ok bool) {
 	c.lock.RLock()

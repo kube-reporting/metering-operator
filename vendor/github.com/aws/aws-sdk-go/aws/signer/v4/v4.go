@@ -8,11 +8,11 @@
 // Generally using the signer outside of the SDK should not require any additional
 // logic when using Go v1.5 or higher. The signer does this by taking advantage
 // of the URL.EscapedPath method. If your request URI requires additional escaping
-// you many need to use the URL.Opaque to de***REMOVED***ne what the raw URI should be sent
+// you many need to use the URL.Opaque to define what the raw URI should be sent
 // to the service as.
 //
-// The signer will ***REMOVED***rst check the URL.Opaque ***REMOVED***eld, and use its value if set.
-// The signer does require the URL.Opaque ***REMOVED***eld to be set in the form of:
+// The signer will first check the URL.Opaque field, and use its value if set.
+// The signer does require the URL.Opaque field to be set in the form of:
 //
 //     "//<hostname>/<path>"
 //
@@ -39,7 +39,7 @@
 // Because of this, it is recommended that when using the signer outside of the
 // SDK that explicitly escaping the request prior to being signed is preferable,
 // and will help prevent signature validation errors. This can be done by setting
-// the URL.Opaque or URL.RawPath. The SDK will use URL.Opaque ***REMOVED***rst and then
+// the URL.Opaque or URL.RawPath. The SDK will use URL.Opaque first and then
 // call URL.EscapedPath() if Opaque is not set.
 //
 // If signing a request intended for HTTP2 server, and you're using Go 1.6.2
@@ -76,7 +76,7 @@ import (
 )
 
 const (
-	authHeaderPre***REMOVED***x = "AWS4-HMAC-SHA256"
+	authHeaderPrefix = "AWS4-HMAC-SHA256"
 	timeFormat       = "20060102T150405Z"
 	shortTimeFormat  = "20060102"
 
@@ -106,16 +106,16 @@ var requiredSignedHeaders = rules{
 			"Content-Type":                          struct{}{},
 			"Expires":                               struct{}{},
 			"If-Match":                              struct{}{},
-			"If-Modi***REMOVED***ed-Since":                     struct{}{},
+			"If-Modified-Since":                     struct{}{},
 			"If-None-Match":                         struct{}{},
-			"If-Unmodi***REMOVED***ed-Since":                   struct{}{},
+			"If-Unmodified-Since":                   struct{}{},
 			"Range":                                 struct{}{},
 			"X-Amz-Acl":                             struct{}{},
 			"X-Amz-Copy-Source":                     struct{}{},
 			"X-Amz-Copy-Source-If-Match":            struct{}{},
-			"X-Amz-Copy-Source-If-Modi***REMOVED***ed-Since":   struct{}{},
+			"X-Amz-Copy-Source-If-Modified-Since":   struct{}{},
 			"X-Amz-Copy-Source-If-None-Match":       struct{}{},
-			"X-Amz-Copy-Source-If-Unmodi***REMOVED***ed-Since": struct{}{},
+			"X-Amz-Copy-Source-If-Unmodified-Since": struct{}{},
 			"X-Amz-Copy-Source-Range":               struct{}{},
 			"X-Amz-Copy-Source-Server-Side-Encryption-Customer-Algorithm": struct{}{},
 			"X-Amz-Copy-Source-Server-Side-Encryption-Customer-Key":       struct{}{},
@@ -182,7 +182,7 @@ type Signer struct {
 	// http://docs.aws.amazon.com/general/latest/gr/sigv4-create-canonical-request.html
 	DisableURIPathEscaping bool
 
-	// Disables the automatical setting of the HTTP request's Body ***REMOVED***eld with the
+	// Disables the automatical setting of the HTTP request's Body field with the
 	// io.ReadSeeker passed in to the signer. This is useful if you're using a
 	// custom wrapper around the body for the io.ReadSeeker and want to preserve
 	// the Body value on the Request.Body.
@@ -202,9 +202,9 @@ type Signer struct {
 	UnsignedPayload bool
 }
 
-// NewSigner returns a Signer pointer con***REMOVED***gured with the credentials and optional
+// NewSigner returns a Signer pointer configured with the credentials and optional
 // option values provided. If not options are provided the Signer will use its
-// default con***REMOVED***guration.
+// default configuration.
 func NewSigner(credentials *credentials.Credentials, options ...func(*Signer)) *Signer {
 	v4 := &Signer{
 		Credentials: credentials,
@@ -257,7 +257,7 @@ type signingCtx struct {
 //
 // Sign will set the request's Body to be the `body` parameter passed in. If
 // the body is not already an io.ReadCloser, it will be wrapped within one. If
-// a `nil` body parameter passed to Sign, the request's Body ***REMOVED***eld will be
+// a `nil` body parameter passed to Sign, the request's Body field will be
 // also set to nil. Its important to note that this functionality will not
 // change the request's ContentLength of the request.
 //
@@ -389,10 +389,10 @@ func (ctx *signingCtx) handlePresignRemoval() {
 
 func (ctx *signingCtx) assignAmzQueryValues() {
 	if ctx.isPresign {
-		ctx.Query.Set("X-Amz-Algorithm", authHeaderPre***REMOVED***x)
+		ctx.Query.Set("X-Amz-Algorithm", authHeaderPrefix)
 		if ctx.credValues.SessionToken != "" {
 			ctx.Query.Set("X-Amz-Security-Token", ctx.credValues.SessionToken)
-		} ***REMOVED*** {
+		} else {
 			ctx.Query.Del("X-Amz-Security-Token")
 		}
 
@@ -419,7 +419,7 @@ var SignRequestHandler = request.NamedHandler{
 // not created by a service client's API operation method use the "Sign" or
 // "Presign" functions of the "Signer" type.
 //
-// If the credentials of the request's con***REMOVED***g are set to
+// If the credentials of the request's config are set to
 // credentials.AnonymousCredentials the request will not be signed.
 func SignSDKRequest(req *request.Request) {
 	SignSDKRequestWithCurrentTime(req, time.Now)
@@ -441,13 +441,13 @@ func BuildNamedHandler(name string, opts ...func(*Signer)) request.NamedHandler 
 func SignSDKRequestWithCurrentTime(req *request.Request, curTimeFn func() time.Time, opts ...func(*Signer)) {
 	// If the request does not need to be signed ignore the signing of the
 	// request if the AnonymousCredentials object is used.
-	if req.Con***REMOVED***g.Credentials == credentials.AnonymousCredentials {
+	if req.Config.Credentials == credentials.AnonymousCredentials {
 		return
 	}
 
 	region := req.ClientInfo.SigningRegion
 	if region == "" {
-		region = aws.StringValue(req.Con***REMOVED***g.Region)
+		region = aws.StringValue(req.Config.Region)
 	}
 
 	name := req.ClientInfo.SigningName
@@ -455,9 +455,9 @@ func SignSDKRequestWithCurrentTime(req *request.Request, curTimeFn func() time.T
 		name = req.ClientInfo.ServiceName
 	}
 
-	v4 := NewSigner(req.Con***REMOVED***g.Credentials, func(v4 *Signer) {
-		v4.Debug = req.Con***REMOVED***g.LogLevel.Value()
-		v4.Logger = req.Con***REMOVED***g.Logger
+	v4 := NewSigner(req.Config.Credentials, func(v4 *Signer) {
+		v4.Debug = req.Config.LogLevel.Value()
+		v4.Logger = req.Config.Logger
 		v4.DisableHeaderHoisting = req.NotHoist
 		v4.currentTimeFn = curTimeFn
 		if name == "s3" {
@@ -533,9 +533,9 @@ func (ctx *signingCtx) build(disableHeaderHoisting bool) error {
 
 	if ctx.isPresign {
 		ctx.Request.URL.RawQuery += "&X-Amz-Signature=" + ctx.signature
-	} ***REMOVED*** {
+	} else {
 		parts := []string{
-			authHeaderPre***REMOVED***x + " Credential=" + ctx.credValues.AccessKeyID + "/" + ctx.credentialString,
+			authHeaderPrefix + " Credential=" + ctx.credValues.AccessKeyID + "/" + ctx.credentialString,
 			"SignedHeaders=" + ctx.signedHeaders,
 			"Signature=" + ctx.signature,
 		}
@@ -553,7 +553,7 @@ func (ctx *signingCtx) buildTime() {
 		duration := int64(ctx.ExpireTime / time.Second)
 		ctx.Query.Set("X-Amz-Date", ctx.formattedTime)
 		ctx.Query.Set("X-Amz-Expires", strconv.FormatInt(duration, 10))
-	} ***REMOVED*** {
+	} else {
 		ctx.Request.Header.Set("X-Amz-Date", ctx.formattedTime)
 	}
 }
@@ -577,7 +577,7 @@ func buildQuery(r rule, header http.Header) (url.Values, http.Header) {
 	for k, h := range header {
 		if r.IsValid(k) {
 			query[k] = h
-		} ***REMOVED*** {
+		} else {
 			unsignedHeaders[k] = h
 		}
 	}
@@ -619,10 +619,10 @@ func (ctx *signingCtx) buildCanonicalHeaders(r rule, header http.Header) {
 		if k == "host" {
 			if ctx.Request.Host != "" {
 				headerValues[i] = "host:" + ctx.Request.Host
-			} ***REMOVED*** {
+			} else {
 				headerValues[i] = "host:" + ctx.Request.URL.Host
 			}
-		} ***REMOVED*** {
+		} else {
 			headerValues[i] = k + ":" +
 				strings.Join(ctx.SignedHeaderVals[k], ",")
 		}
@@ -652,7 +652,7 @@ func (ctx *signingCtx) buildCanonicalString() {
 
 func (ctx *signingCtx) buildStringToSign() {
 	ctx.stringToSign = strings.Join([]string{
-		authHeaderPre***REMOVED***x,
+		authHeaderPrefix,
 		ctx.formattedTime,
 		ctx.credentialString,
 		hex.EncodeToString(makeSha256([]byte(ctx.canonicalString))),
@@ -681,9 +681,9 @@ func (ctx *signingCtx) buildBodyDigest() error {
 		if ctx.unsignedPayload || s3Presign {
 			hash = "UNSIGNED-PAYLOAD"
 			includeSHA256Header = !s3Presign
-		} ***REMOVED*** if ctx.Body == nil {
+		} else if ctx.Body == nil {
 			hash = emptyStringSHA256
-		} ***REMOVED*** {
+		} else {
 			if !aws.IsReaderSeekable(ctx.Body) {
 				return fmt.Errorf("cannot use unseekable request body %T, for signed request with body", ctx.Body)
 			}
@@ -754,7 +754,7 @@ func makeSha256Reader(reader io.ReadSeeker) (hashBytes []byte, err error) {
 	size, err := aws.SeekerLen(reader)
 	if err != nil {
 		io.Copy(hash, reader)
-	} ***REMOVED*** {
+	} else {
 		io.CopyN(hash, reader, size)
 	}
 
@@ -793,7 +793,7 @@ func stripExcessSpaces(vals []string) {
 					m++
 				}
 				spaces++
-			} ***REMOVED*** {
+			} else {
 				// End of multiple spaces.
 				spaces = 0
 				buf[m] = buf[k]

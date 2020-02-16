@@ -6,7 +6,7 @@ type Assertions struct {
 	t TestingT
 }
 
-// New makes a new Assertions object for the speci***REMOVED***ed TestingT.
+// New makes a new Assertions object for the specified TestingT.
 func New(t TestingT) *Assertions {
 	return &Assertions{
 		t: t,

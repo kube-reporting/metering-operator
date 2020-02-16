@@ -242,7 +242,7 @@ spec:
     WHERE period_start  >= timestamp '{| default .Report.ReportingStart .Report.Inputs.ReportingStart | prestoTimestamp |}'
     AND period_end <= timestamp '{| default .Report.ReportingEnd .Report.Inputs.ReportingEnd | prestoTimestamp |}'
     GROUP BY namespace
-    {|- ***REMOVED*** |}
+    {|- else |}
       namespace,
       sum(pod_request_memory_byte_seconds) as pod_request_memory_byte_seconds
     FROM {| dataSourceTableName .Report.Inputs.PodMemoryRequestRawDataSourceName |}
@@ -294,7 +294,7 @@ spec:
     WHERE period_start  >= timestamp '{| default .Report.ReportingStart .Report.Inputs.ReportingStart | prestoTimestamp |}'
     AND period_end <= timestamp '{| default .Report.ReportingEnd .Report.Inputs.ReportingEnd | prestoTimestamp |}'
     GROUP BY namespace
-    {|- ***REMOVED*** |}
+    {|- else |}
       namespace,
       sum(pod_usage_memory_byte_seconds) as pod_usage_memory_byte_seconds
     FROM {| dataSourceTableName .Report.Inputs.PodMemoryUsageRawDataSourceName |}

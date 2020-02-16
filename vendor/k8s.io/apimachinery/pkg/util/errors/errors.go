@@ -2,7 +2,7 @@
 Copyright 2015 The Kubernetes Authors.
 
 Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this ***REMOVED***le except in compliance with the License.
+you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
 
     http://www.apache.org/licenses/LICENSE-2.0
@@ -10,7 +10,7 @@ You may obtain a copy of the License at
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the speci***REMOVED***c language governing permissions and
+See the License for the specific language governing permissions and
 limitations under the License.
 */
 
@@ -95,7 +95,7 @@ func FilterOut(err error, fns ...Matcher) error {
 		return nil
 	}
 	if agg, ok := err.(Aggregate); ok {
-		return NewAggregate(***REMOVED***lterErrors(agg.Errors(), fns...))
+		return NewAggregate(filterErrors(agg.Errors(), fns...))
 	}
 	if !matchesError(err, fns...) {
 		return err
@@ -113,11 +113,11 @@ func matchesError(err error, fns ...Matcher) bool {
 	return false
 }
 
-// ***REMOVED***lterErrors returns any errors (or nested errors, if the list contains
+// filterErrors returns any errors (or nested errors, if the list contains
 // nested Errors) for which all fns return false. If no errors
 // remain a nil list is returned. The resulting silec will have all
 // nested slices flattened as a side effect.
-func ***REMOVED***lterErrors(list []error, fns ...Matcher) []error {
+func filterErrors(list []error, fns ...Matcher) []error {
 	result := []error{}
 	for _, err := range list {
 		r := FilterOut(err, fns...)
@@ -141,7 +141,7 @@ func Flatten(agg Aggregate) Aggregate {
 			if r != nil {
 				result = append(result, r.Errors()...)
 			}
-		} ***REMOVED*** {
+		} else {
 			if err != nil {
 				result = append(result, err)
 			}
@@ -167,7 +167,7 @@ func CreateAggregateFromMessageCountMap(m MessageCountMap) Aggregate {
 }
 
 // Reduce will return err or, if err is an Aggregate and only has one item,
-// the ***REMOVED***rst item in the aggregate.
+// the first item in the aggregate.
 func Reduce(err error) error {
 	if agg, ok := err.(Aggregate); ok && err != nil {
 		switch len(agg.Errors()) {
@@ -180,7 +180,7 @@ func Reduce(err error) error {
 	return err
 }
 
-// AggregateGoroutines runs the provided functions in parallel, stuf***REMOVED***ng all
+// AggregateGoroutines runs the provided functions in parallel, stuffing all
 // non-nil errors into the returned Aggregate.
 // Returns nil if all the functions complete successfully.
 func AggregateGoroutines(funcs ...func() error) Aggregate {

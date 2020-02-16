@@ -47,7 +47,7 @@ type HiveTableSpec struct {
 
 	Location        string            `json:"location,omitempty"`
 	RowFormat       string            `json:"rowFormat,omitempty"`
-	FileFormat      string            `json:"***REMOVED***leFormat,omitempty"`
+	FileFormat      string            `json:"fileFormat,omitempty"`
 	TableProperties map[string]string `json:"tableProperties,omitempty"`
 	External        bool              `json:"external,omitempty"`
 
@@ -66,7 +66,7 @@ type HiveTableStatus struct {
 
 	Location        string            `json:"location,omitempty"`
 	RowFormat       string            `json:"rowFormat,omitempty"`
-	FileFormat      string            `json:"***REMOVED***leFormat,omitempty"`
+	FileFormat      string            `json:"fileFormat,omitempty"`
 	TableProperties map[string]string `json:"tableProperties,omitempty"`
 	External        bool              `json:"external,omitempty"`
 

@@ -26,7 +26,7 @@ func encoderOfStruct(ctx *ctx, typ reflect2.Type) ValEncoder {
 				if old.toName != toName {
 					continue
 				}
-				old.ignored, new.ignored = resolveConflictBinding(ctx.frozenCon***REMOVED***g, old.binding, new.binding)
+				old.ignored, new.ignored = resolveConflictBinding(ctx.frozenConfig, old.binding, new.binding)
 			}
 			orderedBindings = append(orderedBindings, new)
 		}
@@ -34,16 +34,16 @@ func encoderOfStruct(ctx *ctx, typ reflect2.Type) ValEncoder {
 	if len(orderedBindings) == 0 {
 		return &emptyStructEncoder{}
 	}
-	***REMOVED***nalOrderedFields := []structFieldTo{}
+	finalOrderedFields := []structFieldTo{}
 	for _, bindingTo := range orderedBindings {
 		if !bindingTo.ignored {
-			***REMOVED***nalOrderedFields = append(***REMOVED***nalOrderedFields, structFieldTo{
+			finalOrderedFields = append(finalOrderedFields, structFieldTo{
 				encoder: bindingTo.binding.Encoder.(*structFieldEncoder),
 				toName:  bindingTo.toName,
 			})
 		}
 	}
-	return &structEncoder{typ, ***REMOVED***nalOrderedFields}
+	return &structEncoder{typ, finalOrderedFields}
 }
 
 func createCheckIsEmpty(ctx *ctx, typ reflect2.Type) checkIsEmpty {
@@ -70,61 +70,61 @@ func createCheckIsEmpty(ctx *ctx, typ reflect2.Type) checkIsEmpty {
 	}
 }
 
-func resolveConflictBinding(cfg *frozenCon***REMOVED***g, old, new *Binding) (ignoreOld, ignoreNew bool) {
+func resolveConflictBinding(cfg *frozenConfig, old, new *Binding) (ignoreOld, ignoreNew bool) {
 	newTagged := new.Field.Tag().Get(cfg.getTagKey()) != ""
 	oldTagged := old.Field.Tag().Get(cfg.getTagKey()) != ""
 	if newTagged {
 		if oldTagged {
 			if len(old.levels) > len(new.levels) {
 				return true, false
-			} ***REMOVED*** if len(new.levels) > len(old.levels) {
+			} else if len(new.levels) > len(old.levels) {
 				return false, true
-			} ***REMOVED*** {
+			} else {
 				return true, true
 			}
-		} ***REMOVED*** {
+		} else {
 			return true, false
 		}
-	} ***REMOVED*** {
+	} else {
 		if oldTagged {
 			return true, false
 		}
 		if len(old.levels) > len(new.levels) {
 			return true, false
-		} ***REMOVED*** if len(new.levels) > len(old.levels) {
+		} else if len(new.levels) > len(old.levels) {
 			return false, true
-		} ***REMOVED*** {
+		} else {
 			return true, true
 		}
 	}
 }
 
 type structFieldEncoder struct {
-	***REMOVED***eld        reflect2.StructField
-	***REMOVED***eldEncoder ValEncoder
+	field        reflect2.StructField
+	fieldEncoder ValEncoder
 	omitempty    bool
 }
 
 func (encoder *structFieldEncoder) Encode(ptr unsafe.Pointer, stream *Stream) {
-	***REMOVED***eldPtr := encoder.***REMOVED***eld.UnsafeGet(ptr)
-	encoder.***REMOVED***eldEncoder.Encode(***REMOVED***eldPtr, stream)
+	fieldPtr := encoder.field.UnsafeGet(ptr)
+	encoder.fieldEncoder.Encode(fieldPtr, stream)
 	if stream.Error != nil && stream.Error != io.EOF {
-		stream.Error = fmt.Errorf("%s: %s", encoder.***REMOVED***eld.Name(), stream.Error.Error())
+		stream.Error = fmt.Errorf("%s: %s", encoder.field.Name(), stream.Error.Error())
 	}
 }
 
 func (encoder *structFieldEncoder) IsEmpty(ptr unsafe.Pointer) bool {
-	***REMOVED***eldPtr := encoder.***REMOVED***eld.UnsafeGet(ptr)
-	return encoder.***REMOVED***eldEncoder.IsEmpty(***REMOVED***eldPtr)
+	fieldPtr := encoder.field.UnsafeGet(ptr)
+	return encoder.fieldEncoder.IsEmpty(fieldPtr)
 }
 
 func (encoder *structFieldEncoder) IsEmbeddedPtrNil(ptr unsafe.Pointer) bool {
-	isEmbeddedPtrNil, converted := encoder.***REMOVED***eldEncoder.(IsEmbeddedPtrNil)
+	isEmbeddedPtrNil, converted := encoder.fieldEncoder.(IsEmbeddedPtrNil)
 	if !converted {
 		return false
 	}
-	***REMOVED***eldPtr := encoder.***REMOVED***eld.UnsafeGet(ptr)
-	return isEmbeddedPtrNil.IsEmbeddedPtrNil(***REMOVED***eldPtr)
+	fieldPtr := encoder.field.UnsafeGet(ptr)
+	return isEmbeddedPtrNil.IsEmbeddedPtrNil(fieldPtr)
 }
 
 type IsEmbeddedPtrNil interface {
@@ -133,7 +133,7 @@ type IsEmbeddedPtrNil interface {
 
 type structEncoder struct {
 	typ    reflect2.Type
-	***REMOVED***elds []structFieldTo
+	fields []structFieldTo
 }
 
 type structFieldTo struct {
@@ -144,18 +144,18 @@ type structFieldTo struct {
 func (encoder *structEncoder) Encode(ptr unsafe.Pointer, stream *Stream) {
 	stream.WriteObjectStart()
 	isNotFirst := false
-	for _, ***REMOVED***eld := range encoder.***REMOVED***elds {
-		if ***REMOVED***eld.encoder.omitempty && ***REMOVED***eld.encoder.IsEmpty(ptr) {
+	for _, field := range encoder.fields {
+		if field.encoder.omitempty && field.encoder.IsEmpty(ptr) {
 			continue
 		}
-		if ***REMOVED***eld.encoder.IsEmbeddedPtrNil(ptr) {
+		if field.encoder.IsEmbeddedPtrNil(ptr) {
 			continue
 		}
 		if isNotFirst {
 			stream.WriteMore()
 		}
-		stream.WriteObjectField(***REMOVED***eld.toName)
-		***REMOVED***eld.encoder.Encode(ptr, stream)
+		stream.WriteObjectField(field.toName)
+		field.encoder.Encode(ptr, stream)
 		isNotFirst = true
 	}
 	stream.WriteObjectEnd()
@@ -195,7 +195,7 @@ func (encoder *stringModeNumberEncoder) IsEmpty(ptr unsafe.Pointer) bool {
 
 type stringModeStringEncoder struct {
 	elemEncoder ValEncoder
-	cfg         *frozenCon***REMOVED***g
+	cfg         *frozenConfig
 }
 
 func (encoder *stringModeStringEncoder) Encode(ptr unsafe.Pointer, stream *Stream) {

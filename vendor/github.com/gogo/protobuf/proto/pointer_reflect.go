@@ -4,7 +4,7 @@
 // https://github.com/golang/protobuf
 //
 // Redistribution and use in source and binary forms, with or without
-// modi***REMOVED***cation, are permitted provided that the following conditions are
+// modification, are permitted provided that the following conditions are
 // met:
 //
 //     * Redistributions of source code must retain the above copyright
@@ -15,7 +15,7 @@
 // distribution.
 //     * Neither the name of Google Inc. nor the names of its
 // contributors may be used to endorse or promote products derived from
-// this software without speci***REMOVED***c prior written permission.
+// this software without specific prior written permission.
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
 // "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
@@ -31,7 +31,7 @@
 
 // +build purego appengine js
 
-// This ***REMOVED***le contains an implementation of proto ***REMOVED***eld accesses using package reflect.
+// This file contains an implementation of proto field accesses using package reflect.
 // It is slower than the code in pointer_unsafe.go but it avoids package unsafe and can
 // be used on App Engine.
 
@@ -44,24 +44,24 @@ import (
 
 const unsafeAllowed = false
 
-// A ***REMOVED***eld identi***REMOVED***es a ***REMOVED***eld in a struct, accessible from a pointer.
-// In this implementation, a ***REMOVED***eld is identi***REMOVED***ed by the sequence of ***REMOVED***eld indices
+// A field identifies a field in a struct, accessible from a pointer.
+// In this implementation, a field is identified by the sequence of field indices
 // passed to reflect's FieldByIndex.
-type ***REMOVED***eld []int
+type field []int
 
-// toField returns a ***REMOVED***eld equivalent to the given reflect ***REMOVED***eld.
-func toField(f *reflect.StructField) ***REMOVED***eld {
+// toField returns a field equivalent to the given reflect field.
+func toField(f *reflect.StructField) field {
 	return f.Index
 }
 
-// invalidField is an invalid ***REMOVED***eld identi***REMOVED***er.
-var invalidField = ***REMOVED***eld(nil)
+// invalidField is an invalid field identifier.
+var invalidField = field(nil)
 
 // zeroField is a noop when calling pointer.offset.
-var zeroField = ***REMOVED***eld([]int{})
+var zeroField = field([]int{})
 
-// IsValid reports whether the ***REMOVED***eld identi***REMOVED***er is valid.
-func (f ***REMOVED***eld) IsValid() bool { return f != nil }
+// IsValid reports whether the field identifier is valid.
+func (f field) IsValid() bool { return f != nil }
 
 // The pointer type is for the table-driven decoder.
 // The implementation here uses a reflect.Value of pointer type to
@@ -92,8 +92,8 @@ func valToPointer(v reflect.Value) pointer {
 }
 
 // offset converts from a pointer to a structure to a pointer to
-// one of its ***REMOVED***elds.
-func (p pointer) offset(f ***REMOVED***eld) pointer {
+// one of its fields.
+func (p pointer) offset(f field) pointer {
 	return pointer{v: p.v.Elem().FieldByIndex(f).Addr()}
 }
 
@@ -108,7 +108,7 @@ func grow(s reflect.Value) reflect.Value {
 	n, m := s.Len(), s.Cap()
 	if n < m {
 		s.SetLen(n + 1)
-	} ***REMOVED*** {
+	} else {
 		s.Set(reflect.Append(s, reflect.Zero(s.Type().Elem())))
 	}
 	return s.Index(n)

@@ -2,7 +2,7 @@
 Copyright 2014 The Kubernetes Authors.
 
 Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this ***REMOVED***le except in compliance with the License.
+you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
 
     http://www.apache.org/licenses/LICENSE-2.0
@@ -10,7 +10,7 @@ You may obtain a copy of the License at
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the speci***REMOVED***c language governing permissions and
+See the License for the specific language governing permissions and
 limitations under the License.
 */
 
@@ -69,7 +69,7 @@ func GetReference(scheme *runtime.Scheme, obj runtime.Object) (*v1.ObjectReferen
 		if err != nil {
 			return nil, err
 		}
-	} ***REMOVED*** {
+	} else {
 		listMeta = objectMeta
 	}
 
@@ -84,14 +84,14 @@ func GetReference(scheme *runtime.Scheme, obj runtime.Object) (*v1.ObjectReferen
 		if err != nil {
 			return nil, err
 		}
-		// example paths: /<pre***REMOVED***x>/<version>/*
+		// example paths: /<prefix>/<version>/*
 		parts := strings.Split(selfLinkUrl.Path, "/")
 		if len(parts) < 4 {
 			return nil, fmt.Errorf("unexpected self link format: '%v'; got version '%v'", selfLink, version)
 		}
 		if parts[1] == "api" {
 			version = parts[2]
-		} ***REMOVED*** {
+		} else {
 			version = parts[2] + "/" + parts[3]
 		}
 	}
@@ -116,11 +116,11 @@ func GetReference(scheme *runtime.Scheme, obj runtime.Object) (*v1.ObjectReferen
 }
 
 // GetPartialReference is exactly like GetReference, but allows you to set the FieldPath.
-func GetPartialReference(scheme *runtime.Scheme, obj runtime.Object, ***REMOVED***eldPath string) (*v1.ObjectReference, error) {
+func GetPartialReference(scheme *runtime.Scheme, obj runtime.Object, fieldPath string) (*v1.ObjectReference, error) {
 	ref, err := GetReference(scheme, obj)
 	if err != nil {
 		return nil, err
 	}
-	ref.FieldPath = ***REMOVED***eldPath
+	ref.FieldPath = fieldPath
 	return ref, nil
 }

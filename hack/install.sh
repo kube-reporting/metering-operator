@@ -6,7 +6,7 @@ source "${ROOT_DIR}/hack/lib/customize-manifests.sh"
 
 echo "Using $INSTALLER_MANIFESTS_DIR as manifests directory"
 
-# can also be speci***REMOVED***ed as an argument
+# can also be specified as an argument
 METERING_CR_FILE="${1:-$METERING_CR_FILE}"
 
 if [ "$CREATE_NAMESPACE" == "true" ]; then
@@ -15,14 +15,14 @@ if [ "$CREATE_NAMESPACE" == "true" ]; then
 elif ! kubectl get namespace "${METERING_NAMESPACE}" 2> /dev/null; then
     echo "Namespace '${METERING_NAMESPACE}' does not exist, please create it before starting"
     exit 1
-***REMOVED***
+fi
 
-msg "Installing Custom Resource De***REMOVED***nitions"
-***REMOVED***nd "$INSTALLER_MANIFESTS_DIR" -type f -name '*.crd.yaml' -exec kubectl apply -f {} \;
+msg "Installing Custom Resource Definitions"
+find "$INSTALLER_MANIFESTS_DIR" -type f -name '*.crd.yaml' -exec kubectl apply -f {} \;
 
 if [ "$SKIP_METERING_OPERATOR_DEPLOYMENT" == "true" ]; then
     echo "\$SKIP_METERING_OPERATOR_DEPLOYMENT=true, not creating metering-operator"
-***REMOVED***
+else
     TMPDIR="$(mktemp -d)"
     # shellcheck disable=SC2064
     trap "rm -rf $TMPDIR" EXIT SIGINT
@@ -44,12 +44,12 @@ if [ "$SKIP_METERING_OPERATOR_DEPLOYMENT" == "true" ]; then
         kubectl apply \
         -f "$TMPDIR/metering-operator-clusterrole.yaml" \
         -f "$TMPDIR/metering-operator-clusterrolebinding.yaml"
-    ***REMOVED***
+    fi
 
     msg "Installing metering-operator"
     kube-install \
         "$TMPDIR/metering-operator-deployment.yaml"
-***REMOVED***
+fi
 
 msg "Installing Metering Resource"
 kube-install \

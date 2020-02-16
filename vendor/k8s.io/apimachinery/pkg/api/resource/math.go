@@ -2,7 +2,7 @@
 Copyright 2014 The Kubernetes Authors.
 
 Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this ***REMOVED***le except in compliance with the License.
+you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
 
     http://www.apache.org/licenses/LICENSE-2.0
@@ -10,7 +10,7 @@ You may obtain a copy of the License at
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the speci***REMOVED***c language governing permissions and
+See the License for the specific language governing permissions and
 limitations under the License.
 */
 
@@ -140,7 +140,7 @@ func int64MultiplyScale1000(a int64) (int64, bool) {
 }
 
 // positiveScaleInt64 multiplies base by 10^scale, returning false if the
-// value overflows. Passing a negative scale is unde***REMOVED***ned.
+// value overflows. Passing a negative scale is undefined.
 func positiveScaleInt64(base int64, scale Scale) (int64, bool) {
 	switch scale {
 	case 0:
@@ -168,7 +168,7 @@ func positiveScaleInt64(base int64, scale Scale) (int64, bool) {
 }
 
 // negativeScaleInt64 reduces base by the provided scale, rounding up, until the
-// value is zero or the scale is reached. Passing a negative scale is unde***REMOVED***ned.
+// value is zero or the scale is reached. Passing a negative scale is undefined.
 // The value returned, if not exact, is rounded away from zero.
 func negativeScaleInt64(base int64, scale Scale) (result int64, exact bool) {
 	if scale == 0 {
@@ -195,7 +195,7 @@ func negativeScaleInt64(base int64, scale Scale) (result int64, exact bool) {
 	if fraction {
 		if base > 0 {
 			value += 1
-		} ***REMOVED*** {
+		} else {
 			value += -1
 		}
 	}
@@ -248,7 +248,7 @@ func pow10Int64(b int64) int64 {
 }
 
 // negativeScaleInt64 returns the result of dividing base by scale * 10 and the remainder, or
-// false if no such division is possible. Dividing by negative scales is unde***REMOVED***ned.
+// false if no such division is possible. Dividing by negative scales is undefined.
 func divideByScaleInt64(base int64, scale Scale) (result, remainder int64, exact bool) {
 	if scale == 0 {
 		return base, 0, true
@@ -297,7 +297,7 @@ func removeInt64Factors(value int64, base int64) (result int64, times int32) {
 
 // removeBigIntFactors divides in a loop; the return values have the property that
 // d == result * factor ^ times
-// d may be modi***REMOVED***ed in place.
+// d may be modified in place.
 // If d == 0, then the return values will be (0, 0)
 func removeBigIntFactors(d, factor *big.Int) (result *big.Int, times int32) {
 	q := big.NewInt(0)

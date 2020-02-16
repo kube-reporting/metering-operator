@@ -13,7 +13,7 @@ import (
 // Copyright 2017 Microsoft Corporation
 //
 //  Licensed under the Apache License, Version 2.0 (the "License");
-//  you may not use this ***REMOVED***le except in compliance with the License.
+//  you may not use this file except in compliance with the License.
 //  You may obtain a copy of the License at
 //
 //      http://www.apache.org/licenses/LICENSE-2.0
@@ -21,7 +21,7 @@ import (
 //  Unless required by applicable law or agreed to in writing, software
 //  distributed under the License is distributed on an "AS IS" BASIS,
 //  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-//  See the License for the speci***REMOVED***c language governing permissions and
+//  See the License for the specific language governing permissions and
 //  limitations under the License.
 
 type audience []string
@@ -64,22 +64,22 @@ const (
 	EnvironmentServiceBusEndpoint EnvironmentProperty = "serviceBusEndpoint"
 	// EnvironmentBatchManagementEndpoint ...
 	EnvironmentBatchManagementEndpoint EnvironmentProperty = "batchManagementEndpoint"
-	// EnvironmentStorageEndpointSuf***REMOVED***x ...
-	EnvironmentStorageEndpointSuf***REMOVED***x EnvironmentProperty = "storageEndpointSuf***REMOVED***x"
-	// EnvironmentSQLDatabaseDNSSuf***REMOVED***x ...
-	EnvironmentSQLDatabaseDNSSuf***REMOVED***x EnvironmentProperty = "sqlDatabaseDNSSuf***REMOVED***x"
-	// EnvironmentTraf***REMOVED***cManagerDNSSuf***REMOVED***x ...
-	EnvironmentTraf***REMOVED***cManagerDNSSuf***REMOVED***x EnvironmentProperty = "traf***REMOVED***cManagerDNSSuf***REMOVED***x"
-	// EnvironmentKeyVaultDNSSuf***REMOVED***x ...
-	EnvironmentKeyVaultDNSSuf***REMOVED***x EnvironmentProperty = "keyVaultDNSSuf***REMOVED***x"
-	// EnvironmentServiceBusEndpointSuf***REMOVED***x ...
-	EnvironmentServiceBusEndpointSuf***REMOVED***x EnvironmentProperty = "serviceBusEndpointSuf***REMOVED***x"
-	// EnvironmentServiceManagementVMDNSSuf***REMOVED***x ...
-	EnvironmentServiceManagementVMDNSSuf***REMOVED***x EnvironmentProperty = "serviceManagementVMDNSSuf***REMOVED***x"
-	// EnvironmentResourceManagerVMDNSSuf***REMOVED***x ...
-	EnvironmentResourceManagerVMDNSSuf***REMOVED***x EnvironmentProperty = "resourceManagerVMDNSSuf***REMOVED***x"
-	// EnvironmentContainerRegistryDNSSuf***REMOVED***x ...
-	EnvironmentContainerRegistryDNSSuf***REMOVED***x EnvironmentProperty = "containerRegistryDNSSuf***REMOVED***x"
+	// EnvironmentStorageEndpointSuffix ...
+	EnvironmentStorageEndpointSuffix EnvironmentProperty = "storageEndpointSuffix"
+	// EnvironmentSQLDatabaseDNSSuffix ...
+	EnvironmentSQLDatabaseDNSSuffix EnvironmentProperty = "sqlDatabaseDNSSuffix"
+	// EnvironmentTrafficManagerDNSSuffix ...
+	EnvironmentTrafficManagerDNSSuffix EnvironmentProperty = "trafficManagerDNSSuffix"
+	// EnvironmentKeyVaultDNSSuffix ...
+	EnvironmentKeyVaultDNSSuffix EnvironmentProperty = "keyVaultDNSSuffix"
+	// EnvironmentServiceBusEndpointSuffix ...
+	EnvironmentServiceBusEndpointSuffix EnvironmentProperty = "serviceBusEndpointSuffix"
+	// EnvironmentServiceManagementVMDNSSuffix ...
+	EnvironmentServiceManagementVMDNSSuffix EnvironmentProperty = "serviceManagementVMDNSSuffix"
+	// EnvironmentResourceManagerVMDNSSuffix ...
+	EnvironmentResourceManagerVMDNSSuffix EnvironmentProperty = "resourceManagerVMDNSSuffix"
+	// EnvironmentContainerRegistryDNSSuffix ...
+	EnvironmentContainerRegistryDNSSuffix EnvironmentProperty = "containerRegistryDNSSuffix"
 	// EnvironmentTokenAudience ...
 	EnvironmentTokenAudience EnvironmentProperty = "tokenAudience"
 )
@@ -91,7 +91,7 @@ type OverrideProperty struct {
 }
 
 // EnvironmentFromURL loads an Environment from a URL
-// This function is particularly useful in the Hybrid Cloud model, where one may de***REMOVED***ne their own
+// This function is particularly useful in the Hybrid Cloud model, where one may define their own
 // endpoints.
 func EnvironmentFromURL(resourceManagerEndpoint string, properties ...OverrideProperty) (environment Environment, err error) {
 	var metadataEnvProperties environmentMetadataInfo
@@ -110,16 +110,16 @@ func EnvironmentFromURL(resourceManagerEndpoint string, properties ...OverridePr
 	if environment.Name == "" {
 		environment.Name = "HybridEnvironment"
 	}
-	stampDNSSuf***REMOVED***x := environment.StorageEndpointSuf***REMOVED***x
-	if stampDNSSuf***REMOVED***x == "" {
-		stampDNSSuf***REMOVED***x = strings.TrimSuf***REMOVED***x(strings.TrimPre***REMOVED***x(strings.Replace(resourceManagerEndpoint, strings.Split(resourceManagerEndpoint, ".")[0], "", 1), "."), "/")
-		environment.StorageEndpointSuf***REMOVED***x = stampDNSSuf***REMOVED***x
+	stampDNSSuffix := environment.StorageEndpointSuffix
+	if stampDNSSuffix == "" {
+		stampDNSSuffix = strings.TrimSuffix(strings.TrimPrefix(strings.Replace(resourceManagerEndpoint, strings.Split(resourceManagerEndpoint, ".")[0], "", 1), "."), "/")
+		environment.StorageEndpointSuffix = stampDNSSuffix
 	}
-	if environment.KeyVaultDNSSuf***REMOVED***x == "" {
-		environment.KeyVaultDNSSuf***REMOVED***x = fmt.Sprintf("%s.%s", "vault", stampDNSSuf***REMOVED***x)
+	if environment.KeyVaultDNSSuffix == "" {
+		environment.KeyVaultDNSSuffix = fmt.Sprintf("%s.%s", "vault", stampDNSSuffix)
 	}
 	if environment.KeyVaultEndpoint == "" {
-		environment.KeyVaultEndpoint = fmt.Sprintf("%s%s", "https://", environment.KeyVaultDNSSuf***REMOVED***x)
+		environment.KeyVaultEndpoint = fmt.Sprintf("%s%s", "https://", environment.KeyVaultDNSSuffix)
 	}
 	if environment.TokenAudience == "" {
 		environment.TokenAudience = metadataEnvProperties.Authentication.Audiences[0]
@@ -187,37 +187,37 @@ func overrideProperties(environment *Environment, properties []OverrideProperty)
 			{
 				environment.BatchManagementEndpoint = property.Value
 			}
-		case EnvironmentStorageEndpointSuf***REMOVED***x:
+		case EnvironmentStorageEndpointSuffix:
 			{
-				environment.StorageEndpointSuf***REMOVED***x = property.Value
+				environment.StorageEndpointSuffix = property.Value
 			}
-		case EnvironmentSQLDatabaseDNSSuf***REMOVED***x:
+		case EnvironmentSQLDatabaseDNSSuffix:
 			{
-				environment.SQLDatabaseDNSSuf***REMOVED***x = property.Value
+				environment.SQLDatabaseDNSSuffix = property.Value
 			}
-		case EnvironmentTraf***REMOVED***cManagerDNSSuf***REMOVED***x:
+		case EnvironmentTrafficManagerDNSSuffix:
 			{
-				environment.Traf***REMOVED***cManagerDNSSuf***REMOVED***x = property.Value
+				environment.TrafficManagerDNSSuffix = property.Value
 			}
-		case EnvironmentKeyVaultDNSSuf***REMOVED***x:
+		case EnvironmentKeyVaultDNSSuffix:
 			{
-				environment.KeyVaultDNSSuf***REMOVED***x = property.Value
+				environment.KeyVaultDNSSuffix = property.Value
 			}
-		case EnvironmentServiceBusEndpointSuf***REMOVED***x:
+		case EnvironmentServiceBusEndpointSuffix:
 			{
-				environment.ServiceBusEndpointSuf***REMOVED***x = property.Value
+				environment.ServiceBusEndpointSuffix = property.Value
 			}
-		case EnvironmentServiceManagementVMDNSSuf***REMOVED***x:
+		case EnvironmentServiceManagementVMDNSSuffix:
 			{
-				environment.ServiceManagementVMDNSSuf***REMOVED***x = property.Value
+				environment.ServiceManagementVMDNSSuffix = property.Value
 			}
-		case EnvironmentResourceManagerVMDNSSuf***REMOVED***x:
+		case EnvironmentResourceManagerVMDNSSuffix:
 			{
-				environment.ResourceManagerVMDNSSuf***REMOVED***x = property.Value
+				environment.ResourceManagerVMDNSSuffix = property.Value
 			}
-		case EnvironmentContainerRegistryDNSSuf***REMOVED***x:
+		case EnvironmentContainerRegistryDNSSuffix:
 			{
-				environment.ContainerRegistryDNSSuf***REMOVED***x = property.Value
+				environment.ContainerRegistryDNSSuffix = property.Value
 			}
 		case EnvironmentTokenAudience:
 			{
@@ -229,7 +229,7 @@ func overrideProperties(environment *Environment, properties []OverrideProperty)
 
 func retrieveMetadataEnvironment(endpoint string) (environment environmentMetadataInfo, err error) {
 	client := autorest.NewClientWithUserAgent("")
-	managementEndpoint := fmt.Sprintf("%s%s", strings.TrimSuf***REMOVED***x(endpoint, "/"), "/metadata/endpoints?api-version=1.0")
+	managementEndpoint := fmt.Sprintf("%s%s", strings.TrimSuffix(endpoint, "/"), "/metadata/endpoints?api-version=1.0")
 	req, _ := http.NewRequest("GET", managementEndpoint, nil)
 	response, err := client.Do(req)
 	if err != nil {

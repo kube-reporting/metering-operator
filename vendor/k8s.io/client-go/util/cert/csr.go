@@ -2,7 +2,7 @@
 Copyright 2016 The Kubernetes Authors.
 
 Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this ***REMOVED***le except in compliance with the License.
+you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
 
     http://www.apache.org/licenses/LICENSE-2.0
@@ -10,7 +10,7 @@ You may obtain a copy of the License at
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the speci***REMOVED***c language governing permissions and
+See the License for the specific language governing permissions and
 limitations under the License.
 */
 
@@ -28,7 +28,7 @@ import (
 // MakeCSR generates a PEM-encoded CSR using the supplied private key, subject, and SANs.
 // All key types that are implemented via crypto.Signer are supported (This includes *rsa.PrivateKey and *ecdsa.PrivateKey.)
 func MakeCSR(privateKey interface{}, subject *pkix.Name, dnsSANs []string, ipSANs []net.IP) (csr []byte, err error) {
-	template := &x509.Certi***REMOVED***cateRequest{
+	template := &x509.CertificateRequest{
 		Subject:     *subject,
 		DNSNames:    dnsSANs,
 		IPAddresses: ipSANs,
@@ -38,20 +38,20 @@ func MakeCSR(privateKey interface{}, subject *pkix.Name, dnsSANs []string, ipSAN
 }
 
 // MakeCSRFromTemplate generates a PEM-encoded CSR using the supplied private
-// key and certi***REMOVED***cate request as a template. All key types that are
+// key and certificate request as a template. All key types that are
 // implemented via crypto.Signer are supported (This includes *rsa.PrivateKey
 // and *ecdsa.PrivateKey.)
-func MakeCSRFromTemplate(privateKey interface{}, template *x509.Certi***REMOVED***cateRequest) ([]byte, error) {
+func MakeCSRFromTemplate(privateKey interface{}, template *x509.CertificateRequest) ([]byte, error) {
 	t := *template
 	t.SignatureAlgorithm = sigType(privateKey)
 
-	csrDER, err := x509.CreateCerti***REMOVED***cateRequest(cryptorand.Reader, &t, privateKey)
+	csrDER, err := x509.CreateCertificateRequest(cryptorand.Reader, &t, privateKey)
 	if err != nil {
 		return nil, err
 	}
 
 	csrPemBlock := &pem.Block{
-		Type:  Certi***REMOVED***cateRequestBlockType,
+		Type:  CertificateRequestBlockType,
 		Bytes: csrDER,
 	}
 

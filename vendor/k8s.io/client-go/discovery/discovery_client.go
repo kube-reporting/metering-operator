@@ -2,7 +2,7 @@
 Copyright 2015 The Kubernetes Authors.
 
 Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this ***REMOVED***le except in compliance with the License.
+you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
 
     http://www.apache.org/licenses/LICENSE-2.0
@@ -10,7 +10,7 @@ You may obtain a copy of the License at
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the speci***REMOVED***c language governing permissions and
+See the License for the specific language governing permissions and
 limitations under the License.
 */
 
@@ -63,7 +63,7 @@ type DiscoveryInterface interface {
 type CachedDiscoveryInterface interface {
 	DiscoveryInterface
 	// Fresh is supposed to tell the caller whether or not to retry if the cache
-	// fails to ***REMOVED***nd something (false = retry, true = no need to retry).
+	// fails to find something (false = retry, true = no need to retry).
 	//
 	// TODO: this needs to be revisited, this interface can't be locked properly
 	// and doesn't make a lot of sense.
@@ -110,7 +110,7 @@ type OpenAPISchemaInterface interface {
 type DiscoveryClient struct {
 	restClient restclient.Interface
 
-	LegacyPre***REMOVED***x string
+	LegacyPrefix string
 }
 
 // Convert metav1.APIVersions to metav1.APIGroup. APIVersions is used by legacy v1, so
@@ -135,7 +135,7 @@ func apiVersionsToAPIGroup(apiVersions *metav1.APIVersions) (apiGroup metav1.API
 func (d *DiscoveryClient) ServerGroups() (apiGroupList *metav1.APIGroupList, err error) {
 	// Get the groupVersions exposed at /api
 	v := &metav1.APIVersions{}
-	err = d.restClient.Get().AbsPath(d.LegacyPre***REMOVED***x).Do().Into(v)
+	err = d.restClient.Get().AbsPath(d.LegacyPrefix).Do().Into(v)
 	apiGroup := metav1.APIGroup{}
 	if err == nil && len(v.Versions) != 0 {
 		apiGroup = apiVersionsToAPIGroup(v)
@@ -168,9 +168,9 @@ func (d *DiscoveryClient) ServerResourcesForGroupVersion(groupVersion string) (r
 	if len(groupVersion) == 0 {
 		return nil, fmt.Errorf("groupVersion shouldn't be empty")
 	}
-	if len(d.LegacyPre***REMOVED***x) > 0 && groupVersion == "v1" {
-		url.Path = d.LegacyPre***REMOVED***x + "/" + groupVersion
-	} ***REMOVED*** {
+	if len(d.LegacyPrefix) > 0 && groupVersion == "v1" {
+		url.Path = d.LegacyPrefix + "/" + groupVersion
+	} else {
 		url.Path = "/apis/" + groupVersion
 	}
 	resources = &metav1.APIResourceList{
@@ -275,7 +275,7 @@ func ServerPreferredResources(d DiscoveryInterface) ([]*metav1.APIResourceList, 
 				continue
 			}
 
-			// create empty list which is ***REMOVED***lled later in another loop
+			// create empty list which is filled later in another loop
 			emptyAPIResourceList := metav1.APIResourceList{
 				GroupVersion: version.GroupVersion,
 			}
@@ -313,7 +313,7 @@ func ServerPreferredResources(d DiscoveryInterface) ([]*metav1.APIResourceList, 
 	return result, &ErrGroupDiscoveryFailed{Groups: failedGroups}
 }
 
-// fetchServerResourcesForGroupVersions uses the discovery client to fetch the resources for the speci***REMOVED***ed groups in parallel
+// fetchServerResourcesForGroupVersions uses the discovery client to fetch the resources for the specified groups in parallel
 func fetchGroupVersionResources(d DiscoveryInterface, apiGroups *metav1.APIGroupList) (map[schema.GroupVersion]*metav1.APIResourceList, map[schema.GroupVersion]error) {
 	groupVersionResources := make(map[schema.GroupVersion]*metav1.APIResourceList)
 	failedGroups := make(map[schema.GroupVersion]error)
@@ -337,7 +337,7 @@ func fetchGroupVersionResources(d DiscoveryInterface, apiGroups *metav1.APIGroup
 				if err != nil {
 					// TODO: maybe restrict this to NotFound errors
 					failedGroups[groupVersion] = err
-				} ***REMOVED*** {
+				} else {
 					groupVersionResources[groupVersion] = apiResourceList
 				}
 			}()
@@ -393,7 +393,7 @@ func (d *DiscoveryClient) OpenAPISchema() (*openapi_v2.Document, error) {
 			if err != nil {
 				return nil, err
 			}
-		} ***REMOVED*** {
+		} else {
 			return nil, err
 		}
 	}
@@ -421,35 +421,35 @@ func withRetries(maxRetries int, f func() ([]*metav1.APIResourceList, error)) ([
 	return result, err
 }
 
-func setDiscoveryDefaults(con***REMOVED***g *restclient.Con***REMOVED***g) error {
-	con***REMOVED***g.APIPath = ""
-	con***REMOVED***g.GroupVersion = nil
-	if con***REMOVED***g.Timeout == 0 {
-		con***REMOVED***g.Timeout = defaultTimeout
+func setDiscoveryDefaults(config *restclient.Config) error {
+	config.APIPath = ""
+	config.GroupVersion = nil
+	if config.Timeout == 0 {
+		config.Timeout = defaultTimeout
 	}
 	codec := runtime.NoopEncoder{Decoder: scheme.Codecs.UniversalDecoder()}
-	con***REMOVED***g.NegotiatedSerializer = serializer.NegotiatedSerializerWrapper(runtime.SerializerInfo{Serializer: codec})
-	if len(con***REMOVED***g.UserAgent) == 0 {
-		con***REMOVED***g.UserAgent = restclient.DefaultKubernetesUserAgent()
+	config.NegotiatedSerializer = serializer.NegotiatedSerializerWrapper(runtime.SerializerInfo{Serializer: codec})
+	if len(config.UserAgent) == 0 {
+		config.UserAgent = restclient.DefaultKubernetesUserAgent()
 	}
 	return nil
 }
 
-// NewDiscoveryClientForCon***REMOVED***g creates a new DiscoveryClient for the given con***REMOVED***g. This client
+// NewDiscoveryClientForConfig creates a new DiscoveryClient for the given config. This client
 // can be used to discover supported resources in the API server.
-func NewDiscoveryClientForCon***REMOVED***g(c *restclient.Con***REMOVED***g) (*DiscoveryClient, error) {
-	con***REMOVED***g := *c
-	if err := setDiscoveryDefaults(&con***REMOVED***g); err != nil {
+func NewDiscoveryClientForConfig(c *restclient.Config) (*DiscoveryClient, error) {
+	config := *c
+	if err := setDiscoveryDefaults(&config); err != nil {
 		return nil, err
 	}
-	client, err := restclient.UnversionedRESTClientFor(&con***REMOVED***g)
-	return &DiscoveryClient{restClient: client, LegacyPre***REMOVED***x: "/api"}, err
+	client, err := restclient.UnversionedRESTClientFor(&config)
+	return &DiscoveryClient{restClient: client, LegacyPrefix: "/api"}, err
 }
 
-// NewDiscoveryClientForCon***REMOVED***gOrDie creates a new DiscoveryClient for the given con***REMOVED***g. If
+// NewDiscoveryClientForConfigOrDie creates a new DiscoveryClient for the given config. If
 // there is an error, it panics.
-func NewDiscoveryClientForCon***REMOVED***gOrDie(c *restclient.Con***REMOVED***g) *DiscoveryClient {
-	client, err := NewDiscoveryClientForCon***REMOVED***g(c)
+func NewDiscoveryClientForConfigOrDie(c *restclient.Config) *DiscoveryClient {
+	client, err := NewDiscoveryClientForConfig(c)
 	if err != nil {
 		panic(err)
 	}
@@ -459,7 +459,7 @@ func NewDiscoveryClientForCon***REMOVED***gOrDie(c *restclient.Con***REMOVED***g
 
 // NewDiscoveryClient returns  a new DiscoveryClient for the given RESTClient.
 func NewDiscoveryClient(c restclient.Interface) *DiscoveryClient {
-	return &DiscoveryClient{restClient: c, LegacyPre***REMOVED***x: "/api"}
+	return &DiscoveryClient{restClient: c, LegacyPrefix: "/api"}
 }
 
 // RESTClient returns a RESTClient that is used to communicate

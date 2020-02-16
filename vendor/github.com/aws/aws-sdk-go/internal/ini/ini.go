@@ -7,19 +7,19 @@ import (
 	"github.com/aws/aws-sdk-go/aws/awserr"
 )
 
-// OpenFile takes a path to a given ***REMOVED***le, and will open  and parse
-// that ***REMOVED***le.
+// OpenFile takes a path to a given file, and will open  and parse
+// that file.
 func OpenFile(path string) (Sections, error) {
 	f, err := os.Open(path)
 	if err != nil {
-		return Sections{}, awserr.New(ErrCodeUnableToReadFile, "unable to open ***REMOVED***le", err)
+		return Sections{}, awserr.New(ErrCodeUnableToReadFile, "unable to open file", err)
 	}
 	defer f.Close()
 
 	return Parse(f)
 }
 
-// Parse will parse the given ***REMOVED***le using the shared con***REMOVED***g
+// Parse will parse the given file using the shared config
 // visitor.
 func Parse(f io.Reader) (Sections, error) {
 	tree, err := ParseAST(f)

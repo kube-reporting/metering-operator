@@ -2,7 +2,7 @@
 Copyright 2014 The Kubernetes Authors.
 
 Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this ***REMOVED***le except in compliance with the License.
+you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
 
     http://www.apache.org/licenses/LICENSE-2.0
@@ -10,7 +10,7 @@ You may obtain a copy of the License at
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the speci***REMOVED***c language governing permissions and
+See the License for the specific language governing permissions and
 limitations under the License.
 */
 
@@ -28,7 +28,7 @@ import (
 
 // NewDeltaFIFO returns a Store which can be used process changes to items.
 //
-// keyFunc is used to ***REMOVED***gure out what key an object should have. (It's
+// keyFunc is used to figure out what key an object should have. (It's
 // exposed in the returned DeltaFIFO's KeyOf() method, with bonus features.)
 //
 // 'keyLister' is expected to return a list of keys that the consumer of
@@ -41,7 +41,7 @@ import (
 // NOTE: It is possible to misuse this and cause a race when using an
 //       external known object source.
 //       Whether there is a potential race depends on how the comsumer
-//       modi***REMOVED***es knownObjects. In Pop(), process function is called under
+//       modifies knownObjects. In Pop(), process function is called under
 //       lock, so it is safe to update data structures in it that need to be
 //       in sync with the queue (e.g. knownObjects).
 //
@@ -49,7 +49,7 @@ import (
 //       In case of sharedIndexInformer being a consumer
 //       (https://github.com/kubernetes/kubernetes/blob/0cdd940f/staging/
 //       src/k8s.io/client-go/tools/cache/shared_informer.go#L192),
-//       there is no race as knownObjects (s.indexer) is modi***REMOVED***ed safely
+//       there is no race as knownObjects (s.indexer) is modified safely
 //       under DeltaFIFO's lock. The only exceptions are GetStore() and
 //       GetIndexer() methods, which expose ways to modify the underlying
 //       storage. Currently these two methods are used for creating Lister
@@ -89,7 +89,7 @@ func NewDeltaFIFO(keyFunc KeyFunc, knownObjects KeyListerGetter) *DeltaFIFO {
 // different versions of the same object.
 //
 // A note on the KeyLister used by the DeltaFIFO: It's main purpose is
-// to list keys that are "known", for the purpose of ***REMOVED***guring out which
+// to list keys that are "known", for the purpose of figuring out which
 // items have been deleted when Replace() or Delete() are called. The deleted
 // object will be included in the DeleteFinalStateUnknown markers. These objects
 // could be stale.
@@ -104,10 +104,10 @@ type DeltaFIFO struct {
 	items map[string]Deltas
 	queue []string
 
-	// populated is true if the ***REMOVED***rst batch of items inserted by Replace() has been populated
-	// or Delete/Add/Update was called ***REMOVED***rst.
+	// populated is true if the first batch of items inserted by Replace() has been populated
+	// or Delete/Add/Update was called first.
 	populated bool
-	// initialPopulationCount is the number of items inserted by the ***REMOVED***rst call of Replace()
+	// initialPopulationCount is the number of items inserted by the first call of Replace()
 	initialPopulationCount int
 
 	// keyFunc is used to make the key used for queued item
@@ -115,7 +115,7 @@ type DeltaFIFO struct {
 	keyFunc KeyFunc
 
 	// knownObjects list keys that are "known", for the
-	// purpose of ***REMOVED***guring out which items have been deleted
+	// purpose of figuring out which items have been deleted
 	// when Replace() or Delete() is called.
 	knownObjects KeyListerGetter
 
@@ -160,8 +160,8 @@ func (f *DeltaFIFO) KeyOf(obj interface{}) (string, error) {
 	return f.keyFunc(obj)
 }
 
-// Return true if an Add/Update/Delete/AddIfNotPresent are called ***REMOVED***rst,
-// or an Update called ***REMOVED***rst but the ***REMOVED***rst batch of items inserted by Replace() has been popped
+// Return true if an Add/Update/Delete/AddIfNotPresent are called first,
+// or an Update called first but the first batch of items inserted by Replace() has been popped
 func (f *DeltaFIFO) HasSynced() bool {
 	f.lock.Lock()
 	defer f.lock.Unlock()
@@ -202,7 +202,7 @@ func (f *DeltaFIFO) Delete(obj interface{}) error {
 			// Don't provide a second report of the same deletion.
 			return nil
 		}
-	} ***REMOVED*** {
+	} else {
 		// We only want to skip the "deletion" action if the object doesn't
 		// exist in knownObjects and it doesn't have corresponding item in items.
 		// Note that even if there is a "deletion" action in items, we can ignore it,
@@ -244,7 +244,7 @@ func (f *DeltaFIFO) AddIfNotPresent(obj interface{}) error {
 }
 
 // addIfNotPresent inserts deltas under id if it does not exist, and assumes the caller
-// already holds the ***REMOVED***fo lock.
+// already holds the fifo lock.
 func (f *DeltaFIFO) addIfNotPresent(id string, deltas Deltas) {
 	f.populated = true
 	if _, exists := f.items[id]; exists {
@@ -288,7 +288,7 @@ func isDeletionDup(a, b *Delta) *Delta {
 	if b.Type != Deleted || a.Type != Deleted {
 		return nil
 	}
-	// Do more sophisticated checks, or is this suf***REMOVED***cient?
+	// Do more sophisticated checks, or is this sufficient?
 	if _, ok := b.Object.(DeletedFinalStateUnknown); ok {
 		return a
 	}
@@ -296,14 +296,14 @@ func isDeletionDup(a, b *Delta) *Delta {
 }
 
 // willObjectBeDeletedLocked returns true only if the last delta for the
-// given object is Delete. Caller must lock ***REMOVED***rst.
+// given object is Delete. Caller must lock first.
 func (f *DeltaFIFO) willObjectBeDeletedLocked(id string) bool {
 	deltas := f.items[id]
 	return len(deltas) > 0 && deltas[len(deltas)-1].Type == Deleted
 }
 
 // queueActionLocked appends to the delta list for the object.
-// Caller must lock ***REMOVED***rst.
+// Caller must lock first.
 func (f *DeltaFIFO) queueActionLocked(actionType DeltaType, obj interface{}) error {
 	id, err := f.KeyOf(obj)
 	if err != nil {
@@ -326,7 +326,7 @@ func (f *DeltaFIFO) queueActionLocked(actionType DeltaType, obj interface{}) err
 		}
 		f.items[id] = newDeltas
 		f.cond.Broadcast()
-	} ***REMOVED*** {
+	} else {
 		// We need to remove this from our map (extra items in the queue are
 		// ignored if they are not in the map).
 		delete(f.items, id)
@@ -499,7 +499,7 @@ func (f *DeltaFIFO) Replace(list []interface{}, resourceVersion string) error {
 		if err != nil {
 			deletedObj = nil
 			klog.Errorf("Unexpected error %v during lookup of key %v, placing DeleteFinalStateUnknown marker without object", err, k)
-		} ***REMOVED*** if !exists {
+		} else if !exists {
 			deletedObj = nil
 			klog.Infof("Key %v does not exist in known objects store, placing DeleteFinalStateUnknown marker without object", k)
 		}
@@ -547,7 +547,7 @@ func (f *DeltaFIFO) syncKeyLocked(key string) error {
 	if err != nil {
 		klog.Errorf("Unexpected error %v during lookup of key %v, unable to queue object for sync", err, key)
 		return nil
-	} ***REMOVED*** if !exists {
+	} else if !exists {
 		klog.Infof("Key %v does not exist in known objects store, unable to queue object for sync", key)
 		return nil
 	}
@@ -603,7 +603,7 @@ const (
 // Delta is the type stored by a DeltaFIFO. It tells you what change
 // happened, and the object's state after* that change.
 //
-// [*] Unless the change is a deletion, and then you'll get the ***REMOVED***nal
+// [*] Unless the change is a deletion, and then you'll get the final
 //     state of the object before it was deleted.
 type Delta struct {
 	Type   DeltaType
@@ -634,7 +634,7 @@ func (d Deltas) Newest() *Delta {
 
 // copyDeltas returns a shallow copy of d; that is, it copies the slice but not
 // the objects in the slice. This allows Get/List to return an object that we
-// know won't be clobbered by a subsequent modi***REMOVED***cations.
+// know won't be clobbered by a subsequent modifications.
 func copyDeltas(d Deltas) Deltas {
 	d2 := make(Deltas, len(d))
 	copy(d2, d)
@@ -643,7 +643,7 @@ func copyDeltas(d Deltas) Deltas {
 
 // DeletedFinalStateUnknown is placed into a DeltaFIFO in the case where
 // an object was deleted but the watch deletion event was missed. In this
-// case we don't know the ***REMOVED***nal "resting" state of the object, so there's
+// case we don't know the final "resting" state of the object, so there's
 // a chance the included `Obj` is stale.
 type DeletedFinalStateUnknown struct {
 	Key string

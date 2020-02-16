@@ -2,10 +2,10 @@
 
 // Copyright 2013 The Go Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE ***REMOVED***le.
+// license that can be found in the LICENSE file.
 
-// Command mkindex creates the ***REMOVED***le "pkgindex.go" containing an index of the Go
-// standard library. The ***REMOVED***le is intended to be built as part of the imports
+// Command mkindex creates the file "pkgindex.go" containing an index of the Go
+// standard library. The file is intended to be built as part of the imports
 // package, so that the package may be used in environments where a GOROOT is
 // not available (such as App Engine).
 package main
@@ -22,7 +22,7 @@ import (
 	"log"
 	"os"
 	"path"
-	"path/***REMOVED***lepath"
+	"path/filepath"
 	"strings"
 )
 
@@ -65,7 +65,7 @@ func main() {
 		}
 	}
 
-	// Construct source ***REMOVED***le.
+	// Construct source file.
 	var buf bytes.Buffer
 	fmt.Fprint(&buf, pkgIndexHead)
 	fmt.Fprintf(&buf, "var pkgIndexMaster = %#v\n", pkgIndex)
@@ -86,7 +86,7 @@ func main() {
 		log.Fatal(err)
 	}
 
-	// Write out source ***REMOVED***le.
+	// Write out source file.
 	err = ioutil.WriteFile("pkgindex.go", src, 0644)
 	if err != nil {
 		log.Fatal(err)
@@ -107,7 +107,7 @@ func init() {
 
 type pkg struct {
 	importpath string // full pkg import path, e.g. "net/http"
-	dir        string // absolute ***REMOVED***le path to pkg directory e.g. "/usr/lib/go/src/fmt"
+	dir        string // absolute file path to pkg directory e.g. "/usr/lib/go/src/fmt"
 }
 
 var fset = token.NewFileSet()
@@ -118,7 +118,7 @@ func loadPkg(root, importpath string) {
 		return
 	}
 
-	dir := ***REMOVED***lepath.Join(root, importpath)
+	dir := filepath.Join(root, importpath)
 	pkgIndex[shortName] = append(pkgIndex[shortName], pkg{
 		importpath: importpath,
 		dir:        dir,
@@ -142,7 +142,7 @@ func loadPkg(root, importpath string) {
 			continue
 		}
 		if child.IsDir() {
-			loadPkg(root, ***REMOVED***lepath.Join(importpath, name))
+			loadPkg(root, filepath.Join(importpath, name))
 		}
 	}
 }
@@ -151,16 +151,16 @@ func loadExports(dir string) map[string]bool {
 	exports := make(map[string]bool)
 	buildPkg, err := build.ImportDir(dir, 0)
 	if err != nil {
-		if strings.Contains(err.Error(), "no buildable Go source ***REMOVED***les in") {
+		if strings.Contains(err.Error(), "no buildable Go source files in") {
 			return nil
 		}
 		log.Printf("could not import %q: %v", dir, err)
 		return nil
 	}
-	for _, ***REMOVED***le := range buildPkg.GoFiles {
-		f, err := parser.ParseFile(fset, ***REMOVED***lepath.Join(dir, ***REMOVED***le), nil, 0)
+	for _, file := range buildPkg.GoFiles {
+		f, err := parser.ParseFile(fset, filepath.Join(dir, file), nil, 0)
 		if err != nil {
-			log.Printf("could not parse %q: %v", ***REMOVED***le, err)
+			log.Printf("could not parse %q: %v", file, err)
 			continue
 		}
 		for name := range f.Scope.Objects {

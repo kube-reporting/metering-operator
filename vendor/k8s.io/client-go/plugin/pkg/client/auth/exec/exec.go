@@ -2,7 +2,7 @@
 Copyright 2018 The Kubernetes Authors.
 
 Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this ***REMOVED***le except in compliance with the License.
+you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
 
     http://www.apache.org/licenses/LICENSE-2.0
@@ -10,7 +10,7 @@ You may obtain a copy of the License at
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the speci***REMOVED***c language governing permissions and
+See the License for the specific language governing permissions and
 limitations under the License.
 */
 
@@ -60,7 +60,7 @@ func init() {
 
 var (
 	// Since transports can be constantly re-initialized by programs like kubectl,
-	// keep a cache of initialized authenticators keyed by a hash of their con***REMOVED***g.
+	// keep a cache of initialized authenticators keyed by a hash of their config.
 	globalCache = newCache()
 	// The list of API versions we accept.
 	apiVersions = map[string]schema.GroupVersion{
@@ -73,7 +73,7 @@ func newCache() *cache {
 	return &cache{m: make(map[string]*Authenticator)}
 }
 
-func cacheKey(c *api.ExecCon***REMOVED***g) string {
+func cacheKey(c *api.ExecConfig) string {
 	return fmt.Sprintf("%#v", c)
 }
 
@@ -90,7 +90,7 @@ func (c *cache) get(s string) (*Authenticator, bool) {
 }
 
 // put inserts an authenticator into the cache. If an authenticator is already
-// associated with the key, the ***REMOVED***rst one is returned instead.
+// associated with the key, the first one is returned instead.
 func (c *cache) put(s string, a *Authenticator) *Authenticator {
 	c.mu.Lock()
 	defer c.mu.Unlock()
@@ -103,24 +103,24 @@ func (c *cache) put(s string, a *Authenticator) *Authenticator {
 }
 
 // GetAuthenticator returns an exec-based plugin for providing client credentials.
-func GetAuthenticator(con***REMOVED***g *api.ExecCon***REMOVED***g) (*Authenticator, error) {
-	return newAuthenticator(globalCache, con***REMOVED***g)
+func GetAuthenticator(config *api.ExecConfig) (*Authenticator, error) {
+	return newAuthenticator(globalCache, config)
 }
 
-func newAuthenticator(c *cache, con***REMOVED***g *api.ExecCon***REMOVED***g) (*Authenticator, error) {
-	key := cacheKey(con***REMOVED***g)
+func newAuthenticator(c *cache, config *api.ExecConfig) (*Authenticator, error) {
+	key := cacheKey(config)
 	if a, ok := c.get(key); ok {
 		return a, nil
 	}
 
-	gv, ok := apiVersions[con***REMOVED***g.APIVersion]
+	gv, ok := apiVersions[config.APIVersion]
 	if !ok {
-		return nil, fmt.Errorf("exec plugin: invalid apiVersion %q", con***REMOVED***g.APIVersion)
+		return nil, fmt.Errorf("exec plugin: invalid apiVersion %q", config.APIVersion)
 	}
 
 	a := &Authenticator{
-		cmd:   con***REMOVED***g.Command,
-		args:  con***REMOVED***g.Args,
+		cmd:   config.Command,
+		args:  config.Args,
 		group: gv,
 
 		stdin:       os.Stdin,
@@ -130,7 +130,7 @@ func newAuthenticator(c *cache, con***REMOVED***g *api.ExecCon***REMOVED***g) (*
 		environ:     os.Environ,
 	}
 
-	for _, env := range con***REMOVED***g.Env {
+	for _, env := range config.Env {
 		a.env = append(a.env, env.Name+"="+env.Value)
 	}
 
@@ -138,9 +138,9 @@ func newAuthenticator(c *cache, con***REMOVED***g *api.ExecCon***REMOVED***g) (*
 }
 
 // Authenticator is a client credential provider that rotates credentials by executing a plugin.
-// The plugin input and output are de***REMOVED***ned by the API group client.authentication.k8s.io.
+// The plugin input and output are defined by the API group client.authentication.k8s.io.
 type Authenticator struct {
-	// Set by the con***REMOVED***g
+	// Set by the config
 	cmd   string
 	args  []string
 	group schema.GroupVersion
@@ -166,12 +166,12 @@ type Authenticator struct {
 
 type credentials struct {
 	token string
-	cert  *tls.Certi***REMOVED***cate
+	cert  *tls.Certificate
 }
 
-// UpdateTransportCon***REMOVED***g updates the transport.Con***REMOVED***g to use credentials
+// UpdateTransportConfig updates the transport.Config to use credentials
 // returned by the plugin.
-func (a *Authenticator) UpdateTransportCon***REMOVED***g(c *transport.Con***REMOVED***g) error {
+func (a *Authenticator) UpdateTransportConfig(c *transport.Config) error {
 	wt := c.WrapTransport
 	c.WrapTransport = func(rt http.RoundTripper) http.RoundTripper {
 		if wt != nil {
@@ -181,14 +181,14 @@ func (a *Authenticator) UpdateTransportCon***REMOVED***g(c *transport.Con***REMO
 	}
 
 	if c.TLS.GetCert != nil {
-		return errors.New("can't add TLS certi***REMOVED***cate callback: transport.Con***REMOVED***g.TLS.GetCert already set")
+		return errors.New("can't add TLS certificate callback: transport.Config.TLS.GetCert already set")
 	}
 	c.TLS.GetCert = a.cert
 
 	var dial func(ctx context.Context, network, addr string) (net.Conn, error)
 	if c.Dial != nil {
 		dial = c.Dial
-	} ***REMOVED*** {
+	} else {
 		dial = (&net.Dialer{Timeout: 30 * time.Second, KeepAlive: 30 * time.Second}).DialContext
 	}
 	d := connrotation.NewDialer(dial)
@@ -241,7 +241,7 @@ func (a *Authenticator) credsExpired() bool {
 	return a.now().After(a.exp)
 }
 
-func (a *Authenticator) cert() (*tls.Certi***REMOVED***cate, error) {
+func (a *Authenticator) cert() (*tls.Certificate, error) {
 	creds, err := a.getCreds()
 	if err != nil {
 		return nil, err
@@ -319,33 +319,33 @@ func (a *Authenticator) refreshCredsLocked(r *clientauthentication.Response) err
 		return fmt.Errorf("decoding stdout: %v", err)
 	}
 	if gvk.Group != a.group.Group || gvk.Version != a.group.Version {
-		return fmt.Errorf("exec plugin is con***REMOVED***gured to use API version %s, plugin returned version %s",
+		return fmt.Errorf("exec plugin is configured to use API version %s, plugin returned version %s",
 			a.group, schema.GroupVersion{Group: gvk.Group, Version: gvk.Version})
 	}
 
 	if cred.Status == nil {
-		return fmt.Errorf("exec plugin didn't return a status ***REMOVED***eld")
+		return fmt.Errorf("exec plugin didn't return a status field")
 	}
-	if cred.Status.Token == "" && cred.Status.ClientCerti***REMOVED***cateData == "" && cred.Status.ClientKeyData == "" {
+	if cred.Status.Token == "" && cred.Status.ClientCertificateData == "" && cred.Status.ClientKeyData == "" {
 		return fmt.Errorf("exec plugin didn't return a token or cert/key pair")
 	}
-	if (cred.Status.ClientCerti***REMOVED***cateData == "") != (cred.Status.ClientKeyData == "") {
-		return fmt.Errorf("exec plugin returned only certi***REMOVED***cate or key, not both")
+	if (cred.Status.ClientCertificateData == "") != (cred.Status.ClientKeyData == "") {
+		return fmt.Errorf("exec plugin returned only certificate or key, not both")
 	}
 
 	if cred.Status.ExpirationTimestamp != nil {
 		a.exp = cred.Status.ExpirationTimestamp.Time
-	} ***REMOVED*** {
+	} else {
 		a.exp = time.Time{}
 	}
 
 	newCreds := &credentials{
 		token: cred.Status.Token,
 	}
-	if cred.Status.ClientKeyData != "" && cred.Status.ClientCerti***REMOVED***cateData != "" {
-		cert, err := tls.X509KeyPair([]byte(cred.Status.ClientCerti***REMOVED***cateData), []byte(cred.Status.ClientKeyData))
+	if cred.Status.ClientKeyData != "" && cred.Status.ClientCertificateData != "" {
+		cert, err := tls.X509KeyPair([]byte(cred.Status.ClientCertificateData), []byte(cred.Status.ClientKeyData))
 		if err != nil {
-			return fmt.Errorf("failed parsing client key/certi***REMOVED***cate: %v", err)
+			return fmt.Errorf("failed parsing client key/certificate: %v", err)
 		}
 		newCreds.cert = &cert
 	}

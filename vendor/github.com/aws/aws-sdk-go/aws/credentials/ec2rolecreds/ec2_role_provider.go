@@ -1,7 +1,7 @@
 package ec2rolecreds
 
 import (
-	"bu***REMOVED***o"
+	"bufio"
 	"encoding/json"
 	"fmt"
 	"strings"
@@ -21,18 +21,18 @@ const ProviderName = "EC2RoleProvider"
 // A EC2RoleProvider retrieves credentials from the EC2 service, and keeps track if
 // those credentials are expired.
 //
-// Example how to con***REMOVED***gure the EC2RoleProvider with custom http Client, Endpoint
+// Example how to configure the EC2RoleProvider with custom http Client, Endpoint
 // or ExpiryWindow
 //
 //     p := &ec2rolecreds.EC2RoleProvider{
 //         // Pass in a custom timeout to be used when requesting
 //         // IAM EC2 Role credentials.
-//         Client: ec2metadata.New(sess, aws.Con***REMOVED***g{
+//         Client: ec2metadata.New(sess, aws.Config{
 //             HTTPClient: &http.Client{Timeout: 10 * time.Second},
 //         }),
 //
 //         // Do not use early expiry of credentials. If a non zero value is
-//         // speci***REMOVED***ed the credentials will be expired early
+//         // specified the credentials will be expired early
 //         ExpiryWindow: 0,
 //     }
 type EC2RoleProvider struct {
@@ -42,7 +42,7 @@ type EC2RoleProvider struct {
 	Client *ec2metadata.EC2Metadata
 
 	// ExpiryWindow will allow the credentials to trigger refreshing prior to
-	// the credentials actually expiring. This is bene***REMOVED***cial so race conditions
+	// the credentials actually expiring. This is beneficial so race conditions
 	// with expiring credentials do not cause request to fail unexpectedly
 	// due to ExpiredTokenException exceptions.
 	//
@@ -54,9 +54,9 @@ type EC2RoleProvider struct {
 }
 
 // NewCredentials returns a pointer to a new Credentials object wrapping
-// the EC2RoleProvider. Takes a Con***REMOVED***gProvider to create a EC2Metadata client.
-// The Con***REMOVED***gProvider is satis***REMOVED***ed by the session.Session type.
-func NewCredentials(c client.Con***REMOVED***gProvider, options ...func(*EC2RoleProvider)) *credentials.Credentials {
+// the EC2RoleProvider. Takes a ConfigProvider to create a EC2Metadata client.
+// The ConfigProvider is satisfied by the session.Session type.
+func NewCredentials(c client.ConfigProvider, options ...func(*EC2RoleProvider)) *credentials.Credentials {
 	p := &EC2RoleProvider{
 		Client: ec2metadata.New(c),
 	}
@@ -137,7 +137,7 @@ func requestCredList(client *ec2metadata.EC2Metadata) ([]string, error) {
 	}
 
 	credsList := []string{}
-	s := bu***REMOVED***o.NewScanner(strings.NewReader(resp))
+	s := bufio.NewScanner(strings.NewReader(resp))
 	for s.Scan() {
 		credsList = append(credsList, s.Text())
 	}
@@ -150,7 +150,7 @@ func requestCredList(client *ec2metadata.EC2Metadata) ([]string, error) {
 	return credsList, nil
 }
 
-// requestCred requests the credentials for a speci***REMOVED***c credentials from the EC2 service.
+// requestCred requests the credentials for a specific credentials from the EC2 service.
 //
 // If the credentials cannot be found, or there is an error reading the response
 // and error will be returned.

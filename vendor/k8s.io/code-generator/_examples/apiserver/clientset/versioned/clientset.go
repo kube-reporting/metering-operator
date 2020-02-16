@@ -2,7 +2,7 @@
 Copyright The Kubernetes Authors.
 
 Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this ***REMOVED***le except in compliance with the License.
+you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
 
     http://www.apache.org/licenses/LICENSE-2.0
@@ -10,7 +10,7 @@ You may obtain a copy of the License at
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the speci***REMOVED***c language governing permissions and
+See the License for the specific language governing permissions and
 limitations under the License.
 */
 
@@ -74,38 +74,38 @@ func (c *Clientset) Discovery() discovery.DiscoveryInterface {
 	return c.DiscoveryClient
 }
 
-// NewForCon***REMOVED***g creates a new Clientset for the given con***REMOVED***g.
-func NewForCon***REMOVED***g(c *rest.Con***REMOVED***g) (*Clientset, error) {
-	con***REMOVED***gShallowCopy := *c
-	if con***REMOVED***gShallowCopy.RateLimiter == nil && con***REMOVED***gShallowCopy.QPS > 0 {
-		con***REMOVED***gShallowCopy.RateLimiter = flowcontrol.NewTokenBucketRateLimiter(con***REMOVED***gShallowCopy.QPS, con***REMOVED***gShallowCopy.Burst)
+// NewForConfig creates a new Clientset for the given config.
+func NewForConfig(c *rest.Config) (*Clientset, error) {
+	configShallowCopy := *c
+	if configShallowCopy.RateLimiter == nil && configShallowCopy.QPS > 0 {
+		configShallowCopy.RateLimiter = flowcontrol.NewTokenBucketRateLimiter(configShallowCopy.QPS, configShallowCopy.Burst)
 	}
 	var cs Clientset
 	var err error
-	cs.exampleV1, err = examplev1.NewForCon***REMOVED***g(&con***REMOVED***gShallowCopy)
+	cs.exampleV1, err = examplev1.NewForConfig(&configShallowCopy)
 	if err != nil {
 		return nil, err
 	}
-	cs.secondExampleV1, err = secondexamplev1.NewForCon***REMOVED***g(&con***REMOVED***gShallowCopy)
+	cs.secondExampleV1, err = secondexamplev1.NewForConfig(&configShallowCopy)
 	if err != nil {
 		return nil, err
 	}
 
-	cs.DiscoveryClient, err = discovery.NewDiscoveryClientForCon***REMOVED***g(&con***REMOVED***gShallowCopy)
+	cs.DiscoveryClient, err = discovery.NewDiscoveryClientForConfig(&configShallowCopy)
 	if err != nil {
 		return nil, err
 	}
 	return &cs, nil
 }
 
-// NewForCon***REMOVED***gOrDie creates a new Clientset for the given con***REMOVED***g and
-// panics if there is an error in the con***REMOVED***g.
-func NewForCon***REMOVED***gOrDie(c *rest.Con***REMOVED***g) *Clientset {
+// NewForConfigOrDie creates a new Clientset for the given config and
+// panics if there is an error in the config.
+func NewForConfigOrDie(c *rest.Config) *Clientset {
 	var cs Clientset
-	cs.exampleV1 = examplev1.NewForCon***REMOVED***gOrDie(c)
-	cs.secondExampleV1 = secondexamplev1.NewForCon***REMOVED***gOrDie(c)
+	cs.exampleV1 = examplev1.NewForConfigOrDie(c)
+	cs.secondExampleV1 = secondexamplev1.NewForConfigOrDie(c)
 
-	cs.DiscoveryClient = discovery.NewDiscoveryClientForCon***REMOVED***gOrDie(c)
+	cs.DiscoveryClient = discovery.NewDiscoveryClientForConfigOrDie(c)
 	return &cs
 }
 

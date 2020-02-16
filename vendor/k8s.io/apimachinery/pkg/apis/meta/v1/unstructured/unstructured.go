@@ -2,7 +2,7 @@
 Copyright 2015 The Kubernetes Authors.
 
 Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this ***REMOVED***le except in compliance with the License.
+you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
 
     http://www.apache.org/licenses/LICENSE-2.0
@@ -10,7 +10,7 @@ You may obtain a copy of the License at
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the speci***REMOVED***c language governing permissions and
+See the License for the specific language governing permissions and
 limitations under the License.
 */
 
@@ -35,7 +35,7 @@ import (
 // WARNING: This object has accessors for the v1 standard metadata. You *MUST NOT* use this
 // type if you are dealing with objects that are not in the server meta v1 schema.
 //
-// TODO: make the serialization part of this type distinct from the ***REMOVED***eld accessors.
+// TODO: make the serialization part of this type distinct from the field accessors.
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
 // +k8s:deepcopy-gen=true
 type Unstructured struct {
@@ -51,11 +51,11 @@ var _ runtime.Unstructured = &Unstructured{}
 func (obj *Unstructured) GetObjectKind() schema.ObjectKind { return obj }
 
 func (obj *Unstructured) IsList() bool {
-	***REMOVED***eld, ok := obj.Object["items"]
+	field, ok := obj.Object["items"]
 	if !ok {
 		return false
 	}
-	_, ok = ***REMOVED***eld.([]interface{})
+	_, ok = field.([]interface{})
 	return ok
 }
 func (obj *Unstructured) ToList() (*UnstructuredList, error) {
@@ -80,13 +80,13 @@ func (obj *Unstructured) ToList() (*UnstructuredList, error) {
 }
 
 func (obj *Unstructured) EachListItem(fn func(runtime.Object) error) error {
-	***REMOVED***eld, ok := obj.Object["items"]
+	field, ok := obj.Object["items"]
 	if !ok {
 		return errors.New("content is not a list")
 	}
-	items, ok := ***REMOVED***eld.([]interface{})
+	items, ok := field.([]interface{})
 	if !ok {
-		return fmt.Errorf("content is not a list: %T", ***REMOVED***eld)
+		return fmt.Errorf("content is not a list: %T", field)
 	}
 	for _, item := range items {
 		child, ok := item.(map[string]interface{})
@@ -136,33 +136,33 @@ func (in *Unstructured) DeepCopy() *Unstructured {
 	return out
 }
 
-func (u *Unstructured) setNestedField(value interface{}, ***REMOVED***elds ...string) {
+func (u *Unstructured) setNestedField(value interface{}, fields ...string) {
 	if u.Object == nil {
 		u.Object = make(map[string]interface{})
 	}
-	SetNestedField(u.Object, value, ***REMOVED***elds...)
+	SetNestedField(u.Object, value, fields...)
 }
 
-func (u *Unstructured) setNestedSlice(value []string, ***REMOVED***elds ...string) {
+func (u *Unstructured) setNestedSlice(value []string, fields ...string) {
 	if u.Object == nil {
 		u.Object = make(map[string]interface{})
 	}
-	SetNestedStringSlice(u.Object, value, ***REMOVED***elds...)
+	SetNestedStringSlice(u.Object, value, fields...)
 }
 
-func (u *Unstructured) setNestedMap(value map[string]string, ***REMOVED***elds ...string) {
+func (u *Unstructured) setNestedMap(value map[string]string, fields ...string) {
 	if u.Object == nil {
 		u.Object = make(map[string]interface{})
 	}
-	SetNestedStringMap(u.Object, value, ***REMOVED***elds...)
+	SetNestedStringMap(u.Object, value, fields...)
 }
 
 func (u *Unstructured) GetOwnerReferences() []metav1.OwnerReference {
-	***REMOVED***eld, found, err := NestedFieldNoCopy(u.Object, "metadata", "ownerReferences")
+	field, found, err := NestedFieldNoCopy(u.Object, "metadata", "ownerReferences")
 	if !found || err != nil {
 		return nil
 	}
-	original, ok := ***REMOVED***eld.([]interface{})
+	original, ok := field.([]interface{})
 	if !ok {
 		return nil
 	}
@@ -170,7 +170,7 @@ func (u *Unstructured) GetOwnerReferences() []metav1.OwnerReference {
 	for _, obj := range original {
 		o, ok := obj.(map[string]interface{})
 		if !ok {
-			// expected map[string]interface{}, got something ***REMOVED***
+			// expected map[string]interface{}, got something else
 			return nil
 		}
 		ret = append(ret, extractOwnerReference(o))
@@ -427,16 +427,16 @@ func (u *Unstructured) SetInitializers(initializers *metav1.Initializers) {
 }
 
 func (u *Unstructured) GetFinalizers() []string {
-	val, _, _ := NestedStringSlice(u.Object, "metadata", "***REMOVED***nalizers")
+	val, _, _ := NestedStringSlice(u.Object, "metadata", "finalizers")
 	return val
 }
 
-func (u *Unstructured) SetFinalizers(***REMOVED***nalizers []string) {
-	if ***REMOVED***nalizers == nil {
-		RemoveNestedField(u.Object, "metadata", "***REMOVED***nalizers")
+func (u *Unstructured) SetFinalizers(finalizers []string) {
+	if finalizers == nil {
+		RemoveNestedField(u.Object, "metadata", "finalizers")
 		return
 	}
-	u.setNestedSlice(***REMOVED***nalizers, "metadata", "***REMOVED***nalizers")
+	u.setNestedSlice(finalizers, "metadata", "finalizers")
 }
 
 func (u *Unstructured) GetClusterName() string {

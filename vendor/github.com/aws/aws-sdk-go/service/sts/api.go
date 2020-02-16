@@ -25,7 +25,7 @@ const opAssumeRole = "AssumeRole"
 // See AssumeRole for more information on using the AssumeRole
 // API call, and error handling.
 //
-// This method is useful when you want to inject custom logic or con***REMOVED***guration
+// This method is useful when you want to inject custom logic or configuration
 // into the SDK's request lifecycle. Such as custom headers, or retry logic.
 //
 //
@@ -33,7 +33,7 @@ const opAssumeRole = "AssumeRole"
 //    req, resp := client.AssumeRoleRequest(params)
 //
 //    err := req.Send()
-//    if err == nil { // resp is now ***REMOVED***lled
+//    if err == nil { // resp is now filled
 //        fmt.Println(resp)
 //    }
 //
@@ -110,7 +110,7 @@ func (c *STS) AssumeRoleRequest(input *AssumeRoleInput) (req *request.Request, o
 // in the IAM User Guide.
 //
 // To assume a role from a different account, your AWS account must be trusted
-// by the role. The trust relationship is de***REMOVED***ned in the role's trust policy
+// by the role. The trust relationship is defined in the role's trust policy
 // when the role is created. That trust policy states which accounts are allowed
 // to delegate that access to users in the account.
 //
@@ -144,11 +144,11 @@ func (c *STS) AssumeRoleRequest(input *AssumeRoleInput) (req *request.Request, o
 //
 // "Condition": {"Bool": {"aws:MultiFactorAuthPresent": true}}
 //
-// For more information, see Con***REMOVED***guring MFA-Protected API Access (https://docs.aws.amazon.com/IAM/latest/UserGuide/MFAProtectedAPI.html)
+// For more information, see Configuring MFA-Protected API Access (https://docs.aws.amazon.com/IAM/latest/UserGuide/MFAProtectedAPI.html)
 // in the IAM User Guide guide.
 //
 // To use MFA with AssumeRole, you pass values for the SerialNumber and TokenCode
-// parameters. The SerialNumber value identi***REMOVED***es the user's hardware or virtual
+// parameters. The SerialNumber value identifies the user's hardware or virtual
 // MFA device. The TokenCode is the time-based one-time password (TOTP) that
 // the MFA device produces.
 //
@@ -162,7 +162,7 @@ func (c *STS) AssumeRoleRequest(input *AssumeRoleInput) (req *request.Request, o
 // Returned Error Codes:
 //   * ErrCodeMalformedPolicyDocumentException "MalformedPolicyDocument"
 //   The request was rejected because the policy document was malformed. The error
-//   message describes the speci***REMOVED***c error.
+//   message describes the specific error.
 //
 //   * ErrCodePackedPolicyTooLargeException "PackedPolicyTooLarge"
 //   The request was rejected because the policy document was too large. The error
@@ -211,7 +211,7 @@ const opAssumeRoleWithSAML = "AssumeRoleWithSAML"
 // See AssumeRoleWithSAML for more information on using the AssumeRoleWithSAML
 // API call, and error handling.
 //
-// This method is useful when you want to inject custom logic or con***REMOVED***guration
+// This method is useful when you want to inject custom logic or configuration
 // into the SDK's request lifecycle. Such as custom headers, or retry logic.
 //
 //
@@ -219,7 +219,7 @@ const opAssumeRoleWithSAML = "AssumeRoleWithSAML"
 //    req, resp := client.AssumeRoleWithSAMLRequest(params)
 //
 //    err := req.Send()
-//    if err == nil { // resp is now ***REMOVED***lled
+//    if err == nil { // resp is now filled
 //        fmt.Println(resp)
 //    }
 //
@@ -237,7 +237,7 @@ func (c *STS) AssumeRoleWithSAMLRequest(input *AssumeRoleWithSAMLInput) (req *re
 
 	output = &AssumeRoleWithSAMLOutput{}
 	req = c.newRequest(op, input, output)
-	req.Con***REMOVED***g.Credentials = credentials.AnonymousCredentials
+	req.Config.Credentials = credentials.AnonymousCredentials
 	return
 }
 
@@ -246,7 +246,7 @@ func (c *STS) AssumeRoleWithSAMLRequest(input *AssumeRoleWithSAMLInput) (req *re
 // Returns a set of temporary security credentials for users who have been authenticated
 // via a SAML authentication response. This operation provides a mechanism for
 // tying an enterprise identity store or directory to role-based AWS access
-// without user-speci***REMOVED***c credentials or con***REMOVED***guration. For a comparison of AssumeRoleWithSAML
+// without user-specific credentials or configuration. For a comparison of AssumeRoleWithSAML
 // with the other API operations that produce temporary credentials, see Requesting
 // Temporary Security Credentials (https://docs.aws.amazon.com/IAM/latest/UserGuide/id_credentials_temp_request.html)
 // and Comparing the AWS STS API operations (https://docs.aws.amazon.com/IAM/latest/UserGuide/id_credentials_temp_request.html#stsapi_comparison)
@@ -259,7 +259,7 @@ func (c *STS) AssumeRoleWithSAMLRequest(input *AssumeRoleWithSAMLInput) (req *re
 // By default, the temporary security credentials created by AssumeRoleWithSAML
 // last for one hour. However, you can use the optional DurationSeconds parameter
 // to specify the duration of your session. Your role session lasts for the
-// duration that you specify, or until the time speci***REMOVED***ed in the SAML authentication
+// duration that you specify, or until the time specified in the SAML authentication
 // response's SessionNotOnOrAfter value, whichever is shorter. You can provide
 // a DurationSeconds value from 900 seconds (15 minutes) up to the maximum session
 // duration setting for the role. This setting can have a value from 1 hour
@@ -289,11 +289,11 @@ func (c *STS) AssumeRoleWithSAMLRequest(input *AssumeRoleWithSAMLInput) (req *re
 // information, see Session Policies (https://docs.aws.amazon.com/IAM/latest/UserGuide/access_policies.html#policies_session)
 // in the IAM User Guide.
 //
-// Before your application can call AssumeRoleWithSAML, you must con***REMOVED***gure your
+// Before your application can call AssumeRoleWithSAML, you must configure your
 // SAML identity provider (IdP) to issue the claims required by AWS. Additionally,
 // you must use AWS Identity and Access Management (IAM) to create a SAML provider
 // entity in your AWS account that represents your identity provider. You must
-// also create an IAM role that speci***REMOVED***es this SAML provider in its trust policy.
+// also create an IAM role that specifies this SAML provider in its trust policy.
 //
 // Calling AssumeRoleWithSAML does not require the use of AWS security credentials.
 // The identity of the caller is validated by using keys in the metadata document
@@ -302,8 +302,8 @@ func (c *STS) AssumeRoleWithSAMLRequest(input *AssumeRoleWithSAMLInput) (req *re
 // Calling AssumeRoleWithSAML can result in an entry in your AWS CloudTrail
 // logs. The entry includes the value in the NameID element of the SAML assertion.
 // We recommend that you use a NameIDType that is not associated with any personally
-// identi***REMOVED***able information (PII). For example, you could instead use the Persistent
-// Identi***REMOVED***er (urn:oasis:names:tc:SAML:2.0:nameid-format:persistent).
+// identifiable information (PII). For example, you could instead use the Persistent
+// Identifier (urn:oasis:names:tc:SAML:2.0:nameid-format:persistent).
 //
 // For more information, see the following resources:
 //
@@ -313,7 +313,7 @@ func (c *STS) AssumeRoleWithSAMLRequest(input *AssumeRoleWithSAMLInput) (req *re
 //    * Creating SAML Identity Providers (https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles_providers_create_saml.html)
 //    in the IAM User Guide.
 //
-//    * Con***REMOVED***guring a Relying Party and Claims (https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles_providers_create_saml_relying-party.html)
+//    * Configuring a Relying Party and Claims (https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles_providers_create_saml_relying-party.html)
 //    in the IAM User Guide.
 //
 //    * Creating a Role for SAML 2.0 Federation (https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles_create_for-idp_saml.html)
@@ -329,7 +329,7 @@ func (c *STS) AssumeRoleWithSAMLRequest(input *AssumeRoleWithSAMLInput) (req *re
 // Returned Error Codes:
 //   * ErrCodeMalformedPolicyDocumentException "MalformedPolicyDocument"
 //   The request was rejected because the policy document was malformed. The error
-//   message describes the speci***REMOVED***c error.
+//   message describes the specific error.
 //
 //   * ErrCodePackedPolicyTooLargeException "PackedPolicyTooLarge"
 //   The request was rejected because the policy document was too large. The error
@@ -393,7 +393,7 @@ const opAssumeRoleWithWebIdentity = "AssumeRoleWithWebIdentity"
 // See AssumeRoleWithWebIdentity for more information on using the AssumeRoleWithWebIdentity
 // API call, and error handling.
 //
-// This method is useful when you want to inject custom logic or con***REMOVED***guration
+// This method is useful when you want to inject custom logic or configuration
 // into the SDK's request lifecycle. Such as custom headers, or retry logic.
 //
 //
@@ -401,7 +401,7 @@ const opAssumeRoleWithWebIdentity = "AssumeRoleWithWebIdentity"
 //    req, resp := client.AssumeRoleWithWebIdentityRequest(params)
 //
 //    err := req.Send()
-//    if err == nil { // resp is now ***REMOVED***lled
+//    if err == nil { // resp is now filled
 //        fmt.Println(resp)
 //    }
 //
@@ -419,7 +419,7 @@ func (c *STS) AssumeRoleWithWebIdentityRequest(input *AssumeRoleWithWebIdentityI
 
 	output = &AssumeRoleWithWebIdentityOutput{}
 	req = c.newRequest(op, input, output)
-	req.Con***REMOVED***g.Credentials = credentials.AnonymousCredentials
+	req.Config.Credentials = credentials.AnonymousCredentials
 	return
 }
 
@@ -491,14 +491,14 @@ func (c *STS) AssumeRoleWithWebIdentityRequest(input *AssumeRoleWithWebIdentityI
 // an identity token from a supported identity provider and create a role that
 // the application can assume. The role that your application assumes must trust
 // the identity provider that is associated with the identity token. In other
-// words, the identity provider must be speci***REMOVED***ed in the role's trust policy.
+// words, the identity provider must be specified in the role's trust policy.
 //
 // Calling AssumeRoleWithWebIdentity can result in an entry in your AWS CloudTrail
 // logs. The entry includes the Subject (http://openid.net/specs/openid-connect-core-1_0.html#Claims)
 // of the provided Web Identity Token. We recommend that you avoid using any
-// personally identi***REMOVED***able information (PII) in this ***REMOVED***eld. For example, you
-// could instead use a GUID or a pairwise identi***REMOVED***er, as suggested in the OIDC
-// speci***REMOVED***cation (http://openid.net/specs/openid-connect-core-1_0.html#SubjectIDTypes).
+// personally identifiable information (PII) in this field. For example, you
+// could instead use a GUID or a pairwise identifier, as suggested in the OIDC
+// specification (http://openid.net/specs/openid-connect-core-1_0.html#SubjectIDTypes).
 //
 // For more information about how to use web identity federation and the AssumeRoleWithWebIdentity
 // API, see the following resources:
@@ -532,7 +532,7 @@ func (c *STS) AssumeRoleWithWebIdentityRequest(input *AssumeRoleWithWebIdentityI
 // Returned Error Codes:
 //   * ErrCodeMalformedPolicyDocumentException "MalformedPolicyDocument"
 //   The request was rejected because the policy document was malformed. The error
-//   message describes the speci***REMOVED***c error.
+//   message describes the specific error.
 //
 //   * ErrCodePackedPolicyTooLargeException "PackedPolicyTooLarge"
 //   The request was rejected because the policy document was too large. The error
@@ -547,7 +547,7 @@ func (c *STS) AssumeRoleWithWebIdentityRequest(input *AssumeRoleWithWebIdentityI
 //   can also mean that the claim has expired or has been explicitly revoked.
 //
 //   * ErrCodeIDPCommunicationErrorException "IDPCommunicationError"
-//   The request could not be ful***REMOVED***lled because the non-AWS identity provider
+//   The request could not be fulfilled because the non-AWS identity provider
 //   (IDP) that was asked to verify the incoming identity token could not be reached.
 //   This is often a transient error caused by network conditions. Retry the request
 //   a limited number of times so that you don't exceed the request rate. If the
@@ -603,7 +603,7 @@ const opDecodeAuthorizationMessage = "DecodeAuthorizationMessage"
 // See DecodeAuthorizationMessage for more information on using the DecodeAuthorizationMessage
 // API call, and error handling.
 //
-// This method is useful when you want to inject custom logic or con***REMOVED***guration
+// This method is useful when you want to inject custom logic or configuration
 // into the SDK's request lifecycle. Such as custom headers, or retry logic.
 //
 //
@@ -611,7 +611,7 @@ const opDecodeAuthorizationMessage = "DecodeAuthorizationMessage"
 //    req, resp := client.DecodeAuthorizationMessageRequest(params)
 //
 //    err := req.Send()
-//    if err == nil { // resp is now ***REMOVED***lled
+//    if err == nil { // resp is now filled
 //        fmt.Println(resp)
 //    }
 //
@@ -715,7 +715,7 @@ const opGetAccessKeyInfo = "GetAccessKeyInfo"
 // See GetAccessKeyInfo for more information on using the GetAccessKeyInfo
 // API call, and error handling.
 //
-// This method is useful when you want to inject custom logic or con***REMOVED***guration
+// This method is useful when you want to inject custom logic or configuration
 // into the SDK's request lifecycle. Such as custom headers, or retry logic.
 //
 //
@@ -723,7 +723,7 @@ const opGetAccessKeyInfo = "GetAccessKeyInfo"
 //    req, resp := client.GetAccessKeyInfoRequest(params)
 //
 //    err := req.Send()
-//    if err == nil { // resp is now ***REMOVED***lled
+//    if err == nil { // resp is now filled
 //        fmt.Println(resp)
 //    }
 //
@@ -746,10 +746,10 @@ func (c *STS) GetAccessKeyInfoRequest(input *GetAccessKeyInfoInput) (req *reques
 
 // GetAccessKeyInfo API operation for AWS Security Token Service.
 //
-// Returns the account identi***REMOVED***er for the speci***REMOVED***ed access key ID.
+// Returns the account identifier for the specified access key ID.
 //
 // Access keys consist of two parts: an access key ID (for example, AKIAIOSFODNN7EXAMPLE)
-// and a secret access key (for example, wJalrXUtnFEMI/K7MDENG/bPxR***REMOVED***CYEXAMPLEKEY).
+// and a secret access key (for example, wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY).
 // For more information about access keys, see Managing Access Keys for IAM
 // Users (https://docs.aws.amazon.com/IAM/latest/UserGuide/id_credentials_access-keys.html)
 // in the IAM User Guide.
@@ -811,7 +811,7 @@ const opGetCallerIdentity = "GetCallerIdentity"
 // See GetCallerIdentity for more information on using the GetCallerIdentity
 // API call, and error handling.
 //
-// This method is useful when you want to inject custom logic or con***REMOVED***guration
+// This method is useful when you want to inject custom logic or configuration
 // into the SDK's request lifecycle. Such as custom headers, or retry logic.
 //
 //
@@ -819,7 +819,7 @@ const opGetCallerIdentity = "GetCallerIdentity"
 //    req, resp := client.GetCallerIdentityRequest(params)
 //
 //    err := req.Send()
-//    if err == nil { // resp is now ***REMOVED***lled
+//    if err == nil { // resp is now filled
 //        fmt.Println(resp)
 //    }
 //
@@ -893,7 +893,7 @@ const opGetFederationToken = "GetFederationToken"
 // See GetFederationToken for more information on using the GetFederationToken
 // API call, and error handling.
 //
-// This method is useful when you want to inject custom logic or con***REMOVED***guration
+// This method is useful when you want to inject custom logic or configuration
 // into the SDK's request lifecycle. Such as custom headers, or retry logic.
 //
 //
@@ -901,7 +901,7 @@ const opGetFederationToken = "GetFederationToken"
 //    req, resp := client.GetFederationTokenRequest(params)
 //
 //    err := req.Send()
-//    if err == nil { // resp is now ***REMOVED***lled
+//    if err == nil { // resp is now filled
 //        fmt.Println(resp)
 //    }
 //
@@ -952,7 +952,7 @@ func (c *STS) GetFederationTokenRequest(input *GetFederationTokenInput) (req *re
 // Practices (https://docs.aws.amazon.com/IAM/latest/UserGuide/best-practices.html)
 // in the IAM User Guide.
 //
-// The temporary credentials are valid for the speci***REMOVED***ed duration, from 900
+// The temporary credentials are valid for the specified duration, from 900
 // seconds (15 minutes) up to a maximum of 129,600 seconds (36 hours). The default
 // is 43,200 seconds (12 hours). Temporary credentials that are obtained by
 // using AWS account root user credentials have a maximum duration of 3,600
@@ -976,12 +976,12 @@ func (c *STS) GetFederationTokenRequest(input *GetFederationTokenInput) (req *re
 // Though the session policy parameters are optional, if you do not pass a policy,
 // then the resulting federated user session has no permissions. The only exception
 // is when the credentials are used to access a resource that has a resource-based
-// policy that speci***REMOVED***cally references the federated user session in the Principal
+// policy that specifically references the federated user session in the Principal
 // element of the policy. When you pass session policies, the session permissions
 // are the intersection of the IAM user policies and the session policies that
 // you pass. This gives you a way to further restrict the permissions for a
 // federated user. You cannot use session policies to grant more permissions
-// than those that are de***REMOVED***ned in the permissions policy of the IAM user. For
+// than those that are defined in the permissions policy of the IAM user. For
 // more information, see Session Policies (https://docs.aws.amazon.com/IAM/latest/UserGuide/access_policies.html#policies_session)
 // in the IAM User Guide. For information about using GetFederationToken to
 // create temporary security credentials, see GetFederationToken—Federation
@@ -997,7 +997,7 @@ func (c *STS) GetFederationTokenRequest(input *GetFederationTokenInput) (req *re
 // Returned Error Codes:
 //   * ErrCodeMalformedPolicyDocumentException "MalformedPolicyDocument"
 //   The request was rejected because the policy document was malformed. The error
-//   message describes the speci***REMOVED***c error.
+//   message describes the specific error.
 //
 //   * ErrCodePackedPolicyTooLargeException "PackedPolicyTooLarge"
 //   The request was rejected because the policy document was too large. The error
@@ -1046,7 +1046,7 @@ const opGetSessionToken = "GetSessionToken"
 // See GetSessionToken for more information on using the GetSessionToken
 // API call, and error handling.
 //
-// This method is useful when you want to inject custom logic or con***REMOVED***guration
+// This method is useful when you want to inject custom logic or configuration
 // into the SDK's request lifecycle. Such as custom headers, or retry logic.
 //
 //
@@ -1054,7 +1054,7 @@ const opGetSessionToken = "GetSessionToken"
 //    req, resp := client.GetSessionTokenRequest(params)
 //
 //    err := req.Send()
-//    if err == nil { // resp is now ***REMOVED***lled
+//    if err == nil { // resp is now filled
 //        fmt.Println(resp)
 //    }
 //
@@ -1080,7 +1080,7 @@ func (c *STS) GetSessionTokenRequest(input *GetSessionTokenInput) (req *request.
 // Returns a set of temporary credentials for an AWS account or IAM user. The
 // credentials consist of an access key ID, a secret access key, and a security
 // token. Typically, you use GetSessionToken if you want to use MFA to protect
-// programmatic calls to speci***REMOVED***c AWS API operations like Amazon EC2 StopInstances.
+// programmatic calls to specific AWS API operations like Amazon EC2 StopInstances.
 // MFA-enabled IAM users would need to call GetSessionToken and submit an MFA
 // code that is associated with their MFA device. Using the temporary security
 // credentials that are returned from the call, IAM users can then make programmatic
@@ -1178,13 +1178,13 @@ type AssumeRoleInput struct {
 	// The DurationSeconds parameter is separate from the duration of a console
 	// session that you might request using the returned credentials. The request
 	// to the federation endpoint for a console sign-in token takes a SessionDuration
-	// parameter that speci***REMOVED***es the maximum length of the console session. For more
+	// parameter that specifies the maximum length of the console session. For more
 	// information, see Creating a URL that Enables Federated Users to Access the
 	// AWS Management Console (https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles_providers_enable-console-custom-url.html)
 	// in the IAM User Guide.
 	DurationSeconds *int64 `min:"900" type:"integer"`
 
-	// A unique identi***REMOVED***er that might be required when you assume a role in another
+	// A unique identifier that might be required when you assume a role in another
 	// account. If the administrator of the account to which the role belongs provided
 	// you with an external ID, then provide that value in the ExternalId parameter.
 	// This value can be any string, such as a passphrase or account number. A cross-account
@@ -1253,10 +1253,10 @@ type AssumeRoleInput struct {
 
 	// The Amazon Resource Name (ARN) of the role to assume.
 	//
-	// RoleArn is a required ***REMOVED***eld
+	// RoleArn is a required field
 	RoleArn *string `min:"20" type:"string" required:"true"`
 
-	// An identi***REMOVED***er for the assumed role session.
+	// An identifier for the assumed role session.
 	//
 	// Use the role session name to uniquely identify a session when the same role
 	// is assumed by different principals or for different reasons. In cross-account
@@ -1270,10 +1270,10 @@ type AssumeRoleInput struct {
 	// of upper- and lower-case alphanumeric characters with no spaces. You can
 	// also include underscores or any of the following characters: =,.@-
 	//
-	// RoleSessionName is a required ***REMOVED***eld
+	// RoleSessionName is a required field
 	RoleSessionName *string `min:"2" type:"string" required:"true"`
 
-	// The identi***REMOVED***cation number of the MFA device that is associated with the user
+	// The identification number of the MFA device that is associated with the user
 	// who is making the AssumeRole call. Specify this value if the trust policy
 	// of the role being assumed includes a condition that requires MFA authentication.
 	// The value is either the serial number for a hardware device (such as GAHT12345678)
@@ -1304,7 +1304,7 @@ func (s AssumeRoleInput) GoString() string {
 	return s.String()
 }
 
-// Validate inspects the ***REMOVED***elds of the type to determine if they are valid.
+// Validate inspects the fields of the type to determine if they are valid.
 func (s *AssumeRoleInput) Validate() error {
 	invalidParams := request.ErrInvalidParams{Context: "AssumeRoleInput"}
 	if s.DurationSeconds != nil && *s.DurationSeconds < 900 {
@@ -1351,49 +1351,49 @@ func (s *AssumeRoleInput) Validate() error {
 	return nil
 }
 
-// SetDurationSeconds sets the DurationSeconds ***REMOVED***eld's value.
+// SetDurationSeconds sets the DurationSeconds field's value.
 func (s *AssumeRoleInput) SetDurationSeconds(v int64) *AssumeRoleInput {
 	s.DurationSeconds = &v
 	return s
 }
 
-// SetExternalId sets the ExternalId ***REMOVED***eld's value.
+// SetExternalId sets the ExternalId field's value.
 func (s *AssumeRoleInput) SetExternalId(v string) *AssumeRoleInput {
 	s.ExternalId = &v
 	return s
 }
 
-// SetPolicy sets the Policy ***REMOVED***eld's value.
+// SetPolicy sets the Policy field's value.
 func (s *AssumeRoleInput) SetPolicy(v string) *AssumeRoleInput {
 	s.Policy = &v
 	return s
 }
 
-// SetPolicyArns sets the PolicyArns ***REMOVED***eld's value.
+// SetPolicyArns sets the PolicyArns field's value.
 func (s *AssumeRoleInput) SetPolicyArns(v []*PolicyDescriptorType) *AssumeRoleInput {
 	s.PolicyArns = v
 	return s
 }
 
-// SetRoleArn sets the RoleArn ***REMOVED***eld's value.
+// SetRoleArn sets the RoleArn field's value.
 func (s *AssumeRoleInput) SetRoleArn(v string) *AssumeRoleInput {
 	s.RoleArn = &v
 	return s
 }
 
-// SetRoleSessionName sets the RoleSessionName ***REMOVED***eld's value.
+// SetRoleSessionName sets the RoleSessionName field's value.
 func (s *AssumeRoleInput) SetRoleSessionName(v string) *AssumeRoleInput {
 	s.RoleSessionName = &v
 	return s
 }
 
-// SetSerialNumber sets the SerialNumber ***REMOVED***eld's value.
+// SetSerialNumber sets the SerialNumber field's value.
 func (s *AssumeRoleInput) SetSerialNumber(v string) *AssumeRoleInput {
 	s.SerialNumber = &v
 	return s
 }
 
-// SetTokenCode sets the TokenCode ***REMOVED***eld's value.
+// SetTokenCode sets the TokenCode field's value.
 func (s *AssumeRoleInput) SetTokenCode(v string) *AssumeRoleInput {
 	s.TokenCode = &v
 	return s
@@ -1404,17 +1404,17 @@ func (s *AssumeRoleInput) SetTokenCode(v string) *AssumeRoleInput {
 type AssumeRoleOutput struct {
 	_ struct{} `type:"structure"`
 
-	// The Amazon Resource Name (ARN) and the assumed role ID, which are identi***REMOVED***ers
+	// The Amazon Resource Name (ARN) and the assumed role ID, which are identifiers
 	// that you can use to refer to the resulting temporary security credentials.
 	// For example, you can reference these credentials as a principal in a resource-based
 	// policy by using the ARN or assumed role ID. The ARN and ID include the RoleSessionName
-	// that you speci***REMOVED***ed when you called AssumeRole.
+	// that you specified when you called AssumeRole.
 	AssumedRoleUser *AssumedRoleUser `type:"structure"`
 
 	// The temporary security credentials, which include an access key ID, a secret
 	// access key, and a security (or session) token.
 	//
-	// The size of the security token that STS API operations return is not ***REMOVED***xed.
+	// The size of the security token that STS API operations return is not fixed.
 	// We strongly recommend that you make no assumptions about the maximum size.
 	Credentials *Credentials `type:"structure"`
 
@@ -1434,19 +1434,19 @@ func (s AssumeRoleOutput) GoString() string {
 	return s.String()
 }
 
-// SetAssumedRoleUser sets the AssumedRoleUser ***REMOVED***eld's value.
+// SetAssumedRoleUser sets the AssumedRoleUser field's value.
 func (s *AssumeRoleOutput) SetAssumedRoleUser(v *AssumedRoleUser) *AssumeRoleOutput {
 	s.AssumedRoleUser = v
 	return s
 }
 
-// SetCredentials sets the Credentials ***REMOVED***eld's value.
+// SetCredentials sets the Credentials field's value.
 func (s *AssumeRoleOutput) SetCredentials(v *Credentials) *AssumeRoleOutput {
 	s.Credentials = v
 	return s
 }
 
-// SetPackedPolicySize sets the PackedPolicySize ***REMOVED***eld's value.
+// SetPackedPolicySize sets the PackedPolicySize field's value.
 func (s *AssumeRoleOutput) SetPackedPolicySize(v int64) *AssumeRoleOutput {
 	s.PackedPolicySize = &v
 	return s
@@ -1457,7 +1457,7 @@ type AssumeRoleWithSAMLInput struct {
 
 	// The duration, in seconds, of the role session. Your role session lasts for
 	// the duration that you specify for the DurationSeconds parameter, or until
-	// the time speci***REMOVED***ed in the SAML authentication response's SessionNotOnOrAfter
+	// the time specified in the SAML authentication response's SessionNotOnOrAfter
 	// value, whichever is shorter. You can provide a DurationSeconds value from
 	// 900 seconds (15 minutes) up to the maximum session duration setting for the
 	// role. This setting can have a value from 1 hour to 12 hours. If you specify
@@ -1473,7 +1473,7 @@ type AssumeRoleWithSAMLInput struct {
 	// The DurationSeconds parameter is separate from the duration of a console
 	// session that you might request using the returned credentials. The request
 	// to the federation endpoint for a console sign-in token takes a SessionDuration
-	// parameter that speci***REMOVED***es the maximum length of the console session. For more
+	// parameter that specifies the maximum length of the console session. For more
 	// information, see Creating a URL that Enables Federated Users to Access the
 	// AWS Management Console (https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles_providers_enable-console-custom-url.html)
 	// in the IAM User Guide.
@@ -1532,20 +1532,20 @@ type AssumeRoleWithSAMLInput struct {
 	// The Amazon Resource Name (ARN) of the SAML provider in IAM that describes
 	// the IdP.
 	//
-	// PrincipalArn is a required ***REMOVED***eld
+	// PrincipalArn is a required field
 	PrincipalArn *string `min:"20" type:"string" required:"true"`
 
 	// The Amazon Resource Name (ARN) of the role that the caller is assuming.
 	//
-	// RoleArn is a required ***REMOVED***eld
+	// RoleArn is a required field
 	RoleArn *string `min:"20" type:"string" required:"true"`
 
 	// The base-64 encoded SAML authentication response provided by the IdP.
 	//
-	// For more information, see Con***REMOVED***guring a Relying Party and Adding Claims (https://docs.aws.amazon.com/IAM/latest/UserGuide/create-role-saml-IdP-tasks.html)
+	// For more information, see Configuring a Relying Party and Adding Claims (https://docs.aws.amazon.com/IAM/latest/UserGuide/create-role-saml-IdP-tasks.html)
 	// in the IAM User Guide.
 	//
-	// SAMLAssertion is a required ***REMOVED***eld
+	// SAMLAssertion is a required field
 	SAMLAssertion *string `min:"4" type:"string" required:"true"`
 }
 
@@ -1559,7 +1559,7 @@ func (s AssumeRoleWithSAMLInput) GoString() string {
 	return s.String()
 }
 
-// Validate inspects the ***REMOVED***elds of the type to determine if they are valid.
+// Validate inspects the fields of the type to determine if they are valid.
 func (s *AssumeRoleWithSAMLInput) Validate() error {
 	invalidParams := request.ErrInvalidParams{Context: "AssumeRoleWithSAMLInput"}
 	if s.DurationSeconds != nil && *s.DurationSeconds < 900 {
@@ -1603,37 +1603,37 @@ func (s *AssumeRoleWithSAMLInput) Validate() error {
 	return nil
 }
 
-// SetDurationSeconds sets the DurationSeconds ***REMOVED***eld's value.
+// SetDurationSeconds sets the DurationSeconds field's value.
 func (s *AssumeRoleWithSAMLInput) SetDurationSeconds(v int64) *AssumeRoleWithSAMLInput {
 	s.DurationSeconds = &v
 	return s
 }
 
-// SetPolicy sets the Policy ***REMOVED***eld's value.
+// SetPolicy sets the Policy field's value.
 func (s *AssumeRoleWithSAMLInput) SetPolicy(v string) *AssumeRoleWithSAMLInput {
 	s.Policy = &v
 	return s
 }
 
-// SetPolicyArns sets the PolicyArns ***REMOVED***eld's value.
+// SetPolicyArns sets the PolicyArns field's value.
 func (s *AssumeRoleWithSAMLInput) SetPolicyArns(v []*PolicyDescriptorType) *AssumeRoleWithSAMLInput {
 	s.PolicyArns = v
 	return s
 }
 
-// SetPrincipalArn sets the PrincipalArn ***REMOVED***eld's value.
+// SetPrincipalArn sets the PrincipalArn field's value.
 func (s *AssumeRoleWithSAMLInput) SetPrincipalArn(v string) *AssumeRoleWithSAMLInput {
 	s.PrincipalArn = &v
 	return s
 }
 
-// SetRoleArn sets the RoleArn ***REMOVED***eld's value.
+// SetRoleArn sets the RoleArn field's value.
 func (s *AssumeRoleWithSAMLInput) SetRoleArn(v string) *AssumeRoleWithSAMLInput {
 	s.RoleArn = &v
 	return s
 }
 
-// SetSAMLAssertion sets the SAMLAssertion ***REMOVED***eld's value.
+// SetSAMLAssertion sets the SAMLAssertion field's value.
 func (s *AssumeRoleWithSAMLInput) SetSAMLAssertion(v string) *AssumeRoleWithSAMLInput {
 	s.SAMLAssertion = &v
 	return s
@@ -1644,18 +1644,18 @@ func (s *AssumeRoleWithSAMLInput) SetSAMLAssertion(v string) *AssumeRoleWithSAML
 type AssumeRoleWithSAMLOutput struct {
 	_ struct{} `type:"structure"`
 
-	// The identi***REMOVED***ers for the temporary security credentials that the operation
+	// The identifiers for the temporary security credentials that the operation
 	// returns.
 	AssumedRoleUser *AssumedRoleUser `type:"structure"`
 
-	// The value of the Recipient attribute of the SubjectCon***REMOVED***rmationData element
+	// The value of the Recipient attribute of the SubjectConfirmationData element
 	// of the SAML assertion.
 	Audience *string `type:"string"`
 
 	// The temporary security credentials, which include an access key ID, a secret
 	// access key, and a security (or session) token.
 	//
-	// The size of the security token that STS API operations return is not ***REMOVED***xed.
+	// The size of the security token that STS API operations return is not fixed.
 	// We strongly recommend that you make no assumptions about the maximum size.
 	Credentials *Credentials `type:"structure"`
 
@@ -1664,14 +1664,14 @@ type AssumeRoleWithSAMLOutput struct {
 
 	// A hash value based on the concatenation of the Issuer response value, the
 	// AWS account ID, and the friendly name (the last part of the ARN) of the SAML
-	// provider in IAM. The combination of NameQuali***REMOVED***er and Subject can be used
+	// provider in IAM. The combination of NameQualifier and Subject can be used
 	// to uniquely identify a federated user.
 	//
 	// The following pseudocode shows how the hash value is calculated:
 	//
 	// BASE64 ( SHA1 ( "https://example.com/saml" + "123456789012" + "/MySAMLIdP"
 	// ) )
-	NameQuali***REMOVED***er *string `type:"string"`
+	NameQualifier *string `type:"string"`
 
 	// A percentage value that indicates the size of the policy in packed form.
 	// The service rejects any policy with a packed size greater than 100 percent,
@@ -1681,14 +1681,14 @@ type AssumeRoleWithSAMLOutput struct {
 	// The value of the NameID element in the Subject element of the SAML assertion.
 	Subject *string `type:"string"`
 
-	// The format of the name ID, as de***REMOVED***ned by the Format attribute in the NameID
+	// The format of the name ID, as defined by the Format attribute in the NameID
 	// element of the SAML assertion. Typical examples of the format are transient
 	// or persistent.
 	//
-	// If the format includes the pre***REMOVED***x urn:oasis:names:tc:SAML:2.0:nameid-format,
-	// that pre***REMOVED***x is removed. For example, urn:oasis:names:tc:SAML:2.0:nameid-format:transient
-	// is returned as transient. If the format includes any other pre***REMOVED***x, the format
-	// is returned with no modi***REMOVED***cations.
+	// If the format includes the prefix urn:oasis:names:tc:SAML:2.0:nameid-format,
+	// that prefix is removed. For example, urn:oasis:names:tc:SAML:2.0:nameid-format:transient
+	// is returned as transient. If the format includes any other prefix, the format
+	// is returned with no modifications.
 	SubjectType *string `type:"string"`
 }
 
@@ -1702,49 +1702,49 @@ func (s AssumeRoleWithSAMLOutput) GoString() string {
 	return s.String()
 }
 
-// SetAssumedRoleUser sets the AssumedRoleUser ***REMOVED***eld's value.
+// SetAssumedRoleUser sets the AssumedRoleUser field's value.
 func (s *AssumeRoleWithSAMLOutput) SetAssumedRoleUser(v *AssumedRoleUser) *AssumeRoleWithSAMLOutput {
 	s.AssumedRoleUser = v
 	return s
 }
 
-// SetAudience sets the Audience ***REMOVED***eld's value.
+// SetAudience sets the Audience field's value.
 func (s *AssumeRoleWithSAMLOutput) SetAudience(v string) *AssumeRoleWithSAMLOutput {
 	s.Audience = &v
 	return s
 }
 
-// SetCredentials sets the Credentials ***REMOVED***eld's value.
+// SetCredentials sets the Credentials field's value.
 func (s *AssumeRoleWithSAMLOutput) SetCredentials(v *Credentials) *AssumeRoleWithSAMLOutput {
 	s.Credentials = v
 	return s
 }
 
-// SetIssuer sets the Issuer ***REMOVED***eld's value.
+// SetIssuer sets the Issuer field's value.
 func (s *AssumeRoleWithSAMLOutput) SetIssuer(v string) *AssumeRoleWithSAMLOutput {
 	s.Issuer = &v
 	return s
 }
 
-// SetNameQuali***REMOVED***er sets the NameQuali***REMOVED***er ***REMOVED***eld's value.
-func (s *AssumeRoleWithSAMLOutput) SetNameQuali***REMOVED***er(v string) *AssumeRoleWithSAMLOutput {
-	s.NameQuali***REMOVED***er = &v
+// SetNameQualifier sets the NameQualifier field's value.
+func (s *AssumeRoleWithSAMLOutput) SetNameQualifier(v string) *AssumeRoleWithSAMLOutput {
+	s.NameQualifier = &v
 	return s
 }
 
-// SetPackedPolicySize sets the PackedPolicySize ***REMOVED***eld's value.
+// SetPackedPolicySize sets the PackedPolicySize field's value.
 func (s *AssumeRoleWithSAMLOutput) SetPackedPolicySize(v int64) *AssumeRoleWithSAMLOutput {
 	s.PackedPolicySize = &v
 	return s
 }
 
-// SetSubject sets the Subject ***REMOVED***eld's value.
+// SetSubject sets the Subject field's value.
 func (s *AssumeRoleWithSAMLOutput) SetSubject(v string) *AssumeRoleWithSAMLOutput {
 	s.Subject = &v
 	return s
 }
 
-// SetSubjectType sets the SubjectType ***REMOVED***eld's value.
+// SetSubjectType sets the SubjectType field's value.
 func (s *AssumeRoleWithSAMLOutput) SetSubjectType(v string) *AssumeRoleWithSAMLOutput {
 	s.SubjectType = &v
 	return s
@@ -1768,7 +1768,7 @@ type AssumeRoleWithWebIdentityInput struct {
 	// The DurationSeconds parameter is separate from the duration of a console
 	// session that you might request using the returned credentials. The request
 	// to the federation endpoint for a console sign-in token takes a SessionDuration
-	// parameter that speci***REMOVED***es the maximum length of the console session. For more
+	// parameter that specifies the maximum length of the console session. For more
 	// information, see Creating a URL that Enables Federated Users to Access the
 	// AWS Management Console (https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles_providers_enable-console-custom-url.html)
 	// in the IAM User Guide.
@@ -1824,7 +1824,7 @@ type AssumeRoleWithWebIdentityInput struct {
 	// in the IAM User Guide.
 	PolicyArns []*PolicyDescriptorType `type:"list"`
 
-	// The fully quali***REMOVED***ed host component of the domain name of the identity provider.
+	// The fully qualified host component of the domain name of the identity provider.
 	//
 	// Specify this value only for OAuth 2.0 access tokens. Currently www.amazon.com
 	// and graph.facebook.com are the only supported identity providers for OAuth
@@ -1835,11 +1835,11 @@ type AssumeRoleWithWebIdentityInput struct {
 
 	// The Amazon Resource Name (ARN) of the role that the caller is assuming.
 	//
-	// RoleArn is a required ***REMOVED***eld
+	// RoleArn is a required field
 	RoleArn *string `min:"20" type:"string" required:"true"`
 
-	// An identi***REMOVED***er for the assumed role session. Typically, you pass the name
-	// or identi***REMOVED***er that is associated with the user who is using your application.
+	// An identifier for the assumed role session. Typically, you pass the name
+	// or identifier that is associated with the user who is using your application.
 	// That way, the temporary security credentials that your application will use
 	// are associated with that user. This session name is included as part of the
 	// ARN and assumed role ID in the AssumedRoleUser response element.
@@ -1848,7 +1848,7 @@ type AssumeRoleWithWebIdentityInput struct {
 	// of upper- and lower-case alphanumeric characters with no spaces. You can
 	// also include underscores or any of the following characters: =,.@-
 	//
-	// RoleSessionName is a required ***REMOVED***eld
+	// RoleSessionName is a required field
 	RoleSessionName *string `min:"2" type:"string" required:"true"`
 
 	// The OAuth 2.0 access token or OpenID Connect ID token that is provided by
@@ -1856,7 +1856,7 @@ type AssumeRoleWithWebIdentityInput struct {
 	// the user who is using your application with a web identity provider before
 	// the application makes an AssumeRoleWithWebIdentity call.
 	//
-	// WebIdentityToken is a required ***REMOVED***eld
+	// WebIdentityToken is a required field
 	WebIdentityToken *string `min:"4" type:"string" required:"true"`
 }
 
@@ -1870,7 +1870,7 @@ func (s AssumeRoleWithWebIdentityInput) GoString() string {
 	return s.String()
 }
 
-// Validate inspects the ***REMOVED***elds of the type to determine if they are valid.
+// Validate inspects the fields of the type to determine if they are valid.
 func (s *AssumeRoleWithWebIdentityInput) Validate() error {
 	invalidParams := request.ErrInvalidParams{Context: "AssumeRoleWithWebIdentityInput"}
 	if s.DurationSeconds != nil && *s.DurationSeconds < 900 {
@@ -1917,43 +1917,43 @@ func (s *AssumeRoleWithWebIdentityInput) Validate() error {
 	return nil
 }
 
-// SetDurationSeconds sets the DurationSeconds ***REMOVED***eld's value.
+// SetDurationSeconds sets the DurationSeconds field's value.
 func (s *AssumeRoleWithWebIdentityInput) SetDurationSeconds(v int64) *AssumeRoleWithWebIdentityInput {
 	s.DurationSeconds = &v
 	return s
 }
 
-// SetPolicy sets the Policy ***REMOVED***eld's value.
+// SetPolicy sets the Policy field's value.
 func (s *AssumeRoleWithWebIdentityInput) SetPolicy(v string) *AssumeRoleWithWebIdentityInput {
 	s.Policy = &v
 	return s
 }
 
-// SetPolicyArns sets the PolicyArns ***REMOVED***eld's value.
+// SetPolicyArns sets the PolicyArns field's value.
 func (s *AssumeRoleWithWebIdentityInput) SetPolicyArns(v []*PolicyDescriptorType) *AssumeRoleWithWebIdentityInput {
 	s.PolicyArns = v
 	return s
 }
 
-// SetProviderId sets the ProviderId ***REMOVED***eld's value.
+// SetProviderId sets the ProviderId field's value.
 func (s *AssumeRoleWithWebIdentityInput) SetProviderId(v string) *AssumeRoleWithWebIdentityInput {
 	s.ProviderId = &v
 	return s
 }
 
-// SetRoleArn sets the RoleArn ***REMOVED***eld's value.
+// SetRoleArn sets the RoleArn field's value.
 func (s *AssumeRoleWithWebIdentityInput) SetRoleArn(v string) *AssumeRoleWithWebIdentityInput {
 	s.RoleArn = &v
 	return s
 }
 
-// SetRoleSessionName sets the RoleSessionName ***REMOVED***eld's value.
+// SetRoleSessionName sets the RoleSessionName field's value.
 func (s *AssumeRoleWithWebIdentityInput) SetRoleSessionName(v string) *AssumeRoleWithWebIdentityInput {
 	s.RoleSessionName = &v
 	return s
 }
 
-// SetWebIdentityToken sets the WebIdentityToken ***REMOVED***eld's value.
+// SetWebIdentityToken sets the WebIdentityToken field's value.
 func (s *AssumeRoleWithWebIdentityInput) SetWebIdentityToken(v string) *AssumeRoleWithWebIdentityInput {
 	s.WebIdentityToken = &v
 	return s
@@ -1964,22 +1964,22 @@ func (s *AssumeRoleWithWebIdentityInput) SetWebIdentityToken(v string) *AssumeRo
 type AssumeRoleWithWebIdentityOutput struct {
 	_ struct{} `type:"structure"`
 
-	// The Amazon Resource Name (ARN) and the assumed role ID, which are identi***REMOVED***ers
+	// The Amazon Resource Name (ARN) and the assumed role ID, which are identifiers
 	// that you can use to refer to the resulting temporary security credentials.
 	// For example, you can reference these credentials as a principal in a resource-based
 	// policy by using the ARN or assumed role ID. The ARN and ID include the RoleSessionName
-	// that you speci***REMOVED***ed when you called AssumeRole.
+	// that you specified when you called AssumeRole.
 	AssumedRoleUser *AssumedRoleUser `type:"structure"`
 
 	// The intended audience (also known as client ID) of the web identity token.
-	// This is traditionally the client identi***REMOVED***er issued to the application that
+	// This is traditionally the client identifier issued to the application that
 	// requested the web identity token.
 	Audience *string `type:"string"`
 
 	// The temporary security credentials, which include an access key ID, a secret
 	// access key, and a security token.
 	//
-	// The size of the security token that STS API operations return is not ***REMOVED***xed.
+	// The size of the security token that STS API operations return is not fixed.
 	// We strongly recommend that you make no assumptions about the maximum size.
 	Credentials *Credentials `type:"structure"`
 
@@ -1989,16 +1989,16 @@ type AssumeRoleWithWebIdentityOutput struct {
 	PackedPolicySize *int64 `type:"integer"`
 
 	// The issuing authority of the web identity token presented. For OpenID Connect
-	// ID tokens, this contains the value of the iss ***REMOVED***eld. For OAuth 2.0 access
+	// ID tokens, this contains the value of the iss field. For OAuth 2.0 access
 	// tokens, this contains the value of the ProviderId parameter that was passed
 	// in the AssumeRoleWithWebIdentity request.
 	Provider *string `type:"string"`
 
-	// The unique user identi***REMOVED***er that is returned by the identity provider. This
-	// identi***REMOVED***er is associated with the WebIdentityToken that was submitted with
-	// the AssumeRoleWithWebIdentity call. The identi***REMOVED***er is typically unique to
+	// The unique user identifier that is returned by the identity provider. This
+	// identifier is associated with the WebIdentityToken that was submitted with
+	// the AssumeRoleWithWebIdentity call. The identifier is typically unique to
 	// the user and the application that acquired the WebIdentityToken (pairwise
-	// identi***REMOVED***er). For OpenID Connect ID tokens, this ***REMOVED***eld contains the value
+	// identifier). For OpenID Connect ID tokens, this field contains the value
 	// returned by the identity provider as the token's sub (Subject) claim.
 	SubjectFromWebIdentityToken *string `min:"6" type:"string"`
 }
@@ -2013,60 +2013,60 @@ func (s AssumeRoleWithWebIdentityOutput) GoString() string {
 	return s.String()
 }
 
-// SetAssumedRoleUser sets the AssumedRoleUser ***REMOVED***eld's value.
+// SetAssumedRoleUser sets the AssumedRoleUser field's value.
 func (s *AssumeRoleWithWebIdentityOutput) SetAssumedRoleUser(v *AssumedRoleUser) *AssumeRoleWithWebIdentityOutput {
 	s.AssumedRoleUser = v
 	return s
 }
 
-// SetAudience sets the Audience ***REMOVED***eld's value.
+// SetAudience sets the Audience field's value.
 func (s *AssumeRoleWithWebIdentityOutput) SetAudience(v string) *AssumeRoleWithWebIdentityOutput {
 	s.Audience = &v
 	return s
 }
 
-// SetCredentials sets the Credentials ***REMOVED***eld's value.
+// SetCredentials sets the Credentials field's value.
 func (s *AssumeRoleWithWebIdentityOutput) SetCredentials(v *Credentials) *AssumeRoleWithWebIdentityOutput {
 	s.Credentials = v
 	return s
 }
 
-// SetPackedPolicySize sets the PackedPolicySize ***REMOVED***eld's value.
+// SetPackedPolicySize sets the PackedPolicySize field's value.
 func (s *AssumeRoleWithWebIdentityOutput) SetPackedPolicySize(v int64) *AssumeRoleWithWebIdentityOutput {
 	s.PackedPolicySize = &v
 	return s
 }
 
-// SetProvider sets the Provider ***REMOVED***eld's value.
+// SetProvider sets the Provider field's value.
 func (s *AssumeRoleWithWebIdentityOutput) SetProvider(v string) *AssumeRoleWithWebIdentityOutput {
 	s.Provider = &v
 	return s
 }
 
-// SetSubjectFromWebIdentityToken sets the SubjectFromWebIdentityToken ***REMOVED***eld's value.
+// SetSubjectFromWebIdentityToken sets the SubjectFromWebIdentityToken field's value.
 func (s *AssumeRoleWithWebIdentityOutput) SetSubjectFromWebIdentityToken(v string) *AssumeRoleWithWebIdentityOutput {
 	s.SubjectFromWebIdentityToken = &v
 	return s
 }
 
-// The identi***REMOVED***ers for the temporary security credentials that the operation
+// The identifiers for the temporary security credentials that the operation
 // returns.
 type AssumedRoleUser struct {
 	_ struct{} `type:"structure"`
 
 	// The ARN of the temporary security credentials that are returned from the
 	// AssumeRole action. For more information about ARNs and how to use them in
-	// policies, see IAM Identi***REMOVED***ers (https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_identi***REMOVED***ers.html)
+	// policies, see IAM Identifiers (https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_identifiers.html)
 	// in Using IAM.
 	//
-	// Arn is a required ***REMOVED***eld
+	// Arn is a required field
 	Arn *string `min:"20" type:"string" required:"true"`
 
-	// A unique identi***REMOVED***er that contains the role ID and the role session name of
+	// A unique identifier that contains the role ID and the role session name of
 	// the role that is being assumed. The role ID is generated by AWS when the
 	// role is created.
 	//
-	// AssumedRoleId is a required ***REMOVED***eld
+	// AssumedRoleId is a required field
 	AssumedRoleId *string `min:"2" type:"string" required:"true"`
 }
 
@@ -2080,13 +2080,13 @@ func (s AssumedRoleUser) GoString() string {
 	return s.String()
 }
 
-// SetArn sets the Arn ***REMOVED***eld's value.
+// SetArn sets the Arn field's value.
 func (s *AssumedRoleUser) SetArn(v string) *AssumedRoleUser {
 	s.Arn = &v
 	return s
 }
 
-// SetAssumedRoleId sets the AssumedRoleId ***REMOVED***eld's value.
+// SetAssumedRoleId sets the AssumedRoleId field's value.
 func (s *AssumedRoleUser) SetAssumedRoleId(v string) *AssumedRoleUser {
 	s.AssumedRoleId = &v
 	return s
@@ -2096,24 +2096,24 @@ func (s *AssumedRoleUser) SetAssumedRoleId(v string) *AssumedRoleUser {
 type Credentials struct {
 	_ struct{} `type:"structure"`
 
-	// The access key ID that identi***REMOVED***es the temporary security credentials.
+	// The access key ID that identifies the temporary security credentials.
 	//
-	// AccessKeyId is a required ***REMOVED***eld
+	// AccessKeyId is a required field
 	AccessKeyId *string `min:"16" type:"string" required:"true"`
 
 	// The date on which the current credentials expire.
 	//
-	// Expiration is a required ***REMOVED***eld
+	// Expiration is a required field
 	Expiration *time.Time `type:"timestamp" required:"true"`
 
 	// The secret access key that can be used to sign requests.
 	//
-	// SecretAccessKey is a required ***REMOVED***eld
+	// SecretAccessKey is a required field
 	SecretAccessKey *string `type:"string" required:"true"`
 
 	// The token that users must pass to the service API to use the temporary credentials.
 	//
-	// SessionToken is a required ***REMOVED***eld
+	// SessionToken is a required field
 	SessionToken *string `type:"string" required:"true"`
 }
 
@@ -2127,25 +2127,25 @@ func (s Credentials) GoString() string {
 	return s.String()
 }
 
-// SetAccessKeyId sets the AccessKeyId ***REMOVED***eld's value.
+// SetAccessKeyId sets the AccessKeyId field's value.
 func (s *Credentials) SetAccessKeyId(v string) *Credentials {
 	s.AccessKeyId = &v
 	return s
 }
 
-// SetExpiration sets the Expiration ***REMOVED***eld's value.
+// SetExpiration sets the Expiration field's value.
 func (s *Credentials) SetExpiration(v time.Time) *Credentials {
 	s.Expiration = &v
 	return s
 }
 
-// SetSecretAccessKey sets the SecretAccessKey ***REMOVED***eld's value.
+// SetSecretAccessKey sets the SecretAccessKey field's value.
 func (s *Credentials) SetSecretAccessKey(v string) *Credentials {
 	s.SecretAccessKey = &v
 	return s
 }
 
-// SetSessionToken sets the SessionToken ***REMOVED***eld's value.
+// SetSessionToken sets the SessionToken field's value.
 func (s *Credentials) SetSessionToken(v string) *Credentials {
 	s.SessionToken = &v
 	return s
@@ -2156,7 +2156,7 @@ type DecodeAuthorizationMessageInput struct {
 
 	// The encoded message that was returned with the response.
 	//
-	// EncodedMessage is a required ***REMOVED***eld
+	// EncodedMessage is a required field
 	EncodedMessage *string `min:"1" type:"string" required:"true"`
 }
 
@@ -2170,7 +2170,7 @@ func (s DecodeAuthorizationMessageInput) GoString() string {
 	return s.String()
 }
 
-// Validate inspects the ***REMOVED***elds of the type to determine if they are valid.
+// Validate inspects the fields of the type to determine if they are valid.
 func (s *DecodeAuthorizationMessageInput) Validate() error {
 	invalidParams := request.ErrInvalidParams{Context: "DecodeAuthorizationMessageInput"}
 	if s.EncodedMessage == nil {
@@ -2186,7 +2186,7 @@ func (s *DecodeAuthorizationMessageInput) Validate() error {
 	return nil
 }
 
-// SetEncodedMessage sets the EncodedMessage ***REMOVED***eld's value.
+// SetEncodedMessage sets the EncodedMessage field's value.
 func (s *DecodeAuthorizationMessageInput) SetEncodedMessage(v string) *DecodeAuthorizationMessageInput {
 	s.EncodedMessage = &v
 	return s
@@ -2212,28 +2212,28 @@ func (s DecodeAuthorizationMessageOutput) GoString() string {
 	return s.String()
 }
 
-// SetDecodedMessage sets the DecodedMessage ***REMOVED***eld's value.
+// SetDecodedMessage sets the DecodedMessage field's value.
 func (s *DecodeAuthorizationMessageOutput) SetDecodedMessage(v string) *DecodeAuthorizationMessageOutput {
 	s.DecodedMessage = &v
 	return s
 }
 
-// Identi***REMOVED***ers for the federated user that is associated with the credentials.
+// Identifiers for the federated user that is associated with the credentials.
 type FederatedUser struct {
 	_ struct{} `type:"structure"`
 
-	// The ARN that speci***REMOVED***es the federated user that is associated with the credentials.
+	// The ARN that specifies the federated user that is associated with the credentials.
 	// For more information about ARNs and how to use them in policies, see IAM
-	// Identi***REMOVED***ers (https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_identi***REMOVED***ers.html)
+	// Identifiers (https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_identifiers.html)
 	// in Using IAM.
 	//
-	// Arn is a required ***REMOVED***eld
+	// Arn is a required field
 	Arn *string `min:"20" type:"string" required:"true"`
 
-	// The string that identi***REMOVED***es the federated user associated with the credentials,
+	// The string that identifies the federated user associated with the credentials,
 	// similar to the unique ID of an IAM user.
 	//
-	// FederatedUserId is a required ***REMOVED***eld
+	// FederatedUserId is a required field
 	FederatedUserId *string `min:"2" type:"string" required:"true"`
 }
 
@@ -2247,13 +2247,13 @@ func (s FederatedUser) GoString() string {
 	return s.String()
 }
 
-// SetArn sets the Arn ***REMOVED***eld's value.
+// SetArn sets the Arn field's value.
 func (s *FederatedUser) SetArn(v string) *FederatedUser {
 	s.Arn = &v
 	return s
 }
 
-// SetFederatedUserId sets the FederatedUserId ***REMOVED***eld's value.
+// SetFederatedUserId sets the FederatedUserId field's value.
 func (s *FederatedUser) SetFederatedUserId(v string) *FederatedUser {
 	s.FederatedUserId = &v
 	return s
@@ -2262,12 +2262,12 @@ func (s *FederatedUser) SetFederatedUserId(v string) *FederatedUser {
 type GetAccessKeyInfoInput struct {
 	_ struct{} `type:"structure"`
 
-	// The identi***REMOVED***er of an access key.
+	// The identifier of an access key.
 	//
 	// This parameter allows (through its regex pattern) a string of characters
 	// that can consist of any upper- or lowercased letter or digit.
 	//
-	// AccessKeyId is a required ***REMOVED***eld
+	// AccessKeyId is a required field
 	AccessKeyId *string `min:"16" type:"string" required:"true"`
 }
 
@@ -2281,7 +2281,7 @@ func (s GetAccessKeyInfoInput) GoString() string {
 	return s.String()
 }
 
-// Validate inspects the ***REMOVED***elds of the type to determine if they are valid.
+// Validate inspects the fields of the type to determine if they are valid.
 func (s *GetAccessKeyInfoInput) Validate() error {
 	invalidParams := request.ErrInvalidParams{Context: "GetAccessKeyInfoInput"}
 	if s.AccessKeyId == nil {
@@ -2297,7 +2297,7 @@ func (s *GetAccessKeyInfoInput) Validate() error {
 	return nil
 }
 
-// SetAccessKeyId sets the AccessKeyId ***REMOVED***eld's value.
+// SetAccessKeyId sets the AccessKeyId field's value.
 func (s *GetAccessKeyInfoInput) SetAccessKeyId(v string) *GetAccessKeyInfoInput {
 	s.AccessKeyId = &v
 	return s
@@ -2320,7 +2320,7 @@ func (s GetAccessKeyInfoOutput) GoString() string {
 	return s.String()
 }
 
-// SetAccount sets the Account ***REMOVED***eld's value.
+// SetAccount sets the Account field's value.
 func (s *GetAccessKeyInfoOutput) SetAccount(v string) *GetAccessKeyInfoOutput {
 	s.Account = &v
 	return s
@@ -2352,7 +2352,7 @@ type GetCallerIdentityOutput struct {
 	// The AWS ARN associated with the calling entity.
 	Arn *string `min:"20" type:"string"`
 
-	// The unique identi***REMOVED***er of the calling entity. The exact value depends on the
+	// The unique identifier of the calling entity. The exact value depends on the
 	// type of entity that is making the call. The values returned are those listed
 	// in the aws:userid column in the Principal table (https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_policies_variables.html#principaltable)
 	// found on the Policy Variables reference page in the IAM User Guide.
@@ -2369,19 +2369,19 @@ func (s GetCallerIdentityOutput) GoString() string {
 	return s.String()
 }
 
-// SetAccount sets the Account ***REMOVED***eld's value.
+// SetAccount sets the Account field's value.
 func (s *GetCallerIdentityOutput) SetAccount(v string) *GetCallerIdentityOutput {
 	s.Account = &v
 	return s
 }
 
-// SetArn sets the Arn ***REMOVED***eld's value.
+// SetArn sets the Arn field's value.
 func (s *GetCallerIdentityOutput) SetArn(v string) *GetCallerIdentityOutput {
 	s.Arn = &v
 	return s
 }
 
-// SetUserId sets the UserId ***REMOVED***eld's value.
+// SetUserId sets the UserId field's value.
 func (s *GetCallerIdentityOutput) SetUserId(v string) *GetCallerIdentityOutput {
 	s.UserId = &v
 	return s
@@ -2394,11 +2394,11 @@ type GetFederationTokenInput struct {
 	// for federation sessions range from 900 seconds (15 minutes) to 129,600 seconds
 	// (36 hours), with 43,200 seconds (12 hours) as the default. Sessions obtained
 	// using AWS account root user credentials are restricted to a maximum of 3,600
-	// seconds (one hour). If the speci***REMOVED***ed duration is longer than one hour, the
+	// seconds (one hour). If the specified duration is longer than one hour, the
 	// session obtained by using root user credentials defaults to one hour.
 	DurationSeconds *int64 `min:"900" type:"integer"`
 
-	// The name of the federated user. The name is used as an identi***REMOVED***er for the
+	// The name of the federated user. The name is used as an identifier for the
 	// temporary security credentials (such as Bob). For example, you can reference
 	// the federated user name in a resource-based policy, such as in an Amazon
 	// S3 bucket policy.
@@ -2407,7 +2407,7 @@ type GetFederationTokenInput struct {
 	// of upper- and lower-case alphanumeric characters with no spaces. You can
 	// also include underscores or any of the following characters: =,.@-
 	//
-	// Name is a required ***REMOVED***eld
+	// Name is a required field
 	Name *string `min:"2" type:"string" required:"true"`
 
 	// An IAM policy in JSON format that you want to use as an inline session policy.
@@ -2420,13 +2420,13 @@ type GetFederationTokenInput struct {
 	// This parameter is optional. However, if you do not pass any session policies,
 	// then the resulting federated user session has no permissions. The only exception
 	// is when the credentials are used to access a resource that has a resource-based
-	// policy that speci***REMOVED***cally references the federated user session in the Principal
+	// policy that specifically references the federated user session in the Principal
 	// element of the policy.
 	//
 	// When you pass session policies, the session permissions are the intersection
 	// of the IAM user policies and the session policies that you pass. This gives
 	// you a way to further restrict the permissions for a federated user. You cannot
-	// use session policies to grant more permissions than those that are de***REMOVED***ned
+	// use session policies to grant more permissions than those that are defined
 	// in the permissions policy of the IAM user. For more information, see Session
 	// Policies (https://docs.aws.amazon.com/IAM/latest/UserGuide/access_policies.html#policies_session)
 	// in the IAM User Guide.
@@ -2460,13 +2460,13 @@ type GetFederationTokenInput struct {
 	// This parameter is optional. However, if you do not pass any session policies,
 	// then the resulting federated user session has no permissions. The only exception
 	// is when the credentials are used to access a resource that has a resource-based
-	// policy that speci***REMOVED***cally references the federated user session in the Principal
+	// policy that specifically references the federated user session in the Principal
 	// element of the policy.
 	//
 	// When you pass session policies, the session permissions are the intersection
 	// of the IAM user policies and the session policies that you pass. This gives
 	// you a way to further restrict the permissions for a federated user. You cannot
-	// use session policies to grant more permissions than those that are de***REMOVED***ned
+	// use session policies to grant more permissions than those that are defined
 	// in the permissions policy of the IAM user. For more information, see Session
 	// Policies (https://docs.aws.amazon.com/IAM/latest/UserGuide/access_policies.html#policies_session)
 	// in the IAM User Guide.
@@ -2489,7 +2489,7 @@ func (s GetFederationTokenInput) GoString() string {
 	return s.String()
 }
 
-// Validate inspects the ***REMOVED***elds of the type to determine if they are valid.
+// Validate inspects the fields of the type to determine if they are valid.
 func (s *GetFederationTokenInput) Validate() error {
 	invalidParams := request.ErrInvalidParams{Context: "GetFederationTokenInput"}
 	if s.DurationSeconds != nil && *s.DurationSeconds < 900 {
@@ -2521,25 +2521,25 @@ func (s *GetFederationTokenInput) Validate() error {
 	return nil
 }
 
-// SetDurationSeconds sets the DurationSeconds ***REMOVED***eld's value.
+// SetDurationSeconds sets the DurationSeconds field's value.
 func (s *GetFederationTokenInput) SetDurationSeconds(v int64) *GetFederationTokenInput {
 	s.DurationSeconds = &v
 	return s
 }
 
-// SetName sets the Name ***REMOVED***eld's value.
+// SetName sets the Name field's value.
 func (s *GetFederationTokenInput) SetName(v string) *GetFederationTokenInput {
 	s.Name = &v
 	return s
 }
 
-// SetPolicy sets the Policy ***REMOVED***eld's value.
+// SetPolicy sets the Policy field's value.
 func (s *GetFederationTokenInput) SetPolicy(v string) *GetFederationTokenInput {
 	s.Policy = &v
 	return s
 }
 
-// SetPolicyArns sets the PolicyArns ***REMOVED***eld's value.
+// SetPolicyArns sets the PolicyArns field's value.
 func (s *GetFederationTokenInput) SetPolicyArns(v []*PolicyDescriptorType) *GetFederationTokenInput {
 	s.PolicyArns = v
 	return s
@@ -2553,11 +2553,11 @@ type GetFederationTokenOutput struct {
 	// The temporary security credentials, which include an access key ID, a secret
 	// access key, and a security (or session) token.
 	//
-	// The size of the security token that STS API operations return is not ***REMOVED***xed.
+	// The size of the security token that STS API operations return is not fixed.
 	// We strongly recommend that you make no assumptions about the maximum size.
 	Credentials *Credentials `type:"structure"`
 
-	// Identi***REMOVED***ers for the federated user associated with the credentials (such
+	// Identifiers for the federated user associated with the credentials (such
 	// as arn:aws:sts::123456789012:federated-user/Bob or 123456789012:Bob). You
 	// can use the federated user's ARN in your resource-based policies, such as
 	// an Amazon S3 bucket policy.
@@ -2579,19 +2579,19 @@ func (s GetFederationTokenOutput) GoString() string {
 	return s.String()
 }
 
-// SetCredentials sets the Credentials ***REMOVED***eld's value.
+// SetCredentials sets the Credentials field's value.
 func (s *GetFederationTokenOutput) SetCredentials(v *Credentials) *GetFederationTokenOutput {
 	s.Credentials = v
 	return s
 }
 
-// SetFederatedUser sets the FederatedUser ***REMOVED***eld's value.
+// SetFederatedUser sets the FederatedUser field's value.
 func (s *GetFederationTokenOutput) SetFederatedUser(v *FederatedUser) *GetFederationTokenOutput {
 	s.FederatedUser = v
 	return s
 }
 
-// SetPackedPolicySize sets the PackedPolicySize ***REMOVED***eld's value.
+// SetPackedPolicySize sets the PackedPolicySize field's value.
 func (s *GetFederationTokenOutput) SetPackedPolicySize(v int64) *GetFederationTokenOutput {
 	s.PackedPolicySize = &v
 	return s
@@ -2608,12 +2608,12 @@ type GetSessionTokenInput struct {
 	// owners defaults to one hour.
 	DurationSeconds *int64 `min:"900" type:"integer"`
 
-	// The identi***REMOVED***cation number of the MFA device that is associated with the IAM
+	// The identification number of the MFA device that is associated with the IAM
 	// user who is making the GetSessionToken call. Specify this value if the IAM
 	// user has a policy that requires MFA authentication. The value is either the
 	// serial number for a hardware device (such as GAHT12345678) or an Amazon Resource
 	// Name (ARN) for a virtual device (such as arn:aws:iam::123456789012:mfa/user).
-	// You can ***REMOVED***nd the device for an IAM user by going to the AWS Management Console
+	// You can find the device for an IAM user by going to the AWS Management Console
 	// and viewing the user's security credentials.
 	//
 	// The regex used to validate this parameter is a string of characters consisting
@@ -2642,7 +2642,7 @@ func (s GetSessionTokenInput) GoString() string {
 	return s.String()
 }
 
-// Validate inspects the ***REMOVED***elds of the type to determine if they are valid.
+// Validate inspects the fields of the type to determine if they are valid.
 func (s *GetSessionTokenInput) Validate() error {
 	invalidParams := request.ErrInvalidParams{Context: "GetSessionTokenInput"}
 	if s.DurationSeconds != nil && *s.DurationSeconds < 900 {
@@ -2661,19 +2661,19 @@ func (s *GetSessionTokenInput) Validate() error {
 	return nil
 }
 
-// SetDurationSeconds sets the DurationSeconds ***REMOVED***eld's value.
+// SetDurationSeconds sets the DurationSeconds field's value.
 func (s *GetSessionTokenInput) SetDurationSeconds(v int64) *GetSessionTokenInput {
 	s.DurationSeconds = &v
 	return s
 }
 
-// SetSerialNumber sets the SerialNumber ***REMOVED***eld's value.
+// SetSerialNumber sets the SerialNumber field's value.
 func (s *GetSessionTokenInput) SetSerialNumber(v string) *GetSessionTokenInput {
 	s.SerialNumber = &v
 	return s
 }
 
-// SetTokenCode sets the TokenCode ***REMOVED***eld's value.
+// SetTokenCode sets the TokenCode field's value.
 func (s *GetSessionTokenInput) SetTokenCode(v string) *GetSessionTokenInput {
 	s.TokenCode = &v
 	return s
@@ -2687,7 +2687,7 @@ type GetSessionTokenOutput struct {
 	// The temporary security credentials, which include an access key ID, a secret
 	// access key, and a security (or session) token.
 	//
-	// The size of the security token that STS API operations return is not ***REMOVED***xed.
+	// The size of the security token that STS API operations return is not fixed.
 	// We strongly recommend that you make no assumptions about the maximum size.
 	Credentials *Credentials `type:"structure"`
 }
@@ -2702,7 +2702,7 @@ func (s GetSessionTokenOutput) GoString() string {
 	return s.String()
 }
 
-// SetCredentials sets the Credentials ***REMOVED***eld's value.
+// SetCredentials sets the Credentials field's value.
 func (s *GetSessionTokenOutput) SetCredentials(v *Credentials) *GetSessionTokenOutput {
 	s.Credentials = v
 	return s
@@ -2730,7 +2730,7 @@ func (s PolicyDescriptorType) GoString() string {
 	return s.String()
 }
 
-// Validate inspects the ***REMOVED***elds of the type to determine if they are valid.
+// Validate inspects the fields of the type to determine if they are valid.
 func (s *PolicyDescriptorType) Validate() error {
 	invalidParams := request.ErrInvalidParams{Context: "PolicyDescriptorType"}
 	if s.Arn != nil && len(*s.Arn) < 20 {
@@ -2743,7 +2743,7 @@ func (s *PolicyDescriptorType) Validate() error {
 	return nil
 }
 
-// SetArn sets the Arn ***REMOVED***eld's value.
+// SetArn sets the Arn field's value.
 func (s *PolicyDescriptorType) SetArn(v string) *PolicyDescriptorType {
 	s.Arn = &v
 	return s

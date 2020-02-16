@@ -60,7 +60,7 @@ func (c *hiveTables) Get(name string, options metav1.GetOptions) (result *v1.Hiv
 	return
 }
 
-// List takes label and ***REMOVED***eld selectors, and returns the list of HiveTables that match those selectors.
+// List takes label and field selectors, and returns the list of HiveTables that match those selectors.
 func (c *hiveTables) List(opts metav1.ListOptions) (result *v1.HiveTableList, err error) {
 	var timeout time.Duration
 	if opts.TimeoutSeconds != nil {

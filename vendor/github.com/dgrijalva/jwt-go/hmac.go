@@ -13,7 +13,7 @@ type SigningMethodHMAC struct {
 	Hash crypto.Hash
 }
 
-// Speci***REMOVED***c instances for HS256 and company
+// Specific instances for HS256 and company
 var (
 	SigningMethodHS256  *SigningMethodHMAC
 	SigningMethodHS384  *SigningMethodHMAC
@@ -59,7 +59,7 @@ func (m *SigningMethodHMAC) Verify(signingString, signature string, key interfac
 		return err
 	}
 
-	// Can we use the speci***REMOVED***ed hashing method?
+	// Can we use the specified hashing method?
 	if !m.Hash.Available() {
 		return ErrHashUnavailable
 	}

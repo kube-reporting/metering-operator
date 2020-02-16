@@ -1,6 +1,6 @@
 // Copyright 2017 The Prometheus Authors
 // Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this ***REMOVED***le except in compliance with the License.
+// you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 //
 // http://www.apache.org/licenses/LICENSE-2.0
@@ -8,13 +8,13 @@
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the speci***REMOVED***c language governing permissions and
+// See the License for the specific language governing permissions and
 // limitations under the License.
 
 package procfs
 
 import (
-	"bu***REMOVED***o"
+	"bufio"
 	"fmt"
 	"io"
 	"os"
@@ -41,21 +41,21 @@ func NewBuddyInfo() ([]BuddyInfo, error) {
 	return fs.NewBuddyInfo()
 }
 
-// NewBuddyInfo reads the buddyinfo statistics from the speci***REMOVED***ed `proc` ***REMOVED***lesystem.
+// NewBuddyInfo reads the buddyinfo statistics from the specified `proc` filesystem.
 func (fs FS) NewBuddyInfo() ([]BuddyInfo, error) {
-	***REMOVED***le, err := os.Open(fs.Path("buddyinfo"))
+	file, err := os.Open(fs.Path("buddyinfo"))
 	if err != nil {
 		return nil, err
 	}
-	defer ***REMOVED***le.Close()
+	defer file.Close()
 
-	return parseBuddyInfo(***REMOVED***le)
+	return parseBuddyInfo(file)
 }
 
 func parseBuddyInfo(r io.Reader) ([]BuddyInfo, error) {
 	var (
 		buddyInfo   = []BuddyInfo{}
-		scanner     = bu***REMOVED***o.NewScanner(r)
+		scanner     = bufio.NewScanner(r)
 		bucketCount = -1
 	)
 
@@ -65,7 +65,7 @@ func parseBuddyInfo(r io.Reader) ([]BuddyInfo, error) {
 		parts := strings.Fields(line)
 
 		if len(parts) < 4 {
-			return nil, fmt.Errorf("invalid number of ***REMOVED***elds when parsing buddyinfo")
+			return nil, fmt.Errorf("invalid number of fields when parsing buddyinfo")
 		}
 
 		node := strings.TrimRight(parts[1], ",")
@@ -74,7 +74,7 @@ func parseBuddyInfo(r io.Reader) ([]BuddyInfo, error) {
 
 		if bucketCount == -1 {
 			bucketCount = arraySize
-		} ***REMOVED*** {
+		} else {
 			if bucketCount != arraySize {
 				return nil, fmt.Errorf("mismatch in number of buddyinfo buckets, previous count %d, new count %d", bucketCount, arraySize)
 			}

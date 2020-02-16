@@ -1,6 +1,6 @@
 // Copyright 2015 The Go Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE ***REMOVED***le.
+// license that can be found in the LICENSE file.
 
 package gen
 
@@ -19,7 +19,7 @@ import (
 	"unicode/utf8"
 )
 
-// This ***REMOVED***le contains utilities for generating code.
+// This file contains utilities for generating code.
 
 // TODO: other write methods like:
 // - slices, maps, types, etc.
@@ -48,38 +48,38 @@ func NewCodeWriter() *CodeWriter {
 }
 
 // WriteGoFile appends the buffer with the total size of all created structures
-// and writes it as a Go ***REMOVED***le to the the given ***REMOVED***le with the given package name.
-func (w *CodeWriter) WriteGoFile(***REMOVED***lename, pkg string) {
-	f, err := os.Create(***REMOVED***lename)
+// and writes it as a Go file to the the given file with the given package name.
+func (w *CodeWriter) WriteGoFile(filename, pkg string) {
+	f, err := os.Create(filename)
 	if err != nil {
-		log.Fatalf("Could not create ***REMOVED***le %s: %v", ***REMOVED***lename, err)
+		log.Fatalf("Could not create file %s: %v", filename, err)
 	}
 	defer f.Close()
 	if _, err = w.WriteGo(f, pkg, ""); err != nil {
-		log.Fatalf("Error writing ***REMOVED***le %s: %v", ***REMOVED***lename, err)
+		log.Fatalf("Error writing file %s: %v", filename, err)
 	}
 }
 
 // WriteVersionedGoFile appends the buffer with the total size of all created
-// structures and writes it as a Go ***REMOVED***le to the the given ***REMOVED***le with the given
+// structures and writes it as a Go file to the the given file with the given
 // package name and build tags for the current Unicode version,
-func (w *CodeWriter) WriteVersionedGoFile(***REMOVED***lename, pkg string) {
+func (w *CodeWriter) WriteVersionedGoFile(filename, pkg string) {
 	tags := buildTags()
 	if tags != "" {
-		***REMOVED***lename = insertVersion(***REMOVED***lename, UnicodeVersion())
+		filename = insertVersion(filename, UnicodeVersion())
 	}
-	f, err := os.Create(***REMOVED***lename)
+	f, err := os.Create(filename)
 	if err != nil {
-		log.Fatalf("Could not create ***REMOVED***le %s: %v", ***REMOVED***lename, err)
+		log.Fatalf("Could not create file %s: %v", filename, err)
 	}
 	defer f.Close()
 	if _, err = w.WriteGo(f, pkg, tags); err != nil {
-		log.Fatalf("Error writing ***REMOVED***le %s: %v", ***REMOVED***lename, err)
+		log.Fatalf("Error writing file %s: %v", filename, err)
 	}
 }
 
 // WriteGo appends the buffer with the total size of all created structures and
-// writes it as a Go ***REMOVED***le to the the given writer with the given package name.
+// writes it as a Go file to the the given writer with the given package name.
 func (w *CodeWriter) WriteGo(out io.Writer, pkg, tags string) (n int, err error) {
 	sz := w.Size
 	w.WriteComment("Total table size %d bytes (%dKiB); checksum: %X\n", sz, sz/1024, w.Hash.Sum32())
@@ -101,8 +101,8 @@ func (w *CodeWriter) insertSep() {
 	w.printf("\n\n")
 }
 
-// WriteComment writes a comment block. All line starts are pre***REMOVED***xed with "//".
-// Initial empty lines are gobbled. The indentation for the ***REMOVED***rst line is
+// WriteComment writes a comment block. All line starts are prefixed with "//".
+// Initial empty lines are gobbled. The indentation for the first line is
 // stripped from consecutive lines.
 func (w *CodeWriter) WriteComment(comment string, args ...interface{}) {
 	s := fmt.Sprintf(comment, args...)
@@ -113,7 +113,7 @@ func (w *CodeWriter) WriteComment(comment string, args ...interface{}) {
 	w.printf("\n\n// ")
 	w.skipSep = true
 
-	// strip ***REMOVED***rst indent level.
+	// strip first indent level.
 	sep := "\n"
 	for ; len(s) > 0 && (s[0] == '\t' || s[0] == ' '); s = s[1:] {
 		sep += s[:1]
@@ -288,7 +288,7 @@ func (w *CodeWriter) writeSlice(x interface{}, isArray bool) {
 	}
 	if isArray {
 		w.printf("%s{\n", name)
-	} ***REMOVED*** {
+	} else {
 		w.printf("%s{ // %d elements\n", name, v.Len())
 	}
 
@@ -350,7 +350,7 @@ func (w *CodeWriter) writeSlice(x interface{}, isArray bool) {
 	w.printf("}")
 }
 
-// WriteType writes a de***REMOVED***nition of the type of the given value and returns the
+// WriteType writes a definition of the type of the given value and returns the
 // type name.
 func (w *CodeWriter) WriteType(x interface{}) string {
 	t := reflect.TypeOf(x)

@@ -1,6 +1,6 @@
 // Copyright 2016 The Go Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE ***REMOVED***le.
+// license that can be found in the LICENSE file.
 
 // +build go1.7
 
@@ -21,7 +21,7 @@ type contextContext interface {
 func serverConnBaseContext(c net.Conn, opts *ServeConnOpts) (ctx contextContext, cancel func()) {
 	ctx, cancel = context.WithCancel(context.Background())
 	ctx = context.WithValue(ctx, http.LocalAddrContextKey, c.LocalAddr())
-	if hs := opts.baseCon***REMOVED***g(); hs != nil {
+	if hs := opts.baseConfig(); hs != nil {
 		ctx = context.WithValue(ctx, http.ServerContextKey, hs)
 	}
 	return

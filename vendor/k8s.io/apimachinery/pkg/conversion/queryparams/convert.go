@@ -2,7 +2,7 @@
 Copyright 2014 The Kubernetes Authors.
 
 Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this ***REMOVED***le except in compliance with the License.
+you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
 
     http://www.apache.org/licenses/LICENSE-2.0
@@ -10,7 +10,7 @@ You may obtain a copy of the License at
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the speci***REMOVED***c language governing permissions and
+See the License for the specific language governing permissions and
 limitations under the License.
 */
 
@@ -33,8 +33,8 @@ type Unmarshaler interface {
 	UnmarshalQueryParameter(string) error
 }
 
-func jsonTag(***REMOVED***eld reflect.StructField) (string, bool) {
-	structTag := ***REMOVED***eld.Tag.Get("json")
+func jsonTag(field reflect.StructField) (string, bool) {
+	structTag := field.Tag.Get("json")
 	if len(structTag) == 0 {
 		return "", false
 	}
@@ -95,7 +95,7 @@ func customMarshalValue(value reflect.Value) (reflect.Value, bool) {
 			if !ok {
 				return reflect.Value{}, false
 			}
-		} ***REMOVED*** {
+		} else {
 			return reflect.Value{}, false
 		}
 	}
@@ -153,7 +153,7 @@ func Convert(obj interface{}) (url.Values, error) {
 		return nil, fmt.Errorf("expecting a pointer to a struct")
 	}
 
-	// Check all object ***REMOVED***elds
+	// Check all object fields
 	convertStruct(result, st, sv)
 
 	return result, nil
@@ -161,20 +161,20 @@ func Convert(obj interface{}) (url.Values, error) {
 
 func convertStruct(result url.Values, st reflect.Type, sv reflect.Value) {
 	for i := 0; i < st.NumField(); i++ {
-		***REMOVED***eld := sv.Field(i)
+		field := sv.Field(i)
 		tag, omitempty := jsonTag(st.Field(i))
 		if len(tag) == 0 {
 			continue
 		}
-		ft := ***REMOVED***eld.Type()
+		ft := field.Type()
 
 		kind := ft.Kind()
 		if isPointerKind(kind) {
 			ft = ft.Elem()
 			kind = ft.Kind()
-			if !***REMOVED***eld.IsNil() {
-				***REMOVED***eld = reflect.Indirect(***REMOVED***eld)
-				// If the ***REMOVED***eld is non-nil, it should be added to params
+			if !field.IsNil() {
+				field = reflect.Indirect(field)
+				// If the field is non-nil, it should be added to params
 				// and the omitempty should be overwite to false
 				omitempty = false
 			}
@@ -182,16 +182,16 @@ func convertStruct(result url.Values, st reflect.Type, sv reflect.Value) {
 
 		switch {
 		case isValueKind(kind):
-			addParam(result, tag, omitempty, ***REMOVED***eld)
+			addParam(result, tag, omitempty, field)
 		case kind == reflect.Array || kind == reflect.Slice:
 			if isValueKind(ft.Elem().Kind()) {
-				addListOfParams(result, tag, omitempty, ***REMOVED***eld)
+				addListOfParams(result, tag, omitempty, field)
 			}
-		case isStructKind(kind) && !(zeroValue(***REMOVED***eld) && omitempty):
-			if marshalValue, ok := customMarshalValue(***REMOVED***eld); ok {
+		case isStructKind(kind) && !(zeroValue(field) && omitempty):
+			if marshalValue, ok := customMarshalValue(field); ok {
 				addParam(result, tag, omitempty, marshalValue)
-			} ***REMOVED*** {
-				convertStruct(result, ft, ***REMOVED***eld)
+			} else {
+				convertStruct(result, ft, field)
 			}
 		}
 	}

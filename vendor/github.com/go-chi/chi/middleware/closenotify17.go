@@ -15,9 +15,9 @@ import (
 // on 1.8+ and exists just for backwards compatibility.
 func CloseNotify(next http.Handler) http.Handler {
 	fn := func(w http.ResponseWriter, r *http.Request) {
-		cn, ok := w.(http.CloseNoti***REMOVED***er)
+		cn, ok := w.(http.CloseNotifier)
 		if !ok {
-			panic("chi/middleware: CloseNotify expects http.ResponseWriter to implement http.CloseNoti***REMOVED***er interface")
+			panic("chi/middleware: CloseNotify expects http.ResponseWriter to implement http.CloseNotifier interface")
 		}
 		closeNotifyCh := cn.CloseNotify()
 

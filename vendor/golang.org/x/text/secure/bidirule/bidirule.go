@@ -1,8 +1,8 @@
 // Copyright 2016 The Go Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE ***REMOVED***le.
+// license that can be found in the LICENSE file.
 
-// Package bidirule implements the Bidi Rule de***REMOVED***ned by RFC 5893.
+// Package bidirule implements the Bidi Rule defined by RFC 5893.
 //
 // This package is under development. The API may change without notice and
 // without preserving backward compatibility.
@@ -16,7 +16,7 @@ import (
 	"golang.org/x/text/unicode/bidi"
 )
 
-// This ***REMOVED***le contains an implementation of RFC 5893: Right-to-Left Scripts for
+// This file contains an implementation of RFC 5893: Right-to-Left Scripts for
 // Internationalized Domain Names for Applications (IDNA)
 //
 // A label is an individual component of a domain name.  Labels are usually
@@ -31,12 +31,12 @@ import (
 //  The following guarantees can be made based on the above:
 //
 //  o  In a domain name consisting of only labels that satisfy the rule,
-//     the requirements of Section 3 are satis***REMOVED***ed.  Note that even LTR
+//     the requirements of Section 3 are satisfied.  Note that even LTR
 //     labels and pure ASCII labels have to be tested.
 //
-//  o  In a domain name consisting of only LDH labels (as de***REMOVED***ned in the
-//     De***REMOVED***nitions document [RFC5890]) and labels that satisfy the rule,
-//     the requirements of Section 3 are satis***REMOVED***ed as long as a label
+//  o  In a domain name consisting of only LDH labels (as defined in the
+//     Definitions document [RFC5890]) and labels that satisfy the rule,
+//     the requirements of Section 3 are satisfied as long as a label
 //     that starts with an ASCII digit does not come after a
 //     right-to-left label.
 //
@@ -62,7 +62,7 @@ type ruleTransition struct {
 }
 
 var transitions = [...][2]ruleTransition{
-	// [2.1] The ***REMOVED***rst character must be a character with Bidi property L, R, or
+	// [2.1] The first character must be a character with Bidi property L, R, or
 	// AL. If it has the R or AL property, it is an RTL label; if it has the L
 	// property, it is an LTR label.
 	ruleInitial: {
@@ -129,7 +129,7 @@ const exclusiveRTL = uint16(1<<bidi.EN | 1<<bidi.AN)
 //
 // An LTR label is any label that is not an RTL label.
 
-// Direction reports the direction of the given label as de***REMOVED***ned by RFC 5893.
+// Direction reports the direction of the given label as defined by RFC 5893.
 // The Bidi Rule does not have to be applied to labels of the category
 // LeftToRight.
 func Direction(b []byte) bidi.Direction {
@@ -147,7 +147,7 @@ func Direction(b []byte) bidi.Direction {
 	return bidi.LeftToRight
 }
 
-// DirectionString reports the direction of the given label as de***REMOVED***ned by RFC
+// DirectionString reports the direction of the given label as defined by RFC
 // 5893. The Bidi Rule does not have to be applied to labels of the category
 // LeftToRight.
 func DirectionString(s string) bidi.Direction {
@@ -184,7 +184,7 @@ func ValidString(s string) bool {
 	return t.isFinal()
 }
 
-// New returns a Transformer that veri***REMOVED***es that input adheres to the Bidi Rule.
+// New returns a Transformer that verifies that input adheres to the Bidi Rule.
 func New() *Transformer {
 	return &Transformer{}
 }
@@ -222,7 +222,7 @@ func (t *Transformer) Transform(dst, src []byte, atEOF bool) (nDst, nSrc int, er
 	return n, n, err
 }
 
-// Span returns the ***REMOVED***rst n bytes of src that conform to the Bidi rule.
+// Span returns the first n bytes of src that conform to the Bidi rule.
 func (t *Transformer) Span(src []byte, atEOF bool) (n int, err error) {
 	if t.state == ruleInvalid && t.isRTL() {
 		return 0, ErrInvalid
@@ -260,7 +260,7 @@ func (t *Transformer) advance(s []byte) (n int, ok bool) {
 	for n < len(s) {
 		if s[n] < utf8.RuneSelf {
 			e, sz = asciiTable[s[n]], 1
-		} ***REMOVED*** {
+		} else {
 			e, sz = bidi.Lookup(s[n:])
 			if sz <= 1 {
 				if sz == 1 {
@@ -302,7 +302,7 @@ func (t *Transformer) advanceString(s string) (n int, ok bool) {
 	for n < len(s) {
 		if s[n] < utf8.RuneSelf {
 			e, sz = asciiTable[s[n]], 1
-		} ***REMOVED*** {
+		} else {
 			e, sz = bidi.LookupString(s[n:])
 			if sz <= 1 {
 				if sz == 1 {

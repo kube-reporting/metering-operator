@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: Secret
 metadata:
-  name: "{{ .Values.hadoop.spec.con***REMOVED***gSecretName }}"
+  name: "{{ .Values.hadoop.spec.configSecretName }}"
 data:
 {{- if .Values.hadoop.spec.hdfs.enabled }}
   hdfs-site.xml: {{ include "hdfs-site-xml" . | b64enc }}

@@ -1,15 +1,15 @@
 // Copyright 2013 The Go Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE ***REMOVED***le.
+// license that can be found in the LICENSE file.
 
 package colltab // import "golang.org/x/text/internal/colltab"
 
 // A Weighter can be used as a source for Collator and Searcher.
 type Weighter interface {
-	// Start ***REMOVED***nds the start of the segment that includes position p.
+	// Start finds the start of the segment that includes position p.
 	Start(p int, b []byte) int
 
-	// StartString ***REMOVED***nds the start of the segment that includes position p.
+	// StartString finds the start of the segment that includes position p.
 	StartString(p int, s string) int
 
 	// AppendNext appends Elems to buf corresponding to the longest match
@@ -23,7 +23,7 @@ type Weighter interface {
 	AppendNextString(buf []Elem, s string) (ce []Elem, n int)
 
 	// Domain returns a slice of all single characters and contractions for which
-	// collation elements are de***REMOVED***ned in this table.
+	// collation elements are defined in this table.
 	Domain() []string
 
 	// Top returns the highest variable primary value.

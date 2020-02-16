@@ -2,7 +2,7 @@
 Copyright The Kubernetes Authors.
 
 Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this ***REMOVED***le except in compliance with the License.
+you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
 
     http://www.apache.org/licenses/LICENSE-2.0
@@ -10,13 +10,13 @@ You may obtain a copy of the License at
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the speci***REMOVED***c language governing permissions and
+See the License for the specific language governing permissions and
 limitations under the License.
 */
 
 package v1alpha1
 
-// This ***REMOVED***le contains a collection of methods that can be used from go-restful to
+// This file contains a collection of methods that can be used from go-restful to
 // generate Swagger API documentation for its models. Please read this PR for more
 // information on the implementation: https://github.com/emicklei/go-restful/pull/215
 //
@@ -29,7 +29,7 @@ package v1alpha1
 // AUTO-GENERATED FUNCTIONS START HERE. DO NOT EDIT.
 var map_Initializer = map[string]string{
 	"":      "Initializer describes the name and the failure policy of an initializer, and what resources it applies to.",
-	"name":  "Name is the identi***REMOVED***er of the initializer. It will be added to the object that needs to be initialized. Name should be fully quali***REMOVED***ed, e.g., alwayspullimages.kubernetes.io, where \"alwayspullimages\" is the name of the webhook, and kubernetes.io is the name of the organization. Required",
+	"name":  "Name is the identifier of the initializer. It will be added to the object that needs to be initialized. Name should be fully qualified, e.g., alwayspullimages.kubernetes.io, where \"alwayspullimages\" is the name of the webhook, and kubernetes.io is the name of the organization. Required",
 	"rules": "Rules describes what resources/subresources the initializer cares about. The initializer cares about an operation if it matches _any_ Rule. Rule.Resources must not include subresources.",
 }
 
@@ -37,24 +37,24 @@ func (Initializer) SwaggerDoc() map[string]string {
 	return map_Initializer
 }
 
-var map_InitializerCon***REMOVED***guration = map[string]string{
-	"":             "InitializerCon***REMOVED***guration describes the con***REMOVED***guration of initializers.",
+var map_InitializerConfiguration = map[string]string{
+	"":             "InitializerConfiguration describes the configuration of initializers.",
 	"metadata":     "Standard object metadata; More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#metadata.",
-	"initializers": "Initializers is a list of resources and their default initializers Order-sensitive. When merging multiple InitializerCon***REMOVED***gurations, we sort the initializers from different InitializerCon***REMOVED***gurations by the name of the InitializerCon***REMOVED***gurations; the order of the initializers from the same InitializerCon***REMOVED***guration is preserved.",
+	"initializers": "Initializers is a list of resources and their default initializers Order-sensitive. When merging multiple InitializerConfigurations, we sort the initializers from different InitializerConfigurations by the name of the InitializerConfigurations; the order of the initializers from the same InitializerConfiguration is preserved.",
 }
 
-func (InitializerCon***REMOVED***guration) SwaggerDoc() map[string]string {
-	return map_InitializerCon***REMOVED***guration
+func (InitializerConfiguration) SwaggerDoc() map[string]string {
+	return map_InitializerConfiguration
 }
 
-var map_InitializerCon***REMOVED***gurationList = map[string]string{
-	"":         "InitializerCon***REMOVED***gurationList is a list of InitializerCon***REMOVED***guration.",
+var map_InitializerConfigurationList = map[string]string{
+	"":         "InitializerConfigurationList is a list of InitializerConfiguration.",
 	"metadata": "Standard list metadata. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#types-kinds",
-	"items":    "List of InitializerCon***REMOVED***guration.",
+	"items":    "List of InitializerConfiguration.",
 }
 
-func (InitializerCon***REMOVED***gurationList) SwaggerDoc() map[string]string {
-	return map_InitializerCon***REMOVED***gurationList
+func (InitializerConfigurationList) SwaggerDoc() map[string]string {
+	return map_InitializerConfigurationList
 }
 
 var map_Rule = map[string]string{

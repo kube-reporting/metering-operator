@@ -1,12 +1,12 @@
 /*
 Package semver provides the ability to work with Semantic Versions (http://semver.org) in Go.
 
-Speci***REMOVED***cally it provides the ability to:
+Specifically it provides the ability to:
 
     * Parse semantic versions
     * Sort semantic versions
-    * Check if a semantic version ***REMOVED***ts within a set of constraints
-    * Optionally work with a `v` pre***REMOVED***x
+    * Check if a semantic version fits within a set of constraints
+    * Optionally work with a `v` prefix
 
 Parsing Semantic Versions
 
@@ -73,7 +73,7 @@ The basic comparisons are:
 
 Hyphen Range Comparisons
 
-There are multiple methods to handle ranges and the ***REMOVED***rst is hyphens ranges.
+There are multiple methods to handle ranges and the first is hyphens ranges.
 These look like:
 
     * `1.2 - 1.4.5` which is equivalent to `>= 1.2, <= 1.4.5`
@@ -93,7 +93,7 @@ back to the pack level comparison (see tilde below). For example,
 Tilde Range Comparisons (Patch)
 
 The tilde (`~`) comparison operator is for patch level ranges when a minor
-version is speci***REMOVED***ed and major level changes when the minor number is missing.
+version is specified and major level changes when the minor number is missing.
 For example,
 
     * `~1.2.3` is equivalent to `>= 1.2.3, < 1.3.0`

@@ -37,7 +37,7 @@ The repository much be located at:
 $GOPATH/src/github.com/operator-framework/operator-metering
 ```
 
-When cloning this repository, you can run the following commands to ensure that the project ***REMOVED***les are stored in the right location:
+When cloning this repository, you can run the following commands to ensure that the project files are stored in the right location:
 
 ```
 mkdir -p $GOPATH/src/github.com/operator-framework/
@@ -77,16 +77,16 @@ make verify
 ### Running e2e/integration tests locally
 
 There's 2 ways to run integration and e2e tests locally.
-The ***REMOVED***rst option runs the main operators locally (and the rest of the components into the cluster), and runs tests against the local reporting-operator, and the second option deploys everything into the cluster, and runs tests against the reporting-operator in the cluster.
+The first option runs the main operators locally (and the rest of the components into the cluster), and runs tests against the local reporting-operator, and the second option deploys everything into the cluster, and runs tests against the reporting-operator in the cluster.
 
-The ***REMOVED***rst option can be broken down in a few steps:
+The first option can be broken down in a few steps:
 
 - Build the metering-operator docker image
 - Build the reporting-operator binary locally
 - Run a customized manual install for tests, skipping metering-operator and reporting-operator
 - Run metering-operator locally via Docker
 - Run reporting-operator locally as a native Go binary
-- Con***REMOVED***gure everything to properly communicate
+- Configure everything to properly communicate
 - Run tests against the local reporting-operator
 
 You can run one of the following commands to run either e2e or integration tests locally which will do the above steps, testing against a local reporting-operator:
@@ -138,16 +138,16 @@ When committing new dependencies, please use the following guidelines:
 
 ## Helm templates
 
-If you have added a new Helm Chart and would like to render the template to check the values and nesting within the yaml ***REMOVED***le you can run:
+If you have added a new Helm Chart and would like to render the template to check the values and nesting within the yaml file you can run:
 
 ```
-helm template CHART_DIR -x PATH_TO_TEMPLATE/***REMOVED***le.yaml
+helm template CHART_DIR -x PATH_TO_TEMPLATE/file.yaml
 ```
 
 ## Developer install
 
 Developers should generally use the [manual-install guide](../manual-install.md) as it offers the most flexibility when installing.
-If you need a minimal storage con***REMOVED***guration with no external dependencies, use the [manifests/metering-con***REMOVED***g/hdfs-minimal.yaml](manifests/metering-con***REMOVED***g/hdfs-minimal.yaml) example con***REMOVED***guration.
+If you need a minimal storage configuration with no external dependencies, use the [manifests/metering-config/hdfs-minimal.yaml](manifests/metering-config/hdfs-minimal.yaml) example configuration.
 
 ### Testing OCP images
 

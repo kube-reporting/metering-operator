@@ -1,6 +1,6 @@
 // Copyright 2014 The Go Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE ***REMOVED***le.
+// license that can be found in the LICENSE file.
 
 package http2
 
@@ -15,10 +15,10 @@ func NewRandomWriteScheduler() WriteScheduler {
 }
 
 type randomWriteScheduler struct {
-	// zero are frames not associated with a speci***REMOVED***c stream.
+	// zero are frames not associated with a specific stream.
 	zero writeQueue
 
-	// sq contains the stream-speci***REMOVED***c queues, keyed by stream ID.
+	// sq contains the stream-specific queues, keyed by stream ID.
 	// When a stream is idle or closed, it's deleted from the map.
 	sq map[uint32]*writeQueue
 
@@ -58,11 +58,11 @@ func (ws *randomWriteScheduler) Push(wr FrameWriteRequest) {
 }
 
 func (ws *randomWriteScheduler) Pop() (FrameWriteRequest, bool) {
-	// Control frames ***REMOVED***rst.
+	// Control frames first.
 	if !ws.zero.empty() {
 		return ws.zero.shift(), true
 	}
-	// Iterate over all non-idle streams until ***REMOVED***nding one that can be consumed.
+	// Iterate over all non-idle streams until finding one that can be consumed.
 	for _, q := range ws.sq {
 		if wr, ok := q.consume(math.MaxInt32); ok {
 			return wr, true

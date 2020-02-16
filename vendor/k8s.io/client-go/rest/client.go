@@ -2,7 +2,7 @@
 Copyright 2014 The Kubernetes Authors.
 
 Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this ***REMOVED***le except in compliance with the License.
+you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
 
     http://www.apache.org/licenses/LICENSE-2.0
@@ -10,7 +10,7 @@ You may obtain a copy of the License at
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the speci***REMOVED***c language governing permissions and
+See the License for the specific language governing permissions and
 limitations under the License.
 */
 
@@ -64,8 +64,8 @@ type RESTClient struct {
 	// versionedAPIPath is a path segment connecting the base URL to the resource root
 	versionedAPIPath string
 
-	// contentCon***REMOVED***g is the information used to communicate with the server.
-	contentCon***REMOVED***g ContentCon***REMOVED***g
+	// contentConfig is the information used to communicate with the server.
+	contentConfig ContentConfig
 
 	// serializers contain all serializers for underlying content type.
 	serializers Serializers
@@ -76,7 +76,7 @@ type RESTClient struct {
 	// TODO extract this into a wrapper interface via the RESTClient interface in kubectl.
 	Throttle flowcontrol.RateLimiter
 
-	// Set speci***REMOVED***c behavior of the client.  If not set http.DefaultClient will be used.
+	// Set specific behavior of the client.  If not set http.DefaultClient will be used.
 	Client *http.Client
 }
 
@@ -89,23 +89,23 @@ type Serializers struct {
 }
 
 // NewRESTClient creates a new RESTClient. This client performs generic REST functions
-// such as Get, Put, Post, and Delete on speci***REMOVED***ed paths.  Codec controls encoding and
+// such as Get, Put, Post, and Delete on specified paths.  Codec controls encoding and
 // decoding of responses from the server.
-func NewRESTClient(baseURL *url.URL, versionedAPIPath string, con***REMOVED***g ContentCon***REMOVED***g, maxQPS float32, maxBurst int, rateLimiter flowcontrol.RateLimiter, client *http.Client) (*RESTClient, error) {
+func NewRESTClient(baseURL *url.URL, versionedAPIPath string, config ContentConfig, maxQPS float32, maxBurst int, rateLimiter flowcontrol.RateLimiter, client *http.Client) (*RESTClient, error) {
 	base := *baseURL
-	if !strings.HasSuf***REMOVED***x(base.Path, "/") {
+	if !strings.HasSuffix(base.Path, "/") {
 		base.Path += "/"
 	}
 	base.RawQuery = ""
 	base.Fragment = ""
 
-	if con***REMOVED***g.GroupVersion == nil {
-		con***REMOVED***g.GroupVersion = &schema.GroupVersion{}
+	if config.GroupVersion == nil {
+		config.GroupVersion = &schema.GroupVersion{}
 	}
-	if len(con***REMOVED***g.ContentType) == 0 {
-		con***REMOVED***g.ContentType = "application/json"
+	if len(config.ContentType) == 0 {
+		config.ContentType = "application/json"
 	}
-	serializers, err := createSerializers(con***REMOVED***g)
+	serializers, err := createSerializers(config)
 	if err != nil {
 		return nil, err
 	}
@@ -113,15 +113,15 @@ func NewRESTClient(baseURL *url.URL, versionedAPIPath string, con***REMOVED***g 
 	var throttle flowcontrol.RateLimiter
 	if maxQPS > 0 && rateLimiter == nil {
 		throttle = flowcontrol.NewTokenBucketRateLimiter(maxQPS, maxBurst)
-	} ***REMOVED*** if rateLimiter != nil {
+	} else if rateLimiter != nil {
 		throttle = rateLimiter
 	}
 	return &RESTClient{
 		base:             &base,
 		versionedAPIPath: versionedAPIPath,
-		contentCon***REMOVED***g:    con***REMOVED***g,
+		contentConfig:    config,
 		serializers:      *serializers,
-		createBackoffMgr: readExpBackoffCon***REMOVED***g,
+		createBackoffMgr: readExpBackoffConfig,
 		Throttle:         throttle,
 		Client:           client,
 	}, nil
@@ -135,10 +135,10 @@ func (c *RESTClient) GetRateLimiter() flowcontrol.RateLimiter {
 	return c.Throttle
 }
 
-// readExpBackoffCon***REMOVED***g handles the internal logic of determining what the
+// readExpBackoffConfig handles the internal logic of determining what the
 // backoff policy is.  By default if no information is available, NoBackoff.
 // TODO Generalize this see #17727 .
-func readExpBackoffCon***REMOVED***g() BackoffManager {
+func readExpBackoffConfig() BackoffManager {
 	backoffBase := os.Getenv(envBackoffBase)
 	backoffDuration := os.Getenv(envBackoffDuration)
 
@@ -158,12 +158,12 @@ func readExpBackoffCon***REMOVED***g() BackoffManager {
 //   serializers that control decoding and versioning without this package
 //   being aware of the types. Depends on whether RESTClient must deal with
 //   generic infrastructure.
-func createSerializers(con***REMOVED***g ContentCon***REMOVED***g) (*Serializers, error) {
-	mediaTypes := con***REMOVED***g.NegotiatedSerializer.SupportedMediaTypes()
-	contentType := con***REMOVED***g.ContentType
+func createSerializers(config ContentConfig) (*Serializers, error) {
+	mediaTypes := config.NegotiatedSerializer.SupportedMediaTypes()
+	contentType := config.ContentType
 	mediaType, _, err := mime.ParseMediaType(contentType)
 	if err != nil {
-		return nil, fmt.Errorf("the content type speci***REMOVED***ed in the client con***REMOVED***guration is not recognized: %v", err)
+		return nil, fmt.Errorf("the content type specified in the client configuration is not recognized: %v", err)
 	}
 	info, ok := runtime.SerializerInfoForMediaType(mediaTypes, mediaType)
 	if !ok {
@@ -175,7 +175,7 @@ func createSerializers(con***REMOVED***g ContentCon***REMOVED***g) (*Serializers
 
 	internalGV := schema.GroupVersions{
 		{
-			Group:   con***REMOVED***g.GroupVersion.Group,
+			Group:   config.GroupVersion.Group,
 			Version: runtime.APIVersionInternal,
 		},
 		// always include the legacy group as a decoding target to handle non-error `Status` return types
@@ -186,15 +186,15 @@ func createSerializers(con***REMOVED***g ContentCon***REMOVED***g) (*Serializers
 	}
 
 	s := &Serializers{
-		Encoder: con***REMOVED***g.NegotiatedSerializer.EncoderForVersion(info.Serializer, *con***REMOVED***g.GroupVersion),
-		Decoder: con***REMOVED***g.NegotiatedSerializer.DecoderToVersion(info.Serializer, internalGV),
+		Encoder: config.NegotiatedSerializer.EncoderForVersion(info.Serializer, *config.GroupVersion),
+		Decoder: config.NegotiatedSerializer.DecoderToVersion(info.Serializer, internalGV),
 
 		RenegotiatedDecoder: func(contentType string, params map[string]string) (runtime.Decoder, error) {
 			info, ok := runtime.SerializerInfoForMediaType(mediaTypes, contentType)
 			if !ok {
 				return nil, fmt.Errorf("serializer for %s not registered", contentType)
 			}
-			return con***REMOVED***g.NegotiatedSerializer.DecoderToVersion(info.Serializer, internalGV), nil
+			return config.NegotiatedSerializer.DecoderToVersion(info.Serializer, internalGV), nil
 		},
 	}
 	if info.StreamSerializer != nil {
@@ -222,9 +222,9 @@ func (c *RESTClient) Verb(verb string) *Request {
 	backoff := c.createBackoffMgr()
 
 	if c.Client == nil {
-		return NewRequest(nil, verb, c.base, c.versionedAPIPath, c.contentCon***REMOVED***g, c.serializers, backoff, c.Throttle, 0)
+		return NewRequest(nil, verb, c.base, c.versionedAPIPath, c.contentConfig, c.serializers, backoff, c.Throttle, 0)
 	}
-	return NewRequest(c.Client, verb, c.base, c.versionedAPIPath, c.contentCon***REMOVED***g, c.serializers, backoff, c.Throttle, c.Client.Timeout)
+	return NewRequest(c.Client, verb, c.base, c.versionedAPIPath, c.contentConfig, c.serializers, backoff, c.Throttle, c.Client.Timeout)
 }
 
 // Post begins a POST request. Short for c.Verb("POST").
@@ -254,5 +254,5 @@ func (c *RESTClient) Delete() *Request {
 
 // APIVersion returns the APIVersion this RESTClient is expected to use.
 func (c *RESTClient) APIVersion() schema.GroupVersion {
-	return *c.contentCon***REMOVED***g.GroupVersion
+	return *c.contentConfig.GroupVersion
 }

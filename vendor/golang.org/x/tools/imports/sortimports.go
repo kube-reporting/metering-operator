@@ -1,6 +1,6 @@
 // Copyright 2013 The Go Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE ***REMOVED***le.
+// license that can be found in the LICENSE file.
 
 // Hacked up copy of go/ast/import.go
 
@@ -20,7 +20,7 @@ func sortImports(fset *token.FileSet, f *ast.File) {
 		d, ok := d.(*ast.GenDecl)
 		if !ok || d.Tok != token.IMPORT {
 			// Not an import declaration, so we're done.
-			// Imports are always ***REMOVED***rst.
+			// Imports are always first.
 			break
 		}
 
@@ -110,7 +110,7 @@ func sortSpecs(fset *token.FileSet, f *ast.File, specs []ast.Spec) []ast.Spec {
 	}
 
 	// Identify comments in this range.
-	// Any comment from pos[0].Start to the ***REMOVED***nal line counts.
+	// Any comment from pos[0].Start to the final line counts.
 	lastLine := fset.Position(pos[len(pos)-1].End).Line
 	cstart := len(f.Comments)
 	cend := len(f.Comments)
@@ -152,7 +152,7 @@ func sortSpecs(fset *token.FileSet, f *ast.File, specs []ast.Spec) []ast.Spec {
 	for i, s := range specs {
 		if i == len(specs)-1 || !collapse(s, specs[i+1]) {
 			deduped = append(deduped, s)
-		} ***REMOVED*** {
+		} else {
 			p := s.Pos()
 			fset.File(p).MergeLine(fset.Position(p).Line)
 		}

@@ -4,7 +4,7 @@
 // https://github.com/golang/protobuf
 //
 // Redistribution and use in source and binary forms, with or without
-// modi***REMOVED***cation, are permitted provided that the following conditions are
+// modification, are permitted provided that the following conditions are
 // met:
 //
 //     * Redistributions of source code must retain the above copyright
@@ -15,7 +15,7 @@
 // distribution.
 //     * Neither the name of Google Inc. nor the names of its
 // contributors may be used to endorse or promote products derived from
-// this software without speci***REMOVED***c prior written permission.
+// this software without specific prior written permission.
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
 // "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
@@ -44,30 +44,30 @@ import (
 Equal returns true iff protocol buffers a and b are equal.
 The arguments must both be pointers to protocol buffer structs.
 
-Equality is de***REMOVED***ned in this way:
+Equality is defined in this way:
   - Two messages are equal iff they are the same type,
-    corresponding ***REMOVED***elds are equal, unknown ***REMOVED***eld sets
+    corresponding fields are equal, unknown field sets
     are equal, and extensions sets are equal.
-  - Two set scalar ***REMOVED***elds are equal iff their values are equal.
-    If the ***REMOVED***elds are of a floating-point type, remember that
-    NaN != x for all x, including NaN. If the message is de***REMOVED***ned
-    in a proto3 .proto ***REMOVED***le, ***REMOVED***elds are not "set"; speci***REMOVED***cally,
-    zero length proto3 "bytes" ***REMOVED***elds are equal (nil == {}).
-  - Two repeated ***REMOVED***elds are equal iff their lengths are the same,
-    and their corresponding elements are equal. Note a "bytes" ***REMOVED***eld,
-    although represented by []byte, is not a repeated ***REMOVED***eld and the
-    rule for the scalar ***REMOVED***elds described above applies.
-  - Two unset ***REMOVED***elds are equal.
-  - Two unknown ***REMOVED***eld sets are equal if their current
+  - Two set scalar fields are equal iff their values are equal.
+    If the fields are of a floating-point type, remember that
+    NaN != x for all x, including NaN. If the message is defined
+    in a proto3 .proto file, fields are not "set"; specifically,
+    zero length proto3 "bytes" fields are equal (nil == {}).
+  - Two repeated fields are equal iff their lengths are the same,
+    and their corresponding elements are equal. Note a "bytes" field,
+    although represented by []byte, is not a repeated field and the
+    rule for the scalar fields described above applies.
+  - Two unset fields are equal.
+  - Two unknown field sets are equal if their current
     encoded state is equal.
   - Two extension sets are equal iff they have corresponding
     elements that are pairwise equal.
-  - Two map ***REMOVED***elds are equal iff their lengths are the same,
+  - Two map fields are equal iff their lengths are the same,
     and they contain the same set of elements. Zero-length map
-    ***REMOVED***elds are equal.
+    fields are equal.
   - Every other combination of things are not equal.
 
-The return value is unde***REMOVED***ned if a and b are not protocol buffers.
+The return value is undefined if a and b are not protocol buffers.
 */
 func Equal(a, b Message) bool {
 	if a == nil || b == nil {
@@ -97,7 +97,7 @@ func equalStruct(v1, v2 reflect.Value) bool {
 	sprop := GetProperties(v1.Type())
 	for i := 0; i < v1.NumField(); i++ {
 		f := v1.Type().Field(i)
-		if strings.HasPre***REMOVED***x(f.Name, "XXX_") {
+		if strings.HasPrefix(f.Name, "XXX_") {
 			continue
 		}
 		f1, f2 := v1.Field(i), v2.Field(i)
@@ -105,7 +105,7 @@ func equalStruct(v1, v2 reflect.Value) bool {
 			if n1, n2 := f1.IsNil(), f2.IsNil(); n1 && n2 {
 				// both unset
 				continue
-			} ***REMOVED*** if n1 != n2 {
+			} else if n1 != n2 {
 				// set/unset mismatch
 				return false
 			}
@@ -156,7 +156,7 @@ func equalAny(v1, v2 reflect.Value, prop *Properties) bool {
 	case reflect.Int32, reflect.Int64:
 		return v1.Int() == v2.Int()
 	case reflect.Interface:
-		// Probably a oneof ***REMOVED***eld; compare the inner values.
+		// Probably a oneof field; compare the inner values.
 		n1, n2 := v1.IsNil(), v2.IsNil()
 		if n1 || n2 {
 			return n1 == n2
@@ -195,7 +195,7 @@ func equalAny(v1, v2 reflect.Value, prop *Properties) bool {
 			// short circuit: []byte
 
 			// Edge case: if this is in a proto3 message, a zero length
-			// bytes ***REMOVED***eld is considered the zero value.
+			// bytes field is considered the zero value.
 			if prop != nil && prop.proto3 && v1.Len() == 0 && v2.Len() == 0 {
 				return true
 			}
@@ -266,7 +266,7 @@ func equalExtMap(base reflect.Type, em1, em2 map[int32]Extension) bool {
 		}
 
 		// At least one is encoded. To do a semantically correct comparison
-		// we need to unmarshal them ***REMOVED***rst.
+		// we need to unmarshal them first.
 		var desc *ExtensionDesc
 		if m := extensionMaps[base]; m != nil {
 			desc = m[extNum]

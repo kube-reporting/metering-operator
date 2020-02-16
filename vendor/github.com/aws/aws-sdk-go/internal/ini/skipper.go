@@ -1,8 +1,8 @@
 package ini
 
-// skipper is used to skip certain blocks of an ini ***REMOVED***le.
+// skipper is used to skip certain blocks of an ini file.
 // Currently skipper is used to skip nested blocks of ini
-// ***REMOVED***les. See example below
+// files. See example below
 //
 //	[ foo ]
 //	nested = ; this section will be skipped
@@ -22,7 +22,7 @@ func newSkipper() skipper {
 }
 
 func (s *skipper) ShouldSkip(tok Token) bool {
-	// should skip state will be modi***REMOVED***ed only if previous token was new line (NL);
+	// should skip state will be modified only if previous token was new line (NL);
 	// and the current token is not WhiteSpace (WS).
 	if s.shouldSkip &&
 		s.prevTok.Type() == TokenNL &&

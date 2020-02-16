@@ -3,7 +3,7 @@ package autorest
 // Copyright 2017 Microsoft Corporation
 //
 //  Licensed under the Apache License, Version 2.0 (the "License");
-//  you may not use this ***REMOVED***le except in compliance with the License.
+//  you may not use this file except in compliance with the License.
 //  You may obtain a copy of the License at
 //
 //      http://www.apache.org/licenses/LICENSE-2.0
@@ -11,7 +11,7 @@ package autorest
 //  Unless required by applicable law or agreed to in writing, software
 //  distributed under the License is distributed on an "AS IS" BASIS,
 //  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-//  See the License for the speci***REMOVED***c language governing permissions and
+//  See the License for the specific language governing permissions and
 //  limitations under the License.
 
 import (
@@ -40,18 +40,18 @@ const (
 	EncodedAsXML EncodedAs = "XML"
 )
 
-// Decoder de***REMOVED***nes the decoding method json.Decoder and xml.Decoder share
+// Decoder defines the decoding method json.Decoder and xml.Decoder share
 type Decoder interface {
 	Decode(v interface{}) error
 }
 
 // NewDecoder creates a new decoder appropriate to the passed encoding.
-// encodedAs speci***REMOVED***es the type of encoding and r supplies the io.Reader containing the
+// encodedAs specifies the type of encoding and r supplies the io.Reader containing the
 // encoded data.
 func NewDecoder(encodedAs EncodedAs, r io.Reader) Decoder {
 	if encodedAs == EncodedAsJSON {
 		return json.NewDecoder(r)
-	} ***REMOVED*** if encodedAs == EncodedAsXML {
+	} else if encodedAs == EncodedAsXML {
 		return xml.NewDecoder(r)
 	}
 	return nil
@@ -59,7 +59,7 @@ func NewDecoder(encodedAs EncodedAs, r io.Reader) Decoder {
 
 // CopyAndDecode decodes the data from the passed io.Reader while making a copy. Having a copy
 // is especially useful if there is a chance the data will fail to decode.
-// encodedAs speci***REMOVED***es the expected encoding, r provides the io.Reader to the data, and v
+// encodedAs specifies the expected encoding, r provides the io.Reader to the data, and v
 // is the decoding destination.
 func CopyAndDecode(encodedAs EncodedAs, r io.Reader, v interface{}) (bytes.Buffer, error) {
 	b := bytes.Buffer{}
@@ -133,7 +133,7 @@ func MapToValues(m map[string]interface{}) url.Values {
 			for i := 0; i < x.Len(); i++ {
 				v.Add(key, ensureValueString(x.Index(i)))
 			}
-		} ***REMOVED*** {
+		} else {
 			v.Add(key, ensureValueString(value))
 		}
 	}
@@ -158,7 +158,7 @@ func AsStringSlice(s interface{}) ([]string, error) {
 
 // String method converts interface v to string. If interface is a list, it
 // joins list elements using the separator. Note that only sep[0] will be used for
-// joining if any separator is speci***REMOVED***ed.
+// joining if any separator is specified.
 func String(v interface{}, sep ...string) string {
 	if len(sep) == 0 {
 		return ensureValueString(v)
@@ -195,9 +195,9 @@ func queryEscape(s string) string {
 	return url.QueryEscape(s)
 }
 
-// ChangeToGet turns the speci***REMOVED***ed http.Request into a GET (it assumes it wasn't).
+// ChangeToGet turns the specified http.Request into a GET (it assumes it wasn't).
 // This is mainly useful for long-running operations that use the Azure-AsyncOperation
-// header, so we change the initial PUT into a GET to retrieve the ***REMOVED***nal result.
+// header, so we change the initial PUT into a GET to retrieve the final result.
 func ChangeToGet(req *http.Request) *http.Request {
 	req.Method = "GET"
 	req.Body = nil
@@ -206,7 +206,7 @@ func ChangeToGet(req *http.Request) *http.Request {
 	return req
 }
 
-// IsTokenRefreshError returns true if the speci***REMOVED***ed error implements the TokenRefreshError
+// IsTokenRefreshError returns true if the specified error implements the TokenRefreshError
 // interface.  If err is a DetailedError it will walk the chain of Original errors.
 func IsTokenRefreshError(err error) bool {
 	if _, ok := err.(adal.TokenRefreshError); ok {
@@ -218,7 +218,7 @@ func IsTokenRefreshError(err error) bool {
 	return false
 }
 
-// IsTemporaryNetworkError returns true if the speci***REMOVED***ed error is a temporary network error or false
+// IsTemporaryNetworkError returns true if the specified error is a temporary network error or false
 // if it's not.  If the error doesn't implement the net.Error interface the return value is true.
 func IsTemporaryNetworkError(err error) bool {
 	if netErr, ok := err.(net.Error); !ok || (ok && netErr.Temporary()) {

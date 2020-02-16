@@ -20,11 +20,11 @@ var packages = map[string]map[string]reflect.Type{}
 
 func init() {
 	ver := runtime.Version()
-	if ver == "go1.5" || strings.HasPre***REMOVED***x(ver, "go1.5.") {
+	if ver == "go1.5" || strings.HasPrefix(ver, "go1.5.") {
 		loadGo15Types()
-	} ***REMOVED*** if ver == "go1.6" || strings.HasPre***REMOVED***x(ver, "go1.6.") {
+	} else if ver == "go1.6" || strings.HasPrefix(ver, "go1.6.") {
 		loadGo15Types()
-	} ***REMOVED*** {
+	} else {
 		loadGo17Types()
 	}
 }

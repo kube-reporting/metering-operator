@@ -1,31 +1,31 @@
-# Metering Con***REMOVED***guration
+# Metering Configuration
 
-Metering supports con***REMOVED***guration options which may be set in the `spec` section of the `MeteringCon***REMOVED***g` resource.
+Metering supports configuration options which may be set in the `spec` section of the `MeteringConfig` resource.
 
-**Note**: Metering does not support any default storage at this moment. If a storage con***REMOVED***guration is not speci***REMOVED***ed or improperly set, then it will fail the `MeteringCon***REMOVED***g` schema validation.
+**Note**: Metering does not support any default storage at this moment. If a storage configuration is not specified or improperly set, then it will fail the `MeteringConfig` schema validation.
 
-For details on different types of con***REMOVED***guration read the relevant document:
+For details on different types of configuration read the relevant document:
 
-- [common con***REMOVED***guration options](common-con***REMOVED***guration.md)
-  - [pod resource requests and limits](common-con***REMOVED***guration.md#resource-requests-and-limits)
-  - [node selectors](common-con***REMOVED***guration.md#node-selectors)
-  - [image repositories and tags](common-con***REMOVED***guration.md#image-repositories-and-tags)
-- [con***REMOVED***guring reporting-operator](con***REMOVED***guring-reporting-operator.md)
-  - [set Prometheus connection con***REMOVED***guration](con***REMOVED***guring-reporting-operator.md#prometheus-connection)
-  - [exposing the reporting API](con***REMOVED***guring-reporting-operator.md#exposing-the-reporting-api)
-  - [con***REMOVED***guring Authentication on Openshift](con***REMOVED***guring-reporting-operator.md#openshift-authentication)
-- [con***REMOVED***guring storage](con***REMOVED***guring-storage.md)
-  - [storing data in Amazon S3](con***REMOVED***guring-storage.md#storing-data-in-amazon-s3)
-- [con***REMOVED***guring the Hive metastore](con***REMOVED***guring-hive-metastore.md)
-- [con***REMOVED***guring aws billing correlation for cost correlation](con***REMOVED***guring-aws-billing.md)
+- [common configuration options](common-configuration.md)
+  - [pod resource requests and limits](common-configuration.md#resource-requests-and-limits)
+  - [node selectors](common-configuration.md#node-selectors)
+  - [image repositories and tags](common-configuration.md#image-repositories-and-tags)
+- [configuring reporting-operator](configuring-reporting-operator.md)
+  - [set Prometheus connection configuration](configuring-reporting-operator.md#prometheus-connection)
+  - [exposing the reporting API](configuring-reporting-operator.md#exposing-the-reporting-api)
+  - [configuring Authentication on Openshift](configuring-reporting-operator.md#openshift-authentication)
+- [configuring storage](configuring-storage.md)
+  - [storing data in Amazon S3](configuring-storage.md#storing-data-in-amazon-s3)
+- [configuring the Hive metastore](configuring-hive-metastore.md)
+- [configuring aws billing correlation for cost correlation](configuring-aws-billing.md)
 
 ## Documentation conventions
 
-This document and other documents in the operator-metering project follow the convention of describing nested ***REMOVED***elds in con***REMOVED***guration settings using dots as separators.
+This document and other documents in the operator-metering project follow the convention of describing nested fields in configuration settings using dots as separators.
 For example:
 
 ```
-spec.reporting-operator.spec.con***REMOVED***g.awsAccessKeyID
+spec.reporting-operator.spec.config.awsAccessKeyID
 ```
 
 Refers to the following YAML structure and value:
@@ -34,16 +34,16 @@ Refers to the following YAML structure and value:
 spec:
   reporting-operator:
     spec:
-      con***REMOVED***g:
+      config:
         awsAccessKeyID: "REPLACEME"
 ```
 
-## Using a custom con***REMOVED***guration
+## Using a custom configuration
 
 **Note**: Ensure the environment variable `$METERING_NAMESPACE` is properly set to the correct namespace.
 
-To install the custom con***REMOVED***guration ***REMOVED***le, run the following command:
+To install the custom configuration file, run the following command:
 
 ```
-kubectl -n $METERING_NAMESPACE apply -f manifests/metering-con***REMOVED***g/default.yaml
+kubectl -n $METERING_NAMESPACE apply -f manifests/metering-config/default.yaml
 ```

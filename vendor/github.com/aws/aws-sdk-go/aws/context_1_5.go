@@ -22,7 +22,7 @@ type Context interface {
 
 	// Err returns a non-nil error value after Done is closed. Err returns
 	// Canceled if the context was canceled or DeadlineExceeded if the
-	// context's deadline passed. No other values for Err are de***REMOVED***ned.
+	// context's deadline passed. No other values for Err are defined.
 	// After Done is closed, successive calls to Err return the same value.
 	Err() error
 

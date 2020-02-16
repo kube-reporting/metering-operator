@@ -2,7 +2,7 @@
 Copyright 2015 The Kubernetes Authors.
 
 Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this ***REMOVED***le except in compliance with the License.
+you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
 
     http://www.apache.org/licenses/LICENSE-2.0
@@ -10,7 +10,7 @@ You may obtain a copy of the License at
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the speci***REMOVED***c language governing permissions and
+See the License for the specific language governing permissions and
 limitations under the License.
 */
 
@@ -23,7 +23,7 @@ import (
 	"io/ioutil"
 	"os"
 	"path"
-	"path/***REMOVED***lepath"
+	"path/filepath"
 )
 
 func init() {
@@ -33,50 +33,50 @@ func init() {
 	dataOmittedBytes = []byte(string(sDec))
 }
 
-// IsCon***REMOVED***gEmpty returns true if the con***REMOVED***g is empty.
-func IsCon***REMOVED***gEmpty(con***REMOVED***g *Con***REMOVED***g) bool {
-	return len(con***REMOVED***g.AuthInfos) == 0 && len(con***REMOVED***g.Clusters) == 0 && len(con***REMOVED***g.Contexts) == 0 &&
-		len(con***REMOVED***g.CurrentContext) == 0 &&
-		len(con***REMOVED***g.Preferences.Extensions) == 0 && !con***REMOVED***g.Preferences.Colors &&
-		len(con***REMOVED***g.Extensions) == 0
+// IsConfigEmpty returns true if the config is empty.
+func IsConfigEmpty(config *Config) bool {
+	return len(config.AuthInfos) == 0 && len(config.Clusters) == 0 && len(config.Contexts) == 0 &&
+		len(config.CurrentContext) == 0 &&
+		len(config.Preferences.Extensions) == 0 && !config.Preferences.Colors &&
+		len(config.Extensions) == 0
 }
 
-// MinifyCon***REMOVED***g read the current context and uses that to keep only the relevant pieces of con***REMOVED***g
-// This is useful for making secrets based on kubecon***REMOVED***g ***REMOVED***les
-func MinifyCon***REMOVED***g(con***REMOVED***g *Con***REMOVED***g) error {
-	if len(con***REMOVED***g.CurrentContext) == 0 {
+// MinifyConfig read the current context and uses that to keep only the relevant pieces of config
+// This is useful for making secrets based on kubeconfig files
+func MinifyConfig(config *Config) error {
+	if len(config.CurrentContext) == 0 {
 		return errors.New("current-context must exist in order to minify")
 	}
 
-	currContext, exists := con***REMOVED***g.Contexts[con***REMOVED***g.CurrentContext]
+	currContext, exists := config.Contexts[config.CurrentContext]
 	if !exists {
-		return fmt.Errorf("cannot locate context %v", con***REMOVED***g.CurrentContext)
+		return fmt.Errorf("cannot locate context %v", config.CurrentContext)
 	}
 
 	newContexts := map[string]*Context{}
-	newContexts[con***REMOVED***g.CurrentContext] = currContext
+	newContexts[config.CurrentContext] = currContext
 
 	newClusters := map[string]*Cluster{}
 	if len(currContext.Cluster) > 0 {
-		if _, exists := con***REMOVED***g.Clusters[currContext.Cluster]; !exists {
+		if _, exists := config.Clusters[currContext.Cluster]; !exists {
 			return fmt.Errorf("cannot locate cluster %v", currContext.Cluster)
 		}
 
-		newClusters[currContext.Cluster] = con***REMOVED***g.Clusters[currContext.Cluster]
+		newClusters[currContext.Cluster] = config.Clusters[currContext.Cluster]
 	}
 
 	newAuthInfos := map[string]*AuthInfo{}
 	if len(currContext.AuthInfo) > 0 {
-		if _, exists := con***REMOVED***g.AuthInfos[currContext.AuthInfo]; !exists {
+		if _, exists := config.AuthInfos[currContext.AuthInfo]; !exists {
 			return fmt.Errorf("cannot locate user %v", currContext.AuthInfo)
 		}
 
-		newAuthInfos[currContext.AuthInfo] = con***REMOVED***g.AuthInfos[currContext.AuthInfo]
+		newAuthInfos[currContext.AuthInfo] = config.AuthInfos[currContext.AuthInfo]
 	}
 
-	con***REMOVED***g.AuthInfos = newAuthInfos
-	con***REMOVED***g.Clusters = newClusters
-	con***REMOVED***g.Contexts = newContexts
+	config.AuthInfos = newAuthInfos
+	config.Clusters = newClusters
+	config.Contexts = newContexts
 
 	return nil
 }
@@ -86,56 +86,56 @@ var (
 	dataOmittedBytes []byte
 )
 
-// Flatten redacts raw data entries from the con***REMOVED***g object for a human-readable view.
-func ShortenCon***REMOVED***g(con***REMOVED***g *Con***REMOVED***g) {
+// Flatten redacts raw data entries from the config object for a human-readable view.
+func ShortenConfig(config *Config) {
 	// trick json encoder into printing a human readable string in the raw data
 	// by base64 decoding what we want to print. Relies on implementation of
 	// http://golang.org/pkg/encoding/json/#Marshal using base64 to encode []byte
-	for key, authInfo := range con***REMOVED***g.AuthInfos {
+	for key, authInfo := range config.AuthInfos {
 		if len(authInfo.ClientKeyData) > 0 {
 			authInfo.ClientKeyData = redactedBytes
 		}
-		if len(authInfo.ClientCerti***REMOVED***cateData) > 0 {
-			authInfo.ClientCerti***REMOVED***cateData = redactedBytes
+		if len(authInfo.ClientCertificateData) > 0 {
+			authInfo.ClientCertificateData = redactedBytes
 		}
-		con***REMOVED***g.AuthInfos[key] = authInfo
+		config.AuthInfos[key] = authInfo
 	}
-	for key, cluster := range con***REMOVED***g.Clusters {
-		if len(cluster.Certi***REMOVED***cateAuthorityData) > 0 {
-			cluster.Certi***REMOVED***cateAuthorityData = dataOmittedBytes
+	for key, cluster := range config.Clusters {
+		if len(cluster.CertificateAuthorityData) > 0 {
+			cluster.CertificateAuthorityData = dataOmittedBytes
 		}
-		con***REMOVED***g.Clusters[key] = cluster
+		config.Clusters[key] = cluster
 	}
 }
 
-// Flatten changes the con***REMOVED***g object into a self contained con***REMOVED***g (useful for making secrets)
-func FlattenCon***REMOVED***g(con***REMOVED***g *Con***REMOVED***g) error {
-	for key, authInfo := range con***REMOVED***g.AuthInfos {
+// Flatten changes the config object into a self contained config (useful for making secrets)
+func FlattenConfig(config *Config) error {
+	for key, authInfo := range config.AuthInfos {
 		baseDir, err := MakeAbs(path.Dir(authInfo.LocationOfOrigin), "")
 		if err != nil {
 			return err
 		}
 
-		if err := FlattenContent(&authInfo.ClientCerti***REMOVED***cate, &authInfo.ClientCerti***REMOVED***cateData, baseDir); err != nil {
+		if err := FlattenContent(&authInfo.ClientCertificate, &authInfo.ClientCertificateData, baseDir); err != nil {
 			return err
 		}
 		if err := FlattenContent(&authInfo.ClientKey, &authInfo.ClientKeyData, baseDir); err != nil {
 			return err
 		}
 
-		con***REMOVED***g.AuthInfos[key] = authInfo
+		config.AuthInfos[key] = authInfo
 	}
-	for key, cluster := range con***REMOVED***g.Clusters {
+	for key, cluster := range config.Clusters {
 		baseDir, err := MakeAbs(path.Dir(cluster.LocationOfOrigin), "")
 		if err != nil {
 			return err
 		}
 
-		if err := FlattenContent(&cluster.Certi***REMOVED***cateAuthority, &cluster.Certi***REMOVED***cateAuthorityData, baseDir); err != nil {
+		if err := FlattenContent(&cluster.CertificateAuthority, &cluster.CertificateAuthorityData, baseDir); err != nil {
 			return err
 		}
 
-		con***REMOVED***g.Clusters[key] = cluster
+		config.Clusters[key] = cluster
 	}
 
 	return nil
@@ -165,8 +165,8 @@ func ResolvePath(path string, base string) string {
 	// Don't resolve empty paths
 	if len(path) > 0 {
 		// Don't resolve absolute paths
-		if !***REMOVED***lepath.IsAbs(path) {
-			return ***REMOVED***lepath.Join(base, path)
+		if !filepath.IsAbs(path) {
+			return filepath.Join(base, path)
 		}
 	}
 
@@ -174,7 +174,7 @@ func ResolvePath(path string, base string) string {
 }
 
 func MakeAbs(path, base string) (string, error) {
-	if ***REMOVED***lepath.IsAbs(path) {
+	if filepath.IsAbs(path) {
 		return path, nil
 	}
 	if len(base) == 0 {
@@ -184,5 +184,5 @@ func MakeAbs(path, base string) (string, error) {
 		}
 		base = cwd
 	}
-	return ***REMOVED***lepath.Join(base, path), nil
+	return filepath.Join(base, path), nil
 }

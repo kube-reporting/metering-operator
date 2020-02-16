@@ -32,7 +32,7 @@ func (s *durationSliceValue) Set(val string) error {
 	}
 	if !s.changed {
 		*s.value = out
-	} ***REMOVED*** {
+	} else {
 		*s.value = append(*s.value, out...)
 	}
 	s.changed = true
@@ -79,7 +79,7 @@ func (f *FlagSet) GetDurationSlice(name string) ([]time.Duration, error) {
 	return val.([]time.Duration), nil
 }
 
-// DurationSliceVar de***REMOVED***nes a durationSlice flag with speci***REMOVED***ed name, default value, and usage string.
+// DurationSliceVar defines a durationSlice flag with specified name, default value, and usage string.
 // The argument p points to a []time.Duration variable in which to store the value of the flag.
 func (f *FlagSet) DurationSliceVar(p *[]time.Duration, name string, value []time.Duration, usage string) {
 	f.VarP(newDurationSliceValue(value, p), name, "", usage)
@@ -90,7 +90,7 @@ func (f *FlagSet) DurationSliceVarP(p *[]time.Duration, name, shorthand string, 
 	f.VarP(newDurationSliceValue(value, p), name, shorthand, usage)
 }
 
-// DurationSliceVar de***REMOVED***nes a duration[] flag with speci***REMOVED***ed name, default value, and usage string.
+// DurationSliceVar defines a duration[] flag with specified name, default value, and usage string.
 // The argument p points to a duration[] variable in which to store the value of the flag.
 func DurationSliceVar(p *[]time.Duration, name string, value []time.Duration, usage string) {
 	CommandLine.VarP(newDurationSliceValue(value, p), name, "", usage)
@@ -101,7 +101,7 @@ func DurationSliceVarP(p *[]time.Duration, name, shorthand string, value []time.
 	CommandLine.VarP(newDurationSliceValue(value, p), name, shorthand, usage)
 }
 
-// DurationSlice de***REMOVED***nes a []time.Duration flag with speci***REMOVED***ed name, default value, and usage string.
+// DurationSlice defines a []time.Duration flag with specified name, default value, and usage string.
 // The return value is the address of a []time.Duration variable that stores the value of the flag.
 func (f *FlagSet) DurationSlice(name string, value []time.Duration, usage string) *[]time.Duration {
 	p := []time.Duration{}
@@ -116,7 +116,7 @@ func (f *FlagSet) DurationSliceP(name, shorthand string, value []time.Duration, 
 	return &p
 }
 
-// DurationSlice de***REMOVED***nes a []time.Duration flag with speci***REMOVED***ed name, default value, and usage string.
+// DurationSlice defines a []time.Duration flag with specified name, default value, and usage string.
 // The return value is the address of a []time.Duration variable that stores the value of the flag.
 func DurationSlice(name string, value []time.Duration, usage string) *[]time.Duration {
 	return CommandLine.DurationSliceP(name, "", value, usage)

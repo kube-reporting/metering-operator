@@ -14,13 +14,13 @@ import (
 // metric vector Collectors, e.g.:
 //     myVec.With(Labels{"code": "404", "method": "GET"}).Add(42)
 //
-// The other use-case is the speci***REMOVED***cation of constant label pairs in Opts or to
+// The other use-case is the specification of constant label pairs in Opts or to
 // create a Desc.
 type Labels map[string]string
 
-// reservedLabelPre***REMOVED***x is a pre***REMOVED***x which is not legal in user-supplied
+// reservedLabelPrefix is a prefix which is not legal in user-supplied
 // label names.
-const reservedLabelPre***REMOVED***x = "__"
+const reservedLabelPrefix = "__"
 
 var errInconsistentCardinality = errors.New("inconsistent label cardinality")
 
@@ -53,5 +53,5 @@ func validateLabelValues(vals []string, expectedNumberOfValues int) error {
 }
 
 func checkLabelName(l string) bool {
-	return model.LabelName(l).IsValid() && !strings.HasPre***REMOVED***x(l, reservedLabelPre***REMOVED***x)
+	return model.LabelName(l).IsValid() && !strings.HasPrefix(l, reservedLabelPrefix)
 }

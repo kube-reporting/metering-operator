@@ -32,23 +32,23 @@ version_added: "2.7"
 author: "Fabian von Feilitzsch (@fabianvf)"
 
 description:
-  - Sets the status ***REMOVED***eld on a Kubernetes API resource. Only should be used if you are using Ansible to
-    implement a controller for the resource being modi***REMOVED***ed.
+  - Sets the status field on a Kubernetes API resource. Only should be used if you are using Ansible to
+    implement a controller for the resource being modified.
 
 options:
   status:
     type: dict
     description:
-    - A object containing ` + "`key: value`" + ` pairs that will be set on the status object of the speci***REMOVED***ed resource.
+    - A object containing ` + "`key: value`" + ` pairs that will be set on the status object of the specified resource.
     - One of I(status) or I(conditions) is required.
   conditions:
     type: list
     description:
-    - A list of condition objects that will be set on the status.conditions ***REMOVED***eld of the speci***REMOVED***ed resource.
-    - Unless I(force) is C(true) the speci***REMOVED***ed conditions will be merged with the conditions already set on the status ***REMOVED***eld of the speci***REMOVED***ed resource.
-    - Each element in the list will be validated according to the conventions speci***REMOVED***ed in the
+    - A list of condition objects that will be set on the status.conditions field of the specified resource.
+    - Unless I(force) is C(true) the specified conditions will be merged with the conditions already set on the status field of the specified resource.
+    - Each element in the list will be validated according to the conventions specified in the
       [Kubernetes API conventions document](https://github.com/kubernetes/community/blob/master/contributors/devel/api-conventions.md#spec-and-status).
-    - 'The ***REMOVED***elds supported for each condition are:
+    - 'The fields supported for each condition are:
       ` + "`type`" + ` (required),
       ` + "`status`" + ` (required, one of "True", "False", "Unknown"),
       ` + "`reason`" + ` (single CamelCase word),
@@ -59,7 +59,7 @@ options:
   api_version:
     description:
     - Use to specify the API version. Use in conjunction with I(kind), I(name), and I(namespace) to identify a
-      speci***REMOVED***c object.
+      specific object.
     required: yes
     aliases:
     - api
@@ -67,17 +67,17 @@ options:
   kind:
     description:
     - Use to specify an object model. Use in conjunction with I(api_version), I(name), and I(namespace) to identify a
-      speci***REMOVED***c object.
+      specific object.
     required: yes
   name:
     description:
     - Use to specify an object name. Use in conjunction with I(api_version), I(kind) and I(namespace) to identify a
-      speci***REMOVED***c object.
+      specific object.
     required: yes
   namespace:
     description:
     - Use to specify an object namespace. Use in conjunction with I(api_version), I(kind), and I(name)
-      to identify a speci***REMOVED***c object.
+      to identify a specific object.
   force:
     description:
     - If set to C(True), the status will be set using ` + "`PUT`" + ` rather than ` + "`PATCH`" + `, replacing the full status object.
@@ -85,42 +85,42 @@ options:
     type: bool
   host:
     description:
-    - Provide a URL for accessing the API. Can also be speci***REMOVED***ed via K8S_AUTH_HOST environment variable.
+    - Provide a URL for accessing the API. Can also be specified via K8S_AUTH_HOST environment variable.
   api_key:
     description:
-    - Token used to authenticate with the API. Can also be speci***REMOVED***ed via K8S_AUTH_API_KEY environment variable.
-  kubecon***REMOVED***g:
+    - Token used to authenticate with the API. Can also be specified via K8S_AUTH_API_KEY environment variable.
+  kubeconfig:
     description:
-    - Path to an instance Kubernetes con***REMOVED***g ***REMOVED***le. If not provided, and no other connection
+    - Path to an instance Kubernetes config file. If not provided, and no other connection
       options are provided, the openshift client will attempt to load the default
-      con***REMOVED***guration ***REMOVED***le from I(~/.kube/con***REMOVED***g.json). Can also be speci***REMOVED***ed via K8S_AUTH_KUBECONFIG environment
+      configuration file from I(~/.kube/config.json). Can also be specified via K8S_AUTH_KUBECONFIG environment
       variable.
   context:
     description:
-    - The name of a context found in the con***REMOVED***g ***REMOVED***le. Can also be speci***REMOVED***ed via K8S_AUTH_CONTEXT environment variable.
+    - The name of a context found in the config file. Can also be specified via K8S_AUTH_CONTEXT environment variable.
   username:
     description:
-    - Provide a username for authenticating with the API. Can also be speci***REMOVED***ed via K8S_AUTH_USERNAME environment
+    - Provide a username for authenticating with the API. Can also be specified via K8S_AUTH_USERNAME environment
       variable.
   password:
     description:
-    - Provide a password for authenticating with the API. Can also be speci***REMOVED***ed via K8S_AUTH_PASSWORD environment
+    - Provide a password for authenticating with the API. Can also be specified via K8S_AUTH_PASSWORD environment
       variable.
-  cert_***REMOVED***le:
+  cert_file:
     description:
-    - Path to a certi***REMOVED***cate used to authenticate with the API. Can also be speci***REMOVED***ed via K8S_AUTH_CERT_FILE environment
+    - Path to a certificate used to authenticate with the API. Can also be specified via K8S_AUTH_CERT_FILE environment
       variable.
-  key_***REMOVED***le:
+  key_file:
     description:
-    - Path to a key ***REMOVED***le used to authenticate with the API. Can also be speci***REMOVED***ed via K8S_AUTH_KEY_FILE environment
+    - Path to a key file used to authenticate with the API. Can also be specified via K8S_AUTH_KEY_FILE environment
       variable.
   ssl_ca_cert:
     description:
-    - Path to a CA certi***REMOVED***cate used to authenticate with the API. Can also be speci***REMOVED***ed via K8S_AUTH_SSL_CA_CERT
+    - Path to a CA certificate used to authenticate with the API. Can also be specified via K8S_AUTH_SSL_CA_CERT
       environment variable.
   verify_ssl:
     description:
-    - "Whether or not to verify the API server's SSL certi***REMOVED***cates. Can also be speci***REMOVED***ed via K8S_AUTH_VERIFY_SSL
+    - "Whether or not to verify the API server's SSL certificates. Can also be specified via K8S_AUTH_VERIFY_SSL
       environment variable."
     type: bool
 
@@ -131,7 +131,7 @@ requirements:
 '''
 
 EXAMPLES = '''
-- name: Set custom status ***REMOVED***elds on TestCR
+- name: Set custom status fields on TestCR
   k8s_status:
     api_version: apps.example.com/v1alpha1
     kind: TestCR
@@ -156,7 +156,7 @@ EXAMPLES = '''
 
 - name: |
     Create custom conditions. WARNING: The default Ansible Operator status management
-    will never overwrite custom conditions, so they will persist inde***REMOVED***nitely. If you
+    will never overwrite custom conditions, so they will persist indefinitely. If you
     want the values to change or be removed, you will need to clean them up manually.
   k8s_status:
     conditions:
@@ -187,7 +187,7 @@ result:
        returned: success
        type: complex
      spec:
-       description: Speci***REMOVED***c attributes of the object. Will vary based on the I(api_version) and I(kind).
+       description: Specific attributes of the object. Will vary based on the I(api_version) and I(kind).
        returned: success
        type: complex
      status:
@@ -208,11 +208,11 @@ def condition_array(conditions):
         if not isinstance(condition, dict):
             raise ValueError('` + "`conditions`" + ` must be a list of objects')
         if isinstance(condition.get('status'), bool):
-            condition['status'] = 'True' if condition['status'] ***REMOVED*** 'False'
+            condition['status'] = 'True' if condition['status'] else 'False'
 
         for key in condition.keys():
             if key not in VALID_KEYS:
-                raise ValueError('{} is not a valid ***REMOVED***eld for a condition, accepted ***REMOVED***elds are {}'.format(key, VALID_KEYS))
+                raise ValueError('{} is not a valid field for a condition, accepted fields are {}'.format(key, VALID_KEYS))
         for key in REQUIRED:
             if not condition.get(key):
                 raise ValueError('Condition ` + "`{}`" + ` must be set'.format(key))
@@ -274,7 +274,7 @@ class KubernetesAnsibleStatusModule(KubernetesAnsibleModule):
     def execute_module(self):
         self.client = self.get_api_client()
 
-        resource = self.***REMOVED***nd_resource(self.kind, self.api_version, fail=True)
+        resource = self.find_resource(self.kind, self.api_version, fail=True)
         if 'status' not in resource.subresources:
             self.fail_json(msg='Resource {}.{} does not support the status subresource'.format(resource.api_version, resource.kind))
 
@@ -288,7 +288,7 @@ class KubernetesAnsibleStatusModule(KubernetesAnsibleModule):
 
         if self.force:
             self.exit_json(**self.replace(resource, instance))
-        ***REMOVED***:
+        else:
             self.exit_json(**self.patch(resource, instance))
 
     def replace(self, resource, instance):
@@ -328,7 +328,7 @@ class KubernetesAnsibleStatusModule(KubernetesAnsibleModule):
         merged = copy.deepcopy(old_conditions)
 
         for condition in new_conditions:
-          new_merged_list = self.***REMOVED***lter_existing_conditions(merged, condition['type'])
+          new_merged_list = self.filter_existing_conditions(merged, condition['type'])
           new_merged_list.append(condition)
 
           merged = new_merged_list
@@ -336,7 +336,7 @@ class KubernetesAnsibleStatusModule(KubernetesAnsibleModule):
         new['conditions'] = merged
         return new
 
-    def ***REMOVED***lter_existing_conditions(self, conditions, condition_type):
+    def filter_existing_conditions(self, conditions, condition_type):
         new_conditions = []
 
         for condition in conditions:
@@ -370,7 +370,7 @@ class KubernetesAnsibleStatusModule(KubernetesAnsibleModule):
     def argspec(self):
         args = copy.deepcopy(COMMON_ARG_SPEC)
         args.pop('state')
-        args.pop('resource_de***REMOVED***nition')
+        args.pop('resource_definition')
         args.pop('src')
         args.update(AUTH_ARG_SPEC)
         args.update(STATUS_ARG_SPEC)

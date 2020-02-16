@@ -1,6 +1,6 @@
 // Copyright 2013 The Prometheus Authors
 // Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this ***REMOVED***le except in compliance with the License.
+// you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 //
 // http://www.apache.org/licenses/LICENSE-2.0
@@ -8,7 +8,7 @@
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the speci***REMOVED***c language governing permissions and
+// See the License for the specific language governing permissions and
 // limitations under the License.
 
 package model
@@ -100,7 +100,7 @@ func (s *SamplePair) UnmarshalJSON(b []byte) error {
 }
 
 // Equal returns true if this SamplePair and o have equal Values and equal
-// Timestamps. The sematics of Value equality is de***REMOVED***ned by SampleValue.Equal.
+// Timestamps. The sematics of Value equality is defined by SampleValue.Equal.
 func (s *SamplePair) Equal(o *SamplePair) bool {
 	return s == o || (s.Value.Equal(o.Value) && s.Timestamp.Equal(o.Timestamp))
 }
@@ -116,8 +116,8 @@ type Sample struct {
 	Timestamp Time        `json:"timestamp"`
 }
 
-// Equal compares ***REMOVED***rst the metrics, then the timestamp, then the value. The
-// sematics of value equality is de***REMOVED***ned by SampleValue.Equal.
+// Equal compares first the metrics, then the timestamp, then the value. The
+// sematics of value equality is defined by SampleValue.Equal.
 func (s *Sample) Equal(o *Sample) bool {
 	if s == o {
 		return true
@@ -187,7 +187,7 @@ func (s Samples) Len() int {
 	return len(s)
 }
 
-// Less compares ***REMOVED***rst the metrics, then the timestamp.
+// Less compares first the metrics, then the timestamp.
 func (s Samples) Less(i, j int) bool {
 	switch {
 	case s[i].Metric.Before(s[j].Metric):
@@ -366,7 +366,7 @@ func (vec Vector) String() string {
 func (vec Vector) Len() int      { return len(vec) }
 func (vec Vector) Swap(i, j int) { vec[i], vec[j] = vec[j], vec[i] }
 
-// Less compares ***REMOVED***rst the metrics, then the timestamp.
+// Less compares first the metrics, then the timestamp.
 func (vec Vector) Less(i, j int) bool {
 	switch {
 	case vec[i].Metric.Before(vec[j].Metric):

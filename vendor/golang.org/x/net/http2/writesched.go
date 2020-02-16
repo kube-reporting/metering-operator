@@ -1,6 +1,6 @@
 // Copyright 2014 The Go Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE ***REMOVED***le.
+// license that can be found in the LICENSE file.
 
 package http2
 
@@ -36,7 +36,7 @@ type WriteScheduler interface {
 	Pop() (wr FrameWriteRequest, ok bool)
 }
 
-// OpenStreamOptions speci***REMOVED***es extra options for WriteScheduler.OpenStream.
+// OpenStreamOptions specifies extra options for WriteScheduler.OpenStream.
 type OpenStreamOptions struct {
 	// PusherID is zero if the stream was initiated by the client. Otherwise,
 	// PusherID names the stream that pushed the newly opened stream.
@@ -47,7 +47,7 @@ type OpenStreamOptions struct {
 type FrameWriteRequest struct {
 	// write is the interface value that does the writing, once the
 	// WriteScheduler has selected this frame to write. The write
-	// functions are all de***REMOVED***ned in write.go.
+	// functions are all defined in write.go.
 	write writeFramer
 
 	// stream is the stream on which this frame will be written.
@@ -127,7 +127,7 @@ func (wr FrameWriteRequest) Consume(n int32) (FrameWriteRequest, FrameWriteReque
 				// so we know endStream is false.
 				endStream: false,
 			},
-			// Our caller is blocking on the ***REMOVED***nal DATA frame, not
+			// Our caller is blocking on the final DATA frame, not
 			// this intermediate frame, so no need to wait.
 			done: nil,
 		}
@@ -154,7 +154,7 @@ func (wr FrameWriteRequest) String() string {
 	var des string
 	if s, ok := wr.write.(fmt.Stringer); ok {
 		des = s.String()
-	} ***REMOVED*** {
+	} else {
 		des = fmt.Sprintf("%T", wr.write)
 	}
 	return fmt.Sprintf("[FrameWriteRequest stream=%d, ch=%v, writer=%v]", wr.StreamID(), wr.done != nil, des)

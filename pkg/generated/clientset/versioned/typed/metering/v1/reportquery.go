@@ -60,7 +60,7 @@ func (c *reportQueries) Get(name string, options metav1.GetOptions) (result *v1.
 	return
 }
 
-// List takes label and ***REMOVED***eld selectors, and returns the list of ReportQueries that match those selectors.
+// List takes label and field selectors, and returns the list of ReportQueries that match those selectors.
 func (c *reportQueries) List(opts metav1.ListOptions) (result *v1.ReportQueryList, err error) {
 	var timeout time.Duration
 	if opts.TimeoutSeconds != nil {

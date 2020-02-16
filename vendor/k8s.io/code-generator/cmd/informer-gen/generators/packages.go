@@ -2,7 +2,7 @@
 Copyright 2016 The Kubernetes Authors.
 
 Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this ***REMOVED***le except in compliance with the License.
+you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
 
     http://www.apache.org/licenses/LICENSE-2.0
@@ -10,7 +10,7 @@ You may obtain a copy of the License at
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the speci***REMOVED***c language governing permissions and
+See the License for the specific language governing permissions and
 limitations under the License.
 */
 
@@ -19,7 +19,7 @@ package generators
 import (
 	"fmt"
 	"path"
-	"path/***REMOVED***lepath"
+	"path/filepath"
 	"strings"
 
 	"k8s.io/gengo/args"
@@ -77,7 +77,7 @@ func objectMetaForPackage(p *types.Package) (*types.Type, bool, error) {
 		}
 	}
 	if generatingForPackage {
-		return nil, false, fmt.Errorf("unable to ***REMOVED***nd ObjectMeta for any types in package %s", p.Path)
+		return nil, false, fmt.Errorf("unable to find ObjectMeta for any types in package %s", p.Path)
 	}
 	return nil, false, nil
 }
@@ -88,7 +88,7 @@ func isInternal(m types.Member) bool {
 }
 
 func packageForInternalInterfaces(base string) string {
-	return ***REMOVED***lepath.Join(base, "internalinterfaces")
+	return filepath.Join(base, "internalinterfaces")
 }
 
 func vendorless(p string) string {
@@ -98,7 +98,7 @@ func vendorless(p string) string {
 	return p
 }
 
-// Packages makes the client package de***REMOVED***nition.
+// Packages makes the client package definition.
 func Packages(context *generator.Context, arguments *args.GeneratorArgs) generator.Packages {
 	boilerplate, err := arguments.LoadGoBoilerplate()
 	if err != nil {
@@ -110,11 +110,11 @@ func Packages(context *generator.Context, arguments *args.GeneratorArgs) generat
 		klog.Fatalf("Wrong CustomArgs type: %T", arguments.CustomArgs)
 	}
 
-	internalVersionPackagePath := ***REMOVED***lepath.Join(arguments.OutputPackagePath)
-	externalVersionPackagePath := ***REMOVED***lepath.Join(arguments.OutputPackagePath)
+	internalVersionPackagePath := filepath.Join(arguments.OutputPackagePath)
+	externalVersionPackagePath := filepath.Join(arguments.OutputPackagePath)
 	if !customArgs.SingleDirectory {
-		internalVersionPackagePath = ***REMOVED***lepath.Join(arguments.OutputPackagePath, "internalversion")
-		externalVersionPackagePath = ***REMOVED***lepath.Join(arguments.OutputPackagePath, "externalversions")
+		internalVersionPackagePath = filepath.Join(arguments.OutputPackagePath, "internalversion")
+		externalVersionPackagePath = filepath.Join(arguments.OutputPackagePath, "externalversions")
 	}
 
 	var packageList generator.Packages
@@ -145,7 +145,7 @@ func Packages(context *generator.Context, arguments *args.GeneratorArgs) generat
 			}
 			gv.Group = clientgentypes.Group(p.Path[lastSlash+1:])
 			targetGroupVersions = internalGroupVersions
-		} ***REMOVED*** {
+		} else {
 			parts := strings.Split(p.Path, "/")
 			gv.Group = clientgentypes.Group(parts[len(parts)-2])
 			gv.Version = clientgentypes.Version(parts[len(parts)-1])
@@ -155,14 +155,14 @@ func Packages(context *generator.Context, arguments *args.GeneratorArgs) generat
 		gvPackage := path.Clean(p.Path)
 
 		// If there's a comment of the form "// +groupName=somegroup" or
-		// "// +groupName=somegroup.foo.bar.io", use the ***REMOVED***rst ***REMOVED***eld (somegroup) as the name of the
+		// "// +groupName=somegroup.foo.bar.io", use the first field (somegroup) as the name of the
 		// group when generating.
 		if override := types.ExtractCommentTags("+", p.Comments)["groupName"]; override != nil {
 			gv.Group = clientgentypes.Group(override[0])
 		}
 
 		// If there's a comment of the form "// +groupGoName=SomeUniqueShortName", use that as
-		// the Go group identi***REMOVED***er in CamelCase. It defaults
+		// the Go group identifier in CamelCase. It defaults
 		groupGoNames[groupPackageName] = namer.IC(strings.Split(gv.Group.NonEmpty(), ".")[0])
 		if override := types.ExtractCommentTags("+", p.Comments)["groupGoName"]; override != nil {
 			groupGoNames[groupPackageName] = namer.IC(override[0])
@@ -201,7 +201,7 @@ func Packages(context *generator.Context, arguments *args.GeneratorArgs) generat
 
 		if internal {
 			packageList = append(packageList, versionPackage(internalVersionPackagePath, groupPackageName, gv, groupGoNames[groupPackageName], boilerplate, typesToGenerate, customArgs.InternalClientSetPackage, customArgs.ListersPackage))
-		} ***REMOVED*** {
+		} else {
 			packageList = append(packageList, versionPackage(externalVersionPackagePath, groupPackageName, gv, groupGoNames[groupPackageName], boilerplate, typesToGenerate, customArgs.VersionedClientSetPackage, customArgs.ListersPackage))
 		}
 	}
@@ -227,7 +227,7 @@ func Packages(context *generator.Context, arguments *args.GeneratorArgs) generat
 
 func factoryPackage(basePackage string, boilerplate []byte, groupGoNames map[string]string, groupVersions map[string]clientgentypes.GroupVersions, clientSetPackage string, typesForGroupVersion map[clientgentypes.GroupVersion][]*types.Type) generator.Package {
 	return &generator.DefaultPackage{
-		PackageName: ***REMOVED***lepath.Base(basePackage),
+		PackageName: filepath.Base(basePackage),
 		PackagePath: basePackage,
 		HeaderText:  boilerplate,
 		GeneratorFunc: func(c *generator.Context) (generators []generator.Generator) {
@@ -263,7 +263,7 @@ func factoryInterfacePackage(basePackage string, boilerplate []byte, clientSetPa
 	packagePath := packageForInternalInterfaces(basePackage)
 
 	return &generator.DefaultPackage{
-		PackageName: ***REMOVED***lepath.Base(packagePath),
+		PackageName: filepath.Base(packagePath),
 		PackagePath: packagePath,
 		HeaderText:  boilerplate,
 		GeneratorFunc: func(c *generator.Context) (generators []generator.Generator) {
@@ -282,7 +282,7 @@ func factoryInterfacePackage(basePackage string, boilerplate []byte, clientSetPa
 }
 
 func groupPackage(basePackage string, groupVersions clientgentypes.GroupVersions, boilerplate []byte) generator.Package {
-	packagePath := ***REMOVED***lepath.Join(basePackage, groupVersions.PackageName)
+	packagePath := filepath.Join(basePackage, groupVersions.PackageName)
 	groupPkgName := strings.Split(string(groupVersions.Group), ".")[0]
 
 	return &generator.DefaultPackage{
@@ -309,7 +309,7 @@ func groupPackage(basePackage string, groupVersions clientgentypes.GroupVersions
 }
 
 func versionPackage(basePackage string, groupPkgName string, gv clientgentypes.GroupVersion, groupGoName string, boilerplate []byte, typesToGenerate []*types.Type, clientSetPackage, listersPackage string) generator.Package {
-	packagePath := ***REMOVED***lepath.Join(basePackage, groupPkgName, strings.ToLower(gv.Version.NonEmpty()))
+	packagePath := filepath.Join(basePackage, groupPkgName, strings.ToLower(gv.Version.NonEmpty()))
 
 	return &generator.DefaultPackage{
 		PackageName: strings.ToLower(gv.Version.NonEmpty()),

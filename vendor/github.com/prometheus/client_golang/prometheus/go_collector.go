@@ -185,7 +185,7 @@ func NewGoCollector() Collector {
 			}, {
 				desc: NewDesc(
 					memstatNamespace("buck_hash_sys_bytes"),
-					"Number of bytes used by the pro***REMOVED***ling bucket hash table.",
+					"Number of bytes used by the profiling bucket hash table.",
 					nil, nil,
 				),
 				eval:    func(ms *runtime.MemStats) float64 { return float64(ms.BuckHashSys) },
@@ -253,7 +253,7 @@ func (c *goCollector) Describe(ch chan<- *Desc) {
 // Collect returns the current state of all metrics of the collector.
 func (c *goCollector) Collect(ch chan<- Metric) {
 	ch <- MustNewConstMetric(c.goroutinesDesc, GaugeValue, float64(runtime.NumGoroutine()))
-	n, _ := runtime.ThreadCreatePro***REMOVED***le(nil)
+	n, _ := runtime.ThreadCreateProfile(nil)
 	ch <- MustNewConstMetric(c.threadsDesc, GaugeValue, float64(n))
 
 	var stats debug.GCStats

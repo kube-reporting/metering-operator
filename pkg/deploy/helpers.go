@@ -3,25 +3,25 @@ package deploy
 import (
 	"fmt"
 	"os"
-	"path/***REMOVED***lepath"
+	"path/filepath"
 	"strings"
 
 	apiextv1beta1 "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1beta1"
 	"k8s.io/apimachinery/pkg/util/yaml"
 )
 
-// DecodeYAMLManifestToObject is a helper function that takes the path to a manifest ***REMOVED***le, e.g. the
-// deployment YAML ***REMOVED***le, and opens that ***REMOVED***le using os.Open, which returns an io.Reader object that
+// DecodeYAMLManifestToObject is a helper function that takes the path to a manifest file, e.g. the
+// deployment YAML file, and opens that file using os.Open, which returns an io.Reader object that
 // can be passed to the YAML/JSON decoder to build up the @resource parameter for usage in the clientsets.
 func DecodeYAMLManifestToObject(path string, resource interface{}) error {
-	***REMOVED***le, err := os.Open(path)
+	file, err := os.Open(path)
 	if err != nil {
 		return fmt.Errorf("failed to open %s, got: %v", path, err)
 	}
 
-	err = yaml.NewYAMLOrJSONDecoder(***REMOVED***le, 100).Decode(&resource)
+	err = yaml.NewYAMLOrJSONDecoder(file, 100).Decode(&resource)
 	if err != nil {
-		return fmt.Errorf("invalid manifest passed, wasn't able to decode the YAML ***REMOVED***le, got: %v", err)
+		return fmt.Errorf("invalid manifest passed, wasn't able to decode the YAML file, got: %v", err)
 	}
 
 	return nil
@@ -35,38 +35,38 @@ func InitMeteringCRDSlice(manifestDir string, pathToCRDMap map[string]string) []
 
 	crds = append(crds, CRD{
 		Name: "hivetables.metering.openshift.io",
-		Path: ***REMOVED***lepath.Join(manifestDir, pathToCRDMap["hiveTable"]),
-		CRD:  new(apiextv1beta1.CustomResourceDe***REMOVED***nition),
+		Path: filepath.Join(manifestDir, pathToCRDMap["hiveTable"]),
+		CRD:  new(apiextv1beta1.CustomResourceDefinition),
 	})
 	crds = append(crds, CRD{
 		Name: "prestotables.metering.openshift.io",
-		Path: ***REMOVED***lepath.Join(manifestDir, pathToCRDMap["prestoTable"]),
-		CRD:  new(apiextv1beta1.CustomResourceDe***REMOVED***nition),
+		Path: filepath.Join(manifestDir, pathToCRDMap["prestoTable"]),
+		CRD:  new(apiextv1beta1.CustomResourceDefinition),
 	})
 	crds = append(crds, CRD{
 		Name: "storagelocations.metering.openshift.io",
-		Path: ***REMOVED***lepath.Join(manifestDir, pathToCRDMap["storageLocation"]),
-		CRD:  new(apiextv1beta1.CustomResourceDe***REMOVED***nition),
+		Path: filepath.Join(manifestDir, pathToCRDMap["storageLocation"]),
+		CRD:  new(apiextv1beta1.CustomResourceDefinition),
 	})
 	crds = append(crds, CRD{
 		Name: "reports.metering.openshift.io",
-		Path: ***REMOVED***lepath.Join(manifestDir, pathToCRDMap["report"]),
-		CRD:  new(apiextv1beta1.CustomResourceDe***REMOVED***nition),
+		Path: filepath.Join(manifestDir, pathToCRDMap["report"]),
+		CRD:  new(apiextv1beta1.CustomResourceDefinition),
 	})
 	crds = append(crds, CRD{
 		Name: "reportqueries.metering.openshift.io",
-		Path: ***REMOVED***lepath.Join(manifestDir, pathToCRDMap["reportQuery"]),
-		CRD:  new(apiextv1beta1.CustomResourceDe***REMOVED***nition),
+		Path: filepath.Join(manifestDir, pathToCRDMap["reportQuery"]),
+		CRD:  new(apiextv1beta1.CustomResourceDefinition),
 	})
 	crds = append(crds, CRD{
 		Name: "reportdatasources.metering.openshift.io",
-		Path: ***REMOVED***lepath.Join(manifestDir, pathToCRDMap["reportDataSource"]),
-		CRD:  new(apiextv1beta1.CustomResourceDe***REMOVED***nition),
+		Path: filepath.Join(manifestDir, pathToCRDMap["reportDataSource"]),
+		CRD:  new(apiextv1beta1.CustomResourceDefinition),
 	})
 	crds = append(crds, CRD{
-		Name: "meteringcon***REMOVED***gs.metering.openshift.io",
-		Path: ***REMOVED***lepath.Join(manifestDir, pathToCRDMap["meteringCon***REMOVED***g"]),
-		CRD:  new(apiextv1beta1.CustomResourceDe***REMOVED***nition),
+		Name: "meteringconfigs.metering.openshift.io",
+		Path: filepath.Join(manifestDir, pathToCRDMap["meteringConfig"]),
+		CRD:  new(apiextv1beta1.CustomResourceDefinition),
 	})
 
 	return crds
@@ -77,7 +77,7 @@ func getMeteringAnsiblePath(manifestDir, platform string) (string, error) {
 		return "", fmt.Errorf("failed to set the $DEPLOY_MANIFESTS_DIR or --deploy-manifests-dir flag to a non-empty value")
 	}
 
-	deployDir, err := ***REMOVED***lepath.Abs(manifestDir)
+	deployDir, err := filepath.Abs(manifestDir)
 	if err != nil {
 		return "", fmt.Errorf("failed to get the absolute path of the manifest/deploy directory %s: %v", manifestDir, err)
 	}
@@ -87,18 +87,18 @@ func getMeteringAnsiblePath(manifestDir, platform string) (string, error) {
 		return "", fmt.Errorf("failed to get the stat the manifest/deploy directory %s: %v", manifestDir, err)
 	}
 	if !dirStat.IsDir() {
-		return "", fmt.Errorf("speci***REMOVED***ed deploy directory '%s' is not a directory", manifestDir)
+		return "", fmt.Errorf("specified deploy directory '%s' is not a directory", manifestDir)
 	}
 
 	var ansibleOperatorManifestDir string
 
 	switch strings.ToLower(platform) {
 	case "upstream":
-		ansibleOperatorManifestDir = ***REMOVED***lepath.Join(deployDir, upstreamManifestDirname, manifestAnsibleOperator)
+		ansibleOperatorManifestDir = filepath.Join(deployDir, upstreamManifestDirname, manifestAnsibleOperator)
 	case "openshift":
-		ansibleOperatorManifestDir = ***REMOVED***lepath.Join(deployDir, openshiftManifestDirname, manifestAnsibleOperator)
+		ansibleOperatorManifestDir = filepath.Join(deployDir, openshiftManifestDirname, manifestAnsibleOperator)
 	case "ocp-testing":
-		ansibleOperatorManifestDir = ***REMOVED***lepath.Join(deployDir, ocpTestingManifestDirname, manifestAnsibleOperator)
+		ansibleOperatorManifestDir = filepath.Join(deployDir, ocpTestingManifestDirname, manifestAnsibleOperator)
 	default:
 		return "", fmt.Errorf("failed to set $DEPLOY_PLATFORM or --platform flag to a valid value. Supported platforms: [upstream, openshift, ocp-testing]")
 	}
@@ -108,7 +108,7 @@ func getMeteringAnsiblePath(manifestDir, platform string) (string, error) {
 		return "", fmt.Errorf("failed to stat the %s deploy platform directory '%s': %v", platform, ansibleOperatorManifestDir, err)
 	}
 	if !dirStat.IsDir() {
-		return "", fmt.Errorf("speci***REMOVED***ed %s deploy platform directory '%s' is not a directory", platform, ansibleOperatorManifestDir)
+		return "", fmt.Errorf("specified %s deploy platform directory '%s' is not a directory", platform, ansibleOperatorManifestDir)
 	}
 
 	return ansibleOperatorManifestDir, nil
@@ -125,7 +125,7 @@ func ReadMeteringAnsibleOperatorManifests(manifestDir, platform string) (*Operat
 	pathToCRDMap := map[string]string{
 		"hiveTable":        hivetableFile,
 		"prestoTable":      prestotableFile,
-		"meteringCon***REMOVED***g":   meteringcon***REMOVED***gFile,
+		"meteringConfig":   meteringconfigFile,
 		"report":           reportFile,
 		"reportDataSource": reportdatasourceFile,
 		"reportQuery":      reportqueryFile,
@@ -172,7 +172,7 @@ func ReadMeteringAnsibleOperatorManifests(manifestDir, platform string) (*Operat
 	}
 
 	for name, resource := range meteringResourceMap {
-		path := ***REMOVED***lepath.Join(ansibleOperatorManifestDir, resource.path)
+		path := filepath.Join(ansibleOperatorManifestDir, resource.path)
 
 		err = DecodeYAMLManifestToObject(path, resource.obj)
 		if err != nil {

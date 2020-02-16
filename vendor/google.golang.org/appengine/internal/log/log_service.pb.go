@@ -5,7 +5,7 @@
 /*
 Package log is a generated protocol buffer package.
 
-It is generated from these ***REMOVED***les:
+It is generated from these files:
 	google.golang.org/appengine/internal/log/log_service.proto
 
 It has these top-level messages:
@@ -230,13 +230,13 @@ type RequestLog struct {
 	Combined                *string    `protobuf:"bytes,18,req,name=combined" json:"combined,omitempty"`
 	ApiMcycles              *int64     `protobuf:"varint,19,opt,name=api_mcycles" json:"api_mcycles,omitempty"`
 	Host                    *string    `protobuf:"bytes,20,opt,name=host" json:"host,omitempty"`
-	Cost                    *float64   `protobuf:"***REMOVED***xed64,21,opt,name=cost" json:"cost,omitempty"`
+	Cost                    *float64   `protobuf:"fixed64,21,opt,name=cost" json:"cost,omitempty"`
 	TaskQueueName           *string    `protobuf:"bytes,22,opt,name=task_queue_name" json:"task_queue_name,omitempty"`
 	TaskName                *string    `protobuf:"bytes,23,opt,name=task_name" json:"task_name,omitempty"`
 	WasLoadingRequest       *bool      `protobuf:"varint,24,opt,name=was_loading_request" json:"was_loading_request,omitempty"`
 	PendingTime             *int64     `protobuf:"varint,25,opt,name=pending_time" json:"pending_time,omitempty"`
 	ReplicaIndex            *int32     `protobuf:"varint,26,opt,name=replica_index,def=-1" json:"replica_index,omitempty"`
-	Finished                *bool      `protobuf:"varint,27,opt,name=***REMOVED***nished,def=1" json:"***REMOVED***nished,omitempty"`
+	Finished                *bool      `protobuf:"varint,27,opt,name=finished,def=1" json:"finished,omitempty"`
 	CloneKey                []byte     `protobuf:"bytes,28,opt,name=clone_key" json:"clone_key,omitempty"`
 	Line                    []*LogLine `protobuf:"bytes,29,rep,name=line" json:"line,omitempty"`
 	LinesIncomplete         *bool      `protobuf:"varint,36,opt,name=lines_incomplete" json:"lines_incomplete,omitempty"`

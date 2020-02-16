@@ -13,8 +13,8 @@ if [ "$METERING_NAMESPACE" != "openshift-metering" ]; then
     "$FAQ_BIN" -f yaml -o yaml -M -c -r \
         --kwargs "namespace=$METERING_NAMESPACE" \
         '.spec.targetNamespace=$namespace' \
-        "$OLM_MANIFESTS_DIR/metering.catalogsourcecon***REMOVED***g.yaml" \
-        > "$TMPDIR/metering.catalogsourcecon***REMOVED***g.yaml"
+        "$OLM_MANIFESTS_DIR/metering.catalogsourceconfig.yaml" \
+        > "$TMPDIR/metering.catalogsourceconfig.yaml"
 
     "$FAQ_BIN" -f yaml -o yaml -M -c -r \
         --kwargs "namespace=$METERING_NAMESPACE" \
@@ -29,7 +29,7 @@ if [ "$METERING_NAMESPACE" != "openshift-metering" ]; then
         > "$TMPDIR/metering.subscription.yaml"
 
         export OLM_MANIFESTS_DIR="$TMPDIR"
-***REMOVED***
+fi
 
 SUBSCRIPTION_NAME="$(faq -f yaml '.metadata.name' "$OLM_MANIFESTS_DIR/metering.subscription.yaml")"
 CSV_NAME="$(kubectl -n $METERING_NAMESPACE get subscriptions $SUBSCRIPTION_NAME -o yaml | faq -f yaml '.status.currentCSV')"
@@ -46,9 +46,9 @@ msg "Removing Metering Operator Group"
 kube-remove \
     "$OLM_MANIFESTS_DIR/metering.operatorgroup.yaml"
 
-msg "Removing Metering Catalog Source Con***REMOVED***g"
+msg "Removing Metering Catalog Source Config"
 kubectl delete -f \
-    "$OLM_MANIFESTS_DIR/metering.catalogsourcecon***REMOVED***g.yaml"
+    "$OLM_MANIFESTS_DIR/metering.catalogsourceconfig.yaml"
 
 msg "Removing Metering Catalog Source Version"
 kubectl -n $METERING_NAMESPACE delete csv $CSV_NAME

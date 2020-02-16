@@ -1,6 +1,6 @@
 // Copyright 2017 The Go Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE ***REMOVED***le.
+// license that can be found in the LICENSE file.
 
 // +build freebsd
 
@@ -159,7 +159,7 @@ func capright(idx uint64, bit uint64) uint64 {
 	return ((1 << (57 + idx)) | bit)
 }
 
-// CapRightsInit returns a pointer to an initialised CapRights structure ***REMOVED***lled with rights.
+// CapRightsInit returns a pointer to an initialised CapRights structure filled with rights.
 // See man cap_rights_init(3) and rights(4).
 func CapRightsInit(rights []uint64) (*CapRights, error) {
 	var r CapRights

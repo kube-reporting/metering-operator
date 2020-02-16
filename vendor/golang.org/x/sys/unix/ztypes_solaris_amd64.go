@@ -230,7 +230,7 @@ type Cmsghdr struct {
 
 type Inet6Pktinfo struct {
 	Addr    [16]byte /* in6_addr */
-	I***REMOVED***ndex uint32
+	Ifindex uint32
 }
 
 type IPv6MTUInfo struct {
@@ -239,7 +239,7 @@ type IPv6MTUInfo struct {
 }
 
 type ICMPv6Filter struct {
-	X__icmp6_***REMOVED***lt [8]uint32
+	X__icmp6_filt [8]uint32
 }
 
 const (

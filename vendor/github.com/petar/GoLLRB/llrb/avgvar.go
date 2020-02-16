@@ -1,13 +1,13 @@
 // Copyright 2010 Petar Maymounkov. All rights reserved.
 // Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE ***REMOVED***le.
+// license that can be found in the LICENSE file.
 
 package llrb
 
 import "math"
 
 // avgVar maintains the average and variance of a stream of numbers
-// in a space-ef***REMOVED***cient manner.
+// in a space-efficient manner.
 type avgVar struct {
 	count      int64
 	sum, sumsq float64

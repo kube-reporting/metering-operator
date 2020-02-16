@@ -1,12 +1,12 @@
 SHELL := /bin/bash
 
 ROOT_DIR:= $(patsubst %/,%,$(dir $(realpath $(lastword $(MAKEFILE_LIST)))))
-include build/check_de***REMOVED***ned.mk
+include build/check_defined.mk
 
 # Package
 GO_PKG := github.com/operator-framework/operator-metering
 REPORTING_OPERATOR_PKG := $(GO_PKG)/cmd/reporting-operator
-# these are directories/***REMOVED***les which get auto-generated or get reformated by
+# these are directories/files which get auto-generated or get reformated by
 # gofmt
 VERIFY_FILE_PATHS := cmd pkg test manifests Gopkg.lock
 
@@ -36,18 +36,18 @@ REPORTING_OPERATOR_IMAGE_TAG=4.4
 METERING_OPERATOR_IMAGE_REPO=$(DOCKER_BASE_URL)/origin-metering-ansible-operator
 METERING_OPERATOR_IMAGE_TAG=4.4
 
-REPORTING_OPERATOR_DOCKERFILE=Docker***REMOVED***le.reporting-operator
-METERING_ANSIBLE_OPERATOR_DOCKERFILE=Docker***REMOVED***le.metering-ansible-operator
+REPORTING_OPERATOR_DOCKERFILE=Dockerfile.reporting-operator
+METERING_ANSIBLE_OPERATOR_DOCKERFILE=Dockerfile.metering-ansible-operator
 
 ifeq ($(OKD_BUILD), true)
 	DOCKER_BUILD_CMD=imagebuilder -mount $(REPO_DIR):/etc/yum.repos.d/ -mount $(SUB_MGR_FILE):/etc/yum/pluginconf.d/subscription-manager.conf
-	REPORTING_OPERATOR_DOCKERFILE=Docker***REMOVED***le.reporting-operator.okd
+	REPORTING_OPERATOR_DOCKERFILE=Dockerfile.reporting-operator.okd
 endif
 
 ifeq ($(OCP_BUILD), true)
 	DOCKER_BUILD_CMD=imagebuilder -mount $(REPO_DIR):/etc/yum.repos.d/ -mount $(SUB_MGR_FILE):/etc/yum/pluginconf.d/subscription-manager.conf
-	REPORTING_OPERATOR_DOCKERFILE=Docker***REMOVED***le.reporting-operator.rhel
-	METERING_ANSIBLE_OPERATOR_DOCKERFILE=Docker***REMOVED***le.metering-ansible-operator.rhel
+	REPORTING_OPERATOR_DOCKERFILE=Dockerfile.reporting-operator.rhel
+	METERING_ANSIBLE_OPERATOR_DOCKERFILE=Dockerfile.metering-ansible-operator.rhel
 endif
 
 GO_BUILD_ARGS := -ldflags '-extldflags "-static"'
@@ -65,16 +65,16 @@ CODEGEN_SOURCE_GO_FILES =
 CODEGEN_OUTPUT_GO_FILES =
 GOFILES =
 
-# Adds all the Go ***REMOVED***les in the repo as a dependency to the build-reporting-operator target
+# Adds all the Go files in the repo as a dependency to the build-reporting-operator target
 ifeq ($(CHECK_GO_FILES), true)
-	GOFILES := $(shell ***REMOVED***nd $(ROOT_DIR) -name '*.go' | grep -v -E '(./vendor)')
+	GOFILES := $(shell find $(ROOT_DIR) -name '*.go' | grep -v -E '(./vendor)')
 endif
 
 # Adds the update-codegen dependency to the build-reporting-operator target
 ifeq ($(RUN_UPDATE_CODEGEN), true)
 	REPORTING_OPERATOR_BIN_DEPENDENCIES += update-codegen
-	CODEGEN_SOURCE_GO_FILES := $(shell $(ROOT_DIR)/hack/codegen_source_***REMOVED***les.sh)
-	CODEGEN_OUTPUT_GO_FILES := $(shell $(ROOT_DIR)/hack/codegen_output_***REMOVED***les.sh)
+	CODEGEN_SOURCE_GO_FILES := $(shell $(ROOT_DIR)/hack/codegen_source_files.sh)
+	CODEGEN_OUTPUT_GO_FILES := $(shell $(ROOT_DIR)/hack/codegen_output_files.sh)
 endif
 
 all: fmt unit verify docker-build-all
@@ -84,15 +84,15 @@ docker-build-all: reporting-operator-docker-build metering-ansible-operator-dock
 reporting-operator-docker-build: $(REPORTING_OPERATOR_DOCKERFILE)
 	$(DOCKER_BUILD_CMD) -f $< -t $(REPORTING_OPERATOR_IMAGE_REPO):$(REPORTING_OPERATOR_IMAGE_TAG) $(ROOT_DIR)
 
-metering-src-docker-build: Docker***REMOVED***le.src
+metering-src-docker-build: Dockerfile.src
 	$(DOCKER_BUILD_CMD) -f $< -t $(METERING_SRC_IMAGE_REPO):$(METERING_SRC_IMAGE_TAG) $(ROOT_DIR)
 
 metering-ansible-operator-docker-build: $(METERING_ANSIBLE_OPERATOR_DOCKERFILE)
 	$(DOCKER_BUILD_CMD) -f $< -t $(METERING_OPERATOR_IMAGE_REPO):$(METERING_OPERATOR_IMAGE_TAG) $(ROOT_DIR)
 
-# Runs gofmt on all ***REMOVED***les in project except vendored source
+# Runs gofmt on all files in project except vendored source
 fmt:
-	***REMOVED***nd . -name '*.go' -not -path "./vendor/*" | xargs gofmt -w
+	find . -name '*.go' -not -path "./vendor/*" | xargs gofmt -w
 
 # Update dependencies
 vendor: Gopkg.toml
@@ -131,10 +131,10 @@ e2e-docker: metering-src-docker-build
 		-e METERING_NAMESPACE \
 		-e METERING_OPERATOR_IMAGE_REPO -e METERING_OPERATOR_IMAGE_TAG \
 		-e REPORTING_OPERATOR_IMAGE_REPO -e REPORTING_OPERATOR_IMAGE_TAG \
-		-e KUBECONFIG=/kubecon***REMOVED***g \
+		-e KUBECONFIG=/kubeconfig \
 		-e TEST_OUTPUT_PATH=/out \
 		-w /go/src/github.com/operator-framework/operator-metering \
-		-v $(KUBECONFIG):/kubecon***REMOVED***g \
+		-v $(KUBECONFIG):/kubeconfig \
 		-v $(PWD):/go/src/github.com/operator-framework/operator-metering \
 		-v /out \
 		$(METERING_SRC_IMAGE_REPO):$(METERING_SRC_IMAGE_TAG) \
@@ -190,7 +190,7 @@ $(REPORTING_OPERATOR_BIN_OUT): $(GOFILES)
 	$(MAKE) build-reporting-operator
 
 build-reporting-operator: $(REPORTING_OPERATOR_BIN_DEPENDENCIES) $(GOFILES)
-	@:$(call check_de***REMOVED***ned, REPORTING_OPERATOR_BIN_OUT, Path to output binary location)
+	@:$(call check_defined, REPORTING_OPERATOR_BIN_OUT, Path to output binary location)
 	mkdir -p $(dir $(REPORTING_OPERATOR_BIN_OUT))
 	CGO_ENABLED=$(CGO_ENABLED) GOOS=$(GOOS) go build $(GO_BUILD_ARGS) -o $(REPORTING_OPERATOR_BIN_OUT) $(REPORTING_OPERATOR_PKG)
 

@@ -14,18 +14,18 @@ import (
 	"github.com/aws/aws-sdk-go/internal/shareddefaults"
 )
 
-func resolveCredentials(cfg *aws.Con***REMOVED***g,
-	envCfg envCon***REMOVED***g, sharedCfg sharedCon***REMOVED***g,
+func resolveCredentials(cfg *aws.Config,
+	envCfg envConfig, sharedCfg sharedConfig,
 	handlers request.Handlers,
 	sessOpts Options,
 ) (*credentials.Credentials, error) {
 
 	switch {
-	case len(sessOpts.Pro***REMOVED***le) != 0:
-		// User explicitly provided an Pro***REMOVED***le in the session's con***REMOVED***guration
-		// so load that pro***REMOVED***le from shared con***REMOVED***g ***REMOVED***rst.
+	case len(sessOpts.Profile) != 0:
+		// User explicitly provided an Profile in the session's configuration
+		// so load that profile from shared config first.
 		// Github(aws/aws-sdk-go#2727)
-		return resolveCredsFromPro***REMOVED***le(cfg, envCfg, sharedCfg, handlers, sessOpts)
+		return resolveCredsFromProfile(cfg, envCfg, sharedCfg, handlers, sessOpts)
 
 	case envCfg.Creds.HasKeys():
 		// Environment credentials
@@ -42,7 +42,7 @@ func resolveCredentials(cfg *aws.Con***REMOVED***g,
 
 	default:
 		// Fallback to the "default" credential resolution chain.
-		return resolveCredsFromPro***REMOVED***le(cfg, envCfg, sharedCfg, handlers, sessOpts)
+		return resolveCredsFromProfile(cfg, envCfg, sharedCfg, handlers, sessOpts)
 	}
 }
 
@@ -52,14 +52,14 @@ var WebIdentityEmptyRoleARNErr = awserr.New(stscreds.ErrCodeWebIdentity, "role A
 
 // WebIdentityEmptyTokenFilePathErr will occur if 'AWS_IAM_ROLE_ARN' was set but
 // 'AWS_WEB_IDENTITY_TOKEN_FILE' was not set.
-var WebIdentityEmptyTokenFilePathErr = awserr.New(stscreds.ErrCodeWebIdentity, "token ***REMOVED***le path is not set", nil)
+var WebIdentityEmptyTokenFilePathErr = awserr.New(stscreds.ErrCodeWebIdentity, "token file path is not set", nil)
 
-func assumeWebIdentity(cfg *aws.Con***REMOVED***g, handlers request.Handlers,
-	***REMOVED***lepath string,
+func assumeWebIdentity(cfg *aws.Config, handlers request.Handlers,
+	filepath string,
 	roleARN, sessionName string,
 ) (*credentials.Credentials, error) {
 
-	if len(***REMOVED***lepath) == 0 {
+	if len(filepath) == 0 {
 		return nil, WebIdentityEmptyTokenFilePathErr
 	}
 
@@ -69,32 +69,32 @@ func assumeWebIdentity(cfg *aws.Con***REMOVED***g, handlers request.Handlers,
 
 	creds := stscreds.NewWebIdentityCredentials(
 		&Session{
-			Con***REMOVED***g:   cfg,
+			Config:   cfg,
 			Handlers: handlers.Copy(),
 		},
 		roleARN,
 		sessionName,
-		***REMOVED***lepath,
+		filepath,
 	)
 
 	return creds, nil
 }
 
-func resolveCredsFromPro***REMOVED***le(cfg *aws.Con***REMOVED***g,
-	envCfg envCon***REMOVED***g, sharedCfg sharedCon***REMOVED***g,
+func resolveCredsFromProfile(cfg *aws.Config,
+	envCfg envConfig, sharedCfg sharedConfig,
 	handlers request.Handlers,
 	sessOpts Options,
 ) (creds *credentials.Credentials, err error) {
 
 	switch {
-	case sharedCfg.SourcePro***REMOVED***le != nil:
-		// Assume IAM role with credentials source from a different pro***REMOVED***le.
-		creds, err = resolveCredsFromPro***REMOVED***le(cfg, envCfg,
-			*sharedCfg.SourcePro***REMOVED***le, handlers, sessOpts,
+	case sharedCfg.SourceProfile != nil:
+		// Assume IAM role with credentials source from a different profile.
+		creds, err = resolveCredsFromProfile(cfg, envCfg,
+			*sharedCfg.SourceProfile, handlers, sessOpts,
 		)
 
 	case sharedCfg.Creds.HasKeys():
-		// Static Credentials from Shared Con***REMOVED***g/Credentials ***REMOVED***le.
+		// Static Credentials from Shared Config/Credentials file.
 		creds = credentials.NewStaticCredentialsFromCreds(
 			sharedCfg.Creds,
 		)
@@ -111,7 +111,7 @@ func resolveCredsFromPro***REMOVED***le(cfg *aws.Con***REMOVED***g,
 	case len(sharedCfg.WebIdentityTokenFile) != 0:
 		// Credentials from Assume Web Identity token require an IAM Role, and
 		// that roll will be assumed. May be wrapped with another assume role
-		// via SourcePro***REMOVED***le.
+		// via SourceProfile.
 		return assumeWebIdentity(cfg, handlers,
 			sharedCfg.WebIdentityTokenFile,
 			sharedCfg.RoleARN,
@@ -127,11 +127,11 @@ func resolveCredsFromPro***REMOVED***le(cfg *aws.Con***REMOVED***g,
 			Providers: []credentials.Provider{
 				&credProviderError{
 					Err: awserr.New("EnvAccessKeyNotFound",
-						"failed to ***REMOVED***nd credentials in the environment.", nil),
+						"failed to find credentials in the environment.", nil),
 				},
 				&credProviderError{
 					Err: awserr.New("SharedCredsLoad",
-						fmt.Sprintf("failed to load pro***REMOVED***le, %s.", envCfg.Pro***REMOVED***le), nil),
+						fmt.Sprintf("failed to load profile, %s.", envCfg.Profile), nil),
 				},
 				defaults.RemoteCredProvider(*cfg, handlers),
 			},
@@ -157,8 +157,8 @@ const (
 	credSourceECSContainer = "EcsContainer"
 )
 
-func resolveCredsFromSource(cfg *aws.Con***REMOVED***g,
-	envCfg envCon***REMOVED***g, sharedCfg sharedCon***REMOVED***g,
+func resolveCredsFromSource(cfg *aws.Config,
+	envCfg envConfig, sharedCfg sharedConfig,
 	handlers request.Handlers,
 	sessOpts Options,
 ) (creds *credentials.Credentials, err error) {
@@ -173,22 +173,22 @@ func resolveCredsFromSource(cfg *aws.Con***REMOVED***g,
 
 	case credSourceECSContainer:
 		if len(os.Getenv(shareddefaults.ECSCredsProviderEnvVar)) == 0 {
-			return nil, ErrSharedCon***REMOVED***gECSContainerEnvVarEmpty
+			return nil, ErrSharedConfigECSContainerEnvVarEmpty
 		}
 
 		p := defaults.RemoteCredProvider(*cfg, handlers)
 		creds = credentials.NewCredentials(p)
 
 	default:
-		return nil, ErrSharedCon***REMOVED***gInvalidCredSource
+		return nil, ErrSharedConfigInvalidCredSource
 	}
 
 	return creds, nil
 }
 
-func credsFromAssumeRole(cfg aws.Con***REMOVED***g,
+func credsFromAssumeRole(cfg aws.Config,
 	handlers request.Handlers,
-	sharedCfg sharedCon***REMOVED***g,
+	sharedCfg sharedConfig,
 	sessOpts Options,
 ) (*credentials.Credentials, error) {
 
@@ -200,7 +200,7 @@ func credsFromAssumeRole(cfg aws.Con***REMOVED***g,
 
 	return stscreds.NewCredentials(
 		&Session{
-			Con***REMOVED***g:   &cfg,
+			Config:   &cfg,
 			Handlers: handlers.Copy(),
 		},
 		sharedCfg.RoleARN,
@@ -223,7 +223,7 @@ func credsFromAssumeRole(cfg aws.Con***REMOVED***g,
 }
 
 // AssumeRoleTokenProviderNotSetError is an error returned when creating a
-// session when the MFAToken option is not set when shared con***REMOVED***g is con***REMOVED***gured
+// session when the MFAToken option is not set when shared config is configured
 // load assume a role with an MFA token.
 type AssumeRoleTokenProviderNotSetError struct{}
 
@@ -242,7 +242,7 @@ func (e AssumeRoleTokenProviderNotSetError) OrigErr() error {
 	return nil
 }
 
-// Error satis***REMOVED***es the error interface.
+// Error satisfies the error interface.
 func (e AssumeRoleTokenProviderNotSetError) Error() string {
 	return awserr.SprintError(e.Code(), e.Message(), "", nil)
 }

@@ -1,4 +1,4 @@
-The following ***REMOVED***les were ported to Go from C ***REMOVED***les of libyaml, and thus
+The following files were ported to Go from C files of libyaml, and thus
 are still covered by their original copyright and license:
 
     apic.go
@@ -13,7 +13,7 @@ are still covered by their original copyright and license:
 Copyright (c) 2006 Kirill Simonov
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of
-this software and associated documentation ***REMOVED***les (the "Software"), to deal in
+this software and associated documentation files (the "Software"), to deal in
 the Software without restriction, including without limitation the rights to
 use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies
 of the Software, and to permit persons to whom the Software is furnished to do

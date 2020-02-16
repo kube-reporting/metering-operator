@@ -1,6 +1,6 @@
 // Copyright 2016 Google Inc.  All rights reserved.
 // Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE ***REMOVED***le.
+// license that can be found in the LICENSE file.
 
 package uuid
 
@@ -25,7 +25,7 @@ func NodeInterface() string {
 }
 
 // SetNodeInterface selects the hardware address to be used for Version 1 UUIDs.
-// If name is "" then the ***REMOVED***rst usable interface found will be used or a random
+// If name is "" then the first usable interface found will be used or a random
 // Node ID will be generated.  If a named interface cannot be found then false
 // is returned.
 //
@@ -45,7 +45,7 @@ func setNodeInterface(name string) bool {
 	}
 
 	// We found no interfaces with a valid hardware address.  If name
-	// does not specify a speci***REMOVED***c interface generate a random Node ID
+	// does not specify a specific interface generate a random Node ID
 	// (section 4.1.6)
 	if name == "" {
 		randomBits(nodeID[:])
@@ -66,7 +66,7 @@ func NodeID() []byte {
 	return nid[:]
 }
 
-// SetNodeID sets the Node ID to be used for Version 1 UUIDs.  The ***REMOVED***rst 6 bytes
+// SetNodeID sets the Node ID to be used for Version 1 UUIDs.  The first 6 bytes
 // of id are used.  If id is less than 6 bytes then false is returned and the
 // Node ID is not set.
 func SetNodeID(id []byte) bool {
@@ -81,7 +81,7 @@ func SetNodeID(id []byte) bool {
 }
 
 // NodeID returns the 6 byte node id encoded in uuid.  It returns nil if uuid is
-// not valid.  The NodeID is only well de***REMOVED***ned for version 1 and 2 UUIDs.
+// not valid.  The NodeID is only well defined for version 1 and 2 UUIDs.
 func (uuid UUID) NodeID() []byte {
 	var node [6]byte
 	copy(node[:], uuid[10:])

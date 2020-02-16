@@ -39,7 +39,7 @@ func (f *FlagSet) GetInt32(name string) (int32, error) {
 	return val.(int32), nil
 }
 
-// Int32Var de***REMOVED***nes an int32 flag with speci***REMOVED***ed name, default value, and usage string.
+// Int32Var defines an int32 flag with specified name, default value, and usage string.
 // The argument p points to an int32 variable in which to store the value of the flag.
 func (f *FlagSet) Int32Var(p *int32, name string, value int32, usage string) {
 	f.VarP(newInt32Value(value, p), name, "", usage)
@@ -50,7 +50,7 @@ func (f *FlagSet) Int32VarP(p *int32, name, shorthand string, value int32, usage
 	f.VarP(newInt32Value(value, p), name, shorthand, usage)
 }
 
-// Int32Var de***REMOVED***nes an int32 flag with speci***REMOVED***ed name, default value, and usage string.
+// Int32Var defines an int32 flag with specified name, default value, and usage string.
 // The argument p points to an int32 variable in which to store the value of the flag.
 func Int32Var(p *int32, name string, value int32, usage string) {
 	CommandLine.VarP(newInt32Value(value, p), name, "", usage)
@@ -61,7 +61,7 @@ func Int32VarP(p *int32, name, shorthand string, value int32, usage string) {
 	CommandLine.VarP(newInt32Value(value, p), name, shorthand, usage)
 }
 
-// Int32 de***REMOVED***nes an int32 flag with speci***REMOVED***ed name, default value, and usage string.
+// Int32 defines an int32 flag with specified name, default value, and usage string.
 // The return value is the address of an int32 variable that stores the value of the flag.
 func (f *FlagSet) Int32(name string, value int32, usage string) *int32 {
 	p := new(int32)
@@ -76,7 +76,7 @@ func (f *FlagSet) Int32P(name, shorthand string, value int32, usage string) *int
 	return p
 }
 
-// Int32 de***REMOVED***nes an int32 flag with speci***REMOVED***ed name, default value, and usage string.
+// Int32 defines an int32 flag with specified name, default value, and usage string.
 // The return value is the address of an int32 variable that stores the value of the flag.
 func Int32(name string, value int32, usage string) *int32 {
 	return CommandLine.Int32P(name, "", value, usage)

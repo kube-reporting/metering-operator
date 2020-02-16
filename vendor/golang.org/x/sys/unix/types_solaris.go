@@ -1,6 +1,6 @@
 // Copyright 2009 The Go Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE ***REMOVED***le.
+// license that can be found in the LICENSE file.
 
 // +build ignore
 
@@ -14,12 +14,12 @@ Input to cgo -godefs.  See README.md
 package unix
 
 /*
-#de***REMOVED***ne KERNEL
-// These de***REMOVED***nes ensure that builds done on newer versions of Solaris are
+#define KERNEL
+// These defines ensure that builds done on newer versions of Solaris are
 // backwards-compatible with older versions of Solaris and
 // OpenSolaris-based derivatives.
-#de***REMOVED***ne __USE_SUNOS_SOCKETS__          // msghdr
-#de***REMOVED***ne __USE_LEGACY_PROTOTYPES__      // iovec
+#define __USE_SUNOS_SOCKETS__          // msghdr
+#define __USE_LEGACY_PROTOTYPES__      // iovec
 #include <dirent.h>
 #include <fcntl.h>
 #include <netdb.h>
@@ -60,7 +60,7 @@ enum {
 };
 
 union sockaddr_all {
-	struct sockaddr s1;	// this one gets used for ***REMOVED***elds
+	struct sockaddr s1;	// this one gets used for fields
 	struct sockaddr_in s2;	// these pad it out
 	struct sockaddr_in6 s3;
 	struct sockaddr_un s4;
@@ -179,7 +179,7 @@ type Inet6Pktinfo C.struct_in6_pktinfo
 
 type IPv6MTUInfo C.struct_ip6_mtuinfo
 
-type ICMPv6Filter C.struct_icmp6_***REMOVED***lter
+type ICMPv6Filter C.struct_icmp6_filter
 
 const (
 	SizeofSockaddrInet4    = C.sizeof_struct_sockaddr_in
@@ -194,7 +194,7 @@ const (
 	SizeofCmsghdr          = C.sizeof_struct_cmsghdr
 	SizeofInet6Pktinfo     = C.sizeof_struct_in6_pktinfo
 	SizeofIPv6MTUInfo      = C.sizeof_struct_ip6_mtuinfo
-	SizeofICMPv6Filter     = C.sizeof_struct_icmp6_***REMOVED***lter
+	SizeofICMPv6Filter     = C.sizeof_struct_icmp6_filter
 )
 
 // Select
@@ -235,7 +235,7 @@ type RtMsghdr C.struct_rt_msghdr
 
 type RtMetrics C.struct_rt_metrics
 
-// Berkeley packet ***REMOVED***lter
+// Berkeley packet filter
 
 const (
 	SizeofBpfVersion = C.sizeof_struct_bpf_version

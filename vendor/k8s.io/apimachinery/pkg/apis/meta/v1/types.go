@@ -2,7 +2,7 @@
 Copyright 2015 The Kubernetes Authors.
 
 Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this ***REMOVED***le except in compliance with the License.
+you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
 
     http://www.apache.org/licenses/LICENSE-2.0
@@ -10,7 +10,7 @@ You may obtain a copy of the License at
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the speci***REMOVED***c language governing permissions and
+See the License for the specific language governing permissions and
 limitations under the License.
 */
 
@@ -47,7 +47,7 @@ type TypeMeta struct {
 	// +optional
 	Kind string `json:"kind,omitempty" protobuf:"bytes,1,opt,name=kind"`
 
-	// APIVersion de***REMOVED***nes the versioned schema of this representation of an object.
+	// APIVersion defines the versioned schema of this representation of an object.
 	// Servers should convert recognized schemas to the latest internal value, and
 	// may reject unrecognized values.
 	// More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#resources
@@ -64,9 +64,9 @@ type ListMeta struct {
 	// +optional
 	SelfLink string `json:"selfLink,omitempty" protobuf:"bytes,1,opt,name=selfLink"`
 
-	// String that identi***REMOVED***es the server's internal version of this object that
+	// String that identifies the server's internal version of this object that
 	// can be used by clients to determine when objects have changed.
-	// Value must be treated as opaque by clients and passed unmodi***REMOVED***ed back to the server.
+	// Value must be treated as opaque by clients and passed unmodified back to the server.
 	// Populated by the system.
 	// Read-only.
 	// More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#concurrency-control-and-consistency
@@ -76,14 +76,14 @@ type ListMeta struct {
 	// continue may be set if the user set a limit on the number of items returned, and indicates that
 	// the server has more data available. The value is opaque and may be used to issue another request
 	// to the endpoint that served this list to retrieve the next set of available objects. Continuing a
-	// consistent list may not be possible if the server con***REMOVED***guration has changed or more than a few
-	// minutes have passed. The resourceVersion ***REMOVED***eld returned when using this continue value will be
-	// identical to the value in the ***REMOVED***rst response, unless you have received this token from an error
+	// consistent list may not be possible if the server configuration has changed or more than a few
+	// minutes have passed. The resourceVersion field returned when using this continue value will be
+	// identical to the value in the first response, unless you have received this token from an error
 	// message.
 	Continue string `json:"continue,omitempty" protobuf:"bytes,3,opt,name=continue"`
 }
 
-// These are internal ***REMOVED***nalizer values for Kubernetes-like APIs, must be quali***REMOVED***ed name unless de***REMOVED***ned here
+// These are internal finalizer values for Kubernetes-like APIs, must be qualified name unless defined here
 const (
 	FinalizerOrphanDependents string = "orphan"
 	FinalizerDeleteDependents string = "foregroundDeletion"
@@ -94,34 +94,34 @@ const (
 type ObjectMeta struct {
 	// Name must be unique within a namespace. Is required when creating resources, although
 	// some resources may allow a client to request the generation of an appropriate name
-	// automatically. Name is primarily intended for creation idempotence and con***REMOVED***guration
-	// de***REMOVED***nition.
+	// automatically. Name is primarily intended for creation idempotence and configuration
+	// definition.
 	// Cannot be updated.
-	// More info: http://kubernetes.io/docs/user-guide/identi***REMOVED***ers#names
+	// More info: http://kubernetes.io/docs/user-guide/identifiers#names
 	// +optional
 	Name string `json:"name,omitempty" protobuf:"bytes,1,opt,name=name"`
 
-	// GenerateName is an optional pre***REMOVED***x, used by the server, to generate a unique
-	// name ONLY IF the Name ***REMOVED***eld has not been provided.
-	// If this ***REMOVED***eld is used, the name returned to the client will be different
-	// than the name passed. This value will also be combined with a unique suf***REMOVED***x.
-	// The provided value has the same validation rules as the Name ***REMOVED***eld,
-	// and may be truncated by the length of the suf***REMOVED***x required to make the value
+	// GenerateName is an optional prefix, used by the server, to generate a unique
+	// name ONLY IF the Name field has not been provided.
+	// If this field is used, the name returned to the client will be different
+	// than the name passed. This value will also be combined with a unique suffix.
+	// The provided value has the same validation rules as the Name field,
+	// and may be truncated by the length of the suffix required to make the value
 	// unique on the server.
 	//
-	// If this ***REMOVED***eld is speci***REMOVED***ed and the generated name exists, the server will
+	// If this field is specified and the generated name exists, the server will
 	// NOT return a 409 - instead, it will either return 201 Created or 500 with Reason
 	// ServerTimeout indicating a unique name could not be found in the time allotted, and the client
 	// should retry (optionally after the time indicated in the Retry-After header).
 	//
-	// Applied only if Name is not speci***REMOVED***ed.
+	// Applied only if Name is not specified.
 	// More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#idempotency
 	// +optional
 	GenerateName string `json:"generateName,omitempty" protobuf:"bytes,2,opt,name=generateName"`
 
-	// Namespace de***REMOVED***nes the space within each name must be unique. An empty namespace is
+	// Namespace defines the space within each name must be unique. An empty namespace is
 	// equivalent to the "default" namespace, but "default" is the canonical representation.
-	// Not all objects are required to be scoped to a namespace - the value of this ***REMOVED***eld for
+	// Not all objects are required to be scoped to a namespace - the value of this field for
 	// those objects will be empty.
 	//
 	// Must be a DNS_LABEL.
@@ -142,14 +142,14 @@ type ObjectMeta struct {
 	//
 	// Populated by the system.
 	// Read-only.
-	// More info: http://kubernetes.io/docs/user-guide/identi***REMOVED***ers#uids
+	// More info: http://kubernetes.io/docs/user-guide/identifiers#uids
 	// +optional
 	UID types.UID `json:"uid,omitempty" protobuf:"bytes,5,opt,name=uid,casttype=k8s.io/kubernetes/pkg/types.UID"`
 
 	// An opaque value that represents the internal version of this object that can
 	// be used by clients to determine when objects have changed. May be used for optimistic
 	// concurrency, change detection, and the watch operation on a resource or set of resources.
-	// Clients must treat these values as opaque and passed unmodi***REMOVED***ed back to the server.
+	// Clients must treat these values as opaque and passed unmodified back to the server.
 	// They may only be valid for a particular resource or set of resources.
 	//
 	// Populated by the system.
@@ -159,7 +159,7 @@ type ObjectMeta struct {
 	// +optional
 	ResourceVersion string `json:"resourceVersion,omitempty" protobuf:"bytes,6,opt,name=resourceVersion"`
 
-	// A sequence number representing a speci***REMOVED***c generation of the desired state.
+	// A sequence number representing a specific generation of the desired state.
 	// Populated by the system. Read-only.
 	// +optional
 	Generation int64 `json:"generation,omitempty" protobuf:"varint,7,opt,name=generation"`
@@ -176,10 +176,10 @@ type ObjectMeta struct {
 	CreationTimestamp Time `json:"creationTimestamp,omitempty" protobuf:"bytes,8,opt,name=creationTimestamp"`
 
 	// DeletionTimestamp is RFC 3339 date and time at which this resource will be deleted. This
-	// ***REMOVED***eld is set by the server when a graceful deletion is requested by the user, and is not
+	// field is set by the server when a graceful deletion is requested by the user, and is not
 	// directly settable by a client. The resource is expected to be deleted (no longer visible
-	// from resource lists, and not reachable by name) after the time in this ***REMOVED***eld, once the
-	// ***REMOVED***nalizers list is empty. As long as the ***REMOVED***nalizers list contains items, deletion is blocked.
+	// from resource lists, and not reachable by name) after the time in this field, once the
+	// finalizers list is empty. As long as the finalizers list contains items, deletion is blocked.
 	// Once the deletionTimestamp is set, this value may not be unset or be set further into the
 	// future, although it may be shortened or the resource may be deleted prior to this time.
 	// For example, a user may request that a pod is deleted in 30 seconds. The Kubelet will react
@@ -219,7 +219,7 @@ type ObjectMeta struct {
 
 	// List of objects depended by this object. If ALL objects in the list have
 	// been deleted, this object will be garbage collected. If this object is managed by a controller,
-	// then an entry in this list will point to this controller, with the controller ***REMOVED***eld set to true.
+	// then an entry in this list will point to this controller, with the controller field set to true.
 	// There cannot be more than one managing controller.
 	// +optional
 	// +patchMergeKey=uid
@@ -227,27 +227,27 @@ type ObjectMeta struct {
 	OwnerReferences []OwnerReference `json:"ownerReferences,omitempty" patchStrategy:"merge" patchMergeKey:"uid" protobuf:"bytes,13,rep,name=ownerReferences"`
 
 	// An initializer is a controller which enforces some system invariant at object creation time.
-	// This ***REMOVED***eld is a list of initializers that have not yet acted on this object. If nil or empty,
+	// This field is a list of initializers that have not yet acted on this object. If nil or empty,
 	// this object has been completely initialized. Otherwise, the object is considered uninitialized
 	// and is hidden (in list/watch and get calls) from clients that haven't explicitly asked to
 	// observe uninitialized objects.
 	//
 	// When an object is created, the system will populate this list with the current set of initializers.
-	// Only privileged users may set or modify this list. Once it is empty, it may not be modi***REMOVED***ed further
+	// Only privileged users may set or modify this list. Once it is empty, it may not be modified further
 	// by any user.
 	Initializers *Initializers `json:"initializers,omitempty" protobuf:"bytes,16,opt,name=initializers"`
 
 	// Must be empty before the object is deleted from the registry. Each entry
-	// is an identi***REMOVED***er for the responsible component that will remove the entry
+	// is an identifier for the responsible component that will remove the entry
 	// from the list. If the deletionTimestamp of the object is non-nil, entries
 	// in this list can only be removed.
 	// +optional
 	// +patchStrategy=merge
-	Finalizers []string `json:"***REMOVED***nalizers,omitempty" patchStrategy:"merge" protobuf:"bytes,14,rep,name=***REMOVED***nalizers"`
+	Finalizers []string `json:"finalizers,omitempty" patchStrategy:"merge" protobuf:"bytes,14,rep,name=finalizers"`
 
 	// The name of the cluster which the object belongs to.
 	// This is used to distinguish resources with same name and namespace in different clusters.
-	// This ***REMOVED***eld is not set anywhere right now and apiserver is going to ignore it if set in create or update request.
+	// This field is not set anywhere right now and apiserver is going to ignore it if set in create or update request.
 	// +optional
 	ClusterName string `json:"clusterName,omitempty" protobuf:"bytes,15,opt,name=clusterName"`
 }
@@ -261,7 +261,7 @@ type Initializers struct {
 	// +patchMergeKey=name
 	// +patchStrategy=merge
 	Pending []Initializer `json:"pending" protobuf:"bytes,1,rep,name=pending" patchStrategy:"merge" patchMergeKey:"name"`
-	// If result is set with the Failure ***REMOVED***eld, the object will be persisted to storage and then deleted,
+	// If result is set with the Failure field, the object will be persisted to storage and then deleted,
 	// ensuring that other clients can observe the deletion.
 	Result *Status `json:"result,omitempty" protobuf:"bytes,2,opt,name=result"`
 }
@@ -273,21 +273,21 @@ type Initializer struct {
 }
 
 const (
-	// NamespaceDefault means the object is in the default namespace which is applied when not speci***REMOVED***ed by clients
+	// NamespaceDefault means the object is in the default namespace which is applied when not specified by clients
 	NamespaceDefault string = "default"
-	// NamespaceAll is the default argument to specify on a context when you want to list or ***REMOVED***lter resources across all namespaces
+	// NamespaceAll is the default argument to specify on a context when you want to list or filter resources across all namespaces
 	NamespaceAll string = ""
 	// NamespaceNone is the argument for a context when there is no namespace.
 	NamespaceNone string = ""
 	// NamespaceSystem is the system namespace where we place system components.
 	NamespaceSystem string = "kube-system"
-	// NamespacePublic is the namespace where we place public info (Con***REMOVED***gMaps)
+	// NamespacePublic is the namespace where we place public info (ConfigMaps)
 	NamespacePublic string = "kube-public"
 )
 
 // OwnerReference contains enough information to let you identify an owning
 // object. An owning object must be in the same namespace as the dependent, or
-// be cluster-scoped, so there is no namespace ***REMOVED***eld.
+// be cluster-scoped, so there is no namespace field.
 type OwnerReference struct {
 	// API version of the referent.
 	APIVersion string `json:"apiVersion" protobuf:"bytes,5,opt,name=apiVersion"`
@@ -295,19 +295,19 @@ type OwnerReference struct {
 	// More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#types-kinds
 	Kind string `json:"kind" protobuf:"bytes,1,opt,name=kind"`
 	// Name of the referent.
-	// More info: http://kubernetes.io/docs/user-guide/identi***REMOVED***ers#names
+	// More info: http://kubernetes.io/docs/user-guide/identifiers#names
 	Name string `json:"name" protobuf:"bytes,3,opt,name=name"`
 	// UID of the referent.
-	// More info: http://kubernetes.io/docs/user-guide/identi***REMOVED***ers#uids
+	// More info: http://kubernetes.io/docs/user-guide/identifiers#uids
 	UID types.UID `json:"uid" protobuf:"bytes,4,opt,name=uid,casttype=k8s.io/apimachinery/pkg/types.UID"`
 	// If true, this reference points to the managing controller.
 	// +optional
 	Controller *bool `json:"controller,omitempty" protobuf:"varint,6,opt,name=controller"`
-	// If true, AND if the owner has the "foregroundDeletion" ***REMOVED***nalizer, then
+	// If true, AND if the owner has the "foregroundDeletion" finalizer, then
 	// the owner cannot be deleted from the key-value store until this
 	// reference is removed.
 	// Defaults to false.
-	// To set this ***REMOVED***eld, a user needs "delete" permission of the owner,
+	// To set this field, a user needs "delete" permission of the owner,
 	// otherwise 422 (Unprocessable Entity) will be returned.
 	// +optional
 	BlockOwnerDeletion *bool `json:"blockOwnerDeletion,omitempty" protobuf:"varint,7,opt,name=blockOwnerDeletion"`
@@ -323,20 +323,20 @@ type ListOptions struct {
 	// Defaults to everything.
 	// +optional
 	LabelSelector string `json:"labelSelector,omitempty" protobuf:"bytes,1,opt,name=labelSelector"`
-	// A selector to restrict the list of returned objects by their ***REMOVED***elds.
+	// A selector to restrict the list of returned objects by their fields.
 	// Defaults to everything.
 	// +optional
-	FieldSelector string `json:"***REMOVED***eldSelector,omitempty" protobuf:"bytes,2,opt,name=***REMOVED***eldSelector"`
+	FieldSelector string `json:"fieldSelector,omitempty" protobuf:"bytes,2,opt,name=fieldSelector"`
 	// If true, partially initialized resources are included in the response.
 	// +optional
 	IncludeUninitialized bool `json:"includeUninitialized,omitempty" protobuf:"varint,6,opt,name=includeUninitialized"`
 	// Watch for changes to the described resources and return them as a stream of
-	// add, update, and remove noti***REMOVED***cations. Specify resourceVersion.
+	// add, update, and remove notifications. Specify resourceVersion.
 	// +optional
 	Watch bool `json:"watch,omitempty" protobuf:"varint,3,opt,name=watch"`
-	// When speci***REMOVED***ed with a watch call, shows changes that occur after that particular version of a resource.
+	// When specified with a watch call, shows changes that occur after that particular version of a resource.
 	// Defaults to changes from the beginning of history.
-	// When speci***REMOVED***ed for list:
+	// When specified for list:
 	// - if unset, then the result is returned from remote storage based on quorum-read flag;
 	// - if it's 0, then we simply return what we currently have in cache, no guarantee;
 	// - if set to non zero, then the result is at least as fresh as given rv.
@@ -348,36 +348,36 @@ type ListOptions struct {
 	TimeoutSeconds *int64 `json:"timeoutSeconds,omitempty" protobuf:"varint,5,opt,name=timeoutSeconds"`
 
 	// limit is a maximum number of responses to return for a list call. If more items exist, the
-	// server will set the `continue` ***REMOVED***eld on the list metadata to a value that can be used with the
+	// server will set the `continue` field on the list metadata to a value that can be used with the
 	// same initial query to retrieve the next set of results. Setting a limit may return fewer than
 	// the requested amount of items (up to zero items) in the event all requested objects are
-	// ***REMOVED***ltered out and clients should only use the presence of the continue ***REMOVED***eld to determine whether
+	// filtered out and clients should only use the presence of the continue field to determine whether
 	// more results are available. Servers may choose not to support the limit argument and will return
-	// all of the available results. If limit is speci***REMOVED***ed and the continue ***REMOVED***eld is empty, clients may
-	// assume that no more results are available. This ***REMOVED***eld is not supported if watch is true.
+	// all of the available results. If limit is specified and the continue field is empty, clients may
+	// assume that no more results are available. This field is not supported if watch is true.
 	//
 	// The server guarantees that the objects returned when using continue will be identical to issuing
-	// a single list call without a limit - that is, no objects created, modi***REMOVED***ed, or deleted after the
-	// ***REMOVED***rst request is issued will be included in any subsequent continued requests. This is sometimes
+	// a single list call without a limit - that is, no objects created, modified, or deleted after the
+	// first request is issued will be included in any subsequent continued requests. This is sometimes
 	// referred to as a consistent snapshot, and ensures that a client that is using limit to receive
 	// smaller chunks of a very large result can ensure they see all possible objects. If objects are
-	// updated during a chunked list the version of the object that was present at the time the ***REMOVED***rst list
+	// updated during a chunked list the version of the object that was present at the time the first list
 	// result was calculated is returned.
 	Limit int64 `json:"limit,omitempty" protobuf:"varint,7,opt,name=limit"`
 	// The continue option should be set when retrieving more results from the server. Since this value is
-	// server de***REMOVED***ned, clients may only use the continue value from a previous query result with identical
+	// server defined, clients may only use the continue value from a previous query result with identical
 	// query parameters (except for the value of continue) and the server may reject a continue value it
-	// does not recognize. If the speci***REMOVED***ed continue value is no longer valid whether due to expiration
-	// (generally ***REMOVED***ve to ***REMOVED***fteen minutes) or a con***REMOVED***guration change on the server, the server will
+	// does not recognize. If the specified continue value is no longer valid whether due to expiration
+	// (generally five to fifteen minutes) or a configuration change on the server, the server will
 	// respond with a 410 ResourceExpired error together with a continue token. If the client needs a
-	// consistent list, it must restart their list without the continue ***REMOVED***eld. Otherwise, the client may
+	// consistent list, it must restart their list without the continue field. Otherwise, the client may
 	// send another list request with the token received with the 410 error, the server will respond with
 	// a list starting from the next key, but from the latest snapshot, which is inconsistent from the
-	// previous list results - objects that are created, modi***REMOVED***ed, or deleted after the ***REMOVED***rst list request
+	// previous list results - objects that are created, modified, or deleted after the first list request
 	// will be included in the response, as long as their keys are after the "next key".
 	//
-	// This ***REMOVED***eld is not supported when watch is true. Clients may start a watch from the last
-	// resourceVersion value returned by the server and not miss any modi***REMOVED***cations.
+	// This field is not supported when watch is true. Clients may start a watch from the last
+	// resourceVersion value returned by the server and not miss any modifications.
 	Continue string `json:"continue,omitempty" protobuf:"bytes,8,opt,name=continue"`
 }
 
@@ -386,9 +386,9 @@ type ListOptions struct {
 // ExportOptions is the query options to the standard REST get call.
 type ExportOptions struct {
 	TypeMeta `json:",inline"`
-	// Should this value be exported.  Export strips ***REMOVED***elds that a user can not specify.
+	// Should this value be exported.  Export strips fields that a user can not specify.
 	Export bool `json:"export" protobuf:"varint,1,opt,name=export"`
-	// Should the export be exact.  Exact export maintains cluster-speci***REMOVED***c ***REMOVED***elds like 'Namespace'.
+	// Should the export be exact.  Exact export maintains cluster-specific fields like 'Namespace'.
 	Exact bool `json:"exact" protobuf:"varint,2,opt,name=exact"`
 }
 
@@ -397,7 +397,7 @@ type ExportOptions struct {
 // GetOptions is the standard query options to the standard REST get call.
 type GetOptions struct {
 	TypeMeta `json:",inline"`
-	// When speci***REMOVED***ed:
+	// When specified:
 	// - if unset, then the result is returned from remote storage based on quorum-read flag;
 	// - if it's 0, then we simply return what we currently have in cache, no guarantee;
 	// - if set to non zero, then the result is at least as fresh as given rv.
@@ -420,7 +420,7 @@ const (
 	// The object exists in the key-value store until the garbage collector
 	// deletes all the dependents whose ownerReference.blockOwnerDeletion=true
 	// from the key-value store.  API sever will put the "foregroundDeletion"
-	// ***REMOVED***nalizer on the object, and sets its deletionTimestamp.  This policy is
+	// finalizer on the object, and sets its deletionTimestamp.  This policy is
 	// cascading, i.e., the dependents will be deleted with Foreground.
 	DeletePropagationForeground DeletionPropagation = "Foreground"
 )
@@ -439,27 +439,27 @@ type DeleteOptions struct {
 
 	// The duration in seconds before the object should be deleted. Value must be non-negative integer.
 	// The value zero indicates delete immediately. If this value is nil, the default grace period for the
-	// speci***REMOVED***ed type will be used.
-	// Defaults to a per object value if not speci***REMOVED***ed. zero means delete immediately.
+	// specified type will be used.
+	// Defaults to a per object value if not specified. zero means delete immediately.
 	// +optional
 	GracePeriodSeconds *int64 `json:"gracePeriodSeconds,omitempty" protobuf:"varint,1,opt,name=gracePeriodSeconds"`
 
-	// Must be ful***REMOVED***lled before a deletion is carried out. If not possible, a 409 Conflict status will be
+	// Must be fulfilled before a deletion is carried out. If not possible, a 409 Conflict status will be
 	// returned.
 	// +optional
 	Preconditions *Preconditions `json:"preconditions,omitempty" protobuf:"bytes,2,opt,name=preconditions"`
 
-	// Deprecated: please use the PropagationPolicy, this ***REMOVED***eld will be deprecated in 1.7.
+	// Deprecated: please use the PropagationPolicy, this field will be deprecated in 1.7.
 	// Should the dependent objects be orphaned. If true/false, the "orphan"
-	// ***REMOVED***nalizer will be added to/removed from the object's ***REMOVED***nalizers list.
-	// Either this ***REMOVED***eld or PropagationPolicy may be set, but not both.
+	// finalizer will be added to/removed from the object's finalizers list.
+	// Either this field or PropagationPolicy may be set, but not both.
 	// +optional
 	OrphanDependents *bool `json:"orphanDependents,omitempty" protobuf:"varint,3,opt,name=orphanDependents"`
 
 	// Whether and how garbage collection will be performed.
-	// Either this ***REMOVED***eld or OrphanDependents may be set, but not both.
-	// The default policy is decided by the existing ***REMOVED***nalizer set in the
-	// metadata.***REMOVED***nalizers and the resource-speci***REMOVED***c default policy.
+	// Either this field or OrphanDependents may be set, but not both.
+	// The default policy is decided by the existing finalizer set in the
+	// metadata.finalizers and the resource-specific default policy.
 	// Acceptable values are: 'Orphan' - orphan the dependents; 'Background' -
 	// allow the garbage collector to delete the dependents in the background;
 	// 'Foreground' - a cascading policy that deletes all dependents in the
@@ -467,7 +467,7 @@ type DeleteOptions struct {
 	// +optional
 	PropagationPolicy *DeletionPropagation `json:"propagationPolicy,omitempty" protobuf:"varint,4,opt,name=propagationPolicy"`
 
-	// When present, indicates that modi***REMOVED***cations should not be
+	// When present, indicates that modifications should not be
 	// persisted. An invalid or unrecognized dryRun directive will
 	// result in an error response and no further processing of the
 	// request. Valid values are:
@@ -482,7 +482,7 @@ type DeleteOptions struct {
 type CreateOptions struct {
 	TypeMeta `json:",inline"`
 
-	// When present, indicates that modi***REMOVED***cations should not be
+	// When present, indicates that modifications should not be
 	// persisted. An invalid or unrecognized dryRun directive will
 	// result in an error response and no further processing of the
 	// request. Valid values are:
@@ -490,7 +490,7 @@ type CreateOptions struct {
 	// +optional
 	DryRun []string `json:"dryRun,omitempty" protobuf:"bytes,1,rep,name=dryRun"`
 
-	// If IncludeUninitialized is speci***REMOVED***ed, the object may be
+	// If IncludeUninitialized is specified, the object may be
 	// returned without completing initialization.
 	IncludeUninitialized bool `json:"includeUninitialized,omitempty" protobuf:"varint,2,opt,name=includeUninitialized"`
 }
@@ -501,7 +501,7 @@ type CreateOptions struct {
 type UpdateOptions struct {
 	TypeMeta `json:",inline"`
 
-	// When present, indicates that modi***REMOVED***cations should not be
+	// When present, indicates that modifications should not be
 	// persisted. An invalid or unrecognized dryRun directive will
 	// result in an error response and no further processing of the
 	// request. Valid values are:
@@ -510,9 +510,9 @@ type UpdateOptions struct {
 	DryRun []string `json:"dryRun,omitempty" protobuf:"bytes,1,rep,name=dryRun"`
 }
 
-// Preconditions must be ful***REMOVED***lled before an operation (update, delete, etc.) is carried out.
+// Preconditions must be fulfilled before an operation (update, delete, etc.) is carried out.
 type Preconditions struct {
-	// Speci***REMOVED***es the target UID.
+	// Specifies the target UID.
 	// +optional
 	UID *types.UID `json:"uid,omitempty" protobuf:"bytes,1,opt,name=uid,casttype=k8s.io/apimachinery/pkg/types.UID"`
 }
@@ -537,13 +537,13 @@ type Status struct {
 	Message string `json:"message,omitempty" protobuf:"bytes,3,opt,name=message"`
 	// A machine-readable description of why this operation is in the
 	// "Failure" status. If this value is empty there
-	// is no information available. A Reason clari***REMOVED***es an HTTP status
+	// is no information available. A Reason clarifies an HTTP status
 	// code but does not override it.
 	// +optional
 	Reason StatusReason `json:"reason,omitempty" protobuf:"bytes,4,opt,name=reason,casttype=StatusReason"`
-	// Extended data associated with the reason.  Each reason may de***REMOVED***ne its
-	// own extended details. This ***REMOVED***eld is optional and the data returned
-	// is not guaranteed to conform to any schema except that de***REMOVED***ned by
+	// Extended data associated with the reason.  Each reason may define its
+	// own extended details. This field is optional and the data returned
+	// is not guaranteed to conform to any schema except that defined by
 	// the reason type.
 	// +optional
 	Details *StatusDetails `json:"details,omitempty" protobuf:"bytes,5,opt,name=details"`
@@ -554,10 +554,10 @@ type Status struct {
 
 // StatusDetails is a set of additional properties that MAY be set by the
 // server to provide additional information about a response. The Reason
-// ***REMOVED***eld of a Status object de***REMOVED***nes what attributes will be set. Clients
-// must ignore ***REMOVED***elds that do not match the de***REMOVED***ned type of each attribute,
+// field of a Status object defines what attributes will be set. Clients
+// must ignore fields that do not match the defined type of each attribute,
 // and should assume that any attribute may be empty, invalid, or under
-// de***REMOVED***ned.
+// defined.
 type StatusDetails struct {
 	// The name attribute of the resource associated with the status StatusReason
 	// (when there is a single name which can be described).
@@ -573,15 +573,15 @@ type StatusDetails struct {
 	Kind string `json:"kind,omitempty" protobuf:"bytes,3,opt,name=kind"`
 	// UID of the resource.
 	// (when there is a single resource which can be described).
-	// More info: http://kubernetes.io/docs/user-guide/identi***REMOVED***ers#uids
+	// More info: http://kubernetes.io/docs/user-guide/identifiers#uids
 	// +optional
 	UID types.UID `json:"uid,omitempty" protobuf:"bytes,6,opt,name=uid,casttype=k8s.io/apimachinery/pkg/types.UID"`
 	// The Causes array includes more details associated with the StatusReason
 	// failure. Not all StatusReasons may provide detailed causes.
 	// +optional
 	Causes []StatusCause `json:"causes,omitempty" protobuf:"bytes,4,rep,name=causes"`
-	// If speci***REMOVED***ed, the time in seconds before the operation should be retried. Some errors may indicate
-	// the client must take an alternate action - for those errors this ***REMOVED***eld may indicate how long to wait
+	// If specified, the time in seconds before the operation should be retried. Some errors may indicate
+	// the client must take an alternate action - for those errors this field may indicate how long to wait
 	// before taking the alternate action.
 	// +optional
 	RetryAfterSeconds int32 `json:"retryAfterSeconds,omitempty" protobuf:"varint,5,opt,name=retryAfterSeconds"`
@@ -600,26 +600,26 @@ const (
 type StatusReason string
 
 const (
-	// StatusReasonUnknown means the server has declined to indicate a speci***REMOVED***c reason.
-	// The details ***REMOVED***eld may contain other information about this error.
+	// StatusReasonUnknown means the server has declined to indicate a specific reason.
+	// The details field may contain other information about this error.
 	// Status code 500.
 	StatusReasonUnknown StatusReason = ""
 
 	// StatusReasonUnauthorized means the server can be reached and understood the request, but requires
-	// the user to present appropriate authorization credentials (identi***REMOVED***ed by the WWW-Authenticate header)
-	// in order for the action to be completed. If the user has speci***REMOVED***ed credentials on the request, the
-	// server considers them insuf***REMOVED***cient.
+	// the user to present appropriate authorization credentials (identified by the WWW-Authenticate header)
+	// in order for the action to be completed. If the user has specified credentials on the request, the
+	// server considers them insufficient.
 	// Status code 401
 	StatusReasonUnauthorized StatusReason = "Unauthorized"
 
 	// StatusReasonForbidden means the server can be reached and understood the request, but refuses
-	// to take any further action.  It is the result of the server being con***REMOVED***gured to deny access for some reason
+	// to take any further action.  It is the result of the server being configured to deny access for some reason
 	// to the requested resource by the client.
 	// Details (optional):
 	//   "kind" string - the kind attribute of the forbidden resource
 	//                   on some operations may differ from the requested
 	//                   resource.
-	//   "id"   string - the identi***REMOVED***er of the forbidden resource
+	//   "id"   string - the identifier of the forbidden resource
 	// Status code 403
 	StatusReasonForbidden StatusReason = "Forbidden"
 
@@ -629,20 +629,20 @@ const (
 	//   "kind" string - the kind attribute of the missing resource
 	//                   on some operations may differ from the requested
 	//                   resource.
-	//   "id"   string - the identi***REMOVED***er of the missing resource
+	//   "id"   string - the identifier of the missing resource
 	// Status code 404
 	StatusReasonNotFound StatusReason = "NotFound"
 
 	// StatusReasonAlreadyExists means the resource you are creating already exists.
 	// Details (optional):
 	//   "kind" string - the kind attribute of the conflicting resource
-	//   "id"   string - the identi***REMOVED***er of the conflicting resource
+	//   "id"   string - the identifier of the conflicting resource
 	// Status code 409
 	StatusReasonAlreadyExists StatusReason = "AlreadyExists"
 
 	// StatusReasonConflict means the requested operation cannot be completed
 	// due to a conflict in the operation. The client may need to alter the
-	// request. Each resource may de***REMOVED***ne custom details that indicate the
+	// request. Each resource may define custom details that indicate the
 	// nature of the conflict.
 	// Status code 409
 	StatusReasonConflict StatusReason = "Conflict"
@@ -655,13 +655,13 @@ const (
 	// StatusReasonInvalid means the requested create or update operation cannot be
 	// completed due to invalid data provided as part of the request. The client may
 	// need to alter the request. When set, the client may use the StatusDetails
-	// message ***REMOVED***eld as a summary of the issues encountered.
+	// message field as a summary of the issues encountered.
 	// Details (optional):
 	//   "kind" string - the kind attribute of the invalid resource
-	//   "id"   string - the identi***REMOVED***er of the invalid resource
+	//   "id"   string - the identifier of the invalid resource
 	//   "causes"      - one or more StatusCause entries indicating the data in the
 	//                   provided resource that was invalid.  The code, message, and
-	//                   ***REMOVED***eld attributes will be set.
+	//                   field attributes will be set.
 	// Status code 422
 	StatusReasonInvalid StatusReason = "Invalid"
 
@@ -678,10 +678,10 @@ const (
 	StatusReasonServerTimeout StatusReason = "ServerTimeout"
 
 	// StatusReasonTimeout means that the request could not be completed within the given time.
-	// Clients can get this response only when they speci***REMOVED***ed a timeout param in the request,
+	// Clients can get this response only when they specified a timeout param in the request,
 	// or if the server cannot complete the operation within a reasonable amount of time.
 	// The request might succeed with an increased value of timeout param. The client *should*
-	// wait at least the number of seconds speci***REMOVED***ed by the retryAfterSeconds ***REMOVED***eld.
+	// wait at least the number of seconds specified by the retryAfterSeconds field.
 	// Details (optional):
 	//   "retryAfterSeconds" int32 - the number of seconds before the operation should be retried
 	// Status code 504
@@ -690,7 +690,7 @@ const (
 	// StatusReasonTooManyRequests means the server experienced too many requests within a
 	// given window and that the client must wait to perform the action again. A client may
 	// always retry the request that led to this error, although the client should wait at least
-	// the number of seconds speci***REMOVED***ed by the retryAfterSeconds ***REMOVED***eld.
+	// the number of seconds specified by the retryAfterSeconds field.
 	// Details (optional):
 	//   "retryAfterSeconds" int32 - the number of seconds before the operation should be retried
 	// Status code 429
@@ -746,21 +746,21 @@ type StatusCause struct {
 	// empty there is no information available.
 	// +optional
 	Type CauseType `json:"reason,omitempty" protobuf:"bytes,1,opt,name=reason,casttype=CauseType"`
-	// A human-readable description of the cause of the error.  This ***REMOVED***eld may be
+	// A human-readable description of the cause of the error.  This field may be
 	// presented as-is to a reader.
 	// +optional
 	Message string `json:"message,omitempty" protobuf:"bytes,2,opt,name=message"`
-	// The ***REMOVED***eld of the resource that has caused this error, as named by its JSON
-	// serialization. May include dot and post***REMOVED***x notation for nested attributes.
+	// The field of the resource that has caused this error, as named by its JSON
+	// serialization. May include dot and postfix notation for nested attributes.
 	// Arrays are zero-indexed.  Fields may appear more than once in an array of
-	// causes due to ***REMOVED***elds having multiple errors.
+	// causes due to fields having multiple errors.
 	// Optional.
 	//
 	// Examples:
-	//   "name" - the ***REMOVED***eld "name" on the current resource
-	//   "items[0].name" - the ***REMOVED***eld "name" on the ***REMOVED***rst array entry in "items"
+	//   "name" - the field "name" on the current resource
+	//   "items[0].name" - the field "name" on the first array entry in "items"
 	// +optional
-	Field string `json:"***REMOVED***eld,omitempty" protobuf:"bytes,3,opt,name=***REMOVED***eld"`
+	Field string `json:"field,omitempty" protobuf:"bytes,3,opt,name=field"`
 }
 
 // CauseType is a machine readable value providing more detail about what
@@ -769,7 +769,7 @@ type StatusCause struct {
 type CauseType string
 
 const (
-	// CauseTypeFieldValueNotFound is used to report failure to ***REMOVED***nd a requested value
+	// CauseTypeFieldValueNotFound is used to report failure to find a requested value
 	// (e.g. looking up an ID).
 	CauseTypeFieldValueNotFound CauseType = "FieldValueNotFound"
 	// CauseTypeFieldValueRequired is used to report required values that are not
@@ -814,7 +814,7 @@ type APIVersions struct {
 	// versions are the api versions that are available.
 	Versions []string `json:"versions" protobuf:"bytes,1,rep,name=versions"`
 	// a map of client CIDR to server address that is serving this group.
-	// This is to help clients reach servers in the most network-ef***REMOVED***cient way possible.
+	// This is to help clients reach servers in the most network-efficient way possible.
 	// Clients can use the appropriate server address as per the CIDR that they match.
 	// In case of multiple matches, clients should use the longest matching CIDR.
 	// The server returns only those CIDRs that it thinks that the client can match.
@@ -848,7 +848,7 @@ type APIGroup struct {
 	// +optional
 	PreferredVersion GroupVersionForDiscovery `json:"preferredVersion,omitempty" protobuf:"bytes,3,opt,name=preferredVersion"`
 	// a map of client CIDR to server address that is serving this group.
-	// This is to help clients reach servers in the most network-ef***REMOVED***cient way possible.
+	// This is to help clients reach servers in the most network-efficient way possible.
 	// Clients can use the appropriate server address as per the CIDR that they match.
 	// In case of multiple matches, clients should use the longest matching CIDR.
 	// The server returns only those CIDRs that it thinks that the client can match.
@@ -860,7 +860,7 @@ type APIGroup struct {
 
 // ServerAddressByClientCIDR helps the client to determine the server address that they should use, depending on the clientCIDR that they match.
 type ServerAddressByClientCIDR struct {
-	// The CIDR with which clients can match their IP to ***REMOVED***gure out the server address that they should use.
+	// The CIDR with which clients can match their IP to figure out the server address that they should use.
 	ClientCIDR string `json:"clientCIDR" protobuf:"bytes,1,opt,name=clientCIDR"`
 	// Address of this server, suitable for a client that matches the above CIDR.
 	// This can be a hostname, hostname:port, IP or IP:port.
@@ -870,14 +870,14 @@ type ServerAddressByClientCIDR struct {
 // GroupVersion contains the "group/version" and "version" string of a version.
 // It is made a struct to keep extensibility.
 type GroupVersionForDiscovery struct {
-	// groupVersion speci***REMOVED***es the API group and version in the form "group/version"
+	// groupVersion specifies the API group and version in the form "group/version"
 	GroupVersion string `json:"groupVersion" protobuf:"bytes,1,opt,name=groupVersion"`
-	// version speci***REMOVED***es the version in the form of "version". This is to save
+	// version specifies the version in the form of "version". This is to save
 	// the clients the trouble of splitting the GroupVersion.
 	Version string `json:"version" protobuf:"bytes,2,opt,name=version"`
 }
 
-// APIResource speci***REMOVED***es the name of a resource and whether it is namespaced.
+// APIResource specifies the name of a resource and whether it is namespaced.
 type APIResource struct {
 	// name is the plural name of the resource.
 	Name string `json:"name" protobuf:"bytes,1,opt,name=name"`
@@ -917,7 +917,7 @@ func (vs Verbs) String() string {
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
 
 // APIResourceList is a list of APIResource, it is used to expose the name of the
-// resources supported in a speci***REMOVED***c group and version, and if the resource
+// resources supported in a specific group and version, and if the resource
 // is namespaced.
 type APIResourceList struct {
 	TypeMeta `json:",inline"`
@@ -941,7 +941,7 @@ func LabelSelectorQueryParam(version string) string {
 
 // TODO: remove me when watch is refactored
 func FieldSelectorQueryParam(version string) string {
-	return "***REMOVED***eldSelector"
+	return "fieldSelector"
 }
 
 // String returns available api versions as a human-friendly version string.
@@ -967,7 +967,7 @@ type Patch struct{}
 // label selector matches no objects.
 type LabelSelector struct {
 	// matchLabels is a map of {key,value} pairs. A single {key,value} in the matchLabels
-	// map is equivalent to an element of matchExpressions, whose key ***REMOVED***eld is "key", the
+	// map is equivalent to an element of matchExpressions, whose key field is "key", the
 	// operator is "In", and the values array contains only "value". The requirements are ANDed.
 	// +optional
 	MatchLabels map[string]string `json:"matchLabels,omitempty" protobuf:"bytes,1,rep,name=matchLabels"`

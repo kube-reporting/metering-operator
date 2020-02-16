@@ -1,10 +1,10 @@
 // Copyright 2013 The Go Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE ***REMOVED***le.
+// license that can be found in the LICENSE file.
 
 package cldr
 
-// This ***REMOVED***le implements the various inheritance constructs de***REMOVED***ned by LDML.
+// This file implements the various inheritance constructs defined by LDML.
 // See http://www.unicode.org/reports/tr35/#Inheritance_and_Validity
 // for more details.
 
@@ -17,18 +17,18 @@ import (
 	"strings"
 )
 
-// ***REMOVED***eldIter iterates over ***REMOVED***elds in a struct. It includes
-// ***REMOVED***elds of embedded structs.
-type ***REMOVED***eldIter struct {
+// fieldIter iterates over fields in a struct. It includes
+// fields of embedded structs.
+type fieldIter struct {
 	v        reflect.Value
 	index, n []int
 }
 
-func iter(v reflect.Value) ***REMOVED***eldIter {
+func iter(v reflect.Value) fieldIter {
 	if v.Kind() != reflect.Struct {
 		log.Panicf("value %v must be a struct", v)
 	}
-	i := ***REMOVED***eldIter{
+	i := fieldIter{
 		v:     v,
 		index: []int{0},
 		n:     []int{v.NumField()},
@@ -37,14 +37,14 @@ func iter(v reflect.Value) ***REMOVED***eldIter {
 	return i
 }
 
-func (i ****REMOVED***eldIter) descent() {
-	for f := i.***REMOVED***eld(); f.Anonymous && f.Type.NumField() > 0; f = i.***REMOVED***eld() {
+func (i *fieldIter) descent() {
+	for f := i.field(); f.Anonymous && f.Type.NumField() > 0; f = i.field() {
 		i.index = append(i.index, 0)
 		i.n = append(i.n, f.Type.NumField())
 	}
 }
 
-func (i ****REMOVED***eldIter) done() bool {
+func (i *fieldIter) done() bool {
 	return len(i.index) == 1 && i.index[0] >= i.n[0]
 }
 
@@ -52,15 +52,15 @@ func skip(f reflect.StructField) bool {
 	return !f.Anonymous && (f.Name[0] < 'A' || f.Name[0] > 'Z')
 }
 
-func (i ****REMOVED***eldIter) next() {
+func (i *fieldIter) next() {
 	for {
 		k := len(i.index) - 1
 		i.index[k]++
 		if i.index[k] < i.n[k] {
-			if !skip(i.***REMOVED***eld()) {
+			if !skip(i.field()) {
 				break
 			}
-		} ***REMOVED*** {
+		} else {
 			if k == 0 {
 				return
 			}
@@ -71,11 +71,11 @@ func (i ****REMOVED***eldIter) next() {
 	i.descent()
 }
 
-func (i ****REMOVED***eldIter) value() reflect.Value {
+func (i *fieldIter) value() reflect.Value {
 	return i.v.FieldByIndex(i.index)
 }
 
-func (i ****REMOVED***eldIter) ***REMOVED***eld() reflect.StructField {
+func (i *fieldIter) field() reflect.StructField {
 	return i.v.Type().FieldByIndex(i.index)
 }
 
@@ -141,14 +141,14 @@ func xmlName(f reflect.StructField) (name string, attr bool) {
 	return tags[0], attr
 }
 
-func ***REMOVED***ndField(v reflect.Value, key string) (reflect.Value, error) {
+func findField(v reflect.Value, key string) (reflect.Value, error) {
 	v = reflect.Indirect(v)
 	for i := iter(v); !i.done(); i.next() {
-		if n, _ := xmlName(i.***REMOVED***eld()); n == key {
+		if n, _ := xmlName(i.field()); n == key {
 			return i.value(), nil
 		}
 	}
-	return reflect.Value{}, fmt.Errorf("cldr: no ***REMOVED***eld %q in element %#v", key, v.Interface())
+	return reflect.Value{}, fmt.Errorf("cldr: no field %q in element %#v", key, v.Interface())
 }
 
 var xpathPart = regexp.MustCompile(`(\pL+)(?:\[@(\pL+)='([\w-]+)'\])?`)
@@ -161,14 +161,14 @@ func walkXPath(e Elem, path string) (res Elem, err error) {
 				return nil, fmt.Errorf(`cldr: ".." moves past root in path %q`, path)
 			}
 			continue
-		} ***REMOVED*** if c == "" {
+		} else if c == "" {
 			continue
 		}
 		m := xpathPart.FindStringSubmatch(c)
 		if len(m) == 0 || len(m[0]) != len(c) {
 			return nil, fmt.Errorf("cldr: syntax error in path component %q", c)
 		}
-		v, err := ***REMOVED***ndField(reflect.ValueOf(e), m[1])
+		v, err := findField(reflect.ValueOf(e), m[1])
 		if err != nil {
 			return nil, err
 		}
@@ -184,7 +184,7 @@ func walkXPath(e Elem, path string) (res Elem, err error) {
 				}
 				for ; i < v.Len(); i++ {
 					vi := v.Index(i)
-					key, err := ***REMOVED***ndField(vi.Elem(), m[2])
+					key, err := findField(vi.Elem(), m[2])
 					if err != nil {
 						return nil, err
 					}
@@ -205,7 +205,7 @@ func walkXPath(e Elem, path string) (res Elem, err error) {
 			var ok bool
 			if e, ok = v.Interface().(Elem); !ok {
 				return nil, fmt.Errorf("cldr: %q is not an XML element", m[1])
-			} ***REMOVED*** if m[2] != "" || m[3] != "" {
+			} else if m[2] != "" || m[3] != "" {
 				return nil, fmt.Errorf("cldr: no type selector allowed for element %s", m[1])
 			}
 		default:
@@ -215,14 +215,14 @@ func walkXPath(e Elem, path string) (res Elem, err error) {
 	return e, nil
 }
 
-const absPre***REMOVED***x = "//ldml/"
+const absPrefix = "//ldml/"
 
 func (cldr *CLDR) resolveAlias(e Elem, src, path string) (res Elem, err error) {
 	if src != "locale" {
-		if !strings.HasPre***REMOVED***x(path, absPre***REMOVED***x) {
+		if !strings.HasPrefix(path, absPrefix) {
 			return nil, fmt.Errorf("cldr: expected absolute path, found %q", path)
 		}
-		path = path[len(absPre***REMOVED***x):]
+		path = path[len(absPrefix):]
 		if e, err = cldr.resolve(src); err != nil {
 			return nil, err
 		}
@@ -244,7 +244,7 @@ func (cldr *CLDR) resolveAndMergeAlias(e Elem) error {
 	v := reflect.ValueOf(e).Elem()
 	for i := iter(reflect.ValueOf(a).Elem()); !i.done(); i.next() {
 		if vv := i.value(); vv.Kind() != reflect.Ptr || !vv.IsNil() {
-			if _, attr := xmlName(i.***REMOVED***eld()); !attr {
+			if _, attr := xmlName(i.field()); !attr {
 				v.FieldByIndex(i.index).Set(vv)
 			}
 		}
@@ -315,7 +315,7 @@ func attrKey(v reflect.Value, exclude ...string) string {
 	ename := v.Interface().(Elem).GetCommon().name
 	v = v.Elem()
 	for i := iter(v); !i.done(); i.next() {
-		if name, attr := xmlName(i.***REMOVED***eld()); attr {
+		if name, attr := xmlName(i.field()); attr {
 			if except, ok := distinguishing[name]; ok && !in(exclude, name) && !in(except, ename) {
 				v := i.value()
 				if v.Kind() == reflect.Ptr {
@@ -332,7 +332,7 @@ func attrKey(v reflect.Value, exclude ...string) string {
 }
 
 // Key returns a key for e derived from all distinguishing attributes
-// except those speci***REMOVED***ed by exclude.
+// except those specified by exclude.
 func Key(e Elem, exclude ...string) string {
 	return attrKey(reflect.ValueOf(e), exclude...)
 }
@@ -348,7 +348,7 @@ func linkEnclosing(parent, child Elem) {
 			for j := 0; j < vf.Len(); j++ {
 				linkEnclosing(child, vf.Index(j).Interface().(Elem))
 			}
-		} ***REMOVED*** if vf.Kind() == reflect.Ptr && !vf.IsNil() && vf.Elem().Kind() == reflect.Struct {
+		} else if vf.Kind() == reflect.Ptr && !vf.IsNil() && vf.Elem().Kind() == reflect.Struct {
 			linkEnclosing(child, vf.Interface().(Elem))
 		}
 	}
@@ -359,19 +359,19 @@ func setNames(e Elem, name string) {
 	v := reflect.ValueOf(e).Elem()
 	for i := iter(v); !i.done(); i.next() {
 		vf := i.value()
-		name, _ = xmlName(i.***REMOVED***eld())
+		name, _ = xmlName(i.field())
 		if vf.Kind() == reflect.Slice {
 			for j := 0; j < vf.Len(); j++ {
 				setNames(vf.Index(j).Interface().(Elem), name)
 			}
-		} ***REMOVED*** if vf.Kind() == reflect.Ptr && !vf.IsNil() && vf.Elem().Kind() == reflect.Struct {
+		} else if vf.Kind() == reflect.Ptr && !vf.IsNil() && vf.Elem().Kind() == reflect.Struct {
 			setNames(vf.Interface().(Elem), name)
 		}
 	}
 }
 
 // deepCopy copies elements of v recursively.  All elements of v that may
-// be modi***REMOVED***ed by inheritance are explicitly copied.
+// be modified by inheritance are explicitly copied.
 func deepCopy(v reflect.Value) reflect.Value {
 	switch v.Kind() {
 	case reflect.Ptr:
@@ -401,7 +401,7 @@ func deepCopyRec(nv, v reflect.Value) {
 				deepCopyRec(nv.Field(i), v.Field(i))
 			}
 		}
-	} ***REMOVED*** {
+	} else {
 		nv.Set(deepCopy(v))
 	}
 }
@@ -410,7 +410,7 @@ func deepCopyRec(nv, v reflect.Value) {
 func (cldr *CLDR) newNode(v, enc reflect.Value) reflect.Value {
 	n := reflect.New(v.Type())
 	for i := iter(v); !i.done(); i.next() {
-		if name, attr := xmlName(i.***REMOVED***eld()); name == "" || attr {
+		if name, attr := xmlName(i.field()); name == "" || attr {
 			n.Elem().FieldByIndex(i.index).Set(i.value())
 		}
 	}
@@ -425,7 +425,7 @@ func (cldr *CLDR) inheritFields(v, parent reflect.Value) (res reflect.Value, err
 	nv.Elem().Set(v)
 	for i := iter(v); !i.done(); i.next() {
 		vf := i.value()
-		f := i.***REMOVED***eld()
+		f := i.field()
 		name, attr := xmlName(f)
 		if name == "" || attr {
 			continue
@@ -447,7 +447,7 @@ func (cldr *CLDR) inheritFields(v, parent reflect.Value) (res reflect.Value, err
 					}
 					vf.Interface().(Elem).setEnclosing(nv.Interface().(Elem))
 					nv.Elem().FieldByIndex(i.index).Set(vf)
-				} ***REMOVED*** if !pf.IsNil() {
+				} else if !pf.IsNil() {
 					n := cldr.newNode(pf.Elem(), v)
 					if vf, err = cldr.inheritStructPtr(n, pf); err != nil {
 						return reflect.Value{}, err
@@ -473,8 +473,8 @@ func root(e Elem) *LDML {
 	return e.(*LDML)
 }
 
-// inheritStructPtr ***REMOVED***rst merges possible aliases in with v and then inherits
-// any underspeci***REMOVED***ed elements from parent.
+// inheritStructPtr first merges possible aliases in with v and then inherits
+// any underspecified elements from parent.
 func (cldr *CLDR) inheritStructPtr(v, parent reflect.Value) (r reflect.Value, err error) {
 	if !v.IsNil() {
 		e := v.Interface().(Elem).GetCommon()
@@ -493,7 +493,7 @@ func (cldr *CLDR) inheritStructPtr(v, parent reflect.Value) (r reflect.Value, er
 		if !parent.IsNil() {
 			return cldr.inheritFields(v.Elem(), parent.Elem())
 		}
-	} ***REMOVED*** if parent.IsNil() {
+	} else if parent.IsNil() {
 		panic("should not reach here")
 	}
 	return v, nil
@@ -516,7 +516,7 @@ func (cldr *CLDR) inheritSlice(enc, v, parent reflect.Value) (res reflect.Value,
 			key := attrKey(vi)
 			if w, ok := index[key]; ok {
 				index[key], err = cldr.inheritStructPtr(w, vi)
-			} ***REMOVED*** {
+			} else {
 				n := cldr.newNode(vi.Elem(), enc)
 				index[key], err = cldr.inheritStructPtr(n, vi)
 			}
@@ -561,7 +561,7 @@ func (cldr *CLDR) resolve(loc string) (res *LDML, err error) {
 		x = deepCopy(reflect.ValueOf(x)).Interface().(*LDML)
 		linkEnclosing(nil, x)
 		err = cldr.aliasResolver().visit(x)
-	} ***REMOVED*** {
+	} else {
 		key := parentLocale(loc)
 		var parent *LDML
 		for ; cldr.locale[key] == nil; key = parentLocale(key) {
@@ -580,18 +580,18 @@ func (cldr *CLDR) resolve(loc string) (res *LDML, err error) {
 	return x, err
 }
 
-// ***REMOVED***nalize ***REMOVED***nalizes the initialization of the raw LDML structs.  It also
-// removed unwanted ***REMOVED***elds, as speci***REMOVED***ed by ***REMOVED***lter, so that they will not
+// finalize finalizes the initialization of the raw LDML structs.  It also
+// removed unwanted fields, as specified by filter, so that they will not
 // be unnecessarily evaluated.
-func (cldr *CLDR) ***REMOVED***nalize(***REMOVED***lter []string) {
+func (cldr *CLDR) finalize(filter []string) {
 	for _, x := range cldr.locale {
-		if ***REMOVED***lter != nil {
+		if filter != nil {
 			v := reflect.ValueOf(x).Elem()
 			t := v.Type()
 			for i := 0; i < v.NumField(); i++ {
 				f := t.Field(i)
 				name, _ := xmlName(f)
-				if name != "" && name != "identity" && !in(***REMOVED***lter, name) {
+				if name != "" && name != "identity" && !in(filter, name) {
 					v.Field(i).Set(reflect.Zero(f.Type))
 				}
 			}

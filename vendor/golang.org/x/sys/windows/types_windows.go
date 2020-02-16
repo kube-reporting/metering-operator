@@ -1,6 +1,6 @@
 // Copyright 2011 The Go Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE ***REMOVED***le.
+// license that can be found in the LICENSE file.
 
 package windows
 
@@ -76,9 +76,9 @@ var signals = [...]string{
 	7:  "bus error",
 	8:  "floating point exception",
 	9:  "killed",
-	10: "user de***REMOVED***ned signal 1",
+	10: "user defined signal 1",
 	11: "segmentation fault",
-	12: "user de***REMOVED***ned signal 2",
+	12: "user defined signal 2",
 	13: "broken pipe",
 	14: "alarm clock",
 	15: "terminated",
@@ -207,7 +207,7 @@ const (
 )
 
 const (
-	// ***REMOVED***lters for ReadDirectoryChangesW
+	// filters for ReadDirectoryChangesW
 	FILE_NOTIFY_CHANGE_FILE_NAME   = 0x001
 	FILE_NOTIFY_CHANGE_DIR_NAME    = 0x002
 	FILE_NOTIFY_CHANGE_ATTRIBUTES  = 0x004
@@ -377,7 +377,7 @@ func NsecToFiletime(nsec int64) (ft Filetime) {
 	return ft
 }
 
-type Win32***REMOVED***nddata struct {
+type Win32finddata struct {
 	FileAttributes    uint32
 	CreationTime      Filetime
 	LastAccessTime    Filetime
@@ -391,8 +391,8 @@ type Win32***REMOVED***nddata struct {
 }
 
 // This is the actual system call structure.
-// Win32***REMOVED***nddata is what we committed to in Go 1.
-type win32***REMOVED***nddata1 struct {
+// Win32finddata is what we committed to in Go 1.
+type win32finddata1 struct {
 	FileAttributes    uint32
 	CreationTime      Filetime
 	LastAccessTime    Filetime
@@ -405,7 +405,7 @@ type win32***REMOVED***nddata1 struct {
 	AlternateFileName [14]uint16
 }
 
-func copyFindData(dst *Win32***REMOVED***nddata, src *win32***REMOVED***nddata1) {
+func copyFindData(dst *Win32finddata, src *win32finddata1) {
 	dst.FileAttributes = src.FileAttributes
 	dst.CreationTime = src.CreationTime
 	dst.LastAccessTime = src.LastAccessTime
@@ -800,7 +800,7 @@ const (
 const SIO_GET_INTERFACE_LIST = 0x4004747F
 
 // TODO(mattn): SockaddrGen is union of sockaddr/sockaddr_in/sockaddr_in6_old.
-// will be ***REMOVED***xed to change variable type as suitable.
+// will be fixed to change variable type as suitable.
 
 type SockaddrGen [24]byte
 
@@ -923,7 +923,7 @@ type CertRevocationInfo struct {
 	Size             uint32
 	RevocationResult uint32
 	RevocationOid    *byte
-	OidSpeci***REMOVED***cInfo  uintptr
+	OidSpecificInfo  uintptr
 	HasFreshnessTime uint32
 	FreshnessTime    uint32
 	CrlInfo          uintptr // *CertRevocationCrlInfo
@@ -941,7 +941,7 @@ type CertUsageMatch struct {
 
 type CertEnhKeyUsage struct {
 	Length           uint32
-	UsageIdenti***REMOVED***ers **byte
+	UsageIdentifiers **byte
 }
 
 type CertChainPara struct {
@@ -1172,11 +1172,11 @@ const (
 	ComputerNameNetBIOS                   = 0
 	ComputerNameDnsHostname               = 1
 	ComputerNameDnsDomain                 = 2
-	ComputerNameDnsFullyQuali***REMOVED***ed         = 3
+	ComputerNameDnsFullyQualified         = 3
 	ComputerNamePhysicalNetBIOS           = 4
 	ComputerNamePhysicalDnsHostname       = 5
 	ComputerNamePhysicalDnsDomain         = 6
-	ComputerNamePhysicalDnsFullyQuali***REMOVED***ed = 7
+	ComputerNamePhysicalDnsFullyQualified = 7
 	ComputerNameMax                       = 8
 )
 
@@ -1213,13 +1213,13 @@ type IpAdapterUnicastAddress struct {
 	Flags              uint32
 	Next               *IpAdapterUnicastAddress
 	Address            SocketAddress
-	Pre***REMOVED***xOrigin       int32
-	Suf***REMOVED***xOrigin       int32
+	PrefixOrigin       int32
+	SuffixOrigin       int32
 	DadState           int32
 	ValidLifetime      uint32
 	PreferredLifetime  uint32
 	LeaseLifetime      uint32
-	OnLinkPre***REMOVED***xLength uint8
+	OnLinkPrefixLength uint8
 }
 
 type IpAdapterAnycastAddress struct {
@@ -1243,12 +1243,12 @@ type IpAdapterDnsServerAdapter struct {
 	Address  SocketAddress
 }
 
-type IpAdapterPre***REMOVED***x struct {
+type IpAdapterPrefix struct {
 	Length       uint32
 	Flags        uint32
-	Next         *IpAdapterPre***REMOVED***x
+	Next         *IpAdapterPrefix
 	Address      SocketAddress
-	Pre***REMOVED***xLength uint32
+	PrefixLength uint32
 }
 
 type IpAdapterAddresses struct {
@@ -1260,7 +1260,7 @@ type IpAdapterAddresses struct {
 	FirstAnycastAddress   *IpAdapterAnycastAddress
 	FirstMulticastAddress *IpAdapterMulticastAddress
 	FirstDnsServerAddress *IpAdapterDnsServerAdapter
-	DnsSuf***REMOVED***x             *uint16
+	DnsSuffix             *uint16
 	Description           *uint16
 	FriendlyName          *uint16
 	PhysicalAddress       [syscall.MAX_ADAPTER_ADDRESS_LENGTH]byte
@@ -1271,8 +1271,8 @@ type IpAdapterAddresses struct {
 	OperStatus            uint32
 	Ipv6IfIndex           uint32
 	ZoneIndices           [16]uint32
-	FirstPre***REMOVED***x           *IpAdapterPre***REMOVED***x
-	/* more ***REMOVED***elds might be present here. */
+	FirstPrefix           *IpAdapterPrefix
+	/* more fields might be present here. */
 }
 
 const (

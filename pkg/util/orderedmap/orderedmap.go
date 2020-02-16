@@ -128,7 +128,7 @@ func mapToOrderedMap(o *OrderedMap, s string, m map[string]interface{}) {
 				valueStr = strings.TrimSpace(valueStr)
 				if valueStr[0] == '{' {
 					// if the value for this key is a map, convert it to an orderedmap.
-					// ***REMOVED***nd end of valueStr by removing everything after last }
+					// find end of valueStr by removing everything after last }
 					// until it forms valid json
 					hasValidJson := false
 					i := 1
@@ -154,9 +154,9 @@ func mapToOrderedMap(o *OrderedMap, s string, m map[string]interface{}) {
 						mapToOrderedMap(&oo, valueStr, mkTyped)
 						m[k] = oo
 					}
-				} ***REMOVED*** if valueStr[0] == '[' {
+				} else if valueStr[0] == '[' {
 					// if the value for this key is a []interface, convert any map items to an orderedmap.
-					// ***REMOVED***nd end of valueStr by removing everything after last ]
+					// find end of valueStr by removing everything after last ]
 					// until it forms valid json
 					hasValidJson := false
 					i := 1

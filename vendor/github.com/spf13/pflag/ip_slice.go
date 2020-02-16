@@ -45,7 +45,7 @@ func (s *ipSliceValue) Set(val string) error {
 
 	if !s.changed {
 		*s.value = out
-	} ***REMOVED*** {
+	} else {
 		*s.value = append(*s.value, out...)
 	}
 
@@ -59,7 +59,7 @@ func (s *ipSliceValue) Type() string {
 	return "ipSlice"
 }
 
-// String de***REMOVED***nes a "native" format for this net.IP slice flag value.
+// String defines a "native" format for this net.IP slice flag value.
 func (s *ipSliceValue) String() string {
 
 	ipStrSlice := make([]string, len(*s.value))
@@ -99,7 +99,7 @@ func (f *FlagSet) GetIPSlice(name string) ([]net.IP, error) {
 	return val.([]net.IP), nil
 }
 
-// IPSliceVar de***REMOVED***nes a ipSlice flag with speci***REMOVED***ed name, default value, and usage string.
+// IPSliceVar defines a ipSlice flag with specified name, default value, and usage string.
 // The argument p points to a []net.IP variable in which to store the value of the flag.
 func (f *FlagSet) IPSliceVar(p *[]net.IP, name string, value []net.IP, usage string) {
 	f.VarP(newIPSliceValue(value, p), name, "", usage)
@@ -110,7 +110,7 @@ func (f *FlagSet) IPSliceVarP(p *[]net.IP, name, shorthand string, value []net.I
 	f.VarP(newIPSliceValue(value, p), name, shorthand, usage)
 }
 
-// IPSliceVar de***REMOVED***nes a []net.IP flag with speci***REMOVED***ed name, default value, and usage string.
+// IPSliceVar defines a []net.IP flag with specified name, default value, and usage string.
 // The argument p points to a []net.IP variable in which to store the value of the flag.
 func IPSliceVar(p *[]net.IP, name string, value []net.IP, usage string) {
 	CommandLine.VarP(newIPSliceValue(value, p), name, "", usage)
@@ -121,7 +121,7 @@ func IPSliceVarP(p *[]net.IP, name, shorthand string, value []net.IP, usage stri
 	CommandLine.VarP(newIPSliceValue(value, p), name, shorthand, usage)
 }
 
-// IPSlice de***REMOVED***nes a []net.IP flag with speci***REMOVED***ed name, default value, and usage string.
+// IPSlice defines a []net.IP flag with specified name, default value, and usage string.
 // The return value is the address of a []net.IP variable that stores the value of that flag.
 func (f *FlagSet) IPSlice(name string, value []net.IP, usage string) *[]net.IP {
 	p := []net.IP{}
@@ -136,7 +136,7 @@ func (f *FlagSet) IPSliceP(name, shorthand string, value []net.IP, usage string)
 	return &p
 }
 
-// IPSlice de***REMOVED***nes a []net.IP flag with speci***REMOVED***ed name, default value, and usage string.
+// IPSlice defines a []net.IP flag with specified name, default value, and usage string.
 // The return value is the address of a []net.IP variable that stores the value of the flag.
 func IPSlice(name string, value []net.IP, usage string) *[]net.IP {
 	return CommandLine.IPSliceP(name, "", value, usage)

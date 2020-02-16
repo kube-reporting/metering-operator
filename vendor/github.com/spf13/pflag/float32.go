@@ -39,7 +39,7 @@ func (f *FlagSet) GetFloat32(name string) (float32, error) {
 	return val.(float32), nil
 }
 
-// Float32Var de***REMOVED***nes a float32 flag with speci***REMOVED***ed name, default value, and usage string.
+// Float32Var defines a float32 flag with specified name, default value, and usage string.
 // The argument p points to a float32 variable in which to store the value of the flag.
 func (f *FlagSet) Float32Var(p *float32, name string, value float32, usage string) {
 	f.VarP(newFloat32Value(value, p), name, "", usage)
@@ -50,7 +50,7 @@ func (f *FlagSet) Float32VarP(p *float32, name, shorthand string, value float32,
 	f.VarP(newFloat32Value(value, p), name, shorthand, usage)
 }
 
-// Float32Var de***REMOVED***nes a float32 flag with speci***REMOVED***ed name, default value, and usage string.
+// Float32Var defines a float32 flag with specified name, default value, and usage string.
 // The argument p points to a float32 variable in which to store the value of the flag.
 func Float32Var(p *float32, name string, value float32, usage string) {
 	CommandLine.VarP(newFloat32Value(value, p), name, "", usage)
@@ -61,7 +61,7 @@ func Float32VarP(p *float32, name, shorthand string, value float32, usage string
 	CommandLine.VarP(newFloat32Value(value, p), name, shorthand, usage)
 }
 
-// Float32 de***REMOVED***nes a float32 flag with speci***REMOVED***ed name, default value, and usage string.
+// Float32 defines a float32 flag with specified name, default value, and usage string.
 // The return value is the address of a float32 variable that stores the value of the flag.
 func (f *FlagSet) Float32(name string, value float32, usage string) *float32 {
 	p := new(float32)
@@ -76,7 +76,7 @@ func (f *FlagSet) Float32P(name, shorthand string, value float32, usage string) 
 	return p
 }
 
-// Float32 de***REMOVED***nes a float32 flag with speci***REMOVED***ed name, default value, and usage string.
+// Float32 defines a float32 flag with specified name, default value, and usage string.
 // The return value is the address of a float32 variable that stores the value of the flag.
 func Float32(name string, value float32, usage string) *float32 {
 	return CommandLine.Float32P(name, "", value, usage)

@@ -1,6 +1,6 @@
 // Copyright 2011 The Go Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE ***REMOVED***le.
+// license that can be found in the LICENSE file.
 
 package norm
 
@@ -31,7 +31,7 @@ func (w *normWriter) Write(data []byte) (n int, err error) {
 		data = data[m:]
 		n += m
 
-		// Write out complete pre***REMOVED***x, save remainder.
+		// Write out complete prefix, save remainder.
 		// Note that lastBoundary looks back at most 31 runes.
 		i := lastBoundary(&w.rb.f, w.buf)
 		if i == -1 {
@@ -105,7 +105,7 @@ func (r *normReader) Read(p []byte) (int, error) {
 		}
 		if err == io.EOF {
 			r.lastBoundary = len(r.outbuf)
-		} ***REMOVED*** {
+		} else {
 			r.lastBoundary = lastBoundary(&r.rb.f, r.outbuf)
 			if r.lastBoundary == -1 {
 				r.lastBoundary = 0

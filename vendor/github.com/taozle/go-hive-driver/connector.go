@@ -17,8 +17,8 @@ var (
 	_ driver.Connector = &Connector{}
 )
 
-// Connector represents a ***REMOVED***xed con***REMOVED***guration for the hive driver with a given
-// name. Connector satis***REMOVED***es the database/sql/driver Connector interface and
+// Connector represents a fixed configuration for the hive driver with a given
+// name. Connector satisfies the database/sql/driver Connector interface and
 // can be used to create any number of DB Conn's via the database/sql OpenDB
 // function.
 //
@@ -88,7 +88,7 @@ func (c *Connector) connect(ctx context.Context) (*Connection, error) {
 	var err error
 	if timeoutDialer, ok := c.dialer.(TimeoutDialer); ok && c.opts.Timeout != 0 {
 		conn, err = timeoutDialer.DialTimeout("tcp", c.opts.Host, c.opts.Timeout)
-	} ***REMOVED*** {
+	} else {
 		conn, err = c.dialer.Dial("tcp", c.opts.Host)
 	}
 	if err != nil {

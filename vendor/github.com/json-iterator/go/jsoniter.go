@@ -1,4 +1,4 @@
-// Package jsoniter implements encoding and decoding of JSON as de***REMOVED***ned in
+// Package jsoniter implements encoding and decoding of JSON as defined in
 // RFC 4627 and provides interfaces with identical syntax of standard lib encoding/json.
 // Converting from encoding/json to jsoniter is no more than replacing the package with jsoniter
 // and variable type declarations (if any).
@@ -7,7 +7,7 @@
 // "JSON and Go"
 // (https://golang.org/doc/articles/json_and_go.html)
 // gives a description of how Marshal/Unmarshal operate
-// between arbitrary or prede***REMOVED***ned json objects and bytes,
+// between arbitrary or predefined json objects and bytes,
 // and it applies to jsoniter.Marshal/Unmarshal as well.
 //
 // Besides, jsoniter.Iterator provides a different set of interfaces

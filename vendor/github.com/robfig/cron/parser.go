@@ -8,20 +8,20 @@ import (
 	"time"
 )
 
-// Con***REMOVED***guration options for creating a parser. Most options specify which
-// ***REMOVED***elds should be included, while others enable features. If a ***REMOVED***eld is not
+// Configuration options for creating a parser. Most options specify which
+// fields should be included, while others enable features. If a field is not
 // included the parser will assume a default value. These options do not change
-// the order ***REMOVED***elds are parse in.
+// the order fields are parse in.
 type ParseOption int
 
 const (
-	Second      ParseOption = 1 << iota // Seconds ***REMOVED***eld, default 0
-	Minute                              // Minutes ***REMOVED***eld, default 0
-	Hour                                // Hours ***REMOVED***eld, default 0
-	Dom                                 // Day of month ***REMOVED***eld, default *
-	Month                               // Month ***REMOVED***eld, default *
-	Dow                                 // Day of week ***REMOVED***eld, default *
-	DowOptional                         // Optional day of week ***REMOVED***eld, default *
+	Second      ParseOption = 1 << iota // Seconds field, default 0
+	Minute                              // Minutes field, default 0
+	Hour                                // Hours field, default 0
+	Dom                                 // Day of month field, default *
+	Month                               // Month field, default *
+	Dow                                 // Day of week field, default *
+	DowOptional                         // Optional day of week field, default *
 	Descriptor                          // Allow descriptors such as @monthly, @weekly, etc.
 )
 
@@ -43,7 +43,7 @@ var defaults = []string{
 	"*",
 }
 
-// A custom Parser that can be con***REMOVED***gured.
+// A custom Parser that can be configured.
 type Parser struct {
 	options   ParseOption
 	optionals int
@@ -55,7 +55,7 @@ type Parser struct {
 //  specParser := NewParser(Minute | Hour | Dom | Month | Dow)
 //  sched, err := specParser.Parse("0 0 15 */3 *")
 //
-//  // Same as above, just excludes time ***REMOVED***elds
+//  // Same as above, just excludes time fields
 //  subsParser := NewParser(Dom | Month | Dow)
 //  sched, err := specParser.Parse("15 */3 *")
 //
@@ -74,7 +74,7 @@ func NewParser(options ParseOption) Parser {
 
 // Parse returns a new crontab schedule representing the given spec.
 // It returns a descriptive error if the spec is not valid.
-// It accepts crontab specs and features con***REMOVED***gured by NewParser.
+// It accepts crontab specs and features configured by NewParser.
 func (p Parser) Parse(spec string) (Schedule, error) {
 	if len(spec) == 0 {
 		return nil, fmt.Errorf("Empty spec string")
@@ -83,7 +83,7 @@ func (p Parser) Parse(spec string) (Schedule, error) {
 		return parseDescriptor(spec)
 	}
 
-	// Figure out how many ***REMOVED***elds we need
+	// Figure out how many fields we need
 	max := 0
 	for _, place := range places {
 		if p.options&place > 0 {
@@ -92,37 +92,37 @@ func (p Parser) Parse(spec string) (Schedule, error) {
 	}
 	min := max - p.optionals
 
-	// Split ***REMOVED***elds on whitespace
-	***REMOVED***elds := strings.Fields(spec)
+	// Split fields on whitespace
+	fields := strings.Fields(spec)
 
-	// Validate number of ***REMOVED***elds
-	if count := len(***REMOVED***elds); count < min || count > max {
+	// Validate number of fields
+	if count := len(fields); count < min || count > max {
 		if min == max {
-			return nil, fmt.Errorf("Expected exactly %d ***REMOVED***elds, found %d: %s", min, count, spec)
+			return nil, fmt.Errorf("Expected exactly %d fields, found %d: %s", min, count, spec)
 		}
-		return nil, fmt.Errorf("Expected %d to %d ***REMOVED***elds, found %d: %s", min, max, count, spec)
+		return nil, fmt.Errorf("Expected %d to %d fields, found %d: %s", min, max, count, spec)
 	}
 
-	// Fill in missing ***REMOVED***elds
-	***REMOVED***elds = expandFields(***REMOVED***elds, p.options)
+	// Fill in missing fields
+	fields = expandFields(fields, p.options)
 
 	var err error
-	***REMOVED***eld := func(***REMOVED***eld string, r bounds) uint64 {
+	field := func(field string, r bounds) uint64 {
 		if err != nil {
 			return 0
 		}
 		var bits uint64
-		bits, err = getField(***REMOVED***eld, r)
+		bits, err = getField(field, r)
 		return bits
 	}
 
 	var (
-		second     = ***REMOVED***eld(***REMOVED***elds[0], seconds)
-		minute     = ***REMOVED***eld(***REMOVED***elds[1], minutes)
-		hour       = ***REMOVED***eld(***REMOVED***elds[2], hours)
-		dayofmonth = ***REMOVED***eld(***REMOVED***elds[3], dom)
-		month      = ***REMOVED***eld(***REMOVED***elds[4], months)
-		dayofweek  = ***REMOVED***eld(***REMOVED***elds[5], dow)
+		second     = field(fields[0], seconds)
+		minute     = field(fields[1], minutes)
+		hour       = field(fields[2], hours)
+		dayofmonth = field(fields[3], dom)
+		month      = field(fields[4], months)
+		dayofweek  = field(fields[5], dow)
 	)
 	if err != nil {
 		return nil, err
@@ -138,14 +138,14 @@ func (p Parser) Parse(spec string) (Schedule, error) {
 	}, nil
 }
 
-func expandFields(***REMOVED***elds []string, options ParseOption) []string {
+func expandFields(fields []string, options ParseOption) []string {
 	n := 0
-	count := len(***REMOVED***elds)
+	count := len(fields)
 	expFields := make([]string, len(places))
 	copy(expFields, defaults)
 	for i, place := range places {
 		if options&place > 0 {
-			expFields[i] = ***REMOVED***elds[n]
+			expFields[i] = fields[n]
 			n++
 		}
 		if n == count {
@@ -186,11 +186,11 @@ func Parse(spec string) (Schedule, error) {
 }
 
 // getField returns an Int with the bits set representing all of the times that
-// the ***REMOVED***eld represents or error parsing ***REMOVED***eld value.  A "***REMOVED***eld" is a comma-separated
+// the field represents or error parsing field value.  A "field" is a comma-separated
 // list of "ranges".
-func getField(***REMOVED***eld string, r bounds) (uint64, error) {
+func getField(field string, r bounds) (uint64, error) {
 	var bits uint64
-	ranges := strings.FieldsFunc(***REMOVED***eld, func(r rune) bool { return r == ',' })
+	ranges := strings.FieldsFunc(field, func(r rune) bool { return r == ',' })
 	for _, expr := range ranges {
 		bit, err := getRange(expr, r)
 		if err != nil {
@@ -218,7 +218,7 @@ func getRange(expr string, r bounds) (uint64, error) {
 		start = r.min
 		end = r.max
 		extra = starBit
-	} ***REMOVED*** {
+	} else {
 		start, err = parseIntOrName(lowAndHigh[0], r.names)
 		if err != nil {
 			return 0, err
@@ -313,7 +313,7 @@ func all(r bounds) uint64 {
 	return getBits(r.min, r.max, 1) | starBit
 }
 
-// parseDescriptor returns a prede***REMOVED***ned schedule for the expression, or error if none matches.
+// parseDescriptor returns a predefined schedule for the expression, or error if none matches.
 func parseDescriptor(descriptor string) (Schedule, error) {
 	switch descriptor {
 	case "@yearly", "@annually":
@@ -368,7 +368,7 @@ func parseDescriptor(descriptor string) (Schedule, error) {
 	}
 
 	const every = "@every "
-	if strings.HasPre***REMOVED***x(descriptor, every) {
+	if strings.HasPrefix(descriptor, every) {
 		duration, err := time.ParseDuration(descriptor[len(every):])
 		if err != nil {
 			return nil, fmt.Errorf("Failed to parse duration %s: %s", descriptor, err)

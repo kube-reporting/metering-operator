@@ -4,7 +4,7 @@ package middleware
 // https://github.com/zenazn/goji/tree/master/web/middleware
 
 import (
-	"bu***REMOVED***o"
+	"bufio"
 	"io"
 	"net"
 	"net/http"
@@ -21,9 +21,9 @@ type WrapResponseWriter interface {
 	BytesWritten() int
 	// Tee causes the response body to be written to the given io.Writer in
 	// addition to proxying the writes through. Only one io.Writer can be
-	// tee'd to at once: setting a second one will overwrite the ***REMOVED***rst.
+	// tee'd to at once: setting a second one will overwrite the first.
 	// Writes will be sent to the proxy before being written to this
-	// io.Writer. It is illegal for the tee'd writer to be modi***REMOVED***ed
+	// io.Writer. It is illegal for the tee'd writer to be modified
 	// concurrently with writes.
 	Tee(io.Writer)
 	// Unwrap returns the original proxied target.
@@ -89,7 +89,7 @@ func (f *flushWriter) Flush() {
 
 var _ http.Flusher = &flushWriter{}
 
-// httpFancyWriter is a HTTP writer that additionally satis***REMOVED***es http.CloseNoti***REMOVED***er,
+// httpFancyWriter is a HTTP writer that additionally satisfies http.CloseNotifier,
 // http.Flusher, http.Hijacker, and io.ReaderFrom. It exists for the common case
 // of wrapping the http.ResponseWriter that package http gives you, in order to
 // make the proxied object support the full method set of the proxied object.
@@ -98,14 +98,14 @@ type httpFancyWriter struct {
 }
 
 func (f *httpFancyWriter) CloseNotify() <-chan bool {
-	cn := f.basicWriter.ResponseWriter.(http.CloseNoti***REMOVED***er)
+	cn := f.basicWriter.ResponseWriter.(http.CloseNotifier)
 	return cn.CloseNotify()
 }
 func (f *httpFancyWriter) Flush() {
 	fl := f.basicWriter.ResponseWriter.(http.Flusher)
 	fl.Flush()
 }
-func (f *httpFancyWriter) Hijack() (net.Conn, *bu***REMOVED***o.ReadWriter, error) {
+func (f *httpFancyWriter) Hijack() (net.Conn, *bufio.ReadWriter, error) {
 	hj := f.basicWriter.ResponseWriter.(http.Hijacker)
 	return hj.Hijack()
 }
@@ -122,12 +122,12 @@ func (f *httpFancyWriter) ReadFrom(r io.Reader) (int64, error) {
 	return n, err
 }
 
-var _ http.CloseNoti***REMOVED***er = &httpFancyWriter{}
+var _ http.CloseNotifier = &httpFancyWriter{}
 var _ http.Flusher = &httpFancyWriter{}
 var _ http.Hijacker = &httpFancyWriter{}
 var _ io.ReaderFrom = &httpFancyWriter{}
 
-// http2FancyWriter is a HTTP2 writer that additionally satis***REMOVED***es http.CloseNoti***REMOVED***er,
+// http2FancyWriter is a HTTP2 writer that additionally satisfies http.CloseNotifier,
 // http.Flusher, and io.ReaderFrom. It exists for the common case
 // of wrapping the http.ResponseWriter that package http gives you, in order to
 // make the proxied object support the full method set of the proxied object.
@@ -136,7 +136,7 @@ type http2FancyWriter struct {
 }
 
 func (f *http2FancyWriter) CloseNotify() <-chan bool {
-	cn := f.basicWriter.ResponseWriter.(http.CloseNoti***REMOVED***er)
+	cn := f.basicWriter.ResponseWriter.(http.CloseNotifier)
 	return cn.CloseNotify()
 }
 func (f *http2FancyWriter) Flush() {
@@ -144,5 +144,5 @@ func (f *http2FancyWriter) Flush() {
 	fl.Flush()
 }
 
-var _ http.CloseNoti***REMOVED***er = &http2FancyWriter{}
+var _ http.CloseNotifier = &http2FancyWriter{}
 var _ http.Flusher = &http2FancyWriter{}

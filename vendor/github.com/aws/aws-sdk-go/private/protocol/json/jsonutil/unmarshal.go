@@ -41,7 +41,7 @@ func UnmarshalJSON(v interface{}, stream io.Reader) error {
 	err := json.NewDecoder(stream).Decode(&out)
 	if err == io.EOF {
 		return nil
-	} ***REMOVED*** if err != nil {
+	} else if err != nil {
 		return err
 	}
 
@@ -77,8 +77,8 @@ func unmarshalAny(value reflect.Value, data interface{}, tag reflect.StructTag) 
 
 	switch t {
 	case "structure":
-		if ***REMOVED***eld, ok := vtype.FieldByName("_"); ok {
-			tag = ***REMOVED***eld.Tag
+		if field, ok := vtype.FieldByName("_"); ok {
+			tag = field.Tag
 		}
 		return unmarshalStruct(value, data, tag)
 	case "list":
@@ -113,24 +113,24 @@ func unmarshalStruct(value reflect.Value, data interface{}, tag reflect.StructTa
 
 	// unwrap any payloads
 	if payload := tag.Get("payload"); payload != "" {
-		***REMOVED***eld, _ := t.FieldByName(payload)
-		return unmarshalAny(value.FieldByName(payload), data, ***REMOVED***eld.Tag)
+		field, _ := t.FieldByName(payload)
+		return unmarshalAny(value.FieldByName(payload), data, field.Tag)
 	}
 
 	for i := 0; i < t.NumField(); i++ {
-		***REMOVED***eld := t.Field(i)
-		if ***REMOVED***eld.PkgPath != "" {
-			continue // ignore unexported ***REMOVED***elds
+		field := t.Field(i)
+		if field.PkgPath != "" {
+			continue // ignore unexported fields
 		}
 
-		// ***REMOVED***gure out what this ***REMOVED***eld is called
-		name := ***REMOVED***eld.Name
-		if locName := ***REMOVED***eld.Tag.Get("locationName"); locName != "" {
+		// figure out what this field is called
+		name := field.Name
+		if locName := field.Tag.Get("locationName"); locName != "" {
 			name = locName
 		}
 
-		member := value.FieldByIndex(***REMOVED***eld.Index)
-		err := unmarshalAny(member, mapData[name], ***REMOVED***eld.Tag)
+		member := value.FieldByIndex(field.Index)
+		err := unmarshalAny(member, mapData[name], field.Tag)
 		if err != nil {
 			return err
 		}

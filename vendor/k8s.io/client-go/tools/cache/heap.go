@@ -2,7 +2,7 @@
 Copyright 2017 The Kubernetes Authors.
 
 Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this ***REMOVED***le except in compliance with the License.
+you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
 
     http://www.apache.org/licenses/LICENSE-2.0
@@ -10,11 +10,11 @@ You may obtain a copy of the License at
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the speci***REMOVED***c language governing permissions and
+See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-// This ***REMOVED***le implements a heap data structure.
+// This file implements a heap data structure.
 
 package cache
 
@@ -61,7 +61,7 @@ var (
 	_ = heap.Interface(&heapData{}) // heapData is a standard heap
 )
 
-// Less compares two objects and returns true if the ***REMOVED***rst one should go
+// Less compares two objects and returns true if the first one should go
 // in front of the second one in the heap.
 func (h *heapData) Less(i, j int) bool {
 	if i > len(h.queue) || j > len(h.queue) {
@@ -151,7 +151,7 @@ func (h *Heap) Add(obj interface{}) error {
 	if _, exists := h.data.items[key]; exists {
 		h.data.items[key].obj = obj
 		heap.Fix(h.data, h.data.items[key].index)
-	} ***REMOVED*** {
+	} else {
 		h.addIfNotPresentLocked(key, obj)
 	}
 	h.cond.Broadcast()
@@ -175,7 +175,7 @@ func (h *Heap) BulkAdd(list []interface{}) error {
 		if _, exists := h.data.items[key]; exists {
 			h.data.items[key].obj = obj
 			heap.Fix(h.data, h.data.items[key].index)
-		} ***REMOVED*** {
+		} else {
 			h.addIfNotPresentLocked(key, obj)
 		}
 	}
@@ -251,7 +251,7 @@ func (h *Heap) Pop() (interface{}, error) {
 	obj := heap.Pop(h.data)
 	if obj != nil {
 		return obj, nil
-	} ***REMOVED*** {
+	} else {
 		return nil, fmt.Errorf("object was removed from heap data")
 	}
 }

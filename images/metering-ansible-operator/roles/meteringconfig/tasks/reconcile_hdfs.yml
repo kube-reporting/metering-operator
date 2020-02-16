@@ -1,6 +1,6 @@
 ---
 
-- include_tasks: update_meteringcon***REMOVED***g_status.yml
+- include_tasks: update_meteringconfig_status.yml
   vars:
     current_conditions:
       type: "Running"
@@ -11,55 +11,55 @@
 - name: Deploy hdfs resources
   include_tasks: deploy_resources.yml
   vars:
-    values_***REMOVED***le: /tmp/metering-values.yaml
+    values_file: /tmp/metering-values.yaml
     resources:
-      - template_***REMOVED***le: templates/hadoop/hadoop-con***REMOVED***g.yaml
+      - template_file: templates/hadoop/hadoop-config.yaml
         apis: [ {kind: secret} ]
-        prune_label_value: hadoop-con***REMOVED***g
-        # always create the hadoop-con***REMOVED***g
+        prune_label_value: hadoop-config
+        # always create the hadoop-config
         create: true
-      - template_***REMOVED***le: templates/hadoop/hadoop-aws-credentials.yaml
+      - template_file: templates/hadoop/hadoop-aws-credentials.yaml
         apis: [ {kind: secret} ]
         prune_label_value: hadoop-aws-credentials
-        create: "{{ meteringcon***REMOVED***g_create_hadoop_aws_credentials }}"
-      - template_***REMOVED***le: templates/hadoop/hadoop-azure-credentials.yaml
+        create: "{{ meteringconfig_create_hadoop_aws_credentials }}"
+      - template_file: templates/hadoop/hadoop-azure-credentials.yaml
         apis: [ {kind: secret} ]
         prune_label_value: hadoop-azure-credentials
-        create: "{{ meteringcon***REMOVED***g_create_hadoop_azure_credentials }}"
-      - template_***REMOVED***le: templates/hadoop/hadoop-gcs-credentials.yaml
+        create: "{{ meteringconfig_create_hadoop_azure_credentials }}"
+      - template_file: templates/hadoop/hadoop-gcs-credentials.yaml
         apis: [ {kind: secret} ]
         prune_label_value: hadoop-gcs-credentials
-        create: "{{ meteringcon***REMOVED***g_create_hadoop_gcs_credentials }}"
-      - template_***REMOVED***le: templates/hadoop/hadoop-s3-compatible-credentials.yaml
+        create: "{{ meteringconfig_create_hadoop_gcs_credentials }}"
+      - template_file: templates/hadoop/hadoop-s3-compatible-credentials.yaml
         apis: [ {kind: secret} ]
         prune_label_value: hadoop-s3-compatible-credentials
-        create: "{{ meteringcon***REMOVED***g_create_hadoop_s3_compatible_credentials }}"
-      - template_***REMOVED***le: templates/hadoop/hadoop-s3-compatible-ca-secret.yaml
+        create: "{{ meteringconfig_create_hadoop_s3_compatible_credentials }}"
+      - template_file: templates/hadoop/hadoop-s3-compatible-ca-secret.yaml
         apis: [ {kind: secret} ]
         prune_label_value: hadoop-s3-compatible-ca-secret
-        create: "{{ meteringcon***REMOVED***g_create_presto_s3_compatible_ca }}"
-      - template_***REMOVED***le: templates/hadoop/hadoop-scripts.yaml
-        apis: [ {kind: con***REMOVED***gmap} ]
+        create: "{{ meteringconfig_create_presto_s3_compatible_ca }}"
+      - template_file: templates/hadoop/hadoop-scripts.yaml
+        apis: [ {kind: configmap} ]
         prune_label_value: hadoop-scripts
-        create: "{{ meteringcon***REMOVED***g_enable_hdfs }}"
-      - template_***REMOVED***le: templates/hadoop/hdfs-jmx-con***REMOVED***g.yaml
-        apis: [ {kind: con***REMOVED***gmap} ]
-        prune_label_value: hdfs-jmx-con***REMOVED***g
-        create: "{{ meteringcon***REMOVED***g_enable_hdfs }}"
-      - template_***REMOVED***le: templates/hadoop/hdfs-serviceaccount.yaml
+        create: "{{ meteringconfig_enable_hdfs }}"
+      - template_file: templates/hadoop/hdfs-jmx-config.yaml
+        apis: [ {kind: configmap} ]
+        prune_label_value: hdfs-jmx-config
+        create: "{{ meteringconfig_enable_hdfs }}"
+      - template_file: templates/hadoop/hdfs-serviceaccount.yaml
         apis: [ {kind: serviceaccount} ]
         prune_label_value: hdfs-service-account
-        create: "{{ meteringcon***REMOVED***g_enable_hdfs }}"
-      - template_***REMOVED***le: templates/hadoop/hdfs-datanode-statefulset.yaml
+        create: "{{ meteringconfig_enable_hdfs }}"
+      - template_file: templates/hadoop/hdfs-datanode-statefulset.yaml
         apis: [ {kind: statefulset, api_version: 'apps/v1'} ]
         prune_label_value: hdfs-datanode-statefulset
-        create: "{{ meteringcon***REMOVED***g_enable_hdfs }}"
-      - template_***REMOVED***le: templates/hadoop/hdfs-namenode-statefulset.yaml
+        create: "{{ meteringconfig_enable_hdfs }}"
+      - template_file: templates/hadoop/hdfs-namenode-statefulset.yaml
         apis: [ {kind: statefulset, api_version: 'apps/v1'} ]
         prune_label_value: hdfs-namenode-statefulset
-        create: "{{ meteringcon***REMOVED***g_enable_hdfs }}"
+        create: "{{ meteringconfig_enable_hdfs }}"
 
-- include_tasks: update_meteringcon***REMOVED***g_status.yml
+- include_tasks: update_meteringconfig_status.yml
   vars:
     current_conditions:
       type: "Running"
@@ -80,6 +80,6 @@
       component: Metering components
     involvedObject:
       apiVersion: metering.openshift.io
-      kind: MeteringCon***REMOVED***g
+      kind: MeteringConfig
       name: "{{ meta.name }}"
       namespace: "{{ meta.namespace }}"

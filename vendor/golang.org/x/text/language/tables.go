@@ -35,8 +35,8 @@ const (
 	_es  = 318
 	_et  = 320
 	_fa  = 328
-	_***REMOVED***  = 337
-	_***REMOVED***l = 339
+	_fi  = 337
+	_fil = 339
 	_fr  = 350
 	_gu  = 420
 	_he  = 444
@@ -118,13 +118,13 @@ const langPrivateStart = 0x2f72
 
 const langPrivateEnd = 0x3179
 
-// lang holds an alphabetically sorted list of ISO-639 language identi***REMOVED***ers.
-// All entries are 4 bytes. The index of the identi***REMOVED***er (divided by 4) is the language tag.
-// For 2-byte language identi***REMOVED***ers, the two successive bytes have the following meaning:
-//     - if the ***REMOVED***rst letter of the 2- and 3-letter ISO codes are the same:
+// lang holds an alphabetically sorted list of ISO-639 language identifiers.
+// All entries are 4 bytes. The index of the identifier (divided by 4) is the language tag.
+// For 2-byte language identifiers, the two successive bytes have the following meaning:
+//     - if the first letter of the 2- and 3-letter ISO codes are the same:
 //       the second and third letter of the 3-letter ISO code.
 //     - otherwise: a 0 and a by 2 bits right-shifted index into altLangISO3.
-// For 3-byte language identi***REMOVED***ers the 4th byte is 0.
+// For 3-byte language identifiers the 4th byte is 0.
 const lang tag.Index = "" + // Size: 5324 bytes
 	"---\x00aaaraai\x00aak\x00aau\x00abbkabi\x00abq\x00abr\x00abt\x00aby\x00a" +
 	"cd\x00ace\x00ach\x00ada\x00ade\x00adj\x00ady\x00adz\x00aeveaeb\x00aey" +
@@ -154,10 +154,10 @@ const lang tag.Index = "" + // Size: 5324 bytes
 	"ddn\x00deeuded\x00den\x00dga\x00dgh\x00dgi\x00dgl\x00dgr\x00dgz\x00dia" +
 	"\x00dje\x00dnj\x00dob\x00doi\x00dop\x00dow\x00dri\x00drs\x00dsb\x00dtm" +
 	"\x00dtp\x00dts\x00dty\x00dua\x00duc\x00dud\x00dug\x00dvivdva\x00dww\x00d" +
-	"yo\x00dyu\x00dzzodzg\x00ebu\x00eewee***REMOVED***\x00egl\x00egy\x00eka\x00eky\x00el" +
+	"yo\x00dyu\x00dzzodzg\x00ebu\x00eeweefi\x00egl\x00egy\x00eka\x00eky\x00el" +
 	"llema\x00emi\x00enngenn\x00enq\x00eopoeri\x00es\x00\x05esu\x00etstetr" +
 	"\x00ett\x00etu\x00etx\x00euusewo\x00ext\x00faasfaa\x00fab\x00fag\x00fai" +
-	"\x00fan\x00ffulf***REMOVED***\x00ffm\x00***REMOVED***in***REMOVED***a\x00***REMOVED***l\x00***REMOVED***t\x00fjijflr\x00fmp\x00" +
+	"\x00fan\x00ffulffi\x00ffm\x00fiinfia\x00fil\x00fit\x00fjijflr\x00fmp\x00" +
 	"foaofod\x00fon\x00for\x00fpe\x00fqs\x00frrafrc\x00frp\x00frr\x00frs\x00f" +
 	"ub\x00fud\x00fue\x00fuf\x00fuh\x00fuq\x00fur\x00fuv\x00fuy\x00fvr\x00fyr" +
 	"ygalegaa\x00gaf\x00gag\x00gah\x00gaj\x00gam\x00gan\x00gaw\x00gay\x00gba" +
@@ -230,7 +230,7 @@ const lang tag.Index = "" + // Size: 5324 bytes
 	"sur\x00sus\x00svweswwaswb\x00swc\x00swg\x00swp\x00swv\x00sxn\x00sxw\x00s" +
 	"yl\x00syr\x00szl\x00taamtaj\x00tal\x00tan\x00taq\x00tbc\x00tbd\x00tbf" +
 	"\x00tbg\x00tbo\x00tbw\x00tbz\x00tci\x00tcy\x00tdd\x00tdg\x00tdh\x00teelt" +
-	"ed\x00tem\x00teo\x00tet\x00t***REMOVED***\x00tggktgc\x00tgo\x00tgu\x00thhathl\x00th" +
+	"ed\x00tem\x00teo\x00tet\x00tfi\x00tggktgc\x00tgo\x00tgu\x00thhathl\x00th" +
 	"q\x00thr\x00tiirtif\x00tig\x00tik\x00tim\x00tio\x00tiv\x00tkuktkl\x00tkr" +
 	"\x00tkt\x00tlgltlf\x00tlx\x00tly\x00tmh\x00tmy\x00tnsntnh\x00toontof\x00" +
 	"tog\x00toq\x00tpi\x00tpm\x00tpz\x00tqo\x00trurtru\x00trv\x00trw\x00tssot" +
@@ -1011,11 +1011,11 @@ const (
 )
 
 // isoRegionOffset needs to be added to the index of regionISO to obtain the regionID
-// for 2-letter ISO codes. (The ***REMOVED***rst isoRegionOffset regionIDs are reserved for
+// for 2-letter ISO codes. (The first isoRegionOffset regionIDs are reserved for
 // the UN.M49 codes used for groups.)
 const isoRegionOffset = 32
 
-// regionTypes de***REMOVED***nes the status of a region for various standards.
+// regionTypes defines the status of a region for various standards.
 // Size: 358 bytes, 358 elements
 var regionTypes = [358]uint8{
 	// Entry 0 - 3F
@@ -1073,7 +1073,7 @@ var regionTypes = [358]uint8{
 
 // regionISO holds a list of alphabetically sorted 2-letter ISO region codes.
 // Each 2-letter codes is followed by two bytes with the following meaning:
-//     - [A-Z}{2}: the ***REMOVED***rst letter of the 2-letter code plus these two
+//     - [A-Z}{2}: the first letter of the 2-letter code plus these two
 //                 letters form the 3-letter ISO code.
 //     - 0, n:     index into altRegionISO3.
 const regionISO tag.Index = "" + // Size: 1308 bytes
@@ -1134,7 +1134,7 @@ var regionOldMap = [20]fromTo{
 	19: {from: 0x163, to: 0x4b},
 }
 
-// m49 maps regionIDs to UN.M49 codes. The ***REMOVED***rst isoRegionOffset entries are
+// m49 maps regionIDs to UN.M49 codes. The first isoRegionOffset entries are
 // codes indicating collections of regions.
 // Size: 716 bytes, 358 elements
 var m49 = [358]int16{
@@ -1191,10 +1191,10 @@ var m49 = [358]int16{
 	891, 710, 894, 180, 716, 999,
 }
 
-// m49Index gives indexes into fromM49 based on the three most signi***REMOVED***cant bits
+// m49Index gives indexes into fromM49 based on the three most significant bits
 // of a 10-bit UN.M49 code. To search an UN.M49 code in fromM49, search in
 //    fromM49[m49Index[msb39(code)]:m49Index[msb3(code)+1]]
-// for an entry where the ***REMOVED***rst 7 bits match the 7 lsb of the UN.M49 code.
+// for an entry where the first 7 bits match the 7 lsb of the UN.M49 code.
 // The region code is stored in the 9 lsb of the indexed value.
 // Size: 18 bytes, 9 elements
 var m49Index = [9]int16{
@@ -2945,7 +2945,7 @@ type likelyLangScript struct {
 // languages and scripts given incomplete information. If more entries exist
 // for a given regionID, lang and script are the index and size respectively
 // of the list in likelyRegionList.
-// TODO: exclude containers and user-de***REMOVED***nable regions from the list.
+// TODO: exclude containers and user-definable regions from the list.
 // Size: 1432 bytes, 358 elements
 var likelyRegion = [358]likelyLangScript{
 	34:  {lang: 0xd7, script: 0x57, flags: 0x0},
@@ -3376,7 +3376,7 @@ type regionIntelligibility struct {
 }
 
 // matchLang holds pairs of langIDs of base languages that are typically
-// mutually intelligible. Each pair is associated with a con***REMOVED***dence and
+// mutually intelligible. Each pair is associated with a confidence and
 // whether the intelligibility goes one or both ways.
 // Size: 678 bytes, 113 elements
 var matchLang = [113]mutualIntelligibility{
@@ -3496,7 +3496,7 @@ var matchLang = [113]mutualIntelligibility{
 }
 
 // matchScript holds pairs of scriptIDs where readers of one script
-// can typically also read the other. Each is associated with a con***REMOVED***dence.
+// can typically also read the other. Each is associated with a confidence.
 // Size: 208 bytes, 26 elements
 var matchScript = [26]scriptIntelligibility{
 	0:  {wantLang: 0x432, haveLang: 0x432, wantScript: 0x57, haveScript: 0x1f, distance: 0x5},
@@ -3561,7 +3561,7 @@ var regionContainment = [33]uint64{
 	0x0000000100000000,
 }
 
-// regionInclusion maps region identi***REMOVED***ers to sets of regions in regionInclusionBits,
+// regionInclusion maps region identifiers to sets of regions in regionInclusionBits,
 // where each set holds all groupings that are directly connected in a region
 // containment graph.
 // Size: 358 bytes, 358 elements

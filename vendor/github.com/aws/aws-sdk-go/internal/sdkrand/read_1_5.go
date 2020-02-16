@@ -4,7 +4,7 @@ package sdkrand
 
 import "math/rand"
 
-// Read back***REMOVED***lls Go 1.6's math.Rand.Reader for Go 1.5
+// Read backfills Go 1.6's math.Rand.Reader for Go 1.5
 func Read(r *rand.Rand, p []byte) (n int, err error) {
 	// Copy of Go standard libraries math package's read function not added to
 	// standard library until Go 1.6.

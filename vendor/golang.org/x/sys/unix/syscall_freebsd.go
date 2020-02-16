@@ -1,9 +1,9 @@
 // Copyright 2009,2010 The Go Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE ***REMOVED***le.
+// license that can be found in the LICENSE file.
 
 // FreeBSD system calls.
-// This ***REMOVED***le is compiled as ordinary Go code,
+// This file is compiled as ordinary Go code,
 // but it is also input to mksyscall,
 // which parses the //sys lines and generates system call stubs.
 // Note that sometimes we use a lowercase //sys name and wrap
@@ -158,14 +158,14 @@ func xattrnamespace(fullattr string) (ns int, attr string, err error) {
 func initxattrdest(dest []byte, idx int) (d unsafe.Pointer) {
 	if len(dest) > idx {
 		return unsafe.Pointer(&dest[idx])
-	} ***REMOVED*** {
+	} else {
 		return unsafe.Pointer(_zero)
 	}
 }
 
 // FreeBSD implements its own syscalls to handle extended attributes
 
-func Getxattr(***REMOVED***le string, attr string, dest []byte) (sz int, err error) {
+func Getxattr(file string, attr string, dest []byte) (sz int, err error) {
 	d := initxattrdest(dest, 0)
 	destsize := len(dest)
 
@@ -174,7 +174,7 @@ func Getxattr(***REMOVED***le string, attr string, dest []byte) (sz int, err err
 		return -1, err
 	}
 
-	return ExtattrGetFile(***REMOVED***le, nsid, a, uintptr(d), destsize)
+	return ExtattrGetFile(file, nsid, a, uintptr(d), destsize)
 }
 
 func Fgetxattr(fd int, attr string, dest []byte) (sz int, err error) {
@@ -216,7 +216,7 @@ func Fsetxattr(fd int, attr string, data []byte, flags int) (err error) {
 	return
 }
 
-func Setxattr(***REMOVED***le string, attr string, data []byte, flags int) (err error) {
+func Setxattr(file string, attr string, data []byte, flags int) (err error) {
 	d := unsafe.Pointer(&data[0])
 	datasiz := len(data)
 
@@ -225,7 +225,7 @@ func Setxattr(***REMOVED***le string, attr string, data []byte, flags int) (err 
 		return
 	}
 
-	_, err = ExtattrSetFile(***REMOVED***le, nsid, a, uintptr(d), datasiz)
+	_, err = ExtattrSetFile(file, nsid, a, uintptr(d), datasiz)
 	return
 }
 
@@ -242,13 +242,13 @@ func Lsetxattr(link string, attr string, data []byte, flags int) (err error) {
 	return
 }
 
-func Removexattr(***REMOVED***le string, attr string) (err error) {
+func Removexattr(file string, attr string) (err error) {
 	nsid, a, err := xattrnamespace(attr)
 	if err != nil {
 		return
 	}
 
-	err = ExtattrDeleteFile(***REMOVED***le, nsid, a)
+	err = ExtattrDeleteFile(file, nsid, a)
 	return
 }
 
@@ -272,25 +272,25 @@ func Lremovexattr(link string, attr string) (err error) {
 	return
 }
 
-func Listxattr(***REMOVED***le string, dest []byte) (sz int, err error) {
+func Listxattr(file string, dest []byte) (sz int, err error) {
 	d := initxattrdest(dest, 0)
 	destsiz := len(dest)
 
 	// FreeBSD won't allow you to list xattrs from multiple namespaces
 	s := 0
 	for _, nsid := range [...]int{EXTATTR_NAMESPACE_USER, EXTATTR_NAMESPACE_SYSTEM} {
-		stmp, e := ExtattrListFile(***REMOVED***le, nsid, uintptr(d), destsiz)
+		stmp, e := ExtattrListFile(file, nsid, uintptr(d), destsiz)
 
 		/* Errors accessing system attrs are ignored so that
 		 * we can implement the Linux-like behavior of omitting errors that
 		 * we don't have read permissions on
 		 *
-		 * Linux will still error if we ask for user attributes on a ***REMOVED***le that
+		 * Linux will still error if we ask for user attributes on a file that
 		 * we don't have read permissions on, so don't ignore those errors
 		 */
 		if e != nil && e == EPERM && nsid != EXTATTR_NAMESPACE_USER {
 			continue
-		} ***REMOVED*** if e != nil {
+		} else if e != nil {
 			return s, e
 		}
 
@@ -314,7 +314,7 @@ func Flistxattr(fd int, dest []byte) (sz int, err error) {
 		stmp, e := ExtattrListFd(fd, nsid, uintptr(d), destsiz)
 		if e != nil && e == EPERM && nsid != EXTATTR_NAMESPACE_USER {
 			continue
-		} ***REMOVED*** if e != nil {
+		} else if e != nil {
 			return s, e
 		}
 
@@ -338,7 +338,7 @@ func Llistxattr(link string, dest []byte) (sz int, err error) {
 		stmp, e := ExtattrListLink(link, nsid, uintptr(d), destsiz)
 		if e != nil && e == EPERM && nsid != EXTATTR_NAMESPACE_USER {
 			continue
-		} ***REMOVED*** if e != nil {
+		} else if e != nil {
 			return s, e
 		}
 
@@ -356,10 +356,10 @@ func Llistxattr(link string, dest []byte) (sz int, err error) {
 //sys   ioctl(fd int, req uint, arg uintptr) (err error)
 
 // ioctl itself should not be exposed directly, but additional get/set
-// functions for speci***REMOVED***c types are permissible.
+// functions for specific types are permissible.
 
 // IoctlSetInt performs an ioctl operation which sets an integer value
-// on fd, using the speci***REMOVED***ed request number.
+// on fd, using the specified request number.
 func IoctlSetInt(fd int, req uint, value int) error {
 	return ioctl(fd, req, uintptr(value))
 }
@@ -373,7 +373,7 @@ func IoctlSetTermios(fd int, req uint, value *Termios) error {
 }
 
 // IoctlGetInt performs an ioctl operation which gets an integer value
-// from fd, using the speci***REMOVED***ed request number.
+// from fd, using the specified request number.
 func IoctlGetInt(fd int, req uint) (int, error) {
 	var value int
 	err := ioctl(fd, req, uintptr(unsafe.Pointer(&value)))
@@ -423,7 +423,7 @@ func Uname(uname *Utsname) error {
 		if b == '\n' || b == '\t' {
 			if i == len(uname.Version)-1 {
 				uname.Version[i] = 0
-			} ***REMOVED*** {
+			} else {
 				uname.Version[i] = ' '
 			}
 		}
@@ -459,10 +459,10 @@ func Uname(uname *Utsname) error {
 //sys	ExtattrSetFd(fd int, attrnamespace int, attrname string, data uintptr, nbytes int) (ret int, err error)
 //sys	ExtattrDeleteFd(fd int, attrnamespace int, attrname string) (err error)
 //sys	ExtattrListFd(fd int, attrnamespace int, data uintptr, nbytes int) (ret int, err error)
-//sys	ExtattrGetFile(***REMOVED***le string, attrnamespace int, attrname string, data uintptr, nbytes int) (ret int, err error)
-//sys	ExtattrSetFile(***REMOVED***le string, attrnamespace int, attrname string, data uintptr, nbytes int) (ret int, err error)
-//sys	ExtattrDeleteFile(***REMOVED***le string, attrnamespace int, attrname string) (err error)
-//sys	ExtattrListFile(***REMOVED***le string, attrnamespace int, data uintptr, nbytes int) (ret int, err error)
+//sys	ExtattrGetFile(file string, attrnamespace int, attrname string, data uintptr, nbytes int) (ret int, err error)
+//sys	ExtattrSetFile(file string, attrnamespace int, attrname string, data uintptr, nbytes int) (ret int, err error)
+//sys	ExtattrDeleteFile(file string, attrnamespace int, attrname string) (err error)
+//sys	ExtattrListFile(file string, attrnamespace int, data uintptr, nbytes int) (ret int, err error)
 //sys	ExtattrGetLink(link string, attrnamespace int, attrname string, data uintptr, nbytes int) (ret int, err error)
 //sys	ExtattrSetLink(link string, attrnamespace int, attrname string, data uintptr, nbytes int) (ret int, err error)
 //sys	ExtattrDeleteLink(link string, attrnamespace int, attrname string) (err error)
@@ -508,7 +508,7 @@ func Uname(uname *Utsname) error {
 //sys	Lstat(path string, stat *Stat_t) (err error)
 //sys	Mkdir(path string, mode uint32) (err error)
 //sys	Mkdirat(dirfd int, path string, mode uint32) (err error)
-//sys	Mk***REMOVED***fo(path string, mode uint32) (err error)
+//sys	Mkfifo(path string, mode uint32) (err error)
 //sys	Mknod(path string, mode uint32, dev int) (err error)
 //sys	Nanosleep(time *Timespec, leftover *Timespec) (err error)
 //sys	Open(path string, mode int, perm uint32) (fd int, err error)
@@ -561,7 +561,7 @@ func Uname(uname *Utsname) error {
 /*
  * Unimplemented
  */
-// Pro***REMOVED***l
+// Profil
 // Sigaction
 // Sigprocmask
 // Getlogin
@@ -587,7 +587,7 @@ func Uname(uname *Utsname) error {
 // Mount
 // Csops
 // Waitid
-// Add_pro***REMOVED***l
+// Add_profil
 // Kdebug_trace
 // Sigreturn
 // Atsocket
@@ -598,7 +598,7 @@ func Uname(uname *Utsname) error {
 // Getdirentriesattr
 // Searchfs
 // Delete
-// Copy***REMOVED***le
+// Copyfile
 // Watchevent
 // Waitevent
 // Modwatch
@@ -655,7 +655,7 @@ func Uname(uname *Utsname) error {
 // Getsgroups
 // Setwgroups
 // Getwgroups
-// Mk***REMOVED***fo_extended
+// Mkfifo_extended
 // Mkdir_extended
 // Identitysvc
 // Shared_region_check_np
@@ -711,8 +711,8 @@ func Uname(uname *Utsname) error {
 // Workq_ops
 // __mac_execve
 // __mac_syscall
-// __mac_get_***REMOVED***le
-// __mac_set_***REMOVED***le
+// __mac_get_file
+// __mac_set_file
 // __mac_get_link
 // __mac_set_link
 // __mac_get_proc

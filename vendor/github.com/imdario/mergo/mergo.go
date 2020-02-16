@@ -1,9 +1,9 @@
 // Copyright 2013 Dario Castañé. All rights reserved.
 // Copyright 2009 The Go Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE ***REMOVED***le.
+// license that can be found in the LICENSE file.
 
-// Based on src/pkg/reflect/deepequal.go from of***REMOVED***cial
+// Based on src/pkg/reflect/deepequal.go from official
 // golang's stdlib.
 
 package mergo
@@ -13,7 +13,7 @@ import (
 	"reflect"
 )
 
-// Errors reported by Mergo when it ***REMOVED***nds invalid arguments.
+// Errors reported by Mergo when it finds invalid arguments.
 var (
 	ErrNilArguments                = errors.New("src and dst must not be nil")
 	ErrDifferentArgumentsTypes     = errors.New("src and dst must be of same type")
@@ -71,7 +71,7 @@ func resolveValues(dst, src interface{}) (vDst, vSrc reflect.Value, err error) {
 	return
 }
 
-// Traverses recursively both values, assigning src's ***REMOVED***elds values to dst.
+// Traverses recursively both values, assigning src's fields values to dst.
 // The map argument tracks comparisons that have already been seen, which allows
 // short circuiting on recursive types.
 func deeper(dst, src reflect.Value, visited map[uintptr]*visit, depth int) (err error) {

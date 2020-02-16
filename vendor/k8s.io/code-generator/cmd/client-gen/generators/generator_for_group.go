@@ -2,7 +2,7 @@
 Copyright 2015 The Kubernetes Authors.
 
 Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this ***REMOVED***le except in compliance with the License.
+you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
 
     http://www.apache.org/licenses/LICENSE-2.0
@@ -10,7 +10,7 @@ You may obtain a copy of the License at
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the speci***REMOVED***c language governing permissions and
+See the License for the specific language governing permissions and
 limitations under the License.
 */
 
@@ -18,7 +18,7 @@ package generators
 
 import (
 	"io"
-	"path/***REMOVED***lepath"
+	"path/filepath"
 
 	"k8s.io/gengo/generator"
 	"k8s.io/gengo/namer"
@@ -28,7 +28,7 @@ import (
 	"k8s.io/code-generator/cmd/client-gen/path"
 )
 
-// genGroup produces a ***REMOVED***le for a group client, e.g. ExtensionsClient for the extension group.
+// genGroup produces a file for a group client, e.g. ExtensionsClient for the extension group.
 type genGroup struct {
 	generator.DefaultGen
 	outputPackage string
@@ -64,7 +64,7 @@ func (g *genGroup) Namers(c *generator.Context) namer.NameSystems {
 
 func (g *genGroup) Imports(c *generator.Context) (imports []string) {
 	imports = append(imports, g.imports.ImportLines()...)
-	imports = append(imports, ***REMOVED***lepath.Join(g.clientsetPackage, "scheme"))
+	imports = append(imports, filepath.Join(g.clientsetPackage, "scheme"))
 	return
 }
 
@@ -82,7 +82,7 @@ func (g *genGroup) GenerateType(c *generator.Context, t *types.Type, w io.Writer
 	if g.group == "core" {
 		groupName = ""
 	}
-	// allow user to de***REMOVED***ne a group name that's different from the one parsed from the directory.
+	// allow user to define a group name that's different from the one parsed from the directory.
 	p := c.Universe.Package(path.Vendorless(g.inputPackage))
 	if override := types.ExtractCommentTags("+", p.Comments)["groupName"]; override != nil {
 		groupName = override[0]
@@ -99,7 +99,7 @@ func (g *genGroup) GenerateType(c *generator.Context, t *types.Type, w io.Writer
 		"schemaGroupVersion":             c.Universe.Type(types.Name{Package: "k8s.io/apimachinery/pkg/runtime/schema", Name: "GroupVersion"}),
 		"runtimeAPIVersionInternal":      c.Universe.Variable(types.Name{Package: "k8s.io/apimachinery/pkg/runtime", Name: "APIVersionInternal"}),
 		"serializerDirectCodecFactory":   c.Universe.Type(types.Name{Package: "k8s.io/apimachinery/pkg/runtime/serializer", Name: "DirectCodecFactory"}),
-		"restCon***REMOVED***g":                     c.Universe.Type(types.Name{Package: "k8s.io/client-go/rest", Name: "Con***REMOVED***g"}),
+		"restConfig":                     c.Universe.Type(types.Name{Package: "k8s.io/client-go/rest", Name: "Config"}),
 		"restDefaultKubernetesUserAgent": c.Universe.Function(types.Name{Package: "k8s.io/client-go/rest", Name: "DefaultKubernetesUserAgent"}),
 		"restRESTClientInterface":        c.Universe.Type(types.Name{Package: "k8s.io/client-go/rest", Name: "Interface"}),
 		"restRESTClientFor":              c.Universe.Function(types.Name{Package: "k8s.io/client-go/rest", Name: "RESTClientFor"}),
@@ -119,16 +119,16 @@ func (g *genGroup) GenerateType(c *generator.Context, t *types.Type, w io.Writer
 		}
 		if tags.NonNamespaced {
 			sw.Do(getterImplNonNamespaced, wrapper)
-		} ***REMOVED*** {
+		} else {
 			sw.Do(getterImplNamespaced, wrapper)
 		}
 	}
-	sw.Do(newClientForCon***REMOVED***gTemplate, m)
-	sw.Do(newClientForCon***REMOVED***gOrDieTemplate, m)
+	sw.Do(newClientForConfigTemplate, m)
+	sw.Do(newClientForConfigOrDieTemplate, m)
 	sw.Do(newClientForRESTClientTemplate, m)
 	if g.version == "" {
 		sw.Do(setInternalVersionClientDefaultsTemplate, m)
-	} ***REMOVED*** {
+	} else {
 		sw.Do(setClientDefaultsTemplate, m)
 	}
 	sw.Do(getRESTClient, m)
@@ -163,14 +163,14 @@ func (c *$.GroupGoName$$.Version$Client) $.type|publicPlural$() $.type|public$In
 }
 `
 
-var newClientForCon***REMOVED***gTemplate = `
-// NewForCon***REMOVED***g creates a new $.GroupGoName$$.Version$Client for the given con***REMOVED***g.
-func NewForCon***REMOVED***g(c *$.restCon***REMOVED***g|raw$) (*$.GroupGoName$$.Version$Client, error) {
-	con***REMOVED***g := *c
-	if err := setCon***REMOVED***gDefaults(&con***REMOVED***g); err != nil {
+var newClientForConfigTemplate = `
+// NewForConfig creates a new $.GroupGoName$$.Version$Client for the given config.
+func NewForConfig(c *$.restConfig|raw$) (*$.GroupGoName$$.Version$Client, error) {
+	config := *c
+	if err := setConfigDefaults(&config); err != nil {
 		return nil, err
 	}
-	client, err := $.restRESTClientFor|raw$(&con***REMOVED***g)
+	client, err := $.restRESTClientFor|raw$(&config)
 	if err != nil {
 		return nil, err
 	}
@@ -178,11 +178,11 @@ func NewForCon***REMOVED***g(c *$.restCon***REMOVED***g|raw$) (*$.GroupGoName$$.
 }
 `
 
-var newClientForCon***REMOVED***gOrDieTemplate = `
-// NewForCon***REMOVED***gOrDie creates a new $.GroupGoName$$.Version$Client for the given con***REMOVED***g and
-// panics if there is an error in the con***REMOVED***g.
-func NewForCon***REMOVED***gOrDie(c *$.restCon***REMOVED***g|raw$) *$.GroupGoName$$.Version$Client {
-	client, err := NewForCon***REMOVED***g(c)
+var newClientForConfigOrDieTemplate = `
+// NewForConfigOrDie creates a new $.GroupGoName$$.Version$Client for the given config and
+// panics if there is an error in the config.
+func NewForConfigOrDie(c *$.restConfig|raw$) *$.GroupGoName$$.Version$Client {
+	client, err := NewForConfig(c)
 	if err != nil {
 		panic(err)
 	}
@@ -209,22 +209,22 @@ func New(c $.restRESTClientInterface|raw$) *$.GroupGoName$$.Version$Client {
 `
 
 var setInternalVersionClientDefaultsTemplate = `
-func setCon***REMOVED***gDefaults(con***REMOVED***g *$.restCon***REMOVED***g|raw$) error {
-	con***REMOVED***g.APIPath = $.apiPath$
-	if con***REMOVED***g.UserAgent == "" {
-		con***REMOVED***g.UserAgent = $.restDefaultKubernetesUserAgent|raw$()
+func setConfigDefaults(config *$.restConfig|raw$) error {
+	config.APIPath = $.apiPath$
+	if config.UserAgent == "" {
+		config.UserAgent = $.restDefaultKubernetesUserAgent|raw$()
 	}
-	if con***REMOVED***g.GroupVersion == nil || con***REMOVED***g.GroupVersion.Group != scheme.Scheme.PrioritizedVersionsForGroup("$.groupName$")[0].Group {
+	if config.GroupVersion == nil || config.GroupVersion.Group != scheme.Scheme.PrioritizedVersionsForGroup("$.groupName$")[0].Group {
 		gv := scheme.Scheme.PrioritizedVersionsForGroup("$.groupName$")[0]
-		con***REMOVED***g.GroupVersion = &gv
+		config.GroupVersion = &gv
 	}
-	con***REMOVED***g.NegotiatedSerializer = scheme.Codecs
+	config.NegotiatedSerializer = scheme.Codecs
 
-	if con***REMOVED***g.QPS == 0 {
-		con***REMOVED***g.QPS = 5
+	if config.QPS == 0 {
+		config.QPS = 5
 	}
-	if con***REMOVED***g.Burst == 0 {
-		con***REMOVED***g.Burst = 10
+	if config.Burst == 0 {
+		config.Burst = 10
 	}
 
 	return nil
@@ -232,14 +232,14 @@ func setCon***REMOVED***gDefaults(con***REMOVED***g *$.restCon***REMOVED***g|raw
 `
 
 var setClientDefaultsTemplate = `
-func setCon***REMOVED***gDefaults(con***REMOVED***g *$.restCon***REMOVED***g|raw$) error {
+func setConfigDefaults(config *$.restConfig|raw$) error {
 	gv := $.SchemeGroupVersion|raw$
-	con***REMOVED***g.GroupVersion =  &gv
-	con***REMOVED***g.APIPath = $.apiPath$
-	con***REMOVED***g.NegotiatedSerializer = $.serializerDirectCodecFactory|raw${CodecFactory: scheme.Codecs}
+	config.GroupVersion =  &gv
+	config.APIPath = $.apiPath$
+	config.NegotiatedSerializer = $.serializerDirectCodecFactory|raw${CodecFactory: scheme.Codecs}
 
-	if con***REMOVED***g.UserAgent == "" {
-		con***REMOVED***g.UserAgent = $.restDefaultKubernetesUserAgent|raw$()
+	if config.UserAgent == "" {
+		config.UserAgent = $.restDefaultKubernetesUserAgent|raw$()
 	}
 
 	return nil

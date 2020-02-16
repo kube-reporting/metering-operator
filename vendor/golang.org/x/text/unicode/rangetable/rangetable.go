@@ -1,6 +1,6 @@
 // Copyright 2015 The Go Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE ***REMOVED***le.
+// license that can be found in the LICENSE file.
 
 // Package rangetable provides utilities for creating and inspecting
 // unicode.RangeTables.
@@ -32,7 +32,7 @@ func New(r ...rune) *unicode.RangeTable {
 	for _, r := range r[:k] {
 		if r <= 0xFFFF {
 			rt.R16 = append(rt.R16, unicode.Range16{Lo: uint16(r), Hi: uint16(r), Stride: 1})
-		} ***REMOVED*** {
+		} else {
 			rt.R32 = append(rt.R32, unicode.Range32{Lo: uint32(r), Hi: uint32(r), Stride: 1})
 		}
 	}

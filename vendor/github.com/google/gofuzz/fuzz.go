@@ -2,7 +2,7 @@
 Copyright 2014 Google Inc. All rights reserved.
 
 Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this ***REMOVED***le except in compliance with the License.
+you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
 
     http://www.apache.org/licenses/LICENSE-2.0
@@ -10,7 +10,7 @@ You may obtain a copy of the License at
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the speci***REMOVED***c language governing permissions and
+See the License for the specific language governing permissions and
 limitations under the License.
 */
 
@@ -26,7 +26,7 @@ import (
 // fuzzFuncMap is a map from a type to a fuzzFunc that handles that type.
 type fuzzFuncMap map[reflect.Type]reflect.Value
 
-// Fuzzer knows how to ***REMOVED***ll any object with random ***REMOVED***elds.
+// Fuzzer knows how to fill any object with random fields.
 type Fuzzer struct {
 	fuzzFuncs        fuzzFuncMap
 	defaultFuzzFuncs fuzzFuncMap
@@ -62,10 +62,10 @@ func NewWithSeed(seed int64) *Fuzzer {
 // Funcs adds each entry in fuzzFuncs as a custom fuzzing function.
 //
 // Each entry in fuzzFuncs must be a function taking two parameters.
-// The ***REMOVED***rst parameter must be a pointer or map. It is the variable that
-// function will ***REMOVED***ll with random data. The second parameter must be a
+// The first parameter must be a pointer or map. It is the variable that
+// function will fill with random data. The second parameter must be a
 // fuzz.Continue, which will provide a source of randomness and a way
-// to automatically continue fuzzing smaller pieces of the ***REMOVED***rst parameter.
+// to automatically continue fuzzing smaller pieces of the first parameter.
 //
 // These functions are called sensibly, e.g., if you wanted custom string
 // fuzzing, the function `func(s *string, c fuzz.Continue)` would get
@@ -150,20 +150,20 @@ func (f *Fuzzer) MaxDepth(d int) *Fuzzer {
 	return f
 }
 
-// Fuzz recursively ***REMOVED***lls all of obj's ***REMOVED***elds with something random.  First
-// this tries to ***REMOVED***nd a custom fuzz function (see Funcs).  If there is no
+// Fuzz recursively fills all of obj's fields with something random.  First
+// this tries to find a custom fuzz function (see Funcs).  If there is no
 // custom function this tests whether the object implements fuzz.Interface and,
 // if so, calls Fuzz on it to fuzz itself.  If that fails, this will see if
 // there is a default fuzz function provided by this package.  If all of that
-// fails, this will generate random values for all primitive ***REMOVED***elds and then
+// fails, this will generate random values for all primitive fields and then
 // recurse for all non-primitives.
 //
 // This is safe for cyclic or tree-like structs, up to a limit.  Use the
 // MaxDepth method to adjust how deep you need it to recurse.
 //
-// obj must be a pointer. Only exported (public) ***REMOVED***elds can be set (thanks,
+// obj must be a pointer. Only exported (public) fields can be set (thanks,
 // golang :/ ) Intended for tests, so will panic on bad input or unimplemented
-// ***REMOVED***elds.
+// fields.
 func (f *Fuzzer) Fuzz(obj interface{}) {
 	v := reflect.ValueOf(obj)
 	if v.Kind() != reflect.Ptr {
@@ -178,8 +178,8 @@ func (f *Fuzzer) Fuzz(obj interface{}) {
 // conformance.  This applies only to obj and not other instances of obj's
 // type.
 // Not safe for cyclic or tree-like structs!
-// obj must be a pointer. Only exported (public) ***REMOVED***elds can be set (thanks, golang :/ )
-// Intended for tests, so will panic on bad input or unimplemented ***REMOVED***elds.
+// obj must be a pointer. Only exported (public) fields can be set (thanks, golang :/ )
+// Intended for tests, so will panic on bad input or unimplemented fields.
 func (f *Fuzzer) FuzzNoCustom(obj interface{}) {
 	v := reflect.ValueOf(obj)
 	if v.Kind() != reflect.Ptr {
@@ -190,7 +190,7 @@ func (f *Fuzzer) FuzzNoCustom(obj interface{}) {
 }
 
 const (
-	// Do not try to ***REMOVED***nd a custom fuzz function.  Does not apply recursively.
+	// Do not try to find a custom fuzz function.  Does not apply recursively.
 	flagNoCustomFuzz uint64 = 1 << iota
 )
 
@@ -227,7 +227,7 @@ func (fc *fuzzerContext) doFuzz(v reflect.Value, flags uint64) {
 		}
 	}
 
-	if fn, ok := ***REMOVED***llFuncMap[v.Kind()]; ok {
+	if fn, ok := fillFuncMap[v.Kind()]; ok {
 		fn(v, fc.fuzzer.r)
 		return
 	}
@@ -287,7 +287,7 @@ func (fc *fuzzerContext) doFuzz(v reflect.Value, flags uint64) {
 	}
 }
 
-// tryCustom searches for custom handlers, and returns true iff it ***REMOVED***nds a match
+// tryCustom searches for custom handlers, and returns true iff it finds a match
 // and successfully randomizes v.
 func (fc *fuzzerContext) tryCustom(v reflect.Value) bool {
 	// First: see if we have a fuzz function for it.
@@ -335,7 +335,7 @@ func (fc *fuzzerContext) tryCustom(v reflect.Value) bool {
 }
 
 // Interface represents an object that knows how to fuzz itself.  Any time we
-// ***REMOVED***nd a type that implements this interface we will delegate the act of
+// find a type that implements this interface we will delegate the act of
 // fuzzing itself.
 type Interface interface {
 	Fuzz(c Continue)
@@ -409,7 +409,7 @@ func fuzzTime(t *time.Time, c Continue) {
 	*t = time.Unix(sec, nsec)
 }
 
-var ***REMOVED***llFuncMap = map[reflect.Kind]func(reflect.Value, *rand.Rand){
+var fillFuncMap = map[reflect.Kind]func(reflect.Value, *rand.Rand){
 	reflect.Bool: func(v reflect.Value, r *rand.Rand) {
 		v.SetBool(randBool(r))
 	},
@@ -453,14 +453,14 @@ func randBool(r *rand.Rand) bool {
 }
 
 type charRange struct {
-	***REMOVED***rst, last rune
+	first, last rune
 }
 
 // choose returns a random unicode character from the given range, using the
 // given randomness source.
 func (r *charRange) choose(rand *rand.Rand) rune {
-	count := int64(r.last - r.***REMOVED***rst)
-	return r.***REMOVED***rst + rune(rand.Int63n(count))
+	count := int64(r.last - r.first)
+	return r.first + rune(rand.Int63n(count))
 }
 
 var unicodeRanges = []charRange{

@@ -48,7 +48,7 @@ const (
 	SYS_DUP            = 41  // { int sys_dup(int fd); }
 	SYS_FSTATAT        = 42  // { int sys_fstatat(int fd, const char *path, \
 	SYS_GETEGID        = 43  // { gid_t sys_getegid(void); }
-	SYS_PROFIL         = 44  // { int sys_pro***REMOVED***l(caddr_t samples, size_t size, \
+	SYS_PROFIL         = 44  // { int sys_profil(caddr_t samples, size_t size, \
 	SYS_KTRACE         = 45  // { int sys_ktrace(const char *fname, int ops, \
 	SYS_SIGACTION      = 46  // { int sys_sigaction(int signum, \
 	SYS_GETGID         = 47  // { gid_t sys_getgid(void); }
@@ -118,7 +118,7 @@ const (
 	SYS_SETREGID       = 127 // { int sys_setregid(gid_t rgid, gid_t egid); }
 	SYS_RENAME         = 128 // { int sys_rename(const char *from, const char *to); }
 	SYS_FLOCK          = 131 // { int sys_flock(int fd, int how); }
-	SYS_MKFIFO         = 132 // { int sys_mk***REMOVED***fo(const char *path, mode_t mode); }
+	SYS_MKFIFO         = 132 // { int sys_mkfifo(const char *path, mode_t mode); }
 	SYS_SENDTO         = 133 // { ssize_t sys_sendto(int s, const void *buf, \
 	SYS_SHUTDOWN       = 134 // { int sys_shutdown(int s, int how); }
 	SYS_SOCKETPAIR     = 135 // { int sys_socketpair(int domain, int type, \
@@ -195,7 +195,7 @@ const (
 	SYS_FCHOWNAT       = 315 // { int sys_fchownat(int fd, const char *path, \
 	SYS_LINKAT         = 317 // { int sys_linkat(int fd1, const char *path1, int fd2, \
 	SYS_MKDIRAT        = 318 // { int sys_mkdirat(int fd, const char *path, \
-	SYS_MKFIFOAT       = 319 // { int sys_mk***REMOVED***foat(int fd, const char *path, \
+	SYS_MKFIFOAT       = 319 // { int sys_mkfifoat(int fd, const char *path, \
 	SYS_MKNODAT        = 320 // { int sys_mknodat(int fd, const char *path, \
 	SYS_OPENAT         = 321 // { int sys_openat(int fd, const char *path, int flags, \
 	SYS_READLINKAT     = 322 // { ssize_t sys_readlinkat(int fd, const char *path, \

@@ -18,19 +18,19 @@ const (
 	// ErrCodeNoSuchBucket for service response error code
 	// "NoSuchBucket".
 	//
-	// The speci***REMOVED***ed bucket does not exist.
+	// The specified bucket does not exist.
 	ErrCodeNoSuchBucket = "NoSuchBucket"
 
 	// ErrCodeNoSuchKey for service response error code
 	// "NoSuchKey".
 	//
-	// The speci***REMOVED***ed key does not exist.
+	// The specified key does not exist.
 	ErrCodeNoSuchKey = "NoSuchKey"
 
 	// ErrCodeNoSuchUpload for service response error code
 	// "NoSuchUpload".
 	//
-	// The speci***REMOVED***ed multipart upload does not exist.
+	// The specified multipart upload does not exist.
 	ErrCodeNoSuchUpload = "NoSuchUpload"
 
 	// ErrCodeObjectAlreadyInActiveTierError for service response error code

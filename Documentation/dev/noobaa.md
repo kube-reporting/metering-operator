@@ -5,16 +5,16 @@ Follow the instructions on https://github.com/noobaa/noobaa-operator/ for instal
 If you have an existing noobaa install, the management UI and S3 connection information can be found by running `noobaa status`.
 
 It is highly recommended that before beginning you familiarize yourself with NooBaa.
-If you have not already, you should: con***REMOVED***gure a storage pool using the NooBaa management UI, con***REMOVED***gure your Tier 1 data placement, and create a bucket for usage by Metering.
+If you have not already, you should: configure a storage pool using the NooBaa management UI, configure your Tier 1 data placement, and create a bucket for usage by Metering.
 
-## Con***REMOVED***guring Metering for NooBaa
+## Configuring Metering for NooBaa
 
 Currently noobaa supports TLS, but produces a self-signed cert that we cannot trust due to it not being signed for any of the hostnames we connect to it using.
 You have a few choices:
 
 - Do not use TLS to connect to Noobaa (use the http:// protocol and port 80 instead of https:// with 443).
-- Con***REMOVED***gure a CA for NooBaa and ensure that `s3.noobaa.svc` is in the subject alternate names of the server certi***REMOVED***cate.
-  - There is an [open issue](https://github.com/noobaa/noobaa-operator/issues/43#issue-487679497) requesting that certi***REMOVED***cate generation is handled automatically on Openshift, and contains instructions on how you can create a certi***REMOVED***cate in Openshift.
+- Configure a CA for NooBaa and ensure that `s3.noobaa.svc` is in the subject alternate names of the server certificate.
+  - There is an [open issue](https://github.com/noobaa/noobaa-operator/issues/43#issue-487679497) requesting that certificate generation is handled automatically on Openshift, and contains instructions on how you can create a certificate in Openshift.
 
 ### Create the namespace
 
@@ -38,10 +38,10 @@ Create a secret storing your NooBaa AWS credentials:
 kubectl -n $METERING_NAMESPACE create secret generic my-noobaa-secret --from-literal=aws-access-key-id=your-access-key  --from-literal=aws-secret-access-key=your-secret-key
 ```
 
-### MeteringCon***REMOVED***g
+### MeteringConfig
 
-Below are two example `MeteringCon***REMOVED***g` resources you can use when trying to use Metering with NooBaa.
-It is recommended you create a bucket in the NooBaa UI or using the AWS CLI dedicated for Metering and change the value of `spec.storage.hive.s3Compatible.bucket` from `***REMOVED***rst.bucket` to the name of the bucket you created.
+Below are two example `MeteringConfig` resources you can use when trying to use Metering with NooBaa.
+It is recommended you create a bucket in the NooBaa UI or using the AWS CLI dedicated for Metering and change the value of `spec.storage.hive.s3Compatible.bucket` from `first.bucket` to the name of the bucket you created.
 
 ### Without TLS
 
@@ -49,7 +49,7 @@ When using NooBaa without TLS you need to set the `spec.storage.hive.s3Compatibl
 
 ```
 apiVersion: metering.openshift.io/v1
-kind: MeteringCon***REMOVED***g
+kind: MeteringConfig
 metadata:
   name: "operator-metering"
 spec:
@@ -58,18 +58,18 @@ spec:
     hive:
       type: "s3Compatible"
       s3Compatible:
-        bucket: "***REMOVED***rst.bucket"
+        bucket: "first.bucket"
         endpoint: "http://s3.noobaa.svc:80"
         secretName: "my-noobaa-secret"
 ```
 
 ### With TLS
 
-When using NooBaa with TLS you need to set the `spec.storage.hive.s3Compatible.endpoint` value to `https://s3.noobaa.svc:443` and set the `spec.storage.hive.s3Compatible.ca` ***REMOVED***elds.
+When using NooBaa with TLS you need to set the `spec.storage.hive.s3Compatible.endpoint` value to `https://s3.noobaa.svc:443` and set the `spec.storage.hive.s3Compatible.ca` fields.
 
 ```
 apiVersion: metering.openshift.io/v1
-kind: MeteringCon***REMOVED***g
+kind: MeteringConfig
 metadata:
   name: "operator-metering"
 spec:
@@ -78,12 +78,12 @@ spec:
     hive:
       type: "s3Compatible"
       s3Compatible:
-        bucket: "***REMOVED***rst.bucket"
+        bucket: "first.bucket"
         endpoint: "https://s3.noobaa.svc:443"
         secretName: "my-noobaa-secret"
         ca:
           createSecret: true
-          # You MUST replace the value below with the certi***REMOVED***cate chain for
+          # You MUST replace the value below with the certificate chain for
           # your NooBaa installation.
           content: |
             -----BEGIN CERTIFICATE-----

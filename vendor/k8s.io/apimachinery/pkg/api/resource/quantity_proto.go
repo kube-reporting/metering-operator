@@ -2,7 +2,7 @@
 Copyright 2015 The Kubernetes Authors.
 
 Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this ***REMOVED***le except in compliance with the License.
+you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
 
     http://www.apache.org/licenses/LICENSE-2.0
@@ -10,7 +10,7 @@ You may obtain a copy of the License at
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the speci***REMOVED***c language governing permissions and
+See the License for the specific language governing permissions and
 limitations under the License.
 */
 
@@ -36,7 +36,7 @@ func (m *Quantity) Marshal() (data []byte, err error) {
 }
 
 // MarshalTo is a customized version of the generated Protobuf unmarshaler for a struct
-// with a single string ***REMOVED***eld.
+// with a single string field.
 func (m *Quantity) MarshalTo(data []byte) (int, error) {
 	var i int
 	_ = i
@@ -88,7 +88,7 @@ func sovGenerated(x uint64) (n int) {
 }
 
 // Unmarshal is a customized version of the generated Protobuf unmarshaler for a struct
-// with a single string ***REMOVED***eld.
+// with a single string field.
 func (m *Quantity) Unmarshal(data []byte) error {
 	l := len(data)
 	iNdEx := 0
@@ -109,18 +109,18 @@ func (m *Quantity) Unmarshal(data []byte) error {
 				break
 			}
 		}
-		***REMOVED***eldNum := int32(wire >> 3)
+		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
 			return fmt.Errorf("proto: Quantity: wiretype end group for non-group")
 		}
-		if ***REMOVED***eldNum <= 0 {
-			return fmt.Errorf("proto: Quantity: illegal tag %d (wire type %d)", ***REMOVED***eldNum, wire)
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: Quantity: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
-		switch ***REMOVED***eldNum {
+		switch fieldNum {
 		case 1:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for ***REMOVED***eld String_", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field String_", wireType)
 			}
 			var stringLen uint64
 			for shift := uint(0); ; shift += 7 {

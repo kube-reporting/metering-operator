@@ -1,6 +1,6 @@
 // Copyright 2014 The Go Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE ***REMOVED***le.
+// license that can be found in the LICENSE file.
 
 package collate
 
@@ -12,7 +12,7 @@ import (
 	"golang.org/x/text/unicode/norm"
 )
 
-// newCollator creates a new collator with default options con***REMOVED***gured.
+// newCollator creates a new collator with default options configured.
 func newCollator(t colltab.Weighter) *Collator {
 	// Initialize a collator with default options.
 	c := &Collator{
@@ -33,7 +33,7 @@ func newCollator(t colltab.Weighter) *Collator {
 }
 
 // An Option is used to change the behavior of a Collator. Options override the
-// settings passed through the locale identi***REMOVED***er.
+// settings passed through the locale identifier.
 type Option struct {
 	priority int
 	f        func(o *options)
@@ -54,24 +54,24 @@ func (p prioritizedOptions) Less(i, j int) bool {
 }
 
 type options struct {
-	// ignore speci***REMOVED***es which levels to ignore.
+	// ignore specifies which levels to ignore.
 	ignore [colltab.NumLevels]bool
 
 	// caseLevel is true if there is an additional level of case matching
 	// between the secondary and tertiary levels.
 	caseLevel bool
 
-	// backwards speci***REMOVED***es the order of sorting at the secondary level.
+	// backwards specifies the order of sorting at the secondary level.
 	// This option exists predominantly to support reverse sorting of accents in French.
 	backwards bool
 
-	// numeric speci***REMOVED***es whether any sequence of decimal digits (category is Nd)
+	// numeric specifies whether any sequence of decimal digits (category is Nd)
 	// is sorted at a primary level with its numeric value.
 	// For example, "A-21" < "A-123".
 	// This option is set by wrapping the main Weighter with NewNumericWeighter.
 	numeric bool
 
-	// alternate speci***REMOVED***es an alternative handling of variables.
+	// alternate specifies an alternative handling of variables.
 	alternate alternateHandling
 
 	// variableTop is the largest primary value that is considered to be
@@ -91,7 +91,7 @@ func (o *options) setOptions(opts []Option) {
 }
 
 // OptionsFromTag extracts the BCP47 collation options from the tag and
-// con***REMOVED***gures a collator accordingly. These options are set before any other
+// configures a collator accordingly. These options are set before any other
 // option.
 func OptionsFromTag(t language.Tag) Option {
 	return Option{0, func(o *options) {
@@ -123,7 +123,7 @@ func (o *options) setFromTag(t language.Tag) {
 	switch t.TypeForKey("ka") {
 	case "shifted":
 		o.alternate = altShifted
-	// The following two types are not of***REMOVED***cial BCP47, but we support them to
+	// The following two types are not official BCP47, but we support them to
 	// give access to this otherwise hidden functionality. The name blanked is
 	// derived from the LDML name blanked and posix reflects the main use of
 	// the shift-trimmed option.
@@ -173,7 +173,7 @@ var (
 	Force Option = force
 	force        = Option{5, forceF}
 
-	// Numeric speci***REMOVED***es that numbers should sort numerically ("2" < "12").
+	// Numeric specifies that numbers should sort numerically ("2" < "12").
 	Numeric Option = numeric
 	numeric        = Option{5, numericF}
 )
@@ -204,17 +204,17 @@ func forceF(o *options) {
 
 func numericF(o *options) { o.numeric = true }
 
-// Reorder overrides the pre-de***REMOVED***ned ordering of scripts and character sets.
+// Reorder overrides the pre-defined ordering of scripts and character sets.
 func Reorder(s ...string) Option {
 	// TODO: need fractional weights to implement this.
 	panic("TODO: implement")
 }
 
 // TODO: consider making these public again. These options cannot be fully
-// speci***REMOVED***ed in BCP47, so an API interface seems warranted. Still a higher-level
+// specified in BCP47, so an API interface seems warranted. Still a higher-level
 // interface would be nice (e.g. a POSIX option for enabling altShiftTrimmed)
 
-// alternateHandling identi***REMOVED***es the various ways in which variables are handled.
+// alternateHandling identifies the various ways in which variables are handled.
 // A rune with a primary weight lower than the variable top is considered a
 // variable.
 // See http://www.unicode.org/reports/tr10/#Variable_Weighting for details.

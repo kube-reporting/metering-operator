@@ -8,7 +8,7 @@ import (
 	"github.com/aws/aws-sdk-go/aws/awserr"
 )
 
-// Options provide the con***REMOVED***guration needed to direct how the
+// Options provide the configuration needed to direct how the
 // endpoints will be resolved.
 type Options struct {
 	// DisableSSL forces the endpoint to be resolved as HTTP.
@@ -31,7 +31,7 @@ type Options struct {
 
 	// Enables resolving a service endpoint based on the region provided if the
 	// service does not exist. The service endpoint ID will be used as the service
-	// domain name pre***REMOVED***x. By default the endpoint resolver requires the service
+	// domain name prefix. By default the endpoint resolver requires the service
 	// to be known when resolving endpoints.
 	//
 	// If resolving an endpoint on the partition list the provided region will
@@ -39,9 +39,9 @@ type Options struct {
 	// endpoint ID with. If both the service and region are unknown and resolving
 	// the endpoint on partition list an UnknownEndpointError error will be returned.
 	//
-	// If resolving and endpoint on a partition speci***REMOVED***c resolver that partition's
+	// If resolving and endpoint on a partition specific resolver that partition's
 	// domain name pattern will be used with the service endpoint ID. If both
-	// region and service do not exist when resolving an endpoint on a speci***REMOVED***c
+	// region and service do not exist when resolving an endpoint on a specific
 	// partition the partition's domain pattern will be used to combine the
 	// endpoint and region together.
 	//
@@ -58,20 +58,20 @@ type STSRegionalEndpoint int
 
 const (
 
-	// UnsetSTSEndpoint represents that STS Regional Endpoint flag is not speci***REMOVED***ed.
+	// UnsetSTSEndpoint represents that STS Regional Endpoint flag is not specified.
 	UnsetSTSEndpoint STSRegionalEndpoint = iota
 
-	// LegacySTSEndpoint represents when STS Regional Endpoint flag is speci***REMOVED***ed
+	// LegacySTSEndpoint represents when STS Regional Endpoint flag is specified
 	// to use legacy endpoints.
 	LegacySTSEndpoint
 
-	// RegionalSTSEndpoint represents when STS Regional Endpoint flag is speci***REMOVED***ed
+	// RegionalSTSEndpoint represents when STS Regional Endpoint flag is specified
 	// to use regional endpoints.
 	RegionalSTSEndpoint
 )
 
 // GetSTSRegionalEndpoint function returns the STSRegionalEndpointFlag based
-// on the input string provided in env con***REMOVED***g or shared con***REMOVED***g by the user.
+// on the input string provided in env config or shared config by the user.
 //
 // `legacy`, `regional` are the only case-insensitive valid strings for
 // resolving the STS regional Endpoint flag.
@@ -129,9 +129,9 @@ type Resolver interface {
 	EndpointFor(service, region string, opts ...func(*Options)) (ResolvedEndpoint, error)
 }
 
-// ResolverFunc is a helper utility that wraps a function so it satis***REMOVED***es the
+// ResolverFunc is a helper utility that wraps a function so it satisfies the
 // Resolver interface. This is useful when you want to add additional endpoint
-// resolving logic, or stub out speci***REMOVED***c endpoints with custom values.
+// resolving logic, or stub out specific endpoints with custom values.
 type ResolverFunc func(service, region string, opts ...func(*Options)) (ResolvedEndpoint, error)
 
 // EndpointFor wraps the ResolverFunc function to satisfy the Resolver interface.
@@ -160,7 +160,7 @@ func AddScheme(endpoint string, disableSSL bool) string {
 
 // EnumPartitions a provides a way to retrieve the underlying partitions that
 // make up the SDK's default Resolver, or any resolver decoded from a model
-// ***REMOVED***le.
+// file.
 //
 // Use this interface with DefaultResolver and DecodeModels to get the list of
 // Partitions.
@@ -196,7 +196,7 @@ func RegionsForService(ps []Partition, partitionID, serviceID string) (map[strin
 	return map[string]Region{}, false
 }
 
-// PartitionForRegion returns the ***REMOVED***rst partition which includes the region
+// PartitionForRegion returns the first partition which includes the region
 // passed in. This includes both known regions and regions which match
 // a pattern supported by the partition which may include regions that are
 // not explicitly known by the partition. Use the Regions method of the
@@ -214,18 +214,18 @@ func PartitionForRegion(ps []Partition, regionID string) (Partition, bool) {
 // A Partition provides the ability to enumerate the partition's regions
 // and services.
 type Partition struct {
-	id, dnsSuf***REMOVED***x string
+	id, dnsSuffix string
 	p             *partition
 }
 
-// DNSSuf***REMOVED***x returns the base domain name of the partition.
-func (p Partition) DNSSuf***REMOVED***x() string { return p.dnsSuf***REMOVED***x }
+// DNSSuffix returns the base domain name of the partition.
+func (p Partition) DNSSuffix() string { return p.dnsSuffix }
 
-// ID returns the identi***REMOVED***er of the partition.
+// ID returns the identifier of the partition.
 func (p Partition) ID() string { return p.id }
 
 // EndpointFor attempts to resolve the endpoint based on service and region.
-// See Options for information on con***REMOVED***guring how the endpoint is resolved.
+// See Options for information on configuring how the endpoint is resolved.
 //
 // If the service cannot be found in the metadata the UnknownServiceError
 // error will be returned. This validation will occur regardless if
@@ -285,7 +285,7 @@ type Region struct {
 	p        *partition
 }
 
-// ID returns the region's identi***REMOVED***er.
+// ID returns the region's identifier.
 func (r Region) ID() string { return r.id }
 
 // Description returns the region's description. The region description
@@ -320,7 +320,7 @@ type Service struct {
 	p  *partition
 }
 
-// ID returns the identi***REMOVED***er for the service.
+// ID returns the identifier for the service.
 func (s Service) ID() string { return s.id }
 
 // ResolveEndpoint resolves an endpoint from the context of a service given
@@ -375,10 +375,10 @@ type Endpoint struct {
 	p         *partition
 }
 
-// ID returns the identi***REMOVED***er for an endpoint.
+// ID returns the identifier for an endpoint.
 func (e Endpoint) ID() string { return e.id }
 
-// ServiceID returns the identi***REMOVED***er the endpoint belongs to.
+// ServiceID returns the identifier the endpoint belongs to.
 func (e Endpoint) ServiceID() string { return e.serviceID }
 
 // ResolveEndpoint resolves an endpoint from the context of a service and
@@ -408,7 +408,7 @@ type ResolvedEndpoint struct {
 	SigningMethod string
 }
 
-// So that the Error interface type can be included as an anonymous ***REMOVED***eld
+// So that the Error interface type can be included as an anonymous field
 // in the requestError struct and not conflict with the error.Error() method.
 type awsError awserr.Error
 

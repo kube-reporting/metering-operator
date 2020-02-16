@@ -2,7 +2,7 @@
 Copyright 2016 The Kubernetes Authors.
 
 Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this ***REMOVED***le except in compliance with the License.
+you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
 
     http://www.apache.org/licenses/LICENSE-2.0
@@ -10,7 +10,7 @@ You may obtain a copy of the License at
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the speci***REMOVED***c language governing permissions and
+See the License for the specific language governing permissions and
 limitations under the License.
 */
 
@@ -49,7 +49,7 @@ type ScaleStatus struct {
 	// version of both map-based and more expressive set-based selectors. This is done to
 	// avoid introspection in the clients. The string will be in the same format as the
 	// query-param syntax. If the target type only supports map-based selectors, both this
-	// ***REMOVED***eld and map-based selector ***REMOVED***eld are populated.
+	// field and map-based selector field are populated.
 	// More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/#label-selectors
 	// +optional
 	TargetSelector string `json:"targetSelector,omitempty" protobuf:"bytes,3,opt,name=targetSelector"`
@@ -64,7 +64,7 @@ type Scale struct {
 	// +optional
 	metav1.ObjectMeta `json:"metadata,omitempty" protobuf:"bytes,1,opt,name=metadata"`
 
-	// de***REMOVED***nes the behavior of the scale. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#spec-and-status.
+	// defines the behavior of the scale. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#spec-and-status.
 	// +optional
 	Spec ScaleSpec `json:"spec,omitempty" protobuf:"bytes,2,opt,name=spec"`
 
@@ -79,7 +79,7 @@ type Scale struct {
 // DEPRECATED - This group version of StatefulSet is deprecated by apps/v1beta2/StatefulSet. See the release notes for
 // more information.
 // StatefulSet represents a set of pods with consistent identities.
-// Identities are de***REMOVED***ned as:
+// Identities are defined as:
 //  - Network: A single stable DNS and hostname.
 //  - Storage: As many VolumeClaims as requested.
 // The StatefulSet guarantees that a given network identity will always
@@ -89,7 +89,7 @@ type StatefulSet struct {
 	// +optional
 	metav1.ObjectMeta `json:"metadata,omitempty" protobuf:"bytes,1,opt,name=metadata"`
 
-	// Spec de***REMOVED***nes the desired identities of pods in this set.
+	// Spec defines the desired identities of pods in this set.
 	// +optional
 	Spec StatefulSetSpec `json:"spec,omitempty" protobuf:"bytes,2,opt,name=spec"`
 
@@ -99,7 +99,7 @@ type StatefulSet struct {
 	Status StatefulSetStatus `json:"status,omitempty" protobuf:"bytes,3,opt,name=status"`
 }
 
-// PodManagementPolicyType de***REMOVED***nes the policy for creating pods under a stateful set.
+// PodManagementPolicyType defines the policy for creating pods under a stateful set.
 type PodManagementPolicyType string
 
 const (
@@ -132,13 +132,13 @@ const (
 	// RollingUpdateStatefulSetStrategyType indicates that update will be
 	// applied to all Pods in the StatefulSet with respect to the StatefulSet
 	// ordering constraints. When a scale operation is performed with this
-	// strategy, new Pods will be created from the speci***REMOVED***cation version indicated
+	// strategy, new Pods will be created from the specification version indicated
 	// by the StatefulSet's updateRevision.
 	RollingUpdateStatefulSetStrategyType = "RollingUpdate"
 	// OnDeleteStatefulSetStrategyType triggers the legacy behavior. Version
 	// tracking and ordered rolling restarts are disabled. Pods are recreated
 	// from the StatefulSetSpec when they are manually deleted. When a scale
-	// operation is performed with this strategy,speci***REMOVED***cation version indicated
+	// operation is performed with this strategy,specification version indicated
 	// by the StatefulSet's currentRevision.
 	OnDeleteStatefulSetStrategyType = "OnDelete"
 )
@@ -150,13 +150,13 @@ type RollingUpdateStatefulSetStrategy struct {
 	Partition *int32 `json:"partition,omitempty" protobuf:"varint,1,opt,name=partition"`
 }
 
-// A StatefulSetSpec is the speci***REMOVED***cation of a StatefulSet.
+// A StatefulSetSpec is the specification of a StatefulSet.
 type StatefulSetSpec struct {
 	// replicas is the desired number of replicas of the given Template.
 	// These are replicas in the sense that they are instantiations of the
 	// same Template, but individual replicas also have a consistent identity.
-	// If unspeci***REMOVED***ed, defaults to 1.
-	// TODO: Consider a rename of this ***REMOVED***eld.
+	// If unspecified, defaults to 1.
+	// TODO: Consider a rename of this field.
 	// +optional
 	Replicas *int32 `json:"replicas,omitempty" protobuf:"varint,1,opt,name=replicas"`
 
@@ -167,8 +167,8 @@ type StatefulSetSpec struct {
 	Selector *metav1.LabelSelector `json:"selector,omitempty" protobuf:"bytes,2,opt,name=selector"`
 
 	// template is the object that describes the pod that will be created if
-	// insuf***REMOVED***cient replicas are detected. Each pod stamped out by the StatefulSet
-	// will ful***REMOVED***ll this Template, but have a unique identity from the rest
+	// insufficient replicas are detected. Each pod stamped out by the StatefulSet
+	// will fulfill this Template, but have a unique identity from the rest
 	// of the StatefulSet.
 	Template v1.PodTemplateSpec `json:"template" protobuf:"bytes,3,opt,name=template"`
 
@@ -178,15 +178,15 @@ type StatefulSetSpec struct {
 	// this list must have at least one matching (by name) volumeMount in one
 	// container in the template. A claim in this list takes precedence over
 	// any volumes in the template, with the same name.
-	// TODO: De***REMOVED***ne the behavior if a claim already exists with the same name.
+	// TODO: Define the behavior if a claim already exists with the same name.
 	// +optional
 	VolumeClaimTemplates []v1.PersistentVolumeClaim `json:"volumeClaimTemplates,omitempty" protobuf:"bytes,4,rep,name=volumeClaimTemplates"`
 
 	// serviceName is the name of the service that governs this StatefulSet.
 	// This service must exist before the StatefulSet, and is responsible for
 	// the network identity of the set. Pods get DNS/hostnames that follow the
-	// pattern: pod-speci***REMOVED***c-string.serviceName.default.svc.cluster.local
-	// where "pod-speci***REMOVED***c-string" is managed by the StatefulSet controller.
+	// pattern: pod-specific-string.serviceName.default.svc.cluster.local
+	// where "pod-specific-string" is managed by the StatefulSet controller.
 	ServiceName string `json:"serviceName" protobuf:"bytes,5,opt,name=serviceName"`
 
 	// podManagementPolicy controls how pods are created during initial scale up,
@@ -242,7 +242,7 @@ type StatefulSetStatus struct {
 	UpdateRevision string `json:"updateRevision,omitempty" protobuf:"bytes,7,opt,name=updateRevision"`
 
 	// collisionCount is the count of hash collisions for the StatefulSet. The StatefulSet controller
-	// uses this ***REMOVED***eld as a collision avoidance mechanism when it needs to create the name for the
+	// uses this field as a collision avoidance mechanism when it needs to create the name for the
 	// newest ControllerRevision.
 	// +optional
 	CollisionCount *int32 `json:"collisionCount,omitempty" protobuf:"varint,9,opt,name=collisionCount"`
@@ -295,7 +295,7 @@ type Deployment struct {
 	// +optional
 	metav1.ObjectMeta `json:"metadata,omitempty" protobuf:"bytes,1,opt,name=metadata"`
 
-	// Speci***REMOVED***cation of the desired behavior of the Deployment.
+	// Specification of the desired behavior of the Deployment.
 	// +optional
 	Spec DeploymentSpec `json:"spec,omitempty" protobuf:"bytes,2,opt,name=spec"`
 
@@ -304,10 +304,10 @@ type Deployment struct {
 	Status DeploymentStatus `json:"status,omitempty" protobuf:"bytes,3,opt,name=status"`
 }
 
-// DeploymentSpec is the speci***REMOVED***cation of the desired behavior of the Deployment.
+// DeploymentSpec is the specification of the desired behavior of the Deployment.
 type DeploymentSpec struct {
 	// Number of desired pods. This is a pointer to distinguish between explicit
-	// zero and not speci***REMOVED***ed. Defaults to 1.
+	// zero and not specified. Defaults to 1.
 	// +optional
 	Replicas *int32 `json:"replicas,omitempty" protobuf:"varint,1,opt,name=replicas"`
 
@@ -331,7 +331,7 @@ type DeploymentSpec struct {
 	MinReadySeconds int32 `json:"minReadySeconds,omitempty" protobuf:"varint,5,opt,name=minReadySeconds"`
 
 	// The number of old ReplicaSets to retain to allow rollback.
-	// This is a pointer to distinguish between explicit zero and not speci***REMOVED***ed.
+	// This is a pointer to distinguish between explicit zero and not specified.
 	// Defaults to 2.
 	// +optional
 	RevisionHistoryLimit *int32 `json:"revisionHistoryLimit,omitempty" protobuf:"varint,6,opt,name=revisionHistoryLimit"`
@@ -341,9 +341,9 @@ type DeploymentSpec struct {
 	Paused bool `json:"paused,omitempty" protobuf:"varint,7,opt,name=paused"`
 
 	// DEPRECATED.
-	// The con***REMOVED***g this deployment is rolling back to. Will be cleared after rollback is done.
+	// The config this deployment is rolling back to. Will be cleared after rollback is done.
 	// +optional
-	RollbackTo *RollbackCon***REMOVED***g `json:"rollbackTo,omitempty" protobuf:"bytes,8,opt,name=rollbackTo"`
+	RollbackTo *RollbackConfig `json:"rollbackTo,omitempty" protobuf:"bytes,8,opt,name=rollbackTo"`
 
 	// The maximum time in seconds for a deployment to make progress before it
 	// is considered to be failed. The deployment controller will continue to
@@ -365,12 +365,12 @@ type DeploymentRollback struct {
 	// The annotations to be updated to a deployment
 	// +optional
 	UpdatedAnnotations map[string]string `json:"updatedAnnotations,omitempty" protobuf:"bytes,2,rep,name=updatedAnnotations"`
-	// The con***REMOVED***g of this deployment rollback.
-	RollbackTo RollbackCon***REMOVED***g `json:"rollbackTo" protobuf:"bytes,3,opt,name=rollbackTo"`
+	// The config of this deployment rollback.
+	RollbackTo RollbackConfig `json:"rollbackTo" protobuf:"bytes,3,opt,name=rollbackTo"`
 }
 
 // DEPRECATED.
-type RollbackCon***REMOVED***g struct {
+type RollbackConfig struct {
 	// The revision to rollback to. If set to 0, rollback to the last revision.
 	// +optional
 	Revision int64 `json:"revision,omitempty" protobuf:"varint,1,opt,name=revision"`
@@ -389,7 +389,7 @@ type DeploymentStrategy struct {
 	// +optional
 	Type DeploymentStrategyType `json:"type,omitempty" protobuf:"bytes,1,opt,name=type,casttype=DeploymentStrategyType"`
 
-	// Rolling update con***REMOVED***g params. Present only if DeploymentStrategyType =
+	// Rolling update config params. Present only if DeploymentStrategyType =
 	// RollingUpdate.
 	//---
 	// TODO: Update this to follow our convention for oneOf, whatever we decide it
@@ -472,7 +472,7 @@ type DeploymentStatus struct {
 	Conditions []DeploymentCondition `json:"conditions,omitempty" patchStrategy:"merge" patchMergeKey:"type" protobuf:"bytes,6,rep,name=conditions"`
 
 	// Count of hash collisions for the Deployment. The Deployment controller uses this
-	// ***REMOVED***eld as a collision avoidance mechanism when it needs to create the name for the
+	// field as a collision avoidance mechanism when it needs to create the name for the
 	// newest ReplicaSet.
 	// +optional
 	CollisionCount *int32 `json:"collisionCount,omitempty" protobuf:"varint,8,opt,name=collisionCount"`
@@ -488,7 +488,7 @@ const (
 	// Progressing means the deployment is progressing. Progress for a deployment is
 	// considered when a new replica set is created or adopted, and when new pods scale
 	// up or old pods scale down. Progress is not estimated for paused deployments or
-	// when progressDeadlineSeconds is not speci***REMOVED***ed.
+	// when progressDeadlineSeconds is not specified.
 	DeploymentProgressing DeploymentConditionType = "Progressing"
 	// ReplicaFailure is added in a deployment when one of its pods fails to be created
 	// or deleted.
@@ -534,7 +534,7 @@ type DeploymentList struct {
 // their internal state.
 // Once a ControllerRevision has been successfully created, it can not be updated.
 // The API Server will fail validation of all requests that attempt to mutate
-// the Data ***REMOVED***eld. ControllerRevisions may, however, be deleted. Note that, due to its use by both
+// the Data field. ControllerRevisions may, however, be deleted. Note that, due to its use by both
 // the DaemonSet and StatefulSet controllers for update and rollback, this object is beta. However,
 // it may be subject to name and representation changes in future releases, and clients should not
 // depend on its stability. It is primarily for internal use by controllers.

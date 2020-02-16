@@ -22,7 +22,7 @@ func Throttle(limit int) func(http.Handler) http.Handler {
 }
 
 // ThrottleBacklog is a middleware that limits number of currently processed
-// requests at a time and provides a backlog for holding a ***REMOVED***nite number of
+// requests at a time and provides a backlog for holding a finite number of
 // pending requests.
 func ThrottleBacklog(limit int, backlogLimit int, backlogTimeout time.Duration) func(http.Handler) http.Handler {
 	if limit < 1 {

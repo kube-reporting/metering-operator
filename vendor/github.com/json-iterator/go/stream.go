@@ -4,10 +4,10 @@ import (
 	"io"
 )
 
-// stream is a io.Writer like object, with JSON speci***REMOVED***c write functions.
+// stream is a io.Writer like object, with JSON specific write functions.
 // Error is not returned as return value, but stored as Error member on this stream instance.
 type Stream struct {
-	cfg        *frozenCon***REMOVED***g
+	cfg        *frozenConfig
 	out        io.Writer
 	buf        []byte
 	Error      error
@@ -16,12 +16,12 @@ type Stream struct {
 }
 
 // NewStream create new stream instance.
-// cfg can be jsoniter.Con***REMOVED***gDefault.
+// cfg can be jsoniter.ConfigDefault.
 // out can be nil if write to internal buffer.
 // bufSize is the initial size for the internal buffer in bytes.
 func NewStream(cfg API, out io.Writer, bufSize int) *Stream {
 	return &Stream{
-		cfg:       cfg.(*frozenCon***REMOVED***g),
+		cfg:       cfg.(*frozenConfig),
 		out:       out,
 		buf:       make([]byte, 0, bufSize),
 		Error:     nil,
@@ -29,7 +29,7 @@ func NewStream(cfg API, out io.Writer, bufSize int) *Stream {
 	}
 }
 
-// Pool returns a pool can provide more stream with same con***REMOVED***guration
+// Pool returns a pool can provide more stream with same configuration
 func (stream *Stream) Pool() StreamPool {
 	return stream.cfg
 }
@@ -138,7 +138,7 @@ func (stream *Stream) WriteFalse() {
 func (stream *Stream) WriteBool(val bool) {
 	if val {
 		stream.WriteTrue()
-	} ***REMOVED*** {
+	} else {
 		stream.WriteFalse()
 	}
 }
@@ -150,12 +150,12 @@ func (stream *Stream) WriteObjectStart() {
 	stream.writeIndention(0)
 }
 
-// WriteObjectField write "***REMOVED***eld": with possible indention
-func (stream *Stream) WriteObjectField(***REMOVED***eld string) {
-	stream.WriteString(***REMOVED***eld)
+// WriteObjectField write "field": with possible indention
+func (stream *Stream) WriteObjectField(field string) {
+	stream.WriteString(field)
 	if stream.indention > 0 {
 		stream.writeTwoBytes(':', ' ')
-	} ***REMOVED*** {
+	} else {
 		stream.writeByte(':')
 	}
 }

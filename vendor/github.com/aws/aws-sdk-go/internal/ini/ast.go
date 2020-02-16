@@ -51,7 +51,7 @@ func (k ASTKind) String() string {
 // AST interface allows us to determine what kind of node we
 // are on and casting may not need to be necessary.
 //
-// The root is always the ***REMOVED***rst node in Children
+// The root is always the first node in Children
 type AST struct {
 	Kind      ASTKind
 	Root      Token
@@ -80,7 +80,7 @@ func (a *AST) AppendChild(child AST) {
 	a.Children = append(a.Children, child)
 }
 
-// GetRoot will return the root AST which can be the ***REMOVED***rst entry
+// GetRoot will return the root AST which can be the first entry
 // in the children list or a token.
 func (a *AST) GetRoot() AST {
 	if a.RootToken {
@@ -111,7 +111,7 @@ func (a *AST) GetChildren() []AST {
 func (a *AST) SetChildren(children []AST) {
 	if a.RootToken {
 		a.Children = children
-	} ***REMOVED*** {
+	} else {
 		a.Children = append(a.Children[:1], children...)
 	}
 }

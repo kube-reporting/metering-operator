@@ -4,7 +4,7 @@
 // https://github.com/golang/protobuf
 //
 // Redistribution and use in source and binary forms, with or without
-// modi***REMOVED***cation, are permitted provided that the following conditions are
+// modification, are permitted provided that the following conditions are
 // met:
 //
 //     * Redistributions of source code must retain the above copyright
@@ -15,7 +15,7 @@
 // distribution.
 //     * Neither the name of Google Inc. nor the names of its
 // contributors may be used to endorse or promote products derived from
-// this software without speci***REMOVED***c prior written permission.
+// this software without specific prior written permission.
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
 // "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
@@ -49,7 +49,7 @@ import (
 // A message type ID is required for storing a protocol buffer in a message set.
 var errNoMessageTypeID = errors.New("proto does not have a message type ID")
 
-// The ***REMOVED***rst two types (_MessageSet_Item and messageSet)
+// The first two types (_MessageSet_Item and messageSet)
 // model what the protocol compiler produces for the following protocol message:
 //   message MessageSet {
 //     repeated group Item = 1 {
@@ -74,13 +74,13 @@ type messageSet struct {
 // Make sure messageSet is a Message.
 var _ Message = (*messageSet)(nil)
 
-// messageTypeIder is an interface satis***REMOVED***ed by a protocol buffer type
+// messageTypeIder is an interface satisfied by a protocol buffer type
 // that may be stored in a MessageSet.
 type messageTypeIder interface {
 	MessageTypeId() int32
 }
 
-func (ms *messageSet) ***REMOVED***nd(pb Message) *_MessageSet_Item {
+func (ms *messageSet) find(pb Message) *_MessageSet_Item {
 	mti, ok := pb.(messageTypeIder)
 	if !ok {
 		return nil
@@ -95,11 +95,11 @@ func (ms *messageSet) ***REMOVED***nd(pb Message) *_MessageSet_Item {
 }
 
 func (ms *messageSet) Has(pb Message) bool {
-	return ms.***REMOVED***nd(pb) != nil
+	return ms.find(pb) != nil
 }
 
 func (ms *messageSet) Unmarshal(pb Message) error {
-	if item := ms.***REMOVED***nd(pb); item != nil {
+	if item := ms.find(pb); item != nil {
 		return Unmarshal(item.Message, pb)
 	}
 	if _, ok := pb.(messageTypeIder); !ok {
@@ -113,7 +113,7 @@ func (ms *messageSet) Marshal(pb Message) error {
 	if err != nil {
 		return err
 	}
-	if item := ms.***REMOVED***nd(pb); item != nil {
+	if item := ms.find(pb); item != nil {
 		// reuse existing item
 		item.Message = msg
 		return nil
@@ -203,14 +203,14 @@ func UnmarshalMessageSet(buf []byte, exts interface{}) error {
 		id := *item.TypeId
 		msg := item.Message
 
-		// Restore wire type and ***REMOVED***eld number varint, plus length varint.
+		// Restore wire type and field number varint, plus length varint.
 		// Be careful to preserve duplicate items.
 		b := EncodeVarint(uint64(id)<<3 | WireBytes)
 		if ext, ok := m[id]; ok {
 			// Existing data; rip off the tag and length varint
 			// so we join the new data correctly.
 			// We can assume that ext.enc is set because we are unmarshaling.
-			o := ext.enc[len(b):]   // skip wire type and ***REMOVED***eld number
+			o := ext.enc[len(b):]   // skip wire type and field number
 			_, n := DecodeVarint(o) // calculate length of length varint
 			o = o[n:]               // skip length varint
 			msg = append(o, msg...) // join old data and new data
@@ -251,7 +251,7 @@ func MarshalMessageSetJSON(exts interface{}) ([]byte, error) {
 	for id := range m {
 		ids = append(ids, id)
 	}
-	sort.Sort(int32Slice(ids)) // int32Slice de***REMOVED***ned in text.go
+	sort.Sort(int32Slice(ids)) // int32Slice defined in text.go
 
 	for i, id := range ids {
 		ext := m[id]
@@ -306,8 +306,8 @@ type messageSetDesc struct {
 }
 
 // RegisterMessageSetType is called from the generated code.
-func RegisterMessageSetType(m Message, ***REMOVED***eldNum int32, name string) {
-	messageSetMap[***REMOVED***eldNum] = messageSetDesc{
+func RegisterMessageSetType(m Message, fieldNum int32, name string) {
+	messageSetMap[fieldNum] = messageSetDesc{
 		t:    reflect.TypeOf(m),
 		name: name,
 	}

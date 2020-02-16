@@ -3,7 +3,7 @@
 // The s3manager package's Uploader provides concurrent upload of content to S3
 // by taking advantage of S3's Multipart APIs. The Uploader also supports both
 // io.Reader for streaming uploads, and will also take advantage of io.ReadSeeker
-// for optimizations if the Body satis***REMOVED***es that type. Once the Uploader instance
+// for optimizations if the Body satisfies that type. Once the Uploader instance
 // is created you can call Upload concurrently from multiple goroutines safely.
 //
 //   // The session the S3 Uploader will use
@@ -12,21 +12,21 @@
 //   // Create an uploader with the session and default options
 //   uploader := s3manager.NewUploader(sess)
 //
-//   f, err  := os.Open(***REMOVED***lename)
+//   f, err  := os.Open(filename)
 //   if err != nil {
-//       return fmt.Errorf("failed to open ***REMOVED***le %q, %v", ***REMOVED***lename, err)
+//       return fmt.Errorf("failed to open file %q, %v", filename, err)
 //   }
 //
-//   // Upload the ***REMOVED***le to S3.
+//   // Upload the file to S3.
 //   result, err := uploader.Upload(&s3manager.UploadInput{
 //       Bucket: aws.String(myBucket),
 //       Key:    aws.String(myString),
 //       Body:   f,
 //   })
 //   if err != nil {
-//       return fmt.Errorf("failed to upload ***REMOVED***le, %v", err)
+//       return fmt.Errorf("failed to upload file, %v", err)
 //   }
-//   fmt.Printf("***REMOVED***le uploaded to, %s\n", aws.StringValue(result.Location))
+//   fmt.Printf("file uploaded to, %s\n", aws.StringValue(result.Location))
 //
 // See the s3manager package's Uploader type documentation for more information.
 // https://docs.aws.amazon.com/sdk-for-go/api/service/s3/s3manager/#Uploader
@@ -44,21 +44,21 @@
 //   // Create a downloader with the session and default options
 //   downloader := s3manager.NewDownloader(sess)
 //
-//   // Create a ***REMOVED***le to write the S3 Object contents to.
-//   f, err := os.Create(***REMOVED***lename)
+//   // Create a file to write the S3 Object contents to.
+//   f, err := os.Create(filename)
 //   if err != nil {
-//       return fmt.Errorf("failed to create ***REMOVED***le %q, %v", ***REMOVED***lename, err)
+//       return fmt.Errorf("failed to create file %q, %v", filename, err)
 //   }
 //
-//   // Write the contents of S3 Object to the ***REMOVED***le
+//   // Write the contents of S3 Object to the file
 //   n, err := downloader.Download(f, &s3.GetObjectInput{
 //       Bucket: aws.String(myBucket),
 //       Key:    aws.String(myString),
 //   })
 //   if err != nil {
-//       return fmt.Errorf("failed to download ***REMOVED***le, %v", err)
+//       return fmt.Errorf("failed to download file, %v", err)
 //   }
-//   fmt.Printf("***REMOVED***le downloaded, %d bytes\n", n)
+//   fmt.Printf("file downloaded, %d bytes\n", n)
 //
 // See the s3manager package's Downloader type documentation for more information.
 // https://docs.aws.amazon.com/sdk-for-go/api/service/s3/s3manager/#Downloader
@@ -66,10 +66,10 @@
 // Automatic URI cleaning
 //
 // Interacting with objects whose keys contain adjacent slashes (e.g. bucketname/foo//bar/objectname)
-// requires setting DisableRestProtocolURICleaning to true in the aws.Con***REMOVED***g struct
+// requires setting DisableRestProtocolURICleaning to true in the aws.Config struct
 // used by the service client.
 //
-//   svc := s3.New(sess, &aws.Con***REMOVED***g{
+//   svc := s3.New(sess, &aws.Config{
 //      	DisableRestProtocolURICleaning: aws.Bool(true),
 //   })
 //   out, err := svc.GetObject(&s3.GetObjectInput {
@@ -89,7 +89,7 @@
 //   region, err := s3manager.GetBucketRegion(ctx, sess, bucket, "us-west-2")
 //   if err != nil {
 //       if aerr, ok := err.(awserr.Error); ok && aerr.Code() == "NotFound" {
-//            fmt.Fprintf(os.Stderr, "unable to ***REMOVED***nd bucket %s's region not found\n", bucket)
+//            fmt.Fprintf(os.Stderr, "unable to find bucket %s's region not found\n", bucket)
 //       }
 //       return err
 //   }

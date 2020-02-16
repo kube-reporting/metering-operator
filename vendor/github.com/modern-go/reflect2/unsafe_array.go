@@ -13,7 +13,7 @@ type UnsafeArrayType struct {
 	likePtr    bool
 }
 
-func newUnsafeArrayType(cfg *frozenCon***REMOVED***g, type1 reflect.Type) *UnsafeArrayType {
+func newUnsafeArrayType(cfg *frozenConfig, type1 reflect.Type) *UnsafeArrayType {
 	return &UnsafeArrayType{
 		unsafeType: *newUnsafeType(cfg, type1),
 		elemRType:  unpackEFace(type1.Elem()).data,

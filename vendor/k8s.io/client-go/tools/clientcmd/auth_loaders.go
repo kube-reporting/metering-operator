@@ -2,7 +2,7 @@
 Copyright 2014 The Kubernetes Authors.
 
 Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this ***REMOVED***le except in compliance with the License.
+you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
 
     http://www.apache.org/licenses/LICENSE-2.0
@@ -10,7 +10,7 @@ You may obtain a copy of the License at
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the speci***REMOVED***c language governing permissions and
+See the License for the specific language governing permissions and
 limitations under the License.
 */
 
@@ -30,7 +30,7 @@ import (
 
 // AuthLoaders are used to build clientauth.Info objects.
 type AuthLoader interface {
-	// LoadAuth takes a path to a con***REMOVED***g ***REMOVED***le and can then do anything it needs in order to return a valid clientauth.Info
+	// LoadAuth takes a path to a config file and can then do anything it needs in order to return a valid clientauth.Info
 	LoadAuth(path string) (*clientauth.Info, error)
 }
 
@@ -46,9 +46,9 @@ type PromptingAuthLoader struct {
 	reader io.Reader
 }
 
-// LoadAuth parses an AuthInfo object from a ***REMOVED***le path. It prompts user and creates ***REMOVED***le if it doesn't exist.
+// LoadAuth parses an AuthInfo object from a file path. It prompts user and creates file if it doesn't exist.
 func (a *PromptingAuthLoader) LoadAuth(path string) (*clientauth.Info, error) {
-	// Prompt for user/pass and write a ***REMOVED***le if none exists.
+	// Prompt for user/pass and write a file if none exists.
 	if _, err := os.Stat(path); os.IsNotExist(err) {
 		authPtr, err := a.Prompt()
 		auth := *authPtr
@@ -84,28 +84,28 @@ func (a *PromptingAuthLoader) Prompt() (*clientauth.Info, error) {
 	return auth, nil
 }
 
-func promptForString(***REMOVED***eld string, r io.Reader, show bool) (result string, err error) {
-	fmt.Printf("Please enter %s: ", ***REMOVED***eld)
+func promptForString(field string, r io.Reader, show bool) (result string, err error) {
+	fmt.Printf("Please enter %s: ", field)
 	if show {
 		_, err = fmt.Fscan(r, &result)
-	} ***REMOVED*** {
+	} else {
 		var data []byte
 		if terminal.IsTerminal(int(os.Stdin.Fd())) {
 			data, err = terminal.ReadPassword(int(os.Stdin.Fd()))
 			result = string(data)
-		} ***REMOVED*** {
-			return "", fmt.Errorf("error reading input for %s", ***REMOVED***eld)
+		} else {
+			return "", fmt.Errorf("error reading input for %s", field)
 		}
 	}
 	return result, err
 }
 
-// NewPromptingAuthLoader is an AuthLoader that parses an AuthInfo object from a ***REMOVED***le path. It prompts user and creates ***REMOVED***le if it doesn't exist.
+// NewPromptingAuthLoader is an AuthLoader that parses an AuthInfo object from a file path. It prompts user and creates file if it doesn't exist.
 func NewPromptingAuthLoader(reader io.Reader) *PromptingAuthLoader {
 	return &PromptingAuthLoader{reader}
 }
 
-// NewDefaultAuthLoader returns a default implementation of an AuthLoader that only reads from a con***REMOVED***g ***REMOVED***le
+// NewDefaultAuthLoader returns a default implementation of an AuthLoader that only reads from a config file
 func NewDefaultAuthLoader() AuthLoader {
 	return &defaultAuthLoader{}
 }

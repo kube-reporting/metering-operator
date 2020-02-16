@@ -11,14 +11,14 @@ required = [
   # required for client-gen
   "k8s.io/apimachinery/pkg/labels",
   "k8s.io/apimachinery/pkg/watch",
-  "k8s.io/apimachinery/pkg/***REMOVED***elds",
+  "k8s.io/apimachinery/pkg/fields",
   "github.com/golang/mock/mockgen",
   "github.com/golang/mock/mockgen/model",
 ]
 
 [[constraint]]
   branch = "master"
-  name = "github.com/rob***REMOVED***g/cron"
+  name = "github.com/robfig/cron"
 
 [[constraint]]
   name = "github.com/sirupsen/logrus"
@@ -97,8 +97,8 @@ required = [
   name = "github.com/Masterminds/sprig"
   version = "2.16.0"
 
-# required for kube libraries to ensure we have the CaseSensitive ***REMOVED***eld in
-# jsoniter.Con***REMOVED***g
+# required for kube libraries to ensure we have the CaseSensitive field in
+# jsoniter.Config
 [[override]]
   name = "github.com/json-iterator/go"
   version = ">=1.1.5"

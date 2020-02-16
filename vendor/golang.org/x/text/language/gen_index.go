@@ -1,12 +1,12 @@
 // Copyright 2015 The Go Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE ***REMOVED***le.
+// license that can be found in the LICENSE file.
 
 // +build ignore
 
 package main
 
-// This ***REMOVED***le generates derivative tables based on the language package itself.
+// This file generates derivative tables based on the language package itself.
 
 import (
 	"bytes"
@@ -29,13 +29,13 @@ var (
 
 	draft = flag.String("draft",
 		"contributed",
-		`Minimal draft requirements (approved, contributed, provisional, uncon***REMOVED***rmed).`)
+		`Minimal draft requirements (approved, contributed, provisional, unconfirmed).`)
 )
 
 func main() {
 	gen.Init()
 
-	// Read the CLDR zip ***REMOVED***le.
+	// Read the CLDR zip file.
 	r := gen.OpenCLDRCoreZip()
 	defer r.Close()
 
@@ -50,7 +50,7 @@ func main() {
 		buf := &bytes.Buffer{}
 
 		if _, err = w.WriteGo(buf, "language", ""); err != nil {
-			log.Fatalf("Error formatting ***REMOVED***le index.go: %v", err)
+			log.Fatalf("Error formatting file index.go: %v", err)
 		}
 
 		// Since we're generating a table for our own package we need to rewrite
@@ -58,7 +58,7 @@ func main() {
 		// bytes.Replace will do.
 		out := bytes.Replace(buf.Bytes(), []byte("language."), nil, -1)
 		if err := ioutil.WriteFile("index.go", out, 0600); err != nil {
-			log.Fatalf("Could not create ***REMOVED***le index.go: %v", err)
+			log.Fatalf("Could not create file index.go: %v", err)
 		}
 	}()
 
@@ -107,7 +107,7 @@ func main() {
 		}
 		if len(t.Variants()) == 0 && len(t.Extensions()) == 0 {
 			core = append(core, t)
-		} ***REMOVED*** {
+		} else {
 			special = append(special, t)
 		}
 	}
@@ -148,7 +148,7 @@ func main() {
 }
 
 // getIndex prints the subtag type and extracts its index of size nibble.
-// If the index is less than n nibbles, the result is pre***REMOVED***xed with 0s.
+// If the index is less than n nibbles, the result is prefixed with 0s.
 func getIndex(x interface{}, n int) string {
 	s := fmt.Sprintf("%#v", x) // s is of form Type{typeID: 0x00}
 	s = s[strings.Index(s, "0x")+2 : len(s)-1]

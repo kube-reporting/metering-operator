@@ -30,7 +30,7 @@ type ReportQuery struct {
 type ReportQuerySpec struct {
 	Columns []ReportQueryColumn          `json:"columns"`
 	Query   string                       `json:"query"`
-	Inputs  []ReportQueryInputDe***REMOVED***nition `json:"inputs,omitempty"`
+	Inputs  []ReportQueryInputDefinition `json:"inputs,omitempty"`
 }
 
 type ReportQueryColumn struct {
@@ -40,7 +40,7 @@ type ReportQueryColumn struct {
 	Unit        string `json:"unit,omitempty"`
 }
 
-type ReportQueryInputDe***REMOVED***nition struct {
+type ReportQueryInputDefinition struct {
 	Name     string           `json:"name"`
 	Required bool             `json:"required"`
 	Type     string           `json:"type,omitempty"`

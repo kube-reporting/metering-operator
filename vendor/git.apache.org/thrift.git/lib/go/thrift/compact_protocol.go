@@ -1,10 +1,10 @@
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements. See the NOTICE ***REMOVED***le
+ * or more contributor license agreements. See the NOTICE file
  * distributed with this work for additional information
- * regarding copyright ownership. The ASF licenses this ***REMOVED***le
+ * regarding copyright ownership. The ASF licenses this file
  * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this ***REMOVED***le except in compliance
+ * "License"); you may not use this file except in compliance
  * with the License. You may obtain a copy of the License at
  *
  *   http://www.apache.org/licenses/LICENSE-2.0
@@ -13,7 +13,7 @@
  * software distributed under the License is distributed on an
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
  * KIND, either express or implied. See the License for the
- * speci***REMOVED***c language governing permissions and limitations
+ * specific language governing permissions and limitations
  * under the License.
  */
 
@@ -87,18 +87,18 @@ type TCompactProtocol struct {
 	trans         TRichTransport
 	origTransport TTransport
 
-	// Used to keep track of the last ***REMOVED***eld for the current and previous structs,
+	// Used to keep track of the last field for the current and previous structs,
 	// so we can do the delta stuff.
 	lastField   []int
 	lastFieldId int
 
-	// If we encounter a boolean ***REMOVED***eld begin, save the TField here so it can
+	// If we encounter a boolean field begin, save the TField here so it can
 	// have the value incorporated.
 	booleanFieldName    string
 	booleanFieldId      int16
 	booleanFieldPending bool
 
-	// If we read a ***REMOVED***eld header, and it's a boolean ***REMOVED***eld, save the boolean
+	// If we read a field header, and it's a boolean field, save the boolean
 	// value here so that readBool can use it.
 	boolValue          bool
 	boolValueIsNotNull bool
@@ -110,7 +110,7 @@ func NewTCompactProtocol(trans TTransport) *TCompactProtocol {
 	p := &TCompactProtocol{origTransport: trans, lastField: []int{}}
 	if et, ok := trans.(TRichTransport); ok {
 		p.trans = et
-	} ***REMOVED*** {
+	} else {
 		p.trans = NewTRichTransport(trans)
 	}
 
@@ -145,8 +145,8 @@ func (p *TCompactProtocol) WriteMessageBegin(name string, typeId TMessageType, s
 func (p *TCompactProtocol) WriteMessageEnd() error { return nil }
 
 // Write a struct begin. This doesn't actually put anything on the wire. We
-// use it as an opportunity to put special placeholder markers on the ***REMOVED***eld
-// stack so we can get the ***REMOVED***eld id deltas correct.
+// use it as an opportunity to put special placeholder markers on the field
+// stack so we can get the field id deltas correct.
 func (p *TCompactProtocol) WriteStructBegin(name string) error {
 	p.lastField = append(p.lastField, p.lastFieldId)
 	p.lastFieldId = 0
@@ -154,8 +154,8 @@ func (p *TCompactProtocol) WriteStructBegin(name string) error {
 }
 
 // Write a struct end. This doesn't actually put anything on the wire. We use
-// this as an opportunity to pop the last ***REMOVED***eld from the current struct off
-// of the ***REMOVED***eld stack.
+// this as an opportunity to pop the last field from the current struct off
+// of the field stack.
 func (p *TCompactProtocol) WriteStructEnd() error {
 	p.lastFieldId = p.lastField[len(p.lastField)-1]
 	p.lastField = p.lastField[:len(p.lastField)-1]
@@ -173,8 +173,8 @@ func (p *TCompactProtocol) WriteFieldBegin(name string, typeId TType, id int16) 
 }
 
 // The workhorse of writeFieldBegin. It has the option of doing a
-// 'type override' of the type header. This is used speci***REMOVED***cally in the
-// boolean ***REMOVED***eld case.
+// 'type override' of the type header. This is used specifically in the
+// boolean field case.
 func (p *TCompactProtocol) writeFieldBeginInternal(name string, typeId TType, id int16, typeOverride byte) (int, error) {
 	// short lastField = lastField_.pop();
 
@@ -182,19 +182,19 @@ func (p *TCompactProtocol) writeFieldBeginInternal(name string, typeId TType, id
 	var typeToWrite byte
 	if typeOverride == 0xFF {
 		typeToWrite = byte(p.getCompactType(typeId))
-	} ***REMOVED*** {
+	} else {
 		typeToWrite = typeOverride
 	}
-	// check if we can use delta encoding for the ***REMOVED***eld id
-	***REMOVED***eldId := int(id)
+	// check if we can use delta encoding for the field id
+	fieldId := int(id)
 	written := 0
-	if ***REMOVED***eldId > p.lastFieldId && ***REMOVED***eldId-p.lastFieldId <= 15 {
+	if fieldId > p.lastFieldId && fieldId-p.lastFieldId <= 15 {
 		// write them together
-		err := p.writeByteDirect(byte((***REMOVED***eldId-p.lastFieldId)<<4) | typeToWrite)
+		err := p.writeByteDirect(byte((fieldId-p.lastFieldId)<<4) | typeToWrite)
 		if err != nil {
 			return 0, err
 		}
-	} ***REMOVED*** {
+	} else {
 		// write them separate
 		err := p.writeByteDirect(typeToWrite)
 		if err != nil {
@@ -207,8 +207,8 @@ func (p *TCompactProtocol) writeFieldBeginInternal(name string, typeId TType, id
 		}
 	}
 
-	p.lastFieldId = ***REMOVED***eldId
-	// p.lastField.Push(***REMOVED***eld.id);
+	p.lastFieldId = fieldId
+	// p.lastField.Push(field.id);
 	return written, nil
 }
 
@@ -256,12 +256,12 @@ func (p *TCompactProtocol) WriteBool(value bool) error {
 		v = byte(COMPACT_BOOLEAN_TRUE)
 	}
 	if p.booleanFieldPending {
-		// we haven't written the ***REMOVED***eld header yet
+		// we haven't written the field header yet
 		_, err := p.writeFieldBeginInternal(p.booleanFieldName, BOOL, p.booleanFieldId, v)
 		p.booleanFieldPending = false
 		return NewTProtocolException(err)
 	}
-	// we're not part of a ***REMOVED***eld, so just write the value.
+	// we're not part of a field, so just write the value.
 	err := p.writeByteDirect(v)
 	return NewTProtocolException(err)
 }
@@ -364,23 +364,23 @@ func (p *TCompactProtocol) ReadMessageBegin() (name string, typeId TMessageType,
 func (p *TCompactProtocol) ReadMessageEnd() error { return nil }
 
 // Read a struct begin. There's nothing on the wire for this, but it is our
-// opportunity to push a new struct begin marker onto the ***REMOVED***eld stack.
+// opportunity to push a new struct begin marker onto the field stack.
 func (p *TCompactProtocol) ReadStructBegin() (name string, err error) {
 	p.lastField = append(p.lastField, p.lastFieldId)
 	p.lastFieldId = 0
 	return
 }
 
-// Doesn't actually consume any wire data, just removes the last ***REMOVED***eld for
-// this struct from the ***REMOVED***eld stack.
+// Doesn't actually consume any wire data, just removes the last field for
+// this struct from the field stack.
 func (p *TCompactProtocol) ReadStructEnd() error {
-	// consume the last ***REMOVED***eld we read off the wire.
+	// consume the last field we read off the wire.
 	p.lastFieldId = p.lastField[len(p.lastField)-1]
 	p.lastField = p.lastField[:len(p.lastField)-1]
 	return nil
 }
 
-// Read a ***REMOVED***eld header off the wire.
+// Read a field header off the wire.
 func (p *TCompactProtocol) ReadFieldBegin() (name string, typeId TType, id int16, err error) {
 	t, err := p.readByteDirect()
 	if err != nil {
@@ -392,17 +392,17 @@ func (p *TCompactProtocol) ReadFieldBegin() (name string, typeId TType, id int16
 		return "", STOP, 0, nil
 	}
 
-	// mask off the 4 MSB of the type header. it could contain a ***REMOVED***eld id delta.
-	modi***REMOVED***er := int16((t & 0xf0) >> 4)
-	if modi***REMOVED***er == 0 {
-		// not a delta. look ahead for the zigzag varint ***REMOVED***eld id.
+	// mask off the 4 MSB of the type header. it could contain a field id delta.
+	modifier := int16((t & 0xf0) >> 4)
+	if modifier == 0 {
+		// not a delta. look ahead for the zigzag varint field id.
 		id, err = p.ReadI16()
 		if err != nil {
 			return
 		}
-	} ***REMOVED*** {
-		// has a delta. add the delta to the last read ***REMOVED***eld id.
-		id = int16(p.lastFieldId) + modi***REMOVED***er
+	} else {
+		// has a delta. add the delta to the last read field id.
+		id = int16(p.lastFieldId) + modifier
 	}
 	typeId, e := p.getTType(tCompactType(t & 0x0f))
 	if e != nil {
@@ -410,14 +410,14 @@ func (p *TCompactProtocol) ReadFieldBegin() (name string, typeId TType, id int16
 		return
 	}
 
-	// if this happens to be a boolean ***REMOVED***eld, the value is encoded in the type
+	// if this happens to be a boolean field, the value is encoded in the type
 	if p.isBoolType(t) {
 		// save the boolean value in a special instance variable.
 		p.boolValue = (byte(t)&0x0f == COMPACT_BOOLEAN_TRUE)
 		p.boolValueIsNotNull = true
 	}
 
-	// push the new ***REMOVED***eld onto the ***REMOVED***eld stack so we can keep the deltas going.
+	// push the new field onto the field stack so we can keep the deltas going.
 	p.lastFieldId = int(id)
 	return
 }
@@ -495,7 +495,7 @@ func (p *TCompactProtocol) ReadSetBegin() (elemType TType, size int, err error) 
 
 func (p *TCompactProtocol) ReadSetEnd() error { return nil }
 
-// Read a boolean off the wire. If this is a boolean ***REMOVED***eld, the value should
+// Read a boolean off the wire. If this is a boolean field, the value should
 // already have been read during readFieldBegin, so we'll just consume the
 // pre-stored value. Otherwise, read a byte.
 func (p *TCompactProtocol) ReadBool() (value bool, err error) {
@@ -571,7 +571,7 @@ func (p *TCompactProtocol) ReadString() (value string, err error) {
 	var buf []byte
 	if length <= int32(len(p.buffer)) {
 		buf = p.buffer[0:length]
-	} ***REMOVED*** {
+	} else {
 		buf = make([]byte, length)
 	}
 	_, e = io.ReadFull(p.trans, buf)
@@ -603,8 +603,8 @@ func (p *TCompactProtocol) Flush() (err error) {
 	return NewTProtocolException(p.trans.Flush())
 }
 
-func (p *TCompactProtocol) Skip(***REMOVED***eldType TType) (err error) {
-	return SkipDefaultDepth(p, ***REMOVED***eldType)
+func (p *TCompactProtocol) Skip(fieldType TType) (err error) {
+	return SkipDefaultDepth(p, fieldType)
 }
 
 func (p *TCompactProtocol) Transport() TTransport {
@@ -641,7 +641,7 @@ func (p *TCompactProtocol) writeVarint32(n int32) (int, error) {
 			// p.writeByteDirect(byte(n));
 			break
 			// return;
-		} ***REMOVED*** {
+		} else {
 			i32buf[idx] = byte((n & 0x7F) | 0x80)
 			idx++
 			// p.writeByteDirect(byte(((n & 0x7F) | 0x80)));
@@ -661,7 +661,7 @@ func (p *TCompactProtocol) writeVarint64(n int64) (int, error) {
 			varint64out[idx] = byte(n)
 			idx++
 			break
-		} ***REMOVED*** {
+		} else {
 			varint64out[idx] = byte((n & 0x7F) | 0x80)
 			idx++
 			u := uint64(n)
@@ -683,21 +683,21 @@ func (p *TCompactProtocol) int32ToZigzag(n int32) int32 {
 	return (n << 1) ^ (n >> 31)
 }
 
-func (p *TCompactProtocol) ***REMOVED***xedUint64ToBytes(n uint64, buf []byte) {
+func (p *TCompactProtocol) fixedUint64ToBytes(n uint64, buf []byte) {
 	binary.LittleEndian.PutUint64(buf, n)
 }
 
-func (p *TCompactProtocol) ***REMOVED***xedInt64ToBytes(n int64, buf []byte) {
+func (p *TCompactProtocol) fixedInt64ToBytes(n int64, buf []byte) {
 	binary.LittleEndian.PutUint64(buf, uint64(n))
 }
 
-// Writes a byte without any possibility of all that ***REMOVED***eld header nonsense.
+// Writes a byte without any possibility of all that field header nonsense.
 // Used internally by other writing methods that know they need to write a byte.
 func (p *TCompactProtocol) writeByteDirect(b byte) error {
 	return p.trans.WriteByte(b)
 }
 
-// Writes a byte without any possibility of all that ***REMOVED***eld header nonsense.
+// Writes a byte without any possibility of all that field header nonsense.
 func (p *TCompactProtocol) writeIntAsByteDirect(n int) (int, error) {
 	return 1, p.writeByteDirect(byte(n))
 }
@@ -809,7 +809,7 @@ func (p *TCompactProtocol) getTType(t tCompactType) (TType, error) {
 	return STOP, TException(fmt.Errorf("don't know what type: %s", t&0x0f))
 }
 
-// Given a TType value, ***REMOVED***nd the appropriate TCompactProtocol.Types constant.
+// Given a TType value, find the appropriate TCompactProtocol.Types constant.
 func (p *TCompactProtocol) getCompactType(t TType) tCompactType {
 	return ttypeToCompactType[t]
 }

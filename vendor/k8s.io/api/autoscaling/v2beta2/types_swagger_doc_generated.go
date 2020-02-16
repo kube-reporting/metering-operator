@@ -2,7 +2,7 @@
 Copyright The Kubernetes Authors.
 
 Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this ***REMOVED***le except in compliance with the License.
+you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
 
     http://www.apache.org/licenses/LICENSE-2.0
@@ -10,13 +10,13 @@ You may obtain a copy of the License at
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the speci***REMOVED***c language governing permissions and
+See the License for the specific language governing permissions and
 limitations under the License.
 */
 
 package v2beta2
 
-// This ***REMOVED***le contains a collection of methods that can be used from go-restful to
+// This file contains a collection of methods that can be used from go-restful to
 // generate Swagger API documentation for its models. Please read this PR for more
 // information on the implementation: https://github.com/emicklei/go-restful/pull/215
 //
@@ -30,7 +30,7 @@ package v2beta2
 var map_CrossVersionObjectReference = map[string]string{
 	"":           "CrossVersionObjectReference contains enough information to let you identify the referred resource.",
 	"kind":       "Kind of the referent; More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#types-kinds\"",
-	"name":       "Name of the referent; More info: http://kubernetes.io/docs/user-guide/identi***REMOVED***ers#names",
+	"name":       "Name of the referent; More info: http://kubernetes.io/docs/user-guide/identifiers#names",
 	"apiVersion": "API version of the referent",
 }
 
@@ -40,8 +40,8 @@ func (CrossVersionObjectReference) SwaggerDoc() map[string]string {
 
 var map_ExternalMetricSource = map[string]string{
 	"":       "ExternalMetricSource indicates how to scale on a metric not associated with any Kubernetes object (for example length of queue in cloud messaging service, or QPS from loadbalancer running outside of cluster).",
-	"metric": "metric identi***REMOVED***es the target metric by name and selector",
-	"target": "target speci***REMOVED***es the target value for the given metric",
+	"metric": "metric identifies the target metric by name and selector",
+	"target": "target specifies the target value for the given metric",
 }
 
 func (ExternalMetricSource) SwaggerDoc() map[string]string {
@@ -50,7 +50,7 @@ func (ExternalMetricSource) SwaggerDoc() map[string]string {
 
 var map_ExternalMetricStatus = map[string]string{
 	"":        "ExternalMetricStatus indicates the current value of a global metric not associated with any Kubernetes object.",
-	"metric":  "metric identi***REMOVED***es the target metric by name and selector",
+	"metric":  "metric identifies the target metric by name and selector",
 	"current": "current contains the current value for the given metric",
 }
 
@@ -59,9 +59,9 @@ func (ExternalMetricStatus) SwaggerDoc() map[string]string {
 }
 
 var map_HorizontalPodAutoscaler = map[string]string{
-	"":         "HorizontalPodAutoscaler is the con***REMOVED***guration for a horizontal pod autoscaler, which automatically manages the replica count of any resource implementing the scale subresource based on the metrics speci***REMOVED***ed.",
+	"":         "HorizontalPodAutoscaler is the configuration for a horizontal pod autoscaler, which automatically manages the replica count of any resource implementing the scale subresource based on the metrics specified.",
 	"metadata": "metadata is the standard object metadata. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#metadata",
-	"spec":     "spec is the speci***REMOVED***cation for the behaviour of the autoscaler. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#spec-and-status.",
+	"spec":     "spec is the specification for the behaviour of the autoscaler. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#spec-and-status.",
 	"status":   "status is the current information about the autoscaler.",
 }
 
@@ -97,7 +97,7 @@ var map_HorizontalPodAutoscalerSpec = map[string]string{
 	"scaleTargetRef": "scaleTargetRef points to the target resource to scale, and is used to the pods for which metrics should be collected, as well as to actually change the replica count.",
 	"minReplicas":    "minReplicas is the lower limit for the number of replicas to which the autoscaler can scale down. It defaults to 1 pod.",
 	"maxReplicas":    "maxReplicas is the upper limit for the number of replicas to which the autoscaler can scale up. It cannot be less that minReplicas.",
-	"metrics":        "metrics contains the speci***REMOVED***cations for which to use to calculate the desired replica count (the maximum replica count across all metrics will be used).  The desired replica count is calculated multiplying the ratio between the target value and the current value by the current number of pods.  Ergo, metrics used must decrease as the pod count is increased, and vice-versa.  See the individual metric source types for more information about how each type of metric must respond. If not set, the default metric will be set to 80% average CPU utilization.",
+	"metrics":        "metrics contains the specifications for which to use to calculate the desired replica count (the maximum replica count across all metrics will be used).  The desired replica count is calculated multiplying the ratio between the target value and the current value by the current number of pods.  Ergo, metrics used must decrease as the pod count is increased, and vice-versa.  See the individual metric source types for more information about how each type of metric must respond. If not set, the default metric will be set to 80% average CPU utilization.",
 }
 
 func (HorizontalPodAutoscalerSpec) SwaggerDoc() map[string]string {
@@ -118,22 +118,22 @@ func (HorizontalPodAutoscalerStatus) SwaggerDoc() map[string]string {
 	return map_HorizontalPodAutoscalerStatus
 }
 
-var map_MetricIdenti***REMOVED***er = map[string]string{
-	"":         "MetricIdenti***REMOVED***er de***REMOVED***nes the name and optionally selector for a metric",
+var map_MetricIdentifier = map[string]string{
+	"":         "MetricIdentifier defines the name and optionally selector for a metric",
 	"name":     "name is the name of the given metric",
-	"selector": "selector is the string-encoded form of a standard kubernetes label selector for the given metric When set, it is passed as an additional parameter to the metrics server for more speci***REMOVED***c metrics scoping. When unset, just the metricName will be used to gather metrics.",
+	"selector": "selector is the string-encoded form of a standard kubernetes label selector for the given metric When set, it is passed as an additional parameter to the metrics server for more specific metrics scoping. When unset, just the metricName will be used to gather metrics.",
 }
 
-func (MetricIdenti***REMOVED***er) SwaggerDoc() map[string]string {
-	return map_MetricIdenti***REMOVED***er
+func (MetricIdentifier) SwaggerDoc() map[string]string {
+	return map_MetricIdentifier
 }
 
 var map_MetricSpec = map[string]string{
-	"":         "MetricSpec speci***REMOVED***es how to scale based on a single metric (only `type` and one other matching ***REMOVED***eld should be set at once).",
-	"type":     "type is the type of metric source.  It should be one of \"Object\", \"Pods\" or \"Resource\", each mapping to a matching ***REMOVED***eld in the object.",
+	"":         "MetricSpec specifies how to scale based on a single metric (only `type` and one other matching field should be set at once).",
+	"type":     "type is the type of metric source.  It should be one of \"Object\", \"Pods\" or \"Resource\", each mapping to a matching field in the object.",
 	"object":   "object refers to a metric describing a single kubernetes object (for example, hits-per-second on an Ingress object).",
 	"pods":     "pods refers to a metric describing each pod in the current scale target (for example, transactions-processed-per-second).  The values will be averaged together before being compared to the target value.",
-	"resource": "resource refers to a resource metric (such as those speci***REMOVED***ed in requests and limits) known to Kubernetes describing each pod in the current scale target (e.g. CPU or memory). Such metrics are built in to Kubernetes, and have special scaling options on top of those available to normal per-pod metrics using the \"pods\" source.",
+	"resource": "resource refers to a resource metric (such as those specified in requests and limits) known to Kubernetes describing each pod in the current scale target (e.g. CPU or memory). Such metrics are built in to Kubernetes, and have special scaling options on top of those available to normal per-pod metrics using the \"pods\" source.",
 	"external": "external refers to a global metric that is not associated with any Kubernetes object. It allows autoscaling based on information coming from components running outside of cluster (for example length of queue in cloud messaging service, or QPS from loadbalancer running outside of cluster).",
 }
 
@@ -143,10 +143,10 @@ func (MetricSpec) SwaggerDoc() map[string]string {
 
 var map_MetricStatus = map[string]string{
 	"":         "MetricStatus describes the last-read state of a single metric.",
-	"type":     "type is the type of metric source.  It will be one of \"Object\", \"Pods\" or \"Resource\", each corresponds to a matching ***REMOVED***eld in the object.",
+	"type":     "type is the type of metric source.  It will be one of \"Object\", \"Pods\" or \"Resource\", each corresponds to a matching field in the object.",
 	"object":   "object refers to a metric describing a single kubernetes object (for example, hits-per-second on an Ingress object).",
 	"pods":     "pods refers to a metric describing each pod in the current scale target (for example, transactions-processed-per-second).  The values will be averaged together before being compared to the target value.",
-	"resource": "resource refers to a resource metric (such as those speci***REMOVED***ed in requests and limits) known to Kubernetes describing each pod in the current scale target (e.g. CPU or memory). Such metrics are built in to Kubernetes, and have special scaling options on top of those available to normal per-pod metrics using the \"pods\" source.",
+	"resource": "resource refers to a resource metric (such as those specified in requests and limits) known to Kubernetes describing each pod in the current scale target (e.g. CPU or memory). Such metrics are built in to Kubernetes, and have special scaling options on top of those available to normal per-pod metrics using the \"pods\" source.",
 	"external": "external refers to a global metric that is not associated with any Kubernetes object. It allows autoscaling based on information coming from components running outside of cluster (for example length of queue in cloud messaging service, or QPS from loadbalancer running outside of cluster).",
 }
 
@@ -155,7 +155,7 @@ func (MetricStatus) SwaggerDoc() map[string]string {
 }
 
 var map_MetricTarget = map[string]string{
-	"":                   "MetricTarget de***REMOVED***nes the target value, average value, or average utilization of a speci***REMOVED***c metric",
+	"":                   "MetricTarget defines the target value, average value, or average utilization of a specific metric",
 	"type":               "type represents whether the metric type is Utilization, Value, or AverageValue",
 	"value":              "value is the target value of the metric (as a quantity).",
 	"averageValue":       "averageValue is the target value of the average of the metric across all relevant pods (as a quantity)",
@@ -179,8 +179,8 @@ func (MetricValueStatus) SwaggerDoc() map[string]string {
 
 var map_ObjectMetricSource = map[string]string{
 	"":       "ObjectMetricSource indicates how to scale on a metric describing a kubernetes object (for example, hits-per-second on an Ingress object).",
-	"target": "target speci***REMOVED***es the target value for the given metric",
-	"metric": "metric identi***REMOVED***es the target metric by name and selector",
+	"target": "target specifies the target value for the given metric",
+	"metric": "metric identifies the target metric by name and selector",
 }
 
 func (ObjectMetricSource) SwaggerDoc() map[string]string {
@@ -189,7 +189,7 @@ func (ObjectMetricSource) SwaggerDoc() map[string]string {
 
 var map_ObjectMetricStatus = map[string]string{
 	"":        "ObjectMetricStatus indicates the current value of a metric describing a kubernetes object (for example, hits-per-second on an Ingress object).",
-	"metric":  "metric identi***REMOVED***es the target metric by name and selector",
+	"metric":  "metric identifies the target metric by name and selector",
 	"current": "current contains the current value for the given metric",
 }
 
@@ -199,8 +199,8 @@ func (ObjectMetricStatus) SwaggerDoc() map[string]string {
 
 var map_PodsMetricSource = map[string]string{
 	"":       "PodsMetricSource indicates how to scale on a metric describing each pod in the current scale target (for example, transactions-processed-per-second). The values will be averaged together before being compared to the target value.",
-	"metric": "metric identi***REMOVED***es the target metric by name and selector",
-	"target": "target speci***REMOVED***es the target value for the given metric",
+	"metric": "metric identifies the target metric by name and selector",
+	"target": "target specifies the target value for the given metric",
 }
 
 func (PodsMetricSource) SwaggerDoc() map[string]string {
@@ -209,7 +209,7 @@ func (PodsMetricSource) SwaggerDoc() map[string]string {
 
 var map_PodsMetricStatus = map[string]string{
 	"":        "PodsMetricStatus indicates the current value of a metric describing each pod in the current scale target (for example, transactions-processed-per-second).",
-	"metric":  "metric identi***REMOVED***es the target metric by name and selector",
+	"metric":  "metric identifies the target metric by name and selector",
 	"current": "current contains the current value for the given metric",
 }
 
@@ -218,9 +218,9 @@ func (PodsMetricStatus) SwaggerDoc() map[string]string {
 }
 
 var map_ResourceMetricSource = map[string]string{
-	"":       "ResourceMetricSource indicates how to scale on a resource metric known to Kubernetes, as speci***REMOVED***ed in requests and limits, describing each pod in the current scale target (e.g. CPU or memory).  The values will be averaged together before being compared to the target.  Such metrics are built in to Kubernetes, and have special scaling options on top of those available to normal per-pod metrics using the \"pods\" source.  Only one \"target\" type should be set.",
+	"":       "ResourceMetricSource indicates how to scale on a resource metric known to Kubernetes, as specified in requests and limits, describing each pod in the current scale target (e.g. CPU or memory).  The values will be averaged together before being compared to the target.  Such metrics are built in to Kubernetes, and have special scaling options on top of those available to normal per-pod metrics using the \"pods\" source.  Only one \"target\" type should be set.",
 	"name":   "name is the name of the resource in question.",
-	"target": "target speci***REMOVED***es the target value for the given metric",
+	"target": "target specifies the target value for the given metric",
 }
 
 func (ResourceMetricSource) SwaggerDoc() map[string]string {
@@ -228,7 +228,7 @@ func (ResourceMetricSource) SwaggerDoc() map[string]string {
 }
 
 var map_ResourceMetricStatus = map[string]string{
-	"":        "ResourceMetricStatus indicates the current value of a resource metric known to Kubernetes, as speci***REMOVED***ed in requests and limits, describing each pod in the current scale target (e.g. CPU or memory).  Such metrics are built in to Kubernetes, and have special scaling options on top of those available to normal per-pod metrics using the \"pods\" source.",
+	"":        "ResourceMetricStatus indicates the current value of a resource metric known to Kubernetes, as specified in requests and limits, describing each pod in the current scale target (e.g. CPU or memory).  Such metrics are built in to Kubernetes, and have special scaling options on top of those available to normal per-pod metrics using the \"pods\" source.",
 	"name":    "Name is the name of the resource in question.",
 	"current": "current contains the current value for the given metric",
 }

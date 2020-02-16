@@ -3,7 +3,7 @@ package autorest
 // Copyright 2017 Microsoft Corporation
 //
 //  Licensed under the Apache License, Version 2.0 (the "License");
-//  you may not use this ***REMOVED***le except in compliance with the License.
+//  you may not use this file except in compliance with the License.
 //  You may obtain a copy of the License at
 //
 //      http://www.apache.org/licenses/LICENSE-2.0
@@ -11,7 +11,7 @@ package autorest
 //  Unless required by applicable law or agreed to in writing, software
 //  distributed under the License is distributed on an "AS IS" BASIS,
 //  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-//  See the License for the speci***REMOVED***c language governing permissions and
+//  See the License for the specific language governing permissions and
 //  limitations under the License.
 
 import (
@@ -42,7 +42,7 @@ const (
 // used as a key type in context.WithValue()
 type ctxPrepareDecorators struct{}
 
-// WithPrepareDecorators adds the speci***REMOVED***ed PrepareDecorators to the provided context.
+// WithPrepareDecorators adds the specified PrepareDecorators to the provided context.
 // If no PrepareDecorators are provided the context is unchanged.
 func WithPrepareDecorators(ctx context.Context, prepareDecorator []PrepareDecorator) context.Context {
 	if len(prepareDecorator) == 0 {
@@ -62,7 +62,7 @@ func GetPrepareDecorators(ctx context.Context, defaultPrepareDecorators ...Prepa
 
 // Preparer is the interface that wraps the Prepare method.
 //
-// Prepare accepts and possibly modi***REMOVED***es an http.Request (e.g., adding Headers). Implementations
+// Prepare accepts and possibly modifies an http.Request (e.g., adding Headers). Implementations
 // must ensure to not share or hold per-invocation state since Preparers may be shared and re-used.
 type Preparer interface {
 	Prepare(*http.Request) (*http.Request, error)
@@ -77,11 +77,11 @@ func (pf PreparerFunc) Prepare(r *http.Request) (*http.Request, error) {
 }
 
 // PrepareDecorator takes and possibly decorates, by wrapping, a Preparer. Decorators may affect the
-// http.Request and pass it along or, ***REMOVED***rst, pass the http.Request along then affect the result.
+// http.Request and pass it along or, first, pass the http.Request along then affect the result.
 type PrepareDecorator func(Preparer) Preparer
 
 // CreatePreparer creates, decorates, and returns a Preparer.
-// Without decorators, the returned Preparer returns the passed http.Request unmodi***REMOVED***ed.
+// Without decorators, the returned Preparer returns the passed http.Request unmodified.
 // Preparers are safe to share and re-use.
 func CreatePreparer(decorators ...PrepareDecorator) Preparer {
 	return DecoratePreparer(
@@ -119,7 +119,7 @@ func WithNothing() PrepareDecorator {
 	}
 }
 
-// WithHeader returns a PrepareDecorator that sets the speci***REMOVED***ed HTTP header of the http.Request to
+// WithHeader returns a PrepareDecorator that sets the specified HTTP header of the http.Request to
 // the passed value. It canonicalizes the passed header name (via http.CanonicalHeaderKey) before
 // adding the header.
 func WithHeader(header string, value string) PrepareDecorator {
@@ -137,7 +137,7 @@ func WithHeader(header string, value string) PrepareDecorator {
 	}
 }
 
-// WithHeaders returns a PrepareDecorator that sets the speci***REMOVED***ed HTTP headers of the http.Request to
+// WithHeaders returns a PrepareDecorator that sets the specified HTTP headers of the http.Request to
 // the passed value. It canonicalizes the passed headers name (via http.CanonicalHeaderKey) before
 // adding them.
 func WithHeaders(headers map[string]interface{}) PrepareDecorator {
@@ -320,7 +320,7 @@ func WithMultiPartFormData(formDataParameters map[string]interface{}) PrepareDec
 						if _, err = io.Copy(fd, rc); err != nil {
 							return r, err
 						}
-					} ***REMOVED*** {
+					} else {
 						if err = writer.WriteField(key, ensureValueString(value)); err != nil {
 							return r, err
 						}
@@ -342,7 +342,7 @@ func WithMultiPartFormData(formDataParameters map[string]interface{}) PrepareDec
 	}
 }
 
-// WithFile returns a PrepareDecorator that sends ***REMOVED***le in request body.
+// WithFile returns a PrepareDecorator that sends file in request body.
 func WithFile(f io.ReadCloser) PrepareDecorator {
 	return func(p Preparer) Preparer {
 		return PreparerFunc(func(r *http.Request) (*http.Request, error) {
@@ -514,7 +514,7 @@ func WithPathParameters(path string, pathParameters map[string]interface{}) Prep
 
 func parseURL(u *url.URL, path string) (*url.URL, error) {
 	p := strings.TrimRight(u.String(), "/")
-	if !strings.HasPre***REMOVED***x(path, "/") {
+	if !strings.HasPrefix(path, "/") {
 		path = "/" + path
 	}
 	return url.Parse(p + path)

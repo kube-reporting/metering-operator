@@ -23,7 +23,7 @@ func stripPort(hostport string) string {
 		return hostport
 	}
 	if i := strings.IndexByte(hostport, ']'); i != -1 {
-		return strings.TrimPre***REMOVED***x(hostport[:i], "[")
+		return strings.TrimPrefix(hostport[:i], "[")
 	}
 	return hostport[:colon]
 }

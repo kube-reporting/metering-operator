@@ -1,6 +1,6 @@
 // Copyright 2015 The Go Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE ***REMOVED***le.
+// license that can be found in the LICENSE file.
 
 // +build go1.8
 
@@ -12,9 +12,9 @@ import (
 	"net/http"
 )
 
-func cloneTLSCon***REMOVED***g(c *tls.Con***REMOVED***g) *tls.Con***REMOVED***g {
+func cloneTLSConfig(c *tls.Config) *tls.Config {
 	c2 := c.Clone()
-	c2.GetClientCerti***REMOVED***cate = c.GetClientCerti***REMOVED***cate // golang.org/issue/19264
+	c2.GetClientCertificate = c.GetClientCertificate // golang.org/issue/19264
 	return c2
 }
 
@@ -30,11 +30,11 @@ func (w *responseWriter) Push(target string, opts *http.PushOptions) error {
 	return w.push(target, internalOpts)
 }
 
-func con***REMOVED***gureServer18(h1 *http.Server, h2 *Server) error {
+func configureServer18(h1 *http.Server, h2 *Server) error {
 	if h2.IdleTimeout == 0 {
 		if h1.IdleTimeout != 0 {
 			h2.IdleTimeout = h1.IdleTimeout
-		} ***REMOVED*** {
+		} else {
 			h2.IdleTimeout = h1.ReadTimeout
 		}
 	}

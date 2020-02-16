@@ -4,7 +4,7 @@
 // https://github.com/golang/protobuf
 //
 // Redistribution and use in source and binary forms, with or without
-// modi***REMOVED***cation, are permitted provided that the following conditions are
+// modification, are permitted provided that the following conditions are
 // met:
 //
 //     * Redistributions of source code must retain the above copyright
@@ -15,7 +15,7 @@
 // distribution.
 //     * Neither the name of Google Inc. nor the names of its
 // contributors may be used to endorse or promote products derived from
-// this software without speci***REMOVED***c prior written permission.
+// this software without specific prior written permission.
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
 // "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
@@ -104,15 +104,15 @@ func (p *Buffer) DecodeVarint() (x uint64, err error) {
 
 	if i >= len(buf) {
 		return 0, io.ErrUnexpectedEOF
-	} ***REMOVED*** if buf[i] < 0x80 {
+	} else if buf[i] < 0x80 {
 		p.index++
 		return uint64(buf[i]), nil
-	} ***REMOVED*** if len(buf)-i < 10 {
+	} else if len(buf)-i < 10 {
 		return p.decodeVarintSlow()
 	}
 
 	var b uint64
-	// we already checked the ***REMOVED***rst byte
+	// we already checked the first byte
 	x = uint64(buf[i]) - 0x80
 	i++
 
@@ -197,7 +197,7 @@ done:
 
 // DecodeFixed64 reads a 64-bit integer from the Buffer.
 // This is the format for the
-// ***REMOVED***xed64, s***REMOVED***xed64, and double protocol buffer types.
+// fixed64, sfixed64, and double protocol buffer types.
 func (p *Buffer) DecodeFixed64() (x uint64, err error) {
 	// x, err already 0
 	i := p.index + 8
@@ -220,7 +220,7 @@ func (p *Buffer) DecodeFixed64() (x uint64, err error) {
 
 // DecodeFixed32 reads a 32-bit integer from the Buffer.
 // This is the format for the
-// ***REMOVED***xed32, s***REMOVED***xed32, and float protocol buffer types.
+// fixed32, sfixed32, and float protocol buffer types.
 func (p *Buffer) DecodeFixed32() (x uint64, err error) {
 	// x, err already 0
 	i := p.index + 4
@@ -379,7 +379,7 @@ func (p *Buffer) DecodeMessage(pb Message) error {
 // EndGroup tag.
 func (p *Buffer) DecodeGroup(pb Message) error {
 	b := p.buf[p.index:]
-	x, y := ***REMOVED***ndEndGroup(b)
+	x, y := findEndGroup(b)
 	if x < 0 {
 		return io.ErrUnexpectedEOF
 	}
@@ -414,9 +414,9 @@ func (p *Buffer) Unmarshal(pb Message) error {
 	}
 
 	// Slow workaround for messages that aren't Unmarshalers.
-	// This includes some hand-coded .pb.go ***REMOVED***les and
+	// This includes some hand-coded .pb.go files and
 	// bootstrap protos.
-	// TODO: ***REMOVED***x all of those and then add Unmarshal to
+	// TODO: fix all of those and then add Unmarshal to
 	// the Message interface. Then:
 	// The cast above and code below can be deleted.
 	// The old unmarshaler can be deleted.

@@ -1,6 +1,6 @@
 // Copyright 2015 The Go Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE ***REMOVED***le.
+// license that can be found in the LICENSE file.
 
 // +build go1.6
 
@@ -12,7 +12,7 @@ import (
 	"net/http"
 )
 
-func con***REMOVED***gureTransport(t1 *http.Transport) (*Transport, error) {
+func configureTransport(t1 *http.Transport) (*Transport, error) {
 	connPool := new(clientConnPool)
 	t2 := &Transport{
 		ConnPool: noDialClientConnPool{connPool},
@@ -22,21 +22,21 @@ func con***REMOVED***gureTransport(t1 *http.Transport) (*Transport, error) {
 	if err := registerHTTPSProtocol(t1, noDialH2RoundTripper{t2}); err != nil {
 		return nil, err
 	}
-	if t1.TLSClientCon***REMOVED***g == nil {
-		t1.TLSClientCon***REMOVED***g = new(tls.Con***REMOVED***g)
+	if t1.TLSClientConfig == nil {
+		t1.TLSClientConfig = new(tls.Config)
 	}
-	if !strSliceContains(t1.TLSClientCon***REMOVED***g.NextProtos, "h2") {
-		t1.TLSClientCon***REMOVED***g.NextProtos = append([]string{"h2"}, t1.TLSClientCon***REMOVED***g.NextProtos...)
+	if !strSliceContains(t1.TLSClientConfig.NextProtos, "h2") {
+		t1.TLSClientConfig.NextProtos = append([]string{"h2"}, t1.TLSClientConfig.NextProtos...)
 	}
-	if !strSliceContains(t1.TLSClientCon***REMOVED***g.NextProtos, "http/1.1") {
-		t1.TLSClientCon***REMOVED***g.NextProtos = append(t1.TLSClientCon***REMOVED***g.NextProtos, "http/1.1")
+	if !strSliceContains(t1.TLSClientConfig.NextProtos, "http/1.1") {
+		t1.TLSClientConfig.NextProtos = append(t1.TLSClientConfig.NextProtos, "http/1.1")
 	}
 	upgradeFn := func(authority string, c *tls.Conn) http.RoundTripper {
 		addr := authorityAddr("https", authority)
 		if used, err := connPool.addConnIfNeeded(addr, t2, c); err != nil {
 			go c.Close()
 			return erringRoundTripper{err}
-		} ***REMOVED*** if !used {
+		} else if !used {
 			// Turns out we don't need this c.
 			// For example, two goroutines made requests to the same host
 			// at the same time, both kicking off TCP dials. (since protocol
@@ -49,7 +49,7 @@ func con***REMOVED***gureTransport(t1 *http.Transport) (*Transport, error) {
 		t1.TLSNextProto = map[string]func(string, *tls.Conn) http.RoundTripper{
 			"h2": upgradeFn,
 		}
-	} ***REMOVED*** {
+	} else {
 		m["h2"] = upgradeFn
 	}
 	return t2, nil

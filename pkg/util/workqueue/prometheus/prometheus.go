@@ -2,7 +2,7 @@
 Copyright 2016 The Kubernetes Authors.
 
 Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this ***REMOVED***le except in compliance with the License.
+you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
 
     http://www.apache.org/licenses/LICENSE-2.0
@@ -10,7 +10,7 @@ You may obtain a copy of the License at
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the speci***REMOVED***c language governing permissions and
+See the License for the specific language governing permissions and
 limitations under the License.
 */
 
@@ -73,28 +73,28 @@ func (prometheusMetricsProvider) NewWorkDurationMetric(name string) workqueue.Su
 	return workDuration
 }
 
-func (prometheusMetricsProvider) NewUn***REMOVED***nishedWorkSecondsMetric(name string) workqueue.SettableGaugeMetric {
-	un***REMOVED***nished := prometheus.NewGauge(prometheus.GaugeOpts{
+func (prometheusMetricsProvider) NewUnfinishedWorkSecondsMetric(name string) workqueue.SettableGaugeMetric {
+	unfinished := prometheus.NewGauge(prometheus.GaugeOpts{
 		Subsystem: name,
-		Name:      "un***REMOVED***nished_work_seconds",
+		Name:      "unfinished_work_seconds",
 		Help: "How many seconds of work " + name + " has done that " +
 			"is in progress and hasn't been observed by work_duration. Large " +
 			"values indicate stuck threads. One can deduce the number of stuck " +
 			"threads by observing the rate at which this increases.",
 	})
-	prometheus.Register(un***REMOVED***nished)
-	return un***REMOVED***nished
+	prometheus.Register(unfinished)
+	return unfinished
 }
 
 func (prometheusMetricsProvider) NewLongestRunningProcessorMicrosecondsMetric(name string) workqueue.SettableGaugeMetric {
-	un***REMOVED***nished := prometheus.NewGauge(prometheus.GaugeOpts{
+	unfinished := prometheus.NewGauge(prometheus.GaugeOpts{
 		Subsystem: name,
 		Name:      "longest_running_processor_microseconds",
 		Help: "How many microseconds has the longest running " +
 			"processor for " + name + " been running.",
 	})
-	prometheus.Register(un***REMOVED***nished)
-	return un***REMOVED***nished
+	prometheus.Register(unfinished)
+	return unfinished
 }
 
 func (prometheusMetricsProvider) NewRetriesMetric(name string) workqueue.CounterMetric {

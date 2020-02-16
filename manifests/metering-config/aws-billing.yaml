@@ -1,5 +1,5 @@
 apiVersion: metering.openshift.io/v1
-kind: MeteringCon***REMOVED***g
+kind: MeteringConfig
 metadata:
   name: "operator-metering"
 spec:
@@ -10,23 +10,23 @@ spec:
         # Replace these with where your AWS billing reports are
         # stored in S3.
         bucket: "your-aws-cost-report-bucket"
-        pre***REMOVED***x: "path/to/report"
+        prefix: "path/to/report"
         region: "your-buckets-region"
 
   reporting-operator:
     spec:
-      con***REMOVED***g:
+      config:
         aws:
           secretName: "your-aws-secret"
 
   presto:
     spec:
-      con***REMOVED***g:
+      config:
         aws:
           secretName: "your-aws-secret"
 
   hive:
     spec:
-      con***REMOVED***g:
+      config:
         aws:
           secretName: "your-aws-secret"

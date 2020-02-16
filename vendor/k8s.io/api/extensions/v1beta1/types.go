@@ -2,7 +2,7 @@
 Copyright 2015 The Kubernetes Authors.
 
 Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this ***REMOVED***le except in compliance with the License.
+you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
 
     http://www.apache.org/licenses/LICENSE-2.0
@@ -10,7 +10,7 @@ You may obtain a copy of the License at
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the speci***REMOVED***c language governing permissions and
+See the License for the specific language governing permissions and
 limitations under the License.
 */
 
@@ -43,7 +43,7 @@ type ScaleStatus struct {
 	// version of both map-based and more expressive set-based selectors. This is done to
 	// avoid introspection in the clients. The string will be in the same format as the
 	// query-param syntax. If the target type only supports map-based selectors, both this
-	// ***REMOVED***eld and map-based selector ***REMOVED***eld are populated.
+	// field and map-based selector field are populated.
 	// More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/#label-selectors
 	// +optional
 	TargetSelector string `json:"targetSelector,omitempty" protobuf:"bytes,3,opt,name=targetSelector"`
@@ -58,7 +58,7 @@ type Scale struct {
 	// +optional
 	metav1.ObjectMeta `json:"metadata,omitempty" protobuf:"bytes,1,opt,name=metadata"`
 
-	// de***REMOVED***nes the behavior of the scale. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#spec-and-status.
+	// defines the behavior of the scale. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#spec-and-status.
 	// +optional
 	Spec ScaleSpec `json:"spec,omitempty" protobuf:"bytes,2,opt,name=spec"`
 
@@ -69,7 +69,7 @@ type Scale struct {
 
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
 
-// Dummy de***REMOVED***nition
+// Dummy definition
 type ReplicationControllerDummy struct {
 	metav1.TypeMeta `json:",inline"`
 }
@@ -88,7 +88,7 @@ type Deployment struct {
 	// +optional
 	metav1.ObjectMeta `json:"metadata,omitempty" protobuf:"bytes,1,opt,name=metadata"`
 
-	// Speci***REMOVED***cation of the desired behavior of the Deployment.
+	// Specification of the desired behavior of the Deployment.
 	// +optional
 	Spec DeploymentSpec `json:"spec,omitempty" protobuf:"bytes,2,opt,name=spec"`
 
@@ -97,10 +97,10 @@ type Deployment struct {
 	Status DeploymentStatus `json:"status,omitempty" protobuf:"bytes,3,opt,name=status"`
 }
 
-// DeploymentSpec is the speci***REMOVED***cation of the desired behavior of the Deployment.
+// DeploymentSpec is the specification of the desired behavior of the Deployment.
 type DeploymentSpec struct {
 	// Number of desired pods. This is a pointer to distinguish between explicit
-	// zero and not speci***REMOVED***ed. Defaults to 1.
+	// zero and not specified. Defaults to 1.
 	// +optional
 	Replicas *int32 `json:"replicas,omitempty" protobuf:"varint,1,opt,name=replicas"`
 
@@ -124,7 +124,7 @@ type DeploymentSpec struct {
 	MinReadySeconds int32 `json:"minReadySeconds,omitempty" protobuf:"varint,5,opt,name=minReadySeconds"`
 
 	// The number of old ReplicaSets to retain to allow rollback.
-	// This is a pointer to distinguish between explicit zero and not speci***REMOVED***ed.
+	// This is a pointer to distinguish between explicit zero and not specified.
 	// This is set to the max value of int32 (i.e. 2147483647) by default, which
 	// means "retaining all old RelicaSets".
 	// +optional
@@ -136,9 +136,9 @@ type DeploymentSpec struct {
 	Paused bool `json:"paused,omitempty" protobuf:"varint,7,opt,name=paused"`
 
 	// DEPRECATED.
-	// The con***REMOVED***g this deployment is rolling back to. Will be cleared after rollback is done.
+	// The config this deployment is rolling back to. Will be cleared after rollback is done.
 	// +optional
-	RollbackTo *RollbackCon***REMOVED***g `json:"rollbackTo,omitempty" protobuf:"bytes,8,opt,name=rollbackTo"`
+	RollbackTo *RollbackConfig `json:"rollbackTo,omitempty" protobuf:"bytes,8,opt,name=rollbackTo"`
 
 	// The maximum time in seconds for a deployment to make progress before it
 	// is considered to be failed. The deployment controller will continue to
@@ -161,12 +161,12 @@ type DeploymentRollback struct {
 	// The annotations to be updated to a deployment
 	// +optional
 	UpdatedAnnotations map[string]string `json:"updatedAnnotations,omitempty" protobuf:"bytes,2,rep,name=updatedAnnotations"`
-	// The con***REMOVED***g of this deployment rollback.
-	RollbackTo RollbackCon***REMOVED***g `json:"rollbackTo" protobuf:"bytes,3,opt,name=rollbackTo"`
+	// The config of this deployment rollback.
+	RollbackTo RollbackConfig `json:"rollbackTo" protobuf:"bytes,3,opt,name=rollbackTo"`
 }
 
 // DEPRECATED.
-type RollbackCon***REMOVED***g struct {
+type RollbackConfig struct {
 	// The revision to rollback to. If set to 0, rollback to the last revision.
 	// +optional
 	Revision int64 `json:"revision,omitempty" protobuf:"varint,1,opt,name=revision"`
@@ -185,7 +185,7 @@ type DeploymentStrategy struct {
 	// +optional
 	Type DeploymentStrategyType `json:"type,omitempty" protobuf:"bytes,1,opt,name=type,casttype=DeploymentStrategyType"`
 
-	// Rolling update con***REMOVED***g params. Present only if DeploymentStrategyType =
+	// Rolling update config params. Present only if DeploymentStrategyType =
 	// RollingUpdate.
 	//---
 	// TODO: Update this to follow our convention for oneOf, whatever we decide it
@@ -210,7 +210,7 @@ type RollingUpdateDeployment struct {
 	// Value can be an absolute number (ex: 5) or a percentage of desired pods (ex: 10%).
 	// Absolute number is calculated from percentage by rounding down.
 	// This can not be 0 if MaxSurge is 0.
-	// By default, a ***REMOVED***xed value of 1 is used.
+	// By default, a fixed value of 1 is used.
 	// Example: when this is set to 30%, the old RC can be scaled down to 70% of desired pods
 	// immediately when the rolling update starts. Once new pods are ready, old RC
 	// can be scaled down further, followed by scaling up the new RC, ensuring
@@ -268,7 +268,7 @@ type DeploymentStatus struct {
 	Conditions []DeploymentCondition `json:"conditions,omitempty" patchStrategy:"merge" patchMergeKey:"type" protobuf:"bytes,6,rep,name=conditions"`
 
 	// Count of hash collisions for the Deployment. The Deployment controller uses this
-	// ***REMOVED***eld as a collision avoidance mechanism when it needs to create the name for the
+	// field as a collision avoidance mechanism when it needs to create the name for the
 	// newest ReplicaSet.
 	// +optional
 	CollisionCount *int32 `json:"collisionCount,omitempty" protobuf:"varint,8,opt,name=collisionCount"`
@@ -284,7 +284,7 @@ const (
 	// Progressing means the deployment is progressing. Progress for a deployment is
 	// considered when a new replica set is created or adopted, and when new pods scale
 	// up or old pods scale down. Progress is not estimated for paused deployments or
-	// when progressDeadlineSeconds is not speci***REMOVED***ed.
+	// when progressDeadlineSeconds is not specified.
 	DeploymentProgressing DeploymentConditionType = "Progressing"
 	// ReplicaFailure is added in a deployment when one of its pods fails to be created
 	// or deleted.
@@ -326,7 +326,7 @@ type DaemonSetUpdateStrategy struct {
 	// +optional
 	Type DaemonSetUpdateStrategyType `json:"type,omitempty" protobuf:"bytes,1,opt,name=type"`
 
-	// Rolling update con***REMOVED***g params. Present only if type = "RollingUpdate".
+	// Rolling update config params. Present only if type = "RollingUpdate".
 	//---
 	// TODO: Update this to follow our convention for oneOf, whatever we decide it
 	// to be. Same as Deployment `strategy.rollingUpdate`.
@@ -365,7 +365,7 @@ type RollingUpdateDaemonSet struct {
 	MaxUnavailable *intstr.IntOrString `json:"maxUnavailable,omitempty" protobuf:"bytes,1,opt,name=maxUnavailable"`
 }
 
-// DaemonSetSpec is the speci***REMOVED***cation of a daemon set.
+// DaemonSetSpec is the specification of a daemon set.
 type DaemonSetSpec struct {
 	// A label query over pods that are managed by the daemon set.
 	// Must match in order to be controlled.
@@ -377,7 +377,7 @@ type DaemonSetSpec struct {
 	// An object that describes the pod that will be created.
 	// The DaemonSet will create exactly one copy of this pod on every node
 	// that matches the template's node selector (or on every node if no node
-	// selector is speci***REMOVED***ed).
+	// selector is specified).
 	// More info: https://kubernetes.io/docs/concepts/workloads/controllers/replicationcontroller#pod-template
 	Template v1.PodTemplateSpec `json:"template" protobuf:"bytes,2,opt,name=template"`
 
@@ -393,13 +393,13 @@ type DaemonSetSpec struct {
 	MinReadySeconds int32 `json:"minReadySeconds,omitempty" protobuf:"varint,4,opt,name=minReadySeconds"`
 
 	// DEPRECATED.
-	// A sequence number representing a speci***REMOVED***c generation of the template.
+	// A sequence number representing a specific generation of the template.
 	// Populated by the system. It can be set only during the creation.
 	// +optional
 	TemplateGeneration int64 `json:"templateGeneration,omitempty" protobuf:"varint,5,opt,name=templateGeneration"`
 
 	// The number of old history to retain to allow rollback.
-	// This is a pointer to distinguish between explicit zero and not speci***REMOVED***ed.
+	// This is a pointer to distinguish between explicit zero and not specified.
 	// Defaults to 10.
 	// +optional
 	RevisionHistoryLimit *int32 `json:"revisionHistoryLimit,omitempty" protobuf:"varint,6,opt,name=revisionHistoryLimit"`
@@ -447,7 +447,7 @@ type DaemonSetStatus struct {
 	NumberUnavailable int32 `json:"numberUnavailable,omitempty" protobuf:"varint,8,opt,name=numberUnavailable"`
 
 	// Count of hash collisions for the DaemonSet. The DaemonSet controller
-	// uses this ***REMOVED***eld as a collision avoidance mechanism when it needs to
+	// uses this field as a collision avoidance mechanism when it needs to
 	// create the name for the newest ControllerRevision.
 	// +optional
 	CollisionCount *int32 `json:"collisionCount,omitempty" protobuf:"varint,9,opt,name=collisionCount"`
@@ -485,7 +485,7 @@ type DaemonSetCondition struct {
 
 // DEPRECATED - This group version of DaemonSet is deprecated by apps/v1beta2/DaemonSet. See the release notes for
 // more information.
-// DaemonSet represents the con***REMOVED***guration of a daemon set.
+// DaemonSet represents the configuration of a daemon set.
 type DaemonSet struct {
 	metav1.TypeMeta `json:",inline"`
 	// Standard object's metadata.
@@ -538,8 +538,8 @@ type DaemonSetList struct {
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
 
 // Ingress is a collection of rules that allow inbound connections to reach the
-// endpoints de***REMOVED***ned by a backend. An Ingress can be con***REMOVED***gured to give services
-// externally-reachable urls, load balance traf***REMOVED***c, terminate SSL, offer name
+// endpoints defined by a backend. An Ingress can be configured to give services
+// externally-reachable urls, load balance traffic, terminate SSL, offer name
 // based virtual hosting etc.
 type Ingress struct {
 	metav1.TypeMeta `json:",inline"`
@@ -576,22 +576,22 @@ type IngressList struct {
 // IngressSpec describes the Ingress the user wishes to exist.
 type IngressSpec struct {
 	// A default backend capable of servicing requests that don't match any
-	// rule. At least one of 'backend' or 'rules' must be speci***REMOVED***ed. This ***REMOVED***eld
+	// rule. At least one of 'backend' or 'rules' must be specified. This field
 	// is optional to allow the loadbalancer controller or defaulting logic to
 	// specify a global default.
 	// +optional
 	Backend *IngressBackend `json:"backend,omitempty" protobuf:"bytes,1,opt,name=backend"`
 
-	// TLS con***REMOVED***guration. Currently the Ingress only supports a single TLS
+	// TLS configuration. Currently the Ingress only supports a single TLS
 	// port, 443. If multiple members of this list specify different hosts, they
-	// will be multiplexed on the same port according to the hostname speci***REMOVED***ed
-	// through the SNI TLS extension, if the ingress controller ful***REMOVED***lling the
+	// will be multiplexed on the same port according to the hostname specified
+	// through the SNI TLS extension, if the ingress controller fulfilling the
 	// ingress supports SNI.
 	// +optional
 	TLS []IngressTLS `json:"tls,omitempty" protobuf:"bytes,2,rep,name=tls"`
 
-	// A list of host rules used to con***REMOVED***gure the Ingress. If unspeci***REMOVED***ed, or
-	// no rule matches, all traf***REMOVED***c is sent to the default backend.
+	// A list of host rules used to configure the Ingress. If unspecified, or
+	// no rule matches, all traffic is sent to the default backend.
 	// +optional
 	Rules []IngressRule `json:"rules,omitempty" protobuf:"bytes,3,rep,name=rules"`
 	// TODO: Add the ability to specify load-balancer IP through claims
@@ -599,15 +599,15 @@ type IngressSpec struct {
 
 // IngressTLS describes the transport layer security associated with an Ingress.
 type IngressTLS struct {
-	// Hosts are a list of hosts included in the TLS certi***REMOVED***cate. The values in
+	// Hosts are a list of hosts included in the TLS certificate. The values in
 	// this list must match the name/s used in the tlsSecret. Defaults to the
-	// wildcard host setting for the loadbalancer controller ful***REMOVED***lling this
-	// Ingress, if left unspeci***REMOVED***ed.
+	// wildcard host setting for the loadbalancer controller fulfilling this
+	// Ingress, if left unspecified.
 	// +optional
 	Hosts []string `json:"hosts,omitempty" protobuf:"bytes,1,rep,name=hosts"`
-	// SecretName is the name of the secret used to terminate SSL traf***REMOVED***c on 443.
+	// SecretName is the name of the secret used to terminate SSL traffic on 443.
 	// Field is left optional to allow SSL routing based on SNI hostname alone.
-	// If the SNI host in a listener conflicts with the "Host" header ***REMOVED***eld used
+	// If the SNI host in a listener conflicts with the "Host" header field used
 	// by an IngressRule, the SNI host is used for termination and value of the
 	// Host header is used for routing.
 	// +optional
@@ -622,13 +622,13 @@ type IngressStatus struct {
 	LoadBalancer v1.LoadBalancerStatus `json:"loadBalancer,omitempty" protobuf:"bytes,1,opt,name=loadBalancer"`
 }
 
-// IngressRule represents the rules mapping the paths under a speci***REMOVED***ed host to
-// the related backend services. Incoming requests are ***REMOVED***rst evaluated for a host
+// IngressRule represents the rules mapping the paths under a specified host to
+// the related backend services. Incoming requests are first evaluated for a host
 // match, then routed to the backend associated with the matching IngressRuleValue.
 type IngressRule struct {
-	// Host is the fully quali***REMOVED***ed domain name of a network host, as de***REMOVED***ned
+	// Host is the fully qualified domain name of a network host, as defined
 	// by RFC 3986. Note the following deviations from the "host" part of the
-	// URI as de***REMOVED***ned in the RFC:
+	// URI as defined in the RFC:
 	// 1. IPs are not allowed. Currently an IngressRuleValue can only apply to the
 	//	  IP in the Spec of the parent Ingress.
 	// 2. The `:` delimiter is not respected because ports are not allowed.
@@ -636,28 +636,28 @@ type IngressRule struct {
 	//	  :443 for https.
 	// Both these may change in the future.
 	// Incoming requests are matched against the host before the IngressRuleValue.
-	// If the host is unspeci***REMOVED***ed, the Ingress routes all traf***REMOVED***c based on the
-	// speci***REMOVED***ed IngressRuleValue.
+	// If the host is unspecified, the Ingress routes all traffic based on the
+	// specified IngressRuleValue.
 	// +optional
 	Host string `json:"host,omitempty" protobuf:"bytes,1,opt,name=host"`
 	// IngressRuleValue represents a rule to route requests for this IngressRule.
-	// If unspeci***REMOVED***ed, the rule defaults to a http catch-all. Whether that sends
-	// just traf***REMOVED***c matching the host to the default backend or all traf***REMOVED***c to the
-	// default backend, is left to the controller ful***REMOVED***lling the Ingress. Http is
+	// If unspecified, the rule defaults to a http catch-all. Whether that sends
+	// just traffic matching the host to the default backend or all traffic to the
+	// default backend, is left to the controller fulfilling the Ingress. Http is
 	// currently the only supported IngressRuleValue.
 	// +optional
 	IngressRuleValue `json:",inline,omitempty" protobuf:"bytes,2,opt,name=ingressRuleValue"`
 }
 
 // IngressRuleValue represents a rule to apply against incoming requests. If the
-// rule is satis***REMOVED***ed, the request is routed to the speci***REMOVED***ed backend. Currently
+// rule is satisfied, the request is routed to the specified backend. Currently
 // mixing different types of rules in a single Ingress is disallowed, so exactly
 // one of the following must be set.
 type IngressRuleValue struct {
 	//TODO:
 	// 1. Consider renaming this resource and the associated rules so they
-	// aren't tied to Ingress. They can be used to route intra-cluster traf***REMOVED***c.
-	// 2. Consider adding ***REMOVED***elds for ingress-type speci***REMOVED***c global options
+	// aren't tied to Ingress. They can be used to route intra-cluster traffic.
+	// 2. Consider adding fields for ingress-type specific global options
 	// usable by a loadbalancer, like http keep-alive.
 
 	// +optional
@@ -667,39 +667,39 @@ type IngressRuleValue struct {
 // HTTPIngressRuleValue is a list of http selectors pointing to backends.
 // In the example: http://<host>/<path>?<searchpart> -> backend where
 // where parts of the url correspond to RFC 3986, this resource will be used
-// to match against everything after the last '/' and before the ***REMOVED***rst '?'
+// to match against everything after the last '/' and before the first '?'
 // or '#'.
 type HTTPIngressRuleValue struct {
 	// A collection of paths that map requests to backends.
 	Paths []HTTPIngressPath `json:"paths" protobuf:"bytes,1,rep,name=paths"`
-	// TODO: Consider adding ***REMOVED***elds for ingress-type speci***REMOVED***c global
+	// TODO: Consider adding fields for ingress-type specific global
 	// options usable by a loadbalancer, like http keep-alive.
 }
 
 // HTTPIngressPath associates a path regex with a backend. Incoming urls matching
 // the path are forwarded to the backend.
 type HTTPIngressPath struct {
-	// Path is an extended POSIX regex as de***REMOVED***ned by IEEE Std 1003.1,
+	// Path is an extended POSIX regex as defined by IEEE Std 1003.1,
 	// (i.e this follows the egrep/unix syntax, not the perl syntax)
 	// matched against the path of an incoming request. Currently it can
 	// contain characters disallowed from the conventional "path"
-	// part of a URL as de***REMOVED***ned by RFC 3986. Paths must begin with
-	// a '/'. If unspeci***REMOVED***ed, the path defaults to a catch all sending
-	// traf***REMOVED***c to the backend.
+	// part of a URL as defined by RFC 3986. Paths must begin with
+	// a '/'. If unspecified, the path defaults to a catch all sending
+	// traffic to the backend.
 	// +optional
 	Path string `json:"path,omitempty" protobuf:"bytes,1,opt,name=path"`
 
-	// Backend de***REMOVED***nes the referenced service endpoint to which the traf***REMOVED***c
+	// Backend defines the referenced service endpoint to which the traffic
 	// will be forwarded to.
 	Backend IngressBackend `json:"backend" protobuf:"bytes,2,opt,name=backend"`
 }
 
 // IngressBackend describes all endpoints for a given service and port.
 type IngressBackend struct {
-	// Speci***REMOVED***es the name of the referenced service.
+	// Specifies the name of the referenced service.
 	ServiceName string `json:"serviceName" protobuf:"bytes,1,opt,name=serviceName"`
 
-	// Speci***REMOVED***es the port of the referenced service.
+	// Specifies the port of the referenced service.
 	ServicePort intstr.IntOrString `json:"servicePort" protobuf:"bytes,2,opt,name=servicePort"`
 }
 
@@ -710,7 +710,7 @@ type IngressBackend struct {
 
 // DEPRECATED - This group version of ReplicaSet is deprecated by apps/v1beta2/ReplicaSet. See the release notes for
 // more information.
-// ReplicaSet ensures that a speci***REMOVED***ed number of pod replicas are running at any given time.
+// ReplicaSet ensures that a specified number of pod replicas are running at any given time.
 type ReplicaSet struct {
 	metav1.TypeMeta `json:",inline"`
 
@@ -720,7 +720,7 @@ type ReplicaSet struct {
 	// +optional
 	metav1.ObjectMeta `json:"metadata,omitempty" protobuf:"bytes,1,opt,name=metadata"`
 
-	// Spec de***REMOVED***nes the speci***REMOVED***cation of the desired behavior of the ReplicaSet.
+	// Spec defines the specification of the desired behavior of the ReplicaSet.
 	// More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#spec-and-status
 	// +optional
 	Spec ReplicaSetSpec `json:"spec,omitempty" protobuf:"bytes,2,opt,name=spec"`
@@ -749,10 +749,10 @@ type ReplicaSetList struct {
 	Items []ReplicaSet `json:"items" protobuf:"bytes,2,rep,name=items"`
 }
 
-// ReplicaSetSpec is the speci***REMOVED***cation of a ReplicaSet.
+// ReplicaSetSpec is the specification of a ReplicaSet.
 type ReplicaSetSpec struct {
 	// Replicas is the number of desired replicas.
-	// This is a pointer to distinguish between explicit zero and unspeci***REMOVED***ed.
+	// This is a pointer to distinguish between explicit zero and unspecified.
 	// Defaults to 1.
 	// More info: https://kubernetes.io/docs/concepts/workloads/controllers/replicationcontroller/#what-is-a-replicationcontroller
 	// +optional
@@ -772,7 +772,7 @@ type ReplicaSetSpec struct {
 	Selector *metav1.LabelSelector `json:"selector,omitempty" protobuf:"bytes,2,opt,name=selector"`
 
 	// Template is the object that describes the pod that will be created if
-	// insuf***REMOVED***cient replicas are detected.
+	// insufficient replicas are detected.
 	// More info: https://kubernetes.io/docs/concepts/workloads/controllers/replicationcontroller#pod-template
 	// +optional
 	Template v1.PodTemplateSpec `json:"template,omitempty" protobuf:"bytes,3,opt,name=template"`
@@ -812,8 +812,8 @@ type ReplicaSetConditionType string
 // These are valid conditions of a replica set.
 const (
 	// ReplicaSetReplicaFailure is added in a replica set when one of its pods fails to be created
-	// due to insuf***REMOVED***cient quota, limit ranges, pod security policy, node selectors, etc. or deleted
-	// due to kubelet being down or ***REMOVED***nalizers are failing.
+	// due to insufficient quota, limit ranges, pod security policy, node selectors, etc. or deleted
+	// due to kubelet being down or finalizers are failing.
 	ReplicaSetReplicaFailure ReplicaSetConditionType = "ReplicaFailure"
 )
 
@@ -848,19 +848,19 @@ type PodSecurityPolicy struct {
 	// +optional
 	metav1.ObjectMeta `json:"metadata,omitempty" protobuf:"bytes,1,opt,name=metadata"`
 
-	// spec de***REMOVED***nes the policy enforced.
+	// spec defines the policy enforced.
 	// +optional
 	Spec PodSecurityPolicySpec `json:"spec,omitempty" protobuf:"bytes,2,opt,name=spec"`
 }
 
-// PodSecurityPolicySpec de***REMOVED***nes the policy enforced.
+// PodSecurityPolicySpec defines the policy enforced.
 // Deprecated: use PodSecurityPolicySpec from policy API Group instead.
 type PodSecurityPolicySpec struct {
 	// privileged determines if a pod can request to be run as privileged.
 	// +optional
 	Privileged bool `json:"privileged,omitempty" protobuf:"varint,1,opt,name=privileged"`
 	// defaultAddCapabilities is the default set of capabilities that will be added to the container
-	// unless the pod spec speci***REMOVED***cally drops the capability.  You may not list a capability in both
+	// unless the pod spec specifically drops the capability.  You may not list a capability in both
 	// defaultAddCapabilities and requiredDropCapabilities. Capabilities added here are implicitly
 	// allowed, and need not be included in the allowedCapabilities list.
 	// +optional
@@ -870,7 +870,7 @@ type PodSecurityPolicySpec struct {
 	// +optional
 	RequiredDropCapabilities []v1.Capability `json:"requiredDropCapabilities,omitempty" protobuf:"bytes,3,rep,name=requiredDropCapabilities,casttype=k8s.io/api/core/v1.Capability"`
 	// allowedCapabilities is a list of capabilities that can be requested to add to the container.
-	// Capabilities in this ***REMOVED***eld may be added at the pod author's discretion.
+	// Capabilities in this field may be added at the pod author's discretion.
 	// You must not list a capability in both allowedCapabilities and requiredDropCapabilities.
 	// +optional
 	AllowedCapabilities []v1.Capability `json:"allowedCapabilities,omitempty" protobuf:"bytes,4,rep,name=allowedCapabilities,casttype=k8s.io/api/core/v1.Capability"`
@@ -895,7 +895,7 @@ type PodSecurityPolicySpec struct {
 	// runAsUser is the strategy that will dictate the allowable RunAsUser values that may be set.
 	RunAsUser RunAsUserStrategyOptions `json:"runAsUser" protobuf:"bytes,11,opt,name=runAsUser"`
 	// RunAsGroup is the strategy that will dictate the allowable RunAsGroup values that may be set.
-	// If this ***REMOVED***eld is omitted, the pod's RunAsGroup can take any value. This ***REMOVED***eld requires the
+	// If this field is omitted, the pod's RunAsGroup can take any value. This field requires the
 	// RunAsGroup feature gate to be enabled.
 	// +optional
 	RunAsGroup *RunAsGroupStrategyOptions `json:"runAsGroup,omitempty" protobuf:"bytes,22,opt,name=runAsGroup"`
@@ -903,10 +903,10 @@ type PodSecurityPolicySpec struct {
 	SupplementalGroups SupplementalGroupsStrategyOptions `json:"supplementalGroups" protobuf:"bytes,12,opt,name=supplementalGroups"`
 	// fsGroup is the strategy that will dictate what fs group is used by the SecurityContext.
 	FSGroup FSGroupStrategyOptions `json:"fsGroup" protobuf:"bytes,13,opt,name=fsGroup"`
-	// readOnlyRootFilesystem when set to true will force containers to run with a read only root ***REMOVED***le
-	// system.  If the container speci***REMOVED***cally requests to run with a non-read only root ***REMOVED***le system
+	// readOnlyRootFilesystem when set to true will force containers to run with a read only root file
+	// system.  If the container specifically requests to run with a non-read only root file system
 	// the PSP should deny the pod.
-	// If set to false the container may run with a read only root ***REMOVED***le system if it wishes but it
+	// If set to false the container may run with a read only root file system if it wishes but it
 	// will not be forced to.
 	// +optional
 	ReadOnlyRootFilesystem bool `json:"readOnlyRootFilesystem,omitempty" protobuf:"varint,14,opt,name=readOnlyRootFilesystem"`
@@ -915,7 +915,7 @@ type PodSecurityPolicySpec struct {
 	// +optional
 	DefaultAllowPrivilegeEscalation *bool `json:"defaultAllowPrivilegeEscalation,omitempty" protobuf:"varint,15,opt,name=defaultAllowPrivilegeEscalation"`
 	// allowPrivilegeEscalation determines if a pod can request to allow
-	// privilege escalation. If unspeci***REMOVED***ed, defaults to true.
+	// privilege escalation. If unspecified, defaults to true.
 	// +optional
 	AllowPrivilegeEscalation *bool `json:"allowPrivilegeEscalation,omitempty" protobuf:"varint,16,opt,name=allowPrivilegeEscalation"`
 	// allowedHostPaths is a white list of allowed host paths. Empty indicates
@@ -924,12 +924,12 @@ type PodSecurityPolicySpec struct {
 	AllowedHostPaths []AllowedHostPath `json:"allowedHostPaths,omitempty" protobuf:"bytes,17,rep,name=allowedHostPaths"`
 	// allowedFlexVolumes is a whitelist of allowed Flexvolumes.  Empty or nil indicates that all
 	// Flexvolumes may be used.  This parameter is effective only when the usage of the Flexvolumes
-	// is allowed in the "volumes" ***REMOVED***eld.
+	// is allowed in the "volumes" field.
 	// +optional
 	AllowedFlexVolumes []AllowedFlexVolume `json:"allowedFlexVolumes,omitempty" protobuf:"bytes,18,rep,name=allowedFlexVolumes"`
 	// allowedUnsafeSysctls is a list of explicitly allowed unsafe sysctls, defaults to none.
 	// Each entry is either a plain sysctl name or ends in "*" in which case it is considered
-	// as a pre***REMOVED***x of allowed sysctls. Single * means all unsafe sysctls are allowed.
+	// as a prefix of allowed sysctls. Single * means all unsafe sysctls are allowed.
 	// Kubelet has to whitelist all allowed unsafe sysctls explicitly to avoid rejection.
 	//
 	// Examples:
@@ -939,7 +939,7 @@ type PodSecurityPolicySpec struct {
 	AllowedUnsafeSysctls []string `json:"allowedUnsafeSysctls,omitempty" protobuf:"bytes,19,rep,name=allowedUnsafeSysctls"`
 	// forbiddenSysctls is a list of explicitly forbidden sysctls, defaults to none.
 	// Each entry is either a plain sysctl name or ends in "*" in which case it is considered
-	// as a pre***REMOVED***x of forbidden sysctls. Single * means all sysctls are forbidden.
+	// as a prefix of forbidden sysctls. Single * means all sysctls are forbidden.
 	//
 	// Examples:
 	// e.g. "foo/*" forbids "foo/bar", "foo/baz", etc.
@@ -953,25 +953,25 @@ type PodSecurityPolicySpec struct {
 	AllowedProcMountTypes []v1.ProcMountType `json:"allowedProcMountTypes,omitempty" protobuf:"bytes,21,opt,name=allowedProcMountTypes"`
 }
 
-// AllowedHostPath de***REMOVED***nes the host volume conditions that will be enabled by a policy
-// for pods to use. It requires the path pre***REMOVED***x to be de***REMOVED***ned.
+// AllowedHostPath defines the host volume conditions that will be enabled by a policy
+// for pods to use. It requires the path prefix to be defined.
 // Deprecated: use AllowedHostPath from policy API Group instead.
 type AllowedHostPath struct {
-	// pathPre***REMOVED***x is the path pre***REMOVED***x that the host volume must match.
+	// pathPrefix is the path prefix that the host volume must match.
 	// It does not support `*`.
-	// Trailing slashes are trimmed when validating the path pre***REMOVED***x with a host path.
+	// Trailing slashes are trimmed when validating the path prefix with a host path.
 	//
 	// Examples:
 	// `/foo` would allow `/foo`, `/foo/` and `/foo/bar`
 	// `/foo` would not allow `/food` or `/etc/foo`
-	PathPre***REMOVED***x string `json:"pathPre***REMOVED***x,omitempty" protobuf:"bytes,1,rep,name=pathPre***REMOVED***x"`
+	PathPrefix string `json:"pathPrefix,omitempty" protobuf:"bytes,1,rep,name=pathPrefix"`
 
-	// when set to true, will allow host volumes matching the pathPre***REMOVED***x only if all volume mounts are readOnly.
+	// when set to true, will allow host volumes matching the pathPrefix only if all volume mounts are readOnly.
 	// +optional
 	ReadOnly bool `json:"readOnly,omitempty" protobuf:"varint,2,opt,name=readOnly"`
 }
 
-// FSType gives strong typing to different ***REMOVED***le systems that are used by volumes.
+// FSType gives strong typing to different file systems that are used by volumes.
 // Deprecated: use FSType from policy API Group instead.
 type FSType string
 
@@ -994,7 +994,7 @@ var (
 	CephFS                FSType = "cephFS"
 	DownwardAPI           FSType = "downwardAPI"
 	FC                    FSType = "fc"
-	Con***REMOVED***gMap             FSType = "con***REMOVED***gMap"
+	ConfigMap             FSType = "configMap"
 	Quobyte               FSType = "quobyte"
 	AzureDisk             FSType = "azureDisk"
 	All                   FSType = "*"
@@ -1007,8 +1007,8 @@ type AllowedFlexVolume struct {
 	Driver string `json:"driver" protobuf:"bytes,1,opt,name=driver"`
 }
 
-// HostPortRange de***REMOVED***nes a range of host ports that will be enabled by a policy
-// for pods to use.  It requires both the start and end to be de***REMOVED***ned.
+// HostPortRange defines a range of host ports that will be enabled by a policy
+// for pods to use.  It requires both the start and end to be defined.
 // Deprecated: use HostPortRange from policy API Group instead.
 type HostPortRange struct {
 	// min is the start of the range, inclusive.
@@ -1017,13 +1017,13 @@ type HostPortRange struct {
 	Max int32 `json:"max" protobuf:"varint,2,opt,name=max"`
 }
 
-// SELinuxStrategyOptions de***REMOVED***nes the strategy type and any options used to create the strategy.
+// SELinuxStrategyOptions defines the strategy type and any options used to create the strategy.
 // Deprecated: use SELinuxStrategyOptions from policy API Group instead.
 type SELinuxStrategyOptions struct {
 	// rule is the strategy that will dictate the allowable labels that may be set.
 	Rule SELinuxStrategy `json:"rule" protobuf:"bytes,1,opt,name=rule,casttype=SELinuxStrategy"`
 	// seLinuxOptions required to run as; required for MustRunAs
-	// More info: https://kubernetes.io/docs/tasks/con***REMOVED***gure-pod-container/security-context/
+	// More info: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/
 	// +optional
 	SELinuxOptions *v1.SELinuxOptions `json:"seLinuxOptions,omitempty" protobuf:"bytes,2,opt,name=seLinuxOptions"`
 }
@@ -1042,7 +1042,7 @@ const (
 	SELinuxStrategyRunAsAny SELinuxStrategy = "RunAsAny"
 )
 
-// RunAsUserStrategyOptions de***REMOVED***nes the strategy type and any options used to create the strategy.
+// RunAsUserStrategyOptions defines the strategy type and any options used to create the strategy.
 // Deprecated: use RunAsUserStrategyOptions from policy API Group instead.
 type RunAsUserStrategyOptions struct {
 	// rule is the strategy that will dictate the allowable RunAsUser values that may be set.
@@ -1053,7 +1053,7 @@ type RunAsUserStrategyOptions struct {
 	Ranges []IDRange `json:"ranges,omitempty" protobuf:"bytes,2,rep,name=ranges"`
 }
 
-// RunAsGroupStrategyOptions de***REMOVED***nes the strategy type and any options used to create the strategy.
+// RunAsGroupStrategyOptions defines the strategy type and any options used to create the strategy.
 // Deprecated: use RunAsGroupStrategyOptions from policy API Group instead.
 type RunAsGroupStrategyOptions struct {
 	// rule is the strategy that will dictate the allowable RunAsGroup values that may be set.
@@ -1097,7 +1097,7 @@ type RunAsGroupStrategy string
 
 const (
 	// RunAsGroupStrategyMayRunAs means that container does not need to run with a particular gid.
-	// However, when RunAsGroup are speci***REMOVED***ed, they have to fall in the de***REMOVED***ned range.
+	// However, when RunAsGroup are specified, they have to fall in the defined range.
 	RunAsGroupStrategyMayRunAs RunAsGroupStrategy = "MayRunAs"
 	// RunAsGroupStrategyMustRunAs means that container must run as a particular gid.
 	// Deprecated: use RunAsGroupStrategyMustRunAs from policy API Group instead.
@@ -1107,7 +1107,7 @@ const (
 	RunAsGroupStrategyRunAsAny RunAsGroupStrategy = "RunAsAny"
 )
 
-// FSGroupStrategyOptions de***REMOVED***nes the strategy type and options used to create the strategy.
+// FSGroupStrategyOptions defines the strategy type and options used to create the strategy.
 // Deprecated: use FSGroupStrategyOptions from policy API Group instead.
 type FSGroupStrategyOptions struct {
 	// rule is the strategy that will dictate what FSGroup is used in the SecurityContext.
@@ -1133,7 +1133,7 @@ const (
 	FSGroupStrategyRunAsAny FSGroupStrategyType = "RunAsAny"
 )
 
-// SupplementalGroupsStrategyOptions de***REMOVED***nes the strategy type and options used to create the strategy.
+// SupplementalGroupsStrategyOptions defines the strategy type and options used to create the strategy.
 // Deprecated: use SupplementalGroupsStrategyOptions from policy API Group instead.
 type SupplementalGroupsStrategyOptions struct {
 	// rule is the strategy that will dictate what supplemental groups is used in the SecurityContext.
@@ -1177,7 +1177,7 @@ type PodSecurityPolicyList struct {
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
 
 // DEPRECATED 1.9 - This group version of NetworkPolicy is deprecated by networking/v1/NetworkPolicy.
-// NetworkPolicy describes what network traf***REMOVED***c is allowed for a set of Pods
+// NetworkPolicy describes what network traffic is allowed for a set of Pods
 type NetworkPolicy struct {
 	metav1.TypeMeta `json:",inline"`
 	// Standard object's metadata.
@@ -1185,7 +1185,7 @@ type NetworkPolicy struct {
 	// +optional
 	metav1.ObjectMeta `json:"metadata,omitempty" protobuf:"bytes,1,opt,name=metadata"`
 
-	// Speci***REMOVED***cation of the desired behavior for this NetworkPolicy.
+	// Specification of the desired behavior for this NetworkPolicy.
 	// +optional
 	Spec NetworkPolicySpec `json:"spec,omitempty" protobuf:"bytes,2,opt,name=spec"`
 }
@@ -1196,108 +1196,108 @@ type NetworkPolicy struct {
 type PolicyType string
 
 const (
-	// PolicyTypeIngress is a NetworkPolicy that affects ingress traf***REMOVED***c on selected pods
+	// PolicyTypeIngress is a NetworkPolicy that affects ingress traffic on selected pods
 	PolicyTypeIngress PolicyType = "Ingress"
-	// PolicyTypeEgress is a NetworkPolicy that affects egress traf***REMOVED***c on selected pods
+	// PolicyTypeEgress is a NetworkPolicy that affects egress traffic on selected pods
 	PolicyTypeEgress PolicyType = "Egress"
 )
 
 // DEPRECATED 1.9 - This group version of NetworkPolicySpec is deprecated by networking/v1/NetworkPolicySpec.
 type NetworkPolicySpec struct {
 	// Selects the pods to which this NetworkPolicy object applies.  The array of ingress rules
-	// is applied to any pods selected by this ***REMOVED***eld. Multiple network policies can select the
+	// is applied to any pods selected by this field. Multiple network policies can select the
 	// same set of pods.  In this case, the ingress rules for each are combined additively.
-	// This ***REMOVED***eld is NOT optional and follows standard label selector semantics.
+	// This field is NOT optional and follows standard label selector semantics.
 	// An empty podSelector matches all pods in this namespace.
 	PodSelector metav1.LabelSelector `json:"podSelector" protobuf:"bytes,1,opt,name=podSelector"`
 
 	// List of ingress rules to be applied to the selected pods.
-	// Traf***REMOVED***c is allowed to a pod if there are no NetworkPolicies selecting the pod
-	// OR if the traf***REMOVED***c source is the pod's local node,
-	// OR if the traf***REMOVED***c matches at least one ingress rule across all of the NetworkPolicy
+	// Traffic is allowed to a pod if there are no NetworkPolicies selecting the pod
+	// OR if the traffic source is the pod's local node,
+	// OR if the traffic matches at least one ingress rule across all of the NetworkPolicy
 	// objects whose podSelector matches the pod.
-	// If this ***REMOVED***eld is empty then this NetworkPolicy does not allow any traf***REMOVED***c
+	// If this field is empty then this NetworkPolicy does not allow any traffic
 	// (and serves solely to ensure that the pods it selects are isolated by default).
 	// +optional
 	Ingress []NetworkPolicyIngressRule `json:"ingress,omitempty" protobuf:"bytes,2,rep,name=ingress"`
 
-	// List of egress rules to be applied to the selected pods. Outgoing traf***REMOVED***c is
+	// List of egress rules to be applied to the selected pods. Outgoing traffic is
 	// allowed if there are no NetworkPolicies selecting the pod (and cluster policy
-	// otherwise allows the traf***REMOVED***c), OR if the traf***REMOVED***c matches at least one egress rule
+	// otherwise allows the traffic), OR if the traffic matches at least one egress rule
 	// across all of the NetworkPolicy objects whose podSelector matches the pod. If
-	// this ***REMOVED***eld is empty then this NetworkPolicy limits all outgoing traf***REMOVED***c (and serves
+	// this field is empty then this NetworkPolicy limits all outgoing traffic (and serves
 	// solely to ensure that the pods it selects are isolated by default).
-	// This ***REMOVED***eld is beta-level in 1.8
+	// This field is beta-level in 1.8
 	// +optional
 	Egress []NetworkPolicyEgressRule `json:"egress,omitempty" protobuf:"bytes,3,rep,name=egress"`
 
 	// List of rule types that the NetworkPolicy relates to.
 	// Valid options are Ingress, Egress, or Ingress,Egress.
-	// If this ***REMOVED***eld is not speci***REMOVED***ed, it will default based on the existence of Ingress or Egress rules;
+	// If this field is not specified, it will default based on the existence of Ingress or Egress rules;
 	// policies that contain an Egress section are assumed to affect Egress, and all policies
 	// (whether or not they contain an Ingress section) are assumed to affect Ingress.
 	// If you want to write an egress-only policy, you must explicitly specify policyTypes [ "Egress" ].
-	// Likewise, if you want to write a policy that speci***REMOVED***es that no egress is allowed,
+	// Likewise, if you want to write a policy that specifies that no egress is allowed,
 	// you must specify a policyTypes value that include "Egress" (since such a policy would not include
 	// an Egress section and would otherwise default to just [ "Ingress" ]).
-	// This ***REMOVED***eld is beta-level in 1.8
+	// This field is beta-level in 1.8
 	// +optional
 	PolicyTypes []PolicyType `json:"policyTypes,omitempty" protobuf:"bytes,4,rep,name=policyTypes,casttype=PolicyType"`
 }
 
 // DEPRECATED 1.9 - This group version of NetworkPolicyIngressRule is deprecated by networking/v1/NetworkPolicyIngressRule.
-// This NetworkPolicyIngressRule matches traf***REMOVED***c if and only if the traf***REMOVED***c matches both ports AND from.
+// This NetworkPolicyIngressRule matches traffic if and only if the traffic matches both ports AND from.
 type NetworkPolicyIngressRule struct {
 	// List of ports which should be made accessible on the pods selected for this rule.
 	// Each item in this list is combined using a logical OR.
-	// If this ***REMOVED***eld is empty or missing, this rule matches all ports (traf***REMOVED***c not restricted by port).
-	// If this ***REMOVED***eld is present and contains at least one item, then this rule allows traf***REMOVED***c
-	// only if the traf***REMOVED***c matches at least one port in the list.
+	// If this field is empty or missing, this rule matches all ports (traffic not restricted by port).
+	// If this field is present and contains at least one item, then this rule allows traffic
+	// only if the traffic matches at least one port in the list.
 	// +optional
 	Ports []NetworkPolicyPort `json:"ports,omitempty" protobuf:"bytes,1,rep,name=ports"`
 
 	// List of sources which should be able to access the pods selected for this rule.
 	// Items in this list are combined using a logical OR operation.
-	// If this ***REMOVED***eld is empty or missing, this rule matches all sources (traf***REMOVED***c not restricted by source).
-	// If this ***REMOVED***eld is present and contains at least on item, this rule allows traf***REMOVED***c only if the
-	// traf***REMOVED***c matches at least one item in the from list.
+	// If this field is empty or missing, this rule matches all sources (traffic not restricted by source).
+	// If this field is present and contains at least on item, this rule allows traffic only if the
+	// traffic matches at least one item in the from list.
 	// +optional
 	From []NetworkPolicyPeer `json:"from,omitempty" protobuf:"bytes,2,rep,name=from"`
 }
 
 // DEPRECATED 1.9 - This group version of NetworkPolicyEgressRule is deprecated by networking/v1/NetworkPolicyEgressRule.
-// NetworkPolicyEgressRule describes a particular set of traf***REMOVED***c that is allowed out of pods
-// matched by a NetworkPolicySpec's podSelector. The traf***REMOVED***c must match both ports and to.
+// NetworkPolicyEgressRule describes a particular set of traffic that is allowed out of pods
+// matched by a NetworkPolicySpec's podSelector. The traffic must match both ports and to.
 // This type is beta-level in 1.8
 type NetworkPolicyEgressRule struct {
-	// List of destination ports for outgoing traf***REMOVED***c.
-	// Each item in this list is combined using a logical OR. If this ***REMOVED***eld is
-	// empty or missing, this rule matches all ports (traf***REMOVED***c not restricted by port).
-	// If this ***REMOVED***eld is present and contains at least one item, then this rule allows
-	// traf***REMOVED***c only if the traf***REMOVED***c matches at least one port in the list.
+	// List of destination ports for outgoing traffic.
+	// Each item in this list is combined using a logical OR. If this field is
+	// empty or missing, this rule matches all ports (traffic not restricted by port).
+	// If this field is present and contains at least one item, then this rule allows
+	// traffic only if the traffic matches at least one port in the list.
 	// +optional
 	Ports []NetworkPolicyPort `json:"ports,omitempty" protobuf:"bytes,1,rep,name=ports"`
 
-	// List of destinations for outgoing traf***REMOVED***c of pods selected for this rule.
-	// Items in this list are combined using a logical OR operation. If this ***REMOVED***eld is
-	// empty or missing, this rule matches all destinations (traf***REMOVED***c not restricted by
-	// destination). If this ***REMOVED***eld is present and contains at least one item, this rule
-	// allows traf***REMOVED***c only if the traf***REMOVED***c matches at least one item in the to list.
+	// List of destinations for outgoing traffic of pods selected for this rule.
+	// Items in this list are combined using a logical OR operation. If this field is
+	// empty or missing, this rule matches all destinations (traffic not restricted by
+	// destination). If this field is present and contains at least one item, this rule
+	// allows traffic only if the traffic matches at least one item in the to list.
 	// +optional
 	To []NetworkPolicyPeer `json:"to,omitempty" protobuf:"bytes,2,rep,name=to"`
 }
 
 // DEPRECATED 1.9 - This group version of NetworkPolicyPort is deprecated by networking/v1/NetworkPolicyPort.
 type NetworkPolicyPort struct {
-	// Optional.  The protocol (TCP, UDP, or SCTP) which traf***REMOVED***c must match.
-	// If not speci***REMOVED***ed, this ***REMOVED***eld defaults to TCP.
+	// Optional.  The protocol (TCP, UDP, or SCTP) which traffic must match.
+	// If not specified, this field defaults to TCP.
 	// +optional
 	Protocol *v1.Protocol `json:"protocol,omitempty" protobuf:"bytes,1,opt,name=protocol,casttype=k8s.io/api/core/v1.Protocol"`
 
-	// If speci***REMOVED***ed, the port on the given protocol.  This can
-	// either be a numerical or named port on a pod.  If this ***REMOVED***eld is not provided,
+	// If specified, the port on the given protocol.  This can
+	// either be a numerical or named port on a pod.  If this field is not provided,
 	// this matches all port names and numbers.
-	// If present, only traf***REMOVED***c on the speci***REMOVED***ed protocol AND port
+	// If present, only traffic on the specified protocol AND port
 	// will be matched.
 	// +optional
 	Port *intstr.IntOrString `json:"port,omitempty" protobuf:"bytes,2,opt,name=port"`
@@ -1320,7 +1320,7 @@ type IPBlock struct {
 
 // DEPRECATED 1.9 - This group version of NetworkPolicyPeer is deprecated by networking/v1/NetworkPolicyPeer.
 type NetworkPolicyPeer struct {
-	// This is a label selector which selects Pods. This ***REMOVED***eld follows standard label
+	// This is a label selector which selects Pods. This field follows standard label
 	// selector semantics; if present but empty, it selects all pods.
 	//
 	// If NamespaceSelector is also set, then the NetworkPolicyPeer as a whole selects
@@ -1329,7 +1329,7 @@ type NetworkPolicyPeer struct {
 	// +optional
 	PodSelector *metav1.LabelSelector `json:"podSelector,omitempty" protobuf:"bytes,1,opt,name=podSelector"`
 
-	// Selects Namespaces using cluster-scoped labels. This ***REMOVED***eld follows standard label
+	// Selects Namespaces using cluster-scoped labels. This field follows standard label
 	// selector semantics; if present but empty, it selects all namespaces.
 	//
 	// If PodSelector is also set, then the NetworkPolicyPeer as a whole selects
@@ -1338,8 +1338,8 @@ type NetworkPolicyPeer struct {
 	// +optional
 	NamespaceSelector *metav1.LabelSelector `json:"namespaceSelector,omitempty" protobuf:"bytes,2,opt,name=namespaceSelector"`
 
-	// IPBlock de***REMOVED***nes policy on a particular IPBlock. If this ***REMOVED***eld is set then
-	// neither of the other ***REMOVED***elds can be.
+	// IPBlock defines policy on a particular IPBlock. If this field is set then
+	// neither of the other fields can be.
 	// +optional
 	IPBlock *IPBlock `json:"ipBlock,omitempty" protobuf:"bytes,3,rep,name=ipBlock"`
 }

@@ -44,8 +44,8 @@ func CreateTable(queryer db.Queryer, catalog, schema, tableName string, columns 
 }
 
 func CreateTableAs(queryer db.Queryer, catalog, schema, tableName string, columns []Column, comment string, properties map[string]string, ignoreExists bool, query string) error {
-	***REMOVED***nalQuery := generateCreateTableAsSQL(catalog, schema, tableName, columns, comment, properties, ignoreExists, query)
-	_, err := queryer.Query(***REMOVED***nalQuery)
+	finalQuery := generateCreateTableAsSQL(catalog, schema, tableName, columns, comment, properties, ignoreExists, query)
+	_, err := queryer.Query(finalQuery)
 	return err
 }
 
@@ -54,7 +54,7 @@ func DropTable(queryer db.Queryer, catalog, schema, tableName string, ignoreNotE
 	if ignoreNotExists {
 		ifExists = "IF EXISTS"
 	}
-	table := FullyQuali***REMOVED***edTableName(catalog, schema, tableName)
+	table := FullyQualifiedTableName(catalog, schema, tableName)
 	query := fmt.Sprintf("DROP TABLE %s %s", ifExists, table)
 	_, err := queryer.Query(query)
 	return err
@@ -66,9 +66,9 @@ func CreateView(queryer db.Queryer, catalog, schema, viewName string, query stri
 		fullQuery += " OR REPLACE"
 	}
 	fullQuery += " VIEW %s AS %s"
-	view := FullyQuali***REMOVED***edTableName(catalog, schema, viewName)
-	***REMOVED***nalQuery := fmt.Sprintf(fullQuery, view, query)
-	_, err := queryer.Query(***REMOVED***nalQuery)
+	view := FullyQualifiedTableName(catalog, schema, viewName)
+	finalQuery := fmt.Sprintf(fullQuery, view, query)
+	_, err := queryer.Query(finalQuery)
 	return err
 }
 
@@ -77,16 +77,16 @@ func DropView(queryer db.Queryer, catalog, schema, viewName string, ignoreNotExi
 	if ignoreNotExists {
 		ifExists = "IF EXISTS"
 	}
-	view := FullyQuali***REMOVED***edTableName(catalog, schema, viewName)
+	view := FullyQualifiedTableName(catalog, schema, viewName)
 	query := fmt.Sprintf("DROP VIEW %s %s", ifExists, view)
 	_, err := queryer.Query(query)
 	return err
 }
 
-// QueryMetadata executes a "DESCRIBE" Presto query against an existing, fully-quali***REMOVED***ed
+// QueryMetadata executes a "DESCRIBE" Presto query against an existing, fully-qualified
 // table name to determine that table's column information.
 func QueryMetadata(queryer db.Queryer, catalog, schema, tableName string) ([]Column, error) {
-	rows, err := ExecuteSelect(queryer, fmt.Sprintf("DESCRIBE %s", FullyQuali***REMOVED***edTableName(catalog, schema, tableName)))
+	rows, err := ExecuteSelect(queryer, fmt.Sprintf("DESCRIBE %s", FullyQualifiedTableName(catalog, schema, tableName)))
 	if err != nil {
 		return nil, fmt.Errorf("failed to query the %s Presto table's metadata: %v", tableName, err)
 	}
@@ -134,7 +134,7 @@ func GenerateQuotedColumnsListSQL(columns []Column) string {
 	return columnsSQL
 }
 
-func generateColumnDe***REMOVED***nitionListSQL(columns []Column) string {
+func generateColumnDefinitionListSQL(columns []Column) string {
 	c := make([]string, len(columns))
 	for i, col := range columns {
 		c[i] = fmt.Sprintf("`%s` %s", col.Name, col.Type)
@@ -153,14 +153,14 @@ func GenerateOrderBySQL(columns []Column) string {
 		colType := strings.ToLower(col.Type)
 		if mapIndex := strings.Index(colType, "map("); mapIndex != -1 && strings.Index(colType, ")") > mapIndex {
 			quotedColumns = append(quotedColumns, fmt.Sprintf(`map_entries("%s")`, colName))
-		} ***REMOVED*** {
+		} else {
 			quotedColumns = append(quotedColumns, quoteColumn(col))
 		}
 	}
 	return fmt.Sprintf("%s ASC", strings.Join(quotedColumns, ", "))
 }
 
-func FullyQuali***REMOVED***edTableName(catalog, schema, tableName string) string {
+func FullyQualifiedTableName(catalog, schema, tableName string) string {
 	return fmt.Sprintf("%s.%s.%s", catalog, schema, tableName)
 }
 
@@ -170,7 +170,7 @@ func generateCreateTableSQL(catalog, schema, tableName string, columns []Column,
 		ifNotExists = "IF NOT EXISTS"
 	}
 
-	columnsStr := generateColumnDe***REMOVED***nitionListSQL(columns)
+	columnsStr := generateColumnDefinitionListSQL(columns)
 
 	commentStr := ""
 	if comment != "" {
@@ -182,7 +182,7 @@ func generateCreateTableSQL(catalog, schema, tableName string, columns []Column,
 		propsStr = fmt.Sprintf("WITH (%s)", generatePropertiesSQL(properties))
 	}
 
-	table := FullyQuali***REMOVED***edTableName(catalog, schema, tableName)
+	table := FullyQualifiedTableName(catalog, schema, tableName)
 
 	sqlStr := `CREATE TABLE %s
 %s (
@@ -209,7 +209,7 @@ func generateCreateTableAsSQL(catalog, schema, tableName string, columns []Colum
 		propsStr = fmt.Sprintf("WITH (%s)", generatePropertiesSQL(properties))
 	}
 
-	table := FullyQuali***REMOVED***edTableName(catalog, schema, tableName)
+	table := FullyQualifiedTableName(catalog, schema, tableName)
 
 	sqlStr := `CREATE TABLE %s
 %s (

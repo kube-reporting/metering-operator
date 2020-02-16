@@ -24,7 +24,7 @@ them in their own goroutines.
 
 CRON Expression Format
 
-A cron expression represents a set of times, using 6 space-separated ***REMOVED***elds.
+A cron expression represents a set of times, using 6 space-separated fields.
 
 	Field name   | Mandatory? | Allowed values  | Allowed special characters
 	----------   | ---------- | --------------  | --------------------------
@@ -35,7 +35,7 @@ A cron expression represents a set of times, using 6 space-separated ***REMOVED*
 	Month        | Yes        | 1-12 or JAN-DEC | * / , -
 	Day of week  | Yes        | 0-6 or SUN-SAT  | * / , - ?
 
-Note: Month and Day-of-week ***REMOVED***eld values are case insensitive.  "SUN", "Sun",
+Note: Month and Day-of-week field values are case insensitive.  "SUN", "Sun",
 and "sun" are equally accepted.
 
 Special Characters
@@ -43,26 +43,26 @@ Special Characters
 Asterisk ( * )
 
 The asterisk indicates that the cron expression will match for all values of the
-***REMOVED***eld; e.g., using an asterisk in the 5th ***REMOVED***eld (month) would indicate every
+field; e.g., using an asterisk in the 5th field (month) would indicate every
 month.
 
 Slash ( / )
 
 Slashes are used to describe increments of ranges. For example 3-59/15 in the
-1st ***REMOVED***eld (minutes) would indicate the 3rd minute of the hour and every 15
-minutes thereafter. The form "*\/..." is equivalent to the form "***REMOVED***rst-last/...",
-that is, an increment over the largest possible range of the ***REMOVED***eld.  The form
+1st field (minutes) would indicate the 3rd minute of the hour and every 15
+minutes thereafter. The form "*\/..." is equivalent to the form "first-last/...",
+that is, an increment over the largest possible range of the field.  The form
 "N/..." is accepted as meaning "N-MAX/...", that is, starting at N, use the
-increment until the end of that speci***REMOVED***c range.  It does not wrap around.
+increment until the end of that specific range.  It does not wrap around.
 
 Comma ( , )
 
 Commas are used to separate items of a list. For example, using "MON,WED,FRI" in
-the 5th ***REMOVED***eld (day of week) would mean Mondays, Wednesdays and Fridays.
+the 5th field (day of week) would mean Mondays, Wednesdays and Fridays.
 
 Hyphen ( - )
 
-Hyphens are used to de***REMOVED***ne ranges. For example, 9-17 would indicate every
+Hyphens are used to define ranges. For example, 9-17 would indicate every
 hour between 9am and 5pm inclusive.
 
 Question mark ( ? )
@@ -70,21 +70,21 @@ Question mark ( ? )
 Question mark may be used instead of '*' for leaving either day-of-month or
 day-of-week blank.
 
-Prede***REMOVED***ned schedules
+Predefined schedules
 
-You may use one of several pre-de***REMOVED***ned schedules in place of a cron expression.
+You may use one of several pre-defined schedules in place of a cron expression.
 
 	Entry                  | Description                                | Equivalent To
 	-----                  | -----------                                | -------------
 	@yearly (or @annually) | Run once a year, midnight, Jan. 1st        | 0 0 0 1 1 *
-	@monthly               | Run once a month, midnight, ***REMOVED***rst of month | 0 0 0 1 * *
+	@monthly               | Run once a month, midnight, first of month | 0 0 0 1 * *
 	@weekly                | Run once a week, midnight on Sunday        | 0 0 0 * * 0
 	@daily (or @midnight)  | Run once a day, midnight                   | 0 0 0 * * *
 	@hourly                | Run once an hour, beginning of hour        | 0 0 * * * *
 
 Intervals
 
-You may also schedule a job to execute at ***REMOVED***xed intervals, starting at the time it's added 
+You may also schedule a job to execute at fixed intervals, starting at the time it's added 
 or cron is run. This is supported by formatting the cron spec like this:
 
     @every <duration>

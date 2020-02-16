@@ -78,16 +78,16 @@ func (iter *Iterator) skipObject() {
 
 func (iter *Iterator) skipString() {
 	for {
-		end, escaped := iter.***REMOVED***ndStringEnd()
+		end, escaped := iter.findStringEnd()
 		if end == -1 {
 			if !iter.loadMore() {
 				iter.ReportError("skipString", "incomplete string")
 				return
 			}
 			if escaped {
-				iter.head = 1 // skip the ***REMOVED***rst char as last char read is \
+				iter.head = 1 // skip the first char as last char read is \
 			}
-		} ***REMOVED*** {
+		} else {
 			iter.head = end
 			return
 		}
@@ -95,9 +95,9 @@ func (iter *Iterator) skipString() {
 }
 
 // adapted from: https://github.com/buger/jsonparser/blob/master/parser.go
-// Tries to ***REMOVED***nd the end of string
+// Tries to find the end of string
 // Support if string contains escaped quote symbols.
-func (iter *Iterator) ***REMOVED***ndStringEnd() (int, bool) {
+func (iter *Iterator) findStringEnd() (int, bool) {
 	escaped := false
 	for i := iter.head; i < iter.tail; i++ {
 		c := iter.buf[i]
@@ -120,7 +120,7 @@ func (iter *Iterator) ***REMOVED***ndStringEnd() (int, bool) {
 				}
 				j--
 			}
-		} ***REMOVED*** if c == '\\' {
+		} else if c == '\\' {
 			escaped = true
 		}
 	}

@@ -8,7 +8,7 @@ import (
 )
 
 // Cron keeps track of any number of entries, invoking the associated func as
-// speci***REMOVED***ed by the schedule. It may be started, stopped, and the entries may
+// specified by the schedule. It may be started, stopped, and the entries may
 // be inspected while running.
 type Cron struct {
 	entries  []*Entry
@@ -38,7 +38,7 @@ type Entry struct {
 	Schedule Schedule
 
 	// The next time the job will run. This is the zero time if Cron has not been
-	// started or this entry's schedule is unsatis***REMOVED***able
+	// started or this entry's schedule is unsatisfiable
 	Next time.Time
 
 	// The last time this job was run. This is the zero time if the job has never
@@ -183,7 +183,7 @@ func (c *Cron) run() {
 			// If there are no entries yet, just sleep - it still handles new entries
 			// and stop requests.
 			timer = time.NewTimer(100000 * time.Hour)
-		} ***REMOVED*** {
+		} else {
 			timer = time.NewTimer(c.entries[0].Next.Sub(now))
 		}
 
@@ -221,11 +221,11 @@ func (c *Cron) run() {
 	}
 }
 
-// Logs an error to stderr or to the con***REMOVED***gured error log
+// Logs an error to stderr or to the configured error log
 func (c *Cron) logf(format string, args ...interface{}) {
 	if c.ErrorLog != nil {
 		c.ErrorLog.Printf(format, args...)
-	} ***REMOVED*** {
+	} else {
 		log.Printf(format, args...)
 	}
 }

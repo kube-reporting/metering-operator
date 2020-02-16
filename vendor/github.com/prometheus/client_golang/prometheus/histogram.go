@@ -1,6 +1,6 @@
 // Copyright 2015 The Prometheus Authors
 // Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this ***REMOVED***le except in compliance with the License.
+// you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 //
 // http://www.apache.org/licenses/LICENSE-2.0
@@ -8,7 +8,7 @@
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the speci***REMOVED***c language governing permissions and
+// See the License for the specific language governing permissions and
 // limitations under the License.
 
 package prometheus
@@ -25,7 +25,7 @@ import (
 )
 
 // A Histogram counts individual observations from an event or sample stream in
-// con***REMOVED***gurable buckets. Similar to a summary, it also provides a sum of
+// configurable buckets. Similar to a summary, it also provides a sum of
 // observations and an observation count.
 //
 // On the Prometheus server, quantiles can be calculated from a Histogram using
@@ -33,7 +33,7 @@ import (
 //
 // Note that Histograms, in contrast to Summaries, can be aggregated with the
 // Prometheus query language (see the documentation for detailed
-// procedures). However, Histograms require the user to pre-de***REMOVED***ne suitable
+// procedures). However, Histograms require the user to pre-define suitable
 // buckets, and they are in general less accurate. The Observe method of a
 // Histogram has a very low performance overhead in comparison with the Observe
 // method of a Summary.
@@ -47,13 +47,13 @@ type Histogram interface {
 	Observe(float64)
 }
 
-// bucketLabel is used for the label that de***REMOVED***nes the upper bound of a
+// bucketLabel is used for the label that defines the upper bound of a
 // bucket of a histogram ("le" -> "less or equal").
 const bucketLabel = "le"
 
 // DefBuckets are the default Histogram buckets. The default buckets are
 // tailored to broadly measure the response time (in seconds) of a network
-// service. Most likely, however, you will be required to de***REMOVED***ne buckets
+// service. Most likely, however, you will be required to define buckets
 // customized to your use case.
 var (
 	DefBuckets = []float64{.005, .01, .025, .05, .1, .25, .5, 1, 2.5, 5, 10}
@@ -64,9 +64,9 @@ var (
 )
 
 // LinearBuckets creates 'count' buckets, each 'width' wide, where the lowest
-// bucket has an upper bound of 'start'. The ***REMOVED***nal +Inf bucket is not counted
+// bucket has an upper bound of 'start'. The final +Inf bucket is not counted
 // and not included in the returned slice. The returned slice is meant to be
-// used for the Buckets ***REMOVED***eld of HistogramOpts.
+// used for the Buckets field of HistogramOpts.
 //
 // The function panics if 'count' is zero or negative.
 func LinearBuckets(start, width float64, count int) []float64 {
@@ -83,9 +83,9 @@ func LinearBuckets(start, width float64, count int) []float64 {
 
 // ExponentialBuckets creates 'count' buckets, where the lowest bucket has an
 // upper bound of 'start' and each following bucket's upper bound is 'factor'
-// times the previous bucket's upper bound. The ***REMOVED***nal +Inf bucket is not counted
+// times the previous bucket's upper bound. The final +Inf bucket is not counted
 // and not included in the returned slice. The returned slice is meant to be
-// used for the Buckets ***REMOVED***eld of HistogramOpts.
+// used for the Buckets field of HistogramOpts.
 //
 // The function panics if 'count' is 0 or negative, if 'start' is 0 or negative,
 // or if 'factor' is less than or equal 1.
@@ -108,13 +108,13 @@ func ExponentialBuckets(start, factor float64, count int) []float64 {
 }
 
 // HistogramOpts bundles the options for creating a Histogram metric. It is
-// mandatory to set Name and Help to a non-empty string. All other ***REMOVED***elds are
+// mandatory to set Name and Help to a non-empty string. All other fields are
 // optional and can safely be left at their zero value.
 type HistogramOpts struct {
-	// Namespace, Subsystem, and Name are components of the fully-quali***REMOVED***ed
+	// Namespace, Subsystem, and Name are components of the fully-qualified
 	// name of the Histogram (created by joining these components with
 	// "_"). Only Name is mandatory, the others merely help structuring the
-	// name. Note that the fully-quali***REMOVED***ed name of the Histogram must be a
+	// name. Note that the fully-qualified name of the Histogram must be a
 	// valid Prometheus metric name.
 	Namespace string
 	Subsystem string
@@ -122,12 +122,12 @@ type HistogramOpts struct {
 
 	// Help provides information about this Histogram. Mandatory!
 	//
-	// Metrics with the same fully-quali***REMOVED***ed name must have the same Help
+	// Metrics with the same fully-qualified name must have the same Help
 	// string.
 	Help string
 
-	// ConstLabels are used to attach ***REMOVED***xed labels to this
-	// Histogram. Histograms with the same fully-quali***REMOVED***ed name must have the
+	// ConstLabels are used to attach fixed labels to this
+	// Histogram. Histograms with the same fully-qualified name must have the
 	// same label names in their ConstLabels.
 	//
 	// Note that in most cases, labels have a value that varies during the
@@ -136,7 +136,7 @@ type HistogramOpts struct {
 	// special case where the value of a label does not change during the
 	// lifetime of a process, e.g. if the revision of the running binary is
 	// put into a label. Another, more advanced purpose is if more than one
-	// Collector needs to collect Histograms with the same fully-quali***REMOVED***ed
+	// Collector needs to collect Histograms with the same fully-qualified
 	// name. In that case, those Summaries must differ in the values of
 	// their ConstLabels. See the Collector examples.
 	//
@@ -145,7 +145,7 @@ type HistogramOpts struct {
 	// metric name).
 	ConstLabels Labels
 
-	// Buckets de***REMOVED***nes the buckets into which observations are counted. Each
+	// Buckets defines the buckets into which observations are counted. Each
 	// element in the slice is the upper inclusive bound of a bucket. The
 	// values must be sorted in strictly increasing order. There is no need
 	// to add a highest bucket with +Inf bound, it will be added
@@ -200,14 +200,14 @@ func newHistogram(desc *Desc, opts HistogramOpts, labelValues ...string) Histogr
 					upperBound, h.upperBounds[i+1],
 				))
 			}
-		} ***REMOVED*** {
+		} else {
 			if math.IsInf(upperBound, +1) {
 				// The +Inf bucket is implicit. Remove it here.
 				h.upperBounds = h.upperBounds[:i]
 			}
 		}
 	}
-	// Finally we know the ***REMOVED***nal length of h.upperBounds and can make counts.
+	// Finally we know the final length of h.upperBounds and can make counts.
 	h.counts = make([]uint64, len(h.upperBounds))
 
 	h.init(h) // Init self-collection.
@@ -216,7 +216,7 @@ func newHistogram(desc *Desc, opts HistogramOpts, labelValues ...string) Histogr
 
 type histogram struct {
 	// sumBits contains the bits of the float64 representing the sum of all
-	// observations. sumBits and count have to go ***REMOVED***rst in the struct to
+	// observations. sumBits and count have to go first in the struct to
 	// guarantee alignment for atomic operations.
 	// http://golang.org/pkg/sync/atomic/#pkg-note-BUG
 	sumBits uint64
@@ -308,7 +308,7 @@ func NewHistogramVec(opts HistogramOpts, labelNames []string) *HistogramVec {
 
 // GetMetricWithLabelValues returns the Histogram for the given slice of label
 // values (same order as the VariableLabels in Desc). If that combination of
-// label values is accessed for the ***REMOVED***rst time, a new Histogram is created.
+// label values is accessed for the first time, a new Histogram is created.
 //
 // It is possible to call this method without using the returned Histogram to only
 // create the new Histogram but leave it at its starting value, a Histogram without
@@ -340,7 +340,7 @@ func (m *HistogramVec) GetMetricWithLabelValues(lvs ...string) (Observer, error)
 
 // GetMetricWith returns the Histogram for the given Labels map (the label names
 // must match those of the VariableLabels in Desc). If that label map is
-// accessed for the ***REMOVED***rst time, a new Histogram is created. Implications of
+// accessed for the first time, a new Histogram is created. Implications of
 // creating a Histogram without using it and keeping the Histogram for later use
 // are the same as for GetMetricWithLabelValues.
 //
@@ -411,7 +411,7 @@ func (h *constHistogram) Write(out *dto.Metric) error {
 }
 
 // NewConstHistogram returns a metric representing a Prometheus histogram with
-// ***REMOVED***xed values for the count, sum, and bucket counts. As those parameters
+// fixed values for the count, sum, and bucket counts. As those parameters
 // cannot be changed, the returned value does not implement the Histogram
 // interface (but only the Metric interface). Users of this package will not
 // have much use for it in regular operations. However, when implementing custom

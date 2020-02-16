@@ -1,6 +1,6 @@
 // Copyright 2014 The Go Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE ***REMOVED***le.
+// license that can be found in the LICENSE file.
 
 package http2
 
@@ -41,10 +41,10 @@ func init() {
 		"from",
 		"host",
 		"if-match",
-		"if-modi***REMOVED***ed-since",
+		"if-modified-since",
 		"if-none-match",
-		"if-unmodi***REMOVED***ed-since",
-		"last-modi***REMOVED***ed",
+		"if-unmodified-since",
+		"last-modified",
 		"link",
 		"location",
 		"max-forwards",

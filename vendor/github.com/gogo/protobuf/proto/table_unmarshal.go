@@ -4,7 +4,7 @@
 // https://github.com/golang/protobuf
 //
 // Redistribution and use in source and binary forms, with or without
-// modi***REMOVED***cation, are permitted provided that the following conditions are
+// modification, are permitted provided that the following conditions are
 // met:
 //
 //     * Redistributions of source code must retain the above copyright
@@ -15,7 +15,7 @@
 // distribution.
 //     * Neither the name of Google Inc. nor the names of its
 // contributors may be used to endorse or promote products derived from
-// this software without speci***REMOVED***c prior written permission.
+// this software without specific prior written permission.
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
 // "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
@@ -44,7 +44,7 @@ import (
 	"unicode/utf8"
 )
 
-// Unmarshal is the entry point from the generated .pb.go ***REMOVED***les.
+// Unmarshal is the entry point from the generated .pb.go files.
 // This function is not intended to be used by non-generated code.
 // This function is not subject to any compatibility guarantee.
 // msg contains a pointer to a protocol buffer struct.
@@ -55,7 +55,7 @@ func (a *InternalMessageInfo) Unmarshal(msg Message, b []byte) error {
 	// The atomic load ensures memory consistency.
 	u := atomicLoadUnmarshalInfo(&a.unmarshal)
 	if u == nil {
-		// Slow path: ***REMOVED***nd unmarshal info for msg, update a with it.
+		// Slow path: find unmarshal info for msg, update a with it.
 		u = getUnmarshalInfo(reflect.TypeOf(msg).Elem())
 		atomicStoreUnmarshalInfo(&a.unmarshal, u)
 	}
@@ -67,37 +67,37 @@ func (a *InternalMessageInfo) Unmarshal(msg Message, b []byte) error {
 type unmarshalInfo struct {
 	typ reflect.Type // type of the protobuf struct
 
-	// 0 = only typ ***REMOVED***eld is initialized
+	// 0 = only typ field is initialized
 	// 1 = completely initialized
 	initialized     int32
 	lock            sync.Mutex                    // prevents double initialization
-	dense           []unmarshalFieldInfo          // ***REMOVED***elds indexed by tag #
-	sparse          map[uint64]unmarshalFieldInfo // ***REMOVED***elds indexed by tag #
-	reqFields       []string                      // names of required ***REMOVED***elds
+	dense           []unmarshalFieldInfo          // fields indexed by tag #
+	sparse          map[uint64]unmarshalFieldInfo // fields indexed by tag #
+	reqFields       []string                      // names of required fields
 	reqMask         uint64                        // 1<<len(reqFields)-1
-	unrecognized    ***REMOVED***eld                         // offset of []byte to put unrecognized data (or invalidField if we should throw it away)
-	extensions      ***REMOVED***eld                         // offset of extensions ***REMOVED***eld (of type proto.XXX_InternalExtensions), or invalidField if it does not exist
-	oldExtensions   ***REMOVED***eld                         // offset of old-form extensions ***REMOVED***eld (of type map[int]Extension)
-	extensionRanges []ExtensionRange              // if non-nil, implies extensions ***REMOVED***eld is valid
-	isMessageSet    bool                          // if true, implies extensions ***REMOVED***eld is valid
+	unrecognized    field                         // offset of []byte to put unrecognized data (or invalidField if we should throw it away)
+	extensions      field                         // offset of extensions field (of type proto.XXX_InternalExtensions), or invalidField if it does not exist
+	oldExtensions   field                         // offset of old-form extensions field (of type map[int]Extension)
+	extensionRanges []ExtensionRange              // if non-nil, implies extensions field is valid
+	isMessageSet    bool                          // if true, implies extensions field is valid
 
-	bytesExtensions ***REMOVED***eld // offset of XXX_extensions with type []byte
+	bytesExtensions field // offset of XXX_extensions with type []byte
 }
 
-// An unmarshaler takes a stream of bytes and a pointer to a ***REMOVED***eld of a message.
-// It decodes the ***REMOVED***eld, stores it at f, and returns the unused bytes.
+// An unmarshaler takes a stream of bytes and a pointer to a field of a message.
+// It decodes the field, stores it at f, and returns the unused bytes.
 // w is the wire encoding.
 // b is the data after the tag and wire encoding have been read.
 type unmarshaler func(b []byte, f pointer, w int) ([]byte, error)
 
 type unmarshalFieldInfo struct {
-	// location of the ***REMOVED***eld in the proto message structure.
-	***REMOVED***eld ***REMOVED***eld
+	// location of the field in the proto message structure.
+	field field
 
-	// function to unmarshal the data for the ***REMOVED***eld.
+	// function to unmarshal the data for the field.
 	unmarshal unmarshaler
 
-	// if a required ***REMOVED***eld, contains a single set bit at this ***REMOVED***eld's index in the required ***REMOVED***eld list.
+	// if a required field, contains a single set bit at this field's index in the required field list.
 	reqMask uint64
 }
 
@@ -119,8 +119,8 @@ func getUnmarshalInfo(t reflect.Type) *unmarshalInfo {
 	u := unmarshalInfoMap[t]
 	if u == nil {
 		u = &unmarshalInfo{typ: t}
-		// Note: we just set the type here. The rest of the ***REMOVED***elds
-		// will be initialized on ***REMOVED***rst use.
+		// Note: we just set the type here. The rest of the fields
+		// will be initialized on first use.
 		unmarshalInfoMap[t] = u
 	}
 	return u
@@ -138,7 +138,7 @@ func (u *unmarshalInfo) unmarshal(m pointer, b []byte) error {
 	if u.isMessageSet {
 		return UnmarshalMessageSet(b, m.offset(u.extensions).toExtensions())
 	}
-	var reqMask uint64            // bitmask of required ***REMOVED***elds we've seen.
+	var reqMask uint64            // bitmask of required fields we've seen.
 	var rnse *RequiredNotSetError // an instance of a RequiredNotSetError returned by a submessage.
 	for len(b) > 0 {
 		// Read tag and wire type.
@@ -147,10 +147,10 @@ func (u *unmarshalInfo) unmarshal(m pointer, b []byte) error {
 		if b[0] < 128 {
 			x = uint64(b[0])
 			b = b[1:]
-		} ***REMOVED*** if len(b) >= 2 && b[1] < 128 {
+		} else if len(b) >= 2 && b[1] < 128 {
 			x = uint64(b[0]&0x7f) + uint64(b[1])<<7
 			b = b[2:]
-		} ***REMOVED*** {
+		} else {
 			var n int
 			x, n = decodeVarint(b)
 			if n == 0 {
@@ -165,19 +165,19 @@ func (u *unmarshalInfo) unmarshal(m pointer, b []byte) error {
 		var f unmarshalFieldInfo
 		if tag < uint64(len(u.dense)) {
 			f = u.dense[tag]
-		} ***REMOVED*** {
+		} else {
 			f = u.sparse[tag]
 		}
 		if fn := f.unmarshal; fn != nil {
 			var err error
-			b, err = fn(b, m.offset(f.***REMOVED***eld), wire)
+			b, err = fn(b, m.offset(f.field), wire)
 			if err == nil {
 				reqMask |= f.reqMask
 				continue
 			}
 			if r, ok := err.(*RequiredNotSetError); ok {
 				// Remember this error, but keep parsing. We need to produce
-				// a full parse even if a required ***REMOVED***eld is missing.
+				// a full parse even if a required field is missing.
 				rnse = r
 				reqMask |= f.reqMask
 				continue
@@ -185,7 +185,7 @@ func (u *unmarshalInfo) unmarshal(m pointer, b []byte) error {
 			if err != errInternalBadWireType {
 				return err
 			}
-			// Fragments with bad wire type are treated as unknown ***REMOVED***elds.
+			// Fragments with bad wire type are treated as unknown fields.
 		}
 
 		// Unknown tag.
@@ -199,7 +199,7 @@ func (u *unmarshalInfo) unmarshal(m pointer, b []byte) error {
 			continue
 		}
 		// Keep unrecognized data around.
-		// maybe in extensions, maybe in the unrecognized ***REMOVED***eld.
+		// maybe in extensions, maybe in the unrecognized field.
 		z := m.offset(u.unrecognized).toBytes()
 		var emap map[int32]Extension
 		var e Extension
@@ -227,7 +227,7 @@ func (u *unmarshalInfo) unmarshal(m pointer, b []byte) error {
 					z = m.offset(u.bytesExtensions).toBytes()
 					break
 				}
-				panic("no extensions ***REMOVED***eld available")
+				panic("no extensions field available")
 			}
 		}
 		// Use wire type to skip data.
@@ -245,11 +245,11 @@ func (u *unmarshalInfo) unmarshal(m pointer, b []byte) error {
 		}
 	}
 	if rnse != nil {
-		// A required ***REMOVED***eld of a submessage/group is missing. Return that error.
+		// A required field of a submessage/group is missing. Return that error.
 		return rnse
 	}
 	if reqMask != u.reqMask {
-		// A required ***REMOVED***eld of this message is missing.
+		// A required field of this message is missing.
 		for _, n := range u.reqFields {
 			if reqMask&1 == 0 {
 				return &RequiredNotSetError{n}
@@ -260,7 +260,7 @@ func (u *unmarshalInfo) unmarshal(m pointer, b []byte) error {
 	return nil
 }
 
-// computeUnmarshalInfo ***REMOVED***lls in u with information for use
+// computeUnmarshalInfo fills in u with information for use
 // in unmarshaling protocol buffers of type u.typ.
 func (u *unmarshalInfo) computeUnmarshalInfo() {
 	u.lock.Lock()
@@ -278,10 +278,10 @@ func (u *unmarshalInfo) computeUnmarshalInfo() {
 	u.oldExtensions = invalidField
 	u.bytesExtensions = invalidField
 
-	// List of the generated type and offset for each oneof ***REMOVED***eld.
+	// List of the generated type and offset for each oneof field.
 	type oneofField struct {
-		ityp  reflect.Type // interface type of oneof ***REMOVED***eld
-		***REMOVED***eld ***REMOVED***eld        // offset in containing message
+		ityp  reflect.Type // interface type of oneof field
+		field field        // offset in containing message
 	}
 	var oneofFields []oneofField
 
@@ -290,7 +290,7 @@ func (u *unmarshalInfo) computeUnmarshalInfo() {
 		if f.Name == "XXX_unrecognized" {
 			// The byte slice used to hold unrecognized input is special.
 			if f.Type != reflect.TypeOf(([]byte)(nil)) {
-				panic("bad type for XXX_unrecognized ***REMOVED***eld: " + f.Type.Name())
+				panic("bad type for XXX_unrecognized field: " + f.Type.Name())
 			}
 			u.unrecognized = toField(&f)
 			continue
@@ -298,7 +298,7 @@ func (u *unmarshalInfo) computeUnmarshalInfo() {
 		if f.Name == "XXX_InternalExtensions" {
 			// Ditto here.
 			if f.Type != reflect.TypeOf(XXX_InternalExtensions{}) {
-				panic("bad type for XXX_InternalExtensions ***REMOVED***eld: " + f.Type.Name())
+				panic("bad type for XXX_InternalExtensions field: " + f.Type.Name())
 			}
 			u.extensions = toField(&f)
 			if f.Tag.Get("protobuf_messageset") == "1" {
@@ -307,15 +307,15 @@ func (u *unmarshalInfo) computeUnmarshalInfo() {
 			continue
 		}
 		if f.Name == "XXX_extensions" {
-			// An older form of the extensions ***REMOVED***eld.
+			// An older form of the extensions field.
 			if f.Type == reflect.TypeOf((map[int32]Extension)(nil)) {
 				u.oldExtensions = toField(&f)
 				continue
-			} ***REMOVED*** if f.Type == reflect.TypeOf(([]byte)(nil)) {
+			} else if f.Type == reflect.TypeOf(([]byte)(nil)) {
 				u.bytesExtensions = toField(&f)
 				continue
 			}
-			panic("bad type for XXX_extensions ***REMOVED***eld: " + f.Type.Name())
+			panic("bad type for XXX_extensions field: " + f.Type.Name())
 		}
 		if f.Name == "XXX_NoUnkeyedLiteral" || f.Name == "XXX_sizecache" {
 			continue
@@ -331,39 +331,39 @@ func (u *unmarshalInfo) computeUnmarshalInfo() {
 		tags := f.Tag.Get("protobuf")
 		tagArray := strings.Split(tags, ",")
 		if len(tagArray) < 2 {
-			panic("protobuf tag not enough ***REMOVED***elds in " + t.Name() + "." + f.Name + ": " + tags)
+			panic("protobuf tag not enough fields in " + t.Name() + "." + f.Name + ": " + tags)
 		}
 		tag, err := strconv.Atoi(tagArray[1])
 		if err != nil {
-			panic("protobuf tag ***REMOVED***eld not an integer: " + tagArray[1])
+			panic("protobuf tag field not an integer: " + tagArray[1])
 		}
 
 		name := ""
 		for _, tag := range tagArray[3:] {
-			if strings.HasPre***REMOVED***x(tag, "name=") {
+			if strings.HasPrefix(tag, "name=") {
 				name = tag[5:]
 			}
 		}
 
-		// Extract unmarshaling function from the ***REMOVED***eld (its type and tags).
-		unmarshal := ***REMOVED***eldUnmarshaler(&f)
+		// Extract unmarshaling function from the field (its type and tags).
+		unmarshal := fieldUnmarshaler(&f)
 
-		// Required ***REMOVED***eld?
+		// Required field?
 		var reqMask uint64
 		if tagArray[2] == "req" {
 			bit := len(u.reqFields)
 			u.reqFields = append(u.reqFields, name)
 			reqMask = uint64(1) << uint(bit)
-			// TODO: if we have more than 64 required ***REMOVED***elds, we end up
-			// not verifying that all required ***REMOVED***elds are present.
-			// Fix this, perhaps using a count of required ***REMOVED***elds?
+			// TODO: if we have more than 64 required fields, we end up
+			// not verifying that all required fields are present.
+			// Fix this, perhaps using a count of required fields?
 		}
 
 		// Store the info in the correct slot in the message.
 		u.setTag(tag, toField(&f), unmarshal, reqMask)
 	}
 
-	// Find any types associated with oneof ***REMOVED***elds.
+	// Find any types associated with oneof fields.
 	// TODO: XXX_OneofFuncs returns more info than we need.  Get rid of some of it?
 	fn := reflect.Zero(reflect.PtrTo(t)).MethodByName("XXX_OneofFuncs")
 	// gogo: len(oneofFields) > 0 is needed for embedded oneof messages, without a marshaler and unmarshaler
@@ -374,15 +374,15 @@ func (u *unmarshalInfo) computeUnmarshalInfo() {
 			tptr := reflect.ValueOf(v.Interface()).Type() // *Msg_X
 			typ := tptr.Elem()                            // Msg_X
 
-			f := typ.Field(0) // oneof implementers have one ***REMOVED***eld
-			baseUnmarshal := ***REMOVED***eldUnmarshaler(&f)
+			f := typ.Field(0) // oneof implementers have one field
+			baseUnmarshal := fieldUnmarshaler(&f)
 			tagstr := strings.Split(f.Tag.Get("protobuf"), ",")[1]
 			tag, err := strconv.Atoi(tagstr)
 			if err != nil {
-				panic("protobuf tag ***REMOVED***eld not an integer: " + tagstr)
+				panic("protobuf tag field not an integer: " + tagstr)
 			}
 
-			// Find the oneof ***REMOVED***eld that this struct implements.
+			// Find the oneof field that this struct implements.
 			// Might take O(n^2) to process all of the oneofs, but who cares.
 			for _, of := range oneofFields {
 				if tptr.Implements(of.ityp) {
@@ -390,7 +390,7 @@ func (u *unmarshalInfo) computeUnmarshalInfo() {
 					// That lets us know where this struct should be stored
 					// when we encounter it during unmarshaling.
 					unmarshal := makeUnmarshalOneof(typ, of.ityp, baseUnmarshal)
-					u.setTag(tag, of.***REMOVED***eld, unmarshal, 0)
+					u.setTag(tag, of.field, unmarshal, 0)
 				}
 			}
 		}
@@ -400,7 +400,7 @@ func (u *unmarshalInfo) computeUnmarshalInfo() {
 	fn = reflect.Zero(reflect.PtrTo(t)).MethodByName("ExtensionRangeArray")
 	if fn.IsValid() {
 		if !u.extensions.IsValid() && !u.oldExtensions.IsValid() && !u.bytesExtensions.IsValid() {
-			panic("a message with extensions, but no extensions ***REMOVED***eld in " + t.Name())
+			panic("a message with extensions, but no extensions field in " + t.Name())
 		}
 		u.extensionRanges = fn.Call(nil)[0].Interface().([]ExtensionRange)
 	}
@@ -413,18 +413,18 @@ func (u *unmarshalInfo) computeUnmarshalInfo() {
 		return nil, fmt.Errorf("proto: %s: illegal tag 0 (wire type %d)", t, w)
 	}, 0)
 
-	// Set mask for required ***REMOVED***eld check.
+	// Set mask for required field check.
 	u.reqMask = uint64(1)<<uint(len(u.reqFields)) - 1
 
 	atomic.StoreInt32(&u.initialized, 1)
 }
 
 // setTag stores the unmarshal information for the given tag.
-// tag = tag # for ***REMOVED***eld
-// ***REMOVED***eld/unmarshal = unmarshal info for that ***REMOVED***eld.
-// reqMask = if required, bitmask for ***REMOVED***eld position in required ***REMOVED***eld list. 0 otherwise.
-func (u *unmarshalInfo) setTag(tag int, ***REMOVED***eld ***REMOVED***eld, unmarshal unmarshaler, reqMask uint64) {
-	i := unmarshalFieldInfo{***REMOVED***eld: ***REMOVED***eld, unmarshal: unmarshal, reqMask: reqMask}
+// tag = tag # for field
+// field/unmarshal = unmarshal info for that field.
+// reqMask = if required, bitmask for field position in required field list. 0 otherwise.
+func (u *unmarshalInfo) setTag(tag int, field field, unmarshal unmarshaler, reqMask uint64) {
+	i := unmarshalFieldInfo{field: field, unmarshal: unmarshal, reqMask: reqMask}
 	n := u.typ.NumField()
 	if tag >= 0 && (tag < 16 || tag < 2*n) { // TODO: what are the right numbers here?
 		for len(u.dense) <= tag {
@@ -439,15 +439,15 @@ func (u *unmarshalInfo) setTag(tag int, ***REMOVED***eld ***REMOVED***eld, unmar
 	u.sparse[uint64(tag)] = i
 }
 
-// ***REMOVED***eldUnmarshaler returns an unmarshaler for the given ***REMOVED***eld.
-func ***REMOVED***eldUnmarshaler(f *reflect.StructField) unmarshaler {
+// fieldUnmarshaler returns an unmarshaler for the given field.
+func fieldUnmarshaler(f *reflect.StructField) unmarshaler {
 	if f.Type.Kind() == reflect.Map {
 		return makeUnmarshalMap(f)
 	}
 	return typeUnmarshaler(f.Type, f.Tag.Get("protobuf"))
 }
 
-// typeUnmarshaler returns an unmarshaler for the given ***REMOVED***eld type / ***REMOVED***eld tag pair.
+// typeUnmarshaler returns an unmarshaler for the given field type / field tag pair.
 func typeUnmarshaler(t reflect.Type, tags string) unmarshaler {
 	tagArray := strings.Split(tags, ",")
 	encoding := tagArray[0]
@@ -456,10 +456,10 @@ func typeUnmarshaler(t reflect.Type, tags string) unmarshaler {
 	isTime := false
 	isDuration := false
 	for _, tag := range tagArray[3:] {
-		if strings.HasPre***REMOVED***x(tag, "name=") {
+		if strings.HasPrefix(tag, "name=") {
 			name = tag[5:]
 		}
-		if strings.HasPre***REMOVED***x(tag, "customtype=") {
+		if strings.HasPrefix(tag, "customtype=") {
 			ctype = true
 		}
 		if tag == "stdtime" {
@@ -491,7 +491,7 @@ func typeUnmarshaler(t reflect.Type, tags string) unmarshaler {
 				return makeUnmarshalCustomPtr(getUnmarshalInfo(t), name)
 			}
 			return makeUnmarshalCustom(getUnmarshalInfo(t), name)
-		} ***REMOVED*** {
+		} else {
 			panic(fmt.Sprintf("custom type: type: %v, does not implement the proto.custom interface", t))
 		}
 	}
@@ -538,7 +538,7 @@ func typeUnmarshaler(t reflect.Type, tags string) unmarshaler {
 		return unmarshalBoolValue
 	case reflect.Int32:
 		switch encoding {
-		case "***REMOVED***xed32":
+		case "fixed32":
 			if pointer {
 				return unmarshalFixedS32Ptr
 			}
@@ -566,7 +566,7 @@ func typeUnmarshaler(t reflect.Type, tags string) unmarshaler {
 		}
 	case reflect.Int64:
 		switch encoding {
-		case "***REMOVED***xed64":
+		case "fixed64":
 			if pointer {
 				return unmarshalFixedS64Ptr
 			}
@@ -593,7 +593,7 @@ func typeUnmarshaler(t reflect.Type, tags string) unmarshaler {
 		}
 	case reflect.Uint32:
 		switch encoding {
-		case "***REMOVED***xed32":
+		case "fixed32":
 			if pointer {
 				return unmarshalFixed32Ptr
 			}
@@ -612,7 +612,7 @@ func typeUnmarshaler(t reflect.Type, tags string) unmarshaler {
 		}
 	case reflect.Uint64:
 		switch encoding {
-		case "***REMOVED***xed64":
+		case "fixed64":
 			if pointer {
 				return unmarshalFixed64Ptr
 			}
@@ -664,7 +664,7 @@ func typeUnmarshaler(t reflect.Type, tags string) unmarshaler {
 		}
 		return unmarshalStringValue
 	case reflect.Struct:
-		// message or group ***REMOVED***eld
+		// message or group field
 		if !pointer {
 			switch encoding {
 			case "bytes":
@@ -690,7 +690,7 @@ func typeUnmarshaler(t reflect.Type, tags string) unmarshaler {
 	panic(fmt.Sprintf("unmarshaler not found type:%s encoding:%s", t, encoding))
 }
 
-// Below are all the unmarshalers for individual ***REMOVED***elds of various types.
+// Below are all the unmarshalers for individual fields of various types.
 
 func unmarshalInt64Value(b []byte, f pointer, w int) ([]byte, error) {
 	if w != WireVarint {
@@ -1618,9 +1618,9 @@ func makeUnmarshalMessagePtr(sub *unmarshalInfo, name string) unmarshaler {
 		if x > uint64(len(b)) {
 			return nil, io.ErrUnexpectedEOF
 		}
-		// First read the message ***REMOVED***eld to see if something is there.
+		// First read the message field to see if something is there.
 		// The semantics of multiple submessages are weird.  Instead of
-		// the last one winning (as it is for all other ***REMOVED***elds), multiple
+		// the last one winning (as it is for all other fields), multiple
 		// submessages are merged.
 		v := f.getPointer()
 		if v.isNil() {
@@ -1630,8 +1630,8 @@ func makeUnmarshalMessagePtr(sub *unmarshalInfo, name string) unmarshaler {
 		err := sub.unmarshal(v, b[:x])
 		if err != nil {
 			if r, ok := err.(*RequiredNotSetError); ok {
-				r.***REMOVED***eld = name + "." + r.***REMOVED***eld
-			} ***REMOVED*** {
+				r.field = name + "." + r.field
+			} else {
 				return nil, err
 			}
 		}
@@ -1656,8 +1656,8 @@ func makeUnmarshalMessageSlicePtr(sub *unmarshalInfo, name string) unmarshaler {
 		err := sub.unmarshal(v, b[:x])
 		if err != nil {
 			if r, ok := err.(*RequiredNotSetError); ok {
-				r.***REMOVED***eld = name + "." + r.***REMOVED***eld
-			} ***REMOVED*** {
+				r.field = name + "." + r.field
+			} else {
 				return nil, err
 			}
 		}
@@ -1671,7 +1671,7 @@ func makeUnmarshalGroupPtr(sub *unmarshalInfo, name string) unmarshaler {
 		if w != WireStartGroup {
 			return b, errInternalBadWireType
 		}
-		x, y := ***REMOVED***ndEndGroup(b)
+		x, y := findEndGroup(b)
 		if x < 0 {
 			return nil, io.ErrUnexpectedEOF
 		}
@@ -1683,8 +1683,8 @@ func makeUnmarshalGroupPtr(sub *unmarshalInfo, name string) unmarshaler {
 		err := sub.unmarshal(v, b[:x])
 		if err != nil {
 			if r, ok := err.(*RequiredNotSetError); ok {
-				r.***REMOVED***eld = name + "." + r.***REMOVED***eld
-			} ***REMOVED*** {
+				r.field = name + "." + r.field
+			} else {
 				return nil, err
 			}
 		}
@@ -1697,7 +1697,7 @@ func makeUnmarshalGroupSlicePtr(sub *unmarshalInfo, name string) unmarshaler {
 		if w != WireStartGroup {
 			return b, errInternalBadWireType
 		}
-		x, y := ***REMOVED***ndEndGroup(b)
+		x, y := findEndGroup(b)
 		if x < 0 {
 			return nil, io.ErrUnexpectedEOF
 		}
@@ -1705,8 +1705,8 @@ func makeUnmarshalGroupSlicePtr(sub *unmarshalInfo, name string) unmarshaler {
 		err := sub.unmarshal(v, b[:x])
 		if err != nil {
 			if r, ok := err.(*RequiredNotSetError); ok {
-				r.***REMOVED***eld = name + "." + r.***REMOVED***eld
-			} ***REMOVED*** {
+				r.field = name + "." + r.field
+			} else {
 				return nil, err
 			}
 		}
@@ -1722,7 +1722,7 @@ func makeUnmarshalMap(f *reflect.StructField) unmarshaler {
 	tagArray := strings.Split(f.Tag.Get("protobuf"), ",")
 	valTags := strings.Split(f.Tag.Get("protobuf_val"), ",")
 	for _, t := range tagArray {
-		if strings.HasPre***REMOVED***x(t, "customtype=") {
+		if strings.HasPrefix(t, "customtype=") {
 			valTags = append(valTags, t)
 		}
 		if t == "stdtime" {
@@ -1737,7 +1737,7 @@ func makeUnmarshalMap(f *reflect.StructField) unmarshaler {
 	return func(b []byte, f pointer, w int) ([]byte, error) {
 		// The map entry is a submessage. Figure out how big it is.
 		if w != WireBytes {
-			return nil, fmt.Errorf("proto: bad wiretype for map ***REMOVED***eld: got %d want %d", w, WireBytes)
+			return nil, fmt.Errorf("proto: bad wiretype for map field: got %d want %d", w, WireBytes)
 		}
 		x, n := decodeVarint(b)
 		if n == 0 {
@@ -1782,7 +1782,7 @@ func makeUnmarshalMap(f *reflect.StructField) unmarshaler {
 				return nil, err
 			}
 
-			// Skip past unknown ***REMOVED***elds.
+			// Skip past unknown fields.
 			b, err = skipField(b, wire)
 			if err != nil {
 				return nil, err
@@ -1802,7 +1802,7 @@ func makeUnmarshalMap(f *reflect.StructField) unmarshaler {
 	}
 }
 
-// makeUnmarshalOneof makes an unmarshaler for oneof ***REMOVED***elds.
+// makeUnmarshalOneof makes an unmarshaler for oneof fields.
 // for:
 // message Msg {
 //   oneof F {
@@ -1811,25 +1811,25 @@ func makeUnmarshalMap(f *reflect.StructField) unmarshaler {
 //   }
 // }
 // typ is the type of the concrete entry for a oneof case (e.g. Msg_X).
-// ityp is the interface type of the oneof ***REMOVED***eld (e.g. isMsg_F).
+// ityp is the interface type of the oneof field (e.g. isMsg_F).
 // unmarshal is the unmarshaler for the base type of the oneof case (e.g. int64).
 // Note that this function will be called once for each case in the oneof.
 func makeUnmarshalOneof(typ, ityp reflect.Type, unmarshal unmarshaler) unmarshaler {
 	sf := typ.Field(0)
-	***REMOVED***eld0 := toField(&sf)
+	field0 := toField(&sf)
 	return func(b []byte, f pointer, w int) ([]byte, error) {
 		// Allocate holder for value.
 		v := reflect.New(typ)
 
 		// Unmarshal data into holder.
-		// We unmarshal into the ***REMOVED***rst ***REMOVED***eld of the holder object.
+		// We unmarshal into the first field of the holder object.
 		var err error
-		b, err = unmarshal(b, valToPointer(v).offset(***REMOVED***eld0), w)
+		b, err = unmarshal(b, valToPointer(v).offset(field0), w)
 		if err != nil {
 			return nil, err
 		}
 
-		// Write pointer to holder into target ***REMOVED***eld.
+		// Write pointer to holder into target field.
 		f.asPointerTo(ityp).Elem().Set(v)
 
 		return b, nil
@@ -1839,7 +1839,7 @@ func makeUnmarshalOneof(typ, ityp reflect.Type, unmarshal unmarshaler) unmarshal
 // Error used by decode internally.
 var errInternalBadWireType = errors.New("proto: internal error: bad wiretype")
 
-// skipField skips past a ***REMOVED***eld of type wire and returns the remaining bytes.
+// skipField skips past a field of type wire and returns the remaining bytes.
 func skipField(b []byte, wire int) ([]byte, error) {
 	switch wire {
 	case WireVarint:
@@ -1865,7 +1865,7 @@ func skipField(b []byte, wire int) ([]byte, error) {
 		}
 		b = b[uint64(k)+m:]
 	case WireStartGroup:
-		_, i := ***REMOVED***ndEndGroup(b)
+		_, i := findEndGroup(b)
 		if i == -1 {
 			return b, io.ErrUnexpectedEOF
 		}
@@ -1876,12 +1876,12 @@ func skipField(b []byte, wire int) ([]byte, error) {
 	return b, nil
 }
 
-// ***REMOVED***ndEndGroup ***REMOVED***nds the index of the next EndGroup tag.
-// Groups may be nested, so the "next" EndGroup tag is the ***REMOVED***rst
+// findEndGroup finds the index of the next EndGroup tag.
+// Groups may be nested, so the "next" EndGroup tag is the first
 // unpaired EndGroup.
-// ***REMOVED***ndEndGroup returns the indexes of the start and end of the EndGroup tag.
-// Returns (-1,-1) if it can't ***REMOVED***nd one.
-func ***REMOVED***ndEndGroup(b []byte) (int, int) {
+// findEndGroup returns the indexes of the start and end of the EndGroup tag.
+// Returns (-1,-1) if it can't find one.
+func findEndGroup(b []byte) (int, int) {
 	depth := 1
 	i := 0
 	for {

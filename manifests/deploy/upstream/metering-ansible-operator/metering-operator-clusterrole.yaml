@@ -11,7 +11,7 @@ rules:
     - get
     - list
   - apiGroups:
-    - con***REMOVED***g.openshift.io
+    - config.openshift.io
     resources:
     - networks
     verbs:

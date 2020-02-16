@@ -42,11 +42,11 @@ func (d DialWrapper) DialContext(ctx context.Context, network, address string) (
 
 type TLSDialer struct {
 	dialer net.Dialer
-	*tls.Con***REMOVED***g
+	*tls.Config
 }
 
 func (d TLSDialer) Dial(network, address string) (net.Conn, error) {
-	return tls.DialWithDialer(&d.dialer, network, address, d.Con***REMOVED***g)
+	return tls.DialWithDialer(&d.dialer, network, address, d.Config)
 }
 
 func (d TLSDialer) DialTimeout(network, address string, timeout time.Duration) (net.Conn, error) {
@@ -60,7 +60,7 @@ func (d TLSDialer) DialContext(ctx context.Context, network, address string) (ne
 	if err != nil {
 		return nil, err
 	}
-	tlsConn := tls.Client(conn, d.Con***REMOVED***g)
+	tlsConn := tls.Client(conn, d.Config)
 	err = tlsConn.Handshake()
 	if err != nil {
 		return nil, err

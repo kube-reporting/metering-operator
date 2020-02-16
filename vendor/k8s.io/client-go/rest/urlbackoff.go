@@ -2,7 +2,7 @@
 Copyright 2015 The Kubernetes Authors.
 
 Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this ***REMOVED***le except in compliance with the License.
+you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
 
     http://www.apache.org/licenses/LICENSE-2.0
@@ -10,7 +10,7 @@ You may obtain a copy of the License at
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the speci***REMOVED***c language governing permissions and
+See the License for the specific language governing permissions and
 limitations under the License.
 */
 
@@ -27,7 +27,7 @@ import (
 
 // Set of resp. Codes that we backoff for.
 // In general these should be errors that indicate a server is overloaded.
-// These shouldn't be con***REMOVED***gured by any user, we set them based on conventions
+// These shouldn't be configured by any user, we set them based on conventions
 // described in
 var serverIsOverloadedSet = sets.NewInt(429)
 var maxResponseCode = 499
@@ -39,13 +39,13 @@ type BackoffManager interface {
 }
 
 // URLBackoff struct implements the semantics on top of Backoff which
-// we need for URL speci***REMOVED***c exponential backoff.
+// we need for URL specific exponential backoff.
 type URLBackoff struct {
 	// Uses backoff as underlying implementation.
 	Backoff *flowcontrol.Backoff
 }
 
-// NoBackoff is a stub implementation, can be used for mocking or ***REMOVED*** as a default.
+// NoBackoff is a stub implementation, can be used for mocking or else as a default.
 type NoBackoff struct {
 }
 
@@ -72,7 +72,7 @@ func (b *URLBackoff) Disable() {
 // For example, 127.0.0.1:8080/api/v2/abcde -> 127.0.0.1:8080.
 func (b *URLBackoff) baseUrlKey(rawurl *url.URL) string {
 	// Simple implementation for now, just the host.
-	// We may backoff speci***REMOVED***c paths (i.e. "pods") differentially
+	// We may backoff specific paths (i.e. "pods") differentially
 	// in the future.
 	host, err := url.Parse(rawurl.String())
 	if err != nil {
@@ -88,7 +88,7 @@ func (b *URLBackoff) UpdateBackoff(actualUrl *url.URL, err error, responseCode i
 	if responseCode > maxResponseCode || serverIsOverloadedSet.Has(responseCode) {
 		b.Backoff.Next(b.baseUrlKey(actualUrl), b.Backoff.Clock.Now())
 		return
-	} ***REMOVED*** if responseCode >= 300 || err != nil {
+	} else if responseCode >= 300 || err != nil {
 		klog.V(4).Infof("Client is returning errors: code %v, error %v", responseCode, err)
 	}
 

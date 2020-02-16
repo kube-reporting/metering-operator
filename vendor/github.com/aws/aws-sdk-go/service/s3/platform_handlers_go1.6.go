@@ -15,7 +15,7 @@ func platformRequestHandlers(r *request.Request) {
 }
 
 func add100Continue(r *request.Request) {
-	if aws.BoolValue(r.Con***REMOVED***g.S3Disable100Continue) {
+	if aws.BoolValue(r.Config.S3Disable100Continue) {
 		return
 	}
 	if r.HTTPRequest.ContentLength < 1024*1024*2 {

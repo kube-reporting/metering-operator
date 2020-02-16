@@ -15,7 +15,7 @@ var (
 	ErrPageNotAvailable = errors.New("The requested page does not exist.")
 )
 
-// Page must be satis***REMOVED***ed by the result type of any resource collection.
+// Page must be satisfied by the result type of any resource collection.
 // It allows clients to interact with the resource uniformly, regardless of whether or not or how it's paginated.
 // Generally, rather than implementing this interface directly, implementors should embed one of the concrete PageBase structs,
 // instead.
@@ -33,7 +33,7 @@ type Page interface {
 	GetBody() interface{}
 }
 
-// Pager knows how to advance through a speci***REMOVED***c resource collection, one page at a time.
+// Pager knows how to advance through a specific resource collection, one page at a time.
 type Pager struct {
 	client *gophercloud.ServiceClient
 
@@ -41,7 +41,7 @@ type Pager struct {
 
 	createPage func(r PageResult) Page
 
-	***REMOVED***rstPage Page
+	firstPage Page
 
 	Err error
 
@@ -49,8 +49,8 @@ type Pager struct {
 	Headers map[string]string
 }
 
-// NewPager constructs a manually-con***REMOVED***gured pager.
-// Supply the URL for the ***REMOVED***rst page, a function that requests a speci***REMOVED***c page given a URL, and a function that counts a page.
+// NewPager constructs a manually-configured pager.
+// Supply the URL for the first page, a function that requests a specific page given a URL, and a function that counts a page.
 func NewPager(client *gophercloud.ServiceClient, initialURL string, createPage func(r PageResult) Page) Pager {
 	return Pager{
 		client:     client,
@@ -93,11 +93,11 @@ func (p Pager) EachPage(handler func(Page) (bool, error)) error {
 	for {
 		var currentPage Page
 
-		// if ***REMOVED***rst page has already been fetched, no need to fetch it again
-		if p.***REMOVED***rstPage != nil {
-			currentPage = p.***REMOVED***rstPage
-			p.***REMOVED***rstPage = nil
-		} ***REMOVED*** {
+		// if first page has already been fetched, no need to fetch it again
+		if p.firstPage != nil {
+			currentPage = p.firstPage
+			p.firstPage = nil
+		} else {
 			var err error
 			currentPage, err = p.fetchNextPage(currentURL)
 			if err != nil {
@@ -136,29 +136,29 @@ func (p Pager) EachPage(handler func(Page) (bool, error)) error {
 func (p Pager) AllPages() (Page, error) {
 	// pagesSlice holds all the pages until they get converted into as Page Body.
 	var pagesSlice []interface{}
-	// body will contain the ***REMOVED***nal concatenated Page body.
+	// body will contain the final concatenated Page body.
 	var body reflect.Value
 
-	// Grab a ***REMOVED***rst page to ascertain the page body type.
-	***REMOVED***rstPage, err := p.fetchNextPage(p.initialURL)
+	// Grab a first page to ascertain the page body type.
+	firstPage, err := p.fetchNextPage(p.initialURL)
 	if err != nil {
 		return nil, err
 	}
 	// Store the page type so we can use reflection to create a new mega-page of
 	// that type.
-	pageType := reflect.TypeOf(***REMOVED***rstPage)
+	pageType := reflect.TypeOf(firstPage)
 
-	// if it's a single page, just return the ***REMOVED***rstPage (***REMOVED***rst page)
+	// if it's a single page, just return the firstPage (first page)
 	if _, found := pageType.FieldByName("SinglePageBase"); found {
-		return ***REMOVED***rstPage, nil
+		return firstPage, nil
 	}
 
-	// store the ***REMOVED***rst page to avoid getting it twice
-	p.***REMOVED***rstPage = ***REMOVED***rstPage
+	// store the first page to avoid getting it twice
+	p.firstPage = firstPage
 
 	// Switch on the page body type. Recognized types are `map[string]interface{}`,
 	// `[]byte`, and `[]interface{}`.
-	switch pb := ***REMOVED***rstPage.GetBody().(type) {
+	switch pb := firstPage.GetBody().(type) {
 	case map[string]interface{}:
 		// key is the map key for the page body if the body type is `map[string]interface{}`.
 		var key string
@@ -167,8 +167,8 @@ func (p Pager) AllPages() (Page, error) {
 			b := page.GetBody().(map[string]interface{})
 			for k, v := range b {
 				// If it's a linked page, we don't want the `links`, we want the other one.
-				if !strings.HasSuf***REMOVED***x(k, "links") {
-					// check the ***REMOVED***eld's type. we only want []interface{} (which is really []map[string]interface{})
+				if !strings.HasSuffix(k, "links") {
+					// check the field's type. we only want []interface{} (which is really []map[string]interface{})
 					switch vt := v.(type) {
 					case []interface{}:
 						key = k
@@ -230,7 +230,7 @@ func (p Pager) AllPages() (Page, error) {
 		return nil, err
 	}
 
-	// Each `Extract*` function is expecting a speci***REMOVED***c type of page coming back,
+	// Each `Extract*` function is expecting a specific type of page coming back,
 	// otherwise the type assertion in those functions will fail. pageType is needed
 	// to create a type in this method that has the same type that the `Extract*`
 	// function is expecting and set the Body of that object to the concatenated

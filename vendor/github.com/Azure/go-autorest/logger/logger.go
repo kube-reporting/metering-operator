@@ -3,7 +3,7 @@ package logger
 // Copyright 2017 Microsoft Corporation
 //
 //  Licensed under the Apache License, Version 2.0 (the "License");
-//  you may not use this ***REMOVED***le except in compliance with the License.
+//  you may not use this file except in compliance with the License.
 //  You may obtain a copy of the License at
 //
 //      http://www.apache.org/licenses/LICENSE-2.0
@@ -11,7 +11,7 @@ package logger
 //  Unless required by applicable law or agreed to in writing, software
 //  distributed under the License is distributed on an "AS IS" BASIS,
 //  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-//  See the License for the speci***REMOVED***c language governing permissions and
+//  See the License for the specific language governing permissions and
 //  limitations under the License.
 
 import (
@@ -30,7 +30,7 @@ import (
 // LevelType tells a logger the minimum level to log. When code reports a log entry,
 // the LogLevel indicates the level of the log entry. The logger only records entries
 // whose level is at least the level it was told to log. See the Log* constants.
-// For example, if a logger is con***REMOVED***gured with LogError, then LogError, LogPanic,
+// For example, if a logger is configured with LogError, then LogError, LogPanic,
 // and LogFatal entries will be logged; lower level entries are ignored.
 type LevelType uint32
 
@@ -68,7 +68,7 @@ const (
 	logUnknown = "UNKNOWN"
 )
 
-// ParseLevel converts the speci***REMOVED***ed string into the corresponding LevelType.
+// ParseLevel converts the specified string into the corresponding LevelType.
 func ParseLevel(s string) (lt LevelType, err error) {
 	switch strings.ToUpper(s) {
 	case logFatal:
@@ -111,16 +111,16 @@ func (lt LevelType) String() string {
 	}
 }
 
-// Filter de***REMOVED***nes functions for ***REMOVED***ltering HTTP request/response content.
+// Filter defines functions for filtering HTTP request/response content.
 type Filter struct {
-	// URL returns a potentially modi***REMOVED***ed string representation of a request URL.
+	// URL returns a potentially modified string representation of a request URL.
 	URL func(u *url.URL) string
 
-	// Header returns a potentially modi***REMOVED***ed set of values for the speci***REMOVED***ed key.
+	// Header returns a potentially modified set of values for the specified key.
 	// To completely exclude the header key/values return false.
 	Header func(key string, val []string) (bool, []string)
 
-	// Body returns a potentially modi***REMOVED***ed request/response body.
+	// Body returns a potentially modified request/response body.
 	Body func(b []byte) []byte
 }
 
@@ -145,25 +145,25 @@ func (f Filter) processBody(b []byte) []byte {
 	return f.Body(b)
 }
 
-// Writer de***REMOVED***nes methods for writing to a logging facility.
+// Writer defines methods for writing to a logging facility.
 type Writer interface {
-	// Writeln writes the speci***REMOVED***ed message with the standard log entry header and new-line character.
+	// Writeln writes the specified message with the standard log entry header and new-line character.
 	Writeln(level LevelType, message string)
 
-	// Writef writes the speci***REMOVED***ed format speci***REMOVED***er with the standard log entry header and no new-line character.
+	// Writef writes the specified format specifier with the standard log entry header and no new-line character.
 	Writef(level LevelType, format string, a ...interface{})
 
-	// WriteRequest writes the speci***REMOVED***ed HTTP request to the logger if the log level is greater than
+	// WriteRequest writes the specified HTTP request to the logger if the log level is greater than
 	// or equal to LogInfo.  The request body, if set, is logged at level LogDebug or higher.
-	// Custom ***REMOVED***lters can be speci***REMOVED***ed to exclude URL, header, and/or body content from the log.
+	// Custom filters can be specified to exclude URL, header, and/or body content from the log.
 	// By default no request content is excluded.
-	WriteRequest(req *http.Request, ***REMOVED***lter Filter)
+	WriteRequest(req *http.Request, filter Filter)
 
-	// WriteResponse writes the speci***REMOVED***ed HTTP response to the logger if the log level is greater than
+	// WriteResponse writes the specified HTTP response to the logger if the log level is greater than
 	// or equal to LogInfo.  The response body, if set, is logged at level LogDebug or higher.
-	// Custom ***REMOVED***lters can be speci***REMOVED***ed to exclude URL, header, and/or body content from the log.
+	// Custom filters can be specified to exclude URL, header, and/or body content from the log.
 	// By default no response content is excluded.
-	WriteResponse(resp *http.Response, ***REMOVED***lter Filter)
+	WriteResponse(resp *http.Response, filter Filter)
 }
 
 // Instance is the default log writer initialized during package init.
@@ -173,9 +173,9 @@ var Instance Writer
 // default log level
 var logLevel = LogNone
 
-// Level returns the value speci***REMOVED***ed in AZURE_GO_AUTOREST_LOG_LEVEL.
-// If no value was speci***REMOVED***ed the default value is LogNone.
-// Custom loggers can call this to retrieve the con***REMOVED***gured log level.
+// Level returns the value specified in AZURE_GO_AUTOREST_LOG_LEVEL.
+// If no value was specified the default value is LogNone.
+// Custom loggers can call this to retrieve the configured log level.
 func Level() LevelType {
 	return logLevel
 }
@@ -206,15 +206,15 @@ func initDefaultLogger() {
 	lfStr := os.Getenv("AZURE_GO_SDK_LOG_FILE")
 	if strings.EqualFold(lfStr, "stdout") {
 		dest = os.Stdout
-	} ***REMOVED*** if lfStr != "" {
+	} else if lfStr != "" {
 		lf, err := os.Create(lfStr)
 		if err == nil {
 			dest = lf
-		} ***REMOVED*** {
-			fmt.Fprintf(os.Stderr, "go-autorest: failed to create log ***REMOVED***le, using stderr: %s\n", err.Error())
+		} else {
+			fmt.Fprintf(os.Stderr, "go-autorest: failed to create log file, using stderr: %s\n", err.Error())
 		}
 	}
-	Instance = ***REMOVED***leLogger{
+	Instance = fileLogger{
 		logLevel: logLevel,
 		mu:       &sync.Mutex{},
 		logFile:  dest,
@@ -233,17 +233,17 @@ func (nilLogger) WriteRequest(*http.Request, Filter) {}
 func (nilLogger) WriteResponse(*http.Response, Filter) {}
 
 // A File is used instead of a Logger so the stream can be flushed after every write.
-type ***REMOVED***leLogger struct {
+type fileLogger struct {
 	logLevel LevelType
 	mu       *sync.Mutex // for synchronizing writes to logFile
 	logFile  *os.File
 }
 
-func (fl ***REMOVED***leLogger) Writeln(level LevelType, message string) {
+func (fl fileLogger) Writeln(level LevelType, message string) {
 	fl.Writef(level, "%s\n", message)
 }
 
-func (fl ***REMOVED***leLogger) Writef(level LevelType, format string, a ...interface{}) {
+func (fl fileLogger) Writef(level LevelType, format string, a ...interface{}) {
 	if fl.logLevel >= level {
 		fl.mu.Lock()
 		defer fl.mu.Unlock()
@@ -252,15 +252,15 @@ func (fl ***REMOVED***leLogger) Writef(level LevelType, format string, a ...inte
 	}
 }
 
-func (fl ***REMOVED***leLogger) WriteRequest(req *http.Request, ***REMOVED***lter Filter) {
+func (fl fileLogger) WriteRequest(req *http.Request, filter Filter) {
 	if req == nil || fl.logLevel < LogInfo {
 		return
 	}
 	b := &bytes.Buffer{}
-	fmt.Fprintf(b, "%s REQUEST: %s %s\n", entryHeader(LogInfo), req.Method, ***REMOVED***lter.processURL(req.URL))
+	fmt.Fprintf(b, "%s REQUEST: %s %s\n", entryHeader(LogInfo), req.Method, filter.processURL(req.URL))
 	// dump headers
 	for k, v := range req.Header {
-		if ok, mv := ***REMOVED***lter.processHeader(k, v); ok {
+		if ok, mv := filter.processHeader(k, v); ok {
 			fmt.Fprintf(b, "%s: %s\n", k, strings.Join(mv, ","))
 		}
 	}
@@ -268,15 +268,15 @@ func (fl ***REMOVED***leLogger) WriteRequest(req *http.Request, ***REMOVED***lte
 		// dump body
 		body, err := ioutil.ReadAll(req.Body)
 		if err == nil {
-			fmt.Fprintln(b, string(***REMOVED***lter.processBody(body)))
+			fmt.Fprintln(b, string(filter.processBody(body)))
 			if nc, ok := req.Body.(io.Seeker); ok {
 				// rewind to the beginning
 				nc.Seek(0, io.SeekStart)
-			} ***REMOVED*** {
+			} else {
 				// recreate the body
 				req.Body = ioutil.NopCloser(bytes.NewReader(body))
 			}
-		} ***REMOVED*** {
+		} else {
 			fmt.Fprintf(b, "failed to read body: %v\n", err)
 		}
 	}
@@ -286,15 +286,15 @@ func (fl ***REMOVED***leLogger) WriteRequest(req *http.Request, ***REMOVED***lte
 	fl.logFile.Sync()
 }
 
-func (fl ***REMOVED***leLogger) WriteResponse(resp *http.Response, ***REMOVED***lter Filter) {
+func (fl fileLogger) WriteResponse(resp *http.Response, filter Filter) {
 	if resp == nil || fl.logLevel < LogInfo {
 		return
 	}
 	b := &bytes.Buffer{}
-	fmt.Fprintf(b, "%s RESPONSE: %d %s\n", entryHeader(LogInfo), resp.StatusCode, ***REMOVED***lter.processURL(resp.Request.URL))
+	fmt.Fprintf(b, "%s RESPONSE: %d %s\n", entryHeader(LogInfo), resp.StatusCode, filter.processURL(resp.Request.URL))
 	// dump headers
 	for k, v := range resp.Header {
-		if ok, mv := ***REMOVED***lter.processHeader(k, v); ok {
+		if ok, mv := filter.processHeader(k, v); ok {
 			fmt.Fprintf(b, "%s: %s\n", k, strings.Join(mv, ","))
 		}
 	}
@@ -303,9 +303,9 @@ func (fl ***REMOVED***leLogger) WriteResponse(resp *http.Response, ***REMOVED***
 		defer resp.Body.Close()
 		body, err := ioutil.ReadAll(resp.Body)
 		if err == nil {
-			fmt.Fprintln(b, string(***REMOVED***lter.processBody(body)))
+			fmt.Fprintln(b, string(filter.processBody(body)))
 			resp.Body = ioutil.NopCloser(bytes.NewReader(body))
-		} ***REMOVED*** {
+		} else {
 			fmt.Fprintf(b, "failed to read body: %v\n", err)
 		}
 	}
@@ -316,13 +316,13 @@ func (fl ***REMOVED***leLogger) WriteResponse(resp *http.Response, ***REMOVED***
 }
 
 // returns true if the provided body should be included in the log
-func (fl ***REMOVED***leLogger) shouldLogBody(header http.Header, body io.ReadCloser) bool {
+func (fl fileLogger) shouldLogBody(header http.Header, body io.ReadCloser) bool {
 	ct := header.Get("Content-Type")
 	return fl.logLevel >= LogDebug && body != nil && !strings.Contains(ct, "application/octet-stream")
 }
 
 // creates standard header for log entries, it contains a timestamp and the log level
 func entryHeader(level LevelType) string {
-	// this format provides a ***REMOVED***xed number of digits so the size of the timestamp is constant
+	// this format provides a fixed number of digits so the size of the timestamp is constant
 	return fmt.Sprintf("(%s) %s:", time.Now().Format("2006-01-02T15:04:05.0000000Z07:00"), level.String())
 }

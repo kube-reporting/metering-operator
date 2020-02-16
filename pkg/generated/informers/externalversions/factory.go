@@ -16,7 +16,7 @@ import (
 	cache "k8s.io/client-go/tools/cache"
 )
 
-// SharedInformerOption de***REMOVED***nes the functional option type for SharedInformerFactory.
+// SharedInformerOption defines the functional option type for SharedInformerFactory.
 type SharedInformerOption func(*sharedInformerFactory) *sharedInformerFactory
 
 type sharedInformerFactory struct {
@@ -33,17 +33,17 @@ type sharedInformerFactory struct {
 	startedInformers map[reflect.Type]bool
 }
 
-// WithCustomResyncCon***REMOVED***g sets a custom resync period for the speci***REMOVED***ed informer types.
-func WithCustomResyncCon***REMOVED***g(resyncCon***REMOVED***g map[v1.Object]time.Duration) SharedInformerOption {
+// WithCustomResyncConfig sets a custom resync period for the specified informer types.
+func WithCustomResyncConfig(resyncConfig map[v1.Object]time.Duration) SharedInformerOption {
 	return func(factory *sharedInformerFactory) *sharedInformerFactory {
-		for k, v := range resyncCon***REMOVED***g {
+		for k, v := range resyncConfig {
 			factory.customResync[reflect.TypeOf(k)] = v
 		}
 		return factory
 	}
 }
 
-// WithTweakListOptions sets a custom ***REMOVED***lter on all listers of the con***REMOVED***gured SharedInformerFactory.
+// WithTweakListOptions sets a custom filter on all listers of the configured SharedInformerFactory.
 func WithTweakListOptions(tweakListOptions internalinterfaces.TweakListOptionsFunc) SharedInformerOption {
 	return func(factory *sharedInformerFactory) *sharedInformerFactory {
 		factory.tweakListOptions = tweakListOptions
@@ -51,7 +51,7 @@ func WithTweakListOptions(tweakListOptions internalinterfaces.TweakListOptionsFu
 	}
 }
 
-// WithNamespace limits the SharedInformerFactory to the speci***REMOVED***ed namespace.
+// WithNamespace limits the SharedInformerFactory to the specified namespace.
 func WithNamespace(namespace string) SharedInformerOption {
 	return func(factory *sharedInformerFactory) *sharedInformerFactory {
 		factory.namespace = namespace
@@ -65,8 +65,8 @@ func NewSharedInformerFactory(client versioned.Interface, defaultResync time.Dur
 }
 
 // NewFilteredSharedInformerFactory constructs a new instance of sharedInformerFactory.
-// Listers obtained via this SharedInformerFactory will be subject to the same ***REMOVED***lters
-// as speci***REMOVED***ed here.
+// Listers obtained via this SharedInformerFactory will be subject to the same filters
+// as specified here.
 // Deprecated: Please use NewSharedInformerFactoryWithOptions instead
 func NewFilteredSharedInformerFactory(client versioned.Interface, defaultResync time.Duration, namespace string, tweakListOptions internalinterfaces.TweakListOptionsFunc) SharedInformerFactory {
 	return NewSharedInformerFactoryWithOptions(client, defaultResync, WithNamespace(namespace), WithTweakListOptions(tweakListOptions))

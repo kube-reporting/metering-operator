@@ -4,7 +4,7 @@
 // http://github.com/gogo/protobuf
 //
 // Redistribution and use in source and binary forms, with or without
-// modi***REMOVED***cation, are permitted provided that the following conditions are
+// modification, are permitted provided that the following conditions are
 // met:
 //
 //     * Redistributions of source code must retain the above copyright
@@ -77,7 +77,7 @@ func makeMessageRefSliceMarshaler(u *marshalInfo) (sizer, marshaler) {
 
 				if err != nil {
 					if _, ok := err.(*RequiredNotSetError); ok {
-						// Required ***REMOVED***eld in submessage is not set.
+						// Required field in submessage is not set.
 						// We record the error but keep going, to give a complete marshaling.
 						if errreq == nil {
 							errreq = err

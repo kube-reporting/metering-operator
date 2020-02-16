@@ -33,7 +33,7 @@ func (c *FakeHiveTables) Get(name string, options v1.GetOptions) (result *meteri
 	return obj.(*meteringv1.HiveTable), err
 }
 
-// List takes label and ***REMOVED***eld selectors, and returns the list of HiveTables that match those selectors.
+// List takes label and field selectors, and returns the list of HiveTables that match those selectors.
 func (c *FakeHiveTables) List(opts v1.ListOptions) (result *meteringv1.HiveTableList, err error) {
 	obj, err := c.Fake.
 		Invokes(testing.NewListAction(hivetablesResource, hivetablesKind, c.ns, opts), &meteringv1.HiveTableList{})

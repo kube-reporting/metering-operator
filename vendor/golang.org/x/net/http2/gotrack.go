@@ -1,6 +1,6 @@
 // Copyright 2014 The Go Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE ***REMOVED***le.
+// license that can be found in the LICENSE file.
 
 // Defensive debug-only utility to track that functions run on the
 // goroutine that they're supposed to.
@@ -54,7 +54,7 @@ func curGoroutineID() uint64 {
 	b := *bp
 	b = b[:runtime.Stack(b, false)]
 	// Parse the 4707 out of "goroutine 4707 ["
-	b = bytes.TrimPre***REMOVED***x(b, goroutineSpace)
+	b = bytes.TrimPrefix(b, goroutineSpace)
 	i := bytes.IndexByte(b, ' ')
 	if i < 0 {
 		panic(fmt.Sprintf("No space found in %q", b))
@@ -92,7 +92,7 @@ func parseUintBytes(s []byte, base int, bitSize int) (n uint64, err error) {
 		// valid base; nothing to do
 
 	case base == 0:
-		// Look for octal, hex pre***REMOVED***x.
+		// Look for octal, hex prefix.
 		switch {
 		case s[0] == '0' && len(s) > 1 && (s[1] == 'x' || s[1] == 'X'):
 			base = 16
@@ -161,7 +161,7 @@ Error:
 	return n, &strconv.NumError{Func: "ParseUint", Num: string(s0), Err: err}
 }
 
-// Return the ***REMOVED***rst number n such that n*base >= 1<<64.
+// Return the first number n such that n*base >= 1<<64.
 func cutoff64(base int) uint64 {
 	if base < 2 {
 		return 0

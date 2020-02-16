@@ -1,6 +1,6 @@
 // Copyright 2009 The Go Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE ***REMOVED***le.
+// license that can be found in the LICENSE file.
 
 // Windows system calls.
 
@@ -19,7 +19,7 @@ type Handle uintptr
 const (
 	InvalidHandle = ^Handle(0)
 
-	// Flags for De***REMOVED***neDosDevice.
+	// Flags for DefineDosDevice.
 	DDD_EXACT_MATCH_ON_REMOVE = 0x00000004
 	DDD_NO_BROADCAST_SYSTEM   = 0x00000008
 	DDD_RAW_TARGET_PATH       = 0x00000001
@@ -132,15 +132,15 @@ func NewCallbackCDecl(fn interface{}) uintptr {
 //sys	GetVersion() (ver uint32, err error)
 //sys	FormatMessage(flags uint32, msgsrc uintptr, msgid uint32, langid uint32, buf []uint16, args *byte) (n uint32, err error) = FormatMessageW
 //sys	ExitProcess(exitcode uint32)
-//sys	CreateFile(name *uint16, access uint32, mode uint32, sa *SecurityAttributes, createmode uint32, attrs uint32, template***REMOVED***le int32) (handle Handle, err error) [failretval==InvalidHandle] = CreateFileW
+//sys	CreateFile(name *uint16, access uint32, mode uint32, sa *SecurityAttributes, createmode uint32, attrs uint32, templatefile int32) (handle Handle, err error) [failretval==InvalidHandle] = CreateFileW
 //sys	ReadFile(handle Handle, buf []byte, done *uint32, overlapped *Overlapped) (err error)
 //sys	WriteFile(handle Handle, buf []byte, done *uint32, overlapped *Overlapped) (err error)
 //sys	SetFilePointer(handle Handle, lowoffset int32, highoffsetptr *int32, whence uint32) (newlowoffset uint32, err error) [failretval==0xffffffff]
 //sys	CloseHandle(handle Handle) (err error)
 //sys	GetStdHandle(stdhandle uint32) (handle Handle, err error) [failretval==InvalidHandle]
 //sys	SetStdHandle(stdhandle uint32, handle Handle) (err error)
-//sys	***REMOVED***ndFirstFile1(name *uint16, data *win32***REMOVED***nddata1) (handle Handle, err error) [failretval==InvalidHandle] = FindFirstFileW
-//sys	***REMOVED***ndNextFile1(handle Handle, data *win32***REMOVED***nddata1) (err error) = FindNextFileW
+//sys	findFirstFile1(name *uint16, data *win32finddata1) (handle Handle, err error) [failretval==InvalidHandle] = FindFirstFileW
+//sys	findNextFile1(handle Handle, data *win32finddata1) (err error) = FindNextFileW
 //sys	FindClose(handle Handle) (err error)
 //sys	GetFileInformationByHandle(handle Handle, data *ByHandleFileInformation) (err error)
 //sys	GetCurrentDirectory(buflen uint32, buf *uint16) (n uint32, err error) = GetCurrentDirectoryW
@@ -156,7 +156,7 @@ func NewCallbackCDecl(fn interface{}) uintptr {
 //sys	GetSystemTimeAsFileTime(time *Filetime)
 //sys	GetSystemTimePreciseAsFileTime(time *Filetime)
 //sys	GetTimeZoneInformation(tzi *Timezoneinformation) (rc uint32, err error) [failretval==0xffffffff]
-//sys	CreateIoCompletionPort(***REMOVED***lehandle Handle, cphandle Handle, key uint32, threadcnt uint32) (handle Handle, err error)
+//sys	CreateIoCompletionPort(filehandle Handle, cphandle Handle, key uint32, threadcnt uint32) (handle Handle, err error)
 //sys	GetQueuedCompletionStatus(cphandle Handle, qty *uint32, key *uint32, overlapped **Overlapped, timeout uint32) (err error)
 //sys	PostQueuedCompletionStatus(cphandle Handle, qty uint32, key uint32, overlapped *Overlapped) (err error)
 //sys	CancelIo(s Handle) (err error)
@@ -172,7 +172,7 @@ func NewCallbackCDecl(fn interface{}) uintptr {
 //sys	WaitForSingleObject(handle Handle, waitMilliseconds uint32) (event uint32, err error) [failretval==0xffffffff]
 //sys	GetTempPath(buflen uint32, buf *uint16) (n uint32, err error) = GetTempPathW
 //sys	CreatePipe(readhandle *Handle, writehandle *Handle, sa *SecurityAttributes, size uint32) (err error)
-//sys	GetFileType(***REMOVED***lehandle Handle) (n uint32, err error)
+//sys	GetFileType(filehandle Handle) (n uint32, err error)
 //sys	CryptAcquireContext(provhandle *Handle, container *uint16, provider *uint16, provtype uint32, flags uint32) (err error) = advapi32.CryptAcquireContextW
 //sys	CryptReleaseContext(provhandle Handle, flags uint32) (err error) = advapi32.CryptReleaseContext
 //sys	CryptGenRandom(provhandle Handle, buflen uint32, buf *byte) (err error) = advapi32.CryptGenRandom
@@ -205,14 +205,14 @@ func NewCallbackCDecl(fn interface{}) uintptr {
 //sys	ReadDirectoryChanges(handle Handle, buf *byte, buflen uint32, watchSubTree bool, mask uint32, retlen *uint32, overlapped *Overlapped, completionRoutine uintptr) (err error) = kernel32.ReadDirectoryChangesW
 //sys	CertOpenSystemStore(hprov Handle, name *uint16) (store Handle, err error) = crypt32.CertOpenSystemStoreW
 //sys   CertOpenStore(storeProvider uintptr, msgAndCertEncodingType uint32, cryptProv uintptr, flags uint32, para uintptr) (handle Handle, err error) [failretval==InvalidHandle] = crypt32.CertOpenStore
-//sys	CertEnumCerti***REMOVED***catesInStore(store Handle, prevContext *CertContext) (context *CertContext, err error) [failretval==nil] = crypt32.CertEnumCerti***REMOVED***catesInStore
-//sys   CertAddCerti***REMOVED***cateContextToStore(store Handle, certContext *CertContext, addDisposition uint32, storeContext **CertContext) (err error) = crypt32.CertAddCerti***REMOVED***cateContextToStore
+//sys	CertEnumCertificatesInStore(store Handle, prevContext *CertContext) (context *CertContext, err error) [failretval==nil] = crypt32.CertEnumCertificatesInStore
+//sys   CertAddCertificateContextToStore(store Handle, certContext *CertContext, addDisposition uint32, storeContext **CertContext) (err error) = crypt32.CertAddCertificateContextToStore
 //sys	CertCloseStore(store Handle, flags uint32) (err error) = crypt32.CertCloseStore
-//sys   CertGetCerti***REMOVED***cateChain(engine Handle, leaf *CertContext, time *Filetime, additionalStore Handle, para *CertChainPara, flags uint32, reserved uintptr, chainCtx **CertChainContext) (err error) = crypt32.CertGetCerti***REMOVED***cateChain
-//sys   CertFreeCerti***REMOVED***cateChain(ctx *CertChainContext) = crypt32.CertFreeCerti***REMOVED***cateChain
-//sys   CertCreateCerti***REMOVED***cateContext(certEncodingType uint32, certEncoded *byte, encodedLen uint32) (context *CertContext, err error) [failretval==nil] = crypt32.CertCreateCerti***REMOVED***cateContext
-//sys   CertFreeCerti***REMOVED***cateContext(ctx *CertContext) (err error) = crypt32.CertFreeCerti***REMOVED***cateContext
-//sys   CertVerifyCerti***REMOVED***cateChainPolicy(policyOID uintptr, chain *CertChainContext, para *CertChainPolicyPara, status *CertChainPolicyStatus) (err error) = crypt32.CertVerifyCerti***REMOVED***cateChainPolicy
+//sys   CertGetCertificateChain(engine Handle, leaf *CertContext, time *Filetime, additionalStore Handle, para *CertChainPara, flags uint32, reserved uintptr, chainCtx **CertChainContext) (err error) = crypt32.CertGetCertificateChain
+//sys   CertFreeCertificateChain(ctx *CertChainContext) = crypt32.CertFreeCertificateChain
+//sys   CertCreateCertificateContext(certEncodingType uint32, certEncoded *byte, encodedLen uint32) (context *CertContext, err error) [failretval==nil] = crypt32.CertCreateCertificateContext
+//sys   CertFreeCertificateContext(ctx *CertContext) (err error) = crypt32.CertFreeCertificateContext
+//sys   CertVerifyCertificateChainPolicy(policyOID uintptr, chain *CertChainContext, para *CertChainPolicyPara, status *CertChainPolicyStatus) (err error) = crypt32.CertVerifyCertificateChainPolicy
 //sys	RegOpenKeyEx(key Handle, subkey *uint16, options uint32, desiredAccess uint32, result *Handle) (regerrno error) = advapi32.RegOpenKeyExW
 //sys	RegCloseKey(key Handle) (regerrno error) = advapi32.RegCloseKey
 //sys	RegQueryInfoKey(key Handle, class *uint16, classLen *uint32, reserved *uint32, subkeysLen *uint32, maxSubkeyLen *uint32, maxClassLen *uint32, valuesLen *uint32, maxValueNameLen *uint32, maxValueLen *uint32, saLen *uint32, lastWriteTime *Filetime) (regerrno error) = advapi32.RegQueryInfoKeyW
@@ -229,8 +229,8 @@ func NewCallbackCDecl(fn interface{}) uintptr {
 //sys	Process32Next(snapshot Handle, procEntry *ProcessEntry32) (err error) = kernel32.Process32NextW
 //sys	DeviceIoControl(handle Handle, ioControlCode uint32, inBuffer *byte, inBufferSize uint32, outBuffer *byte, outBufferSize uint32, bytesReturned *uint32, overlapped *Overlapped) (err error)
 // This function returns 1 byte BOOLEAN rather than the 4 byte BOOL.
-//sys	CreateSymbolicLink(symlink***REMOVED***lename *uint16, target***REMOVED***lename *uint16, flags uint32) (err error) [failretval&0xff==0] = CreateSymbolicLinkW
-//sys	CreateHardLink(***REMOVED***lename *uint16, existing***REMOVED***lename *uint16, reserved uintptr) (err error) [failretval&0xff==0] = CreateHardLinkW
+//sys	CreateSymbolicLink(symlinkfilename *uint16, targetfilename *uint16, flags uint32) (err error) [failretval&0xff==0] = CreateSymbolicLinkW
+//sys	CreateHardLink(filename *uint16, existingfilename *uint16, reserved uintptr) (err error) [failretval&0xff==0] = CreateHardLinkW
 //sys	GetCurrentThreadId() (id uint32)
 //sys	CreateEvent(eventAttrs *SecurityAttributes, manualReset uint32, initialState uint32, name *uint16) (handle Handle, err error) = kernel32.CreateEventW
 //sys	CreateEventEx(eventAttrs *SecurityAttributes, name *uint16, flags uint32, desiredAccess uint32) (handle Handle, err error) = kernel32.CreateEventExW
@@ -240,21 +240,21 @@ func NewCallbackCDecl(fn interface{}) uintptr {
 //sys	PulseEvent(event Handle) (err error) = kernel32.PulseEvent
 
 // Volume Management Functions
-//sys	De***REMOVED***neDosDevice(flags uint32, deviceName *uint16, targetPath *uint16) (err error) = De***REMOVED***neDosDeviceW
+//sys	DefineDosDevice(flags uint32, deviceName *uint16, targetPath *uint16) (err error) = DefineDosDeviceW
 //sys	DeleteVolumeMountPoint(volumeMountPoint *uint16) (err error) = DeleteVolumeMountPointW
 //sys	FindFirstVolume(volumeName *uint16, bufferLength uint32) (handle Handle, err error) [failretval==InvalidHandle] = FindFirstVolumeW
 //sys	FindFirstVolumeMountPoint(rootPathName *uint16, volumeMountPoint *uint16, bufferLength uint32) (handle Handle, err error) [failretval==InvalidHandle] = FindFirstVolumeMountPointW
-//sys	FindNextVolume(***REMOVED***ndVolume Handle, volumeName *uint16, bufferLength uint32) (err error) = FindNextVolumeW
-//sys	FindNextVolumeMountPoint(***REMOVED***ndVolumeMountPoint Handle, volumeMountPoint *uint16, bufferLength uint32) (err error) = FindNextVolumeMountPointW
-//sys	FindVolumeClose(***REMOVED***ndVolume Handle) (err error)
-//sys	FindVolumeMountPointClose(***REMOVED***ndVolumeMountPoint Handle) (err error)
+//sys	FindNextVolume(findVolume Handle, volumeName *uint16, bufferLength uint32) (err error) = FindNextVolumeW
+//sys	FindNextVolumeMountPoint(findVolumeMountPoint Handle, volumeMountPoint *uint16, bufferLength uint32) (err error) = FindNextVolumeMountPointW
+//sys	FindVolumeClose(findVolume Handle) (err error)
+//sys	FindVolumeMountPointClose(findVolumeMountPoint Handle) (err error)
 //sys	GetDriveType(rootPathName *uint16) (driveType uint32) = GetDriveTypeW
 //sys	GetLogicalDrives() (drivesBitMask uint32, err error) [failretval==0]
 //sys	GetLogicalDriveStrings(bufferLength uint32, buffer *uint16) (n uint32, err error) [failretval==0] = GetLogicalDriveStringsW
-//sys	GetVolumeInformation(rootPathName *uint16, volumeNameBuffer *uint16, volumeNameSize uint32, volumeNameSerialNumber *uint32, maximumComponentLength *uint32, ***REMOVED***leSystemFlags *uint32, ***REMOVED***leSystemNameBuffer *uint16, ***REMOVED***leSystemNameSize uint32) (err error) = GetVolumeInformationW
-//sys	GetVolumeInformationByHandle(***REMOVED***le Handle, volumeNameBuffer *uint16, volumeNameSize uint32, volumeNameSerialNumber *uint32, maximumComponentLength *uint32, ***REMOVED***leSystemFlags *uint32, ***REMOVED***leSystemNameBuffer *uint16, ***REMOVED***leSystemNameSize uint32) (err error) = GetVolumeInformationByHandleW
+//sys	GetVolumeInformation(rootPathName *uint16, volumeNameBuffer *uint16, volumeNameSize uint32, volumeNameSerialNumber *uint32, maximumComponentLength *uint32, fileSystemFlags *uint32, fileSystemNameBuffer *uint16, fileSystemNameSize uint32) (err error) = GetVolumeInformationW
+//sys	GetVolumeInformationByHandle(file Handle, volumeNameBuffer *uint16, volumeNameSize uint32, volumeNameSerialNumber *uint32, maximumComponentLength *uint32, fileSystemFlags *uint32, fileSystemNameBuffer *uint16, fileSystemNameSize uint32) (err error) = GetVolumeInformationByHandleW
 //sys	GetVolumeNameForVolumeMountPoint(volumeMountPoint *uint16, volumeName *uint16, bufferlength uint32) (err error) = GetVolumeNameForVolumeMountPointW
-//sys	GetVolumePathName(***REMOVED***leName *uint16, volumePathName *uint16, bufferLength uint32) (err error) = GetVolumePathNameW
+//sys	GetVolumePathName(fileName *uint16, volumePathName *uint16, bufferLength uint32) (err error) = GetVolumePathNameW
 //sys	GetVolumePathNamesForVolumeName(volumeName *uint16, volumePathNames *uint16, bufferLength uint32, returnLength *uint32) (err error) = GetVolumePathNamesForVolumeNameW
 //sys	QueryDosDevice(deviceName *uint16, targetPath *uint16, max uint32) (n uint32, err error) [failretval==0] = QueryDosDeviceW
 //sys	SetVolumeLabel(rootPathName *uint16, volumeName *uint16) (err error) = SetVolumeLabelW
@@ -270,7 +270,7 @@ func GetProcAddressByOrdinal(module Handle, ordinal uintptr) (proc uintptr, err 
 	if proc == 0 {
 		if e1 != 0 {
 			err = errnoErr(e1)
-		} ***REMOVED*** {
+		} else {
 			err = syscall.EINVAL
 		}
 	}
@@ -569,7 +569,7 @@ func Chmod(path string, mode uint32) (err error) {
 	}
 	if mode&S_IWRITE != 0 {
 		attrs &^= FILE_ATTRIBUTE_READONLY
-	} ***REMOVED*** {
+	} else {
 		attrs |= FILE_ATTRIBUTE_READONLY
 	}
 	return SetFileAttributes(p, attrs)
@@ -583,8 +583,8 @@ func LoadCancelIoEx() error {
 	return procCancelIoEx.Find()
 }
 
-func LoadSetFileCompletionNoti***REMOVED***cationModes() error {
-	return procSetFileCompletionNoti***REMOVED***cationModes.Find()
+func LoadSetFileCompletionNotificationModes() error {
+	return procSetFileCompletionNotificationModes.Find()
 }
 
 // net api calls
@@ -621,7 +621,7 @@ const socket_error = uintptr(^uint32(0))
 //sys	FreeAddrInfoW(addrinfo *AddrinfoW) = ws2_32.FreeAddrInfoW
 //sys	GetIfEntry(pIfRow *MibIfRow) (errcode error) = iphlpapi.GetIfEntry
 //sys	GetAdaptersInfo(ai *IpAdapterInfo, ol *uint32) (errcode error) = iphlpapi.GetAdaptersInfo
-//sys	SetFileCompletionNoti***REMOVED***cationModes(handle Handle, flags uint8) (err error) = kernel32.SetFileCompletionNoti***REMOVED***cationModes
+//sys	SetFileCompletionNotificationModes(handle Handle, flags uint8) (err error) = kernel32.SetFileCompletionNotificationModes
 //sys	WSAEnumProtocols(protocols *int32, protocolBuffer *WSAProtocolInfo, bufferLength *uint32) (n int32, err error) [failretval==-1] = ws2_32.WSAEnumProtocolsW
 //sys	GetAdaptersAddresses(family uint32, flags uint32, reserved uintptr, adapterAddresses *IpAdapterAddresses, sizePointer *uint32) (errcode error) = iphlpapi.GetAdaptersAddresses
 //sys	GetACP() (acp uint32) = kernel32.GetACP
@@ -657,7 +657,7 @@ type RawSockaddrAny struct {
 }
 
 type Sockaddr interface {
-	sockaddr() (ptr unsafe.Pointer, len int32, err error) // lowercase; only we can de***REMOVED***ne Sockaddrs
+	sockaddr() (ptr unsafe.Pointer, len int32, err error) // lowercase; only we can define Sockaddrs
 }
 
 type SockaddrInet4 struct {
@@ -837,7 +837,7 @@ func connectEx(s Handle, name unsafe.Pointer, namelen int32, sendBuf *byte, send
 	if r1 == 0 {
 		if e1 != 0 {
 			err = error(e1)
-		} ***REMOVED*** {
+		} else {
 			err = syscall.EINVAL
 		}
 	}
@@ -847,7 +847,7 @@ func connectEx(s Handle, name unsafe.Pointer, namelen int32, sendBuf *byte, send
 func ConnectEx(fd Handle, sa Sockaddr, sendBuf *byte, sendDataLen uint32, bytesSent *uint32, overlapped *Overlapped) error {
 	err := LoadConnectEx()
 	if err != nil {
-		return errorspkg.New("failed to ***REMOVED***nd ConnectEx: " + err.Error())
+		return errorspkg.New("failed to find ConnectEx: " + err.Error())
 	}
 	ptr, n, err := sa.sockaddr()
 	if err != nil {
@@ -902,7 +902,7 @@ func WSASendMsg(fd Handle, msg *WSAMsg, flags uint32, bytesSent *uint32, overlap
 	if r1 == socket_error {
 		if e1 != 0 {
 			err = errnoErr(e1)
-		} ***REMOVED*** {
+		} else {
 			err = syscall.EINVAL
 		}
 	}
@@ -918,7 +918,7 @@ func WSARecvMsg(fd Handle, msg *WSAMsg, bytesReceived *uint32, overlapped *Overl
 	if r1 == socket_error {
 		if e1 != 0 {
 			err = errnoErr(e1)
-		} ***REMOVED*** {
+		} else {
 			err = syscall.EINVAL
 		}
 	}
@@ -970,7 +970,7 @@ func NsecToTimespec(nsec int64) (ts Timespec) {
 	return
 }
 
-// TODO(brainman): ***REMOVED***x all needed for net
+// TODO(brainman): fix all needed for net
 
 func Accept(fd Handle) (nfd Handle, sa Sockaddr, err error) { return 0, nil, syscall.EWINDOWS }
 func Recvfrom(fd Handle, p []byte, flags int) (n int, from Sockaddr, err error) {
@@ -982,7 +982,7 @@ func SetsockoptTimeval(fd Handle, level, opt int, tv *Timeval) (err error) { ret
 // The Linger struct is wrong but we only noticed after Go 1.
 // sysLinger is the real system call structure.
 
-// BUG(brainman): The de***REMOVED***nition of Linger is not appropriate for direct use
+// BUG(brainman): The definition of Linger is not appropriate for direct use
 // with Setsockopt and Getsockopt.
 // Use SetsockoptLinger instead.
 
@@ -1025,26 +1025,26 @@ func SetsockoptIPv6Mreq(fd Handle, level, opt int, mreq *IPv6Mreq) (err error) {
 
 func Getpid() (pid int) { return int(getCurrentProcessId()) }
 
-func FindFirstFile(name *uint16, data *Win32***REMOVED***nddata) (handle Handle, err error) {
-	// NOTE(rsc): The Win32***REMOVED***nddata struct is wrong for the system call:
+func FindFirstFile(name *uint16, data *Win32finddata) (handle Handle, err error) {
+	// NOTE(rsc): The Win32finddata struct is wrong for the system call:
 	// the two paths are each one uint16 short. Use the correct struct,
-	// a win32***REMOVED***nddata1, and then copy the results out.
-	// There is no loss of expressivity here, because the ***REMOVED***nal
+	// a win32finddata1, and then copy the results out.
+	// There is no loss of expressivity here, because the final
 	// uint16, if it is used, is supposed to be a NUL, and Go doesn't need that.
-	// For Go 1.1, we might avoid the allocation of win32***REMOVED***nddata1 here
-	// by adding a ***REMOVED***nal Bug [2]uint16 ***REMOVED***eld to the struct and then
-	// adjusting the ***REMOVED***elds in the result directly.
-	var data1 win32***REMOVED***nddata1
-	handle, err = ***REMOVED***ndFirstFile1(name, &data1)
+	// For Go 1.1, we might avoid the allocation of win32finddata1 here
+	// by adding a final Bug [2]uint16 field to the struct and then
+	// adjusting the fields in the result directly.
+	var data1 win32finddata1
+	handle, err = findFirstFile1(name, &data1)
 	if err == nil {
 		copyFindData(data, &data1)
 	}
 	return
 }
 
-func FindNextFile(handle Handle, data *Win32***REMOVED***nddata) (err error) {
-	var data1 win32***REMOVED***nddata1
-	err = ***REMOVED***ndNextFile1(handle, &data1)
+func FindNextFile(handle Handle, data *Win32finddata) (err error) {
+	var data1 win32finddata1
+	err = findNextFile1(handle, &data1)
 	if err == nil {
 		copyFindData(data, &data1)
 	}
@@ -1081,7 +1081,7 @@ func Getppid() (ppid int) {
 	return int(pe.ParentProcessID)
 }
 
-// TODO(brainman): ***REMOVED***x all needed for os
+// TODO(brainman): fix all needed for os
 func Fchdir(fd Handle) (err error)             { return syscall.EWINDOWS }
 func Link(oldpath, newpath string) (err error) { return syscall.EWINDOWS }
 func Symlink(path, link string) (err error)    { return syscall.EWINDOWS }

@@ -14,7 +14,7 @@ var (
 // The errors that might occur when parsing and validating a token
 const (
 	ValidationErrorMalformed        uint32 = 1 << iota // Token is malformed
-	ValidationErrorUnveri***REMOVED***able                        // Token could not be veri***REMOVED***ed because of signing problems
+	ValidationErrorUnverifiable                        // Token could not be verified because of signing problems
 	ValidationErrorSignatureInvalid                    // Signature validation failed
 
 	// Standard Claim validation errors
@@ -38,7 +38,7 @@ func NewValidationError(errorText string, errorFlags uint32) *ValidationError {
 // The error from Parse if token is not valid
 type ValidationError struct {
 	Inner  error  // stores the error returned by external dependencies, i.e.: KeyFunc
-	Errors uint32 // bit***REMOVED***eld.  see ValidationError... constants
+	Errors uint32 // bitfield.  see ValidationError... constants
 	text   string // errors that do not have a valid error just have text
 }
 
@@ -46,9 +46,9 @@ type ValidationError struct {
 func (e ValidationError) Error() string {
 	if e.Inner != nil {
 		return e.Inner.Error()
-	} ***REMOVED*** if e.text != "" {
+	} else if e.text != "" {
 		return e.text
-	} ***REMOVED*** {
+	} else {
 		return "token is invalid"
 	}
 }

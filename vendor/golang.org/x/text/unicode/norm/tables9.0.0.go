@@ -26,12 +26,12 @@ var ccc = [55]uint8{
 }
 
 const (
-	***REMOVED***rstMulti            = 0x186D
-	***REMOVED***rstCCC              = 0x2C9E
+	firstMulti            = 0x186D
+	firstCCC              = 0x2C9E
 	endMulti              = 0x2F60
-	***REMOVED***rstLeadingCCC       = 0x49AE
-	***REMOVED***rstCCCZeroExcept    = 0x4A78
-	***REMOVED***rstStarterWithNLead = 0x4A9F
+	firstLeadingCCC       = 0x49AE
+	firstCCCZeroExcept    = 0x4A78
+	firstStarterWithNLead = 0x4A9F
 	lastDecomp            = 0x4AA1
 	maxDecomp             = 0x8000
 )
@@ -2728,7 +2728,7 @@ var decomps = [...]byte{
 	0x01,
 }
 
-// lookup returns the trie value for the ***REMOVED***rst UTF-8 encoding in s and
+// lookup returns the trie value for the first UTF-8 encoding in s and
 // the width in bytes of this encoding. The size will be 0 if s does not
 // hold enough bytes to complete the encoding. len(s) must be greater than 0.
 func (t *nfcTrie) lookup(s []byte) (v uint16, sz int) {
@@ -2791,7 +2791,7 @@ func (t *nfcTrie) lookup(s []byte) (v uint16, sz int) {
 	return 0, 1
 }
 
-// lookupUnsafe returns the trie value for the ***REMOVED***rst UTF-8 encoding in s.
+// lookupUnsafe returns the trie value for the first UTF-8 encoding in s.
 // s must start with a full and valid UTF-8 encoded rune.
 func (t *nfcTrie) lookupUnsafe(s []byte) uint16 {
 	c0 := s[0]
@@ -2813,7 +2813,7 @@ func (t *nfcTrie) lookupUnsafe(s []byte) uint16 {
 	return 0
 }
 
-// lookupString returns the trie value for the ***REMOVED***rst UTF-8 encoding in s and
+// lookupString returns the trie value for the first UTF-8 encoding in s and
 // the width in bytes of this encoding. The size will be 0 if s does not
 // hold enough bytes to complete the encoding. len(s) must be greater than 0.
 func (t *nfcTrie) lookupString(s string) (v uint16, sz int) {
@@ -2876,7 +2876,7 @@ func (t *nfcTrie) lookupString(s string) (v uint16, sz int) {
 	return 0, 1
 }
 
-// lookupStringUnsafe returns the trie value for the ***REMOVED***rst UTF-8 encoding in s.
+// lookupStringUnsafe returns the trie value for the first UTF-8 encoding in s.
 // s must start with a full and valid UTF-8 encoded rune.
 func (t *nfcTrie) lookupStringUnsafe(s string) uint16 {
 	c0 := s[0]
@@ -4349,7 +4349,7 @@ var nfcSparseValues = [688]valueRange{
 	{value: 0x8100, lo: 0x93, hi: 0x93},
 }
 
-// lookup returns the trie value for the ***REMOVED***rst UTF-8 encoding in s and
+// lookup returns the trie value for the first UTF-8 encoding in s and
 // the width in bytes of this encoding. The size will be 0 if s does not
 // hold enough bytes to complete the encoding. len(s) must be greater than 0.
 func (t *nfkcTrie) lookup(s []byte) (v uint16, sz int) {
@@ -4412,7 +4412,7 @@ func (t *nfkcTrie) lookup(s []byte) (v uint16, sz int) {
 	return 0, 1
 }
 
-// lookupUnsafe returns the trie value for the ***REMOVED***rst UTF-8 encoding in s.
+// lookupUnsafe returns the trie value for the first UTF-8 encoding in s.
 // s must start with a full and valid UTF-8 encoded rune.
 func (t *nfkcTrie) lookupUnsafe(s []byte) uint16 {
 	c0 := s[0]
@@ -4434,7 +4434,7 @@ func (t *nfkcTrie) lookupUnsafe(s []byte) uint16 {
 	return 0
 }
 
-// lookupString returns the trie value for the ***REMOVED***rst UTF-8 encoding in s and
+// lookupString returns the trie value for the first UTF-8 encoding in s and
 // the width in bytes of this encoding. The size will be 0 if s does not
 // hold enough bytes to complete the encoding. len(s) must be greater than 0.
 func (t *nfkcTrie) lookupString(s string) (v uint16, sz int) {
@@ -4497,7 +4497,7 @@ func (t *nfkcTrie) lookupString(s string) (v uint16, sz int) {
 	return 0, 1
 }
 
-// lookupStringUnsafe returns the trie value for the ***REMOVED***rst UTF-8 encoding in s.
+// lookupStringUnsafe returns the trie value for the first UTF-8 encoding in s.
 // s must start with a full and valid UTF-8 encoded rune.
 func (t *nfkcTrie) lookupStringUnsafe(s string) uint16 {
 	c0 := s[0]

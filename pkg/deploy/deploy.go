@@ -24,7 +24,7 @@ const (
 
 	hivetableFile        = "hive.crd.yaml"
 	prestotableFile      = "prestotable.crd.yaml"
-	meteringcon***REMOVED***gFile   = "meteringcon***REMOVED***g.crd.yaml"
+	meteringconfigFile   = "meteringconfig.crd.yaml"
 	reportFile           = "report.crd.yaml"
 	reportdatasourceFile = "reportdatasource.crd.yaml"
 	reportqueryFile      = "reportquery.crd.yaml"
@@ -44,14 +44,14 @@ const (
 type CRD struct {
 	Name string
 	Path string
-	CRD  *apiextv1beta1.CustomResourceDe***REMOVED***nition
+	CRD  *apiextv1beta1.CustomResourceDefinition
 }
 
-// Con***REMOVED***g contains all the information needed to handle different
-// metering deployment con***REMOVED***gurations and internal states, e.g. what
+// Config contains all the information needed to handle different
+// metering deployment configurations and internal states, e.g. what
 // platform to deploy on, whether or not to delete the metering CRDs,
 // or namespace during an install, the location to the manifests dir, etc.
-type Con***REMOVED***g struct {
+type Config struct {
 	SkipMeteringDeployment   bool
 	RunMeteringOperatorLocal bool
 	DeleteCRDs               bool
@@ -65,7 +65,7 @@ type Con***REMOVED***g struct {
 	Tag                      string
 	ExtraNamespaceLabels     map[string]string
 	OperatorResources        *OperatorResources
-	MeteringCon***REMOVED***g           *metering.MeteringCon***REMOVED***g
+	MeteringConfig           *metering.MeteringConfig
 }
 
 // OperatorResources contains all the objects that make up the
@@ -83,24 +83,24 @@ type OperatorResources struct {
 // Deployer holds all the information needed to handle the deployment
 // process of the metering stack. This includes the clientsets needed
 // to provision and remove all the metering resources, and a customized
-// deployment con***REMOVED***guration.
+// deployment configuration.
 type Deployer struct {
-	con***REMOVED***g         Con***REMOVED***g
+	config         Config
 	logger         log.FieldLogger
 	client         kubernetes.Interface
-	apiExtClient   apiextclientv1beta1.CustomResourceDe***REMOVED***nitionsGetter
+	apiExtClient   apiextclientv1beta1.CustomResourceDefinitionsGetter
 	meteringClient meteringclient.MeteringV1Interface
 }
 
 // NewDeployer creates a new reference to a deploy structure, and then calls helper
-// functions that initialize the structure ***REMOVED***elds based on the value of
+// functions that initialize the structure fields based on the value of
 // environment variables and function parameters, returning a reference to this initialized
 // deploy structure
 func NewDeployer(
-	cfg Con***REMOVED***g,
+	cfg Config,
 	logger log.FieldLogger,
 	client kubernetes.Interface,
-	apiextClient apiextclientv1beta1.CustomResourceDe***REMOVED***nitionsGetter,
+	apiextClient apiextclientv1beta1.CustomResourceDefinitionsGetter,
 	meteringClient meteringclient.MeteringV1Interface,
 ) (*Deployer, error) {
 	deploy := &Deployer{
@@ -108,20 +108,20 @@ func NewDeployer(
 		apiExtClient:   apiextClient,
 		meteringClient: meteringClient,
 		logger:         logger,
-		con***REMOVED***g:         cfg,
+		config:         cfg,
 	}
 
-	deploy.logger.Infof("Metering Deploy Namespace: %s", deploy.con***REMOVED***g.Namespace)
-	deploy.logger.Infof("Metering Deploy Platform: %s", deploy.con***REMOVED***g.Platform)
+	deploy.logger.Infof("Metering Deploy Namespace: %s", deploy.config.Namespace)
+	deploy.logger.Infof("Metering Deploy Platform: %s", deploy.config.Platform)
 
-	if deploy.con***REMOVED***g.DeleteAll {
-		deploy.con***REMOVED***g.DeletePVCs = true
-		deploy.con***REMOVED***g.DeleteNamespace = true
-		deploy.con***REMOVED***g.DeleteCRB = true
-		deploy.con***REMOVED***g.DeleteCRDs = true
+	if deploy.config.DeleteAll {
+		deploy.config.DeletePVCs = true
+		deploy.config.DeleteNamespace = true
+		deploy.config.DeleteCRB = true
+		deploy.config.DeleteCRDs = true
 	}
 
-	if deploy.con***REMOVED***g.Namespace == "" {
+	if deploy.config.Namespace == "" {
 		return deploy, fmt.Errorf("failed to set $METERING_NAMESPACE or --namespace flag")
 	}
 
@@ -133,7 +133,7 @@ func NewDeployer(
 func (deploy *Deployer) Install() error {
 	err := deploy.installNamespace()
 	if err != nil {
-		return fmt.Errorf("failed to create the %s namespace: %v", deploy.con***REMOVED***g.Namespace, err)
+		return fmt.Errorf("failed to create the %s namespace: %v", deploy.config.Namespace, err)
 	}
 
 	err = deploy.installMeteringCRDs()
@@ -141,28 +141,28 @@ func (deploy *Deployer) Install() error {
 		return fmt.Errorf("failed to create the Metering CRDs: %v", err)
 	}
 
-	if !deploy.con***REMOVED***g.SkipMeteringDeployment {
+	if !deploy.config.SkipMeteringDeployment {
 		err = deploy.installMeteringResources()
 		if err != nil {
 			return fmt.Errorf("failed to create the metering resources: %v", err)
 		}
 	}
 
-	err = deploy.installMeteringCon***REMOVED***g()
+	err = deploy.installMeteringConfig()
 	if err != nil {
-		return fmt.Errorf("failed to create the MeteringCon***REMOVED***g resource: %v", err)
+		return fmt.Errorf("failed to create the MeteringConfig resource: %v", err)
 	}
 
 	return nil
 }
 
 // Uninstall is the driver function that manages deleting all the resources that
-// metering had created. Depending on the con***REMOVED***guration of the deploy structure,
+// metering had created. Depending on the configuration of the deploy structure,
 // resources like the metering CRDs, PVCs, or cluster role/role binding may be skipped
 func (deploy *Deployer) Uninstall() error {
-	err := deploy.uninstallMeteringCon***REMOVED***g()
+	err := deploy.uninstallMeteringConfig()
 	if err != nil {
-		return fmt.Errorf("failed to delete the MeteringCon***REMOVED***g resource: %v", err)
+		return fmt.Errorf("failed to delete the MeteringConfig resource: %v", err)
 	}
 
 	err = deploy.uninstallMeteringResources()
@@ -170,22 +170,22 @@ func (deploy *Deployer) Uninstall() error {
 		return fmt.Errorf("failed to delete the metering resources: %v", err)
 	}
 
-	if deploy.con***REMOVED***g.DeleteCRDs {
+	if deploy.config.DeleteCRDs {
 		err = deploy.uninstallMeteringCRDs()
 		if err != nil {
 			return fmt.Errorf("failed to delete the Metering CRDs: %v", err)
 		}
-	} ***REMOVED*** {
+	} else {
 		deploy.logger.Infof("Skipped deleting the metering CRDs")
 	}
 
-	if deploy.con***REMOVED***g.DeleteNamespace {
+	if deploy.config.DeleteNamespace {
 		err = deploy.uninstallNamespace()
 		if err != nil {
-			return fmt.Errorf("failed to delete the %s namespace: %v", deploy.con***REMOVED***g.Namespace, err)
+			return fmt.Errorf("failed to delete the %s namespace: %v", deploy.config.Namespace, err)
 		}
-	} ***REMOVED*** {
-		deploy.logger.Infof("Skipped deleting the %s namespace", deploy.con***REMOVED***g.Namespace)
+	} else {
+		deploy.logger.Infof("Skipped deleting the %s namespace", deploy.config.Namespace)
 	}
 
 	return nil

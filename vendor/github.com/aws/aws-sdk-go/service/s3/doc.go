@@ -17,8 +17,8 @@
 // See the SDK's documentation for more information on how to use the SDK.
 // https://docs.aws.amazon.com/sdk-for-go/api/
 //
-// See aws.Con***REMOVED***g documentation for more information on con***REMOVED***guring SDK clients.
-// https://docs.aws.amazon.com/sdk-for-go/api/aws/#Con***REMOVED***g
+// See aws.Config documentation for more information on configuring SDK clients.
+// https://docs.aws.amazon.com/sdk-for-go/api/aws/#Config
 //
 // See the Amazon Simple Storage Service client S3 for more
 // information on creating client for this service.

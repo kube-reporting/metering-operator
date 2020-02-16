@@ -3,7 +3,7 @@ package autorest
 // Copyright 2017 Microsoft Corporation
 //
 //  Licensed under the Apache License, Version 2.0 (the "License");
-//  you may not use this ***REMOVED***le except in compliance with the License.
+//  you may not use this file except in compliance with the License.
 //  You may obtain a copy of the License at
 //
 //      http://www.apache.org/licenses/LICENSE-2.0
@@ -11,7 +11,7 @@ package autorest
 //  Unless required by applicable law or agreed to in writing, software
 //  distributed under the License is distributed on an "AS IS" BASIS,
 //  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-//  See the License for the speci***REMOVED***c language governing permissions and
+//  See the License for the specific language governing permissions and
 //  limitations under the License.
 
 import (
@@ -42,13 +42,13 @@ func (rf ResponderFunc) Respond(r *http.Response) error {
 }
 
 // RespondDecorator takes and possibly decorates, by wrapping, a Responder. Decorators may react to
-// the http.Response and pass it along or, ***REMOVED***rst, pass the http.Response along then react.
+// the http.Response and pass it along or, first, pass the http.Response along then react.
 type RespondDecorator func(Responder) Responder
 
 // CreateResponder creates, decorates, and returns a Responder. Without decorators, the returned
-// Responder returns the passed http.Response unmodi***REMOVED***ed. Responders may or may not be safe to share
+// Responder returns the passed http.Response unmodified. Responders may or may not be safe to share
 // and re-used: It depends on the applied decorators. For example, a standard decorator that closes
-// the response body is ***REMOVED***ne to share whereas a decorator that reads the body into a passed struct
+// the response body is fine to share whereas a decorator that reads the body into a passed struct
 // is not.
 //
 // To prevent memory leaks, ensure that at least one Responder closes the response body.
@@ -102,7 +102,7 @@ func ByCopying(b *bytes.Buffer) RespondDecorator {
 	}
 }
 
-// ByDiscardingBody returns a RespondDecorator that ***REMOVED***rst invokes the passed Responder after which
+// ByDiscardingBody returns a RespondDecorator that first invokes the passed Responder after which
 // it copies the remaining bytes (if any) in the response body to ioutil.Discard. Since the passed
 // Responder is invoked prior to discarding the response body, the decorator may occur anywhere
 // within the set.
@@ -120,7 +120,7 @@ func ByDiscardingBody() RespondDecorator {
 	}
 }
 
-// ByClosing returns a RespondDecorator that ***REMOVED***rst invokes the passed Responder after which it
+// ByClosing returns a RespondDecorator that first invokes the passed Responder after which it
 // closes the response body. Since the passed Responder is invoked prior to closing the response
 // body, the decorator may occur anywhere within the set.
 func ByClosing() RespondDecorator {
@@ -137,7 +137,7 @@ func ByClosing() RespondDecorator {
 	}
 }
 
-// ByClosingIfError returns a RespondDecorator that ***REMOVED***rst invokes the passed Responder after which
+// ByClosingIfError returns a RespondDecorator that first invokes the passed Responder after which
 // it closes the response if the passed Responder returns an error and the response body exists.
 func ByClosingIfError() RespondDecorator {
 	return func(r Responder) Responder {
@@ -163,7 +163,7 @@ func ByUnmarshallingBytes(v *[]byte) RespondDecorator {
 				bytes, errInner := ioutil.ReadAll(resp.Body)
 				if errInner != nil {
 					err = fmt.Errorf("Error occurred reading http.Response#Body - Error = '%v'", errInner)
-				} ***REMOVED*** {
+				} else {
 					*v = bytes
 				}
 			}
@@ -181,10 +181,10 @@ func ByUnmarshallingJSON(v interface{}) RespondDecorator {
 			if err == nil {
 				b, errInner := ioutil.ReadAll(resp.Body)
 				// Some responses might include a BOM, remove for successful unmarshalling
-				b = bytes.TrimPre***REMOVED***x(b, []byte("\xef\xbb\xbf"))
+				b = bytes.TrimPrefix(b, []byte("\xef\xbb\xbf"))
 				if errInner != nil {
 					err = fmt.Errorf("Error occurred reading http.Response#Body - Error = '%v'", errInner)
-				} ***REMOVED*** if len(strings.Trim(string(b), " ")) > 0 {
+				} else if len(strings.Trim(string(b), " ")) > 0 {
 					errInner = json.Unmarshal(b, v)
 					if errInner != nil {
 						err = fmt.Errorf("Error occurred unmarshalling JSON - Error = '%v' JSON = '%s'", errInner, string(b))
@@ -206,7 +206,7 @@ func ByUnmarshallingXML(v interface{}) RespondDecorator {
 				b, errInner := ioutil.ReadAll(resp.Body)
 				if errInner != nil {
 					err = fmt.Errorf("Error occurred reading http.Response#Body - Error = '%v'", errInner)
-				} ***REMOVED*** {
+				} else {
 					errInner = xml.Unmarshal(b, v)
 					if errInner != nil {
 						err = fmt.Errorf("Error occurred unmarshalling Xml - Error = '%v' Xml = '%s'", errInner, string(b))
@@ -249,7 +249,7 @@ func WithErrorUnlessOK() RespondDecorator {
 	return WithErrorUnlessStatusCode(http.StatusOK)
 }
 
-// ExtractHeader extracts all values of the speci***REMOVED***ed header from the http.Response. It returns an
+// ExtractHeader extracts all values of the specified header from the http.Response. It returns an
 // empty string slice if the passed http.Response is nil or the header does not exist.
 func ExtractHeader(header string, resp *http.Response) []string {
 	if resp != nil && resp.Header != nil {
@@ -258,7 +258,7 @@ func ExtractHeader(header string, resp *http.Response) []string {
 	return nil
 }
 
-// ExtractHeaderValue extracts the ***REMOVED***rst value of the speci***REMOVED***ed header from the http.Response. It
+// ExtractHeaderValue extracts the first value of the specified header from the http.Response. It
 // returns an empty string if the passed http.Response is nil or the header does not exist.
 func ExtractHeaderValue(header string, resp *http.Response) string {
 	h := ExtractHeader(header, resp)

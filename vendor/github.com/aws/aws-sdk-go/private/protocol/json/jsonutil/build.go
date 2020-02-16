@@ -59,8 +59,8 @@ func buildAny(value reflect.Value, buf *bytes.Buffer, tag reflect.StructTag) err
 
 	switch t {
 	case "structure":
-		if ***REMOVED***eld, ok := vtype.FieldByName("_"); ok {
-			tag = ***REMOVED***eld.Tag
+		if field, ok := vtype.FieldByName("_"); ok {
+			tag = field.Tag
 		}
 		return buildStruct(value, buf, tag)
 	case "list":
@@ -79,8 +79,8 @@ func buildStruct(value reflect.Value, buf *bytes.Buffer, tag reflect.StructTag) 
 
 	// unwrap payloads
 	if payload := tag.Get("payload"); payload != "" {
-		***REMOVED***eld, _ := value.Type().FieldByName(payload)
-		tag = ***REMOVED***eld.Tag
+		field, _ := value.Type().FieldByName(payload)
+		tag = field.Tag
 		value = elemOf(value.FieldByName(payload))
 
 		if !value.IsValid() {
@@ -91,53 +91,53 @@ func buildStruct(value reflect.Value, buf *bytes.Buffer, tag reflect.StructTag) 
 	buf.WriteByte('{')
 
 	t := value.Type()
-	***REMOVED***rst := true
+	first := true
 	for i := 0; i < t.NumField(); i++ {
 		member := value.Field(i)
 
 		// This allocates the most memory.
-		// Additionally, we cannot skip nil ***REMOVED***elds due to
-		// idempotency auto ***REMOVED***lling.
-		***REMOVED***eld := t.Field(i)
+		// Additionally, we cannot skip nil fields due to
+		// idempotency auto filling.
+		field := t.Field(i)
 
-		if ***REMOVED***eld.PkgPath != "" {
-			continue // ignore unexported ***REMOVED***elds
+		if field.PkgPath != "" {
+			continue // ignore unexported fields
 		}
-		if ***REMOVED***eld.Tag.Get("json") == "-" {
+		if field.Tag.Get("json") == "-" {
 			continue
 		}
-		if ***REMOVED***eld.Tag.Get("location") != "" {
+		if field.Tag.Get("location") != "" {
 			continue // ignore non-body elements
 		}
-		if ***REMOVED***eld.Tag.Get("ignore") != "" {
+		if field.Tag.Get("ignore") != "" {
 			continue
 		}
 
-		if protocol.CanSetIdempotencyToken(member, ***REMOVED***eld) {
+		if protocol.CanSetIdempotencyToken(member, field) {
 			token := protocol.GetIdempotencyToken()
 			member = reflect.ValueOf(&token)
 		}
 
 		if (member.Kind() == reflect.Ptr || member.Kind() == reflect.Slice || member.Kind() == reflect.Map) && member.IsNil() {
-			continue // ignore unset ***REMOVED***elds
+			continue // ignore unset fields
 		}
 
-		if ***REMOVED***rst {
-			***REMOVED***rst = false
-		} ***REMOVED*** {
+		if first {
+			first = false
+		} else {
 			buf.WriteByte(',')
 		}
 
-		// ***REMOVED***gure out what this ***REMOVED***eld is called
-		name := ***REMOVED***eld.Name
-		if locName := ***REMOVED***eld.Tag.Get("locationName"); locName != "" {
+		// figure out what this field is called
+		name := field.Name
+		if locName := field.Tag.Get("locationName"); locName != "" {
 			name = locName
 		}
 
 		writeString(name, buf)
 		buf.WriteString(`:`)
 
-		err := buildAny(member, buf, ***REMOVED***eld.Tag)
+		err := buildAny(member, buf, field.Tag)
 		if err != nil {
 			return err
 		}
@@ -202,7 +202,7 @@ func buildScalar(v reflect.Value, buf *bytes.Buffer, tag reflect.StructTag) erro
 	case reflect.Bool:
 		if value.Bool() {
 			buf.WriteString("true")
-		} ***REMOVED*** {
+		} else {
 			buf.WriteString("false")
 		}
 	case reflect.Int64:
@@ -235,7 +235,7 @@ func buildScalar(v reflect.Value, buf *bytes.Buffer, tag reflect.StructTag) erro
 					dst := make([]byte, base64.StdEncoding.EncodedLen(len(converted)))
 					base64.StdEncoding.Encode(dst, converted)
 					buf.Write(dst)
-				} ***REMOVED*** {
+				} else {
 					// for large buffers, avoid unnecessary extra temporary
 					// buffer space.
 					enc := base64.NewEncoder(base64.StdEncoding, buf)
@@ -264,23 +264,23 @@ func writeString(s string, buf *bytes.Buffer) {
 	for i := 0; i < len(s); i++ {
 		if s[i] == '"' {
 			buf.WriteString(`\"`)
-		} ***REMOVED*** if s[i] == '\\' {
+		} else if s[i] == '\\' {
 			buf.WriteString(`\\`)
-		} ***REMOVED*** if s[i] == '\b' {
+		} else if s[i] == '\b' {
 			buf.WriteString(`\b`)
-		} ***REMOVED*** if s[i] == '\f' {
+		} else if s[i] == '\f' {
 			buf.WriteString(`\f`)
-		} ***REMOVED*** if s[i] == '\r' {
+		} else if s[i] == '\r' {
 			buf.WriteString(`\r`)
-		} ***REMOVED*** if s[i] == '\t' {
+		} else if s[i] == '\t' {
 			buf.WriteString(`\t`)
-		} ***REMOVED*** if s[i] == '\n' {
+		} else if s[i] == '\n' {
 			buf.WriteString(`\n`)
-		} ***REMOVED*** if s[i] < 32 {
+		} else if s[i] < 32 {
 			buf.WriteString("\\u00")
 			buf.WriteByte(hex[s[i]>>4])
 			buf.WriteByte(hex[s[i]&0xF])
-		} ***REMOVED*** {
+		} else {
 			buf.WriteByte(s[i])
 		}
 	}

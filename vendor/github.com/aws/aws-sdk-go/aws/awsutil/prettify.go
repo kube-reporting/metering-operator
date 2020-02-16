@@ -28,7 +28,7 @@ func prettify(v reflect.Value, indent int, buf *bytes.Buffer) {
 		if strtype == "time.Time" {
 			fmt.Fprintf(buf, "%s", v.Interface())
 			break
-		} ***REMOVED*** if strings.HasPre***REMOVED***x(strtype, "io.") {
+		} else if strings.HasPrefix(strtype, "io.") {
 			buf.WriteString("<buffer>")
 			break
 		}
@@ -40,10 +40,10 @@ func prettify(v reflect.Value, indent int, buf *bytes.Buffer) {
 			name := v.Type().Field(i).Name
 			f := v.Field(i)
 			if name[0:1] == strings.ToLower(name[0:1]) {
-				continue // ignore unexported ***REMOVED***elds
+				continue // ignore unexported fields
 			}
 			if (f.Kind() == reflect.Ptr || f.Kind() == reflect.Slice || f.Kind() == reflect.Map) && f.IsNil() {
-				continue // ignore unset ***REMOVED***elds
+				continue // ignore unset fields
 			}
 			names = append(names, name)
 		}

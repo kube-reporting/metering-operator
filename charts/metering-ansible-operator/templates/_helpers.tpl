@@ -1,4 +1,4 @@
-{{- de***REMOVED***ne "operator-deployment-spec" -}}
+{{- define "operator-deployment-spec" -}}
 replicas: 1
 strategy:
   type: RollingUpdate
@@ -45,19 +45,19 @@ template:
       - name: WATCH_NAMESPACE
 {{- if .Values.operator.targetNamespace }}
         value: "{{ .Values.operator.targetNamespace }}"
-{{- ***REMOVED*** if .Values.operator.useTargetNamespacesDownwardAPIValueFrom }}
+{{- else if .Values.operator.useTargetNamespacesDownwardAPIValueFrom }}
         valueFrom:
-          ***REMOVED***eldRef:
-            ***REMOVED***eldPath: metadata.annotations['olm.targetNamespaces']
-{{- ***REMOVED*** }}
+          fieldRef:
+            fieldPath: metadata.annotations['olm.targetNamespaces']
+{{- else }}
         valueFrom:
-          ***REMOVED***eldRef:
-            ***REMOVED***eldPath: metadata.namespace
+          fieldRef:
+            fieldPath: metadata.namespace
 {{- end }}
       - name: POD_NAME
         valueFrom:
-          ***REMOVED***eldRef:
-            ***REMOVED***eldPath: metadata.name
+          fieldRef:
+            fieldPath: metadata.name
 {{- range $index, $item := .Values.olm.imageTags }}
       - name: {{ $item.name | replace "-" "_" | upper | printf "%s_IMAGE" }}
         value: "{{ $item.from.name }}"
@@ -82,7 +82,7 @@ template:
 {{ end }}
 
 
-{{- de***REMOVED***ne "cluster-service-version-deployment-spec" -}}
+{{- define "cluster-service-version-deployment-spec" -}}
 {{- $ctxCopy := merge (dict "Values" (dict "operator" (dict "useTargetNamespacesDownwardAPIValueFrom" true))) . -}}
 {{ include "operator-deployment-spec" $ctxCopy }}
 {{ end }}

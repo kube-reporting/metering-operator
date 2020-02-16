@@ -1,17 +1,17 @@
 // Copyright 2012 The Go Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE ***REMOVED***le.
+// license that can be found in the LICENSE file.
 
 /*
-Package pbkdf2 implements the key derivation function PBKDF2 as de***REMOVED***ned in RFC
+Package pbkdf2 implements the key derivation function PBKDF2 as defined in RFC
 2898 / PKCS #5 v2.0.
 
 A key derivation function is useful when encrypting data based on a password
 or any other not-fully-random data. It uses a pseudorandom function to derive
 a secure encryption key based on the password.
 
-While v2.0 of the standard de***REMOVED***nes only one pseudorandom function to use,
-HMAC-SHA1, the drafted v2.1 speci***REMOVED***cation allows use of all ***REMOVED***ve FIPS Approved
+While v2.0 of the standard defines only one pseudorandom function to use,
+HMAC-SHA1, the drafted v2.1 specification allows use of all five FIPS Approved
 Hash Functions SHA-1, SHA-224, SHA-256, SHA-384 and SHA-512 for HMAC. To
 choose, you can pass the `New` functions from the different SHA packages to
 pbkdf2.Key.

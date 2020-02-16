@@ -1,12 +1,12 @@
 // Copyright 2016 The Go Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE ***REMOVED***le.
+// license that can be found in the LICENSE file.
 
-// A faster implementation of ***REMOVED***lepath.Walk.
+// A faster implementation of filepath.Walk.
 //
-// ***REMOVED***lepath.Walk's design necessarily calls os.Lstat on each ***REMOVED***le,
+// filepath.Walk's design necessarily calls os.Lstat on each file,
 // even if the caller needs less info. And goimports only need to know
-// the type of each ***REMOVED***le. The kernel interface provides the type in
+// the type of each file. The kernel interface provides the type in
 // the Readdir call but the standard library ignored it.
 // fastwalk_unix.go contains a fork of the syscall routines.
 //
@@ -17,40 +17,40 @@ package imports
 import (
 	"errors"
 	"os"
-	"path/***REMOVED***lepath"
+	"path/filepath"
 	"runtime"
 	"sync"
 )
 
-// traverseLink is a sentinel error for fastWalk, similar to ***REMOVED***lepath.SkipDir.
+// traverseLink is a sentinel error for fastWalk, similar to filepath.SkipDir.
 var traverseLink = errors.New("traverse symlink, assuming target is a directory")
 
-// fastWalk walks the ***REMOVED***le tree rooted at root, calling walkFn for
-// each ***REMOVED***le or directory in the tree, including root.
+// fastWalk walks the file tree rooted at root, calling walkFn for
+// each file or directory in the tree, including root.
 //
-// If fastWalk returns ***REMOVED***lepath.SkipDir, the directory is skipped.
+// If fastWalk returns filepath.SkipDir, the directory is skipped.
 //
-// Unlike ***REMOVED***lepath.Walk:
-//   * ***REMOVED***le stat calls must be done by the user.
-//     The only provided metadata is the ***REMOVED***le type, which does not include
+// Unlike filepath.Walk:
+//   * file stat calls must be done by the user.
+//     The only provided metadata is the file type, which does not include
 //     any permission bits.
-//   * multiple goroutines stat the ***REMOVED***lesystem concurrently. The provided
+//   * multiple goroutines stat the filesystem concurrently. The provided
 //     walkFn must be safe for concurrent use.
 //   * fastWalk can follow symlinks if walkFn returns the traverseLink
 //     sentinel error. It is the walkFn's responsibility to prevent
 //     fastWalk from going into symlink cycles.
 func fastWalk(root string, walkFn func(path string, typ os.FileMode) error) error {
-	// TODO(brad***REMOVED***tz): make numWorkers con***REMOVED***gurable? We used a
+	// TODO(bradfitz): make numWorkers configurable? We used a
 	// minimum of 4 to give the kernel more info about multiple
 	// things we want, in hopes its I/O scheduling can take
 	// advantage of that. Hopefully most are in cache. Maybe 4 is
-	// even too low of a minimum. Pro***REMOVED***le more.
+	// even too low of a minimum. Profile more.
 	numWorkers := 4
 	if n := runtime.NumCPU(); n > numWorkers {
 		numWorkers = n
 	}
 
-	// Make sure to wait for all workers to ***REMOVED***nish, otherwise
+	// Make sure to wait for all workers to finish, otherwise
 	// walkFn could still be called after returning. This Wait call
 	// runs after close(e.donec) below.
 	var wg sync.WaitGroup
@@ -78,7 +78,7 @@ func fastWalk(root string, walkFn func(path string, typ os.FileMode) error) erro
 		var workItem walkItem
 		if len(todo) == 0 {
 			workc = nil
-		} ***REMOVED*** {
+		} else {
 			workItem = todo[len(todo)-1]
 		}
 		select {
@@ -164,7 +164,7 @@ func (w *walker) onDirEnt(dirName, baseName string, typ os.FileMode) error {
 			w.enqueue(walkItem{dir: joined, callbackDone: true})
 			return nil
 		}
-		if err == ***REMOVED***lepath.SkipDir {
+		if err == filepath.SkipDir {
 			// Permit SkipDir on symlinks too.
 			return nil
 		}
@@ -175,7 +175,7 @@ func (w *walker) onDirEnt(dirName, baseName string, typ os.FileMode) error {
 func (w *walker) walk(root string, runUserCallback bool) error {
 	if runUserCallback {
 		err := w.fn(root, os.ModeDir)
-		if err == ***REMOVED***lepath.SkipDir {
+		if err == filepath.SkipDir {
 			return nil
 		}
 		if err != nil {

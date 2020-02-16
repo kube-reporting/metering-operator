@@ -21,7 +21,7 @@ func (p *Parser) Parse(tokenString string, keyFunc Keyfunc) (*Token, error) {
 }
 
 func (p *Parser) ParseWithClaims(tokenString string, claims Claims, keyFunc Keyfunc) (*Token, error) {
-	token, parts, err := p.ParseUnveri***REMOVED***ed(tokenString, claims)
+	token, parts, err := p.ParseUnverified(tokenString, claims)
 	if err != nil {
 		return token, err
 	}
@@ -46,14 +46,14 @@ func (p *Parser) ParseWithClaims(tokenString string, claims Claims, keyFunc Keyf
 	var key interface{}
 	if keyFunc == nil {
 		// keyFunc was not provided.  short circuiting validation
-		return token, NewValidationError("no Keyfunc was provided.", ValidationErrorUnveri***REMOVED***able)
+		return token, NewValidationError("no Keyfunc was provided.", ValidationErrorUnverifiable)
 	}
 	if key, err = keyFunc(token); err != nil {
 		// keyFunc returned an error
 		if ve, ok := err.(*ValidationError); ok {
 			return token, ve
 		}
-		return token, &ValidationError{Inner: err, Errors: ValidationErrorUnveri***REMOVED***able}
+		return token, &ValidationError{Inner: err, Errors: ValidationErrorUnverifiable}
 	}
 
 	vErr := &ValidationError{}
@@ -66,7 +66,7 @@ func (p *Parser) ParseWithClaims(tokenString string, claims Claims, keyFunc Keyf
 			// If it was another error type, create a ValidationError with a generic ClaimsInvalid flag set
 			if e, ok := err.(*ValidationError); !ok {
 				vErr = &ValidationError{Inner: err, Errors: ValidationErrorClaimsInvalid}
-			} ***REMOVED*** {
+			} else {
 				vErr = e
 			}
 		}
@@ -93,7 +93,7 @@ func (p *Parser) ParseWithClaims(tokenString string, claims Claims, keyFunc Keyf
 // ever useful in cases where you know the signature is valid (because it has
 // been checked previously in the stack) and you want to extract values from
 // it.
-func (p *Parser) ParseUnveri***REMOVED***ed(tokenString string, claims Claims) (token *Token, parts []string, err error) {
+func (p *Parser) ParseUnverified(tokenString string, claims Claims) (token *Token, parts []string, err error) {
 	parts = strings.Split(tokenString, ".")
 	if len(parts) != 3 {
 		return nil, parts, NewValidationError("token contains an invalid number of segments", ValidationErrorMalformed)
@@ -104,7 +104,7 @@ func (p *Parser) ParseUnveri***REMOVED***ed(tokenString string, claims Claims) (
 	// parse Header
 	var headerBytes []byte
 	if headerBytes, err = DecodeSegment(parts[0]); err != nil {
-		if strings.HasPre***REMOVED***x(strings.ToLower(tokenString), "bearer ") {
+		if strings.HasPrefix(strings.ToLower(tokenString), "bearer ") {
 			return token, parts, NewValidationError("tokenstring should not contain 'bearer '", ValidationErrorMalformed)
 		}
 		return token, parts, &ValidationError{Inner: err, Errors: ValidationErrorMalformed}
@@ -127,7 +127,7 @@ func (p *Parser) ParseUnveri***REMOVED***ed(tokenString string, claims Claims) (
 	// JSON Decode.  Special case for map type to avoid weird pointer behavior
 	if c, ok := token.Claims.(MapClaims); ok {
 		err = dec.Decode(&c)
-	} ***REMOVED*** {
+	} else {
 		err = dec.Decode(&claims)
 	}
 	// Handle decode error
@@ -138,10 +138,10 @@ func (p *Parser) ParseUnveri***REMOVED***ed(tokenString string, claims Claims) (
 	// Lookup signature method
 	if method, ok := token.Header["alg"].(string); ok {
 		if token.Method = GetSigningMethod(method); token.Method == nil {
-			return token, parts, NewValidationError("signing method (alg) is unavailable.", ValidationErrorUnveri***REMOVED***able)
+			return token, parts, NewValidationError("signing method (alg) is unavailable.", ValidationErrorUnverifiable)
 		}
-	} ***REMOVED*** {
-		return token, parts, NewValidationError("signing method (alg) is unspeci***REMOVED***ed.", ValidationErrorUnveri***REMOVED***able)
+	} else {
+		return token, parts, NewValidationError("signing method (alg) is unspecified.", ValidationErrorUnverifiable)
 	}
 
 	return token, parts, nil

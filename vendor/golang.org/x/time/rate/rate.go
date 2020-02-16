@@ -1,6 +1,6 @@
 // Copyright 2015 The Go Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE ***REMOVED***le.
+// license that can be found in the LICENSE file.
 
 // Package rate provides a rate limiter.
 package rate
@@ -13,12 +13,12 @@ import (
 	"time"
 )
 
-// Limit de***REMOVED***nes the maximum frequency of some events.
+// Limit defines the maximum frequency of some events.
 // Limit is represented as number of events per second.
 // A zero Limit allows no events.
 type Limit float64
 
-// Inf is the in***REMOVED***nite rate limit; it allows all events (even if burst is zero).
+// Inf is the infinite rate limit; it allows all events (even if burst is zero).
 const Inf = Limit(math.MaxFloat64)
 
 // Every converts a minimum time interval between events to a Limit.
@@ -30,11 +30,11 @@ func Every(interval time.Duration) Limit {
 }
 
 // A Limiter controls how frequently events are allowed to happen.
-// It implements a "token bucket" of size b, initially full and re***REMOVED***lled
+// It implements a "token bucket" of size b, initially full and refilled
 // at rate r tokens per second.
 // Informally, in any large enough time interval, the Limiter limits the
 // rate to r tokens per second, with a maximum burst size of b events.
-// As a special case, if r == Inf (the in***REMOVED***nite rate), b is ignored.
+// As a special case, if r == Inf (the infinite rate), b is ignored.
 // See https://en.wikipedia.org/wiki/Token_bucket for more about token buckets.
 //
 // The zero value is a valid Limiter, but it will reject all events.
@@ -58,7 +58,7 @@ type Limiter struct {
 
 	mu     sync.Mutex
 	tokens float64
-	// last is the last time the limiter's tokens ***REMOVED***eld was updated
+	// last is the last time the limiter's tokens field was updated
 	last time.Time
 	// lastEvent is the latest time of a rate-limited event (past or future)
 	lastEvent time.Time
@@ -282,7 +282,7 @@ func (lim *Limiter) SetLimitAt(now time.Time, newLimit Limit) {
 }
 
 // reserveN is a helper method for AllowN, ReserveN, and WaitN.
-// maxFutureReserve speci***REMOVED***es the maximum reservation wait duration allowed.
+// maxFutureReserve specifies the maximum reservation wait duration allowed.
 // reserveN returns Reservation, not *Reservation, to avoid allocation in AllowN and WaitN.
 func (lim *Limiter) reserveN(now time.Time, n int, maxFutureReserve time.Duration) Reservation {
 	lim.mu.Lock()
@@ -327,7 +327,7 @@ func (lim *Limiter) reserveN(now time.Time, n int, maxFutureReserve time.Duratio
 		lim.last = now
 		lim.tokens = tokens
 		lim.lastEvent = r.timeToAct
-	} ***REMOVED*** {
+	} else {
 		lim.last = last
 	}
 

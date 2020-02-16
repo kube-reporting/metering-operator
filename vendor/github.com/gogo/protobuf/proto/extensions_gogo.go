@@ -4,7 +4,7 @@
 // http://github.com/gogo/protobuf
 //
 // Redistribution and use in source and binary forms, with or without
-// modi***REMOVED***cation, are permitted provided that the following conditions are
+// modification, are permitted provided that the following conditions are
 // met:
 //
 //     * Redistributions of source code must retain the above copyright
@@ -50,7 +50,7 @@ type slowExtensionAdapter struct {
 }
 
 func (s slowExtensionAdapter) extensionsWrite() map[int32]Extension {
-	panic("Please report a bug to github.com/gogo/protobuf if you see this message: Writing extensions is not supported for extensions stored in a byte slice ***REMOVED***eld.")
+	panic("Please report a bug to github.com/gogo/protobuf if you see this message: Writing extensions is not supported for extensions stored in a byte slice field.")
 }
 
 func (s slowExtensionAdapter) extensionsRead() (map[int32]Extension, sync.Locker) {
@@ -105,14 +105,14 @@ func SizeOfInternalExtension(m extendableProto) (n int) {
 }
 
 type sortableMapElem struct {
-	***REMOVED***eld int32
+	field int32
 	ext   Extension
 }
 
 func newSortableExtensionsFromMap(m map[int32]Extension) sortableExtensions {
 	s := make(sortableExtensions, 0, len(m))
 	for k, v := range m {
-		s = append(s, &sortableMapElem{***REMOVED***eld: k, ext: v})
+		s = append(s, &sortableMapElem{field: k, ext: v})
 	}
 	return s
 }
@@ -123,13 +123,13 @@ func (this sortableExtensions) Len() int { return len(this) }
 
 func (this sortableExtensions) Swap(i, j int) { this[i], this[j] = this[j], this[i] }
 
-func (this sortableExtensions) Less(i, j int) bool { return this[i].***REMOVED***eld < this[j].***REMOVED***eld }
+func (this sortableExtensions) Less(i, j int) bool { return this[i].field < this[j].field }
 
 func (this sortableExtensions) String() string {
 	sort.Sort(this)
 	ss := make([]string, len(this))
 	for i := range this {
-		ss[i] = fmt.Sprintf("%d: %v", this[i].***REMOVED***eld, this[i].ext)
+		ss[i] = fmt.Sprintf("%d: %v", this[i].field, this[i].ext)
 	}
 	return "map[" + strings.Join(ss, ",") + "]"
 }
@@ -216,14 +216,14 @@ func BytesToExtensionsMap(buf []byte) (map[int32]Extension, error) {
 		if n <= 0 {
 			return nil, fmt.Errorf("unable to decode varint")
 		}
-		***REMOVED***eldNum := int32(tag >> 3)
+		fieldNum := int32(tag >> 3)
 		wireType := int(tag & 0x7)
 		l, err := size(buf[i+n:], wireType)
 		if err != nil {
 			return nil, err
 		}
 		end := i + int(l) + n
-		m[int32(***REMOVED***eldNum)] = Extension{enc: buf[i:end]}
+		m[int32(fieldNum)] = Extension{enc: buf[i:end]}
 		i = end
 	}
 	return m, nil
@@ -263,7 +263,7 @@ func decodeExtensionFromBytes(extension *ExtensionDesc, buf []byte) (interface{}
 	o := 0
 	for o < len(buf) {
 		tag, n := DecodeVarint((buf)[o:])
-		***REMOVED***eldNum := int32(tag >> 3)
+		fieldNum := int32(tag >> 3)
 		wireType := int(tag & 0x7)
 		if o+n > len(buf) {
 			return nil, fmt.Errorf("unable to decode extension")
@@ -272,7 +272,7 @@ func decodeExtensionFromBytes(extension *ExtensionDesc, buf []byte) (interface{}
 		if err != nil {
 			return nil, err
 		}
-		if int32(***REMOVED***eldNum) == extension.Field {
+		if int32(fieldNum) == extension.Field {
 			if o+n+l > len(buf) {
 				return nil, fmt.Errorf("unable to decode extension")
 			}
@@ -305,28 +305,28 @@ func (this Extension) GoString() string {
 	return fmt.Sprintf("proto.NewExtension(%#v)", this.enc)
 }
 
-func SetUnsafeExtension(pb Message, ***REMOVED***eldNum int32, value interface{}) error {
+func SetUnsafeExtension(pb Message, fieldNum int32, value interface{}) error {
 	typ := reflect.TypeOf(pb).Elem()
 	ext, ok := extensionMaps[typ]
 	if !ok {
 		return fmt.Errorf("proto: bad extended type; %s is not extendable", typ.String())
 	}
-	desc, ok := ext[***REMOVED***eldNum]
+	desc, ok := ext[fieldNum]
 	if !ok {
 		return errors.New("proto: bad extension number; not in declared ranges")
 	}
 	return SetExtension(pb, desc, value)
 }
 
-func GetUnsafeExtension(pb Message, ***REMOVED***eldNum int32) (interface{}, error) {
+func GetUnsafeExtension(pb Message, fieldNum int32) (interface{}, error) {
 	typ := reflect.TypeOf(pb).Elem()
 	ext, ok := extensionMaps[typ]
 	if !ok {
 		return nil, fmt.Errorf("proto: bad extended type; %s is not extendable", typ.String())
 	}
-	desc, ok := ext[***REMOVED***eldNum]
+	desc, ok := ext[fieldNum]
 	if !ok {
-		return nil, fmt.Errorf("unregistered ***REMOVED***eld number %d", ***REMOVED***eldNum)
+		return nil, fmt.Errorf("unregistered field number %d", fieldNum)
 	}
 	return GetExtension(pb, desc)
 }
@@ -351,14 +351,14 @@ func deleteExtension(pb extensionsBytes, theFieldNum int32, offset int) int {
 	ext := pb.GetExtensions()
 	for offset < len(*ext) {
 		tag, n1 := DecodeVarint((*ext)[offset:])
-		***REMOVED***eldNum := int32(tag >> 3)
+		fieldNum := int32(tag >> 3)
 		wireType := int(tag & 0x7)
 		n2, err := size((*ext)[offset+n1:], wireType)
 		if err != nil {
 			panic(err)
 		}
 		newOffset := offset + n1 + n2
-		if ***REMOVED***eldNum == theFieldNum {
+		if fieldNum == theFieldNum {
 			*ext = append((*ext)[:offset], (*ext)[newOffset:]...)
 			return offset
 		}

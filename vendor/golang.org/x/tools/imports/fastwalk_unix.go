@@ -1,6 +1,6 @@
 // Copyright 2016 The Go Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE ***REMOVED***le.
+// license that can be found in the LICENSE file.
 
 // +build linux darwin freebsd openbsd netbsd
 // +build !appengine
@@ -48,11 +48,11 @@ func readDir(dirName string, fn func(dirName, entName string, typ os.FileMode) e
 		if name == "" || name == "." || name == ".." {
 			continue
 		}
-		// Fallback for ***REMOVED***lesystems (like old XFS) that don't
+		// Fallback for filesystems (like old XFS) that don't
 		// support Dirent.Type and have DT_UNKNOWN (0) there
 		// instead.
 		if typ == unknownFileMode {
-			***REMOVED***, err := os.Lstat(dirName + "/" + name)
+			fi, err := os.Lstat(dirName + "/" + name)
 			if err != nil {
 				// It got deleted in the meantime.
 				if os.IsNotExist(err) {
@@ -60,7 +60,7 @@ func readDir(dirName string, fn func(dirName, entName string, typ os.FileMode) e
 				}
 				return err
 			}
-			typ = ***REMOVED***.Mode() & os.ModeType
+			typ = fi.Mode() & os.ModeType
 		}
 		if err := fn(dirName, name, typ); err != nil {
 			return err
@@ -100,7 +100,7 @@ func parseDirEnt(buf []byte) (consumed int, name string, typ os.FileMode) {
 		// Skip weird things.
 		// It's probably a DT_WHT (http://lwn.net/Articles/325369/)
 		// or something. Revisit if/when this package is moved outside
-		// of goimports. goimports only cares about regular ***REMOVED***les,
+		// of goimports. goimports only cares about regular files,
 		// symlinks, and directories.
 		return
 	}
@@ -108,15 +108,15 @@ func parseDirEnt(buf []byte) (consumed int, name string, typ os.FileMode) {
 	nameBuf := (*[unsafe.Sizeof(dirent.Name)]byte)(unsafe.Pointer(&dirent.Name[0]))
 	nameLen := bytes.IndexByte(nameBuf[:], 0)
 	if nameLen < 0 {
-		panic("failed to ***REMOVED***nd terminating 0 byte in dirent")
+		panic("failed to find terminating 0 byte in dirent")
 	}
 
 	// Special cases for common things:
 	if nameLen == 1 && nameBuf[0] == '.' {
 		name = "."
-	} ***REMOVED*** if nameLen == 2 && nameBuf[0] == '.' && nameBuf[1] == '.' {
+	} else if nameLen == 2 && nameBuf[0] == '.' && nameBuf[1] == '.' {
 		name = ".."
-	} ***REMOVED*** {
+	} else {
 		name = string(nameBuf[:nameLen])
 	}
 	return

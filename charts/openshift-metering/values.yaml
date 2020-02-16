@@ -12,7 +12,7 @@ storage:
   type: "hive"
   hive: {}
 
-  # Below is an example of what con***REMOVED***guring storage could look like:
+  # Below is an example of what configuring storage could look like:
   #
   # hive:
   #   type: "hdfs"
@@ -39,7 +39,7 @@ storage:
 tls:
   enabled: true
   # the name of the secret containing root CA key/cert
-  certi***REMOVED***cate: ""
+  certificate: ""
   key: ""
   secretName: "metering-operator-root-ca"
 
@@ -244,7 +244,7 @@ openshift-reporting:
 
 reporting-operator:
   spec:
-    af***REMOVED***nity: {}
+    affinity: {}
     annotations: {}
     labels: {}
     nodeSelector: {}
@@ -271,7 +271,7 @@ reporting-operator:
         cpu: 500m
         memory: 100Mi
 
-    con***REMOVED***g:
+    config:
       allNamespaces: false
       enableFinalizers: false
       leaderLeaseDuration: "60s"
@@ -291,14 +291,14 @@ reporting-operator:
         host: null
         tls:
           # CA for the client cert
-          caCerti***REMOVED***cate: ""
+          caCertificate: ""
 
           createSecret: false
           enabled: false
           secretName: ""
         auth:
           # client cert
-          certi***REMOVED***cate: ""
+          certificate: ""
           # client private key
           key: ""
 
@@ -312,14 +312,14 @@ reporting-operator:
 
         tls:
           # CA for the server cert
-          caCerti***REMOVED***cate: ""
+          caCertificate: ""
 
           createSecret: false
           enabled: false
           secretName: ""
         auth:
           # client cert
-          certi***REMOVED***cate: ""
+          certificate: ""
           # client private key
           key: ""
 
@@ -330,13 +330,13 @@ reporting-operator:
       prometheus:
         url: ""
 
-        certi***REMOVED***cateAuthority:
+        certificateAuthority:
           useServiceAccountCA: true
-          con***REMOVED***gMap:
+          configMap:
             create: false
             enabled: false
-            ***REMOVED***lename: ""
-            name: reporting-operator-certi***REMOVED***cate-authority-con***REMOVED***g
+            filename: ""
+            name: reporting-operator-certificate-authority-config
             value: ""
 
         metricsImporter:
@@ -348,22 +348,22 @@ reporting-operator:
               enabled: false
               name: reporting-operator-prometheus-bearer-secrets
               value: ""
-          con***REMOVED***g:
+          config:
             chunkSize: 5m
             pollInterval: 5m
             stepSize: 60s
             importFrom: null
-            maxImportBack***REMOVED***llDuration: null
+            maxImportBackfillDuration: null
             maxQueryRangeDuration: null
 
       tls:
         api:
           # server cert
-          certi***REMOVED***cate: ""
+          certificate: ""
           # server private key
           key: ""
           # CA for the server cert
-          caCerti***REMOVED***cate: ""
+          caCertificate: ""
 
           createSecret: false
           # default enabled because we expect the cert to be created by the
@@ -471,7 +471,7 @@ presto:
       repository: null
       tag: null
 
-    con***REMOVED***g:
+    config:
       environment: production
       nodeSchedulerIncludeCoordinator: true
       maxQueryLength: "10000000"
@@ -507,11 +507,11 @@ presto:
 
       tls:
         # server cert
-        certi***REMOVED***cate: ""
+        certificate: ""
         # server private key
         key: ""
         # CA for the server cert
-        caCerti***REMOVED***cate: ""
+        caCertificate: ""
 
         createSecret: false
         enabled: false
@@ -519,11 +519,11 @@ presto:
 
       auth:
         # client cert
-        certi***REMOVED***cate: ""
+        certificate: ""
         # client private key
         key: ""
         # CA for the client cert
-        caCerti***REMOVED***cate: ""
+        caCertificate: ""
 
         createSecret: false
         enabled: false
@@ -531,19 +531,19 @@ presto:
 
       connectors:
         hive:
-          hadoopCon***REMOVED***gSecretName: hadoop-con***REMOVED***g
-          useHadoopCon***REMOVED***g: true
+          hadoopConfigSecretName: hadoop-config
+          useHadoopConfig: true
 
           metastoreURI: null
           metastoreTimeout: null
 
           tls:
             # client cert
-            certi***REMOVED***cate: ""
+            certificate: ""
             # client private key
             key: ""
             # CA for metastore
-            caCerti***REMOVED***cate: ""
+            caCertificate: ""
 
             createSecret: false
             enabled: false
@@ -554,7 +554,7 @@ presto:
         extraConnectorFiles: []
         prometheus:
           enabled: false
-          con***REMOVED***g:
+          config:
             uri: ""
             chunkSizeDuration: null
             maxQueryRangeDuration: null
@@ -564,8 +564,8 @@ presto:
             useServiceAccountToken: true
 
     coordinator:
-      af***REMOVED***nity:
-        podAntiAf***REMOVED***nity:
+      affinity:
+        podAntiAffinity:
           requiredDuringSchedulingIgnoredDuringExecution:
           - labelSelector:
               matchExpressions:
@@ -578,7 +578,7 @@ presto:
       tolerations: []
       terminationGracePeriodSeconds: 30
 
-      con***REMOVED***g:
+      config:
         jvm:
           G1HeapRegionSize: null
           concGCThreads: null
@@ -611,8 +611,8 @@ presto:
 
     worker:
       replicas: 0
-      af***REMOVED***nity:
-        podAntiAf***REMOVED***nity:
+      affinity:
+        podAntiAffinity:
           requiredDuringSchedulingIgnoredDuringExecution:
           - labelSelector:
               matchExpressions:
@@ -625,7 +625,7 @@ presto:
       terminationGracePeriodSeconds: 30
       tolerations: []
 
-      con***REMOVED***g:
+      config:
         jvm:
           G1HeapRegionSize: null
           concGCThreads: null
@@ -658,14 +658,14 @@ hive:
     annotations: {}
     terminationGracePeriodSeconds: 30
 
-    con***REMOVED***g:
+    config:
       metastoreClientSocketTimeout: null
       metastoreWarehouseDir: null
 
       defaultFileFormat: orc
 
-      hadoopCon***REMOVED***gSecretName: hadoop-con***REMOVED***g
-      useHadoopCon***REMOVED***g: true
+      hadoopConfigSecretName: hadoop-config
+      useHadoopConfig: true
 
       db:
         driver: org.apache.derby.jdbc.EmbeddedDriver
@@ -674,7 +674,7 @@ hive:
         username: null
 
         autoCreateMetastoreSchema: true
-        enableMetastoreSchemaVeri***REMOVED***cation: false
+        enableMetastoreSchemaVerification: false
 
       aws:
         accessKeyID: ""
@@ -723,11 +723,11 @@ hive:
       pullSecrets: []
 
     metastore:
-      af***REMOVED***nity: {}
+      affinity: {}
       nodeSelector: {}
       tolerations: []
 
-      con***REMOVED***g:
+      config:
         logLevel: info
         jvm:
           initialRAMPercentage: null
@@ -736,11 +736,11 @@ hive:
 
         tls:
           # server cert
-          certi***REMOVED***cate: ""
+          certificate: ""
           # server private key
           key: ""
           # CA for the server cert
-          caCerti***REMOVED***cate: ""
+          caCertificate: ""
 
           enabled: false
           createSecret: false
@@ -780,11 +780,11 @@ hive:
         timeoutSeconds: 15
 
     server:
-      af***REMOVED***nity: {}
+      affinity: {}
       nodeSelector: {}
       tolerations: []
 
-      con***REMOVED***g:
+      config:
         logLevel: info
         jvm:
           initialRAMPercentage: null
@@ -793,11 +793,11 @@ hive:
 
         tls:
           # server cert
-          certi***REMOVED***cate: ""
+          certificate: ""
           # server private key
           key: ""
           # CA for the server cert
-          caCerti***REMOVED***cate: ""
+          caCertificate: ""
 
           enabled: false
           createSecret: false
@@ -809,11 +809,11 @@ hive:
         metastoreTLS:
           # TLS options for connecting to hive-metastore from hive-server
           # client cert
-          certi***REMOVED***cate: ""
+          certificate: ""
           # client private key
           key: ""
           # CA for the client cert
-          caCerti***REMOVED***cate: ""
+          caCertificate: ""
 
           enabled: false
           createSecret: false
@@ -860,9 +860,9 @@ __ghostunnel:
 
 hadoop:
   spec:
-    con***REMOVED***gSecretName: hadoop-con***REMOVED***g
+    configSecretName: hadoop-config
 
-    con***REMOVED***g:
+    config:
       defaultFS: hdfs://hdfs-namenode-0.hdfs-namenode:9820
 
       aws:
@@ -905,7 +905,7 @@ hadoop:
 
     hdfs:
       enabled: false
-      con***REMOVED***g:
+      config:
         datanodeDataDirPerms: "775"
         replicationFactor: 3
         logLevel: info
@@ -918,7 +918,7 @@ hadoop:
         terminationGracePeriodSeconds: 30
         replicas: 1
 
-        con***REMOVED***g:
+        config:
           jvm:
             initialRAMPercentage: null
             maxRAMPercentage: null
@@ -936,8 +936,8 @@ hadoop:
           class: null
           size: 5Gi
 
-        af***REMOVED***nity:
-          podAntiAf***REMOVED***nity:
+        affinity:
+          podAntiAffinity:
             requiredDuringSchedulingIgnoredDuringExecution:
             - labelSelector:
                 matchExpressions:
@@ -954,7 +954,7 @@ hadoop:
         terminationGracePeriodSeconds: 30
         tolerations: []
 
-        con***REMOVED***g:
+        config:
           jvm:
             initialRAMPercentage: null
             maxRAMPercentage: null
@@ -972,8 +972,8 @@ hadoop:
           class: null
           size: 5Gi
 
-        af***REMOVED***nity:
-          podAntiAf***REMOVED***nity:
+        affinity:
+          podAntiAffinity:
             requiredDuringSchedulingIgnoredDuringExecution:
             - labelSelector:
                 matchExpressions:

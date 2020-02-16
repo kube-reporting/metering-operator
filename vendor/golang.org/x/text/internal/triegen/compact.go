@@ -1,14 +1,14 @@
 // Copyright 2014 The Go Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE ***REMOVED***le.
+// license that can be found in the LICENSE file.
 
 package triegen
 
-// This ***REMOVED***le de***REMOVED***nes Compacter and its implementations.
+// This file defines Compacter and its implementations.
 
 import "io"
 
-// A Compacter generates an alternative, more space-ef***REMOVED***cient way to store a
+// A Compacter generates an alternative, more space-efficient way to store a
 // trie value block. A trie value block holds all possible values for the last
 // byte of a UTF-8 encoded rune. Excluding ASCII characters, a trie value block
 // always has 64 values, as a UTF-8 encoding ends with a byte in [0x80, 0xC0).

@@ -5,7 +5,7 @@ There are two endpoints for the V2 versions of the endpoint:
 - `/api/v2/reports/{namespace}/{name}/full`
 - `/api/v2/reports/{namespace}/{name}/table`
 
-`{name}` is the name of the report that you are looking to run. Output format is speci***REMOVED***ed as a query string at the end.
+`{name}` is the name of the report that you are looking to run. Output format is specified as a query string at the end.
 
 # Sample URLs
 
@@ -27,7 +27,7 @@ Replace `$REPORT_FORMAT` with json, csv or tabular.
 
 ### V2 Reports Full
 
-The `/api/v2/reports/{namespace}/{name}/full` endpoint returns reports in either CSV, JSON, or tabular format, similar to /api/v1/reports/get. The difference is in the structure of the JSON results. The JSON results from this endpoint contain more metadata about each ***REMOVED***eld including the unit, and whether or not the ***REMOVED***eld should be shown the in a table (used in the table endpoint below).
+The `/api/v2/reports/{namespace}/{name}/full` endpoint returns reports in either CSV, JSON, or tabular format, similar to /api/v1/reports/get. The difference is in the structure of the JSON results. The JSON results from this endpoint contain more metadata about each field including the unit, and whether or not the field should be shown the in a table (used in the table endpoint below).
 
 This URL `/api/v2/reports/openshift-metering/namespace-cpu-request/full?format=json` returns
 

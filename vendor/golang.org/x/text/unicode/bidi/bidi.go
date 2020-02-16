@@ -1,6 +1,6 @@
 // Copyright 2015 The Go Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE ***REMOVED***le.
+// license that can be found in the LICENSE file.
 
 //go:generate go run gen.go gen_trieval.go gen_ranges.go
 
@@ -14,7 +14,7 @@ package bidi // import "golang.org/x/text/unicode/bidi"
 
 // TODO:
 // The following functionality would not be hard to implement, but hinges on
-// the de***REMOVED***nition of a Segmenter interface. For now this is up to the user.
+// the definition of a Segmenter interface. For now this is up to the user.
 // - Iterate over paragraphs
 // - Segmenter to iterate over runs directly from a given text.
 // Also:
@@ -54,8 +54,8 @@ type options struct{}
 // An Option is an option for Bidi processing.
 type Option func(*options)
 
-// ICU allows the user to de***REMOVED***ne embedding levels. This may be used, for example,
-// to use hierarchical structure of markup languages to de***REMOVED***ne embeddings.
+// ICU allows the user to define embedding levels. This may be used, for example,
+// to use hierarchical structure of markup languages to define embeddings.
 // The following option may be a way to expose this functionality in this API.
 // // LevelFunc sets a function that associates nesting levels with the given text.
 // // The levels function will be called with monotonically increasing values for p.
@@ -74,18 +74,18 @@ type Paragraph struct {
 	// buffers
 }
 
-// SetBytes con***REMOVED***gures p for the given paragraph text. It replaces text
+// SetBytes configures p for the given paragraph text. It replaces text
 // previously set by SetBytes or SetString. If b contains a paragraph separator
-// it will only process the ***REMOVED***rst paragraph and report the number of bytes
+// it will only process the first paragraph and report the number of bytes
 // consumed from b including this separator. Error may be non-nil if options are
 // given.
 func (p *Paragraph) SetBytes(b []byte, opts ...Option) (n int, err error) {
 	panic("unimplemented")
 }
 
-// SetString con***REMOVED***gures p for the given paragraph text. It replaces text
+// SetString configures p for the given paragraph text. It replaces text
 // previously set by SetBytes or SetString. If b contains a paragraph separator
-// it will only process the ***REMOVED***rst paragraph and report the number of bytes
+// it will only process the first paragraph and report the number of bytes
 // consumed from b including this separator. Error may be non-nil if options are
 // given.
 func (p *Paragraph) SetString(s string, opts ...Option) (n int, err error) {
@@ -148,7 +148,7 @@ func (o *Ordering) Run(i int) Run {
 
 // TODO: perhaps with options.
 // // Reorder creates a reader that reads the runes in visual order per character.
-// // Modi***REMOVED***ers remain after the runes they modify.
+// // Modifiers remain after the runes they modify.
 // func (l *Runs) Reorder() io.Reader {
 // 	panic("unimplemented")
 // }
@@ -184,14 +184,14 @@ func (r *Run) Pos() (start, end int) {
 }
 
 // AppendReverse reverses the order of characters of in, appends them to out,
-// and returns the result. Modi***REMOVED***ers will still follow the runes they modify.
+// and returns the result. Modifiers will still follow the runes they modify.
 // Brackets are replaced with their counterparts.
 func AppendReverse(out, in []byte) []byte {
 	panic("unimplemented")
 }
 
 // ReverseString reverses the order of characters in s and returns a new string.
-// Modi***REMOVED***ers will still follow the runes they modify. Brackets are replaced with
+// Modifiers will still follow the runes they modify. Brackets are replaced with
 // their counterparts.
 func ReverseString(s string) string {
 	panic("unimplemented")

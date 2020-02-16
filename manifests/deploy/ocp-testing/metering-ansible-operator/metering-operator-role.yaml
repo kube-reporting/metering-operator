@@ -28,7 +28,7 @@ rules:
   - apiGroups:
     - ""
     resources:
-    - con***REMOVED***gmaps
+    - configmaps
     - endpoints
     - persistentvolumeclaims
     - secrets
@@ -69,7 +69,7 @@ rules:
     resources:
     - daemonsets
     - deployments
-    - deployments/***REMOVED***nalizers
+    - deployments/finalizers
     - deployments/rollback
     - deployments/scale
     - replicasets

@@ -27,7 +27,7 @@ type MapItem struct {
 // The Unmarshaler interface may be implemented by types to customize their
 // behavior when being unmarshaled from a YAML document. The UnmarshalYAML
 // method receives a function that may be called to unmarshal the original
-// YAML value into a ***REMOVED***eld or variable. It is safe to call the unmarshal
+// YAML value into a field or variable. It is safe to call the unmarshal
 // function parameter more than once if necessary.
 type Unmarshaler interface {
 	UnmarshalYAML(unmarshal func(interface{}) error) error
@@ -43,7 +43,7 @@ type Marshaler interface {
 	MarshalYAML() (interface{}, error)
 }
 
-// Unmarshal decodes the ***REMOVED***rst document found within the in byte slice
+// Unmarshal decodes the first document found within the in byte slice
 // and assigns decoded values into the out value.
 //
 // Maps and pointers (to a struct, string, int, etc) are accepted as out
@@ -57,10 +57,10 @@ type Marshaler interface {
 // content, and a *yaml.TypeError is returned with details for all
 // missed values.
 //
-// Struct ***REMOVED***elds are only unmarshalled if they are exported (have an
-// upper case ***REMOVED***rst letter), and are unmarshalled using the ***REMOVED***eld name
-// lowercased as the default key. Custom keys may be de***REMOVED***ned via the
-// "yaml" name in the ***REMOVED***eld tag: the content preceding the ***REMOVED***rst comma
+// Struct fields are only unmarshalled if they are exported (have an
+// upper case first letter), and are unmarshalled using the field name
+// lowercased as the default key. Custom keys may be defined via the
+// "yaml" name in the field tag: the content preceding the first comma
 // is used as the key, and the following comma-separated options are
 // used to tweak the marshalling process (see Marshal).
 // Conflicting names result in a runtime error.
@@ -81,7 +81,7 @@ func Unmarshal(in []byte, out interface{}) (err error) {
 	return unmarshal(in, out, false)
 }
 
-// UnmarshalStrict is like Unmarshal except that any ***REMOVED***elds that are found
+// UnmarshalStrict is like Unmarshal except that any fields that are found
 // in the data that do not have corresponding struct members, or mapping
 // keys that are duplicates, will result in
 // an error.
@@ -157,35 +157,35 @@ func unmarshal(in []byte, out interface{}, strict bool) (err error) {
 // of the generated document will reflect the structure of the value itself.
 // Maps and pointers (to struct, string, int, etc) are accepted as the in value.
 //
-// Struct ***REMOVED***elds are only marshalled if they are exported (have an upper case
-// ***REMOVED***rst letter), and are marshalled using the ***REMOVED***eld name lowercased as the
-// default key. Custom keys may be de***REMOVED***ned via the "yaml" name in the ***REMOVED***eld
-// tag: the content preceding the ***REMOVED***rst comma is used as the key, and the
+// Struct fields are only marshalled if they are exported (have an upper case
+// first letter), and are marshalled using the field name lowercased as the
+// default key. Custom keys may be defined via the "yaml" name in the field
+// tag: the content preceding the first comma is used as the key, and the
 // following comma-separated options are used to tweak the marshalling process.
 // Conflicting names result in a runtime error.
 //
-// The ***REMOVED***eld tag format accepted is:
+// The field tag format accepted is:
 //
 //     `(...) yaml:"[<key>][,<flag1>[,<flag2>]]" (...)`
 //
 // The following flags are currently supported:
 //
-//     omitempty    Only include the ***REMOVED***eld if it's not set to the zero
+//     omitempty    Only include the field if it's not set to the zero
 //                  value for the type or to empty slices or maps.
 //                  Zero valued structs will be omitted if all their public
-//                  ***REMOVED***elds are zero, unless they implement an IsZero
+//                  fields are zero, unless they implement an IsZero
 //                  method (see the IsZeroer interface type), in which
-//                  case the ***REMOVED***eld will be included if that method returns true.
+//                  case the field will be included if that method returns true.
 //
 //     flow         Marshal using a flow style (useful for structs,
 //                  sequences and maps).
 //
-//     inline       Inline the ***REMOVED***eld, which must be a struct or a map,
-//                  causing all of its ***REMOVED***elds or keys to be processed as if
+//     inline       Inline the field, which must be a struct or a map,
+//                  causing all of its fields or keys to be processed as if
 //                  they were part of the outer struct. For maps, keys must
-//                  not conflict with the yaml keys of other struct ***REMOVED***elds.
+//                  not conflict with the yaml keys of other struct fields.
 //
-// In addition, if the key is "-", the ***REMOVED***eld is ignored.
+// In addition, if the key is "-", the field is ignored.
 //
 // For example:
 //
@@ -201,7 +201,7 @@ func Marshal(in interface{}) (out []byte, err error) {
 	e := newEncoder()
 	defer e.destroy()
 	e.marshalDoc("", reflect.ValueOf(in))
-	e.***REMOVED***nish()
+	e.finish()
 	out = e.out
 	return
 }
@@ -223,7 +223,7 @@ func NewEncoder(w io.Writer) *Encoder {
 // Encode writes the YAML encoding of v to the stream.
 // If multiple items are encoded to the stream, the
 // second and subsequent document will be preceded
-// with a "---" document separator, but the ***REMOVED***rst will not.
+// with a "---" document separator, but the first will not.
 //
 // See the documentation for Marshal for details about the conversion of Go
 // values to YAML.
@@ -237,7 +237,7 @@ func (e *Encoder) Encode(v interface{}) (err error) {
 // It does not write a stream terminating string "...".
 func (e *Encoder) Close() (err error) {
 	defer handleErr(&err)
-	e.encoder.***REMOVED***nish()
+	e.encoder.finish()
 	return nil
 }
 
@@ -245,7 +245,7 @@ func handleErr(err *error) {
 	if v := recover(); v != nil {
 		if e, ok := v.(yamlError); ok {
 			*err = e.err
-		} ***REMOVED*** {
+		} else {
 			panic(v)
 		}
 	}
@@ -263,7 +263,7 @@ func failf(format string, args ...interface{}) {
 	panic(yamlError{fmt.Errorf("yaml: "+format, args...)})
 }
 
-// A TypeError is returned by Unmarshal when one or more ***REMOVED***elds in
+// A TypeError is returned by Unmarshal when one or more fields in
 // the YAML document cannot be properly decoded into the requested
 // types. When this error is returned, the value is still
 // unmarshaled partially.
@@ -276,69 +276,69 @@ func (e *TypeError) Error() string {
 }
 
 // --------------------------------------------------------------------------
-// Maintain a mapping of keys to structure ***REMOVED***eld indexes
+// Maintain a mapping of keys to structure field indexes
 
 // The code in this section was copied from mgo/bson.
 
-// structInfo holds details for the serialization of ***REMOVED***elds of
+// structInfo holds details for the serialization of fields of
 // a given struct.
 type structInfo struct {
-	FieldsMap  map[string]***REMOVED***eldInfo
-	FieldsList []***REMOVED***eldInfo
+	FieldsMap  map[string]fieldInfo
+	FieldsList []fieldInfo
 
-	// InlineMap is the number of the ***REMOVED***eld in the struct that
+	// InlineMap is the number of the field in the struct that
 	// contains an ,inline map, or -1 if there's none.
 	InlineMap int
 }
 
-type ***REMOVED***eldInfo struct {
+type fieldInfo struct {
 	Key       string
 	Num       int
 	OmitEmpty bool
 	Flow      bool
-	// Id holds the unique ***REMOVED***eld identi***REMOVED***er, so we can cheaply
-	// check for ***REMOVED***eld duplicates without maintaining an extra map.
+	// Id holds the unique field identifier, so we can cheaply
+	// check for field duplicates without maintaining an extra map.
 	Id int
 
-	// Inline holds the ***REMOVED***eld index if the ***REMOVED***eld is part of an inlined struct.
+	// Inline holds the field index if the field is part of an inlined struct.
 	Inline []int
 }
 
 var structMap = make(map[reflect.Type]*structInfo)
-var ***REMOVED***eldMapMutex sync.RWMutex
+var fieldMapMutex sync.RWMutex
 
 func getStructInfo(st reflect.Type) (*structInfo, error) {
-	***REMOVED***eldMapMutex.RLock()
+	fieldMapMutex.RLock()
 	sinfo, found := structMap[st]
-	***REMOVED***eldMapMutex.RUnlock()
+	fieldMapMutex.RUnlock()
 	if found {
 		return sinfo, nil
 	}
 
 	n := st.NumField()
-	***REMOVED***eldsMap := make(map[string]***REMOVED***eldInfo)
-	***REMOVED***eldsList := make([]***REMOVED***eldInfo, 0, n)
+	fieldsMap := make(map[string]fieldInfo)
+	fieldsList := make([]fieldInfo, 0, n)
 	inlineMap := -1
 	for i := 0; i != n; i++ {
-		***REMOVED***eld := st.Field(i)
-		if ***REMOVED***eld.PkgPath != "" && !***REMOVED***eld.Anonymous {
-			continue // Private ***REMOVED***eld
+		field := st.Field(i)
+		if field.PkgPath != "" && !field.Anonymous {
+			continue // Private field
 		}
 
-		info := ***REMOVED***eldInfo{Num: i}
+		info := fieldInfo{Num: i}
 
-		tag := ***REMOVED***eld.Tag.Get("yaml")
-		if tag == "" && strings.Index(string(***REMOVED***eld.Tag), ":") < 0 {
-			tag = string(***REMOVED***eld.Tag)
+		tag := field.Tag.Get("yaml")
+		if tag == "" && strings.Index(string(field.Tag), ":") < 0 {
+			tag = string(field.Tag)
 		}
 		if tag == "-" {
 			continue
 		}
 
 		inline := false
-		***REMOVED***elds := strings.Split(tag, ",")
-		if len(***REMOVED***elds) > 1 {
-			for _, flag := range ***REMOVED***elds[1:] {
+		fields := strings.Split(tag, ",")
+		if len(fields) > 1 {
+			for _, flag := range fields[1:] {
 				switch flag {
 				case "omitempty":
 					info.OmitEmpty = true
@@ -350,70 +350,70 @@ func getStructInfo(st reflect.Type) (*structInfo, error) {
 					return nil, errors.New(fmt.Sprintf("Unsupported flag %q in tag %q of type %s", flag, tag, st))
 				}
 			}
-			tag = ***REMOVED***elds[0]
+			tag = fields[0]
 		}
 
 		if inline {
-			switch ***REMOVED***eld.Type.Kind() {
+			switch field.Type.Kind() {
 			case reflect.Map:
 				if inlineMap >= 0 {
 					return nil, errors.New("Multiple ,inline maps in struct " + st.String())
 				}
-				if ***REMOVED***eld.Type.Key() != reflect.TypeOf("") {
+				if field.Type.Key() != reflect.TypeOf("") {
 					return nil, errors.New("Option ,inline needs a map with string keys in struct " + st.String())
 				}
 				inlineMap = info.Num
 			case reflect.Struct:
-				sinfo, err := getStructInfo(***REMOVED***eld.Type)
+				sinfo, err := getStructInfo(field.Type)
 				if err != nil {
 					return nil, err
 				}
-				for _, ***REMOVED***nfo := range sinfo.FieldsList {
-					if _, found := ***REMOVED***eldsMap[***REMOVED***nfo.Key]; found {
-						msg := "Duplicated key '" + ***REMOVED***nfo.Key + "' in struct " + st.String()
+				for _, finfo := range sinfo.FieldsList {
+					if _, found := fieldsMap[finfo.Key]; found {
+						msg := "Duplicated key '" + finfo.Key + "' in struct " + st.String()
 						return nil, errors.New(msg)
 					}
-					if ***REMOVED***nfo.Inline == nil {
-						***REMOVED***nfo.Inline = []int{i, ***REMOVED***nfo.Num}
-					} ***REMOVED*** {
-						***REMOVED***nfo.Inline = append([]int{i}, ***REMOVED***nfo.Inline...)
+					if finfo.Inline == nil {
+						finfo.Inline = []int{i, finfo.Num}
+					} else {
+						finfo.Inline = append([]int{i}, finfo.Inline...)
 					}
-					***REMOVED***nfo.Id = len(***REMOVED***eldsList)
-					***REMOVED***eldsMap[***REMOVED***nfo.Key] = ***REMOVED***nfo
-					***REMOVED***eldsList = append(***REMOVED***eldsList, ***REMOVED***nfo)
+					finfo.Id = len(fieldsList)
+					fieldsMap[finfo.Key] = finfo
+					fieldsList = append(fieldsList, finfo)
 				}
 			default:
-				//return nil, errors.New("Option ,inline needs a struct value or map ***REMOVED***eld")
-				return nil, errors.New("Option ,inline needs a struct value ***REMOVED***eld")
+				//return nil, errors.New("Option ,inline needs a struct value or map field")
+				return nil, errors.New("Option ,inline needs a struct value field")
 			}
 			continue
 		}
 
 		if tag != "" {
 			info.Key = tag
-		} ***REMOVED*** {
-			info.Key = strings.ToLower(***REMOVED***eld.Name)
+		} else {
+			info.Key = strings.ToLower(field.Name)
 		}
 
-		if _, found = ***REMOVED***eldsMap[info.Key]; found {
+		if _, found = fieldsMap[info.Key]; found {
 			msg := "Duplicated key '" + info.Key + "' in struct " + st.String()
 			return nil, errors.New(msg)
 		}
 
-		info.Id = len(***REMOVED***eldsList)
-		***REMOVED***eldsList = append(***REMOVED***eldsList, info)
-		***REMOVED***eldsMap[info.Key] = info
+		info.Id = len(fieldsList)
+		fieldsList = append(fieldsList, info)
+		fieldsMap[info.Key] = info
 	}
 
 	sinfo = &structInfo{
-		FieldsMap:  ***REMOVED***eldsMap,
-		FieldsList: ***REMOVED***eldsList,
+		FieldsMap:  fieldsMap,
+		FieldsList: fieldsList,
 		InlineMap:  inlineMap,
 	}
 
-	***REMOVED***eldMapMutex.Lock()
+	fieldMapMutex.Lock()
 	structMap[st] = sinfo
-	***REMOVED***eldMapMutex.Unlock()
+	fieldMapMutex.Unlock()
 	return sinfo, nil
 }
 
@@ -454,7 +454,7 @@ func isZero(v reflect.Value) bool {
 		vt := v.Type()
 		for i := v.NumField() - 1; i >= 0; i-- {
 			if vt.Field(i).PkgPath != "" {
-				continue // Private ***REMOVED***eld
+				continue // Private field
 			}
 			if !isZero(v.Field(i)) {
 				return false

@@ -10,7 +10,7 @@ import (
 // Version is a supported API version, corresponding to a vN package within the appropriate service.
 type Version struct {
 	ID       string
-	Suf***REMOVED***x   string
+	Suffix   string
 	Priority int
 }
 
@@ -44,16 +44,16 @@ func ChooseVersion(client *gophercloud.ProviderClient, recognized []*Version) (*
 	}
 
 	normalize := func(endpoint string) string {
-		if !strings.HasSuf***REMOVED***x(endpoint, "/") {
+		if !strings.HasSuffix(endpoint, "/") {
 			return endpoint + "/"
 		}
 		return endpoint
 	}
 	identityEndpoint := normalize(client.IdentityEndpoint)
 
-	// If a full endpoint is speci***REMOVED***ed, check version suf***REMOVED***xes for a match ***REMOVED***rst.
+	// If a full endpoint is specified, check version suffixes for a match first.
 	for _, v := range recognized {
-		if strings.HasSuf***REMOVED***x(identityEndpoint, v.Suf***REMOVED***x) {
+		if strings.HasSuffix(identityEndpoint, v.Suffix) {
 			return v, identityEndpoint, nil
 		}
 	}
@@ -89,7 +89,7 @@ func ChooseVersion(client *gophercloud.ProviderClient, recognized []*Version) (*
 					return version, href, nil
 				}
 
-				// Otherwise, ***REMOVED***nd the highest-priority version with a whitelisted status.
+				// Otherwise, find the highest-priority version with a whitelisted status.
 				if goodStatus[strings.ToLower(value.Status)] {
 					if highest == nil || version.Priority > highest.Priority {
 						highest = version

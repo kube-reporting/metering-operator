@@ -44,7 +44,7 @@ func (f *FlagSet) GetBool(name string) (bool, error) {
 	return val.(bool), nil
 }
 
-// BoolVar de***REMOVED***nes a bool flag with speci***REMOVED***ed name, default value, and usage string.
+// BoolVar defines a bool flag with specified name, default value, and usage string.
 // The argument p points to a bool variable in which to store the value of the flag.
 func (f *FlagSet) BoolVar(p *bool, name string, value bool, usage string) {
 	f.BoolVarP(p, name, "", value, usage)
@@ -56,7 +56,7 @@ func (f *FlagSet) BoolVarP(p *bool, name, shorthand string, value bool, usage st
 	flag.NoOptDefVal = "true"
 }
 
-// BoolVar de***REMOVED***nes a bool flag with speci***REMOVED***ed name, default value, and usage string.
+// BoolVar defines a bool flag with specified name, default value, and usage string.
 // The argument p points to a bool variable in which to store the value of the flag.
 func BoolVar(p *bool, name string, value bool, usage string) {
 	BoolVarP(p, name, "", value, usage)
@@ -68,7 +68,7 @@ func BoolVarP(p *bool, name, shorthand string, value bool, usage string) {
 	flag.NoOptDefVal = "true"
 }
 
-// Bool de***REMOVED***nes a bool flag with speci***REMOVED***ed name, default value, and usage string.
+// Bool defines a bool flag with specified name, default value, and usage string.
 // The return value is the address of a bool variable that stores the value of the flag.
 func (f *FlagSet) Bool(name string, value bool, usage string) *bool {
 	return f.BoolP(name, "", value, usage)
@@ -81,7 +81,7 @@ func (f *FlagSet) BoolP(name, shorthand string, value bool, usage string) *bool 
 	return p
 }
 
-// Bool de***REMOVED***nes a bool flag with speci***REMOVED***ed name, default value, and usage string.
+// Bool defines a bool flag with specified name, default value, and usage string.
 // The return value is the address of a bool variable that stores the value of the flag.
 func Bool(name string, value bool, usage string) *bool {
 	return BoolP(name, "", value, usage)

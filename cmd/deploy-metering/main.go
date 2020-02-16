@@ -18,10 +18,10 @@ import (
 )
 
 var (
-	cfg                  deploy.Con***REMOVED***g
+	cfg                  deploy.Config
 	deployType           string
 	logLevel             string
-	meteringCon***REMOVED***gCRFile string
+	meteringConfigCRFile string
 	deployManifestsDir   string
 
 	rootCmd = &cobra.Command{
@@ -54,22 +54,22 @@ var (
 )
 
 func init() {
-	rootCmd.PersistentFlags().StringVar(&cfg.Namespace, "namespace", "", "The namespace to install the metering resources. This can also be speci***REMOVED***ed through the METERING_NAMESPACE ENV var.")
-	rootCmd.PersistentFlags().StringVar(&cfg.Platform, "platform", "openshift", "The platform to install the metering stack on. Supported options are 'openshift', 'upstream', or 'ocp-testing'. This can also be speci***REMOVED***ed through the DEPLOY_PLATFORM ENV var.")
+	rootCmd.PersistentFlags().StringVar(&cfg.Namespace, "namespace", "", "The namespace to install the metering resources. This can also be specified through the METERING_NAMESPACE ENV var.")
+	rootCmd.PersistentFlags().StringVar(&cfg.Platform, "platform", "openshift", "The platform to install the metering stack on. Supported options are 'openshift', 'upstream', or 'ocp-testing'. This can also be specified through the DEPLOY_PLATFORM ENV var.")
 	rootCmd.PersistentFlags().StringVar(&logLevel, "log-level", log.InfoLevel.String(), "The logging level when deploying metering")
-	rootCmd.PersistentFlags().StringVar(&meteringCon***REMOVED***gCRFile, "meteringcon***REMOVED***g", "", "The absolute/relative path to the MeteringCon***REMOVED***g custom resource. This can also be speci***REMOVED***ed through the METERING_CR_FILE ENV var.")
-	rootCmd.PersistentFlags().StringVar(&deployManifestsDir, "deploy-manifests-dir", "manifests/deploy", "The absolute/relative path to the metering manifest directory. This can also be speci***REMOVED***ed through the INSTALLER_MANIFESTS_DIR.")
+	rootCmd.PersistentFlags().StringVar(&meteringConfigCRFile, "meteringconfig", "", "The absolute/relative path to the MeteringConfig custom resource. This can also be specified through the METERING_CR_FILE ENV var.")
+	rootCmd.PersistentFlags().StringVar(&deployManifestsDir, "deploy-manifests-dir", "manifests/deploy", "The absolute/relative path to the metering manifest directory. This can also be specified through the INSTALLER_MANIFESTS_DIR.")
 
-	uninstallCmd.Flags().BoolVar(&cfg.DeleteCRDs, "delete-crd", false, "If true, this would delete the metering CRDs during an uninstall. This can also be speci***REMOVED***ed through the METERING_DELETE_CRDS ENV var.")
-	uninstallCmd.Flags().BoolVar(&cfg.DeleteCRB, "delete-crb", false, "If true, this would delete the metering cluster role bindings during an uninstall. This can also be speci***REMOVED***ed through METERING_DELETE_CRB ENV var.")
-	uninstallCmd.Flags().BoolVar(&cfg.DeleteNamespace, "delete-namespace", false, "If true, this would delete the namespace during an uninstall. This can also be speci***REMOVED***ed through the METERING_DELETE_NAMESPACE ENV var.")
-	uninstallCmd.Flags().BoolVar(&cfg.DeletePVCs, "delete-pvc", true, "If true, this would delete the PVCs used by metering resources during an uninstall. This can also be speci***REMOVED***ed through the METERING_DELETE_PVCS ENV var.")
-	uninstallCmd.Flags().BoolVar(&cfg.DeleteAll, "delete-all", false, "If true, this would delete the all metering resources during an uninstall. This can also be speci***REMOVED***ed through the METERING_DELETE_ALL ENV var.")
+	uninstallCmd.Flags().BoolVar(&cfg.DeleteCRDs, "delete-crd", false, "If true, this would delete the metering CRDs during an uninstall. This can also be specified through the METERING_DELETE_CRDS ENV var.")
+	uninstallCmd.Flags().BoolVar(&cfg.DeleteCRB, "delete-crb", false, "If true, this would delete the metering cluster role bindings during an uninstall. This can also be specified through METERING_DELETE_CRB ENV var.")
+	uninstallCmd.Flags().BoolVar(&cfg.DeleteNamespace, "delete-namespace", false, "If true, this would delete the namespace during an uninstall. This can also be specified through the METERING_DELETE_NAMESPACE ENV var.")
+	uninstallCmd.Flags().BoolVar(&cfg.DeletePVCs, "delete-pvc", true, "If true, this would delete the PVCs used by metering resources during an uninstall. This can also be specified through the METERING_DELETE_PVCS ENV var.")
+	uninstallCmd.Flags().BoolVar(&cfg.DeleteAll, "delete-all", false, "If true, this would delete the all metering resources during an uninstall. This can also be specified through the METERING_DELETE_ALL ENV var.")
 
-	installCmd.Flags().StringVar(&cfg.Repo, "repo", "", "The name of the metering-ansible-operator image repository. This can also be speci***REMOVED***ed through the METERING_OPERATOR_IMAGE_REPO ENV var.")
-	installCmd.Flags().StringVar(&cfg.Tag, "tag", "", "The name of the metering-ansible-operator image tag. This can also be speci***REMOVED***ed through the METERING_OPERATOR_IMAGE_TAG ENV var.")
-	installCmd.Flags().BoolVar(&cfg.SkipMeteringDeployment, "skip-metering-operator-deployment", false, "If true, only create the metering namespace, CRDs, and MeteringCon***REMOVED***g resources. This can also be speci***REMOVED***ed through the SKIP_METERING_OPERATOR_DEPLOY ENV var.")
-	installCmd.Flags().BoolVar(&cfg.RunMeteringOperatorLocal, "run-metering-operator-local", false, "If true, skip installing the metering deployment. This can also be speci***REMOVED***ed through the $SKIP_METERING_OPERATOR_DEPLOYMENT ENV var.")
+	installCmd.Flags().StringVar(&cfg.Repo, "repo", "", "The name of the metering-ansible-operator image repository. This can also be specified through the METERING_OPERATOR_IMAGE_REPO ENV var.")
+	installCmd.Flags().StringVar(&cfg.Tag, "tag", "", "The name of the metering-ansible-operator image tag. This can also be specified through the METERING_OPERATOR_IMAGE_TAG ENV var.")
+	installCmd.Flags().BoolVar(&cfg.SkipMeteringDeployment, "skip-metering-operator-deployment", false, "If true, only create the metering namespace, CRDs, and MeteringConfig resources. This can also be specified through the SKIP_METERING_OPERATOR_DEPLOY ENV var.")
+	installCmd.Flags().BoolVar(&cfg.RunMeteringOperatorLocal, "run-metering-operator-local", false, "If true, skip installing the metering deployment. This can also be specified through the $SKIP_METERING_OPERATOR_DEPLOYMENT ENV var.")
 
 	if err := initFlagsFromEnv(); err != nil {
 		log.WithError(err).Fatalf("Failed to update flags from ENV vars: %v", err)
@@ -88,13 +88,13 @@ func main() {
 func runDeployMetering(cmd *cobra.Command, args []string) error {
 	logger := setupLogger(logLevel)
 
-	if meteringCon***REMOVED***gCRFile == "" {
-		return fmt.Errorf("failed to set the $METERING_CR_FILE or --meteringcon***REMOVED***g flag")
+	if meteringConfigCRFile == "" {
+		return fmt.Errorf("failed to set the $METERING_CR_FILE or --meteringconfig flag")
 	}
 
-	err := deploy.DecodeYAMLManifestToObject(meteringCon***REMOVED***gCRFile, &cfg.MeteringCon***REMOVED***g)
+	err := deploy.DecodeYAMLManifestToObject(meteringConfigCRFile, &cfg.MeteringConfig)
 	if err != nil {
-		return fmt.Errorf("failed to read MeteringCon***REMOVED***g: %v", err)
+		return fmt.Errorf("failed to read MeteringConfig: %v", err)
 	}
 
 	cfg.OperatorResources, err = deploy.ReadMeteringAnsibleOperatorManifests(deployManifestsDir, cfg.Platform)
@@ -102,29 +102,29 @@ func runDeployMetering(cmd *cobra.Command, args []string) error {
 		return fmt.Errorf("failed to read metering-ansible-operator manifests: %v", err)
 	}
 
-	logger.Debugf("Metering Deploy Con***REMOVED***g: %#v", cfg)
+	logger.Debugf("Metering Deploy Config: %#v", cfg)
 
-	kubecon***REMOVED***g := clientcmd.NewNonInteractiveDeferredLoadingClientCon***REMOVED***g(
-		clientcmd.NewDefaultClientCon***REMOVED***gLoadingRules(),
-		&clientcmd.Con***REMOVED***gOverrides{},
+	kubeconfig := clientcmd.NewNonInteractiveDeferredLoadingClientConfig(
+		clientcmd.NewDefaultClientConfigLoadingRules(),
+		&clientcmd.ConfigOverrides{},
 	)
 
-	restcon***REMOVED***g, err := kubecon***REMOVED***g.ClientCon***REMOVED***g()
+	restconfig, err := kubeconfig.ClientConfig()
 	if err != nil {
-		return fmt.Errorf("failed to initialize the kubernetes client con***REMOVED***g: %v", err)
+		return fmt.Errorf("failed to initialize the kubernetes client config: %v", err)
 	}
 
-	client, err := kubernetes.NewForCon***REMOVED***g(restcon***REMOVED***g)
+	client, err := kubernetes.NewForConfig(restconfig)
 	if err != nil {
 		return fmt.Errorf("failed to initialize the kubernetes clientset: %v", err)
 	}
 
-	apiextClient, err := apiextclientv1beta1.NewForCon***REMOVED***g(restcon***REMOVED***g)
+	apiextClient, err := apiextclientv1beta1.NewForConfig(restconfig)
 	if err != nil {
 		return fmt.Errorf("failed to initialize the apiextensions clientset: %v", err)
 	}
 
-	meteringClient, err := metering.NewForCon***REMOVED***g(restcon***REMOVED***g)
+	meteringClient, err := metering.NewForConfig(restconfig)
 	if err != nil {
 		return fmt.Errorf("failed to initialize the metering clientset: %v", err)
 	}
@@ -140,7 +140,7 @@ func runDeployMetering(cmd *cobra.Command, args []string) error {
 			return fmt.Errorf("failed to install metering: %v", err)
 		}
 		logger.Infof("Finished installing metering")
-	} ***REMOVED*** if deployType == "uninstall" {
+	} else if deployType == "uninstall" {
 		err := deployObj.Uninstall()
 		if err != nil {
 			return fmt.Errorf("failed to uninstall metering: %v", err)
@@ -182,7 +182,7 @@ func initFlagsFromEnv() error {
 			env: map[string]string{
 				"METERING_NAMESPACE":        "namespace",
 				"DEPLOY_PLATFORM":           "platform",
-				"METERING_CR_FILE":          "meteringcon***REMOVED***g",
+				"METERING_CR_FILE":          "meteringconfig",
 				"DEPLOY_MANIFESTS_DIR":      "deploy-manifests-dir",
 				"METERING_DEPLOY_LOG_LEVEL": "log-level",
 			},

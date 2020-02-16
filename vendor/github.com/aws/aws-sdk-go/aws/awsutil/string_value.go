@@ -28,10 +28,10 @@ func stringValue(v reflect.Value, indent int, buf *bytes.Buffer) {
 			fv := v.Field(i)
 
 			if ft.Name[0:1] == strings.ToLower(ft.Name[0:1]) {
-				continue // ignore unexported ***REMOVED***elds
+				continue // ignore unexported fields
 			}
 			if (fv.Kind() == reflect.Ptr || fv.Kind() == reflect.Slice) && fv.IsNil() {
-				continue // ignore unset ***REMOVED***elds
+				continue // ignore unset fields
 			}
 
 			buf.WriteString(strings.Repeat(" ", indent+2))
@@ -39,7 +39,7 @@ func stringValue(v reflect.Value, indent int, buf *bytes.Buffer) {
 
 			if tag := ft.Tag.Get("sensitive"); tag == "true" {
 				buf.WriteString("<sensitive>")
-			} ***REMOVED*** {
+			} else {
 				stringValue(fv, indent+2, buf)
 			}
 

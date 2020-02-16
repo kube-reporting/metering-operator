@@ -2,7 +2,7 @@
 Copyright 2017 The Kubernetes Authors.
 
 Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this ***REMOVED***le except in compliance with the License.
+you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
 
     http://www.apache.org/licenses/LICENSE-2.0
@@ -10,7 +10,7 @@ You may obtain a copy of the License at
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the speci***REMOVED***c language governing permissions and
+See the License for the specific language governing permissions and
 limitations under the License.
 */
 
@@ -18,7 +18,7 @@ package internalversion
 
 import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/apimachinery/pkg/***REMOVED***elds"
+	"k8s.io/apimachinery/pkg/fields"
 	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/apimachinery/pkg/runtime"
 )
@@ -31,25 +31,25 @@ type ListOptions struct {
 
 	// A selector based on labels
 	LabelSelector labels.Selector
-	// A selector based on ***REMOVED***elds
-	FieldSelector ***REMOVED***elds.Selector
+	// A selector based on fields
+	FieldSelector fields.Selector
 	// If true, partially initialized resources are included in the response.
 	// +optional
 	IncludeUninitialized bool
 	// If true, watch for changes to this list
 	Watch bool
-	// When speci***REMOVED***ed with a watch call, shows changes that occur after that particular version of a resource.
+	// When specified with a watch call, shows changes that occur after that particular version of a resource.
 	// Defaults to changes from the beginning of history.
-	// When speci***REMOVED***ed for list:
+	// When specified for list:
 	// - if unset, then the result is returned from remote storage based on quorum-read flag;
 	// - if it's 0, then we simply return what we currently have in cache, no guarantee;
 	// - if set to non zero, then the result is at least as fresh as given rv.
 	ResourceVersion string
 	// Timeout for the list/watch call.
 	TimeoutSeconds *int64
-	// Limit speci***REMOVED***es the maximum number of results to return from the server. The server may
-	// not support this ***REMOVED***eld on all resource types, but if it does and more results remain it
-	// will set the continue ***REMOVED***eld on the returned list object.
+	// Limit specifies the maximum number of results to return from the server. The server may
+	// not support this field on all resource types, but if it does and more results remain it
+	// will set the continue field on the returned list object.
 	Limit int64
 	// Continue is a token returned by the server that lets a client retrieve chunks of results
 	// from the server by specifying limit. The server may reject requests for continuation tokens

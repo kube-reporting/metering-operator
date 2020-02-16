@@ -12,7 +12,7 @@ Read more about the implemented and planned features in the documentation:
  - [Installation Guide](Documentation/install-metering.md) - install Metering on your Kubernetes cluster
  - [Usage Guide](Documentation/using-metering.md) - start here to learn how to use the project
  - [Metering Architecture](Documentation/metering-architecture.md) - understand the system's components
- - [Con***REMOVED***guration](Documentation/metering-con***REMOVED***g.md) - see the available options for talking to Prometheus, talking to AWS, storing Metering output and more.
+ - [Configuration](Documentation/metering-config.md) - see the available options for talking to Prometheus, talking to AWS, storing Metering output and more.
  - [Writing Custom Reports](Documentation/writing-custom-queries.md) - extend or customize reports based on your needs
 
 ## Developers

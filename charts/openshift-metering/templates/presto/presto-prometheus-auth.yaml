@@ -1,5 +1,5 @@
 #  grants list namespaces permissions to the presto service account
-{{- if .Values.presto.spec.con***REMOVED***g.connectors.prometheus.enabled }}
+{{- if .Values.presto.spec.config.connectors.prometheus.enabled }}
 ---
 kind: ClusterRole
 apiVersion: rbac.authorization.k8s.io/v1

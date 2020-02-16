@@ -29,7 +29,7 @@ func (r rules) IsValid(value string) bool {
 // mapRule generic rule for maps
 type mapRule map[string]struct{}
 
-// IsValid for the map rule satis***REMOVED***es whether it exists in the map
+// IsValid for the map rule satisfies whether it exists in the map
 func (m mapRule) IsValid(value string) bool {
 	_, ok := m[value]
 	return ok
@@ -61,7 +61,7 @@ type patterns []string
 // been found
 func (p patterns) IsValid(value string) bool {
 	for _, pattern := range p {
-		if strings.HasPre***REMOVED***x(http.CanonicalHeaderKey(value), pattern) {
+		if strings.HasPrefix(http.CanonicalHeaderKey(value), pattern) {
 			return true
 		}
 	}

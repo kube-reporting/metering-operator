@@ -60,10 +60,10 @@ var (
 	procControlService                     = modadvapi32.NewProc("ControlService")
 	procStartServiceCtrlDispatcherW        = modadvapi32.NewProc("StartServiceCtrlDispatcherW")
 	procSetServiceStatus                   = modadvapi32.NewProc("SetServiceStatus")
-	procChangeServiceCon***REMOVED***gW               = modadvapi32.NewProc("ChangeServiceCon***REMOVED***gW")
-	procQueryServiceCon***REMOVED***gW                = modadvapi32.NewProc("QueryServiceCon***REMOVED***gW")
-	procChangeServiceCon***REMOVED***g2W              = modadvapi32.NewProc("ChangeServiceCon***REMOVED***g2W")
-	procQueryServiceCon***REMOVED***g2W               = modadvapi32.NewProc("QueryServiceCon***REMOVED***g2W")
+	procChangeServiceConfigW               = modadvapi32.NewProc("ChangeServiceConfigW")
+	procQueryServiceConfigW                = modadvapi32.NewProc("QueryServiceConfigW")
+	procChangeServiceConfig2W              = modadvapi32.NewProc("ChangeServiceConfig2W")
+	procQueryServiceConfig2W               = modadvapi32.NewProc("QueryServiceConfig2W")
 	procEnumServicesStatusExW              = modadvapi32.NewProc("EnumServicesStatusExW")
 	procGetLastError                       = modkernel32.NewProc("GetLastError")
 	procLoadLibraryW                       = modkernel32.NewProc("LoadLibraryW")
@@ -146,14 +146,14 @@ var (
 	procReadDirectoryChangesW              = modkernel32.NewProc("ReadDirectoryChangesW")
 	procCertOpenSystemStoreW               = modcrypt32.NewProc("CertOpenSystemStoreW")
 	procCertOpenStore                      = modcrypt32.NewProc("CertOpenStore")
-	procCertEnumCerti***REMOVED***catesInStore        = modcrypt32.NewProc("CertEnumCerti***REMOVED***catesInStore")
-	procCertAddCerti***REMOVED***cateContextToStore   = modcrypt32.NewProc("CertAddCerti***REMOVED***cateContextToStore")
+	procCertEnumCertificatesInStore        = modcrypt32.NewProc("CertEnumCertificatesInStore")
+	procCertAddCertificateContextToStore   = modcrypt32.NewProc("CertAddCertificateContextToStore")
 	procCertCloseStore                     = modcrypt32.NewProc("CertCloseStore")
-	procCertGetCerti***REMOVED***cateChain            = modcrypt32.NewProc("CertGetCerti***REMOVED***cateChain")
-	procCertFreeCerti***REMOVED***cateChain           = modcrypt32.NewProc("CertFreeCerti***REMOVED***cateChain")
-	procCertCreateCerti***REMOVED***cateContext       = modcrypt32.NewProc("CertCreateCerti***REMOVED***cateContext")
-	procCertFreeCerti***REMOVED***cateContext         = modcrypt32.NewProc("CertFreeCerti***REMOVED***cateContext")
-	procCertVerifyCerti***REMOVED***cateChainPolicy   = modcrypt32.NewProc("CertVerifyCerti***REMOVED***cateChainPolicy")
+	procCertGetCertificateChain            = modcrypt32.NewProc("CertGetCertificateChain")
+	procCertFreeCertificateChain           = modcrypt32.NewProc("CertFreeCertificateChain")
+	procCertCreateCertificateContext       = modcrypt32.NewProc("CertCreateCertificateContext")
+	procCertFreeCertificateContext         = modcrypt32.NewProc("CertFreeCertificateContext")
+	procCertVerifyCertificateChainPolicy   = modcrypt32.NewProc("CertVerifyCertificateChainPolicy")
 	procRegOpenKeyExW                      = modadvapi32.NewProc("RegOpenKeyExW")
 	procRegCloseKey                        = modadvapi32.NewProc("RegCloseKey")
 	procRegQueryInfoKeyW                   = modadvapi32.NewProc("RegQueryInfoKeyW")
@@ -178,7 +178,7 @@ var (
 	procSetEvent                           = modkernel32.NewProc("SetEvent")
 	procResetEvent                         = modkernel32.NewProc("ResetEvent")
 	procPulseEvent                         = modkernel32.NewProc("PulseEvent")
-	procDe***REMOVED***neDosDeviceW                   = modkernel32.NewProc("De***REMOVED***neDosDeviceW")
+	procDefineDosDeviceW                   = modkernel32.NewProc("DefineDosDeviceW")
 	procDeleteVolumeMountPointW            = modkernel32.NewProc("DeleteVolumeMountPointW")
 	procFindFirstVolumeW                   = modkernel32.NewProc("FindFirstVolumeW")
 	procFindFirstVolumeMountPointW         = modkernel32.NewProc("FindFirstVolumeMountPointW")
@@ -227,7 +227,7 @@ var (
 	procFreeAddrInfoW                      = modws2_32.NewProc("FreeAddrInfoW")
 	procGetIfEntry                         = modiphlpapi.NewProc("GetIfEntry")
 	procGetAdaptersInfo                    = modiphlpapi.NewProc("GetAdaptersInfo")
-	procSetFileCompletionNoti***REMOVED***cationModes = modkernel32.NewProc("SetFileCompletionNoti***REMOVED***cationModes")
+	procSetFileCompletionNotificationModes = modkernel32.NewProc("SetFileCompletionNotificationModes")
 	procWSAEnumProtocolsW                  = modws2_32.NewProc("WSAEnumProtocolsW")
 	procGetAdaptersAddresses               = modiphlpapi.NewProc("GetAdaptersAddresses")
 	procGetACP                             = modkernel32.NewProc("GetACP")
@@ -249,7 +249,7 @@ var (
 	procCheckTokenMembership               = modadvapi32.NewProc("CheckTokenMembership")
 	procOpenProcessToken                   = modadvapi32.NewProc("OpenProcessToken")
 	procGetTokenInformation                = modadvapi32.NewProc("GetTokenInformation")
-	procGetUserPro***REMOVED***leDirectoryW           = moduserenv.NewProc("GetUserPro***REMOVED***leDirectoryW")
+	procGetUserProfileDirectoryW           = moduserenv.NewProc("GetUserProfileDirectoryW")
 )
 
 func RegisterEventSource(uncServerName *uint16, sourceName *uint16) (handle Handle, err error) {
@@ -258,7 +258,7 @@ func RegisterEventSource(uncServerName *uint16, sourceName *uint16) (handle Hand
 	if handle == 0 {
 		if e1 != 0 {
 			err = errnoErr(e1)
-		} ***REMOVED*** {
+		} else {
 			err = syscall.EINVAL
 		}
 	}
@@ -270,7 +270,7 @@ func DeregisterEventSource(handle Handle) (err error) {
 	if r1 == 0 {
 		if e1 != 0 {
 			err = errnoErr(e1)
-		} ***REMOVED*** {
+		} else {
 			err = syscall.EINVAL
 		}
 	}
@@ -282,7 +282,7 @@ func ReportEvent(log Handle, etype uint16, category uint16, eventId uint32, usrS
 	if r1 == 0 {
 		if e1 != 0 {
 			err = errnoErr(e1)
-		} ***REMOVED*** {
+		} else {
 			err = syscall.EINVAL
 		}
 	}
@@ -295,7 +295,7 @@ func OpenSCManager(machineName *uint16, databaseName *uint16, access uint32) (ha
 	if handle == 0 {
 		if e1 != 0 {
 			err = errnoErr(e1)
-		} ***REMOVED*** {
+		} else {
 			err = syscall.EINVAL
 		}
 	}
@@ -307,7 +307,7 @@ func CloseServiceHandle(handle Handle) (err error) {
 	if r1 == 0 {
 		if e1 != 0 {
 			err = errnoErr(e1)
-		} ***REMOVED*** {
+		} else {
 			err = syscall.EINVAL
 		}
 	}
@@ -320,7 +320,7 @@ func CreateService(mgr Handle, serviceName *uint16, displayName *uint16, access 
 	if handle == 0 {
 		if e1 != 0 {
 			err = errnoErr(e1)
-		} ***REMOVED*** {
+		} else {
 			err = syscall.EINVAL
 		}
 	}
@@ -333,7 +333,7 @@ func OpenService(mgr Handle, serviceName *uint16, access uint32) (handle Handle,
 	if handle == 0 {
 		if e1 != 0 {
 			err = errnoErr(e1)
-		} ***REMOVED*** {
+		} else {
 			err = syscall.EINVAL
 		}
 	}
@@ -345,7 +345,7 @@ func DeleteService(service Handle) (err error) {
 	if r1 == 0 {
 		if e1 != 0 {
 			err = errnoErr(e1)
-		} ***REMOVED*** {
+		} else {
 			err = syscall.EINVAL
 		}
 	}
@@ -357,7 +357,7 @@ func StartService(service Handle, numArgs uint32, argVectors **uint16) (err erro
 	if r1 == 0 {
 		if e1 != 0 {
 			err = errnoErr(e1)
-		} ***REMOVED*** {
+		} else {
 			err = syscall.EINVAL
 		}
 	}
@@ -369,7 +369,7 @@ func QueryServiceStatus(service Handle, status *SERVICE_STATUS) (err error) {
 	if r1 == 0 {
 		if e1 != 0 {
 			err = errnoErr(e1)
-		} ***REMOVED*** {
+		} else {
 			err = syscall.EINVAL
 		}
 	}
@@ -381,7 +381,7 @@ func ControlService(service Handle, control uint32, status *SERVICE_STATUS) (err
 	if r1 == 0 {
 		if e1 != 0 {
 			err = errnoErr(e1)
-		} ***REMOVED*** {
+		} else {
 			err = syscall.EINVAL
 		}
 	}
@@ -393,7 +393,7 @@ func StartServiceCtrlDispatcher(serviceTable *SERVICE_TABLE_ENTRY) (err error) {
 	if r1 == 0 {
 		if e1 != 0 {
 			err = errnoErr(e1)
-		} ***REMOVED*** {
+		} else {
 			err = syscall.EINVAL
 		}
 	}
@@ -405,55 +405,55 @@ func SetServiceStatus(service Handle, serviceStatus *SERVICE_STATUS) (err error)
 	if r1 == 0 {
 		if e1 != 0 {
 			err = errnoErr(e1)
-		} ***REMOVED*** {
+		} else {
 			err = syscall.EINVAL
 		}
 	}
 	return
 }
 
-func ChangeServiceCon***REMOVED***g(service Handle, serviceType uint32, startType uint32, errorControl uint32, binaryPathName *uint16, loadOrderGroup *uint16, tagId *uint32, dependencies *uint16, serviceStartName *uint16, password *uint16, displayName *uint16) (err error) {
-	r1, _, e1 := syscall.Syscall12(procChangeServiceCon***REMOVED***gW.Addr(), 11, uintptr(service), uintptr(serviceType), uintptr(startType), uintptr(errorControl), uintptr(unsafe.Pointer(binaryPathName)), uintptr(unsafe.Pointer(loadOrderGroup)), uintptr(unsafe.Pointer(tagId)), uintptr(unsafe.Pointer(dependencies)), uintptr(unsafe.Pointer(serviceStartName)), uintptr(unsafe.Pointer(password)), uintptr(unsafe.Pointer(displayName)), 0)
+func ChangeServiceConfig(service Handle, serviceType uint32, startType uint32, errorControl uint32, binaryPathName *uint16, loadOrderGroup *uint16, tagId *uint32, dependencies *uint16, serviceStartName *uint16, password *uint16, displayName *uint16) (err error) {
+	r1, _, e1 := syscall.Syscall12(procChangeServiceConfigW.Addr(), 11, uintptr(service), uintptr(serviceType), uintptr(startType), uintptr(errorControl), uintptr(unsafe.Pointer(binaryPathName)), uintptr(unsafe.Pointer(loadOrderGroup)), uintptr(unsafe.Pointer(tagId)), uintptr(unsafe.Pointer(dependencies)), uintptr(unsafe.Pointer(serviceStartName)), uintptr(unsafe.Pointer(password)), uintptr(unsafe.Pointer(displayName)), 0)
 	if r1 == 0 {
 		if e1 != 0 {
 			err = errnoErr(e1)
-		} ***REMOVED*** {
+		} else {
 			err = syscall.EINVAL
 		}
 	}
 	return
 }
 
-func QueryServiceCon***REMOVED***g(service Handle, serviceCon***REMOVED***g *QUERY_SERVICE_CONFIG, bufSize uint32, bytesNeeded *uint32) (err error) {
-	r1, _, e1 := syscall.Syscall6(procQueryServiceCon***REMOVED***gW.Addr(), 4, uintptr(service), uintptr(unsafe.Pointer(serviceCon***REMOVED***g)), uintptr(bufSize), uintptr(unsafe.Pointer(bytesNeeded)), 0, 0)
+func QueryServiceConfig(service Handle, serviceConfig *QUERY_SERVICE_CONFIG, bufSize uint32, bytesNeeded *uint32) (err error) {
+	r1, _, e1 := syscall.Syscall6(procQueryServiceConfigW.Addr(), 4, uintptr(service), uintptr(unsafe.Pointer(serviceConfig)), uintptr(bufSize), uintptr(unsafe.Pointer(bytesNeeded)), 0, 0)
 	if r1 == 0 {
 		if e1 != 0 {
 			err = errnoErr(e1)
-		} ***REMOVED*** {
+		} else {
 			err = syscall.EINVAL
 		}
 	}
 	return
 }
 
-func ChangeServiceCon***REMOVED***g2(service Handle, infoLevel uint32, info *byte) (err error) {
-	r1, _, e1 := syscall.Syscall(procChangeServiceCon***REMOVED***g2W.Addr(), 3, uintptr(service), uintptr(infoLevel), uintptr(unsafe.Pointer(info)))
+func ChangeServiceConfig2(service Handle, infoLevel uint32, info *byte) (err error) {
+	r1, _, e1 := syscall.Syscall(procChangeServiceConfig2W.Addr(), 3, uintptr(service), uintptr(infoLevel), uintptr(unsafe.Pointer(info)))
 	if r1 == 0 {
 		if e1 != 0 {
 			err = errnoErr(e1)
-		} ***REMOVED*** {
+		} else {
 			err = syscall.EINVAL
 		}
 	}
 	return
 }
 
-func QueryServiceCon***REMOVED***g2(service Handle, infoLevel uint32, buff *byte, buffSize uint32, bytesNeeded *uint32) (err error) {
-	r1, _, e1 := syscall.Syscall6(procQueryServiceCon***REMOVED***g2W.Addr(), 5, uintptr(service), uintptr(infoLevel), uintptr(unsafe.Pointer(buff)), uintptr(buffSize), uintptr(unsafe.Pointer(bytesNeeded)), 0)
+func QueryServiceConfig2(service Handle, infoLevel uint32, buff *byte, buffSize uint32, bytesNeeded *uint32) (err error) {
+	r1, _, e1 := syscall.Syscall6(procQueryServiceConfig2W.Addr(), 5, uintptr(service), uintptr(infoLevel), uintptr(unsafe.Pointer(buff)), uintptr(buffSize), uintptr(unsafe.Pointer(bytesNeeded)), 0)
 	if r1 == 0 {
 		if e1 != 0 {
 			err = errnoErr(e1)
-		} ***REMOVED*** {
+		} else {
 			err = syscall.EINVAL
 		}
 	}
@@ -465,7 +465,7 @@ func EnumServicesStatusEx(mgr Handle, infoLevel uint32, serviceType uint32, serv
 	if r1 == 0 {
 		if e1 != 0 {
 			err = errnoErr(e1)
-		} ***REMOVED*** {
+		} else {
 			err = syscall.EINVAL
 		}
 	}
@@ -495,7 +495,7 @@ func _LoadLibrary(libname *uint16) (handle Handle, err error) {
 	if handle == 0 {
 		if e1 != 0 {
 			err = errnoErr(e1)
-		} ***REMOVED*** {
+		} else {
 			err = syscall.EINVAL
 		}
 	}
@@ -517,7 +517,7 @@ func _LoadLibraryEx(libname *uint16, zero Handle, flags uintptr) (handle Handle,
 	if handle == 0 {
 		if e1 != 0 {
 			err = errnoErr(e1)
-		} ***REMOVED*** {
+		} else {
 			err = syscall.EINVAL
 		}
 	}
@@ -529,7 +529,7 @@ func FreeLibrary(handle Handle) (err error) {
 	if r1 == 0 {
 		if e1 != 0 {
 			err = errnoErr(e1)
-		} ***REMOVED*** {
+		} else {
 			err = syscall.EINVAL
 		}
 	}
@@ -551,7 +551,7 @@ func _GetProcAddress(module Handle, procname *byte) (proc uintptr, err error) {
 	if proc == 0 {
 		if e1 != 0 {
 			err = errnoErr(e1)
-		} ***REMOVED*** {
+		} else {
 			err = syscall.EINVAL
 		}
 	}
@@ -564,7 +564,7 @@ func GetVersion() (ver uint32, err error) {
 	if ver == 0 {
 		if e1 != 0 {
 			err = errnoErr(e1)
-		} ***REMOVED*** {
+		} else {
 			err = syscall.EINVAL
 		}
 	}
@@ -581,7 +581,7 @@ func FormatMessage(flags uint32, msgsrc uintptr, msgid uint32, langid uint32, bu
 	if n == 0 {
 		if e1 != 0 {
 			err = errnoErr(e1)
-		} ***REMOVED*** {
+		} else {
 			err = syscall.EINVAL
 		}
 	}
@@ -593,13 +593,13 @@ func ExitProcess(exitcode uint32) {
 	return
 }
 
-func CreateFile(name *uint16, access uint32, mode uint32, sa *SecurityAttributes, createmode uint32, attrs uint32, template***REMOVED***le int32) (handle Handle, err error) {
-	r0, _, e1 := syscall.Syscall9(procCreateFileW.Addr(), 7, uintptr(unsafe.Pointer(name)), uintptr(access), uintptr(mode), uintptr(unsafe.Pointer(sa)), uintptr(createmode), uintptr(attrs), uintptr(template***REMOVED***le), 0, 0)
+func CreateFile(name *uint16, access uint32, mode uint32, sa *SecurityAttributes, createmode uint32, attrs uint32, templatefile int32) (handle Handle, err error) {
+	r0, _, e1 := syscall.Syscall9(procCreateFileW.Addr(), 7, uintptr(unsafe.Pointer(name)), uintptr(access), uintptr(mode), uintptr(unsafe.Pointer(sa)), uintptr(createmode), uintptr(attrs), uintptr(templatefile), 0, 0)
 	handle = Handle(r0)
 	if handle == InvalidHandle {
 		if e1 != 0 {
 			err = errnoErr(e1)
-		} ***REMOVED*** {
+		} else {
 			err = syscall.EINVAL
 		}
 	}
@@ -615,7 +615,7 @@ func ReadFile(handle Handle, buf []byte, done *uint32, overlapped *Overlapped) (
 	if r1 == 0 {
 		if e1 != 0 {
 			err = errnoErr(e1)
-		} ***REMOVED*** {
+		} else {
 			err = syscall.EINVAL
 		}
 	}
@@ -631,7 +631,7 @@ func WriteFile(handle Handle, buf []byte, done *uint32, overlapped *Overlapped) 
 	if r1 == 0 {
 		if e1 != 0 {
 			err = errnoErr(e1)
-		} ***REMOVED*** {
+		} else {
 			err = syscall.EINVAL
 		}
 	}
@@ -644,7 +644,7 @@ func SetFilePointer(handle Handle, lowoffset int32, highoffsetptr *int32, whence
 	if newlowoffset == 0xffffffff {
 		if e1 != 0 {
 			err = errnoErr(e1)
-		} ***REMOVED*** {
+		} else {
 			err = syscall.EINVAL
 		}
 	}
@@ -656,7 +656,7 @@ func CloseHandle(handle Handle) (err error) {
 	if r1 == 0 {
 		if e1 != 0 {
 			err = errnoErr(e1)
-		} ***REMOVED*** {
+		} else {
 			err = syscall.EINVAL
 		}
 	}
@@ -669,7 +669,7 @@ func GetStdHandle(stdhandle uint32) (handle Handle, err error) {
 	if handle == InvalidHandle {
 		if e1 != 0 {
 			err = errnoErr(e1)
-		} ***REMOVED*** {
+		} else {
 			err = syscall.EINVAL
 		}
 	}
@@ -681,32 +681,32 @@ func SetStdHandle(stdhandle uint32, handle Handle) (err error) {
 	if r1 == 0 {
 		if e1 != 0 {
 			err = errnoErr(e1)
-		} ***REMOVED*** {
+		} else {
 			err = syscall.EINVAL
 		}
 	}
 	return
 }
 
-func ***REMOVED***ndFirstFile1(name *uint16, data *win32***REMOVED***nddata1) (handle Handle, err error) {
+func findFirstFile1(name *uint16, data *win32finddata1) (handle Handle, err error) {
 	r0, _, e1 := syscall.Syscall(procFindFirstFileW.Addr(), 2, uintptr(unsafe.Pointer(name)), uintptr(unsafe.Pointer(data)), 0)
 	handle = Handle(r0)
 	if handle == InvalidHandle {
 		if e1 != 0 {
 			err = errnoErr(e1)
-		} ***REMOVED*** {
+		} else {
 			err = syscall.EINVAL
 		}
 	}
 	return
 }
 
-func ***REMOVED***ndNextFile1(handle Handle, data *win32***REMOVED***nddata1) (err error) {
+func findNextFile1(handle Handle, data *win32finddata1) (err error) {
 	r1, _, e1 := syscall.Syscall(procFindNextFileW.Addr(), 2, uintptr(handle), uintptr(unsafe.Pointer(data)), 0)
 	if r1 == 0 {
 		if e1 != 0 {
 			err = errnoErr(e1)
-		} ***REMOVED*** {
+		} else {
 			err = syscall.EINVAL
 		}
 	}
@@ -718,7 +718,7 @@ func FindClose(handle Handle) (err error) {
 	if r1 == 0 {
 		if e1 != 0 {
 			err = errnoErr(e1)
-		} ***REMOVED*** {
+		} else {
 			err = syscall.EINVAL
 		}
 	}
@@ -730,7 +730,7 @@ func GetFileInformationByHandle(handle Handle, data *ByHandleFileInformation) (e
 	if r1 == 0 {
 		if e1 != 0 {
 			err = errnoErr(e1)
-		} ***REMOVED*** {
+		} else {
 			err = syscall.EINVAL
 		}
 	}
@@ -743,7 +743,7 @@ func GetCurrentDirectory(buflen uint32, buf *uint16) (n uint32, err error) {
 	if n == 0 {
 		if e1 != 0 {
 			err = errnoErr(e1)
-		} ***REMOVED*** {
+		} else {
 			err = syscall.EINVAL
 		}
 	}
@@ -755,7 +755,7 @@ func SetCurrentDirectory(path *uint16) (err error) {
 	if r1 == 0 {
 		if e1 != 0 {
 			err = errnoErr(e1)
-		} ***REMOVED*** {
+		} else {
 			err = syscall.EINVAL
 		}
 	}
@@ -767,7 +767,7 @@ func CreateDirectory(path *uint16, sa *SecurityAttributes) (err error) {
 	if r1 == 0 {
 		if e1 != 0 {
 			err = errnoErr(e1)
-		} ***REMOVED*** {
+		} else {
 			err = syscall.EINVAL
 		}
 	}
@@ -779,7 +779,7 @@ func RemoveDirectory(path *uint16) (err error) {
 	if r1 == 0 {
 		if e1 != 0 {
 			err = errnoErr(e1)
-		} ***REMOVED*** {
+		} else {
 			err = syscall.EINVAL
 		}
 	}
@@ -791,7 +791,7 @@ func DeleteFile(path *uint16) (err error) {
 	if r1 == 0 {
 		if e1 != 0 {
 			err = errnoErr(e1)
-		} ***REMOVED*** {
+		} else {
 			err = syscall.EINVAL
 		}
 	}
@@ -803,7 +803,7 @@ func MoveFile(from *uint16, to *uint16) (err error) {
 	if r1 == 0 {
 		if e1 != 0 {
 			err = errnoErr(e1)
-		} ***REMOVED*** {
+		} else {
 			err = syscall.EINVAL
 		}
 	}
@@ -815,7 +815,7 @@ func MoveFileEx(from *uint16, to *uint16, flags uint32) (err error) {
 	if r1 == 0 {
 		if e1 != 0 {
 			err = errnoErr(e1)
-		} ***REMOVED*** {
+		} else {
 			err = syscall.EINVAL
 		}
 	}
@@ -827,7 +827,7 @@ func GetComputerName(buf *uint16, n *uint32) (err error) {
 	if r1 == 0 {
 		if e1 != 0 {
 			err = errnoErr(e1)
-		} ***REMOVED*** {
+		} else {
 			err = syscall.EINVAL
 		}
 	}
@@ -839,7 +839,7 @@ func GetComputerNameEx(nametype uint32, buf *uint16, n *uint32) (err error) {
 	if r1 == 0 {
 		if e1 != 0 {
 			err = errnoErr(e1)
-		} ***REMOVED*** {
+		} else {
 			err = syscall.EINVAL
 		}
 	}
@@ -851,7 +851,7 @@ func SetEndOfFile(handle Handle) (err error) {
 	if r1 == 0 {
 		if e1 != 0 {
 			err = errnoErr(e1)
-		} ***REMOVED*** {
+		} else {
 			err = syscall.EINVAL
 		}
 	}
@@ -874,20 +874,20 @@ func GetTimeZoneInformation(tzi *Timezoneinformation) (rc uint32, err error) {
 	if rc == 0xffffffff {
 		if e1 != 0 {
 			err = errnoErr(e1)
-		} ***REMOVED*** {
+		} else {
 			err = syscall.EINVAL
 		}
 	}
 	return
 }
 
-func CreateIoCompletionPort(***REMOVED***lehandle Handle, cphandle Handle, key uint32, threadcnt uint32) (handle Handle, err error) {
-	r0, _, e1 := syscall.Syscall6(procCreateIoCompletionPort.Addr(), 4, uintptr(***REMOVED***lehandle), uintptr(cphandle), uintptr(key), uintptr(threadcnt), 0, 0)
+func CreateIoCompletionPort(filehandle Handle, cphandle Handle, key uint32, threadcnt uint32) (handle Handle, err error) {
+	r0, _, e1 := syscall.Syscall6(procCreateIoCompletionPort.Addr(), 4, uintptr(filehandle), uintptr(cphandle), uintptr(key), uintptr(threadcnt), 0, 0)
 	handle = Handle(r0)
 	if handle == 0 {
 		if e1 != 0 {
 			err = errnoErr(e1)
-		} ***REMOVED*** {
+		} else {
 			err = syscall.EINVAL
 		}
 	}
@@ -899,7 +899,7 @@ func GetQueuedCompletionStatus(cphandle Handle, qty *uint32, key *uint32, overla
 	if r1 == 0 {
 		if e1 != 0 {
 			err = errnoErr(e1)
-		} ***REMOVED*** {
+		} else {
 			err = syscall.EINVAL
 		}
 	}
@@ -911,7 +911,7 @@ func PostQueuedCompletionStatus(cphandle Handle, qty uint32, key uint32, overlap
 	if r1 == 0 {
 		if e1 != 0 {
 			err = errnoErr(e1)
-		} ***REMOVED*** {
+		} else {
 			err = syscall.EINVAL
 		}
 	}
@@ -923,7 +923,7 @@ func CancelIo(s Handle) (err error) {
 	if r1 == 0 {
 		if e1 != 0 {
 			err = errnoErr(e1)
-		} ***REMOVED*** {
+		} else {
 			err = syscall.EINVAL
 		}
 	}
@@ -935,7 +935,7 @@ func CancelIoEx(s Handle, o *Overlapped) (err error) {
 	if r1 == 0 {
 		if e1 != 0 {
 			err = errnoErr(e1)
-		} ***REMOVED*** {
+		} else {
 			err = syscall.EINVAL
 		}
 	}
@@ -946,14 +946,14 @@ func CreateProcess(appName *uint16, commandLine *uint16, procSecurity *SecurityA
 	var _p0 uint32
 	if inheritHandles {
 		_p0 = 1
-	} ***REMOVED*** {
+	} else {
 		_p0 = 0
 	}
 	r1, _, e1 := syscall.Syscall12(procCreateProcessW.Addr(), 10, uintptr(unsafe.Pointer(appName)), uintptr(unsafe.Pointer(commandLine)), uintptr(unsafe.Pointer(procSecurity)), uintptr(unsafe.Pointer(threadSecurity)), uintptr(_p0), uintptr(creationFlags), uintptr(unsafe.Pointer(env)), uintptr(unsafe.Pointer(currentDir)), uintptr(unsafe.Pointer(startupInfo)), uintptr(unsafe.Pointer(outProcInfo)), 0, 0)
 	if r1 == 0 {
 		if e1 != 0 {
 			err = errnoErr(e1)
-		} ***REMOVED*** {
+		} else {
 			err = syscall.EINVAL
 		}
 	}
@@ -964,7 +964,7 @@ func OpenProcess(da uint32, inheritHandle bool, pid uint32) (handle Handle, err 
 	var _p0 uint32
 	if inheritHandle {
 		_p0 = 1
-	} ***REMOVED*** {
+	} else {
 		_p0 = 0
 	}
 	r0, _, e1 := syscall.Syscall(procOpenProcess.Addr(), 3, uintptr(da), uintptr(_p0), uintptr(pid))
@@ -972,7 +972,7 @@ func OpenProcess(da uint32, inheritHandle bool, pid uint32) (handle Handle, err 
 	if handle == 0 {
 		if e1 != 0 {
 			err = errnoErr(e1)
-		} ***REMOVED*** {
+		} else {
 			err = syscall.EINVAL
 		}
 	}
@@ -984,7 +984,7 @@ func TerminateProcess(handle Handle, exitcode uint32) (err error) {
 	if r1 == 0 {
 		if e1 != 0 {
 			err = errnoErr(e1)
-		} ***REMOVED*** {
+		} else {
 			err = syscall.EINVAL
 		}
 	}
@@ -996,7 +996,7 @@ func GetExitCodeProcess(handle Handle, exitcode *uint32) (err error) {
 	if r1 == 0 {
 		if e1 != 0 {
 			err = errnoErr(e1)
-		} ***REMOVED*** {
+		} else {
 			err = syscall.EINVAL
 		}
 	}
@@ -1008,7 +1008,7 @@ func GetStartupInfo(startupInfo *StartupInfo) (err error) {
 	if r1 == 0 {
 		if e1 != 0 {
 			err = errnoErr(e1)
-		} ***REMOVED*** {
+		} else {
 			err = syscall.EINVAL
 		}
 	}
@@ -1021,7 +1021,7 @@ func GetCurrentProcess() (pseudoHandle Handle, err error) {
 	if pseudoHandle == 0 {
 		if e1 != 0 {
 			err = errnoErr(e1)
-		} ***REMOVED*** {
+		} else {
 			err = syscall.EINVAL
 		}
 	}
@@ -1033,7 +1033,7 @@ func GetProcessTimes(handle Handle, creationTime *Filetime, exitTime *Filetime, 
 	if r1 == 0 {
 		if e1 != 0 {
 			err = errnoErr(e1)
-		} ***REMOVED*** {
+		} else {
 			err = syscall.EINVAL
 		}
 	}
@@ -1044,14 +1044,14 @@ func DuplicateHandle(hSourceProcessHandle Handle, hSourceHandle Handle, hTargetP
 	var _p0 uint32
 	if bInheritHandle {
 		_p0 = 1
-	} ***REMOVED*** {
+	} else {
 		_p0 = 0
 	}
 	r1, _, e1 := syscall.Syscall9(procDuplicateHandle.Addr(), 7, uintptr(hSourceProcessHandle), uintptr(hSourceHandle), uintptr(hTargetProcessHandle), uintptr(unsafe.Pointer(lpTargetHandle)), uintptr(dwDesiredAccess), uintptr(_p0), uintptr(dwOptions), 0, 0)
 	if r1 == 0 {
 		if e1 != 0 {
 			err = errnoErr(e1)
-		} ***REMOVED*** {
+		} else {
 			err = syscall.EINVAL
 		}
 	}
@@ -1064,7 +1064,7 @@ func WaitForSingleObject(handle Handle, waitMilliseconds uint32) (event uint32, 
 	if event == 0xffffffff {
 		if e1 != 0 {
 			err = errnoErr(e1)
-		} ***REMOVED*** {
+		} else {
 			err = syscall.EINVAL
 		}
 	}
@@ -1077,7 +1077,7 @@ func GetTempPath(buflen uint32, buf *uint16) (n uint32, err error) {
 	if n == 0 {
 		if e1 != 0 {
 			err = errnoErr(e1)
-		} ***REMOVED*** {
+		} else {
 			err = syscall.EINVAL
 		}
 	}
@@ -1089,20 +1089,20 @@ func CreatePipe(readhandle *Handle, writehandle *Handle, sa *SecurityAttributes,
 	if r1 == 0 {
 		if e1 != 0 {
 			err = errnoErr(e1)
-		} ***REMOVED*** {
+		} else {
 			err = syscall.EINVAL
 		}
 	}
 	return
 }
 
-func GetFileType(***REMOVED***lehandle Handle) (n uint32, err error) {
-	r0, _, e1 := syscall.Syscall(procGetFileType.Addr(), 1, uintptr(***REMOVED***lehandle), 0, 0)
+func GetFileType(filehandle Handle) (n uint32, err error) {
+	r0, _, e1 := syscall.Syscall(procGetFileType.Addr(), 1, uintptr(filehandle), 0, 0)
 	n = uint32(r0)
 	if n == 0 {
 		if e1 != 0 {
 			err = errnoErr(e1)
-		} ***REMOVED*** {
+		} else {
 			err = syscall.EINVAL
 		}
 	}
@@ -1114,7 +1114,7 @@ func CryptAcquireContext(provhandle *Handle, container *uint16, provider *uint16
 	if r1 == 0 {
 		if e1 != 0 {
 			err = errnoErr(e1)
-		} ***REMOVED*** {
+		} else {
 			err = syscall.EINVAL
 		}
 	}
@@ -1126,7 +1126,7 @@ func CryptReleaseContext(provhandle Handle, flags uint32) (err error) {
 	if r1 == 0 {
 		if e1 != 0 {
 			err = errnoErr(e1)
-		} ***REMOVED*** {
+		} else {
 			err = syscall.EINVAL
 		}
 	}
@@ -1138,7 +1138,7 @@ func CryptGenRandom(provhandle Handle, buflen uint32, buf *byte) (err error) {
 	if r1 == 0 {
 		if e1 != 0 {
 			err = errnoErr(e1)
-		} ***REMOVED*** {
+		} else {
 			err = syscall.EINVAL
 		}
 	}
@@ -1151,7 +1151,7 @@ func GetEnvironmentStrings() (envs *uint16, err error) {
 	if envs == nil {
 		if e1 != 0 {
 			err = errnoErr(e1)
-		} ***REMOVED*** {
+		} else {
 			err = syscall.EINVAL
 		}
 	}
@@ -1163,7 +1163,7 @@ func FreeEnvironmentStrings(envs *uint16) (err error) {
 	if r1 == 0 {
 		if e1 != 0 {
 			err = errnoErr(e1)
-		} ***REMOVED*** {
+		} else {
 			err = syscall.EINVAL
 		}
 	}
@@ -1176,7 +1176,7 @@ func GetEnvironmentVariable(name *uint16, buffer *uint16, size uint32) (n uint32
 	if n == 0 {
 		if e1 != 0 {
 			err = errnoErr(e1)
-		} ***REMOVED*** {
+		} else {
 			err = syscall.EINVAL
 		}
 	}
@@ -1188,7 +1188,7 @@ func SetEnvironmentVariable(name *uint16, value *uint16) (err error) {
 	if r1 == 0 {
 		if e1 != 0 {
 			err = errnoErr(e1)
-		} ***REMOVED*** {
+		} else {
 			err = syscall.EINVAL
 		}
 	}
@@ -1200,7 +1200,7 @@ func SetFileTime(handle Handle, ctime *Filetime, atime *Filetime, wtime *Filetim
 	if r1 == 0 {
 		if e1 != 0 {
 			err = errnoErr(e1)
-		} ***REMOVED*** {
+		} else {
 			err = syscall.EINVAL
 		}
 	}
@@ -1213,7 +1213,7 @@ func GetFileAttributes(name *uint16) (attrs uint32, err error) {
 	if attrs == INVALID_FILE_ATTRIBUTES {
 		if e1 != 0 {
 			err = errnoErr(e1)
-		} ***REMOVED*** {
+		} else {
 			err = syscall.EINVAL
 		}
 	}
@@ -1225,7 +1225,7 @@ func SetFileAttributes(name *uint16, attrs uint32) (err error) {
 	if r1 == 0 {
 		if e1 != 0 {
 			err = errnoErr(e1)
-		} ***REMOVED*** {
+		} else {
 			err = syscall.EINVAL
 		}
 	}
@@ -1237,7 +1237,7 @@ func GetFileAttributesEx(name *uint16, level uint32, info *byte) (err error) {
 	if r1 == 0 {
 		if e1 != 0 {
 			err = errnoErr(e1)
-		} ***REMOVED*** {
+		} else {
 			err = syscall.EINVAL
 		}
 	}
@@ -1256,7 +1256,7 @@ func CommandLineToArgv(cmd *uint16, argc *int32) (argv *[8192]*[8192]uint16, err
 	if argv == nil {
 		if e1 != 0 {
 			err = errnoErr(e1)
-		} ***REMOVED*** {
+		} else {
 			err = syscall.EINVAL
 		}
 	}
@@ -1269,7 +1269,7 @@ func LocalFree(hmem Handle) (handle Handle, err error) {
 	if handle != 0 {
 		if e1 != 0 {
 			err = errnoErr(e1)
-		} ***REMOVED*** {
+		} else {
 			err = syscall.EINVAL
 		}
 	}
@@ -1281,7 +1281,7 @@ func SetHandleInformation(handle Handle, mask uint32, flags uint32) (err error) 
 	if r1 == 0 {
 		if e1 != 0 {
 			err = errnoErr(e1)
-		} ***REMOVED*** {
+		} else {
 			err = syscall.EINVAL
 		}
 	}
@@ -1293,7 +1293,7 @@ func FlushFileBuffers(handle Handle) (err error) {
 	if r1 == 0 {
 		if e1 != 0 {
 			err = errnoErr(e1)
-		} ***REMOVED*** {
+		} else {
 			err = syscall.EINVAL
 		}
 	}
@@ -1306,7 +1306,7 @@ func GetFullPathName(path *uint16, buflen uint32, buf *uint16, fname **uint16) (
 	if n == 0 {
 		if e1 != 0 {
 			err = errnoErr(e1)
-		} ***REMOVED*** {
+		} else {
 			err = syscall.EINVAL
 		}
 	}
@@ -1319,7 +1319,7 @@ func GetLongPathName(path *uint16, buf *uint16, buflen uint32) (n uint32, err er
 	if n == 0 {
 		if e1 != 0 {
 			err = errnoErr(e1)
-		} ***REMOVED*** {
+		} else {
 			err = syscall.EINVAL
 		}
 	}
@@ -1332,7 +1332,7 @@ func GetShortPathName(longpath *uint16, shortpath *uint16, buflen uint32) (n uin
 	if n == 0 {
 		if e1 != 0 {
 			err = errnoErr(e1)
-		} ***REMOVED*** {
+		} else {
 			err = syscall.EINVAL
 		}
 	}
@@ -1345,7 +1345,7 @@ func CreateFileMapping(fhandle Handle, sa *SecurityAttributes, prot uint32, maxS
 	if handle == 0 {
 		if e1 != 0 {
 			err = errnoErr(e1)
-		} ***REMOVED*** {
+		} else {
 			err = syscall.EINVAL
 		}
 	}
@@ -1358,7 +1358,7 @@ func MapViewOfFile(handle Handle, access uint32, offsetHigh uint32, offsetLow ui
 	if addr == 0 {
 		if e1 != 0 {
 			err = errnoErr(e1)
-		} ***REMOVED*** {
+		} else {
 			err = syscall.EINVAL
 		}
 	}
@@ -1370,7 +1370,7 @@ func UnmapViewOfFile(addr uintptr) (err error) {
 	if r1 == 0 {
 		if e1 != 0 {
 			err = errnoErr(e1)
-		} ***REMOVED*** {
+		} else {
 			err = syscall.EINVAL
 		}
 	}
@@ -1382,7 +1382,7 @@ func FlushViewOfFile(addr uintptr, length uintptr) (err error) {
 	if r1 == 0 {
 		if e1 != 0 {
 			err = errnoErr(e1)
-		} ***REMOVED*** {
+		} else {
 			err = syscall.EINVAL
 		}
 	}
@@ -1394,7 +1394,7 @@ func VirtualLock(addr uintptr, length uintptr) (err error) {
 	if r1 == 0 {
 		if e1 != 0 {
 			err = errnoErr(e1)
-		} ***REMOVED*** {
+		} else {
 			err = syscall.EINVAL
 		}
 	}
@@ -1406,7 +1406,7 @@ func VirtualUnlock(addr uintptr, length uintptr) (err error) {
 	if r1 == 0 {
 		if e1 != 0 {
 			err = errnoErr(e1)
-		} ***REMOVED*** {
+		} else {
 			err = syscall.EINVAL
 		}
 	}
@@ -1419,7 +1419,7 @@ func VirtualAlloc(address uintptr, size uintptr, alloctype uint32, protect uint3
 	if value == 0 {
 		if e1 != 0 {
 			err = errnoErr(e1)
-		} ***REMOVED*** {
+		} else {
 			err = syscall.EINVAL
 		}
 	}
@@ -1431,7 +1431,7 @@ func VirtualFree(address uintptr, size uintptr, freetype uint32) (err error) {
 	if r1 == 0 {
 		if e1 != 0 {
 			err = errnoErr(e1)
-		} ***REMOVED*** {
+		} else {
 			err = syscall.EINVAL
 		}
 	}
@@ -1443,7 +1443,7 @@ func VirtualProtect(address uintptr, size uintptr, newprotect uint32, oldprotect
 	if r1 == 0 {
 		if e1 != 0 {
 			err = errnoErr(e1)
-		} ***REMOVED*** {
+		} else {
 			err = syscall.EINVAL
 		}
 	}
@@ -1455,7 +1455,7 @@ func TransmitFile(s Handle, handle Handle, bytesToWrite uint32, bytsPerSend uint
 	if r1 == 0 {
 		if e1 != 0 {
 			err = errnoErr(e1)
-		} ***REMOVED*** {
+		} else {
 			err = syscall.EINVAL
 		}
 	}
@@ -1466,14 +1466,14 @@ func ReadDirectoryChanges(handle Handle, buf *byte, buflen uint32, watchSubTree 
 	var _p0 uint32
 	if watchSubTree {
 		_p0 = 1
-	} ***REMOVED*** {
+	} else {
 		_p0 = 0
 	}
 	r1, _, e1 := syscall.Syscall9(procReadDirectoryChangesW.Addr(), 8, uintptr(handle), uintptr(unsafe.Pointer(buf)), uintptr(buflen), uintptr(_p0), uintptr(mask), uintptr(unsafe.Pointer(retlen)), uintptr(unsafe.Pointer(overlapped)), uintptr(completionRoutine), 0)
 	if r1 == 0 {
 		if e1 != 0 {
 			err = errnoErr(e1)
-		} ***REMOVED*** {
+		} else {
 			err = syscall.EINVAL
 		}
 	}
@@ -1486,7 +1486,7 @@ func CertOpenSystemStore(hprov Handle, name *uint16) (store Handle, err error) {
 	if store == 0 {
 		if e1 != 0 {
 			err = errnoErr(e1)
-		} ***REMOVED*** {
+		} else {
 			err = syscall.EINVAL
 		}
 	}
@@ -1499,32 +1499,32 @@ func CertOpenStore(storeProvider uintptr, msgAndCertEncodingType uint32, cryptPr
 	if handle == InvalidHandle {
 		if e1 != 0 {
 			err = errnoErr(e1)
-		} ***REMOVED*** {
+		} else {
 			err = syscall.EINVAL
 		}
 	}
 	return
 }
 
-func CertEnumCerti***REMOVED***catesInStore(store Handle, prevContext *CertContext) (context *CertContext, err error) {
-	r0, _, e1 := syscall.Syscall(procCertEnumCerti***REMOVED***catesInStore.Addr(), 2, uintptr(store), uintptr(unsafe.Pointer(prevContext)), 0)
+func CertEnumCertificatesInStore(store Handle, prevContext *CertContext) (context *CertContext, err error) {
+	r0, _, e1 := syscall.Syscall(procCertEnumCertificatesInStore.Addr(), 2, uintptr(store), uintptr(unsafe.Pointer(prevContext)), 0)
 	context = (*CertContext)(unsafe.Pointer(r0))
 	if context == nil {
 		if e1 != 0 {
 			err = errnoErr(e1)
-		} ***REMOVED*** {
+		} else {
 			err = syscall.EINVAL
 		}
 	}
 	return
 }
 
-func CertAddCerti***REMOVED***cateContextToStore(store Handle, certContext *CertContext, addDisposition uint32, storeContext **CertContext) (err error) {
-	r1, _, e1 := syscall.Syscall6(procCertAddCerti***REMOVED***cateContextToStore.Addr(), 4, uintptr(store), uintptr(unsafe.Pointer(certContext)), uintptr(addDisposition), uintptr(unsafe.Pointer(storeContext)), 0, 0)
+func CertAddCertificateContextToStore(store Handle, certContext *CertContext, addDisposition uint32, storeContext **CertContext) (err error) {
+	r1, _, e1 := syscall.Syscall6(procCertAddCertificateContextToStore.Addr(), 4, uintptr(store), uintptr(unsafe.Pointer(certContext)), uintptr(addDisposition), uintptr(unsafe.Pointer(storeContext)), 0, 0)
 	if r1 == 0 {
 		if e1 != 0 {
 			err = errnoErr(e1)
-		} ***REMOVED*** {
+		} else {
 			err = syscall.EINVAL
 		}
 	}
@@ -1536,61 +1536,61 @@ func CertCloseStore(store Handle, flags uint32) (err error) {
 	if r1 == 0 {
 		if e1 != 0 {
 			err = errnoErr(e1)
-		} ***REMOVED*** {
+		} else {
 			err = syscall.EINVAL
 		}
 	}
 	return
 }
 
-func CertGetCerti***REMOVED***cateChain(engine Handle, leaf *CertContext, time *Filetime, additionalStore Handle, para *CertChainPara, flags uint32, reserved uintptr, chainCtx **CertChainContext) (err error) {
-	r1, _, e1 := syscall.Syscall9(procCertGetCerti***REMOVED***cateChain.Addr(), 8, uintptr(engine), uintptr(unsafe.Pointer(leaf)), uintptr(unsafe.Pointer(time)), uintptr(additionalStore), uintptr(unsafe.Pointer(para)), uintptr(flags), uintptr(reserved), uintptr(unsafe.Pointer(chainCtx)), 0)
+func CertGetCertificateChain(engine Handle, leaf *CertContext, time *Filetime, additionalStore Handle, para *CertChainPara, flags uint32, reserved uintptr, chainCtx **CertChainContext) (err error) {
+	r1, _, e1 := syscall.Syscall9(procCertGetCertificateChain.Addr(), 8, uintptr(engine), uintptr(unsafe.Pointer(leaf)), uintptr(unsafe.Pointer(time)), uintptr(additionalStore), uintptr(unsafe.Pointer(para)), uintptr(flags), uintptr(reserved), uintptr(unsafe.Pointer(chainCtx)), 0)
 	if r1 == 0 {
 		if e1 != 0 {
 			err = errnoErr(e1)
-		} ***REMOVED*** {
+		} else {
 			err = syscall.EINVAL
 		}
 	}
 	return
 }
 
-func CertFreeCerti***REMOVED***cateChain(ctx *CertChainContext) {
-	syscall.Syscall(procCertFreeCerti***REMOVED***cateChain.Addr(), 1, uintptr(unsafe.Pointer(ctx)), 0, 0)
+func CertFreeCertificateChain(ctx *CertChainContext) {
+	syscall.Syscall(procCertFreeCertificateChain.Addr(), 1, uintptr(unsafe.Pointer(ctx)), 0, 0)
 	return
 }
 
-func CertCreateCerti***REMOVED***cateContext(certEncodingType uint32, certEncoded *byte, encodedLen uint32) (context *CertContext, err error) {
-	r0, _, e1 := syscall.Syscall(procCertCreateCerti***REMOVED***cateContext.Addr(), 3, uintptr(certEncodingType), uintptr(unsafe.Pointer(certEncoded)), uintptr(encodedLen))
+func CertCreateCertificateContext(certEncodingType uint32, certEncoded *byte, encodedLen uint32) (context *CertContext, err error) {
+	r0, _, e1 := syscall.Syscall(procCertCreateCertificateContext.Addr(), 3, uintptr(certEncodingType), uintptr(unsafe.Pointer(certEncoded)), uintptr(encodedLen))
 	context = (*CertContext)(unsafe.Pointer(r0))
 	if context == nil {
 		if e1 != 0 {
 			err = errnoErr(e1)
-		} ***REMOVED*** {
+		} else {
 			err = syscall.EINVAL
 		}
 	}
 	return
 }
 
-func CertFreeCerti***REMOVED***cateContext(ctx *CertContext) (err error) {
-	r1, _, e1 := syscall.Syscall(procCertFreeCerti***REMOVED***cateContext.Addr(), 1, uintptr(unsafe.Pointer(ctx)), 0, 0)
+func CertFreeCertificateContext(ctx *CertContext) (err error) {
+	r1, _, e1 := syscall.Syscall(procCertFreeCertificateContext.Addr(), 1, uintptr(unsafe.Pointer(ctx)), 0, 0)
 	if r1 == 0 {
 		if e1 != 0 {
 			err = errnoErr(e1)
-		} ***REMOVED*** {
+		} else {
 			err = syscall.EINVAL
 		}
 	}
 	return
 }
 
-func CertVerifyCerti***REMOVED***cateChainPolicy(policyOID uintptr, chain *CertChainContext, para *CertChainPolicyPara, status *CertChainPolicyStatus) (err error) {
-	r1, _, e1 := syscall.Syscall6(procCertVerifyCerti***REMOVED***cateChainPolicy.Addr(), 4, uintptr(policyOID), uintptr(unsafe.Pointer(chain)), uintptr(unsafe.Pointer(para)), uintptr(unsafe.Pointer(status)), 0, 0)
+func CertVerifyCertificateChainPolicy(policyOID uintptr, chain *CertChainContext, para *CertChainPolicyPara, status *CertChainPolicyStatus) (err error) {
+	r1, _, e1 := syscall.Syscall6(procCertVerifyCertificateChainPolicy.Addr(), 4, uintptr(policyOID), uintptr(unsafe.Pointer(chain)), uintptr(unsafe.Pointer(para)), uintptr(unsafe.Pointer(status)), 0, 0)
 	if r1 == 0 {
 		if e1 != 0 {
 			err = errnoErr(e1)
-		} ***REMOVED*** {
+		} else {
 			err = syscall.EINVAL
 		}
 	}
@@ -1648,7 +1648,7 @@ func GetConsoleMode(console Handle, mode *uint32) (err error) {
 	if r1 == 0 {
 		if e1 != 0 {
 			err = errnoErr(e1)
-		} ***REMOVED*** {
+		} else {
 			err = syscall.EINVAL
 		}
 	}
@@ -1660,7 +1660,7 @@ func SetConsoleMode(console Handle, mode uint32) (err error) {
 	if r1 == 0 {
 		if e1 != 0 {
 			err = errnoErr(e1)
-		} ***REMOVED*** {
+		} else {
 			err = syscall.EINVAL
 		}
 	}
@@ -1672,7 +1672,7 @@ func GetConsoleScreenBufferInfo(console Handle, info *ConsoleScreenBufferInfo) (
 	if r1 == 0 {
 		if e1 != 0 {
 			err = errnoErr(e1)
-		} ***REMOVED*** {
+		} else {
 			err = syscall.EINVAL
 		}
 	}
@@ -1684,7 +1684,7 @@ func WriteConsole(console Handle, buf *uint16, towrite uint32, written *uint32, 
 	if r1 == 0 {
 		if e1 != 0 {
 			err = errnoErr(e1)
-		} ***REMOVED*** {
+		} else {
 			err = syscall.EINVAL
 		}
 	}
@@ -1696,7 +1696,7 @@ func ReadConsole(console Handle, buf *uint16, toread uint32, read *uint32, input
 	if r1 == 0 {
 		if e1 != 0 {
 			err = errnoErr(e1)
-		} ***REMOVED*** {
+		} else {
 			err = syscall.EINVAL
 		}
 	}
@@ -1709,7 +1709,7 @@ func CreateToolhelp32Snapshot(flags uint32, processId uint32) (handle Handle, er
 	if handle == InvalidHandle {
 		if e1 != 0 {
 			err = errnoErr(e1)
-		} ***REMOVED*** {
+		} else {
 			err = syscall.EINVAL
 		}
 	}
@@ -1721,7 +1721,7 @@ func Process32First(snapshot Handle, procEntry *ProcessEntry32) (err error) {
 	if r1 == 0 {
 		if e1 != 0 {
 			err = errnoErr(e1)
-		} ***REMOVED*** {
+		} else {
 			err = syscall.EINVAL
 		}
 	}
@@ -1733,7 +1733,7 @@ func Process32Next(snapshot Handle, procEntry *ProcessEntry32) (err error) {
 	if r1 == 0 {
 		if e1 != 0 {
 			err = errnoErr(e1)
-		} ***REMOVED*** {
+		} else {
 			err = syscall.EINVAL
 		}
 	}
@@ -1745,31 +1745,31 @@ func DeviceIoControl(handle Handle, ioControlCode uint32, inBuffer *byte, inBuff
 	if r1 == 0 {
 		if e1 != 0 {
 			err = errnoErr(e1)
-		} ***REMOVED*** {
+		} else {
 			err = syscall.EINVAL
 		}
 	}
 	return
 }
 
-func CreateSymbolicLink(symlink***REMOVED***lename *uint16, target***REMOVED***lename *uint16, flags uint32) (err error) {
-	r1, _, e1 := syscall.Syscall(procCreateSymbolicLinkW.Addr(), 3, uintptr(unsafe.Pointer(symlink***REMOVED***lename)), uintptr(unsafe.Pointer(target***REMOVED***lename)), uintptr(flags))
+func CreateSymbolicLink(symlinkfilename *uint16, targetfilename *uint16, flags uint32) (err error) {
+	r1, _, e1 := syscall.Syscall(procCreateSymbolicLinkW.Addr(), 3, uintptr(unsafe.Pointer(symlinkfilename)), uintptr(unsafe.Pointer(targetfilename)), uintptr(flags))
 	if r1&0xff == 0 {
 		if e1 != 0 {
 			err = errnoErr(e1)
-		} ***REMOVED*** {
+		} else {
 			err = syscall.EINVAL
 		}
 	}
 	return
 }
 
-func CreateHardLink(***REMOVED***lename *uint16, existing***REMOVED***lename *uint16, reserved uintptr) (err error) {
-	r1, _, e1 := syscall.Syscall(procCreateHardLinkW.Addr(), 3, uintptr(unsafe.Pointer(***REMOVED***lename)), uintptr(unsafe.Pointer(existing***REMOVED***lename)), uintptr(reserved))
+func CreateHardLink(filename *uint16, existingfilename *uint16, reserved uintptr) (err error) {
+	r1, _, e1 := syscall.Syscall(procCreateHardLinkW.Addr(), 3, uintptr(unsafe.Pointer(filename)), uintptr(unsafe.Pointer(existingfilename)), uintptr(reserved))
 	if r1&0xff == 0 {
 		if e1 != 0 {
 			err = errnoErr(e1)
-		} ***REMOVED*** {
+		} else {
 			err = syscall.EINVAL
 		}
 	}
@@ -1788,7 +1788,7 @@ func CreateEvent(eventAttrs *SecurityAttributes, manualReset uint32, initialStat
 	if handle == 0 {
 		if e1 != 0 {
 			err = errnoErr(e1)
-		} ***REMOVED*** {
+		} else {
 			err = syscall.EINVAL
 		}
 	}
@@ -1801,7 +1801,7 @@ func CreateEventEx(eventAttrs *SecurityAttributes, name *uint16, flags uint32, d
 	if handle == 0 {
 		if e1 != 0 {
 			err = errnoErr(e1)
-		} ***REMOVED*** {
+		} else {
 			err = syscall.EINVAL
 		}
 	}
@@ -1812,7 +1812,7 @@ func OpenEvent(desiredAccess uint32, inheritHandle bool, name *uint16) (handle H
 	var _p0 uint32
 	if inheritHandle {
 		_p0 = 1
-	} ***REMOVED*** {
+	} else {
 		_p0 = 0
 	}
 	r0, _, e1 := syscall.Syscall(procOpenEventW.Addr(), 3, uintptr(desiredAccess), uintptr(_p0), uintptr(unsafe.Pointer(name)))
@@ -1820,7 +1820,7 @@ func OpenEvent(desiredAccess uint32, inheritHandle bool, name *uint16) (handle H
 	if handle == 0 {
 		if e1 != 0 {
 			err = errnoErr(e1)
-		} ***REMOVED*** {
+		} else {
 			err = syscall.EINVAL
 		}
 	}
@@ -1832,7 +1832,7 @@ func SetEvent(event Handle) (err error) {
 	if r1 == 0 {
 		if e1 != 0 {
 			err = errnoErr(e1)
-		} ***REMOVED*** {
+		} else {
 			err = syscall.EINVAL
 		}
 	}
@@ -1844,7 +1844,7 @@ func ResetEvent(event Handle) (err error) {
 	if r1 == 0 {
 		if e1 != 0 {
 			err = errnoErr(e1)
-		} ***REMOVED*** {
+		} else {
 			err = syscall.EINVAL
 		}
 	}
@@ -1856,19 +1856,19 @@ func PulseEvent(event Handle) (err error) {
 	if r1 == 0 {
 		if e1 != 0 {
 			err = errnoErr(e1)
-		} ***REMOVED*** {
+		} else {
 			err = syscall.EINVAL
 		}
 	}
 	return
 }
 
-func De***REMOVED***neDosDevice(flags uint32, deviceName *uint16, targetPath *uint16) (err error) {
-	r1, _, e1 := syscall.Syscall(procDe***REMOVED***neDosDeviceW.Addr(), 3, uintptr(flags), uintptr(unsafe.Pointer(deviceName)), uintptr(unsafe.Pointer(targetPath)))
+func DefineDosDevice(flags uint32, deviceName *uint16, targetPath *uint16) (err error) {
+	r1, _, e1 := syscall.Syscall(procDefineDosDeviceW.Addr(), 3, uintptr(flags), uintptr(unsafe.Pointer(deviceName)), uintptr(unsafe.Pointer(targetPath)))
 	if r1 == 0 {
 		if e1 != 0 {
 			err = errnoErr(e1)
-		} ***REMOVED*** {
+		} else {
 			err = syscall.EINVAL
 		}
 	}
@@ -1880,7 +1880,7 @@ func DeleteVolumeMountPoint(volumeMountPoint *uint16) (err error) {
 	if r1 == 0 {
 		if e1 != 0 {
 			err = errnoErr(e1)
-		} ***REMOVED*** {
+		} else {
 			err = syscall.EINVAL
 		}
 	}
@@ -1893,7 +1893,7 @@ func FindFirstVolume(volumeName *uint16, bufferLength uint32) (handle Handle, er
 	if handle == InvalidHandle {
 		if e1 != 0 {
 			err = errnoErr(e1)
-		} ***REMOVED*** {
+		} else {
 			err = syscall.EINVAL
 		}
 	}
@@ -1906,55 +1906,55 @@ func FindFirstVolumeMountPoint(rootPathName *uint16, volumeMountPoint *uint16, b
 	if handle == InvalidHandle {
 		if e1 != 0 {
 			err = errnoErr(e1)
-		} ***REMOVED*** {
+		} else {
 			err = syscall.EINVAL
 		}
 	}
 	return
 }
 
-func FindNextVolume(***REMOVED***ndVolume Handle, volumeName *uint16, bufferLength uint32) (err error) {
-	r1, _, e1 := syscall.Syscall(procFindNextVolumeW.Addr(), 3, uintptr(***REMOVED***ndVolume), uintptr(unsafe.Pointer(volumeName)), uintptr(bufferLength))
+func FindNextVolume(findVolume Handle, volumeName *uint16, bufferLength uint32) (err error) {
+	r1, _, e1 := syscall.Syscall(procFindNextVolumeW.Addr(), 3, uintptr(findVolume), uintptr(unsafe.Pointer(volumeName)), uintptr(bufferLength))
 	if r1 == 0 {
 		if e1 != 0 {
 			err = errnoErr(e1)
-		} ***REMOVED*** {
+		} else {
 			err = syscall.EINVAL
 		}
 	}
 	return
 }
 
-func FindNextVolumeMountPoint(***REMOVED***ndVolumeMountPoint Handle, volumeMountPoint *uint16, bufferLength uint32) (err error) {
-	r1, _, e1 := syscall.Syscall(procFindNextVolumeMountPointW.Addr(), 3, uintptr(***REMOVED***ndVolumeMountPoint), uintptr(unsafe.Pointer(volumeMountPoint)), uintptr(bufferLength))
+func FindNextVolumeMountPoint(findVolumeMountPoint Handle, volumeMountPoint *uint16, bufferLength uint32) (err error) {
+	r1, _, e1 := syscall.Syscall(procFindNextVolumeMountPointW.Addr(), 3, uintptr(findVolumeMountPoint), uintptr(unsafe.Pointer(volumeMountPoint)), uintptr(bufferLength))
 	if r1 == 0 {
 		if e1 != 0 {
 			err = errnoErr(e1)
-		} ***REMOVED*** {
+		} else {
 			err = syscall.EINVAL
 		}
 	}
 	return
 }
 
-func FindVolumeClose(***REMOVED***ndVolume Handle) (err error) {
-	r1, _, e1 := syscall.Syscall(procFindVolumeClose.Addr(), 1, uintptr(***REMOVED***ndVolume), 0, 0)
+func FindVolumeClose(findVolume Handle) (err error) {
+	r1, _, e1 := syscall.Syscall(procFindVolumeClose.Addr(), 1, uintptr(findVolume), 0, 0)
 	if r1 == 0 {
 		if e1 != 0 {
 			err = errnoErr(e1)
-		} ***REMOVED*** {
+		} else {
 			err = syscall.EINVAL
 		}
 	}
 	return
 }
 
-func FindVolumeMountPointClose(***REMOVED***ndVolumeMountPoint Handle) (err error) {
-	r1, _, e1 := syscall.Syscall(procFindVolumeMountPointClose.Addr(), 1, uintptr(***REMOVED***ndVolumeMountPoint), 0, 0)
+func FindVolumeMountPointClose(findVolumeMountPoint Handle) (err error) {
+	r1, _, e1 := syscall.Syscall(procFindVolumeMountPointClose.Addr(), 1, uintptr(findVolumeMountPoint), 0, 0)
 	if r1 == 0 {
 		if e1 != 0 {
 			err = errnoErr(e1)
-		} ***REMOVED*** {
+		} else {
 			err = syscall.EINVAL
 		}
 	}
@@ -1973,7 +1973,7 @@ func GetLogicalDrives() (drivesBitMask uint32, err error) {
 	if drivesBitMask == 0 {
 		if e1 != 0 {
 			err = errnoErr(e1)
-		} ***REMOVED*** {
+		} else {
 			err = syscall.EINVAL
 		}
 	}
@@ -1986,31 +1986,31 @@ func GetLogicalDriveStrings(bufferLength uint32, buffer *uint16) (n uint32, err 
 	if n == 0 {
 		if e1 != 0 {
 			err = errnoErr(e1)
-		} ***REMOVED*** {
+		} else {
 			err = syscall.EINVAL
 		}
 	}
 	return
 }
 
-func GetVolumeInformation(rootPathName *uint16, volumeNameBuffer *uint16, volumeNameSize uint32, volumeNameSerialNumber *uint32, maximumComponentLength *uint32, ***REMOVED***leSystemFlags *uint32, ***REMOVED***leSystemNameBuffer *uint16, ***REMOVED***leSystemNameSize uint32) (err error) {
-	r1, _, e1 := syscall.Syscall9(procGetVolumeInformationW.Addr(), 8, uintptr(unsafe.Pointer(rootPathName)), uintptr(unsafe.Pointer(volumeNameBuffer)), uintptr(volumeNameSize), uintptr(unsafe.Pointer(volumeNameSerialNumber)), uintptr(unsafe.Pointer(maximumComponentLength)), uintptr(unsafe.Pointer(***REMOVED***leSystemFlags)), uintptr(unsafe.Pointer(***REMOVED***leSystemNameBuffer)), uintptr(***REMOVED***leSystemNameSize), 0)
+func GetVolumeInformation(rootPathName *uint16, volumeNameBuffer *uint16, volumeNameSize uint32, volumeNameSerialNumber *uint32, maximumComponentLength *uint32, fileSystemFlags *uint32, fileSystemNameBuffer *uint16, fileSystemNameSize uint32) (err error) {
+	r1, _, e1 := syscall.Syscall9(procGetVolumeInformationW.Addr(), 8, uintptr(unsafe.Pointer(rootPathName)), uintptr(unsafe.Pointer(volumeNameBuffer)), uintptr(volumeNameSize), uintptr(unsafe.Pointer(volumeNameSerialNumber)), uintptr(unsafe.Pointer(maximumComponentLength)), uintptr(unsafe.Pointer(fileSystemFlags)), uintptr(unsafe.Pointer(fileSystemNameBuffer)), uintptr(fileSystemNameSize), 0)
 	if r1 == 0 {
 		if e1 != 0 {
 			err = errnoErr(e1)
-		} ***REMOVED*** {
+		} else {
 			err = syscall.EINVAL
 		}
 	}
 	return
 }
 
-func GetVolumeInformationByHandle(***REMOVED***le Handle, volumeNameBuffer *uint16, volumeNameSize uint32, volumeNameSerialNumber *uint32, maximumComponentLength *uint32, ***REMOVED***leSystemFlags *uint32, ***REMOVED***leSystemNameBuffer *uint16, ***REMOVED***leSystemNameSize uint32) (err error) {
-	r1, _, e1 := syscall.Syscall9(procGetVolumeInformationByHandleW.Addr(), 8, uintptr(***REMOVED***le), uintptr(unsafe.Pointer(volumeNameBuffer)), uintptr(volumeNameSize), uintptr(unsafe.Pointer(volumeNameSerialNumber)), uintptr(unsafe.Pointer(maximumComponentLength)), uintptr(unsafe.Pointer(***REMOVED***leSystemFlags)), uintptr(unsafe.Pointer(***REMOVED***leSystemNameBuffer)), uintptr(***REMOVED***leSystemNameSize), 0)
+func GetVolumeInformationByHandle(file Handle, volumeNameBuffer *uint16, volumeNameSize uint32, volumeNameSerialNumber *uint32, maximumComponentLength *uint32, fileSystemFlags *uint32, fileSystemNameBuffer *uint16, fileSystemNameSize uint32) (err error) {
+	r1, _, e1 := syscall.Syscall9(procGetVolumeInformationByHandleW.Addr(), 8, uintptr(file), uintptr(unsafe.Pointer(volumeNameBuffer)), uintptr(volumeNameSize), uintptr(unsafe.Pointer(volumeNameSerialNumber)), uintptr(unsafe.Pointer(maximumComponentLength)), uintptr(unsafe.Pointer(fileSystemFlags)), uintptr(unsafe.Pointer(fileSystemNameBuffer)), uintptr(fileSystemNameSize), 0)
 	if r1 == 0 {
 		if e1 != 0 {
 			err = errnoErr(e1)
-		} ***REMOVED*** {
+		} else {
 			err = syscall.EINVAL
 		}
 	}
@@ -2022,19 +2022,19 @@ func GetVolumeNameForVolumeMountPoint(volumeMountPoint *uint16, volumeName *uint
 	if r1 == 0 {
 		if e1 != 0 {
 			err = errnoErr(e1)
-		} ***REMOVED*** {
+		} else {
 			err = syscall.EINVAL
 		}
 	}
 	return
 }
 
-func GetVolumePathName(***REMOVED***leName *uint16, volumePathName *uint16, bufferLength uint32) (err error) {
-	r1, _, e1 := syscall.Syscall(procGetVolumePathNameW.Addr(), 3, uintptr(unsafe.Pointer(***REMOVED***leName)), uintptr(unsafe.Pointer(volumePathName)), uintptr(bufferLength))
+func GetVolumePathName(fileName *uint16, volumePathName *uint16, bufferLength uint32) (err error) {
+	r1, _, e1 := syscall.Syscall(procGetVolumePathNameW.Addr(), 3, uintptr(unsafe.Pointer(fileName)), uintptr(unsafe.Pointer(volumePathName)), uintptr(bufferLength))
 	if r1 == 0 {
 		if e1 != 0 {
 			err = errnoErr(e1)
-		} ***REMOVED*** {
+		} else {
 			err = syscall.EINVAL
 		}
 	}
@@ -2046,7 +2046,7 @@ func GetVolumePathNamesForVolumeName(volumeName *uint16, volumePathNames *uint16
 	if r1 == 0 {
 		if e1 != 0 {
 			err = errnoErr(e1)
-		} ***REMOVED*** {
+		} else {
 			err = syscall.EINVAL
 		}
 	}
@@ -2059,7 +2059,7 @@ func QueryDosDevice(deviceName *uint16, targetPath *uint16, max uint32) (n uint3
 	if n == 0 {
 		if e1 != 0 {
 			err = errnoErr(e1)
-		} ***REMOVED*** {
+		} else {
 			err = syscall.EINVAL
 		}
 	}
@@ -2071,7 +2071,7 @@ func SetVolumeLabel(rootPathName *uint16, volumeName *uint16) (err error) {
 	if r1 == 0 {
 		if e1 != 0 {
 			err = errnoErr(e1)
-		} ***REMOVED*** {
+		} else {
 			err = syscall.EINVAL
 		}
 	}
@@ -2083,7 +2083,7 @@ func SetVolumeMountPoint(volumeMountPoint *uint16, volumeName *uint16) (err erro
 	if r1 == 0 {
 		if e1 != 0 {
 			err = errnoErr(e1)
-		} ***REMOVED*** {
+		} else {
 			err = syscall.EINVAL
 		}
 	}
@@ -2103,7 +2103,7 @@ func WSACleanup() (err error) {
 	if r1 == socket_error {
 		if e1 != 0 {
 			err = errnoErr(e1)
-		} ***REMOVED*** {
+		} else {
 			err = syscall.EINVAL
 		}
 	}
@@ -2115,7 +2115,7 @@ func WSAIoctl(s Handle, iocc uint32, inbuf *byte, cbif uint32, outbuf *byte, cbo
 	if r1 == socket_error {
 		if e1 != 0 {
 			err = errnoErr(e1)
-		} ***REMOVED*** {
+		} else {
 			err = syscall.EINVAL
 		}
 	}
@@ -2128,7 +2128,7 @@ func socket(af int32, typ int32, protocol int32) (handle Handle, err error) {
 	if handle == InvalidHandle {
 		if e1 != 0 {
 			err = errnoErr(e1)
-		} ***REMOVED*** {
+		} else {
 			err = syscall.EINVAL
 		}
 	}
@@ -2140,7 +2140,7 @@ func Setsockopt(s Handle, level int32, optname int32, optval *byte, optlen int32
 	if r1 == socket_error {
 		if e1 != 0 {
 			err = errnoErr(e1)
-		} ***REMOVED*** {
+		} else {
 			err = syscall.EINVAL
 		}
 	}
@@ -2152,7 +2152,7 @@ func Getsockopt(s Handle, level int32, optname int32, optval *byte, optlen *int3
 	if r1 == socket_error {
 		if e1 != 0 {
 			err = errnoErr(e1)
-		} ***REMOVED*** {
+		} else {
 			err = syscall.EINVAL
 		}
 	}
@@ -2164,7 +2164,7 @@ func bind(s Handle, name unsafe.Pointer, namelen int32) (err error) {
 	if r1 == socket_error {
 		if e1 != 0 {
 			err = errnoErr(e1)
-		} ***REMOVED*** {
+		} else {
 			err = syscall.EINVAL
 		}
 	}
@@ -2176,7 +2176,7 @@ func connect(s Handle, name unsafe.Pointer, namelen int32) (err error) {
 	if r1 == socket_error {
 		if e1 != 0 {
 			err = errnoErr(e1)
-		} ***REMOVED*** {
+		} else {
 			err = syscall.EINVAL
 		}
 	}
@@ -2188,7 +2188,7 @@ func getsockname(s Handle, rsa *RawSockaddrAny, addrlen *int32) (err error) {
 	if r1 == socket_error {
 		if e1 != 0 {
 			err = errnoErr(e1)
-		} ***REMOVED*** {
+		} else {
 			err = syscall.EINVAL
 		}
 	}
@@ -2200,7 +2200,7 @@ func getpeername(s Handle, rsa *RawSockaddrAny, addrlen *int32) (err error) {
 	if r1 == socket_error {
 		if e1 != 0 {
 			err = errnoErr(e1)
-		} ***REMOVED*** {
+		} else {
 			err = syscall.EINVAL
 		}
 	}
@@ -2212,7 +2212,7 @@ func listen(s Handle, backlog int32) (err error) {
 	if r1 == socket_error {
 		if e1 != 0 {
 			err = errnoErr(e1)
-		} ***REMOVED*** {
+		} else {
 			err = syscall.EINVAL
 		}
 	}
@@ -2224,7 +2224,7 @@ func shutdown(s Handle, how int32) (err error) {
 	if r1 == socket_error {
 		if e1 != 0 {
 			err = errnoErr(e1)
-		} ***REMOVED*** {
+		} else {
 			err = syscall.EINVAL
 		}
 	}
@@ -2236,7 +2236,7 @@ func Closesocket(s Handle) (err error) {
 	if r1 == socket_error {
 		if e1 != 0 {
 			err = errnoErr(e1)
-		} ***REMOVED*** {
+		} else {
 			err = syscall.EINVAL
 		}
 	}
@@ -2248,7 +2248,7 @@ func AcceptEx(ls Handle, as Handle, buf *byte, rxdatalen uint32, laddrlen uint32
 	if r1 == 0 {
 		if e1 != 0 {
 			err = errnoErr(e1)
-		} ***REMOVED*** {
+		} else {
 			err = syscall.EINVAL
 		}
 	}
@@ -2265,7 +2265,7 @@ func WSARecv(s Handle, bufs *WSABuf, bufcnt uint32, recvd *uint32, flags *uint32
 	if r1 == socket_error {
 		if e1 != 0 {
 			err = errnoErr(e1)
-		} ***REMOVED*** {
+		} else {
 			err = syscall.EINVAL
 		}
 	}
@@ -2277,7 +2277,7 @@ func WSASend(s Handle, bufs *WSABuf, bufcnt uint32, sent *uint32, flags uint32, 
 	if r1 == socket_error {
 		if e1 != 0 {
 			err = errnoErr(e1)
-		} ***REMOVED*** {
+		} else {
 			err = syscall.EINVAL
 		}
 	}
@@ -2289,7 +2289,7 @@ func WSARecvFrom(s Handle, bufs *WSABuf, bufcnt uint32, recvd *uint32, flags *ui
 	if r1 == socket_error {
 		if e1 != 0 {
 			err = errnoErr(e1)
-		} ***REMOVED*** {
+		} else {
 			err = syscall.EINVAL
 		}
 	}
@@ -2301,7 +2301,7 @@ func WSASendTo(s Handle, bufs *WSABuf, bufcnt uint32, sent *uint32, flags uint32
 	if r1 == socket_error {
 		if e1 != 0 {
 			err = errnoErr(e1)
-		} ***REMOVED*** {
+		} else {
 			err = syscall.EINVAL
 		}
 	}
@@ -2323,7 +2323,7 @@ func _GetHostByName(name *byte) (h *Hostent, err error) {
 	if h == nil {
 		if e1 != 0 {
 			err = errnoErr(e1)
-		} ***REMOVED*** {
+		} else {
 			err = syscall.EINVAL
 		}
 	}
@@ -2350,7 +2350,7 @@ func _GetServByName(name *byte, proto *byte) (s *Servent, err error) {
 	if s == nil {
 		if e1 != 0 {
 			err = errnoErr(e1)
-		} ***REMOVED*** {
+		} else {
 			err = syscall.EINVAL
 		}
 	}
@@ -2378,7 +2378,7 @@ func _GetProtoByName(name *byte) (p *Protoent, err error) {
 	if p == nil {
 		if e1 != 0 {
 			err = errnoErr(e1)
-		} ***REMOVED*** {
+		} else {
 			err = syscall.EINVAL
 		}
 	}
@@ -2442,12 +2442,12 @@ func GetAdaptersInfo(ai *IpAdapterInfo, ol *uint32) (errcode error) {
 	return
 }
 
-func SetFileCompletionNoti***REMOVED***cationModes(handle Handle, flags uint8) (err error) {
-	r1, _, e1 := syscall.Syscall(procSetFileCompletionNoti***REMOVED***cationModes.Addr(), 2, uintptr(handle), uintptr(flags), 0)
+func SetFileCompletionNotificationModes(handle Handle, flags uint8) (err error) {
+	r1, _, e1 := syscall.Syscall(procSetFileCompletionNotificationModes.Addr(), 2, uintptr(handle), uintptr(flags), 0)
 	if r1 == 0 {
 		if e1 != 0 {
 			err = errnoErr(e1)
-		} ***REMOVED*** {
+		} else {
 			err = syscall.EINVAL
 		}
 	}
@@ -2460,7 +2460,7 @@ func WSAEnumProtocols(protocols *int32, protocolBuffer *WSAProtocolInfo, bufferL
 	if n == -1 {
 		if e1 != 0 {
 			err = errnoErr(e1)
-		} ***REMOVED*** {
+		} else {
 			err = syscall.EINVAL
 		}
 	}
@@ -2487,7 +2487,7 @@ func MultiByteToWideChar(codePage uint32, dwFlags uint32, str *byte, nstr int32,
 	if nwrite == 0 {
 		if e1 != 0 {
 			err = errnoErr(e1)
-		} ***REMOVED*** {
+		} else {
 			err = syscall.EINVAL
 		}
 	}
@@ -2499,7 +2499,7 @@ func TranslateName(accName *uint16, accNameFormat uint32, desiredNameFormat uint
 	if r1&0xff == 0 {
 		if e1 != 0 {
 			err = errnoErr(e1)
-		} ***REMOVED*** {
+		} else {
 			err = syscall.EINVAL
 		}
 	}
@@ -2511,7 +2511,7 @@ func GetUserNameEx(nameFormat uint32, nameBuffre *uint16, nSize *uint32) (err er
 	if r1&0xff == 0 {
 		if e1 != 0 {
 			err = errnoErr(e1)
-		} ***REMOVED*** {
+		} else {
 			err = syscall.EINVAL
 		}
 	}
@@ -2547,7 +2547,7 @@ func LookupAccountSid(systemName *uint16, sid *SID, name *uint16, nameLen *uint3
 	if r1 == 0 {
 		if e1 != 0 {
 			err = errnoErr(e1)
-		} ***REMOVED*** {
+		} else {
 			err = syscall.EINVAL
 		}
 	}
@@ -2559,7 +2559,7 @@ func LookupAccountName(systemName *uint16, accountName *uint16, sid *SID, sidLen
 	if r1 == 0 {
 		if e1 != 0 {
 			err = errnoErr(e1)
-		} ***REMOVED*** {
+		} else {
 			err = syscall.EINVAL
 		}
 	}
@@ -2571,7 +2571,7 @@ func ConvertSidToStringSid(sid *SID, stringSid **uint16) (err error) {
 	if r1 == 0 {
 		if e1 != 0 {
 			err = errnoErr(e1)
-		} ***REMOVED*** {
+		} else {
 			err = syscall.EINVAL
 		}
 	}
@@ -2583,7 +2583,7 @@ func ConvertStringSidToSid(stringSid *uint16, sid **SID) (err error) {
 	if r1 == 0 {
 		if e1 != 0 {
 			err = errnoErr(e1)
-		} ***REMOVED*** {
+		} else {
 			err = syscall.EINVAL
 		}
 	}
@@ -2601,19 +2601,19 @@ func CopySid(destSidLen uint32, destSid *SID, srcSid *SID) (err error) {
 	if r1 == 0 {
 		if e1 != 0 {
 			err = errnoErr(e1)
-		} ***REMOVED*** {
+		} else {
 			err = syscall.EINVAL
 		}
 	}
 	return
 }
 
-func AllocateAndInitializeSid(identAuth *SidIdenti***REMOVED***erAuthority, subAuth byte, subAuth0 uint32, subAuth1 uint32, subAuth2 uint32, subAuth3 uint32, subAuth4 uint32, subAuth5 uint32, subAuth6 uint32, subAuth7 uint32, sid **SID) (err error) {
+func AllocateAndInitializeSid(identAuth *SidIdentifierAuthority, subAuth byte, subAuth0 uint32, subAuth1 uint32, subAuth2 uint32, subAuth3 uint32, subAuth4 uint32, subAuth5 uint32, subAuth6 uint32, subAuth7 uint32, sid **SID) (err error) {
 	r1, _, e1 := syscall.Syscall12(procAllocateAndInitializeSid.Addr(), 11, uintptr(unsafe.Pointer(identAuth)), uintptr(subAuth), uintptr(subAuth0), uintptr(subAuth1), uintptr(subAuth2), uintptr(subAuth3), uintptr(subAuth4), uintptr(subAuth5), uintptr(subAuth6), uintptr(subAuth7), uintptr(unsafe.Pointer(sid)), 0)
 	if r1 == 0 {
 		if e1 != 0 {
 			err = errnoErr(e1)
-		} ***REMOVED*** {
+		} else {
 			err = syscall.EINVAL
 		}
 	}
@@ -2625,7 +2625,7 @@ func FreeSid(sid *SID) (err error) {
 	if r1 != 0 {
 		if e1 != 0 {
 			err = errnoErr(e1)
-		} ***REMOVED*** {
+		} else {
 			err = syscall.EINVAL
 		}
 	}
@@ -2643,7 +2643,7 @@ func checkTokenMembership(tokenHandle Token, sidToCheck *SID, isMember *int32) (
 	if r1 == 0 {
 		if e1 != 0 {
 			err = errnoErr(e1)
-		} ***REMOVED*** {
+		} else {
 			err = syscall.EINVAL
 		}
 	}
@@ -2655,7 +2655,7 @@ func OpenProcessToken(h Handle, access uint32, token *Token) (err error) {
 	if r1 == 0 {
 		if e1 != 0 {
 			err = errnoErr(e1)
-		} ***REMOVED*** {
+		} else {
 			err = syscall.EINVAL
 		}
 	}
@@ -2667,19 +2667,19 @@ func GetTokenInformation(t Token, infoClass uint32, info *byte, infoLen uint32, 
 	if r1 == 0 {
 		if e1 != 0 {
 			err = errnoErr(e1)
-		} ***REMOVED*** {
+		} else {
 			err = syscall.EINVAL
 		}
 	}
 	return
 }
 
-func GetUserPro***REMOVED***leDirectory(t Token, dir *uint16, dirLen *uint32) (err error) {
-	r1, _, e1 := syscall.Syscall(procGetUserPro***REMOVED***leDirectoryW.Addr(), 3, uintptr(t), uintptr(unsafe.Pointer(dir)), uintptr(unsafe.Pointer(dirLen)))
+func GetUserProfileDirectory(t Token, dir *uint16, dirLen *uint32) (err error) {
+	r1, _, e1 := syscall.Syscall(procGetUserProfileDirectoryW.Addr(), 3, uintptr(t), uintptr(unsafe.Pointer(dir)), uintptr(unsafe.Pointer(dirLen)))
 	if r1 == 0 {
 		if e1 != 0 {
 			err = errnoErr(e1)
-		} ***REMOVED*** {
+		} else {
 			err = syscall.EINVAL
 		}
 	}

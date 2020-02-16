@@ -2,7 +2,7 @@
 Copyright 2017 The Kubernetes Authors.
 
 Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this ***REMOVED***le except in compliance with the License.
+you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
 
     http://www.apache.org/licenses/LICENSE-2.0
@@ -10,7 +10,7 @@ You may obtain a copy of the License at
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the speci***REMOVED***c language governing permissions and
+See the License for the specific language governing permissions and
 limitations under the License.
 */
 
@@ -22,7 +22,7 @@ import (
 	"strings"
 )
 
-// De***REMOVED***nes openapi types.
+// Defines openapi types.
 const (
 	Integer = "integer"
 	Number  = "number"
@@ -36,7 +36,7 @@ const (
 )
 
 // Models interface describe a model provider. They can give you the
-// schema for a speci***REMOVED***c model.
+// schema for a specific model.
 type Models interface {
 	LookupModel(string) Schema
 	ListModels() []string
@@ -48,8 +48,8 @@ type Models interface {
 // - Array is a list of one and only one given subtype
 // - Map is a map of string to one and only one given subtype
 // - Primitive can be string, integer, number and boolean.
-// - Kind is an object with speci***REMOVED***c ***REMOVED***elds mapping to speci***REMOVED***c types.
-// - Reference is a link to another de***REMOVED***nition.
+// - Kind is an object with specific fields mapping to specific types.
+// - Reference is a link to another definition.
 type SchemaVisitor interface {
 	VisitArray(*Array)
 	VisitMap(*Map)
@@ -66,16 +66,16 @@ type SchemaVisitorArbitrary interface {
 	VisitArbitrary(*Arbitrary)
 }
 
-// Schema is the base de***REMOVED***nition of an openapi type.
+// Schema is the base definition of an openapi type.
 type Schema interface {
 	// Giving a visitor here will let you visit the actual type.
 	Accept(SchemaVisitor)
 
 	// Pretty print the name of the type.
 	GetName() string
-	// Describes how to access this ***REMOVED***eld.
+	// Describes how to access this field.
 	GetPath() *Path
-	// Describes the ***REMOVED***eld.
+	// Describes the field.
 	GetDescription() string
 	// Returns type extensions.
 	GetExtensions() map[string]interface{}
@@ -117,11 +117,11 @@ func (p *Path) ArrayPath(i int) Path {
 	}
 }
 
-// FieldPath appends a ***REMOVED***eld name and creates a new path
-func (p *Path) FieldPath(***REMOVED***eld string) Path {
+// FieldPath appends a field name and creates a new path
+func (p *Path) FieldPath(field string) Path {
 	return Path{
 		parent: p,
-		key:    fmt.Sprintf(".%s", ***REMOVED***eld),
+		key:    fmt.Sprintf(".%s", field),
 	}
 }
 
@@ -163,15 +163,15 @@ func (a *Array) GetName() string {
 }
 
 // Kind is a complex object. It can have multiple different
-// subtypes for each ***REMOVED***eld, as de***REMOVED***ned in the `Fields` ***REMOVED***eld. Mandatory
-// ***REMOVED***elds are listed in `RequiredFields`. The key of the object is
+// subtypes for each field, as defined in the `Fields` field. Mandatory
+// fields are listed in `RequiredFields`. The key of the object is
 // always of type `string`.
 type Kind struct {
 	BaseSchema
 
-	// Lists names of required ***REMOVED***elds.
+	// Lists names of required fields.
 	RequiredFields []string
-	// Maps ***REMOVED***eld names to types.
+	// Maps field names to types.
 	Fields map[string]Schema
 }
 
@@ -189,10 +189,10 @@ func (k *Kind) GetName() string {
 	return fmt.Sprintf("Kind(%v)", properties)
 }
 
-// IsRequired returns true if `***REMOVED***eld` is a required ***REMOVED***eld for this type.
-func (k *Kind) IsRequired(***REMOVED***eld string) bool {
+// IsRequired returns true if `field` is a required field for this type.
+func (k *Kind) IsRequired(field string) bool {
 	for _, f := range k.RequiredFields {
-		if f == ***REMOVED***eld {
+		if f == field {
 			return true
 		}
 	}
@@ -228,7 +228,7 @@ func (m *Map) GetName() string {
 }
 
 // Primitive is a literal. There can be multiple types of primitives,
-// and this subtype can be visited through the `subType` ***REMOVED***eld.
+// and this subtype can be visited through the `subType` field.
 type Primitive struct {
 	BaseSchema
 

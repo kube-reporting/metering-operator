@@ -2,7 +2,7 @@
 Copyright 2015 The Kubernetes Authors.
 
 Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this ***REMOVED***le except in compliance with the License.
+you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
 
     http://www.apache.org/licenses/LICENSE-2.0
@@ -10,7 +10,7 @@ You may obtain a copy of the License at
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the speci***REMOVED***c language governing permissions and
+See the License for the specific language governing permissions and
 limitations under the License.
 */
 
@@ -44,10 +44,10 @@ type ObjectTracker interface {
 	// Get retrieves the object by its kind, namespace and name.
 	Get(gvr schema.GroupVersionResource, ns, name string) (runtime.Object, error)
 
-	// Create adds an object to the tracker in the speci***REMOVED***ed namespace.
+	// Create adds an object to the tracker in the specified namespace.
 	Create(gvr schema.GroupVersionResource, obj runtime.Object, ns string) error
 
-	// Update updates an existing object in the tracker in the speci***REMOVED***ed namespace.
+	// Update updates an existing object in the tracker in the specified namespace.
 	Update(gvr schema.GroupVersionResource, obj runtime.Object, ns string) error
 
 	// List retrieves all objects of a given kind in the given
@@ -60,7 +60,7 @@ type ObjectTracker interface {
 	Delete(gvr schema.GroupVersionResource, ns, name string) error
 
 	// Watch watches objects from the tracker. Watch returns a channel
-	// which will push added / modi***REMOVED***ed / deleted object.
+	// which will push added / modified / deleted object.
 	Watch(gvr schema.GroupVersionResource, ns string) (watch.Interface, error)
 }
 
@@ -97,7 +97,7 @@ func ObjectReaction(tracker ObjectTracker) ReactionFunc {
 			}
 			if action.GetSubresource() == "" {
 				err = tracker.Create(gvr, action.GetObject(), ns)
-			} ***REMOVED*** {
+			} else {
 				// TODO: Currently we're handling subresource creation as an update
 				// on the enclosing resource. This works for some subresources but
 				// might not be generic enough.
@@ -146,11 +146,11 @@ func ObjectReaction(tracker ObjectTracker) ReactionFunc {
 				if err != nil {
 					return true, nil, err
 				}
-				modi***REMOVED***ed, err := patch.Apply(old)
+				modified, err := patch.Apply(old)
 				if err != nil {
 					return true, nil, err
 				}
-				if err = json.Unmarshal(modi***REMOVED***ed, obj); err != nil {
+				if err = json.Unmarshal(modified, obj); err != nil {
 					return true, nil, err
 				}
 			case types.StrategicMergePatchType:
@@ -184,7 +184,7 @@ type tracker struct {
 	objects map[schema.GroupVersionResource][]runtime.Object
 	// The value type of watchers is a map of which the key is either a namespace or
 	// all/non namespace aka "" and its value is list of fake watchers.
-	// Manipulations on resources will broadcast the noti***REMOVED***cation events into the
+	// Manipulations on resources will broadcast the notification events into the
 	// watchers' channel. Note that too many unhandled events (currently 100,
 	// see apimachinery/pkg/watch.DefaultChanSize) will cause a panic.
 	watchers map[schema.GroupVersionResource]map[string][]*watch.RaceFreeFakeWatcher
@@ -204,7 +204,7 @@ func NewObjectTracker(scheme ObjectScheme, decoder runtime.Decoder) ObjectTracke
 }
 
 func (t *tracker) List(gvr schema.GroupVersionResource, gvk schema.GroupVersionKind, ns string) (runtime.Object, error) {
-	// Heuristic for list kind: original kind + List suf***REMOVED***x. Might
+	// Heuristic for list kind: original kind + List suffix. Might
 	// not always be true but this tracker has a pretty limited
 	// understanding of the actual API model.
 	listGVK := gvk
@@ -232,7 +232,7 @@ func (t *tracker) List(gvr schema.GroupVersionResource, gvk schema.GroupVersionK
 		return list, nil
 	}
 
-	matchingObjs, err := ***REMOVED***lterByNamespaceAndName(objs, ns, "")
+	matchingObjs, err := filterByNamespaceAndName(objs, ns, "")
 	if err != nil {
 		return nil, err
 	}
@@ -266,7 +266,7 @@ func (t *tracker) Get(gvr schema.GroupVersionResource, ns, name string) (runtime
 		return nil, errNotFound
 	}
 
-	matchingObjs, err := ***REMOVED***lterByNamespaceAndName(objs, ns, name)
+	matchingObjs, err := filterByNamespaceAndName(objs, ns, name)
 	if err != nil {
 		return nil, err
 	}
@@ -310,7 +310,7 @@ func (t *tracker) Add(obj runtime.Object) error {
 		// actual registration in apiserver can specify arbitrary route for a
 		// gvk. If a test uses such objects, it cannot preset the tracker with
 		// objects via Add(). Instead, it should trigger the Create() function
-		// of the tracker, where an arbitrary gvr can be speci***REMOVED***ed.
+		// of the tracker, where an arbitrary gvr can be specified.
 		gvr, _ := meta.UnsafeGuessKindToResource(gvk)
 		// Resource doesn't have the concept of "__internal" version, just set it to "".
 		if gvr.Version == runtime.APIVersionInternal {
@@ -352,7 +352,7 @@ func (t *tracker) add(gvr schema.GroupVersionResource, obj runtime.Object, ns st
 
 	gr := gvr.GroupResource()
 
-	// To avoid the object from being accidentally modi***REMOVED***ed by caller
+	// To avoid the object from being accidentally modified by caller
 	// after it's been added to the tracker, we always store the deep
 	// copy.
 	obj = obj.DeepCopyObject()
@@ -449,10 +449,10 @@ func (t *tracker) Delete(gvr schema.GroupVersionResource, ns, name string) error
 	return errors.NewNotFound(gvr.GroupResource(), name)
 }
 
-// ***REMOVED***lterByNamespaceAndName returns all objects in the collection that
+// filterByNamespaceAndName returns all objects in the collection that
 // match provided namespace and name. Empty namespace matches
 // non-namespaced objects.
-func ***REMOVED***lterByNamespaceAndName(objs []runtime.Object, ns, name string) ([]runtime.Object, error) {
+func filterByNamespaceAndName(objs []runtime.Object, ns, name string) ([]runtime.Object, error) {
 	var res []runtime.Object
 
 	for _, obj := range objs {
@@ -478,7 +478,7 @@ func DefaultWatchReactor(watchInterface watch.Interface, err error) WatchReactio
 	}
 }
 
-// SimpleReactor is a Reactor.  Each reaction function is attached to a given verb,resource tuple.  "*" in either ***REMOVED***eld matches everything for that value.
+// SimpleReactor is a Reactor.  Each reaction function is attached to a given verb,resource tuple.  "*" in either field matches everything for that value.
 // For instance, *,pods matches all verbs on pods.  This allows for easier composition of reaction functions
 type SimpleReactor struct {
 	Verb     string

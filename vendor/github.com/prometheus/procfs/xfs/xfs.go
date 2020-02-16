@@ -1,6 +1,6 @@
 // Copyright 2017 The Prometheus Authors
 // Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this ***REMOVED***le except in compliance with the License.
+// you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 //
 // http://www.apache.org/licenses/LICENSE-2.0
@@ -8,13 +8,13 @@
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the speci***REMOVED***c language governing permissions and
+// See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Package xfs provides access to statistics exposed by the XFS ***REMOVED***lesystem.
+// Package xfs provides access to statistics exposed by the XFS filesystem.
 package xfs
 
-// Stats contains XFS ***REMOVED***lesystem runtime statistics, parsed from
+// Stats contains XFS filesystem runtime statistics, parsed from
 // /proc/fs/xfs/stat.
 //
 // The names and meanings of each statistic were taken from
@@ -22,9 +22,9 @@ package xfs
 // kernel source. Most counters are uint32s (same data types used in
 // xfs_stats.h), but some of the "extended precision stats" are uint64s.
 type Stats struct {
-	// The name of the ***REMOVED***lesystem used to source these statistics.
+	// The name of the filesystem used to source these statistics.
 	// If empty, this indicates aggregated statistics for all XFS
-	// ***REMOVED***lesystems on the host.
+	// filesystems on the host.
 	Name string
 
 	ExtentAllocation   ExtentAllocationStats
@@ -106,14 +106,14 @@ type LogOperationStats struct {
 }
 
 // ReadWriteStats contains statistics regarding the number of read and write
-// system calls for XFS ***REMOVED***lesystems.
+// system calls for XFS filesystems.
 type ReadWriteStats struct {
 	Read  uint32
 	Write uint32
 }
 
 // AttributeOperationStats contains statistics regarding manipulation of
-// XFS extended ***REMOVED***le attributes.
+// XFS extended file attributes.
 type AttributeOperationStats struct {
 	Get    uint32
 	Set    uint32

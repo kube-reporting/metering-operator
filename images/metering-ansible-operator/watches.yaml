@@ -1,8 +1,8 @@
 ---
 - version: v1
   group: metering.openshift.io
-  kind: MeteringCon***REMOVED***g
-  role: /opt/ansible/roles/meteringcon***REMOVED***g
+  kind: MeteringConfig
+  role: /opt/ansible/roles/meteringconfig
   watchDependentResources: false
   reconcilePeriod: 5m
   manageStatus: false

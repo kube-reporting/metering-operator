@@ -1,6 +1,6 @@
 // Copyright 2009 The Go Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE ***REMOVED***le.
+// license that can be found in the LICENSE file.
 
 // +build darwin dragonfly freebsd linux netbsd openbsd solaris
 
@@ -51,7 +51,7 @@ func errnoErr(e syscall.Errno) error {
 	return e
 }
 
-// clen returns the index of the ***REMOVED***rst NULL byte in n or len(n) if n contains no NULL byte.
+// clen returns the index of the first NULL byte in n or len(n) if n contains no NULL byte.
 func clen(n []byte) int {
 	i := bytes.IndexByte(n, 0)
 	if i == -1 {
@@ -60,7 +60,7 @@ func clen(n []byte) int {
 	return i
 }
 
-// Mmap manager, for use by operating system-speci***REMOVED***c implementations.
+// Mmap manager, for use by operating system-specific implementations.
 
 type mmapper struct {
 	sync.Mutex
@@ -150,7 +150,7 @@ var SocketDisableIPv6 bool
 
 // Sockaddr represents a socket address.
 type Sockaddr interface {
-	sockaddr() (ptr unsafe.Pointer, len _Socklen, err error) // lowercase; only we can de***REMOVED***ne Sockaddrs
+	sockaddr() (ptr unsafe.Pointer, len _Socklen, err error) // lowercase; only we can define Sockaddrs
 }
 
 // SockaddrInet4 implements the Sockaddr interface for AF_INET type sockets.
@@ -302,8 +302,8 @@ func SetsockoptIPv6Mreq(fd, level, opt int, mreq *IPv6Mreq) (err error) {
 	return setsockopt(fd, level, opt, unsafe.Pointer(mreq), SizeofIPv6Mreq)
 }
 
-func SetsockoptICMPv6Filter(fd, level, opt int, ***REMOVED***lter *ICMPv6Filter) error {
-	return setsockopt(fd, level, opt, unsafe.Pointer(***REMOVED***lter), SizeofICMPv6Filter)
+func SetsockoptICMPv6Filter(fd, level, opt int, filter *ICMPv6Filter) error {
+	return setsockopt(fd, level, opt, unsafe.Pointer(filter), SizeofICMPv6Filter)
 }
 
 func SetsockoptLinger(fd, level, opt int, l *Linger) (err error) {
@@ -336,11 +336,11 @@ func Socketpair(domain, typ, proto int) (fd [2]int, err error) {
 	return
 }
 
-func Send***REMOVED***le(outfd int, infd int, offset *int64, count int) (written int, err error) {
+func Sendfile(outfd int, infd int, offset *int64, count int) (written int, err error) {
 	if raceenabled {
 		raceReleaseMerge(unsafe.Pointer(&ioSync))
 	}
-	return send***REMOVED***le(outfd, infd, offset, count)
+	return sendfile(outfd, infd, offset, count)
 }
 
 var ioSync int64
@@ -354,7 +354,7 @@ func SetNonblock(fd int, nonblocking bool) (err error) {
 	}
 	if nonblocking {
 		flag |= O_NONBLOCK
-	} ***REMOVED*** {
+	} else {
 		flag &= ^O_NONBLOCK
 	}
 	_, err = fcntl(fd, F_SETFL, flag)
@@ -363,7 +363,7 @@ func SetNonblock(fd int, nonblocking bool) (err error) {
 
 // Exec calls execve(2), which replaces the calling executable in the process
 // tree. argv0 should be the full path to an executable ("/bin/ls") and the
-// executable name should also be the ***REMOVED***rst argument in argv (["ls", "-l"]).
+// executable name should also be the first argument in argv (["ls", "-l"]).
 // envv are the environment variables that should be passed to the new
 // process (["USER=go", "PWD=/tmp"]).
 func Exec(argv0 string, argv []string, envv []string) error {

@@ -11,7 +11,7 @@ var signingMethodLock = new(sync.RWMutex)
 type SigningMethod interface {
 	Verify(signingString, signature string, key interface{}) error // Returns nil if signature is valid
 	Sign(signingString string, key interface{}) (string, error)    // Returns encoded signature or error
-	Alg() string                                                   // returns the alg identi***REMOVED***er for this method (example: 'HS256')
+	Alg() string                                                   // returns the alg identifier for this method (example: 'HS256')
 }
 
 // Register the "alg" name and a factory function for signing method.

@@ -1,10 +1,10 @@
 // Copyright 2013 The Go Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE ***REMOVED***le.
+// license that can be found in the LICENSE file.
 
 package astutil
 
-// This ***REMOVED***le de***REMOVED***nes utilities for working with source positions.
+// This file defines utilities for working with source positions.
 
 import (
 	"fmt"
@@ -16,7 +16,7 @@ import (
 // PathEnclosingInterval returns the node that encloses the source
 // interval [start, end), and all its ancestors up to the AST root.
 //
-// The de***REMOVED***nition of "enclosing" used by this function considers
+// The definition of "enclosing" used by this function considers
 // additional whitespace abutting a node to be enclosed by it.
 // In this example:
 //
@@ -52,7 +52,7 @@ import (
 // interior whitespace of the assignment.  E is considered interior
 // whitespace of the BlockStmt containing the assignment.
 //
-// Precondition: [start, end) both lie within the same ***REMOVED***le as root.
+// Precondition: [start, end) both lie within the same file as root.
 // TODO(adonovan): return (nil, false) in this case and remove precond.
 // Requires FileSet; see loader.tokenFileContainsPos.
 //
@@ -147,9 +147,9 @@ func PathEnclosingInterval(root *ast.File, start, end token.Pos) (path []ast.Nod
 		for i, l := 0, len(path); i < l/2; i++ {
 			path[i], path[l-1-i] = path[l-1-i], path[i]
 		}
-	} ***REMOVED*** {
+	} else {
 		// Selection lies within whitespace preceding the
-		// ***REMOVED***rst (or following the last) declaration in the ***REMOVED***le.
+		// first (or following the last) declaration in the file.
 		// The result nonetheless always includes the ast.File.
 		path = append(path, root)
 	}
@@ -235,7 +235,7 @@ func childrenOf(n ast.Node) []ast.Node {
 		if n.List == nil {
 			children = append(children,
 				tok(n.Case, len("default")))
-		} ***REMOVED*** {
+		} else {
 			children = append(children,
 				tok(n.Case, len("case")))
 		}
@@ -255,7 +255,7 @@ func childrenOf(n ast.Node) []ast.Node {
 		if n.Comm == nil {
 			children = append(children,
 				tok(n.Case, len("default")))
-		} ***REMOVED*** {
+		} else {
 			children = append(children,
 				tok(n.Case, len("case")))
 		}
@@ -476,7 +476,7 @@ func (sl byPos) Swap(i, j int) {
 // for a user interface.
 //
 // TODO(adonovan): in some cases (e.g. Field, FieldList, Ident,
-// StarExpr) we could be much more speci***REMOVED***c given the path to the AST
+// StarExpr) we could be much more specific given the path to the AST
 // root.  Perhaps we should do that.
 //
 func NodeDescription(n ast.Node) string {
@@ -537,16 +537,16 @@ func NodeDescription(n ast.Node) string {
 		return "expression statement"
 	case *ast.Field:
 		// Can be any of these:
-		// struct {x, y int}  -- struct ***REMOVED***eld(s)
-		// struct {T}         -- anon struct ***REMOVED***eld
+		// struct {x, y int}  -- struct field(s)
+		// struct {T}         -- anon struct field
 		// interface {I}      -- interface embedding
 		// interface {f()}    -- interface method
 		// func (A) func(B) C -- receiver, param(s), result(s)
-		return "***REMOVED***eld/method/parameter"
+		return "field/method/parameter"
 	case *ast.FieldList:
-		return "***REMOVED***eld/method/parameter list"
+		return "field/method/parameter list"
 	case *ast.File:
-		return "source ***REMOVED***le"
+		return "source file"
 	case *ast.ForStmt:
 		return "for loop"
 	case *ast.FuncDecl:
@@ -569,11 +569,11 @@ func NodeDescription(n ast.Node) string {
 	case *ast.GoStmt:
 		return "go statement"
 	case *ast.Ident:
-		return "identi***REMOVED***er"
+		return "identifier"
 	case *ast.IfStmt:
 		return "if statement"
 	case *ast.ImportSpec:
-		return "import speci***REMOVED***cation"
+		return "import specification"
 	case *ast.IncDecStmt:
 		if n.Tok == token.INC {
 			return "increment statement"
@@ -614,13 +614,13 @@ func NodeDescription(n ast.Node) string {
 	case *ast.TypeAssertExpr:
 		return "type assertion"
 	case *ast.TypeSpec:
-		return "type speci***REMOVED***cation"
+		return "type specification"
 	case *ast.TypeSwitchStmt:
 		return "type switch"
 	case *ast.UnaryExpr:
 		return fmt.Sprintf("unary %s operation", n.Op)
 	case *ast.ValueSpec:
-		return "value speci***REMOVED***cation"
+		return "value specification"
 
 	}
 	panic(fmt.Sprintf("unexpected node type: %T", n))

@@ -1,4 +1,4 @@
-***REMOVED***
+#! /bin/bash
 
 ROOT_DIR=$(dirname "${BASH_SOURCE}")/..
 source "${ROOT_DIR}/hack/common.sh"

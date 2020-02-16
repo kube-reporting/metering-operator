@@ -3,7 +3,7 @@
 # Copyright 2017 The Kubernetes Authors.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this ***REMOVED***le except in compliance with the License.
+# you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
 #
 #     http://www.apache.org/licenses/LICENSE-2.0
@@ -11,7 +11,7 @@
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the speci***REMOVED***c language governing permissions and
+# See the License for the specific language governing permissions and
 # limitations under the License.
 
 set -o errexit
@@ -38,7 +38,7 @@ Examples:
   $(basename $0) deepcopy,defaulter,conversion github.com/example/project/pkg/client github.com/example/project/pkg/apis github.com/example/project/apis     "foo:v1 bar:v1alpha1,v1beta1"
 EOF
   exit 0
-***REMOVED***
+fi
 
 GENS="$1"
 OUTPUT_PKG="$2"
@@ -60,7 +60,7 @@ for GVs in ${GROUPS_WITH_VERSIONS}; do
   if [ -n "${INT_APIS_PKG}" ]; then
     ALL_FQ_APIS+=("${INT_APIS_PKG}/${G}")
     INT_FQ_APIS+=("${INT_APIS_PKG}/${G}")
-  ***REMOVED***
+  fi
 
   # enumerate versions
   for V in ${Vs//,/ }; do
@@ -72,30 +72,30 @@ done
 if [ "${GENS}" = "all" ] || grep -qw "deepcopy" <<<"${GENS}"; then
   echo "Generating deepcopy funcs"
   ${GOPATH}/bin/deepcopy-gen --input-dirs $(codegen::join , "${ALL_FQ_APIS[@]}") -O zz_generated.deepcopy --bounding-dirs ${INT_APIS_PKG},${EXT_APIS_PKG} "$@"
-***REMOVED***
+fi
 
 if [ "${GENS}" = "all" ] || grep -qw "defaulter" <<<"${GENS}"; then
   echo "Generating defaulters"
   ${GOPATH}/bin/defaulter-gen  --input-dirs $(codegen::join , "${EXT_FQ_APIS[@]}") -O zz_generated.defaults "$@"
-***REMOVED***
+fi
 
 if [ "${GENS}" = "all" ] || grep -qw "conversion" <<<"${GENS}"; then
   echo "Generating conversions"
   ${GOPATH}/bin/conversion-gen --input-dirs $(codegen::join , "${ALL_FQ_APIS[@]}") -O zz_generated.conversion "$@"
-***REMOVED***
+fi
 
 if [ "${GENS}" = "all" ] || grep -qw "client" <<<"${GENS}"; then
   echo "Generating clientset for ${GROUPS_WITH_VERSIONS} at ${OUTPUT_PKG}/${CLIENTSET_PKG_NAME:-clientset}"
   if [ -n "${INT_APIS_PKG}" ]; then
     ${GOPATH}/bin/client-gen --clientset-name ${CLIENTSET_NAME_INTERNAL:-internalversion} --input-base "" --input $(codegen::join , $(printf '%s/ ' "${INT_FQ_APIS[@]}")) --output-package ${OUTPUT_PKG}/${CLIENTSET_PKG_NAME:-clientset} "$@"
-  ***REMOVED***
+  fi
   ${GOPATH}/bin/client-gen --clientset-name ${CLIENTSET_NAME_VERSIONED:-versioned} --input-base "" --input $(codegen::join , "${EXT_FQ_APIS[@]}") --output-package ${OUTPUT_PKG}/${CLIENTSET_PKG_NAME:-clientset} "$@"
-***REMOVED***
+fi
 
 if [ "${GENS}" = "all" ] || grep -qw "lister" <<<"${GENS}"; then
   echo "Generating listers for ${GROUPS_WITH_VERSIONS} at ${OUTPUT_PKG}/listers"
   ${GOPATH}/bin/lister-gen --input-dirs $(codegen::join , "${ALL_FQ_APIS[@]}") --output-package ${OUTPUT_PKG}/listers "$@"
-***REMOVED***
+fi
 
 if [ "${GENS}" = "all" ] || grep -qw "informer" <<<"${GENS}"; then
   echo "Generating informers for ${GROUPS_WITH_VERSIONS} at ${OUTPUT_PKG}/informers"
@@ -106,4 +106,4 @@ if [ "${GENS}" = "all" ] || grep -qw "informer" <<<"${GENS}"; then
            --listers-package ${OUTPUT_PKG}/listers \
            --output-package ${OUTPUT_PKG}/informers \
            "$@"
-***REMOVED***
+fi

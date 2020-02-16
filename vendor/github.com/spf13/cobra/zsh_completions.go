@@ -8,9 +8,9 @@ import (
 	"strings"
 )
 
-// GenZshCompletionFile generates zsh completion ***REMOVED***le.
-func (c *Command) GenZshCompletionFile(***REMOVED***lename string) error {
-	outFile, err := os.Create(***REMOVED***lename)
+// GenZshCompletionFile generates zsh completion file.
+func (c *Command) GenZshCompletionFile(filename string) error {
+	outFile, err := os.Create(filename)
 	if err != nil {
 		return err
 	}
@@ -19,7 +19,7 @@ func (c *Command) GenZshCompletionFile(***REMOVED***lename string) error {
 	return c.GenZshCompletion(outFile)
 }
 
-// GenZshCompletion generates a zsh completion ***REMOVED***le and writes to the passed writer.
+// GenZshCompletion generates a zsh completion file and writes to the passed writer.
 func (c *Command) GenZshCompletion(w io.Writer) error {
 	buf := new(bytes.Buffer)
 
@@ -56,7 +56,7 @@ func writeLevelMapping(w io.Writer, numLevels int) {
 		fmt.Fprintf(w, `  '%d: :->level%d' \`, i, i)
 		fmt.Fprintln(w)
 	}
-	fmt.Fprintf(w, `  '%d: :%s'`, numLevels+1, "_***REMOVED***les")
+	fmt.Fprintf(w, `  '%d: :%s'`, numLevels+1, "_files")
 	fmt.Fprintln(w)
 }
 
@@ -70,7 +70,7 @@ func writeLevelCases(w io.Writer, maxDepth int, root *Command) {
 		fmt.Fprintln(w, "  ;;")
 	}
 	fmt.Fprintln(w, "  *)")
-	fmt.Fprintln(w, "    _arguments '*: :_***REMOVED***les'")
+	fmt.Fprintln(w, "    _arguments '*: :_files'")
 	fmt.Fprintln(w, "  ;;")
 }
 
@@ -78,7 +78,7 @@ func writeLevel(w io.Writer, root *Command, i int) {
 	fmt.Fprintf(w, "    case $words[%d] in\n", i)
 	defer fmt.Fprintln(w, "    esac")
 
-	commands := ***REMOVED***lterByLevel(root, i)
+	commands := filterByLevel(root, i)
 	byParent := groupByParent(commands)
 
 	for p, c := range byParent {
@@ -88,19 +88,19 @@ func writeLevel(w io.Writer, root *Command, i int) {
 		fmt.Fprintln(w, "      ;;")
 	}
 	fmt.Fprintln(w, "      *)")
-	fmt.Fprintln(w, "        _arguments '*: :_***REMOVED***les'")
+	fmt.Fprintln(w, "        _arguments '*: :_files'")
 	fmt.Fprintln(w, "      ;;")
 
 }
 
-func ***REMOVED***lterByLevel(c *Command, l int) []*Command {
+func filterByLevel(c *Command, l int) []*Command {
 	cs := make([]*Command, 0)
 	if l == 0 {
 		cs = append(cs, c)
 		return cs
 	}
 	for _, s := range c.Commands() {
-		cs = append(cs, ***REMOVED***lterByLevel(s, l-1)...)
+		cs = append(cs, filterByLevel(s, l-1)...)
 	}
 	return cs
 }

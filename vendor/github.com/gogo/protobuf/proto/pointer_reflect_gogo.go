@@ -4,7 +4,7 @@
 // http://github.com/gogo/protobuf
 //
 // Redistribution and use in source and binary forms, with or without
-// modi***REMOVED***cation, are permitted provided that the following conditions are
+// modification, are permitted provided that the following conditions are
 // met:
 //
 //     * Redistributions of source code must retain the above copyright
@@ -28,7 +28,7 @@
 
 // +build purego appengine js
 
-// This ***REMOVED***le contains an implementation of proto ***REMOVED***eld accesses using package reflect.
+// This file contains an implementation of proto field accesses using package reflect.
 // It is slower than the code in pointer_unsafe.go but it avoids package unsafe and can
 // be used on App Engine.
 

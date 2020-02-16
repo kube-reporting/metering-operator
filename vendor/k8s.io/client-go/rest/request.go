@@ -2,7 +2,7 @@
 Copyright 2014 The Kubernetes Authors.
 
 Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this ***REMOVED***le except in compliance with the License.
+you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
 
     http://www.apache.org/licenses/LICENSE-2.0
@@ -10,7 +10,7 @@ You may obtain a copy of the License at
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the speci***REMOVED***c language governing permissions and
+See the License for the specific language governing permissions and
 limitations under the License.
 */
 
@@ -47,7 +47,7 @@ import (
 )
 
 var (
-	// longThrottleLatency de***REMOVED***nes threshold for logging requests. All requests being
+	// longThrottleLatency defines threshold for logging requests. All requests being
 	// throttle for more than longThrottleLatency will be logged.
 	longThrottleLatency = 50 * time.Millisecond
 )
@@ -83,11 +83,11 @@ type Request struct {
 	verb   string
 
 	baseURL     *url.URL
-	content     ContentCon***REMOVED***g
+	content     ContentConfig
 	serializers Serializers
 
 	// generic components accessible via method setters
-	pathPre***REMOVED***x string
+	pathPrefix string
 	subpath    string
 	params     url.Values
 	headers    http.Header
@@ -112,21 +112,21 @@ type Request struct {
 }
 
 // NewRequest creates a new request helper object for accessing runtime.Objects on a server.
-func NewRequest(client HTTPClient, verb string, baseURL *url.URL, versionedAPIPath string, content ContentCon***REMOVED***g, serializers Serializers, backoff BackoffManager, throttle flowcontrol.RateLimiter, timeout time.Duration) *Request {
+func NewRequest(client HTTPClient, verb string, baseURL *url.URL, versionedAPIPath string, content ContentConfig, serializers Serializers, backoff BackoffManager, throttle flowcontrol.RateLimiter, timeout time.Duration) *Request {
 	if backoff == nil {
 		klog.V(2).Infof("Not implementing request backoff strategy.")
 		backoff = &NoBackoff{}
 	}
 
-	pathPre***REMOVED***x := "/"
+	pathPrefix := "/"
 	if baseURL != nil {
-		pathPre***REMOVED***x = path.Join(pathPre***REMOVED***x, baseURL.Path)
+		pathPrefix = path.Join(pathPrefix, baseURL.Path)
 	}
 	r := &Request{
 		client:      client,
 		verb:        verb,
 		baseURL:     baseURL,
-		pathPre***REMOVED***x:  path.Join(pathPre***REMOVED***x, versionedAPIPath),
+		pathPrefix:  path.Join(pathPrefix, versionedAPIPath),
 		content:     content,
 		serializers: serializers,
 		backoffMgr:  backoff,
@@ -142,20 +142,20 @@ func NewRequest(client HTTPClient, verb string, baseURL *url.URL, versionedAPIPa
 	return r
 }
 
-// Pre***REMOVED***x adds segments to the relative beginning to the request path. These
+// Prefix adds segments to the relative beginning to the request path. These
 // items will be placed before the optional Namespace, Resource, or Name sections.
-// Setting AbsPath will clear any previously set Pre***REMOVED***x segments
-func (r *Request) Pre***REMOVED***x(segments ...string) *Request {
+// Setting AbsPath will clear any previously set Prefix segments
+func (r *Request) Prefix(segments ...string) *Request {
 	if r.err != nil {
 		return r
 	}
-	r.pathPre***REMOVED***x = path.Join(r.pathPre***REMOVED***x, path.Join(segments...))
+	r.pathPrefix = path.Join(r.pathPrefix, path.Join(segments...))
 	return r
 }
 
-// Suf***REMOVED***x appends segments to the end of the path. These items will be placed after the pre***REMOVED***x and optional
+// Suffix appends segments to the end of the path. These items will be placed after the prefix and optional
 // Namespace, Resource, or Name sections.
-func (r *Request) Suf***REMOVED***x(segments ...string) *Request {
+func (r *Request) Suffix(segments ...string) *Request {
 	if r.err != nil {
 		return r
 	}
@@ -180,7 +180,7 @@ func (r *Request) Resource(resource string) *Request {
 	return r
 }
 
-// BackOff sets the request's backoff manager to the one speci***REMOVED***ed,
+// BackOff sets the request's backoff manager to the one specified,
 // or defaults to the stub implementation if nil is provided
 func (r *Request) BackOff(manager BackoffManager) *Request {
 	if manager == nil {
@@ -199,7 +199,7 @@ func (r *Request) Throttle(limiter flowcontrol.RateLimiter) *Request {
 }
 
 // SubResource sets a sub-resource path which can be multiple segments after the resource
-// name but before the suf***REMOVED***x.
+// name but before the suffix.
 func (r *Request) SubResource(subresources ...string) *Request {
 	if r.err != nil {
 		return r
@@ -272,10 +272,10 @@ func (r *Request) AbsPath(segments ...string) *Request {
 	if r.err != nil {
 		return r
 	}
-	r.pathPre***REMOVED***x = path.Join(r.baseURL.Path, path.Join(segments...))
-	if len(segments) == 1 && (len(r.baseURL.Path) > 1 || len(segments[0]) > 1) && strings.HasSuf***REMOVED***x(segments[0], "/") {
+	r.pathPrefix = path.Join(r.baseURL.Path, path.Join(segments...))
+	if len(segments) == 1 && (len(r.baseURL.Path) > 1 || len(segments[0]) > 1) && strings.HasSuffix(segments[0], "/") {
 		// preserve any trailing slashes for legacy behavior
-		r.pathPre***REMOVED***x += "/"
+		r.pathPrefix += "/"
 	}
 	return r
 }
@@ -291,7 +291,7 @@ func (r *Request) RequestURI(uri string) *Request {
 		r.err = err
 		return r
 	}
-	r.pathPre***REMOVED***x = locator.Path
+	r.pathPrefix = locator.Path
 	if len(locator.Query()) > 0 {
 		if r.params == nil {
 			r.params = make(url.Values)
@@ -317,10 +317,10 @@ func (r *Request) Param(paramName, s string) *Request {
 // VersionedParams will not write query parameters that have omitempty set and are empty. If a
 // parameter has already been set it is appended to (Params and VersionedParams are additive).
 func (r *Request) VersionedParams(obj runtime.Object, codec runtime.ParameterCodec) *Request {
-	return r.Speci***REMOVED***callyVersionedParams(obj, codec, *r.content.GroupVersion)
+	return r.SpecificallyVersionedParams(obj, codec, *r.content.GroupVersion)
 }
 
-func (r *Request) Speci***REMOVED***callyVersionedParams(obj runtime.Object, codec runtime.ParameterCodec, version schema.GroupVersion) *Request {
+func (r *Request) SpecificallyVersionedParams(obj runtime.Object, codec runtime.ParameterCodec, version schema.GroupVersion) *Request {
 	if r.err != nil {
 		return r
 	}
@@ -368,7 +368,7 @@ func (r *Request) Timeout(d time.Duration) *Request {
 }
 
 // Body makes the request use obj as the body. Optional.
-// If obj is a string, try to read a ***REMOVED***le of that name.
+// If obj is a string, try to read a file of that name.
 // If obj is a []byte, send it directly.
 // If obj is an io.Reader, use it directly.
 // If obj is a runtime.Object, marshal it correctly, and set Content-Type header.
@@ -420,23 +420,23 @@ func (r *Request) Context(ctx context.Context) *Request {
 
 // URL returns the current working URL.
 func (r *Request) URL() *url.URL {
-	p := r.pathPre***REMOVED***x
+	p := r.pathPrefix
 	if r.namespaceSet && len(r.namespace) > 0 {
 		p = path.Join(p, "namespaces", r.namespace)
 	}
 	if len(r.resource) != 0 {
 		p = path.Join(p, strings.ToLower(r.resource))
 	}
-	// Join trims trailing slashes, so preserve r.pathPre***REMOVED***x's trailing slash for backwards compatibility if nothing was changed
+	// Join trims trailing slashes, so preserve r.pathPrefix's trailing slash for backwards compatibility if nothing was changed
 	if len(r.resourceName) != 0 || len(r.subpath) != 0 || len(r.subresource) != 0 {
 		p = path.Join(p, r.resourceName, r.subresource, r.subpath)
 	}
 
-	***REMOVED***nalURL := &url.URL{}
+	finalURL := &url.URL{}
 	if r.baseURL != nil {
-		****REMOVED***nalURL = *r.baseURL
+		*finalURL = *r.baseURL
 	}
-	***REMOVED***nalURL.Path = p
+	finalURL.Path = p
 
 	query := url.Values{}
 	for key, values := range r.params {
@@ -449,15 +449,15 @@ func (r *Request) URL() *url.URL {
 	if r.timeout != 0 {
 		query.Set("timeout", r.timeout.String())
 	}
-	***REMOVED***nalURL.RawQuery = query.Encode()
-	return ***REMOVED***nalURL
+	finalURL.RawQuery = query.Encode()
+	return finalURL
 }
 
-// ***REMOVED***nalURLTemplate is similar to URL(), but will make all speci***REMOVED***c parameter values equal
+// finalURLTemplate is similar to URL(), but will make all specific parameter values equal
 // - instead of name or namespace, "{name}" and "{namespace}" will be used, and all query
 // parameters will be reset. This creates a copy of the url so as not to change the
 // underlying object.
-func (r Request) ***REMOVED***nalURLTemplate() url.URL {
+func (r Request) finalURLTemplate() url.URL {
 	newParams := url.Values{}
 	v := []string{"{value}"}
 	for k := range r.params {
@@ -475,22 +475,22 @@ func (r Request) ***REMOVED***nalURLTemplate() url.URL {
 		return *url
 	}
 
-	const CoreGroupPre***REMOVED***x = "api"
-	const NamedGroupPre***REMOVED***x = "apis"
-	isCoreGroup := segments[groupIndex] == CoreGroupPre***REMOVED***x
-	isNamedGroup := segments[groupIndex] == NamedGroupPre***REMOVED***x
+	const CoreGroupPrefix = "api"
+	const NamedGroupPrefix = "apis"
+	isCoreGroup := segments[groupIndex] == CoreGroupPrefix
+	isNamedGroup := segments[groupIndex] == NamedGroupPrefix
 	if isCoreGroup {
 		// checking the case of core group with /api/v1/... format
 		index = groupIndex + 2
-	} ***REMOVED*** if isNamedGroup {
+	} else if isNamedGroup {
 		// checking the case of named group with /apis/apps/v1/... format
 		index = groupIndex + 3
-	} ***REMOVED*** {
+	} else {
 		// this should not happen that the only two possibilities are /api... and /apis..., just want to put an
 		// outlet here in case more API groups are added in future if ever possible:
 		// https://kubernetes.io/docs/concepts/overview/kubernetes-api/#api-groups
-		// if a wrong API groups name is encountered, return the {pre***REMOVED***x} for url.Path
-		url.Path = "/{pre***REMOVED***x}"
+		// if a wrong API groups name is encountered, return the {prefix} for url.Path
+		url.Path = "/{prefix}"
 		url.RawQuery = ""
 		return *url
 	}
@@ -502,17 +502,17 @@ func (r Request) ***REMOVED***nalURLTemplate() url.URL {
 		// /$RESOURCE/$NAME: replace $NAME with {name}
 		segments[index+1] = "{name}"
 	case len(segments)-index == 3:
-		if segments[index+2] == "***REMOVED***nalize" || segments[index+2] == "status" {
+		if segments[index+2] == "finalize" || segments[index+2] == "status" {
 			// /$RESOURCE/$NAME/$SUBRESOURCE: replace $NAME with {name}
 			segments[index+1] = "{name}"
-		} ***REMOVED*** {
+		} else {
 			// /namespace/$NAMESPACE/$RESOURCE: replace $NAMESPACE with {namespace}
 			segments[index+1] = "{namespace}"
 		}
 	case len(segments)-index >= 4:
 		segments[index+1] = "{namespace}"
 		// /namespace/$NAMESPACE/$RESOURCE/$NAME: replace $NAMESPACE with {namespace},  $NAME with {name}
-		if segments[index+3] != "***REMOVED***nalize" && segments[index+3] != "status" {
+		if segments[index+3] != "finalize" && segments[index+3] != "status" {
 			// /$RESOURCE/$NAME/$SUBRESOURCE: replace $NAME with {name}
 			segments[index+3] = "{name}"
 		}
@@ -534,7 +534,7 @@ func (r *Request) tryThrottle() {
 // Watch attempts to begin watching the requested location.
 // Returns a watch.Interface, or an error.
 func (r *Request) Watch() (watch.Interface, error) {
-	return r.WatchWithSpeci***REMOVED***cDecoders(
+	return r.WatchWithSpecificDecoders(
 		func(body io.ReadCloser) streaming.Decoder {
 			framer := r.serializers.Framer.NewFrameReader(body)
 			return streaming.NewDecoder(framer, r.serializers.StreamingSerializer)
@@ -543,11 +543,11 @@ func (r *Request) Watch() (watch.Interface, error) {
 	)
 }
 
-// WatchWithSpeci***REMOVED***cDecoders attempts to begin watching the requested location with a *different* decoder.
+// WatchWithSpecificDecoders attempts to begin watching the requested location with a *different* decoder.
 // Turns out that you want one "standard" decoder for the watch event and one "personal" decoder for the content
 // Returns a watch.Interface, or an error.
-func (r *Request) WatchWithSpeci***REMOVED***cDecoders(wrapperDecoderFn func(io.ReadCloser) streaming.Decoder, embeddedDecoder runtime.Decoder) (watch.Interface, error) {
-	// We speci***REMOVED***cally don't want to rate limit watches, so we
+func (r *Request) WatchWithSpecificDecoders(wrapperDecoderFn func(io.ReadCloser) streaming.Decoder, embeddedDecoder runtime.Decoder) (watch.Interface, error) {
+	// We specifically don't want to rate limit watches, so we
 	// don't use r.throttle here.
 	if r.err != nil {
 		return nil, r.err
@@ -575,7 +575,7 @@ func (r *Request) WatchWithSpeci***REMOVED***cDecoders(wrapperDecoderFn func(io.
 	if r.baseURL != nil {
 		if err != nil {
 			r.backoffMgr.UpdateBackoff(r.baseURL, err, 0)
-		} ***REMOVED*** {
+		} else {
 			r.backoffMgr.UpdateBackoff(r.baseURL, err, resp.StatusCode)
 		}
 	}
@@ -610,7 +610,7 @@ func updateURLMetrics(req *Request, resp *http.Response, err error) {
 	// system so we just report them as `<error>`.
 	if err != nil {
 		metrics.RequestResult.Increment("<error>", req.verb, url)
-	} ***REMOVED*** {
+	} else {
 		//Metrics for failure codes
 		metrics.RequestResult.Increment(strconv.Itoa(resp.StatusCode), req.verb, url)
 	}
@@ -646,7 +646,7 @@ func (r *Request) Stream() (io.ReadCloser, error) {
 	if r.baseURL != nil {
 		if err != nil {
 			r.backoffMgr.UpdateBackoff(r.URL(), err, 0)
-		} ***REMOVED*** {
+		} else {
 			r.backoffMgr.UpdateBackoff(r.URL(), err, resp.StatusCode)
 		}
 	}
@@ -679,7 +679,7 @@ func (r *Request) request(fn func(*http.Request, *http.Response)) error {
 	//Metrics for total request latency
 	start := time.Now()
 	defer func() {
-		metrics.RequestLatency.Observe(r.verb, r.***REMOVED***nalURLTemplate(), time.Since(start))
+		metrics.RequestLatency.Observe(r.verb, r.finalURLTemplate(), time.Since(start))
 	}()
 
 	if r.err != nil {
@@ -733,7 +733,7 @@ func (r *Request) request(fn func(*http.Request, *http.Response)) error {
 		updateURLMetrics(r, resp, err)
 		if err != nil {
 			r.backoffMgr.UpdateBackoff(r.URL(), err, 0)
-		} ***REMOVED*** {
+		} else {
 			r.backoffMgr.UpdateBackoff(r.URL(), err, resp.StatusCode)
 		}
 		if err != nil {
@@ -744,7 +744,7 @@ func (r *Request) request(fn func(*http.Request, *http.Response)) error {
 			if !net.IsConnectionReset(err) || r.verb != "GET" {
 				return err
 			}
-			// For the purpose of retry, we set the arti***REMOVED***cial "retry-after" response.
+			// For the purpose of retry, we set the artificial "retry-after" response.
 			// TODO: Should we clean the original response if it exists?
 			resp = &http.Response{
 				StatusCode: http.StatusInternalServerError,
@@ -932,14 +932,14 @@ func truncateBody(body string) string {
 // glogBody logs a body output that could be either JSON or protobuf. It explicitly guards against
 // allocating a new string for the body output unless necessary. Uses a simple heuristic to determine
 // whether the body is printable.
-func glogBody(pre***REMOVED***x string, body []byte) {
+func glogBody(prefix string, body []byte) {
 	if klog.V(8) {
 		if bytes.IndexFunc(body, func(r rune) bool {
 			return r < 0x0a
 		}) != -1 {
-			klog.Infof("%s:\n%s", pre***REMOVED***x, truncateBody(hex.Dump(body)))
-		} ***REMOVED*** {
-			klog.Infof("%s: %s", pre***REMOVED***x, truncateBody(string(body)))
+			klog.Infof("%s:\n%s", prefix, truncateBody(hex.Dump(body)))
+		} else {
+			klog.Infof("%s: %s", prefix, truncateBody(string(body)))
 		}
 	}
 }
@@ -953,14 +953,14 @@ const maxUnstructuredResponseTextBytes = 2048
 // introduce a level of uncertainty to the responses returned by servers that in common use result in
 // unexpected responses. The rough structure is:
 //
-// 1. Assume the server sends you something sane - JSON + well de***REMOVED***ned error objects + proper codes
+// 1. Assume the server sends you something sane - JSON + well defined error objects + proper codes
 //    - this is the happy path
 //    - when you get this output, trust what the server sends
-// 2. Guard against empty ***REMOVED***elds / bodies in received JSON and attempt to cull suf***REMOVED***cient info from them to
+// 2. Guard against empty fields / bodies in received JSON and attempt to cull sufficient info from them to
 //    generate a reasonable facsimile of the original failure.
 //    - Be sure to use a distinct error type or flag that allows a client to distinguish between this and error 1 above
 // 3. Handle true disconnect failures / completely malformed data by moving up to a more generic client error
-// 4. Distinguish between various connection failures like SSL certi***REMOVED***cates, timeouts, proxy errors, unexpected
+// 4. Distinguish between various connection failures like SSL certificates, timeouts, proxy errors, unexpected
 //    initial contact, the presence of mismatched body contents from posted content types
 //    - Give these a separate distinct error type and capture as much as possible of the original message
 //
@@ -1012,7 +1012,7 @@ func isTextResponse(resp *http.Response) bool {
 	if err != nil {
 		return false
 	}
-	return strings.HasPre***REMOVED***x(media, "text/")
+	return strings.HasPrefix(media, "text/")
 }
 
 // checkWait returns true along with a number of seconds if the server instructed us to wait
@@ -1154,10 +1154,10 @@ func (r Result) Error() error {
 	return r.err
 }
 
-// NameMayNotBe speci***REMOVED***es strings that cannot be used as names speci***REMOVED***ed as path segments (like the REST API or etcd store)
+// NameMayNotBe specifies strings that cannot be used as names specified as path segments (like the REST API or etcd store)
 var NameMayNotBe = []string{".", ".."}
 
-// NameMayNotContain speci***REMOVED***es substrings that cannot be used in names speci***REMOVED***ed as path segments (like the REST API or etcd store)
+// NameMayNotContain specifies substrings that cannot be used in names specified as path segments (like the REST API or etcd store)
 var NameMayNotContain = []string{"/", "%"}
 
 // IsValidPathSegmentName validates the name can be safely encoded as a path segment
@@ -1178,9 +1178,9 @@ func IsValidPathSegmentName(name string) []string {
 	return errors
 }
 
-// IsValidPathSegmentPre***REMOVED***x validates the name can be used as a pre***REMOVED***x for a name which will be encoded as a path segment
-// It does not check for exact matches with disallowed names, since an arbitrary suf***REMOVED***x might make the name valid
-func IsValidPathSegmentPre***REMOVED***x(name string) []string {
+// IsValidPathSegmentPrefix validates the name can be used as a prefix for a name which will be encoded as a path segment
+// It does not check for exact matches with disallowed names, since an arbitrary suffix might make the name valid
+func IsValidPathSegmentPrefix(name string) []string {
 	var errors []string
 	for _, illegalContent := range NameMayNotContain {
 		if strings.Contains(name, illegalContent) {
@@ -1192,10 +1192,10 @@ func IsValidPathSegmentPre***REMOVED***x(name string) []string {
 }
 
 // ValidatePathSegmentName validates the name can be safely encoded as a path segment
-func ValidatePathSegmentName(name string, pre***REMOVED***x bool) []string {
-	if pre***REMOVED***x {
-		return IsValidPathSegmentPre***REMOVED***x(name)
-	} ***REMOVED*** {
+func ValidatePathSegmentName(name string, prefix bool) []string {
+	if prefix {
+		return IsValidPathSegmentPrefix(name)
+	} else {
 		return IsValidPathSegmentName(name)
 	}
 }

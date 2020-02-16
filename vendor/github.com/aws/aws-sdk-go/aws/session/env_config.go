@@ -11,15 +11,15 @@ import (
 	"github.com/aws/aws-sdk-go/aws/endpoints"
 )
 
-// EnvProviderName provides a name of the provider when con***REMOVED***g is loaded from environment.
-const EnvProviderName = "EnvCon***REMOVED***gCredentials"
+// EnvProviderName provides a name of the provider when config is loaded from environment.
+const EnvProviderName = "EnvConfigCredentials"
 
-// envCon***REMOVED***g is a collection of environment values the SDK will read
-// setup con***REMOVED***g from. All environment values are optional. But some values
+// envConfig is a collection of environment values the SDK will read
+// setup config from. All environment values are optional. But some values
 // such as credentials require multiple values to be complete or the values
 // will be ignored.
-type envCon***REMOVED***g struct {
-	// Environment con***REMOVED***guration values. If set both Access Key ID and Secret Access
+type envConfig struct {
+	// Environment configuration values. If set both Access Key ID and Secret Access
 	// Key must be provided. Session Token and optionally also be provided, but is
 	// not required.
 	//
@@ -46,54 +46,54 @@ type envCon***REMOVED***g struct {
 	//	AWS_DEFAULT_REGION=us-east-1
 	Region string
 
-	// Pro***REMOVED***le name the SDK should load use when loading shared con***REMOVED***guration from the
-	// shared con***REMOVED***guration ***REMOVED***les. If not provided "default" will be used as the
-	// pro***REMOVED***le name.
+	// Profile name the SDK should load use when loading shared configuration from the
+	// shared configuration files. If not provided "default" will be used as the
+	// profile name.
 	//
-	//	AWS_PROFILE=my_pro***REMOVED***le
+	//	AWS_PROFILE=my_profile
 	//
 	//	# AWS_DEFAULT_PROFILE is only read if AWS_SDK_LOAD_CONFIG is also set,
 	//	# and AWS_PROFILE is not also set.
-	//	AWS_DEFAULT_PROFILE=my_pro***REMOVED***le
-	Pro***REMOVED***le string
+	//	AWS_DEFAULT_PROFILE=my_profile
+	Profile string
 
-	// SDK load con***REMOVED***g instructs the SDK to load the shared con***REMOVED***g in addition to
-	// shared credentials. This also expands the con***REMOVED***guration loaded from the shared
-	// credentials to have parity with the shared con***REMOVED***g ***REMOVED***le. This also enables
-	// Region and Pro***REMOVED***le support for the AWS_DEFAULT_REGION and AWS_DEFAULT_PROFILE
+	// SDK load config instructs the SDK to load the shared config in addition to
+	// shared credentials. This also expands the configuration loaded from the shared
+	// credentials to have parity with the shared config file. This also enables
+	// Region and Profile support for the AWS_DEFAULT_REGION and AWS_DEFAULT_PROFILE
 	// env values as well.
 	//
 	//	AWS_SDK_LOAD_CONFIG=1
-	EnableSharedCon***REMOVED***g bool
+	EnableSharedConfig bool
 
-	// Shared credentials ***REMOVED***le path can be set to instruct the SDK to use an alternate
-	// ***REMOVED***le for the shared credentials. If not set the ***REMOVED***le will be loaded from
+	// Shared credentials file path can be set to instruct the SDK to use an alternate
+	// file for the shared credentials. If not set the file will be loaded from
 	// $HOME/.aws/credentials on Linux/Unix based systems, and
 	// %USERPROFILE%\.aws\credentials on Windows.
 	//
 	//	AWS_SHARED_CREDENTIALS_FILE=$HOME/my_shared_credentials
 	SharedCredentialsFile string
 
-	// Shared con***REMOVED***g ***REMOVED***le path can be set to instruct the SDK to use an alternate
-	// ***REMOVED***le for the shared con***REMOVED***g. If not set the ***REMOVED***le will be loaded from
-	// $HOME/.aws/con***REMOVED***g on Linux/Unix based systems, and
-	// %USERPROFILE%\.aws\con***REMOVED***g on Windows.
+	// Shared config file path can be set to instruct the SDK to use an alternate
+	// file for the shared config. If not set the file will be loaded from
+	// $HOME/.aws/config on Linux/Unix based systems, and
+	// %USERPROFILE%\.aws\config on Windows.
 	//
-	//	AWS_CONFIG_FILE=$HOME/my_shared_con***REMOVED***g
-	SharedCon***REMOVED***gFile string
+	//	AWS_CONFIG_FILE=$HOME/my_shared_config
+	SharedConfigFile string
 
-	// Sets the path to a custom Credentials Authority (CA) Bundle PEM ***REMOVED***le
+	// Sets the path to a custom Credentials Authority (CA) Bundle PEM file
 	// that the SDK will use instead of the system's root CA bundle.
-	// Only use this if you want to con***REMOVED***gure the SDK to use a custom set
+	// Only use this if you want to configure the SDK to use a custom set
 	// of CAs.
 	//
 	// Enabling this option will attempt to merge the Transport
 	// into the SDK's HTTP client. If the client's Transport is
 	// not a http.Transport an error will be returned. If the
-	// Transport's TLS con***REMOVED***g is set this option will cause the
-	// SDK to overwrite the Transport's TLS con***REMOVED***g's  RootCAs value.
+	// Transport's TLS config is set this option will cause the
+	// SDK to overwrite the Transport's TLS config's  RootCAs value.
 	//
-	// Setting a custom HTTPClient in the aws.Con***REMOVED***g options will override this setting.
+	// Setting a custom HTTPClient in the aws.Config options will override this setting.
 	// To use this option and custom HTTP client, the HTTP client needs to be provided
 	// when creating the session. Not the service client.
 	//
@@ -112,23 +112,23 @@ type envCon***REMOVED***g struct {
 	EnableEndpointDiscovery *bool
 	enableEndpointDiscovery string
 
-	// Speci***REMOVED***es the WebIdentity token the SDK should use to assume a role
+	// Specifies the WebIdentity token the SDK should use to assume a role
 	// with.
 	//
-	//  AWS_WEB_IDENTITY_TOKEN_FILE=***REMOVED***le_path
+	//  AWS_WEB_IDENTITY_TOKEN_FILE=file_path
 	WebIdentityTokenFilePath string
 
-	// Speci***REMOVED***es the IAM role arn to use when assuming an role.
+	// Specifies the IAM role arn to use when assuming an role.
 	//
 	//  AWS_ROLE_ARN=role_arn
 	RoleARN string
 
-	// Speci***REMOVED***es the IAM role session name to use when assuming a role.
+	// Specifies the IAM role session name to use when assuming a role.
 	//
 	//  AWS_ROLE_SESSION_NAME=session_name
 	RoleSessionName string
 
-	// Speci***REMOVED***es the Regional Endpoint flag for the sdk to resolve the endpoint for a service
+	// Specifies the Regional Endpoint flag for the sdk to resolve the endpoint for a service
 	//
 	// AWS_STS_REGIONAL_ENDPOINTS =sts_regional_endpoint
 	// This can take value as `regional` or `legacy`
@@ -168,14 +168,14 @@ var (
 		"AWS_REGION",
 		"AWS_DEFAULT_REGION", // Only read if AWS_SDK_LOAD_CONFIG is also set
 	}
-	pro***REMOVED***leEnvKeys = []string{
+	profileEnvKeys = []string{
 		"AWS_PROFILE",
 		"AWS_DEFAULT_PROFILE", // Only read if AWS_SDK_LOAD_CONFIG is also set
 	}
 	sharedCredsFileEnvKey = []string{
 		"AWS_SHARED_CREDENTIALS_FILE",
 	}
-	sharedCon***REMOVED***gFileEnvKey = []string{
+	sharedConfigFileEnvKey = []string{
 		"AWS_CONFIG_FILE",
 	}
 	webIdentityTokenFilePathEnvKey = []string{
@@ -192,31 +192,31 @@ var (
 	}
 )
 
-// loadEnvCon***REMOVED***g retrieves the SDK's environment con***REMOVED***guration.
-// See `envCon***REMOVED***g` for the values that will be retrieved.
+// loadEnvConfig retrieves the SDK's environment configuration.
+// See `envConfig` for the values that will be retrieved.
 //
 // If the environment variable `AWS_SDK_LOAD_CONFIG` is set to a truthy value
-// the shared SDK con***REMOVED***g will be loaded in addition to the SDK's speci***REMOVED***c
-// con***REMOVED***guration values.
-func loadEnvCon***REMOVED***g() (envCon***REMOVED***g, error) {
-	enableSharedCon***REMOVED***g, _ := strconv.ParseBool(os.Getenv("AWS_SDK_LOAD_CONFIG"))
-	return envCon***REMOVED***gLoad(enableSharedCon***REMOVED***g)
+// the shared SDK config will be loaded in addition to the SDK's specific
+// configuration values.
+func loadEnvConfig() (envConfig, error) {
+	enableSharedConfig, _ := strconv.ParseBool(os.Getenv("AWS_SDK_LOAD_CONFIG"))
+	return envConfigLoad(enableSharedConfig)
 }
 
-// loadEnvSharedCon***REMOVED***g retrieves the SDK's environment con***REMOVED***guration, and the
-// SDK shared con***REMOVED***g. See `envCon***REMOVED***g` for the values that will be retrieved.
+// loadEnvSharedConfig retrieves the SDK's environment configuration, and the
+// SDK shared config. See `envConfig` for the values that will be retrieved.
 //
-// Loads the shared con***REMOVED***guration in addition to the SDK's speci***REMOVED***c con***REMOVED***guration.
-// This will load the same values as `loadEnvCon***REMOVED***g` if the `AWS_SDK_LOAD_CONFIG`
+// Loads the shared configuration in addition to the SDK's specific configuration.
+// This will load the same values as `loadEnvConfig` if the `AWS_SDK_LOAD_CONFIG`
 // environment variable is set.
-func loadSharedEnvCon***REMOVED***g() (envCon***REMOVED***g, error) {
-	return envCon***REMOVED***gLoad(true)
+func loadSharedEnvConfig() (envConfig, error) {
+	return envConfigLoad(true)
 }
 
-func envCon***REMOVED***gLoad(enableSharedCon***REMOVED***g bool) (envCon***REMOVED***g, error) {
-	cfg := envCon***REMOVED***g{}
+func envConfigLoad(enableSharedConfig bool) (envConfig, error) {
+	cfg := envConfig{}
 
-	cfg.EnableSharedCon***REMOVED***g = enableSharedCon***REMOVED***g
+	cfg.EnableSharedConfig = enableSharedConfig
 
 	// Static environment credentials
 	var creds credentials.Value
@@ -248,14 +248,14 @@ func envCon***REMOVED***gLoad(enableSharedCon***REMOVED***g bool) (envCon***REMO
 	}
 
 	regionKeys := regionEnvKeys
-	pro***REMOVED***leKeys := pro***REMOVED***leEnvKeys
-	if !cfg.EnableSharedCon***REMOVED***g {
+	profileKeys := profileEnvKeys
+	if !cfg.EnableSharedConfig {
 		regionKeys = regionKeys[:1]
-		pro***REMOVED***leKeys = pro***REMOVED***leKeys[:1]
+		profileKeys = profileKeys[:1]
 	}
 
 	setFromEnvVal(&cfg.Region, regionKeys)
-	setFromEnvVal(&cfg.Pro***REMOVED***le, pro***REMOVED***leKeys)
+	setFromEnvVal(&cfg.Profile, profileKeys)
 
 	// endpoint discovery is in reference to it being enabled.
 	setFromEnvVal(&cfg.enableEndpointDiscovery, enableEndpointDiscoveryEnvKey)
@@ -264,13 +264,13 @@ func envCon***REMOVED***gLoad(enableSharedCon***REMOVED***g bool) (envCon***REMO
 	}
 
 	setFromEnvVal(&cfg.SharedCredentialsFile, sharedCredsFileEnvKey)
-	setFromEnvVal(&cfg.SharedCon***REMOVED***gFile, sharedCon***REMOVED***gFileEnvKey)
+	setFromEnvVal(&cfg.SharedConfigFile, sharedConfigFileEnvKey)
 
 	if len(cfg.SharedCredentialsFile) == 0 {
 		cfg.SharedCredentialsFile = defaults.SharedCredentialsFilename()
 	}
-	if len(cfg.SharedCon***REMOVED***gFile) == 0 {
-		cfg.SharedCon***REMOVED***gFile = defaults.SharedCon***REMOVED***gFilename()
+	if len(cfg.SharedConfigFile) == 0 {
+		cfg.SharedConfigFile = defaults.SharedConfigFilename()
 	}
 
 	cfg.CustomCABundle = os.Getenv("AWS_CA_BUNDLE")
@@ -280,7 +280,7 @@ func envCon***REMOVED***gLoad(enableSharedCon***REMOVED***g bool) (envCon***REMO
 		if v := os.Getenv(k); len(v) != 0 {
 			STSRegionalEndpoint, err := endpoints.GetSTSRegionalEndpoint(v)
 			if err != nil {
-				return cfg, fmt.Errorf("failed to load, %v from env con***REMOVED***g, %v", k, err)
+				return cfg, fmt.Errorf("failed to load, %v from env config, %v", k, err)
 			}
 			cfg.STSRegionalEndpoint = STSRegionalEndpoint
 		}

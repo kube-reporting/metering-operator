@@ -36,7 +36,7 @@ type SyntaxError struct {
 }
 
 func (e SyntaxError) Error() string {
-	// In the future, it would be good to underline the speci***REMOVED***c
+	// In the future, it would be good to underline the specific
 	// location where the error occurred.
 	return "SyntaxError: " + e.msg
 }
@@ -64,8 +64,8 @@ const (
 	tOr
 	tPipe
 	tNumber
-	tUnquotedIdenti***REMOVED***er
-	tQuotedIdenti***REMOVED***er
+	tUnquotedIdentifier
+	tQuotedIdentifier
 	tComma
 	tColon
 	tLT
@@ -96,13 +96,13 @@ var basicTokens = map[rune]tokType{
 	'@': tCurrent,
 }
 
-// Bit mask for [a-zA-Z_] shifted down 64 bits to ***REMOVED***t in a single uint64.
+// Bit mask for [a-zA-Z_] shifted down 64 bits to fit in a single uint64.
 // When using this bitmask just be sure to shift the rune down 64 bits
-// before checking against identi***REMOVED***erStartBits.
-const identi***REMOVED***erStartBits uint64 = 576460745995190270
+// before checking against identifierStartBits.
+const identifierStartBits uint64 = 576460745995190270
 
 // Bit mask for [a-zA-Z0-9], 128 bits -> 2 uint64s.
-var identi***REMOVED***erTrailingBits = [2]uint64{287948901175001088, 576460745995190270}
+var identifierTrailingBits = [2]uint64{287948901175001088, 576460745995190270}
 
 var whiteSpace = map[rune]bool{
 	' ': true, '\t': true, '\n': true, '\r': true,
@@ -149,10 +149,10 @@ func (lexer *Lexer) tokenize(expression string) ([]token, error) {
 loop:
 	for {
 		r := lexer.next()
-		if identi***REMOVED***erStartBits&(1<<(uint64(r)-64)) > 0 {
-			t := lexer.consumeUnquotedIdenti***REMOVED***er()
+		if identifierStartBits&(1<<(uint64(r)-64)) > 0 {
+			t := lexer.consumeUnquotedIdentifier()
 			tokens = append(tokens, t)
-		} ***REMOVED*** if val, ok := basicTokens[r]; ok {
+		} else if val, ok := basicTokens[r]; ok {
 			// Basic single char token.
 			t := token{
 				tokenType: val,
@@ -161,53 +161,53 @@ loop:
 				length:    1,
 			}
 			tokens = append(tokens, t)
-		} ***REMOVED*** if r == '-' || (r >= '0' && r <= '9') {
+		} else if r == '-' || (r >= '0' && r <= '9') {
 			t := lexer.consumeNumber()
 			tokens = append(tokens, t)
-		} ***REMOVED*** if r == '[' {
+		} else if r == '[' {
 			t := lexer.consumeLBracket()
 			tokens = append(tokens, t)
-		} ***REMOVED*** if r == '"' {
-			t, err := lexer.consumeQuotedIdenti***REMOVED***er()
+		} else if r == '"' {
+			t, err := lexer.consumeQuotedIdentifier()
 			if err != nil {
 				return tokens, err
 			}
 			tokens = append(tokens, t)
-		} ***REMOVED*** if r == '\'' {
+		} else if r == '\'' {
 			t, err := lexer.consumeRawStringLiteral()
 			if err != nil {
 				return tokens, err
 			}
 			tokens = append(tokens, t)
-		} ***REMOVED*** if r == '`' {
+		} else if r == '`' {
 			t, err := lexer.consumeLiteral()
 			if err != nil {
 				return tokens, err
 			}
 			tokens = append(tokens, t)
-		} ***REMOVED*** if r == '|' {
+		} else if r == '|' {
 			t := lexer.matchOrElse(r, '|', tOr, tPipe)
 			tokens = append(tokens, t)
-		} ***REMOVED*** if r == '<' {
+		} else if r == '<' {
 			t := lexer.matchOrElse(r, '=', tLTE, tLT)
 			tokens = append(tokens, t)
-		} ***REMOVED*** if r == '>' {
+		} else if r == '>' {
 			t := lexer.matchOrElse(r, '=', tGTE, tGT)
 			tokens = append(tokens, t)
-		} ***REMOVED*** if r == '!' {
+		} else if r == '!' {
 			t := lexer.matchOrElse(r, '=', tNE, tNot)
 			tokens = append(tokens, t)
-		} ***REMOVED*** if r == '=' {
+		} else if r == '=' {
 			t := lexer.matchOrElse(r, '=', tEQ, tUnknown)
 			tokens = append(tokens, t)
-		} ***REMOVED*** if r == '&' {
+		} else if r == '&' {
 			t := lexer.matchOrElse(r, '&', tAnd, tExpref)
 			tokens = append(tokens, t)
-		} ***REMOVED*** if r == eof {
+		} else if r == eof {
 			break loop
-		} ***REMOVED*** if _, ok := whiteSpace[r]; ok {
+		} else if _, ok := whiteSpace[r]; ok {
 			// Ignore whitespace
-		} ***REMOVED*** {
+		} else {
 			return tokens, lexer.syntaxError(fmt.Sprintf("Unknown char: %s", strconv.QuoteRuneToASCII(r)))
 		}
 	}
@@ -304,22 +304,22 @@ func (lexer *Lexer) syntaxError(msg string) SyntaxError {
 // Checks for a two char token, otherwise matches a single character
 // token. This is used whenever a two char token overlaps a single
 // char token, e.g. "||" -> tPipe, "|" -> tOr.
-func (lexer *Lexer) matchOrElse(***REMOVED***rst rune, second rune, matchedType tokType, singleCharType tokType) token {
+func (lexer *Lexer) matchOrElse(first rune, second rune, matchedType tokType, singleCharType tokType) token {
 	start := lexer.currentPos - lexer.lastWidth
 	nextRune := lexer.next()
 	var t token
 	if nextRune == second {
 		t = token{
 			tokenType: matchedType,
-			value:     string(***REMOVED***rst) + string(second),
+			value:     string(first) + string(second),
 			position:  start,
 			length:    2,
 		}
-	} ***REMOVED*** {
+	} else {
 		lexer.back()
 		t = token{
 			tokenType: singleCharType,
-			value:     string(***REMOVED***rst),
+			value:     string(first),
 			position:  start,
 			length:    1,
 		}
@@ -329,7 +329,7 @@ func (lexer *Lexer) matchOrElse(***REMOVED***rst rune, second rune, matchedType 
 
 func (lexer *Lexer) consumeLBracket() token {
 	// There's three options here:
-	// 1. A ***REMOVED***lter expression "[?"
+	// 1. A filter expression "[?"
 	// 2. A flatten operator "[]"
 	// 3. A bare rbracket "["
 	start := lexer.currentPos - lexer.lastWidth
@@ -342,14 +342,14 @@ func (lexer *Lexer) consumeLBracket() token {
 			position:  start,
 			length:    2,
 		}
-	} ***REMOVED*** if nextRune == ']' {
+	} else if nextRune == ']' {
 		t = token{
 			tokenType: tFlatten,
 			value:     "[]",
 			position:  start,
 			length:    2,
 		}
-	} ***REMOVED*** {
+	} else {
 		t = token{
 			tokenType: tLbracket,
 			value:     "[",
@@ -361,7 +361,7 @@ func (lexer *Lexer) consumeLBracket() token {
 	return t
 }
 
-func (lexer *Lexer) consumeQuotedIdenti***REMOVED***er() (token, error) {
+func (lexer *Lexer) consumeQuotedIdentifier() (token, error) {
 	start := lexer.currentPos
 	value, err := lexer.consumeUntil('"')
 	if err != nil {
@@ -373,27 +373,27 @@ func (lexer *Lexer) consumeQuotedIdenti***REMOVED***er() (token, error) {
 		return token{}, err
 	}
 	return token{
-		tokenType: tQuotedIdenti***REMOVED***er,
+		tokenType: tQuotedIdentifier,
 		value:     decoded,
 		position:  start - 1,
 		length:    len(decoded),
 	}, nil
 }
 
-func (lexer *Lexer) consumeUnquotedIdenti***REMOVED***er() token {
+func (lexer *Lexer) consumeUnquotedIdentifier() token {
 	// Consume runes until we reach the end of an unquoted
-	// identi***REMOVED***er.
+	// identifier.
 	start := lexer.currentPos - lexer.lastWidth
 	for {
 		r := lexer.next()
-		if r < 0 || r > 128 || identi***REMOVED***erTrailingBits[uint64(r)/64]&(1<<(uint64(r)%64)) == 0 {
+		if r < 0 || r > 128 || identifierTrailingBits[uint64(r)/64]&(1<<(uint64(r)%64)) == 0 {
 			lexer.back()
 			break
 		}
 	}
 	value := lexer.expression[start:lexer.currentPos]
 	return token{
-		tokenType: tUnquotedIdenti***REMOVED***er,
+		tokenType: tUnquotedIdentifier,
 		value:     value,
 		position:  start,
 		length:    lexer.currentPos - start,

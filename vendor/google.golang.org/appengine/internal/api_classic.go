@@ -1,6 +1,6 @@
 // Copyright 2015 Google Inc. All rights reserved.
 // Use of this source code is governed by the Apache 2.0
-// license that can be found in the LICENSE ***REMOVED***le.
+// license that can be found in the LICENSE file.
 
 // +build appengine
 
@@ -64,7 +64,7 @@ type testingContext struct {
 	req *http.Request
 }
 
-func (t *testingContext) FullyQuali***REMOVED***edAppID() string { return "dev~testcontext" }
+func (t *testingContext) FullyQualifiedAppID() string { return "dev~testcontext" }
 func (t *testingContext) Call(service, method string, _, _ appengine_internal.ProtoMessage, _ *appengine_internal.CallOptions) error {
 	if service == "__go__" && method == "GetNamespace" {
 		return nil
@@ -101,9 +101,9 @@ func Call(ctx netcontext.Context, service, method string, in, out proto.Message)
 		return errors.New("not an App Engine context")
 	}
 
-	// Apply transaction modi***REMOVED***cations if we're in a transaction.
+	// Apply transaction modifications if we're in a transaction.
 	if t := transactionFromContext(ctx); t != nil {
-		if t.***REMOVED***nished {
+		if t.finished {
 			return errors.New("transaction context has expired")
 		}
 		applyTransaction(in, &t.transaction)

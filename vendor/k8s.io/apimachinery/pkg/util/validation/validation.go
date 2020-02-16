@@ -2,7 +2,7 @@
 Copyright 2014 The Kubernetes Authors.
 
 Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this ***REMOVED***le except in compliance with the License.
+you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
 
     http://www.apache.org/licenses/LICENSE-2.0
@@ -10,7 +10,7 @@ You may obtain a copy of the License at
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the speci***REMOVED***c language governing permissions and
+See the License for the specific language governing permissions and
 limitations under the License.
 */
 
@@ -24,22 +24,22 @@ import (
 	"strconv"
 	"strings"
 
-	"k8s.io/apimachinery/pkg/util/validation/***REMOVED***eld"
+	"k8s.io/apimachinery/pkg/util/validation/field"
 )
 
 const qnameCharFmt string = "[A-Za-z0-9]"
 const qnameExtCharFmt string = "[-A-Za-z0-9_.]"
-const quali***REMOVED***edNameFmt string = "(" + qnameCharFmt + qnameExtCharFmt + "*)?" + qnameCharFmt
-const quali***REMOVED***edNameErrMsg string = "must consist of alphanumeric characters, '-', '_' or '.', and must start and end with an alphanumeric character"
-const quali***REMOVED***edNameMaxLength int = 63
+const qualifiedNameFmt string = "(" + qnameCharFmt + qnameExtCharFmt + "*)?" + qnameCharFmt
+const qualifiedNameErrMsg string = "must consist of alphanumeric characters, '-', '_' or '.', and must start and end with an alphanumeric character"
+const qualifiedNameMaxLength int = 63
 
-var quali***REMOVED***edNameRegexp = regexp.MustCompile("^" + quali***REMOVED***edNameFmt + "$")
+var qualifiedNameRegexp = regexp.MustCompile("^" + qualifiedNameFmt + "$")
 
-// IsQuali***REMOVED***edName tests whether the value passed is what Kubernetes calls a
-// "quali***REMOVED***ed name".  This is a format used in various places throughout the
+// IsQualifiedName tests whether the value passed is what Kubernetes calls a
+// "qualified name".  This is a format used in various places throughout the
 // system.  If the value is not valid, a list of error strings is returned.
 // Otherwise an empty list (or nil) is returned.
-func IsQuali***REMOVED***edName(value string) []string {
+func IsQualifiedName(value string) []string {
 	var errs []string
 	parts := strings.Split(value, "/")
 	var name string
@@ -47,45 +47,45 @@ func IsQuali***REMOVED***edName(value string) []string {
 	case 1:
 		name = parts[0]
 	case 2:
-		var pre***REMOVED***x string
-		pre***REMOVED***x, name = parts[0], parts[1]
-		if len(pre***REMOVED***x) == 0 {
-			errs = append(errs, "pre***REMOVED***x part "+EmptyError())
-		} ***REMOVED*** if msgs := IsDNS1123Subdomain(pre***REMOVED***x); len(msgs) != 0 {
-			errs = append(errs, pre***REMOVED***xEach(msgs, "pre***REMOVED***x part ")...)
+		var prefix string
+		prefix, name = parts[0], parts[1]
+		if len(prefix) == 0 {
+			errs = append(errs, "prefix part "+EmptyError())
+		} else if msgs := IsDNS1123Subdomain(prefix); len(msgs) != 0 {
+			errs = append(errs, prefixEach(msgs, "prefix part ")...)
 		}
 	default:
-		return append(errs, "a quali***REMOVED***ed name "+RegexError(quali***REMOVED***edNameErrMsg, quali***REMOVED***edNameFmt, "MyName", "my.name", "123-abc")+
-			" with an optional DNS subdomain pre***REMOVED***x and '/' (e.g. 'example.com/MyName')")
+		return append(errs, "a qualified name "+RegexError(qualifiedNameErrMsg, qualifiedNameFmt, "MyName", "my.name", "123-abc")+
+			" with an optional DNS subdomain prefix and '/' (e.g. 'example.com/MyName')")
 	}
 
 	if len(name) == 0 {
 		errs = append(errs, "name part "+EmptyError())
-	} ***REMOVED*** if len(name) > quali***REMOVED***edNameMaxLength {
-		errs = append(errs, "name part "+MaxLenError(quali***REMOVED***edNameMaxLength))
+	} else if len(name) > qualifiedNameMaxLength {
+		errs = append(errs, "name part "+MaxLenError(qualifiedNameMaxLength))
 	}
-	if !quali***REMOVED***edNameRegexp.MatchString(name) {
-		errs = append(errs, "name part "+RegexError(quali***REMOVED***edNameErrMsg, quali***REMOVED***edNameFmt, "MyName", "my.name", "123-abc"))
+	if !qualifiedNameRegexp.MatchString(name) {
+		errs = append(errs, "name part "+RegexError(qualifiedNameErrMsg, qualifiedNameFmt, "MyName", "my.name", "123-abc"))
 	}
 	return errs
 }
 
-// IsFullyQuali***REMOVED***edName checks if the name is fully quali***REMOVED***ed.
-func IsFullyQuali***REMOVED***edName(fldPath ****REMOVED***eld.Path, name string) ***REMOVED***eld.ErrorList {
-	var allErrors ***REMOVED***eld.ErrorList
+// IsFullyQualifiedName checks if the name is fully qualified.
+func IsFullyQualifiedName(fldPath *field.Path, name string) field.ErrorList {
+	var allErrors field.ErrorList
 	if len(name) == 0 {
-		return append(allErrors, ***REMOVED***eld.Required(fldPath, ""))
+		return append(allErrors, field.Required(fldPath, ""))
 	}
 	if errs := IsDNS1123Subdomain(name); len(errs) > 0 {
-		return append(allErrors, ***REMOVED***eld.Invalid(fldPath, name, strings.Join(errs, ",")))
+		return append(allErrors, field.Invalid(fldPath, name, strings.Join(errs, ",")))
 	}
 	if len(strings.Split(name, ".")) < 3 {
-		return append(allErrors, ***REMOVED***eld.Invalid(fldPath, name, "should be a domain with at least three segments separated by dots"))
+		return append(allErrors, field.Invalid(fldPath, name, "should be a domain with at least three segments separated by dots"))
 	}
 	return allErrors
 }
 
-const labelValueFmt string = "(" + quali***REMOVED***edNameFmt + ")?"
+const labelValueFmt string = "(" + qualifiedNameFmt + ")?"
 const labelValueErrMsg string = "a valid label must be an empty string or consist of alphanumeric characters, '-', '_' or '.', and must start and end with an alphanumeric character"
 const LabelValueMaxLength int = 63
 
@@ -111,7 +111,7 @@ const DNS1123LabelMaxLength int = 63
 
 var dns1123LabelRegexp = regexp.MustCompile("^" + dns1123LabelFmt + "$")
 
-// IsDNS1123Label tests for a string that conforms to the de***REMOVED***nition of a label in
+// IsDNS1123Label tests for a string that conforms to the definition of a label in
 // DNS (RFC 1123).
 func IsDNS1123Label(value string) []string {
 	var errs []string
@@ -130,7 +130,7 @@ const DNS1123SubdomainMaxLength int = 253
 
 var dns1123SubdomainRegexp = regexp.MustCompile("^" + dns1123SubdomainFmt + "$")
 
-// IsDNS1123Subdomain tests for a string that conforms to the de***REMOVED***nition of a
+// IsDNS1123Subdomain tests for a string that conforms to the definition of a
 // subdomain in DNS (RFC 1123).
 func IsDNS1123Subdomain(value string) []string {
 	var errs []string
@@ -149,7 +149,7 @@ const DNS1035LabelMaxLength int = 63
 
 var dns1035LabelRegexp = regexp.MustCompile("^" + dns1035LabelFmt + "$")
 
-// IsDNS1035Label tests for a string that conforms to the de***REMOVED***nition of a label in
+// IsDNS1035Label tests for a string that conforms to the definition of a label in
 // DNS (RFC 1035).
 func IsDNS1035Label(value string) []string {
 	var errs []string
@@ -162,14 +162,14 @@ func IsDNS1035Label(value string) []string {
 	return errs
 }
 
-// wildcard de***REMOVED***nition - RFC 1034 section 4.3.3.
+// wildcard definition - RFC 1034 section 4.3.3.
 // examples:
 // - valid: *.bar.com, *.foo.bar.com
 // - invalid: *.*.bar.com, *.foo.*.com, *bar.com, f*.bar.com, *
 const wildcardDNS1123SubdomainFmt = "\\*\\." + dns1123SubdomainFmt
 const wildcardDNS1123SubdomainErrMsg = "a wildcard DNS-1123 subdomain must start with '*.', followed by a valid DNS subdomain, which must consist of lower case alphanumeric characters, '-' or '.' and end with an alphanumeric character"
 
-// IsWildcardDNS1123Subdomain tests for a string that conforms to the de***REMOVED***nition of a
+// IsWildcardDNS1123Subdomain tests for a string that conforms to the definition of a
 // wildcard subdomain in DNS (RFC 1034 section 4.3.3).
 func IsWildcardDNS1123Subdomain(value string) []string {
 	wildcardDNS1123SubdomainRegexp := regexp.MustCompile("^" + wildcardDNS1123SubdomainFmt + "$")
@@ -184,16 +184,16 @@ func IsWildcardDNS1123Subdomain(value string) []string {
 	return errs
 }
 
-const cIdenti***REMOVED***erFmt string = "[A-Za-z_][A-Za-z0-9_]*"
-const identi***REMOVED***erErrMsg string = "a valid C identi***REMOVED***er must start with alphabetic character or '_', followed by a string of alphanumeric characters or '_'"
+const cIdentifierFmt string = "[A-Za-z_][A-Za-z0-9_]*"
+const identifierErrMsg string = "a valid C identifier must start with alphabetic character or '_', followed by a string of alphanumeric characters or '_'"
 
-var cIdenti***REMOVED***erRegexp = regexp.MustCompile("^" + cIdenti***REMOVED***erFmt + "$")
+var cIdentifierRegexp = regexp.MustCompile("^" + cIdentifierFmt + "$")
 
-// IsCIdenti***REMOVED***er tests for a string that conforms the de***REMOVED***nition of an identi***REMOVED***er
+// IsCIdentifier tests for a string that conforms the definition of an identifier
 // in C. This checks the format, but not the length.
-func IsCIdenti***REMOVED***er(value string) []string {
-	if !cIdenti***REMOVED***erRegexp.MatchString(value) {
-		return []string{RegexError(identi***REMOVED***erErrMsg, cIdenti***REMOVED***erFmt, "my_name", "MY_NAME", "MyName")}
+func IsCIdentifier(value string) []string {
+	if !cIdentifierRegexp.MatchString(value) {
+		return []string{RegexError(identifierErrMsg, cIdentifierFmt, "my_name", "MY_NAME", "MyName")}
 	}
 	return nil
 }
@@ -295,7 +295,7 @@ const httpHeaderNameErrMsg string = "a valid HTTP header must consist of alphanu
 var httpHeaderNameRegexp = regexp.MustCompile("^" + httpHeaderNameFmt + "$")
 
 // IsHTTPHeaderName checks that a string conforms to the Go HTTP library's
-// de***REMOVED***nition of a valid header ***REMOVED***eld name (a stricter subset than RFC7230).
+// definition of a valid header field name (a stricter subset than RFC7230).
 func IsHTTPHeaderName(value string) []string {
 	if !httpHeaderNameRegexp.MatchString(value) {
 		return []string{RegexError(httpHeaderNameErrMsg, httpHeaderNameFmt, "X-Header-Name")}
@@ -315,25 +315,25 @@ func IsEnvVarName(value string) []string {
 		errs = append(errs, RegexError(envVarNameFmtErrMsg, envVarNameFmt, "my.env-name", "MY_ENV.NAME", "MyEnvName1"))
 	}
 
-	errs = append(errs, hasChDirPre***REMOVED***x(value)...)
+	errs = append(errs, hasChDirPrefix(value)...)
 	return errs
 }
 
-const con***REMOVED***gMapKeyFmt = `[-._a-zA-Z0-9]+`
-const con***REMOVED***gMapKeyErrMsg string = "a valid con***REMOVED***g key must consist of alphanumeric characters, '-', '_' or '.'"
+const configMapKeyFmt = `[-._a-zA-Z0-9]+`
+const configMapKeyErrMsg string = "a valid config key must consist of alphanumeric characters, '-', '_' or '.'"
 
-var con***REMOVED***gMapKeyRegexp = regexp.MustCompile("^" + con***REMOVED***gMapKeyFmt + "$")
+var configMapKeyRegexp = regexp.MustCompile("^" + configMapKeyFmt + "$")
 
-// IsCon***REMOVED***gMapKey tests for a string that is a valid key for a Con***REMOVED***gMap or Secret
-func IsCon***REMOVED***gMapKey(value string) []string {
+// IsConfigMapKey tests for a string that is a valid key for a ConfigMap or Secret
+func IsConfigMapKey(value string) []string {
 	var errs []string
 	if len(value) > DNS1123SubdomainMaxLength {
 		errs = append(errs, MaxLenError(DNS1123SubdomainMaxLength))
 	}
-	if !con***REMOVED***gMapKeyRegexp.MatchString(value) {
-		errs = append(errs, RegexError(con***REMOVED***gMapKeyErrMsg, con***REMOVED***gMapKeyFmt, "key.name", "KEY_NAME", "key-name"))
+	if !configMapKeyRegexp.MatchString(value) {
+		errs = append(errs, RegexError(configMapKeyErrMsg, configMapKeyFmt, "key.name", "KEY_NAME", "key-name"))
 	}
-	errs = append(errs, hasChDirPre***REMOVED***x(value)...)
+	errs = append(errs, hasChDirPrefix(value)...)
 	return errs
 }
 
@@ -365,9 +365,9 @@ func EmptyError() string {
 	return "must be non-empty"
 }
 
-func pre***REMOVED***xEach(msgs []string, pre***REMOVED***x string) []string {
+func prefixEach(msgs []string, prefix string) []string {
 	for i := range msgs {
-		msgs[i] = pre***REMOVED***x + msgs[i]
+		msgs[i] = prefix + msgs[i]
 	}
 	return msgs
 }
@@ -378,21 +378,21 @@ func InclusiveRangeError(lo, hi int) string {
 	return fmt.Sprintf(`must be between %d and %d, inclusive`, lo, hi)
 }
 
-func hasChDirPre***REMOVED***x(value string) []string {
+func hasChDirPrefix(value string) []string {
 	var errs []string
 	switch {
 	case value == ".":
 		errs = append(errs, `must not be '.'`)
 	case value == "..":
 		errs = append(errs, `must not be '..'`)
-	case strings.HasPre***REMOVED***x(value, ".."):
+	case strings.HasPrefix(value, ".."):
 		errs = append(errs, `must not start with '..'`)
 	}
 	return errs
 }
 
 // IsSocketAddr checks that a string conforms is a valid socket address
-// as de***REMOVED***ned in RFC 789. (e.g 0.0.0.0:10254 or [::]:10254))
+// as defined in RFC 789. (e.g 0.0.0.0:10254 or [::]:10254))
 func IsValidSocketAddr(value string) []string {
 	var errs []string
 	ip, port, err := net.SplitHostPort(value)

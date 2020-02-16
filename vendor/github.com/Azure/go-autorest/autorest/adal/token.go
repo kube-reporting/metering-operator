@@ -3,7 +3,7 @@ package adal
 // Copyright 2017 Microsoft Corporation
 //
 //  Licensed under the Apache License, Version 2.0 (the "License");
-//  you may not use this ***REMOVED***le except in compliance with the License.
+//  you may not use this file except in compliance with the License.
 //  You may obtain a copy of the License at
 //
 //      http://www.apache.org/licenses/LICENSE-2.0
@@ -11,7 +11,7 @@ package adal
 //  Unless required by applicable law or agreed to in writing, software
 //  distributed under the License is distributed on an "AS IS" BASIS,
 //  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-//  See the License for the speci***REMOVED***c language governing permissions and
+//  See the License for the specific language governing permissions and
 //  limitations under the License.
 
 import (
@@ -40,19 +40,19 @@ import (
 const (
 	defaultRefresh = 5 * time.Minute
 
-	// OAuthGrantTypeDeviceCode is the "grant_type" identi***REMOVED***er used in device flow
+	// OAuthGrantTypeDeviceCode is the "grant_type" identifier used in device flow
 	OAuthGrantTypeDeviceCode = "device_code"
 
-	// OAuthGrantTypeClientCredentials is the "grant_type" identi***REMOVED***er used in credential flows
+	// OAuthGrantTypeClientCredentials is the "grant_type" identifier used in credential flows
 	OAuthGrantTypeClientCredentials = "client_credentials"
 
-	// OAuthGrantTypeUserPass is the "grant_type" identi***REMOVED***er used in username and password auth flows
+	// OAuthGrantTypeUserPass is the "grant_type" identifier used in username and password auth flows
 	OAuthGrantTypeUserPass = "password"
 
-	// OAuthGrantTypeRefreshToken is the "grant_type" identi***REMOVED***er used in refresh token flows
+	// OAuthGrantTypeRefreshToken is the "grant_type" identifier used in refresh token flows
 	OAuthGrantTypeRefreshToken = "refresh_token"
 
-	// OAuthGrantTypeAuthorizationCode is the "grant_type" identi***REMOVED***er used in authorization code flows
+	// OAuthGrantTypeAuthorizationCode is the "grant_type" identifier used in authorization code flows
 	OAuthGrantTypeAuthorizationCode = "authorization_code"
 
 	// metadataHeader is the header required by MSI extension
@@ -155,7 +155,7 @@ func (t *Token) OAuthToken() string {
 	return t.AccessToken
 }
 
-// ServicePrincipalSecret is an interface that allows various secret mechanism to ***REMOVED***ll the form
+// ServicePrincipalSecret is an interface that allows various secret mechanism to fill the form
 // that is submitted when acquiring an oAuth token.
 type ServicePrincipalSecret interface {
 	SetAuthenticationValues(spt *ServicePrincipalToken, values *url.Values) error
@@ -206,23 +206,23 @@ func (tokenSecret ServicePrincipalTokenSecret) MarshalJSON() ([]byte, error) {
 	})
 }
 
-// ServicePrincipalCerti***REMOVED***cateSecret implements ServicePrincipalSecret for generic RSA cert auth with signed JWTs.
-type ServicePrincipalCerti***REMOVED***cateSecret struct {
-	Certi***REMOVED***cate *x509.Certi***REMOVED***cate
+// ServicePrincipalCertificateSecret implements ServicePrincipalSecret for generic RSA cert auth with signed JWTs.
+type ServicePrincipalCertificateSecret struct {
+	Certificate *x509.Certificate
 	PrivateKey  *rsa.PrivateKey
 }
 
-// SignJwt returns the JWT signed with the certi***REMOVED***cate's private key.
-func (secret *ServicePrincipalCerti***REMOVED***cateSecret) SignJwt(spt *ServicePrincipalToken) (string, error) {
+// SignJwt returns the JWT signed with the certificate's private key.
+func (secret *ServicePrincipalCertificateSecret) SignJwt(spt *ServicePrincipalToken) (string, error) {
 	hasher := sha1.New()
-	_, err := hasher.Write(secret.Certi***REMOVED***cate.Raw)
+	_, err := hasher.Write(secret.Certificate.Raw)
 	if err != nil {
 		return "", err
 	}
 
 	thumbprint := base64.URLEncoding.EncodeToString(hasher.Sum(nil))
 
-	// The jti (JWT ID) claim provides a unique identi***REMOVED***er for the JWT.
+	// The jti (JWT ID) claim provides a unique identifier for the JWT.
 	jti := make([]byte, 20)
 	_, err = rand.Read(jti)
 	if err != nil {
@@ -231,10 +231,10 @@ func (secret *ServicePrincipalCerti***REMOVED***cateSecret) SignJwt(spt *Service
 
 	token := jwt.New(jwt.SigningMethodRS256)
 	token.Header["x5t"] = thumbprint
-	x5c := []string{base64.StdEncoding.EncodeToString(secret.Certi***REMOVED***cate.Raw)}
+	x5c := []string{base64.StdEncoding.EncodeToString(secret.Certificate.Raw)}
 	token.Header["x5c"] = x5c
 	token.Claims = jwt.MapClaims{
-		"aud": spt.inner.OauthCon***REMOVED***g.TokenEndpoint.String(),
+		"aud": spt.inner.OauthConfig.TokenEndpoint.String(),
 		"iss": spt.inner.ClientID,
 		"sub": spt.inner.ClientID,
 		"jti": base64.URLEncoding.EncodeToString(jti),
@@ -247,8 +247,8 @@ func (secret *ServicePrincipalCerti***REMOVED***cateSecret) SignJwt(spt *Service
 }
 
 // SetAuthenticationValues is a method of the interface ServicePrincipalSecret.
-// It will populate the form submitted during oAuth Token Acquisition using a JWT signed with a certi***REMOVED***cate.
-func (secret *ServicePrincipalCerti***REMOVED***cateSecret) SetAuthenticationValues(spt *ServicePrincipalToken, v *url.Values) error {
+// It will populate the form submitted during oAuth Token Acquisition using a JWT signed with a certificate.
+func (secret *ServicePrincipalCertificateSecret) SetAuthenticationValues(spt *ServicePrincipalToken, v *url.Values) error {
 	jwt, err := secret.SignJwt(spt)
 	if err != nil {
 		return err
@@ -260,8 +260,8 @@ func (secret *ServicePrincipalCerti***REMOVED***cateSecret) SetAuthenticationVal
 }
 
 // MarshalJSON implements the json.Marshaler interface.
-func (secret ServicePrincipalCerti***REMOVED***cateSecret) MarshalJSON() ([]byte, error) {
-	return nil, errors.New("marshalling ServicePrincipalCerti***REMOVED***cateSecret is not supported")
+func (secret ServicePrincipalCertificateSecret) MarshalJSON() ([]byte, error) {
+	return nil, errors.New("marshalling ServicePrincipalCertificateSecret is not supported")
 }
 
 // ServicePrincipalMSISecret implements ServicePrincipalSecret for machines running the MSI Extension.
@@ -351,7 +351,7 @@ func (spt ServicePrincipalToken) MarshalTokenJSON() ([]byte, error) {
 	return json.Marshal(spt.inner.Token)
 }
 
-// SetRefreshCallbacks replaces any existing refresh callbacks with the speci***REMOVED***ed callbacks.
+// SetRefreshCallbacks replaces any existing refresh callbacks with the specified callbacks.
 func (spt *ServicePrincipalToken) SetRefreshCallbacks(callbacks []TokenRefreshCallback) {
 	spt.refreshCallbacks = callbacks
 }
@@ -375,8 +375,8 @@ func (spt *ServicePrincipalToken) UnmarshalJSON(data []byte) error {
 		spt.inner.Secret = &ServicePrincipalNoSecret{}
 	case "ServicePrincipalTokenSecret":
 		spt.inner.Secret = &ServicePrincipalTokenSecret{}
-	case "ServicePrincipalCerti***REMOVED***cateSecret":
-		return errors.New("unmarshalling ServicePrincipalCerti***REMOVED***cateSecret is not supported")
+	case "ServicePrincipalCertificateSecret":
+		return errors.New("unmarshalling ServicePrincipalCertificateSecret is not supported")
 	case "ServicePrincipalMSISecret":
 		return errors.New("unmarshalling ServicePrincipalMSISecret is not supported")
 	case "ServicePrincipalUsernamePasswordSecret":
@@ -404,23 +404,23 @@ func (spt *ServicePrincipalToken) UnmarshalJSON(data []byte) error {
 type servicePrincipalToken struct {
 	Token         Token                  `json:"token"`
 	Secret        ServicePrincipalSecret `json:"secret"`
-	OauthCon***REMOVED***g   OAuthCon***REMOVED***g            `json:"oauth"`
+	OauthConfig   OAuthConfig            `json:"oauth"`
 	ClientID      string                 `json:"clientID"`
 	Resource      string                 `json:"resource"`
 	AutoRefresh   bool                   `json:"autoRefresh"`
 	RefreshWithin time.Duration          `json:"refreshWithin"`
 }
 
-func validateOAuthCon***REMOVED***g(oac OAuthCon***REMOVED***g) error {
+func validateOAuthConfig(oac OAuthConfig) error {
 	if oac.IsZero() {
-		return fmt.Errorf("parameter 'oauthCon***REMOVED***g' cannot be zero-initialized")
+		return fmt.Errorf("parameter 'oauthConfig' cannot be zero-initialized")
 	}
 	return nil
 }
 
 // NewServicePrincipalTokenWithSecret create a ServicePrincipalToken using the supplied ServicePrincipalSecret implementation.
-func NewServicePrincipalTokenWithSecret(oauthCon***REMOVED***g OAuthCon***REMOVED***g, id string, resource string, secret ServicePrincipalSecret, callbacks ...TokenRefreshCallback) (*ServicePrincipalToken, error) {
-	if err := validateOAuthCon***REMOVED***g(oauthCon***REMOVED***g); err != nil {
+func NewServicePrincipalTokenWithSecret(oauthConfig OAuthConfig, id string, resource string, secret ServicePrincipalSecret, callbacks ...TokenRefreshCallback) (*ServicePrincipalToken, error) {
+	if err := validateOAuthConfig(oauthConfig); err != nil {
 		return nil, err
 	}
 	if err := validateStringParam(id, "id"); err != nil {
@@ -435,7 +435,7 @@ func NewServicePrincipalTokenWithSecret(oauthCon***REMOVED***g OAuthCon***REMOVE
 	spt := &ServicePrincipalToken{
 		inner: servicePrincipalToken{
 			Token:         newToken(),
-			OauthCon***REMOVED***g:   oauthCon***REMOVED***g,
+			OauthConfig:   oauthConfig,
 			Secret:        secret,
 			ClientID:      id,
 			Resource:      resource,
@@ -450,8 +450,8 @@ func NewServicePrincipalTokenWithSecret(oauthCon***REMOVED***g OAuthCon***REMOVE
 }
 
 // NewServicePrincipalTokenFromManualToken creates a ServicePrincipalToken using the supplied token
-func NewServicePrincipalTokenFromManualToken(oauthCon***REMOVED***g OAuthCon***REMOVED***g, clientID string, resource string, token Token, callbacks ...TokenRefreshCallback) (*ServicePrincipalToken, error) {
-	if err := validateOAuthCon***REMOVED***g(oauthCon***REMOVED***g); err != nil {
+func NewServicePrincipalTokenFromManualToken(oauthConfig OAuthConfig, clientID string, resource string, token Token, callbacks ...TokenRefreshCallback) (*ServicePrincipalToken, error) {
+	if err := validateOAuthConfig(oauthConfig); err != nil {
 		return nil, err
 	}
 	if err := validateStringParam(clientID, "clientID"); err != nil {
@@ -464,7 +464,7 @@ func NewServicePrincipalTokenFromManualToken(oauthCon***REMOVED***g OAuthCon***R
 		return nil, fmt.Errorf("parameter 'token' cannot be zero-initialized")
 	}
 	spt, err := NewServicePrincipalTokenWithSecret(
-		oauthCon***REMOVED***g,
+		oauthConfig,
 		clientID,
 		resource,
 		&ServicePrincipalNoSecret{},
@@ -479,8 +479,8 @@ func NewServicePrincipalTokenFromManualToken(oauthCon***REMOVED***g OAuthCon***R
 }
 
 // NewServicePrincipalTokenFromManualTokenSecret creates a ServicePrincipalToken using the supplied token and secret
-func NewServicePrincipalTokenFromManualTokenSecret(oauthCon***REMOVED***g OAuthCon***REMOVED***g, clientID string, resource string, token Token, secret ServicePrincipalSecret, callbacks ...TokenRefreshCallback) (*ServicePrincipalToken, error) {
-	if err := validateOAuthCon***REMOVED***g(oauthCon***REMOVED***g); err != nil {
+func NewServicePrincipalTokenFromManualTokenSecret(oauthConfig OAuthConfig, clientID string, resource string, token Token, secret ServicePrincipalSecret, callbacks ...TokenRefreshCallback) (*ServicePrincipalToken, error) {
+	if err := validateOAuthConfig(oauthConfig); err != nil {
 		return nil, err
 	}
 	if err := validateStringParam(clientID, "clientID"); err != nil {
@@ -496,7 +496,7 @@ func NewServicePrincipalTokenFromManualTokenSecret(oauthCon***REMOVED***g OAuthC
 		return nil, fmt.Errorf("parameter 'token' cannot be zero-initialized")
 	}
 	spt, err := NewServicePrincipalTokenWithSecret(
-		oauthCon***REMOVED***g,
+		oauthConfig,
 		clientID,
 		resource,
 		secret,
@@ -512,8 +512,8 @@ func NewServicePrincipalTokenFromManualTokenSecret(oauthCon***REMOVED***g OAuthC
 
 // NewServicePrincipalToken creates a ServicePrincipalToken from the supplied Service Principal
 // credentials scoped to the named resource.
-func NewServicePrincipalToken(oauthCon***REMOVED***g OAuthCon***REMOVED***g, clientID string, secret string, resource string, callbacks ...TokenRefreshCallback) (*ServicePrincipalToken, error) {
-	if err := validateOAuthCon***REMOVED***g(oauthCon***REMOVED***g); err != nil {
+func NewServicePrincipalToken(oauthConfig OAuthConfig, clientID string, secret string, resource string, callbacks ...TokenRefreshCallback) (*ServicePrincipalToken, error) {
+	if err := validateOAuthConfig(oauthConfig); err != nil {
 		return nil, err
 	}
 	if err := validateStringParam(clientID, "clientID"); err != nil {
@@ -526,7 +526,7 @@ func NewServicePrincipalToken(oauthCon***REMOVED***g OAuthCon***REMOVED***g, cli
 		return nil, err
 	}
 	return NewServicePrincipalTokenWithSecret(
-		oauthCon***REMOVED***g,
+		oauthConfig,
 		clientID,
 		resource,
 		&ServicePrincipalTokenSecret{
@@ -536,9 +536,9 @@ func NewServicePrincipalToken(oauthCon***REMOVED***g OAuthCon***REMOVED***g, cli
 	)
 }
 
-// NewServicePrincipalTokenFromCerti***REMOVED***cate creates a ServicePrincipalToken from the supplied pkcs12 bytes.
-func NewServicePrincipalTokenFromCerti***REMOVED***cate(oauthCon***REMOVED***g OAuthCon***REMOVED***g, clientID string, certi***REMOVED***cate *x509.Certi***REMOVED***cate, privateKey *rsa.PrivateKey, resource string, callbacks ...TokenRefreshCallback) (*ServicePrincipalToken, error) {
-	if err := validateOAuthCon***REMOVED***g(oauthCon***REMOVED***g); err != nil {
+// NewServicePrincipalTokenFromCertificate creates a ServicePrincipalToken from the supplied pkcs12 bytes.
+func NewServicePrincipalTokenFromCertificate(oauthConfig OAuthConfig, clientID string, certificate *x509.Certificate, privateKey *rsa.PrivateKey, resource string, callbacks ...TokenRefreshCallback) (*ServicePrincipalToken, error) {
+	if err := validateOAuthConfig(oauthConfig); err != nil {
 		return nil, err
 	}
 	if err := validateStringParam(clientID, "clientID"); err != nil {
@@ -547,27 +547,27 @@ func NewServicePrincipalTokenFromCerti***REMOVED***cate(oauthCon***REMOVED***g O
 	if err := validateStringParam(resource, "resource"); err != nil {
 		return nil, err
 	}
-	if certi***REMOVED***cate == nil {
-		return nil, fmt.Errorf("parameter 'certi***REMOVED***cate' cannot be nil")
+	if certificate == nil {
+		return nil, fmt.Errorf("parameter 'certificate' cannot be nil")
 	}
 	if privateKey == nil {
 		return nil, fmt.Errorf("parameter 'privateKey' cannot be nil")
 	}
 	return NewServicePrincipalTokenWithSecret(
-		oauthCon***REMOVED***g,
+		oauthConfig,
 		clientID,
 		resource,
-		&ServicePrincipalCerti***REMOVED***cateSecret{
+		&ServicePrincipalCertificateSecret{
 			PrivateKey:  privateKey,
-			Certi***REMOVED***cate: certi***REMOVED***cate,
+			Certificate: certificate,
 		},
 		callbacks...,
 	)
 }
 
 // NewServicePrincipalTokenFromUsernamePassword creates a ServicePrincipalToken from the username and password.
-func NewServicePrincipalTokenFromUsernamePassword(oauthCon***REMOVED***g OAuthCon***REMOVED***g, clientID string, username string, password string, resource string, callbacks ...TokenRefreshCallback) (*ServicePrincipalToken, error) {
-	if err := validateOAuthCon***REMOVED***g(oauthCon***REMOVED***g); err != nil {
+func NewServicePrincipalTokenFromUsernamePassword(oauthConfig OAuthConfig, clientID string, username string, password string, resource string, callbacks ...TokenRefreshCallback) (*ServicePrincipalToken, error) {
+	if err := validateOAuthConfig(oauthConfig); err != nil {
 		return nil, err
 	}
 	if err := validateStringParam(clientID, "clientID"); err != nil {
@@ -583,7 +583,7 @@ func NewServicePrincipalTokenFromUsernamePassword(oauthCon***REMOVED***g OAuthCo
 		return nil, err
 	}
 	return NewServicePrincipalTokenWithSecret(
-		oauthCon***REMOVED***g,
+		oauthConfig,
 		clientID,
 		resource,
 		&ServicePrincipalUsernamePasswordSecret{
@@ -595,9 +595,9 @@ func NewServicePrincipalTokenFromUsernamePassword(oauthCon***REMOVED***g OAuthCo
 }
 
 // NewServicePrincipalTokenFromAuthorizationCode creates a ServicePrincipalToken from the
-func NewServicePrincipalTokenFromAuthorizationCode(oauthCon***REMOVED***g OAuthCon***REMOVED***g, clientID string, clientSecret string, authorizationCode string, redirectURI string, resource string, callbacks ...TokenRefreshCallback) (*ServicePrincipalToken, error) {
+func NewServicePrincipalTokenFromAuthorizationCode(oauthConfig OAuthConfig, clientID string, clientSecret string, authorizationCode string, redirectURI string, resource string, callbacks ...TokenRefreshCallback) (*ServicePrincipalToken, error) {
 
-	if err := validateOAuthCon***REMOVED***g(oauthCon***REMOVED***g); err != nil {
+	if err := validateOAuthConfig(oauthConfig); err != nil {
 		return nil, err
 	}
 	if err := validateStringParam(clientID, "clientID"); err != nil {
@@ -617,7 +617,7 @@ func NewServicePrincipalTokenFromAuthorizationCode(oauthCon***REMOVED***g OAuthC
 	}
 
 	return NewServicePrincipalTokenWithSecret(
-		oauthCon***REMOVED***g,
+		oauthConfig,
 		clientID,
 		resource,
 		&ServicePrincipalAuthorizationCodeSecret{
@@ -641,7 +641,7 @@ func NewServicePrincipalTokenFromMSI(msiEndpoint, resource string, callbacks ...
 }
 
 // NewServicePrincipalTokenFromMSIWithUserAssignedID creates a ServicePrincipalToken via the MSI VM Extension.
-// It will use the speci***REMOVED***ed user assigned identity when creating the token.
+// It will use the specified user assigned identity when creating the token.
 func NewServicePrincipalTokenFromMSIWithUserAssignedID(msiEndpoint, resource string, userAssignedID string, callbacks ...TokenRefreshCallback) (*ServicePrincipalToken, error) {
 	return newServicePrincipalTokenFromMSI(msiEndpoint, resource, &userAssignedID, callbacks...)
 }
@@ -658,7 +658,7 @@ func newServicePrincipalTokenFromMSI(msiEndpoint, resource string, userAssignedI
 			return nil, err
 		}
 	}
-	// We set the oauth con***REMOVED***g token endpoint to be MSI's endpoint
+	// We set the oauth config token endpoint to be MSI's endpoint
 	msiEndpointURL, err := url.Parse(msiEndpoint)
 	if err != nil {
 		return nil, err
@@ -675,7 +675,7 @@ func newServicePrincipalTokenFromMSI(msiEndpoint, resource string, userAssignedI
 	spt := &ServicePrincipalToken{
 		inner: servicePrincipalToken{
 			Token: newToken(),
-			OauthCon***REMOVED***g: OAuthCon***REMOVED***g{
+			OauthConfig: OAuthConfig{
 				TokenEndpoint: *msiEndpointURL,
 			},
 			Secret:        &ServicePrincipalMSISecret{},
@@ -797,13 +797,13 @@ func isIMDS(u url.URL) bool {
 }
 
 func (spt *ServicePrincipalToken) refreshInternal(ctx context.Context, resource string) error {
-	req, err := http.NewRequest(http.MethodPost, spt.inner.OauthCon***REMOVED***g.TokenEndpoint.String(), nil)
+	req, err := http.NewRequest(http.MethodPost, spt.inner.OauthConfig.TokenEndpoint.String(), nil)
 	if err != nil {
 		return fmt.Errorf("adal: Failed to build the refresh request. Error = '%v'", err)
 	}
 	req.Header.Add("User-Agent", UserAgent())
 	req = req.WithContext(ctx)
-	if !isIMDS(spt.inner.OauthCon***REMOVED***g.TokenEndpoint) {
+	if !isIMDS(spt.inner.OauthConfig.TokenEndpoint) {
 		v := url.Values{}
 		v.Set("client_id", spt.inner.ClientID)
 		v.Set("resource", resource)
@@ -819,7 +819,7 @@ func (spt *ServicePrincipalToken) refreshInternal(ctx context.Context, resource 
 					return err
 				}
 			}
-		} ***REMOVED*** {
+		} else {
 			v.Set("grant_type", spt.getGrantType())
 			err := spt.inner.Secret.SetAuthenticationValues(spt, &v)
 			if err != nil {
@@ -840,9 +840,9 @@ func (spt *ServicePrincipalToken) refreshInternal(ctx context.Context, resource 
 	}
 
 	var resp *http.Response
-	if isIMDS(spt.inner.OauthCon***REMOVED***g.TokenEndpoint) {
+	if isIMDS(spt.inner.OauthConfig.TokenEndpoint) {
 		resp, err = retryForIMDS(spt.sender, req, spt.MaxMSIRefreshAttempts)
-	} ***REMOVED*** {
+	} else {
 		resp, err = spt.sender.Do(req)
 	}
 	if err != nil {
@@ -880,7 +880,7 @@ func (spt *ServicePrincipalToken) refreshInternal(ctx context.Context, resource 
 	return spt.InvokeRefreshCallbacks(token)
 }
 
-// retry logic speci***REMOVED***c to retrieving a token from the IMDS endpoint
+// retry logic specific to retrieving a token from the IMDS endpoint
 func retryForIMDS(sender Sender, req *http.Request, maxAttempts int) (resp *http.Response, err error) {
 	// copied from client.go due to circular dependency
 	retries := []int{
@@ -891,7 +891,7 @@ func retryForIMDS(sender Sender, req *http.Request, maxAttempts int) (resp *http
 		http.StatusServiceUnavailable,  // 503
 		http.StatusGatewayTimeout,      // 504
 	}
-	// extra retry status codes speci***REMOVED***c to IMDS
+	// extra retry status codes specific to IMDS
 	retries = append(retries,
 		http.StatusNotFound,
 		http.StatusGone,
@@ -899,7 +899,7 @@ func retryForIMDS(sender Sender, req *http.Request, maxAttempts int) (resp *http
 		http.StatusNotImplemented,
 		http.StatusHTTPVersionNotSupported,
 		http.StatusVariantAlsoNegotiates,
-		http.StatusInsuf***REMOVED***cientStorage,
+		http.StatusInsufficientStorage,
 		http.StatusLoopDetected,
 		http.StatusNotExtended,
 		http.StatusNetworkAuthenticationRequired)
@@ -923,7 +923,7 @@ func retryForIMDS(sender Sender, req *http.Request, maxAttempts int) (resp *http
 		// perform exponential backoff with a cap.
 		// must increment attempt before calculating delay.
 		attempt++
-		// the base value of 2 is the "delta backoff" as speci***REMOVED***ed in the guidance doc
+		// the base value of 2 is the "delta backoff" as specified in the guidance doc
 		delay += (time.Duration(math.Pow(2, float64(attempt))) * time.Second)
 		if delay > maxDelay {
 			delay = maxDelay
@@ -940,7 +940,7 @@ func retryForIMDS(sender Sender, req *http.Request, maxAttempts int) (resp *http
 	return
 }
 
-// returns true if the speci***REMOVED***ed error is a temporary network error or false if it's not.
+// returns true if the specified error is a temporary network error or false if it's not.
 // if the error doesn't implement the net.Error interface the return value is true.
 func isTemporaryNetworkError(err error) bool {
 	if netErr, ok := err.(net.Error); !ok || (ok && netErr.Temporary()) {
@@ -1049,8 +1049,8 @@ func (mt *MultiTenantServicePrincipalToken) RefreshExchangeWithContext(ctx conte
 	return nil
 }
 
-// NewMultiTenantServicePrincipalToken creates a new MultiTenantServicePrincipalToken with the speci***REMOVED***ed credentials and resource.
-func NewMultiTenantServicePrincipalToken(multiTenantCfg MultiTenantOAuthCon***REMOVED***g, clientID string, secret string, resource string) (*MultiTenantServicePrincipalToken, error) {
+// NewMultiTenantServicePrincipalToken creates a new MultiTenantServicePrincipalToken with the specified credentials and resource.
+func NewMultiTenantServicePrincipalToken(multiTenantCfg MultiTenantOAuthConfig, clientID string, secret string, resource string) (*MultiTenantServicePrincipalToken, error) {
 	if err := validateStringParam(clientID, "clientID"); err != nil {
 		return nil, err
 	}

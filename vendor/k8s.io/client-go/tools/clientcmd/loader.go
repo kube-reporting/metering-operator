@@ -2,7 +2,7 @@
 Copyright 2014 The Kubernetes Authors.
 
 Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this ***REMOVED***le except in compliance with the License.
+you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
 
     http://www.apache.org/licenses/LICENSE-2.0
@@ -10,7 +10,7 @@ You may obtain a copy of the License at
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the speci***REMOVED***c language governing permissions and
+See the License for the specific language governing permissions and
 limitations under the License.
 */
 
@@ -22,7 +22,7 @@ import (
 	"io/ioutil"
 	"os"
 	"path"
-	"path/***REMOVED***lepath"
+	"path/filepath"
 	"reflect"
 	goruntime "runtime"
 	"strings"
@@ -40,24 +40,24 @@ import (
 )
 
 const (
-	RecommendedCon***REMOVED***gPathFlag   = "kubecon***REMOVED***g"
-	RecommendedCon***REMOVED***gPathEnvVar = "KUBECONFIG"
+	RecommendedConfigPathFlag   = "kubeconfig"
+	RecommendedConfigPathEnvVar = "KUBECONFIG"
 	RecommendedHomeDir          = ".kube"
-	RecommendedFileName         = "con***REMOVED***g"
+	RecommendedFileName         = "config"
 	RecommendedSchemaName       = "schema"
 )
 
 var (
-	RecommendedCon***REMOVED***gDir  = path.Join(homedir.HomeDir(), RecommendedHomeDir)
-	RecommendedHomeFile   = path.Join(RecommendedCon***REMOVED***gDir, RecommendedFileName)
-	RecommendedSchemaFile = path.Join(RecommendedCon***REMOVED***gDir, RecommendedSchemaName)
+	RecommendedConfigDir  = path.Join(homedir.HomeDir(), RecommendedHomeDir)
+	RecommendedHomeFile   = path.Join(RecommendedConfigDir, RecommendedFileName)
+	RecommendedSchemaFile = path.Join(RecommendedConfigDir, RecommendedSchemaName)
 )
 
 // currentMigrationRules returns a map that holds the history of recommended home directories used in previous versions.
 // Any future changes to RecommendedHomeFile and related are expected to add a migration rule here, in order to make
-// sure existing con***REMOVED***g ***REMOVED***les are migrated to their new locations properly.
+// sure existing config files are migrated to their new locations properly.
 func currentMigrationRules() map[string]string {
-	oldRecommendedHomeFile := path.Join(os.Getenv("HOME"), "/.kube/.kubecon***REMOVED***g")
+	oldRecommendedHomeFile := path.Join(os.Getenv("HOME"), "/.kube/.kubeconfig")
 	oldRecommendedWindowsHomeFile := path.Join(os.Getenv("HOME"), RecommendedHomeDir, RecommendedFileName)
 
 	migrationRules := map[string]string{}
@@ -68,177 +68,177 @@ func currentMigrationRules() map[string]string {
 	return migrationRules
 }
 
-type ClientCon***REMOVED***gLoader interface {
-	Con***REMOVED***gAccess
-	// IsDefaultCon***REMOVED***g returns true if the returned con***REMOVED***g matches the defaults.
-	IsDefaultCon***REMOVED***g(*restclient.Con***REMOVED***g) bool
-	// Load returns the latest con***REMOVED***g
-	Load() (*clientcmdapi.Con***REMOVED***g, error)
+type ClientConfigLoader interface {
+	ConfigAccess
+	// IsDefaultConfig returns true if the returned config matches the defaults.
+	IsDefaultConfig(*restclient.Config) bool
+	// Load returns the latest config
+	Load() (*clientcmdapi.Config, error)
 }
 
-type Kubecon***REMOVED***gGetter func() (*clientcmdapi.Con***REMOVED***g, error)
+type KubeconfigGetter func() (*clientcmdapi.Config, error)
 
-type ClientCon***REMOVED***gGetter struct {
-	kubecon***REMOVED***gGetter Kubecon***REMOVED***gGetter
+type ClientConfigGetter struct {
+	kubeconfigGetter KubeconfigGetter
 }
 
-// ClientCon***REMOVED***gGetter implements the ClientCon***REMOVED***gLoader interface.
-var _ ClientCon***REMOVED***gLoader = &ClientCon***REMOVED***gGetter{}
+// ClientConfigGetter implements the ClientConfigLoader interface.
+var _ ClientConfigLoader = &ClientConfigGetter{}
 
-func (g *ClientCon***REMOVED***gGetter) Load() (*clientcmdapi.Con***REMOVED***g, error) {
-	return g.kubecon***REMOVED***gGetter()
+func (g *ClientConfigGetter) Load() (*clientcmdapi.Config, error) {
+	return g.kubeconfigGetter()
 }
 
-func (g *ClientCon***REMOVED***gGetter) GetLoadingPrecedence() []string {
+func (g *ClientConfigGetter) GetLoadingPrecedence() []string {
 	return nil
 }
-func (g *ClientCon***REMOVED***gGetter) GetStartingCon***REMOVED***g() (*clientcmdapi.Con***REMOVED***g, error) {
-	return g.kubecon***REMOVED***gGetter()
+func (g *ClientConfigGetter) GetStartingConfig() (*clientcmdapi.Config, error) {
+	return g.kubeconfigGetter()
 }
-func (g *ClientCon***REMOVED***gGetter) GetDefaultFilename() string {
+func (g *ClientConfigGetter) GetDefaultFilename() string {
 	return ""
 }
-func (g *ClientCon***REMOVED***gGetter) IsExplicitFile() bool {
+func (g *ClientConfigGetter) IsExplicitFile() bool {
 	return false
 }
-func (g *ClientCon***REMOVED***gGetter) GetExplicitFile() string {
+func (g *ClientConfigGetter) GetExplicitFile() string {
 	return ""
 }
-func (g *ClientCon***REMOVED***gGetter) IsDefaultCon***REMOVED***g(con***REMOVED***g *restclient.Con***REMOVED***g) bool {
+func (g *ClientConfigGetter) IsDefaultConfig(config *restclient.Config) bool {
 	return false
 }
 
-// ClientCon***REMOVED***gLoadingRules is an ExplicitPath and string slice of speci***REMOVED***c locations that are used for merging together a Con***REMOVED***g
+// ClientConfigLoadingRules is an ExplicitPath and string slice of specific locations that are used for merging together a Config
 // Callers can put the chain together however they want, but we'd recommend:
-// EnvVarPathFiles if set (a list of ***REMOVED***les if set) OR the HomeDirectoryPath
-// ExplicitPath is special, because if a user speci***REMOVED***cally requests a certain ***REMOVED***le be used and error is reported if this ***REMOVED***le is not present
-type ClientCon***REMOVED***gLoadingRules struct {
+// EnvVarPathFiles if set (a list of files if set) OR the HomeDirectoryPath
+// ExplicitPath is special, because if a user specifically requests a certain file be used and error is reported if this file is not present
+type ClientConfigLoadingRules struct {
 	ExplicitPath string
 	Precedence   []string
 
-	// MigrationRules is a map of destination ***REMOVED***les to source ***REMOVED***les.  If a destination ***REMOVED***le is not present, then the source ***REMOVED***le is checked.
-	// If the source ***REMOVED***le is present, then it is copied to the destination ***REMOVED***le BEFORE any further loading happens.
+	// MigrationRules is a map of destination files to source files.  If a destination file is not present, then the source file is checked.
+	// If the source file is present, then it is copied to the destination file BEFORE any further loading happens.
 	MigrationRules map[string]string
 
-	// DoNotResolvePaths indicates whether or not to resolve paths with respect to the originating ***REMOVED***les.  This is phrased as a negative so
+	// DoNotResolvePaths indicates whether or not to resolve paths with respect to the originating files.  This is phrased as a negative so
 	// that a default object that doesn't set this will usually get the behavior it wants.
 	DoNotResolvePaths bool
 
-	// DefaultClientCon***REMOVED***g is an optional ***REMOVED***eld indicating what rules to use to calculate a default con***REMOVED***guration.
-	// This should match the overrides passed in to ClientCon***REMOVED***g loader.
-	DefaultClientCon***REMOVED***g ClientCon***REMOVED***g
+	// DefaultClientConfig is an optional field indicating what rules to use to calculate a default configuration.
+	// This should match the overrides passed in to ClientConfig loader.
+	DefaultClientConfig ClientConfig
 }
 
-// ClientCon***REMOVED***gLoadingRules implements the ClientCon***REMOVED***gLoader interface.
-var _ ClientCon***REMOVED***gLoader = &ClientCon***REMOVED***gLoadingRules{}
+// ClientConfigLoadingRules implements the ClientConfigLoader interface.
+var _ ClientConfigLoader = &ClientConfigLoadingRules{}
 
-// NewDefaultClientCon***REMOVED***gLoadingRules returns a ClientCon***REMOVED***gLoadingRules object with default ***REMOVED***elds ***REMOVED***lled in.  You are not required to
+// NewDefaultClientConfigLoadingRules returns a ClientConfigLoadingRules object with default fields filled in.  You are not required to
 // use this constructor
-func NewDefaultClientCon***REMOVED***gLoadingRules() *ClientCon***REMOVED***gLoadingRules {
+func NewDefaultClientConfigLoadingRules() *ClientConfigLoadingRules {
 	chain := []string{}
 
-	envVarFiles := os.Getenv(RecommendedCon***REMOVED***gPathEnvVar)
+	envVarFiles := os.Getenv(RecommendedConfigPathEnvVar)
 	if len(envVarFiles) != 0 {
-		***REMOVED***leList := ***REMOVED***lepath.SplitList(envVarFiles)
+		fileList := filepath.SplitList(envVarFiles)
 		// prevent the same path load multiple times
-		chain = append(chain, deduplicate(***REMOVED***leList)...)
+		chain = append(chain, deduplicate(fileList)...)
 
-	} ***REMOVED*** {
+	} else {
 		chain = append(chain, RecommendedHomeFile)
 	}
 
-	return &ClientCon***REMOVED***gLoadingRules{
+	return &ClientConfigLoadingRules{
 		Precedence:     chain,
 		MigrationRules: currentMigrationRules(),
 	}
 }
 
 // Load starts by running the MigrationRules and then
-// takes the loading rules and returns a Con***REMOVED***g object based on following rules.
-//   if the ExplicitPath, return the unmerged explicit ***REMOVED***le
-//   Otherwise, return a merged con***REMOVED***g based on the Precedence slice
-// A missing ExplicitPath ***REMOVED***le produces an error. Empty ***REMOVED***lenames or other missing ***REMOVED***les are ignored.
-// Read errors or ***REMOVED***les with non-deserializable content produce errors.
-// The ***REMOVED***rst ***REMOVED***le to set a particular map key wins and map key's value is never changed.
+// takes the loading rules and returns a Config object based on following rules.
+//   if the ExplicitPath, return the unmerged explicit file
+//   Otherwise, return a merged config based on the Precedence slice
+// A missing ExplicitPath file produces an error. Empty filenames or other missing files are ignored.
+// Read errors or files with non-deserializable content produce errors.
+// The first file to set a particular map key wins and map key's value is never changed.
 // BUT, if you set a struct value that is NOT contained inside of map, the value WILL be changed.
 // This results in some odd looking logic to merge in one direction, merge in the other, and then merge the two.
-// It also means that if two ***REMOVED***les specify a "red-user", only values from the ***REMOVED***rst ***REMOVED***le's red-user are used.  Even
-// non-conflicting entries from the second ***REMOVED***le's "red-user" are discarded.
-// Relative paths inside of the .kubecon***REMOVED***g ***REMOVED***les are resolved against the .kubecon***REMOVED***g ***REMOVED***le's parent folder
-// and only absolute ***REMOVED***le paths are returned.
-func (rules *ClientCon***REMOVED***gLoadingRules) Load() (*clientcmdapi.Con***REMOVED***g, error) {
+// It also means that if two files specify a "red-user", only values from the first file's red-user are used.  Even
+// non-conflicting entries from the second file's "red-user" are discarded.
+// Relative paths inside of the .kubeconfig files are resolved against the .kubeconfig file's parent folder
+// and only absolute file paths are returned.
+func (rules *ClientConfigLoadingRules) Load() (*clientcmdapi.Config, error) {
 	if err := rules.Migrate(); err != nil {
 		return nil, err
 	}
 
 	errlist := []error{}
 
-	kubeCon***REMOVED***gFiles := []string{}
+	kubeConfigFiles := []string{}
 
-	// Make sure a ***REMOVED***le we were explicitly told to use exists
+	// Make sure a file we were explicitly told to use exists
 	if len(rules.ExplicitPath) > 0 {
 		if _, err := os.Stat(rules.ExplicitPath); os.IsNotExist(err) {
 			return nil, err
 		}
-		kubeCon***REMOVED***gFiles = append(kubeCon***REMOVED***gFiles, rules.ExplicitPath)
+		kubeConfigFiles = append(kubeConfigFiles, rules.ExplicitPath)
 
-	} ***REMOVED*** {
-		kubeCon***REMOVED***gFiles = append(kubeCon***REMOVED***gFiles, rules.Precedence...)
+	} else {
+		kubeConfigFiles = append(kubeConfigFiles, rules.Precedence...)
 	}
 
-	kubecon***REMOVED***gs := []*clientcmdapi.Con***REMOVED***g{}
-	// read and cache the con***REMOVED***g ***REMOVED***les so that we only look at them once
-	for _, ***REMOVED***lename := range kubeCon***REMOVED***gFiles {
-		if len(***REMOVED***lename) == 0 {
+	kubeconfigs := []*clientcmdapi.Config{}
+	// read and cache the config files so that we only look at them once
+	for _, filename := range kubeConfigFiles {
+		if len(filename) == 0 {
 			// no work to do
 			continue
 		}
 
-		con***REMOVED***g, err := LoadFromFile(***REMOVED***lename)
+		config, err := LoadFromFile(filename)
 		if os.IsNotExist(err) {
-			// skip missing ***REMOVED***les
+			// skip missing files
 			continue
 		}
 		if err != nil {
-			errlist = append(errlist, fmt.Errorf("Error loading con***REMOVED***g ***REMOVED***le \"%s\": %v", ***REMOVED***lename, err))
+			errlist = append(errlist, fmt.Errorf("Error loading config file \"%s\": %v", filename, err))
 			continue
 		}
 
-		kubecon***REMOVED***gs = append(kubecon***REMOVED***gs, con***REMOVED***g)
+		kubeconfigs = append(kubeconfigs, config)
 	}
 
-	// ***REMOVED***rst merge all of our maps
-	mapCon***REMOVED***g := clientcmdapi.NewCon***REMOVED***g()
+	// first merge all of our maps
+	mapConfig := clientcmdapi.NewConfig()
 
-	for _, kubecon***REMOVED***g := range kubecon***REMOVED***gs {
-		mergo.MergeWithOverwrite(mapCon***REMOVED***g, kubecon***REMOVED***g)
+	for _, kubeconfig := range kubeconfigs {
+		mergo.MergeWithOverwrite(mapConfig, kubeconfig)
 	}
 
 	// merge all of the struct values in the reverse order so that priority is given correctly
 	// errors are not added to the list the second time
-	nonMapCon***REMOVED***g := clientcmdapi.NewCon***REMOVED***g()
-	for i := len(kubecon***REMOVED***gs) - 1; i >= 0; i-- {
-		kubecon***REMOVED***g := kubecon***REMOVED***gs[i]
-		mergo.MergeWithOverwrite(nonMapCon***REMOVED***g, kubecon***REMOVED***g)
+	nonMapConfig := clientcmdapi.NewConfig()
+	for i := len(kubeconfigs) - 1; i >= 0; i-- {
+		kubeconfig := kubeconfigs[i]
+		mergo.MergeWithOverwrite(nonMapConfig, kubeconfig)
 	}
 
-	// since values are overwritten, but maps values are not, we can merge the non-map con***REMOVED***g on top of the map con***REMOVED***g and
+	// since values are overwritten, but maps values are not, we can merge the non-map config on top of the map config and
 	// get the values we expect.
-	con***REMOVED***g := clientcmdapi.NewCon***REMOVED***g()
-	mergo.MergeWithOverwrite(con***REMOVED***g, mapCon***REMOVED***g)
-	mergo.MergeWithOverwrite(con***REMOVED***g, nonMapCon***REMOVED***g)
+	config := clientcmdapi.NewConfig()
+	mergo.MergeWithOverwrite(config, mapConfig)
+	mergo.MergeWithOverwrite(config, nonMapConfig)
 
 	if rules.ResolvePaths() {
-		if err := ResolveLocalPaths(con***REMOVED***g); err != nil {
+		if err := ResolveLocalPaths(config); err != nil {
 			errlist = append(errlist, err)
 		}
 	}
-	return con***REMOVED***g, utilerrors.NewAggregate(errlist)
+	return config, utilerrors.NewAggregate(errlist)
 }
 
-// Migrate uses the MigrationRules map.  If a destination ***REMOVED***le is not present, then the source ***REMOVED***le is checked.
-// If the source ***REMOVED***le is present, then it is copied to the destination ***REMOVED***le BEFORE any further loading happens.
-func (rules *ClientCon***REMOVED***gLoadingRules) Migrate() error {
+// Migrate uses the MigrationRules map.  If a destination file is not present, then the source file is checked.
+// If the source file is present, then it is copied to the destination file BEFORE any further loading happens.
+func (rules *ClientConfigLoadingRules) Migrate() error {
 	if rules.MigrationRules == nil {
 		return nil
 	}
@@ -247,23 +247,23 @@ func (rules *ClientCon***REMOVED***gLoadingRules) Migrate() error {
 		if _, err := os.Stat(destination); err == nil {
 			// if the destination already exists, do nothing
 			continue
-		} ***REMOVED*** if os.IsPermission(err) {
-			// if we can't access the ***REMOVED***le, skip it
+		} else if os.IsPermission(err) {
+			// if we can't access the file, skip it
 			continue
-		} ***REMOVED*** if !os.IsNotExist(err) {
+		} else if !os.IsNotExist(err) {
 			// if we had an error other than non-existence, fail
 			return err
 		}
 
 		if sourceInfo, err := os.Stat(source); err != nil {
 			if os.IsNotExist(err) || os.IsPermission(err) {
-				// if the source ***REMOVED***le doesn't exist or we can't access it, there's no work to do.
+				// if the source file doesn't exist or we can't access it, there's no work to do.
 				continue
 			}
 
 			// if we had an error other than non-existence, fail
 			return err
-		} ***REMOVED*** if sourceInfo.IsDir() {
+		} else if sourceInfo.IsDir() {
 			return fmt.Errorf("cannot migrate %v to %v because it is a directory", source, destination)
 		}
 
@@ -286,152 +286,152 @@ func (rules *ClientCon***REMOVED***gLoadingRules) Migrate() error {
 	return nil
 }
 
-// GetLoadingPrecedence implements Con***REMOVED***gAccess
-func (rules *ClientCon***REMOVED***gLoadingRules) GetLoadingPrecedence() []string {
+// GetLoadingPrecedence implements ConfigAccess
+func (rules *ClientConfigLoadingRules) GetLoadingPrecedence() []string {
 	return rules.Precedence
 }
 
-// GetStartingCon***REMOVED***g implements Con***REMOVED***gAccess
-func (rules *ClientCon***REMOVED***gLoadingRules) GetStartingCon***REMOVED***g() (*clientcmdapi.Con***REMOVED***g, error) {
-	clientCon***REMOVED***g := NewNonInteractiveDeferredLoadingClientCon***REMOVED***g(rules, &Con***REMOVED***gOverrides{})
-	rawCon***REMOVED***g, err := clientCon***REMOVED***g.RawCon***REMOVED***g()
+// GetStartingConfig implements ConfigAccess
+func (rules *ClientConfigLoadingRules) GetStartingConfig() (*clientcmdapi.Config, error) {
+	clientConfig := NewNonInteractiveDeferredLoadingClientConfig(rules, &ConfigOverrides{})
+	rawConfig, err := clientConfig.RawConfig()
 	if os.IsNotExist(err) {
-		return clientcmdapi.NewCon***REMOVED***g(), nil
+		return clientcmdapi.NewConfig(), nil
 	}
 	if err != nil {
 		return nil, err
 	}
 
-	return &rawCon***REMOVED***g, nil
+	return &rawConfig, nil
 }
 
-// GetDefaultFilename implements Con***REMOVED***gAccess
-func (rules *ClientCon***REMOVED***gLoadingRules) GetDefaultFilename() string {
-	// Explicit ***REMOVED***le if we have one.
+// GetDefaultFilename implements ConfigAccess
+func (rules *ClientConfigLoadingRules) GetDefaultFilename() string {
+	// Explicit file if we have one.
 	if rules.IsExplicitFile() {
 		return rules.GetExplicitFile()
 	}
-	// Otherwise, ***REMOVED***rst existing ***REMOVED***le from precedence.
-	for _, ***REMOVED***lename := range rules.GetLoadingPrecedence() {
-		if _, err := os.Stat(***REMOVED***lename); err == nil {
-			return ***REMOVED***lename
+	// Otherwise, first existing file from precedence.
+	for _, filename := range rules.GetLoadingPrecedence() {
+		if _, err := os.Stat(filename); err == nil {
+			return filename
 		}
 	}
-	// If none exists, use the ***REMOVED***rst from precedence.
+	// If none exists, use the first from precedence.
 	if len(rules.Precedence) > 0 {
 		return rules.Precedence[0]
 	}
 	return ""
 }
 
-// IsExplicitFile implements Con***REMOVED***gAccess
-func (rules *ClientCon***REMOVED***gLoadingRules) IsExplicitFile() bool {
+// IsExplicitFile implements ConfigAccess
+func (rules *ClientConfigLoadingRules) IsExplicitFile() bool {
 	return len(rules.ExplicitPath) > 0
 }
 
-// GetExplicitFile implements Con***REMOVED***gAccess
-func (rules *ClientCon***REMOVED***gLoadingRules) GetExplicitFile() string {
+// GetExplicitFile implements ConfigAccess
+func (rules *ClientConfigLoadingRules) GetExplicitFile() string {
 	return rules.ExplicitPath
 }
 
-// IsDefaultCon***REMOVED***g returns true if the provided con***REMOVED***guration matches the default
-func (rules *ClientCon***REMOVED***gLoadingRules) IsDefaultCon***REMOVED***g(con***REMOVED***g *restclient.Con***REMOVED***g) bool {
-	if rules.DefaultClientCon***REMOVED***g == nil {
+// IsDefaultConfig returns true if the provided configuration matches the default
+func (rules *ClientConfigLoadingRules) IsDefaultConfig(config *restclient.Config) bool {
+	if rules.DefaultClientConfig == nil {
 		return false
 	}
-	defaultCon***REMOVED***g, err := rules.DefaultClientCon***REMOVED***g.ClientCon***REMOVED***g()
+	defaultConfig, err := rules.DefaultClientConfig.ClientConfig()
 	if err != nil {
 		return false
 	}
-	return reflect.DeepEqual(con***REMOVED***g, defaultCon***REMOVED***g)
+	return reflect.DeepEqual(config, defaultConfig)
 }
 
-// LoadFromFile takes a ***REMOVED***lename and deserializes the contents into Con***REMOVED***g object
-func LoadFromFile(***REMOVED***lename string) (*clientcmdapi.Con***REMOVED***g, error) {
-	kubecon***REMOVED***gBytes, err := ioutil.ReadFile(***REMOVED***lename)
+// LoadFromFile takes a filename and deserializes the contents into Config object
+func LoadFromFile(filename string) (*clientcmdapi.Config, error) {
+	kubeconfigBytes, err := ioutil.ReadFile(filename)
 	if err != nil {
 		return nil, err
 	}
-	con***REMOVED***g, err := Load(kubecon***REMOVED***gBytes)
+	config, err := Load(kubeconfigBytes)
 	if err != nil {
 		return nil, err
 	}
-	klog.V(6).Infoln("Con***REMOVED***g loaded from ***REMOVED***le", ***REMOVED***lename)
+	klog.V(6).Infoln("Config loaded from file", filename)
 
 	// set LocationOfOrigin on every Cluster, User, and Context
-	for key, obj := range con***REMOVED***g.AuthInfos {
-		obj.LocationOfOrigin = ***REMOVED***lename
-		con***REMOVED***g.AuthInfos[key] = obj
+	for key, obj := range config.AuthInfos {
+		obj.LocationOfOrigin = filename
+		config.AuthInfos[key] = obj
 	}
-	for key, obj := range con***REMOVED***g.Clusters {
-		obj.LocationOfOrigin = ***REMOVED***lename
-		con***REMOVED***g.Clusters[key] = obj
+	for key, obj := range config.Clusters {
+		obj.LocationOfOrigin = filename
+		config.Clusters[key] = obj
 	}
-	for key, obj := range con***REMOVED***g.Contexts {
-		obj.LocationOfOrigin = ***REMOVED***lename
-		con***REMOVED***g.Contexts[key] = obj
-	}
-
-	if con***REMOVED***g.AuthInfos == nil {
-		con***REMOVED***g.AuthInfos = map[string]*clientcmdapi.AuthInfo{}
-	}
-	if con***REMOVED***g.Clusters == nil {
-		con***REMOVED***g.Clusters = map[string]*clientcmdapi.Cluster{}
-	}
-	if con***REMOVED***g.Contexts == nil {
-		con***REMOVED***g.Contexts = map[string]*clientcmdapi.Context{}
+	for key, obj := range config.Contexts {
+		obj.LocationOfOrigin = filename
+		config.Contexts[key] = obj
 	}
 
-	return con***REMOVED***g, nil
+	if config.AuthInfos == nil {
+		config.AuthInfos = map[string]*clientcmdapi.AuthInfo{}
+	}
+	if config.Clusters == nil {
+		config.Clusters = map[string]*clientcmdapi.Cluster{}
+	}
+	if config.Contexts == nil {
+		config.Contexts = map[string]*clientcmdapi.Context{}
+	}
+
+	return config, nil
 }
 
-// Load takes a byte slice and deserializes the contents into Con***REMOVED***g object.
-// Encapsulates deserialization without assuming the source is a ***REMOVED***le.
-func Load(data []byte) (*clientcmdapi.Con***REMOVED***g, error) {
-	con***REMOVED***g := clientcmdapi.NewCon***REMOVED***g()
-	// if there's no data in a ***REMOVED***le, return the default object instead of failing (DecodeInto reject empty input)
+// Load takes a byte slice and deserializes the contents into Config object.
+// Encapsulates deserialization without assuming the source is a file.
+func Load(data []byte) (*clientcmdapi.Config, error) {
+	config := clientcmdapi.NewConfig()
+	// if there's no data in a file, return the default object instead of failing (DecodeInto reject empty input)
 	if len(data) == 0 {
-		return con***REMOVED***g, nil
+		return config, nil
 	}
-	decoded, _, err := clientcmdlatest.Codec.Decode(data, &schema.GroupVersionKind{Version: clientcmdlatest.Version, Kind: "Con***REMOVED***g"}, con***REMOVED***g)
+	decoded, _, err := clientcmdlatest.Codec.Decode(data, &schema.GroupVersionKind{Version: clientcmdlatest.Version, Kind: "Config"}, config)
 	if err != nil {
 		return nil, err
 	}
-	return decoded.(*clientcmdapi.Con***REMOVED***g), nil
+	return decoded.(*clientcmdapi.Config), nil
 }
 
-// WriteToFile serializes the con***REMOVED***g to yaml and writes it out to a ***REMOVED***le.  If not present, it creates the ***REMOVED***le with the mode 0600.  If it is present
+// WriteToFile serializes the config to yaml and writes it out to a file.  If not present, it creates the file with the mode 0600.  If it is present
 // it stomps the contents
-func WriteToFile(con***REMOVED***g clientcmdapi.Con***REMOVED***g, ***REMOVED***lename string) error {
-	content, err := Write(con***REMOVED***g)
+func WriteToFile(config clientcmdapi.Config, filename string) error {
+	content, err := Write(config)
 	if err != nil {
 		return err
 	}
-	dir := ***REMOVED***lepath.Dir(***REMOVED***lename)
+	dir := filepath.Dir(filename)
 	if _, err := os.Stat(dir); os.IsNotExist(err) {
 		if err = os.MkdirAll(dir, 0755); err != nil {
 			return err
 		}
 	}
 
-	if err := ioutil.WriteFile(***REMOVED***lename, content, 0600); err != nil {
+	if err := ioutil.WriteFile(filename, content, 0600); err != nil {
 		return err
 	}
 	return nil
 }
 
-func lockFile(***REMOVED***lename string) error {
-	// TODO: ***REMOVED***nd a way to do this with actual ***REMOVED***le locks. Will
+func lockFile(filename string) error {
+	// TODO: find a way to do this with actual file locks. Will
 	// probably need separate solution for windows and Linux.
 
-	// Make sure the dir exists before we try to create a lock ***REMOVED***le.
-	dir := ***REMOVED***lepath.Dir(***REMOVED***lename)
+	// Make sure the dir exists before we try to create a lock file.
+	dir := filepath.Dir(filename)
 	if _, err := os.Stat(dir); os.IsNotExist(err) {
 		if err = os.MkdirAll(dir, 0755); err != nil {
 			return err
 		}
 	}
-	f, err := os.OpenFile(lockName(***REMOVED***lename), os.O_CREATE|os.O_EXCL, 0)
+	f, err := os.OpenFile(lockName(filename), os.O_CREATE|os.O_EXCL, 0)
 	if err != nil {
 		return err
 	}
@@ -439,48 +439,48 @@ func lockFile(***REMOVED***lename string) error {
 	return nil
 }
 
-func unlockFile(***REMOVED***lename string) error {
-	return os.Remove(lockName(***REMOVED***lename))
+func unlockFile(filename string) error {
+	return os.Remove(lockName(filename))
 }
 
-func lockName(***REMOVED***lename string) string {
-	return ***REMOVED***lename + ".lock"
+func lockName(filename string) string {
+	return filename + ".lock"
 }
 
-// Write serializes the con***REMOVED***g to yaml.
-// Encapsulates serialization without assuming the destination is a ***REMOVED***le.
-func Write(con***REMOVED***g clientcmdapi.Con***REMOVED***g) ([]byte, error) {
-	return runtime.Encode(clientcmdlatest.Codec, &con***REMOVED***g)
+// Write serializes the config to yaml.
+// Encapsulates serialization without assuming the destination is a file.
+func Write(config clientcmdapi.Config) ([]byte, error) {
+	return runtime.Encode(clientcmdlatest.Codec, &config)
 }
 
-func (rules ClientCon***REMOVED***gLoadingRules) ResolvePaths() bool {
+func (rules ClientConfigLoadingRules) ResolvePaths() bool {
 	return !rules.DoNotResolvePaths
 }
 
-// ResolveLocalPaths resolves all relative paths in the con***REMOVED***g object with respect to the stanza's LocationOfOrigin
-// this cannot be done directly inside of LoadFromFile because doing so there would make it impossible to load a ***REMOVED***le without
-// modi***REMOVED***cation of its contents.
-func ResolveLocalPaths(con***REMOVED***g *clientcmdapi.Con***REMOVED***g) error {
-	for _, cluster := range con***REMOVED***g.Clusters {
+// ResolveLocalPaths resolves all relative paths in the config object with respect to the stanza's LocationOfOrigin
+// this cannot be done directly inside of LoadFromFile because doing so there would make it impossible to load a file without
+// modification of its contents.
+func ResolveLocalPaths(config *clientcmdapi.Config) error {
+	for _, cluster := range config.Clusters {
 		if len(cluster.LocationOfOrigin) == 0 {
 			continue
 		}
-		base, err := ***REMOVED***lepath.Abs(***REMOVED***lepath.Dir(cluster.LocationOfOrigin))
+		base, err := filepath.Abs(filepath.Dir(cluster.LocationOfOrigin))
 		if err != nil {
-			return fmt.Errorf("Could not determine the absolute path of con***REMOVED***g ***REMOVED***le %s: %v", cluster.LocationOfOrigin, err)
+			return fmt.Errorf("Could not determine the absolute path of config file %s: %v", cluster.LocationOfOrigin, err)
 		}
 
 		if err := ResolvePaths(GetClusterFileReferences(cluster), base); err != nil {
 			return err
 		}
 	}
-	for _, authInfo := range con***REMOVED***g.AuthInfos {
+	for _, authInfo := range config.AuthInfos {
 		if len(authInfo.LocationOfOrigin) == 0 {
 			continue
 		}
-		base, err := ***REMOVED***lepath.Abs(***REMOVED***lepath.Dir(authInfo.LocationOfOrigin))
+		base, err := filepath.Abs(filepath.Dir(authInfo.LocationOfOrigin))
 		if err != nil {
-			return fmt.Errorf("Could not determine the absolute path of con***REMOVED***g ***REMOVED***le %s: %v", authInfo.LocationOfOrigin, err)
+			return fmt.Errorf("Could not determine the absolute path of config file %s: %v", authInfo.LocationOfOrigin, err)
 		}
 
 		if err := ResolvePaths(GetAuthInfoFileReferences(authInfo), base); err != nil {
@@ -491,15 +491,15 @@ func ResolveLocalPaths(con***REMOVED***g *clientcmdapi.Con***REMOVED***g) error 
 	return nil
 }
 
-// RelativizeClusterLocalPaths ***REMOVED***rst absolutizes the paths by calling ResolveLocalPaths.  This assumes that any NEW path is already
+// RelativizeClusterLocalPaths first absolutizes the paths by calling ResolveLocalPaths.  This assumes that any NEW path is already
 // absolute, but any existing path will be resolved relative to LocationOfOrigin
 func RelativizeClusterLocalPaths(cluster *clientcmdapi.Cluster) error {
 	if len(cluster.LocationOfOrigin) == 0 {
 		return fmt.Errorf("no location of origin for %s", cluster.Server)
 	}
-	base, err := ***REMOVED***lepath.Abs(***REMOVED***lepath.Dir(cluster.LocationOfOrigin))
+	base, err := filepath.Abs(filepath.Dir(cluster.LocationOfOrigin))
 	if err != nil {
-		return fmt.Errorf("could not determine the absolute path of con***REMOVED***g ***REMOVED***le %s: %v", cluster.LocationOfOrigin, err)
+		return fmt.Errorf("could not determine the absolute path of config file %s: %v", cluster.LocationOfOrigin, err)
 	}
 
 	if err := ResolvePaths(GetClusterFileReferences(cluster), base); err != nil {
@@ -512,15 +512,15 @@ func RelativizeClusterLocalPaths(cluster *clientcmdapi.Cluster) error {
 	return nil
 }
 
-// RelativizeAuthInfoLocalPaths ***REMOVED***rst absolutizes the paths by calling ResolveLocalPaths.  This assumes that any NEW path is already
+// RelativizeAuthInfoLocalPaths first absolutizes the paths by calling ResolveLocalPaths.  This assumes that any NEW path is already
 // absolute, but any existing path will be resolved relative to LocationOfOrigin
 func RelativizeAuthInfoLocalPaths(authInfo *clientcmdapi.AuthInfo) error {
 	if len(authInfo.LocationOfOrigin) == 0 {
 		return fmt.Errorf("no location of origin for %v", authInfo)
 	}
-	base, err := ***REMOVED***lepath.Abs(***REMOVED***lepath.Dir(authInfo.LocationOfOrigin))
+	base, err := filepath.Abs(filepath.Dir(authInfo.LocationOfOrigin))
 	if err != nil {
-		return fmt.Errorf("could not determine the absolute path of con***REMOVED***g ***REMOVED***le %s: %v", authInfo.LocationOfOrigin, err)
+		return fmt.Errorf("could not determine the absolute path of config file %s: %v", authInfo.LocationOfOrigin, err)
 	}
 
 	if err := ResolvePaths(GetAuthInfoFileReferences(authInfo), base); err != nil {
@@ -533,21 +533,21 @@ func RelativizeAuthInfoLocalPaths(authInfo *clientcmdapi.AuthInfo) error {
 	return nil
 }
 
-func RelativizeCon***REMOVED***gPaths(con***REMOVED***g *clientcmdapi.Con***REMOVED***g, base string) error {
-	return RelativizePathWithNoBacksteps(GetCon***REMOVED***gFileReferences(con***REMOVED***g), base)
+func RelativizeConfigPaths(config *clientcmdapi.Config, base string) error {
+	return RelativizePathWithNoBacksteps(GetConfigFileReferences(config), base)
 }
 
-func ResolveCon***REMOVED***gPaths(con***REMOVED***g *clientcmdapi.Con***REMOVED***g, base string) error {
-	return ResolvePaths(GetCon***REMOVED***gFileReferences(con***REMOVED***g), base)
+func ResolveConfigPaths(config *clientcmdapi.Config, base string) error {
+	return ResolvePaths(GetConfigFileReferences(config), base)
 }
 
-func GetCon***REMOVED***gFileReferences(con***REMOVED***g *clientcmdapi.Con***REMOVED***g) []*string {
+func GetConfigFileReferences(config *clientcmdapi.Config) []*string {
 	refs := []*string{}
 
-	for _, cluster := range con***REMOVED***g.Clusters {
+	for _, cluster := range config.Clusters {
 		refs = append(refs, GetClusterFileReferences(cluster)...)
 	}
-	for _, authInfo := range con***REMOVED***g.AuthInfos {
+	for _, authInfo := range config.AuthInfos {
 		refs = append(refs, GetAuthInfoFileReferences(authInfo)...)
 	}
 
@@ -555,13 +555,13 @@ func GetCon***REMOVED***gFileReferences(con***REMOVED***g *clientcmdapi.Con***RE
 }
 
 func GetClusterFileReferences(cluster *clientcmdapi.Cluster) []*string {
-	return []*string{&cluster.Certi***REMOVED***cateAuthority}
+	return []*string{&cluster.CertificateAuthority}
 }
 
 func GetAuthInfoFileReferences(authInfo *clientcmdapi.AuthInfo) []*string {
-	s := []*string{&authInfo.ClientCerti***REMOVED***cate, &authInfo.ClientKey, &authInfo.TokenFile}
+	s := []*string{&authInfo.ClientCertificate, &authInfo.ClientKey, &authInfo.TokenFile}
 	// Only resolve exec command if it isn't PATH based.
-	if authInfo.Exec != nil && strings.ContainsRune(authInfo.Exec.Command, ***REMOVED***lepath.Separator) {
+	if authInfo.Exec != nil && strings.ContainsRune(authInfo.Exec.Command, filepath.Separator) {
 		s = append(s, &authInfo.Exec.Command)
 	}
 	return s
@@ -573,8 +573,8 @@ func ResolvePaths(refs []*string, base string) error {
 		// Don't resolve empty paths
 		if len(*ref) > 0 {
 			// Don't resolve absolute paths
-			if !***REMOVED***lepath.IsAbs(*ref) {
-				*ref = ***REMOVED***lepath.Join(base, *ref)
+			if !filepath.IsAbs(*ref) {
+				*ref = filepath.Join(base, *ref)
 			}
 		}
 	}
@@ -593,8 +593,8 @@ func RelativizePathWithNoBacksteps(refs []*string, base string) error {
 			}
 
 			// if we have a backstep, don't mess with the path
-			if strings.HasPre***REMOVED***x(rel, "../") {
-				if ***REMOVED***lepath.IsAbs(*ref) {
+			if strings.HasPrefix(rel, "../") {
+				if filepath.IsAbs(*ref) {
 					continue
 				}
 
@@ -609,7 +609,7 @@ func RelativizePathWithNoBacksteps(refs []*string, base string) error {
 
 func MakeRelative(path, base string) (string, error) {
 	if len(path) > 0 {
-		rel, err := ***REMOVED***lepath.Rel(base, path)
+		rel, err := filepath.Rel(base, path)
 		if err != nil {
 			return path, err
 		}

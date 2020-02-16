@@ -1,6 +1,6 @@
 // Copyright 2013 The Go Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE ***REMOVED***le.
+// license that can be found in the LICENSE file.
 
 package cldr
 
@@ -13,7 +13,7 @@ import (
 	"io/ioutil"
 	"log"
 	"os"
-	"path/***REMOVED***lepath"
+	"path/filepath"
 	"regexp"
 )
 
@@ -28,33 +28,33 @@ type Decoder struct {
 
 // SetSectionFilter takes a list top-level LDML element names to which
 // evaluation of LDML should be limited.  It automatically calls SetDirFilter.
-func (d *Decoder) SetSectionFilter(***REMOVED***lter ...string) {
-	d.sectionFilter = ***REMOVED***lter
-	// TODO: automatically set dir ***REMOVED***lter
+func (d *Decoder) SetSectionFilter(filter ...string) {
+	d.sectionFilter = filter
+	// TODO: automatically set dir filter
 }
 
-// SetDirFilter limits the loading of LDML XML ***REMOVED***les of the specied directories.
+// SetDirFilter limits the loading of LDML XML files of the specied directories.
 // Note that sections may be split across directories differently for different CLDR versions.
 // For more robust code, use SetSectionFilter.
 func (d *Decoder) SetDirFilter(dir ...string) {
 	d.dirFilter = dir
 }
 
-// A Loader provides access to the ***REMOVED***les of a CLDR archive.
+// A Loader provides access to the files of a CLDR archive.
 type Loader interface {
 	Len() int
 	Path(i int) string
 	Reader(i int) (io.ReadCloser, error)
 }
 
-var ***REMOVED***leRe = regexp.MustCompile(`.*[/\\](.*)[/\\](.*)\.xml`)
+var fileRe = regexp.MustCompile(`.*[/\\](.*)[/\\](.*)\.xml`)
 
-// Decode loads and decodes the ***REMOVED***les represented by l.
+// Decode loads and decodes the files represented by l.
 func (d *Decoder) Decode(l Loader) (cldr *CLDR, err error) {
 	d.cldr = makeCLDR()
 	for i := 0; i < l.Len(); i++ {
 		fname := l.Path(i)
-		if m := ***REMOVED***leRe.FindStringSubmatch(fname); m != nil {
+		if m := fileRe.FindStringSubmatch(fname); m != nil {
 			if len(d.dirFilter) > 0 && !in(d.dirFilter, m[1]) {
 				continue
 			}
@@ -67,7 +67,7 @@ func (d *Decoder) Decode(l Loader) (cldr *CLDR, err error) {
 			}
 		}
 	}
-	d.cldr.***REMOVED***nalize(d.sectionFilter)
+	d.cldr.finalize(d.sectionFilter)
 	return d.cldr, nil
 }
 
@@ -113,7 +113,7 @@ func (d *Decoder) decode(dir, id string, r io.Reader) error {
 type pathLoader []string
 
 func makePathLoader(path string) (pl pathLoader, err error) {
-	err = ***REMOVED***lepath.Walk(path, func(path string, _ os.FileInfo, err error) error {
+	err = filepath.Walk(path, func(path string, _ os.FileInfo, err error) error {
 		pl = append(pl, path)
 		return err
 	})

@@ -44,7 +44,7 @@ func createEncoderOfMarshaler(ctx *ctx, typ reflect2.Type) ValEncoder {
 		return encoder
 	}
 	ptrType := reflect2.PtrTo(typ)
-	if ctx.pre***REMOVED***x != "" && ptrType.Implements(marshalerType) {
+	if ctx.prefix != "" && ptrType.Implements(marshalerType) {
 		checkIsEmpty := createCheckIsEmpty(ctx, ptrType)
 		var encoder ValEncoder = &marshalerEncoder{
 			valType:      ptrType,
@@ -69,8 +69,8 @@ func createEncoderOfMarshaler(ctx *ctx, typ reflect2.Type) ValEncoder {
 		}
 		return encoder
 	}
-	// if pre***REMOVED***x is empty, the type is the root type
-	if ctx.pre***REMOVED***x != "" && ptrType.Implements(textMarshalerType) {
+	// if prefix is empty, the type is the root type
+	if ctx.prefix != "" && ptrType.Implements(textMarshalerType) {
 		checkIsEmpty := createCheckIsEmpty(ctx, ptrType)
 		var encoder ValEncoder = &textMarshalerEncoder{
 			valType:       ptrType,
@@ -97,7 +97,7 @@ func (encoder *marshalerEncoder) Encode(ptr unsafe.Pointer, stream *Stream) {
 	bytes, err := marshaler.MarshalJSON()
 	if err != nil {
 		stream.Error = err
-	} ***REMOVED*** {
+	} else {
 		stream.Write(bytes)
 	}
 }
@@ -119,7 +119,7 @@ func (encoder *directMarshalerEncoder) Encode(ptr unsafe.Pointer, stream *Stream
 	bytes, err := marshaler.MarshalJSON()
 	if err != nil {
 		stream.Error = err
-	} ***REMOVED*** {
+	} else {
 		stream.Write(bytes)
 	}
 }
@@ -144,7 +144,7 @@ func (encoder *textMarshalerEncoder) Encode(ptr unsafe.Pointer, stream *Stream) 
 	bytes, err := marshaler.MarshalText()
 	if err != nil {
 		stream.Error = err
-	} ***REMOVED*** {
+	} else {
 		str := string(bytes)
 		encoder.stringEncoder.Encode(unsafe.Pointer(&str), stream)
 	}
@@ -168,7 +168,7 @@ func (encoder *directTextMarshalerEncoder) Encode(ptr unsafe.Pointer, stream *St
 	bytes, err := marshaler.MarshalText()
 	if err != nil {
 		stream.Error = err
-	} ***REMOVED*** {
+	} else {
 		str := string(bytes)
 		encoder.stringEncoder.Encode(unsafe.Pointer(&str), stream)
 	}

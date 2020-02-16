@@ -1,6 +1,6 @@
 // Copyright 2014 The Prometheus Authors
 // Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this ***REMOVED***le except in compliance with the License.
+// you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 //
 // http://www.apache.org/licenses/LICENSE-2.0
@@ -8,7 +8,7 @@
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the speci***REMOVED***c language governing permissions and
+// See the License for the specific language governing permissions and
 // limitations under the License.
 
 package prometheus
@@ -162,14 +162,14 @@ func (m *metricVec) deleteByHashWithLabelValues(h uint64, lvs []string) bool {
 		return false
 	}
 
-	i := m.***REMOVED***ndMetricWithLabelValues(metrics, lvs)
+	i := m.findMetricWithLabelValues(metrics, lvs)
 	if i >= len(metrics) {
 		return false
 	}
 
 	if len(metrics) > 1 {
 		m.children[h] = append(metrics[:i], metrics[i+1:]...)
-	} ***REMOVED*** {
+	} else {
 		delete(m.children, h)
 	}
 	return true
@@ -183,14 +183,14 @@ func (m *metricVec) deleteByHashWithLabels(h uint64, labels Labels) bool {
 	if !ok {
 		return false
 	}
-	i := m.***REMOVED***ndMetricWithLabels(metrics, labels)
+	i := m.findMetricWithLabels(metrics, labels)
 	if i >= len(metrics) {
 		return false
 	}
 
 	if len(metrics) > 1 {
 		m.children[h] = append(metrics[:i], metrics[i+1:]...)
-	} ***REMOVED*** {
+	} else {
 		delete(m.children, h)
 	}
 	return true
@@ -289,7 +289,7 @@ func (m *metricVec) getOrCreateMetricWithLabels(hash uint64, labels Labels) Metr
 func (m *metricVec) getMetricWithHashAndLabelValues(h uint64, lvs []string) (Metric, bool) {
 	metrics, ok := m.children[h]
 	if ok {
-		if i := m.***REMOVED***ndMetricWithLabelValues(metrics, lvs); i < len(metrics) {
+		if i := m.findMetricWithLabelValues(metrics, lvs); i < len(metrics) {
 			return metrics[i].metric, true
 		}
 	}
@@ -301,16 +301,16 @@ func (m *metricVec) getMetricWithHashAndLabelValues(h uint64, lvs []string) (Met
 func (m *metricVec) getMetricWithHashAndLabels(h uint64, labels Labels) (Metric, bool) {
 	metrics, ok := m.children[h]
 	if ok {
-		if i := m.***REMOVED***ndMetricWithLabels(metrics, labels); i < len(metrics) {
+		if i := m.findMetricWithLabels(metrics, labels); i < len(metrics) {
 			return metrics[i].metric, true
 		}
 	}
 	return nil, false
 }
 
-// ***REMOVED***ndMetricWithLabelValues returns the index of the matching metric or
+// findMetricWithLabelValues returns the index of the matching metric or
 // len(metrics) if not found.
-func (m *metricVec) ***REMOVED***ndMetricWithLabelValues(metrics []metricWithLabelValues, lvs []string) int {
+func (m *metricVec) findMetricWithLabelValues(metrics []metricWithLabelValues, lvs []string) int {
 	for i, metric := range metrics {
 		if m.matchLabelValues(metric.values, lvs) {
 			return i
@@ -319,9 +319,9 @@ func (m *metricVec) ***REMOVED***ndMetricWithLabelValues(metrics []metricWithLab
 	return len(metrics)
 }
 
-// ***REMOVED***ndMetricWithLabels returns the index of the matching metric or len(metrics)
+// findMetricWithLabels returns the index of the matching metric or len(metrics)
 // if not found.
-func (m *metricVec) ***REMOVED***ndMetricWithLabels(metrics []metricWithLabelValues, labels Labels) int {
+func (m *metricVec) findMetricWithLabels(metrics []metricWithLabelValues, labels Labels) int {
 	for i, metric := range metrics {
 		if m.matchLabels(metric.values, labels) {
 			return i

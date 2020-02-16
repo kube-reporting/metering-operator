@@ -64,7 +64,7 @@ func AssertReportResultsEqual(t *testing.T, expected, actual []map[string]interf
 			}
 			if isCompareColumn && expectedValue != 0.0 {
 				assert.InEpsilonf(t, expectedValue, actualValue, reportComparisionEpsilon, "expected column %q value to be within delta of expected row", column)
-			} ***REMOVED*** {
+			} else {
 				assert.Equal(t, expectedValue, actualValue, "expected column %q values between actual and expected rows to be the same", column)
 			}
 		}

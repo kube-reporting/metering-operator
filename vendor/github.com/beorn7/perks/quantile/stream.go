@@ -80,7 +80,7 @@ func NewHighBiased(epsilon float64) *Stream {
 func NewTargeted(targetMap map[float64]float64) *Stream {
 	// Convert map to slice to avoid slow iterations on a map.
 	// ƒ is called on the hot path, so converting the map to a slice
-	// beforehand results in signi***REMOVED***cant CPU savings.
+	// beforehand results in significant CPU savings.
 	targets := targetMapToSlice(targetMap)
 
 	ƒ := func(s *stream, r float64) float64 {
@@ -89,7 +89,7 @@ func NewTargeted(targetMap map[float64]float64) *Stream {
 		for _, t := range targets {
 			if t.quantile*s.n <= r {
 				f = (2 * t.epsilon * r) / t.quantile
-			} ***REMOVED*** {
+			} else {
 				f = (2 * t.epsilon * (s.n - r)) / (1 - t.quantile)
 			}
 			if f < m {
@@ -148,7 +148,7 @@ func (s *Stream) insert(sample Sample) {
 
 // Query returns the computed qth percentiles value. If s was created with
 // NewTargeted, and q is not in the set of quantiles provided a priori, Query
-// will return an unspeci***REMOVED***ed result.
+// will return an unspecified result.
 func (s *Stream) Query(q float64) float64 {
 	if !s.flushed() {
 		// Fast path when there hasn't been enough data for a flush;
@@ -301,7 +301,7 @@ func (s *stream) compress() {
 			copy(s.l[i:], s.l[i+1:])
 			s.l = s.l[:len(s.l)-1]
 			xi -= 1
-		} ***REMOVED*** {
+		} else {
 			x = c
 			xi = i
 		}

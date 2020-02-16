@@ -2,7 +2,7 @@
 Copyright The Kubernetes Authors.
 
 Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this ***REMOVED***le except in compliance with the License.
+you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
 
     http://www.apache.org/licenses/LICENSE-2.0
@@ -10,7 +10,7 @@ You may obtain a copy of the License at
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the speci***REMOVED***c language governing permissions and
+See the License for the specific language governing permissions and
 limitations under the License.
 */
 
@@ -49,7 +49,7 @@ func (c *FakeTestTypes) Get(name string, options v1.GetOptions) (result *example
 	return obj.(*example2v1.TestType), err
 }
 
-// List takes label and ***REMOVED***eld selectors, and returns the list of TestTypes that match those selectors.
+// List takes label and field selectors, and returns the list of TestTypes that match those selectors.
 func (c *FakeTestTypes) List(opts v1.ListOptions) (result *example2v1.TestTypeList, err error) {
 	obj, err := c.Fake.
 		Invokes(testing.NewListAction(testtypesResource, testtypesKind, c.ns, opts), &example2v1.TestTypeList{})

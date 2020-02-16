@@ -29,8 +29,8 @@ func unmarshalError(r *request.Request) {
 	if r.HTTPResponse.StatusCode == http.StatusMovedPermanently {
 		msg := fmt.Sprintf(
 			"incorrect region, the bucket is not in '%s' region at endpoint '%s'",
-			aws.StringValue(r.Con***REMOVED***g.Region),
-			aws.StringValue(r.Con***REMOVED***g.Endpoint),
+			aws.StringValue(r.Config.Region),
+			aws.StringValue(r.Config.Endpoint),
 		)
 		if v := r.HTTPResponse.Header.Get("x-amz-bucket-region"); len(v) != 0 {
 			msg += fmt.Sprintf(", bucket is in '%s' region", v)

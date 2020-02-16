@@ -1,6 +1,6 @@
 // Copyright 2011 Google Inc. All rights reserved.
 // Use of this source code is governed by the Apache 2.0
-// license that can be found in the LICENSE ***REMOVED***le.
+// license that can be found in the LICENSE file.
 
 package appengine
 
@@ -16,7 +16,7 @@ import (
 
 // AppID returns the application ID for the current application.
 // The string will be a plain application ID (e.g. "appid"), with a
-// domain pre***REMOVED***x for custom domain deployments (e.g. "example.com:appid").
+// domain prefix for custom domain deployments (e.g. "example.com:appid").
 func AppID(c context.Context) string { return internal.AppID(c) }
 
 // DefaultVersionHostname returns the standard hostname of the default version
@@ -55,15 +55,15 @@ func ModuleHostname(c context.Context, module, version, instance string) (string
 }
 
 // VersionID returns the version ID for the current application.
-// It will be of the form "X.Y", where X is speci***REMOVED***ed in app.yaml,
+// It will be of the form "X.Y", where X is specified in app.yaml,
 // and Y is a number generated when each version of the app is uploaded.
 // It does not include a module name.
 func VersionID(c context.Context) string { return internal.VersionID(c) }
 
-// InstanceID returns a mostly-unique identi***REMOVED***er for this instance.
+// InstanceID returns a mostly-unique identifier for this instance.
 func InstanceID() string { return internal.InstanceID() }
 
-// Datacenter returns an identi***REMOVED***er for the datacenter that the instance is running in.
+// Datacenter returns an identifier for the datacenter that the instance is running in.
 func Datacenter(c context.Context) string { return internal.Datacenter(c) }
 
 // ServerSoftware returns the App Engine release version.
@@ -71,10 +71,10 @@ func Datacenter(c context.Context) string { return internal.Datacenter(c) }
 // In the development appserver, it looks like "Development/X.Y".
 func ServerSoftware() string { return internal.ServerSoftware() }
 
-// RequestID returns a string that uniquely identi***REMOVED***es the request.
+// RequestID returns a string that uniquely identifies the request.
 func RequestID(c context.Context) string { return internal.RequestID(c) }
 
-// AccessToken generates an OAuth2 access token for the speci***REMOVED***ed scopes on
+// AccessToken generates an OAuth2 access token for the specified scopes on
 // behalf of service account of this application. This token will expire after
 // the returned time.
 func AccessToken(c context.Context, scopes ...string) (token string, expiry time.Time, err error) {
@@ -88,25 +88,25 @@ func AccessToken(c context.Context, scopes ...string) (token string, expiry time
 	return res.GetAccessToken(), time.Unix(res.GetExpirationTime(), 0), nil
 }
 
-// Certi***REMOVED***cate represents a public certi***REMOVED***cate for the app.
-type Certi***REMOVED***cate struct {
+// Certificate represents a public certificate for the app.
+type Certificate struct {
 	KeyName string
-	Data    []byte // PEM-encoded X.509 certi***REMOVED***cate
+	Data    []byte // PEM-encoded X.509 certificate
 }
 
-// PublicCerti***REMOVED***cates retrieves the public certi***REMOVED***cates for the app.
+// PublicCertificates retrieves the public certificates for the app.
 // They can be used to verify a signature returned by SignBytes.
-func PublicCerti***REMOVED***cates(c context.Context) ([]Certi***REMOVED***cate, error) {
-	req := &pb.GetPublicCerti***REMOVED***cateForAppRequest{}
-	res := &pb.GetPublicCerti***REMOVED***cateForAppResponse{}
-	if err := internal.Call(c, "app_identity_service", "GetPublicCerti***REMOVED***catesForApp", req, res); err != nil {
+func PublicCertificates(c context.Context) ([]Certificate, error) {
+	req := &pb.GetPublicCertificateForAppRequest{}
+	res := &pb.GetPublicCertificateForAppResponse{}
+	if err := internal.Call(c, "app_identity_service", "GetPublicCertificatesForApp", req, res); err != nil {
 		return nil, err
 	}
-	var cs []Certi***REMOVED***cate
-	for _, pc := range res.PublicCerti***REMOVED***cateList {
-		cs = append(cs, Certi***REMOVED***cate{
+	var cs []Certificate
+	for _, pc := range res.PublicCertificateList {
+		cs = append(cs, Certificate{
 			KeyName: pc.GetKeyName(),
-			Data:    []byte(pc.GetX509Certi***REMOVED***catePem()),
+			Data:    []byte(pc.GetX509CertificatePem()),
 		})
 	}
 	return cs, nil

@@ -1,7 +1,7 @@
 // Copyright 2012 Google Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this ***REMOVED***le except in compliance with the License.
+// you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 //
 //     http://www.apache.org/licenses/LICENSE-2.0
@@ -9,12 +9,12 @@
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the speci***REMOVED***c language governing permissions and
+// See the License for the specific language governing permissions and
 // limitations under the License.
 
 package main
 
-// This ***REMOVED***le contains the model construction by reflection.
+// This file contains the model construction by reflection.
 
 import (
 	"bytes"
@@ -24,7 +24,7 @@ import (
 	"io/ioutil"
 	"os"
 	"os/exec"
-	"path/***REMOVED***lepath"
+	"path/filepath"
 	"runtime"
 	"text/template"
 
@@ -71,7 +71,7 @@ func run(command string) (*model.Package, error) {
 // runInDir writes the given program into the given dir, runs it there, and
 // parses the output as a model.Package.
 func runInDir(program []byte, dir string) (*model.Package, error) {
-	// We use TempDir instead of TempFile so we can control the ***REMOVED***lename.
+	// We use TempDir instead of TempFile so we can control the filename.
 	tmpDir, err := ioutil.TempDir(dir, "gomock_reflect_")
 	if err != nil {
 		return nil, err
@@ -80,11 +80,11 @@ func runInDir(program []byte, dir string) (*model.Package, error) {
 	const progSource = "prog.go"
 	var progBinary = "prog.bin"
 	if runtime.GOOS == "windows" {
-		// Windows won't execute a program unless it has a ".exe" suf***REMOVED***x.
+		// Windows won't execute a program unless it has a ".exe" suffix.
 		progBinary += ".exe"
 	}
 
-	if err := ioutil.WriteFile(***REMOVED***lepath.Join(tmpDir, progSource), program, 0600); err != nil {
+	if err := ioutil.WriteFile(filepath.Join(tmpDir, progSource), program, 0600); err != nil {
 		return nil, err
 	}
 
@@ -103,7 +103,7 @@ func runInDir(program []byte, dir string) (*model.Package, error) {
 	if err := cmd.Run(); err != nil {
 		return nil, err
 	}
-	return run(***REMOVED***lepath.Join(tmpDir, progBinary))
+	return run(filepath.Join(tmpDir, progBinary))
 }
 
 func Reflect(importPath string, symbols []string) (*model.Package, error) {
@@ -175,7 +175,7 @@ func main() {
 	}
 	pkg := &model.Package{
 		// NOTE: This behaves contrary to documented behaviour if the
-		// package name is not the ***REMOVED***nal component of the import path.
+		// package name is not the final component of the import path.
 		// The reflect package doesn't expose the package name, though.
 		Name: path.Base({{printf "%q" .ImportPath}}),
 	}

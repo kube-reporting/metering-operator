@@ -9,70 +9,70 @@ import (
 	"k8s.io/client-go/tools/cache"
 )
 
-// MeteringCon***REMOVED***gLister helps list MeteringCon***REMOVED***gs.
-type MeteringCon***REMOVED***gLister interface {
-	// List lists all MeteringCon***REMOVED***gs in the indexer.
-	List(selector labels.Selector) (ret []*v1.MeteringCon***REMOVED***g, err error)
-	// MeteringCon***REMOVED***gs returns an object that can list and get MeteringCon***REMOVED***gs.
-	MeteringCon***REMOVED***gs(namespace string) MeteringCon***REMOVED***gNamespaceLister
-	MeteringCon***REMOVED***gListerExpansion
+// MeteringConfigLister helps list MeteringConfigs.
+type MeteringConfigLister interface {
+	// List lists all MeteringConfigs in the indexer.
+	List(selector labels.Selector) (ret []*v1.MeteringConfig, err error)
+	// MeteringConfigs returns an object that can list and get MeteringConfigs.
+	MeteringConfigs(namespace string) MeteringConfigNamespaceLister
+	MeteringConfigListerExpansion
 }
 
-// meteringCon***REMOVED***gLister implements the MeteringCon***REMOVED***gLister interface.
-type meteringCon***REMOVED***gLister struct {
+// meteringConfigLister implements the MeteringConfigLister interface.
+type meteringConfigLister struct {
 	indexer cache.Indexer
 }
 
-// NewMeteringCon***REMOVED***gLister returns a new MeteringCon***REMOVED***gLister.
-func NewMeteringCon***REMOVED***gLister(indexer cache.Indexer) MeteringCon***REMOVED***gLister {
-	return &meteringCon***REMOVED***gLister{indexer: indexer}
+// NewMeteringConfigLister returns a new MeteringConfigLister.
+func NewMeteringConfigLister(indexer cache.Indexer) MeteringConfigLister {
+	return &meteringConfigLister{indexer: indexer}
 }
 
-// List lists all MeteringCon***REMOVED***gs in the indexer.
-func (s *meteringCon***REMOVED***gLister) List(selector labels.Selector) (ret []*v1.MeteringCon***REMOVED***g, err error) {
+// List lists all MeteringConfigs in the indexer.
+func (s *meteringConfigLister) List(selector labels.Selector) (ret []*v1.MeteringConfig, err error) {
 	err = cache.ListAll(s.indexer, selector, func(m interface{}) {
-		ret = append(ret, m.(*v1.MeteringCon***REMOVED***g))
+		ret = append(ret, m.(*v1.MeteringConfig))
 	})
 	return ret, err
 }
 
-// MeteringCon***REMOVED***gs returns an object that can list and get MeteringCon***REMOVED***gs.
-func (s *meteringCon***REMOVED***gLister) MeteringCon***REMOVED***gs(namespace string) MeteringCon***REMOVED***gNamespaceLister {
-	return meteringCon***REMOVED***gNamespaceLister{indexer: s.indexer, namespace: namespace}
+// MeteringConfigs returns an object that can list and get MeteringConfigs.
+func (s *meteringConfigLister) MeteringConfigs(namespace string) MeteringConfigNamespaceLister {
+	return meteringConfigNamespaceLister{indexer: s.indexer, namespace: namespace}
 }
 
-// MeteringCon***REMOVED***gNamespaceLister helps list and get MeteringCon***REMOVED***gs.
-type MeteringCon***REMOVED***gNamespaceLister interface {
-	// List lists all MeteringCon***REMOVED***gs in the indexer for a given namespace.
-	List(selector labels.Selector) (ret []*v1.MeteringCon***REMOVED***g, err error)
-	// Get retrieves the MeteringCon***REMOVED***g from the indexer for a given namespace and name.
-	Get(name string) (*v1.MeteringCon***REMOVED***g, error)
-	MeteringCon***REMOVED***gNamespaceListerExpansion
+// MeteringConfigNamespaceLister helps list and get MeteringConfigs.
+type MeteringConfigNamespaceLister interface {
+	// List lists all MeteringConfigs in the indexer for a given namespace.
+	List(selector labels.Selector) (ret []*v1.MeteringConfig, err error)
+	// Get retrieves the MeteringConfig from the indexer for a given namespace and name.
+	Get(name string) (*v1.MeteringConfig, error)
+	MeteringConfigNamespaceListerExpansion
 }
 
-// meteringCon***REMOVED***gNamespaceLister implements the MeteringCon***REMOVED***gNamespaceLister
+// meteringConfigNamespaceLister implements the MeteringConfigNamespaceLister
 // interface.
-type meteringCon***REMOVED***gNamespaceLister struct {
+type meteringConfigNamespaceLister struct {
 	indexer   cache.Indexer
 	namespace string
 }
 
-// List lists all MeteringCon***REMOVED***gs in the indexer for a given namespace.
-func (s meteringCon***REMOVED***gNamespaceLister) List(selector labels.Selector) (ret []*v1.MeteringCon***REMOVED***g, err error) {
+// List lists all MeteringConfigs in the indexer for a given namespace.
+func (s meteringConfigNamespaceLister) List(selector labels.Selector) (ret []*v1.MeteringConfig, err error) {
 	err = cache.ListAllByNamespace(s.indexer, s.namespace, selector, func(m interface{}) {
-		ret = append(ret, m.(*v1.MeteringCon***REMOVED***g))
+		ret = append(ret, m.(*v1.MeteringConfig))
 	})
 	return ret, err
 }
 
-// Get retrieves the MeteringCon***REMOVED***g from the indexer for a given namespace and name.
-func (s meteringCon***REMOVED***gNamespaceLister) Get(name string) (*v1.MeteringCon***REMOVED***g, error) {
+// Get retrieves the MeteringConfig from the indexer for a given namespace and name.
+func (s meteringConfigNamespaceLister) Get(name string) (*v1.MeteringConfig, error) {
 	obj, exists, err := s.indexer.GetByKey(s.namespace + "/" + name)
 	if err != nil {
 		return nil, err
 	}
 	if !exists {
-		return nil, errors.NewNotFound(v1.Resource("meteringcon***REMOVED***g"), name)
+		return nil, errors.NewNotFound(v1.Resource("meteringconfig"), name)
 	}
-	return obj.(*v1.MeteringCon***REMOVED***g), nil
+	return obj.(*v1.MeteringConfig), nil
 }

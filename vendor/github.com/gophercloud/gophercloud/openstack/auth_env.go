@@ -9,7 +9,7 @@ import (
 var nilOptions = gophercloud.AuthOptions{}
 
 /*
-AuthOptionsFromEnv ***REMOVED***lls out an identity.AuthOptions structure with the
+AuthOptionsFromEnv fills out an identity.AuthOptions structure with the
 settings found on the various OpenStack OS_* environment variables.
 
 The following variables provide sources of truth: OS_AUTH_URL, OS_USERNAME,
@@ -27,8 +27,8 @@ as "tenant" in Gophercloud.
 If OS_PROJECT_NAME is set, it requires OS_PROJECT_ID to be set as well to
 handle projects not on the default domain.
 
-To use this function, ***REMOVED***rst set the OS_* environment variables (for example,
-by sourcing an `openrc` ***REMOVED***le), then:
+To use this function, first set the OS_* environment variables (for example,
+by sourcing an `openrc` file), then:
 
 	opts, err := openstack.AuthOptionsFromEnv()
 	provider, err := openstack.AuthenticatedClient(opts)

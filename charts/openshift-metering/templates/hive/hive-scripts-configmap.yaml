@@ -1,19 +1,19 @@
 apiVersion: v1
-kind: Con***REMOVED***gMap
+kind: ConfigMap
 metadata:
   name: hive-scripts
 data:
-  copy-hadoop-con***REMOVED***g.sh: |
+  copy-hadoop-config.sh: |
     #!/bin/bash
     set -ex
-    cp -v -L -r -f /hadoop-starting-con***REMOVED***g/* /hadoop-con***REMOVED***g/
-    cd /hadoop-con***REMOVED***g/
-    faq '.con***REMOVED***guration.property+=[{name: ("fs.azure.account.key." + env.AZURE_STORAGE_ACCOUNT_NAME + ".blob.core.windows.net"), value: env.AZURE_SECRET_ACCESS_KEY }]' core-site.xml > core-site.xml.temp
+    cp -v -L -r -f /hadoop-starting-config/* /hadoop-config/
+    cd /hadoop-config/
+    faq '.configuration.property+=[{name: ("fs.azure.account.key." + env.AZURE_STORAGE_ACCOUNT_NAME + ".blob.core.windows.net"), value: env.AZURE_SECRET_ACCESS_KEY }]' core-site.xml > core-site.xml.temp
     mv -f core-site.xml.temp core-site.xml
     if [ -a /gcs-json/gcs-service-account.json ]; then
-      faq '.con***REMOVED***guration.property+=[{name: "fs.gs.auth.service.account.json.key***REMOVED***le" , value: "/gcs-json/gcs-service-account.json" }]' core-site.xml > core-site.xml.temp
+      faq '.configuration.property+=[{name: "fs.gs.auth.service.account.json.keyfile" , value: "/gcs-json/gcs-service-account.json" }]' core-site.xml > core-site.xml.temp
       mv -f core-site.xml.temp core-site.xml
-    ***REMOVED***
+    fi
 
   entrypoint.sh: |
     #!/bin/bash
@@ -21,10 +21,10 @@ data:
       PEM_FILE=$1
       PASSWORD=$2
       KEYSTORE=$3
-      # number of certs in the PEM ***REMOVED***le
+      # number of certs in the PEM file
       CERTS=$(grep 'END CERTIFICATE' $PEM_FILE| wc -l)
 
-      # For every cert in the PEM ***REMOVED***le, extract it and import into the JKS keystore
+      # For every cert in the PEM file, extract it and import into the JKS keystore
       # awk command: step 1, if line is in the desired cert, print the line
       #              step 2, increment counter when last line of cert is found
       for N in $(seq 0 $(($CERTS - 1))); do
@@ -41,45 +41,45 @@ data:
     if [ -a /s3-compatible-ca/ca-bundle.crt ]; then
       echo "Adding /s3-compatible-ca/ca-bundle.crt to $JAVA_HOME/lib/security/cacerts"
       importCert /s3-compatible-ca/ca-bundle.crt changeit $JAVA_HOME/lib/security/cacerts
-    ***REMOVED***
+    fi
     # always add the openshift service-ca.crt if it exists
     if [ -a /var/run/secrets/kubernetes.io/serviceaccount/service-ca.crt ]; then
       echo "Adding /var/run/secrets/kubernetes.io/serviceaccount/service-ca.crt to $JAVA_HOME/lib/security/cacerts"
       importCert /var/run/secrets/kubernetes.io/serviceaccount/service-ca.crt changeit $JAVA_HOME/lib/security/cacerts
-    ***REMOVED***
+    fi
 
     # add UID to /etc/passwd if missing
     if ! whoami &> /dev/null; then
         if [ -w /etc/passwd ]; then
             echo "Adding user ${USER_NAME:-hadoop} with current UID $(id -u) to /etc/passwd"
-            # Remove existing entry with user ***REMOVED***rst.
+            # Remove existing entry with user first.
             # cannot use sed -i because we do not have permission to write new
-            # ***REMOVED***les into /etc
+            # files into /etc
             sed  "/${USER_NAME:-hadoop}:x/d" /etc/passwd > /tmp/passwd
             # add our user with our current user ID into passwd
             echo "${USER_NAME:-hadoop}:x:$(id -u):0:${USER_NAME:-hadoop} user:${HOME}:/sbin/nologin" >> /tmp/passwd
             # overwrite existing contents with new contents (cannot replace the
-            # ***REMOVED***le due to permissions)
+            # file due to permissions)
             cat /tmp/passwd > /etc/passwd
             rm /tmp/passwd
-        ***REMOVED***
-    ***REMOVED***
+        fi
+    fi
 
-    # symlink our con***REMOVED***guration ***REMOVED***les to the correct location
-    if [ -f /hadoop-con***REMOVED***g/core-site.xml ]; then
-      ln -s -f /hadoop-con***REMOVED***g/core-site.xml /etc/hadoop/core-site.xml
-    ***REMOVED***
-      echo "/hadoop-con***REMOVED***g/core-site.xml doesnt exist, skipping symlink"
-    ***REMOVED***
-    if [ -f /hadoop-con***REMOVED***g/hdfs-site.xml ]; then
-      ln -s -f /hadoop-con***REMOVED***g/hdfs-site.xml /etc/hadoop/hdfs-site.xml
-    ***REMOVED***
-      echo "/hadoop-con***REMOVED***g/hdfs-site.xml doesnt exist, skipping symlink"
-    ***REMOVED***
+    # symlink our configuration files to the correct location
+    if [ -f /hadoop-config/core-site.xml ]; then
+      ln -s -f /hadoop-config/core-site.xml /etc/hadoop/core-site.xml
+    else
+      echo "/hadoop-config/core-site.xml doesnt exist, skipping symlink"
+    fi
+    if [ -f /hadoop-config/hdfs-site.xml ]; then
+      ln -s -f /hadoop-config/hdfs-site.xml /etc/hadoop/hdfs-site.xml
+    else
+      echo "/hadoop-config/hdfs-site.xml doesnt exist, skipping symlink"
+    fi
 
-    ln -s -f /hive-con***REMOVED***g/hive-site.xml $HIVE_HOME/conf/hive-site.xml
-    ln -s -f /hive-con***REMOVED***g/hive-log4j2.properties $HIVE_HOME/conf/hive-log4j2.properties
-    ln -s -f /hive-con***REMOVED***g/hive-exec-log4j2.properties $HIVE_HOME/conf/hive-exec-log4j2.properties
+    ln -s -f /hive-config/hive-site.xml $HIVE_HOME/conf/hive-site.xml
+    ln -s -f /hive-config/hive-log4j2.properties $HIVE_HOME/conf/hive-log4j2.properties
+    ln -s -f /hive-config/hive-exec-log4j2.properties $HIVE_HOME/conf/hive-exec-log4j2.properties
 
     export HADOOP_LOG_DIR="${HADOOP_HOME}/logs"
     # Set garbage collection settings
@@ -89,16 +89,16 @@ data:
 
     if [ -n "$JVM_INITIAL_RAM_PERCENTAGE" ]; then
       VM_OPTIONS="$VM_OPTIONS -XX:InitialRAMPercentage=$JVM_INITIAL_RAM_PERCENTAGE"
-    ***REMOVED***
+    fi
     if [ -n "$JVM_MAX_RAM_PERCENTAGE" ]; then
       VM_OPTIONS="$VM_OPTIONS -XX:MaxRAMPercentage=$JVM_MAX_RAM_PERCENTAGE"
-    ***REMOVED***
+    fi
     if [ -n "$JVM_MIN_RAM_PERCENTAGE" ]; then
       VM_OPTIONS="$VM_OPTIONS -XX:MinRAMPercentage=$JVM_MIN_RAM_PERCENTAGE"
-    ***REMOVED***
+    fi
 
     # Set JMX options
-    export JMX_OPTIONS="-javaagent:/opt/jmx_exporter/jmx_exporter.jar=8082:/opt/jmx_exporter/con***REMOVED***g/con***REMOVED***g.yml -Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.local.only=false -Dcom.sun.management.jmxremote.ssl=false -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.port=8081 -Dcom.sun.management.jmxremote.rmi.port=8081 -Djava.rmi.server.hostname=127.0.0.1"
+    export JMX_OPTIONS="-javaagent:/opt/jmx_exporter/jmx_exporter.jar=8082:/opt/jmx_exporter/config/config.yml -Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.local.only=false -Dcom.sun.management.jmxremote.ssl=false -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.port=8081 -Dcom.sun.management.jmxremote.rmi.port=8081 -Djava.rmi.server.hostname=127.0.0.1"
 
     # Set garbage collection logs
     GC_SETTINGS="${GC_SETTINGS} -verbose:gc -XX:+PrintGCDetails -XX:+PrintGCTimeStamps -XX:+PrintGCDateStamps -Xloggc:${HADOOP_LOG_DIR}/gc.log"

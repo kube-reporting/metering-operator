@@ -1,6 +1,6 @@
 // Copyright 2011 Google Inc. All rights reserved.
 // Use of this source code is governed by the Apache 2.0
-// license that can be found in the LICENSE ***REMOVED***le.
+// license that can be found in the LICENSE file.
 
 // +build !appengine
 
@@ -97,16 +97,16 @@ func handleHTTP(w http.ResponseWriter, r *http.Request) {
 	// Patch up RemoteAddr so it looks reasonable.
 	if addr := r.Header.Get(userIPHeader); addr != "" {
 		r.RemoteAddr = addr
-	} ***REMOVED*** if addr = r.Header.Get(remoteAddrHeader); addr != "" {
+	} else if addr = r.Header.Get(remoteAddrHeader); addr != "" {
 		r.RemoteAddr = addr
-	} ***REMOVED*** {
+	} else {
 		// Should not normally reach here, but pick a sensible default anyway.
 		r.RemoteAddr = "127.0.0.1"
 	}
 	// The address in the headers will most likely be of these forms:
 	//	123.123.123.123
 	//	2001:db8::1
-	// net/http.Request.RemoteAddr is speci***REMOVED***ed to be in "IP:port" form.
+	// net/http.Request.RemoteAddr is specified to be in "IP:port" form.
 	if _, _, err := net.SplitHostPort(r.RemoteAddr); err != nil {
 		// Assume the remote address is only a host; add a default port.
 		r.RemoteAddr = net.JoinHostPort(r.RemoteAddr, "80")
@@ -156,7 +156,7 @@ func renderPanic(x interface{}) string {
 	buf := make([]byte, 16<<10) // 16 KB should be plenty
 	buf = buf[:runtime.Stack(buf, false)]
 
-	// Remove the ***REMOVED***rst few stack frames:
+	// Remove the first few stack frames:
 	//   this func
 	//   the recover closure in the caller
 	// That will root the stack trace at the site of the panic.
@@ -292,7 +292,7 @@ func BackgroundContext() netcontext.Context {
 		apiURL: apiURL(),
 	}
 
-	// TODO(dsymonds): Wire up the shutdown handler to do a ***REMOVED***nal flush.
+	// TODO(dsymonds): Wire up the shutdown handler to do a final flush.
 	go ctxs.bg.logFlusher(make(chan int))
 
 	return toContext(ctxs.bg)
@@ -455,9 +455,9 @@ func Call(ctx netcontext.Context, service, method string, in, out proto.Message)
 		return errors.New("not an App Engine context")
 	}
 
-	// Apply transaction modi***REMOVED***cations if we're in a transaction.
+	// Apply transaction modifications if we're in a transaction.
 	if t := transactionFromContext(ctx); t != nil {
-		if t.***REMOVED***nished {
+		if t.finished {
 			return errors.New("transaction context has expired")
 		}
 		applyTransaction(in, &t.transaction)
@@ -532,8 +532,8 @@ func (c *context) addLogLine(ll *logpb.UserAppLogLine) {
 	// TODO(dsymonds): Check if this is still necessary.
 	const lim = 8 << 10
 	if len(*ll.Message) > lim {
-		suf***REMOVED***x := fmt.Sprintf("...(length %d)", len(*ll.Message))
-		ll.Message = proto.String((*ll.Message)[:lim-len(suf***REMOVED***x)] + suf***REMOVED***x)
+		suffix := fmt.Sprintf("...(length %d)", len(*ll.Message))
+		ll.Message = proto.String((*ll.Message)[:lim-len(suffix)] + suffix)
 	}
 
 	c.pendingLogs.Lock()
@@ -629,7 +629,7 @@ func (c *context) logFlusher(stop <-chan int) {
 	for {
 		select {
 		case <-stop:
-			// Request ***REMOVED***nished.
+			// Request finished.
 			tick.Stop()
 			return
 		case <-tick.C:

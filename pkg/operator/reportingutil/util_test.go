@@ -73,7 +73,7 @@ func TestHiveColumnToPrestoColumn(t *testing.T) {
 			},
 			compareAssertion: assert.Equal,
 			errAssertion:     assert.Error,
-			expectedErr:      fmt.Errorf(`invalid map de***REMOVED***nition in column type, column "foo", type: "MAP<>"`),
+			expectedErr:      fmt.Errorf(`invalid map definition in column type, column "foo", type: "MAP<>"`),
 		},
 		"broken map MAP< error": {
 			hiveColumn: hive.Column{
@@ -82,7 +82,7 @@ func TestHiveColumnToPrestoColumn(t *testing.T) {
 			},
 			compareAssertion: assert.Equal,
 			errAssertion:     assert.Error,
-			expectedErr:      fmt.Errorf(`unable to ***REMOVED***nd matching <, > pair for column "foo", type: "MAP<"`),
+			expectedErr:      fmt.Errorf(`unable to find matching <, > pair for column "foo", type: "MAP<"`),
 		},
 		"broken map MAP<STRING> error": {
 			hiveColumn: hive.Column{
@@ -91,7 +91,7 @@ func TestHiveColumnToPrestoColumn(t *testing.T) {
 			},
 			compareAssertion: assert.Equal,
 			errAssertion:     assert.Error,
-			expectedErr:      fmt.Errorf(`invalid map de***REMOVED***nition in column type, column "foo", type: "MAP<STRING>"`),
+			expectedErr:      fmt.Errorf(`invalid map definition in column type, column "foo", type: "MAP<STRING>"`),
 		},
 		"broken map MAP<STRING,> error": {
 			hiveColumn: hive.Column{
@@ -121,7 +121,7 @@ func TestHiveColumnToPrestoColumn(t *testing.T) {
 			tt.errAssertion(t, err)
 			if tt.expectedErr != nil {
 				tt.compareAssertion(t, tt.expectedErr, err)
-			} ***REMOVED*** {
+			} else {
 				tt.compareAssertion(t, tt.expectedPrestoColumn, prestoColumn)
 			}
 		})

@@ -12,7 +12,7 @@ var _ = proto.Marshal
 var _ = fmt.Errorf
 var _ = math.Inf
 
-// This is a compile-time assertion to ensure that this generated ***REMOVED***le
+// This is a compile-time assertion to ensure that this generated file
 // is compatible with the proto package it is being compiled against.
 // A compilation error at this line likely means your copy of the
 // proto package needs to be updated.
@@ -60,7 +60,7 @@ func (x *MetricType) UnmarshalJSON(data []byte) error {
 	return nil
 }
 func (MetricType) EnumDescriptor() ([]byte, []int) {
-	return ***REMOVED***leDescriptor_metrics_c97c9a2b9560cb8f, []int{0}
+	return fileDescriptor_metrics_c97c9a2b9560cb8f, []int{0}
 }
 
 type LabelPair struct {
@@ -75,7 +75,7 @@ func (m *LabelPair) Reset()         { *m = LabelPair{} }
 func (m *LabelPair) String() string { return proto.CompactTextString(m) }
 func (*LabelPair) ProtoMessage()    {}
 func (*LabelPair) Descriptor() ([]byte, []int) {
-	return ***REMOVED***leDescriptor_metrics_c97c9a2b9560cb8f, []int{0}
+	return fileDescriptor_metrics_c97c9a2b9560cb8f, []int{0}
 }
 func (m *LabelPair) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_LabelPair.Unmarshal(m, b)
@@ -110,7 +110,7 @@ func (m *LabelPair) GetValue() string {
 }
 
 type Gauge struct {
-	Value                *float64 `protobuf:"***REMOVED***xed64,1,opt,name=value" json:"value,omitempty"`
+	Value                *float64 `protobuf:"fixed64,1,opt,name=value" json:"value,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
 	XXX_sizecache        int32    `json:"-"`
@@ -120,7 +120,7 @@ func (m *Gauge) Reset()         { *m = Gauge{} }
 func (m *Gauge) String() string { return proto.CompactTextString(m) }
 func (*Gauge) ProtoMessage()    {}
 func (*Gauge) Descriptor() ([]byte, []int) {
-	return ***REMOVED***leDescriptor_metrics_c97c9a2b9560cb8f, []int{1}
+	return fileDescriptor_metrics_c97c9a2b9560cb8f, []int{1}
 }
 func (m *Gauge) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_Gauge.Unmarshal(m, b)
@@ -148,7 +148,7 @@ func (m *Gauge) GetValue() float64 {
 }
 
 type Counter struct {
-	Value                *float64 `protobuf:"***REMOVED***xed64,1,opt,name=value" json:"value,omitempty"`
+	Value                *float64 `protobuf:"fixed64,1,opt,name=value" json:"value,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
 	XXX_sizecache        int32    `json:"-"`
@@ -158,7 +158,7 @@ func (m *Counter) Reset()         { *m = Counter{} }
 func (m *Counter) String() string { return proto.CompactTextString(m) }
 func (*Counter) ProtoMessage()    {}
 func (*Counter) Descriptor() ([]byte, []int) {
-	return ***REMOVED***leDescriptor_metrics_c97c9a2b9560cb8f, []int{2}
+	return fileDescriptor_metrics_c97c9a2b9560cb8f, []int{2}
 }
 func (m *Counter) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_Counter.Unmarshal(m, b)
@@ -186,8 +186,8 @@ func (m *Counter) GetValue() float64 {
 }
 
 type Quantile struct {
-	Quantile             *float64 `protobuf:"***REMOVED***xed64,1,opt,name=quantile" json:"quantile,omitempty"`
-	Value                *float64 `protobuf:"***REMOVED***xed64,2,opt,name=value" json:"value,omitempty"`
+	Quantile             *float64 `protobuf:"fixed64,1,opt,name=quantile" json:"quantile,omitempty"`
+	Value                *float64 `protobuf:"fixed64,2,opt,name=value" json:"value,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
 	XXX_sizecache        int32    `json:"-"`
@@ -197,7 +197,7 @@ func (m *Quantile) Reset()         { *m = Quantile{} }
 func (m *Quantile) String() string { return proto.CompactTextString(m) }
 func (*Quantile) ProtoMessage()    {}
 func (*Quantile) Descriptor() ([]byte, []int) {
-	return ***REMOVED***leDescriptor_metrics_c97c9a2b9560cb8f, []int{3}
+	return fileDescriptor_metrics_c97c9a2b9560cb8f, []int{3}
 }
 func (m *Quantile) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_Quantile.Unmarshal(m, b)
@@ -233,7 +233,7 @@ func (m *Quantile) GetValue() float64 {
 
 type Summary struct {
 	SampleCount          *uint64     `protobuf:"varint,1,opt,name=sample_count,json=sampleCount" json:"sample_count,omitempty"`
-	SampleSum            *float64    `protobuf:"***REMOVED***xed64,2,opt,name=sample_sum,json=sampleSum" json:"sample_sum,omitempty"`
+	SampleSum            *float64    `protobuf:"fixed64,2,opt,name=sample_sum,json=sampleSum" json:"sample_sum,omitempty"`
 	Quantile             []*Quantile `protobuf:"bytes,3,rep,name=quantile" json:"quantile,omitempty"`
 	XXX_NoUnkeyedLiteral struct{}    `json:"-"`
 	XXX_unrecognized     []byte      `json:"-"`
@@ -244,7 +244,7 @@ func (m *Summary) Reset()         { *m = Summary{} }
 func (m *Summary) String() string { return proto.CompactTextString(m) }
 func (*Summary) ProtoMessage()    {}
 func (*Summary) Descriptor() ([]byte, []int) {
-	return ***REMOVED***leDescriptor_metrics_c97c9a2b9560cb8f, []int{4}
+	return fileDescriptor_metrics_c97c9a2b9560cb8f, []int{4}
 }
 func (m *Summary) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_Summary.Unmarshal(m, b)
@@ -286,7 +286,7 @@ func (m *Summary) GetQuantile() []*Quantile {
 }
 
 type Untyped struct {
-	Value                *float64 `protobuf:"***REMOVED***xed64,1,opt,name=value" json:"value,omitempty"`
+	Value                *float64 `protobuf:"fixed64,1,opt,name=value" json:"value,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
 	XXX_sizecache        int32    `json:"-"`
@@ -296,7 +296,7 @@ func (m *Untyped) Reset()         { *m = Untyped{} }
 func (m *Untyped) String() string { return proto.CompactTextString(m) }
 func (*Untyped) ProtoMessage()    {}
 func (*Untyped) Descriptor() ([]byte, []int) {
-	return ***REMOVED***leDescriptor_metrics_c97c9a2b9560cb8f, []int{5}
+	return fileDescriptor_metrics_c97c9a2b9560cb8f, []int{5}
 }
 func (m *Untyped) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_Untyped.Unmarshal(m, b)
@@ -325,7 +325,7 @@ func (m *Untyped) GetValue() float64 {
 
 type Histogram struct {
 	SampleCount          *uint64   `protobuf:"varint,1,opt,name=sample_count,json=sampleCount" json:"sample_count,omitempty"`
-	SampleSum            *float64  `protobuf:"***REMOVED***xed64,2,opt,name=sample_sum,json=sampleSum" json:"sample_sum,omitempty"`
+	SampleSum            *float64  `protobuf:"fixed64,2,opt,name=sample_sum,json=sampleSum" json:"sample_sum,omitempty"`
 	Bucket               []*Bucket `protobuf:"bytes,3,rep,name=bucket" json:"bucket,omitempty"`
 	XXX_NoUnkeyedLiteral struct{}  `json:"-"`
 	XXX_unrecognized     []byte    `json:"-"`
@@ -336,7 +336,7 @@ func (m *Histogram) Reset()         { *m = Histogram{} }
 func (m *Histogram) String() string { return proto.CompactTextString(m) }
 func (*Histogram) ProtoMessage()    {}
 func (*Histogram) Descriptor() ([]byte, []int) {
-	return ***REMOVED***leDescriptor_metrics_c97c9a2b9560cb8f, []int{6}
+	return fileDescriptor_metrics_c97c9a2b9560cb8f, []int{6}
 }
 func (m *Histogram) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_Histogram.Unmarshal(m, b)
@@ -379,7 +379,7 @@ func (m *Histogram) GetBucket() []*Bucket {
 
 type Bucket struct {
 	CumulativeCount      *uint64  `protobuf:"varint,1,opt,name=cumulative_count,json=cumulativeCount" json:"cumulative_count,omitempty"`
-	UpperBound           *float64 `protobuf:"***REMOVED***xed64,2,opt,name=upper_bound,json=upperBound" json:"upper_bound,omitempty"`
+	UpperBound           *float64 `protobuf:"fixed64,2,opt,name=upper_bound,json=upperBound" json:"upper_bound,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
 	XXX_sizecache        int32    `json:"-"`
@@ -389,7 +389,7 @@ func (m *Bucket) Reset()         { *m = Bucket{} }
 func (m *Bucket) String() string { return proto.CompactTextString(m) }
 func (*Bucket) ProtoMessage()    {}
 func (*Bucket) Descriptor() ([]byte, []int) {
-	return ***REMOVED***leDescriptor_metrics_c97c9a2b9560cb8f, []int{7}
+	return fileDescriptor_metrics_c97c9a2b9560cb8f, []int{7}
 }
 func (m *Bucket) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_Bucket.Unmarshal(m, b)
@@ -440,7 +440,7 @@ func (m *Metric) Reset()         { *m = Metric{} }
 func (m *Metric) String() string { return proto.CompactTextString(m) }
 func (*Metric) ProtoMessage()    {}
 func (*Metric) Descriptor() ([]byte, []int) {
-	return ***REMOVED***leDescriptor_metrics_c97c9a2b9560cb8f, []int{8}
+	return fileDescriptor_metrics_c97c9a2b9560cb8f, []int{8}
 }
 func (m *Metric) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_Metric.Unmarshal(m, b)
@@ -523,7 +523,7 @@ func (m *MetricFamily) Reset()         { *m = MetricFamily{} }
 func (m *MetricFamily) String() string { return proto.CompactTextString(m) }
 func (*MetricFamily) ProtoMessage()    {}
 func (*MetricFamily) Descriptor() ([]byte, []int) {
-	return ***REMOVED***leDescriptor_metrics_c97c9a2b9560cb8f, []int{9}
+	return fileDescriptor_metrics_c97c9a2b9560cb8f, []int{9}
 }
 func (m *MetricFamily) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_MetricFamily.Unmarshal(m, b)
@@ -585,9 +585,9 @@ func init() {
 	proto.RegisterEnum("io.prometheus.client.MetricType", MetricType_name, MetricType_value)
 }
 
-func init() { proto.RegisterFile("metrics.proto", ***REMOVED***leDescriptor_metrics_c97c9a2b9560cb8f) }
+func init() { proto.RegisterFile("metrics.proto", fileDescriptor_metrics_c97c9a2b9560cb8f) }
 
-var ***REMOVED***leDescriptor_metrics_c97c9a2b9560cb8f = []byte{
+var fileDescriptor_metrics_c97c9a2b9560cb8f = []byte{
 	// 591 bytes of a gzipped FileDescriptorProto
 	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xac, 0x54, 0x4f, 0x4f, 0xdb, 0x4e,
 	0x14, 0xfc, 0x99, 0xd8, 0x09, 0x7e, 0x86, 0x5f, 0xad, 0x15, 0x07, 0xab, 0x2d, 0x25, 0xcd, 0x89,

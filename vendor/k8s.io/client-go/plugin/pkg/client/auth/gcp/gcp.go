@@ -2,7 +2,7 @@
 Copyright 2016 The Kubernetes Authors.
 
 Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this ***REMOVED***le except in compliance with the License.
+you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
 
     http://www.apache.org/licenses/LICENSE-2.0
@@ -10,7 +10,7 @@ You may obtain a copy of the License at
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the speci***REMOVED***c language governing permissions and
+See the License for the specific language governing permissions and
 limitations under the License.
 */
 
@@ -56,7 +56,7 @@ var (
 )
 
 // gcpAuthProvider is an auth provider plugin that uses GCP credentials to provide
-// tokens for kubectl to authenticate itself to the apiserver. A sample json con***REMOVED***g
+// tokens for kubectl to authenticate itself to the apiserver. A sample json config
 // is provided below with all recognized options described.
 //
 // {
@@ -64,13 +64,13 @@ var (
 //     # Required
 //     "name": "gcp",
 //
-//     'con***REMOVED***g': {
+//     'config': {
 //       # Authentication options
 //       # These options are used while getting a token.
 //
-//       # comma-separated list of GCP API scopes. default value of this ***REMOVED***eld
+//       # comma-separated list of GCP API scopes. default value of this field
 //       # is "https://www.googleapis.com/auth/cloud-platform,https://www.googleapis.com/auth/userinfo.email".
-// 		 # to override the API scopes, specify this ***REMOVED***eld explicitly.
+// 		 # to override the API scopes, specify this field explicitly.
 //       "scopes": "https://www.googleapis.com/auth/cloud-platform"
 //
 //       # Caching options
@@ -81,22 +81,22 @@ var (
 //       "expiry": "2016-10-31 22:31:9.123",
 //
 //       # Command execution options
-//       # These options direct the plugin to execute a speci***REMOVED***ed command and parse
+//       # These options direct the plugin to execute a specified command and parse
 //       # token and expiry time from the output of the command.
 //
 //       # Command to execute for access token. Command output will be parsed as JSON.
 //       # If "cmd-args" is not present, this value will be split on whitespace, with
-//       # the ***REMOVED***rst element interpreted as the command, remaining elements as args.
+//       # the first element interpreted as the command, remaining elements as args.
 //       "cmd-path": "/usr/bin/gcloud",
 //
 //       # Arguments to pass to command to execute for access token.
-//       "cmd-args": "con***REMOVED***g con***REMOVED***g-helper --output=json"
+//       "cmd-args": "config config-helper --output=json"
 //
-//       # JSONPath to the string ***REMOVED***eld that represents the access token in
+//       # JSONPath to the string field that represents the access token in
 //       # command output. If omitted, defaults to "{.access_token}".
 //       "token-key": "{.credential.access_token}",
 //
-//       # JSONPath to the string ***REMOVED***eld that represents expiration timestamp
+//       # JSONPath to the string field that represents expiration timestamp
 //       # of the access token in the command output. If omitted, defaults to
 //       # "{.token_expiry}"
 //       "expiry-key": ""{.credential.token_expiry}",
@@ -110,49 +110,49 @@ var (
 //
 type gcpAuthProvider struct {
 	tokenSource oauth2.TokenSource
-	persister   restclient.AuthProviderCon***REMOVED***gPersister
+	persister   restclient.AuthProviderConfigPersister
 }
 
-func newGCPAuthProvider(_ string, gcpCon***REMOVED***g map[string]string, persister restclient.AuthProviderCon***REMOVED***gPersister) (restclient.AuthProvider, error) {
-	ts, err := tokenSource(isCmdTokenSource(gcpCon***REMOVED***g), gcpCon***REMOVED***g)
+func newGCPAuthProvider(_ string, gcpConfig map[string]string, persister restclient.AuthProviderConfigPersister) (restclient.AuthProvider, error) {
+	ts, err := tokenSource(isCmdTokenSource(gcpConfig), gcpConfig)
 	if err != nil {
 		return nil, err
 	}
-	cts, err := newCachedTokenSource(gcpCon***REMOVED***g["access-token"], gcpCon***REMOVED***g["expiry"], persister, ts, gcpCon***REMOVED***g)
+	cts, err := newCachedTokenSource(gcpConfig["access-token"], gcpConfig["expiry"], persister, ts, gcpConfig)
 	if err != nil {
 		return nil, err
 	}
 	return &gcpAuthProvider{cts, persister}, nil
 }
 
-func isCmdTokenSource(gcpCon***REMOVED***g map[string]string) bool {
-	_, ok := gcpCon***REMOVED***g["cmd-path"]
+func isCmdTokenSource(gcpConfig map[string]string) bool {
+	_, ok := gcpConfig["cmd-path"]
 	return ok
 }
 
-func tokenSource(isCmd bool, gcpCon***REMOVED***g map[string]string) (oauth2.TokenSource, error) {
+func tokenSource(isCmd bool, gcpConfig map[string]string) (oauth2.TokenSource, error) {
 	// Command-based token source
 	if isCmd {
-		cmd := gcpCon***REMOVED***g["cmd-path"]
+		cmd := gcpConfig["cmd-path"]
 		if len(cmd) == 0 {
 			return nil, fmt.Errorf("missing access token cmd")
 		}
-		if gcpCon***REMOVED***g["scopes"] != "" {
+		if gcpConfig["scopes"] != "" {
 			return nil, fmt.Errorf("scopes can only be used when kubectl is using a gcp service account key")
 		}
 		var args []string
-		if cmdArgs, ok := gcpCon***REMOVED***g["cmd-args"]; ok {
+		if cmdArgs, ok := gcpConfig["cmd-args"]; ok {
 			args = strings.Fields(cmdArgs)
-		} ***REMOVED*** {
-			***REMOVED***elds := strings.Fields(cmd)
-			cmd = ***REMOVED***elds[0]
-			args = ***REMOVED***elds[1:]
+		} else {
+			fields := strings.Fields(cmd)
+			cmd = fields[0]
+			args = fields[1:]
 		}
-		return newCmdTokenSource(cmd, args, gcpCon***REMOVED***g["token-key"], gcpCon***REMOVED***g["expiry-key"], gcpCon***REMOVED***g["time-fmt"]), nil
+		return newCmdTokenSource(cmd, args, gcpConfig["token-key"], gcpConfig["expiry-key"], gcpConfig["time-fmt"]), nil
 	}
 
 	// Google Application Credentials-based token source
-	scopes := parseScopes(gcpCon***REMOVED***g)
+	scopes := parseScopes(gcpConfig)
 	ts, err := google.DefaultTokenSource(context.Background(), scopes...)
 	if err != nil {
 		return nil, fmt.Errorf("cannot construct google default token source: %v", err)
@@ -161,23 +161,23 @@ func tokenSource(isCmd bool, gcpCon***REMOVED***g map[string]string) (oauth2.Tok
 }
 
 // parseScopes constructs a list of scopes that should be included in token source
-// from the con***REMOVED***g map.
-func parseScopes(gcpCon***REMOVED***g map[string]string) []string {
-	scopes, ok := gcpCon***REMOVED***g["scopes"]
+// from the config map.
+func parseScopes(gcpConfig map[string]string) []string {
+	scopes, ok := gcpConfig["scopes"]
 	if !ok {
 		return defaultScopes
 	}
 	if scopes == "" {
 		return []string{}
 	}
-	return strings.Split(gcpCon***REMOVED***g["scopes"], ",")
+	return strings.Split(gcpConfig["scopes"], ",")
 }
 
 func (g *gcpAuthProvider) WrapTransport(rt http.RoundTripper) http.RoundTripper {
 	var resetCache map[string]string
 	if cts, ok := g.tokenSource.(*cachedTokenSource); ok {
 		resetCache = cts.baseCache()
-	} ***REMOVED*** {
+	} else {
 		resetCache = make(map[string]string)
 	}
 	return &conditionalTransport{&oauth2.Transport{Source: g.tokenSource, Base: rt}, g.persister, resetCache}
@@ -190,11 +190,11 @@ type cachedTokenSource struct {
 	source      oauth2.TokenSource
 	accessToken string
 	expiry      time.Time
-	persister   restclient.AuthProviderCon***REMOVED***gPersister
+	persister   restclient.AuthProviderConfigPersister
 	cache       map[string]string
 }
 
-func newCachedTokenSource(accessToken, expiry string, persister restclient.AuthProviderCon***REMOVED***gPersister, ts oauth2.TokenSource, cache map[string]string) (*cachedTokenSource, error) {
+func newCachedTokenSource(accessToken, expiry string, persister restclient.AuthProviderConfigPersister, ts oauth2.TokenSource, cache map[string]string) (*cachedTokenSource, error) {
 	var expiryTime time.Time
 	if parsedTime, err := time.Parse(time.RFC3339Nano, expiry); err == nil {
 		expiryTime = parsedTime
@@ -253,7 +253,7 @@ func (t *cachedTokenSource) update(tok *oauth2.Token) map[string]string {
 	return ret
 }
 
-// baseCache is the base con***REMOVED***guration value for this TokenSource, without any cached ephemeral tokens.
+// baseCache is the base configuration value for this TokenSource, without any cached ephemeral tokens.
 func (t *cachedTokenSource) baseCache() map[string]string {
 	t.lk.Lock()
 	defer t.lk.Unlock()
@@ -330,7 +330,7 @@ func (c *commandTokenSource) parseTokenCmdOutput(output []byte) (*oauth2.Token, 
 	var expiry time.Time
 	if t, err := time.Parse(c.timeFmt, expiryStr); err != nil {
 		klog.V(4).Infof("Failed to parse token expiry from %s (fmt=%s): %v", expiryStr, c.timeFmt, err)
-	} ***REMOVED*** {
+	} else {
 		expiry = t
 	}
 
@@ -355,7 +355,7 @@ func parseJSONPath(input interface{}, name, template string) (string, error) {
 
 type conditionalTransport struct {
 	oauthTransport *oauth2.Transport
-	persister      restclient.AuthProviderCon***REMOVED***gPersister
+	persister      restclient.AuthProviderConfigPersister
 	resetCache     map[string]string
 }
 

@@ -15,7 +15,7 @@ func (op *Reporting) runReportQueryWorker() {
 	logger.Infof("ReportQuery worker started")
 	// 10 requeues compared to the 5 others have because
 	// ReportQueries can reference a lot of other resources, and it may
-	// take time for them to all to ***REMOVED***nish setup
+	// take time for them to all to finish setup
 	const maxRequeues = 10
 	for op.processResource(logger, op.syncReportQuery, "ReportQuery", op.reportQueryQueue, maxRequeues) {
 	}

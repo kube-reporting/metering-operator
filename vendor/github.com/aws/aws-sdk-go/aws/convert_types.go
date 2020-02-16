@@ -861,8 +861,8 @@ func MillisecondsTimeValue(v *int64) time.Time {
 }
 
 // TimeUnixMilli returns a Unix timestamp in milliseconds from "January 1, 1970 UTC".
-// The result is unde***REMOVED***ned if the Unix time cannot be represented by an int64.
-// Which includes calling TimeUnixMilli on a zero Time is unde***REMOVED***ned.
+// The result is undefined if the Unix time cannot be represented by an int64.
+// Which includes calling TimeUnixMilli on a zero Time is undefined.
 //
 // This utility is useful for service API's such as CloudWatch Logs which require
 // their unix time values to be in milliseconds.

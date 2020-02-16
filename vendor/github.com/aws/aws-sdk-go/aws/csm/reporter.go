@@ -52,7 +52,7 @@ func (rep *Reporter) sendAPICallAttemptMetric(r *request.Request) {
 	}
 
 	now := time.Now()
-	creds, _ := r.Con***REMOVED***g.Credentials.Get()
+	creds, _ := r.Config.Credentials.Get()
 
 	m := metric{
 		ClientID:  aws.String(rep.clientID),
@@ -60,7 +60,7 @@ func (rep *Reporter) sendAPICallAttemptMetric(r *request.Request) {
 		Service:   aws.String(r.ClientInfo.ServiceID),
 		Timestamp: (*metricTime)(&now),
 		UserAgent: aws.String(r.HTTPRequest.Header.Get("User-Agent")),
-		Region:    r.Con***REMOVED***g.Region,
+		Region:    r.Config.Region,
 		Type:      aws.String("ApiCallAttempt"),
 		Version:   aws.Int(1),
 
@@ -116,7 +116,7 @@ func (rep *Reporter) sendAPICallMetric(r *request.Request) {
 		UserAgent:          aws.String(r.HTTPRequest.Header.Get("User-Agent")),
 		Type:               aws.String("ApiCall"),
 		AttemptCount:       aws.Int(r.RetryCount + 1),
-		Region:             r.Con***REMOVED***g.Region,
+		Region:             r.Config.Region,
 		Latency:            aws.Int(int(time.Since(r.Time) / time.Millisecond)),
 		XAmzRequestID:      aws.String(r.RequestID),
 		MaxRetriesExceeded: aws.Int(boolIntValue(r.RetryCount >= r.MaxRetries())),
@@ -134,7 +134,7 @@ func (rep *Reporter) sendAPICallMetric(r *request.Request) {
 
 	m.TruncateFields()
 
-	// TODO: Probably want to ***REMOVED***gure something out for logging dropped
+	// TODO: Probably want to figure something out for logging dropped
 	// metrics
 	rep.metricsCh.Push(m)
 }

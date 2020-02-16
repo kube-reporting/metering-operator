@@ -58,7 +58,7 @@ func NewMux() *Mux {
 // Mux interoperable with the standard library. It uses a sync.Pool to get and
 // reuse routing contexts for each request.
 func (mx *Mux) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	// Ensure the mux has some routes de***REMOVED***ned on the mux
+	// Ensure the mux has some routes defined on the mux
 	if mx.handler == nil {
 		panic("chi: attempting to route to a mux with no handlers.")
 	}
@@ -72,7 +72,7 @@ func (mx *Mux) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 	// Fetch a RouteContext object from the sync pool, and call the computed
 	// mx.handler that is comprised of mx.middlewares + mx.routeHTTP.
-	// Once the request is ***REMOVED***nished, reset the routing context and put it back
+	// Once the request is finished, reset the routing context and put it back
 	// into the pool for reuse from another request.
 	rctx = mx.pool.Get().(*Context)
 	rctx.Reset()
@@ -85,12 +85,12 @@ func (mx *Mux) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 // Use appends a middleware handler to the Mux middleware stack.
 //
 // The middleware stack for any Mux will execute before searching for a matching
-// route to a speci***REMOVED***c handler, which provides opportunity to respond early,
+// route to a specific handler, which provides opportunity to respond early,
 // change the course of the request execution, or set request-scoped values for
 // the next http.Handler.
 func (mx *Mux) Use(middlewares ...func(http.Handler) http.Handler) {
 	if mx.handler != nil {
-		panic("chi: all middlewares must be de***REMOVED***ned before routes on a mux")
+		panic("chi: all middlewares must be defined before routes on a mux")
 	}
 	mx.middlewares = append(mx.middlewares, middlewares...)
 }
@@ -267,15 +267,15 @@ func (mx *Mux) Route(pattern string, fn func(r Router)) Router {
 //
 // Note that Mount() simply sets a wildcard along the `pattern` that will continue
 // routing at the `handler`, which in most cases is another chi.Router. As a result,
-// if you de***REMOVED***ne two Mount() routes on the exact same pattern the mount will panic.
+// if you define two Mount() routes on the exact same pattern the mount will panic.
 func (mx *Mux) Mount(pattern string, handler http.Handler) {
 	// Provide runtime safety for ensuring a pattern isn't mounted on an existing
 	// routing pattern.
-	if mx.tree.***REMOVED***ndPattern(pattern+"*") || mx.tree.***REMOVED***ndPattern(pattern+"/*") {
+	if mx.tree.findPattern(pattern+"*") || mx.tree.findPattern(pattern+"/*") {
 		panic(fmt.Sprintf("chi: attempting to Mount() a handler on an existing path, '%s'", pattern))
 	}
 
-	// Assign sub-Router's with the parent not found & method not allowed handler if not speci***REMOVED***ed.
+	// Assign sub-Router's with the parent not found & method not allowed handler if not specified.
 	subr, ok := handler.(*Mux)
 	if ok && subr.notFoundHandler == nil && mx.notFoundHandler != nil {
 		subr.NotFound(mx.notFoundHandler)
@@ -361,7 +361,7 @@ func (mx *Mux) MethodNotAllowedHandler() http.HandlerFunc {
 }
 
 // buildRouteHandler builds the single mux handler that is a chain of the middleware
-// stack, as de***REMOVED***ned by calls to Use(), and the tree router (Mux) itself. After this
+// stack, as defined by calls to Use(), and the tree router (Mux) itself. After this
 // point, no other middlewares can be registered on this Mux's stack. But you can still
 // compose additional middlewares via Group()'s or using a chained middleware handler.
 func (mx *Mux) buildRouteHandler() {
@@ -375,7 +375,7 @@ func (mx *Mux) handle(method methodTyp, pattern string, handler http.Handler) *n
 		panic(fmt.Sprintf("chi: routing pattern must begin with '/' in '%s'", pattern))
 	}
 
-	// Build the ***REMOVED***nal routing handler for this Mux.
+	// Build the final routing handler for this Mux.
 	if !mx.inline && mx.handler == nil {
 		mx.buildRouteHandler()
 	}
@@ -385,7 +385,7 @@ func (mx *Mux) handle(method methodTyp, pattern string, handler http.Handler) *n
 	if mx.inline {
 		mx.handler = http.HandlerFunc(mx.routeHTTP)
 		h = Chain(mx.middlewares...).Handler(handler)
-	} ***REMOVED*** {
+	} else {
 		h = handler
 	}
 
@@ -404,7 +404,7 @@ func (mx *Mux) routeHTTP(w http.ResponseWriter, r *http.Request) {
 	if routePath == "" {
 		if r.URL.RawPath != "" {
 			routePath = r.URL.RawPath
-		} ***REMOVED*** {
+		} else {
 			routePath = r.URL.Path
 		}
 	}
@@ -426,7 +426,7 @@ func (mx *Mux) routeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 	if rctx.methodNotAllowed {
 		mx.MethodNotAllowedHandler().ServeHTTP(w, r)
-	} ***REMOVED*** {
+	} else {
 		mx.NotFoundHandler().ServeHTTP(w, r)
 	}
 }

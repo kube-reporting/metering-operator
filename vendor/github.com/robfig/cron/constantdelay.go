@@ -10,7 +10,7 @@ type ConstantDelaySchedule struct {
 
 // Every returns a crontab Schedule that activates once every duration.
 // Delays of less than a second are not supported (will round up to 1 second).
-// Any ***REMOVED***elds less than a Second are truncated.
+// Any fields less than a Second are truncated.
 func Every(duration time.Duration) ConstantDelaySchedule {
 	if duration < time.Second {
 		duration = time.Second

@@ -3,7 +3,7 @@ package autorest
 // Copyright 2017 Microsoft Corporation
 //
 //  Licensed under the Apache License, Version 2.0 (the "License");
-//  you may not use this ***REMOVED***le except in compliance with the License.
+//  you may not use this file except in compliance with the License.
 //  You may obtain a copy of the License at
 //
 //      http://www.apache.org/licenses/LICENSE-2.0
@@ -11,7 +11,7 @@ package autorest
 //  Unless required by applicable law or agreed to in writing, software
 //  distributed under the License is distributed on an "AS IS" BASIS,
 //  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-//  See the License for the speci***REMOVED***c language governing permissions and
+//  See the License for the specific language governing permissions and
 //  limitations under the License.
 
 import (
@@ -31,7 +31,7 @@ import (
 // used as a key type in context.WithValue()
 type ctxSendDecorators struct{}
 
-// WithSendDecorators adds the speci***REMOVED***ed SendDecorators to the provided context.
+// WithSendDecorators adds the specified SendDecorators to the provided context.
 // If no SendDecorators are provided the context is unchanged.
 func WithSendDecorators(ctx context.Context, sendDecorator []SendDecorator) context.Context {
 	if len(sendDecorator) == 0 {
@@ -65,7 +65,7 @@ func (sf SenderFunc) Do(r *http.Request) (*http.Response, error) {
 }
 
 // SendDecorator takes and possibly decorates, by wrapping, a Sender. Decorators may affect the
-// http.Request and pass it along or, ***REMOVED***rst, pass the http.Request along then react to the
+// http.Request and pass it along or, first, pass the http.Request along then react to the
 // http.Response result.
 type SendDecorator func(Sender) Sender
 
@@ -116,7 +116,7 @@ func sender(renengotiation tls.RenegotiationSupport) Sender {
 		IdleConnTimeout:       defaultTransport.IdleConnTimeout,
 		TLSHandshakeTimeout:   defaultTransport.TLSHandshakeTimeout,
 		ExpectContinueTimeout: defaultTransport.ExpectContinueTimeout,
-		TLSClientCon***REMOVED***g: &tls.Con***REMOVED***g{
+		TLSClientConfig: &tls.Config{
 			MinVersion:    tls.VersionTLS12,
 			Renegotiation: renengotiation,
 		},
@@ -152,7 +152,7 @@ func AsIs() SendDecorator {
 	}
 }
 
-// DoCloseIfError returns a SendDecorator that ***REMOVED***rst invokes the passed Sender after which
+// DoCloseIfError returns a SendDecorator that first invokes the passed Sender after which
 // it closes the response if the passed Sender returns an error and the response body exists.
 func DoCloseIfError() SendDecorator {
 	return func(s Sender) Sender {
@@ -167,7 +167,7 @@ func DoCloseIfError() SendDecorator {
 }
 
 // DoErrorIfStatusCode returns a SendDecorator that emits an error if the response StatusCode is
-// among the set passed. Since these are arti***REMOVED***cial errors, the response body may still require
+// among the set passed. Since these are artificial errors, the response body may still require
 // closing.
 func DoErrorIfStatusCode(codes ...int) SendDecorator {
 	return func(s Sender) Sender {
@@ -185,7 +185,7 @@ func DoErrorIfStatusCode(codes ...int) SendDecorator {
 }
 
 // DoErrorUnlessStatusCode returns a SendDecorator that emits an error unless the response
-// StatusCode is among the set passed. Since these are arti***REMOVED***cial errors, the response body
+// StatusCode is among the set passed. Since these are artificial errors, the response body
 // may still require closing.
 func DoErrorUnlessStatusCode(codes ...int) SendDecorator {
 	return func(s Sender) Sender {
@@ -205,7 +205,7 @@ func DoErrorUnlessStatusCode(codes ...int) SendDecorator {
 // DoPollForStatusCodes returns a SendDecorator that polls if the http.Response contains one of the
 // passed status codes. It expects the http.Response to contain a Location header providing the
 // URL at which to poll (using GET) and will poll until the time passed is equal to or greater than
-// the supplied duration. It will delay between requests for the duration speci***REMOVED***ed in the
+// the supplied duration. It will delay between requests for the duration specified in the
 // RetryAfter header or, if the header is absent, the passed delay. Polling may be canceled by
 // closing the optional channel on the http.Request.
 func DoPollForStatusCodes(duration time.Duration, delay time.Duration, codes ...int) SendDecorator {
@@ -230,7 +230,7 @@ func DoPollForStatusCodes(duration time.Duration, delay time.Duration, codes ...
 	}
 }
 
-// DoRetryForAttempts returns a SendDecorator that retries a failed request for up to the speci***REMOVED***ed
+// DoRetryForAttempts returns a SendDecorator that retries a failed request for up to the specified
 // number of attempts, exponentially backing off between requests using the supplied backoff
 // time.Duration (which may be zero). Retrying may be canceled by closing the optional channel on
 // the http.Request.
@@ -256,7 +256,7 @@ func DoRetryForAttempts(attempts int, backoff time.Duration) SendDecorator {
 	}
 }
 
-// DoRetryForStatusCodes returns a SendDecorator that retries for speci***REMOVED***ed statusCodes for up to the speci***REMOVED***ed
+// DoRetryForStatusCodes returns a SendDecorator that retries for specified statusCodes for up to the specified
 // number of attempts, exponentially backing off between requests using the supplied backoff
 // time.Duration (which may be zero). Retrying may be canceled by cancelling the context on the http.Request.
 // NOTE: Code http.StatusTooManyRequests (429) will *not* be counted against the number of attempts.
@@ -268,8 +268,8 @@ func DoRetryForStatusCodes(attempts int, backoff time.Duration, codes ...int) Se
 	}
 }
 
-// DoRetryForStatusCodesWithCap returns a SendDecorator that retries for speci***REMOVED***ed statusCodes for up to the
-// speci***REMOVED***ed number of attempts, exponentially backing off between requests using the supplied backoff
+// DoRetryForStatusCodesWithCap returns a SendDecorator that retries for specified statusCodes for up to the
+// specified number of attempts, exponentially backing off between requests using the supplied backoff
 // time.Duration (which may be zero). To cap the maximum possible delay between iterations specify a value greater
 // than zero for cap. Retrying may be canceled by cancelling the context on the http.Request.
 func DoRetryForStatusCodesWithCap(attempts int, backoff, cap time.Duration, codes ...int) SendDecorator {
@@ -282,7 +282,7 @@ func DoRetryForStatusCodesWithCap(attempts int, backoff, cap time.Duration, code
 
 func doRetryForStatusCodesImpl(s Sender, r *http.Request, count429 bool, attempts int, backoff, cap time.Duration, codes ...int) (resp *http.Response, err error) {
 	rr := NewRetriableRequest(r)
-	// Increment to add the ***REMOVED***rst call (attempts denotes number of retries)
+	// Increment to add the first call (attempts denotes number of retries)
 	for attempt := 0; attempt < attempts+1; {
 		err = rr.Prepare()
 		if err != nil {
@@ -311,9 +311,9 @@ func doRetryForStatusCodesImpl(s Sender, r *http.Request, count429 bool, attempt
 	return resp, err
 }
 
-// DelayWithRetryAfter invokes time.After for the duration speci***REMOVED***ed in the "Retry-After" header.
+// DelayWithRetryAfter invokes time.After for the duration specified in the "Retry-After" header.
 // The value of Retry-After can be either the number of seconds or a date in RFC1123 format.
-// The function returns true after successfully waiting for the speci***REMOVED***ed duration.  If there is
+// The function returns true after successfully waiting for the specified duration.  If there is
 // no Retry-After header or the wait is cancelled the return value is false.
 func DelayWithRetryAfter(resp *http.Response, cancel <-chan struct{}) bool {
 	if resp == nil {
@@ -323,7 +323,7 @@ func DelayWithRetryAfter(resp *http.Response, cancel <-chan struct{}) bool {
 	ra := resp.Header.Get("Retry-After")
 	if retryAfter, _ := strconv.Atoi(ra); retryAfter > 0 {
 		dur = time.Duration(retryAfter) * time.Second
-	} ***REMOVED*** if t, err := time.Parse(time.RFC1123, ra); err == nil {
+	} else if t, err := time.Parse(time.RFC1123, ra); err == nil {
 		dur = t.Sub(time.Now())
 	}
 	if dur > 0 {
@@ -338,7 +338,7 @@ func DelayWithRetryAfter(resp *http.Response, cancel <-chan struct{}) bool {
 }
 
 // DoRetryForDuration returns a SendDecorator that retries the request until the total time is equal
-// to or greater than the speci***REMOVED***ed duration, exponentially backing off between requests using the
+// to or greater than the specified duration, exponentially backing off between requests using the
 // supplied backoff time.Duration (which may be zero). Retrying may be canceled by closing the
 // optional channel on the http.Request.
 func DoRetryForDuration(d time.Duration, backoff time.Duration) SendDecorator {
@@ -373,7 +373,7 @@ func WithLogging(logger *log.Logger) SendDecorator {
 			resp, err := s.Do(r)
 			if err != nil {
 				logger.Printf("%s %s received error '%v'", r.Method, r.URL, err)
-			} ***REMOVED*** {
+			} else {
 				logger.Printf("%s %s received %s", r.Method, r.URL, resp.Status)
 			}
 			return resp, err

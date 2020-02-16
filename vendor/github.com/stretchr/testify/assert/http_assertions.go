@@ -21,7 +21,7 @@ func httpCode(handler http.HandlerFunc, method, url string, values url.Values) (
 	return w.Code, nil
 }
 
-// HTTPSuccess asserts that a speci***REMOVED***ed handler returns a success status code.
+// HTTPSuccess asserts that a specified handler returns a success status code.
 //
 //  assert.HTTPSuccess(t, myHandler, "POST", "http://www.google.com", nil)
 //
@@ -44,7 +44,7 @@ func HTTPSuccess(t TestingT, handler http.HandlerFunc, method, url string, value
 	return isSuccessCode
 }
 
-// HTTPRedirect asserts that a speci***REMOVED***ed handler returns a redirect status code.
+// HTTPRedirect asserts that a specified handler returns a redirect status code.
 //
 //  assert.HTTPRedirect(t, myHandler, "GET", "/a/b/c", url.Values{"a": []string{"b", "c"}}
 //
@@ -67,7 +67,7 @@ func HTTPRedirect(t TestingT, handler http.HandlerFunc, method, url string, valu
 	return isRedirectCode
 }
 
-// HTTPError asserts that a speci***REMOVED***ed handler returns an error status code.
+// HTTPError asserts that a specified handler returns an error status code.
 //
 //  assert.HTTPError(t, myHandler, "POST", "/a/b/c", url.Values{"a": []string{"b", "c"}}
 //
@@ -102,7 +102,7 @@ func HTTPBody(handler http.HandlerFunc, method, url string, values url.Values) s
 	return w.Body.String()
 }
 
-// HTTPBodyContains asserts that a speci***REMOVED***ed handler returns a
+// HTTPBodyContains asserts that a specified handler returns a
 // body that contains a string.
 //
 //  assert.HTTPBodyContains(t, myHandler, "GET", "www.google.com", nil, "I'm Feeling Lucky")
@@ -122,7 +122,7 @@ func HTTPBodyContains(t TestingT, handler http.HandlerFunc, method, url string, 
 	return contains
 }
 
-// HTTPBodyNotContains asserts that a speci***REMOVED***ed handler returns a
+// HTTPBodyNotContains asserts that a specified handler returns a
 // body that does not contain a string.
 //
 //  assert.HTTPBodyNotContains(t, myHandler, "GET", "www.google.com", nil, "I'm Feeling Lucky")

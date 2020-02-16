@@ -2,7 +2,7 @@
 Copyright 2016 The Kubernetes Authors.
 
 Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this ***REMOVED***le except in compliance with the License.
+you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
 
     http://www.apache.org/licenses/LICENSE-2.0
@@ -10,7 +10,7 @@ You may obtain a copy of the License at
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the speci***REMOVED***c language governing permissions and
+See the License for the specific language governing permissions and
 limitations under the License.
 */
 
@@ -38,8 +38,8 @@ const (
 	cfgIssuerUrl                = "idp-issuer-url"
 	cfgClientID                 = "client-id"
 	cfgClientSecret             = "client-secret"
-	cfgCerti***REMOVED***cateAuthority     = "idp-certi***REMOVED***cate-authority"
-	cfgCerti***REMOVED***cateAuthorityData = "idp-certi***REMOVED***cate-authority-data"
+	cfgCertificateAuthority     = "idp-certificate-authority"
+	cfgCertificateAuthorityData = "idp-certificate-authority-data"
 	cfgIDToken                  = "id-token"
 	cfgRefreshToken             = "refresh-token"
 
@@ -98,7 +98,7 @@ func (c *clientCache) setClient(issuer, clientID string, client *oidcAuthProvide
 	// If another client has already initialized a client for the given provider we want
 	// to use that client instead of the one we're trying to set. This is so all transports
 	// share a client and can coordinate around the same mutex when refreshing and writing
-	// to the kubecon***REMOVED***g.
+	// to the kubeconfig.
 	if oldClient, ok := c.cache[key]; ok {
 		return oldClient
 	}
@@ -107,7 +107,7 @@ func (c *clientCache) setClient(issuer, clientID string, client *oidcAuthProvide
 	return client
 }
 
-func newOIDCAuthProvider(_ string, cfg map[string]string, persister restclient.AuthProviderCon***REMOVED***gPersister) (restclient.AuthProvider, error) {
+func newOIDCAuthProvider(_ string, cfg map[string]string, persister restclient.AuthProviderConfigPersister) (restclient.AuthProvider, error) {
 	issuer := cfg[cfgIssuerUrl]
 	if issuer == "" {
 		return nil, fmt.Errorf("Must provide %s", cfgIssuerUrl)
@@ -124,27 +124,27 @@ func newOIDCAuthProvider(_ string, cfg map[string]string, persister restclient.A
 	}
 
 	if len(cfg[cfgExtraScopes]) > 0 {
-		klog.V(2).Infof("%s auth provider ***REMOVED***eld depricated, refresh request don't send scopes",
+		klog.V(2).Infof("%s auth provider field depricated, refresh request don't send scopes",
 			cfgExtraScopes)
 	}
 
 	var certAuthData []byte
 	var err error
-	if cfg[cfgCerti***REMOVED***cateAuthorityData] != "" {
-		certAuthData, err = base64.StdEncoding.DecodeString(cfg[cfgCerti***REMOVED***cateAuthorityData])
+	if cfg[cfgCertificateAuthorityData] != "" {
+		certAuthData, err = base64.StdEncoding.DecodeString(cfg[cfgCertificateAuthorityData])
 		if err != nil {
 			return nil, err
 		}
 	}
 
-	clientCon***REMOVED***g := restclient.Con***REMOVED***g{
-		TLSClientCon***REMOVED***g: restclient.TLSClientCon***REMOVED***g{
-			CAFile: cfg[cfgCerti***REMOVED***cateAuthority],
+	clientConfig := restclient.Config{
+		TLSClientConfig: restclient.TLSClientConfig{
+			CAFile: cfg[cfgCertificateAuthority],
 			CAData: certAuthData,
 		},
 	}
 
-	trans, err := restclient.TransportFor(&clientCon***REMOVED***g)
+	trans, err := restclient.TransportFor(&clientConfig)
 	if err != nil {
 		return nil, err
 	}
@@ -166,12 +166,12 @@ type oidcAuthProvider struct {
 	// Method for determining the current time.
 	now func() time.Time
 
-	// Mutex guards persisting to the kubecon***REMOVED***g ***REMOVED***le and allows synchronized
-	// updates to the in-memory con***REMOVED***g. It also ensures concurrent calls to
+	// Mutex guards persisting to the kubeconfig file and allows synchronized
+	// updates to the in-memory config. It also ensures concurrent calls to
 	// the RoundTripper only trigger a single refresh request.
 	mu        sync.Mutex
 	cfg       map[string]string
-	persister restclient.AuthProviderCon***REMOVED***gPersister
+	persister restclient.AuthProviderConfigPersister
 }
 
 func (p *oidcAuthProvider) WrapTransport(rt http.RoundTripper) http.RoundTripper {
@@ -244,14 +244,14 @@ func (p *oidcAuthProvider) idToken() (string, error) {
 		return "", err
 	}
 
-	con***REMOVED***g := oauth2.Con***REMOVED***g{
+	config := oauth2.Config{
 		ClientID:     p.cfg[cfgClientID],
 		ClientSecret: p.cfg[cfgClientSecret],
 		Endpoint:     oauth2.Endpoint{TokenURL: tokenURL},
 	}
 
 	ctx := context.WithValue(context.Background(), oauth2.HTTPClient, p.client)
-	token, err := con***REMOVED***g.TokenSource(ctx, &oauth2.Token{RefreshToken: rt}).Token()
+	token, err := config.TokenSource(ctx, &oauth2.Token{RefreshToken: rt}).Token()
 	if err != nil {
 		return "", fmt.Errorf("failed to refresh token: %v", err)
 	}
@@ -265,7 +265,7 @@ func (p *oidcAuthProvider) idToken() (string, error) {
 		return "", fmt.Errorf("token response did not contain an id_token, either the scope \"openid\" wasn't requested upon login, or the provider doesn't support id_tokens as part of the refresh response.")
 	}
 
-	// Create a new con***REMOVED***g to persist.
+	// Create a new config to persist.
 	newCfg := make(map[string]string)
 	for key, val := range p.cfg {
 		newCfg[key] = val
@@ -277,7 +277,7 @@ func (p *oidcAuthProvider) idToken() (string, error) {
 	}
 	newCfg[cfgIDToken] = idToken
 
-	// Persist new con***REMOVED***g and if successful, update the in memory con***REMOVED***g.
+	// Persist new config and if successful, update the in memory config.
 	if err = p.persister.Persist(newCfg); err != nil {
 		return "", fmt.Errorf("could not persist new tokens: %v", err)
 	}
@@ -292,8 +292,8 @@ func (p *oidcAuthProvider) idToken() (string, error) {
 func tokenEndpoint(client *http.Client, issuer string) (string, error) {
 	// Well known URL for getting OpenID Connect metadata.
 	//
-	// https://openid.net/specs/openid-connect-discovery-1_0.html#ProviderCon***REMOVED***g
-	wellKnown := strings.TrimSuf***REMOVED***x(issuer, "/") + "/.well-known/openid-con***REMOVED***guration"
+	// https://openid.net/specs/openid-connect-discovery-1_0.html#ProviderConfig
+	wellKnown := strings.TrimSuffix(issuer, "/") + "/.well-known/openid-configuration"
 	resp, err := client.Get(wellKnown)
 	if err != nil {
 		return "", err
@@ -363,7 +363,7 @@ func (j *jsonTime) UnmarshalJSON(b []byte) error {
 
 	if t, err := n.Int64(); err == nil {
 		unix = t
-	} ***REMOVED*** {
+	} else {
 		f, err := n.Float64()
 		if err != nil {
 			return err

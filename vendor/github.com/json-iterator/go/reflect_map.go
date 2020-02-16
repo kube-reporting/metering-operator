@@ -160,7 +160,7 @@ func (decoder *mapDecoder) Decode(ptr unsafe.Pointer, iter *Iterator) {
 	decoder.keyDecoder.Decode(key, iter)
 	c = iter.nextToken()
 	if c != ':' {
-		iter.ReportError("ReadMapCB", "expect : after object ***REMOVED***eld, but found "+string([]byte{c}))
+		iter.ReportError("ReadMapCB", "expect : after object field, but found "+string([]byte{c}))
 		return
 	}
 	elem := decoder.elemType.UnsafeNew()
@@ -171,7 +171,7 @@ func (decoder *mapDecoder) Decode(ptr unsafe.Pointer, iter *Iterator) {
 		decoder.keyDecoder.Decode(key, iter)
 		c = iter.nextToken()
 		if c != ':' {
-			iter.ReportError("ReadMapCB", "expect : after object ***REMOVED***eld, but found "+string([]byte{c}))
+			iter.ReportError("ReadMapCB", "expect : after object field, but found "+string([]byte{c}))
 			return
 		}
 		elem := decoder.elemType.UnsafeNew()
@@ -247,7 +247,7 @@ func (encoder *mapEncoder) Encode(ptr unsafe.Pointer, stream *Stream) {
 		encoder.keyEncoder.Encode(key, stream)
 		if stream.indention > 0 {
 			stream.writeTwoBytes(byte(':'), byte(' '))
-		} ***REMOVED*** {
+		} else {
 			stream.writeByte(':')
 		}
 		encoder.elemEncoder.Encode(elem, stream)
@@ -288,7 +288,7 @@ func (encoder *sortKeysMapEncoder) Encode(ptr unsafe.Pointer, stream *Stream) {
 		decodedKey := subIter.ReadString()
 		if stream.indention > 0 {
 			subStream.writeTwoBytes(byte(':'), byte(' '))
-		} ***REMOVED*** {
+		} else {
 			subStream.writeByte(':')
 		}
 		encoder.elemEncoder.Encode(elem, subStream)

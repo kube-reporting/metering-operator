@@ -1,6 +1,6 @@
 // Copyright 2011 The Go Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE ***REMOVED***le.
+// license that can be found in the LICENSE file.
 
 package norm
 
@@ -46,7 +46,7 @@ func (t *sparseBlocks) lookup(n uint32, b byte) uint16 {
 		}
 		if b < r.lo {
 			hi = m
-		} ***REMOVED*** {
+		} else {
 			lo = m + 1
 		}
 	}

@@ -33,7 +33,7 @@ func (c *FakeReportDataSources) Get(name string, options v1.GetOptions) (result 
 	return obj.(*meteringv1.ReportDataSource), err
 }
 
-// List takes label and ***REMOVED***eld selectors, and returns the list of ReportDataSources that match those selectors.
+// List takes label and field selectors, and returns the list of ReportDataSources that match those selectors.
 func (c *FakeReportDataSources) List(opts v1.ListOptions) (result *meteringv1.ReportDataSourceList, err error) {
 	obj, err := c.Fake.
 		Invokes(testing.NewListAction(reportdatasourcesResource, reportdatasourcesKind, c.ns, opts), &meteringv1.ReportDataSourceList{})

@@ -15,15 +15,15 @@ type Unmarshaler interface {
 	UnmarshalEvent(protocol.PayloadUnmarshaler, eventstream.Message) error
 }
 
-// EventStream headers with speci***REMOVED***c meaning to async API functionality.
+// EventStream headers with specific meaning to async API functionality.
 const (
-	MessageTypeHeader    = `:message-type` // Identi***REMOVED***es type of message.
+	MessageTypeHeader    = `:message-type` // Identifies type of message.
 	EventMessageType     = `event`
 	ErrorMessageType     = `error`
 	ExceptionMessageType = `exception`
 
 	// Message Events
-	EventTypeHeader = `:event-type` // Identi***REMOVED***es message event type e.g. "Stats".
+	EventTypeHeader = `:event-type` // Identifies message event type e.g. "Stats".
 
 	// Message Error
 	ErrorCodeHeader    = `:error-code`
@@ -61,7 +61,7 @@ func NewEventReader(
 }
 
 // UseLogger instructs the EventReader to use the logger and log level
-// speci***REMOVED***ed.
+// specified.
 func (r *EventReader) UseLogger(logger aws.Logger, logLevel aws.LogLevelType) {
 	if logger != nil && logLevel.Matches(aws.LogDebugWithEventStreamBody) {
 		r.decoder.UseLogger(logger)
@@ -71,7 +71,7 @@ func (r *EventReader) UseLogger(logger aws.Logger, logLevel aws.LogLevelType) {
 // ReadEvent attempts to read a message from the EventStream and return the
 // unmarshaled event value that the message is for.
 //
-// For EventStream API errors check if the returned error satis***REMOVED***es the
+// For EventStream API errors check if the returned error satisfies the
 // awserr.Error interface to get the error's Code and Message components.
 //
 // EventUnmarshalers called with EventStream messages must take copies of the

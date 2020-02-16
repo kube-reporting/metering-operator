@@ -31,26 +31,26 @@ var initRequest func(*request.Request)
 const (
 	ServiceName = "sts"       // Name of service.
 	EndpointsID = ServiceName // ID to lookup a service endpoint with.
-	ServiceID   = "STS"       // ServiceID is a unique identifer of a speci***REMOVED***c service.
+	ServiceID   = "STS"       // ServiceID is a unique identifer of a specific service.
 )
 
 // New creates a new instance of the STS client with a session.
-// If additional con***REMOVED***guration is needed for the client instance use the optional
-// aws.Con***REMOVED***g parameter to add your extra con***REMOVED***g.
+// If additional configuration is needed for the client instance use the optional
+// aws.Config parameter to add your extra config.
 //
 // Example:
 //     // Create a STS client from just a session.
 //     svc := sts.New(mySession)
 //
-//     // Create a STS client with additional con***REMOVED***guration
-//     svc := sts.New(mySession, aws.NewCon***REMOVED***g().WithRegion("us-west-2"))
-func New(p client.Con***REMOVED***gProvider, cfgs ...*aws.Con***REMOVED***g) *STS {
-	c := p.ClientCon***REMOVED***g(EndpointsID, cfgs...)
-	return newClient(*c.Con***REMOVED***g, c.Handlers, c.Endpoint, c.SigningRegion, c.SigningName)
+//     // Create a STS client with additional configuration
+//     svc := sts.New(mySession, aws.NewConfig().WithRegion("us-west-2"))
+func New(p client.ConfigProvider, cfgs ...*aws.Config) *STS {
+	c := p.ClientConfig(EndpointsID, cfgs...)
+	return newClient(*c.Config, c.Handlers, c.Endpoint, c.SigningRegion, c.SigningName)
 }
 
 // newClient creates, initializes and returns a new service client instance.
-func newClient(cfg aws.Con***REMOVED***g, handlers request.Handlers, endpoint, signingRegion, signingName string) *STS {
+func newClient(cfg aws.Config, handlers request.Handlers, endpoint, signingRegion, signingName string) *STS {
 	svc := &STS{
 		Client: client.New(
 			cfg,

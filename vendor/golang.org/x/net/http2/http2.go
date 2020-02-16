@@ -1,13 +1,13 @@
 // Copyright 2014 The Go Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE ***REMOVED***le.
+// license that can be found in the LICENSE file.
 
 // Package http2 implements the HTTP/2 protocol.
 //
 // This package is low-level and intended to be used directly by very
 // few people. Most users will use it indirectly through the automatic
 // use by the net/http package (from Go 1.6 and later).
-// For use in earlier Go versions see Con***REMOVED***gureServer. (Transport support
+// For use in earlier Go versions see ConfigureServer. (Transport support
 // requires Go 1.6 or later)
 //
 // See https://http2.github.io/ for more information on HTTP/2.
@@ -17,7 +17,7 @@
 package http2 // import "golang.org/x/net/http2"
 
 import (
-	"bu***REMOVED***o"
+	"bufio"
 	"crypto/tls"
 	"errors"
 	"fmt"
@@ -126,7 +126,7 @@ func (s Setting) String() string {
 
 // Valid reports whether the setting is valid.
 func (s Setting) Valid() error {
-	// Limits and error codes from 6.5.2 De***REMOVED***ned SETTINGS Parameters
+	// Limits and error codes from 6.5.2 Defined SETTINGS Parameters
 	switch s.ID {
 	case SettingEnablePush:
 		if s.Val != 1 && s.Val != 0 {
@@ -144,7 +144,7 @@ func (s Setting) Valid() error {
 	return nil
 }
 
-// A SettingID is an HTTP/2 setting as de***REMOVED***ned in
+// A SettingID is an HTTP/2 setting as defined in
 // http://http2.github.io/http2-spec/#iana-settings
 type SettingID uint16
 
@@ -174,17 +174,17 @@ func (s SettingID) String() string {
 }
 
 var (
-	errInvalidHeaderFieldName  = errors.New("http2: invalid header ***REMOVED***eld name")
-	errInvalidHeaderFieldValue = errors.New("http2: invalid header ***REMOVED***eld value")
+	errInvalidHeaderFieldName  = errors.New("http2: invalid header field name")
+	errInvalidHeaderFieldValue = errors.New("http2: invalid header field value")
 )
 
-// validWireHeaderFieldName reports whether v is a valid header ***REMOVED***eld
+// validWireHeaderFieldName reports whether v is a valid header field
 // name (key). See httplex.ValidHeaderName for the base rules.
 //
 // Further, http2 says:
-//   "Just as in HTTP/1.x, header ***REMOVED***eld names are strings of ASCII
+//   "Just as in HTTP/1.x, header field names are strings of ASCII
 //   characters that are compared in a case-insensitive
-//   fashion. However, header ***REMOVED***eld names MUST be converted to
+//   fashion. However, header field names MUST be converted to
 //   lowercase prior to their encoding in HTTP/2. "
 func validWireHeaderFieldName(v string) bool {
 	if len(v) == 0 {
@@ -255,14 +255,14 @@ func (cw closeWaiter) Wait() {
 // idle memory usage with many connections.
 type bufferedWriter struct {
 	w  io.Writer     // immutable
-	bw *bu***REMOVED***o.Writer // non-nil when data is buffered
+	bw *bufio.Writer // non-nil when data is buffered
 }
 
 func newBufferedWriter(w io.Writer) *bufferedWriter {
 	return &bufferedWriter{w: w}
 }
 
-// bufWriterPoolBufferSize is the size of bu***REMOVED***o.Writer's
+// bufWriterPoolBufferSize is the size of bufio.Writer's
 // buffers created using bufWriterPool.
 //
 // TODO: pick a less arbitrary value? this is a bit under
@@ -272,7 +272,7 @@ const bufWriterPoolBufferSize = 4 << 10
 
 var bufWriterPool = sync.Pool{
 	New: func() interface{} {
-		return bu***REMOVED***o.NewWriterSize(nil, bufWriterPoolBufferSize)
+		return bufio.NewWriterSize(nil, bufWriterPoolBufferSize)
 	},
 }
 
@@ -285,7 +285,7 @@ func (w *bufferedWriter) Available() int {
 
 func (w *bufferedWriter) Write(p []byte) (n int, err error) {
 	if w.bw == nil {
-		bw := bufWriterPool.Get().(*bu***REMOVED***o.Writer)
+		bw := bufWriterPool.Get().(*bufio.Writer)
 		bw.Reset(w.w)
 		w.bw = bw
 	}

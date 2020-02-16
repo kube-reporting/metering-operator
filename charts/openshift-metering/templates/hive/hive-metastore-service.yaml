@@ -9,9 +9,9 @@ spec:
   ports:
   - name: meta
     port: 9083
-{{- if .Values.hive.spec.metastore.con***REMOVED***g.tls.enabled }}
+{{- if .Values.hive.spec.metastore.config.tls.enabled }}
     targetPort: ghostunnel
-{{- ***REMOVED*** }}
+{{- else }}
     targetPort: meta
 {{- end }}
   - name: metrics
@@ -19,5 +19,5 @@ spec:
   selector:
     app: hive
     hive: metastore
-  sessionAf***REMOVED***nity: None
+  sessionAffinity: None
   type: ClusterIP

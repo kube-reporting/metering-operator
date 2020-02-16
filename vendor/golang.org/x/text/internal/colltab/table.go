@@ -1,6 +1,6 @@
 // Copyright 2012 The Go Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE ***REMOVED***le.
+// license that can be found in the LICENSE file.
 
 package colltab
 
@@ -66,7 +66,7 @@ func (src *source) lookup(t *Table) (ce Elem, sz int) {
 func (src *source) tail(sz int) {
 	if src.bytes == nil {
 		src.str = src.str[sz:]
-	} ***REMOVED*** {
+	} else {
 		src.bytes = src.bytes[sz:]
 	}
 }
@@ -105,10 +105,10 @@ func (t *Table) appendNext(w []Elem, src source) (res []Elem, n int) {
 			r, _ := src.rune()
 			const (
 				hangulSize  = 3
-				***REMOVED***rstHangul = 0xAC00
+				firstHangul = 0xAC00
 				lastHangul  = 0xD7A3
 			)
-			if r >= ***REMOVED***rstHangul && r <= lastHangul {
+			if r >= firstHangul && r <= lastHangul {
 				// TODO: performance can be considerably improved here.
 				n = sz
 				var buf [16]byte // Used for decomposing Hangul.
@@ -121,18 +121,18 @@ func (t *Table) appendNext(w []Elem, src source) (res []Elem, n int) {
 			ce = makeImplicitCE(implicitPrimary(r))
 		}
 		w = append(w, ce)
-	} ***REMOVED*** if tp == ceExpansionIndex {
+	} else if tp == ceExpansionIndex {
 		w = t.appendExpansion(w, ce)
-	} ***REMOVED*** if tp == ceContractionIndex {
+	} else if tp == ceContractionIndex {
 		n := 0
 		src.tail(sz)
 		if src.bytes == nil {
 			w, n = t.matchContractionString(w, ce, src.str)
-		} ***REMOVED*** {
+		} else {
 			w, n = t.matchContraction(w, ce, src.bytes)
 		}
 		sz += n
-	} ***REMOVED*** if tp == ceDecompose {
+	} else if tp == ceDecompose {
 		// Decompose using NFKD and replace tertiary weights.
 		t1, t2 := splitDecompose(ce)
 		i := len(w)
@@ -161,41 +161,41 @@ func (t *Table) appendExpansion(w []Elem, ce Elem) []Elem {
 	return w
 }
 
-func (t *Table) matchContraction(w []Elem, ce Elem, suf***REMOVED***x []byte) ([]Elem, int) {
+func (t *Table) matchContraction(w []Elem, ce Elem, suffix []byte) ([]Elem, int) {
 	index, n, offset := splitContractIndex(ce)
 
-	scan := t.ContractTries.scanner(index, n, suf***REMOVED***x)
+	scan := t.ContractTries.scanner(index, n, suffix)
 	buf := [norm.MaxSegmentSize]byte{}
 	bufp := 0
 	p := scan.scan(0)
 
-	if !scan.done && p < len(suf***REMOVED***x) && suf***REMOVED***x[p] >= utf8.RuneSelf {
-		// By now we should have ***REMOVED***ltered most cases.
+	if !scan.done && p < len(suffix) && suffix[p] >= utf8.RuneSelf {
+		// By now we should have filtered most cases.
 		p0 := p
 		bufn := 0
-		rune := norm.NFD.Properties(suf***REMOVED***x[p:])
+		rune := norm.NFD.Properties(suffix[p:])
 		p += rune.Size()
 		if rune.LeadCCC() != 0 {
 			prevCC := rune.TrailCCC()
 			// A gap may only occur in the last normalization segment.
 			// This also ensures that len(scan.s) < norm.MaxSegmentSize.
-			if end := norm.NFD.FirstBoundary(suf***REMOVED***x[p:]); end != -1 {
-				scan.s = suf***REMOVED***x[:p+end]
+			if end := norm.NFD.FirstBoundary(suffix[p:]); end != -1 {
+				scan.s = suffix[:p+end]
 			}
-			for p < len(suf***REMOVED***x) && !scan.done && suf***REMOVED***x[p] >= utf8.RuneSelf {
-				rune = norm.NFD.Properties(suf***REMOVED***x[p:])
+			for p < len(suffix) && !scan.done && suffix[p] >= utf8.RuneSelf {
+				rune = norm.NFD.Properties(suffix[p:])
 				if ccc := rune.LeadCCC(); ccc == 0 || prevCC >= ccc {
 					break
 				}
 				prevCC = rune.TrailCCC()
 				if pp := scan.scan(p); pp != p {
 					// Copy the interstitial runes for later processing.
-					bufn += copy(buf[bufn:], suf***REMOVED***x[p0:p])
+					bufn += copy(buf[bufn:], suffix[p0:p])
 					if scan.pindex == pp {
 						bufp = bufn
 					}
 					p, p0 = pp, pp
-				} ***REMOVED*** {
+				} else {
 					p += rune.Size()
 				}
 			}
@@ -206,7 +206,7 @@ func (t *Table) matchContraction(w []Elem, ce Elem, suf***REMOVED***x []byte) ([
 	ce = Elem(t.ContractElem[i+offset])
 	if ce.ctype() == ceNormal {
 		w = append(w, ce)
-	} ***REMOVED*** {
+	} else {
 		w = t.appendExpansion(w, ce)
 	}
 	// Append weights for the runes in the segment not part of the contraction.
@@ -216,44 +216,44 @@ func (t *Table) matchContraction(w []Elem, ce Elem, suf***REMOVED***x []byte) ([
 	return w, n
 }
 
-// TODO: unify the two implementations. This is best done after ***REMOVED***rst simplifying
+// TODO: unify the two implementations. This is best done after first simplifying
 // the algorithm taking into account the inclusion of both NFC and NFD forms
 // in the table.
-func (t *Table) matchContractionString(w []Elem, ce Elem, suf***REMOVED***x string) ([]Elem, int) {
+func (t *Table) matchContractionString(w []Elem, ce Elem, suffix string) ([]Elem, int) {
 	index, n, offset := splitContractIndex(ce)
 
-	scan := t.ContractTries.scannerString(index, n, suf***REMOVED***x)
+	scan := t.ContractTries.scannerString(index, n, suffix)
 	buf := [norm.MaxSegmentSize]byte{}
 	bufp := 0
 	p := scan.scan(0)
 
-	if !scan.done && p < len(suf***REMOVED***x) && suf***REMOVED***x[p] >= utf8.RuneSelf {
-		// By now we should have ***REMOVED***ltered most cases.
+	if !scan.done && p < len(suffix) && suffix[p] >= utf8.RuneSelf {
+		// By now we should have filtered most cases.
 		p0 := p
 		bufn := 0
-		rune := norm.NFD.PropertiesString(suf***REMOVED***x[p:])
+		rune := norm.NFD.PropertiesString(suffix[p:])
 		p += rune.Size()
 		if rune.LeadCCC() != 0 {
 			prevCC := rune.TrailCCC()
 			// A gap may only occur in the last normalization segment.
 			// This also ensures that len(scan.s) < norm.MaxSegmentSize.
-			if end := norm.NFD.FirstBoundaryInString(suf***REMOVED***x[p:]); end != -1 {
-				scan.s = suf***REMOVED***x[:p+end]
+			if end := norm.NFD.FirstBoundaryInString(suffix[p:]); end != -1 {
+				scan.s = suffix[:p+end]
 			}
-			for p < len(suf***REMOVED***x) && !scan.done && suf***REMOVED***x[p] >= utf8.RuneSelf {
-				rune = norm.NFD.PropertiesString(suf***REMOVED***x[p:])
+			for p < len(suffix) && !scan.done && suffix[p] >= utf8.RuneSelf {
+				rune = norm.NFD.PropertiesString(suffix[p:])
 				if ccc := rune.LeadCCC(); ccc == 0 || prevCC >= ccc {
 					break
 				}
 				prevCC = rune.TrailCCC()
 				if pp := scan.scan(p); pp != p {
 					// Copy the interstitial runes for later processing.
-					bufn += copy(buf[bufn:], suf***REMOVED***x[p0:p])
+					bufn += copy(buf[bufn:], suffix[p0:p])
 					if scan.pindex == pp {
 						bufp = bufn
 					}
 					p, p0 = pp, pp
-				} ***REMOVED*** {
+				} else {
 					p += rune.Size()
 				}
 			}
@@ -264,7 +264,7 @@ func (t *Table) matchContractionString(w []Elem, ce Elem, suf***REMOVED***x stri
 	ce = Elem(t.ContractElem[i+offset])
 	if ce.ctype() == ceNormal {
 		w = append(w, ce)
-	} ***REMOVED*** {
+	} else {
 		w = t.appendExpansion(w, ce)
 	}
 	// Append weights for the runes in the segment not part of the contraction.

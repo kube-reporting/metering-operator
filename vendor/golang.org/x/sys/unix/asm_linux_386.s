@@ -1,6 +1,6 @@
 // Copyright 2009 The Go Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE ***REMOVED***le.
+// license that can be found in the LICENSE file.
 
 // +build !gccgo
 
@@ -11,8 +11,8 @@
 //
 
 // See ../runtime/sys_linux_386.s for the reason why we always use int 0x80
-// instead of the glibc-speci***REMOVED***c "CALL 0x10(GS)".
-#de***REMOVED***ne INVOKE_SYSCALL	INT	$0x80
+// instead of the glibc-specific "CALL 0x10(GS)".
+#define INVOKE_SYSCALL	INT	$0x80
 
 // Just jump to package syscall's implementation for all these functions.
 // The runtime may know about them.

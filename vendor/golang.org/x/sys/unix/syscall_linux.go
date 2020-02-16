@@ -1,9 +1,9 @@
 // Copyright 2009 The Go Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE ***REMOVED***le.
+// license that can be found in the LICENSE file.
 
 // Linux system calls.
-// This ***REMOVED***le is compiled as ordinary Go code,
+// This file is compiled as ordinary Go code,
 // but it is also input to mksyscall,
 // which parses the //sys lines and generates system call stubs.
 // Note that sometimes we use a lowercase //sys name and
@@ -44,7 +44,7 @@ func Fchmodat(dirfd int, path string, mode uint32, flags int) (err error) {
 	// destination which is not what the user expects.
 	if flags&^AT_SYMLINK_NOFOLLOW != 0 {
 		return EINVAL
-	} ***REMOVED*** if flags&AT_SYMLINK_NOFOLLOW != 0 {
+	} else if flags&AT_SYMLINK_NOFOLLOW != 0 {
 		return EOPNOTSUPP
 	}
 	return fchmodat(dirfd, path, mode)
@@ -53,10 +53,10 @@ func Fchmodat(dirfd int, path string, mode uint32, flags int) (err error) {
 //sys	ioctl(fd int, req uint, arg uintptr) (err error)
 
 // ioctl itself should not be exposed directly, but additional get/set
-// functions for speci***REMOVED***c types are permissible.
+// functions for specific types are permissible.
 
 // IoctlSetInt performs an ioctl operation which sets an integer value
-// on fd, using the speci***REMOVED***ed request number.
+// on fd, using the specified request number.
 func IoctlSetInt(fd int, req uint, value int) error {
 	return ioctl(fd, req, uintptr(value))
 }
@@ -70,7 +70,7 @@ func IoctlSetTermios(fd int, req uint, value *Termios) error {
 }
 
 // IoctlGetInt performs an ioctl operation which gets an integer value
-// from fd, using the speci***REMOVED***ed request number.
+// from fd, using the specified request number.
 func IoctlGetInt(fd int, req uint) (int, error) {
 	var value int
 	err := ioctl(fd, req, uintptr(unsafe.Pointer(&value)))
@@ -352,11 +352,11 @@ func Wait4(pid int, wstatus *WaitStatus, options int, rusage *Rusage) (wpid int,
 	return
 }
 
-func Mk***REMOVED***fo(path string, mode uint32) error {
+func Mkfifo(path string, mode uint32) error {
 	return Mknod(path, mode|S_IFIFO, 0)
 }
 
-func Mk***REMOVED***foat(dirfd int, path string, mode uint32) error {
+func Mkfifoat(dirfd int, path string, mode uint32) error {
 	return Mknodat(dirfd, path, mode|S_IFIFO, 0)
 }
 
@@ -416,7 +416,7 @@ func (sa *SockaddrUnix) sockaddr() (unsafe.Pointer, _Socklen, error) {
 // SockaddrLinklayer implements the Sockaddr interface for AF_PACKET type sockets.
 type SockaddrLinklayer struct {
 	Protocol uint16
-	I***REMOVED***ndex  int
+	Ifindex  int
 	Hatype   uint16
 	Pkttype  uint8
 	Halen    uint8
@@ -425,12 +425,12 @@ type SockaddrLinklayer struct {
 }
 
 func (sa *SockaddrLinklayer) sockaddr() (unsafe.Pointer, _Socklen, error) {
-	if sa.I***REMOVED***ndex < 0 || sa.I***REMOVED***ndex > 0x7fffffff {
+	if sa.Ifindex < 0 || sa.Ifindex > 0x7fffffff {
 		return nil, 0, EINVAL
 	}
 	sa.raw.Family = AF_PACKET
 	sa.raw.Protocol = sa.Protocol
-	sa.raw.I***REMOVED***ndex = int32(sa.I***REMOVED***ndex)
+	sa.raw.Ifindex = int32(sa.Ifindex)
 	sa.raw.Hatype = sa.Hatype
 	sa.raw.Pkttype = sa.Pkttype
 	sa.raw.Halen = sa.Halen
@@ -498,16 +498,16 @@ func (sa *SockaddrL2) sockaddr() (unsafe.Pointer, _Socklen, error) {
 }
 
 // SockaddrCAN implements the Sockaddr interface for AF_CAN type sockets.
-// The RxID and TxID ***REMOVED***elds are used for transport protocol addressing in
+// The RxID and TxID fields are used for transport protocol addressing in
 // (CAN_TP16, CAN_TP20, CAN_MCNET, and CAN_ISOTP), they can be left with
 // zero values for CAN_RAW and CAN_BCM sockets as they have no meaning.
 //
-// The SockaddrCAN struct must be bound to the socket ***REMOVED***le descriptor
+// The SockaddrCAN struct must be bound to the socket file descriptor
 // using Bind before the CAN socket can be used.
 //
 //      // Read one raw CAN frame
 //      fd, _ := Socket(AF_CAN, SOCK_RAW, CAN_RAW)
-//      addr := &SockaddrCAN{I***REMOVED***ndex: index}
+//      addr := &SockaddrCAN{Ifindex: index}
 //      Bind(fd, addr)
 //      frame := make([]byte, 16)
 //      Read(fd, frame)
@@ -515,18 +515,18 @@ func (sa *SockaddrL2) sockaddr() (unsafe.Pointer, _Socklen, error) {
 // The full SocketCAN documentation can be found in the linux kernel
 // archives at: https://www.kernel.org/doc/Documentation/networking/can.txt
 type SockaddrCAN struct {
-	I***REMOVED***ndex int
+	Ifindex int
 	RxID    uint32
 	TxID    uint32
 	raw     RawSockaddrCAN
 }
 
 func (sa *SockaddrCAN) sockaddr() (unsafe.Pointer, _Socklen, error) {
-	if sa.I***REMOVED***ndex < 0 || sa.I***REMOVED***ndex > 0x7fffffff {
+	if sa.Ifindex < 0 || sa.Ifindex > 0x7fffffff {
 		return nil, 0, EINVAL
 	}
 	sa.raw.Family = AF_CAN
-	sa.raw.I***REMOVED***ndex = int32(sa.I***REMOVED***ndex)
+	sa.raw.Ifindex = int32(sa.Ifindex)
 	rx := (*[4]byte)(unsafe.Pointer(&sa.RxID))
 	for i := 0; i < 4; i++ {
 		sa.raw.Addr[i] = rx[i]
@@ -540,10 +540,10 @@ func (sa *SockaddrCAN) sockaddr() (unsafe.Pointer, _Socklen, error) {
 
 // SockaddrALG implements the Sockaddr interface for AF_ALG type sockets.
 // SockaddrALG enables userspace access to the Linux kernel's cryptography
-// subsystem. The Type and Name ***REMOVED***elds specify which type of hash or cipher
+// subsystem. The Type and Name fields specify which type of hash or cipher
 // should be used with a given socket.
 //
-// To create a ***REMOVED***le descriptor that provides access to a hash or cipher, both
+// To create a file descriptor that provides access to a hash or cipher, both
 // Bind and Accept must be used. Once the setup process is complete, input
 // data can be written to the socket, processed by the kernel, and then read
 // back as hash output or ciphertext.
@@ -559,14 +559,14 @@ func (sa *SockaddrCAN) sockaddr() (unsafe.Pointer, _Socklen, error) {
 //      // manually using unix.Syscall.
 //      hashfd, _, _ := unix.Syscall(unix.SYS_ACCEPT, uintptr(fd), 0, 0)
 //
-// Once a ***REMOVED***le descriptor has been returned from Accept, it may be used to
+// Once a file descriptor has been returned from Accept, it may be used to
 // perform SHA1 hashing. The descriptor is not safe for concurrent use, but
 // may be re-used repeatedly with subsequent Write and Read operations.
 //
 // When hashing a small byte slice or string, a single Write and Read may
 // be used:
 //
-//      // Assume hashfd is already con***REMOVED***gured using the setup process.
+//      // Assume hashfd is already configured using the setup process.
 //      hash := os.NewFile(hashfd, "sha1")
 //      // Hash an input string and read the results. Each Write discards
 //      // previous hash state. Read always reads the current state.
@@ -581,12 +581,12 @@ func (sa *SockaddrCAN) sockaddr() (unsafe.Pointer, _Socklen, error) {
 //      // 2ae01472317d1935a84797ec1983ae243fc6aa28
 //
 // For hashing larger byte slices, or byte streams such as those read from
-// a ***REMOVED***le or socket, use Sendto with MSG_MORE to instruct the kernel to update
-// the hash digest instead of creating a new one for a given chunk and ***REMOVED***nalizing it.
+// a file or socket, use Sendto with MSG_MORE to instruct the kernel to update
+// the hash digest instead of creating a new one for a given chunk and finalizing it.
 //
-//      // Assume hashfd and addr are already con***REMOVED***gured using the setup process.
+//      // Assume hashfd and addr are already configured using the setup process.
 //      hash := os.NewFile(hashfd, "sha1")
-//      // Hash the contents of a ***REMOVED***le.
+//      // Hash the contents of a file.
 //      f, _ := os.Open("/tmp/linux-4.10-rc7.tar.xz")
 //      b := make([]byte, 4096)
 //      for {
@@ -674,7 +674,7 @@ func anyToSockaddr(rsa *RawSockaddrAny) (Sockaddr, error) {
 		pp := (*RawSockaddrLinklayer)(unsafe.Pointer(rsa))
 		sa := new(SockaddrLinklayer)
 		sa.Protocol = pp.Protocol
-		sa.I***REMOVED***ndex = int(pp.I***REMOVED***ndex)
+		sa.Ifindex = int(pp.Ifindex)
 		sa.Hatype = pp.Hatype
 		sa.Pkttype = pp.Pkttype
 		sa.Halen = pp.Halen
@@ -698,7 +698,7 @@ func anyToSockaddr(rsa *RawSockaddrAny) (Sockaddr, error) {
 		// Assume path ends at NUL.
 		// This is not technically the Linux semantics for
 		// abstract Unix domain sockets--they are supposed
-		// to be uninterpreted ***REMOVED***xed-size binary blobs--but
+		// to be uninterpreted fixed-size binary blobs--but
 		// everyone uses this convention.
 		n := 0
 		for n < len(pp.Path) && pp.Path[n] != 0 {
@@ -848,7 +848,7 @@ func KeyctlString(cmd int, id int) (string, error) {
 	// the performance loss is negligible.
 	var buffer []byte
 	for {
-		// Try to ***REMOVED***ll the buffer with data
+		// Try to fill the buffer with data
 		length, err := KeyctlBuffer(cmd, id, buffer, 0)
 		if err != nil {
 			return "", err
@@ -920,9 +920,9 @@ func KeyctlInstantiateIOV(id int, payload []Iovec, ringid int) error {
 //sys	keyctlDH(cmd int, arg2 *KeyctlDHParams, buf []byte) (ret int, err error) = SYS_KEYCTL
 
 // KeyctlDHCompute implements the KEYCTL_DH_COMPUTE command. This command
-// computes a Dif***REMOVED***e-Hellman shared secret based on the provide params. The
+// computes a Diffie-Hellman shared secret based on the provide params. The
 // secret is written to the provided buffer and the returned size is the number
-// of bytes written (returning an error if there is insuf***REMOVED***cient space in the
+// of bytes written (returning an error if there is insufficient space in the
 // buffer). If a nil buffer is passed in, this function returns the minimum
 // buffer length needed to store the appropriate data. Note that this differs
 // from KEYCTL_READ's behavior which always returns the requested payload size.
@@ -964,7 +964,7 @@ func Recvmsg(fd int, p, oob []byte, flags int) (n, oobn int, recvflags int, from
 	}
 	oobn = int(msg.Controllen)
 	recvflags = int(msg.Flags)
-	// source address is only speci***REMOVED***ed if the socket is unconnected
+	// source address is only specified if the socket is unconnected
 	if rsa.Addr.Family != AF_UNSPEC {
 		from, err = anyToSockaddr(&rsa)
 	}
@@ -1188,7 +1188,7 @@ func ReadDirent(fd int, buf []byte) (n int, err error) {
 //sys	mount(source string, target string, fstype string, flags uintptr, data *byte) (err error)
 
 func Mount(source string, target string, fstype string, flags uintptr, data string) (err error) {
-	// Certain ***REMOVED***le systems get rather angry and EINVAL if you give
+	// Certain file systems get rather angry and EINVAL if you give
 	// them an empty string of data, rather than NULL.
 	if data == "" {
 		return mount(source, target, fstype, flags, nil)
@@ -1332,8 +1332,8 @@ func Munmap(b []byte) (err error) {
 //sys	Munlock(b []byte) (err error)
 //sys	Munlockall() (err error)
 
-// Vmsplice splices user pages from a slice of Iovecs into a pipe speci***REMOVED***ed by fd,
-// using the speci***REMOVED***ed flags.
+// Vmsplice splices user pages from a slice of Iovecs into a pipe specified by fd,
+// using the specified flags.
 func Vmsplice(fd int, iovs []Iovec, flags int) (int, error) {
 	n, _, errno := Syscall6(
 		SYS_VMSPLICE,

@@ -1,6 +1,6 @@
 // Copyright 2014 The Go Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE ***REMOVED***le.
+// license that can be found in the LICENSE file.
 
 package hpack
 
@@ -62,7 +62,7 @@ func (e *Encoder) WriteField(f HeaderField) error {
 	idx, nameValueMatch := e.searchTable(f)
 	if nameValueMatch {
 		e.buf = appendIndexed(e.buf, idx)
-	} ***REMOVED*** {
+	} else {
 		indexing := e.shouldIndex(f)
 		if indexing {
 			e.dynTab.add(f)
@@ -70,7 +70,7 @@ func (e *Encoder) WriteField(f HeaderField) error {
 
 		if idx == 0 {
 			e.buf = appendNewName(e.buf, f, indexing)
-		} ***REMOVED*** {
+		} else {
 			e.buf = appendIndexedName(e.buf, f, idx, indexing)
 		}
 	}
@@ -82,7 +82,7 @@ func (e *Encoder) WriteField(f HeaderField) error {
 }
 
 // searchTable searches f in both stable and dynamic header tables.
-// The static header table is searched ***REMOVED***rst. Only when there is no
+// The static header table is searched first. Only when there is no
 // exact match for both name and value, the dynamic header table is
 // then searched. If there is no match, i is 0. If both name and value
 // match, i is the matched index and nameValueMatch becomes true. If
@@ -117,9 +117,9 @@ func (e *Encoder) SetMaxDynamicTableSize(v uint32) {
 }
 
 // SetMaxDynamicTableSizeLimit changes the maximum value that can be
-// speci***REMOVED***ed in SetMaxDynamicTableSize to v. By default, it is set to
+// specified in SetMaxDynamicTableSize to v. By default, it is set to
 // 4096, which is the same size of the default dynamic header table
-// size described in HPACK speci***REMOVED***cation. If the current maximum
+// size described in HPACK specification. If the current maximum
 // dynamic header table size is strictly greater than v, "Header Table
 // Size Update" will be done in the next WriteField call and the
 // maximum dynamic header table size is truncated to v.
@@ -139,13 +139,13 @@ func (e *Encoder) shouldIndex(f HeaderField) bool {
 // appendIndexed appends index i, as encoded in "Indexed Header Field"
 // representation, to dst and returns the extended buffer.
 func appendIndexed(dst []byte, i uint64) []byte {
-	***REMOVED***rst := len(dst)
+	first := len(dst)
 	dst = appendVarInt(dst, 7, i)
-	dst[***REMOVED***rst] |= 0x80
+	dst[first] |= 0x80
 	return dst
 }
 
-// appendNewName appends f, as encoded in one of "Literal Header ***REMOVED***eld
+// appendNewName appends f, as encoded in one of "Literal Header field
 // - New Name" representation variants, to dst and returns the
 // extended buffer.
 //
@@ -159,36 +159,36 @@ func appendNewName(dst []byte, f HeaderField, indexing bool) []byte {
 }
 
 // appendIndexedName appends f and index i referring indexed name
-// entry, as encoded in one of "Literal Header ***REMOVED***eld - Indexed Name"
+// entry, as encoded in one of "Literal Header field - Indexed Name"
 // representation variants, to dst and returns the extended buffer.
 //
 // If f.Sensitive is true, "Never Indexed" representation is used. If
 // f.Sensitive is false and indexing is true, "Incremental Indexing"
 // representation is used.
 func appendIndexedName(dst []byte, f HeaderField, i uint64, indexing bool) []byte {
-	***REMOVED***rst := len(dst)
+	first := len(dst)
 	var n byte
 	if indexing {
 		n = 6
-	} ***REMOVED*** {
+	} else {
 		n = 4
 	}
 	dst = appendVarInt(dst, n, i)
-	dst[***REMOVED***rst] |= encodeTypeByte(indexing, f.Sensitive)
+	dst[first] |= encodeTypeByte(indexing, f.Sensitive)
 	return appendHpackString(dst, f.Value)
 }
 
 // appendTableSize appends v, as encoded in "Header Table Size Update"
 // representation, to dst and returns the extended buffer.
 func appendTableSize(dst []byte, v uint32) []byte {
-	***REMOVED***rst := len(dst)
+	first := len(dst)
 	dst = appendVarInt(dst, 5, uint64(v))
-	dst[***REMOVED***rst] |= 0x20
+	dst[first] |= 0x20
 	return dst
 }
 
 // appendVarInt appends i, as encoded in variable integer form using n
-// bit pre***REMOVED***x, to dst and returns the extended buffer.
+// bit prefix, to dst and returns the extended buffer.
 //
 // See
 // http://http2.github.io/http2-spec/compression.html#integer.representation
@@ -213,11 +213,11 @@ func appendVarInt(dst []byte, n byte, i uint64) []byte {
 func appendHpackString(dst []byte, s string) []byte {
 	huffmanLength := HuffmanEncodeLength(s)
 	if huffmanLength < uint64(len(s)) {
-		***REMOVED***rst := len(dst)
+		first := len(dst)
 		dst = appendVarInt(dst, 7, huffmanLength)
 		dst = AppendHuffmanString(dst, s)
-		dst[***REMOVED***rst] |= 0x80
-	} ***REMOVED*** {
+		dst[first] |= 0x80
+	} else {
 		dst = appendVarInt(dst, 7, uint64(len(s)))
 		dst = append(dst, s...)
 	}

@@ -2,7 +2,7 @@
 Copyright 2014 The Kubernetes Authors.
 
 Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this ***REMOVED***le except in compliance with the License.
+you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
 
     http://www.apache.org/licenses/LICENSE-2.0
@@ -10,7 +10,7 @@ You may obtain a copy of the License at
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the speci***REMOVED***c language governing permissions and
+See the License for the specific language governing permissions and
 limitations under the License.
 */
 
@@ -28,16 +28,16 @@ type ListMetaAccessor interface {
 }
 
 // List lets you work with list metadata from any of the versioned or
-// internal API objects. Attempting to set or retrieve a ***REMOVED***eld on an object that does
-// not support that ***REMOVED***eld will be a no-op and return a default value.
+// internal API objects. Attempting to set or retrieve a field on an object that does
+// not support that field will be a no-op and return a default value.
 type List metav1.ListInterface
 
 // Type exposes the type and APIVersion of versioned or internal API objects.
 type Type metav1.Type
 
 // MetadataAccessor lets you work with object and list metadata from any of the versioned or
-// internal API objects. Attempting to set or retrieve a ***REMOVED***eld on an object that does
-// not support that ***REMOVED***eld (Name, UID, Namespace on lists) will be a no-op and return
+// internal API objects. Attempting to set or retrieve a field on an object that does
+// not support that field (Name, UID, Namespace on lists) will be a no-op and return
 // a default value.
 //
 // MetadataAccessor exposes Interface in a way that can be used with multiple objects.
@@ -88,7 +88,7 @@ type RESTScope interface {
 	Name() RESTScopeName
 }
 
-// RESTMapping contains the information needed to deal with objects of a speci***REMOVED***c
+// RESTMapping contains the information needed to deal with objects of a specific
 // resource and kind in a RESTful manner.
 type RESTMapping struct {
 	// Resource is the GroupVersionResource (location) for this endpoint
@@ -103,7 +103,7 @@ type RESTMapping struct {
 
 // RESTMapper allows clients to map resources to kind, and map kind and version
 // to interfaces for manipulating those objects. It is primarily intended for
-// consumers of Kubernetes compatible REST APIs as de***REMOVED***ned in docs/devel/api-conventions.md.
+// consumers of Kubernetes compatible REST APIs as defined in docs/devel/api-conventions.md.
 //
 // The Kubernetes API provides versioned resources and object kinds which are scoped
 // to API groups. In other words, kinds and resources should not be assumed to be
@@ -123,10 +123,10 @@ type RESTMapper interface {
 	// ResourcesFor takes a partial resource and returns the list of potential resource in priority order
 	ResourcesFor(input schema.GroupVersionResource) ([]schema.GroupVersionResource, error)
 
-	// RESTMapping identi***REMOVED***es a preferred resource mapping for the provided group kind.
+	// RESTMapping identifies a preferred resource mapping for the provided group kind.
 	RESTMapping(gk schema.GroupKind, versions ...string) (*RESTMapping, error)
 	// RESTMappings returns all resource mappings for the provided group kind if no
-	// version search is provided. Otherwise identi***REMOVED***es a preferred resource mapping for
+	// version search is provided. Otherwise identifies a preferred resource mapping for
 	// the provided version(s).
 	RESTMappings(gk schema.GroupKind, versions ...string) ([]*RESTMapping, error)
 

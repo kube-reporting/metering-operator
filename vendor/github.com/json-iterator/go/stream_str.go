@@ -227,7 +227,7 @@ func (stream *Stream) WriteStringWithHTMLEscaped(s string) {
 		c := s[i]
 		if c < utf8.RuneSelf && htmlSafeSet[c] {
 			stream.buf = append(stream.buf, c)
-		} ***REMOVED*** {
+		} else {
 			break
 		}
 	}
@@ -317,7 +317,7 @@ func (stream *Stream) WriteString(s string) {
 		c := s[i]
 		if c > 31 && c != '"' && c != '\\' {
 			stream.buf = append(stream.buf, c)
-		} ***REMOVED*** {
+		} else {
 			break
 		}
 	}

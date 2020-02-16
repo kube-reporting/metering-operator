@@ -2,7 +2,7 @@
 Copyright 2014 The Kubernetes Authors.
 
 Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this ***REMOVED***le except in compliance with the License.
+you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
 
     http://www.apache.org/licenses/LICENSE-2.0
@@ -10,7 +10,7 @@ You may obtain a copy of the License at
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the speci***REMOVED***c language governing permissions and
+See the License for the specific language governing permissions and
 limitations under the License.
 */
 
@@ -26,7 +26,7 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/schema"
-	"k8s.io/apimachinery/pkg/util/validation/***REMOVED***eld"
+	"k8s.io/apimachinery/pkg/util/validation/field"
 )
 
 const (
@@ -42,7 +42,7 @@ type StatusError struct {
 }
 
 // APIStatus is exposed by errors that can be converted to an api.Status object
-// for ***REMOVED***ner grained details.
+// for finer grained details.
 type APIStatus interface {
 	Status() metav1.Status
 }
@@ -102,32 +102,32 @@ func FromObject(obj runtime.Object) error {
 }
 
 // NewNotFound returns a new error which indicates that the resource of the kind and the name was not found.
-func NewNotFound(quali***REMOVED***edResource schema.GroupResource, name string) *StatusError {
+func NewNotFound(qualifiedResource schema.GroupResource, name string) *StatusError {
 	return &StatusError{metav1.Status{
 		Status: metav1.StatusFailure,
 		Code:   http.StatusNotFound,
 		Reason: metav1.StatusReasonNotFound,
 		Details: &metav1.StatusDetails{
-			Group: quali***REMOVED***edResource.Group,
-			Kind:  quali***REMOVED***edResource.Resource,
+			Group: qualifiedResource.Group,
+			Kind:  qualifiedResource.Resource,
 			Name:  name,
 		},
-		Message: fmt.Sprintf("%s %q not found", quali***REMOVED***edResource.String(), name),
+		Message: fmt.Sprintf("%s %q not found", qualifiedResource.String(), name),
 	}}
 }
 
-// NewAlreadyExists returns an error indicating the item requested exists by that identi***REMOVED***er.
-func NewAlreadyExists(quali***REMOVED***edResource schema.GroupResource, name string) *StatusError {
+// NewAlreadyExists returns an error indicating the item requested exists by that identifier.
+func NewAlreadyExists(qualifiedResource schema.GroupResource, name string) *StatusError {
 	return &StatusError{metav1.Status{
 		Status: metav1.StatusFailure,
 		Code:   http.StatusConflict,
 		Reason: metav1.StatusReasonAlreadyExists,
 		Details: &metav1.StatusDetails{
-			Group: quali***REMOVED***edResource.Group,
-			Kind:  quali***REMOVED***edResource.Resource,
+			Group: qualifiedResource.Group,
+			Kind:  qualifiedResource.Resource,
 			Name:  name,
 		},
-		Message: fmt.Sprintf("%s %q already exists", quali***REMOVED***edResource.String(), name),
+		Message: fmt.Sprintf("%s %q already exists", qualifiedResource.String(), name),
 	}}
 }
 
@@ -147,22 +147,22 @@ func NewUnauthorized(reason string) *StatusError {
 }
 
 // NewForbidden returns an error indicating the requested action was forbidden
-func NewForbidden(quali***REMOVED***edResource schema.GroupResource, name string, err error) *StatusError {
+func NewForbidden(qualifiedResource schema.GroupResource, name string, err error) *StatusError {
 	var message string
-	if quali***REMOVED***edResource.Empty() {
+	if qualifiedResource.Empty() {
 		message = fmt.Sprintf("forbidden: %v", err)
-	} ***REMOVED*** if name == "" {
-		message = fmt.Sprintf("%s is forbidden: %v", quali***REMOVED***edResource.String(), err)
-	} ***REMOVED*** {
-		message = fmt.Sprintf("%s %q is forbidden: %v", quali***REMOVED***edResource.String(), name, err)
+	} else if name == "" {
+		message = fmt.Sprintf("%s is forbidden: %v", qualifiedResource.String(), err)
+	} else {
+		message = fmt.Sprintf("%s %q is forbidden: %v", qualifiedResource.String(), name, err)
 	}
 	return &StatusError{metav1.Status{
 		Status: metav1.StatusFailure,
 		Code:   http.StatusForbidden,
 		Reason: metav1.StatusReasonForbidden,
 		Details: &metav1.StatusDetails{
-			Group: quali***REMOVED***edResource.Group,
-			Kind:  quali***REMOVED***edResource.Resource,
+			Group: qualifiedResource.Group,
+			Kind:  qualifiedResource.Resource,
 			Name:  name,
 		},
 		Message: message,
@@ -170,17 +170,17 @@ func NewForbidden(quali***REMOVED***edResource schema.GroupResource, name string
 }
 
 // NewConflict returns an error indicating the item can't be updated as provided.
-func NewConflict(quali***REMOVED***edResource schema.GroupResource, name string, err error) *StatusError {
+func NewConflict(qualifiedResource schema.GroupResource, name string, err error) *StatusError {
 	return &StatusError{metav1.Status{
 		Status: metav1.StatusFailure,
 		Code:   http.StatusConflict,
 		Reason: metav1.StatusReasonConflict,
 		Details: &metav1.StatusDetails{
-			Group: quali***REMOVED***edResource.Group,
-			Kind:  quali***REMOVED***edResource.Resource,
+			Group: qualifiedResource.Group,
+			Kind:  qualifiedResource.Resource,
 			Name:  name,
 		},
-		Message: fmt.Sprintf("Operation cannot be ful***REMOVED***lled on %s %q: %v", quali***REMOVED***edResource.String(), name, err),
+		Message: fmt.Sprintf("Operation cannot be fulfilled on %s %q: %v", qualifiedResource.String(), name, err),
 	}}
 }
 
@@ -206,7 +206,7 @@ func NewResourceExpired(message string) *StatusError {
 }
 
 // NewInvalid returns an error indicating the item is invalid and cannot be processed.
-func NewInvalid(quali***REMOVED***edKind schema.GroupKind, name string, errs ***REMOVED***eld.ErrorList) *StatusError {
+func NewInvalid(qualifiedKind schema.GroupKind, name string, errs field.ErrorList) *StatusError {
 	causes := make([]metav1.StatusCause, 0, len(errs))
 	for i := range errs {
 		err := errs[i]
@@ -221,12 +221,12 @@ func NewInvalid(quali***REMOVED***edKind schema.GroupKind, name string, errs ***
 		Code:   http.StatusUnprocessableEntity,
 		Reason: metav1.StatusReasonInvalid,
 		Details: &metav1.StatusDetails{
-			Group:  quali***REMOVED***edKind.Group,
-			Kind:   quali***REMOVED***edKind.Kind,
+			Group:  qualifiedKind.Group,
+			Kind:   qualifiedKind.Kind,
 			Name:   name,
 			Causes: causes,
 		},
-		Message: fmt.Sprintf("%s %q is invalid: %v", quali***REMOVED***edKind.String(), name, errs.ToAggregate()),
+		Message: fmt.Sprintf("%s %q is invalid: %v", qualifiedKind.String(), name, errs.ToAggregate()),
 	}}
 }
 
@@ -241,7 +241,7 @@ func NewBadRequest(reason string) *StatusError {
 }
 
 // NewTooManyRequests creates an error that indicates that the client must try again later because
-// the speci***REMOVED***ed endpoint is not accepting requests. More speci***REMOVED***c details should be provided
+// the specified endpoint is not accepting requests. More specific details should be provided
 // if client should know why the failure was limited4.
 func NewTooManyRequests(message string, retryAfterSeconds int) *StatusError {
 	return &StatusError{metav1.Status{
@@ -266,40 +266,40 @@ func NewServiceUnavailable(reason string) *StatusError {
 }
 
 // NewMethodNotSupported returns an error indicating the requested action is not supported on this kind.
-func NewMethodNotSupported(quali***REMOVED***edResource schema.GroupResource, action string) *StatusError {
+func NewMethodNotSupported(qualifiedResource schema.GroupResource, action string) *StatusError {
 	return &StatusError{metav1.Status{
 		Status: metav1.StatusFailure,
 		Code:   http.StatusMethodNotAllowed,
 		Reason: metav1.StatusReasonMethodNotAllowed,
 		Details: &metav1.StatusDetails{
-			Group: quali***REMOVED***edResource.Group,
-			Kind:  quali***REMOVED***edResource.Resource,
+			Group: qualifiedResource.Group,
+			Kind:  qualifiedResource.Resource,
 		},
-		Message: fmt.Sprintf("%s is not supported on resources of kind %q", action, quali***REMOVED***edResource.String()),
+		Message: fmt.Sprintf("%s is not supported on resources of kind %q", action, qualifiedResource.String()),
 	}}
 }
 
 // NewServerTimeout returns an error indicating the requested action could not be completed due to a
 // transient error, and the client should try again.
-func NewServerTimeout(quali***REMOVED***edResource schema.GroupResource, operation string, retryAfterSeconds int) *StatusError {
+func NewServerTimeout(qualifiedResource schema.GroupResource, operation string, retryAfterSeconds int) *StatusError {
 	return &StatusError{metav1.Status{
 		Status: metav1.StatusFailure,
 		Code:   http.StatusInternalServerError,
 		Reason: metav1.StatusReasonServerTimeout,
 		Details: &metav1.StatusDetails{
-			Group:             quali***REMOVED***edResource.Group,
-			Kind:              quali***REMOVED***edResource.Resource,
+			Group:             qualifiedResource.Group,
+			Kind:              qualifiedResource.Resource,
 			Name:              operation,
 			RetryAfterSeconds: int32(retryAfterSeconds),
 		},
-		Message: fmt.Sprintf("The %s operation against %s could not be completed at this time, please try again.", operation, quali***REMOVED***edResource.String()),
+		Message: fmt.Sprintf("The %s operation against %s could not be completed at this time, please try again.", operation, qualifiedResource.String()),
 	}}
 }
 
 // NewServerTimeoutForKind should not exist.  Server timeouts happen when accessing resources, the Kind is just what we
 // happened to be looking at when the request failed.  This delegates to keep code sane, but we should work towards removing this.
-func NewServerTimeoutForKind(quali***REMOVED***edKind schema.GroupKind, operation string, retryAfterSeconds int) *StatusError {
-	return NewServerTimeout(schema.GroupResource{Group: quali***REMOVED***edKind.Group, Resource: quali***REMOVED***edKind.Kind}, operation, retryAfterSeconds)
+func NewServerTimeoutForKind(qualifiedKind schema.GroupKind, operation string, retryAfterSeconds int) *StatusError {
+	return NewServerTimeout(schema.GroupResource{Group: qualifiedKind.Group, Resource: qualifiedKind.Kind}, operation, retryAfterSeconds)
 }
 
 // NewInternalError returns an error indicating the item is invalid and cannot be processed.
@@ -342,20 +342,20 @@ func NewTooManyRequestsError(message string) *StatusError {
 }
 
 // NewGenericServerResponse returns a new error for server responses that are not in a recognizable form.
-func NewGenericServerResponse(code int, verb string, quali***REMOVED***edResource schema.GroupResource, name, serverMessage string, retryAfterSeconds int, isUnexpectedResponse bool) *StatusError {
+func NewGenericServerResponse(code int, verb string, qualifiedResource schema.GroupResource, name, serverMessage string, retryAfterSeconds int, isUnexpectedResponse bool) *StatusError {
 	reason := metav1.StatusReasonUnknown
 	message := fmt.Sprintf("the server responded with the status code %d but did not return more information", code)
 	switch code {
 	case http.StatusConflict:
 		if verb == "POST" {
 			reason = metav1.StatusReasonAlreadyExists
-		} ***REMOVED*** {
+		} else {
 			reason = metav1.StatusReasonConflict
 		}
 		message = "the server reported a conflict"
 	case http.StatusNotFound:
 		reason = metav1.StatusReasonNotFound
-		message = "the server could not ***REMOVED***nd the requested resource"
+		message = "the server could not find the requested resource"
 	case http.StatusBadRequest:
 		reason = metav1.StatusReasonBadRequest
 		message = "the server rejected our request for an unknown reason"
@@ -396,10 +396,10 @@ func NewGenericServerResponse(code int, verb string, quali***REMOVED***edResourc
 		}
 	}
 	switch {
-	case !quali***REMOVED***edResource.Empty() && len(name) > 0:
-		message = fmt.Sprintf("%s (%s %s %s)", message, strings.ToLower(verb), quali***REMOVED***edResource.String(), name)
-	case !quali***REMOVED***edResource.Empty():
-		message = fmt.Sprintf("%s (%s %s)", message, strings.ToLower(verb), quali***REMOVED***edResource.String())
+	case !qualifiedResource.Empty() && len(name) > 0:
+		message = fmt.Sprintf("%s (%s %s %s)", message, strings.ToLower(verb), qualifiedResource.String(), name)
+	case !qualifiedResource.Empty():
+		message = fmt.Sprintf("%s (%s %s)", message, strings.ToLower(verb), qualifiedResource.String())
 	}
 	var causes []metav1.StatusCause
 	if isUnexpectedResponse {
@@ -409,7 +409,7 @@ func NewGenericServerResponse(code int, verb string, quali***REMOVED***edResourc
 				Message: serverMessage,
 			},
 		}
-	} ***REMOVED*** {
+	} else {
 		causes = nil
 	}
 	return &StatusError{metav1.Status{
@@ -417,8 +417,8 @@ func NewGenericServerResponse(code int, verb string, quali***REMOVED***edResourc
 		Code:   int32(code),
 		Reason: reason,
 		Details: &metav1.StatusDetails{
-			Group: quali***REMOVED***edResource.Group,
-			Kind:  quali***REMOVED***edResource.Resource,
+			Group: qualifiedResource.Group,
+			Kind:  qualifiedResource.Resource,
 			Name:  name,
 
 			Causes:            causes,
@@ -428,12 +428,12 @@ func NewGenericServerResponse(code int, verb string, quali***REMOVED***edResourc
 	}}
 }
 
-// IsNotFound returns true if the speci***REMOVED***ed error was created by NewNotFound.
+// IsNotFound returns true if the specified error was created by NewNotFound.
 func IsNotFound(err error) bool {
 	return ReasonForError(err) == metav1.StatusReasonNotFound
 }
 
-// IsAlreadyExists determines if the err is an error which indicates that a speci***REMOVED***ed resource already exists.
+// IsAlreadyExists determines if the err is an error which indicates that a specified resource already exists.
 func IsAlreadyExists(err error) bool {
 	return ReasonForError(err) == metav1.StatusReasonAlreadyExists
 }

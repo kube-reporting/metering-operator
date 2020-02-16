@@ -5,7 +5,7 @@
 /*
 Package datastore is a generated protocol buffer package.
 
-It is generated from these ***REMOVED***les:
+It is generated from these files:
 	google.golang.org/appengine/internal/datastore/datastore_v3.proto
 
 It has these top-level messages:
@@ -19,7 +19,7 @@ It has these top-level messages:
 	CompositeProperty
 	Index
 	CompositeIndex
-	IndexPost***REMOVED***x
+	IndexPostfix
 	IndexPosition
 	Snapshot
 	InternalHeader
@@ -542,7 +542,7 @@ type PropertyValue struct {
 	Int64Value       *int64                        `protobuf:"varint,1,opt,name=int64Value" json:"int64Value,omitempty"`
 	BooleanValue     *bool                         `protobuf:"varint,2,opt,name=booleanValue" json:"booleanValue,omitempty"`
 	StringValue      *string                       `protobuf:"bytes,3,opt,name=stringValue" json:"stringValue,omitempty"`
-	DoubleValue      *float64                      `protobuf:"***REMOVED***xed64,4,opt,name=doubleValue" json:"doubleValue,omitempty"`
+	DoubleValue      *float64                      `protobuf:"fixed64,4,opt,name=doubleValue" json:"doubleValue,omitempty"`
 	Pointvalue       *PropertyValue_PointValue     `protobuf:"group,5,opt,name=PointValue" json:"pointvalue,omitempty"`
 	Uservalue        *PropertyValue_UserValue      `protobuf:"group,8,opt,name=UserValue" json:"uservalue,omitempty"`
 	Referencevalue   *PropertyValue_ReferenceValue `protobuf:"group,12,opt,name=ReferenceValue" json:"referencevalue,omitempty"`
@@ -603,8 +603,8 @@ func (m *PropertyValue) GetReferencevalue() *PropertyValue_ReferenceValue {
 }
 
 type PropertyValue_PointValue struct {
-	X                *float64 `protobuf:"***REMOVED***xed64,6,req,name=x" json:"x,omitempty"`
-	Y                *float64 `protobuf:"***REMOVED***xed64,7,req,name=y" json:"y,omitempty"`
+	X                *float64 `protobuf:"fixed64,6,req,name=x" json:"x,omitempty"`
+	Y                *float64 `protobuf:"fixed64,7,req,name=y" json:"y,omitempty"`
 	XXX_unrecognized []byte   `json:"-"`
 }
 
@@ -1101,7 +1101,7 @@ func (m *Index_Property) GetDirection() Index_Property_Direction {
 type CompositeIndex struct {
 	AppId             *string               `protobuf:"bytes,1,req,name=app_id" json:"app_id,omitempty"`
 	Id                *int64                `protobuf:"varint,2,req,name=id" json:"id,omitempty"`
-	De***REMOVED***nition        *Index                `protobuf:"bytes,3,req,name=de***REMOVED***nition" json:"de***REMOVED***nition,omitempty"`
+	Definition        *Index                `protobuf:"bytes,3,req,name=definition" json:"definition,omitempty"`
 	State             *CompositeIndex_State `protobuf:"varint,4,req,name=state,enum=appengine.CompositeIndex_State" json:"state,omitempty"`
 	OnlyUseIfRequired *bool                 `protobuf:"varint,6,opt,name=only_use_if_required,def=0" json:"only_use_if_required,omitempty"`
 	XXX_unrecognized  []byte                `json:"-"`
@@ -1127,9 +1127,9 @@ func (m *CompositeIndex) GetId() int64 {
 	return 0
 }
 
-func (m *CompositeIndex) GetDe***REMOVED***nition() *Index {
+func (m *CompositeIndex) GetDefinition() *Index {
 	if m != nil {
-		return m.De***REMOVED***nition
+		return m.Definition
 	}
 	return nil
 }
@@ -1148,58 +1148,58 @@ func (m *CompositeIndex) GetOnlyUseIfRequired() bool {
 	return Default_CompositeIndex_OnlyUseIfRequired
 }
 
-type IndexPost***REMOVED***x struct {
-	IndexValue       []*IndexPost***REMOVED***x_IndexValue `protobuf:"bytes,1,rep,name=index_value" json:"index_value,omitempty"`
+type IndexPostfix struct {
+	IndexValue       []*IndexPostfix_IndexValue `protobuf:"bytes,1,rep,name=index_value" json:"index_value,omitempty"`
 	Key              *Reference                 `protobuf:"bytes,2,opt,name=key" json:"key,omitempty"`
 	Before           *bool                      `protobuf:"varint,3,opt,name=before,def=1" json:"before,omitempty"`
 	XXX_unrecognized []byte                     `json:"-"`
 }
 
-func (m *IndexPost***REMOVED***x) Reset()         { *m = IndexPost***REMOVED***x{} }
-func (m *IndexPost***REMOVED***x) String() string { return proto.CompactTextString(m) }
-func (*IndexPost***REMOVED***x) ProtoMessage()    {}
+func (m *IndexPostfix) Reset()         { *m = IndexPostfix{} }
+func (m *IndexPostfix) String() string { return proto.CompactTextString(m) }
+func (*IndexPostfix) ProtoMessage()    {}
 
-const Default_IndexPost***REMOVED***x_Before bool = true
+const Default_IndexPostfix_Before bool = true
 
-func (m *IndexPost***REMOVED***x) GetIndexValue() []*IndexPost***REMOVED***x_IndexValue {
+func (m *IndexPostfix) GetIndexValue() []*IndexPostfix_IndexValue {
 	if m != nil {
 		return m.IndexValue
 	}
 	return nil
 }
 
-func (m *IndexPost***REMOVED***x) GetKey() *Reference {
+func (m *IndexPostfix) GetKey() *Reference {
 	if m != nil {
 		return m.Key
 	}
 	return nil
 }
 
-func (m *IndexPost***REMOVED***x) GetBefore() bool {
+func (m *IndexPostfix) GetBefore() bool {
 	if m != nil && m.Before != nil {
 		return *m.Before
 	}
-	return Default_IndexPost***REMOVED***x_Before
+	return Default_IndexPostfix_Before
 }
 
-type IndexPost***REMOVED***x_IndexValue struct {
+type IndexPostfix_IndexValue struct {
 	PropertyName     *string        `protobuf:"bytes,1,req,name=property_name" json:"property_name,omitempty"`
 	Value            *PropertyValue `protobuf:"bytes,2,req,name=value" json:"value,omitempty"`
 	XXX_unrecognized []byte         `json:"-"`
 }
 
-func (m *IndexPost***REMOVED***x_IndexValue) Reset()         { *m = IndexPost***REMOVED***x_IndexValue{} }
-func (m *IndexPost***REMOVED***x_IndexValue) String() string { return proto.CompactTextString(m) }
-func (*IndexPost***REMOVED***x_IndexValue) ProtoMessage()    {}
+func (m *IndexPostfix_IndexValue) Reset()         { *m = IndexPostfix_IndexValue{} }
+func (m *IndexPostfix_IndexValue) String() string { return proto.CompactTextString(m) }
+func (*IndexPostfix_IndexValue) ProtoMessage()    {}
 
-func (m *IndexPost***REMOVED***x_IndexValue) GetPropertyName() string {
+func (m *IndexPostfix_IndexValue) GetPropertyName() string {
 	if m != nil && m.PropertyName != nil {
 		return *m.PropertyName
 	}
 	return ""
 }
 
-func (m *IndexPost***REMOVED***x_IndexValue) GetValue() *PropertyValue {
+func (m *IndexPostfix_IndexValue) GetValue() *PropertyValue {
 	if m != nil {
 		return m.Value
 	}
@@ -1266,7 +1266,7 @@ func (m *InternalHeader) GetQos() string {
 
 type Transaction struct {
 	Header           *InternalHeader `protobuf:"bytes,4,opt,name=header" json:"header,omitempty"`
-	Handle           *uint64         `protobuf:"***REMOVED***xed64,1,req,name=handle" json:"handle,omitempty"`
+	Handle           *uint64         `protobuf:"fixed64,1,req,name=handle" json:"handle,omitempty"`
 	App              *string         `protobuf:"bytes,2,req,name=app" json:"app,omitempty"`
 	MarkChanges      *bool           `protobuf:"varint,3,opt,name=mark_changes,def=0" json:"mark_changes,omitempty"`
 	XXX_unrecognized []byte          `json:"-"`
@@ -1312,7 +1312,7 @@ type Query struct {
 	NameSpace           *string           `protobuf:"bytes,29,opt,name=name_space" json:"name_space,omitempty"`
 	Kind                *string           `protobuf:"bytes,3,opt,name=kind" json:"kind,omitempty"`
 	Ancestor            *Reference        `protobuf:"bytes,17,opt,name=ancestor" json:"ancestor,omitempty"`
-	Filter              []*Query_Filter   `protobuf:"group,4,rep,name=Filter" json:"***REMOVED***lter,omitempty"`
+	Filter              []*Query_Filter   `protobuf:"group,4,rep,name=Filter" json:"filter,omitempty"`
 	SearchQuery         *string           `protobuf:"bytes,8,opt,name=search_query" json:"search_query,omitempty"`
 	Order               []*Query_Order    `protobuf:"group,9,rep,name=Order" json:"order,omitempty"`
 	Hint                *Query_Hint       `protobuf:"varint,18,opt,name=hint,enum=appengine.Query_Hint" json:"hint,omitempty"`
@@ -1594,8 +1594,8 @@ type CompiledQuery struct {
 	Limit             *int32                         `protobuf:"varint,11,opt,name=limit" json:"limit,omitempty"`
 	KeysOnly          *bool                          `protobuf:"varint,12,req,name=keys_only" json:"keys_only,omitempty"`
 	PropertyName      []string                       `protobuf:"bytes,24,rep,name=property_name" json:"property_name,omitempty"`
-	DistinctIn***REMOVED***xSize *int32                         `protobuf:"varint,25,opt,name=distinct_in***REMOVED***x_size" json:"distinct_in***REMOVED***x_size,omitempty"`
-	Entity***REMOVED***lter      *CompiledQuery_EntityFilter    `protobuf:"group,13,opt,name=EntityFilter" json:"entity***REMOVED***lter,omitempty"`
+	DistinctInfixSize *int32                         `protobuf:"varint,25,opt,name=distinct_infix_size" json:"distinct_infix_size,omitempty"`
+	Entityfilter      *CompiledQuery_EntityFilter    `protobuf:"group,13,opt,name=EntityFilter" json:"entityfilter,omitempty"`
 	XXX_unrecognized  []byte                         `json:"-"`
 }
 
@@ -1654,16 +1654,16 @@ func (m *CompiledQuery) GetPropertyName() []string {
 	return nil
 }
 
-func (m *CompiledQuery) GetDistinctIn***REMOVED***xSize() int32 {
-	if m != nil && m.DistinctIn***REMOVED***xSize != nil {
-		return *m.DistinctIn***REMOVED***xSize
+func (m *CompiledQuery) GetDistinctInfixSize() int32 {
+	if m != nil && m.DistinctInfixSize != nil {
+		return *m.DistinctInfixSize
 	}
 	return 0
 }
 
-func (m *CompiledQuery) GetEntity***REMOVED***lter() *CompiledQuery_EntityFilter {
+func (m *CompiledQuery) GetEntityfilter() *CompiledQuery_EntityFilter {
 	if m != nil {
-		return m.Entity***REMOVED***lter
+		return m.Entityfilter
 	}
 	return nil
 }
@@ -1674,8 +1674,8 @@ type CompiledQuery_PrimaryScan struct {
 	StartInclusive             *bool    `protobuf:"varint,4,opt,name=start_inclusive" json:"start_inclusive,omitempty"`
 	EndKey                     *string  `protobuf:"bytes,5,opt,name=end_key" json:"end_key,omitempty"`
 	EndInclusive               *bool    `protobuf:"varint,6,opt,name=end_inclusive" json:"end_inclusive,omitempty"`
-	StartPost***REMOVED***xValue          []string `protobuf:"bytes,22,rep,name=start_post***REMOVED***x_value" json:"start_post***REMOVED***x_value,omitempty"`
-	EndPost***REMOVED***xValue            []string `protobuf:"bytes,23,rep,name=end_post***REMOVED***x_value" json:"end_post***REMOVED***x_value,omitempty"`
+	StartPostfixValue          []string `protobuf:"bytes,22,rep,name=start_postfix_value" json:"start_postfix_value,omitempty"`
+	EndPostfixValue            []string `protobuf:"bytes,23,rep,name=end_postfix_value" json:"end_postfix_value,omitempty"`
 	EndUnappliedLogTimestampUs *int64   `protobuf:"varint,19,opt,name=end_unapplied_log_timestamp_us" json:"end_unapplied_log_timestamp_us,omitempty"`
 	XXX_unrecognized           []byte   `json:"-"`
 }
@@ -1719,16 +1719,16 @@ func (m *CompiledQuery_PrimaryScan) GetEndInclusive() bool {
 	return false
 }
 
-func (m *CompiledQuery_PrimaryScan) GetStartPost***REMOVED***xValue() []string {
+func (m *CompiledQuery_PrimaryScan) GetStartPostfixValue() []string {
 	if m != nil {
-		return m.StartPost***REMOVED***xValue
+		return m.StartPostfixValue
 	}
 	return nil
 }
 
-func (m *CompiledQuery_PrimaryScan) GetEndPost***REMOVED***xValue() []string {
+func (m *CompiledQuery_PrimaryScan) GetEndPostfixValue() []string {
 	if m != nil {
-		return m.EndPost***REMOVED***xValue
+		return m.EndPostfixValue
 	}
 	return nil
 }
@@ -1742,8 +1742,8 @@ func (m *CompiledQuery_PrimaryScan) GetEndUnappliedLogTimestampUs() int64 {
 
 type CompiledQuery_MergeJoinScan struct {
 	IndexName        *string  `protobuf:"bytes,8,req,name=index_name" json:"index_name,omitempty"`
-	Pre***REMOVED***xValue      []string `protobuf:"bytes,9,rep,name=pre***REMOVED***x_value" json:"pre***REMOVED***x_value,omitempty"`
-	ValuePre***REMOVED***x      *bool    `protobuf:"varint,20,opt,name=value_pre***REMOVED***x,def=0" json:"value_pre***REMOVED***x,omitempty"`
+	PrefixValue      []string `protobuf:"bytes,9,rep,name=prefix_value" json:"prefix_value,omitempty"`
+	ValuePrefix      *bool    `protobuf:"varint,20,opt,name=value_prefix,def=0" json:"value_prefix,omitempty"`
 	XXX_unrecognized []byte   `json:"-"`
 }
 
@@ -1751,7 +1751,7 @@ func (m *CompiledQuery_MergeJoinScan) Reset()         { *m = CompiledQuery_Merge
 func (m *CompiledQuery_MergeJoinScan) String() string { return proto.CompactTextString(m) }
 func (*CompiledQuery_MergeJoinScan) ProtoMessage()    {}
 
-const Default_CompiledQuery_MergeJoinScan_ValuePre***REMOVED***x bool = false
+const Default_CompiledQuery_MergeJoinScan_ValuePrefix bool = false
 
 func (m *CompiledQuery_MergeJoinScan) GetIndexName() string {
 	if m != nil && m.IndexName != nil {
@@ -1760,18 +1760,18 @@ func (m *CompiledQuery_MergeJoinScan) GetIndexName() string {
 	return ""
 }
 
-func (m *CompiledQuery_MergeJoinScan) GetPre***REMOVED***xValue() []string {
+func (m *CompiledQuery_MergeJoinScan) GetPrefixValue() []string {
 	if m != nil {
-		return m.Pre***REMOVED***xValue
+		return m.PrefixValue
 	}
 	return nil
 }
 
-func (m *CompiledQuery_MergeJoinScan) GetValuePre***REMOVED***x() bool {
-	if m != nil && m.ValuePre***REMOVED***x != nil {
-		return *m.ValuePre***REMOVED***x
+func (m *CompiledQuery_MergeJoinScan) GetValuePrefix() bool {
+	if m != nil && m.ValuePrefix != nil {
+		return *m.ValuePrefix
 	}
-	return Default_CompiledQuery_MergeJoinScan_ValuePre***REMOVED***x
+	return Default_CompiledQuery_MergeJoinScan_ValuePrefix
 }
 
 type CompiledQuery_EntityFilter struct {
@@ -1891,7 +1891,7 @@ func (m *CompiledCursor_Position_IndexValue) GetValue() *PropertyValue {
 }
 
 type Cursor struct {
-	Cursor           *uint64 `protobuf:"***REMOVED***xed64,1,req,name=cursor" json:"cursor,omitempty"`
+	Cursor           *uint64 `protobuf:"fixed64,1,req,name=cursor" json:"cursor,omitempty"`
 	App              *string `protobuf:"bytes,2,opt,name=app" json:"app,omitempty"`
 	XXX_unrecognized []byte  `json:"-"`
 }

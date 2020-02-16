@@ -180,7 +180,7 @@ func (l *HandlerList) PushFrontNamed(n NamedHandler) {
 	if cap(l.list) == len(l.list) {
 		// Allocating new list required
 		l.list = append([]NamedHandler{n}, l.list...)
-	} ***REMOVED*** {
+	} else {
 		// Enough room to prepend into list.
 		l.list = append(l.list, NamedHandler{})
 		copy(l.list[1:], l.list)
@@ -272,10 +272,10 @@ func (l *HandlerList) Run(r *Request) {
 // request's Error value. Always returns true to continue iterating
 // request handlers in a HandlerList.
 func HandlerListLogItem(item HandlerListRunItem) bool {
-	if item.Request.Con***REMOVED***g.Logger == nil {
+	if item.Request.Config.Logger == nil {
 		return true
 	}
-	item.Request.Con***REMOVED***g.Logger.Log("DEBUG: RequestHandler",
+	item.Request.Config.Logger.Log("DEBUG: RequestHandler",
 		item.Index, item.Handler.Name, item.Request.Error)
 
 	return true
@@ -288,7 +288,7 @@ func HandlerListStopOnError(item HandlerListRunItem) bool {
 	return item.Request.Error == nil
 }
 
-// WithAppendUserAgent will add a string to the user agent pre***REMOVED***xed with a
+// WithAppendUserAgent will add a string to the user agent prefixed with a
 // single white space.
 func WithAppendUserAgent(s string) Option {
 	return func(r *Request) {

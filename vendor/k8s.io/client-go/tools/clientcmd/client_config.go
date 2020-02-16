@@ -2,7 +2,7 @@
 Copyright 2014 The Kubernetes Authors.
 
 Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this ***REMOVED***le except in compliance with the License.
+you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
 
     http://www.apache.org/licenses/LICENSE-2.0
@@ -10,7 +10,7 @@ You may obtain a copy of the License at
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the speci***REMOVED***c language governing permissions and
+See the License for the specific language governing permissions and
 limitations under the License.
 */
 
@@ -33,17 +33,17 @@ import (
 )
 
 var (
-	// ClusterDefaults has the same behavior as the old EnvVar and DefaultCluster ***REMOVED***elds
+	// ClusterDefaults has the same behavior as the old EnvVar and DefaultCluster fields
 	// DEPRECATED will be replaced
 	ClusterDefaults = clientcmdapi.Cluster{Server: getDefaultServer()}
-	// DefaultClientCon***REMOVED***g represents the legacy behavior of this package for defaulting
+	// DefaultClientConfig represents the legacy behavior of this package for defaulting
 	// DEPRECATED will be replace
-	DefaultClientCon***REMOVED***g = DirectClientCon***REMOVED***g{*clientcmdapi.NewCon***REMOVED***g(), "", &Con***REMOVED***gOverrides{
+	DefaultClientConfig = DirectClientConfig{*clientcmdapi.NewConfig(), "", &ConfigOverrides{
 		ClusterDefaults: ClusterDefaults,
-	}, nil, NewDefaultClientCon***REMOVED***gLoadingRules(), promptedCredentials{}}
+	}, nil, NewDefaultClientConfigLoadingRules(), promptedCredentials{}}
 )
 
-// getDefaultServer returns a default setting for DefaultClientCon***REMOVED***g
+// getDefaultServer returns a default setting for DefaultClientConfig
 // DEPRECATED
 func getDefaultServer() string {
 	if server := os.Getenv("KUBERNETES_MASTER"); len(server) > 0 {
@@ -52,467 +52,467 @@ func getDefaultServer() string {
 	return "http://localhost:8080"
 }
 
-// ClientCon***REMOVED***g is used to make it easy to get an api server client
-type ClientCon***REMOVED***g interface {
-	// RawCon***REMOVED***g returns the merged result of all overrides
-	RawCon***REMOVED***g() (clientcmdapi.Con***REMOVED***g, error)
-	// ClientCon***REMOVED***g returns a complete client con***REMOVED***g
-	ClientCon***REMOVED***g() (*restclient.Con***REMOVED***g, error)
+// ClientConfig is used to make it easy to get an api server client
+type ClientConfig interface {
+	// RawConfig returns the merged result of all overrides
+	RawConfig() (clientcmdapi.Config, error)
+	// ClientConfig returns a complete client config
+	ClientConfig() (*restclient.Config, error)
 	// Namespace returns the namespace resulting from the merged
 	// result of all overrides and a boolean indicating if it was
 	// overridden
 	Namespace() (string, bool, error)
-	// Con***REMOVED***gAccess returns the rules for loading/persisting the con***REMOVED***g.
-	Con***REMOVED***gAccess() Con***REMOVED***gAccess
+	// ConfigAccess returns the rules for loading/persisting the config.
+	ConfigAccess() ConfigAccess
 }
 
-type PersistAuthProviderCon***REMOVED***gForUser func(user string) restclient.AuthProviderCon***REMOVED***gPersister
+type PersistAuthProviderConfigForUser func(user string) restclient.AuthProviderConfigPersister
 
 type promptedCredentials struct {
 	username string
 	password string
 }
 
-// DirectClientCon***REMOVED***g is a ClientCon***REMOVED***g interface that is backed by a clientcmdapi.Con***REMOVED***g, options overrides, and an optional fallbackReader for auth information
-type DirectClientCon***REMOVED***g struct {
-	con***REMOVED***g         clientcmdapi.Con***REMOVED***g
+// DirectClientConfig is a ClientConfig interface that is backed by a clientcmdapi.Config, options overrides, and an optional fallbackReader for auth information
+type DirectClientConfig struct {
+	config         clientcmdapi.Config
 	contextName    string
-	overrides      *Con***REMOVED***gOverrides
+	overrides      *ConfigOverrides
 	fallbackReader io.Reader
-	con***REMOVED***gAccess   Con***REMOVED***gAccess
+	configAccess   ConfigAccess
 	// promptedCredentials store the credentials input by the user
 	promptedCredentials promptedCredentials
 }
 
-// NewDefaultClientCon***REMOVED***g creates a DirectClientCon***REMOVED***g using the con***REMOVED***g.CurrentContext as the context name
-func NewDefaultClientCon***REMOVED***g(con***REMOVED***g clientcmdapi.Con***REMOVED***g, overrides *Con***REMOVED***gOverrides) ClientCon***REMOVED***g {
-	return &DirectClientCon***REMOVED***g{con***REMOVED***g, con***REMOVED***g.CurrentContext, overrides, nil, NewDefaultClientCon***REMOVED***gLoadingRules(), promptedCredentials{}}
+// NewDefaultClientConfig creates a DirectClientConfig using the config.CurrentContext as the context name
+func NewDefaultClientConfig(config clientcmdapi.Config, overrides *ConfigOverrides) ClientConfig {
+	return &DirectClientConfig{config, config.CurrentContext, overrides, nil, NewDefaultClientConfigLoadingRules(), promptedCredentials{}}
 }
 
-// NewNonInteractiveClientCon***REMOVED***g creates a DirectClientCon***REMOVED***g using the passed context name and does not have a fallback reader for auth information
-func NewNonInteractiveClientCon***REMOVED***g(con***REMOVED***g clientcmdapi.Con***REMOVED***g, contextName string, overrides *Con***REMOVED***gOverrides, con***REMOVED***gAccess Con***REMOVED***gAccess) ClientCon***REMOVED***g {
-	return &DirectClientCon***REMOVED***g{con***REMOVED***g, contextName, overrides, nil, con***REMOVED***gAccess, promptedCredentials{}}
+// NewNonInteractiveClientConfig creates a DirectClientConfig using the passed context name and does not have a fallback reader for auth information
+func NewNonInteractiveClientConfig(config clientcmdapi.Config, contextName string, overrides *ConfigOverrides, configAccess ConfigAccess) ClientConfig {
+	return &DirectClientConfig{config, contextName, overrides, nil, configAccess, promptedCredentials{}}
 }
 
-// NewInteractiveClientCon***REMOVED***g creates a DirectClientCon***REMOVED***g using the passed context name and a reader in case auth information is not provided via ***REMOVED***les or flags
-func NewInteractiveClientCon***REMOVED***g(con***REMOVED***g clientcmdapi.Con***REMOVED***g, contextName string, overrides *Con***REMOVED***gOverrides, fallbackReader io.Reader, con***REMOVED***gAccess Con***REMOVED***gAccess) ClientCon***REMOVED***g {
-	return &DirectClientCon***REMOVED***g{con***REMOVED***g, contextName, overrides, fallbackReader, con***REMOVED***gAccess, promptedCredentials{}}
+// NewInteractiveClientConfig creates a DirectClientConfig using the passed context name and a reader in case auth information is not provided via files or flags
+func NewInteractiveClientConfig(config clientcmdapi.Config, contextName string, overrides *ConfigOverrides, fallbackReader io.Reader, configAccess ConfigAccess) ClientConfig {
+	return &DirectClientConfig{config, contextName, overrides, fallbackReader, configAccess, promptedCredentials{}}
 }
 
-// NewClientCon***REMOVED***gFromBytes takes your kubecon***REMOVED***g and gives you back a ClientCon***REMOVED***g
-func NewClientCon***REMOVED***gFromBytes(con***REMOVED***gBytes []byte) (ClientCon***REMOVED***g, error) {
-	con***REMOVED***g, err := Load(con***REMOVED***gBytes)
+// NewClientConfigFromBytes takes your kubeconfig and gives you back a ClientConfig
+func NewClientConfigFromBytes(configBytes []byte) (ClientConfig, error) {
+	config, err := Load(configBytes)
 	if err != nil {
 		return nil, err
 	}
 
-	return &DirectClientCon***REMOVED***g{*con***REMOVED***g, "", &Con***REMOVED***gOverrides{}, nil, nil, promptedCredentials{}}, nil
+	return &DirectClientConfig{*config, "", &ConfigOverrides{}, nil, nil, promptedCredentials{}}, nil
 }
 
-// RESTCon***REMOVED***gFromKubeCon***REMOVED***g is a convenience method to give back a restcon***REMOVED***g from your kubecon***REMOVED***g bytes.
+// RESTConfigFromKubeConfig is a convenience method to give back a restconfig from your kubeconfig bytes.
 // For programmatic access, this is what you want 80% of the time
-func RESTCon***REMOVED***gFromKubeCon***REMOVED***g(con***REMOVED***gBytes []byte) (*restclient.Con***REMOVED***g, error) {
-	clientCon***REMOVED***g, err := NewClientCon***REMOVED***gFromBytes(con***REMOVED***gBytes)
+func RESTConfigFromKubeConfig(configBytes []byte) (*restclient.Config, error) {
+	clientConfig, err := NewClientConfigFromBytes(configBytes)
 	if err != nil {
 		return nil, err
 	}
-	return clientCon***REMOVED***g.ClientCon***REMOVED***g()
+	return clientConfig.ClientConfig()
 }
 
-func (con***REMOVED***g *DirectClientCon***REMOVED***g) RawCon***REMOVED***g() (clientcmdapi.Con***REMOVED***g, error) {
-	return con***REMOVED***g.con***REMOVED***g, nil
+func (config *DirectClientConfig) RawConfig() (clientcmdapi.Config, error) {
+	return config.config, nil
 }
 
-// ClientCon***REMOVED***g implements ClientCon***REMOVED***g
-func (con***REMOVED***g *DirectClientCon***REMOVED***g) ClientCon***REMOVED***g() (*restclient.Con***REMOVED***g, error) {
+// ClientConfig implements ClientConfig
+func (config *DirectClientConfig) ClientConfig() (*restclient.Config, error) {
 	// check that getAuthInfo, getContext, and getCluster do not return an error.
-	// Do this before checking if the current con***REMOVED***g is usable in the event that an
-	// AuthInfo, Context, or Cluster con***REMOVED***g with user-de***REMOVED***ned names are not found.
+	// Do this before checking if the current config is usable in the event that an
+	// AuthInfo, Context, or Cluster config with user-defined names are not found.
 	// This provides a user with the immediate cause for error if one is found
-	con***REMOVED***gAuthInfo, err := con***REMOVED***g.getAuthInfo()
+	configAuthInfo, err := config.getAuthInfo()
 	if err != nil {
 		return nil, err
 	}
 
-	_, err = con***REMOVED***g.getContext()
+	_, err = config.getContext()
 	if err != nil {
 		return nil, err
 	}
 
-	con***REMOVED***gClusterInfo, err := con***REMOVED***g.getCluster()
+	configClusterInfo, err := config.getCluster()
 	if err != nil {
 		return nil, err
 	}
 
-	if err := con***REMOVED***g.Con***REMOVED***rmUsable(); err != nil {
+	if err := config.ConfirmUsable(); err != nil {
 		return nil, err
 	}
 
-	clientCon***REMOVED***g := &restclient.Con***REMOVED***g{}
-	clientCon***REMOVED***g.Host = con***REMOVED***gClusterInfo.Server
+	clientConfig := &restclient.Config{}
+	clientConfig.Host = configClusterInfo.Server
 
-	if len(con***REMOVED***g.overrides.Timeout) > 0 {
-		timeout, err := ParseTimeout(con***REMOVED***g.overrides.Timeout)
+	if len(config.overrides.Timeout) > 0 {
+		timeout, err := ParseTimeout(config.overrides.Timeout)
 		if err != nil {
 			return nil, err
 		}
-		clientCon***REMOVED***g.Timeout = timeout
+		clientConfig.Timeout = timeout
 	}
 
-	if u, err := url.ParseRequestURI(clientCon***REMOVED***g.Host); err == nil && u.Opaque == "" && len(u.Path) > 1 {
+	if u, err := url.ParseRequestURI(clientConfig.Host); err == nil && u.Opaque == "" && len(u.Path) > 1 {
 		u.RawQuery = ""
 		u.Fragment = ""
-		clientCon***REMOVED***g.Host = u.String()
+		clientConfig.Host = u.String()
 	}
-	if len(con***REMOVED***gAuthInfo.Impersonate) > 0 {
-		clientCon***REMOVED***g.Impersonate = restclient.ImpersonationCon***REMOVED***g{
-			UserName: con***REMOVED***gAuthInfo.Impersonate,
-			Groups:   con***REMOVED***gAuthInfo.ImpersonateGroups,
-			Extra:    con***REMOVED***gAuthInfo.ImpersonateUserExtra,
+	if len(configAuthInfo.Impersonate) > 0 {
+		clientConfig.Impersonate = restclient.ImpersonationConfig{
+			UserName: configAuthInfo.Impersonate,
+			Groups:   configAuthInfo.ImpersonateGroups,
+			Extra:    configAuthInfo.ImpersonateUserExtra,
 		}
 	}
 
 	// only try to read the auth information if we are secure
-	if restclient.IsCon***REMOVED***gTransportTLS(*clientCon***REMOVED***g) {
+	if restclient.IsConfigTransportTLS(*clientConfig) {
 		var err error
-		var persister restclient.AuthProviderCon***REMOVED***gPersister
-		if con***REMOVED***g.con***REMOVED***gAccess != nil {
-			authInfoName, _ := con***REMOVED***g.getAuthInfoName()
-			persister = PersisterForUser(con***REMOVED***g.con***REMOVED***gAccess, authInfoName)
+		var persister restclient.AuthProviderConfigPersister
+		if config.configAccess != nil {
+			authInfoName, _ := config.getAuthInfoName()
+			persister = PersisterForUser(config.configAccess, authInfoName)
 		}
-		userAuthPartialCon***REMOVED***g, err := con***REMOVED***g.getUserIdenti***REMOVED***cationPartialCon***REMOVED***g(con***REMOVED***gAuthInfo, con***REMOVED***g.fallbackReader, persister)
+		userAuthPartialConfig, err := config.getUserIdentificationPartialConfig(configAuthInfo, config.fallbackReader, persister)
 		if err != nil {
 			return nil, err
 		}
-		mergo.MergeWithOverwrite(clientCon***REMOVED***g, userAuthPartialCon***REMOVED***g)
+		mergo.MergeWithOverwrite(clientConfig, userAuthPartialConfig)
 
-		serverAuthPartialCon***REMOVED***g, err := getServerIdenti***REMOVED***cationPartialCon***REMOVED***g(con***REMOVED***gAuthInfo, con***REMOVED***gClusterInfo)
+		serverAuthPartialConfig, err := getServerIdentificationPartialConfig(configAuthInfo, configClusterInfo)
 		if err != nil {
 			return nil, err
 		}
-		mergo.MergeWithOverwrite(clientCon***REMOVED***g, serverAuthPartialCon***REMOVED***g)
+		mergo.MergeWithOverwrite(clientConfig, serverAuthPartialConfig)
 	}
 
-	return clientCon***REMOVED***g, nil
+	return clientConfig, nil
 }
 
-// clientauth.Info object contain both user identi***REMOVED***cation and server identi***REMOVED***cation.  We want different precedence orders for
+// clientauth.Info object contain both user identification and server identification.  We want different precedence orders for
 // both, so we have to split the objects and merge them separately
-// we want this order of precedence for the server identi***REMOVED***cation
-// 1.  con***REMOVED***gClusterInfo (the ***REMOVED***nal result of command line flags and merged .kubecon***REMOVED***g ***REMOVED***les)
-// 2.  con***REMOVED***gAuthInfo.auth-path (this ***REMOVED***le can contain information that conflicts with #1, and we want #1 to win the priority)
-// 3.  load the ~/.kubernetes_auth ***REMOVED***le as a default
-func getServerIdenti***REMOVED***cationPartialCon***REMOVED***g(con***REMOVED***gAuthInfo clientcmdapi.AuthInfo, con***REMOVED***gClusterInfo clientcmdapi.Cluster) (*restclient.Con***REMOVED***g, error) {
-	mergedCon***REMOVED***g := &restclient.Con***REMOVED***g{}
+// we want this order of precedence for the server identification
+// 1.  configClusterInfo (the final result of command line flags and merged .kubeconfig files)
+// 2.  configAuthInfo.auth-path (this file can contain information that conflicts with #1, and we want #1 to win the priority)
+// 3.  load the ~/.kubernetes_auth file as a default
+func getServerIdentificationPartialConfig(configAuthInfo clientcmdapi.AuthInfo, configClusterInfo clientcmdapi.Cluster) (*restclient.Config, error) {
+	mergedConfig := &restclient.Config{}
 
-	// con***REMOVED***gClusterInfo holds the information identify the server provided by .kubecon***REMOVED***g
-	con***REMOVED***gClientCon***REMOVED***g := &restclient.Con***REMOVED***g{}
-	con***REMOVED***gClientCon***REMOVED***g.CAFile = con***REMOVED***gClusterInfo.Certi***REMOVED***cateAuthority
-	con***REMOVED***gClientCon***REMOVED***g.CAData = con***REMOVED***gClusterInfo.Certi***REMOVED***cateAuthorityData
-	con***REMOVED***gClientCon***REMOVED***g.Insecure = con***REMOVED***gClusterInfo.InsecureSkipTLSVerify
-	mergo.MergeWithOverwrite(mergedCon***REMOVED***g, con***REMOVED***gClientCon***REMOVED***g)
+	// configClusterInfo holds the information identify the server provided by .kubeconfig
+	configClientConfig := &restclient.Config{}
+	configClientConfig.CAFile = configClusterInfo.CertificateAuthority
+	configClientConfig.CAData = configClusterInfo.CertificateAuthorityData
+	configClientConfig.Insecure = configClusterInfo.InsecureSkipTLSVerify
+	mergo.MergeWithOverwrite(mergedConfig, configClientConfig)
 
-	return mergedCon***REMOVED***g, nil
+	return mergedConfig, nil
 }
 
-// clientauth.Info object contain both user identi***REMOVED***cation and server identi***REMOVED***cation.  We want different precedence orders for
+// clientauth.Info object contain both user identification and server identification.  We want different precedence orders for
 // both, so we have to split the objects and merge them separately
-// we want this order of precedence for user identi***REMOVED***cation
-// 1.  con***REMOVED***gAuthInfo minus auth-path (the ***REMOVED***nal result of command line flags and merged .kubecon***REMOVED***g ***REMOVED***les)
-// 2.  con***REMOVED***gAuthInfo.auth-path (this ***REMOVED***le can contain information that conflicts with #1, and we want #1 to win the priority)
-// 3.  if there is not enough information to identify the user, load try the ~/.kubernetes_auth ***REMOVED***le
+// we want this order of precedence for user identification
+// 1.  configAuthInfo minus auth-path (the final result of command line flags and merged .kubeconfig files)
+// 2.  configAuthInfo.auth-path (this file can contain information that conflicts with #1, and we want #1 to win the priority)
+// 3.  if there is not enough information to identify the user, load try the ~/.kubernetes_auth file
 // 4.  if there is not enough information to identify the user, prompt if possible
-func (con***REMOVED***g *DirectClientCon***REMOVED***g) getUserIdenti***REMOVED***cationPartialCon***REMOVED***g(con***REMOVED***gAuthInfo clientcmdapi.AuthInfo, fallbackReader io.Reader, persistAuthCon***REMOVED***g restclient.AuthProviderCon***REMOVED***gPersister) (*restclient.Con***REMOVED***g, error) {
-	mergedCon***REMOVED***g := &restclient.Con***REMOVED***g{}
+func (config *DirectClientConfig) getUserIdentificationPartialConfig(configAuthInfo clientcmdapi.AuthInfo, fallbackReader io.Reader, persistAuthConfig restclient.AuthProviderConfigPersister) (*restclient.Config, error) {
+	mergedConfig := &restclient.Config{}
 
 	// blindly overwrite existing values based on precedence
-	if len(con***REMOVED***gAuthInfo.Token) > 0 {
-		mergedCon***REMOVED***g.BearerToken = con***REMOVED***gAuthInfo.Token
-	} ***REMOVED*** if len(con***REMOVED***gAuthInfo.TokenFile) > 0 {
-		tokenBytes, err := ioutil.ReadFile(con***REMOVED***gAuthInfo.TokenFile)
+	if len(configAuthInfo.Token) > 0 {
+		mergedConfig.BearerToken = configAuthInfo.Token
+	} else if len(configAuthInfo.TokenFile) > 0 {
+		tokenBytes, err := ioutil.ReadFile(configAuthInfo.TokenFile)
 		if err != nil {
 			return nil, err
 		}
-		mergedCon***REMOVED***g.BearerToken = string(tokenBytes)
-		mergedCon***REMOVED***g.BearerTokenFile = con***REMOVED***gAuthInfo.TokenFile
+		mergedConfig.BearerToken = string(tokenBytes)
+		mergedConfig.BearerTokenFile = configAuthInfo.TokenFile
 	}
-	if len(con***REMOVED***gAuthInfo.Impersonate) > 0 {
-		mergedCon***REMOVED***g.Impersonate = restclient.ImpersonationCon***REMOVED***g{
-			UserName: con***REMOVED***gAuthInfo.Impersonate,
-			Groups:   con***REMOVED***gAuthInfo.ImpersonateGroups,
-			Extra:    con***REMOVED***gAuthInfo.ImpersonateUserExtra,
+	if len(configAuthInfo.Impersonate) > 0 {
+		mergedConfig.Impersonate = restclient.ImpersonationConfig{
+			UserName: configAuthInfo.Impersonate,
+			Groups:   configAuthInfo.ImpersonateGroups,
+			Extra:    configAuthInfo.ImpersonateUserExtra,
 		}
 	}
-	if len(con***REMOVED***gAuthInfo.ClientCerti***REMOVED***cate) > 0 || len(con***REMOVED***gAuthInfo.ClientCerti***REMOVED***cateData) > 0 {
-		mergedCon***REMOVED***g.CertFile = con***REMOVED***gAuthInfo.ClientCerti***REMOVED***cate
-		mergedCon***REMOVED***g.CertData = con***REMOVED***gAuthInfo.ClientCerti***REMOVED***cateData
-		mergedCon***REMOVED***g.KeyFile = con***REMOVED***gAuthInfo.ClientKey
-		mergedCon***REMOVED***g.KeyData = con***REMOVED***gAuthInfo.ClientKeyData
+	if len(configAuthInfo.ClientCertificate) > 0 || len(configAuthInfo.ClientCertificateData) > 0 {
+		mergedConfig.CertFile = configAuthInfo.ClientCertificate
+		mergedConfig.CertData = configAuthInfo.ClientCertificateData
+		mergedConfig.KeyFile = configAuthInfo.ClientKey
+		mergedConfig.KeyData = configAuthInfo.ClientKeyData
 	}
-	if len(con***REMOVED***gAuthInfo.Username) > 0 || len(con***REMOVED***gAuthInfo.Password) > 0 {
-		mergedCon***REMOVED***g.Username = con***REMOVED***gAuthInfo.Username
-		mergedCon***REMOVED***g.Password = con***REMOVED***gAuthInfo.Password
+	if len(configAuthInfo.Username) > 0 || len(configAuthInfo.Password) > 0 {
+		mergedConfig.Username = configAuthInfo.Username
+		mergedConfig.Password = configAuthInfo.Password
 	}
-	if con***REMOVED***gAuthInfo.AuthProvider != nil {
-		mergedCon***REMOVED***g.AuthProvider = con***REMOVED***gAuthInfo.AuthProvider
-		mergedCon***REMOVED***g.AuthCon***REMOVED***gPersister = persistAuthCon***REMOVED***g
+	if configAuthInfo.AuthProvider != nil {
+		mergedConfig.AuthProvider = configAuthInfo.AuthProvider
+		mergedConfig.AuthConfigPersister = persistAuthConfig
 	}
-	if con***REMOVED***gAuthInfo.Exec != nil {
-		mergedCon***REMOVED***g.ExecProvider = con***REMOVED***gAuthInfo.Exec
+	if configAuthInfo.Exec != nil {
+		mergedConfig.ExecProvider = configAuthInfo.Exec
 	}
 
 	// if there still isn't enough information to authenticate the user, try prompting
-	if !canIdentifyUser(*mergedCon***REMOVED***g) && (fallbackReader != nil) {
-		if len(con***REMOVED***g.promptedCredentials.username) > 0 && len(con***REMOVED***g.promptedCredentials.password) > 0 {
-			mergedCon***REMOVED***g.Username = con***REMOVED***g.promptedCredentials.username
-			mergedCon***REMOVED***g.Password = con***REMOVED***g.promptedCredentials.password
-			return mergedCon***REMOVED***g, nil
+	if !canIdentifyUser(*mergedConfig) && (fallbackReader != nil) {
+		if len(config.promptedCredentials.username) > 0 && len(config.promptedCredentials.password) > 0 {
+			mergedConfig.Username = config.promptedCredentials.username
+			mergedConfig.Password = config.promptedCredentials.password
+			return mergedConfig, nil
 		}
 		prompter := NewPromptingAuthLoader(fallbackReader)
 		promptedAuthInfo, err := prompter.Prompt()
 		if err != nil {
 			return nil, err
 		}
-		promptedCon***REMOVED***g := makeUserIdenti***REMOVED***cationCon***REMOVED***g(*promptedAuthInfo)
-		previouslyMergedCon***REMOVED***g := mergedCon***REMOVED***g
-		mergedCon***REMOVED***g = &restclient.Con***REMOVED***g{}
-		mergo.MergeWithOverwrite(mergedCon***REMOVED***g, promptedCon***REMOVED***g)
-		mergo.MergeWithOverwrite(mergedCon***REMOVED***g, previouslyMergedCon***REMOVED***g)
-		con***REMOVED***g.promptedCredentials.username = mergedCon***REMOVED***g.Username
-		con***REMOVED***g.promptedCredentials.password = mergedCon***REMOVED***g.Password
+		promptedConfig := makeUserIdentificationConfig(*promptedAuthInfo)
+		previouslyMergedConfig := mergedConfig
+		mergedConfig = &restclient.Config{}
+		mergo.MergeWithOverwrite(mergedConfig, promptedConfig)
+		mergo.MergeWithOverwrite(mergedConfig, previouslyMergedConfig)
+		config.promptedCredentials.username = mergedConfig.Username
+		config.promptedCredentials.password = mergedConfig.Password
 	}
 
-	return mergedCon***REMOVED***g, nil
+	return mergedConfig, nil
 }
 
-// makeUserIdenti***REMOVED***cationFieldsCon***REMOVED***g returns a client.Con***REMOVED***g capable of being merged using mergo for only user identi***REMOVED***cation information
-func makeUserIdenti***REMOVED***cationCon***REMOVED***g(info clientauth.Info) *restclient.Con***REMOVED***g {
-	con***REMOVED***g := &restclient.Con***REMOVED***g{}
-	con***REMOVED***g.Username = info.User
-	con***REMOVED***g.Password = info.Password
-	con***REMOVED***g.CertFile = info.CertFile
-	con***REMOVED***g.KeyFile = info.KeyFile
-	con***REMOVED***g.BearerToken = info.BearerToken
-	return con***REMOVED***g
+// makeUserIdentificationFieldsConfig returns a client.Config capable of being merged using mergo for only user identification information
+func makeUserIdentificationConfig(info clientauth.Info) *restclient.Config {
+	config := &restclient.Config{}
+	config.Username = info.User
+	config.Password = info.Password
+	config.CertFile = info.CertFile
+	config.KeyFile = info.KeyFile
+	config.BearerToken = info.BearerToken
+	return config
 }
 
-// makeUserIdenti***REMOVED***cationFieldsCon***REMOVED***g returns a client.Con***REMOVED***g capable of being merged using mergo for only server identi***REMOVED***cation information
-func makeServerIdenti***REMOVED***cationCon***REMOVED***g(info clientauth.Info) restclient.Con***REMOVED***g {
-	con***REMOVED***g := restclient.Con***REMOVED***g{}
-	con***REMOVED***g.CAFile = info.CAFile
+// makeUserIdentificationFieldsConfig returns a client.Config capable of being merged using mergo for only server identification information
+func makeServerIdentificationConfig(info clientauth.Info) restclient.Config {
+	config := restclient.Config{}
+	config.CAFile = info.CAFile
 	if info.Insecure != nil {
-		con***REMOVED***g.Insecure = *info.Insecure
+		config.Insecure = *info.Insecure
 	}
-	return con***REMOVED***g
+	return config
 }
 
-func canIdentifyUser(con***REMOVED***g restclient.Con***REMOVED***g) bool {
-	return len(con***REMOVED***g.Username) > 0 ||
-		(len(con***REMOVED***g.CertFile) > 0 || len(con***REMOVED***g.CertData) > 0) ||
-		len(con***REMOVED***g.BearerToken) > 0 ||
-		con***REMOVED***g.AuthProvider != nil ||
-		con***REMOVED***g.ExecProvider != nil
+func canIdentifyUser(config restclient.Config) bool {
+	return len(config.Username) > 0 ||
+		(len(config.CertFile) > 0 || len(config.CertData) > 0) ||
+		len(config.BearerToken) > 0 ||
+		config.AuthProvider != nil ||
+		config.ExecProvider != nil
 }
 
-// Namespace implements ClientCon***REMOVED***g
-func (con***REMOVED***g *DirectClientCon***REMOVED***g) Namespace() (string, bool, error) {
-	if con***REMOVED***g.overrides != nil && con***REMOVED***g.overrides.Context.Namespace != "" {
-		// In the event we have an empty con***REMOVED***g but we do have a namespace override, we should return
-		// the namespace override instead of having con***REMOVED***g.Con***REMOVED***rmUsable() return an error. This allows
+// Namespace implements ClientConfig
+func (config *DirectClientConfig) Namespace() (string, bool, error) {
+	if config.overrides != nil && config.overrides.Context.Namespace != "" {
+		// In the event we have an empty config but we do have a namespace override, we should return
+		// the namespace override instead of having config.ConfirmUsable() return an error. This allows
 		// things like in-cluster clients to execute `kubectl get pods --namespace=foo` and have the
 		// --namespace flag honored instead of being ignored.
-		return con***REMOVED***g.overrides.Context.Namespace, true, nil
+		return config.overrides.Context.Namespace, true, nil
 	}
 
-	if err := con***REMOVED***g.Con***REMOVED***rmUsable(); err != nil {
+	if err := config.ConfirmUsable(); err != nil {
 		return "", false, err
 	}
 
-	con***REMOVED***gContext, err := con***REMOVED***g.getContext()
+	configContext, err := config.getContext()
 	if err != nil {
 		return "", false, err
 	}
 
-	if len(con***REMOVED***gContext.Namespace) == 0 {
+	if len(configContext.Namespace) == 0 {
 		return "default", false, nil
 	}
 
-	return con***REMOVED***gContext.Namespace, false, nil
+	return configContext.Namespace, false, nil
 }
 
-// Con***REMOVED***gAccess implements ClientCon***REMOVED***g
-func (con***REMOVED***g *DirectClientCon***REMOVED***g) Con***REMOVED***gAccess() Con***REMOVED***gAccess {
-	return con***REMOVED***g.con***REMOVED***gAccess
+// ConfigAccess implements ClientConfig
+func (config *DirectClientConfig) ConfigAccess() ConfigAccess {
+	return config.configAccess
 }
 
-// Con***REMOVED***rmUsable looks a particular context and determines if that particular part of the con***REMOVED***g is useable.  There might still be errors in the con***REMOVED***g,
-// but no errors in the sections requested or referenced.  It does not return early so that it can ***REMOVED***nd as many errors as possible.
-func (con***REMOVED***g *DirectClientCon***REMOVED***g) Con***REMOVED***rmUsable() error {
+// ConfirmUsable looks a particular context and determines if that particular part of the config is useable.  There might still be errors in the config,
+// but no errors in the sections requested or referenced.  It does not return early so that it can find as many errors as possible.
+func (config *DirectClientConfig) ConfirmUsable() error {
 	validationErrors := make([]error, 0)
 
 	var contextName string
-	if len(con***REMOVED***g.contextName) != 0 {
-		contextName = con***REMOVED***g.contextName
-	} ***REMOVED*** {
-		contextName = con***REMOVED***g.con***REMOVED***g.CurrentContext
+	if len(config.contextName) != 0 {
+		contextName = config.contextName
+	} else {
+		contextName = config.config.CurrentContext
 	}
 
 	if len(contextName) > 0 {
-		_, exists := con***REMOVED***g.con***REMOVED***g.Contexts[contextName]
+		_, exists := config.config.Contexts[contextName]
 		if !exists {
 			validationErrors = append(validationErrors, &errContextNotFound{contextName})
 		}
 	}
 
-	authInfoName, _ := con***REMOVED***g.getAuthInfoName()
-	authInfo, _ := con***REMOVED***g.getAuthInfo()
+	authInfoName, _ := config.getAuthInfoName()
+	authInfo, _ := config.getAuthInfo()
 	validationErrors = append(validationErrors, validateAuthInfo(authInfoName, authInfo)...)
-	clusterName, _ := con***REMOVED***g.getClusterName()
-	cluster, _ := con***REMOVED***g.getCluster()
+	clusterName, _ := config.getClusterName()
+	cluster, _ := config.getCluster()
 	validationErrors = append(validationErrors, validateClusterInfo(clusterName, cluster)...)
-	// when direct client con***REMOVED***g is speci***REMOVED***ed, and our only error is that no server is de***REMOVED***ned, we should
-	// return a standard "no con***REMOVED***g" error
+	// when direct client config is specified, and our only error is that no server is defined, we should
+	// return a standard "no config" error
 	if len(validationErrors) == 1 && validationErrors[0] == ErrEmptyCluster {
-		return newErrCon***REMOVED***gurationInvalid([]error{ErrEmptyCon***REMOVED***g})
+		return newErrConfigurationInvalid([]error{ErrEmptyConfig})
 	}
-	return newErrCon***REMOVED***gurationInvalid(validationErrors)
+	return newErrConfigurationInvalid(validationErrors)
 }
 
 // getContextName returns the default, or user-set context name, and a boolean that indicates
 // whether the default context name has been overwritten by a user-set flag, or left as its default value
-func (con***REMOVED***g *DirectClientCon***REMOVED***g) getContextName() (string, bool) {
-	if len(con***REMOVED***g.overrides.CurrentContext) != 0 {
-		return con***REMOVED***g.overrides.CurrentContext, true
+func (config *DirectClientConfig) getContextName() (string, bool) {
+	if len(config.overrides.CurrentContext) != 0 {
+		return config.overrides.CurrentContext, true
 	}
-	if len(con***REMOVED***g.contextName) != 0 {
-		return con***REMOVED***g.contextName, false
+	if len(config.contextName) != 0 {
+		return config.contextName, false
 	}
 
-	return con***REMOVED***g.con***REMOVED***g.CurrentContext, false
+	return config.config.CurrentContext, false
 }
 
 // getAuthInfoName returns a string containing the current authinfo name for the current context,
 // and a boolean indicating  whether the default authInfo name is overwritten by a user-set flag, or
 // left as its default value
-func (con***REMOVED***g *DirectClientCon***REMOVED***g) getAuthInfoName() (string, bool) {
-	if len(con***REMOVED***g.overrides.Context.AuthInfo) != 0 {
-		return con***REMOVED***g.overrides.Context.AuthInfo, true
+func (config *DirectClientConfig) getAuthInfoName() (string, bool) {
+	if len(config.overrides.Context.AuthInfo) != 0 {
+		return config.overrides.Context.AuthInfo, true
 	}
-	context, _ := con***REMOVED***g.getContext()
+	context, _ := config.getContext()
 	return context.AuthInfo, false
 }
 
 // getClusterName returns a string containing the default, or user-set cluster name, and a boolean
 // indicating whether the default clusterName has been overwritten by a user-set flag, or left as
 // its default value
-func (con***REMOVED***g *DirectClientCon***REMOVED***g) getClusterName() (string, bool) {
-	if len(con***REMOVED***g.overrides.Context.Cluster) != 0 {
-		return con***REMOVED***g.overrides.Context.Cluster, true
+func (config *DirectClientConfig) getClusterName() (string, bool) {
+	if len(config.overrides.Context.Cluster) != 0 {
+		return config.overrides.Context.Cluster, true
 	}
-	context, _ := con***REMOVED***g.getContext()
+	context, _ := config.getContext()
 	return context.Cluster, false
 }
 
 // getContext returns the clientcmdapi.Context, or an error if a required context is not found.
-func (con***REMOVED***g *DirectClientCon***REMOVED***g) getContext() (clientcmdapi.Context, error) {
-	contexts := con***REMOVED***g.con***REMOVED***g.Contexts
-	contextName, required := con***REMOVED***g.getContextName()
+func (config *DirectClientConfig) getContext() (clientcmdapi.Context, error) {
+	contexts := config.config.Contexts
+	contextName, required := config.getContextName()
 
 	mergedContext := clientcmdapi.NewContext()
-	if con***REMOVED***gContext, exists := contexts[contextName]; exists {
-		mergo.MergeWithOverwrite(mergedContext, con***REMOVED***gContext)
-	} ***REMOVED*** if required {
+	if configContext, exists := contexts[contextName]; exists {
+		mergo.MergeWithOverwrite(mergedContext, configContext)
+	} else if required {
 		return clientcmdapi.Context{}, fmt.Errorf("context %q does not exist", contextName)
 	}
-	mergo.MergeWithOverwrite(mergedContext, con***REMOVED***g.overrides.Context)
+	mergo.MergeWithOverwrite(mergedContext, config.overrides.Context)
 
 	return *mergedContext, nil
 }
 
 // getAuthInfo returns the clientcmdapi.AuthInfo, or an error if a required auth info is not found.
-func (con***REMOVED***g *DirectClientCon***REMOVED***g) getAuthInfo() (clientcmdapi.AuthInfo, error) {
-	authInfos := con***REMOVED***g.con***REMOVED***g.AuthInfos
-	authInfoName, required := con***REMOVED***g.getAuthInfoName()
+func (config *DirectClientConfig) getAuthInfo() (clientcmdapi.AuthInfo, error) {
+	authInfos := config.config.AuthInfos
+	authInfoName, required := config.getAuthInfoName()
 
 	mergedAuthInfo := clientcmdapi.NewAuthInfo()
-	if con***REMOVED***gAuthInfo, exists := authInfos[authInfoName]; exists {
-		mergo.MergeWithOverwrite(mergedAuthInfo, con***REMOVED***gAuthInfo)
-	} ***REMOVED*** if required {
+	if configAuthInfo, exists := authInfos[authInfoName]; exists {
+		mergo.MergeWithOverwrite(mergedAuthInfo, configAuthInfo)
+	} else if required {
 		return clientcmdapi.AuthInfo{}, fmt.Errorf("auth info %q does not exist", authInfoName)
 	}
-	mergo.MergeWithOverwrite(mergedAuthInfo, con***REMOVED***g.overrides.AuthInfo)
+	mergo.MergeWithOverwrite(mergedAuthInfo, config.overrides.AuthInfo)
 
 	return *mergedAuthInfo, nil
 }
 
 // getCluster returns the clientcmdapi.Cluster, or an error if a required cluster is not found.
-func (con***REMOVED***g *DirectClientCon***REMOVED***g) getCluster() (clientcmdapi.Cluster, error) {
-	clusterInfos := con***REMOVED***g.con***REMOVED***g.Clusters
-	clusterInfoName, required := con***REMOVED***g.getClusterName()
+func (config *DirectClientConfig) getCluster() (clientcmdapi.Cluster, error) {
+	clusterInfos := config.config.Clusters
+	clusterInfoName, required := config.getClusterName()
 
 	mergedClusterInfo := clientcmdapi.NewCluster()
-	mergo.MergeWithOverwrite(mergedClusterInfo, con***REMOVED***g.overrides.ClusterDefaults)
-	if con***REMOVED***gClusterInfo, exists := clusterInfos[clusterInfoName]; exists {
-		mergo.MergeWithOverwrite(mergedClusterInfo, con***REMOVED***gClusterInfo)
-	} ***REMOVED*** if required {
+	mergo.MergeWithOverwrite(mergedClusterInfo, config.overrides.ClusterDefaults)
+	if configClusterInfo, exists := clusterInfos[clusterInfoName]; exists {
+		mergo.MergeWithOverwrite(mergedClusterInfo, configClusterInfo)
+	} else if required {
 		return clientcmdapi.Cluster{}, fmt.Errorf("cluster %q does not exist", clusterInfoName)
 	}
-	mergo.MergeWithOverwrite(mergedClusterInfo, con***REMOVED***g.overrides.ClusterInfo)
+	mergo.MergeWithOverwrite(mergedClusterInfo, config.overrides.ClusterInfo)
 	// An override of --insecure-skip-tls-verify=true and no accompanying CA/CA data should clear already-set CA/CA data
-	// otherwise, a kubecon***REMOVED***g containing a CA reference would return an error that "CA and insecure-skip-tls-verify couldn't both be set"
-	caLen := len(con***REMOVED***g.overrides.ClusterInfo.Certi***REMOVED***cateAuthority)
-	caDataLen := len(con***REMOVED***g.overrides.ClusterInfo.Certi***REMOVED***cateAuthorityData)
-	if con***REMOVED***g.overrides.ClusterInfo.InsecureSkipTLSVerify && caLen == 0 && caDataLen == 0 {
-		mergedClusterInfo.Certi***REMOVED***cateAuthority = ""
-		mergedClusterInfo.Certi***REMOVED***cateAuthorityData = nil
+	// otherwise, a kubeconfig containing a CA reference would return an error that "CA and insecure-skip-tls-verify couldn't both be set"
+	caLen := len(config.overrides.ClusterInfo.CertificateAuthority)
+	caDataLen := len(config.overrides.ClusterInfo.CertificateAuthorityData)
+	if config.overrides.ClusterInfo.InsecureSkipTLSVerify && caLen == 0 && caDataLen == 0 {
+		mergedClusterInfo.CertificateAuthority = ""
+		mergedClusterInfo.CertificateAuthorityData = nil
 	}
 
 	return *mergedClusterInfo, nil
 }
 
-// inClusterClientCon***REMOVED***g makes a con***REMOVED***g that will work from within a kubernetes cluster container environment.
+// inClusterClientConfig makes a config that will work from within a kubernetes cluster container environment.
 // Can take options overrides for flags explicitly provided to the command inside the cluster container.
-type inClusterClientCon***REMOVED***g struct {
-	overrides               *Con***REMOVED***gOverrides
-	inClusterCon***REMOVED***gProvider func() (*restclient.Con***REMOVED***g, error)
+type inClusterClientConfig struct {
+	overrides               *ConfigOverrides
+	inClusterConfigProvider func() (*restclient.Config, error)
 }
 
-var _ ClientCon***REMOVED***g = &inClusterClientCon***REMOVED***g{}
+var _ ClientConfig = &inClusterClientConfig{}
 
-func (con***REMOVED***g *inClusterClientCon***REMOVED***g) RawCon***REMOVED***g() (clientcmdapi.Con***REMOVED***g, error) {
-	return clientcmdapi.Con***REMOVED***g{}, fmt.Errorf("inCluster environment con***REMOVED***g doesn't support multiple clusters")
+func (config *inClusterClientConfig) RawConfig() (clientcmdapi.Config, error) {
+	return clientcmdapi.Config{}, fmt.Errorf("inCluster environment config doesn't support multiple clusters")
 }
 
-func (con***REMOVED***g *inClusterClientCon***REMOVED***g) ClientCon***REMOVED***g() (*restclient.Con***REMOVED***g, error) {
-	if con***REMOVED***g.inClusterCon***REMOVED***gProvider == nil {
-		con***REMOVED***g.inClusterCon***REMOVED***gProvider = restclient.InClusterCon***REMOVED***g
+func (config *inClusterClientConfig) ClientConfig() (*restclient.Config, error) {
+	if config.inClusterConfigProvider == nil {
+		config.inClusterConfigProvider = restclient.InClusterConfig
 	}
 
-	icc, err := con***REMOVED***g.inClusterCon***REMOVED***gProvider()
+	icc, err := config.inClusterConfigProvider()
 	if err != nil {
 		return nil, err
 	}
 
-	// in-cluster con***REMOVED***gs only takes a host, token, or CA ***REMOVED***le
-	// if any of them were individually provided, overwrite anything ***REMOVED***
-	if con***REMOVED***g.overrides != nil {
-		if server := con***REMOVED***g.overrides.ClusterInfo.Server; len(server) > 0 {
+	// in-cluster configs only takes a host, token, or CA file
+	// if any of them were individually provided, overwrite anything else
+	if config.overrides != nil {
+		if server := config.overrides.ClusterInfo.Server; len(server) > 0 {
 			icc.Host = server
 		}
-		if token := con***REMOVED***g.overrides.AuthInfo.Token; len(token) > 0 {
+		if token := config.overrides.AuthInfo.Token; len(token) > 0 {
 			icc.BearerToken = token
 		}
-		if certi***REMOVED***cateAuthorityFile := con***REMOVED***g.overrides.ClusterInfo.Certi***REMOVED***cateAuthority; len(certi***REMOVED***cateAuthorityFile) > 0 {
-			icc.TLSClientCon***REMOVED***g.CAFile = certi***REMOVED***cateAuthorityFile
+		if certificateAuthorityFile := config.overrides.ClusterInfo.CertificateAuthority; len(certificateAuthorityFile) > 0 {
+			icc.TLSClientConfig.CAFile = certificateAuthorityFile
 		}
 	}
 
 	return icc, err
 }
 
-func (con***REMOVED***g *inClusterClientCon***REMOVED***g) Namespace() (string, bool, error) {
+func (config *inClusterClientConfig) Namespace() (string, bool, error) {
 	// This way assumes you've set the POD_NAMESPACE environment variable using the downward API.
-	// This check has to be done ***REMOVED***rst for backwards compatibility with the way InClusterCon***REMOVED***g was originally set up
+	// This check has to be done first for backwards compatibility with the way InClusterConfig was originally set up
 	if ns := os.Getenv("POD_NAMESPACE"); ns != "" {
 		return ns, false, nil
 	}
@@ -527,43 +527,43 @@ func (con***REMOVED***g *inClusterClientCon***REMOVED***g) Namespace() (string, 
 	return "default", false, nil
 }
 
-func (con***REMOVED***g *inClusterClientCon***REMOVED***g) Con***REMOVED***gAccess() Con***REMOVED***gAccess {
-	return NewDefaultClientCon***REMOVED***gLoadingRules()
+func (config *inClusterClientConfig) ConfigAccess() ConfigAccess {
+	return NewDefaultClientConfigLoadingRules()
 }
 
 // Possible returns true if loading an inside-kubernetes-cluster is possible.
-func (con***REMOVED***g *inClusterClientCon***REMOVED***g) Possible() bool {
-	***REMOVED***, err := os.Stat("/var/run/secrets/kubernetes.io/serviceaccount/token")
+func (config *inClusterClientConfig) Possible() bool {
+	fi, err := os.Stat("/var/run/secrets/kubernetes.io/serviceaccount/token")
 	return os.Getenv("KUBERNETES_SERVICE_HOST") != "" &&
 		os.Getenv("KUBERNETES_SERVICE_PORT") != "" &&
-		err == nil && !***REMOVED***.IsDir()
+		err == nil && !fi.IsDir()
 }
 
-// BuildCon***REMOVED***gFromFlags is a helper function that builds con***REMOVED***gs from a master
-// url or a kubecon***REMOVED***g ***REMOVED***lepath. These are passed in as command line flags for cluster
-// components. Warnings should reflect this usage. If neither masterUrl or kubecon***REMOVED***gPath
-// are passed in we fallback to inClusterCon***REMOVED***g. If inClusterCon***REMOVED***g fails, we fallback
-// to the default con***REMOVED***g.
-func BuildCon***REMOVED***gFromFlags(masterUrl, kubecon***REMOVED***gPath string) (*restclient.Con***REMOVED***g, error) {
-	if kubecon***REMOVED***gPath == "" && masterUrl == "" {
-		klog.Warningf("Neither --kubecon***REMOVED***g nor --master was speci***REMOVED***ed.  Using the inClusterCon***REMOVED***g.  This might not work.")
-		kubecon***REMOVED***g, err := restclient.InClusterCon***REMOVED***g()
+// BuildConfigFromFlags is a helper function that builds configs from a master
+// url or a kubeconfig filepath. These are passed in as command line flags for cluster
+// components. Warnings should reflect this usage. If neither masterUrl or kubeconfigPath
+// are passed in we fallback to inClusterConfig. If inClusterConfig fails, we fallback
+// to the default config.
+func BuildConfigFromFlags(masterUrl, kubeconfigPath string) (*restclient.Config, error) {
+	if kubeconfigPath == "" && masterUrl == "" {
+		klog.Warningf("Neither --kubeconfig nor --master was specified.  Using the inClusterConfig.  This might not work.")
+		kubeconfig, err := restclient.InClusterConfig()
 		if err == nil {
-			return kubecon***REMOVED***g, nil
+			return kubeconfig, nil
 		}
-		klog.Warning("error creating inClusterCon***REMOVED***g, falling back to default con***REMOVED***g: ", err)
+		klog.Warning("error creating inClusterConfig, falling back to default config: ", err)
 	}
-	return NewNonInteractiveDeferredLoadingClientCon***REMOVED***g(
-		&ClientCon***REMOVED***gLoadingRules{ExplicitPath: kubecon***REMOVED***gPath},
-		&Con***REMOVED***gOverrides{ClusterInfo: clientcmdapi.Cluster{Server: masterUrl}}).ClientCon***REMOVED***g()
+	return NewNonInteractiveDeferredLoadingClientConfig(
+		&ClientConfigLoadingRules{ExplicitPath: kubeconfigPath},
+		&ConfigOverrides{ClusterInfo: clientcmdapi.Cluster{Server: masterUrl}}).ClientConfig()
 }
 
-// BuildCon***REMOVED***gFromKubecon***REMOVED***gGetter is a helper function that builds con***REMOVED***gs from a master
-// url and a kubecon***REMOVED***gGetter.
-func BuildCon***REMOVED***gFromKubecon***REMOVED***gGetter(masterUrl string, kubecon***REMOVED***gGetter Kubecon***REMOVED***gGetter) (*restclient.Con***REMOVED***g, error) {
-	// TODO: We do not need a DeferredLoader here. Refactor code and see if we can use DirectClientCon***REMOVED***g here.
-	cc := NewNonInteractiveDeferredLoadingClientCon***REMOVED***g(
-		&ClientCon***REMOVED***gGetter{kubecon***REMOVED***gGetter: kubecon***REMOVED***gGetter},
-		&Con***REMOVED***gOverrides{ClusterInfo: clientcmdapi.Cluster{Server: masterUrl}})
-	return cc.ClientCon***REMOVED***g()
+// BuildConfigFromKubeconfigGetter is a helper function that builds configs from a master
+// url and a kubeconfigGetter.
+func BuildConfigFromKubeconfigGetter(masterUrl string, kubeconfigGetter KubeconfigGetter) (*restclient.Config, error) {
+	// TODO: We do not need a DeferredLoader here. Refactor code and see if we can use DirectClientConfig here.
+	cc := NewNonInteractiveDeferredLoadingClientConfig(
+		&ClientConfigGetter{kubeconfigGetter: kubeconfigGetter},
+		&ConfigOverrides{ClusterInfo: clientcmdapi.Cluster{Server: masterUrl}})
+	return cc.ClientConfig()
 }

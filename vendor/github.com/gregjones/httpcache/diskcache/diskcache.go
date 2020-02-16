@@ -44,7 +44,7 @@ func keyToFilename(key string) string {
 	return hex.EncodeToString(h.Sum(nil))
 }
 
-// New returns a new Cache that will store ***REMOVED***les in basePath
+// New returns a new Cache that will store files in basePath
 func New(basePath string) *Cache {
 	return &Cache{
 		d: diskv.New(diskv.Options{

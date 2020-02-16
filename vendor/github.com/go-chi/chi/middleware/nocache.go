@@ -21,11 +21,11 @@ var noCacheHeaders = map[string]string{
 
 var etagHeaders = []string{
 	"ETag",
-	"If-Modi***REMOVED***ed-Since",
+	"If-Modified-Since",
 	"If-Match",
 	"If-None-Match",
 	"If-Range",
-	"If-Unmodi***REMOVED***ed-Since",
+	"If-Unmodified-Since",
 }
 
 // NoCache is a simple piece of middleware that sets a number of HTTP headers to prevent

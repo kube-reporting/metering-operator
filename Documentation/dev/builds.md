@@ -8,12 +8,12 @@ Each of them is built slightly differently.
   - Source is primarily in `pkg/`, and `cmd/` of this repo.
   - origin
     - source is https://github.com/operator-framework/operator-metering
-    - Docker***REMOVED***le is `Docker***REMOVED***le.reporting-operator`
+    - Dockerfile is `Dockerfile.reporting-operator`
     - Docker image is [quay.io/openshift/origin-metering-reporting-operator](https://quay.io/repository/openshift/origin-metering-reporting-operator)
     - Built by origin CI using prow/ci-operator
   - OCP
     - Source: http://pkgs.devel.redhat.com/cgit/containers/ose-metering-reporting-operator/
-    - OCP Docker***REMOVED***le is `Docker***REMOVED***le.reporting-operator.rhel`
+    - OCP Dockerfile is `Dockerfile.reporting-operator.rhel`
     - OCP Docker image is TBD
     - Built in brew by OSBS
     - brew package name: `ose-metering-reporting-operator-container`
@@ -24,12 +24,12 @@ Each of them is built slightly differently.
   - Source is primarily in `charts/`, `images/helm-operator/`
   - origin
     - Source: https://github.com/operator-framework/operator-metering
-    - Docker***REMOVED***le is `Docker***REMOVED***le.metering-operator`
+    - Dockerfile is `Dockerfile.metering-operator`
     - Docker image is [quay.io/openshift/origin-metering-helm-operator](https://quay.io/repository/openshift/origin-metering-helm-operator)
     - Built by origin CI using prow/ci-operator
   - OCP
     - Source: http://pkgs.devel.redhat.com/cgit/containers/ose-metering-helm-operator/
-    - OCP Docker***REMOVED***le is `Docker***REMOVED***le.metering-operator.rhel`
+    - OCP Dockerfile is `Dockerfile.metering-operator.rhel`
     - OCP Docker image is TBD
     - Built in brew by OSBS
     - brew package name: `ose-metering-helm-operator-container`
@@ -38,12 +38,12 @@ Each of them is built slightly differently.
   - Written in Go
   - origin
     - Source is https://github.com/operator-framework/helm/blob/master
-    - Docker***REMOVED***le is https://github.com/operator-framework/helm/blob/master/Docker***REMOVED***le
+    - Dockerfile is https://github.com/operator-framework/helm/blob/master/Dockerfile
     - Docker image is [quay.io/openshift/origin-metering-helm](https://quay.io/repository/openshift/origin-metering-helm)
     - Build by origin CI using prow/ci-operator
   - OCP
     - Source is  http://pkgs.devel.redhat.com/cgit/containers/ose-metering-helm/
-    - OCP Docker***REMOVED***le is https://github.com/operator-framework/helm/blob/master/Docker***REMOVED***le.rhel
+    - OCP Dockerfile is https://github.com/operator-framework/helm/blob/master/Dockerfile.rhel
     - OCP Docker image is TBD
     - Built in brew by OSBS
     - brew package name: `ose-metering-helm-container`
@@ -52,12 +52,12 @@ Each of them is built slightly differently.
   - Written in Java, uses [maven][maven] as a project build tool.
   - origin
     - Source is https://github.com/operator-framework/presto/tree/master
-    - Docker***REMOVED***le is https://github.com/operator-framework/presto/blob/master/Docker***REMOVED***le
+    - Dockerfile is https://github.com/operator-framework/presto/blob/master/Dockerfile
     - Docker image is [quay.io/openshift/origin-metering-presto](https://quay.io/repository/openshift/origin-metering-presto)
     - Build by origin CI using prow/ci-operator
   - OCP
     - Source is http://pkgs.devel.redhat.com/cgit/containers/presto/
-    - OCP Docker***REMOVED***le is https://github.com/operator-framework/presto/blob/master/Docker***REMOVED***le.rhel
+    - OCP Dockerfile is https://github.com/operator-framework/presto/blob/master/Dockerfile.rhel
     - OCP Docker image is TBD
     - Built in brew by OSBS
     - brew package name: `presto-container`
@@ -66,12 +66,12 @@ Each of them is built slightly differently.
   - Written in Java, uses [maven][maven] as a project build tool.
   - origin
     - Source is https://github.com/operator-framework/hive/tree/master
-    - Docker***REMOVED***le is https://github.com/operator-framework/hive/tree/master/Docker***REMOVED***le
+    - Dockerfile is https://github.com/operator-framework/hive/tree/master/Dockerfile
     - Docker image is [quay.io/openshift/origin-metering-hive](https://quay.io/repository/openshift/origin-metering-hive)
     - Build by origin CI using prow/ci-operator
   - OCP
     - Source is http://pkgs.devel.redhat.com/cgit/containers/hive/
-    - OCP Docker***REMOVED***le is https://github.com/operator-framework/hive/tree/master/Docker***REMOVED***le.rhel
+    - OCP Dockerfile is https://github.com/operator-framework/hive/tree/master/Dockerfile.rhel
     - OCP Docker image is TBD
     - Built in brew by OSBS
     - brew package name: `hive-container`
@@ -80,12 +80,12 @@ Each of them is built slightly differently.
   - Written in Java, uses [maven][maven] as a project build tool.
   - origin
     - Source is https://github.com/operator-framework/hadoop/tree/master
-    - Docker***REMOVED***le is https://github.com/operator-framework/hadoop/tree/master/Docker***REMOVED***le
+    - Dockerfile is https://github.com/operator-framework/hadoop/tree/master/Dockerfile
     - Docker image is [quay.io/openshift/origin-metering-hadoop](https://quay.io/repository/openshift/origin-metering-hadoop)
     - Build by origin CI using prow/ci-operator
   - OCP
     - Source is http://pkgs.devel.redhat.com/cgit/containers/hadoop/
-    - OCP Docker***REMOVED***le is https://github.com/operator-framework/hadoop/tree/master/Docker***REMOVED***le.rhel
+    - OCP Dockerfile is https://github.com/operator-framework/hadoop/tree/master/Dockerfile.rhel
     - OCP Docker image is TBD
     - Built in brew by OSBS
     - brew package name: `hadoop-container`
@@ -108,10 +108,10 @@ The major components are:
   - Builds, Images, rpms, java artifacts, etc all get pushed here.
 - [dist-git][dist-git]
   - Holds copies of our repos that are synced and managed by the Automated Release Team (ART).
-  - Contains modi***REMOVED***ed Docker***REMOVED***les: They use a tool [OIT][oit] that adds some additional changes to the repo before syncing it to dist-git.
-  - One dist-git repo per docker image. Each repo is for one Docker***REMOVED***le + other ***REMOVED***les used by OSBS.
+  - Contains modified Dockerfiles: They use a tool [OIT][oit] that adds some additional changes to the repo before syncing it to dist-git.
+  - One dist-git repo per docker image. Each repo is for one Dockerfile + other files used by OSBS.
 
-For reporting-operator, helm, and metering-helm-operator, they all are written primarily in Go, and have any dependencies vendored, so OSBS can build them directly without any additional requirements once ART runs [oit][oit] to sync the repositories and update the Docker***REMOVED***les.
+For reporting-operator, helm, and metering-helm-operator, they all are written primarily in Go, and have any dependencies vendored, so OSBS can build them directly without any additional requirements once ART runs [oit][oit] to sync the repositories and update the Dockerfiles.
 
 For Presto, Hive, and Hadoop, these are all written in Java, and their dependencies are fetched using [maven][maven], meaning extra work is required to build these, since OSBS doesn't allow downloading things outside the network.
 To handle this we use [PNC][pnc] to perform builds using maven and push the artifacts to brew.
@@ -127,34 +127,34 @@ The Openshift Metering "product" is found at: http://orch.psi.redhat.com/pnc-web
 Current product versions:
 
 - Openshift Metering 0.7
-  - Brew Tag Pre***REMOVED***x: `openshift-metering-0.7-pnc`
+  - Brew Tag Prefix: `openshift-metering-0.7-pnc`
 
 We currently have 4 projects in PNC:
 
 - presto
   - http://orch.psi.redhat.com/pnc-web/#/projects/207
-  - build con***REMOVED***gs:
-    - presto-0.212: http://orch.psi.redhat.com/pnc-web/#/projects/207/build-con***REMOVED***gs/571
-    - presto-310: http://orch.psi.redhat.com/pnc-web/#/projects/207/build-con***REMOVED***gs/1470
+  - build configs:
+    - presto-0.212: http://orch.psi.redhat.com/pnc-web/#/projects/207/build-configs/571
+    - presto-310: http://orch.psi.redhat.com/pnc-web/#/projects/207/build-configs/1470
 - hive
   - http://orch.psi.redhat.com/pnc-web/#/projects/220
-  - build con***REMOVED***gs:
-    - hive-2.3.3: http://orch.psi.redhat.com/pnc-web/#/projects/220/build-con***REMOVED***gs/636
+  - build configs:
+    - hive-2.3.3: http://orch.psi.redhat.com/pnc-web/#/projects/220/build-configs/636
 - hadoop
   - http://orch.psi.redhat.com/pnc-web/#/projects/219
-  - build con***REMOVED***gs:
-    - hadoop-3.1.1: http://orch.psi.redhat.com/pnc-web/#/projects/219/build-con***REMOVED***gs/633
+  - build configs:
+    - hadoop-3.1.1: http://orch.psi.redhat.com/pnc-web/#/projects/219/build-configs/633
 - prometheus-jmx-exporter
   - http://orch.psi.redhat.com/pnc-web/#/projects/208
-  - build con***REMOVED***gs:
-    - prometheus-jmx-exporter-0.3.1: http://orch.psi.redhat.com/pnc-web/#/projects/208/build-con***REMOVED***gs/578
+  - build configs:
+    - prometheus-jmx-exporter-0.3.1: http://orch.psi.redhat.com/pnc-web/#/projects/208/build-configs/578
 
 ### PNC Brew Push
 
 Read the PNC documentation on closing milestones: https://docs.engineering.redhat.com/pages/viewpage.action?pageId=44534467
 
 Also read https://docs.engineering.redhat.com/display/JP/Integration+with+Brew for details on the brew tags that need to be created prior to the push.
-Usually having tags added is as simple as ***REMOVED***ling a Jira ticket in the RCM project (Ex: https://projects.engineering.redhat.com/browse/RCM-43044).
+Usually having tags added is as simple as filing a Jira ticket in the RCM project (Ex: https://projects.engineering.redhat.com/browse/RCM-43044).
 
 [osbs]: https://osbs.readthedocs.io/en/latest/
 [pnc]: https://docs.engineering.redhat.com/display/JP/User%27s+guide

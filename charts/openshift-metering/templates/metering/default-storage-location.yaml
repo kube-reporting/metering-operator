@@ -14,7 +14,7 @@ spec:
 {{- if eq $reportingValues.spec.defaultStorageLocation.type "hive" }}
   hive:
 {{ toYaml $reportingValues.spec.defaultStorageLocation.hive | indent 4 }}
-{{- ***REMOVED*** }}
+{{- else }}
 {{ printf "Unsupported defaultStorageLocation.type: '%s'" $reportingValues.spec.defaultStorageLocation.type | fail }}
 {{- end -}}
 {{- end -}}

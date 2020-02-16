@@ -3,7 +3,7 @@ package azure
 // Copyright 2017 Microsoft Corporation
 //
 //  Licensed under the Apache License, Version 2.0 (the "License");
-//  you may not use this ***REMOVED***le except in compliance with the License.
+//  you may not use this file except in compliance with the License.
 //  You may obtain a copy of the License at
 //
 //      http://www.apache.org/licenses/LICENSE-2.0
@@ -11,7 +11,7 @@ package azure
 //  Unless required by applicable law or agreed to in writing, software
 //  distributed under the License is distributed on an "AS IS" BASIS,
 //  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-//  See the License for the speci***REMOVED***c language governing permissions and
+//  See the License for the specific language governing permissions and
 //  limitations under the License.
 
 import (
@@ -23,7 +23,7 @@ import (
 )
 
 const (
-	// EnvironmentFilepathName captures the name of the environment variable containing the path to the ***REMOVED***le
+	// EnvironmentFilepathName captures the name of the environment variable containing the path to the file
 	// to be used while populating the Azure Environment.
 	EnvironmentFilepathName = "AZURE_ENVIRONMENT_FILEPATH"
 
@@ -38,8 +38,8 @@ var environments = map[string]Environment{
 	"AZUREUSGOVERNMENTCLOUD": USGovernmentCloud,
 }
 
-// ResourceIdenti***REMOVED***er contains a set of Azure resource IDs.
-type ResourceIdenti***REMOVED***er struct {
+// ResourceIdentifier contains a set of Azure resource IDs.
+type ResourceIdentifier struct {
 	Graph               string `json:"graph"`
 	KeyVault            string `json:"keyVault"`
 	Datalake            string `json:"datalake"`
@@ -61,17 +61,17 @@ type Environment struct {
 	GraphEndpoint                string             `json:"graphEndpoint"`
 	ServiceBusEndpoint           string             `json:"serviceBusEndpoint"`
 	BatchManagementEndpoint      string             `json:"batchManagementEndpoint"`
-	StorageEndpointSuf***REMOVED***x        string             `json:"storageEndpointSuf***REMOVED***x"`
-	SQLDatabaseDNSSuf***REMOVED***x         string             `json:"sqlDatabaseDNSSuf***REMOVED***x"`
-	Traf***REMOVED***cManagerDNSSuf***REMOVED***x      string             `json:"traf***REMOVED***cManagerDNSSuf***REMOVED***x"`
-	KeyVaultDNSSuf***REMOVED***x            string             `json:"keyVaultDNSSuf***REMOVED***x"`
-	ServiceBusEndpointSuf***REMOVED***x     string             `json:"serviceBusEndpointSuf***REMOVED***x"`
-	ServiceManagementVMDNSSuf***REMOVED***x string             `json:"serviceManagementVMDNSSuf***REMOVED***x"`
-	ResourceManagerVMDNSSuf***REMOVED***x   string             `json:"resourceManagerVMDNSSuf***REMOVED***x"`
-	ContainerRegistryDNSSuf***REMOVED***x   string             `json:"containerRegistryDNSSuf***REMOVED***x"`
-	CosmosDBDNSSuf***REMOVED***x            string             `json:"cosmosDBDNSSuf***REMOVED***x"`
+	StorageEndpointSuffix        string             `json:"storageEndpointSuffix"`
+	SQLDatabaseDNSSuffix         string             `json:"sqlDatabaseDNSSuffix"`
+	TrafficManagerDNSSuffix      string             `json:"trafficManagerDNSSuffix"`
+	KeyVaultDNSSuffix            string             `json:"keyVaultDNSSuffix"`
+	ServiceBusEndpointSuffix     string             `json:"serviceBusEndpointSuffix"`
+	ServiceManagementVMDNSSuffix string             `json:"serviceManagementVMDNSSuffix"`
+	ResourceManagerVMDNSSuffix   string             `json:"resourceManagerVMDNSSuffix"`
+	ContainerRegistryDNSSuffix   string             `json:"containerRegistryDNSSuffix"`
+	CosmosDBDNSSuffix            string             `json:"cosmosDBDNSSuffix"`
 	TokenAudience                string             `json:"tokenAudience"`
-	ResourceIdenti***REMOVED***ers          ResourceIdenti***REMOVED***er `json:"resourceIdenti***REMOVED***ers"`
+	ResourceIdentifiers          ResourceIdentifier `json:"resourceIdentifiers"`
 }
 
 var (
@@ -88,17 +88,17 @@ var (
 		GraphEndpoint:                "https://graph.windows.net/",
 		ServiceBusEndpoint:           "https://servicebus.windows.net/",
 		BatchManagementEndpoint:      "https://batch.core.windows.net/",
-		StorageEndpointSuf***REMOVED***x:        "core.windows.net",
-		SQLDatabaseDNSSuf***REMOVED***x:         "database.windows.net",
-		Traf***REMOVED***cManagerDNSSuf***REMOVED***x:      "traf***REMOVED***cmanager.net",
-		KeyVaultDNSSuf***REMOVED***x:            "vault.azure.net",
-		ServiceBusEndpointSuf***REMOVED***x:     "servicebus.windows.net",
-		ServiceManagementVMDNSSuf***REMOVED***x: "cloudapp.net",
-		ResourceManagerVMDNSSuf***REMOVED***x:   "cloudapp.azure.com",
-		ContainerRegistryDNSSuf***REMOVED***x:   "azurecr.io",
-		CosmosDBDNSSuf***REMOVED***x:            "documents.azure.com",
+		StorageEndpointSuffix:        "core.windows.net",
+		SQLDatabaseDNSSuffix:         "database.windows.net",
+		TrafficManagerDNSSuffix:      "trafficmanager.net",
+		KeyVaultDNSSuffix:            "vault.azure.net",
+		ServiceBusEndpointSuffix:     "servicebus.windows.net",
+		ServiceManagementVMDNSSuffix: "cloudapp.net",
+		ResourceManagerVMDNSSuffix:   "cloudapp.azure.com",
+		ContainerRegistryDNSSuffix:   "azurecr.io",
+		CosmosDBDNSSuffix:            "documents.azure.com",
 		TokenAudience:                "https://management.azure.com/",
-		ResourceIdenti***REMOVED***ers: ResourceIdenti***REMOVED***er{
+		ResourceIdentifiers: ResourceIdentifier{
 			Graph:               "https://graph.windows.net/",
 			KeyVault:            "https://vault.azure.net",
 			Datalake:            "https://datalake.azure.net/",
@@ -121,17 +121,17 @@ var (
 		GraphEndpoint:                "https://graph.windows.net/",
 		ServiceBusEndpoint:           "https://servicebus.usgovcloudapi.net/",
 		BatchManagementEndpoint:      "https://batch.core.usgovcloudapi.net/",
-		StorageEndpointSuf***REMOVED***x:        "core.usgovcloudapi.net",
-		SQLDatabaseDNSSuf***REMOVED***x:         "database.usgovcloudapi.net",
-		Traf***REMOVED***cManagerDNSSuf***REMOVED***x:      "usgovtraf***REMOVED***cmanager.net",
-		KeyVaultDNSSuf***REMOVED***x:            "vault.usgovcloudapi.net",
-		ServiceBusEndpointSuf***REMOVED***x:     "servicebus.usgovcloudapi.net",
-		ServiceManagementVMDNSSuf***REMOVED***x: "usgovcloudapp.net",
-		ResourceManagerVMDNSSuf***REMOVED***x:   "cloudapp.windowsazure.us",
-		ContainerRegistryDNSSuf***REMOVED***x:   "azurecr.us",
-		CosmosDBDNSSuf***REMOVED***x:            "documents.azure.us",
+		StorageEndpointSuffix:        "core.usgovcloudapi.net",
+		SQLDatabaseDNSSuffix:         "database.usgovcloudapi.net",
+		TrafficManagerDNSSuffix:      "usgovtrafficmanager.net",
+		KeyVaultDNSSuffix:            "vault.usgovcloudapi.net",
+		ServiceBusEndpointSuffix:     "servicebus.usgovcloudapi.net",
+		ServiceManagementVMDNSSuffix: "usgovcloudapp.net",
+		ResourceManagerVMDNSSuffix:   "cloudapp.windowsazure.us",
+		ContainerRegistryDNSSuffix:   "azurecr.us",
+		CosmosDBDNSSuffix:            "documents.azure.us",
 		TokenAudience:                "https://management.usgovcloudapi.net/",
-		ResourceIdenti***REMOVED***ers: ResourceIdenti***REMOVED***er{
+		ResourceIdentifiers: ResourceIdentifier{
 			Graph:               "https://graph.windows.net/",
 			KeyVault:            "https://vault.usgovcloudapi.net",
 			Datalake:            NotAvailable,
@@ -154,17 +154,17 @@ var (
 		GraphEndpoint:                "https://graph.chinacloudapi.cn/",
 		ServiceBusEndpoint:           "https://servicebus.chinacloudapi.cn/",
 		BatchManagementEndpoint:      "https://batch.chinacloudapi.cn/",
-		StorageEndpointSuf***REMOVED***x:        "core.chinacloudapi.cn",
-		SQLDatabaseDNSSuf***REMOVED***x:         "database.chinacloudapi.cn",
-		Traf***REMOVED***cManagerDNSSuf***REMOVED***x:      "traf***REMOVED***cmanager.cn",
-		KeyVaultDNSSuf***REMOVED***x:            "vault.azure.cn",
-		ServiceBusEndpointSuf***REMOVED***x:     "servicebus.chinacloudapi.cn",
-		ServiceManagementVMDNSSuf***REMOVED***x: "chinacloudapp.cn",
-		ResourceManagerVMDNSSuf***REMOVED***x:   "cloudapp.azure.cn",
-		ContainerRegistryDNSSuf***REMOVED***x:   "azurecr.cn",
-		CosmosDBDNSSuf***REMOVED***x:            "documents.azure.cn",
+		StorageEndpointSuffix:        "core.chinacloudapi.cn",
+		SQLDatabaseDNSSuffix:         "database.chinacloudapi.cn",
+		TrafficManagerDNSSuffix:      "trafficmanager.cn",
+		KeyVaultDNSSuffix:            "vault.azure.cn",
+		ServiceBusEndpointSuffix:     "servicebus.chinacloudapi.cn",
+		ServiceManagementVMDNSSuffix: "chinacloudapp.cn",
+		ResourceManagerVMDNSSuffix:   "cloudapp.azure.cn",
+		ContainerRegistryDNSSuffix:   "azurecr.cn",
+		CosmosDBDNSSuffix:            "documents.azure.cn",
 		TokenAudience:                "https://management.chinacloudapi.cn/",
-		ResourceIdenti***REMOVED***ers: ResourceIdenti***REMOVED***er{
+		ResourceIdentifiers: ResourceIdentifier{
 			Graph:               "https://graph.chinacloudapi.cn/",
 			KeyVault:            "https://vault.azure.cn",
 			Datalake:            NotAvailable,
@@ -187,17 +187,17 @@ var (
 		GraphEndpoint:                "https://graph.cloudapi.de/",
 		ServiceBusEndpoint:           "https://servicebus.cloudapi.de/",
 		BatchManagementEndpoint:      "https://batch.cloudapi.de/",
-		StorageEndpointSuf***REMOVED***x:        "core.cloudapi.de",
-		SQLDatabaseDNSSuf***REMOVED***x:         "database.cloudapi.de",
-		Traf***REMOVED***cManagerDNSSuf***REMOVED***x:      "azuretraf***REMOVED***cmanager.de",
-		KeyVaultDNSSuf***REMOVED***x:            "vault.microsoftazure.de",
-		ServiceBusEndpointSuf***REMOVED***x:     "servicebus.cloudapi.de",
-		ServiceManagementVMDNSSuf***REMOVED***x: "azurecloudapp.de",
-		ResourceManagerVMDNSSuf***REMOVED***x:   "cloudapp.microsoftazure.de",
-		ContainerRegistryDNSSuf***REMOVED***x:   NotAvailable,
-		CosmosDBDNSSuf***REMOVED***x:            "documents.microsoftazure.de",
+		StorageEndpointSuffix:        "core.cloudapi.de",
+		SQLDatabaseDNSSuffix:         "database.cloudapi.de",
+		TrafficManagerDNSSuffix:      "azuretrafficmanager.de",
+		KeyVaultDNSSuffix:            "vault.microsoftazure.de",
+		ServiceBusEndpointSuffix:     "servicebus.cloudapi.de",
+		ServiceManagementVMDNSSuffix: "azurecloudapp.de",
+		ResourceManagerVMDNSSuffix:   "cloudapp.microsoftazure.de",
+		ContainerRegistryDNSSuffix:   NotAvailable,
+		CosmosDBDNSSuffix:            "documents.microsoftazure.de",
 		TokenAudience:                "https://management.microsoftazure.de/",
-		ResourceIdenti***REMOVED***ers: ResourceIdenti***REMOVED***er{
+		ResourceIdentifiers: ResourceIdentifier{
 			Graph:               "https://graph.cloudapi.de/",
 			KeyVault:            "https://vault.microsoftazure.de",
 			Datalake:            NotAvailable,
@@ -208,7 +208,7 @@ var (
 	}
 )
 
-// EnvironmentFromName returns an Environment based on the common name speci***REMOVED***ed.
+// EnvironmentFromName returns an Environment based on the common name specified.
 func EnvironmentFromName(name string) (Environment, error) {
 	// IMPORTANT
 	// As per @radhikagupta5:
@@ -229,16 +229,16 @@ func EnvironmentFromName(name string) (Environment, error) {
 	return env, nil
 }
 
-// EnvironmentFromFile loads an Environment from a con***REMOVED***guration ***REMOVED***le available on disk.
-// This function is particularly useful in the Hybrid Cloud model, where one must de***REMOVED***ne their own
+// EnvironmentFromFile loads an Environment from a configuration file available on disk.
+// This function is particularly useful in the Hybrid Cloud model, where one must define their own
 // endpoints.
 func EnvironmentFromFile(location string) (unmarshaled Environment, err error) {
-	***REMOVED***leContents, err := ioutil.ReadFile(location)
+	fileContents, err := ioutil.ReadFile(location)
 	if err != nil {
 		return
 	}
 
-	err = json.Unmarshal(***REMOVED***leContents, &unmarshaled)
+	err = json.Unmarshal(fileContents, &unmarshaled)
 
 	return
 }

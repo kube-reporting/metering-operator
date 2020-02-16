@@ -2,7 +2,7 @@
 Copyright 2015 The Kubernetes Authors.
 
 Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this ***REMOVED***le except in compliance with the License.
+you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
 
     http://www.apache.org/licenses/LICENSE-2.0
@@ -10,7 +10,7 @@ You may obtain a copy of the License at
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the speci***REMOVED***c language governing permissions and
+See the License for the specific language governing permissions and
 limitations under the License.
 */
 
@@ -18,7 +18,7 @@ limitations under the License.
 package generators
 
 import (
-	"path/***REMOVED***lepath"
+	"path/filepath"
 	"strings"
 
 	clientgenargs "k8s.io/code-generator/cmd/client-gen/args"
@@ -45,7 +45,7 @@ func NameSystems() namer.NameSystems {
 	publicNamer := &ExceptionNamer{
 		Exceptions: map[string]string{
 			// these exceptions are used to deconflict the generated code
-			// you can put your fully quali***REMOVED***ed package like
+			// you can put your fully qualified package like
 			// to generate a name that doesn't conflict with your group.
 			// "k8s.io/apis/events/v1beta1.Event": "EventResource"
 		},
@@ -57,7 +57,7 @@ func NameSystems() namer.NameSystems {
 	privateNamer := &ExceptionNamer{
 		Exceptions: map[string]string{
 			// these exceptions are used to deconflict the generated code
-			// you can put your fully quali***REMOVED***ed package like
+			// you can put your fully qualified package like
 			// to generate a name that doesn't conflict with your group.
 			// "k8s.io/apis/events/v1beta1.Event": "eventResource"
 		},
@@ -69,7 +69,7 @@ func NameSystems() namer.NameSystems {
 	publicPluralNamer := &ExceptionNamer{
 		Exceptions: map[string]string{
 			// these exceptions are used to deconflict the generated code
-			// you can put your fully quali***REMOVED***ed package like
+			// you can put your fully qualified package like
 			// to generate a name that doesn't conflict with your group.
 			// "k8s.io/apis/events/v1beta1.Event": "EventResource"
 		},
@@ -80,7 +80,7 @@ func NameSystems() namer.NameSystems {
 	}
 	privatePluralNamer := &ExceptionNamer{
 		Exceptions: map[string]string{
-			// you can put your fully quali***REMOVED***ed package like
+			// you can put your fully qualified package like
 			// to generate a name that doesn't conflict with your group.
 			// "k8s.io/apis/events/v1beta1.Event": "eventResource"
 			// these exceptions are used to deconflict the generated code
@@ -130,7 +130,7 @@ func DefaultNameSystem() string {
 }
 
 func packageForGroup(gv clientgentypes.GroupVersion, typeList []*types.Type, clientsetPackage string, groupPackageName string, groupGoName string, apiPath string, srcTreePath string, inputPackage string, boilerplate []byte) generator.Package {
-	groupVersionClientPackage := ***REMOVED***lepath.Join(clientsetPackage, "typed", strings.ToLower(groupPackageName), strings.ToLower(gv.Version.NonEmpty()))
+	groupVersionClientPackage := filepath.Join(clientsetPackage, "typed", strings.ToLower(groupPackageName), strings.ToLower(gv.Version.NonEmpty()))
 	return &generator.DefaultPackage{
 		PackageName: strings.ToLower(gv.Version.NonEmpty()),
 		PackagePath: groupVersionClientPackage,
@@ -139,13 +139,13 @@ func packageForGroup(gv clientgentypes.GroupVersion, typeList []*types.Type, cli
 			`// This package has the automatically generated typed clients.
 `),
 		// GeneratorFunc returns a list of generators. Each generator makes a
-		// single ***REMOVED***le.
+		// single file.
 		GeneratorFunc: func(c *generator.Context) (generators []generator.Generator) {
 			generators = []generator.Generator{
-				// Always generate a "doc.go" ***REMOVED***le.
+				// Always generate a "doc.go" file.
 				generator.DefaultGen{OptionalName: "doc"},
 			}
-			// Since we want a ***REMOVED***le per type that we generate a client for, we
+			// Since we want a file per type that we generate a client for, we
 			// have to provide a function for this.
 			for _, t := range typeList {
 				generators = append(generators, &genClientForType{
@@ -179,7 +179,7 @@ func packageForGroup(gv clientgentypes.GroupVersion, typeList []*types.Type, cli
 
 			expansionFileName := "generated_expansion"
 			generators = append(generators, &genExpansion{
-				groupPackagePath: ***REMOVED***lepath.Join(srcTreePath, groupVersionClientPackage),
+				groupPackagePath: filepath.Join(srcTreePath, groupVersionClientPackage),
 				DefaultGen: generator.DefaultGen{
 					OptionalName: expansionFileName,
 				},
@@ -203,10 +203,10 @@ func packageForClientset(customArgs *clientgenargs.CustomArgs, clientsetPackage 
 			`// This package has the automatically generated clientset.
 `),
 		// GeneratorFunc returns a list of generators. Each generator generates a
-		// single ***REMOVED***le.
+		// single file.
 		GeneratorFunc: func(c *generator.Context) (generators []generator.Generator) {
 			generators = []generator.Generator{
-				// Always generate a "doc.go" ***REMOVED***le.
+				// Always generate a "doc.go" file.
 				generator.DefaultGen{OptionalName: "doc"},
 
 				&genClientset{
@@ -226,7 +226,7 @@ func packageForClientset(customArgs *clientgenargs.CustomArgs, clientsetPackage 
 }
 
 func packageForScheme(customArgs *clientgenargs.CustomArgs, clientsetPackage string, srcTreePath string, groupGoNames map[clientgentypes.GroupVersion]string, boilerplate []byte) generator.Package {
-	schemePackage := ***REMOVED***lepath.Join(clientsetPackage, "scheme")
+	schemePackage := filepath.Join(clientsetPackage, "scheme")
 
 	// create runtime.Registry for internal client because it has to know about group versions
 	internalClient := false
@@ -248,10 +248,10 @@ NextGroup:
 			`// This package contains the scheme of the automatically generated clientset.
 `),
 		// GeneratorFunc returns a list of generators. Each generator generates a
-		// single ***REMOVED***le.
+		// single file.
 		GeneratorFunc: func(c *generator.Context) (generators []generator.Generator) {
 			generators = []generator.Generator{
-				// Always generate a "doc.go" ***REMOVED***le.
+				// Always generate a "doc.go" file.
 				generator.DefaultGen{OptionalName: "doc"},
 
 				&scheme.GenScheme{
@@ -260,7 +260,7 @@ NextGroup:
 					},
 					InputPackages:  customArgs.GroupVersionPackages(),
 					OutputPackage:  schemePackage,
-					OutputPath:     ***REMOVED***lepath.Join(srcTreePath, schemePackage),
+					OutputPath:     filepath.Join(srcTreePath, schemePackage),
 					Groups:         customArgs.Groups,
 					GroupGoNames:   groupGoNames,
 					ImportTracker:  generator.NewImportTracker(),
@@ -274,9 +274,9 @@ NextGroup:
 
 // applyGroupOverrides applies group name overrides to each package, if applicable. If there is a
 // comment of the form "// +groupName=somegroup" or "// +groupName=somegroup.foo.bar.io", use the
-// ***REMOVED***rst ***REMOVED***eld (somegroup) as the name of the group in Go code, e.g. as the func name in a clientset.
+// first field (somegroup) as the name of the group in Go code, e.g. as the func name in a clientset.
 //
-// If the ***REMOVED***rst ***REMOVED***eld of the groupName is not unique within the clientset, use "// +groupName=unique
+// If the first field of the groupName is not unique within the clientset, use "// +groupName=unique
 func applyGroupOverrides(universe types.Universe, customArgs *clientgenargs.CustomArgs) {
 	// Create a map from "old GV" to "new GV" so we know what changes we need to make.
 	changes := make(map[clientgentypes.GroupVersion]clientgentypes.GroupVersion)
@@ -296,7 +296,7 @@ func applyGroupOverrides(universe types.Universe, customArgs *clientgenargs.Cust
 	for _, gvs := range customArgs.Groups {
 		gv := clientgentypes.GroupVersion{
 			Group:   gvs.Group,
-			Version: gvs.Versions[0].Version, // we only need a version, and the ***REMOVED***rst will do
+			Version: gvs.Versions[0].Version, // we only need a version, and the first will do
 		}
 		if newGV, ok := changes[gv]; ok {
 			// There's an override, so use it.
@@ -306,7 +306,7 @@ func applyGroupOverrides(universe types.Universe, customArgs *clientgenargs.Cust
 				Versions:    gvs.Versions,
 			}
 			newGroups = append(newGroups, newGVS)
-		} ***REMOVED*** {
+		} else {
 			// No override.
 			newGroups = append(newGroups, gvs)
 		}
@@ -314,7 +314,7 @@ func applyGroupOverrides(universe types.Universe, customArgs *clientgenargs.Cust
 	customArgs.Groups = newGroups
 }
 
-// Packages makes the client package de***REMOVED***nition.
+// Packages makes the client package definition.
 func Packages(context *generator.Context, arguments *args.GeneratorArgs) generator.Packages {
 	boilerplate, err := arguments.LoadGoBoilerplate()
 	if err != nil {
@@ -335,15 +335,15 @@ func Packages(context *generator.Context, arguments *args.GeneratorArgs) generat
 		p := context.Universe.Package(path.Vendorless(inputDir))
 
 		// If there's a comment of the form "// +groupGoName=SomeUniqueShortName", use that as
-		// the Go group identi***REMOVED***er in CamelCase. It defaults
+		// the Go group identifier in CamelCase. It defaults
 		groupGoNames[gv] = namer.IC(strings.Split(gv.Group.NonEmpty(), ".")[0])
 		if override := types.ExtractCommentTags("+", p.Comments)["groupGoName"]; override != nil {
 			groupGoNames[gv] = namer.IC(override[0])
 		}
 
-		// Package are indexed with the vendor pre***REMOVED***x stripped
+		// Package are indexed with the vendor prefix stripped
 		for n, t := range p.Types {
-			// ***REMOVED***lter out types which are not included in user speci***REMOVED***ed overrides.
+			// filter out types which are not included in user specified overrides.
 			typesOverride, ok := includedTypesOverrides[gv]
 			if ok {
 				found := false
@@ -356,9 +356,9 @@ func Packages(context *generator.Context, arguments *args.GeneratorArgs) generat
 				if !found {
 					continue
 				}
-			} ***REMOVED*** {
-				// User has not speci***REMOVED***ed any override for this group version.
-				// ***REMOVED***lter out types which dont have genclient.
+			} else {
+				// User has not specified any override for this group version.
+				// filter out types which dont have genclient.
 				if tags := util.MustParseClientGenTags(append(t.SecondClosestCommentLines, t.CommentLines...)); !tags.GenerateClient {
 					continue
 				}
@@ -371,7 +371,7 @@ func Packages(context *generator.Context, arguments *args.GeneratorArgs) generat
 	}
 
 	var packageList []generator.Package
-	clientsetPackage := ***REMOVED***lepath.Join(arguments.OutputPackagePath, customArgs.ClientsetName)
+	clientsetPackage := filepath.Join(arguments.OutputPackagePath, customArgs.ClientsetName)
 
 	packageList = append(packageList, packageForClientset(customArgs, clientsetPackage, groupGoNames, boilerplate))
 	packageList = append(packageList, packageForScheme(customArgs, clientsetPackage, arguments.OutputBase, groupGoNames, boilerplate))
@@ -401,7 +401,7 @@ func Packages(context *generator.Context, arguments *args.GeneratorArgs) generat
 	return generator.Packages(packageList)
 }
 
-// tagOverrideNamer is a namer which pulls names from a given tag, if speci***REMOVED***ed,
+// tagOverrideNamer is a namer which pulls names from a given tag, if specified,
 // and otherwise falls back to a different namer.
 type tagOverrideNamer struct {
 	tagName  string

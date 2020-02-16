@@ -5,12 +5,12 @@ import (
 	"github.com/gophercloud/gophercloud/pagination"
 )
 
-// ListOpts ***REMOVED***lters the Tenants that are returned by the List call.
+// ListOpts filters the Tenants that are returned by the List call.
 type ListOpts struct {
 	// Marker is the ID of the last Tenant on the previous page.
 	Marker string `q:"marker"`
 
-	// Limit speci***REMOVED***es the page size.
+	// Limit specifies the page size.
 	Limit int `q:"limit"`
 }
 
@@ -78,7 +78,7 @@ type UpdateOptsBuilder interface {
 	ToTenantUpdateMap() (map[string]interface{}, error)
 }
 
-// UpdateOpts speci***REMOVED***es the base attributes that may be updated on an existing
+// UpdateOpts specifies the base attributes that may be updated on an existing
 // tenant.
 type UpdateOpts struct {
 	// Name is the name of the tenant.

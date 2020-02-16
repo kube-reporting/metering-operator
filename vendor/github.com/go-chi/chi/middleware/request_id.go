@@ -20,11 +20,11 @@ type ctxKeyRequestID int
 // RequestIDKey is the key that holds th unique request ID in a request context.
 const RequestIDKey ctxKeyRequestID = 0
 
-var pre***REMOVED***x string
+var prefix string
 var reqid uint64
 
 // A quick note on the statistics here: we're trying to calculate the chance that
-// two randomly generated base62 pre***REMOVED***xes will collide. We use the formula from
+// two randomly generated base62 prefixes will collide. We use the formula from
 // http://en.wikipedia.org/wiki/Birthday_problem
 //
 // P[m, n] \approx 1 - e^{-m^2/2n}
@@ -32,9 +32,9 @@ var reqid uint64
 // We ballpark an upper bound for $m$ by imagining (for whatever reason) a server
 // that restarts every second over 10 years, for $m = 86400 * 365 * 10 = 315360000$
 //
-// For a $k$ character base-62 identi***REMOVED***er, we have $n(k) = 62^k$
+// For a $k$ character base-62 identifier, we have $n(k) = 62^k$
 //
-// Plugging this in, we ***REMOVED***nd $P[m, n(10)] \approx 5.75%$, which is good enough for
+// Plugging this in, we find $P[m, n(10)] \approx 5.75%$, which is good enough for
 // our purposes, and is surely more than anyone would ever need in practice -- a
 // process that is rebooted a handful of times a day for a hundred years has less
 // than a millionth of a percent chance of generating two colliding IDs.
@@ -52,19 +52,19 @@ func init() {
 		b64 = strings.NewReplacer("+", "", "/", "").Replace(b64)
 	}
 
-	pre***REMOVED***x = fmt.Sprintf("%s/%s", hostname, b64[0:10])
+	prefix = fmt.Sprintf("%s/%s", hostname, b64[0:10])
 }
 
 // RequestID is a middleware that injects a request ID into the context of each
 // request. A request ID is a string of the form "host.example.com/random-0001",
-// where "random" is a base62 random string that uniquely identi***REMOVED***es this go
+// where "random" is a base62 random string that uniquely identifies this go
 // process, and where the last number is an atomically incremented request
 // counter.
 func RequestID(next http.Handler) http.Handler {
 	fn := func(w http.ResponseWriter, r *http.Request) {
 		myid := atomic.AddUint64(&reqid, 1)
 		ctx := r.Context()
-		ctx = context.WithValue(ctx, RequestIDKey, fmt.Sprintf("%s-%06d", pre***REMOVED***x, myid))
+		ctx = context.WithValue(ctx, RequestIDKey, fmt.Sprintf("%s-%06d", prefix, myid))
 		next.ServeHTTP(w, r.WithContext(ctx))
 	}
 	return http.HandlerFunc(fn)

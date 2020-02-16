@@ -1,8 +1,8 @@
 // Copyright 2011 The Go Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE ***REMOVED***le.
+// license that can be found in the LICENSE file.
 
-// Note: the ***REMOVED***le data_test.go that is generated should not be checked in.
+// Note: the file data_test.go that is generated should not be checked in.
 //go:generate go run maketables.go triegen.go
 //go:generate go test -tags test
 
@@ -16,7 +16,7 @@ import (
 )
 
 // A Form denotes a canonical representation of Unicode code points.
-// The Unicode-de***REMOVED***ned normalization and equivalence forms are:
+// The Unicode-defined normalization and equivalence forms are:
 //
 //   NFC   Unicode Normalization Form C
 //   NFD   Unicode Normalization Form D
@@ -142,7 +142,7 @@ func (f Form) IsNormalString(s string) bool {
 	return true
 }
 
-// patchTail ***REMOVED***xes a case where a rune may be incorrectly normalized
+// patchTail fixes a case where a rune may be incorrectly normalized
 // if it is followed by illegal continuation bytes. It returns the
 // patched buffer and whether the decomposition is still in progress.
 func patchTail(rb *reorderBuffer) bool {
@@ -168,8 +168,8 @@ func patchTail(rb *reorderBuffer) bool {
 	decomposeToLastBoundary(rb)
 	if s := rb.ss.next(info); s == ssStarter {
 		rb.doFlush()
-		rb.ss.***REMOVED***rst(info)
-	} ***REMOVED*** if s == ssOverflow {
+		rb.ss.first(info)
+	} else if s == ssOverflow {
 		rb.doFlush()
 		rb.insertCGJ()
 		rb.ss = 0
@@ -198,7 +198,7 @@ func (f Form) doAppend(out []byte, src input, n int) []byte {
 		return out
 	}
 	ft := formTable[f]
-	// Attempt to do a quickSpan ***REMOVED***rst so we can avoid initializing the reorderBuffer.
+	// Attempt to do a quickSpan first so we can avoid initializing the reorderBuffer.
 	if len(out) == 0 {
 		p, _ := ft.quickSpan(src, 0, n, true)
 		out = src.appendSlice(out, 0, p)
@@ -275,7 +275,7 @@ func (f Form) Span(b []byte, atEOF bool) (n int, err error) {
 	if n < len(b) {
 		if !ok {
 			err = transform.ErrEndOfSpan
-		} ***REMOVED*** {
+		} else {
 			err = transform.ErrShortSrc
 		}
 	}
@@ -289,7 +289,7 @@ func (f Form) SpanString(s string, atEOF bool) (n int, err error) {
 	if n < len(s) {
 		if !ok {
 			err = transform.ErrEndOfSpan
-		} ***REMOVED*** {
+		} else {
 			err = transform.ErrShortSrc
 		}
 	}
@@ -336,7 +336,7 @@ func (f *formInfo) quickSpan(src input, i, end int, atEOF bool) (n int, ok bool)
 			if !info.isYesC() {
 				break
 			}
-		} ***REMOVED*** {
+		} else {
 			if !info.isYesD() {
 				break
 			}
@@ -360,20 +360,20 @@ func (f Form) QuickSpanString(s string) int {
 	return n
 }
 
-// FirstBoundary returns the position i of the ***REMOVED***rst boundary in b
+// FirstBoundary returns the position i of the first boundary in b
 // or -1 if b contains no boundary.
 func (f Form) FirstBoundary(b []byte) int {
-	return f.***REMOVED***rstBoundary(inputBytes(b), len(b))
+	return f.firstBoundary(inputBytes(b), len(b))
 }
 
-func (f Form) ***REMOVED***rstBoundary(src input, nsrc int) int {
+func (f Form) firstBoundary(src input, nsrc int) int {
 	i := src.skipContinuationBytes(0)
 	if i >= nsrc {
 		return -1
 	}
 	fd := formTable[f]
 	ss := streamSafe(0)
-	// We should call ss.***REMOVED***rst here, but we can't as the ***REMOVED***rst rune is
+	// We should call ss.first here, but we can't as the first rune is
 	// skipped already. This means FirstBoundary can't really determine
 	// CGJ insertion points correctly. Luckily it doesn't have to.
 	for {
@@ -394,20 +394,20 @@ func (f Form) ***REMOVED***rstBoundary(src input, nsrc int) int {
 	}
 }
 
-// FirstBoundaryInString returns the position i of the ***REMOVED***rst boundary in s
+// FirstBoundaryInString returns the position i of the first boundary in s
 // or -1 if s contains no boundary.
 func (f Form) FirstBoundaryInString(s string) int {
-	return f.***REMOVED***rstBoundary(inputString(s), len(s))
+	return f.firstBoundary(inputString(s), len(s))
 }
 
-// NextBoundary reports the index of the boundary between the ***REMOVED***rst and next
+// NextBoundary reports the index of the boundary between the first and next
 // segment in b or -1 if atEOF is false and there are not enough bytes to
 // determine this boundary.
 func (f Form) NextBoundary(b []byte, atEOF bool) int {
 	return f.nextBoundary(inputBytes(b), len(b), atEOF)
 }
 
-// NextBoundaryInString reports the index of the boundary between the ***REMOVED***rst and
+// NextBoundaryInString reports the index of the boundary between the first and
 // next segment in b or -1 if atEOF is false and there are not enough bytes to
 // determine this boundary.
 func (f Form) NextBoundaryInString(s string, atEOF bool) int {
@@ -430,7 +430,7 @@ func (f Form) nextBoundary(src input, nsrc int, atEOF bool) int {
 		return -1
 	}
 	ss := streamSafe(0)
-	ss.***REMOVED***rst(info)
+	ss.first(info)
 
 	for i := int(info.size); i < nsrc; i += int(info.size) {
 		info = fd.info(src, i)
@@ -497,7 +497,7 @@ func lastBoundary(fd *formInfo, b []byte) int {
 	return i
 }
 
-// decomposeSegment scans the ***REMOVED***rst segment in src into rb. It inserts 0x034f
+// decomposeSegment scans the first segment in src into rb. It inserts 0x034f
 // (Grapheme Joiner) when it encounters a sequence of more than 30 non-starters
 // and returns the number of bytes consumed from src or iShortDst or iShortSrc.
 func decomposeSegment(rb *reorderBuffer, sp int, atEOF bool) int {
@@ -511,7 +511,7 @@ func decomposeSegment(rb *reorderBuffer, sp int, atEOF bool) int {
 		if rb.nrune > 0 {
 			goto end
 		}
-	} ***REMOVED*** if s == ssOverflow {
+	} else if s == ssOverflow {
 		rb.insertCGJ()
 		goto end
 	}
@@ -535,7 +535,7 @@ func decomposeSegment(rb *reorderBuffer, sp int, atEOF bool) int {
 		}
 		if s := rb.ss.next(info); s == ssStarter {
 			break
-		} ***REMOVED*** if s == ssOverflow {
+		} else if s == ssOverflow {
 			rb.insertCGJ()
 			break
 		}
@@ -562,7 +562,7 @@ func lastRuneStart(fd *formInfo, buf []byte) (Properties, int) {
 	return fd.info(inputBytes(buf), p), p
 }
 
-// decomposeToLastBoundary ***REMOVED***nds an open segment at the end of the buffer
+// decomposeToLastBoundary finds an open segment at the end of the buffer
 // and scans it into rb. Returns the buffer minus the last segment.
 func decomposeToLastBoundary(rb *reorderBuffer) {
 	fd := &rb.f
@@ -583,7 +583,7 @@ func decomposeToLastBoundary(rb *reorderBuffer) {
 		v := ss.backwards(info)
 		if v == ssOverflow {
 			// Note that if we have an overflow, it the string we are appending to
-			// is not correctly normalized. In this case the behavior is unde***REMOVED***ned.
+			// is not correctly normalized. In this case the behavior is undefined.
 			break
 		}
 		padd++

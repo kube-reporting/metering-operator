@@ -35,16 +35,16 @@ if [ "${METERING_UNINSTALL_CLUSTERROLEBINDING}" == "true" ]; then
     kubectl delete \
         -f "$TMPDIR/metering-operator-clusterrole.yaml" \
         -f "$TMPDIR/metering-operator-clusterrolebinding.yaml"
-***REMOVED***
+fi
 
 if [ "$SKIP_DELETE_CRDS" == "true" ]; then
-    echo "\$SKIP_DELETE_CRDS is true, skipping deletion of Custom Resource De***REMOVED***nitions"
-***REMOVED***
-    msg "Removing Custom Resource De***REMOVED***nitions"
-    ***REMOVED***nd "$INSTALLER_MANIFESTS_DIR" -type f -name '*.crd.yaml' -exec kubectl delete -f {} \;
-***REMOVED***
+    echo "\$SKIP_DELETE_CRDS is true, skipping deletion of Custom Resource Definitions"
+else
+    msg "Removing Custom Resource Definitions"
+    find "$INSTALLER_MANIFESTS_DIR" -type f -name '*.crd.yaml' -exec kubectl delete -f {} \;
+fi
 
 if [ "$DELETE_PVCS" == "true" ]; then
     echo "Deleting PVCs"
-    kube-remove-non-***REMOVED***le pvc -l "app in (hive, hdfs)"
-***REMOVED***
+    kube-remove-non-file pvc -l "app in (hive, hdfs)"
+fi

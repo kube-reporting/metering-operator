@@ -3,7 +3,7 @@ package awserr
 
 // An Error wraps lower level errors with code, message and an original error.
 // The underlying concrete error type may also satisfy other interfaces which
-// can be to used to obtain more speci***REMOVED***c information about the error.
+// can be to used to obtain more specific information about the error.
 //
 // Calling Error() or String() will always include the full information about
 // an error based on its underlying type.
@@ -23,7 +23,7 @@ package awserr
 //             if origErr := awsErr.OrigErr(); origErr != nil {
 //                 // operate on original error.
 //             }
-//         } ***REMOVED*** {
+//         } else {
 //             fmt.Println(err.Error())
 //         }
 //     }
@@ -32,7 +32,7 @@ type Error interface {
 	// Satisfy the generic error interface.
 	error
 
-	// Returns the short phrase depicting the classi***REMOVED***cation of the error.
+	// Returns the short phrase depicting the classification of the error.
 	Code() string
 
 	// Returns the error details message.
@@ -46,13 +46,13 @@ type Error interface {
 // code, message, and original errors. Calling Error() will include all errors
 // that occurred in the batch.
 //
-// Deprecated: Replaced with BatchedErrors. Only de***REMOVED***ned for backwards
+// Deprecated: Replaced with BatchedErrors. Only defined for backwards
 // compatibility.
 type BatchError interface {
 	// Satisfy the generic error interface.
 	error
 
-	// Returns the short phrase depicting the classi***REMOVED***cation of the error.
+	// Returns the short phrase depicting the classification of the error.
 	Code() string
 
 	// Returns the error details message.
@@ -77,7 +77,7 @@ type BatchedErrors interface {
 
 // New returns an Error object described by the code, message, and origErr.
 //
-// If origErr satis***REMOVED***es the Error interface it will not be wrapped within a new
+// If origErr satisfies the Error interface it will not be wrapped within a new
 // Error object and will instead be returned.
 func New(code, message string, origErr error) Error {
 	var errs []error
@@ -104,7 +104,7 @@ func NewBatchError(code, message string, errs []error) BatchedErrors {
 //     if err != nil {
 //         if reqerr, ok := err.(RequestFailure); ok {
 //             log.Println("Request failed", reqerr.Code(), reqerr.Message(), reqerr.RequestID())
-//         } ***REMOVED*** {
+//         } else {
 //             log.Println("Error:", err.Error())
 //         }
 //     }
@@ -121,7 +121,7 @@ func NewBatchError(code, message string, errs []error) BatchedErrors {
 //                // A service error occurred
 //                fmt.Println(reqErr.StatusCode(), reqErr.RequestID())
 //            }
-//        } ***REMOVED*** {
+//        } else {
 //            fmt.Println(err.Error())
 //        }
 //    }

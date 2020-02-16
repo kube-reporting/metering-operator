@@ -11,7 +11,7 @@ import (
 // token.
 type Token struct {
 	// ID provides the primary means of identifying a user to the OpenStack API.
-	// OpenStack de***REMOVED***nes this ***REMOVED***eld as an opaque value, so do not depend on its
+	// OpenStack defines this field as an opaque value, so do not depend on its
 	// content. It is safe, however, to compare for equality.
 	ID string
 
@@ -43,15 +43,15 @@ type User struct {
 
 // Endpoint represents a single API endpoint offered by a service.
 // It provides the public and internal URLs, if supported, along with a region
-// speci***REMOVED***er, again if provided.
+// specifier, again if provided.
 //
-// The signi***REMOVED***cance of the Region ***REMOVED***eld will depend upon your provider.
+// The significance of the Region field will depend upon your provider.
 //
 // In addition, the interface offered by the service will have version
 // information associated with it through the VersionId, VersionInfo, and
-// VersionList ***REMOVED***elds, if provided or supported.
+// VersionList fields, if provided or supported.
 //
-// In all cases, ***REMOVED***elds which aren't supported by the provider and service
+// In all cases, fields which aren't supported by the provider and service
 // combined will assume a zero-value ("").
 type Endpoint struct {
 	TenantID    string `json:"tenantId"`
@@ -71,14 +71,14 @@ type Endpoint struct {
 // a single CatalogEntry representing it.
 //
 // Note: when looking for the desired service, try, whenever possible, to key
-// off the type ***REMOVED***eld. Otherwise, you'll tie the representation of the service
-// to a speci***REMOVED***c provider.
+// off the type field. Otherwise, you'll tie the representation of the service
+// to a specific provider.
 type CatalogEntry struct {
-	// Name will contain the provider-speci***REMOVED***ed name for the service.
+	// Name will contain the provider-specified name for the service.
 	Name string `json:"name"`
 
-	// Type will contain a type string if OpenStack de***REMOVED***nes a type for the
-	// service. Otherwise, for provider-speci***REMOVED***c services, the provider may assign
+	// Type will contain a type string if OpenStack defines a type for the
+	// service. Otherwise, for provider-specific services, the provider may assign
 	// their own type strings.
 	Type string `json:"type"`
 
@@ -136,7 +136,7 @@ func (r CreateResult) ExtractToken() (*Token, error) {
 }
 
 // ExtractTokenID implements the gophercloud.AuthResult interface. The returned
-// string is the same as the ID ***REMOVED***eld of the Token struct returned from
+// string is the same as the ID field of the Token struct returned from
 // ExtractToken().
 func (r CreateResult) ExtractTokenID() (string, error) {
 	var s struct {

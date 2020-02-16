@@ -19,8 +19,8 @@ var (
 
 func init() {
 	// We only register manually written functions here. The registration of the
-	// generated functions takes place in the generated ***REMOVED***les. The separation
-	// makes the code compile even when the generated ***REMOVED***les are missing.
+	// generated functions takes place in the generated files. The separation
+	// makes the code compile even when the generated files are missing.
 	localSchemeBuilder.Register(addKnownTypes)
 }
 
@@ -39,14 +39,14 @@ func addKnownTypes(scheme *runtime.Scheme) error {
 		&PrestoTableList{},
 		&HiveTable{},
 		&HiveTableList{},
-		&MeteringCon***REMOVED***g{},
-		&MeteringCon***REMOVED***gList{},
+		&MeteringConfig{},
+		&MeteringConfigList{},
 	)
 	metav1.AddToGroupVersion(scheme, SchemeGroupVersion)
 	return nil
 }
 
-// Resource takes an unquali***REMOVED***ed resource and returns back a Group quali***REMOVED***ed GroupResource
+// Resource takes an unqualified resource and returns back a Group qualified GroupResource
 func Resource(resource string) schema.GroupResource {
 	return SchemeGroupVersion.WithResource(resource).GroupResource()
 }

@@ -44,7 +44,7 @@ func XMLToStruct(d *xml.Decoder, s *xml.StartElement) (*XMLNode, error) {
 		if err != nil {
 			if err == io.EOF {
 				break
-			} ***REMOVED*** {
+			} else {
 				return out, err
 			}
 		}
@@ -69,12 +69,12 @@ func XMLToStruct(d *xml.Decoder, s *xml.StartElement) (*XMLNode, error) {
 				slice = []*XMLNode{}
 			}
 			node, e := XMLToStruct(d, &el)
-			out.***REMOVED***ndNamespaces()
+			out.findNamespaces()
 			if e != nil {
 				return out, e
 			}
 			node.Name = typed.Name
-			node.***REMOVED***ndNamespaces()
+			node.findNamespaces()
 			tempOut := *out
 			// Save into a temp variable, simply because out gets squashed during
 			// loop iterations
@@ -91,7 +91,7 @@ func XMLToStruct(d *xml.Decoder, s *xml.StartElement) (*XMLNode, error) {
 	return out, nil
 }
 
-func (n *XMLNode) ***REMOVED***ndNamespaces() {
+func (n *XMLNode) findNamespaces() {
 	ns := map[string]string{}
 	for _, a := range n.Attr {
 		if a.Name.Space == "xmlns" {
@@ -102,7 +102,7 @@ func (n *XMLNode) ***REMOVED***ndNamespaces() {
 	n.namespaces = ns
 }
 
-func (n *XMLNode) ***REMOVED***ndElem(name string) (string, bool) {
+func (n *XMLNode) findElem(name string) (string, bool) {
 	for node := n; node != nil; node = node.parent {
 		for _, a := range node.Attr {
 			namespace := a.Name.Space
@@ -134,7 +134,7 @@ func StructToXML(e *xml.Encoder, node *XMLNode, sorted bool) error {
 
 	if node.Text != "" {
 		e.EncodeToken(xml.CharData([]byte(node.Text)))
-	} ***REMOVED*** if sorted {
+	} else if sorted {
 		sortedNames := []string{}
 		for k := range node.Children {
 			sortedNames = append(sortedNames, k)
@@ -146,7 +146,7 @@ func StructToXML(e *xml.Encoder, node *XMLNode, sorted bool) error {
 				StructToXML(e, v, sorted)
 			}
 		}
-	} ***REMOVED*** {
+	} else {
 		for _, c := range node.Children {
 			for _, v := range c {
 				StructToXML(e, v, sorted)

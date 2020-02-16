@@ -1,13 +1,13 @@
 // Copyright 2012 The Go Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE ***REMOVED***le.
+// license that can be found in the LICENSE file.
 
-// The trie in this ***REMOVED***le is used to associate the ***REMOVED***rst full character
+// The trie in this file is used to associate the first full character
 // in a UTF-8 string to a collation element.
 // All but the last byte in a UTF-8 byte sequence are
 // used to look up offsets in the index table to be used for the next byte.
 // The last byte is used to index into a table of collation elements.
-// This ***REMOVED***le contains the code for the generation of the trie.
+// This file contains the code for the generation of the trie.
 
 package build
 
@@ -24,8 +24,8 @@ const (
 )
 
 type trieHandle struct {
-	lookupStart uint16 // offset in table for ***REMOVED***rst byte
-	valueStart  uint16 // offset in table for ***REMOVED***rst byte
+	lookupStart uint16 // offset in table for first byte
+	valueStart  uint16 // offset in table for first byte
 }
 
 type trie struct {
@@ -54,7 +54,7 @@ func (n *trieNode) isInternal() bool {
 }
 
 func (n *trieNode) insert(r rune, value uint32) {
-	const maskx = 0x3F // mask out two most-signi***REMOVED***cant bits
+	const maskx = 0x3F // mask out two most-significant bits
 	str := string(r)
 	if len(str) == 1 {
 		n.value[str[0]] = value
@@ -125,10 +125,10 @@ func (b *trieBuilder) computeOffsets(n *trieNode) *trieNode {
 			n.refIndex = uint16(len(b.lookupBlocks)) - blockOffset
 			b.lookupBlocks = append(b.lookupBlocks, n)
 			b.lookupBlockIdx[h] = n
-		} ***REMOVED*** {
+		} else {
 			n = nn
 		}
-	} ***REMOVED*** {
+	} else {
 		for _, v := range n.value {
 			hasher.Write([]byte{byte(v >> 24), byte(v >> 16), byte(v >> 8), byte(v)})
 		}
@@ -139,7 +139,7 @@ func (b *trieBuilder) computeOffsets(n *trieNode) *trieNode {
 			n.refIndex = n.refValue
 			b.valueBlocks = append(b.valueBlocks, n)
 			b.valueBlockIdx[h] = n
-		} ***REMOVED*** {
+		} else {
 			n = nn
 		}
 	}
@@ -160,7 +160,7 @@ func (b *trieBuilder) addStartValueBlock(n *trieNode) uint16 {
 		// Add a dummy block to accommodate the double block size.
 		b.valueBlocks = append(b.valueBlocks, nil)
 		b.valueBlockIdx[h] = n
-	} ***REMOVED*** {
+	} else {
 		n = nn
 	}
 	return n.refValue
@@ -180,7 +180,7 @@ func genLookupBlock(t *trie, n *trieNode) {
 		if nn != nil {
 			if n.index != nil {
 				v = nn.refIndex
-			} ***REMOVED*** {
+			} else {
 				v = nn.refValue
 			}
 		}
@@ -193,14 +193,14 @@ func (b *trieBuilder) addTrie(n *trieNode) *trieHandle {
 	b.roots = append(b.roots, h)
 	h.valueStart = b.addStartValueBlock(n)
 	if len(b.roots) == 1 {
-		// We insert a null block after the ***REMOVED***rst start value block.
+		// We insert a null block after the first start value block.
 		// This ensures that continuation bytes UTF-8 sequences of length
 		// greater than 2 will automatically hit a null block if there
-		// was an unde***REMOVED***ned entry.
+		// was an undefined entry.
 		b.valueBlocks = append(b.valueBlocks, nil)
 	}
 	n = b.computeOffsets(n)
-	// Offset by one extra block as the ***REMOVED***rst byte starts at 0xC0 instead of 0x80.
+	// Offset by one extra block as the first byte starts at 0xC0 instead of 0x80.
 	h.lookupStart = n.refIndex - 1
 	return h
 }

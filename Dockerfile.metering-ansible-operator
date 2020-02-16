@@ -1,12 +1,12 @@
 # need the helm-cli from the helm image
 FROM quay.io/openshift/origin-metering-helm:latest as helm
-# ***REMOVED***nal image needs kubectl, so we copy `oc` from cli image to use as kubectl.
+# final image needs kubectl, so we copy `oc` from cli image to use as kubectl.
 FROM openshift/origin-cli:latest as cli
 # real base
 FROM quay.io/openshift/origin-ansible-operator:latest
 
 USER root
-RUN set -x; INSTALL_PKGS="curl bash ca-certi***REMOVED***cates less which inotify-tools openssl" \
+RUN set -x; INSTALL_PKGS="curl bash ca-certificates less which inotify-tools openssl" \
     && yum clean all && rm -rf /var/cache/yum/* \
     && yum -y install epel-release \
     && yum install --setopt=skip_missing_names_on_install=False -y \
@@ -26,7 +26,7 @@ RUN ln -f -s /tini /usr/bin/tini
 
 RUN pip install --no-cache-dir --upgrade openshift boto3 cryptography netaddr "setuptools<=45.1.0"
 # In order to use the 'ansible_failed_result' and 'ansible_failed_task' variables in a block/rescue,
-# we need to ensure that the 2.8 version is being used while this is ***REMOVED***xed in 2.9 upstream.
+# we need to ensure that the 2.8 version is being used while this is fixed in 2.9 upstream.
 # TODO: revert this change once the issue mentioned above is resolved.
 RUN pip install --upgrade ansible==2.8
 
@@ -50,7 +50,7 @@ USER 1001
 ENTRYPOINT ["/opt/ansible/scripts/entrypoint.sh"]
 
 LABEL io.k8s.display-name="OpenShift metering-ansible-operator" \
-      io.k8s.description="This is a component of OpenShift Container Platform and manages installation and con***REMOVED***guration of all other metering components." \
+      io.k8s.description="This is a component of OpenShift Container Platform and manages installation and configuration of all other metering components." \
       io.openshift.tags="openshift" \
       com.redhat.delivery.appregistry=true \
       maintainer="sd-operator-metering@redhat.com"

@@ -1,6 +1,6 @@
 // Copyright 2011 The Go Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE ***REMOVED***le.
+// license that can be found in the LICENSE file.
 
 package windows
 
@@ -20,8 +20,8 @@ type DLLError struct {
 
 func (e *DLLError) Error() string { return e.Msg }
 
-// Implemented in runtime/syscall_windows.goc; we provide jumps to them in our assembly ***REMOVED***le.
-func loadlibrary(***REMOVED***lename *uint16) (handle uintptr, err syscall.Errno)
+// Implemented in runtime/syscall_windows.goc; we provide jumps to them in our assembly file.
+func loadlibrary(filename *uint16) (handle uintptr, err syscall.Errno)
 func getprocaddress(handle uintptr, procname *uint8) (proc uintptr, err syscall.Errno)
 
 // A DLL implements access to a single DLL.
@@ -30,7 +30,7 @@ type DLL struct {
 	Handle Handle
 }
 
-// LoadDLL loads DLL ***REMOVED***le into memory.
+// LoadDLL loads DLL file into memory.
 //
 // Warning: using LoadDLL without an absolute path name is subject to
 // DLL preloading attacks. To safely load a system DLL, use LazyDLL
@@ -76,7 +76,7 @@ func (d *DLL) FindProc(name string) (proc *Proc, err error) {
 		return nil, &DLLError{
 			Err:     e,
 			ObjName: name,
-			Msg:     "Failed to ***REMOVED***nd " + name + " procedure in " + d.Name + ": " + e.Error(),
+			Msg:     "Failed to find " + name + " procedure in " + d.Name + ": " + e.Error(),
 		}
 	}
 	p := &Proc{
@@ -121,7 +121,7 @@ func (p *Proc) Addr() uintptr {
 //
 // The returned error is always non-nil, constructed from the result of GetLastError.
 // Callers must inspect the primary return value to decide whether an error occurred
-// (according to the semantics of the speci***REMOVED***c function being called) before consulting
+// (according to the semantics of the specific function being called) before consulting
 // the error. The error will be guaranteed to contain windows.Errno.
 func (p *Proc) Call(a ...uintptr) (r1, r2 uintptr, lastErr error) {
 	switch len(a) {
@@ -163,7 +163,7 @@ func (p *Proc) Call(a ...uintptr) (r1, r2 uintptr, lastErr error) {
 }
 
 // A LazyDLL implements access to a single DLL.
-// It will delay the load of the DLL until the ***REMOVED***rst
+// It will delay the load of the DLL until the first
 // call to its Handle method or to one of its
 // LazyProc's Addr method.
 type LazyDLL struct {
@@ -178,7 +178,7 @@ type LazyDLL struct {
 	dll *DLL // non nil once DLL is loaded
 }
 
-// Load loads DLL ***REMOVED***le d.Name into memory. It returns an error if fails.
+// Load loads DLL file d.Name into memory. It returns an error if fails.
 // Load will not try to load DLL, if it is already loaded into memory.
 func (d *LazyDLL) Load() error {
 	// Non-racy version of:
@@ -199,7 +199,7 @@ func (d *LazyDLL) Load() error {
 	var err error
 	if d.Name == "kernel32.dll" {
 		dll, err = LoadDLL(d.Name)
-	} ***REMOVED*** {
+	} else {
 		dll, err = loadLibraryEx(d.Name, d.System)
 	}
 	if err != nil {
@@ -231,7 +231,7 @@ func (d *LazyDLL) NewProc(name string) *LazyProc {
 	return &LazyProc{l: d, Name: name}
 }
 
-// NewLazyDLL creates new LazyDLL associated with DLL ***REMOVED***le.
+// NewLazyDLL creates new LazyDLL associated with DLL file.
 func NewLazyDLL(name string) *LazyDLL {
 	return &LazyDLL{Name: name}
 }
@@ -302,7 +302,7 @@ func (p *LazyProc) Addr() uintptr {
 //
 // The returned error is always non-nil, constructed from the result of GetLastError.
 // Callers must inspect the primary return value to decide whether an error occurred
-// (according to the semantics of the speci***REMOVED***c function being called) before consulting
+// (according to the semantics of the specific function being called) before consulting
 // the error. The error will be guaranteed to contain windows.Errno.
 func (p *LazyProc) Call(a ...uintptr) (r1, r2 uintptr, lastErr error) {
 	p.mustFind()
@@ -354,14 +354,14 @@ func loadLibraryEx(name string, system bool) (*DLL, error) {
 		if canDoSearchSystem32() {
 			const LOAD_LIBRARY_SEARCH_SYSTEM32 = 0x00000800
 			flags = LOAD_LIBRARY_SEARCH_SYSTEM32
-		} ***REMOVED*** if isBaseName(name) {
+		} else if isBaseName(name) {
 			// WindowsXP or unpatched Windows machine
 			// trying to load "foo.dll" out of the system
 			// folder, but LoadLibraryEx doesn't support
 			// that yet on their system, so emulate it.
 			windir, _ := Getenv("WINDIR") // old var; apparently works on XP
 			if windir == "" {
-				return nil, errString("%WINDIR% not de***REMOVED***ned")
+				return nil, errString("%WINDIR% not defined")
 			}
 			loadDLL = windir + "\\System32\\" + name
 		}

@@ -733,45 +733,45 @@ type TTypeEntryPtr int32
 
 func TTypeEntryPtrPtr(v TTypeEntryPtr) *TTypeEntryPtr { return &v }
 
-type TIdenti***REMOVED***er string
+type TIdentifier string
 
-func TIdenti***REMOVED***erPtr(v TIdenti***REMOVED***er) *TIdenti***REMOVED***er { return &v }
+func TIdentifierPtr(v TIdentifier) *TIdentifier { return &v }
 
 type TPattern string
 
 func TPatternPtr(v TPattern) *TPattern { return &v }
 
-type TPatternOrIdenti***REMOVED***er string
+type TPatternOrIdentifier string
 
-func TPatternOrIdenti***REMOVED***erPtr(v TPatternOrIdenti***REMOVED***er) *TPatternOrIdenti***REMOVED***er { return &v }
+func TPatternOrIdentifierPtr(v TPatternOrIdentifier) *TPatternOrIdentifier { return &v }
 
 // Attributes:
 //  - I32Value
 //  - StringValue
-type TTypeQuali***REMOVED***erValue struct {
+type TTypeQualifierValue struct {
   I32Value *int32 `thrift:"i32Value,1" db:"i32Value" json:"i32Value,omitempty"`
   StringValue *string `thrift:"stringValue,2" db:"stringValue" json:"stringValue,omitempty"`
 }
 
-func NewTTypeQuali***REMOVED***erValue() *TTypeQuali***REMOVED***erValue {
-  return &TTypeQuali***REMOVED***erValue{}
+func NewTTypeQualifierValue() *TTypeQualifierValue {
+  return &TTypeQualifierValue{}
 }
 
-var TTypeQuali***REMOVED***erValue_I32Value_DEFAULT int32
-func (p *TTypeQuali***REMOVED***erValue) GetI32Value() int32 {
+var TTypeQualifierValue_I32Value_DEFAULT int32
+func (p *TTypeQualifierValue) GetI32Value() int32 {
   if !p.IsSetI32Value() {
-    return TTypeQuali***REMOVED***erValue_I32Value_DEFAULT
+    return TTypeQualifierValue_I32Value_DEFAULT
   }
 return *p.I32Value
 }
-var TTypeQuali***REMOVED***erValue_StringValue_DEFAULT string
-func (p *TTypeQuali***REMOVED***erValue) GetStringValue() string {
+var TTypeQualifierValue_StringValue_DEFAULT string
+func (p *TTypeQualifierValue) GetStringValue() string {
   if !p.IsSetStringValue() {
-    return TTypeQuali***REMOVED***erValue_StringValue_DEFAULT
+    return TTypeQualifierValue_StringValue_DEFAULT
   }
 return *p.StringValue
 }
-func (p *TTypeQuali***REMOVED***erValue) CountSetFieldsTTypeQuali***REMOVED***erValue() int {
+func (p *TTypeQualifierValue) CountSetFieldsTTypeQualifierValue() int {
   count := 0
   if (p.IsSetI32Value()) {
     count++
@@ -783,49 +783,49 @@ func (p *TTypeQuali***REMOVED***erValue) CountSetFieldsTTypeQuali***REMOVED***er
 
 }
 
-func (p *TTypeQuali***REMOVED***erValue) IsSetI32Value() bool {
+func (p *TTypeQualifierValue) IsSetI32Value() bool {
   return p.I32Value != nil
 }
 
-func (p *TTypeQuali***REMOVED***erValue) IsSetStringValue() bool {
+func (p *TTypeQualifierValue) IsSetStringValue() bool {
   return p.StringValue != nil
 }
 
-func (p *TTypeQuali***REMOVED***erValue) Read(iprot thrift.TProtocol) error {
+func (p *TTypeQualifierValue) Read(iprot thrift.TProtocol) error {
   if _, err := iprot.ReadStructBegin(); err != nil {
     return thrift.PrependError(fmt.Sprintf("%T read error: ", p), err)
   }
 
 
   for {
-    _, ***REMOVED***eldTypeId, ***REMOVED***eldId, err := iprot.ReadFieldBegin()
+    _, fieldTypeId, fieldId, err := iprot.ReadFieldBegin()
     if err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T ***REMOVED***eld %d read error: ", p, ***REMOVED***eldId), err)
+      return thrift.PrependError(fmt.Sprintf("%T field %d read error: ", p, fieldId), err)
     }
-    if ***REMOVED***eldTypeId == thrift.STOP { break; }
-    switch ***REMOVED***eldId {
+    if fieldTypeId == thrift.STOP { break; }
+    switch fieldId {
     case 1:
-      if ***REMOVED***eldTypeId == thrift.I32 {
+      if fieldTypeId == thrift.I32 {
         if err := p.ReadField1(iprot); err != nil {
           return err
         }
-      } ***REMOVED*** {
-        if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      } else {
+        if err := iprot.Skip(fieldTypeId); err != nil {
           return err
         }
       }
     case 2:
-      if ***REMOVED***eldTypeId == thrift.STRING {
+      if fieldTypeId == thrift.STRING {
         if err := p.ReadField2(iprot); err != nil {
           return err
         }
-      } ***REMOVED*** {
-        if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      } else {
+        if err := iprot.Skip(fieldTypeId); err != nil {
           return err
         }
       }
     default:
-      if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      if err := iprot.Skip(fieldTypeId); err != nil {
         return err
       }
     }
@@ -839,113 +839,113 @@ func (p *TTypeQuali***REMOVED***erValue) Read(iprot thrift.TProtocol) error {
   return nil
 }
 
-func (p *TTypeQuali***REMOVED***erValue)  ReadField1(iprot thrift.TProtocol) error {
+func (p *TTypeQualifierValue)  ReadField1(iprot thrift.TProtocol) error {
   if v, err := iprot.ReadI32(); err != nil {
-  return thrift.PrependError("error reading ***REMOVED***eld 1: ", err)
-} ***REMOVED*** {
+  return thrift.PrependError("error reading field 1: ", err)
+} else {
   p.I32Value = &v
 }
   return nil
 }
 
-func (p *TTypeQuali***REMOVED***erValue)  ReadField2(iprot thrift.TProtocol) error {
+func (p *TTypeQualifierValue)  ReadField2(iprot thrift.TProtocol) error {
   if v, err := iprot.ReadString(); err != nil {
-  return thrift.PrependError("error reading ***REMOVED***eld 2: ", err)
-} ***REMOVED*** {
+  return thrift.PrependError("error reading field 2: ", err)
+} else {
   p.StringValue = &v
 }
   return nil
 }
 
-func (p *TTypeQuali***REMOVED***erValue) Write(oprot thrift.TProtocol) error {
-  if c := p.CountSetFieldsTTypeQuali***REMOVED***erValue(); c != 1 {
-    return fmt.Errorf("%T write union: exactly one ***REMOVED***eld must be set (%d set).", p, c)
+func (p *TTypeQualifierValue) Write(oprot thrift.TProtocol) error {
+  if c := p.CountSetFieldsTTypeQualifierValue(); c != 1 {
+    return fmt.Errorf("%T write union: exactly one field must be set (%d set).", p, c)
   }
-  if err := oprot.WriteStructBegin("TTypeQuali***REMOVED***erValue"); err != nil {
+  if err := oprot.WriteStructBegin("TTypeQualifierValue"); err != nil {
     return thrift.PrependError(fmt.Sprintf("%T write struct begin error: ", p), err) }
   if p != nil {
     if err := p.writeField1(oprot); err != nil { return err }
     if err := p.writeField2(oprot); err != nil { return err }
   }
   if err := oprot.WriteFieldStop(); err != nil {
-    return thrift.PrependError("write ***REMOVED***eld stop error: ", err) }
+    return thrift.PrependError("write field stop error: ", err) }
   if err := oprot.WriteStructEnd(); err != nil {
     return thrift.PrependError("write struct stop error: ", err) }
   return nil
 }
 
-func (p *TTypeQuali***REMOVED***erValue) writeField1(oprot thrift.TProtocol) (err error) {
+func (p *TTypeQualifierValue) writeField1(oprot thrift.TProtocol) (err error) {
   if p.IsSetI32Value() {
     if err := oprot.WriteFieldBegin("i32Value", thrift.I32, 1); err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld begin error 1:i32Value: ", p), err) }
+      return thrift.PrependError(fmt.Sprintf("%T write field begin error 1:i32Value: ", p), err) }
     if err := oprot.WriteI32(int32(*p.I32Value)); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T.i32Value (1) ***REMOVED***eld write error: ", p), err) }
+    return thrift.PrependError(fmt.Sprintf("%T.i32Value (1) field write error: ", p), err) }
     if err := oprot.WriteFieldEnd(); err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld end error 1:i32Value: ", p), err) }
+      return thrift.PrependError(fmt.Sprintf("%T write field end error 1:i32Value: ", p), err) }
   }
   return err
 }
 
-func (p *TTypeQuali***REMOVED***erValue) writeField2(oprot thrift.TProtocol) (err error) {
+func (p *TTypeQualifierValue) writeField2(oprot thrift.TProtocol) (err error) {
   if p.IsSetStringValue() {
     if err := oprot.WriteFieldBegin("stringValue", thrift.STRING, 2); err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld begin error 2:stringValue: ", p), err) }
+      return thrift.PrependError(fmt.Sprintf("%T write field begin error 2:stringValue: ", p), err) }
     if err := oprot.WriteString(string(*p.StringValue)); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T.stringValue (2) ***REMOVED***eld write error: ", p), err) }
+    return thrift.PrependError(fmt.Sprintf("%T.stringValue (2) field write error: ", p), err) }
     if err := oprot.WriteFieldEnd(); err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld end error 2:stringValue: ", p), err) }
+      return thrift.PrependError(fmt.Sprintf("%T write field end error 2:stringValue: ", p), err) }
   }
   return err
 }
 
-func (p *TTypeQuali***REMOVED***erValue) String() string {
+func (p *TTypeQualifierValue) String() string {
   if p == nil {
     return "<nil>"
   }
-  return fmt.Sprintf("TTypeQuali***REMOVED***erValue(%+v)", *p)
+  return fmt.Sprintf("TTypeQualifierValue(%+v)", *p)
 }
 
 // Attributes:
-//  - Quali***REMOVED***ers
-type TTypeQuali***REMOVED***ers struct {
-  Quali***REMOVED***ers map[string]*TTypeQuali***REMOVED***erValue `thrift:"quali***REMOVED***ers,1,required" db:"quali***REMOVED***ers" json:"quali***REMOVED***ers"`
+//  - Qualifiers
+type TTypeQualifiers struct {
+  Qualifiers map[string]*TTypeQualifierValue `thrift:"qualifiers,1,required" db:"qualifiers" json:"qualifiers"`
 }
 
-func NewTTypeQuali***REMOVED***ers() *TTypeQuali***REMOVED***ers {
-  return &TTypeQuali***REMOVED***ers{}
+func NewTTypeQualifiers() *TTypeQualifiers {
+  return &TTypeQualifiers{}
 }
 
 
-func (p *TTypeQuali***REMOVED***ers) GetQuali***REMOVED***ers() map[string]*TTypeQuali***REMOVED***erValue {
-  return p.Quali***REMOVED***ers
+func (p *TTypeQualifiers) GetQualifiers() map[string]*TTypeQualifierValue {
+  return p.Qualifiers
 }
-func (p *TTypeQuali***REMOVED***ers) Read(iprot thrift.TProtocol) error {
+func (p *TTypeQualifiers) Read(iprot thrift.TProtocol) error {
   if _, err := iprot.ReadStructBegin(); err != nil {
     return thrift.PrependError(fmt.Sprintf("%T read error: ", p), err)
   }
 
-  var issetQuali***REMOVED***ers bool = false;
+  var issetQualifiers bool = false;
 
   for {
-    _, ***REMOVED***eldTypeId, ***REMOVED***eldId, err := iprot.ReadFieldBegin()
+    _, fieldTypeId, fieldId, err := iprot.ReadFieldBegin()
     if err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T ***REMOVED***eld %d read error: ", p, ***REMOVED***eldId), err)
+      return thrift.PrependError(fmt.Sprintf("%T field %d read error: ", p, fieldId), err)
     }
-    if ***REMOVED***eldTypeId == thrift.STOP { break; }
-    switch ***REMOVED***eldId {
+    if fieldTypeId == thrift.STOP { break; }
+    switch fieldId {
     case 1:
-      if ***REMOVED***eldTypeId == thrift.MAP {
+      if fieldTypeId == thrift.MAP {
         if err := p.ReadField1(iprot); err != nil {
           return err
         }
-      } ***REMOVED*** {
-        if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      } else {
+        if err := iprot.Skip(fieldTypeId); err != nil {
           return err
         }
       }
-      issetQuali***REMOVED***ers = true
+      issetQualifiers = true
     default:
-      if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      if err := iprot.Skip(fieldTypeId); err != nil {
         return err
       }
     }
@@ -956,31 +956,31 @@ func (p *TTypeQuali***REMOVED***ers) Read(iprot thrift.TProtocol) error {
   if err := iprot.ReadStructEnd(); err != nil {
     return thrift.PrependError(fmt.Sprintf("%T read struct end error: ", p), err)
   }
-  if !issetQuali***REMOVED***ers{
-    return thrift.NewTProtocolExceptionWithType(thrift.INVALID_DATA, fmt.Errorf("Required ***REMOVED***eld Quali***REMOVED***ers is not set"));
+  if !issetQualifiers{
+    return thrift.NewTProtocolExceptionWithType(thrift.INVALID_DATA, fmt.Errorf("Required field Qualifiers is not set"));
   }
   return nil
 }
 
-func (p *TTypeQuali***REMOVED***ers)  ReadField1(iprot thrift.TProtocol) error {
+func (p *TTypeQualifiers)  ReadField1(iprot thrift.TProtocol) error {
   _, _, size, err := iprot.ReadMapBegin()
   if err != nil {
     return thrift.PrependError("error reading map begin: ", err)
   }
-  tMap := make(map[string]*TTypeQuali***REMOVED***erValue, size)
-  p.Quali***REMOVED***ers =  tMap
+  tMap := make(map[string]*TTypeQualifierValue, size)
+  p.Qualifiers =  tMap
   for i := 0; i < size; i ++ {
 var _key0 string
     if v, err := iprot.ReadString(); err != nil {
-    return thrift.PrependError("error reading ***REMOVED***eld 0: ", err)
-} ***REMOVED*** {
+    return thrift.PrependError("error reading field 0: ", err)
+} else {
     _key0 = v
 }
-    _val1 := &TTypeQuali***REMOVED***erValue{}
+    _val1 := &TTypeQualifierValue{}
     if err := _val1.Read(iprot); err != nil {
       return thrift.PrependError(fmt.Sprintf("%T error reading struct: ", _val1), err)
     }
-    p.Quali***REMOVED***ers[_key0] = _val1
+    p.Qualifiers[_key0] = _val1
   }
   if err := iprot.ReadMapEnd(); err != nil {
     return thrift.PrependError("error reading map end: ", err)
@@ -988,28 +988,28 @@ var _key0 string
   return nil
 }
 
-func (p *TTypeQuali***REMOVED***ers) Write(oprot thrift.TProtocol) error {
-  if err := oprot.WriteStructBegin("TTypeQuali***REMOVED***ers"); err != nil {
+func (p *TTypeQualifiers) Write(oprot thrift.TProtocol) error {
+  if err := oprot.WriteStructBegin("TTypeQualifiers"); err != nil {
     return thrift.PrependError(fmt.Sprintf("%T write struct begin error: ", p), err) }
   if p != nil {
     if err := p.writeField1(oprot); err != nil { return err }
   }
   if err := oprot.WriteFieldStop(); err != nil {
-    return thrift.PrependError("write ***REMOVED***eld stop error: ", err) }
+    return thrift.PrependError("write field stop error: ", err) }
   if err := oprot.WriteStructEnd(); err != nil {
     return thrift.PrependError("write struct stop error: ", err) }
   return nil
 }
 
-func (p *TTypeQuali***REMOVED***ers) writeField1(oprot thrift.TProtocol) (err error) {
-  if err := oprot.WriteFieldBegin("quali***REMOVED***ers", thrift.MAP, 1); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld begin error 1:quali***REMOVED***ers: ", p), err) }
-  if err := oprot.WriteMapBegin(thrift.STRING, thrift.STRUCT, len(p.Quali***REMOVED***ers)); err != nil {
+func (p *TTypeQualifiers) writeField1(oprot thrift.TProtocol) (err error) {
+  if err := oprot.WriteFieldBegin("qualifiers", thrift.MAP, 1); err != nil {
+    return thrift.PrependError(fmt.Sprintf("%T write field begin error 1:qualifiers: ", p), err) }
+  if err := oprot.WriteMapBegin(thrift.STRING, thrift.STRUCT, len(p.Qualifiers)); err != nil {
     return thrift.PrependError("error writing map begin: ", err)
   }
-  for k, v := range p.Quali***REMOVED***ers {
+  for k, v := range p.Qualifiers {
     if err := oprot.WriteString(string(k)); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T. (0) ***REMOVED***eld write error: ", p), err) }
+    return thrift.PrependError(fmt.Sprintf("%T. (0) field write error: ", p), err) }
     if err := v.Write(oprot); err != nil {
       return thrift.PrependError(fmt.Sprintf("%T error writing struct: ", v), err)
     }
@@ -1018,23 +1018,23 @@ func (p *TTypeQuali***REMOVED***ers) writeField1(oprot thrift.TProtocol) (err er
     return thrift.PrependError("error writing map end: ", err)
   }
   if err := oprot.WriteFieldEnd(); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld end error 1:quali***REMOVED***ers: ", p), err) }
+    return thrift.PrependError(fmt.Sprintf("%T write field end error 1:qualifiers: ", p), err) }
   return err
 }
 
-func (p *TTypeQuali***REMOVED***ers) String() string {
+func (p *TTypeQualifiers) String() string {
   if p == nil {
     return "<nil>"
   }
-  return fmt.Sprintf("TTypeQuali***REMOVED***ers(%+v)", *p)
+  return fmt.Sprintf("TTypeQualifiers(%+v)", *p)
 }
 
 // Attributes:
 //  - Type
-//  - TypeQuali***REMOVED***ers
+//  - TypeQualifiers
 type TPrimitiveTypeEntry struct {
   Type TTypeId `thrift:"type,1,required" db:"type" json:"type"`
-  TypeQuali***REMOVED***ers *TTypeQuali***REMOVED***ers `thrift:"typeQuali***REMOVED***ers,2" db:"typeQuali***REMOVED***ers" json:"typeQuali***REMOVED***ers,omitempty"`
+  TypeQualifiers *TTypeQualifiers `thrift:"typeQualifiers,2" db:"typeQualifiers" json:"typeQualifiers,omitempty"`
 }
 
 func NewTPrimitiveTypeEntry() *TPrimitiveTypeEntry {
@@ -1045,15 +1045,15 @@ func NewTPrimitiveTypeEntry() *TPrimitiveTypeEntry {
 func (p *TPrimitiveTypeEntry) GetType() TTypeId {
   return p.Type
 }
-var TPrimitiveTypeEntry_TypeQuali***REMOVED***ers_DEFAULT *TTypeQuali***REMOVED***ers
-func (p *TPrimitiveTypeEntry) GetTypeQuali***REMOVED***ers() *TTypeQuali***REMOVED***ers {
-  if !p.IsSetTypeQuali***REMOVED***ers() {
-    return TPrimitiveTypeEntry_TypeQuali***REMOVED***ers_DEFAULT
+var TPrimitiveTypeEntry_TypeQualifiers_DEFAULT *TTypeQualifiers
+func (p *TPrimitiveTypeEntry) GetTypeQualifiers() *TTypeQualifiers {
+  if !p.IsSetTypeQualifiers() {
+    return TPrimitiveTypeEntry_TypeQualifiers_DEFAULT
   }
-return p.TypeQuali***REMOVED***ers
+return p.TypeQualifiers
 }
-func (p *TPrimitiveTypeEntry) IsSetTypeQuali***REMOVED***ers() bool {
-  return p.TypeQuali***REMOVED***ers != nil
+func (p *TPrimitiveTypeEntry) IsSetTypeQualifiers() bool {
+  return p.TypeQualifiers != nil
 }
 
 func (p *TPrimitiveTypeEntry) Read(iprot thrift.TProtocol) error {
@@ -1064,35 +1064,35 @@ func (p *TPrimitiveTypeEntry) Read(iprot thrift.TProtocol) error {
   var issetType bool = false;
 
   for {
-    _, ***REMOVED***eldTypeId, ***REMOVED***eldId, err := iprot.ReadFieldBegin()
+    _, fieldTypeId, fieldId, err := iprot.ReadFieldBegin()
     if err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T ***REMOVED***eld %d read error: ", p, ***REMOVED***eldId), err)
+      return thrift.PrependError(fmt.Sprintf("%T field %d read error: ", p, fieldId), err)
     }
-    if ***REMOVED***eldTypeId == thrift.STOP { break; }
-    switch ***REMOVED***eldId {
+    if fieldTypeId == thrift.STOP { break; }
+    switch fieldId {
     case 1:
-      if ***REMOVED***eldTypeId == thrift.I32 {
+      if fieldTypeId == thrift.I32 {
         if err := p.ReadField1(iprot); err != nil {
           return err
         }
-      } ***REMOVED*** {
-        if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      } else {
+        if err := iprot.Skip(fieldTypeId); err != nil {
           return err
         }
       }
       issetType = true
     case 2:
-      if ***REMOVED***eldTypeId == thrift.STRUCT {
+      if fieldTypeId == thrift.STRUCT {
         if err := p.ReadField2(iprot); err != nil {
           return err
         }
-      } ***REMOVED*** {
-        if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      } else {
+        if err := iprot.Skip(fieldTypeId); err != nil {
           return err
         }
       }
     default:
-      if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      if err := iprot.Skip(fieldTypeId); err != nil {
         return err
       }
     }
@@ -1104,15 +1104,15 @@ func (p *TPrimitiveTypeEntry) Read(iprot thrift.TProtocol) error {
     return thrift.PrependError(fmt.Sprintf("%T read struct end error: ", p), err)
   }
   if !issetType{
-    return thrift.NewTProtocolExceptionWithType(thrift.INVALID_DATA, fmt.Errorf("Required ***REMOVED***eld Type is not set"));
+    return thrift.NewTProtocolExceptionWithType(thrift.INVALID_DATA, fmt.Errorf("Required field Type is not set"));
   }
   return nil
 }
 
 func (p *TPrimitiveTypeEntry)  ReadField1(iprot thrift.TProtocol) error {
   if v, err := iprot.ReadI32(); err != nil {
-  return thrift.PrependError("error reading ***REMOVED***eld 1: ", err)
-} ***REMOVED*** {
+  return thrift.PrependError("error reading field 1: ", err)
+} else {
   temp := TTypeId(v)
   p.Type = temp
 }
@@ -1120,9 +1120,9 @@ func (p *TPrimitiveTypeEntry)  ReadField1(iprot thrift.TProtocol) error {
 }
 
 func (p *TPrimitiveTypeEntry)  ReadField2(iprot thrift.TProtocol) error {
-  p.TypeQuali***REMOVED***ers = &TTypeQuali***REMOVED***ers{}
-  if err := p.TypeQuali***REMOVED***ers.Read(iprot); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T error reading struct: ", p.TypeQuali***REMOVED***ers), err)
+  p.TypeQualifiers = &TTypeQualifiers{}
+  if err := p.TypeQualifiers.Read(iprot); err != nil {
+    return thrift.PrependError(fmt.Sprintf("%T error reading struct: ", p.TypeQualifiers), err)
   }
   return nil
 }
@@ -1135,7 +1135,7 @@ func (p *TPrimitiveTypeEntry) Write(oprot thrift.TProtocol) error {
     if err := p.writeField2(oprot); err != nil { return err }
   }
   if err := oprot.WriteFieldStop(); err != nil {
-    return thrift.PrependError("write ***REMOVED***eld stop error: ", err) }
+    return thrift.PrependError("write field stop error: ", err) }
   if err := oprot.WriteStructEnd(); err != nil {
     return thrift.PrependError("write struct stop error: ", err) }
   return nil
@@ -1143,23 +1143,23 @@ func (p *TPrimitiveTypeEntry) Write(oprot thrift.TProtocol) error {
 
 func (p *TPrimitiveTypeEntry) writeField1(oprot thrift.TProtocol) (err error) {
   if err := oprot.WriteFieldBegin("type", thrift.I32, 1); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld begin error 1:type: ", p), err) }
+    return thrift.PrependError(fmt.Sprintf("%T write field begin error 1:type: ", p), err) }
   if err := oprot.WriteI32(int32(p.Type)); err != nil {
-  return thrift.PrependError(fmt.Sprintf("%T.type (1) ***REMOVED***eld write error: ", p), err) }
+  return thrift.PrependError(fmt.Sprintf("%T.type (1) field write error: ", p), err) }
   if err := oprot.WriteFieldEnd(); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld end error 1:type: ", p), err) }
+    return thrift.PrependError(fmt.Sprintf("%T write field end error 1:type: ", p), err) }
   return err
 }
 
 func (p *TPrimitiveTypeEntry) writeField2(oprot thrift.TProtocol) (err error) {
-  if p.IsSetTypeQuali***REMOVED***ers() {
-    if err := oprot.WriteFieldBegin("typeQuali***REMOVED***ers", thrift.STRUCT, 2); err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld begin error 2:typeQuali***REMOVED***ers: ", p), err) }
-    if err := p.TypeQuali***REMOVED***ers.Write(oprot); err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T error writing struct: ", p.TypeQuali***REMOVED***ers), err)
+  if p.IsSetTypeQualifiers() {
+    if err := oprot.WriteFieldBegin("typeQualifiers", thrift.STRUCT, 2); err != nil {
+      return thrift.PrependError(fmt.Sprintf("%T write field begin error 2:typeQualifiers: ", p), err) }
+    if err := p.TypeQualifiers.Write(oprot); err != nil {
+      return thrift.PrependError(fmt.Sprintf("%T error writing struct: ", p.TypeQualifiers), err)
     }
     if err := oprot.WriteFieldEnd(); err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld end error 2:typeQuali***REMOVED***ers: ", p), err) }
+      return thrift.PrependError(fmt.Sprintf("%T write field end error 2:typeQualifiers: ", p), err) }
   }
   return err
 }
@@ -1193,25 +1193,25 @@ func (p *TArrayTypeEntry) Read(iprot thrift.TProtocol) error {
   var issetObjectTypePtr bool = false;
 
   for {
-    _, ***REMOVED***eldTypeId, ***REMOVED***eldId, err := iprot.ReadFieldBegin()
+    _, fieldTypeId, fieldId, err := iprot.ReadFieldBegin()
     if err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T ***REMOVED***eld %d read error: ", p, ***REMOVED***eldId), err)
+      return thrift.PrependError(fmt.Sprintf("%T field %d read error: ", p, fieldId), err)
     }
-    if ***REMOVED***eldTypeId == thrift.STOP { break; }
-    switch ***REMOVED***eldId {
+    if fieldTypeId == thrift.STOP { break; }
+    switch fieldId {
     case 1:
-      if ***REMOVED***eldTypeId == thrift.I32 {
+      if fieldTypeId == thrift.I32 {
         if err := p.ReadField1(iprot); err != nil {
           return err
         }
-      } ***REMOVED*** {
-        if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      } else {
+        if err := iprot.Skip(fieldTypeId); err != nil {
           return err
         }
       }
       issetObjectTypePtr = true
     default:
-      if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      if err := iprot.Skip(fieldTypeId); err != nil {
         return err
       }
     }
@@ -1223,15 +1223,15 @@ func (p *TArrayTypeEntry) Read(iprot thrift.TProtocol) error {
     return thrift.PrependError(fmt.Sprintf("%T read struct end error: ", p), err)
   }
   if !issetObjectTypePtr{
-    return thrift.NewTProtocolExceptionWithType(thrift.INVALID_DATA, fmt.Errorf("Required ***REMOVED***eld ObjectTypePtr is not set"));
+    return thrift.NewTProtocolExceptionWithType(thrift.INVALID_DATA, fmt.Errorf("Required field ObjectTypePtr is not set"));
   }
   return nil
 }
 
 func (p *TArrayTypeEntry)  ReadField1(iprot thrift.TProtocol) error {
   if v, err := iprot.ReadI32(); err != nil {
-  return thrift.PrependError("error reading ***REMOVED***eld 1: ", err)
-} ***REMOVED*** {
+  return thrift.PrependError("error reading field 1: ", err)
+} else {
   temp := TTypeEntryPtr(v)
   p.ObjectTypePtr = temp
 }
@@ -1245,7 +1245,7 @@ func (p *TArrayTypeEntry) Write(oprot thrift.TProtocol) error {
     if err := p.writeField1(oprot); err != nil { return err }
   }
   if err := oprot.WriteFieldStop(); err != nil {
-    return thrift.PrependError("write ***REMOVED***eld stop error: ", err) }
+    return thrift.PrependError("write field stop error: ", err) }
   if err := oprot.WriteStructEnd(); err != nil {
     return thrift.PrependError("write struct stop error: ", err) }
   return nil
@@ -1253,11 +1253,11 @@ func (p *TArrayTypeEntry) Write(oprot thrift.TProtocol) error {
 
 func (p *TArrayTypeEntry) writeField1(oprot thrift.TProtocol) (err error) {
   if err := oprot.WriteFieldBegin("objectTypePtr", thrift.I32, 1); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld begin error 1:objectTypePtr: ", p), err) }
+    return thrift.PrependError(fmt.Sprintf("%T write field begin error 1:objectTypePtr: ", p), err) }
   if err := oprot.WriteI32(int32(p.ObjectTypePtr)); err != nil {
-  return thrift.PrependError(fmt.Sprintf("%T.objectTypePtr (1) ***REMOVED***eld write error: ", p), err) }
+  return thrift.PrependError(fmt.Sprintf("%T.objectTypePtr (1) field write error: ", p), err) }
   if err := oprot.WriteFieldEnd(); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld end error 1:objectTypePtr: ", p), err) }
+    return thrift.PrependError(fmt.Sprintf("%T write field end error 1:objectTypePtr: ", p), err) }
   return err
 }
 
@@ -1297,36 +1297,36 @@ func (p *TMapTypeEntry) Read(iprot thrift.TProtocol) error {
   var issetValueTypePtr bool = false;
 
   for {
-    _, ***REMOVED***eldTypeId, ***REMOVED***eldId, err := iprot.ReadFieldBegin()
+    _, fieldTypeId, fieldId, err := iprot.ReadFieldBegin()
     if err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T ***REMOVED***eld %d read error: ", p, ***REMOVED***eldId), err)
+      return thrift.PrependError(fmt.Sprintf("%T field %d read error: ", p, fieldId), err)
     }
-    if ***REMOVED***eldTypeId == thrift.STOP { break; }
-    switch ***REMOVED***eldId {
+    if fieldTypeId == thrift.STOP { break; }
+    switch fieldId {
     case 1:
-      if ***REMOVED***eldTypeId == thrift.I32 {
+      if fieldTypeId == thrift.I32 {
         if err := p.ReadField1(iprot); err != nil {
           return err
         }
-      } ***REMOVED*** {
-        if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      } else {
+        if err := iprot.Skip(fieldTypeId); err != nil {
           return err
         }
       }
       issetKeyTypePtr = true
     case 2:
-      if ***REMOVED***eldTypeId == thrift.I32 {
+      if fieldTypeId == thrift.I32 {
         if err := p.ReadField2(iprot); err != nil {
           return err
         }
-      } ***REMOVED*** {
-        if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      } else {
+        if err := iprot.Skip(fieldTypeId); err != nil {
           return err
         }
       }
       issetValueTypePtr = true
     default:
-      if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      if err := iprot.Skip(fieldTypeId); err != nil {
         return err
       }
     }
@@ -1338,18 +1338,18 @@ func (p *TMapTypeEntry) Read(iprot thrift.TProtocol) error {
     return thrift.PrependError(fmt.Sprintf("%T read struct end error: ", p), err)
   }
   if !issetKeyTypePtr{
-    return thrift.NewTProtocolExceptionWithType(thrift.INVALID_DATA, fmt.Errorf("Required ***REMOVED***eld KeyTypePtr is not set"));
+    return thrift.NewTProtocolExceptionWithType(thrift.INVALID_DATA, fmt.Errorf("Required field KeyTypePtr is not set"));
   }
   if !issetValueTypePtr{
-    return thrift.NewTProtocolExceptionWithType(thrift.INVALID_DATA, fmt.Errorf("Required ***REMOVED***eld ValueTypePtr is not set"));
+    return thrift.NewTProtocolExceptionWithType(thrift.INVALID_DATA, fmt.Errorf("Required field ValueTypePtr is not set"));
   }
   return nil
 }
 
 func (p *TMapTypeEntry)  ReadField1(iprot thrift.TProtocol) error {
   if v, err := iprot.ReadI32(); err != nil {
-  return thrift.PrependError("error reading ***REMOVED***eld 1: ", err)
-} ***REMOVED*** {
+  return thrift.PrependError("error reading field 1: ", err)
+} else {
   temp := TTypeEntryPtr(v)
   p.KeyTypePtr = temp
 }
@@ -1358,8 +1358,8 @@ func (p *TMapTypeEntry)  ReadField1(iprot thrift.TProtocol) error {
 
 func (p *TMapTypeEntry)  ReadField2(iprot thrift.TProtocol) error {
   if v, err := iprot.ReadI32(); err != nil {
-  return thrift.PrependError("error reading ***REMOVED***eld 2: ", err)
-} ***REMOVED*** {
+  return thrift.PrependError("error reading field 2: ", err)
+} else {
   temp := TTypeEntryPtr(v)
   p.ValueTypePtr = temp
 }
@@ -1374,7 +1374,7 @@ func (p *TMapTypeEntry) Write(oprot thrift.TProtocol) error {
     if err := p.writeField2(oprot); err != nil { return err }
   }
   if err := oprot.WriteFieldStop(); err != nil {
-    return thrift.PrependError("write ***REMOVED***eld stop error: ", err) }
+    return thrift.PrependError("write field stop error: ", err) }
   if err := oprot.WriteStructEnd(); err != nil {
     return thrift.PrependError("write struct stop error: ", err) }
   return nil
@@ -1382,21 +1382,21 @@ func (p *TMapTypeEntry) Write(oprot thrift.TProtocol) error {
 
 func (p *TMapTypeEntry) writeField1(oprot thrift.TProtocol) (err error) {
   if err := oprot.WriteFieldBegin("keyTypePtr", thrift.I32, 1); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld begin error 1:keyTypePtr: ", p), err) }
+    return thrift.PrependError(fmt.Sprintf("%T write field begin error 1:keyTypePtr: ", p), err) }
   if err := oprot.WriteI32(int32(p.KeyTypePtr)); err != nil {
-  return thrift.PrependError(fmt.Sprintf("%T.keyTypePtr (1) ***REMOVED***eld write error: ", p), err) }
+  return thrift.PrependError(fmt.Sprintf("%T.keyTypePtr (1) field write error: ", p), err) }
   if err := oprot.WriteFieldEnd(); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld end error 1:keyTypePtr: ", p), err) }
+    return thrift.PrependError(fmt.Sprintf("%T write field end error 1:keyTypePtr: ", p), err) }
   return err
 }
 
 func (p *TMapTypeEntry) writeField2(oprot thrift.TProtocol) (err error) {
   if err := oprot.WriteFieldBegin("valueTypePtr", thrift.I32, 2); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld begin error 2:valueTypePtr: ", p), err) }
+    return thrift.PrependError(fmt.Sprintf("%T write field begin error 2:valueTypePtr: ", p), err) }
   if err := oprot.WriteI32(int32(p.ValueTypePtr)); err != nil {
-  return thrift.PrependError(fmt.Sprintf("%T.valueTypePtr (2) ***REMOVED***eld write error: ", p), err) }
+  return thrift.PrependError(fmt.Sprintf("%T.valueTypePtr (2) field write error: ", p), err) }
   if err := oprot.WriteFieldEnd(); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld end error 2:valueTypePtr: ", p), err) }
+    return thrift.PrependError(fmt.Sprintf("%T write field end error 2:valueTypePtr: ", p), err) }
   return err
 }
 
@@ -1429,25 +1429,25 @@ func (p *TStructTypeEntry) Read(iprot thrift.TProtocol) error {
   var issetNameToTypePtr bool = false;
 
   for {
-    _, ***REMOVED***eldTypeId, ***REMOVED***eldId, err := iprot.ReadFieldBegin()
+    _, fieldTypeId, fieldId, err := iprot.ReadFieldBegin()
     if err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T ***REMOVED***eld %d read error: ", p, ***REMOVED***eldId), err)
+      return thrift.PrependError(fmt.Sprintf("%T field %d read error: ", p, fieldId), err)
     }
-    if ***REMOVED***eldTypeId == thrift.STOP { break; }
-    switch ***REMOVED***eldId {
+    if fieldTypeId == thrift.STOP { break; }
+    switch fieldId {
     case 1:
-      if ***REMOVED***eldTypeId == thrift.MAP {
+      if fieldTypeId == thrift.MAP {
         if err := p.ReadField1(iprot); err != nil {
           return err
         }
-      } ***REMOVED*** {
-        if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      } else {
+        if err := iprot.Skip(fieldTypeId); err != nil {
           return err
         }
       }
       issetNameToTypePtr = true
     default:
-      if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      if err := iprot.Skip(fieldTypeId); err != nil {
         return err
       }
     }
@@ -1459,7 +1459,7 @@ func (p *TStructTypeEntry) Read(iprot thrift.TProtocol) error {
     return thrift.PrependError(fmt.Sprintf("%T read struct end error: ", p), err)
   }
   if !issetNameToTypePtr{
-    return thrift.NewTProtocolExceptionWithType(thrift.INVALID_DATA, fmt.Errorf("Required ***REMOVED***eld NameToTypePtr is not set"));
+    return thrift.NewTProtocolExceptionWithType(thrift.INVALID_DATA, fmt.Errorf("Required field NameToTypePtr is not set"));
   }
   return nil
 }
@@ -1474,14 +1474,14 @@ func (p *TStructTypeEntry)  ReadField1(iprot thrift.TProtocol) error {
   for i := 0; i < size; i ++ {
 var _key2 string
     if v, err := iprot.ReadString(); err != nil {
-    return thrift.PrependError("error reading ***REMOVED***eld 0: ", err)
-} ***REMOVED*** {
+    return thrift.PrependError("error reading field 0: ", err)
+} else {
     _key2 = v
 }
 var _val3 TTypeEntryPtr
     if v, err := iprot.ReadI32(); err != nil {
-    return thrift.PrependError("error reading ***REMOVED***eld 0: ", err)
-} ***REMOVED*** {
+    return thrift.PrependError("error reading field 0: ", err)
+} else {
     temp := TTypeEntryPtr(v)
     _val3 = temp
 }
@@ -1500,7 +1500,7 @@ func (p *TStructTypeEntry) Write(oprot thrift.TProtocol) error {
     if err := p.writeField1(oprot); err != nil { return err }
   }
   if err := oprot.WriteFieldStop(); err != nil {
-    return thrift.PrependError("write ***REMOVED***eld stop error: ", err) }
+    return thrift.PrependError("write field stop error: ", err) }
   if err := oprot.WriteStructEnd(); err != nil {
     return thrift.PrependError("write struct stop error: ", err) }
   return nil
@@ -1508,21 +1508,21 @@ func (p *TStructTypeEntry) Write(oprot thrift.TProtocol) error {
 
 func (p *TStructTypeEntry) writeField1(oprot thrift.TProtocol) (err error) {
   if err := oprot.WriteFieldBegin("nameToTypePtr", thrift.MAP, 1); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld begin error 1:nameToTypePtr: ", p), err) }
+    return thrift.PrependError(fmt.Sprintf("%T write field begin error 1:nameToTypePtr: ", p), err) }
   if err := oprot.WriteMapBegin(thrift.STRING, thrift.I32, len(p.NameToTypePtr)); err != nil {
     return thrift.PrependError("error writing map begin: ", err)
   }
   for k, v := range p.NameToTypePtr {
     if err := oprot.WriteString(string(k)); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T. (0) ***REMOVED***eld write error: ", p), err) }
+    return thrift.PrependError(fmt.Sprintf("%T. (0) field write error: ", p), err) }
     if err := oprot.WriteI32(int32(v)); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T. (0) ***REMOVED***eld write error: ", p), err) }
+    return thrift.PrependError(fmt.Sprintf("%T. (0) field write error: ", p), err) }
   }
   if err := oprot.WriteMapEnd(); err != nil {
     return thrift.PrependError("error writing map end: ", err)
   }
   if err := oprot.WriteFieldEnd(); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld end error 1:nameToTypePtr: ", p), err) }
+    return thrift.PrependError(fmt.Sprintf("%T write field end error 1:nameToTypePtr: ", p), err) }
   return err
 }
 
@@ -1555,25 +1555,25 @@ func (p *TUnionTypeEntry) Read(iprot thrift.TProtocol) error {
   var issetNameToTypePtr bool = false;
 
   for {
-    _, ***REMOVED***eldTypeId, ***REMOVED***eldId, err := iprot.ReadFieldBegin()
+    _, fieldTypeId, fieldId, err := iprot.ReadFieldBegin()
     if err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T ***REMOVED***eld %d read error: ", p, ***REMOVED***eldId), err)
+      return thrift.PrependError(fmt.Sprintf("%T field %d read error: ", p, fieldId), err)
     }
-    if ***REMOVED***eldTypeId == thrift.STOP { break; }
-    switch ***REMOVED***eldId {
+    if fieldTypeId == thrift.STOP { break; }
+    switch fieldId {
     case 1:
-      if ***REMOVED***eldTypeId == thrift.MAP {
+      if fieldTypeId == thrift.MAP {
         if err := p.ReadField1(iprot); err != nil {
           return err
         }
-      } ***REMOVED*** {
-        if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      } else {
+        if err := iprot.Skip(fieldTypeId); err != nil {
           return err
         }
       }
       issetNameToTypePtr = true
     default:
-      if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      if err := iprot.Skip(fieldTypeId); err != nil {
         return err
       }
     }
@@ -1585,7 +1585,7 @@ func (p *TUnionTypeEntry) Read(iprot thrift.TProtocol) error {
     return thrift.PrependError(fmt.Sprintf("%T read struct end error: ", p), err)
   }
   if !issetNameToTypePtr{
-    return thrift.NewTProtocolExceptionWithType(thrift.INVALID_DATA, fmt.Errorf("Required ***REMOVED***eld NameToTypePtr is not set"));
+    return thrift.NewTProtocolExceptionWithType(thrift.INVALID_DATA, fmt.Errorf("Required field NameToTypePtr is not set"));
   }
   return nil
 }
@@ -1600,14 +1600,14 @@ func (p *TUnionTypeEntry)  ReadField1(iprot thrift.TProtocol) error {
   for i := 0; i < size; i ++ {
 var _key4 string
     if v, err := iprot.ReadString(); err != nil {
-    return thrift.PrependError("error reading ***REMOVED***eld 0: ", err)
-} ***REMOVED*** {
+    return thrift.PrependError("error reading field 0: ", err)
+} else {
     _key4 = v
 }
 var _val5 TTypeEntryPtr
     if v, err := iprot.ReadI32(); err != nil {
-    return thrift.PrependError("error reading ***REMOVED***eld 0: ", err)
-} ***REMOVED*** {
+    return thrift.PrependError("error reading field 0: ", err)
+} else {
     temp := TTypeEntryPtr(v)
     _val5 = temp
 }
@@ -1626,7 +1626,7 @@ func (p *TUnionTypeEntry) Write(oprot thrift.TProtocol) error {
     if err := p.writeField1(oprot); err != nil { return err }
   }
   if err := oprot.WriteFieldStop(); err != nil {
-    return thrift.PrependError("write ***REMOVED***eld stop error: ", err) }
+    return thrift.PrependError("write field stop error: ", err) }
   if err := oprot.WriteStructEnd(); err != nil {
     return thrift.PrependError("write struct stop error: ", err) }
   return nil
@@ -1634,21 +1634,21 @@ func (p *TUnionTypeEntry) Write(oprot thrift.TProtocol) error {
 
 func (p *TUnionTypeEntry) writeField1(oprot thrift.TProtocol) (err error) {
   if err := oprot.WriteFieldBegin("nameToTypePtr", thrift.MAP, 1); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld begin error 1:nameToTypePtr: ", p), err) }
+    return thrift.PrependError(fmt.Sprintf("%T write field begin error 1:nameToTypePtr: ", p), err) }
   if err := oprot.WriteMapBegin(thrift.STRING, thrift.I32, len(p.NameToTypePtr)); err != nil {
     return thrift.PrependError("error writing map begin: ", err)
   }
   for k, v := range p.NameToTypePtr {
     if err := oprot.WriteString(string(k)); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T. (0) ***REMOVED***eld write error: ", p), err) }
+    return thrift.PrependError(fmt.Sprintf("%T. (0) field write error: ", p), err) }
     if err := oprot.WriteI32(int32(v)); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T. (0) ***REMOVED***eld write error: ", p), err) }
+    return thrift.PrependError(fmt.Sprintf("%T. (0) field write error: ", p), err) }
   }
   if err := oprot.WriteMapEnd(); err != nil {
     return thrift.PrependError("error writing map end: ", err)
   }
   if err := oprot.WriteFieldEnd(); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld end error 1:nameToTypePtr: ", p), err) }
+    return thrift.PrependError(fmt.Sprintf("%T write field end error 1:nameToTypePtr: ", p), err) }
   return err
 }
 
@@ -1661,19 +1661,19 @@ func (p *TUnionTypeEntry) String() string {
 
 // Attributes:
 //  - TypeClassName
-type TUserDe***REMOVED***nedTypeEntry struct {
+type TUserDefinedTypeEntry struct {
   TypeClassName string `thrift:"typeClassName,1,required" db:"typeClassName" json:"typeClassName"`
 }
 
-func NewTUserDe***REMOVED***nedTypeEntry() *TUserDe***REMOVED***nedTypeEntry {
-  return &TUserDe***REMOVED***nedTypeEntry{}
+func NewTUserDefinedTypeEntry() *TUserDefinedTypeEntry {
+  return &TUserDefinedTypeEntry{}
 }
 
 
-func (p *TUserDe***REMOVED***nedTypeEntry) GetTypeClassName() string {
+func (p *TUserDefinedTypeEntry) GetTypeClassName() string {
   return p.TypeClassName
 }
-func (p *TUserDe***REMOVED***nedTypeEntry) Read(iprot thrift.TProtocol) error {
+func (p *TUserDefinedTypeEntry) Read(iprot thrift.TProtocol) error {
   if _, err := iprot.ReadStructBegin(); err != nil {
     return thrift.PrependError(fmt.Sprintf("%T read error: ", p), err)
   }
@@ -1681,25 +1681,25 @@ func (p *TUserDe***REMOVED***nedTypeEntry) Read(iprot thrift.TProtocol) error {
   var issetTypeClassName bool = false;
 
   for {
-    _, ***REMOVED***eldTypeId, ***REMOVED***eldId, err := iprot.ReadFieldBegin()
+    _, fieldTypeId, fieldId, err := iprot.ReadFieldBegin()
     if err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T ***REMOVED***eld %d read error: ", p, ***REMOVED***eldId), err)
+      return thrift.PrependError(fmt.Sprintf("%T field %d read error: ", p, fieldId), err)
     }
-    if ***REMOVED***eldTypeId == thrift.STOP { break; }
-    switch ***REMOVED***eldId {
+    if fieldTypeId == thrift.STOP { break; }
+    switch fieldId {
     case 1:
-      if ***REMOVED***eldTypeId == thrift.STRING {
+      if fieldTypeId == thrift.STRING {
         if err := p.ReadField1(iprot); err != nil {
           return err
         }
-      } ***REMOVED*** {
-        if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      } else {
+        if err := iprot.Skip(fieldTypeId); err != nil {
           return err
         }
       }
       issetTypeClassName = true
     default:
-      if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      if err := iprot.Skip(fieldTypeId); err != nil {
         return err
       }
     }
@@ -1711,48 +1711,48 @@ func (p *TUserDe***REMOVED***nedTypeEntry) Read(iprot thrift.TProtocol) error {
     return thrift.PrependError(fmt.Sprintf("%T read struct end error: ", p), err)
   }
   if !issetTypeClassName{
-    return thrift.NewTProtocolExceptionWithType(thrift.INVALID_DATA, fmt.Errorf("Required ***REMOVED***eld TypeClassName is not set"));
+    return thrift.NewTProtocolExceptionWithType(thrift.INVALID_DATA, fmt.Errorf("Required field TypeClassName is not set"));
   }
   return nil
 }
 
-func (p *TUserDe***REMOVED***nedTypeEntry)  ReadField1(iprot thrift.TProtocol) error {
+func (p *TUserDefinedTypeEntry)  ReadField1(iprot thrift.TProtocol) error {
   if v, err := iprot.ReadString(); err != nil {
-  return thrift.PrependError("error reading ***REMOVED***eld 1: ", err)
-} ***REMOVED*** {
+  return thrift.PrependError("error reading field 1: ", err)
+} else {
   p.TypeClassName = v
 }
   return nil
 }
 
-func (p *TUserDe***REMOVED***nedTypeEntry) Write(oprot thrift.TProtocol) error {
-  if err := oprot.WriteStructBegin("TUserDe***REMOVED***nedTypeEntry"); err != nil {
+func (p *TUserDefinedTypeEntry) Write(oprot thrift.TProtocol) error {
+  if err := oprot.WriteStructBegin("TUserDefinedTypeEntry"); err != nil {
     return thrift.PrependError(fmt.Sprintf("%T write struct begin error: ", p), err) }
   if p != nil {
     if err := p.writeField1(oprot); err != nil { return err }
   }
   if err := oprot.WriteFieldStop(); err != nil {
-    return thrift.PrependError("write ***REMOVED***eld stop error: ", err) }
+    return thrift.PrependError("write field stop error: ", err) }
   if err := oprot.WriteStructEnd(); err != nil {
     return thrift.PrependError("write struct stop error: ", err) }
   return nil
 }
 
-func (p *TUserDe***REMOVED***nedTypeEntry) writeField1(oprot thrift.TProtocol) (err error) {
+func (p *TUserDefinedTypeEntry) writeField1(oprot thrift.TProtocol) (err error) {
   if err := oprot.WriteFieldBegin("typeClassName", thrift.STRING, 1); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld begin error 1:typeClassName: ", p), err) }
+    return thrift.PrependError(fmt.Sprintf("%T write field begin error 1:typeClassName: ", p), err) }
   if err := oprot.WriteString(string(p.TypeClassName)); err != nil {
-  return thrift.PrependError(fmt.Sprintf("%T.typeClassName (1) ***REMOVED***eld write error: ", p), err) }
+  return thrift.PrependError(fmt.Sprintf("%T.typeClassName (1) field write error: ", p), err) }
   if err := oprot.WriteFieldEnd(); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld end error 1:typeClassName: ", p), err) }
+    return thrift.PrependError(fmt.Sprintf("%T write field end error 1:typeClassName: ", p), err) }
   return err
 }
 
-func (p *TUserDe***REMOVED***nedTypeEntry) String() string {
+func (p *TUserDefinedTypeEntry) String() string {
   if p == nil {
     return "<nil>"
   }
-  return fmt.Sprintf("TUserDe***REMOVED***nedTypeEntry(%+v)", *p)
+  return fmt.Sprintf("TUserDefinedTypeEntry(%+v)", *p)
 }
 
 // Attributes:
@@ -1761,14 +1761,14 @@ func (p *TUserDe***REMOVED***nedTypeEntry) String() string {
 //  - MapEntry
 //  - StructEntry
 //  - UnionEntry
-//  - UserDe***REMOVED***nedTypeEntry
+//  - UserDefinedTypeEntry
 type TTypeEntry struct {
   PrimitiveEntry *TPrimitiveTypeEntry `thrift:"primitiveEntry,1" db:"primitiveEntry" json:"primitiveEntry,omitempty"`
   ArrayEntry *TArrayTypeEntry `thrift:"arrayEntry,2" db:"arrayEntry" json:"arrayEntry,omitempty"`
   MapEntry *TMapTypeEntry `thrift:"mapEntry,3" db:"mapEntry" json:"mapEntry,omitempty"`
   StructEntry *TStructTypeEntry `thrift:"structEntry,4" db:"structEntry" json:"structEntry,omitempty"`
   UnionEntry *TUnionTypeEntry `thrift:"unionEntry,5" db:"unionEntry" json:"unionEntry,omitempty"`
-  UserDe***REMOVED***nedTypeEntry *TUserDe***REMOVED***nedTypeEntry `thrift:"userDe***REMOVED***nedTypeEntry,6" db:"userDe***REMOVED***nedTypeEntry" json:"userDe***REMOVED***nedTypeEntry,omitempty"`
+  UserDefinedTypeEntry *TUserDefinedTypeEntry `thrift:"userDefinedTypeEntry,6" db:"userDefinedTypeEntry" json:"userDefinedTypeEntry,omitempty"`
 }
 
 func NewTTypeEntry() *TTypeEntry {
@@ -1810,12 +1810,12 @@ func (p *TTypeEntry) GetUnionEntry() *TUnionTypeEntry {
   }
 return p.UnionEntry
 }
-var TTypeEntry_UserDe***REMOVED***nedTypeEntry_DEFAULT *TUserDe***REMOVED***nedTypeEntry
-func (p *TTypeEntry) GetUserDe***REMOVED***nedTypeEntry() *TUserDe***REMOVED***nedTypeEntry {
-  if !p.IsSetUserDe***REMOVED***nedTypeEntry() {
-    return TTypeEntry_UserDe***REMOVED***nedTypeEntry_DEFAULT
+var TTypeEntry_UserDefinedTypeEntry_DEFAULT *TUserDefinedTypeEntry
+func (p *TTypeEntry) GetUserDefinedTypeEntry() *TUserDefinedTypeEntry {
+  if !p.IsSetUserDefinedTypeEntry() {
+    return TTypeEntry_UserDefinedTypeEntry_DEFAULT
   }
-return p.UserDe***REMOVED***nedTypeEntry
+return p.UserDefinedTypeEntry
 }
 func (p *TTypeEntry) CountSetFieldsTTypeEntry() int {
   count := 0
@@ -1834,7 +1834,7 @@ func (p *TTypeEntry) CountSetFieldsTTypeEntry() int {
   if (p.IsSetUnionEntry()) {
     count++
   }
-  if (p.IsSetUserDe***REMOVED***nedTypeEntry()) {
+  if (p.IsSetUserDefinedTypeEntry()) {
     count++
   }
   return count
@@ -1861,8 +1861,8 @@ func (p *TTypeEntry) IsSetUnionEntry() bool {
   return p.UnionEntry != nil
 }
 
-func (p *TTypeEntry) IsSetUserDe***REMOVED***nedTypeEntry() bool {
-  return p.UserDe***REMOVED***nedTypeEntry != nil
+func (p *TTypeEntry) IsSetUserDefinedTypeEntry() bool {
+  return p.UserDefinedTypeEntry != nil
 }
 
 func (p *TTypeEntry) Read(iprot thrift.TProtocol) error {
@@ -1872,74 +1872,74 @@ func (p *TTypeEntry) Read(iprot thrift.TProtocol) error {
 
 
   for {
-    _, ***REMOVED***eldTypeId, ***REMOVED***eldId, err := iprot.ReadFieldBegin()
+    _, fieldTypeId, fieldId, err := iprot.ReadFieldBegin()
     if err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T ***REMOVED***eld %d read error: ", p, ***REMOVED***eldId), err)
+      return thrift.PrependError(fmt.Sprintf("%T field %d read error: ", p, fieldId), err)
     }
-    if ***REMOVED***eldTypeId == thrift.STOP { break; }
-    switch ***REMOVED***eldId {
+    if fieldTypeId == thrift.STOP { break; }
+    switch fieldId {
     case 1:
-      if ***REMOVED***eldTypeId == thrift.STRUCT {
+      if fieldTypeId == thrift.STRUCT {
         if err := p.ReadField1(iprot); err != nil {
           return err
         }
-      } ***REMOVED*** {
-        if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      } else {
+        if err := iprot.Skip(fieldTypeId); err != nil {
           return err
         }
       }
     case 2:
-      if ***REMOVED***eldTypeId == thrift.STRUCT {
+      if fieldTypeId == thrift.STRUCT {
         if err := p.ReadField2(iprot); err != nil {
           return err
         }
-      } ***REMOVED*** {
-        if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      } else {
+        if err := iprot.Skip(fieldTypeId); err != nil {
           return err
         }
       }
     case 3:
-      if ***REMOVED***eldTypeId == thrift.STRUCT {
+      if fieldTypeId == thrift.STRUCT {
         if err := p.ReadField3(iprot); err != nil {
           return err
         }
-      } ***REMOVED*** {
-        if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      } else {
+        if err := iprot.Skip(fieldTypeId); err != nil {
           return err
         }
       }
     case 4:
-      if ***REMOVED***eldTypeId == thrift.STRUCT {
+      if fieldTypeId == thrift.STRUCT {
         if err := p.ReadField4(iprot); err != nil {
           return err
         }
-      } ***REMOVED*** {
-        if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      } else {
+        if err := iprot.Skip(fieldTypeId); err != nil {
           return err
         }
       }
     case 5:
-      if ***REMOVED***eldTypeId == thrift.STRUCT {
+      if fieldTypeId == thrift.STRUCT {
         if err := p.ReadField5(iprot); err != nil {
           return err
         }
-      } ***REMOVED*** {
-        if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      } else {
+        if err := iprot.Skip(fieldTypeId); err != nil {
           return err
         }
       }
     case 6:
-      if ***REMOVED***eldTypeId == thrift.STRUCT {
+      if fieldTypeId == thrift.STRUCT {
         if err := p.ReadField6(iprot); err != nil {
           return err
         }
-      } ***REMOVED*** {
-        if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      } else {
+        if err := iprot.Skip(fieldTypeId); err != nil {
           return err
         }
       }
     default:
-      if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      if err := iprot.Skip(fieldTypeId); err != nil {
         return err
       }
     }
@@ -1994,16 +1994,16 @@ func (p *TTypeEntry)  ReadField5(iprot thrift.TProtocol) error {
 }
 
 func (p *TTypeEntry)  ReadField6(iprot thrift.TProtocol) error {
-  p.UserDe***REMOVED***nedTypeEntry = &TUserDe***REMOVED***nedTypeEntry{}
-  if err := p.UserDe***REMOVED***nedTypeEntry.Read(iprot); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T error reading struct: ", p.UserDe***REMOVED***nedTypeEntry), err)
+  p.UserDefinedTypeEntry = &TUserDefinedTypeEntry{}
+  if err := p.UserDefinedTypeEntry.Read(iprot); err != nil {
+    return thrift.PrependError(fmt.Sprintf("%T error reading struct: ", p.UserDefinedTypeEntry), err)
   }
   return nil
 }
 
 func (p *TTypeEntry) Write(oprot thrift.TProtocol) error {
   if c := p.CountSetFieldsTTypeEntry(); c != 1 {
-    return fmt.Errorf("%T write union: exactly one ***REMOVED***eld must be set (%d set).", p, c)
+    return fmt.Errorf("%T write union: exactly one field must be set (%d set).", p, c)
   }
   if err := oprot.WriteStructBegin("TTypeEntry"); err != nil {
     return thrift.PrependError(fmt.Sprintf("%T write struct begin error: ", p), err) }
@@ -2016,7 +2016,7 @@ func (p *TTypeEntry) Write(oprot thrift.TProtocol) error {
     if err := p.writeField6(oprot); err != nil { return err }
   }
   if err := oprot.WriteFieldStop(); err != nil {
-    return thrift.PrependError("write ***REMOVED***eld stop error: ", err) }
+    return thrift.PrependError("write field stop error: ", err) }
   if err := oprot.WriteStructEnd(); err != nil {
     return thrift.PrependError("write struct stop error: ", err) }
   return nil
@@ -2025,12 +2025,12 @@ func (p *TTypeEntry) Write(oprot thrift.TProtocol) error {
 func (p *TTypeEntry) writeField1(oprot thrift.TProtocol) (err error) {
   if p.IsSetPrimitiveEntry() {
     if err := oprot.WriteFieldBegin("primitiveEntry", thrift.STRUCT, 1); err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld begin error 1:primitiveEntry: ", p), err) }
+      return thrift.PrependError(fmt.Sprintf("%T write field begin error 1:primitiveEntry: ", p), err) }
     if err := p.PrimitiveEntry.Write(oprot); err != nil {
       return thrift.PrependError(fmt.Sprintf("%T error writing struct: ", p.PrimitiveEntry), err)
     }
     if err := oprot.WriteFieldEnd(); err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld end error 1:primitiveEntry: ", p), err) }
+      return thrift.PrependError(fmt.Sprintf("%T write field end error 1:primitiveEntry: ", p), err) }
   }
   return err
 }
@@ -2038,12 +2038,12 @@ func (p *TTypeEntry) writeField1(oprot thrift.TProtocol) (err error) {
 func (p *TTypeEntry) writeField2(oprot thrift.TProtocol) (err error) {
   if p.IsSetArrayEntry() {
     if err := oprot.WriteFieldBegin("arrayEntry", thrift.STRUCT, 2); err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld begin error 2:arrayEntry: ", p), err) }
+      return thrift.PrependError(fmt.Sprintf("%T write field begin error 2:arrayEntry: ", p), err) }
     if err := p.ArrayEntry.Write(oprot); err != nil {
       return thrift.PrependError(fmt.Sprintf("%T error writing struct: ", p.ArrayEntry), err)
     }
     if err := oprot.WriteFieldEnd(); err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld end error 2:arrayEntry: ", p), err) }
+      return thrift.PrependError(fmt.Sprintf("%T write field end error 2:arrayEntry: ", p), err) }
   }
   return err
 }
@@ -2051,12 +2051,12 @@ func (p *TTypeEntry) writeField2(oprot thrift.TProtocol) (err error) {
 func (p *TTypeEntry) writeField3(oprot thrift.TProtocol) (err error) {
   if p.IsSetMapEntry() {
     if err := oprot.WriteFieldBegin("mapEntry", thrift.STRUCT, 3); err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld begin error 3:mapEntry: ", p), err) }
+      return thrift.PrependError(fmt.Sprintf("%T write field begin error 3:mapEntry: ", p), err) }
     if err := p.MapEntry.Write(oprot); err != nil {
       return thrift.PrependError(fmt.Sprintf("%T error writing struct: ", p.MapEntry), err)
     }
     if err := oprot.WriteFieldEnd(); err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld end error 3:mapEntry: ", p), err) }
+      return thrift.PrependError(fmt.Sprintf("%T write field end error 3:mapEntry: ", p), err) }
   }
   return err
 }
@@ -2064,12 +2064,12 @@ func (p *TTypeEntry) writeField3(oprot thrift.TProtocol) (err error) {
 func (p *TTypeEntry) writeField4(oprot thrift.TProtocol) (err error) {
   if p.IsSetStructEntry() {
     if err := oprot.WriteFieldBegin("structEntry", thrift.STRUCT, 4); err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld begin error 4:structEntry: ", p), err) }
+      return thrift.PrependError(fmt.Sprintf("%T write field begin error 4:structEntry: ", p), err) }
     if err := p.StructEntry.Write(oprot); err != nil {
       return thrift.PrependError(fmt.Sprintf("%T error writing struct: ", p.StructEntry), err)
     }
     if err := oprot.WriteFieldEnd(); err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld end error 4:structEntry: ", p), err) }
+      return thrift.PrependError(fmt.Sprintf("%T write field end error 4:structEntry: ", p), err) }
   }
   return err
 }
@@ -2077,25 +2077,25 @@ func (p *TTypeEntry) writeField4(oprot thrift.TProtocol) (err error) {
 func (p *TTypeEntry) writeField5(oprot thrift.TProtocol) (err error) {
   if p.IsSetUnionEntry() {
     if err := oprot.WriteFieldBegin("unionEntry", thrift.STRUCT, 5); err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld begin error 5:unionEntry: ", p), err) }
+      return thrift.PrependError(fmt.Sprintf("%T write field begin error 5:unionEntry: ", p), err) }
     if err := p.UnionEntry.Write(oprot); err != nil {
       return thrift.PrependError(fmt.Sprintf("%T error writing struct: ", p.UnionEntry), err)
     }
     if err := oprot.WriteFieldEnd(); err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld end error 5:unionEntry: ", p), err) }
+      return thrift.PrependError(fmt.Sprintf("%T write field end error 5:unionEntry: ", p), err) }
   }
   return err
 }
 
 func (p *TTypeEntry) writeField6(oprot thrift.TProtocol) (err error) {
-  if p.IsSetUserDe***REMOVED***nedTypeEntry() {
-    if err := oprot.WriteFieldBegin("userDe***REMOVED***nedTypeEntry", thrift.STRUCT, 6); err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld begin error 6:userDe***REMOVED***nedTypeEntry: ", p), err) }
-    if err := p.UserDe***REMOVED***nedTypeEntry.Write(oprot); err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T error writing struct: ", p.UserDe***REMOVED***nedTypeEntry), err)
+  if p.IsSetUserDefinedTypeEntry() {
+    if err := oprot.WriteFieldBegin("userDefinedTypeEntry", thrift.STRUCT, 6); err != nil {
+      return thrift.PrependError(fmt.Sprintf("%T write field begin error 6:userDefinedTypeEntry: ", p), err) }
+    if err := p.UserDefinedTypeEntry.Write(oprot); err != nil {
+      return thrift.PrependError(fmt.Sprintf("%T error writing struct: ", p.UserDefinedTypeEntry), err)
     }
     if err := oprot.WriteFieldEnd(); err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld end error 6:userDe***REMOVED***nedTypeEntry: ", p), err) }
+      return thrift.PrependError(fmt.Sprintf("%T write field end error 6:userDefinedTypeEntry: ", p), err) }
   }
   return err
 }
@@ -2129,25 +2129,25 @@ func (p *TTypeDesc) Read(iprot thrift.TProtocol) error {
   var issetTypes bool = false;
 
   for {
-    _, ***REMOVED***eldTypeId, ***REMOVED***eldId, err := iprot.ReadFieldBegin()
+    _, fieldTypeId, fieldId, err := iprot.ReadFieldBegin()
     if err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T ***REMOVED***eld %d read error: ", p, ***REMOVED***eldId), err)
+      return thrift.PrependError(fmt.Sprintf("%T field %d read error: ", p, fieldId), err)
     }
-    if ***REMOVED***eldTypeId == thrift.STOP { break; }
-    switch ***REMOVED***eldId {
+    if fieldTypeId == thrift.STOP { break; }
+    switch fieldId {
     case 1:
-      if ***REMOVED***eldTypeId == thrift.LIST {
+      if fieldTypeId == thrift.LIST {
         if err := p.ReadField1(iprot); err != nil {
           return err
         }
-      } ***REMOVED*** {
-        if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      } else {
+        if err := iprot.Skip(fieldTypeId); err != nil {
           return err
         }
       }
       issetTypes = true
     default:
-      if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      if err := iprot.Skip(fieldTypeId); err != nil {
         return err
       }
     }
@@ -2159,7 +2159,7 @@ func (p *TTypeDesc) Read(iprot thrift.TProtocol) error {
     return thrift.PrependError(fmt.Sprintf("%T read struct end error: ", p), err)
   }
   if !issetTypes{
-    return thrift.NewTProtocolExceptionWithType(thrift.INVALID_DATA, fmt.Errorf("Required ***REMOVED***eld Types is not set"));
+    return thrift.NewTProtocolExceptionWithType(thrift.INVALID_DATA, fmt.Errorf("Required field Types is not set"));
   }
   return nil
 }
@@ -2191,7 +2191,7 @@ func (p *TTypeDesc) Write(oprot thrift.TProtocol) error {
     if err := p.writeField1(oprot); err != nil { return err }
   }
   if err := oprot.WriteFieldStop(); err != nil {
-    return thrift.PrependError("write ***REMOVED***eld stop error: ", err) }
+    return thrift.PrependError("write field stop error: ", err) }
   if err := oprot.WriteStructEnd(); err != nil {
     return thrift.PrependError("write struct stop error: ", err) }
   return nil
@@ -2199,7 +2199,7 @@ func (p *TTypeDesc) Write(oprot thrift.TProtocol) error {
 
 func (p *TTypeDesc) writeField1(oprot thrift.TProtocol) (err error) {
   if err := oprot.WriteFieldBegin("types", thrift.LIST, 1); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld begin error 1:types: ", p), err) }
+    return thrift.PrependError(fmt.Sprintf("%T write field begin error 1:types: ", p), err) }
   if err := oprot.WriteListBegin(thrift.STRUCT, len(p.Types)); err != nil {
     return thrift.PrependError("error writing list begin: ", err)
   }
@@ -2212,7 +2212,7 @@ func (p *TTypeDesc) writeField1(oprot thrift.TProtocol) (err error) {
     return thrift.PrependError("error writing list end: ", err)
   }
   if err := oprot.WriteFieldEnd(); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld end error 1:types: ", p), err) }
+    return thrift.PrependError(fmt.Sprintf("%T write field end error 1:types: ", p), err) }
   return err
 }
 
@@ -2279,57 +2279,57 @@ func (p *TColumnDesc) Read(iprot thrift.TProtocol) error {
   var issetPosition bool = false;
 
   for {
-    _, ***REMOVED***eldTypeId, ***REMOVED***eldId, err := iprot.ReadFieldBegin()
+    _, fieldTypeId, fieldId, err := iprot.ReadFieldBegin()
     if err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T ***REMOVED***eld %d read error: ", p, ***REMOVED***eldId), err)
+      return thrift.PrependError(fmt.Sprintf("%T field %d read error: ", p, fieldId), err)
     }
-    if ***REMOVED***eldTypeId == thrift.STOP { break; }
-    switch ***REMOVED***eldId {
+    if fieldTypeId == thrift.STOP { break; }
+    switch fieldId {
     case 1:
-      if ***REMOVED***eldTypeId == thrift.STRING {
+      if fieldTypeId == thrift.STRING {
         if err := p.ReadField1(iprot); err != nil {
           return err
         }
-      } ***REMOVED*** {
-        if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      } else {
+        if err := iprot.Skip(fieldTypeId); err != nil {
           return err
         }
       }
       issetColumnName = true
     case 2:
-      if ***REMOVED***eldTypeId == thrift.STRUCT {
+      if fieldTypeId == thrift.STRUCT {
         if err := p.ReadField2(iprot); err != nil {
           return err
         }
-      } ***REMOVED*** {
-        if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      } else {
+        if err := iprot.Skip(fieldTypeId); err != nil {
           return err
         }
       }
       issetTypeDesc = true
     case 3:
-      if ***REMOVED***eldTypeId == thrift.I32 {
+      if fieldTypeId == thrift.I32 {
         if err := p.ReadField3(iprot); err != nil {
           return err
         }
-      } ***REMOVED*** {
-        if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      } else {
+        if err := iprot.Skip(fieldTypeId); err != nil {
           return err
         }
       }
       issetPosition = true
     case 4:
-      if ***REMOVED***eldTypeId == thrift.STRING {
+      if fieldTypeId == thrift.STRING {
         if err := p.ReadField4(iprot); err != nil {
           return err
         }
-      } ***REMOVED*** {
-        if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      } else {
+        if err := iprot.Skip(fieldTypeId); err != nil {
           return err
         }
       }
     default:
-      if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      if err := iprot.Skip(fieldTypeId); err != nil {
         return err
       }
     }
@@ -2341,21 +2341,21 @@ func (p *TColumnDesc) Read(iprot thrift.TProtocol) error {
     return thrift.PrependError(fmt.Sprintf("%T read struct end error: ", p), err)
   }
   if !issetColumnName{
-    return thrift.NewTProtocolExceptionWithType(thrift.INVALID_DATA, fmt.Errorf("Required ***REMOVED***eld ColumnName is not set"));
+    return thrift.NewTProtocolExceptionWithType(thrift.INVALID_DATA, fmt.Errorf("Required field ColumnName is not set"));
   }
   if !issetTypeDesc{
-    return thrift.NewTProtocolExceptionWithType(thrift.INVALID_DATA, fmt.Errorf("Required ***REMOVED***eld TypeDesc is not set"));
+    return thrift.NewTProtocolExceptionWithType(thrift.INVALID_DATA, fmt.Errorf("Required field TypeDesc is not set"));
   }
   if !issetPosition{
-    return thrift.NewTProtocolExceptionWithType(thrift.INVALID_DATA, fmt.Errorf("Required ***REMOVED***eld Position is not set"));
+    return thrift.NewTProtocolExceptionWithType(thrift.INVALID_DATA, fmt.Errorf("Required field Position is not set"));
   }
   return nil
 }
 
 func (p *TColumnDesc)  ReadField1(iprot thrift.TProtocol) error {
   if v, err := iprot.ReadString(); err != nil {
-  return thrift.PrependError("error reading ***REMOVED***eld 1: ", err)
-} ***REMOVED*** {
+  return thrift.PrependError("error reading field 1: ", err)
+} else {
   p.ColumnName = v
 }
   return nil
@@ -2371,8 +2371,8 @@ func (p *TColumnDesc)  ReadField2(iprot thrift.TProtocol) error {
 
 func (p *TColumnDesc)  ReadField3(iprot thrift.TProtocol) error {
   if v, err := iprot.ReadI32(); err != nil {
-  return thrift.PrependError("error reading ***REMOVED***eld 3: ", err)
-} ***REMOVED*** {
+  return thrift.PrependError("error reading field 3: ", err)
+} else {
   p.Position = v
 }
   return nil
@@ -2380,8 +2380,8 @@ func (p *TColumnDesc)  ReadField3(iprot thrift.TProtocol) error {
 
 func (p *TColumnDesc)  ReadField4(iprot thrift.TProtocol) error {
   if v, err := iprot.ReadString(); err != nil {
-  return thrift.PrependError("error reading ***REMOVED***eld 4: ", err)
-} ***REMOVED*** {
+  return thrift.PrependError("error reading field 4: ", err)
+} else {
   p.Comment = &v
 }
   return nil
@@ -2397,7 +2397,7 @@ func (p *TColumnDesc) Write(oprot thrift.TProtocol) error {
     if err := p.writeField4(oprot); err != nil { return err }
   }
   if err := oprot.WriteFieldStop(); err != nil {
-    return thrift.PrependError("write ***REMOVED***eld stop error: ", err) }
+    return thrift.PrependError("write field stop error: ", err) }
   if err := oprot.WriteStructEnd(); err != nil {
     return thrift.PrependError("write struct stop error: ", err) }
   return nil
@@ -2405,43 +2405,43 @@ func (p *TColumnDesc) Write(oprot thrift.TProtocol) error {
 
 func (p *TColumnDesc) writeField1(oprot thrift.TProtocol) (err error) {
   if err := oprot.WriteFieldBegin("columnName", thrift.STRING, 1); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld begin error 1:columnName: ", p), err) }
+    return thrift.PrependError(fmt.Sprintf("%T write field begin error 1:columnName: ", p), err) }
   if err := oprot.WriteString(string(p.ColumnName)); err != nil {
-  return thrift.PrependError(fmt.Sprintf("%T.columnName (1) ***REMOVED***eld write error: ", p), err) }
+  return thrift.PrependError(fmt.Sprintf("%T.columnName (1) field write error: ", p), err) }
   if err := oprot.WriteFieldEnd(); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld end error 1:columnName: ", p), err) }
+    return thrift.PrependError(fmt.Sprintf("%T write field end error 1:columnName: ", p), err) }
   return err
 }
 
 func (p *TColumnDesc) writeField2(oprot thrift.TProtocol) (err error) {
   if err := oprot.WriteFieldBegin("typeDesc", thrift.STRUCT, 2); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld begin error 2:typeDesc: ", p), err) }
+    return thrift.PrependError(fmt.Sprintf("%T write field begin error 2:typeDesc: ", p), err) }
   if err := p.TypeDesc.Write(oprot); err != nil {
     return thrift.PrependError(fmt.Sprintf("%T error writing struct: ", p.TypeDesc), err)
   }
   if err := oprot.WriteFieldEnd(); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld end error 2:typeDesc: ", p), err) }
+    return thrift.PrependError(fmt.Sprintf("%T write field end error 2:typeDesc: ", p), err) }
   return err
 }
 
 func (p *TColumnDesc) writeField3(oprot thrift.TProtocol) (err error) {
   if err := oprot.WriteFieldBegin("position", thrift.I32, 3); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld begin error 3:position: ", p), err) }
+    return thrift.PrependError(fmt.Sprintf("%T write field begin error 3:position: ", p), err) }
   if err := oprot.WriteI32(int32(p.Position)); err != nil {
-  return thrift.PrependError(fmt.Sprintf("%T.position (3) ***REMOVED***eld write error: ", p), err) }
+  return thrift.PrependError(fmt.Sprintf("%T.position (3) field write error: ", p), err) }
   if err := oprot.WriteFieldEnd(); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld end error 3:position: ", p), err) }
+    return thrift.PrependError(fmt.Sprintf("%T write field end error 3:position: ", p), err) }
   return err
 }
 
 func (p *TColumnDesc) writeField4(oprot thrift.TProtocol) (err error) {
   if p.IsSetComment() {
     if err := oprot.WriteFieldBegin("comment", thrift.STRING, 4); err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld begin error 4:comment: ", p), err) }
+      return thrift.PrependError(fmt.Sprintf("%T write field begin error 4:comment: ", p), err) }
     if err := oprot.WriteString(string(*p.Comment)); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T.comment (4) ***REMOVED***eld write error: ", p), err) }
+    return thrift.PrependError(fmt.Sprintf("%T.comment (4) field write error: ", p), err) }
     if err := oprot.WriteFieldEnd(); err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld end error 4:comment: ", p), err) }
+      return thrift.PrependError(fmt.Sprintf("%T write field end error 4:comment: ", p), err) }
   }
   return err
 }
@@ -2475,25 +2475,25 @@ func (p *TTableSchema) Read(iprot thrift.TProtocol) error {
   var issetColumns bool = false;
 
   for {
-    _, ***REMOVED***eldTypeId, ***REMOVED***eldId, err := iprot.ReadFieldBegin()
+    _, fieldTypeId, fieldId, err := iprot.ReadFieldBegin()
     if err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T ***REMOVED***eld %d read error: ", p, ***REMOVED***eldId), err)
+      return thrift.PrependError(fmt.Sprintf("%T field %d read error: ", p, fieldId), err)
     }
-    if ***REMOVED***eldTypeId == thrift.STOP { break; }
-    switch ***REMOVED***eldId {
+    if fieldTypeId == thrift.STOP { break; }
+    switch fieldId {
     case 1:
-      if ***REMOVED***eldTypeId == thrift.LIST {
+      if fieldTypeId == thrift.LIST {
         if err := p.ReadField1(iprot); err != nil {
           return err
         }
-      } ***REMOVED*** {
-        if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      } else {
+        if err := iprot.Skip(fieldTypeId); err != nil {
           return err
         }
       }
       issetColumns = true
     default:
-      if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      if err := iprot.Skip(fieldTypeId); err != nil {
         return err
       }
     }
@@ -2505,7 +2505,7 @@ func (p *TTableSchema) Read(iprot thrift.TProtocol) error {
     return thrift.PrependError(fmt.Sprintf("%T read struct end error: ", p), err)
   }
   if !issetColumns{
-    return thrift.NewTProtocolExceptionWithType(thrift.INVALID_DATA, fmt.Errorf("Required ***REMOVED***eld Columns is not set"));
+    return thrift.NewTProtocolExceptionWithType(thrift.INVALID_DATA, fmt.Errorf("Required field Columns is not set"));
   }
   return nil
 }
@@ -2537,7 +2537,7 @@ func (p *TTableSchema) Write(oprot thrift.TProtocol) error {
     if err := p.writeField1(oprot); err != nil { return err }
   }
   if err := oprot.WriteFieldStop(); err != nil {
-    return thrift.PrependError("write ***REMOVED***eld stop error: ", err) }
+    return thrift.PrependError("write field stop error: ", err) }
   if err := oprot.WriteStructEnd(); err != nil {
     return thrift.PrependError("write struct stop error: ", err) }
   return nil
@@ -2545,7 +2545,7 @@ func (p *TTableSchema) Write(oprot thrift.TProtocol) error {
 
 func (p *TTableSchema) writeField1(oprot thrift.TProtocol) (err error) {
   if err := oprot.WriteFieldBegin("columns", thrift.LIST, 1); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld begin error 1:columns: ", p), err) }
+    return thrift.PrependError(fmt.Sprintf("%T write field begin error 1:columns: ", p), err) }
   if err := oprot.WriteListBegin(thrift.STRUCT, len(p.Columns)); err != nil {
     return thrift.PrependError("error writing list begin: ", err)
   }
@@ -2558,7 +2558,7 @@ func (p *TTableSchema) writeField1(oprot thrift.TProtocol) (err error) {
     return thrift.PrependError("error writing list end: ", err)
   }
   if err := oprot.WriteFieldEnd(); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld end error 1:columns: ", p), err) }
+    return thrift.PrependError(fmt.Sprintf("%T write field end error 1:columns: ", p), err) }
   return err
 }
 
@@ -2597,24 +2597,24 @@ func (p *TBoolValue) Read(iprot thrift.TProtocol) error {
 
 
   for {
-    _, ***REMOVED***eldTypeId, ***REMOVED***eldId, err := iprot.ReadFieldBegin()
+    _, fieldTypeId, fieldId, err := iprot.ReadFieldBegin()
     if err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T ***REMOVED***eld %d read error: ", p, ***REMOVED***eldId), err)
+      return thrift.PrependError(fmt.Sprintf("%T field %d read error: ", p, fieldId), err)
     }
-    if ***REMOVED***eldTypeId == thrift.STOP { break; }
-    switch ***REMOVED***eldId {
+    if fieldTypeId == thrift.STOP { break; }
+    switch fieldId {
     case 1:
-      if ***REMOVED***eldTypeId == thrift.BOOL {
+      if fieldTypeId == thrift.BOOL {
         if err := p.ReadField1(iprot); err != nil {
           return err
         }
-      } ***REMOVED*** {
-        if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      } else {
+        if err := iprot.Skip(fieldTypeId); err != nil {
           return err
         }
       }
     default:
-      if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      if err := iprot.Skip(fieldTypeId); err != nil {
         return err
       }
     }
@@ -2630,8 +2630,8 @@ func (p *TBoolValue) Read(iprot thrift.TProtocol) error {
 
 func (p *TBoolValue)  ReadField1(iprot thrift.TProtocol) error {
   if v, err := iprot.ReadBool(); err != nil {
-  return thrift.PrependError("error reading ***REMOVED***eld 1: ", err)
-} ***REMOVED*** {
+  return thrift.PrependError("error reading field 1: ", err)
+} else {
   p.Value = &v
 }
   return nil
@@ -2644,7 +2644,7 @@ func (p *TBoolValue) Write(oprot thrift.TProtocol) error {
     if err := p.writeField1(oprot); err != nil { return err }
   }
   if err := oprot.WriteFieldStop(); err != nil {
-    return thrift.PrependError("write ***REMOVED***eld stop error: ", err) }
+    return thrift.PrependError("write field stop error: ", err) }
   if err := oprot.WriteStructEnd(); err != nil {
     return thrift.PrependError("write struct stop error: ", err) }
   return nil
@@ -2653,11 +2653,11 @@ func (p *TBoolValue) Write(oprot thrift.TProtocol) error {
 func (p *TBoolValue) writeField1(oprot thrift.TProtocol) (err error) {
   if p.IsSetValue() {
     if err := oprot.WriteFieldBegin("value", thrift.BOOL, 1); err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld begin error 1:value: ", p), err) }
+      return thrift.PrependError(fmt.Sprintf("%T write field begin error 1:value: ", p), err) }
     if err := oprot.WriteBool(bool(*p.Value)); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T.value (1) ***REMOVED***eld write error: ", p), err) }
+    return thrift.PrependError(fmt.Sprintf("%T.value (1) field write error: ", p), err) }
     if err := oprot.WriteFieldEnd(); err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld end error 1:value: ", p), err) }
+      return thrift.PrependError(fmt.Sprintf("%T write field end error 1:value: ", p), err) }
   }
   return err
 }
@@ -2697,24 +2697,24 @@ func (p *TByteValue) Read(iprot thrift.TProtocol) error {
 
 
   for {
-    _, ***REMOVED***eldTypeId, ***REMOVED***eldId, err := iprot.ReadFieldBegin()
+    _, fieldTypeId, fieldId, err := iprot.ReadFieldBegin()
     if err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T ***REMOVED***eld %d read error: ", p, ***REMOVED***eldId), err)
+      return thrift.PrependError(fmt.Sprintf("%T field %d read error: ", p, fieldId), err)
     }
-    if ***REMOVED***eldTypeId == thrift.STOP { break; }
-    switch ***REMOVED***eldId {
+    if fieldTypeId == thrift.STOP { break; }
+    switch fieldId {
     case 1:
-      if ***REMOVED***eldTypeId == thrift.BYTE {
+      if fieldTypeId == thrift.BYTE {
         if err := p.ReadField1(iprot); err != nil {
           return err
         }
-      } ***REMOVED*** {
-        if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      } else {
+        if err := iprot.Skip(fieldTypeId); err != nil {
           return err
         }
       }
     default:
-      if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      if err := iprot.Skip(fieldTypeId); err != nil {
         return err
       }
     }
@@ -2730,8 +2730,8 @@ func (p *TByteValue) Read(iprot thrift.TProtocol) error {
 
 func (p *TByteValue)  ReadField1(iprot thrift.TProtocol) error {
   if v, err := iprot.ReadByte(); err != nil {
-  return thrift.PrependError("error reading ***REMOVED***eld 1: ", err)
-} ***REMOVED*** {
+  return thrift.PrependError("error reading field 1: ", err)
+} else {
   temp := int8(v)
   p.Value = &temp
 }
@@ -2745,7 +2745,7 @@ func (p *TByteValue) Write(oprot thrift.TProtocol) error {
     if err := p.writeField1(oprot); err != nil { return err }
   }
   if err := oprot.WriteFieldStop(); err != nil {
-    return thrift.PrependError("write ***REMOVED***eld stop error: ", err) }
+    return thrift.PrependError("write field stop error: ", err) }
   if err := oprot.WriteStructEnd(); err != nil {
     return thrift.PrependError("write struct stop error: ", err) }
   return nil
@@ -2754,11 +2754,11 @@ func (p *TByteValue) Write(oprot thrift.TProtocol) error {
 func (p *TByteValue) writeField1(oprot thrift.TProtocol) (err error) {
   if p.IsSetValue() {
     if err := oprot.WriteFieldBegin("value", thrift.BYTE, 1); err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld begin error 1:value: ", p), err) }
+      return thrift.PrependError(fmt.Sprintf("%T write field begin error 1:value: ", p), err) }
     if err := oprot.WriteByte(int8(*p.Value)); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T.value (1) ***REMOVED***eld write error: ", p), err) }
+    return thrift.PrependError(fmt.Sprintf("%T.value (1) field write error: ", p), err) }
     if err := oprot.WriteFieldEnd(); err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld end error 1:value: ", p), err) }
+      return thrift.PrependError(fmt.Sprintf("%T write field end error 1:value: ", p), err) }
   }
   return err
 }
@@ -2798,24 +2798,24 @@ func (p *TI16Value) Read(iprot thrift.TProtocol) error {
 
 
   for {
-    _, ***REMOVED***eldTypeId, ***REMOVED***eldId, err := iprot.ReadFieldBegin()
+    _, fieldTypeId, fieldId, err := iprot.ReadFieldBegin()
     if err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T ***REMOVED***eld %d read error: ", p, ***REMOVED***eldId), err)
+      return thrift.PrependError(fmt.Sprintf("%T field %d read error: ", p, fieldId), err)
     }
-    if ***REMOVED***eldTypeId == thrift.STOP { break; }
-    switch ***REMOVED***eldId {
+    if fieldTypeId == thrift.STOP { break; }
+    switch fieldId {
     case 1:
-      if ***REMOVED***eldTypeId == thrift.I16 {
+      if fieldTypeId == thrift.I16 {
         if err := p.ReadField1(iprot); err != nil {
           return err
         }
-      } ***REMOVED*** {
-        if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      } else {
+        if err := iprot.Skip(fieldTypeId); err != nil {
           return err
         }
       }
     default:
-      if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      if err := iprot.Skip(fieldTypeId); err != nil {
         return err
       }
     }
@@ -2831,8 +2831,8 @@ func (p *TI16Value) Read(iprot thrift.TProtocol) error {
 
 func (p *TI16Value)  ReadField1(iprot thrift.TProtocol) error {
   if v, err := iprot.ReadI16(); err != nil {
-  return thrift.PrependError("error reading ***REMOVED***eld 1: ", err)
-} ***REMOVED*** {
+  return thrift.PrependError("error reading field 1: ", err)
+} else {
   p.Value = &v
 }
   return nil
@@ -2845,7 +2845,7 @@ func (p *TI16Value) Write(oprot thrift.TProtocol) error {
     if err := p.writeField1(oprot); err != nil { return err }
   }
   if err := oprot.WriteFieldStop(); err != nil {
-    return thrift.PrependError("write ***REMOVED***eld stop error: ", err) }
+    return thrift.PrependError("write field stop error: ", err) }
   if err := oprot.WriteStructEnd(); err != nil {
     return thrift.PrependError("write struct stop error: ", err) }
   return nil
@@ -2854,11 +2854,11 @@ func (p *TI16Value) Write(oprot thrift.TProtocol) error {
 func (p *TI16Value) writeField1(oprot thrift.TProtocol) (err error) {
   if p.IsSetValue() {
     if err := oprot.WriteFieldBegin("value", thrift.I16, 1); err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld begin error 1:value: ", p), err) }
+      return thrift.PrependError(fmt.Sprintf("%T write field begin error 1:value: ", p), err) }
     if err := oprot.WriteI16(int16(*p.Value)); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T.value (1) ***REMOVED***eld write error: ", p), err) }
+    return thrift.PrependError(fmt.Sprintf("%T.value (1) field write error: ", p), err) }
     if err := oprot.WriteFieldEnd(); err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld end error 1:value: ", p), err) }
+      return thrift.PrependError(fmt.Sprintf("%T write field end error 1:value: ", p), err) }
   }
   return err
 }
@@ -2898,24 +2898,24 @@ func (p *TI32Value) Read(iprot thrift.TProtocol) error {
 
 
   for {
-    _, ***REMOVED***eldTypeId, ***REMOVED***eldId, err := iprot.ReadFieldBegin()
+    _, fieldTypeId, fieldId, err := iprot.ReadFieldBegin()
     if err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T ***REMOVED***eld %d read error: ", p, ***REMOVED***eldId), err)
+      return thrift.PrependError(fmt.Sprintf("%T field %d read error: ", p, fieldId), err)
     }
-    if ***REMOVED***eldTypeId == thrift.STOP { break; }
-    switch ***REMOVED***eldId {
+    if fieldTypeId == thrift.STOP { break; }
+    switch fieldId {
     case 1:
-      if ***REMOVED***eldTypeId == thrift.I32 {
+      if fieldTypeId == thrift.I32 {
         if err := p.ReadField1(iprot); err != nil {
           return err
         }
-      } ***REMOVED*** {
-        if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      } else {
+        if err := iprot.Skip(fieldTypeId); err != nil {
           return err
         }
       }
     default:
-      if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      if err := iprot.Skip(fieldTypeId); err != nil {
         return err
       }
     }
@@ -2931,8 +2931,8 @@ func (p *TI32Value) Read(iprot thrift.TProtocol) error {
 
 func (p *TI32Value)  ReadField1(iprot thrift.TProtocol) error {
   if v, err := iprot.ReadI32(); err != nil {
-  return thrift.PrependError("error reading ***REMOVED***eld 1: ", err)
-} ***REMOVED*** {
+  return thrift.PrependError("error reading field 1: ", err)
+} else {
   p.Value = &v
 }
   return nil
@@ -2945,7 +2945,7 @@ func (p *TI32Value) Write(oprot thrift.TProtocol) error {
     if err := p.writeField1(oprot); err != nil { return err }
   }
   if err := oprot.WriteFieldStop(); err != nil {
-    return thrift.PrependError("write ***REMOVED***eld stop error: ", err) }
+    return thrift.PrependError("write field stop error: ", err) }
   if err := oprot.WriteStructEnd(); err != nil {
     return thrift.PrependError("write struct stop error: ", err) }
   return nil
@@ -2954,11 +2954,11 @@ func (p *TI32Value) Write(oprot thrift.TProtocol) error {
 func (p *TI32Value) writeField1(oprot thrift.TProtocol) (err error) {
   if p.IsSetValue() {
     if err := oprot.WriteFieldBegin("value", thrift.I32, 1); err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld begin error 1:value: ", p), err) }
+      return thrift.PrependError(fmt.Sprintf("%T write field begin error 1:value: ", p), err) }
     if err := oprot.WriteI32(int32(*p.Value)); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T.value (1) ***REMOVED***eld write error: ", p), err) }
+    return thrift.PrependError(fmt.Sprintf("%T.value (1) field write error: ", p), err) }
     if err := oprot.WriteFieldEnd(); err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld end error 1:value: ", p), err) }
+      return thrift.PrependError(fmt.Sprintf("%T write field end error 1:value: ", p), err) }
   }
   return err
 }
@@ -2998,24 +2998,24 @@ func (p *TI64Value) Read(iprot thrift.TProtocol) error {
 
 
   for {
-    _, ***REMOVED***eldTypeId, ***REMOVED***eldId, err := iprot.ReadFieldBegin()
+    _, fieldTypeId, fieldId, err := iprot.ReadFieldBegin()
     if err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T ***REMOVED***eld %d read error: ", p, ***REMOVED***eldId), err)
+      return thrift.PrependError(fmt.Sprintf("%T field %d read error: ", p, fieldId), err)
     }
-    if ***REMOVED***eldTypeId == thrift.STOP { break; }
-    switch ***REMOVED***eldId {
+    if fieldTypeId == thrift.STOP { break; }
+    switch fieldId {
     case 1:
-      if ***REMOVED***eldTypeId == thrift.I64 {
+      if fieldTypeId == thrift.I64 {
         if err := p.ReadField1(iprot); err != nil {
           return err
         }
-      } ***REMOVED*** {
-        if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      } else {
+        if err := iprot.Skip(fieldTypeId); err != nil {
           return err
         }
       }
     default:
-      if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      if err := iprot.Skip(fieldTypeId); err != nil {
         return err
       }
     }
@@ -3031,8 +3031,8 @@ func (p *TI64Value) Read(iprot thrift.TProtocol) error {
 
 func (p *TI64Value)  ReadField1(iprot thrift.TProtocol) error {
   if v, err := iprot.ReadI64(); err != nil {
-  return thrift.PrependError("error reading ***REMOVED***eld 1: ", err)
-} ***REMOVED*** {
+  return thrift.PrependError("error reading field 1: ", err)
+} else {
   p.Value = &v
 }
   return nil
@@ -3045,7 +3045,7 @@ func (p *TI64Value) Write(oprot thrift.TProtocol) error {
     if err := p.writeField1(oprot); err != nil { return err }
   }
   if err := oprot.WriteFieldStop(); err != nil {
-    return thrift.PrependError("write ***REMOVED***eld stop error: ", err) }
+    return thrift.PrependError("write field stop error: ", err) }
   if err := oprot.WriteStructEnd(); err != nil {
     return thrift.PrependError("write struct stop error: ", err) }
   return nil
@@ -3054,11 +3054,11 @@ func (p *TI64Value) Write(oprot thrift.TProtocol) error {
 func (p *TI64Value) writeField1(oprot thrift.TProtocol) (err error) {
   if p.IsSetValue() {
     if err := oprot.WriteFieldBegin("value", thrift.I64, 1); err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld begin error 1:value: ", p), err) }
+      return thrift.PrependError(fmt.Sprintf("%T write field begin error 1:value: ", p), err) }
     if err := oprot.WriteI64(int64(*p.Value)); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T.value (1) ***REMOVED***eld write error: ", p), err) }
+    return thrift.PrependError(fmt.Sprintf("%T.value (1) field write error: ", p), err) }
     if err := oprot.WriteFieldEnd(); err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld end error 1:value: ", p), err) }
+      return thrift.PrependError(fmt.Sprintf("%T write field end error 1:value: ", p), err) }
   }
   return err
 }
@@ -3098,24 +3098,24 @@ func (p *TDoubleValue) Read(iprot thrift.TProtocol) error {
 
 
   for {
-    _, ***REMOVED***eldTypeId, ***REMOVED***eldId, err := iprot.ReadFieldBegin()
+    _, fieldTypeId, fieldId, err := iprot.ReadFieldBegin()
     if err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T ***REMOVED***eld %d read error: ", p, ***REMOVED***eldId), err)
+      return thrift.PrependError(fmt.Sprintf("%T field %d read error: ", p, fieldId), err)
     }
-    if ***REMOVED***eldTypeId == thrift.STOP { break; }
-    switch ***REMOVED***eldId {
+    if fieldTypeId == thrift.STOP { break; }
+    switch fieldId {
     case 1:
-      if ***REMOVED***eldTypeId == thrift.DOUBLE {
+      if fieldTypeId == thrift.DOUBLE {
         if err := p.ReadField1(iprot); err != nil {
           return err
         }
-      } ***REMOVED*** {
-        if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      } else {
+        if err := iprot.Skip(fieldTypeId); err != nil {
           return err
         }
       }
     default:
-      if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      if err := iprot.Skip(fieldTypeId); err != nil {
         return err
       }
     }
@@ -3131,8 +3131,8 @@ func (p *TDoubleValue) Read(iprot thrift.TProtocol) error {
 
 func (p *TDoubleValue)  ReadField1(iprot thrift.TProtocol) error {
   if v, err := iprot.ReadDouble(); err != nil {
-  return thrift.PrependError("error reading ***REMOVED***eld 1: ", err)
-} ***REMOVED*** {
+  return thrift.PrependError("error reading field 1: ", err)
+} else {
   p.Value = &v
 }
   return nil
@@ -3145,7 +3145,7 @@ func (p *TDoubleValue) Write(oprot thrift.TProtocol) error {
     if err := p.writeField1(oprot); err != nil { return err }
   }
   if err := oprot.WriteFieldStop(); err != nil {
-    return thrift.PrependError("write ***REMOVED***eld stop error: ", err) }
+    return thrift.PrependError("write field stop error: ", err) }
   if err := oprot.WriteStructEnd(); err != nil {
     return thrift.PrependError("write struct stop error: ", err) }
   return nil
@@ -3154,11 +3154,11 @@ func (p *TDoubleValue) Write(oprot thrift.TProtocol) error {
 func (p *TDoubleValue) writeField1(oprot thrift.TProtocol) (err error) {
   if p.IsSetValue() {
     if err := oprot.WriteFieldBegin("value", thrift.DOUBLE, 1); err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld begin error 1:value: ", p), err) }
+      return thrift.PrependError(fmt.Sprintf("%T write field begin error 1:value: ", p), err) }
     if err := oprot.WriteDouble(float64(*p.Value)); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T.value (1) ***REMOVED***eld write error: ", p), err) }
+    return thrift.PrependError(fmt.Sprintf("%T.value (1) field write error: ", p), err) }
     if err := oprot.WriteFieldEnd(); err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld end error 1:value: ", p), err) }
+      return thrift.PrependError(fmt.Sprintf("%T write field end error 1:value: ", p), err) }
   }
   return err
 }
@@ -3198,24 +3198,24 @@ func (p *TStringValue) Read(iprot thrift.TProtocol) error {
 
 
   for {
-    _, ***REMOVED***eldTypeId, ***REMOVED***eldId, err := iprot.ReadFieldBegin()
+    _, fieldTypeId, fieldId, err := iprot.ReadFieldBegin()
     if err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T ***REMOVED***eld %d read error: ", p, ***REMOVED***eldId), err)
+      return thrift.PrependError(fmt.Sprintf("%T field %d read error: ", p, fieldId), err)
     }
-    if ***REMOVED***eldTypeId == thrift.STOP { break; }
-    switch ***REMOVED***eldId {
+    if fieldTypeId == thrift.STOP { break; }
+    switch fieldId {
     case 1:
-      if ***REMOVED***eldTypeId == thrift.STRING {
+      if fieldTypeId == thrift.STRING {
         if err := p.ReadField1(iprot); err != nil {
           return err
         }
-      } ***REMOVED*** {
-        if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      } else {
+        if err := iprot.Skip(fieldTypeId); err != nil {
           return err
         }
       }
     default:
-      if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      if err := iprot.Skip(fieldTypeId); err != nil {
         return err
       }
     }
@@ -3231,8 +3231,8 @@ func (p *TStringValue) Read(iprot thrift.TProtocol) error {
 
 func (p *TStringValue)  ReadField1(iprot thrift.TProtocol) error {
   if v, err := iprot.ReadString(); err != nil {
-  return thrift.PrependError("error reading ***REMOVED***eld 1: ", err)
-} ***REMOVED*** {
+  return thrift.PrependError("error reading field 1: ", err)
+} else {
   p.Value = &v
 }
   return nil
@@ -3245,7 +3245,7 @@ func (p *TStringValue) Write(oprot thrift.TProtocol) error {
     if err := p.writeField1(oprot); err != nil { return err }
   }
   if err := oprot.WriteFieldStop(); err != nil {
-    return thrift.PrependError("write ***REMOVED***eld stop error: ", err) }
+    return thrift.PrependError("write field stop error: ", err) }
   if err := oprot.WriteStructEnd(); err != nil {
     return thrift.PrependError("write struct stop error: ", err) }
   return nil
@@ -3254,11 +3254,11 @@ func (p *TStringValue) Write(oprot thrift.TProtocol) error {
 func (p *TStringValue) writeField1(oprot thrift.TProtocol) (err error) {
   if p.IsSetValue() {
     if err := oprot.WriteFieldBegin("value", thrift.STRING, 1); err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld begin error 1:value: ", p), err) }
+      return thrift.PrependError(fmt.Sprintf("%T write field begin error 1:value: ", p), err) }
     if err := oprot.WriteString(string(*p.Value)); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T.value (1) ***REMOVED***eld write error: ", p), err) }
+    return thrift.PrependError(fmt.Sprintf("%T.value (1) field write error: ", p), err) }
     if err := oprot.WriteFieldEnd(); err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld end error 1:value: ", p), err) }
+      return thrift.PrependError(fmt.Sprintf("%T write field end error 1:value: ", p), err) }
   }
   return err
 }
@@ -3403,84 +3403,84 @@ func (p *TColumnValue) Read(iprot thrift.TProtocol) error {
 
 
   for {
-    _, ***REMOVED***eldTypeId, ***REMOVED***eldId, err := iprot.ReadFieldBegin()
+    _, fieldTypeId, fieldId, err := iprot.ReadFieldBegin()
     if err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T ***REMOVED***eld %d read error: ", p, ***REMOVED***eldId), err)
+      return thrift.PrependError(fmt.Sprintf("%T field %d read error: ", p, fieldId), err)
     }
-    if ***REMOVED***eldTypeId == thrift.STOP { break; }
-    switch ***REMOVED***eldId {
+    if fieldTypeId == thrift.STOP { break; }
+    switch fieldId {
     case 1:
-      if ***REMOVED***eldTypeId == thrift.STRUCT {
+      if fieldTypeId == thrift.STRUCT {
         if err := p.ReadField1(iprot); err != nil {
           return err
         }
-      } ***REMOVED*** {
-        if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      } else {
+        if err := iprot.Skip(fieldTypeId); err != nil {
           return err
         }
       }
     case 2:
-      if ***REMOVED***eldTypeId == thrift.STRUCT {
+      if fieldTypeId == thrift.STRUCT {
         if err := p.ReadField2(iprot); err != nil {
           return err
         }
-      } ***REMOVED*** {
-        if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      } else {
+        if err := iprot.Skip(fieldTypeId); err != nil {
           return err
         }
       }
     case 3:
-      if ***REMOVED***eldTypeId == thrift.STRUCT {
+      if fieldTypeId == thrift.STRUCT {
         if err := p.ReadField3(iprot); err != nil {
           return err
         }
-      } ***REMOVED*** {
-        if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      } else {
+        if err := iprot.Skip(fieldTypeId); err != nil {
           return err
         }
       }
     case 4:
-      if ***REMOVED***eldTypeId == thrift.STRUCT {
+      if fieldTypeId == thrift.STRUCT {
         if err := p.ReadField4(iprot); err != nil {
           return err
         }
-      } ***REMOVED*** {
-        if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      } else {
+        if err := iprot.Skip(fieldTypeId); err != nil {
           return err
         }
       }
     case 5:
-      if ***REMOVED***eldTypeId == thrift.STRUCT {
+      if fieldTypeId == thrift.STRUCT {
         if err := p.ReadField5(iprot); err != nil {
           return err
         }
-      } ***REMOVED*** {
-        if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      } else {
+        if err := iprot.Skip(fieldTypeId); err != nil {
           return err
         }
       }
     case 6:
-      if ***REMOVED***eldTypeId == thrift.STRUCT {
+      if fieldTypeId == thrift.STRUCT {
         if err := p.ReadField6(iprot); err != nil {
           return err
         }
-      } ***REMOVED*** {
-        if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      } else {
+        if err := iprot.Skip(fieldTypeId); err != nil {
           return err
         }
       }
     case 7:
-      if ***REMOVED***eldTypeId == thrift.STRUCT {
+      if fieldTypeId == thrift.STRUCT {
         if err := p.ReadField7(iprot); err != nil {
           return err
         }
-      } ***REMOVED*** {
-        if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      } else {
+        if err := iprot.Skip(fieldTypeId); err != nil {
           return err
         }
       }
     default:
-      if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      if err := iprot.Skip(fieldTypeId); err != nil {
         return err
       }
     }
@@ -3552,7 +3552,7 @@ func (p *TColumnValue)  ReadField7(iprot thrift.TProtocol) error {
 
 func (p *TColumnValue) Write(oprot thrift.TProtocol) error {
   if c := p.CountSetFieldsTColumnValue(); c != 1 {
-    return fmt.Errorf("%T write union: exactly one ***REMOVED***eld must be set (%d set).", p, c)
+    return fmt.Errorf("%T write union: exactly one field must be set (%d set).", p, c)
   }
   if err := oprot.WriteStructBegin("TColumnValue"); err != nil {
     return thrift.PrependError(fmt.Sprintf("%T write struct begin error: ", p), err) }
@@ -3566,7 +3566,7 @@ func (p *TColumnValue) Write(oprot thrift.TProtocol) error {
     if err := p.writeField7(oprot); err != nil { return err }
   }
   if err := oprot.WriteFieldStop(); err != nil {
-    return thrift.PrependError("write ***REMOVED***eld stop error: ", err) }
+    return thrift.PrependError("write field stop error: ", err) }
   if err := oprot.WriteStructEnd(); err != nil {
     return thrift.PrependError("write struct stop error: ", err) }
   return nil
@@ -3575,12 +3575,12 @@ func (p *TColumnValue) Write(oprot thrift.TProtocol) error {
 func (p *TColumnValue) writeField1(oprot thrift.TProtocol) (err error) {
   if p.IsSetBoolVal() {
     if err := oprot.WriteFieldBegin("boolVal", thrift.STRUCT, 1); err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld begin error 1:boolVal: ", p), err) }
+      return thrift.PrependError(fmt.Sprintf("%T write field begin error 1:boolVal: ", p), err) }
     if err := p.BoolVal.Write(oprot); err != nil {
       return thrift.PrependError(fmt.Sprintf("%T error writing struct: ", p.BoolVal), err)
     }
     if err := oprot.WriteFieldEnd(); err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld end error 1:boolVal: ", p), err) }
+      return thrift.PrependError(fmt.Sprintf("%T write field end error 1:boolVal: ", p), err) }
   }
   return err
 }
@@ -3588,12 +3588,12 @@ func (p *TColumnValue) writeField1(oprot thrift.TProtocol) (err error) {
 func (p *TColumnValue) writeField2(oprot thrift.TProtocol) (err error) {
   if p.IsSetByteVal() {
     if err := oprot.WriteFieldBegin("byteVal", thrift.STRUCT, 2); err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld begin error 2:byteVal: ", p), err) }
+      return thrift.PrependError(fmt.Sprintf("%T write field begin error 2:byteVal: ", p), err) }
     if err := p.ByteVal.Write(oprot); err != nil {
       return thrift.PrependError(fmt.Sprintf("%T error writing struct: ", p.ByteVal), err)
     }
     if err := oprot.WriteFieldEnd(); err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld end error 2:byteVal: ", p), err) }
+      return thrift.PrependError(fmt.Sprintf("%T write field end error 2:byteVal: ", p), err) }
   }
   return err
 }
@@ -3601,12 +3601,12 @@ func (p *TColumnValue) writeField2(oprot thrift.TProtocol) (err error) {
 func (p *TColumnValue) writeField3(oprot thrift.TProtocol) (err error) {
   if p.IsSetI16Val() {
     if err := oprot.WriteFieldBegin("i16Val", thrift.STRUCT, 3); err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld begin error 3:i16Val: ", p), err) }
+      return thrift.PrependError(fmt.Sprintf("%T write field begin error 3:i16Val: ", p), err) }
     if err := p.I16Val.Write(oprot); err != nil {
       return thrift.PrependError(fmt.Sprintf("%T error writing struct: ", p.I16Val), err)
     }
     if err := oprot.WriteFieldEnd(); err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld end error 3:i16Val: ", p), err) }
+      return thrift.PrependError(fmt.Sprintf("%T write field end error 3:i16Val: ", p), err) }
   }
   return err
 }
@@ -3614,12 +3614,12 @@ func (p *TColumnValue) writeField3(oprot thrift.TProtocol) (err error) {
 func (p *TColumnValue) writeField4(oprot thrift.TProtocol) (err error) {
   if p.IsSetI32Val() {
     if err := oprot.WriteFieldBegin("i32Val", thrift.STRUCT, 4); err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld begin error 4:i32Val: ", p), err) }
+      return thrift.PrependError(fmt.Sprintf("%T write field begin error 4:i32Val: ", p), err) }
     if err := p.I32Val.Write(oprot); err != nil {
       return thrift.PrependError(fmt.Sprintf("%T error writing struct: ", p.I32Val), err)
     }
     if err := oprot.WriteFieldEnd(); err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld end error 4:i32Val: ", p), err) }
+      return thrift.PrependError(fmt.Sprintf("%T write field end error 4:i32Val: ", p), err) }
   }
   return err
 }
@@ -3627,12 +3627,12 @@ func (p *TColumnValue) writeField4(oprot thrift.TProtocol) (err error) {
 func (p *TColumnValue) writeField5(oprot thrift.TProtocol) (err error) {
   if p.IsSetI64Val() {
     if err := oprot.WriteFieldBegin("i64Val", thrift.STRUCT, 5); err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld begin error 5:i64Val: ", p), err) }
+      return thrift.PrependError(fmt.Sprintf("%T write field begin error 5:i64Val: ", p), err) }
     if err := p.I64Val.Write(oprot); err != nil {
       return thrift.PrependError(fmt.Sprintf("%T error writing struct: ", p.I64Val), err)
     }
     if err := oprot.WriteFieldEnd(); err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld end error 5:i64Val: ", p), err) }
+      return thrift.PrependError(fmt.Sprintf("%T write field end error 5:i64Val: ", p), err) }
   }
   return err
 }
@@ -3640,12 +3640,12 @@ func (p *TColumnValue) writeField5(oprot thrift.TProtocol) (err error) {
 func (p *TColumnValue) writeField6(oprot thrift.TProtocol) (err error) {
   if p.IsSetDoubleVal() {
     if err := oprot.WriteFieldBegin("doubleVal", thrift.STRUCT, 6); err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld begin error 6:doubleVal: ", p), err) }
+      return thrift.PrependError(fmt.Sprintf("%T write field begin error 6:doubleVal: ", p), err) }
     if err := p.DoubleVal.Write(oprot); err != nil {
       return thrift.PrependError(fmt.Sprintf("%T error writing struct: ", p.DoubleVal), err)
     }
     if err := oprot.WriteFieldEnd(); err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld end error 6:doubleVal: ", p), err) }
+      return thrift.PrependError(fmt.Sprintf("%T write field end error 6:doubleVal: ", p), err) }
   }
   return err
 }
@@ -3653,12 +3653,12 @@ func (p *TColumnValue) writeField6(oprot thrift.TProtocol) (err error) {
 func (p *TColumnValue) writeField7(oprot thrift.TProtocol) (err error) {
   if p.IsSetStringVal() {
     if err := oprot.WriteFieldBegin("stringVal", thrift.STRUCT, 7); err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld begin error 7:stringVal: ", p), err) }
+      return thrift.PrependError(fmt.Sprintf("%T write field begin error 7:stringVal: ", p), err) }
     if err := p.StringVal.Write(oprot); err != nil {
       return thrift.PrependError(fmt.Sprintf("%T error writing struct: ", p.StringVal), err)
     }
     if err := oprot.WriteFieldEnd(); err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld end error 7:stringVal: ", p), err) }
+      return thrift.PrependError(fmt.Sprintf("%T write field end error 7:stringVal: ", p), err) }
   }
   return err
 }
@@ -3692,25 +3692,25 @@ func (p *TRow) Read(iprot thrift.TProtocol) error {
   var issetColVals bool = false;
 
   for {
-    _, ***REMOVED***eldTypeId, ***REMOVED***eldId, err := iprot.ReadFieldBegin()
+    _, fieldTypeId, fieldId, err := iprot.ReadFieldBegin()
     if err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T ***REMOVED***eld %d read error: ", p, ***REMOVED***eldId), err)
+      return thrift.PrependError(fmt.Sprintf("%T field %d read error: ", p, fieldId), err)
     }
-    if ***REMOVED***eldTypeId == thrift.STOP { break; }
-    switch ***REMOVED***eldId {
+    if fieldTypeId == thrift.STOP { break; }
+    switch fieldId {
     case 1:
-      if ***REMOVED***eldTypeId == thrift.LIST {
+      if fieldTypeId == thrift.LIST {
         if err := p.ReadField1(iprot); err != nil {
           return err
         }
-      } ***REMOVED*** {
-        if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      } else {
+        if err := iprot.Skip(fieldTypeId); err != nil {
           return err
         }
       }
       issetColVals = true
     default:
-      if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      if err := iprot.Skip(fieldTypeId); err != nil {
         return err
       }
     }
@@ -3722,7 +3722,7 @@ func (p *TRow) Read(iprot thrift.TProtocol) error {
     return thrift.PrependError(fmt.Sprintf("%T read struct end error: ", p), err)
   }
   if !issetColVals{
-    return thrift.NewTProtocolExceptionWithType(thrift.INVALID_DATA, fmt.Errorf("Required ***REMOVED***eld ColVals is not set"));
+    return thrift.NewTProtocolExceptionWithType(thrift.INVALID_DATA, fmt.Errorf("Required field ColVals is not set"));
   }
   return nil
 }
@@ -3754,7 +3754,7 @@ func (p *TRow) Write(oprot thrift.TProtocol) error {
     if err := p.writeField1(oprot); err != nil { return err }
   }
   if err := oprot.WriteFieldStop(); err != nil {
-    return thrift.PrependError("write ***REMOVED***eld stop error: ", err) }
+    return thrift.PrependError("write field stop error: ", err) }
   if err := oprot.WriteStructEnd(); err != nil {
     return thrift.PrependError("write struct stop error: ", err) }
   return nil
@@ -3762,7 +3762,7 @@ func (p *TRow) Write(oprot thrift.TProtocol) error {
 
 func (p *TRow) writeField1(oprot thrift.TProtocol) (err error) {
   if err := oprot.WriteFieldBegin("colVals", thrift.LIST, 1); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld begin error 1:colVals: ", p), err) }
+    return thrift.PrependError(fmt.Sprintf("%T write field begin error 1:colVals: ", p), err) }
   if err := oprot.WriteListBegin(thrift.STRUCT, len(p.ColVals)); err != nil {
     return thrift.PrependError("error writing list begin: ", err)
   }
@@ -3775,7 +3775,7 @@ func (p *TRow) writeField1(oprot thrift.TProtocol) (err error) {
     return thrift.PrependError("error writing list end: ", err)
   }
   if err := oprot.WriteFieldEnd(); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld end error 1:colVals: ", p), err) }
+    return thrift.PrependError(fmt.Sprintf("%T write field end error 1:colVals: ", p), err) }
   return err
 }
 
@@ -3815,36 +3815,36 @@ func (p *TBoolColumn) Read(iprot thrift.TProtocol) error {
   var issetNulls bool = false;
 
   for {
-    _, ***REMOVED***eldTypeId, ***REMOVED***eldId, err := iprot.ReadFieldBegin()
+    _, fieldTypeId, fieldId, err := iprot.ReadFieldBegin()
     if err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T ***REMOVED***eld %d read error: ", p, ***REMOVED***eldId), err)
+      return thrift.PrependError(fmt.Sprintf("%T field %d read error: ", p, fieldId), err)
     }
-    if ***REMOVED***eldTypeId == thrift.STOP { break; }
-    switch ***REMOVED***eldId {
+    if fieldTypeId == thrift.STOP { break; }
+    switch fieldId {
     case 1:
-      if ***REMOVED***eldTypeId == thrift.LIST {
+      if fieldTypeId == thrift.LIST {
         if err := p.ReadField1(iprot); err != nil {
           return err
         }
-      } ***REMOVED*** {
-        if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      } else {
+        if err := iprot.Skip(fieldTypeId); err != nil {
           return err
         }
       }
       issetValues = true
     case 2:
-      if ***REMOVED***eldTypeId == thrift.STRING {
+      if fieldTypeId == thrift.STRING {
         if err := p.ReadField2(iprot); err != nil {
           return err
         }
-      } ***REMOVED*** {
-        if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      } else {
+        if err := iprot.Skip(fieldTypeId); err != nil {
           return err
         }
       }
       issetNulls = true
     default:
-      if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      if err := iprot.Skip(fieldTypeId); err != nil {
         return err
       }
     }
@@ -3856,10 +3856,10 @@ func (p *TBoolColumn) Read(iprot thrift.TProtocol) error {
     return thrift.PrependError(fmt.Sprintf("%T read struct end error: ", p), err)
   }
   if !issetValues{
-    return thrift.NewTProtocolExceptionWithType(thrift.INVALID_DATA, fmt.Errorf("Required ***REMOVED***eld Values is not set"));
+    return thrift.NewTProtocolExceptionWithType(thrift.INVALID_DATA, fmt.Errorf("Required field Values is not set"));
   }
   if !issetNulls{
-    return thrift.NewTProtocolExceptionWithType(thrift.INVALID_DATA, fmt.Errorf("Required ***REMOVED***eld Nulls is not set"));
+    return thrift.NewTProtocolExceptionWithType(thrift.INVALID_DATA, fmt.Errorf("Required field Nulls is not set"));
   }
   return nil
 }
@@ -3874,8 +3874,8 @@ func (p *TBoolColumn)  ReadField1(iprot thrift.TProtocol) error {
   for i := 0; i < size; i ++ {
 var _elem9 bool
     if v, err := iprot.ReadBool(); err != nil {
-    return thrift.PrependError("error reading ***REMOVED***eld 0: ", err)
-} ***REMOVED*** {
+    return thrift.PrependError("error reading field 0: ", err)
+} else {
     _elem9 = v
 }
     p.Values = append(p.Values, _elem9)
@@ -3888,8 +3888,8 @@ var _elem9 bool
 
 func (p *TBoolColumn)  ReadField2(iprot thrift.TProtocol) error {
   if v, err := iprot.ReadBinary(); err != nil {
-  return thrift.PrependError("error reading ***REMOVED***eld 2: ", err)
-} ***REMOVED*** {
+  return thrift.PrependError("error reading field 2: ", err)
+} else {
   p.Nulls = v
 }
   return nil
@@ -3903,7 +3903,7 @@ func (p *TBoolColumn) Write(oprot thrift.TProtocol) error {
     if err := p.writeField2(oprot); err != nil { return err }
   }
   if err := oprot.WriteFieldStop(); err != nil {
-    return thrift.PrependError("write ***REMOVED***eld stop error: ", err) }
+    return thrift.PrependError("write field stop error: ", err) }
   if err := oprot.WriteStructEnd(); err != nil {
     return thrift.PrependError("write struct stop error: ", err) }
   return nil
@@ -3911,29 +3911,29 @@ func (p *TBoolColumn) Write(oprot thrift.TProtocol) error {
 
 func (p *TBoolColumn) writeField1(oprot thrift.TProtocol) (err error) {
   if err := oprot.WriteFieldBegin("values", thrift.LIST, 1); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld begin error 1:values: ", p), err) }
+    return thrift.PrependError(fmt.Sprintf("%T write field begin error 1:values: ", p), err) }
   if err := oprot.WriteListBegin(thrift.BOOL, len(p.Values)); err != nil {
     return thrift.PrependError("error writing list begin: ", err)
   }
   for _, v := range p.Values {
     if err := oprot.WriteBool(bool(v)); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T. (0) ***REMOVED***eld write error: ", p), err) }
+    return thrift.PrependError(fmt.Sprintf("%T. (0) field write error: ", p), err) }
   }
   if err := oprot.WriteListEnd(); err != nil {
     return thrift.PrependError("error writing list end: ", err)
   }
   if err := oprot.WriteFieldEnd(); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld end error 1:values: ", p), err) }
+    return thrift.PrependError(fmt.Sprintf("%T write field end error 1:values: ", p), err) }
   return err
 }
 
 func (p *TBoolColumn) writeField2(oprot thrift.TProtocol) (err error) {
   if err := oprot.WriteFieldBegin("nulls", thrift.STRING, 2); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld begin error 2:nulls: ", p), err) }
+    return thrift.PrependError(fmt.Sprintf("%T write field begin error 2:nulls: ", p), err) }
   if err := oprot.WriteBinary(p.Nulls); err != nil {
-  return thrift.PrependError(fmt.Sprintf("%T.nulls (2) ***REMOVED***eld write error: ", p), err) }
+  return thrift.PrependError(fmt.Sprintf("%T.nulls (2) field write error: ", p), err) }
   if err := oprot.WriteFieldEnd(); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld end error 2:nulls: ", p), err) }
+    return thrift.PrependError(fmt.Sprintf("%T write field end error 2:nulls: ", p), err) }
   return err
 }
 
@@ -3973,36 +3973,36 @@ func (p *TByteColumn) Read(iprot thrift.TProtocol) error {
   var issetNulls bool = false;
 
   for {
-    _, ***REMOVED***eldTypeId, ***REMOVED***eldId, err := iprot.ReadFieldBegin()
+    _, fieldTypeId, fieldId, err := iprot.ReadFieldBegin()
     if err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T ***REMOVED***eld %d read error: ", p, ***REMOVED***eldId), err)
+      return thrift.PrependError(fmt.Sprintf("%T field %d read error: ", p, fieldId), err)
     }
-    if ***REMOVED***eldTypeId == thrift.STOP { break; }
-    switch ***REMOVED***eldId {
+    if fieldTypeId == thrift.STOP { break; }
+    switch fieldId {
     case 1:
-      if ***REMOVED***eldTypeId == thrift.LIST {
+      if fieldTypeId == thrift.LIST {
         if err := p.ReadField1(iprot); err != nil {
           return err
         }
-      } ***REMOVED*** {
-        if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      } else {
+        if err := iprot.Skip(fieldTypeId); err != nil {
           return err
         }
       }
       issetValues = true
     case 2:
-      if ***REMOVED***eldTypeId == thrift.STRING {
+      if fieldTypeId == thrift.STRING {
         if err := p.ReadField2(iprot); err != nil {
           return err
         }
-      } ***REMOVED*** {
-        if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      } else {
+        if err := iprot.Skip(fieldTypeId); err != nil {
           return err
         }
       }
       issetNulls = true
     default:
-      if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      if err := iprot.Skip(fieldTypeId); err != nil {
         return err
       }
     }
@@ -4014,10 +4014,10 @@ func (p *TByteColumn) Read(iprot thrift.TProtocol) error {
     return thrift.PrependError(fmt.Sprintf("%T read struct end error: ", p), err)
   }
   if !issetValues{
-    return thrift.NewTProtocolExceptionWithType(thrift.INVALID_DATA, fmt.Errorf("Required ***REMOVED***eld Values is not set"));
+    return thrift.NewTProtocolExceptionWithType(thrift.INVALID_DATA, fmt.Errorf("Required field Values is not set"));
   }
   if !issetNulls{
-    return thrift.NewTProtocolExceptionWithType(thrift.INVALID_DATA, fmt.Errorf("Required ***REMOVED***eld Nulls is not set"));
+    return thrift.NewTProtocolExceptionWithType(thrift.INVALID_DATA, fmt.Errorf("Required field Nulls is not set"));
   }
   return nil
 }
@@ -4032,8 +4032,8 @@ func (p *TByteColumn)  ReadField1(iprot thrift.TProtocol) error {
   for i := 0; i < size; i ++ {
 var _elem10 int8
     if v, err := iprot.ReadByte(); err != nil {
-    return thrift.PrependError("error reading ***REMOVED***eld 0: ", err)
-} ***REMOVED*** {
+    return thrift.PrependError("error reading field 0: ", err)
+} else {
     temp := int8(v)
     _elem10 = temp
 }
@@ -4047,8 +4047,8 @@ var _elem10 int8
 
 func (p *TByteColumn)  ReadField2(iprot thrift.TProtocol) error {
   if v, err := iprot.ReadBinary(); err != nil {
-  return thrift.PrependError("error reading ***REMOVED***eld 2: ", err)
-} ***REMOVED*** {
+  return thrift.PrependError("error reading field 2: ", err)
+} else {
   p.Nulls = v
 }
   return nil
@@ -4062,7 +4062,7 @@ func (p *TByteColumn) Write(oprot thrift.TProtocol) error {
     if err := p.writeField2(oprot); err != nil { return err }
   }
   if err := oprot.WriteFieldStop(); err != nil {
-    return thrift.PrependError("write ***REMOVED***eld stop error: ", err) }
+    return thrift.PrependError("write field stop error: ", err) }
   if err := oprot.WriteStructEnd(); err != nil {
     return thrift.PrependError("write struct stop error: ", err) }
   return nil
@@ -4070,29 +4070,29 @@ func (p *TByteColumn) Write(oprot thrift.TProtocol) error {
 
 func (p *TByteColumn) writeField1(oprot thrift.TProtocol) (err error) {
   if err := oprot.WriteFieldBegin("values", thrift.LIST, 1); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld begin error 1:values: ", p), err) }
+    return thrift.PrependError(fmt.Sprintf("%T write field begin error 1:values: ", p), err) }
   if err := oprot.WriteListBegin(thrift.BYTE, len(p.Values)); err != nil {
     return thrift.PrependError("error writing list begin: ", err)
   }
   for _, v := range p.Values {
     if err := oprot.WriteByte(int8(v)); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T. (0) ***REMOVED***eld write error: ", p), err) }
+    return thrift.PrependError(fmt.Sprintf("%T. (0) field write error: ", p), err) }
   }
   if err := oprot.WriteListEnd(); err != nil {
     return thrift.PrependError("error writing list end: ", err)
   }
   if err := oprot.WriteFieldEnd(); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld end error 1:values: ", p), err) }
+    return thrift.PrependError(fmt.Sprintf("%T write field end error 1:values: ", p), err) }
   return err
 }
 
 func (p *TByteColumn) writeField2(oprot thrift.TProtocol) (err error) {
   if err := oprot.WriteFieldBegin("nulls", thrift.STRING, 2); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld begin error 2:nulls: ", p), err) }
+    return thrift.PrependError(fmt.Sprintf("%T write field begin error 2:nulls: ", p), err) }
   if err := oprot.WriteBinary(p.Nulls); err != nil {
-  return thrift.PrependError(fmt.Sprintf("%T.nulls (2) ***REMOVED***eld write error: ", p), err) }
+  return thrift.PrependError(fmt.Sprintf("%T.nulls (2) field write error: ", p), err) }
   if err := oprot.WriteFieldEnd(); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld end error 2:nulls: ", p), err) }
+    return thrift.PrependError(fmt.Sprintf("%T write field end error 2:nulls: ", p), err) }
   return err
 }
 
@@ -4132,36 +4132,36 @@ func (p *TI16Column) Read(iprot thrift.TProtocol) error {
   var issetNulls bool = false;
 
   for {
-    _, ***REMOVED***eldTypeId, ***REMOVED***eldId, err := iprot.ReadFieldBegin()
+    _, fieldTypeId, fieldId, err := iprot.ReadFieldBegin()
     if err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T ***REMOVED***eld %d read error: ", p, ***REMOVED***eldId), err)
+      return thrift.PrependError(fmt.Sprintf("%T field %d read error: ", p, fieldId), err)
     }
-    if ***REMOVED***eldTypeId == thrift.STOP { break; }
-    switch ***REMOVED***eldId {
+    if fieldTypeId == thrift.STOP { break; }
+    switch fieldId {
     case 1:
-      if ***REMOVED***eldTypeId == thrift.LIST {
+      if fieldTypeId == thrift.LIST {
         if err := p.ReadField1(iprot); err != nil {
           return err
         }
-      } ***REMOVED*** {
-        if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      } else {
+        if err := iprot.Skip(fieldTypeId); err != nil {
           return err
         }
       }
       issetValues = true
     case 2:
-      if ***REMOVED***eldTypeId == thrift.STRING {
+      if fieldTypeId == thrift.STRING {
         if err := p.ReadField2(iprot); err != nil {
           return err
         }
-      } ***REMOVED*** {
-        if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      } else {
+        if err := iprot.Skip(fieldTypeId); err != nil {
           return err
         }
       }
       issetNulls = true
     default:
-      if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      if err := iprot.Skip(fieldTypeId); err != nil {
         return err
       }
     }
@@ -4173,10 +4173,10 @@ func (p *TI16Column) Read(iprot thrift.TProtocol) error {
     return thrift.PrependError(fmt.Sprintf("%T read struct end error: ", p), err)
   }
   if !issetValues{
-    return thrift.NewTProtocolExceptionWithType(thrift.INVALID_DATA, fmt.Errorf("Required ***REMOVED***eld Values is not set"));
+    return thrift.NewTProtocolExceptionWithType(thrift.INVALID_DATA, fmt.Errorf("Required field Values is not set"));
   }
   if !issetNulls{
-    return thrift.NewTProtocolExceptionWithType(thrift.INVALID_DATA, fmt.Errorf("Required ***REMOVED***eld Nulls is not set"));
+    return thrift.NewTProtocolExceptionWithType(thrift.INVALID_DATA, fmt.Errorf("Required field Nulls is not set"));
   }
   return nil
 }
@@ -4191,8 +4191,8 @@ func (p *TI16Column)  ReadField1(iprot thrift.TProtocol) error {
   for i := 0; i < size; i ++ {
 var _elem11 int16
     if v, err := iprot.ReadI16(); err != nil {
-    return thrift.PrependError("error reading ***REMOVED***eld 0: ", err)
-} ***REMOVED*** {
+    return thrift.PrependError("error reading field 0: ", err)
+} else {
     _elem11 = v
 }
     p.Values = append(p.Values, _elem11)
@@ -4205,8 +4205,8 @@ var _elem11 int16
 
 func (p *TI16Column)  ReadField2(iprot thrift.TProtocol) error {
   if v, err := iprot.ReadBinary(); err != nil {
-  return thrift.PrependError("error reading ***REMOVED***eld 2: ", err)
-} ***REMOVED*** {
+  return thrift.PrependError("error reading field 2: ", err)
+} else {
   p.Nulls = v
 }
   return nil
@@ -4220,7 +4220,7 @@ func (p *TI16Column) Write(oprot thrift.TProtocol) error {
     if err := p.writeField2(oprot); err != nil { return err }
   }
   if err := oprot.WriteFieldStop(); err != nil {
-    return thrift.PrependError("write ***REMOVED***eld stop error: ", err) }
+    return thrift.PrependError("write field stop error: ", err) }
   if err := oprot.WriteStructEnd(); err != nil {
     return thrift.PrependError("write struct stop error: ", err) }
   return nil
@@ -4228,29 +4228,29 @@ func (p *TI16Column) Write(oprot thrift.TProtocol) error {
 
 func (p *TI16Column) writeField1(oprot thrift.TProtocol) (err error) {
   if err := oprot.WriteFieldBegin("values", thrift.LIST, 1); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld begin error 1:values: ", p), err) }
+    return thrift.PrependError(fmt.Sprintf("%T write field begin error 1:values: ", p), err) }
   if err := oprot.WriteListBegin(thrift.I16, len(p.Values)); err != nil {
     return thrift.PrependError("error writing list begin: ", err)
   }
   for _, v := range p.Values {
     if err := oprot.WriteI16(int16(v)); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T. (0) ***REMOVED***eld write error: ", p), err) }
+    return thrift.PrependError(fmt.Sprintf("%T. (0) field write error: ", p), err) }
   }
   if err := oprot.WriteListEnd(); err != nil {
     return thrift.PrependError("error writing list end: ", err)
   }
   if err := oprot.WriteFieldEnd(); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld end error 1:values: ", p), err) }
+    return thrift.PrependError(fmt.Sprintf("%T write field end error 1:values: ", p), err) }
   return err
 }
 
 func (p *TI16Column) writeField2(oprot thrift.TProtocol) (err error) {
   if err := oprot.WriteFieldBegin("nulls", thrift.STRING, 2); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld begin error 2:nulls: ", p), err) }
+    return thrift.PrependError(fmt.Sprintf("%T write field begin error 2:nulls: ", p), err) }
   if err := oprot.WriteBinary(p.Nulls); err != nil {
-  return thrift.PrependError(fmt.Sprintf("%T.nulls (2) ***REMOVED***eld write error: ", p), err) }
+  return thrift.PrependError(fmt.Sprintf("%T.nulls (2) field write error: ", p), err) }
   if err := oprot.WriteFieldEnd(); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld end error 2:nulls: ", p), err) }
+    return thrift.PrependError(fmt.Sprintf("%T write field end error 2:nulls: ", p), err) }
   return err
 }
 
@@ -4290,36 +4290,36 @@ func (p *TI32Column) Read(iprot thrift.TProtocol) error {
   var issetNulls bool = false;
 
   for {
-    _, ***REMOVED***eldTypeId, ***REMOVED***eldId, err := iprot.ReadFieldBegin()
+    _, fieldTypeId, fieldId, err := iprot.ReadFieldBegin()
     if err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T ***REMOVED***eld %d read error: ", p, ***REMOVED***eldId), err)
+      return thrift.PrependError(fmt.Sprintf("%T field %d read error: ", p, fieldId), err)
     }
-    if ***REMOVED***eldTypeId == thrift.STOP { break; }
-    switch ***REMOVED***eldId {
+    if fieldTypeId == thrift.STOP { break; }
+    switch fieldId {
     case 1:
-      if ***REMOVED***eldTypeId == thrift.LIST {
+      if fieldTypeId == thrift.LIST {
         if err := p.ReadField1(iprot); err != nil {
           return err
         }
-      } ***REMOVED*** {
-        if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      } else {
+        if err := iprot.Skip(fieldTypeId); err != nil {
           return err
         }
       }
       issetValues = true
     case 2:
-      if ***REMOVED***eldTypeId == thrift.STRING {
+      if fieldTypeId == thrift.STRING {
         if err := p.ReadField2(iprot); err != nil {
           return err
         }
-      } ***REMOVED*** {
-        if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      } else {
+        if err := iprot.Skip(fieldTypeId); err != nil {
           return err
         }
       }
       issetNulls = true
     default:
-      if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      if err := iprot.Skip(fieldTypeId); err != nil {
         return err
       }
     }
@@ -4331,10 +4331,10 @@ func (p *TI32Column) Read(iprot thrift.TProtocol) error {
     return thrift.PrependError(fmt.Sprintf("%T read struct end error: ", p), err)
   }
   if !issetValues{
-    return thrift.NewTProtocolExceptionWithType(thrift.INVALID_DATA, fmt.Errorf("Required ***REMOVED***eld Values is not set"));
+    return thrift.NewTProtocolExceptionWithType(thrift.INVALID_DATA, fmt.Errorf("Required field Values is not set"));
   }
   if !issetNulls{
-    return thrift.NewTProtocolExceptionWithType(thrift.INVALID_DATA, fmt.Errorf("Required ***REMOVED***eld Nulls is not set"));
+    return thrift.NewTProtocolExceptionWithType(thrift.INVALID_DATA, fmt.Errorf("Required field Nulls is not set"));
   }
   return nil
 }
@@ -4349,8 +4349,8 @@ func (p *TI32Column)  ReadField1(iprot thrift.TProtocol) error {
   for i := 0; i < size; i ++ {
 var _elem12 int32
     if v, err := iprot.ReadI32(); err != nil {
-    return thrift.PrependError("error reading ***REMOVED***eld 0: ", err)
-} ***REMOVED*** {
+    return thrift.PrependError("error reading field 0: ", err)
+} else {
     _elem12 = v
 }
     p.Values = append(p.Values, _elem12)
@@ -4363,8 +4363,8 @@ var _elem12 int32
 
 func (p *TI32Column)  ReadField2(iprot thrift.TProtocol) error {
   if v, err := iprot.ReadBinary(); err != nil {
-  return thrift.PrependError("error reading ***REMOVED***eld 2: ", err)
-} ***REMOVED*** {
+  return thrift.PrependError("error reading field 2: ", err)
+} else {
   p.Nulls = v
 }
   return nil
@@ -4378,7 +4378,7 @@ func (p *TI32Column) Write(oprot thrift.TProtocol) error {
     if err := p.writeField2(oprot); err != nil { return err }
   }
   if err := oprot.WriteFieldStop(); err != nil {
-    return thrift.PrependError("write ***REMOVED***eld stop error: ", err) }
+    return thrift.PrependError("write field stop error: ", err) }
   if err := oprot.WriteStructEnd(); err != nil {
     return thrift.PrependError("write struct stop error: ", err) }
   return nil
@@ -4386,29 +4386,29 @@ func (p *TI32Column) Write(oprot thrift.TProtocol) error {
 
 func (p *TI32Column) writeField1(oprot thrift.TProtocol) (err error) {
   if err := oprot.WriteFieldBegin("values", thrift.LIST, 1); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld begin error 1:values: ", p), err) }
+    return thrift.PrependError(fmt.Sprintf("%T write field begin error 1:values: ", p), err) }
   if err := oprot.WriteListBegin(thrift.I32, len(p.Values)); err != nil {
     return thrift.PrependError("error writing list begin: ", err)
   }
   for _, v := range p.Values {
     if err := oprot.WriteI32(int32(v)); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T. (0) ***REMOVED***eld write error: ", p), err) }
+    return thrift.PrependError(fmt.Sprintf("%T. (0) field write error: ", p), err) }
   }
   if err := oprot.WriteListEnd(); err != nil {
     return thrift.PrependError("error writing list end: ", err)
   }
   if err := oprot.WriteFieldEnd(); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld end error 1:values: ", p), err) }
+    return thrift.PrependError(fmt.Sprintf("%T write field end error 1:values: ", p), err) }
   return err
 }
 
 func (p *TI32Column) writeField2(oprot thrift.TProtocol) (err error) {
   if err := oprot.WriteFieldBegin("nulls", thrift.STRING, 2); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld begin error 2:nulls: ", p), err) }
+    return thrift.PrependError(fmt.Sprintf("%T write field begin error 2:nulls: ", p), err) }
   if err := oprot.WriteBinary(p.Nulls); err != nil {
-  return thrift.PrependError(fmt.Sprintf("%T.nulls (2) ***REMOVED***eld write error: ", p), err) }
+  return thrift.PrependError(fmt.Sprintf("%T.nulls (2) field write error: ", p), err) }
   if err := oprot.WriteFieldEnd(); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld end error 2:nulls: ", p), err) }
+    return thrift.PrependError(fmt.Sprintf("%T write field end error 2:nulls: ", p), err) }
   return err
 }
 
@@ -4448,36 +4448,36 @@ func (p *TI64Column) Read(iprot thrift.TProtocol) error {
   var issetNulls bool = false;
 
   for {
-    _, ***REMOVED***eldTypeId, ***REMOVED***eldId, err := iprot.ReadFieldBegin()
+    _, fieldTypeId, fieldId, err := iprot.ReadFieldBegin()
     if err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T ***REMOVED***eld %d read error: ", p, ***REMOVED***eldId), err)
+      return thrift.PrependError(fmt.Sprintf("%T field %d read error: ", p, fieldId), err)
     }
-    if ***REMOVED***eldTypeId == thrift.STOP { break; }
-    switch ***REMOVED***eldId {
+    if fieldTypeId == thrift.STOP { break; }
+    switch fieldId {
     case 1:
-      if ***REMOVED***eldTypeId == thrift.LIST {
+      if fieldTypeId == thrift.LIST {
         if err := p.ReadField1(iprot); err != nil {
           return err
         }
-      } ***REMOVED*** {
-        if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      } else {
+        if err := iprot.Skip(fieldTypeId); err != nil {
           return err
         }
       }
       issetValues = true
     case 2:
-      if ***REMOVED***eldTypeId == thrift.STRING {
+      if fieldTypeId == thrift.STRING {
         if err := p.ReadField2(iprot); err != nil {
           return err
         }
-      } ***REMOVED*** {
-        if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      } else {
+        if err := iprot.Skip(fieldTypeId); err != nil {
           return err
         }
       }
       issetNulls = true
     default:
-      if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      if err := iprot.Skip(fieldTypeId); err != nil {
         return err
       }
     }
@@ -4489,10 +4489,10 @@ func (p *TI64Column) Read(iprot thrift.TProtocol) error {
     return thrift.PrependError(fmt.Sprintf("%T read struct end error: ", p), err)
   }
   if !issetValues{
-    return thrift.NewTProtocolExceptionWithType(thrift.INVALID_DATA, fmt.Errorf("Required ***REMOVED***eld Values is not set"));
+    return thrift.NewTProtocolExceptionWithType(thrift.INVALID_DATA, fmt.Errorf("Required field Values is not set"));
   }
   if !issetNulls{
-    return thrift.NewTProtocolExceptionWithType(thrift.INVALID_DATA, fmt.Errorf("Required ***REMOVED***eld Nulls is not set"));
+    return thrift.NewTProtocolExceptionWithType(thrift.INVALID_DATA, fmt.Errorf("Required field Nulls is not set"));
   }
   return nil
 }
@@ -4507,8 +4507,8 @@ func (p *TI64Column)  ReadField1(iprot thrift.TProtocol) error {
   for i := 0; i < size; i ++ {
 var _elem13 int64
     if v, err := iprot.ReadI64(); err != nil {
-    return thrift.PrependError("error reading ***REMOVED***eld 0: ", err)
-} ***REMOVED*** {
+    return thrift.PrependError("error reading field 0: ", err)
+} else {
     _elem13 = v
 }
     p.Values = append(p.Values, _elem13)
@@ -4521,8 +4521,8 @@ var _elem13 int64
 
 func (p *TI64Column)  ReadField2(iprot thrift.TProtocol) error {
   if v, err := iprot.ReadBinary(); err != nil {
-  return thrift.PrependError("error reading ***REMOVED***eld 2: ", err)
-} ***REMOVED*** {
+  return thrift.PrependError("error reading field 2: ", err)
+} else {
   p.Nulls = v
 }
   return nil
@@ -4536,7 +4536,7 @@ func (p *TI64Column) Write(oprot thrift.TProtocol) error {
     if err := p.writeField2(oprot); err != nil { return err }
   }
   if err := oprot.WriteFieldStop(); err != nil {
-    return thrift.PrependError("write ***REMOVED***eld stop error: ", err) }
+    return thrift.PrependError("write field stop error: ", err) }
   if err := oprot.WriteStructEnd(); err != nil {
     return thrift.PrependError("write struct stop error: ", err) }
   return nil
@@ -4544,29 +4544,29 @@ func (p *TI64Column) Write(oprot thrift.TProtocol) error {
 
 func (p *TI64Column) writeField1(oprot thrift.TProtocol) (err error) {
   if err := oprot.WriteFieldBegin("values", thrift.LIST, 1); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld begin error 1:values: ", p), err) }
+    return thrift.PrependError(fmt.Sprintf("%T write field begin error 1:values: ", p), err) }
   if err := oprot.WriteListBegin(thrift.I64, len(p.Values)); err != nil {
     return thrift.PrependError("error writing list begin: ", err)
   }
   for _, v := range p.Values {
     if err := oprot.WriteI64(int64(v)); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T. (0) ***REMOVED***eld write error: ", p), err) }
+    return thrift.PrependError(fmt.Sprintf("%T. (0) field write error: ", p), err) }
   }
   if err := oprot.WriteListEnd(); err != nil {
     return thrift.PrependError("error writing list end: ", err)
   }
   if err := oprot.WriteFieldEnd(); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld end error 1:values: ", p), err) }
+    return thrift.PrependError(fmt.Sprintf("%T write field end error 1:values: ", p), err) }
   return err
 }
 
 func (p *TI64Column) writeField2(oprot thrift.TProtocol) (err error) {
   if err := oprot.WriteFieldBegin("nulls", thrift.STRING, 2); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld begin error 2:nulls: ", p), err) }
+    return thrift.PrependError(fmt.Sprintf("%T write field begin error 2:nulls: ", p), err) }
   if err := oprot.WriteBinary(p.Nulls); err != nil {
-  return thrift.PrependError(fmt.Sprintf("%T.nulls (2) ***REMOVED***eld write error: ", p), err) }
+  return thrift.PrependError(fmt.Sprintf("%T.nulls (2) field write error: ", p), err) }
   if err := oprot.WriteFieldEnd(); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld end error 2:nulls: ", p), err) }
+    return thrift.PrependError(fmt.Sprintf("%T write field end error 2:nulls: ", p), err) }
   return err
 }
 
@@ -4606,36 +4606,36 @@ func (p *TDoubleColumn) Read(iprot thrift.TProtocol) error {
   var issetNulls bool = false;
 
   for {
-    _, ***REMOVED***eldTypeId, ***REMOVED***eldId, err := iprot.ReadFieldBegin()
+    _, fieldTypeId, fieldId, err := iprot.ReadFieldBegin()
     if err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T ***REMOVED***eld %d read error: ", p, ***REMOVED***eldId), err)
+      return thrift.PrependError(fmt.Sprintf("%T field %d read error: ", p, fieldId), err)
     }
-    if ***REMOVED***eldTypeId == thrift.STOP { break; }
-    switch ***REMOVED***eldId {
+    if fieldTypeId == thrift.STOP { break; }
+    switch fieldId {
     case 1:
-      if ***REMOVED***eldTypeId == thrift.LIST {
+      if fieldTypeId == thrift.LIST {
         if err := p.ReadField1(iprot); err != nil {
           return err
         }
-      } ***REMOVED*** {
-        if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      } else {
+        if err := iprot.Skip(fieldTypeId); err != nil {
           return err
         }
       }
       issetValues = true
     case 2:
-      if ***REMOVED***eldTypeId == thrift.STRING {
+      if fieldTypeId == thrift.STRING {
         if err := p.ReadField2(iprot); err != nil {
           return err
         }
-      } ***REMOVED*** {
-        if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      } else {
+        if err := iprot.Skip(fieldTypeId); err != nil {
           return err
         }
       }
       issetNulls = true
     default:
-      if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      if err := iprot.Skip(fieldTypeId); err != nil {
         return err
       }
     }
@@ -4647,10 +4647,10 @@ func (p *TDoubleColumn) Read(iprot thrift.TProtocol) error {
     return thrift.PrependError(fmt.Sprintf("%T read struct end error: ", p), err)
   }
   if !issetValues{
-    return thrift.NewTProtocolExceptionWithType(thrift.INVALID_DATA, fmt.Errorf("Required ***REMOVED***eld Values is not set"));
+    return thrift.NewTProtocolExceptionWithType(thrift.INVALID_DATA, fmt.Errorf("Required field Values is not set"));
   }
   if !issetNulls{
-    return thrift.NewTProtocolExceptionWithType(thrift.INVALID_DATA, fmt.Errorf("Required ***REMOVED***eld Nulls is not set"));
+    return thrift.NewTProtocolExceptionWithType(thrift.INVALID_DATA, fmt.Errorf("Required field Nulls is not set"));
   }
   return nil
 }
@@ -4665,8 +4665,8 @@ func (p *TDoubleColumn)  ReadField1(iprot thrift.TProtocol) error {
   for i := 0; i < size; i ++ {
 var _elem14 float64
     if v, err := iprot.ReadDouble(); err != nil {
-    return thrift.PrependError("error reading ***REMOVED***eld 0: ", err)
-} ***REMOVED*** {
+    return thrift.PrependError("error reading field 0: ", err)
+} else {
     _elem14 = v
 }
     p.Values = append(p.Values, _elem14)
@@ -4679,8 +4679,8 @@ var _elem14 float64
 
 func (p *TDoubleColumn)  ReadField2(iprot thrift.TProtocol) error {
   if v, err := iprot.ReadBinary(); err != nil {
-  return thrift.PrependError("error reading ***REMOVED***eld 2: ", err)
-} ***REMOVED*** {
+  return thrift.PrependError("error reading field 2: ", err)
+} else {
   p.Nulls = v
 }
   return nil
@@ -4694,7 +4694,7 @@ func (p *TDoubleColumn) Write(oprot thrift.TProtocol) error {
     if err := p.writeField2(oprot); err != nil { return err }
   }
   if err := oprot.WriteFieldStop(); err != nil {
-    return thrift.PrependError("write ***REMOVED***eld stop error: ", err) }
+    return thrift.PrependError("write field stop error: ", err) }
   if err := oprot.WriteStructEnd(); err != nil {
     return thrift.PrependError("write struct stop error: ", err) }
   return nil
@@ -4702,29 +4702,29 @@ func (p *TDoubleColumn) Write(oprot thrift.TProtocol) error {
 
 func (p *TDoubleColumn) writeField1(oprot thrift.TProtocol) (err error) {
   if err := oprot.WriteFieldBegin("values", thrift.LIST, 1); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld begin error 1:values: ", p), err) }
+    return thrift.PrependError(fmt.Sprintf("%T write field begin error 1:values: ", p), err) }
   if err := oprot.WriteListBegin(thrift.DOUBLE, len(p.Values)); err != nil {
     return thrift.PrependError("error writing list begin: ", err)
   }
   for _, v := range p.Values {
     if err := oprot.WriteDouble(float64(v)); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T. (0) ***REMOVED***eld write error: ", p), err) }
+    return thrift.PrependError(fmt.Sprintf("%T. (0) field write error: ", p), err) }
   }
   if err := oprot.WriteListEnd(); err != nil {
     return thrift.PrependError("error writing list end: ", err)
   }
   if err := oprot.WriteFieldEnd(); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld end error 1:values: ", p), err) }
+    return thrift.PrependError(fmt.Sprintf("%T write field end error 1:values: ", p), err) }
   return err
 }
 
 func (p *TDoubleColumn) writeField2(oprot thrift.TProtocol) (err error) {
   if err := oprot.WriteFieldBegin("nulls", thrift.STRING, 2); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld begin error 2:nulls: ", p), err) }
+    return thrift.PrependError(fmt.Sprintf("%T write field begin error 2:nulls: ", p), err) }
   if err := oprot.WriteBinary(p.Nulls); err != nil {
-  return thrift.PrependError(fmt.Sprintf("%T.nulls (2) ***REMOVED***eld write error: ", p), err) }
+  return thrift.PrependError(fmt.Sprintf("%T.nulls (2) field write error: ", p), err) }
   if err := oprot.WriteFieldEnd(); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld end error 2:nulls: ", p), err) }
+    return thrift.PrependError(fmt.Sprintf("%T write field end error 2:nulls: ", p), err) }
   return err
 }
 
@@ -4764,36 +4764,36 @@ func (p *TStringColumn) Read(iprot thrift.TProtocol) error {
   var issetNulls bool = false;
 
   for {
-    _, ***REMOVED***eldTypeId, ***REMOVED***eldId, err := iprot.ReadFieldBegin()
+    _, fieldTypeId, fieldId, err := iprot.ReadFieldBegin()
     if err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T ***REMOVED***eld %d read error: ", p, ***REMOVED***eldId), err)
+      return thrift.PrependError(fmt.Sprintf("%T field %d read error: ", p, fieldId), err)
     }
-    if ***REMOVED***eldTypeId == thrift.STOP { break; }
-    switch ***REMOVED***eldId {
+    if fieldTypeId == thrift.STOP { break; }
+    switch fieldId {
     case 1:
-      if ***REMOVED***eldTypeId == thrift.LIST {
+      if fieldTypeId == thrift.LIST {
         if err := p.ReadField1(iprot); err != nil {
           return err
         }
-      } ***REMOVED*** {
-        if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      } else {
+        if err := iprot.Skip(fieldTypeId); err != nil {
           return err
         }
       }
       issetValues = true
     case 2:
-      if ***REMOVED***eldTypeId == thrift.STRING {
+      if fieldTypeId == thrift.STRING {
         if err := p.ReadField2(iprot); err != nil {
           return err
         }
-      } ***REMOVED*** {
-        if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      } else {
+        if err := iprot.Skip(fieldTypeId); err != nil {
           return err
         }
       }
       issetNulls = true
     default:
-      if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      if err := iprot.Skip(fieldTypeId); err != nil {
         return err
       }
     }
@@ -4805,10 +4805,10 @@ func (p *TStringColumn) Read(iprot thrift.TProtocol) error {
     return thrift.PrependError(fmt.Sprintf("%T read struct end error: ", p), err)
   }
   if !issetValues{
-    return thrift.NewTProtocolExceptionWithType(thrift.INVALID_DATA, fmt.Errorf("Required ***REMOVED***eld Values is not set"));
+    return thrift.NewTProtocolExceptionWithType(thrift.INVALID_DATA, fmt.Errorf("Required field Values is not set"));
   }
   if !issetNulls{
-    return thrift.NewTProtocolExceptionWithType(thrift.INVALID_DATA, fmt.Errorf("Required ***REMOVED***eld Nulls is not set"));
+    return thrift.NewTProtocolExceptionWithType(thrift.INVALID_DATA, fmt.Errorf("Required field Nulls is not set"));
   }
   return nil
 }
@@ -4823,8 +4823,8 @@ func (p *TStringColumn)  ReadField1(iprot thrift.TProtocol) error {
   for i := 0; i < size; i ++ {
 var _elem15 string
     if v, err := iprot.ReadString(); err != nil {
-    return thrift.PrependError("error reading ***REMOVED***eld 0: ", err)
-} ***REMOVED*** {
+    return thrift.PrependError("error reading field 0: ", err)
+} else {
     _elem15 = v
 }
     p.Values = append(p.Values, _elem15)
@@ -4837,8 +4837,8 @@ var _elem15 string
 
 func (p *TStringColumn)  ReadField2(iprot thrift.TProtocol) error {
   if v, err := iprot.ReadBinary(); err != nil {
-  return thrift.PrependError("error reading ***REMOVED***eld 2: ", err)
-} ***REMOVED*** {
+  return thrift.PrependError("error reading field 2: ", err)
+} else {
   p.Nulls = v
 }
   return nil
@@ -4852,7 +4852,7 @@ func (p *TStringColumn) Write(oprot thrift.TProtocol) error {
     if err := p.writeField2(oprot); err != nil { return err }
   }
   if err := oprot.WriteFieldStop(); err != nil {
-    return thrift.PrependError("write ***REMOVED***eld stop error: ", err) }
+    return thrift.PrependError("write field stop error: ", err) }
   if err := oprot.WriteStructEnd(); err != nil {
     return thrift.PrependError("write struct stop error: ", err) }
   return nil
@@ -4860,29 +4860,29 @@ func (p *TStringColumn) Write(oprot thrift.TProtocol) error {
 
 func (p *TStringColumn) writeField1(oprot thrift.TProtocol) (err error) {
   if err := oprot.WriteFieldBegin("values", thrift.LIST, 1); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld begin error 1:values: ", p), err) }
+    return thrift.PrependError(fmt.Sprintf("%T write field begin error 1:values: ", p), err) }
   if err := oprot.WriteListBegin(thrift.STRING, len(p.Values)); err != nil {
     return thrift.PrependError("error writing list begin: ", err)
   }
   for _, v := range p.Values {
     if err := oprot.WriteString(string(v)); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T. (0) ***REMOVED***eld write error: ", p), err) }
+    return thrift.PrependError(fmt.Sprintf("%T. (0) field write error: ", p), err) }
   }
   if err := oprot.WriteListEnd(); err != nil {
     return thrift.PrependError("error writing list end: ", err)
   }
   if err := oprot.WriteFieldEnd(); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld end error 1:values: ", p), err) }
+    return thrift.PrependError(fmt.Sprintf("%T write field end error 1:values: ", p), err) }
   return err
 }
 
 func (p *TStringColumn) writeField2(oprot thrift.TProtocol) (err error) {
   if err := oprot.WriteFieldBegin("nulls", thrift.STRING, 2); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld begin error 2:nulls: ", p), err) }
+    return thrift.PrependError(fmt.Sprintf("%T write field begin error 2:nulls: ", p), err) }
   if err := oprot.WriteBinary(p.Nulls); err != nil {
-  return thrift.PrependError(fmt.Sprintf("%T.nulls (2) ***REMOVED***eld write error: ", p), err) }
+  return thrift.PrependError(fmt.Sprintf("%T.nulls (2) field write error: ", p), err) }
   if err := oprot.WriteFieldEnd(); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld end error 2:nulls: ", p), err) }
+    return thrift.PrependError(fmt.Sprintf("%T write field end error 2:nulls: ", p), err) }
   return err
 }
 
@@ -4922,36 +4922,36 @@ func (p *TBinaryColumn) Read(iprot thrift.TProtocol) error {
   var issetNulls bool = false;
 
   for {
-    _, ***REMOVED***eldTypeId, ***REMOVED***eldId, err := iprot.ReadFieldBegin()
+    _, fieldTypeId, fieldId, err := iprot.ReadFieldBegin()
     if err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T ***REMOVED***eld %d read error: ", p, ***REMOVED***eldId), err)
+      return thrift.PrependError(fmt.Sprintf("%T field %d read error: ", p, fieldId), err)
     }
-    if ***REMOVED***eldTypeId == thrift.STOP { break; }
-    switch ***REMOVED***eldId {
+    if fieldTypeId == thrift.STOP { break; }
+    switch fieldId {
     case 1:
-      if ***REMOVED***eldTypeId == thrift.LIST {
+      if fieldTypeId == thrift.LIST {
         if err := p.ReadField1(iprot); err != nil {
           return err
         }
-      } ***REMOVED*** {
-        if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      } else {
+        if err := iprot.Skip(fieldTypeId); err != nil {
           return err
         }
       }
       issetValues = true
     case 2:
-      if ***REMOVED***eldTypeId == thrift.STRING {
+      if fieldTypeId == thrift.STRING {
         if err := p.ReadField2(iprot); err != nil {
           return err
         }
-      } ***REMOVED*** {
-        if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      } else {
+        if err := iprot.Skip(fieldTypeId); err != nil {
           return err
         }
       }
       issetNulls = true
     default:
-      if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      if err := iprot.Skip(fieldTypeId); err != nil {
         return err
       }
     }
@@ -4963,10 +4963,10 @@ func (p *TBinaryColumn) Read(iprot thrift.TProtocol) error {
     return thrift.PrependError(fmt.Sprintf("%T read struct end error: ", p), err)
   }
   if !issetValues{
-    return thrift.NewTProtocolExceptionWithType(thrift.INVALID_DATA, fmt.Errorf("Required ***REMOVED***eld Values is not set"));
+    return thrift.NewTProtocolExceptionWithType(thrift.INVALID_DATA, fmt.Errorf("Required field Values is not set"));
   }
   if !issetNulls{
-    return thrift.NewTProtocolExceptionWithType(thrift.INVALID_DATA, fmt.Errorf("Required ***REMOVED***eld Nulls is not set"));
+    return thrift.NewTProtocolExceptionWithType(thrift.INVALID_DATA, fmt.Errorf("Required field Nulls is not set"));
   }
   return nil
 }
@@ -4981,8 +4981,8 @@ func (p *TBinaryColumn)  ReadField1(iprot thrift.TProtocol) error {
   for i := 0; i < size; i ++ {
 var _elem16 []byte
     if v, err := iprot.ReadBinary(); err != nil {
-    return thrift.PrependError("error reading ***REMOVED***eld 0: ", err)
-} ***REMOVED*** {
+    return thrift.PrependError("error reading field 0: ", err)
+} else {
     _elem16 = v
 }
     p.Values = append(p.Values, _elem16)
@@ -4995,8 +4995,8 @@ var _elem16 []byte
 
 func (p *TBinaryColumn)  ReadField2(iprot thrift.TProtocol) error {
   if v, err := iprot.ReadBinary(); err != nil {
-  return thrift.PrependError("error reading ***REMOVED***eld 2: ", err)
-} ***REMOVED*** {
+  return thrift.PrependError("error reading field 2: ", err)
+} else {
   p.Nulls = v
 }
   return nil
@@ -5010,7 +5010,7 @@ func (p *TBinaryColumn) Write(oprot thrift.TProtocol) error {
     if err := p.writeField2(oprot); err != nil { return err }
   }
   if err := oprot.WriteFieldStop(); err != nil {
-    return thrift.PrependError("write ***REMOVED***eld stop error: ", err) }
+    return thrift.PrependError("write field stop error: ", err) }
   if err := oprot.WriteStructEnd(); err != nil {
     return thrift.PrependError("write struct stop error: ", err) }
   return nil
@@ -5018,29 +5018,29 @@ func (p *TBinaryColumn) Write(oprot thrift.TProtocol) error {
 
 func (p *TBinaryColumn) writeField1(oprot thrift.TProtocol) (err error) {
   if err := oprot.WriteFieldBegin("values", thrift.LIST, 1); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld begin error 1:values: ", p), err) }
+    return thrift.PrependError(fmt.Sprintf("%T write field begin error 1:values: ", p), err) }
   if err := oprot.WriteListBegin(thrift.STRING, len(p.Values)); err != nil {
     return thrift.PrependError("error writing list begin: ", err)
   }
   for _, v := range p.Values {
     if err := oprot.WriteBinary(v); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T. (0) ***REMOVED***eld write error: ", p), err) }
+    return thrift.PrependError(fmt.Sprintf("%T. (0) field write error: ", p), err) }
   }
   if err := oprot.WriteListEnd(); err != nil {
     return thrift.PrependError("error writing list end: ", err)
   }
   if err := oprot.WriteFieldEnd(); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld end error 1:values: ", p), err) }
+    return thrift.PrependError(fmt.Sprintf("%T write field end error 1:values: ", p), err) }
   return err
 }
 
 func (p *TBinaryColumn) writeField2(oprot thrift.TProtocol) (err error) {
   if err := oprot.WriteFieldBegin("nulls", thrift.STRING, 2); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld begin error 2:nulls: ", p), err) }
+    return thrift.PrependError(fmt.Sprintf("%T write field begin error 2:nulls: ", p), err) }
   if err := oprot.WriteBinary(p.Nulls); err != nil {
-  return thrift.PrependError(fmt.Sprintf("%T.nulls (2) ***REMOVED***eld write error: ", p), err) }
+  return thrift.PrependError(fmt.Sprintf("%T.nulls (2) field write error: ", p), err) }
   if err := oprot.WriteFieldEnd(); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld end error 2:nulls: ", p), err) }
+    return thrift.PrependError(fmt.Sprintf("%T write field end error 2:nulls: ", p), err) }
   return err
 }
 
@@ -5200,94 +5200,94 @@ func (p *TColumn) Read(iprot thrift.TProtocol) error {
 
 
   for {
-    _, ***REMOVED***eldTypeId, ***REMOVED***eldId, err := iprot.ReadFieldBegin()
+    _, fieldTypeId, fieldId, err := iprot.ReadFieldBegin()
     if err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T ***REMOVED***eld %d read error: ", p, ***REMOVED***eldId), err)
+      return thrift.PrependError(fmt.Sprintf("%T field %d read error: ", p, fieldId), err)
     }
-    if ***REMOVED***eldTypeId == thrift.STOP { break; }
-    switch ***REMOVED***eldId {
+    if fieldTypeId == thrift.STOP { break; }
+    switch fieldId {
     case 1:
-      if ***REMOVED***eldTypeId == thrift.STRUCT {
+      if fieldTypeId == thrift.STRUCT {
         if err := p.ReadField1(iprot); err != nil {
           return err
         }
-      } ***REMOVED*** {
-        if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      } else {
+        if err := iprot.Skip(fieldTypeId); err != nil {
           return err
         }
       }
     case 2:
-      if ***REMOVED***eldTypeId == thrift.STRUCT {
+      if fieldTypeId == thrift.STRUCT {
         if err := p.ReadField2(iprot); err != nil {
           return err
         }
-      } ***REMOVED*** {
-        if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      } else {
+        if err := iprot.Skip(fieldTypeId); err != nil {
           return err
         }
       }
     case 3:
-      if ***REMOVED***eldTypeId == thrift.STRUCT {
+      if fieldTypeId == thrift.STRUCT {
         if err := p.ReadField3(iprot); err != nil {
           return err
         }
-      } ***REMOVED*** {
-        if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      } else {
+        if err := iprot.Skip(fieldTypeId); err != nil {
           return err
         }
       }
     case 4:
-      if ***REMOVED***eldTypeId == thrift.STRUCT {
+      if fieldTypeId == thrift.STRUCT {
         if err := p.ReadField4(iprot); err != nil {
           return err
         }
-      } ***REMOVED*** {
-        if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      } else {
+        if err := iprot.Skip(fieldTypeId); err != nil {
           return err
         }
       }
     case 5:
-      if ***REMOVED***eldTypeId == thrift.STRUCT {
+      if fieldTypeId == thrift.STRUCT {
         if err := p.ReadField5(iprot); err != nil {
           return err
         }
-      } ***REMOVED*** {
-        if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      } else {
+        if err := iprot.Skip(fieldTypeId); err != nil {
           return err
         }
       }
     case 6:
-      if ***REMOVED***eldTypeId == thrift.STRUCT {
+      if fieldTypeId == thrift.STRUCT {
         if err := p.ReadField6(iprot); err != nil {
           return err
         }
-      } ***REMOVED*** {
-        if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      } else {
+        if err := iprot.Skip(fieldTypeId); err != nil {
           return err
         }
       }
     case 7:
-      if ***REMOVED***eldTypeId == thrift.STRUCT {
+      if fieldTypeId == thrift.STRUCT {
         if err := p.ReadField7(iprot); err != nil {
           return err
         }
-      } ***REMOVED*** {
-        if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      } else {
+        if err := iprot.Skip(fieldTypeId); err != nil {
           return err
         }
       }
     case 8:
-      if ***REMOVED***eldTypeId == thrift.STRUCT {
+      if fieldTypeId == thrift.STRUCT {
         if err := p.ReadField8(iprot); err != nil {
           return err
         }
-      } ***REMOVED*** {
-        if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      } else {
+        if err := iprot.Skip(fieldTypeId); err != nil {
           return err
         }
       }
     default:
-      if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      if err := iprot.Skip(fieldTypeId); err != nil {
         return err
       }
     }
@@ -5367,7 +5367,7 @@ func (p *TColumn)  ReadField8(iprot thrift.TProtocol) error {
 
 func (p *TColumn) Write(oprot thrift.TProtocol) error {
   if c := p.CountSetFieldsTColumn(); c != 1 {
-    return fmt.Errorf("%T write union: exactly one ***REMOVED***eld must be set (%d set).", p, c)
+    return fmt.Errorf("%T write union: exactly one field must be set (%d set).", p, c)
   }
   if err := oprot.WriteStructBegin("TColumn"); err != nil {
     return thrift.PrependError(fmt.Sprintf("%T write struct begin error: ", p), err) }
@@ -5382,7 +5382,7 @@ func (p *TColumn) Write(oprot thrift.TProtocol) error {
     if err := p.writeField8(oprot); err != nil { return err }
   }
   if err := oprot.WriteFieldStop(); err != nil {
-    return thrift.PrependError("write ***REMOVED***eld stop error: ", err) }
+    return thrift.PrependError("write field stop error: ", err) }
   if err := oprot.WriteStructEnd(); err != nil {
     return thrift.PrependError("write struct stop error: ", err) }
   return nil
@@ -5391,12 +5391,12 @@ func (p *TColumn) Write(oprot thrift.TProtocol) error {
 func (p *TColumn) writeField1(oprot thrift.TProtocol) (err error) {
   if p.IsSetBoolVal() {
     if err := oprot.WriteFieldBegin("boolVal", thrift.STRUCT, 1); err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld begin error 1:boolVal: ", p), err) }
+      return thrift.PrependError(fmt.Sprintf("%T write field begin error 1:boolVal: ", p), err) }
     if err := p.BoolVal.Write(oprot); err != nil {
       return thrift.PrependError(fmt.Sprintf("%T error writing struct: ", p.BoolVal), err)
     }
     if err := oprot.WriteFieldEnd(); err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld end error 1:boolVal: ", p), err) }
+      return thrift.PrependError(fmt.Sprintf("%T write field end error 1:boolVal: ", p), err) }
   }
   return err
 }
@@ -5404,12 +5404,12 @@ func (p *TColumn) writeField1(oprot thrift.TProtocol) (err error) {
 func (p *TColumn) writeField2(oprot thrift.TProtocol) (err error) {
   if p.IsSetByteVal() {
     if err := oprot.WriteFieldBegin("byteVal", thrift.STRUCT, 2); err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld begin error 2:byteVal: ", p), err) }
+      return thrift.PrependError(fmt.Sprintf("%T write field begin error 2:byteVal: ", p), err) }
     if err := p.ByteVal.Write(oprot); err != nil {
       return thrift.PrependError(fmt.Sprintf("%T error writing struct: ", p.ByteVal), err)
     }
     if err := oprot.WriteFieldEnd(); err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld end error 2:byteVal: ", p), err) }
+      return thrift.PrependError(fmt.Sprintf("%T write field end error 2:byteVal: ", p), err) }
   }
   return err
 }
@@ -5417,12 +5417,12 @@ func (p *TColumn) writeField2(oprot thrift.TProtocol) (err error) {
 func (p *TColumn) writeField3(oprot thrift.TProtocol) (err error) {
   if p.IsSetI16Val() {
     if err := oprot.WriteFieldBegin("i16Val", thrift.STRUCT, 3); err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld begin error 3:i16Val: ", p), err) }
+      return thrift.PrependError(fmt.Sprintf("%T write field begin error 3:i16Val: ", p), err) }
     if err := p.I16Val.Write(oprot); err != nil {
       return thrift.PrependError(fmt.Sprintf("%T error writing struct: ", p.I16Val), err)
     }
     if err := oprot.WriteFieldEnd(); err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld end error 3:i16Val: ", p), err) }
+      return thrift.PrependError(fmt.Sprintf("%T write field end error 3:i16Val: ", p), err) }
   }
   return err
 }
@@ -5430,12 +5430,12 @@ func (p *TColumn) writeField3(oprot thrift.TProtocol) (err error) {
 func (p *TColumn) writeField4(oprot thrift.TProtocol) (err error) {
   if p.IsSetI32Val() {
     if err := oprot.WriteFieldBegin("i32Val", thrift.STRUCT, 4); err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld begin error 4:i32Val: ", p), err) }
+      return thrift.PrependError(fmt.Sprintf("%T write field begin error 4:i32Val: ", p), err) }
     if err := p.I32Val.Write(oprot); err != nil {
       return thrift.PrependError(fmt.Sprintf("%T error writing struct: ", p.I32Val), err)
     }
     if err := oprot.WriteFieldEnd(); err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld end error 4:i32Val: ", p), err) }
+      return thrift.PrependError(fmt.Sprintf("%T write field end error 4:i32Val: ", p), err) }
   }
   return err
 }
@@ -5443,12 +5443,12 @@ func (p *TColumn) writeField4(oprot thrift.TProtocol) (err error) {
 func (p *TColumn) writeField5(oprot thrift.TProtocol) (err error) {
   if p.IsSetI64Val() {
     if err := oprot.WriteFieldBegin("i64Val", thrift.STRUCT, 5); err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld begin error 5:i64Val: ", p), err) }
+      return thrift.PrependError(fmt.Sprintf("%T write field begin error 5:i64Val: ", p), err) }
     if err := p.I64Val.Write(oprot); err != nil {
       return thrift.PrependError(fmt.Sprintf("%T error writing struct: ", p.I64Val), err)
     }
     if err := oprot.WriteFieldEnd(); err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld end error 5:i64Val: ", p), err) }
+      return thrift.PrependError(fmt.Sprintf("%T write field end error 5:i64Val: ", p), err) }
   }
   return err
 }
@@ -5456,12 +5456,12 @@ func (p *TColumn) writeField5(oprot thrift.TProtocol) (err error) {
 func (p *TColumn) writeField6(oprot thrift.TProtocol) (err error) {
   if p.IsSetDoubleVal() {
     if err := oprot.WriteFieldBegin("doubleVal", thrift.STRUCT, 6); err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld begin error 6:doubleVal: ", p), err) }
+      return thrift.PrependError(fmt.Sprintf("%T write field begin error 6:doubleVal: ", p), err) }
     if err := p.DoubleVal.Write(oprot); err != nil {
       return thrift.PrependError(fmt.Sprintf("%T error writing struct: ", p.DoubleVal), err)
     }
     if err := oprot.WriteFieldEnd(); err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld end error 6:doubleVal: ", p), err) }
+      return thrift.PrependError(fmt.Sprintf("%T write field end error 6:doubleVal: ", p), err) }
   }
   return err
 }
@@ -5469,12 +5469,12 @@ func (p *TColumn) writeField6(oprot thrift.TProtocol) (err error) {
 func (p *TColumn) writeField7(oprot thrift.TProtocol) (err error) {
   if p.IsSetStringVal() {
     if err := oprot.WriteFieldBegin("stringVal", thrift.STRUCT, 7); err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld begin error 7:stringVal: ", p), err) }
+      return thrift.PrependError(fmt.Sprintf("%T write field begin error 7:stringVal: ", p), err) }
     if err := p.StringVal.Write(oprot); err != nil {
       return thrift.PrependError(fmt.Sprintf("%T error writing struct: ", p.StringVal), err)
     }
     if err := oprot.WriteFieldEnd(); err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld end error 7:stringVal: ", p), err) }
+      return thrift.PrependError(fmt.Sprintf("%T write field end error 7:stringVal: ", p), err) }
   }
   return err
 }
@@ -5482,12 +5482,12 @@ func (p *TColumn) writeField7(oprot thrift.TProtocol) (err error) {
 func (p *TColumn) writeField8(oprot thrift.TProtocol) (err error) {
   if p.IsSetBinaryVal() {
     if err := oprot.WriteFieldBegin("binaryVal", thrift.STRUCT, 8); err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld begin error 8:binaryVal: ", p), err) }
+      return thrift.PrependError(fmt.Sprintf("%T write field begin error 8:binaryVal: ", p), err) }
     if err := p.BinaryVal.Write(oprot); err != nil {
       return thrift.PrependError(fmt.Sprintf("%T error writing struct: ", p.BinaryVal), err)
     }
     if err := oprot.WriteFieldEnd(); err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld end error 8:binaryVal: ", p), err) }
+      return thrift.PrependError(fmt.Sprintf("%T write field end error 8:binaryVal: ", p), err) }
   }
   return err
 }
@@ -5563,66 +5563,66 @@ func (p *TRowSet) Read(iprot thrift.TProtocol) error {
   var issetRows bool = false;
 
   for {
-    _, ***REMOVED***eldTypeId, ***REMOVED***eldId, err := iprot.ReadFieldBegin()
+    _, fieldTypeId, fieldId, err := iprot.ReadFieldBegin()
     if err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T ***REMOVED***eld %d read error: ", p, ***REMOVED***eldId), err)
+      return thrift.PrependError(fmt.Sprintf("%T field %d read error: ", p, fieldId), err)
     }
-    if ***REMOVED***eldTypeId == thrift.STOP { break; }
-    switch ***REMOVED***eldId {
+    if fieldTypeId == thrift.STOP { break; }
+    switch fieldId {
     case 1:
-      if ***REMOVED***eldTypeId == thrift.I64 {
+      if fieldTypeId == thrift.I64 {
         if err := p.ReadField1(iprot); err != nil {
           return err
         }
-      } ***REMOVED*** {
-        if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      } else {
+        if err := iprot.Skip(fieldTypeId); err != nil {
           return err
         }
       }
       issetStartRowOffset = true
     case 2:
-      if ***REMOVED***eldTypeId == thrift.LIST {
+      if fieldTypeId == thrift.LIST {
         if err := p.ReadField2(iprot); err != nil {
           return err
         }
-      } ***REMOVED*** {
-        if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      } else {
+        if err := iprot.Skip(fieldTypeId); err != nil {
           return err
         }
       }
       issetRows = true
     case 3:
-      if ***REMOVED***eldTypeId == thrift.LIST {
+      if fieldTypeId == thrift.LIST {
         if err := p.ReadField3(iprot); err != nil {
           return err
         }
-      } ***REMOVED*** {
-        if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      } else {
+        if err := iprot.Skip(fieldTypeId); err != nil {
           return err
         }
       }
     case 4:
-      if ***REMOVED***eldTypeId == thrift.STRING {
+      if fieldTypeId == thrift.STRING {
         if err := p.ReadField4(iprot); err != nil {
           return err
         }
-      } ***REMOVED*** {
-        if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      } else {
+        if err := iprot.Skip(fieldTypeId); err != nil {
           return err
         }
       }
     case 5:
-      if ***REMOVED***eldTypeId == thrift.I32 {
+      if fieldTypeId == thrift.I32 {
         if err := p.ReadField5(iprot); err != nil {
           return err
         }
-      } ***REMOVED*** {
-        if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      } else {
+        if err := iprot.Skip(fieldTypeId); err != nil {
           return err
         }
       }
     default:
-      if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      if err := iprot.Skip(fieldTypeId); err != nil {
         return err
       }
     }
@@ -5634,18 +5634,18 @@ func (p *TRowSet) Read(iprot thrift.TProtocol) error {
     return thrift.PrependError(fmt.Sprintf("%T read struct end error: ", p), err)
   }
   if !issetStartRowOffset{
-    return thrift.NewTProtocolExceptionWithType(thrift.INVALID_DATA, fmt.Errorf("Required ***REMOVED***eld StartRowOffset is not set"));
+    return thrift.NewTProtocolExceptionWithType(thrift.INVALID_DATA, fmt.Errorf("Required field StartRowOffset is not set"));
   }
   if !issetRows{
-    return thrift.NewTProtocolExceptionWithType(thrift.INVALID_DATA, fmt.Errorf("Required ***REMOVED***eld Rows is not set"));
+    return thrift.NewTProtocolExceptionWithType(thrift.INVALID_DATA, fmt.Errorf("Required field Rows is not set"));
   }
   return nil
 }
 
 func (p *TRowSet)  ReadField1(iprot thrift.TProtocol) error {
   if v, err := iprot.ReadI64(); err != nil {
-  return thrift.PrependError("error reading ***REMOVED***eld 1: ", err)
-} ***REMOVED*** {
+  return thrift.PrependError("error reading field 1: ", err)
+} else {
   p.StartRowOffset = v
 }
   return nil
@@ -5693,8 +5693,8 @@ func (p *TRowSet)  ReadField3(iprot thrift.TProtocol) error {
 
 func (p *TRowSet)  ReadField4(iprot thrift.TProtocol) error {
   if v, err := iprot.ReadBinary(); err != nil {
-  return thrift.PrependError("error reading ***REMOVED***eld 4: ", err)
-} ***REMOVED*** {
+  return thrift.PrependError("error reading field 4: ", err)
+} else {
   p.BinaryColumns = v
 }
   return nil
@@ -5702,8 +5702,8 @@ func (p *TRowSet)  ReadField4(iprot thrift.TProtocol) error {
 
 func (p *TRowSet)  ReadField5(iprot thrift.TProtocol) error {
   if v, err := iprot.ReadI32(); err != nil {
-  return thrift.PrependError("error reading ***REMOVED***eld 5: ", err)
-} ***REMOVED*** {
+  return thrift.PrependError("error reading field 5: ", err)
+} else {
   p.ColumnCount = &v
 }
   return nil
@@ -5720,7 +5720,7 @@ func (p *TRowSet) Write(oprot thrift.TProtocol) error {
     if err := p.writeField5(oprot); err != nil { return err }
   }
   if err := oprot.WriteFieldStop(); err != nil {
-    return thrift.PrependError("write ***REMOVED***eld stop error: ", err) }
+    return thrift.PrependError("write field stop error: ", err) }
   if err := oprot.WriteStructEnd(); err != nil {
     return thrift.PrependError("write struct stop error: ", err) }
   return nil
@@ -5728,17 +5728,17 @@ func (p *TRowSet) Write(oprot thrift.TProtocol) error {
 
 func (p *TRowSet) writeField1(oprot thrift.TProtocol) (err error) {
   if err := oprot.WriteFieldBegin("startRowOffset", thrift.I64, 1); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld begin error 1:startRowOffset: ", p), err) }
+    return thrift.PrependError(fmt.Sprintf("%T write field begin error 1:startRowOffset: ", p), err) }
   if err := oprot.WriteI64(int64(p.StartRowOffset)); err != nil {
-  return thrift.PrependError(fmt.Sprintf("%T.startRowOffset (1) ***REMOVED***eld write error: ", p), err) }
+  return thrift.PrependError(fmt.Sprintf("%T.startRowOffset (1) field write error: ", p), err) }
   if err := oprot.WriteFieldEnd(); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld end error 1:startRowOffset: ", p), err) }
+    return thrift.PrependError(fmt.Sprintf("%T write field end error 1:startRowOffset: ", p), err) }
   return err
 }
 
 func (p *TRowSet) writeField2(oprot thrift.TProtocol) (err error) {
   if err := oprot.WriteFieldBegin("rows", thrift.LIST, 2); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld begin error 2:rows: ", p), err) }
+    return thrift.PrependError(fmt.Sprintf("%T write field begin error 2:rows: ", p), err) }
   if err := oprot.WriteListBegin(thrift.STRUCT, len(p.Rows)); err != nil {
     return thrift.PrependError("error writing list begin: ", err)
   }
@@ -5751,14 +5751,14 @@ func (p *TRowSet) writeField2(oprot thrift.TProtocol) (err error) {
     return thrift.PrependError("error writing list end: ", err)
   }
   if err := oprot.WriteFieldEnd(); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld end error 2:rows: ", p), err) }
+    return thrift.PrependError(fmt.Sprintf("%T write field end error 2:rows: ", p), err) }
   return err
 }
 
 func (p *TRowSet) writeField3(oprot thrift.TProtocol) (err error) {
   if p.IsSetColumns() {
     if err := oprot.WriteFieldBegin("columns", thrift.LIST, 3); err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld begin error 3:columns: ", p), err) }
+      return thrift.PrependError(fmt.Sprintf("%T write field begin error 3:columns: ", p), err) }
     if err := oprot.WriteListBegin(thrift.STRUCT, len(p.Columns)); err != nil {
       return thrift.PrependError("error writing list begin: ", err)
     }
@@ -5771,7 +5771,7 @@ func (p *TRowSet) writeField3(oprot thrift.TProtocol) (err error) {
       return thrift.PrependError("error writing list end: ", err)
     }
     if err := oprot.WriteFieldEnd(); err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld end error 3:columns: ", p), err) }
+      return thrift.PrependError(fmt.Sprintf("%T write field end error 3:columns: ", p), err) }
   }
   return err
 }
@@ -5779,11 +5779,11 @@ func (p *TRowSet) writeField3(oprot thrift.TProtocol) (err error) {
 func (p *TRowSet) writeField4(oprot thrift.TProtocol) (err error) {
   if p.IsSetBinaryColumns() {
     if err := oprot.WriteFieldBegin("binaryColumns", thrift.STRING, 4); err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld begin error 4:binaryColumns: ", p), err) }
+      return thrift.PrependError(fmt.Sprintf("%T write field begin error 4:binaryColumns: ", p), err) }
     if err := oprot.WriteBinary(p.BinaryColumns); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T.binaryColumns (4) ***REMOVED***eld write error: ", p), err) }
+    return thrift.PrependError(fmt.Sprintf("%T.binaryColumns (4) field write error: ", p), err) }
     if err := oprot.WriteFieldEnd(); err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld end error 4:binaryColumns: ", p), err) }
+      return thrift.PrependError(fmt.Sprintf("%T write field end error 4:binaryColumns: ", p), err) }
   }
   return err
 }
@@ -5791,11 +5791,11 @@ func (p *TRowSet) writeField4(oprot thrift.TProtocol) (err error) {
 func (p *TRowSet) writeField5(oprot thrift.TProtocol) (err error) {
   if p.IsSetColumnCount() {
     if err := oprot.WriteFieldBegin("columnCount", thrift.I32, 5); err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld begin error 5:columnCount: ", p), err) }
+      return thrift.PrependError(fmt.Sprintf("%T write field begin error 5:columnCount: ", p), err) }
     if err := oprot.WriteI32(int32(*p.ColumnCount)); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T.columnCount (5) ***REMOVED***eld write error: ", p), err) }
+    return thrift.PrependError(fmt.Sprintf("%T.columnCount (5) field write error: ", p), err) }
     if err := oprot.WriteFieldEnd(); err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld end error 5:columnCount: ", p), err) }
+      return thrift.PrependError(fmt.Sprintf("%T write field end error 5:columnCount: ", p), err) }
   }
   return err
 }
@@ -5879,65 +5879,65 @@ func (p *TStatus) Read(iprot thrift.TProtocol) error {
   var issetStatusCode bool = false;
 
   for {
-    _, ***REMOVED***eldTypeId, ***REMOVED***eldId, err := iprot.ReadFieldBegin()
+    _, fieldTypeId, fieldId, err := iprot.ReadFieldBegin()
     if err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T ***REMOVED***eld %d read error: ", p, ***REMOVED***eldId), err)
+      return thrift.PrependError(fmt.Sprintf("%T field %d read error: ", p, fieldId), err)
     }
-    if ***REMOVED***eldTypeId == thrift.STOP { break; }
-    switch ***REMOVED***eldId {
+    if fieldTypeId == thrift.STOP { break; }
+    switch fieldId {
     case 1:
-      if ***REMOVED***eldTypeId == thrift.I32 {
+      if fieldTypeId == thrift.I32 {
         if err := p.ReadField1(iprot); err != nil {
           return err
         }
-      } ***REMOVED*** {
-        if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      } else {
+        if err := iprot.Skip(fieldTypeId); err != nil {
           return err
         }
       }
       issetStatusCode = true
     case 2:
-      if ***REMOVED***eldTypeId == thrift.LIST {
+      if fieldTypeId == thrift.LIST {
         if err := p.ReadField2(iprot); err != nil {
           return err
         }
-      } ***REMOVED*** {
-        if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      } else {
+        if err := iprot.Skip(fieldTypeId); err != nil {
           return err
         }
       }
     case 3:
-      if ***REMOVED***eldTypeId == thrift.STRING {
+      if fieldTypeId == thrift.STRING {
         if err := p.ReadField3(iprot); err != nil {
           return err
         }
-      } ***REMOVED*** {
-        if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      } else {
+        if err := iprot.Skip(fieldTypeId); err != nil {
           return err
         }
       }
     case 4:
-      if ***REMOVED***eldTypeId == thrift.I32 {
+      if fieldTypeId == thrift.I32 {
         if err := p.ReadField4(iprot); err != nil {
           return err
         }
-      } ***REMOVED*** {
-        if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      } else {
+        if err := iprot.Skip(fieldTypeId); err != nil {
           return err
         }
       }
     case 5:
-      if ***REMOVED***eldTypeId == thrift.STRING {
+      if fieldTypeId == thrift.STRING {
         if err := p.ReadField5(iprot); err != nil {
           return err
         }
-      } ***REMOVED*** {
-        if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      } else {
+        if err := iprot.Skip(fieldTypeId); err != nil {
           return err
         }
       }
     default:
-      if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      if err := iprot.Skip(fieldTypeId); err != nil {
         return err
       }
     }
@@ -5949,15 +5949,15 @@ func (p *TStatus) Read(iprot thrift.TProtocol) error {
     return thrift.PrependError(fmt.Sprintf("%T read struct end error: ", p), err)
   }
   if !issetStatusCode{
-    return thrift.NewTProtocolExceptionWithType(thrift.INVALID_DATA, fmt.Errorf("Required ***REMOVED***eld StatusCode is not set"));
+    return thrift.NewTProtocolExceptionWithType(thrift.INVALID_DATA, fmt.Errorf("Required field StatusCode is not set"));
   }
   return nil
 }
 
 func (p *TStatus)  ReadField1(iprot thrift.TProtocol) error {
   if v, err := iprot.ReadI32(); err != nil {
-  return thrift.PrependError("error reading ***REMOVED***eld 1: ", err)
-} ***REMOVED*** {
+  return thrift.PrependError("error reading field 1: ", err)
+} else {
   temp := TStatusCode(v)
   p.StatusCode = temp
 }
@@ -5974,8 +5974,8 @@ func (p *TStatus)  ReadField2(iprot thrift.TProtocol) error {
   for i := 0; i < size; i ++ {
 var _elem19 string
     if v, err := iprot.ReadString(); err != nil {
-    return thrift.PrependError("error reading ***REMOVED***eld 0: ", err)
-} ***REMOVED*** {
+    return thrift.PrependError("error reading field 0: ", err)
+} else {
     _elem19 = v
 }
     p.InfoMessages = append(p.InfoMessages, _elem19)
@@ -5988,8 +5988,8 @@ var _elem19 string
 
 func (p *TStatus)  ReadField3(iprot thrift.TProtocol) error {
   if v, err := iprot.ReadString(); err != nil {
-  return thrift.PrependError("error reading ***REMOVED***eld 3: ", err)
-} ***REMOVED*** {
+  return thrift.PrependError("error reading field 3: ", err)
+} else {
   p.SqlState = &v
 }
   return nil
@@ -5997,8 +5997,8 @@ func (p *TStatus)  ReadField3(iprot thrift.TProtocol) error {
 
 func (p *TStatus)  ReadField4(iprot thrift.TProtocol) error {
   if v, err := iprot.ReadI32(); err != nil {
-  return thrift.PrependError("error reading ***REMOVED***eld 4: ", err)
-} ***REMOVED*** {
+  return thrift.PrependError("error reading field 4: ", err)
+} else {
   p.ErrorCode = &v
 }
   return nil
@@ -6006,8 +6006,8 @@ func (p *TStatus)  ReadField4(iprot thrift.TProtocol) error {
 
 func (p *TStatus)  ReadField5(iprot thrift.TProtocol) error {
   if v, err := iprot.ReadString(); err != nil {
-  return thrift.PrependError("error reading ***REMOVED***eld 5: ", err)
-} ***REMOVED*** {
+  return thrift.PrependError("error reading field 5: ", err)
+} else {
   p.ErrorMessage = &v
 }
   return nil
@@ -6024,7 +6024,7 @@ func (p *TStatus) Write(oprot thrift.TProtocol) error {
     if err := p.writeField5(oprot); err != nil { return err }
   }
   if err := oprot.WriteFieldStop(); err != nil {
-    return thrift.PrependError("write ***REMOVED***eld stop error: ", err) }
+    return thrift.PrependError("write field stop error: ", err) }
   if err := oprot.WriteStructEnd(); err != nil {
     return thrift.PrependError("write struct stop error: ", err) }
   return nil
@@ -6032,30 +6032,30 @@ func (p *TStatus) Write(oprot thrift.TProtocol) error {
 
 func (p *TStatus) writeField1(oprot thrift.TProtocol) (err error) {
   if err := oprot.WriteFieldBegin("statusCode", thrift.I32, 1); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld begin error 1:statusCode: ", p), err) }
+    return thrift.PrependError(fmt.Sprintf("%T write field begin error 1:statusCode: ", p), err) }
   if err := oprot.WriteI32(int32(p.StatusCode)); err != nil {
-  return thrift.PrependError(fmt.Sprintf("%T.statusCode (1) ***REMOVED***eld write error: ", p), err) }
+  return thrift.PrependError(fmt.Sprintf("%T.statusCode (1) field write error: ", p), err) }
   if err := oprot.WriteFieldEnd(); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld end error 1:statusCode: ", p), err) }
+    return thrift.PrependError(fmt.Sprintf("%T write field end error 1:statusCode: ", p), err) }
   return err
 }
 
 func (p *TStatus) writeField2(oprot thrift.TProtocol) (err error) {
   if p.IsSetInfoMessages() {
     if err := oprot.WriteFieldBegin("infoMessages", thrift.LIST, 2); err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld begin error 2:infoMessages: ", p), err) }
+      return thrift.PrependError(fmt.Sprintf("%T write field begin error 2:infoMessages: ", p), err) }
     if err := oprot.WriteListBegin(thrift.STRING, len(p.InfoMessages)); err != nil {
       return thrift.PrependError("error writing list begin: ", err)
     }
     for _, v := range p.InfoMessages {
       if err := oprot.WriteString(string(v)); err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T. (0) ***REMOVED***eld write error: ", p), err) }
+      return thrift.PrependError(fmt.Sprintf("%T. (0) field write error: ", p), err) }
     }
     if err := oprot.WriteListEnd(); err != nil {
       return thrift.PrependError("error writing list end: ", err)
     }
     if err := oprot.WriteFieldEnd(); err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld end error 2:infoMessages: ", p), err) }
+      return thrift.PrependError(fmt.Sprintf("%T write field end error 2:infoMessages: ", p), err) }
   }
   return err
 }
@@ -6063,11 +6063,11 @@ func (p *TStatus) writeField2(oprot thrift.TProtocol) (err error) {
 func (p *TStatus) writeField3(oprot thrift.TProtocol) (err error) {
   if p.IsSetSqlState() {
     if err := oprot.WriteFieldBegin("sqlState", thrift.STRING, 3); err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld begin error 3:sqlState: ", p), err) }
+      return thrift.PrependError(fmt.Sprintf("%T write field begin error 3:sqlState: ", p), err) }
     if err := oprot.WriteString(string(*p.SqlState)); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T.sqlState (3) ***REMOVED***eld write error: ", p), err) }
+    return thrift.PrependError(fmt.Sprintf("%T.sqlState (3) field write error: ", p), err) }
     if err := oprot.WriteFieldEnd(); err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld end error 3:sqlState: ", p), err) }
+      return thrift.PrependError(fmt.Sprintf("%T write field end error 3:sqlState: ", p), err) }
   }
   return err
 }
@@ -6075,11 +6075,11 @@ func (p *TStatus) writeField3(oprot thrift.TProtocol) (err error) {
 func (p *TStatus) writeField4(oprot thrift.TProtocol) (err error) {
   if p.IsSetErrorCode() {
     if err := oprot.WriteFieldBegin("errorCode", thrift.I32, 4); err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld begin error 4:errorCode: ", p), err) }
+      return thrift.PrependError(fmt.Sprintf("%T write field begin error 4:errorCode: ", p), err) }
     if err := oprot.WriteI32(int32(*p.ErrorCode)); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T.errorCode (4) ***REMOVED***eld write error: ", p), err) }
+    return thrift.PrependError(fmt.Sprintf("%T.errorCode (4) field write error: ", p), err) }
     if err := oprot.WriteFieldEnd(); err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld end error 4:errorCode: ", p), err) }
+      return thrift.PrependError(fmt.Sprintf("%T write field end error 4:errorCode: ", p), err) }
   }
   return err
 }
@@ -6087,11 +6087,11 @@ func (p *TStatus) writeField4(oprot thrift.TProtocol) (err error) {
 func (p *TStatus) writeField5(oprot thrift.TProtocol) (err error) {
   if p.IsSetErrorMessage() {
     if err := oprot.WriteFieldBegin("errorMessage", thrift.STRING, 5); err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld begin error 5:errorMessage: ", p), err) }
+      return thrift.PrependError(fmt.Sprintf("%T write field begin error 5:errorMessage: ", p), err) }
     if err := oprot.WriteString(string(*p.ErrorMessage)); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T.errorMessage (5) ***REMOVED***eld write error: ", p), err) }
+    return thrift.PrependError(fmt.Sprintf("%T.errorMessage (5) field write error: ", p), err) }
     if err := oprot.WriteFieldEnd(); err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld end error 5:errorMessage: ", p), err) }
+      return thrift.PrependError(fmt.Sprintf("%T write field end error 5:errorMessage: ", p), err) }
   }
   return err
 }
@@ -6106,24 +6106,24 @@ func (p *TStatus) String() string {
 // Attributes:
 //  - GUID
 //  - Secret
-type THandleIdenti***REMOVED***er struct {
+type THandleIdentifier struct {
   GUID []byte `thrift:"guid,1,required" db:"guid" json:"guid"`
   Secret []byte `thrift:"secret,2,required" db:"secret" json:"secret"`
 }
 
-func NewTHandleIdenti***REMOVED***er() *THandleIdenti***REMOVED***er {
-  return &THandleIdenti***REMOVED***er{}
+func NewTHandleIdentifier() *THandleIdentifier {
+  return &THandleIdentifier{}
 }
 
 
-func (p *THandleIdenti***REMOVED***er) GetGUID() []byte {
+func (p *THandleIdentifier) GetGUID() []byte {
   return p.GUID
 }
 
-func (p *THandleIdenti***REMOVED***er) GetSecret() []byte {
+func (p *THandleIdentifier) GetSecret() []byte {
   return p.Secret
 }
-func (p *THandleIdenti***REMOVED***er) Read(iprot thrift.TProtocol) error {
+func (p *THandleIdentifier) Read(iprot thrift.TProtocol) error {
   if _, err := iprot.ReadStructBegin(); err != nil {
     return thrift.PrependError(fmt.Sprintf("%T read error: ", p), err)
   }
@@ -6132,36 +6132,36 @@ func (p *THandleIdenti***REMOVED***er) Read(iprot thrift.TProtocol) error {
   var issetSecret bool = false;
 
   for {
-    _, ***REMOVED***eldTypeId, ***REMOVED***eldId, err := iprot.ReadFieldBegin()
+    _, fieldTypeId, fieldId, err := iprot.ReadFieldBegin()
     if err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T ***REMOVED***eld %d read error: ", p, ***REMOVED***eldId), err)
+      return thrift.PrependError(fmt.Sprintf("%T field %d read error: ", p, fieldId), err)
     }
-    if ***REMOVED***eldTypeId == thrift.STOP { break; }
-    switch ***REMOVED***eldId {
+    if fieldTypeId == thrift.STOP { break; }
+    switch fieldId {
     case 1:
-      if ***REMOVED***eldTypeId == thrift.STRING {
+      if fieldTypeId == thrift.STRING {
         if err := p.ReadField1(iprot); err != nil {
           return err
         }
-      } ***REMOVED*** {
-        if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      } else {
+        if err := iprot.Skip(fieldTypeId); err != nil {
           return err
         }
       }
       issetGUID = true
     case 2:
-      if ***REMOVED***eldTypeId == thrift.STRING {
+      if fieldTypeId == thrift.STRING {
         if err := p.ReadField2(iprot); err != nil {
           return err
         }
-      } ***REMOVED*** {
-        if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      } else {
+        if err := iprot.Skip(fieldTypeId); err != nil {
           return err
         }
       }
       issetSecret = true
     default:
-      if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      if err := iprot.Skip(fieldTypeId); err != nil {
         return err
       }
     }
@@ -6173,85 +6173,85 @@ func (p *THandleIdenti***REMOVED***er) Read(iprot thrift.TProtocol) error {
     return thrift.PrependError(fmt.Sprintf("%T read struct end error: ", p), err)
   }
   if !issetGUID{
-    return thrift.NewTProtocolExceptionWithType(thrift.INVALID_DATA, fmt.Errorf("Required ***REMOVED***eld GUID is not set"));
+    return thrift.NewTProtocolExceptionWithType(thrift.INVALID_DATA, fmt.Errorf("Required field GUID is not set"));
   }
   if !issetSecret{
-    return thrift.NewTProtocolExceptionWithType(thrift.INVALID_DATA, fmt.Errorf("Required ***REMOVED***eld Secret is not set"));
+    return thrift.NewTProtocolExceptionWithType(thrift.INVALID_DATA, fmt.Errorf("Required field Secret is not set"));
   }
   return nil
 }
 
-func (p *THandleIdenti***REMOVED***er)  ReadField1(iprot thrift.TProtocol) error {
+func (p *THandleIdentifier)  ReadField1(iprot thrift.TProtocol) error {
   if v, err := iprot.ReadBinary(); err != nil {
-  return thrift.PrependError("error reading ***REMOVED***eld 1: ", err)
-} ***REMOVED*** {
+  return thrift.PrependError("error reading field 1: ", err)
+} else {
   p.GUID = v
 }
   return nil
 }
 
-func (p *THandleIdenti***REMOVED***er)  ReadField2(iprot thrift.TProtocol) error {
+func (p *THandleIdentifier)  ReadField2(iprot thrift.TProtocol) error {
   if v, err := iprot.ReadBinary(); err != nil {
-  return thrift.PrependError("error reading ***REMOVED***eld 2: ", err)
-} ***REMOVED*** {
+  return thrift.PrependError("error reading field 2: ", err)
+} else {
   p.Secret = v
 }
   return nil
 }
 
-func (p *THandleIdenti***REMOVED***er) Write(oprot thrift.TProtocol) error {
-  if err := oprot.WriteStructBegin("THandleIdenti***REMOVED***er"); err != nil {
+func (p *THandleIdentifier) Write(oprot thrift.TProtocol) error {
+  if err := oprot.WriteStructBegin("THandleIdentifier"); err != nil {
     return thrift.PrependError(fmt.Sprintf("%T write struct begin error: ", p), err) }
   if p != nil {
     if err := p.writeField1(oprot); err != nil { return err }
     if err := p.writeField2(oprot); err != nil { return err }
   }
   if err := oprot.WriteFieldStop(); err != nil {
-    return thrift.PrependError("write ***REMOVED***eld stop error: ", err) }
+    return thrift.PrependError("write field stop error: ", err) }
   if err := oprot.WriteStructEnd(); err != nil {
     return thrift.PrependError("write struct stop error: ", err) }
   return nil
 }
 
-func (p *THandleIdenti***REMOVED***er) writeField1(oprot thrift.TProtocol) (err error) {
+func (p *THandleIdentifier) writeField1(oprot thrift.TProtocol) (err error) {
   if err := oprot.WriteFieldBegin("guid", thrift.STRING, 1); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld begin error 1:guid: ", p), err) }
+    return thrift.PrependError(fmt.Sprintf("%T write field begin error 1:guid: ", p), err) }
   if err := oprot.WriteBinary(p.GUID); err != nil {
-  return thrift.PrependError(fmt.Sprintf("%T.guid (1) ***REMOVED***eld write error: ", p), err) }
+  return thrift.PrependError(fmt.Sprintf("%T.guid (1) field write error: ", p), err) }
   if err := oprot.WriteFieldEnd(); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld end error 1:guid: ", p), err) }
+    return thrift.PrependError(fmt.Sprintf("%T write field end error 1:guid: ", p), err) }
   return err
 }
 
-func (p *THandleIdenti***REMOVED***er) writeField2(oprot thrift.TProtocol) (err error) {
+func (p *THandleIdentifier) writeField2(oprot thrift.TProtocol) (err error) {
   if err := oprot.WriteFieldBegin("secret", thrift.STRING, 2); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld begin error 2:secret: ", p), err) }
+    return thrift.PrependError(fmt.Sprintf("%T write field begin error 2:secret: ", p), err) }
   if err := oprot.WriteBinary(p.Secret); err != nil {
-  return thrift.PrependError(fmt.Sprintf("%T.secret (2) ***REMOVED***eld write error: ", p), err) }
+  return thrift.PrependError(fmt.Sprintf("%T.secret (2) field write error: ", p), err) }
   if err := oprot.WriteFieldEnd(); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld end error 2:secret: ", p), err) }
+    return thrift.PrependError(fmt.Sprintf("%T write field end error 2:secret: ", p), err) }
   return err
 }
 
-func (p *THandleIdenti***REMOVED***er) String() string {
+func (p *THandleIdentifier) String() string {
   if p == nil {
     return "<nil>"
   }
-  return fmt.Sprintf("THandleIdenti***REMOVED***er(%+v)", *p)
+  return fmt.Sprintf("THandleIdentifier(%+v)", *p)
 }
 
 // Attributes:
 //  - SessionId
 type TSessionHandle struct {
-  SessionId *THandleIdenti***REMOVED***er `thrift:"sessionId,1,required" db:"sessionId" json:"sessionId"`
+  SessionId *THandleIdentifier `thrift:"sessionId,1,required" db:"sessionId" json:"sessionId"`
 }
 
 func NewTSessionHandle() *TSessionHandle {
   return &TSessionHandle{}
 }
 
-var TSessionHandle_SessionId_DEFAULT *THandleIdenti***REMOVED***er
-func (p *TSessionHandle) GetSessionId() *THandleIdenti***REMOVED***er {
+var TSessionHandle_SessionId_DEFAULT *THandleIdentifier
+func (p *TSessionHandle) GetSessionId() *THandleIdentifier {
   if !p.IsSetSessionId() {
     return TSessionHandle_SessionId_DEFAULT
   }
@@ -6269,25 +6269,25 @@ func (p *TSessionHandle) Read(iprot thrift.TProtocol) error {
   var issetSessionId bool = false;
 
   for {
-    _, ***REMOVED***eldTypeId, ***REMOVED***eldId, err := iprot.ReadFieldBegin()
+    _, fieldTypeId, fieldId, err := iprot.ReadFieldBegin()
     if err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T ***REMOVED***eld %d read error: ", p, ***REMOVED***eldId), err)
+      return thrift.PrependError(fmt.Sprintf("%T field %d read error: ", p, fieldId), err)
     }
-    if ***REMOVED***eldTypeId == thrift.STOP { break; }
-    switch ***REMOVED***eldId {
+    if fieldTypeId == thrift.STOP { break; }
+    switch fieldId {
     case 1:
-      if ***REMOVED***eldTypeId == thrift.STRUCT {
+      if fieldTypeId == thrift.STRUCT {
         if err := p.ReadField1(iprot); err != nil {
           return err
         }
-      } ***REMOVED*** {
-        if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      } else {
+        if err := iprot.Skip(fieldTypeId); err != nil {
           return err
         }
       }
       issetSessionId = true
     default:
-      if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      if err := iprot.Skip(fieldTypeId); err != nil {
         return err
       }
     }
@@ -6299,13 +6299,13 @@ func (p *TSessionHandle) Read(iprot thrift.TProtocol) error {
     return thrift.PrependError(fmt.Sprintf("%T read struct end error: ", p), err)
   }
   if !issetSessionId{
-    return thrift.NewTProtocolExceptionWithType(thrift.INVALID_DATA, fmt.Errorf("Required ***REMOVED***eld SessionId is not set"));
+    return thrift.NewTProtocolExceptionWithType(thrift.INVALID_DATA, fmt.Errorf("Required field SessionId is not set"));
   }
   return nil
 }
 
 func (p *TSessionHandle)  ReadField1(iprot thrift.TProtocol) error {
-  p.SessionId = &THandleIdenti***REMOVED***er{}
+  p.SessionId = &THandleIdentifier{}
   if err := p.SessionId.Read(iprot); err != nil {
     return thrift.PrependError(fmt.Sprintf("%T error reading struct: ", p.SessionId), err)
   }
@@ -6319,7 +6319,7 @@ func (p *TSessionHandle) Write(oprot thrift.TProtocol) error {
     if err := p.writeField1(oprot); err != nil { return err }
   }
   if err := oprot.WriteFieldStop(); err != nil {
-    return thrift.PrependError("write ***REMOVED***eld stop error: ", err) }
+    return thrift.PrependError("write field stop error: ", err) }
   if err := oprot.WriteStructEnd(); err != nil {
     return thrift.PrependError("write struct stop error: ", err) }
   return nil
@@ -6327,12 +6327,12 @@ func (p *TSessionHandle) Write(oprot thrift.TProtocol) error {
 
 func (p *TSessionHandle) writeField1(oprot thrift.TProtocol) (err error) {
   if err := oprot.WriteFieldBegin("sessionId", thrift.STRUCT, 1); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld begin error 1:sessionId: ", p), err) }
+    return thrift.PrependError(fmt.Sprintf("%T write field begin error 1:sessionId: ", p), err) }
   if err := p.SessionId.Write(oprot); err != nil {
     return thrift.PrependError(fmt.Sprintf("%T error writing struct: ", p.SessionId), err)
   }
   if err := oprot.WriteFieldEnd(); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld end error 1:sessionId: ", p), err) }
+    return thrift.PrependError(fmt.Sprintf("%T write field end error 1:sessionId: ", p), err) }
   return err
 }
 
@@ -6347,20 +6347,20 @@ func (p *TSessionHandle) String() string {
 //  - OperationId
 //  - OperationType
 //  - HasResultSet
-//  - Modi***REMOVED***edRowCount
+//  - ModifiedRowCount
 type TOperationHandle struct {
-  OperationId *THandleIdenti***REMOVED***er `thrift:"operationId,1,required" db:"operationId" json:"operationId"`
+  OperationId *THandleIdentifier `thrift:"operationId,1,required" db:"operationId" json:"operationId"`
   OperationType TOperationType `thrift:"operationType,2,required" db:"operationType" json:"operationType"`
   HasResultSet bool `thrift:"hasResultSet,3,required" db:"hasResultSet" json:"hasResultSet"`
-  Modi***REMOVED***edRowCount *float64 `thrift:"modi***REMOVED***edRowCount,4" db:"modi***REMOVED***edRowCount" json:"modi***REMOVED***edRowCount,omitempty"`
+  ModifiedRowCount *float64 `thrift:"modifiedRowCount,4" db:"modifiedRowCount" json:"modifiedRowCount,omitempty"`
 }
 
 func NewTOperationHandle() *TOperationHandle {
   return &TOperationHandle{}
 }
 
-var TOperationHandle_OperationId_DEFAULT *THandleIdenti***REMOVED***er
-func (p *TOperationHandle) GetOperationId() *THandleIdenti***REMOVED***er {
+var TOperationHandle_OperationId_DEFAULT *THandleIdentifier
+func (p *TOperationHandle) GetOperationId() *THandleIdentifier {
   if !p.IsSetOperationId() {
     return TOperationHandle_OperationId_DEFAULT
   }
@@ -6374,19 +6374,19 @@ func (p *TOperationHandle) GetOperationType() TOperationType {
 func (p *TOperationHandle) GetHasResultSet() bool {
   return p.HasResultSet
 }
-var TOperationHandle_Modi***REMOVED***edRowCount_DEFAULT float64
-func (p *TOperationHandle) GetModi***REMOVED***edRowCount() float64 {
-  if !p.IsSetModi***REMOVED***edRowCount() {
-    return TOperationHandle_Modi***REMOVED***edRowCount_DEFAULT
+var TOperationHandle_ModifiedRowCount_DEFAULT float64
+func (p *TOperationHandle) GetModifiedRowCount() float64 {
+  if !p.IsSetModifiedRowCount() {
+    return TOperationHandle_ModifiedRowCount_DEFAULT
   }
-return *p.Modi***REMOVED***edRowCount
+return *p.ModifiedRowCount
 }
 func (p *TOperationHandle) IsSetOperationId() bool {
   return p.OperationId != nil
 }
 
-func (p *TOperationHandle) IsSetModi***REMOVED***edRowCount() bool {
-  return p.Modi***REMOVED***edRowCount != nil
+func (p *TOperationHandle) IsSetModifiedRowCount() bool {
+  return p.ModifiedRowCount != nil
 }
 
 func (p *TOperationHandle) Read(iprot thrift.TProtocol) error {
@@ -6399,57 +6399,57 @@ func (p *TOperationHandle) Read(iprot thrift.TProtocol) error {
   var issetHasResultSet bool = false;
 
   for {
-    _, ***REMOVED***eldTypeId, ***REMOVED***eldId, err := iprot.ReadFieldBegin()
+    _, fieldTypeId, fieldId, err := iprot.ReadFieldBegin()
     if err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T ***REMOVED***eld %d read error: ", p, ***REMOVED***eldId), err)
+      return thrift.PrependError(fmt.Sprintf("%T field %d read error: ", p, fieldId), err)
     }
-    if ***REMOVED***eldTypeId == thrift.STOP { break; }
-    switch ***REMOVED***eldId {
+    if fieldTypeId == thrift.STOP { break; }
+    switch fieldId {
     case 1:
-      if ***REMOVED***eldTypeId == thrift.STRUCT {
+      if fieldTypeId == thrift.STRUCT {
         if err := p.ReadField1(iprot); err != nil {
           return err
         }
-      } ***REMOVED*** {
-        if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      } else {
+        if err := iprot.Skip(fieldTypeId); err != nil {
           return err
         }
       }
       issetOperationId = true
     case 2:
-      if ***REMOVED***eldTypeId == thrift.I32 {
+      if fieldTypeId == thrift.I32 {
         if err := p.ReadField2(iprot); err != nil {
           return err
         }
-      } ***REMOVED*** {
-        if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      } else {
+        if err := iprot.Skip(fieldTypeId); err != nil {
           return err
         }
       }
       issetOperationType = true
     case 3:
-      if ***REMOVED***eldTypeId == thrift.BOOL {
+      if fieldTypeId == thrift.BOOL {
         if err := p.ReadField3(iprot); err != nil {
           return err
         }
-      } ***REMOVED*** {
-        if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      } else {
+        if err := iprot.Skip(fieldTypeId); err != nil {
           return err
         }
       }
       issetHasResultSet = true
     case 4:
-      if ***REMOVED***eldTypeId == thrift.DOUBLE {
+      if fieldTypeId == thrift.DOUBLE {
         if err := p.ReadField4(iprot); err != nil {
           return err
         }
-      } ***REMOVED*** {
-        if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      } else {
+        if err := iprot.Skip(fieldTypeId); err != nil {
           return err
         }
       }
     default:
-      if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      if err := iprot.Skip(fieldTypeId); err != nil {
         return err
       }
     }
@@ -6461,19 +6461,19 @@ func (p *TOperationHandle) Read(iprot thrift.TProtocol) error {
     return thrift.PrependError(fmt.Sprintf("%T read struct end error: ", p), err)
   }
   if !issetOperationId{
-    return thrift.NewTProtocolExceptionWithType(thrift.INVALID_DATA, fmt.Errorf("Required ***REMOVED***eld OperationId is not set"));
+    return thrift.NewTProtocolExceptionWithType(thrift.INVALID_DATA, fmt.Errorf("Required field OperationId is not set"));
   }
   if !issetOperationType{
-    return thrift.NewTProtocolExceptionWithType(thrift.INVALID_DATA, fmt.Errorf("Required ***REMOVED***eld OperationType is not set"));
+    return thrift.NewTProtocolExceptionWithType(thrift.INVALID_DATA, fmt.Errorf("Required field OperationType is not set"));
   }
   if !issetHasResultSet{
-    return thrift.NewTProtocolExceptionWithType(thrift.INVALID_DATA, fmt.Errorf("Required ***REMOVED***eld HasResultSet is not set"));
+    return thrift.NewTProtocolExceptionWithType(thrift.INVALID_DATA, fmt.Errorf("Required field HasResultSet is not set"));
   }
   return nil
 }
 
 func (p *TOperationHandle)  ReadField1(iprot thrift.TProtocol) error {
-  p.OperationId = &THandleIdenti***REMOVED***er{}
+  p.OperationId = &THandleIdentifier{}
   if err := p.OperationId.Read(iprot); err != nil {
     return thrift.PrependError(fmt.Sprintf("%T error reading struct: ", p.OperationId), err)
   }
@@ -6482,8 +6482,8 @@ func (p *TOperationHandle)  ReadField1(iprot thrift.TProtocol) error {
 
 func (p *TOperationHandle)  ReadField2(iprot thrift.TProtocol) error {
   if v, err := iprot.ReadI32(); err != nil {
-  return thrift.PrependError("error reading ***REMOVED***eld 2: ", err)
-} ***REMOVED*** {
+  return thrift.PrependError("error reading field 2: ", err)
+} else {
   temp := TOperationType(v)
   p.OperationType = temp
 }
@@ -6492,8 +6492,8 @@ func (p *TOperationHandle)  ReadField2(iprot thrift.TProtocol) error {
 
 func (p *TOperationHandle)  ReadField3(iprot thrift.TProtocol) error {
   if v, err := iprot.ReadBool(); err != nil {
-  return thrift.PrependError("error reading ***REMOVED***eld 3: ", err)
-} ***REMOVED*** {
+  return thrift.PrependError("error reading field 3: ", err)
+} else {
   p.HasResultSet = v
 }
   return nil
@@ -6501,9 +6501,9 @@ func (p *TOperationHandle)  ReadField3(iprot thrift.TProtocol) error {
 
 func (p *TOperationHandle)  ReadField4(iprot thrift.TProtocol) error {
   if v, err := iprot.ReadDouble(); err != nil {
-  return thrift.PrependError("error reading ***REMOVED***eld 4: ", err)
-} ***REMOVED*** {
-  p.Modi***REMOVED***edRowCount = &v
+  return thrift.PrependError("error reading field 4: ", err)
+} else {
+  p.ModifiedRowCount = &v
 }
   return nil
 }
@@ -6518,7 +6518,7 @@ func (p *TOperationHandle) Write(oprot thrift.TProtocol) error {
     if err := p.writeField4(oprot); err != nil { return err }
   }
   if err := oprot.WriteFieldStop(); err != nil {
-    return thrift.PrependError("write ***REMOVED***eld stop error: ", err) }
+    return thrift.PrependError("write field stop error: ", err) }
   if err := oprot.WriteStructEnd(); err != nil {
     return thrift.PrependError("write struct stop error: ", err) }
   return nil
@@ -6526,43 +6526,43 @@ func (p *TOperationHandle) Write(oprot thrift.TProtocol) error {
 
 func (p *TOperationHandle) writeField1(oprot thrift.TProtocol) (err error) {
   if err := oprot.WriteFieldBegin("operationId", thrift.STRUCT, 1); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld begin error 1:operationId: ", p), err) }
+    return thrift.PrependError(fmt.Sprintf("%T write field begin error 1:operationId: ", p), err) }
   if err := p.OperationId.Write(oprot); err != nil {
     return thrift.PrependError(fmt.Sprintf("%T error writing struct: ", p.OperationId), err)
   }
   if err := oprot.WriteFieldEnd(); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld end error 1:operationId: ", p), err) }
+    return thrift.PrependError(fmt.Sprintf("%T write field end error 1:operationId: ", p), err) }
   return err
 }
 
 func (p *TOperationHandle) writeField2(oprot thrift.TProtocol) (err error) {
   if err := oprot.WriteFieldBegin("operationType", thrift.I32, 2); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld begin error 2:operationType: ", p), err) }
+    return thrift.PrependError(fmt.Sprintf("%T write field begin error 2:operationType: ", p), err) }
   if err := oprot.WriteI32(int32(p.OperationType)); err != nil {
-  return thrift.PrependError(fmt.Sprintf("%T.operationType (2) ***REMOVED***eld write error: ", p), err) }
+  return thrift.PrependError(fmt.Sprintf("%T.operationType (2) field write error: ", p), err) }
   if err := oprot.WriteFieldEnd(); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld end error 2:operationType: ", p), err) }
+    return thrift.PrependError(fmt.Sprintf("%T write field end error 2:operationType: ", p), err) }
   return err
 }
 
 func (p *TOperationHandle) writeField3(oprot thrift.TProtocol) (err error) {
   if err := oprot.WriteFieldBegin("hasResultSet", thrift.BOOL, 3); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld begin error 3:hasResultSet: ", p), err) }
+    return thrift.PrependError(fmt.Sprintf("%T write field begin error 3:hasResultSet: ", p), err) }
   if err := oprot.WriteBool(bool(p.HasResultSet)); err != nil {
-  return thrift.PrependError(fmt.Sprintf("%T.hasResultSet (3) ***REMOVED***eld write error: ", p), err) }
+  return thrift.PrependError(fmt.Sprintf("%T.hasResultSet (3) field write error: ", p), err) }
   if err := oprot.WriteFieldEnd(); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld end error 3:hasResultSet: ", p), err) }
+    return thrift.PrependError(fmt.Sprintf("%T write field end error 3:hasResultSet: ", p), err) }
   return err
 }
 
 func (p *TOperationHandle) writeField4(oprot thrift.TProtocol) (err error) {
-  if p.IsSetModi***REMOVED***edRowCount() {
-    if err := oprot.WriteFieldBegin("modi***REMOVED***edRowCount", thrift.DOUBLE, 4); err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld begin error 4:modi***REMOVED***edRowCount: ", p), err) }
-    if err := oprot.WriteDouble(float64(*p.Modi***REMOVED***edRowCount)); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T.modi***REMOVED***edRowCount (4) ***REMOVED***eld write error: ", p), err) }
+  if p.IsSetModifiedRowCount() {
+    if err := oprot.WriteFieldBegin("modifiedRowCount", thrift.DOUBLE, 4); err != nil {
+      return thrift.PrependError(fmt.Sprintf("%T write field begin error 4:modifiedRowCount: ", p), err) }
+    if err := oprot.WriteDouble(float64(*p.ModifiedRowCount)); err != nil {
+    return thrift.PrependError(fmt.Sprintf("%T.modifiedRowCount (4) field write error: ", p), err) }
     if err := oprot.WriteFieldEnd(); err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld end error 4:modi***REMOVED***edRowCount: ", p), err) }
+      return thrift.PrependError(fmt.Sprintf("%T write field end error 4:modifiedRowCount: ", p), err) }
   }
   return err
 }
@@ -6578,12 +6578,12 @@ func (p *TOperationHandle) String() string {
 //  - ClientProtocol
 //  - Username
 //  - Password
-//  - Con***REMOVED***guration
+//  - Configuration
 type TOpenSessionReq struct {
   ClientProtocol TProtocolVersion `thrift:"client_protocol,1,required" db:"client_protocol" json:"client_protocol"`
   Username *string `thrift:"username,2" db:"username" json:"username,omitempty"`
   Password *string `thrift:"password,3" db:"password" json:"password,omitempty"`
-  Con***REMOVED***guration map[string]string `thrift:"con***REMOVED***guration,4" db:"con***REMOVED***guration" json:"con***REMOVED***guration,omitempty"`
+  Configuration map[string]string `thrift:"configuration,4" db:"configuration" json:"configuration,omitempty"`
 }
 
 func NewTOpenSessionReq() *TOpenSessionReq {
@@ -6610,10 +6610,10 @@ func (p *TOpenSessionReq) GetPassword() string {
   }
 return *p.Password
 }
-var TOpenSessionReq_Con***REMOVED***guration_DEFAULT map[string]string
+var TOpenSessionReq_Configuration_DEFAULT map[string]string
 
-func (p *TOpenSessionReq) GetCon***REMOVED***guration() map[string]string {
-  return p.Con***REMOVED***guration
+func (p *TOpenSessionReq) GetConfiguration() map[string]string {
+  return p.Configuration
 }
 func (p *TOpenSessionReq) IsSetUsername() bool {
   return p.Username != nil
@@ -6623,8 +6623,8 @@ func (p *TOpenSessionReq) IsSetPassword() bool {
   return p.Password != nil
 }
 
-func (p *TOpenSessionReq) IsSetCon***REMOVED***guration() bool {
-  return p.Con***REMOVED***guration != nil
+func (p *TOpenSessionReq) IsSetConfiguration() bool {
+  return p.Configuration != nil
 }
 
 func (p *TOpenSessionReq) Read(iprot thrift.TProtocol) error {
@@ -6635,55 +6635,55 @@ func (p *TOpenSessionReq) Read(iprot thrift.TProtocol) error {
   var issetClientProtocol bool = false;
 
   for {
-    _, ***REMOVED***eldTypeId, ***REMOVED***eldId, err := iprot.ReadFieldBegin()
+    _, fieldTypeId, fieldId, err := iprot.ReadFieldBegin()
     if err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T ***REMOVED***eld %d read error: ", p, ***REMOVED***eldId), err)
+      return thrift.PrependError(fmt.Sprintf("%T field %d read error: ", p, fieldId), err)
     }
-    if ***REMOVED***eldTypeId == thrift.STOP { break; }
-    switch ***REMOVED***eldId {
+    if fieldTypeId == thrift.STOP { break; }
+    switch fieldId {
     case 1:
-      if ***REMOVED***eldTypeId == thrift.I32 {
+      if fieldTypeId == thrift.I32 {
         if err := p.ReadField1(iprot); err != nil {
           return err
         }
-      } ***REMOVED*** {
-        if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      } else {
+        if err := iprot.Skip(fieldTypeId); err != nil {
           return err
         }
       }
       issetClientProtocol = true
     case 2:
-      if ***REMOVED***eldTypeId == thrift.STRING {
+      if fieldTypeId == thrift.STRING {
         if err := p.ReadField2(iprot); err != nil {
           return err
         }
-      } ***REMOVED*** {
-        if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      } else {
+        if err := iprot.Skip(fieldTypeId); err != nil {
           return err
         }
       }
     case 3:
-      if ***REMOVED***eldTypeId == thrift.STRING {
+      if fieldTypeId == thrift.STRING {
         if err := p.ReadField3(iprot); err != nil {
           return err
         }
-      } ***REMOVED*** {
-        if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      } else {
+        if err := iprot.Skip(fieldTypeId); err != nil {
           return err
         }
       }
     case 4:
-      if ***REMOVED***eldTypeId == thrift.MAP {
+      if fieldTypeId == thrift.MAP {
         if err := p.ReadField4(iprot); err != nil {
           return err
         }
-      } ***REMOVED*** {
-        if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      } else {
+        if err := iprot.Skip(fieldTypeId); err != nil {
           return err
         }
       }
     default:
-      if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      if err := iprot.Skip(fieldTypeId); err != nil {
         return err
       }
     }
@@ -6695,15 +6695,15 @@ func (p *TOpenSessionReq) Read(iprot thrift.TProtocol) error {
     return thrift.PrependError(fmt.Sprintf("%T read struct end error: ", p), err)
   }
   if !issetClientProtocol{
-    return thrift.NewTProtocolExceptionWithType(thrift.INVALID_DATA, fmt.Errorf("Required ***REMOVED***eld ClientProtocol is not set"));
+    return thrift.NewTProtocolExceptionWithType(thrift.INVALID_DATA, fmt.Errorf("Required field ClientProtocol is not set"));
   }
   return nil
 }
 
 func (p *TOpenSessionReq)  ReadField1(iprot thrift.TProtocol) error {
   if v, err := iprot.ReadI32(); err != nil {
-  return thrift.PrependError("error reading ***REMOVED***eld 1: ", err)
-} ***REMOVED*** {
+  return thrift.PrependError("error reading field 1: ", err)
+} else {
   temp := TProtocolVersion(v)
   p.ClientProtocol = temp
 }
@@ -6712,8 +6712,8 @@ func (p *TOpenSessionReq)  ReadField1(iprot thrift.TProtocol) error {
 
 func (p *TOpenSessionReq)  ReadField2(iprot thrift.TProtocol) error {
   if v, err := iprot.ReadString(); err != nil {
-  return thrift.PrependError("error reading ***REMOVED***eld 2: ", err)
-} ***REMOVED*** {
+  return thrift.PrependError("error reading field 2: ", err)
+} else {
   p.Username = &v
 }
   return nil
@@ -6721,8 +6721,8 @@ func (p *TOpenSessionReq)  ReadField2(iprot thrift.TProtocol) error {
 
 func (p *TOpenSessionReq)  ReadField3(iprot thrift.TProtocol) error {
   if v, err := iprot.ReadString(); err != nil {
-  return thrift.PrependError("error reading ***REMOVED***eld 3: ", err)
-} ***REMOVED*** {
+  return thrift.PrependError("error reading field 3: ", err)
+} else {
   p.Password = &v
 }
   return nil
@@ -6734,21 +6734,21 @@ func (p *TOpenSessionReq)  ReadField4(iprot thrift.TProtocol) error {
     return thrift.PrependError("error reading map begin: ", err)
   }
   tMap := make(map[string]string, size)
-  p.Con***REMOVED***guration =  tMap
+  p.Configuration =  tMap
   for i := 0; i < size; i ++ {
 var _key20 string
     if v, err := iprot.ReadString(); err != nil {
-    return thrift.PrependError("error reading ***REMOVED***eld 0: ", err)
-} ***REMOVED*** {
+    return thrift.PrependError("error reading field 0: ", err)
+} else {
     _key20 = v
 }
 var _val21 string
     if v, err := iprot.ReadString(); err != nil {
-    return thrift.PrependError("error reading ***REMOVED***eld 0: ", err)
-} ***REMOVED*** {
+    return thrift.PrependError("error reading field 0: ", err)
+} else {
     _val21 = v
 }
-    p.Con***REMOVED***guration[_key20] = _val21
+    p.Configuration[_key20] = _val21
   }
   if err := iprot.ReadMapEnd(); err != nil {
     return thrift.PrependError("error reading map end: ", err)
@@ -6766,7 +6766,7 @@ func (p *TOpenSessionReq) Write(oprot thrift.TProtocol) error {
     if err := p.writeField4(oprot); err != nil { return err }
   }
   if err := oprot.WriteFieldStop(); err != nil {
-    return thrift.PrependError("write ***REMOVED***eld stop error: ", err) }
+    return thrift.PrependError("write field stop error: ", err) }
   if err := oprot.WriteStructEnd(); err != nil {
     return thrift.PrependError("write struct stop error: ", err) }
   return nil
@@ -6774,22 +6774,22 @@ func (p *TOpenSessionReq) Write(oprot thrift.TProtocol) error {
 
 func (p *TOpenSessionReq) writeField1(oprot thrift.TProtocol) (err error) {
   if err := oprot.WriteFieldBegin("client_protocol", thrift.I32, 1); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld begin error 1:client_protocol: ", p), err) }
+    return thrift.PrependError(fmt.Sprintf("%T write field begin error 1:client_protocol: ", p), err) }
   if err := oprot.WriteI32(int32(p.ClientProtocol)); err != nil {
-  return thrift.PrependError(fmt.Sprintf("%T.client_protocol (1) ***REMOVED***eld write error: ", p), err) }
+  return thrift.PrependError(fmt.Sprintf("%T.client_protocol (1) field write error: ", p), err) }
   if err := oprot.WriteFieldEnd(); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld end error 1:client_protocol: ", p), err) }
+    return thrift.PrependError(fmt.Sprintf("%T write field end error 1:client_protocol: ", p), err) }
   return err
 }
 
 func (p *TOpenSessionReq) writeField2(oprot thrift.TProtocol) (err error) {
   if p.IsSetUsername() {
     if err := oprot.WriteFieldBegin("username", thrift.STRING, 2); err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld begin error 2:username: ", p), err) }
+      return thrift.PrependError(fmt.Sprintf("%T write field begin error 2:username: ", p), err) }
     if err := oprot.WriteString(string(*p.Username)); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T.username (2) ***REMOVED***eld write error: ", p), err) }
+    return thrift.PrependError(fmt.Sprintf("%T.username (2) field write error: ", p), err) }
     if err := oprot.WriteFieldEnd(); err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld end error 2:username: ", p), err) }
+      return thrift.PrependError(fmt.Sprintf("%T write field end error 2:username: ", p), err) }
   }
   return err
 }
@@ -6797,33 +6797,33 @@ func (p *TOpenSessionReq) writeField2(oprot thrift.TProtocol) (err error) {
 func (p *TOpenSessionReq) writeField3(oprot thrift.TProtocol) (err error) {
   if p.IsSetPassword() {
     if err := oprot.WriteFieldBegin("password", thrift.STRING, 3); err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld begin error 3:password: ", p), err) }
+      return thrift.PrependError(fmt.Sprintf("%T write field begin error 3:password: ", p), err) }
     if err := oprot.WriteString(string(*p.Password)); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T.password (3) ***REMOVED***eld write error: ", p), err) }
+    return thrift.PrependError(fmt.Sprintf("%T.password (3) field write error: ", p), err) }
     if err := oprot.WriteFieldEnd(); err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld end error 3:password: ", p), err) }
+      return thrift.PrependError(fmt.Sprintf("%T write field end error 3:password: ", p), err) }
   }
   return err
 }
 
 func (p *TOpenSessionReq) writeField4(oprot thrift.TProtocol) (err error) {
-  if p.IsSetCon***REMOVED***guration() {
-    if err := oprot.WriteFieldBegin("con***REMOVED***guration", thrift.MAP, 4); err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld begin error 4:con***REMOVED***guration: ", p), err) }
-    if err := oprot.WriteMapBegin(thrift.STRING, thrift.STRING, len(p.Con***REMOVED***guration)); err != nil {
+  if p.IsSetConfiguration() {
+    if err := oprot.WriteFieldBegin("configuration", thrift.MAP, 4); err != nil {
+      return thrift.PrependError(fmt.Sprintf("%T write field begin error 4:configuration: ", p), err) }
+    if err := oprot.WriteMapBegin(thrift.STRING, thrift.STRING, len(p.Configuration)); err != nil {
       return thrift.PrependError("error writing map begin: ", err)
     }
-    for k, v := range p.Con***REMOVED***guration {
+    for k, v := range p.Configuration {
       if err := oprot.WriteString(string(k)); err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T. (0) ***REMOVED***eld write error: ", p), err) }
+      return thrift.PrependError(fmt.Sprintf("%T. (0) field write error: ", p), err) }
       if err := oprot.WriteString(string(v)); err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T. (0) ***REMOVED***eld write error: ", p), err) }
+      return thrift.PrependError(fmt.Sprintf("%T. (0) field write error: ", p), err) }
     }
     if err := oprot.WriteMapEnd(); err != nil {
       return thrift.PrependError("error writing map end: ", err)
     }
     if err := oprot.WriteFieldEnd(); err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld end error 4:con***REMOVED***guration: ", p), err) }
+      return thrift.PrependError(fmt.Sprintf("%T write field end error 4:configuration: ", p), err) }
   }
   return err
 }
@@ -6839,12 +6839,12 @@ func (p *TOpenSessionReq) String() string {
 //  - Status
 //  - ServerProtocolVersion
 //  - SessionHandle
-//  - Con***REMOVED***guration
+//  - Configuration
 type TOpenSessionResp struct {
   Status *TStatus `thrift:"status,1,required" db:"status" json:"status"`
   ServerProtocolVersion TProtocolVersion `thrift:"serverProtocolVersion,2,required" db:"serverProtocolVersion" json:"serverProtocolVersion"`
   SessionHandle *TSessionHandle `thrift:"sessionHandle,3" db:"sessionHandle" json:"sessionHandle,omitempty"`
-  Con***REMOVED***guration map[string]string `thrift:"con***REMOVED***guration,4" db:"con***REMOVED***guration" json:"con***REMOVED***guration,omitempty"`
+  Configuration map[string]string `thrift:"configuration,4" db:"configuration" json:"configuration,omitempty"`
 }
 
 func NewTOpenSessionResp() *TOpenSessionResp {
@@ -6871,10 +6871,10 @@ func (p *TOpenSessionResp) GetSessionHandle() *TSessionHandle {
   }
 return p.SessionHandle
 }
-var TOpenSessionResp_Con***REMOVED***guration_DEFAULT map[string]string
+var TOpenSessionResp_Configuration_DEFAULT map[string]string
 
-func (p *TOpenSessionResp) GetCon***REMOVED***guration() map[string]string {
-  return p.Con***REMOVED***guration
+func (p *TOpenSessionResp) GetConfiguration() map[string]string {
+  return p.Configuration
 }
 func (p *TOpenSessionResp) IsSetStatus() bool {
   return p.Status != nil
@@ -6884,8 +6884,8 @@ func (p *TOpenSessionResp) IsSetSessionHandle() bool {
   return p.SessionHandle != nil
 }
 
-func (p *TOpenSessionResp) IsSetCon***REMOVED***guration() bool {
-  return p.Con***REMOVED***guration != nil
+func (p *TOpenSessionResp) IsSetConfiguration() bool {
+  return p.Configuration != nil
 }
 
 func (p *TOpenSessionResp) Read(iprot thrift.TProtocol) error {
@@ -6897,56 +6897,56 @@ func (p *TOpenSessionResp) Read(iprot thrift.TProtocol) error {
   var issetServerProtocolVersion bool = false;
 
   for {
-    _, ***REMOVED***eldTypeId, ***REMOVED***eldId, err := iprot.ReadFieldBegin()
+    _, fieldTypeId, fieldId, err := iprot.ReadFieldBegin()
     if err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T ***REMOVED***eld %d read error: ", p, ***REMOVED***eldId), err)
+      return thrift.PrependError(fmt.Sprintf("%T field %d read error: ", p, fieldId), err)
     }
-    if ***REMOVED***eldTypeId == thrift.STOP { break; }
-    switch ***REMOVED***eldId {
+    if fieldTypeId == thrift.STOP { break; }
+    switch fieldId {
     case 1:
-      if ***REMOVED***eldTypeId == thrift.STRUCT {
+      if fieldTypeId == thrift.STRUCT {
         if err := p.ReadField1(iprot); err != nil {
           return err
         }
-      } ***REMOVED*** {
-        if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      } else {
+        if err := iprot.Skip(fieldTypeId); err != nil {
           return err
         }
       }
       issetStatus = true
     case 2:
-      if ***REMOVED***eldTypeId == thrift.I32 {
+      if fieldTypeId == thrift.I32 {
         if err := p.ReadField2(iprot); err != nil {
           return err
         }
-      } ***REMOVED*** {
-        if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      } else {
+        if err := iprot.Skip(fieldTypeId); err != nil {
           return err
         }
       }
       issetServerProtocolVersion = true
     case 3:
-      if ***REMOVED***eldTypeId == thrift.STRUCT {
+      if fieldTypeId == thrift.STRUCT {
         if err := p.ReadField3(iprot); err != nil {
           return err
         }
-      } ***REMOVED*** {
-        if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      } else {
+        if err := iprot.Skip(fieldTypeId); err != nil {
           return err
         }
       }
     case 4:
-      if ***REMOVED***eldTypeId == thrift.MAP {
+      if fieldTypeId == thrift.MAP {
         if err := p.ReadField4(iprot); err != nil {
           return err
         }
-      } ***REMOVED*** {
-        if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      } else {
+        if err := iprot.Skip(fieldTypeId); err != nil {
           return err
         }
       }
     default:
-      if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      if err := iprot.Skip(fieldTypeId); err != nil {
         return err
       }
     }
@@ -6958,10 +6958,10 @@ func (p *TOpenSessionResp) Read(iprot thrift.TProtocol) error {
     return thrift.PrependError(fmt.Sprintf("%T read struct end error: ", p), err)
   }
   if !issetStatus{
-    return thrift.NewTProtocolExceptionWithType(thrift.INVALID_DATA, fmt.Errorf("Required ***REMOVED***eld Status is not set"));
+    return thrift.NewTProtocolExceptionWithType(thrift.INVALID_DATA, fmt.Errorf("Required field Status is not set"));
   }
   if !issetServerProtocolVersion{
-    return thrift.NewTProtocolExceptionWithType(thrift.INVALID_DATA, fmt.Errorf("Required ***REMOVED***eld ServerProtocolVersion is not set"));
+    return thrift.NewTProtocolExceptionWithType(thrift.INVALID_DATA, fmt.Errorf("Required field ServerProtocolVersion is not set"));
   }
   return nil
 }
@@ -6976,8 +6976,8 @@ func (p *TOpenSessionResp)  ReadField1(iprot thrift.TProtocol) error {
 
 func (p *TOpenSessionResp)  ReadField2(iprot thrift.TProtocol) error {
   if v, err := iprot.ReadI32(); err != nil {
-  return thrift.PrependError("error reading ***REMOVED***eld 2: ", err)
-} ***REMOVED*** {
+  return thrift.PrependError("error reading field 2: ", err)
+} else {
   temp := TProtocolVersion(v)
   p.ServerProtocolVersion = temp
 }
@@ -6998,21 +6998,21 @@ func (p *TOpenSessionResp)  ReadField4(iprot thrift.TProtocol) error {
     return thrift.PrependError("error reading map begin: ", err)
   }
   tMap := make(map[string]string, size)
-  p.Con***REMOVED***guration =  tMap
+  p.Configuration =  tMap
   for i := 0; i < size; i ++ {
 var _key22 string
     if v, err := iprot.ReadString(); err != nil {
-    return thrift.PrependError("error reading ***REMOVED***eld 0: ", err)
-} ***REMOVED*** {
+    return thrift.PrependError("error reading field 0: ", err)
+} else {
     _key22 = v
 }
 var _val23 string
     if v, err := iprot.ReadString(); err != nil {
-    return thrift.PrependError("error reading ***REMOVED***eld 0: ", err)
-} ***REMOVED*** {
+    return thrift.PrependError("error reading field 0: ", err)
+} else {
     _val23 = v
 }
-    p.Con***REMOVED***guration[_key22] = _val23
+    p.Configuration[_key22] = _val23
   }
   if err := iprot.ReadMapEnd(); err != nil {
     return thrift.PrependError("error reading map end: ", err)
@@ -7030,7 +7030,7 @@ func (p *TOpenSessionResp) Write(oprot thrift.TProtocol) error {
     if err := p.writeField4(oprot); err != nil { return err }
   }
   if err := oprot.WriteFieldStop(); err != nil {
-    return thrift.PrependError("write ***REMOVED***eld stop error: ", err) }
+    return thrift.PrependError("write field stop error: ", err) }
   if err := oprot.WriteStructEnd(); err != nil {
     return thrift.PrependError("write struct stop error: ", err) }
   return nil
@@ -7038,56 +7038,56 @@ func (p *TOpenSessionResp) Write(oprot thrift.TProtocol) error {
 
 func (p *TOpenSessionResp) writeField1(oprot thrift.TProtocol) (err error) {
   if err := oprot.WriteFieldBegin("status", thrift.STRUCT, 1); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld begin error 1:status: ", p), err) }
+    return thrift.PrependError(fmt.Sprintf("%T write field begin error 1:status: ", p), err) }
   if err := p.Status.Write(oprot); err != nil {
     return thrift.PrependError(fmt.Sprintf("%T error writing struct: ", p.Status), err)
   }
   if err := oprot.WriteFieldEnd(); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld end error 1:status: ", p), err) }
+    return thrift.PrependError(fmt.Sprintf("%T write field end error 1:status: ", p), err) }
   return err
 }
 
 func (p *TOpenSessionResp) writeField2(oprot thrift.TProtocol) (err error) {
   if err := oprot.WriteFieldBegin("serverProtocolVersion", thrift.I32, 2); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld begin error 2:serverProtocolVersion: ", p), err) }
+    return thrift.PrependError(fmt.Sprintf("%T write field begin error 2:serverProtocolVersion: ", p), err) }
   if err := oprot.WriteI32(int32(p.ServerProtocolVersion)); err != nil {
-  return thrift.PrependError(fmt.Sprintf("%T.serverProtocolVersion (2) ***REMOVED***eld write error: ", p), err) }
+  return thrift.PrependError(fmt.Sprintf("%T.serverProtocolVersion (2) field write error: ", p), err) }
   if err := oprot.WriteFieldEnd(); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld end error 2:serverProtocolVersion: ", p), err) }
+    return thrift.PrependError(fmt.Sprintf("%T write field end error 2:serverProtocolVersion: ", p), err) }
   return err
 }
 
 func (p *TOpenSessionResp) writeField3(oprot thrift.TProtocol) (err error) {
   if p.IsSetSessionHandle() {
     if err := oprot.WriteFieldBegin("sessionHandle", thrift.STRUCT, 3); err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld begin error 3:sessionHandle: ", p), err) }
+      return thrift.PrependError(fmt.Sprintf("%T write field begin error 3:sessionHandle: ", p), err) }
     if err := p.SessionHandle.Write(oprot); err != nil {
       return thrift.PrependError(fmt.Sprintf("%T error writing struct: ", p.SessionHandle), err)
     }
     if err := oprot.WriteFieldEnd(); err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld end error 3:sessionHandle: ", p), err) }
+      return thrift.PrependError(fmt.Sprintf("%T write field end error 3:sessionHandle: ", p), err) }
   }
   return err
 }
 
 func (p *TOpenSessionResp) writeField4(oprot thrift.TProtocol) (err error) {
-  if p.IsSetCon***REMOVED***guration() {
-    if err := oprot.WriteFieldBegin("con***REMOVED***guration", thrift.MAP, 4); err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld begin error 4:con***REMOVED***guration: ", p), err) }
-    if err := oprot.WriteMapBegin(thrift.STRING, thrift.STRING, len(p.Con***REMOVED***guration)); err != nil {
+  if p.IsSetConfiguration() {
+    if err := oprot.WriteFieldBegin("configuration", thrift.MAP, 4); err != nil {
+      return thrift.PrependError(fmt.Sprintf("%T write field begin error 4:configuration: ", p), err) }
+    if err := oprot.WriteMapBegin(thrift.STRING, thrift.STRING, len(p.Configuration)); err != nil {
       return thrift.PrependError("error writing map begin: ", err)
     }
-    for k, v := range p.Con***REMOVED***guration {
+    for k, v := range p.Configuration {
       if err := oprot.WriteString(string(k)); err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T. (0) ***REMOVED***eld write error: ", p), err) }
+      return thrift.PrependError(fmt.Sprintf("%T. (0) field write error: ", p), err) }
       if err := oprot.WriteString(string(v)); err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T. (0) ***REMOVED***eld write error: ", p), err) }
+      return thrift.PrependError(fmt.Sprintf("%T. (0) field write error: ", p), err) }
     }
     if err := oprot.WriteMapEnd(); err != nil {
       return thrift.PrependError("error writing map end: ", err)
     }
     if err := oprot.WriteFieldEnd(); err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld end error 4:con***REMOVED***guration: ", p), err) }
+      return thrift.PrependError(fmt.Sprintf("%T write field end error 4:configuration: ", p), err) }
   }
   return err
 }
@@ -7128,25 +7128,25 @@ func (p *TCloseSessionReq) Read(iprot thrift.TProtocol) error {
   var issetSessionHandle bool = false;
 
   for {
-    _, ***REMOVED***eldTypeId, ***REMOVED***eldId, err := iprot.ReadFieldBegin()
+    _, fieldTypeId, fieldId, err := iprot.ReadFieldBegin()
     if err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T ***REMOVED***eld %d read error: ", p, ***REMOVED***eldId), err)
+      return thrift.PrependError(fmt.Sprintf("%T field %d read error: ", p, fieldId), err)
     }
-    if ***REMOVED***eldTypeId == thrift.STOP { break; }
-    switch ***REMOVED***eldId {
+    if fieldTypeId == thrift.STOP { break; }
+    switch fieldId {
     case 1:
-      if ***REMOVED***eldTypeId == thrift.STRUCT {
+      if fieldTypeId == thrift.STRUCT {
         if err := p.ReadField1(iprot); err != nil {
           return err
         }
-      } ***REMOVED*** {
-        if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      } else {
+        if err := iprot.Skip(fieldTypeId); err != nil {
           return err
         }
       }
       issetSessionHandle = true
     default:
-      if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      if err := iprot.Skip(fieldTypeId); err != nil {
         return err
       }
     }
@@ -7158,7 +7158,7 @@ func (p *TCloseSessionReq) Read(iprot thrift.TProtocol) error {
     return thrift.PrependError(fmt.Sprintf("%T read struct end error: ", p), err)
   }
   if !issetSessionHandle{
-    return thrift.NewTProtocolExceptionWithType(thrift.INVALID_DATA, fmt.Errorf("Required ***REMOVED***eld SessionHandle is not set"));
+    return thrift.NewTProtocolExceptionWithType(thrift.INVALID_DATA, fmt.Errorf("Required field SessionHandle is not set"));
   }
   return nil
 }
@@ -7178,7 +7178,7 @@ func (p *TCloseSessionReq) Write(oprot thrift.TProtocol) error {
     if err := p.writeField1(oprot); err != nil { return err }
   }
   if err := oprot.WriteFieldStop(); err != nil {
-    return thrift.PrependError("write ***REMOVED***eld stop error: ", err) }
+    return thrift.PrependError("write field stop error: ", err) }
   if err := oprot.WriteStructEnd(); err != nil {
     return thrift.PrependError("write struct stop error: ", err) }
   return nil
@@ -7186,12 +7186,12 @@ func (p *TCloseSessionReq) Write(oprot thrift.TProtocol) error {
 
 func (p *TCloseSessionReq) writeField1(oprot thrift.TProtocol) (err error) {
   if err := oprot.WriteFieldBegin("sessionHandle", thrift.STRUCT, 1); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld begin error 1:sessionHandle: ", p), err) }
+    return thrift.PrependError(fmt.Sprintf("%T write field begin error 1:sessionHandle: ", p), err) }
   if err := p.SessionHandle.Write(oprot); err != nil {
     return thrift.PrependError(fmt.Sprintf("%T error writing struct: ", p.SessionHandle), err)
   }
   if err := oprot.WriteFieldEnd(); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld end error 1:sessionHandle: ", p), err) }
+    return thrift.PrependError(fmt.Sprintf("%T write field end error 1:sessionHandle: ", p), err) }
   return err
 }
 
@@ -7231,25 +7231,25 @@ func (p *TCloseSessionResp) Read(iprot thrift.TProtocol) error {
   var issetStatus bool = false;
 
   for {
-    _, ***REMOVED***eldTypeId, ***REMOVED***eldId, err := iprot.ReadFieldBegin()
+    _, fieldTypeId, fieldId, err := iprot.ReadFieldBegin()
     if err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T ***REMOVED***eld %d read error: ", p, ***REMOVED***eldId), err)
+      return thrift.PrependError(fmt.Sprintf("%T field %d read error: ", p, fieldId), err)
     }
-    if ***REMOVED***eldTypeId == thrift.STOP { break; }
-    switch ***REMOVED***eldId {
+    if fieldTypeId == thrift.STOP { break; }
+    switch fieldId {
     case 1:
-      if ***REMOVED***eldTypeId == thrift.STRUCT {
+      if fieldTypeId == thrift.STRUCT {
         if err := p.ReadField1(iprot); err != nil {
           return err
         }
-      } ***REMOVED*** {
-        if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      } else {
+        if err := iprot.Skip(fieldTypeId); err != nil {
           return err
         }
       }
       issetStatus = true
     default:
-      if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      if err := iprot.Skip(fieldTypeId); err != nil {
         return err
       }
     }
@@ -7261,7 +7261,7 @@ func (p *TCloseSessionResp) Read(iprot thrift.TProtocol) error {
     return thrift.PrependError(fmt.Sprintf("%T read struct end error: ", p), err)
   }
   if !issetStatus{
-    return thrift.NewTProtocolExceptionWithType(thrift.INVALID_DATA, fmt.Errorf("Required ***REMOVED***eld Status is not set"));
+    return thrift.NewTProtocolExceptionWithType(thrift.INVALID_DATA, fmt.Errorf("Required field Status is not set"));
   }
   return nil
 }
@@ -7281,7 +7281,7 @@ func (p *TCloseSessionResp) Write(oprot thrift.TProtocol) error {
     if err := p.writeField1(oprot); err != nil { return err }
   }
   if err := oprot.WriteFieldStop(); err != nil {
-    return thrift.PrependError("write ***REMOVED***eld stop error: ", err) }
+    return thrift.PrependError("write field stop error: ", err) }
   if err := oprot.WriteStructEnd(); err != nil {
     return thrift.PrependError("write struct stop error: ", err) }
   return nil
@@ -7289,12 +7289,12 @@ func (p *TCloseSessionResp) Write(oprot thrift.TProtocol) error {
 
 func (p *TCloseSessionResp) writeField1(oprot thrift.TProtocol) (err error) {
   if err := oprot.WriteFieldBegin("status", thrift.STRUCT, 1); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld begin error 1:status: ", p), err) }
+    return thrift.PrependError(fmt.Sprintf("%T write field begin error 1:status: ", p), err) }
   if err := p.Status.Write(oprot); err != nil {
     return thrift.PrependError(fmt.Sprintf("%T error writing struct: ", p.Status), err)
   }
   if err := oprot.WriteFieldEnd(); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld end error 1:status: ", p), err) }
+    return thrift.PrependError(fmt.Sprintf("%T write field end error 1:status: ", p), err) }
   return err
 }
 
@@ -7422,74 +7422,74 @@ func (p *TGetInfoValue) Read(iprot thrift.TProtocol) error {
 
 
   for {
-    _, ***REMOVED***eldTypeId, ***REMOVED***eldId, err := iprot.ReadFieldBegin()
+    _, fieldTypeId, fieldId, err := iprot.ReadFieldBegin()
     if err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T ***REMOVED***eld %d read error: ", p, ***REMOVED***eldId), err)
+      return thrift.PrependError(fmt.Sprintf("%T field %d read error: ", p, fieldId), err)
     }
-    if ***REMOVED***eldTypeId == thrift.STOP { break; }
-    switch ***REMOVED***eldId {
+    if fieldTypeId == thrift.STOP { break; }
+    switch fieldId {
     case 1:
-      if ***REMOVED***eldTypeId == thrift.STRING {
+      if fieldTypeId == thrift.STRING {
         if err := p.ReadField1(iprot); err != nil {
           return err
         }
-      } ***REMOVED*** {
-        if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      } else {
+        if err := iprot.Skip(fieldTypeId); err != nil {
           return err
         }
       }
     case 2:
-      if ***REMOVED***eldTypeId == thrift.I16 {
+      if fieldTypeId == thrift.I16 {
         if err := p.ReadField2(iprot); err != nil {
           return err
         }
-      } ***REMOVED*** {
-        if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      } else {
+        if err := iprot.Skip(fieldTypeId); err != nil {
           return err
         }
       }
     case 3:
-      if ***REMOVED***eldTypeId == thrift.I32 {
+      if fieldTypeId == thrift.I32 {
         if err := p.ReadField3(iprot); err != nil {
           return err
         }
-      } ***REMOVED*** {
-        if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      } else {
+        if err := iprot.Skip(fieldTypeId); err != nil {
           return err
         }
       }
     case 4:
-      if ***REMOVED***eldTypeId == thrift.I32 {
+      if fieldTypeId == thrift.I32 {
         if err := p.ReadField4(iprot); err != nil {
           return err
         }
-      } ***REMOVED*** {
-        if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      } else {
+        if err := iprot.Skip(fieldTypeId); err != nil {
           return err
         }
       }
     case 5:
-      if ***REMOVED***eldTypeId == thrift.I32 {
+      if fieldTypeId == thrift.I32 {
         if err := p.ReadField5(iprot); err != nil {
           return err
         }
-      } ***REMOVED*** {
-        if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      } else {
+        if err := iprot.Skip(fieldTypeId); err != nil {
           return err
         }
       }
     case 6:
-      if ***REMOVED***eldTypeId == thrift.I64 {
+      if fieldTypeId == thrift.I64 {
         if err := p.ReadField6(iprot); err != nil {
           return err
         }
-      } ***REMOVED*** {
-        if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      } else {
+        if err := iprot.Skip(fieldTypeId); err != nil {
           return err
         }
       }
     default:
-      if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      if err := iprot.Skip(fieldTypeId); err != nil {
         return err
       }
     }
@@ -7505,8 +7505,8 @@ func (p *TGetInfoValue) Read(iprot thrift.TProtocol) error {
 
 func (p *TGetInfoValue)  ReadField1(iprot thrift.TProtocol) error {
   if v, err := iprot.ReadString(); err != nil {
-  return thrift.PrependError("error reading ***REMOVED***eld 1: ", err)
-} ***REMOVED*** {
+  return thrift.PrependError("error reading field 1: ", err)
+} else {
   p.StringValue = &v
 }
   return nil
@@ -7514,8 +7514,8 @@ func (p *TGetInfoValue)  ReadField1(iprot thrift.TProtocol) error {
 
 func (p *TGetInfoValue)  ReadField2(iprot thrift.TProtocol) error {
   if v, err := iprot.ReadI16(); err != nil {
-  return thrift.PrependError("error reading ***REMOVED***eld 2: ", err)
-} ***REMOVED*** {
+  return thrift.PrependError("error reading field 2: ", err)
+} else {
   p.SmallIntValue = &v
 }
   return nil
@@ -7523,8 +7523,8 @@ func (p *TGetInfoValue)  ReadField2(iprot thrift.TProtocol) error {
 
 func (p *TGetInfoValue)  ReadField3(iprot thrift.TProtocol) error {
   if v, err := iprot.ReadI32(); err != nil {
-  return thrift.PrependError("error reading ***REMOVED***eld 3: ", err)
-} ***REMOVED*** {
+  return thrift.PrependError("error reading field 3: ", err)
+} else {
   p.IntegerBitmask = &v
 }
   return nil
@@ -7532,8 +7532,8 @@ func (p *TGetInfoValue)  ReadField3(iprot thrift.TProtocol) error {
 
 func (p *TGetInfoValue)  ReadField4(iprot thrift.TProtocol) error {
   if v, err := iprot.ReadI32(); err != nil {
-  return thrift.PrependError("error reading ***REMOVED***eld 4: ", err)
-} ***REMOVED*** {
+  return thrift.PrependError("error reading field 4: ", err)
+} else {
   p.IntegerFlag = &v
 }
   return nil
@@ -7541,8 +7541,8 @@ func (p *TGetInfoValue)  ReadField4(iprot thrift.TProtocol) error {
 
 func (p *TGetInfoValue)  ReadField5(iprot thrift.TProtocol) error {
   if v, err := iprot.ReadI32(); err != nil {
-  return thrift.PrependError("error reading ***REMOVED***eld 5: ", err)
-} ***REMOVED*** {
+  return thrift.PrependError("error reading field 5: ", err)
+} else {
   p.BinaryValue = &v
 }
   return nil
@@ -7550,8 +7550,8 @@ func (p *TGetInfoValue)  ReadField5(iprot thrift.TProtocol) error {
 
 func (p *TGetInfoValue)  ReadField6(iprot thrift.TProtocol) error {
   if v, err := iprot.ReadI64(); err != nil {
-  return thrift.PrependError("error reading ***REMOVED***eld 6: ", err)
-} ***REMOVED*** {
+  return thrift.PrependError("error reading field 6: ", err)
+} else {
   p.LenValue = &v
 }
   return nil
@@ -7559,7 +7559,7 @@ func (p *TGetInfoValue)  ReadField6(iprot thrift.TProtocol) error {
 
 func (p *TGetInfoValue) Write(oprot thrift.TProtocol) error {
   if c := p.CountSetFieldsTGetInfoValue(); c != 1 {
-    return fmt.Errorf("%T write union: exactly one ***REMOVED***eld must be set (%d set).", p, c)
+    return fmt.Errorf("%T write union: exactly one field must be set (%d set).", p, c)
   }
   if err := oprot.WriteStructBegin("TGetInfoValue"); err != nil {
     return thrift.PrependError(fmt.Sprintf("%T write struct begin error: ", p), err) }
@@ -7572,7 +7572,7 @@ func (p *TGetInfoValue) Write(oprot thrift.TProtocol) error {
     if err := p.writeField6(oprot); err != nil { return err }
   }
   if err := oprot.WriteFieldStop(); err != nil {
-    return thrift.PrependError("write ***REMOVED***eld stop error: ", err) }
+    return thrift.PrependError("write field stop error: ", err) }
   if err := oprot.WriteStructEnd(); err != nil {
     return thrift.PrependError("write struct stop error: ", err) }
   return nil
@@ -7581,11 +7581,11 @@ func (p *TGetInfoValue) Write(oprot thrift.TProtocol) error {
 func (p *TGetInfoValue) writeField1(oprot thrift.TProtocol) (err error) {
   if p.IsSetStringValue() {
     if err := oprot.WriteFieldBegin("stringValue", thrift.STRING, 1); err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld begin error 1:stringValue: ", p), err) }
+      return thrift.PrependError(fmt.Sprintf("%T write field begin error 1:stringValue: ", p), err) }
     if err := oprot.WriteString(string(*p.StringValue)); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T.stringValue (1) ***REMOVED***eld write error: ", p), err) }
+    return thrift.PrependError(fmt.Sprintf("%T.stringValue (1) field write error: ", p), err) }
     if err := oprot.WriteFieldEnd(); err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld end error 1:stringValue: ", p), err) }
+      return thrift.PrependError(fmt.Sprintf("%T write field end error 1:stringValue: ", p), err) }
   }
   return err
 }
@@ -7593,11 +7593,11 @@ func (p *TGetInfoValue) writeField1(oprot thrift.TProtocol) (err error) {
 func (p *TGetInfoValue) writeField2(oprot thrift.TProtocol) (err error) {
   if p.IsSetSmallIntValue() {
     if err := oprot.WriteFieldBegin("smallIntValue", thrift.I16, 2); err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld begin error 2:smallIntValue: ", p), err) }
+      return thrift.PrependError(fmt.Sprintf("%T write field begin error 2:smallIntValue: ", p), err) }
     if err := oprot.WriteI16(int16(*p.SmallIntValue)); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T.smallIntValue (2) ***REMOVED***eld write error: ", p), err) }
+    return thrift.PrependError(fmt.Sprintf("%T.smallIntValue (2) field write error: ", p), err) }
     if err := oprot.WriteFieldEnd(); err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld end error 2:smallIntValue: ", p), err) }
+      return thrift.PrependError(fmt.Sprintf("%T write field end error 2:smallIntValue: ", p), err) }
   }
   return err
 }
@@ -7605,11 +7605,11 @@ func (p *TGetInfoValue) writeField2(oprot thrift.TProtocol) (err error) {
 func (p *TGetInfoValue) writeField3(oprot thrift.TProtocol) (err error) {
   if p.IsSetIntegerBitmask() {
     if err := oprot.WriteFieldBegin("integerBitmask", thrift.I32, 3); err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld begin error 3:integerBitmask: ", p), err) }
+      return thrift.PrependError(fmt.Sprintf("%T write field begin error 3:integerBitmask: ", p), err) }
     if err := oprot.WriteI32(int32(*p.IntegerBitmask)); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T.integerBitmask (3) ***REMOVED***eld write error: ", p), err) }
+    return thrift.PrependError(fmt.Sprintf("%T.integerBitmask (3) field write error: ", p), err) }
     if err := oprot.WriteFieldEnd(); err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld end error 3:integerBitmask: ", p), err) }
+      return thrift.PrependError(fmt.Sprintf("%T write field end error 3:integerBitmask: ", p), err) }
   }
   return err
 }
@@ -7617,11 +7617,11 @@ func (p *TGetInfoValue) writeField3(oprot thrift.TProtocol) (err error) {
 func (p *TGetInfoValue) writeField4(oprot thrift.TProtocol) (err error) {
   if p.IsSetIntegerFlag() {
     if err := oprot.WriteFieldBegin("integerFlag", thrift.I32, 4); err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld begin error 4:integerFlag: ", p), err) }
+      return thrift.PrependError(fmt.Sprintf("%T write field begin error 4:integerFlag: ", p), err) }
     if err := oprot.WriteI32(int32(*p.IntegerFlag)); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T.integerFlag (4) ***REMOVED***eld write error: ", p), err) }
+    return thrift.PrependError(fmt.Sprintf("%T.integerFlag (4) field write error: ", p), err) }
     if err := oprot.WriteFieldEnd(); err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld end error 4:integerFlag: ", p), err) }
+      return thrift.PrependError(fmt.Sprintf("%T write field end error 4:integerFlag: ", p), err) }
   }
   return err
 }
@@ -7629,11 +7629,11 @@ func (p *TGetInfoValue) writeField4(oprot thrift.TProtocol) (err error) {
 func (p *TGetInfoValue) writeField5(oprot thrift.TProtocol) (err error) {
   if p.IsSetBinaryValue() {
     if err := oprot.WriteFieldBegin("binaryValue", thrift.I32, 5); err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld begin error 5:binaryValue: ", p), err) }
+      return thrift.PrependError(fmt.Sprintf("%T write field begin error 5:binaryValue: ", p), err) }
     if err := oprot.WriteI32(int32(*p.BinaryValue)); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T.binaryValue (5) ***REMOVED***eld write error: ", p), err) }
+    return thrift.PrependError(fmt.Sprintf("%T.binaryValue (5) field write error: ", p), err) }
     if err := oprot.WriteFieldEnd(); err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld end error 5:binaryValue: ", p), err) }
+      return thrift.PrependError(fmt.Sprintf("%T write field end error 5:binaryValue: ", p), err) }
   }
   return err
 }
@@ -7641,11 +7641,11 @@ func (p *TGetInfoValue) writeField5(oprot thrift.TProtocol) (err error) {
 func (p *TGetInfoValue) writeField6(oprot thrift.TProtocol) (err error) {
   if p.IsSetLenValue() {
     if err := oprot.WriteFieldBegin("lenValue", thrift.I64, 6); err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld begin error 6:lenValue: ", p), err) }
+      return thrift.PrependError(fmt.Sprintf("%T write field begin error 6:lenValue: ", p), err) }
     if err := oprot.WriteI64(int64(*p.LenValue)); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T.lenValue (6) ***REMOVED***eld write error: ", p), err) }
+    return thrift.PrependError(fmt.Sprintf("%T.lenValue (6) field write error: ", p), err) }
     if err := oprot.WriteFieldEnd(); err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld end error 6:lenValue: ", p), err) }
+      return thrift.PrependError(fmt.Sprintf("%T write field end error 6:lenValue: ", p), err) }
   }
   return err
 }
@@ -7693,36 +7693,36 @@ func (p *TGetInfoReq) Read(iprot thrift.TProtocol) error {
   var issetInfoType bool = false;
 
   for {
-    _, ***REMOVED***eldTypeId, ***REMOVED***eldId, err := iprot.ReadFieldBegin()
+    _, fieldTypeId, fieldId, err := iprot.ReadFieldBegin()
     if err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T ***REMOVED***eld %d read error: ", p, ***REMOVED***eldId), err)
+      return thrift.PrependError(fmt.Sprintf("%T field %d read error: ", p, fieldId), err)
     }
-    if ***REMOVED***eldTypeId == thrift.STOP { break; }
-    switch ***REMOVED***eldId {
+    if fieldTypeId == thrift.STOP { break; }
+    switch fieldId {
     case 1:
-      if ***REMOVED***eldTypeId == thrift.STRUCT {
+      if fieldTypeId == thrift.STRUCT {
         if err := p.ReadField1(iprot); err != nil {
           return err
         }
-      } ***REMOVED*** {
-        if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      } else {
+        if err := iprot.Skip(fieldTypeId); err != nil {
           return err
         }
       }
       issetSessionHandle = true
     case 2:
-      if ***REMOVED***eldTypeId == thrift.I32 {
+      if fieldTypeId == thrift.I32 {
         if err := p.ReadField2(iprot); err != nil {
           return err
         }
-      } ***REMOVED*** {
-        if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      } else {
+        if err := iprot.Skip(fieldTypeId); err != nil {
           return err
         }
       }
       issetInfoType = true
     default:
-      if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      if err := iprot.Skip(fieldTypeId); err != nil {
         return err
       }
     }
@@ -7734,10 +7734,10 @@ func (p *TGetInfoReq) Read(iprot thrift.TProtocol) error {
     return thrift.PrependError(fmt.Sprintf("%T read struct end error: ", p), err)
   }
   if !issetSessionHandle{
-    return thrift.NewTProtocolExceptionWithType(thrift.INVALID_DATA, fmt.Errorf("Required ***REMOVED***eld SessionHandle is not set"));
+    return thrift.NewTProtocolExceptionWithType(thrift.INVALID_DATA, fmt.Errorf("Required field SessionHandle is not set"));
   }
   if !issetInfoType{
-    return thrift.NewTProtocolExceptionWithType(thrift.INVALID_DATA, fmt.Errorf("Required ***REMOVED***eld InfoType is not set"));
+    return thrift.NewTProtocolExceptionWithType(thrift.INVALID_DATA, fmt.Errorf("Required field InfoType is not set"));
   }
   return nil
 }
@@ -7752,8 +7752,8 @@ func (p *TGetInfoReq)  ReadField1(iprot thrift.TProtocol) error {
 
 func (p *TGetInfoReq)  ReadField2(iprot thrift.TProtocol) error {
   if v, err := iprot.ReadI32(); err != nil {
-  return thrift.PrependError("error reading ***REMOVED***eld 2: ", err)
-} ***REMOVED*** {
+  return thrift.PrependError("error reading field 2: ", err)
+} else {
   temp := TGetInfoType(v)
   p.InfoType = temp
 }
@@ -7768,7 +7768,7 @@ func (p *TGetInfoReq) Write(oprot thrift.TProtocol) error {
     if err := p.writeField2(oprot); err != nil { return err }
   }
   if err := oprot.WriteFieldStop(); err != nil {
-    return thrift.PrependError("write ***REMOVED***eld stop error: ", err) }
+    return thrift.PrependError("write field stop error: ", err) }
   if err := oprot.WriteStructEnd(); err != nil {
     return thrift.PrependError("write struct stop error: ", err) }
   return nil
@@ -7776,22 +7776,22 @@ func (p *TGetInfoReq) Write(oprot thrift.TProtocol) error {
 
 func (p *TGetInfoReq) writeField1(oprot thrift.TProtocol) (err error) {
   if err := oprot.WriteFieldBegin("sessionHandle", thrift.STRUCT, 1); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld begin error 1:sessionHandle: ", p), err) }
+    return thrift.PrependError(fmt.Sprintf("%T write field begin error 1:sessionHandle: ", p), err) }
   if err := p.SessionHandle.Write(oprot); err != nil {
     return thrift.PrependError(fmt.Sprintf("%T error writing struct: ", p.SessionHandle), err)
   }
   if err := oprot.WriteFieldEnd(); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld end error 1:sessionHandle: ", p), err) }
+    return thrift.PrependError(fmt.Sprintf("%T write field end error 1:sessionHandle: ", p), err) }
   return err
 }
 
 func (p *TGetInfoReq) writeField2(oprot thrift.TProtocol) (err error) {
   if err := oprot.WriteFieldBegin("infoType", thrift.I32, 2); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld begin error 2:infoType: ", p), err) }
+    return thrift.PrependError(fmt.Sprintf("%T write field begin error 2:infoType: ", p), err) }
   if err := oprot.WriteI32(int32(p.InfoType)); err != nil {
-  return thrift.PrependError(fmt.Sprintf("%T.infoType (2) ***REMOVED***eld write error: ", p), err) }
+  return thrift.PrependError(fmt.Sprintf("%T.infoType (2) field write error: ", p), err) }
   if err := oprot.WriteFieldEnd(); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld end error 2:infoType: ", p), err) }
+    return thrift.PrependError(fmt.Sprintf("%T write field end error 2:infoType: ", p), err) }
   return err
 }
 
@@ -7845,36 +7845,36 @@ func (p *TGetInfoResp) Read(iprot thrift.TProtocol) error {
   var issetInfoValue bool = false;
 
   for {
-    _, ***REMOVED***eldTypeId, ***REMOVED***eldId, err := iprot.ReadFieldBegin()
+    _, fieldTypeId, fieldId, err := iprot.ReadFieldBegin()
     if err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T ***REMOVED***eld %d read error: ", p, ***REMOVED***eldId), err)
+      return thrift.PrependError(fmt.Sprintf("%T field %d read error: ", p, fieldId), err)
     }
-    if ***REMOVED***eldTypeId == thrift.STOP { break; }
-    switch ***REMOVED***eldId {
+    if fieldTypeId == thrift.STOP { break; }
+    switch fieldId {
     case 1:
-      if ***REMOVED***eldTypeId == thrift.STRUCT {
+      if fieldTypeId == thrift.STRUCT {
         if err := p.ReadField1(iprot); err != nil {
           return err
         }
-      } ***REMOVED*** {
-        if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      } else {
+        if err := iprot.Skip(fieldTypeId); err != nil {
           return err
         }
       }
       issetStatus = true
     case 2:
-      if ***REMOVED***eldTypeId == thrift.STRUCT {
+      if fieldTypeId == thrift.STRUCT {
         if err := p.ReadField2(iprot); err != nil {
           return err
         }
-      } ***REMOVED*** {
-        if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      } else {
+        if err := iprot.Skip(fieldTypeId); err != nil {
           return err
         }
       }
       issetInfoValue = true
     default:
-      if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      if err := iprot.Skip(fieldTypeId); err != nil {
         return err
       }
     }
@@ -7886,10 +7886,10 @@ func (p *TGetInfoResp) Read(iprot thrift.TProtocol) error {
     return thrift.PrependError(fmt.Sprintf("%T read struct end error: ", p), err)
   }
   if !issetStatus{
-    return thrift.NewTProtocolExceptionWithType(thrift.INVALID_DATA, fmt.Errorf("Required ***REMOVED***eld Status is not set"));
+    return thrift.NewTProtocolExceptionWithType(thrift.INVALID_DATA, fmt.Errorf("Required field Status is not set"));
   }
   if !issetInfoValue{
-    return thrift.NewTProtocolExceptionWithType(thrift.INVALID_DATA, fmt.Errorf("Required ***REMOVED***eld InfoValue is not set"));
+    return thrift.NewTProtocolExceptionWithType(thrift.INVALID_DATA, fmt.Errorf("Required field InfoValue is not set"));
   }
   return nil
 }
@@ -7918,7 +7918,7 @@ func (p *TGetInfoResp) Write(oprot thrift.TProtocol) error {
     if err := p.writeField2(oprot); err != nil { return err }
   }
   if err := oprot.WriteFieldStop(); err != nil {
-    return thrift.PrependError("write ***REMOVED***eld stop error: ", err) }
+    return thrift.PrependError("write field stop error: ", err) }
   if err := oprot.WriteStructEnd(); err != nil {
     return thrift.PrependError("write struct stop error: ", err) }
   return nil
@@ -7926,23 +7926,23 @@ func (p *TGetInfoResp) Write(oprot thrift.TProtocol) error {
 
 func (p *TGetInfoResp) writeField1(oprot thrift.TProtocol) (err error) {
   if err := oprot.WriteFieldBegin("status", thrift.STRUCT, 1); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld begin error 1:status: ", p), err) }
+    return thrift.PrependError(fmt.Sprintf("%T write field begin error 1:status: ", p), err) }
   if err := p.Status.Write(oprot); err != nil {
     return thrift.PrependError(fmt.Sprintf("%T error writing struct: ", p.Status), err)
   }
   if err := oprot.WriteFieldEnd(); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld end error 1:status: ", p), err) }
+    return thrift.PrependError(fmt.Sprintf("%T write field end error 1:status: ", p), err) }
   return err
 }
 
 func (p *TGetInfoResp) writeField2(oprot thrift.TProtocol) (err error) {
   if err := oprot.WriteFieldBegin("infoValue", thrift.STRUCT, 2); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld begin error 2:infoValue: ", p), err) }
+    return thrift.PrependError(fmt.Sprintf("%T write field begin error 2:infoValue: ", p), err) }
   if err := p.InfoValue.Write(oprot); err != nil {
     return thrift.PrependError(fmt.Sprintf("%T error writing struct: ", p.InfoValue), err)
   }
   if err := oprot.WriteFieldEnd(); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld end error 2:infoValue: ", p), err) }
+    return thrift.PrependError(fmt.Sprintf("%T write field end error 2:infoValue: ", p), err) }
   return err
 }
 
@@ -8022,66 +8022,66 @@ func (p *TExecuteStatementReq) Read(iprot thrift.TProtocol) error {
   var issetStatement bool = false;
 
   for {
-    _, ***REMOVED***eldTypeId, ***REMOVED***eldId, err := iprot.ReadFieldBegin()
+    _, fieldTypeId, fieldId, err := iprot.ReadFieldBegin()
     if err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T ***REMOVED***eld %d read error: ", p, ***REMOVED***eldId), err)
+      return thrift.PrependError(fmt.Sprintf("%T field %d read error: ", p, fieldId), err)
     }
-    if ***REMOVED***eldTypeId == thrift.STOP { break; }
-    switch ***REMOVED***eldId {
+    if fieldTypeId == thrift.STOP { break; }
+    switch fieldId {
     case 1:
-      if ***REMOVED***eldTypeId == thrift.STRUCT {
+      if fieldTypeId == thrift.STRUCT {
         if err := p.ReadField1(iprot); err != nil {
           return err
         }
-      } ***REMOVED*** {
-        if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      } else {
+        if err := iprot.Skip(fieldTypeId); err != nil {
           return err
         }
       }
       issetSessionHandle = true
     case 2:
-      if ***REMOVED***eldTypeId == thrift.STRING {
+      if fieldTypeId == thrift.STRING {
         if err := p.ReadField2(iprot); err != nil {
           return err
         }
-      } ***REMOVED*** {
-        if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      } else {
+        if err := iprot.Skip(fieldTypeId); err != nil {
           return err
         }
       }
       issetStatement = true
     case 3:
-      if ***REMOVED***eldTypeId == thrift.MAP {
+      if fieldTypeId == thrift.MAP {
         if err := p.ReadField3(iprot); err != nil {
           return err
         }
-      } ***REMOVED*** {
-        if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      } else {
+        if err := iprot.Skip(fieldTypeId); err != nil {
           return err
         }
       }
     case 4:
-      if ***REMOVED***eldTypeId == thrift.BOOL {
+      if fieldTypeId == thrift.BOOL {
         if err := p.ReadField4(iprot); err != nil {
           return err
         }
-      } ***REMOVED*** {
-        if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      } else {
+        if err := iprot.Skip(fieldTypeId); err != nil {
           return err
         }
       }
     case 5:
-      if ***REMOVED***eldTypeId == thrift.I64 {
+      if fieldTypeId == thrift.I64 {
         if err := p.ReadField5(iprot); err != nil {
           return err
         }
-      } ***REMOVED*** {
-        if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      } else {
+        if err := iprot.Skip(fieldTypeId); err != nil {
           return err
         }
       }
     default:
-      if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      if err := iprot.Skip(fieldTypeId); err != nil {
         return err
       }
     }
@@ -8093,10 +8093,10 @@ func (p *TExecuteStatementReq) Read(iprot thrift.TProtocol) error {
     return thrift.PrependError(fmt.Sprintf("%T read struct end error: ", p), err)
   }
   if !issetSessionHandle{
-    return thrift.NewTProtocolExceptionWithType(thrift.INVALID_DATA, fmt.Errorf("Required ***REMOVED***eld SessionHandle is not set"));
+    return thrift.NewTProtocolExceptionWithType(thrift.INVALID_DATA, fmt.Errorf("Required field SessionHandle is not set"));
   }
   if !issetStatement{
-    return thrift.NewTProtocolExceptionWithType(thrift.INVALID_DATA, fmt.Errorf("Required ***REMOVED***eld Statement is not set"));
+    return thrift.NewTProtocolExceptionWithType(thrift.INVALID_DATA, fmt.Errorf("Required field Statement is not set"));
   }
   return nil
 }
@@ -8111,8 +8111,8 @@ func (p *TExecuteStatementReq)  ReadField1(iprot thrift.TProtocol) error {
 
 func (p *TExecuteStatementReq)  ReadField2(iprot thrift.TProtocol) error {
   if v, err := iprot.ReadString(); err != nil {
-  return thrift.PrependError("error reading ***REMOVED***eld 2: ", err)
-} ***REMOVED*** {
+  return thrift.PrependError("error reading field 2: ", err)
+} else {
   p.Statement = v
 }
   return nil
@@ -8128,14 +8128,14 @@ func (p *TExecuteStatementReq)  ReadField3(iprot thrift.TProtocol) error {
   for i := 0; i < size; i ++ {
 var _key24 string
     if v, err := iprot.ReadString(); err != nil {
-    return thrift.PrependError("error reading ***REMOVED***eld 0: ", err)
-} ***REMOVED*** {
+    return thrift.PrependError("error reading field 0: ", err)
+} else {
     _key24 = v
 }
 var _val25 string
     if v, err := iprot.ReadString(); err != nil {
-    return thrift.PrependError("error reading ***REMOVED***eld 0: ", err)
-} ***REMOVED*** {
+    return thrift.PrependError("error reading field 0: ", err)
+} else {
     _val25 = v
 }
     p.ConfOverlay[_key24] = _val25
@@ -8148,8 +8148,8 @@ var _val25 string
 
 func (p *TExecuteStatementReq)  ReadField4(iprot thrift.TProtocol) error {
   if v, err := iprot.ReadBool(); err != nil {
-  return thrift.PrependError("error reading ***REMOVED***eld 4: ", err)
-} ***REMOVED*** {
+  return thrift.PrependError("error reading field 4: ", err)
+} else {
   p.RunAsync = v
 }
   return nil
@@ -8157,8 +8157,8 @@ func (p *TExecuteStatementReq)  ReadField4(iprot thrift.TProtocol) error {
 
 func (p *TExecuteStatementReq)  ReadField5(iprot thrift.TProtocol) error {
   if v, err := iprot.ReadI64(); err != nil {
-  return thrift.PrependError("error reading ***REMOVED***eld 5: ", err)
-} ***REMOVED*** {
+  return thrift.PrependError("error reading field 5: ", err)
+} else {
   p.QueryTimeout = v
 }
   return nil
@@ -8175,7 +8175,7 @@ func (p *TExecuteStatementReq) Write(oprot thrift.TProtocol) error {
     if err := p.writeField5(oprot); err != nil { return err }
   }
   if err := oprot.WriteFieldStop(); err != nil {
-    return thrift.PrependError("write ***REMOVED***eld stop error: ", err) }
+    return thrift.PrependError("write field stop error: ", err) }
   if err := oprot.WriteStructEnd(); err != nil {
     return thrift.PrependError("write struct stop error: ", err) }
   return nil
@@ -8183,43 +8183,43 @@ func (p *TExecuteStatementReq) Write(oprot thrift.TProtocol) error {
 
 func (p *TExecuteStatementReq) writeField1(oprot thrift.TProtocol) (err error) {
   if err := oprot.WriteFieldBegin("sessionHandle", thrift.STRUCT, 1); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld begin error 1:sessionHandle: ", p), err) }
+    return thrift.PrependError(fmt.Sprintf("%T write field begin error 1:sessionHandle: ", p), err) }
   if err := p.SessionHandle.Write(oprot); err != nil {
     return thrift.PrependError(fmt.Sprintf("%T error writing struct: ", p.SessionHandle), err)
   }
   if err := oprot.WriteFieldEnd(); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld end error 1:sessionHandle: ", p), err) }
+    return thrift.PrependError(fmt.Sprintf("%T write field end error 1:sessionHandle: ", p), err) }
   return err
 }
 
 func (p *TExecuteStatementReq) writeField2(oprot thrift.TProtocol) (err error) {
   if err := oprot.WriteFieldBegin("statement", thrift.STRING, 2); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld begin error 2:statement: ", p), err) }
+    return thrift.PrependError(fmt.Sprintf("%T write field begin error 2:statement: ", p), err) }
   if err := oprot.WriteString(string(p.Statement)); err != nil {
-  return thrift.PrependError(fmt.Sprintf("%T.statement (2) ***REMOVED***eld write error: ", p), err) }
+  return thrift.PrependError(fmt.Sprintf("%T.statement (2) field write error: ", p), err) }
   if err := oprot.WriteFieldEnd(); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld end error 2:statement: ", p), err) }
+    return thrift.PrependError(fmt.Sprintf("%T write field end error 2:statement: ", p), err) }
   return err
 }
 
 func (p *TExecuteStatementReq) writeField3(oprot thrift.TProtocol) (err error) {
   if p.IsSetConfOverlay() {
     if err := oprot.WriteFieldBegin("confOverlay", thrift.MAP, 3); err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld begin error 3:confOverlay: ", p), err) }
+      return thrift.PrependError(fmt.Sprintf("%T write field begin error 3:confOverlay: ", p), err) }
     if err := oprot.WriteMapBegin(thrift.STRING, thrift.STRING, len(p.ConfOverlay)); err != nil {
       return thrift.PrependError("error writing map begin: ", err)
     }
     for k, v := range p.ConfOverlay {
       if err := oprot.WriteString(string(k)); err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T. (0) ***REMOVED***eld write error: ", p), err) }
+      return thrift.PrependError(fmt.Sprintf("%T. (0) field write error: ", p), err) }
       if err := oprot.WriteString(string(v)); err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T. (0) ***REMOVED***eld write error: ", p), err) }
+      return thrift.PrependError(fmt.Sprintf("%T. (0) field write error: ", p), err) }
     }
     if err := oprot.WriteMapEnd(); err != nil {
       return thrift.PrependError("error writing map end: ", err)
     }
     if err := oprot.WriteFieldEnd(); err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld end error 3:confOverlay: ", p), err) }
+      return thrift.PrependError(fmt.Sprintf("%T write field end error 3:confOverlay: ", p), err) }
   }
   return err
 }
@@ -8227,11 +8227,11 @@ func (p *TExecuteStatementReq) writeField3(oprot thrift.TProtocol) (err error) {
 func (p *TExecuteStatementReq) writeField4(oprot thrift.TProtocol) (err error) {
   if p.IsSetRunAsync() {
     if err := oprot.WriteFieldBegin("runAsync", thrift.BOOL, 4); err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld begin error 4:runAsync: ", p), err) }
+      return thrift.PrependError(fmt.Sprintf("%T write field begin error 4:runAsync: ", p), err) }
     if err := oprot.WriteBool(bool(p.RunAsync)); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T.runAsync (4) ***REMOVED***eld write error: ", p), err) }
+    return thrift.PrependError(fmt.Sprintf("%T.runAsync (4) field write error: ", p), err) }
     if err := oprot.WriteFieldEnd(); err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld end error 4:runAsync: ", p), err) }
+      return thrift.PrependError(fmt.Sprintf("%T write field end error 4:runAsync: ", p), err) }
   }
   return err
 }
@@ -8239,11 +8239,11 @@ func (p *TExecuteStatementReq) writeField4(oprot thrift.TProtocol) (err error) {
 func (p *TExecuteStatementReq) writeField5(oprot thrift.TProtocol) (err error) {
   if p.IsSetQueryTimeout() {
     if err := oprot.WriteFieldBegin("queryTimeout", thrift.I64, 5); err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld begin error 5:queryTimeout: ", p), err) }
+      return thrift.PrependError(fmt.Sprintf("%T write field begin error 5:queryTimeout: ", p), err) }
     if err := oprot.WriteI64(int64(p.QueryTimeout)); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T.queryTimeout (5) ***REMOVED***eld write error: ", p), err) }
+    return thrift.PrependError(fmt.Sprintf("%T.queryTimeout (5) field write error: ", p), err) }
     if err := oprot.WriteFieldEnd(); err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld end error 5:queryTimeout: ", p), err) }
+      return thrift.PrependError(fmt.Sprintf("%T write field end error 5:queryTimeout: ", p), err) }
   }
   return err
 }
@@ -8297,35 +8297,35 @@ func (p *TExecuteStatementResp) Read(iprot thrift.TProtocol) error {
   var issetStatus bool = false;
 
   for {
-    _, ***REMOVED***eldTypeId, ***REMOVED***eldId, err := iprot.ReadFieldBegin()
+    _, fieldTypeId, fieldId, err := iprot.ReadFieldBegin()
     if err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T ***REMOVED***eld %d read error: ", p, ***REMOVED***eldId), err)
+      return thrift.PrependError(fmt.Sprintf("%T field %d read error: ", p, fieldId), err)
     }
-    if ***REMOVED***eldTypeId == thrift.STOP { break; }
-    switch ***REMOVED***eldId {
+    if fieldTypeId == thrift.STOP { break; }
+    switch fieldId {
     case 1:
-      if ***REMOVED***eldTypeId == thrift.STRUCT {
+      if fieldTypeId == thrift.STRUCT {
         if err := p.ReadField1(iprot); err != nil {
           return err
         }
-      } ***REMOVED*** {
-        if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      } else {
+        if err := iprot.Skip(fieldTypeId); err != nil {
           return err
         }
       }
       issetStatus = true
     case 2:
-      if ***REMOVED***eldTypeId == thrift.STRUCT {
+      if fieldTypeId == thrift.STRUCT {
         if err := p.ReadField2(iprot); err != nil {
           return err
         }
-      } ***REMOVED*** {
-        if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      } else {
+        if err := iprot.Skip(fieldTypeId); err != nil {
           return err
         }
       }
     default:
-      if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      if err := iprot.Skip(fieldTypeId); err != nil {
         return err
       }
     }
@@ -8337,7 +8337,7 @@ func (p *TExecuteStatementResp) Read(iprot thrift.TProtocol) error {
     return thrift.PrependError(fmt.Sprintf("%T read struct end error: ", p), err)
   }
   if !issetStatus{
-    return thrift.NewTProtocolExceptionWithType(thrift.INVALID_DATA, fmt.Errorf("Required ***REMOVED***eld Status is not set"));
+    return thrift.NewTProtocolExceptionWithType(thrift.INVALID_DATA, fmt.Errorf("Required field Status is not set"));
   }
   return nil
 }
@@ -8366,7 +8366,7 @@ func (p *TExecuteStatementResp) Write(oprot thrift.TProtocol) error {
     if err := p.writeField2(oprot); err != nil { return err }
   }
   if err := oprot.WriteFieldStop(); err != nil {
-    return thrift.PrependError("write ***REMOVED***eld stop error: ", err) }
+    return thrift.PrependError("write field stop error: ", err) }
   if err := oprot.WriteStructEnd(); err != nil {
     return thrift.PrependError("write struct stop error: ", err) }
   return nil
@@ -8374,24 +8374,24 @@ func (p *TExecuteStatementResp) Write(oprot thrift.TProtocol) error {
 
 func (p *TExecuteStatementResp) writeField1(oprot thrift.TProtocol) (err error) {
   if err := oprot.WriteFieldBegin("status", thrift.STRUCT, 1); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld begin error 1:status: ", p), err) }
+    return thrift.PrependError(fmt.Sprintf("%T write field begin error 1:status: ", p), err) }
   if err := p.Status.Write(oprot); err != nil {
     return thrift.PrependError(fmt.Sprintf("%T error writing struct: ", p.Status), err)
   }
   if err := oprot.WriteFieldEnd(); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld end error 1:status: ", p), err) }
+    return thrift.PrependError(fmt.Sprintf("%T write field end error 1:status: ", p), err) }
   return err
 }
 
 func (p *TExecuteStatementResp) writeField2(oprot thrift.TProtocol) (err error) {
   if p.IsSetOperationHandle() {
     if err := oprot.WriteFieldBegin("operationHandle", thrift.STRUCT, 2); err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld begin error 2:operationHandle: ", p), err) }
+      return thrift.PrependError(fmt.Sprintf("%T write field begin error 2:operationHandle: ", p), err) }
     if err := p.OperationHandle.Write(oprot); err != nil {
       return thrift.PrependError(fmt.Sprintf("%T error writing struct: ", p.OperationHandle), err)
     }
     if err := oprot.WriteFieldEnd(); err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld end error 2:operationHandle: ", p), err) }
+      return thrift.PrependError(fmt.Sprintf("%T write field end error 2:operationHandle: ", p), err) }
   }
   return err
 }
@@ -8432,25 +8432,25 @@ func (p *TGetTypeInfoReq) Read(iprot thrift.TProtocol) error {
   var issetSessionHandle bool = false;
 
   for {
-    _, ***REMOVED***eldTypeId, ***REMOVED***eldId, err := iprot.ReadFieldBegin()
+    _, fieldTypeId, fieldId, err := iprot.ReadFieldBegin()
     if err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T ***REMOVED***eld %d read error: ", p, ***REMOVED***eldId), err)
+      return thrift.PrependError(fmt.Sprintf("%T field %d read error: ", p, fieldId), err)
     }
-    if ***REMOVED***eldTypeId == thrift.STOP { break; }
-    switch ***REMOVED***eldId {
+    if fieldTypeId == thrift.STOP { break; }
+    switch fieldId {
     case 1:
-      if ***REMOVED***eldTypeId == thrift.STRUCT {
+      if fieldTypeId == thrift.STRUCT {
         if err := p.ReadField1(iprot); err != nil {
           return err
         }
-      } ***REMOVED*** {
-        if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      } else {
+        if err := iprot.Skip(fieldTypeId); err != nil {
           return err
         }
       }
       issetSessionHandle = true
     default:
-      if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      if err := iprot.Skip(fieldTypeId); err != nil {
         return err
       }
     }
@@ -8462,7 +8462,7 @@ func (p *TGetTypeInfoReq) Read(iprot thrift.TProtocol) error {
     return thrift.PrependError(fmt.Sprintf("%T read struct end error: ", p), err)
   }
   if !issetSessionHandle{
-    return thrift.NewTProtocolExceptionWithType(thrift.INVALID_DATA, fmt.Errorf("Required ***REMOVED***eld SessionHandle is not set"));
+    return thrift.NewTProtocolExceptionWithType(thrift.INVALID_DATA, fmt.Errorf("Required field SessionHandle is not set"));
   }
   return nil
 }
@@ -8482,7 +8482,7 @@ func (p *TGetTypeInfoReq) Write(oprot thrift.TProtocol) error {
     if err := p.writeField1(oprot); err != nil { return err }
   }
   if err := oprot.WriteFieldStop(); err != nil {
-    return thrift.PrependError("write ***REMOVED***eld stop error: ", err) }
+    return thrift.PrependError("write field stop error: ", err) }
   if err := oprot.WriteStructEnd(); err != nil {
     return thrift.PrependError("write struct stop error: ", err) }
   return nil
@@ -8490,12 +8490,12 @@ func (p *TGetTypeInfoReq) Write(oprot thrift.TProtocol) error {
 
 func (p *TGetTypeInfoReq) writeField1(oprot thrift.TProtocol) (err error) {
   if err := oprot.WriteFieldBegin("sessionHandle", thrift.STRUCT, 1); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld begin error 1:sessionHandle: ", p), err) }
+    return thrift.PrependError(fmt.Sprintf("%T write field begin error 1:sessionHandle: ", p), err) }
   if err := p.SessionHandle.Write(oprot); err != nil {
     return thrift.PrependError(fmt.Sprintf("%T error writing struct: ", p.SessionHandle), err)
   }
   if err := oprot.WriteFieldEnd(); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld end error 1:sessionHandle: ", p), err) }
+    return thrift.PrependError(fmt.Sprintf("%T write field end error 1:sessionHandle: ", p), err) }
   return err
 }
 
@@ -8548,35 +8548,35 @@ func (p *TGetTypeInfoResp) Read(iprot thrift.TProtocol) error {
   var issetStatus bool = false;
 
   for {
-    _, ***REMOVED***eldTypeId, ***REMOVED***eldId, err := iprot.ReadFieldBegin()
+    _, fieldTypeId, fieldId, err := iprot.ReadFieldBegin()
     if err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T ***REMOVED***eld %d read error: ", p, ***REMOVED***eldId), err)
+      return thrift.PrependError(fmt.Sprintf("%T field %d read error: ", p, fieldId), err)
     }
-    if ***REMOVED***eldTypeId == thrift.STOP { break; }
-    switch ***REMOVED***eldId {
+    if fieldTypeId == thrift.STOP { break; }
+    switch fieldId {
     case 1:
-      if ***REMOVED***eldTypeId == thrift.STRUCT {
+      if fieldTypeId == thrift.STRUCT {
         if err := p.ReadField1(iprot); err != nil {
           return err
         }
-      } ***REMOVED*** {
-        if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      } else {
+        if err := iprot.Skip(fieldTypeId); err != nil {
           return err
         }
       }
       issetStatus = true
     case 2:
-      if ***REMOVED***eldTypeId == thrift.STRUCT {
+      if fieldTypeId == thrift.STRUCT {
         if err := p.ReadField2(iprot); err != nil {
           return err
         }
-      } ***REMOVED*** {
-        if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      } else {
+        if err := iprot.Skip(fieldTypeId); err != nil {
           return err
         }
       }
     default:
-      if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      if err := iprot.Skip(fieldTypeId); err != nil {
         return err
       }
     }
@@ -8588,7 +8588,7 @@ func (p *TGetTypeInfoResp) Read(iprot thrift.TProtocol) error {
     return thrift.PrependError(fmt.Sprintf("%T read struct end error: ", p), err)
   }
   if !issetStatus{
-    return thrift.NewTProtocolExceptionWithType(thrift.INVALID_DATA, fmt.Errorf("Required ***REMOVED***eld Status is not set"));
+    return thrift.NewTProtocolExceptionWithType(thrift.INVALID_DATA, fmt.Errorf("Required field Status is not set"));
   }
   return nil
 }
@@ -8617,7 +8617,7 @@ func (p *TGetTypeInfoResp) Write(oprot thrift.TProtocol) error {
     if err := p.writeField2(oprot); err != nil { return err }
   }
   if err := oprot.WriteFieldStop(); err != nil {
-    return thrift.PrependError("write ***REMOVED***eld stop error: ", err) }
+    return thrift.PrependError("write field stop error: ", err) }
   if err := oprot.WriteStructEnd(); err != nil {
     return thrift.PrependError("write struct stop error: ", err) }
   return nil
@@ -8625,24 +8625,24 @@ func (p *TGetTypeInfoResp) Write(oprot thrift.TProtocol) error {
 
 func (p *TGetTypeInfoResp) writeField1(oprot thrift.TProtocol) (err error) {
   if err := oprot.WriteFieldBegin("status", thrift.STRUCT, 1); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld begin error 1:status: ", p), err) }
+    return thrift.PrependError(fmt.Sprintf("%T write field begin error 1:status: ", p), err) }
   if err := p.Status.Write(oprot); err != nil {
     return thrift.PrependError(fmt.Sprintf("%T error writing struct: ", p.Status), err)
   }
   if err := oprot.WriteFieldEnd(); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld end error 1:status: ", p), err) }
+    return thrift.PrependError(fmt.Sprintf("%T write field end error 1:status: ", p), err) }
   return err
 }
 
 func (p *TGetTypeInfoResp) writeField2(oprot thrift.TProtocol) (err error) {
   if p.IsSetOperationHandle() {
     if err := oprot.WriteFieldBegin("operationHandle", thrift.STRUCT, 2); err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld begin error 2:operationHandle: ", p), err) }
+      return thrift.PrependError(fmt.Sprintf("%T write field begin error 2:operationHandle: ", p), err) }
     if err := p.OperationHandle.Write(oprot); err != nil {
       return thrift.PrependError(fmt.Sprintf("%T error writing struct: ", p.OperationHandle), err)
     }
     if err := oprot.WriteFieldEnd(); err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld end error 2:operationHandle: ", p), err) }
+      return thrift.PrependError(fmt.Sprintf("%T write field end error 2:operationHandle: ", p), err) }
   }
   return err
 }
@@ -8683,25 +8683,25 @@ func (p *TGetCatalogsReq) Read(iprot thrift.TProtocol) error {
   var issetSessionHandle bool = false;
 
   for {
-    _, ***REMOVED***eldTypeId, ***REMOVED***eldId, err := iprot.ReadFieldBegin()
+    _, fieldTypeId, fieldId, err := iprot.ReadFieldBegin()
     if err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T ***REMOVED***eld %d read error: ", p, ***REMOVED***eldId), err)
+      return thrift.PrependError(fmt.Sprintf("%T field %d read error: ", p, fieldId), err)
     }
-    if ***REMOVED***eldTypeId == thrift.STOP { break; }
-    switch ***REMOVED***eldId {
+    if fieldTypeId == thrift.STOP { break; }
+    switch fieldId {
     case 1:
-      if ***REMOVED***eldTypeId == thrift.STRUCT {
+      if fieldTypeId == thrift.STRUCT {
         if err := p.ReadField1(iprot); err != nil {
           return err
         }
-      } ***REMOVED*** {
-        if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      } else {
+        if err := iprot.Skip(fieldTypeId); err != nil {
           return err
         }
       }
       issetSessionHandle = true
     default:
-      if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      if err := iprot.Skip(fieldTypeId); err != nil {
         return err
       }
     }
@@ -8713,7 +8713,7 @@ func (p *TGetCatalogsReq) Read(iprot thrift.TProtocol) error {
     return thrift.PrependError(fmt.Sprintf("%T read struct end error: ", p), err)
   }
   if !issetSessionHandle{
-    return thrift.NewTProtocolExceptionWithType(thrift.INVALID_DATA, fmt.Errorf("Required ***REMOVED***eld SessionHandle is not set"));
+    return thrift.NewTProtocolExceptionWithType(thrift.INVALID_DATA, fmt.Errorf("Required field SessionHandle is not set"));
   }
   return nil
 }
@@ -8733,7 +8733,7 @@ func (p *TGetCatalogsReq) Write(oprot thrift.TProtocol) error {
     if err := p.writeField1(oprot); err != nil { return err }
   }
   if err := oprot.WriteFieldStop(); err != nil {
-    return thrift.PrependError("write ***REMOVED***eld stop error: ", err) }
+    return thrift.PrependError("write field stop error: ", err) }
   if err := oprot.WriteStructEnd(); err != nil {
     return thrift.PrependError("write struct stop error: ", err) }
   return nil
@@ -8741,12 +8741,12 @@ func (p *TGetCatalogsReq) Write(oprot thrift.TProtocol) error {
 
 func (p *TGetCatalogsReq) writeField1(oprot thrift.TProtocol) (err error) {
   if err := oprot.WriteFieldBegin("sessionHandle", thrift.STRUCT, 1); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld begin error 1:sessionHandle: ", p), err) }
+    return thrift.PrependError(fmt.Sprintf("%T write field begin error 1:sessionHandle: ", p), err) }
   if err := p.SessionHandle.Write(oprot); err != nil {
     return thrift.PrependError(fmt.Sprintf("%T error writing struct: ", p.SessionHandle), err)
   }
   if err := oprot.WriteFieldEnd(); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld end error 1:sessionHandle: ", p), err) }
+    return thrift.PrependError(fmt.Sprintf("%T write field end error 1:sessionHandle: ", p), err) }
   return err
 }
 
@@ -8799,35 +8799,35 @@ func (p *TGetCatalogsResp) Read(iprot thrift.TProtocol) error {
   var issetStatus bool = false;
 
   for {
-    _, ***REMOVED***eldTypeId, ***REMOVED***eldId, err := iprot.ReadFieldBegin()
+    _, fieldTypeId, fieldId, err := iprot.ReadFieldBegin()
     if err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T ***REMOVED***eld %d read error: ", p, ***REMOVED***eldId), err)
+      return thrift.PrependError(fmt.Sprintf("%T field %d read error: ", p, fieldId), err)
     }
-    if ***REMOVED***eldTypeId == thrift.STOP { break; }
-    switch ***REMOVED***eldId {
+    if fieldTypeId == thrift.STOP { break; }
+    switch fieldId {
     case 1:
-      if ***REMOVED***eldTypeId == thrift.STRUCT {
+      if fieldTypeId == thrift.STRUCT {
         if err := p.ReadField1(iprot); err != nil {
           return err
         }
-      } ***REMOVED*** {
-        if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      } else {
+        if err := iprot.Skip(fieldTypeId); err != nil {
           return err
         }
       }
       issetStatus = true
     case 2:
-      if ***REMOVED***eldTypeId == thrift.STRUCT {
+      if fieldTypeId == thrift.STRUCT {
         if err := p.ReadField2(iprot); err != nil {
           return err
         }
-      } ***REMOVED*** {
-        if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      } else {
+        if err := iprot.Skip(fieldTypeId); err != nil {
           return err
         }
       }
     default:
-      if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      if err := iprot.Skip(fieldTypeId); err != nil {
         return err
       }
     }
@@ -8839,7 +8839,7 @@ func (p *TGetCatalogsResp) Read(iprot thrift.TProtocol) error {
     return thrift.PrependError(fmt.Sprintf("%T read struct end error: ", p), err)
   }
   if !issetStatus{
-    return thrift.NewTProtocolExceptionWithType(thrift.INVALID_DATA, fmt.Errorf("Required ***REMOVED***eld Status is not set"));
+    return thrift.NewTProtocolExceptionWithType(thrift.INVALID_DATA, fmt.Errorf("Required field Status is not set"));
   }
   return nil
 }
@@ -8868,7 +8868,7 @@ func (p *TGetCatalogsResp) Write(oprot thrift.TProtocol) error {
     if err := p.writeField2(oprot); err != nil { return err }
   }
   if err := oprot.WriteFieldStop(); err != nil {
-    return thrift.PrependError("write ***REMOVED***eld stop error: ", err) }
+    return thrift.PrependError("write field stop error: ", err) }
   if err := oprot.WriteStructEnd(); err != nil {
     return thrift.PrependError("write struct stop error: ", err) }
   return nil
@@ -8876,24 +8876,24 @@ func (p *TGetCatalogsResp) Write(oprot thrift.TProtocol) error {
 
 func (p *TGetCatalogsResp) writeField1(oprot thrift.TProtocol) (err error) {
   if err := oprot.WriteFieldBegin("status", thrift.STRUCT, 1); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld begin error 1:status: ", p), err) }
+    return thrift.PrependError(fmt.Sprintf("%T write field begin error 1:status: ", p), err) }
   if err := p.Status.Write(oprot); err != nil {
     return thrift.PrependError(fmt.Sprintf("%T error writing struct: ", p.Status), err)
   }
   if err := oprot.WriteFieldEnd(); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld end error 1:status: ", p), err) }
+    return thrift.PrependError(fmt.Sprintf("%T write field end error 1:status: ", p), err) }
   return err
 }
 
 func (p *TGetCatalogsResp) writeField2(oprot thrift.TProtocol) (err error) {
   if p.IsSetOperationHandle() {
     if err := oprot.WriteFieldBegin("operationHandle", thrift.STRUCT, 2); err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld begin error 2:operationHandle: ", p), err) }
+      return thrift.PrependError(fmt.Sprintf("%T write field begin error 2:operationHandle: ", p), err) }
     if err := p.OperationHandle.Write(oprot); err != nil {
       return thrift.PrependError(fmt.Sprintf("%T error writing struct: ", p.OperationHandle), err)
     }
     if err := oprot.WriteFieldEnd(); err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld end error 2:operationHandle: ", p), err) }
+      return thrift.PrependError(fmt.Sprintf("%T write field end error 2:operationHandle: ", p), err) }
   }
   return err
 }
@@ -8911,8 +8911,8 @@ func (p *TGetCatalogsResp) String() string {
 //  - SchemaName
 type TGetSchemasReq struct {
   SessionHandle *TSessionHandle `thrift:"sessionHandle,1,required" db:"sessionHandle" json:"sessionHandle"`
-  CatalogName *TIdenti***REMOVED***er `thrift:"catalogName,2" db:"catalogName" json:"catalogName,omitempty"`
-  SchemaName *TPatternOrIdenti***REMOVED***er `thrift:"schemaName,3" db:"schemaName" json:"schemaName,omitempty"`
+  CatalogName *TIdentifier `thrift:"catalogName,2" db:"catalogName" json:"catalogName,omitempty"`
+  SchemaName *TPatternOrIdentifier `thrift:"schemaName,3" db:"schemaName" json:"schemaName,omitempty"`
 }
 
 func NewTGetSchemasReq() *TGetSchemasReq {
@@ -8926,15 +8926,15 @@ func (p *TGetSchemasReq) GetSessionHandle() *TSessionHandle {
   }
 return p.SessionHandle
 }
-var TGetSchemasReq_CatalogName_DEFAULT TIdenti***REMOVED***er
-func (p *TGetSchemasReq) GetCatalogName() TIdenti***REMOVED***er {
+var TGetSchemasReq_CatalogName_DEFAULT TIdentifier
+func (p *TGetSchemasReq) GetCatalogName() TIdentifier {
   if !p.IsSetCatalogName() {
     return TGetSchemasReq_CatalogName_DEFAULT
   }
 return *p.CatalogName
 }
-var TGetSchemasReq_SchemaName_DEFAULT TPatternOrIdenti***REMOVED***er
-func (p *TGetSchemasReq) GetSchemaName() TPatternOrIdenti***REMOVED***er {
+var TGetSchemasReq_SchemaName_DEFAULT TPatternOrIdentifier
+func (p *TGetSchemasReq) GetSchemaName() TPatternOrIdentifier {
   if !p.IsSetSchemaName() {
     return TGetSchemasReq_SchemaName_DEFAULT
   }
@@ -8960,45 +8960,45 @@ func (p *TGetSchemasReq) Read(iprot thrift.TProtocol) error {
   var issetSessionHandle bool = false;
 
   for {
-    _, ***REMOVED***eldTypeId, ***REMOVED***eldId, err := iprot.ReadFieldBegin()
+    _, fieldTypeId, fieldId, err := iprot.ReadFieldBegin()
     if err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T ***REMOVED***eld %d read error: ", p, ***REMOVED***eldId), err)
+      return thrift.PrependError(fmt.Sprintf("%T field %d read error: ", p, fieldId), err)
     }
-    if ***REMOVED***eldTypeId == thrift.STOP { break; }
-    switch ***REMOVED***eldId {
+    if fieldTypeId == thrift.STOP { break; }
+    switch fieldId {
     case 1:
-      if ***REMOVED***eldTypeId == thrift.STRUCT {
+      if fieldTypeId == thrift.STRUCT {
         if err := p.ReadField1(iprot); err != nil {
           return err
         }
-      } ***REMOVED*** {
-        if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      } else {
+        if err := iprot.Skip(fieldTypeId); err != nil {
           return err
         }
       }
       issetSessionHandle = true
     case 2:
-      if ***REMOVED***eldTypeId == thrift.STRING {
+      if fieldTypeId == thrift.STRING {
         if err := p.ReadField2(iprot); err != nil {
           return err
         }
-      } ***REMOVED*** {
-        if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      } else {
+        if err := iprot.Skip(fieldTypeId); err != nil {
           return err
         }
       }
     case 3:
-      if ***REMOVED***eldTypeId == thrift.STRING {
+      if fieldTypeId == thrift.STRING {
         if err := p.ReadField3(iprot); err != nil {
           return err
         }
-      } ***REMOVED*** {
-        if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      } else {
+        if err := iprot.Skip(fieldTypeId); err != nil {
           return err
         }
       }
     default:
-      if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      if err := iprot.Skip(fieldTypeId); err != nil {
         return err
       }
     }
@@ -9010,7 +9010,7 @@ func (p *TGetSchemasReq) Read(iprot thrift.TProtocol) error {
     return thrift.PrependError(fmt.Sprintf("%T read struct end error: ", p), err)
   }
   if !issetSessionHandle{
-    return thrift.NewTProtocolExceptionWithType(thrift.INVALID_DATA, fmt.Errorf("Required ***REMOVED***eld SessionHandle is not set"));
+    return thrift.NewTProtocolExceptionWithType(thrift.INVALID_DATA, fmt.Errorf("Required field SessionHandle is not set"));
   }
   return nil
 }
@@ -9025,9 +9025,9 @@ func (p *TGetSchemasReq)  ReadField1(iprot thrift.TProtocol) error {
 
 func (p *TGetSchemasReq)  ReadField2(iprot thrift.TProtocol) error {
   if v, err := iprot.ReadString(); err != nil {
-  return thrift.PrependError("error reading ***REMOVED***eld 2: ", err)
-} ***REMOVED*** {
-  temp := TIdenti***REMOVED***er(v)
+  return thrift.PrependError("error reading field 2: ", err)
+} else {
+  temp := TIdentifier(v)
   p.CatalogName = &temp
 }
   return nil
@@ -9035,9 +9035,9 @@ func (p *TGetSchemasReq)  ReadField2(iprot thrift.TProtocol) error {
 
 func (p *TGetSchemasReq)  ReadField3(iprot thrift.TProtocol) error {
   if v, err := iprot.ReadString(); err != nil {
-  return thrift.PrependError("error reading ***REMOVED***eld 3: ", err)
-} ***REMOVED*** {
-  temp := TPatternOrIdenti***REMOVED***er(v)
+  return thrift.PrependError("error reading field 3: ", err)
+} else {
+  temp := TPatternOrIdentifier(v)
   p.SchemaName = &temp
 }
   return nil
@@ -9052,7 +9052,7 @@ func (p *TGetSchemasReq) Write(oprot thrift.TProtocol) error {
     if err := p.writeField3(oprot); err != nil { return err }
   }
   if err := oprot.WriteFieldStop(); err != nil {
-    return thrift.PrependError("write ***REMOVED***eld stop error: ", err) }
+    return thrift.PrependError("write field stop error: ", err) }
   if err := oprot.WriteStructEnd(); err != nil {
     return thrift.PrependError("write struct stop error: ", err) }
   return nil
@@ -9060,23 +9060,23 @@ func (p *TGetSchemasReq) Write(oprot thrift.TProtocol) error {
 
 func (p *TGetSchemasReq) writeField1(oprot thrift.TProtocol) (err error) {
   if err := oprot.WriteFieldBegin("sessionHandle", thrift.STRUCT, 1); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld begin error 1:sessionHandle: ", p), err) }
+    return thrift.PrependError(fmt.Sprintf("%T write field begin error 1:sessionHandle: ", p), err) }
   if err := p.SessionHandle.Write(oprot); err != nil {
     return thrift.PrependError(fmt.Sprintf("%T error writing struct: ", p.SessionHandle), err)
   }
   if err := oprot.WriteFieldEnd(); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld end error 1:sessionHandle: ", p), err) }
+    return thrift.PrependError(fmt.Sprintf("%T write field end error 1:sessionHandle: ", p), err) }
   return err
 }
 
 func (p *TGetSchemasReq) writeField2(oprot thrift.TProtocol) (err error) {
   if p.IsSetCatalogName() {
     if err := oprot.WriteFieldBegin("catalogName", thrift.STRING, 2); err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld begin error 2:catalogName: ", p), err) }
+      return thrift.PrependError(fmt.Sprintf("%T write field begin error 2:catalogName: ", p), err) }
     if err := oprot.WriteString(string(*p.CatalogName)); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T.catalogName (2) ***REMOVED***eld write error: ", p), err) }
+    return thrift.PrependError(fmt.Sprintf("%T.catalogName (2) field write error: ", p), err) }
     if err := oprot.WriteFieldEnd(); err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld end error 2:catalogName: ", p), err) }
+      return thrift.PrependError(fmt.Sprintf("%T write field end error 2:catalogName: ", p), err) }
   }
   return err
 }
@@ -9084,11 +9084,11 @@ func (p *TGetSchemasReq) writeField2(oprot thrift.TProtocol) (err error) {
 func (p *TGetSchemasReq) writeField3(oprot thrift.TProtocol) (err error) {
   if p.IsSetSchemaName() {
     if err := oprot.WriteFieldBegin("schemaName", thrift.STRING, 3); err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld begin error 3:schemaName: ", p), err) }
+      return thrift.PrependError(fmt.Sprintf("%T write field begin error 3:schemaName: ", p), err) }
     if err := oprot.WriteString(string(*p.SchemaName)); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T.schemaName (3) ***REMOVED***eld write error: ", p), err) }
+    return thrift.PrependError(fmt.Sprintf("%T.schemaName (3) field write error: ", p), err) }
     if err := oprot.WriteFieldEnd(); err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld end error 3:schemaName: ", p), err) }
+      return thrift.PrependError(fmt.Sprintf("%T write field end error 3:schemaName: ", p), err) }
   }
   return err
 }
@@ -9142,35 +9142,35 @@ func (p *TGetSchemasResp) Read(iprot thrift.TProtocol) error {
   var issetStatus bool = false;
 
   for {
-    _, ***REMOVED***eldTypeId, ***REMOVED***eldId, err := iprot.ReadFieldBegin()
+    _, fieldTypeId, fieldId, err := iprot.ReadFieldBegin()
     if err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T ***REMOVED***eld %d read error: ", p, ***REMOVED***eldId), err)
+      return thrift.PrependError(fmt.Sprintf("%T field %d read error: ", p, fieldId), err)
     }
-    if ***REMOVED***eldTypeId == thrift.STOP { break; }
-    switch ***REMOVED***eldId {
+    if fieldTypeId == thrift.STOP { break; }
+    switch fieldId {
     case 1:
-      if ***REMOVED***eldTypeId == thrift.STRUCT {
+      if fieldTypeId == thrift.STRUCT {
         if err := p.ReadField1(iprot); err != nil {
           return err
         }
-      } ***REMOVED*** {
-        if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      } else {
+        if err := iprot.Skip(fieldTypeId); err != nil {
           return err
         }
       }
       issetStatus = true
     case 2:
-      if ***REMOVED***eldTypeId == thrift.STRUCT {
+      if fieldTypeId == thrift.STRUCT {
         if err := p.ReadField2(iprot); err != nil {
           return err
         }
-      } ***REMOVED*** {
-        if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      } else {
+        if err := iprot.Skip(fieldTypeId); err != nil {
           return err
         }
       }
     default:
-      if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      if err := iprot.Skip(fieldTypeId); err != nil {
         return err
       }
     }
@@ -9182,7 +9182,7 @@ func (p *TGetSchemasResp) Read(iprot thrift.TProtocol) error {
     return thrift.PrependError(fmt.Sprintf("%T read struct end error: ", p), err)
   }
   if !issetStatus{
-    return thrift.NewTProtocolExceptionWithType(thrift.INVALID_DATA, fmt.Errorf("Required ***REMOVED***eld Status is not set"));
+    return thrift.NewTProtocolExceptionWithType(thrift.INVALID_DATA, fmt.Errorf("Required field Status is not set"));
   }
   return nil
 }
@@ -9211,7 +9211,7 @@ func (p *TGetSchemasResp) Write(oprot thrift.TProtocol) error {
     if err := p.writeField2(oprot); err != nil { return err }
   }
   if err := oprot.WriteFieldStop(); err != nil {
-    return thrift.PrependError("write ***REMOVED***eld stop error: ", err) }
+    return thrift.PrependError("write field stop error: ", err) }
   if err := oprot.WriteStructEnd(); err != nil {
     return thrift.PrependError("write struct stop error: ", err) }
   return nil
@@ -9219,24 +9219,24 @@ func (p *TGetSchemasResp) Write(oprot thrift.TProtocol) error {
 
 func (p *TGetSchemasResp) writeField1(oprot thrift.TProtocol) (err error) {
   if err := oprot.WriteFieldBegin("status", thrift.STRUCT, 1); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld begin error 1:status: ", p), err) }
+    return thrift.PrependError(fmt.Sprintf("%T write field begin error 1:status: ", p), err) }
   if err := p.Status.Write(oprot); err != nil {
     return thrift.PrependError(fmt.Sprintf("%T error writing struct: ", p.Status), err)
   }
   if err := oprot.WriteFieldEnd(); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld end error 1:status: ", p), err) }
+    return thrift.PrependError(fmt.Sprintf("%T write field end error 1:status: ", p), err) }
   return err
 }
 
 func (p *TGetSchemasResp) writeField2(oprot thrift.TProtocol) (err error) {
   if p.IsSetOperationHandle() {
     if err := oprot.WriteFieldBegin("operationHandle", thrift.STRUCT, 2); err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld begin error 2:operationHandle: ", p), err) }
+      return thrift.PrependError(fmt.Sprintf("%T write field begin error 2:operationHandle: ", p), err) }
     if err := p.OperationHandle.Write(oprot); err != nil {
       return thrift.PrependError(fmt.Sprintf("%T error writing struct: ", p.OperationHandle), err)
     }
     if err := oprot.WriteFieldEnd(); err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld end error 2:operationHandle: ", p), err) }
+      return thrift.PrependError(fmt.Sprintf("%T write field end error 2:operationHandle: ", p), err) }
   }
   return err
 }
@@ -9256,9 +9256,9 @@ func (p *TGetSchemasResp) String() string {
 //  - TableTypes
 type TGetTablesReq struct {
   SessionHandle *TSessionHandle `thrift:"sessionHandle,1,required" db:"sessionHandle" json:"sessionHandle"`
-  CatalogName *TPatternOrIdenti***REMOVED***er `thrift:"catalogName,2" db:"catalogName" json:"catalogName,omitempty"`
-  SchemaName *TPatternOrIdenti***REMOVED***er `thrift:"schemaName,3" db:"schemaName" json:"schemaName,omitempty"`
-  TableName *TPatternOrIdenti***REMOVED***er `thrift:"tableName,4" db:"tableName" json:"tableName,omitempty"`
+  CatalogName *TPatternOrIdentifier `thrift:"catalogName,2" db:"catalogName" json:"catalogName,omitempty"`
+  SchemaName *TPatternOrIdentifier `thrift:"schemaName,3" db:"schemaName" json:"schemaName,omitempty"`
+  TableName *TPatternOrIdentifier `thrift:"tableName,4" db:"tableName" json:"tableName,omitempty"`
   TableTypes []string `thrift:"tableTypes,5" db:"tableTypes" json:"tableTypes,omitempty"`
 }
 
@@ -9273,22 +9273,22 @@ func (p *TGetTablesReq) GetSessionHandle() *TSessionHandle {
   }
 return p.SessionHandle
 }
-var TGetTablesReq_CatalogName_DEFAULT TPatternOrIdenti***REMOVED***er
-func (p *TGetTablesReq) GetCatalogName() TPatternOrIdenti***REMOVED***er {
+var TGetTablesReq_CatalogName_DEFAULT TPatternOrIdentifier
+func (p *TGetTablesReq) GetCatalogName() TPatternOrIdentifier {
   if !p.IsSetCatalogName() {
     return TGetTablesReq_CatalogName_DEFAULT
   }
 return *p.CatalogName
 }
-var TGetTablesReq_SchemaName_DEFAULT TPatternOrIdenti***REMOVED***er
-func (p *TGetTablesReq) GetSchemaName() TPatternOrIdenti***REMOVED***er {
+var TGetTablesReq_SchemaName_DEFAULT TPatternOrIdentifier
+func (p *TGetTablesReq) GetSchemaName() TPatternOrIdentifier {
   if !p.IsSetSchemaName() {
     return TGetTablesReq_SchemaName_DEFAULT
   }
 return *p.SchemaName
 }
-var TGetTablesReq_TableName_DEFAULT TPatternOrIdenti***REMOVED***er
-func (p *TGetTablesReq) GetTableName() TPatternOrIdenti***REMOVED***er {
+var TGetTablesReq_TableName_DEFAULT TPatternOrIdentifier
+func (p *TGetTablesReq) GetTableName() TPatternOrIdentifier {
   if !p.IsSetTableName() {
     return TGetTablesReq_TableName_DEFAULT
   }
@@ -9327,65 +9327,65 @@ func (p *TGetTablesReq) Read(iprot thrift.TProtocol) error {
   var issetSessionHandle bool = false;
 
   for {
-    _, ***REMOVED***eldTypeId, ***REMOVED***eldId, err := iprot.ReadFieldBegin()
+    _, fieldTypeId, fieldId, err := iprot.ReadFieldBegin()
     if err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T ***REMOVED***eld %d read error: ", p, ***REMOVED***eldId), err)
+      return thrift.PrependError(fmt.Sprintf("%T field %d read error: ", p, fieldId), err)
     }
-    if ***REMOVED***eldTypeId == thrift.STOP { break; }
-    switch ***REMOVED***eldId {
+    if fieldTypeId == thrift.STOP { break; }
+    switch fieldId {
     case 1:
-      if ***REMOVED***eldTypeId == thrift.STRUCT {
+      if fieldTypeId == thrift.STRUCT {
         if err := p.ReadField1(iprot); err != nil {
           return err
         }
-      } ***REMOVED*** {
-        if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      } else {
+        if err := iprot.Skip(fieldTypeId); err != nil {
           return err
         }
       }
       issetSessionHandle = true
     case 2:
-      if ***REMOVED***eldTypeId == thrift.STRING {
+      if fieldTypeId == thrift.STRING {
         if err := p.ReadField2(iprot); err != nil {
           return err
         }
-      } ***REMOVED*** {
-        if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      } else {
+        if err := iprot.Skip(fieldTypeId); err != nil {
           return err
         }
       }
     case 3:
-      if ***REMOVED***eldTypeId == thrift.STRING {
+      if fieldTypeId == thrift.STRING {
         if err := p.ReadField3(iprot); err != nil {
           return err
         }
-      } ***REMOVED*** {
-        if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      } else {
+        if err := iprot.Skip(fieldTypeId); err != nil {
           return err
         }
       }
     case 4:
-      if ***REMOVED***eldTypeId == thrift.STRING {
+      if fieldTypeId == thrift.STRING {
         if err := p.ReadField4(iprot); err != nil {
           return err
         }
-      } ***REMOVED*** {
-        if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      } else {
+        if err := iprot.Skip(fieldTypeId); err != nil {
           return err
         }
       }
     case 5:
-      if ***REMOVED***eldTypeId == thrift.LIST {
+      if fieldTypeId == thrift.LIST {
         if err := p.ReadField5(iprot); err != nil {
           return err
         }
-      } ***REMOVED*** {
-        if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      } else {
+        if err := iprot.Skip(fieldTypeId); err != nil {
           return err
         }
       }
     default:
-      if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      if err := iprot.Skip(fieldTypeId); err != nil {
         return err
       }
     }
@@ -9397,7 +9397,7 @@ func (p *TGetTablesReq) Read(iprot thrift.TProtocol) error {
     return thrift.PrependError(fmt.Sprintf("%T read struct end error: ", p), err)
   }
   if !issetSessionHandle{
-    return thrift.NewTProtocolExceptionWithType(thrift.INVALID_DATA, fmt.Errorf("Required ***REMOVED***eld SessionHandle is not set"));
+    return thrift.NewTProtocolExceptionWithType(thrift.INVALID_DATA, fmt.Errorf("Required field SessionHandle is not set"));
   }
   return nil
 }
@@ -9412,9 +9412,9 @@ func (p *TGetTablesReq)  ReadField1(iprot thrift.TProtocol) error {
 
 func (p *TGetTablesReq)  ReadField2(iprot thrift.TProtocol) error {
   if v, err := iprot.ReadString(); err != nil {
-  return thrift.PrependError("error reading ***REMOVED***eld 2: ", err)
-} ***REMOVED*** {
-  temp := TPatternOrIdenti***REMOVED***er(v)
+  return thrift.PrependError("error reading field 2: ", err)
+} else {
+  temp := TPatternOrIdentifier(v)
   p.CatalogName = &temp
 }
   return nil
@@ -9422,9 +9422,9 @@ func (p *TGetTablesReq)  ReadField2(iprot thrift.TProtocol) error {
 
 func (p *TGetTablesReq)  ReadField3(iprot thrift.TProtocol) error {
   if v, err := iprot.ReadString(); err != nil {
-  return thrift.PrependError("error reading ***REMOVED***eld 3: ", err)
-} ***REMOVED*** {
-  temp := TPatternOrIdenti***REMOVED***er(v)
+  return thrift.PrependError("error reading field 3: ", err)
+} else {
+  temp := TPatternOrIdentifier(v)
   p.SchemaName = &temp
 }
   return nil
@@ -9432,9 +9432,9 @@ func (p *TGetTablesReq)  ReadField3(iprot thrift.TProtocol) error {
 
 func (p *TGetTablesReq)  ReadField4(iprot thrift.TProtocol) error {
   if v, err := iprot.ReadString(); err != nil {
-  return thrift.PrependError("error reading ***REMOVED***eld 4: ", err)
-} ***REMOVED*** {
-  temp := TPatternOrIdenti***REMOVED***er(v)
+  return thrift.PrependError("error reading field 4: ", err)
+} else {
+  temp := TPatternOrIdentifier(v)
   p.TableName = &temp
 }
   return nil
@@ -9450,8 +9450,8 @@ func (p *TGetTablesReq)  ReadField5(iprot thrift.TProtocol) error {
   for i := 0; i < size; i ++ {
 var _elem26 string
     if v, err := iprot.ReadString(); err != nil {
-    return thrift.PrependError("error reading ***REMOVED***eld 0: ", err)
-} ***REMOVED*** {
+    return thrift.PrependError("error reading field 0: ", err)
+} else {
     _elem26 = v
 }
     p.TableTypes = append(p.TableTypes, _elem26)
@@ -9473,7 +9473,7 @@ func (p *TGetTablesReq) Write(oprot thrift.TProtocol) error {
     if err := p.writeField5(oprot); err != nil { return err }
   }
   if err := oprot.WriteFieldStop(); err != nil {
-    return thrift.PrependError("write ***REMOVED***eld stop error: ", err) }
+    return thrift.PrependError("write field stop error: ", err) }
   if err := oprot.WriteStructEnd(); err != nil {
     return thrift.PrependError("write struct stop error: ", err) }
   return nil
@@ -9481,23 +9481,23 @@ func (p *TGetTablesReq) Write(oprot thrift.TProtocol) error {
 
 func (p *TGetTablesReq) writeField1(oprot thrift.TProtocol) (err error) {
   if err := oprot.WriteFieldBegin("sessionHandle", thrift.STRUCT, 1); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld begin error 1:sessionHandle: ", p), err) }
+    return thrift.PrependError(fmt.Sprintf("%T write field begin error 1:sessionHandle: ", p), err) }
   if err := p.SessionHandle.Write(oprot); err != nil {
     return thrift.PrependError(fmt.Sprintf("%T error writing struct: ", p.SessionHandle), err)
   }
   if err := oprot.WriteFieldEnd(); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld end error 1:sessionHandle: ", p), err) }
+    return thrift.PrependError(fmt.Sprintf("%T write field end error 1:sessionHandle: ", p), err) }
   return err
 }
 
 func (p *TGetTablesReq) writeField2(oprot thrift.TProtocol) (err error) {
   if p.IsSetCatalogName() {
     if err := oprot.WriteFieldBegin("catalogName", thrift.STRING, 2); err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld begin error 2:catalogName: ", p), err) }
+      return thrift.PrependError(fmt.Sprintf("%T write field begin error 2:catalogName: ", p), err) }
     if err := oprot.WriteString(string(*p.CatalogName)); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T.catalogName (2) ***REMOVED***eld write error: ", p), err) }
+    return thrift.PrependError(fmt.Sprintf("%T.catalogName (2) field write error: ", p), err) }
     if err := oprot.WriteFieldEnd(); err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld end error 2:catalogName: ", p), err) }
+      return thrift.PrependError(fmt.Sprintf("%T write field end error 2:catalogName: ", p), err) }
   }
   return err
 }
@@ -9505,11 +9505,11 @@ func (p *TGetTablesReq) writeField2(oprot thrift.TProtocol) (err error) {
 func (p *TGetTablesReq) writeField3(oprot thrift.TProtocol) (err error) {
   if p.IsSetSchemaName() {
     if err := oprot.WriteFieldBegin("schemaName", thrift.STRING, 3); err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld begin error 3:schemaName: ", p), err) }
+      return thrift.PrependError(fmt.Sprintf("%T write field begin error 3:schemaName: ", p), err) }
     if err := oprot.WriteString(string(*p.SchemaName)); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T.schemaName (3) ***REMOVED***eld write error: ", p), err) }
+    return thrift.PrependError(fmt.Sprintf("%T.schemaName (3) field write error: ", p), err) }
     if err := oprot.WriteFieldEnd(); err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld end error 3:schemaName: ", p), err) }
+      return thrift.PrependError(fmt.Sprintf("%T write field end error 3:schemaName: ", p), err) }
   }
   return err
 }
@@ -9517,11 +9517,11 @@ func (p *TGetTablesReq) writeField3(oprot thrift.TProtocol) (err error) {
 func (p *TGetTablesReq) writeField4(oprot thrift.TProtocol) (err error) {
   if p.IsSetTableName() {
     if err := oprot.WriteFieldBegin("tableName", thrift.STRING, 4); err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld begin error 4:tableName: ", p), err) }
+      return thrift.PrependError(fmt.Sprintf("%T write field begin error 4:tableName: ", p), err) }
     if err := oprot.WriteString(string(*p.TableName)); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T.tableName (4) ***REMOVED***eld write error: ", p), err) }
+    return thrift.PrependError(fmt.Sprintf("%T.tableName (4) field write error: ", p), err) }
     if err := oprot.WriteFieldEnd(); err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld end error 4:tableName: ", p), err) }
+      return thrift.PrependError(fmt.Sprintf("%T write field end error 4:tableName: ", p), err) }
   }
   return err
 }
@@ -9529,19 +9529,19 @@ func (p *TGetTablesReq) writeField4(oprot thrift.TProtocol) (err error) {
 func (p *TGetTablesReq) writeField5(oprot thrift.TProtocol) (err error) {
   if p.IsSetTableTypes() {
     if err := oprot.WriteFieldBegin("tableTypes", thrift.LIST, 5); err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld begin error 5:tableTypes: ", p), err) }
+      return thrift.PrependError(fmt.Sprintf("%T write field begin error 5:tableTypes: ", p), err) }
     if err := oprot.WriteListBegin(thrift.STRING, len(p.TableTypes)); err != nil {
       return thrift.PrependError("error writing list begin: ", err)
     }
     for _, v := range p.TableTypes {
       if err := oprot.WriteString(string(v)); err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T. (0) ***REMOVED***eld write error: ", p), err) }
+      return thrift.PrependError(fmt.Sprintf("%T. (0) field write error: ", p), err) }
     }
     if err := oprot.WriteListEnd(); err != nil {
       return thrift.PrependError("error writing list end: ", err)
     }
     if err := oprot.WriteFieldEnd(); err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld end error 5:tableTypes: ", p), err) }
+      return thrift.PrependError(fmt.Sprintf("%T write field end error 5:tableTypes: ", p), err) }
   }
   return err
 }
@@ -9595,35 +9595,35 @@ func (p *TGetTablesResp) Read(iprot thrift.TProtocol) error {
   var issetStatus bool = false;
 
   for {
-    _, ***REMOVED***eldTypeId, ***REMOVED***eldId, err := iprot.ReadFieldBegin()
+    _, fieldTypeId, fieldId, err := iprot.ReadFieldBegin()
     if err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T ***REMOVED***eld %d read error: ", p, ***REMOVED***eldId), err)
+      return thrift.PrependError(fmt.Sprintf("%T field %d read error: ", p, fieldId), err)
     }
-    if ***REMOVED***eldTypeId == thrift.STOP { break; }
-    switch ***REMOVED***eldId {
+    if fieldTypeId == thrift.STOP { break; }
+    switch fieldId {
     case 1:
-      if ***REMOVED***eldTypeId == thrift.STRUCT {
+      if fieldTypeId == thrift.STRUCT {
         if err := p.ReadField1(iprot); err != nil {
           return err
         }
-      } ***REMOVED*** {
-        if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      } else {
+        if err := iprot.Skip(fieldTypeId); err != nil {
           return err
         }
       }
       issetStatus = true
     case 2:
-      if ***REMOVED***eldTypeId == thrift.STRUCT {
+      if fieldTypeId == thrift.STRUCT {
         if err := p.ReadField2(iprot); err != nil {
           return err
         }
-      } ***REMOVED*** {
-        if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      } else {
+        if err := iprot.Skip(fieldTypeId); err != nil {
           return err
         }
       }
     default:
-      if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      if err := iprot.Skip(fieldTypeId); err != nil {
         return err
       }
     }
@@ -9635,7 +9635,7 @@ func (p *TGetTablesResp) Read(iprot thrift.TProtocol) error {
     return thrift.PrependError(fmt.Sprintf("%T read struct end error: ", p), err)
   }
   if !issetStatus{
-    return thrift.NewTProtocolExceptionWithType(thrift.INVALID_DATA, fmt.Errorf("Required ***REMOVED***eld Status is not set"));
+    return thrift.NewTProtocolExceptionWithType(thrift.INVALID_DATA, fmt.Errorf("Required field Status is not set"));
   }
   return nil
 }
@@ -9664,7 +9664,7 @@ func (p *TGetTablesResp) Write(oprot thrift.TProtocol) error {
     if err := p.writeField2(oprot); err != nil { return err }
   }
   if err := oprot.WriteFieldStop(); err != nil {
-    return thrift.PrependError("write ***REMOVED***eld stop error: ", err) }
+    return thrift.PrependError("write field stop error: ", err) }
   if err := oprot.WriteStructEnd(); err != nil {
     return thrift.PrependError("write struct stop error: ", err) }
   return nil
@@ -9672,24 +9672,24 @@ func (p *TGetTablesResp) Write(oprot thrift.TProtocol) error {
 
 func (p *TGetTablesResp) writeField1(oprot thrift.TProtocol) (err error) {
   if err := oprot.WriteFieldBegin("status", thrift.STRUCT, 1); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld begin error 1:status: ", p), err) }
+    return thrift.PrependError(fmt.Sprintf("%T write field begin error 1:status: ", p), err) }
   if err := p.Status.Write(oprot); err != nil {
     return thrift.PrependError(fmt.Sprintf("%T error writing struct: ", p.Status), err)
   }
   if err := oprot.WriteFieldEnd(); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld end error 1:status: ", p), err) }
+    return thrift.PrependError(fmt.Sprintf("%T write field end error 1:status: ", p), err) }
   return err
 }
 
 func (p *TGetTablesResp) writeField2(oprot thrift.TProtocol) (err error) {
   if p.IsSetOperationHandle() {
     if err := oprot.WriteFieldBegin("operationHandle", thrift.STRUCT, 2); err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld begin error 2:operationHandle: ", p), err) }
+      return thrift.PrependError(fmt.Sprintf("%T write field begin error 2:operationHandle: ", p), err) }
     if err := p.OperationHandle.Write(oprot); err != nil {
       return thrift.PrependError(fmt.Sprintf("%T error writing struct: ", p.OperationHandle), err)
     }
     if err := oprot.WriteFieldEnd(); err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld end error 2:operationHandle: ", p), err) }
+      return thrift.PrependError(fmt.Sprintf("%T write field end error 2:operationHandle: ", p), err) }
   }
   return err
 }
@@ -9730,25 +9730,25 @@ func (p *TGetTableTypesReq) Read(iprot thrift.TProtocol) error {
   var issetSessionHandle bool = false;
 
   for {
-    _, ***REMOVED***eldTypeId, ***REMOVED***eldId, err := iprot.ReadFieldBegin()
+    _, fieldTypeId, fieldId, err := iprot.ReadFieldBegin()
     if err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T ***REMOVED***eld %d read error: ", p, ***REMOVED***eldId), err)
+      return thrift.PrependError(fmt.Sprintf("%T field %d read error: ", p, fieldId), err)
     }
-    if ***REMOVED***eldTypeId == thrift.STOP { break; }
-    switch ***REMOVED***eldId {
+    if fieldTypeId == thrift.STOP { break; }
+    switch fieldId {
     case 1:
-      if ***REMOVED***eldTypeId == thrift.STRUCT {
+      if fieldTypeId == thrift.STRUCT {
         if err := p.ReadField1(iprot); err != nil {
           return err
         }
-      } ***REMOVED*** {
-        if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      } else {
+        if err := iprot.Skip(fieldTypeId); err != nil {
           return err
         }
       }
       issetSessionHandle = true
     default:
-      if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      if err := iprot.Skip(fieldTypeId); err != nil {
         return err
       }
     }
@@ -9760,7 +9760,7 @@ func (p *TGetTableTypesReq) Read(iprot thrift.TProtocol) error {
     return thrift.PrependError(fmt.Sprintf("%T read struct end error: ", p), err)
   }
   if !issetSessionHandle{
-    return thrift.NewTProtocolExceptionWithType(thrift.INVALID_DATA, fmt.Errorf("Required ***REMOVED***eld SessionHandle is not set"));
+    return thrift.NewTProtocolExceptionWithType(thrift.INVALID_DATA, fmt.Errorf("Required field SessionHandle is not set"));
   }
   return nil
 }
@@ -9780,7 +9780,7 @@ func (p *TGetTableTypesReq) Write(oprot thrift.TProtocol) error {
     if err := p.writeField1(oprot); err != nil { return err }
   }
   if err := oprot.WriteFieldStop(); err != nil {
-    return thrift.PrependError("write ***REMOVED***eld stop error: ", err) }
+    return thrift.PrependError("write field stop error: ", err) }
   if err := oprot.WriteStructEnd(); err != nil {
     return thrift.PrependError("write struct stop error: ", err) }
   return nil
@@ -9788,12 +9788,12 @@ func (p *TGetTableTypesReq) Write(oprot thrift.TProtocol) error {
 
 func (p *TGetTableTypesReq) writeField1(oprot thrift.TProtocol) (err error) {
   if err := oprot.WriteFieldBegin("sessionHandle", thrift.STRUCT, 1); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld begin error 1:sessionHandle: ", p), err) }
+    return thrift.PrependError(fmt.Sprintf("%T write field begin error 1:sessionHandle: ", p), err) }
   if err := p.SessionHandle.Write(oprot); err != nil {
     return thrift.PrependError(fmt.Sprintf("%T error writing struct: ", p.SessionHandle), err)
   }
   if err := oprot.WriteFieldEnd(); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld end error 1:sessionHandle: ", p), err) }
+    return thrift.PrependError(fmt.Sprintf("%T write field end error 1:sessionHandle: ", p), err) }
   return err
 }
 
@@ -9846,35 +9846,35 @@ func (p *TGetTableTypesResp) Read(iprot thrift.TProtocol) error {
   var issetStatus bool = false;
 
   for {
-    _, ***REMOVED***eldTypeId, ***REMOVED***eldId, err := iprot.ReadFieldBegin()
+    _, fieldTypeId, fieldId, err := iprot.ReadFieldBegin()
     if err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T ***REMOVED***eld %d read error: ", p, ***REMOVED***eldId), err)
+      return thrift.PrependError(fmt.Sprintf("%T field %d read error: ", p, fieldId), err)
     }
-    if ***REMOVED***eldTypeId == thrift.STOP { break; }
-    switch ***REMOVED***eldId {
+    if fieldTypeId == thrift.STOP { break; }
+    switch fieldId {
     case 1:
-      if ***REMOVED***eldTypeId == thrift.STRUCT {
+      if fieldTypeId == thrift.STRUCT {
         if err := p.ReadField1(iprot); err != nil {
           return err
         }
-      } ***REMOVED*** {
-        if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      } else {
+        if err := iprot.Skip(fieldTypeId); err != nil {
           return err
         }
       }
       issetStatus = true
     case 2:
-      if ***REMOVED***eldTypeId == thrift.STRUCT {
+      if fieldTypeId == thrift.STRUCT {
         if err := p.ReadField2(iprot); err != nil {
           return err
         }
-      } ***REMOVED*** {
-        if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      } else {
+        if err := iprot.Skip(fieldTypeId); err != nil {
           return err
         }
       }
     default:
-      if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      if err := iprot.Skip(fieldTypeId); err != nil {
         return err
       }
     }
@@ -9886,7 +9886,7 @@ func (p *TGetTableTypesResp) Read(iprot thrift.TProtocol) error {
     return thrift.PrependError(fmt.Sprintf("%T read struct end error: ", p), err)
   }
   if !issetStatus{
-    return thrift.NewTProtocolExceptionWithType(thrift.INVALID_DATA, fmt.Errorf("Required ***REMOVED***eld Status is not set"));
+    return thrift.NewTProtocolExceptionWithType(thrift.INVALID_DATA, fmt.Errorf("Required field Status is not set"));
   }
   return nil
 }
@@ -9915,7 +9915,7 @@ func (p *TGetTableTypesResp) Write(oprot thrift.TProtocol) error {
     if err := p.writeField2(oprot); err != nil { return err }
   }
   if err := oprot.WriteFieldStop(); err != nil {
-    return thrift.PrependError("write ***REMOVED***eld stop error: ", err) }
+    return thrift.PrependError("write field stop error: ", err) }
   if err := oprot.WriteStructEnd(); err != nil {
     return thrift.PrependError("write struct stop error: ", err) }
   return nil
@@ -9923,24 +9923,24 @@ func (p *TGetTableTypesResp) Write(oprot thrift.TProtocol) error {
 
 func (p *TGetTableTypesResp) writeField1(oprot thrift.TProtocol) (err error) {
   if err := oprot.WriteFieldBegin("status", thrift.STRUCT, 1); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld begin error 1:status: ", p), err) }
+    return thrift.PrependError(fmt.Sprintf("%T write field begin error 1:status: ", p), err) }
   if err := p.Status.Write(oprot); err != nil {
     return thrift.PrependError(fmt.Sprintf("%T error writing struct: ", p.Status), err)
   }
   if err := oprot.WriteFieldEnd(); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld end error 1:status: ", p), err) }
+    return thrift.PrependError(fmt.Sprintf("%T write field end error 1:status: ", p), err) }
   return err
 }
 
 func (p *TGetTableTypesResp) writeField2(oprot thrift.TProtocol) (err error) {
   if p.IsSetOperationHandle() {
     if err := oprot.WriteFieldBegin("operationHandle", thrift.STRUCT, 2); err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld begin error 2:operationHandle: ", p), err) }
+      return thrift.PrependError(fmt.Sprintf("%T write field begin error 2:operationHandle: ", p), err) }
     if err := p.OperationHandle.Write(oprot); err != nil {
       return thrift.PrependError(fmt.Sprintf("%T error writing struct: ", p.OperationHandle), err)
     }
     if err := oprot.WriteFieldEnd(); err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld end error 2:operationHandle: ", p), err) }
+      return thrift.PrependError(fmt.Sprintf("%T write field end error 2:operationHandle: ", p), err) }
   }
   return err
 }
@@ -9960,10 +9960,10 @@ func (p *TGetTableTypesResp) String() string {
 //  - ColumnName
 type TGetColumnsReq struct {
   SessionHandle *TSessionHandle `thrift:"sessionHandle,1,required" db:"sessionHandle" json:"sessionHandle"`
-  CatalogName *TIdenti***REMOVED***er `thrift:"catalogName,2" db:"catalogName" json:"catalogName,omitempty"`
-  SchemaName *TPatternOrIdenti***REMOVED***er `thrift:"schemaName,3" db:"schemaName" json:"schemaName,omitempty"`
-  TableName *TPatternOrIdenti***REMOVED***er `thrift:"tableName,4" db:"tableName" json:"tableName,omitempty"`
-  ColumnName *TPatternOrIdenti***REMOVED***er `thrift:"columnName,5" db:"columnName" json:"columnName,omitempty"`
+  CatalogName *TIdentifier `thrift:"catalogName,2" db:"catalogName" json:"catalogName,omitempty"`
+  SchemaName *TPatternOrIdentifier `thrift:"schemaName,3" db:"schemaName" json:"schemaName,omitempty"`
+  TableName *TPatternOrIdentifier `thrift:"tableName,4" db:"tableName" json:"tableName,omitempty"`
+  ColumnName *TPatternOrIdentifier `thrift:"columnName,5" db:"columnName" json:"columnName,omitempty"`
 }
 
 func NewTGetColumnsReq() *TGetColumnsReq {
@@ -9977,29 +9977,29 @@ func (p *TGetColumnsReq) GetSessionHandle() *TSessionHandle {
   }
 return p.SessionHandle
 }
-var TGetColumnsReq_CatalogName_DEFAULT TIdenti***REMOVED***er
-func (p *TGetColumnsReq) GetCatalogName() TIdenti***REMOVED***er {
+var TGetColumnsReq_CatalogName_DEFAULT TIdentifier
+func (p *TGetColumnsReq) GetCatalogName() TIdentifier {
   if !p.IsSetCatalogName() {
     return TGetColumnsReq_CatalogName_DEFAULT
   }
 return *p.CatalogName
 }
-var TGetColumnsReq_SchemaName_DEFAULT TPatternOrIdenti***REMOVED***er
-func (p *TGetColumnsReq) GetSchemaName() TPatternOrIdenti***REMOVED***er {
+var TGetColumnsReq_SchemaName_DEFAULT TPatternOrIdentifier
+func (p *TGetColumnsReq) GetSchemaName() TPatternOrIdentifier {
   if !p.IsSetSchemaName() {
     return TGetColumnsReq_SchemaName_DEFAULT
   }
 return *p.SchemaName
 }
-var TGetColumnsReq_TableName_DEFAULT TPatternOrIdenti***REMOVED***er
-func (p *TGetColumnsReq) GetTableName() TPatternOrIdenti***REMOVED***er {
+var TGetColumnsReq_TableName_DEFAULT TPatternOrIdentifier
+func (p *TGetColumnsReq) GetTableName() TPatternOrIdentifier {
   if !p.IsSetTableName() {
     return TGetColumnsReq_TableName_DEFAULT
   }
 return *p.TableName
 }
-var TGetColumnsReq_ColumnName_DEFAULT TPatternOrIdenti***REMOVED***er
-func (p *TGetColumnsReq) GetColumnName() TPatternOrIdenti***REMOVED***er {
+var TGetColumnsReq_ColumnName_DEFAULT TPatternOrIdentifier
+func (p *TGetColumnsReq) GetColumnName() TPatternOrIdentifier {
   if !p.IsSetColumnName() {
     return TGetColumnsReq_ColumnName_DEFAULT
   }
@@ -10033,65 +10033,65 @@ func (p *TGetColumnsReq) Read(iprot thrift.TProtocol) error {
   var issetSessionHandle bool = false;
 
   for {
-    _, ***REMOVED***eldTypeId, ***REMOVED***eldId, err := iprot.ReadFieldBegin()
+    _, fieldTypeId, fieldId, err := iprot.ReadFieldBegin()
     if err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T ***REMOVED***eld %d read error: ", p, ***REMOVED***eldId), err)
+      return thrift.PrependError(fmt.Sprintf("%T field %d read error: ", p, fieldId), err)
     }
-    if ***REMOVED***eldTypeId == thrift.STOP { break; }
-    switch ***REMOVED***eldId {
+    if fieldTypeId == thrift.STOP { break; }
+    switch fieldId {
     case 1:
-      if ***REMOVED***eldTypeId == thrift.STRUCT {
+      if fieldTypeId == thrift.STRUCT {
         if err := p.ReadField1(iprot); err != nil {
           return err
         }
-      } ***REMOVED*** {
-        if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      } else {
+        if err := iprot.Skip(fieldTypeId); err != nil {
           return err
         }
       }
       issetSessionHandle = true
     case 2:
-      if ***REMOVED***eldTypeId == thrift.STRING {
+      if fieldTypeId == thrift.STRING {
         if err := p.ReadField2(iprot); err != nil {
           return err
         }
-      } ***REMOVED*** {
-        if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      } else {
+        if err := iprot.Skip(fieldTypeId); err != nil {
           return err
         }
       }
     case 3:
-      if ***REMOVED***eldTypeId == thrift.STRING {
+      if fieldTypeId == thrift.STRING {
         if err := p.ReadField3(iprot); err != nil {
           return err
         }
-      } ***REMOVED*** {
-        if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      } else {
+        if err := iprot.Skip(fieldTypeId); err != nil {
           return err
         }
       }
     case 4:
-      if ***REMOVED***eldTypeId == thrift.STRING {
+      if fieldTypeId == thrift.STRING {
         if err := p.ReadField4(iprot); err != nil {
           return err
         }
-      } ***REMOVED*** {
-        if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      } else {
+        if err := iprot.Skip(fieldTypeId); err != nil {
           return err
         }
       }
     case 5:
-      if ***REMOVED***eldTypeId == thrift.STRING {
+      if fieldTypeId == thrift.STRING {
         if err := p.ReadField5(iprot); err != nil {
           return err
         }
-      } ***REMOVED*** {
-        if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      } else {
+        if err := iprot.Skip(fieldTypeId); err != nil {
           return err
         }
       }
     default:
-      if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      if err := iprot.Skip(fieldTypeId); err != nil {
         return err
       }
     }
@@ -10103,7 +10103,7 @@ func (p *TGetColumnsReq) Read(iprot thrift.TProtocol) error {
     return thrift.PrependError(fmt.Sprintf("%T read struct end error: ", p), err)
   }
   if !issetSessionHandle{
-    return thrift.NewTProtocolExceptionWithType(thrift.INVALID_DATA, fmt.Errorf("Required ***REMOVED***eld SessionHandle is not set"));
+    return thrift.NewTProtocolExceptionWithType(thrift.INVALID_DATA, fmt.Errorf("Required field SessionHandle is not set"));
   }
   return nil
 }
@@ -10118,9 +10118,9 @@ func (p *TGetColumnsReq)  ReadField1(iprot thrift.TProtocol) error {
 
 func (p *TGetColumnsReq)  ReadField2(iprot thrift.TProtocol) error {
   if v, err := iprot.ReadString(); err != nil {
-  return thrift.PrependError("error reading ***REMOVED***eld 2: ", err)
-} ***REMOVED*** {
-  temp := TIdenti***REMOVED***er(v)
+  return thrift.PrependError("error reading field 2: ", err)
+} else {
+  temp := TIdentifier(v)
   p.CatalogName = &temp
 }
   return nil
@@ -10128,9 +10128,9 @@ func (p *TGetColumnsReq)  ReadField2(iprot thrift.TProtocol) error {
 
 func (p *TGetColumnsReq)  ReadField3(iprot thrift.TProtocol) error {
   if v, err := iprot.ReadString(); err != nil {
-  return thrift.PrependError("error reading ***REMOVED***eld 3: ", err)
-} ***REMOVED*** {
-  temp := TPatternOrIdenti***REMOVED***er(v)
+  return thrift.PrependError("error reading field 3: ", err)
+} else {
+  temp := TPatternOrIdentifier(v)
   p.SchemaName = &temp
 }
   return nil
@@ -10138,9 +10138,9 @@ func (p *TGetColumnsReq)  ReadField3(iprot thrift.TProtocol) error {
 
 func (p *TGetColumnsReq)  ReadField4(iprot thrift.TProtocol) error {
   if v, err := iprot.ReadString(); err != nil {
-  return thrift.PrependError("error reading ***REMOVED***eld 4: ", err)
-} ***REMOVED*** {
-  temp := TPatternOrIdenti***REMOVED***er(v)
+  return thrift.PrependError("error reading field 4: ", err)
+} else {
+  temp := TPatternOrIdentifier(v)
   p.TableName = &temp
 }
   return nil
@@ -10148,9 +10148,9 @@ func (p *TGetColumnsReq)  ReadField4(iprot thrift.TProtocol) error {
 
 func (p *TGetColumnsReq)  ReadField5(iprot thrift.TProtocol) error {
   if v, err := iprot.ReadString(); err != nil {
-  return thrift.PrependError("error reading ***REMOVED***eld 5: ", err)
-} ***REMOVED*** {
-  temp := TPatternOrIdenti***REMOVED***er(v)
+  return thrift.PrependError("error reading field 5: ", err)
+} else {
+  temp := TPatternOrIdentifier(v)
   p.ColumnName = &temp
 }
   return nil
@@ -10167,7 +10167,7 @@ func (p *TGetColumnsReq) Write(oprot thrift.TProtocol) error {
     if err := p.writeField5(oprot); err != nil { return err }
   }
   if err := oprot.WriteFieldStop(); err != nil {
-    return thrift.PrependError("write ***REMOVED***eld stop error: ", err) }
+    return thrift.PrependError("write field stop error: ", err) }
   if err := oprot.WriteStructEnd(); err != nil {
     return thrift.PrependError("write struct stop error: ", err) }
   return nil
@@ -10175,23 +10175,23 @@ func (p *TGetColumnsReq) Write(oprot thrift.TProtocol) error {
 
 func (p *TGetColumnsReq) writeField1(oprot thrift.TProtocol) (err error) {
   if err := oprot.WriteFieldBegin("sessionHandle", thrift.STRUCT, 1); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld begin error 1:sessionHandle: ", p), err) }
+    return thrift.PrependError(fmt.Sprintf("%T write field begin error 1:sessionHandle: ", p), err) }
   if err := p.SessionHandle.Write(oprot); err != nil {
     return thrift.PrependError(fmt.Sprintf("%T error writing struct: ", p.SessionHandle), err)
   }
   if err := oprot.WriteFieldEnd(); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld end error 1:sessionHandle: ", p), err) }
+    return thrift.PrependError(fmt.Sprintf("%T write field end error 1:sessionHandle: ", p), err) }
   return err
 }
 
 func (p *TGetColumnsReq) writeField2(oprot thrift.TProtocol) (err error) {
   if p.IsSetCatalogName() {
     if err := oprot.WriteFieldBegin("catalogName", thrift.STRING, 2); err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld begin error 2:catalogName: ", p), err) }
+      return thrift.PrependError(fmt.Sprintf("%T write field begin error 2:catalogName: ", p), err) }
     if err := oprot.WriteString(string(*p.CatalogName)); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T.catalogName (2) ***REMOVED***eld write error: ", p), err) }
+    return thrift.PrependError(fmt.Sprintf("%T.catalogName (2) field write error: ", p), err) }
     if err := oprot.WriteFieldEnd(); err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld end error 2:catalogName: ", p), err) }
+      return thrift.PrependError(fmt.Sprintf("%T write field end error 2:catalogName: ", p), err) }
   }
   return err
 }
@@ -10199,11 +10199,11 @@ func (p *TGetColumnsReq) writeField2(oprot thrift.TProtocol) (err error) {
 func (p *TGetColumnsReq) writeField3(oprot thrift.TProtocol) (err error) {
   if p.IsSetSchemaName() {
     if err := oprot.WriteFieldBegin("schemaName", thrift.STRING, 3); err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld begin error 3:schemaName: ", p), err) }
+      return thrift.PrependError(fmt.Sprintf("%T write field begin error 3:schemaName: ", p), err) }
     if err := oprot.WriteString(string(*p.SchemaName)); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T.schemaName (3) ***REMOVED***eld write error: ", p), err) }
+    return thrift.PrependError(fmt.Sprintf("%T.schemaName (3) field write error: ", p), err) }
     if err := oprot.WriteFieldEnd(); err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld end error 3:schemaName: ", p), err) }
+      return thrift.PrependError(fmt.Sprintf("%T write field end error 3:schemaName: ", p), err) }
   }
   return err
 }
@@ -10211,11 +10211,11 @@ func (p *TGetColumnsReq) writeField3(oprot thrift.TProtocol) (err error) {
 func (p *TGetColumnsReq) writeField4(oprot thrift.TProtocol) (err error) {
   if p.IsSetTableName() {
     if err := oprot.WriteFieldBegin("tableName", thrift.STRING, 4); err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld begin error 4:tableName: ", p), err) }
+      return thrift.PrependError(fmt.Sprintf("%T write field begin error 4:tableName: ", p), err) }
     if err := oprot.WriteString(string(*p.TableName)); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T.tableName (4) ***REMOVED***eld write error: ", p), err) }
+    return thrift.PrependError(fmt.Sprintf("%T.tableName (4) field write error: ", p), err) }
     if err := oprot.WriteFieldEnd(); err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld end error 4:tableName: ", p), err) }
+      return thrift.PrependError(fmt.Sprintf("%T write field end error 4:tableName: ", p), err) }
   }
   return err
 }
@@ -10223,11 +10223,11 @@ func (p *TGetColumnsReq) writeField4(oprot thrift.TProtocol) (err error) {
 func (p *TGetColumnsReq) writeField5(oprot thrift.TProtocol) (err error) {
   if p.IsSetColumnName() {
     if err := oprot.WriteFieldBegin("columnName", thrift.STRING, 5); err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld begin error 5:columnName: ", p), err) }
+      return thrift.PrependError(fmt.Sprintf("%T write field begin error 5:columnName: ", p), err) }
     if err := oprot.WriteString(string(*p.ColumnName)); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T.columnName (5) ***REMOVED***eld write error: ", p), err) }
+    return thrift.PrependError(fmt.Sprintf("%T.columnName (5) field write error: ", p), err) }
     if err := oprot.WriteFieldEnd(); err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld end error 5:columnName: ", p), err) }
+      return thrift.PrependError(fmt.Sprintf("%T write field end error 5:columnName: ", p), err) }
   }
   return err
 }
@@ -10281,35 +10281,35 @@ func (p *TGetColumnsResp) Read(iprot thrift.TProtocol) error {
   var issetStatus bool = false;
 
   for {
-    _, ***REMOVED***eldTypeId, ***REMOVED***eldId, err := iprot.ReadFieldBegin()
+    _, fieldTypeId, fieldId, err := iprot.ReadFieldBegin()
     if err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T ***REMOVED***eld %d read error: ", p, ***REMOVED***eldId), err)
+      return thrift.PrependError(fmt.Sprintf("%T field %d read error: ", p, fieldId), err)
     }
-    if ***REMOVED***eldTypeId == thrift.STOP { break; }
-    switch ***REMOVED***eldId {
+    if fieldTypeId == thrift.STOP { break; }
+    switch fieldId {
     case 1:
-      if ***REMOVED***eldTypeId == thrift.STRUCT {
+      if fieldTypeId == thrift.STRUCT {
         if err := p.ReadField1(iprot); err != nil {
           return err
         }
-      } ***REMOVED*** {
-        if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      } else {
+        if err := iprot.Skip(fieldTypeId); err != nil {
           return err
         }
       }
       issetStatus = true
     case 2:
-      if ***REMOVED***eldTypeId == thrift.STRUCT {
+      if fieldTypeId == thrift.STRUCT {
         if err := p.ReadField2(iprot); err != nil {
           return err
         }
-      } ***REMOVED*** {
-        if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      } else {
+        if err := iprot.Skip(fieldTypeId); err != nil {
           return err
         }
       }
     default:
-      if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      if err := iprot.Skip(fieldTypeId); err != nil {
         return err
       }
     }
@@ -10321,7 +10321,7 @@ func (p *TGetColumnsResp) Read(iprot thrift.TProtocol) error {
     return thrift.PrependError(fmt.Sprintf("%T read struct end error: ", p), err)
   }
   if !issetStatus{
-    return thrift.NewTProtocolExceptionWithType(thrift.INVALID_DATA, fmt.Errorf("Required ***REMOVED***eld Status is not set"));
+    return thrift.NewTProtocolExceptionWithType(thrift.INVALID_DATA, fmt.Errorf("Required field Status is not set"));
   }
   return nil
 }
@@ -10350,7 +10350,7 @@ func (p *TGetColumnsResp) Write(oprot thrift.TProtocol) error {
     if err := p.writeField2(oprot); err != nil { return err }
   }
   if err := oprot.WriteFieldStop(); err != nil {
-    return thrift.PrependError("write ***REMOVED***eld stop error: ", err) }
+    return thrift.PrependError("write field stop error: ", err) }
   if err := oprot.WriteStructEnd(); err != nil {
     return thrift.PrependError("write struct stop error: ", err) }
   return nil
@@ -10358,24 +10358,24 @@ func (p *TGetColumnsResp) Write(oprot thrift.TProtocol) error {
 
 func (p *TGetColumnsResp) writeField1(oprot thrift.TProtocol) (err error) {
   if err := oprot.WriteFieldBegin("status", thrift.STRUCT, 1); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld begin error 1:status: ", p), err) }
+    return thrift.PrependError(fmt.Sprintf("%T write field begin error 1:status: ", p), err) }
   if err := p.Status.Write(oprot); err != nil {
     return thrift.PrependError(fmt.Sprintf("%T error writing struct: ", p.Status), err)
   }
   if err := oprot.WriteFieldEnd(); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld end error 1:status: ", p), err) }
+    return thrift.PrependError(fmt.Sprintf("%T write field end error 1:status: ", p), err) }
   return err
 }
 
 func (p *TGetColumnsResp) writeField2(oprot thrift.TProtocol) (err error) {
   if p.IsSetOperationHandle() {
     if err := oprot.WriteFieldBegin("operationHandle", thrift.STRUCT, 2); err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld begin error 2:operationHandle: ", p), err) }
+      return thrift.PrependError(fmt.Sprintf("%T write field begin error 2:operationHandle: ", p), err) }
     if err := p.OperationHandle.Write(oprot); err != nil {
       return thrift.PrependError(fmt.Sprintf("%T error writing struct: ", p.OperationHandle), err)
     }
     if err := oprot.WriteFieldEnd(); err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld end error 2:operationHandle: ", p), err) }
+      return thrift.PrependError(fmt.Sprintf("%T write field end error 2:operationHandle: ", p), err) }
   }
   return err
 }
@@ -10394,9 +10394,9 @@ func (p *TGetColumnsResp) String() string {
 //  - FunctionName
 type TGetFunctionsReq struct {
   SessionHandle *TSessionHandle `thrift:"sessionHandle,1,required" db:"sessionHandle" json:"sessionHandle"`
-  CatalogName *TIdenti***REMOVED***er `thrift:"catalogName,2" db:"catalogName" json:"catalogName,omitempty"`
-  SchemaName *TPatternOrIdenti***REMOVED***er `thrift:"schemaName,3" db:"schemaName" json:"schemaName,omitempty"`
-  FunctionName TPatternOrIdenti***REMOVED***er `thrift:"functionName,4,required" db:"functionName" json:"functionName"`
+  CatalogName *TIdentifier `thrift:"catalogName,2" db:"catalogName" json:"catalogName,omitempty"`
+  SchemaName *TPatternOrIdentifier `thrift:"schemaName,3" db:"schemaName" json:"schemaName,omitempty"`
+  FunctionName TPatternOrIdentifier `thrift:"functionName,4,required" db:"functionName" json:"functionName"`
 }
 
 func NewTGetFunctionsReq() *TGetFunctionsReq {
@@ -10410,22 +10410,22 @@ func (p *TGetFunctionsReq) GetSessionHandle() *TSessionHandle {
   }
 return p.SessionHandle
 }
-var TGetFunctionsReq_CatalogName_DEFAULT TIdenti***REMOVED***er
-func (p *TGetFunctionsReq) GetCatalogName() TIdenti***REMOVED***er {
+var TGetFunctionsReq_CatalogName_DEFAULT TIdentifier
+func (p *TGetFunctionsReq) GetCatalogName() TIdentifier {
   if !p.IsSetCatalogName() {
     return TGetFunctionsReq_CatalogName_DEFAULT
   }
 return *p.CatalogName
 }
-var TGetFunctionsReq_SchemaName_DEFAULT TPatternOrIdenti***REMOVED***er
-func (p *TGetFunctionsReq) GetSchemaName() TPatternOrIdenti***REMOVED***er {
+var TGetFunctionsReq_SchemaName_DEFAULT TPatternOrIdentifier
+func (p *TGetFunctionsReq) GetSchemaName() TPatternOrIdentifier {
   if !p.IsSetSchemaName() {
     return TGetFunctionsReq_SchemaName_DEFAULT
   }
 return *p.SchemaName
 }
 
-func (p *TGetFunctionsReq) GetFunctionName() TPatternOrIdenti***REMOVED***er {
+func (p *TGetFunctionsReq) GetFunctionName() TPatternOrIdentifier {
   return p.FunctionName
 }
 func (p *TGetFunctionsReq) IsSetSessionHandle() bool {
@@ -10449,56 +10449,56 @@ func (p *TGetFunctionsReq) Read(iprot thrift.TProtocol) error {
   var issetFunctionName bool = false;
 
   for {
-    _, ***REMOVED***eldTypeId, ***REMOVED***eldId, err := iprot.ReadFieldBegin()
+    _, fieldTypeId, fieldId, err := iprot.ReadFieldBegin()
     if err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T ***REMOVED***eld %d read error: ", p, ***REMOVED***eldId), err)
+      return thrift.PrependError(fmt.Sprintf("%T field %d read error: ", p, fieldId), err)
     }
-    if ***REMOVED***eldTypeId == thrift.STOP { break; }
-    switch ***REMOVED***eldId {
+    if fieldTypeId == thrift.STOP { break; }
+    switch fieldId {
     case 1:
-      if ***REMOVED***eldTypeId == thrift.STRUCT {
+      if fieldTypeId == thrift.STRUCT {
         if err := p.ReadField1(iprot); err != nil {
           return err
         }
-      } ***REMOVED*** {
-        if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      } else {
+        if err := iprot.Skip(fieldTypeId); err != nil {
           return err
         }
       }
       issetSessionHandle = true
     case 2:
-      if ***REMOVED***eldTypeId == thrift.STRING {
+      if fieldTypeId == thrift.STRING {
         if err := p.ReadField2(iprot); err != nil {
           return err
         }
-      } ***REMOVED*** {
-        if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      } else {
+        if err := iprot.Skip(fieldTypeId); err != nil {
           return err
         }
       }
     case 3:
-      if ***REMOVED***eldTypeId == thrift.STRING {
+      if fieldTypeId == thrift.STRING {
         if err := p.ReadField3(iprot); err != nil {
           return err
         }
-      } ***REMOVED*** {
-        if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      } else {
+        if err := iprot.Skip(fieldTypeId); err != nil {
           return err
         }
       }
     case 4:
-      if ***REMOVED***eldTypeId == thrift.STRING {
+      if fieldTypeId == thrift.STRING {
         if err := p.ReadField4(iprot); err != nil {
           return err
         }
-      } ***REMOVED*** {
-        if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      } else {
+        if err := iprot.Skip(fieldTypeId); err != nil {
           return err
         }
       }
       issetFunctionName = true
     default:
-      if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      if err := iprot.Skip(fieldTypeId); err != nil {
         return err
       }
     }
@@ -10510,10 +10510,10 @@ func (p *TGetFunctionsReq) Read(iprot thrift.TProtocol) error {
     return thrift.PrependError(fmt.Sprintf("%T read struct end error: ", p), err)
   }
   if !issetSessionHandle{
-    return thrift.NewTProtocolExceptionWithType(thrift.INVALID_DATA, fmt.Errorf("Required ***REMOVED***eld SessionHandle is not set"));
+    return thrift.NewTProtocolExceptionWithType(thrift.INVALID_DATA, fmt.Errorf("Required field SessionHandle is not set"));
   }
   if !issetFunctionName{
-    return thrift.NewTProtocolExceptionWithType(thrift.INVALID_DATA, fmt.Errorf("Required ***REMOVED***eld FunctionName is not set"));
+    return thrift.NewTProtocolExceptionWithType(thrift.INVALID_DATA, fmt.Errorf("Required field FunctionName is not set"));
   }
   return nil
 }
@@ -10528,9 +10528,9 @@ func (p *TGetFunctionsReq)  ReadField1(iprot thrift.TProtocol) error {
 
 func (p *TGetFunctionsReq)  ReadField2(iprot thrift.TProtocol) error {
   if v, err := iprot.ReadString(); err != nil {
-  return thrift.PrependError("error reading ***REMOVED***eld 2: ", err)
-} ***REMOVED*** {
-  temp := TIdenti***REMOVED***er(v)
+  return thrift.PrependError("error reading field 2: ", err)
+} else {
+  temp := TIdentifier(v)
   p.CatalogName = &temp
 }
   return nil
@@ -10538,9 +10538,9 @@ func (p *TGetFunctionsReq)  ReadField2(iprot thrift.TProtocol) error {
 
 func (p *TGetFunctionsReq)  ReadField3(iprot thrift.TProtocol) error {
   if v, err := iprot.ReadString(); err != nil {
-  return thrift.PrependError("error reading ***REMOVED***eld 3: ", err)
-} ***REMOVED*** {
-  temp := TPatternOrIdenti***REMOVED***er(v)
+  return thrift.PrependError("error reading field 3: ", err)
+} else {
+  temp := TPatternOrIdentifier(v)
   p.SchemaName = &temp
 }
   return nil
@@ -10548,9 +10548,9 @@ func (p *TGetFunctionsReq)  ReadField3(iprot thrift.TProtocol) error {
 
 func (p *TGetFunctionsReq)  ReadField4(iprot thrift.TProtocol) error {
   if v, err := iprot.ReadString(); err != nil {
-  return thrift.PrependError("error reading ***REMOVED***eld 4: ", err)
-} ***REMOVED*** {
-  temp := TPatternOrIdenti***REMOVED***er(v)
+  return thrift.PrependError("error reading field 4: ", err)
+} else {
+  temp := TPatternOrIdentifier(v)
   p.FunctionName = temp
 }
   return nil
@@ -10566,7 +10566,7 @@ func (p *TGetFunctionsReq) Write(oprot thrift.TProtocol) error {
     if err := p.writeField4(oprot); err != nil { return err }
   }
   if err := oprot.WriteFieldStop(); err != nil {
-    return thrift.PrependError("write ***REMOVED***eld stop error: ", err) }
+    return thrift.PrependError("write field stop error: ", err) }
   if err := oprot.WriteStructEnd(); err != nil {
     return thrift.PrependError("write struct stop error: ", err) }
   return nil
@@ -10574,23 +10574,23 @@ func (p *TGetFunctionsReq) Write(oprot thrift.TProtocol) error {
 
 func (p *TGetFunctionsReq) writeField1(oprot thrift.TProtocol) (err error) {
   if err := oprot.WriteFieldBegin("sessionHandle", thrift.STRUCT, 1); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld begin error 1:sessionHandle: ", p), err) }
+    return thrift.PrependError(fmt.Sprintf("%T write field begin error 1:sessionHandle: ", p), err) }
   if err := p.SessionHandle.Write(oprot); err != nil {
     return thrift.PrependError(fmt.Sprintf("%T error writing struct: ", p.SessionHandle), err)
   }
   if err := oprot.WriteFieldEnd(); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld end error 1:sessionHandle: ", p), err) }
+    return thrift.PrependError(fmt.Sprintf("%T write field end error 1:sessionHandle: ", p), err) }
   return err
 }
 
 func (p *TGetFunctionsReq) writeField2(oprot thrift.TProtocol) (err error) {
   if p.IsSetCatalogName() {
     if err := oprot.WriteFieldBegin("catalogName", thrift.STRING, 2); err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld begin error 2:catalogName: ", p), err) }
+      return thrift.PrependError(fmt.Sprintf("%T write field begin error 2:catalogName: ", p), err) }
     if err := oprot.WriteString(string(*p.CatalogName)); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T.catalogName (2) ***REMOVED***eld write error: ", p), err) }
+    return thrift.PrependError(fmt.Sprintf("%T.catalogName (2) field write error: ", p), err) }
     if err := oprot.WriteFieldEnd(); err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld end error 2:catalogName: ", p), err) }
+      return thrift.PrependError(fmt.Sprintf("%T write field end error 2:catalogName: ", p), err) }
   }
   return err
 }
@@ -10598,22 +10598,22 @@ func (p *TGetFunctionsReq) writeField2(oprot thrift.TProtocol) (err error) {
 func (p *TGetFunctionsReq) writeField3(oprot thrift.TProtocol) (err error) {
   if p.IsSetSchemaName() {
     if err := oprot.WriteFieldBegin("schemaName", thrift.STRING, 3); err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld begin error 3:schemaName: ", p), err) }
+      return thrift.PrependError(fmt.Sprintf("%T write field begin error 3:schemaName: ", p), err) }
     if err := oprot.WriteString(string(*p.SchemaName)); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T.schemaName (3) ***REMOVED***eld write error: ", p), err) }
+    return thrift.PrependError(fmt.Sprintf("%T.schemaName (3) field write error: ", p), err) }
     if err := oprot.WriteFieldEnd(); err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld end error 3:schemaName: ", p), err) }
+      return thrift.PrependError(fmt.Sprintf("%T write field end error 3:schemaName: ", p), err) }
   }
   return err
 }
 
 func (p *TGetFunctionsReq) writeField4(oprot thrift.TProtocol) (err error) {
   if err := oprot.WriteFieldBegin("functionName", thrift.STRING, 4); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld begin error 4:functionName: ", p), err) }
+    return thrift.PrependError(fmt.Sprintf("%T write field begin error 4:functionName: ", p), err) }
   if err := oprot.WriteString(string(p.FunctionName)); err != nil {
-  return thrift.PrependError(fmt.Sprintf("%T.functionName (4) ***REMOVED***eld write error: ", p), err) }
+  return thrift.PrependError(fmt.Sprintf("%T.functionName (4) field write error: ", p), err) }
   if err := oprot.WriteFieldEnd(); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld end error 4:functionName: ", p), err) }
+    return thrift.PrependError(fmt.Sprintf("%T write field end error 4:functionName: ", p), err) }
   return err
 }
 
@@ -10666,35 +10666,35 @@ func (p *TGetFunctionsResp) Read(iprot thrift.TProtocol) error {
   var issetStatus bool = false;
 
   for {
-    _, ***REMOVED***eldTypeId, ***REMOVED***eldId, err := iprot.ReadFieldBegin()
+    _, fieldTypeId, fieldId, err := iprot.ReadFieldBegin()
     if err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T ***REMOVED***eld %d read error: ", p, ***REMOVED***eldId), err)
+      return thrift.PrependError(fmt.Sprintf("%T field %d read error: ", p, fieldId), err)
     }
-    if ***REMOVED***eldTypeId == thrift.STOP { break; }
-    switch ***REMOVED***eldId {
+    if fieldTypeId == thrift.STOP { break; }
+    switch fieldId {
     case 1:
-      if ***REMOVED***eldTypeId == thrift.STRUCT {
+      if fieldTypeId == thrift.STRUCT {
         if err := p.ReadField1(iprot); err != nil {
           return err
         }
-      } ***REMOVED*** {
-        if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      } else {
+        if err := iprot.Skip(fieldTypeId); err != nil {
           return err
         }
       }
       issetStatus = true
     case 2:
-      if ***REMOVED***eldTypeId == thrift.STRUCT {
+      if fieldTypeId == thrift.STRUCT {
         if err := p.ReadField2(iprot); err != nil {
           return err
         }
-      } ***REMOVED*** {
-        if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      } else {
+        if err := iprot.Skip(fieldTypeId); err != nil {
           return err
         }
       }
     default:
-      if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      if err := iprot.Skip(fieldTypeId); err != nil {
         return err
       }
     }
@@ -10706,7 +10706,7 @@ func (p *TGetFunctionsResp) Read(iprot thrift.TProtocol) error {
     return thrift.PrependError(fmt.Sprintf("%T read struct end error: ", p), err)
   }
   if !issetStatus{
-    return thrift.NewTProtocolExceptionWithType(thrift.INVALID_DATA, fmt.Errorf("Required ***REMOVED***eld Status is not set"));
+    return thrift.NewTProtocolExceptionWithType(thrift.INVALID_DATA, fmt.Errorf("Required field Status is not set"));
   }
   return nil
 }
@@ -10735,7 +10735,7 @@ func (p *TGetFunctionsResp) Write(oprot thrift.TProtocol) error {
     if err := p.writeField2(oprot); err != nil { return err }
   }
   if err := oprot.WriteFieldStop(); err != nil {
-    return thrift.PrependError("write ***REMOVED***eld stop error: ", err) }
+    return thrift.PrependError("write field stop error: ", err) }
   if err := oprot.WriteStructEnd(); err != nil {
     return thrift.PrependError("write struct stop error: ", err) }
   return nil
@@ -10743,24 +10743,24 @@ func (p *TGetFunctionsResp) Write(oprot thrift.TProtocol) error {
 
 func (p *TGetFunctionsResp) writeField1(oprot thrift.TProtocol) (err error) {
   if err := oprot.WriteFieldBegin("status", thrift.STRUCT, 1); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld begin error 1:status: ", p), err) }
+    return thrift.PrependError(fmt.Sprintf("%T write field begin error 1:status: ", p), err) }
   if err := p.Status.Write(oprot); err != nil {
     return thrift.PrependError(fmt.Sprintf("%T error writing struct: ", p.Status), err)
   }
   if err := oprot.WriteFieldEnd(); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld end error 1:status: ", p), err) }
+    return thrift.PrependError(fmt.Sprintf("%T write field end error 1:status: ", p), err) }
   return err
 }
 
 func (p *TGetFunctionsResp) writeField2(oprot thrift.TProtocol) (err error) {
   if p.IsSetOperationHandle() {
     if err := oprot.WriteFieldBegin("operationHandle", thrift.STRUCT, 2); err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld begin error 2:operationHandle: ", p), err) }
+      return thrift.PrependError(fmt.Sprintf("%T write field begin error 2:operationHandle: ", p), err) }
     if err := p.OperationHandle.Write(oprot); err != nil {
       return thrift.PrependError(fmt.Sprintf("%T error writing struct: ", p.OperationHandle), err)
     }
     if err := oprot.WriteFieldEnd(); err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld end error 2:operationHandle: ", p), err) }
+      return thrift.PrependError(fmt.Sprintf("%T write field end error 2:operationHandle: ", p), err) }
   }
   return err
 }
@@ -10779,9 +10779,9 @@ func (p *TGetFunctionsResp) String() string {
 //  - TableName
 type TGetPrimaryKeysReq struct {
   SessionHandle *TSessionHandle `thrift:"sessionHandle,1,required" db:"sessionHandle" json:"sessionHandle"`
-  CatalogName *TIdenti***REMOVED***er `thrift:"catalogName,2" db:"catalogName" json:"catalogName,omitempty"`
-  SchemaName *TIdenti***REMOVED***er `thrift:"schemaName,3" db:"schemaName" json:"schemaName,omitempty"`
-  TableName *TIdenti***REMOVED***er `thrift:"tableName,4" db:"tableName" json:"tableName,omitempty"`
+  CatalogName *TIdentifier `thrift:"catalogName,2" db:"catalogName" json:"catalogName,omitempty"`
+  SchemaName *TIdentifier `thrift:"schemaName,3" db:"schemaName" json:"schemaName,omitempty"`
+  TableName *TIdentifier `thrift:"tableName,4" db:"tableName" json:"tableName,omitempty"`
 }
 
 func NewTGetPrimaryKeysReq() *TGetPrimaryKeysReq {
@@ -10795,22 +10795,22 @@ func (p *TGetPrimaryKeysReq) GetSessionHandle() *TSessionHandle {
   }
 return p.SessionHandle
 }
-var TGetPrimaryKeysReq_CatalogName_DEFAULT TIdenti***REMOVED***er
-func (p *TGetPrimaryKeysReq) GetCatalogName() TIdenti***REMOVED***er {
+var TGetPrimaryKeysReq_CatalogName_DEFAULT TIdentifier
+func (p *TGetPrimaryKeysReq) GetCatalogName() TIdentifier {
   if !p.IsSetCatalogName() {
     return TGetPrimaryKeysReq_CatalogName_DEFAULT
   }
 return *p.CatalogName
 }
-var TGetPrimaryKeysReq_SchemaName_DEFAULT TIdenti***REMOVED***er
-func (p *TGetPrimaryKeysReq) GetSchemaName() TIdenti***REMOVED***er {
+var TGetPrimaryKeysReq_SchemaName_DEFAULT TIdentifier
+func (p *TGetPrimaryKeysReq) GetSchemaName() TIdentifier {
   if !p.IsSetSchemaName() {
     return TGetPrimaryKeysReq_SchemaName_DEFAULT
   }
 return *p.SchemaName
 }
-var TGetPrimaryKeysReq_TableName_DEFAULT TIdenti***REMOVED***er
-func (p *TGetPrimaryKeysReq) GetTableName() TIdenti***REMOVED***er {
+var TGetPrimaryKeysReq_TableName_DEFAULT TIdentifier
+func (p *TGetPrimaryKeysReq) GetTableName() TIdentifier {
   if !p.IsSetTableName() {
     return TGetPrimaryKeysReq_TableName_DEFAULT
   }
@@ -10840,55 +10840,55 @@ func (p *TGetPrimaryKeysReq) Read(iprot thrift.TProtocol) error {
   var issetSessionHandle bool = false;
 
   for {
-    _, ***REMOVED***eldTypeId, ***REMOVED***eldId, err := iprot.ReadFieldBegin()
+    _, fieldTypeId, fieldId, err := iprot.ReadFieldBegin()
     if err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T ***REMOVED***eld %d read error: ", p, ***REMOVED***eldId), err)
+      return thrift.PrependError(fmt.Sprintf("%T field %d read error: ", p, fieldId), err)
     }
-    if ***REMOVED***eldTypeId == thrift.STOP { break; }
-    switch ***REMOVED***eldId {
+    if fieldTypeId == thrift.STOP { break; }
+    switch fieldId {
     case 1:
-      if ***REMOVED***eldTypeId == thrift.STRUCT {
+      if fieldTypeId == thrift.STRUCT {
         if err := p.ReadField1(iprot); err != nil {
           return err
         }
-      } ***REMOVED*** {
-        if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      } else {
+        if err := iprot.Skip(fieldTypeId); err != nil {
           return err
         }
       }
       issetSessionHandle = true
     case 2:
-      if ***REMOVED***eldTypeId == thrift.STRING {
+      if fieldTypeId == thrift.STRING {
         if err := p.ReadField2(iprot); err != nil {
           return err
         }
-      } ***REMOVED*** {
-        if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      } else {
+        if err := iprot.Skip(fieldTypeId); err != nil {
           return err
         }
       }
     case 3:
-      if ***REMOVED***eldTypeId == thrift.STRING {
+      if fieldTypeId == thrift.STRING {
         if err := p.ReadField3(iprot); err != nil {
           return err
         }
-      } ***REMOVED*** {
-        if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      } else {
+        if err := iprot.Skip(fieldTypeId); err != nil {
           return err
         }
       }
     case 4:
-      if ***REMOVED***eldTypeId == thrift.STRING {
+      if fieldTypeId == thrift.STRING {
         if err := p.ReadField4(iprot); err != nil {
           return err
         }
-      } ***REMOVED*** {
-        if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      } else {
+        if err := iprot.Skip(fieldTypeId); err != nil {
           return err
         }
       }
     default:
-      if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      if err := iprot.Skip(fieldTypeId); err != nil {
         return err
       }
     }
@@ -10900,7 +10900,7 @@ func (p *TGetPrimaryKeysReq) Read(iprot thrift.TProtocol) error {
     return thrift.PrependError(fmt.Sprintf("%T read struct end error: ", p), err)
   }
   if !issetSessionHandle{
-    return thrift.NewTProtocolExceptionWithType(thrift.INVALID_DATA, fmt.Errorf("Required ***REMOVED***eld SessionHandle is not set"));
+    return thrift.NewTProtocolExceptionWithType(thrift.INVALID_DATA, fmt.Errorf("Required field SessionHandle is not set"));
   }
   return nil
 }
@@ -10915,9 +10915,9 @@ func (p *TGetPrimaryKeysReq)  ReadField1(iprot thrift.TProtocol) error {
 
 func (p *TGetPrimaryKeysReq)  ReadField2(iprot thrift.TProtocol) error {
   if v, err := iprot.ReadString(); err != nil {
-  return thrift.PrependError("error reading ***REMOVED***eld 2: ", err)
-} ***REMOVED*** {
-  temp := TIdenti***REMOVED***er(v)
+  return thrift.PrependError("error reading field 2: ", err)
+} else {
+  temp := TIdentifier(v)
   p.CatalogName = &temp
 }
   return nil
@@ -10925,9 +10925,9 @@ func (p *TGetPrimaryKeysReq)  ReadField2(iprot thrift.TProtocol) error {
 
 func (p *TGetPrimaryKeysReq)  ReadField3(iprot thrift.TProtocol) error {
   if v, err := iprot.ReadString(); err != nil {
-  return thrift.PrependError("error reading ***REMOVED***eld 3: ", err)
-} ***REMOVED*** {
-  temp := TIdenti***REMOVED***er(v)
+  return thrift.PrependError("error reading field 3: ", err)
+} else {
+  temp := TIdentifier(v)
   p.SchemaName = &temp
 }
   return nil
@@ -10935,9 +10935,9 @@ func (p *TGetPrimaryKeysReq)  ReadField3(iprot thrift.TProtocol) error {
 
 func (p *TGetPrimaryKeysReq)  ReadField4(iprot thrift.TProtocol) error {
   if v, err := iprot.ReadString(); err != nil {
-  return thrift.PrependError("error reading ***REMOVED***eld 4: ", err)
-} ***REMOVED*** {
-  temp := TIdenti***REMOVED***er(v)
+  return thrift.PrependError("error reading field 4: ", err)
+} else {
+  temp := TIdentifier(v)
   p.TableName = &temp
 }
   return nil
@@ -10953,7 +10953,7 @@ func (p *TGetPrimaryKeysReq) Write(oprot thrift.TProtocol) error {
     if err := p.writeField4(oprot); err != nil { return err }
   }
   if err := oprot.WriteFieldStop(); err != nil {
-    return thrift.PrependError("write ***REMOVED***eld stop error: ", err) }
+    return thrift.PrependError("write field stop error: ", err) }
   if err := oprot.WriteStructEnd(); err != nil {
     return thrift.PrependError("write struct stop error: ", err) }
   return nil
@@ -10961,23 +10961,23 @@ func (p *TGetPrimaryKeysReq) Write(oprot thrift.TProtocol) error {
 
 func (p *TGetPrimaryKeysReq) writeField1(oprot thrift.TProtocol) (err error) {
   if err := oprot.WriteFieldBegin("sessionHandle", thrift.STRUCT, 1); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld begin error 1:sessionHandle: ", p), err) }
+    return thrift.PrependError(fmt.Sprintf("%T write field begin error 1:sessionHandle: ", p), err) }
   if err := p.SessionHandle.Write(oprot); err != nil {
     return thrift.PrependError(fmt.Sprintf("%T error writing struct: ", p.SessionHandle), err)
   }
   if err := oprot.WriteFieldEnd(); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld end error 1:sessionHandle: ", p), err) }
+    return thrift.PrependError(fmt.Sprintf("%T write field end error 1:sessionHandle: ", p), err) }
   return err
 }
 
 func (p *TGetPrimaryKeysReq) writeField2(oprot thrift.TProtocol) (err error) {
   if p.IsSetCatalogName() {
     if err := oprot.WriteFieldBegin("catalogName", thrift.STRING, 2); err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld begin error 2:catalogName: ", p), err) }
+      return thrift.PrependError(fmt.Sprintf("%T write field begin error 2:catalogName: ", p), err) }
     if err := oprot.WriteString(string(*p.CatalogName)); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T.catalogName (2) ***REMOVED***eld write error: ", p), err) }
+    return thrift.PrependError(fmt.Sprintf("%T.catalogName (2) field write error: ", p), err) }
     if err := oprot.WriteFieldEnd(); err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld end error 2:catalogName: ", p), err) }
+      return thrift.PrependError(fmt.Sprintf("%T write field end error 2:catalogName: ", p), err) }
   }
   return err
 }
@@ -10985,11 +10985,11 @@ func (p *TGetPrimaryKeysReq) writeField2(oprot thrift.TProtocol) (err error) {
 func (p *TGetPrimaryKeysReq) writeField3(oprot thrift.TProtocol) (err error) {
   if p.IsSetSchemaName() {
     if err := oprot.WriteFieldBegin("schemaName", thrift.STRING, 3); err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld begin error 3:schemaName: ", p), err) }
+      return thrift.PrependError(fmt.Sprintf("%T write field begin error 3:schemaName: ", p), err) }
     if err := oprot.WriteString(string(*p.SchemaName)); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T.schemaName (3) ***REMOVED***eld write error: ", p), err) }
+    return thrift.PrependError(fmt.Sprintf("%T.schemaName (3) field write error: ", p), err) }
     if err := oprot.WriteFieldEnd(); err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld end error 3:schemaName: ", p), err) }
+      return thrift.PrependError(fmt.Sprintf("%T write field end error 3:schemaName: ", p), err) }
   }
   return err
 }
@@ -10997,11 +10997,11 @@ func (p *TGetPrimaryKeysReq) writeField3(oprot thrift.TProtocol) (err error) {
 func (p *TGetPrimaryKeysReq) writeField4(oprot thrift.TProtocol) (err error) {
   if p.IsSetTableName() {
     if err := oprot.WriteFieldBegin("tableName", thrift.STRING, 4); err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld begin error 4:tableName: ", p), err) }
+      return thrift.PrependError(fmt.Sprintf("%T write field begin error 4:tableName: ", p), err) }
     if err := oprot.WriteString(string(*p.TableName)); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T.tableName (4) ***REMOVED***eld write error: ", p), err) }
+    return thrift.PrependError(fmt.Sprintf("%T.tableName (4) field write error: ", p), err) }
     if err := oprot.WriteFieldEnd(); err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld end error 4:tableName: ", p), err) }
+      return thrift.PrependError(fmt.Sprintf("%T write field end error 4:tableName: ", p), err) }
   }
   return err
 }
@@ -11055,35 +11055,35 @@ func (p *TGetPrimaryKeysResp) Read(iprot thrift.TProtocol) error {
   var issetStatus bool = false;
 
   for {
-    _, ***REMOVED***eldTypeId, ***REMOVED***eldId, err := iprot.ReadFieldBegin()
+    _, fieldTypeId, fieldId, err := iprot.ReadFieldBegin()
     if err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T ***REMOVED***eld %d read error: ", p, ***REMOVED***eldId), err)
+      return thrift.PrependError(fmt.Sprintf("%T field %d read error: ", p, fieldId), err)
     }
-    if ***REMOVED***eldTypeId == thrift.STOP { break; }
-    switch ***REMOVED***eldId {
+    if fieldTypeId == thrift.STOP { break; }
+    switch fieldId {
     case 1:
-      if ***REMOVED***eldTypeId == thrift.STRUCT {
+      if fieldTypeId == thrift.STRUCT {
         if err := p.ReadField1(iprot); err != nil {
           return err
         }
-      } ***REMOVED*** {
-        if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      } else {
+        if err := iprot.Skip(fieldTypeId); err != nil {
           return err
         }
       }
       issetStatus = true
     case 2:
-      if ***REMOVED***eldTypeId == thrift.STRUCT {
+      if fieldTypeId == thrift.STRUCT {
         if err := p.ReadField2(iprot); err != nil {
           return err
         }
-      } ***REMOVED*** {
-        if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      } else {
+        if err := iprot.Skip(fieldTypeId); err != nil {
           return err
         }
       }
     default:
-      if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      if err := iprot.Skip(fieldTypeId); err != nil {
         return err
       }
     }
@@ -11095,7 +11095,7 @@ func (p *TGetPrimaryKeysResp) Read(iprot thrift.TProtocol) error {
     return thrift.PrependError(fmt.Sprintf("%T read struct end error: ", p), err)
   }
   if !issetStatus{
-    return thrift.NewTProtocolExceptionWithType(thrift.INVALID_DATA, fmt.Errorf("Required ***REMOVED***eld Status is not set"));
+    return thrift.NewTProtocolExceptionWithType(thrift.INVALID_DATA, fmt.Errorf("Required field Status is not set"));
   }
   return nil
 }
@@ -11124,7 +11124,7 @@ func (p *TGetPrimaryKeysResp) Write(oprot thrift.TProtocol) error {
     if err := p.writeField2(oprot); err != nil { return err }
   }
   if err := oprot.WriteFieldStop(); err != nil {
-    return thrift.PrependError("write ***REMOVED***eld stop error: ", err) }
+    return thrift.PrependError("write field stop error: ", err) }
   if err := oprot.WriteStructEnd(); err != nil {
     return thrift.PrependError("write struct stop error: ", err) }
   return nil
@@ -11132,24 +11132,24 @@ func (p *TGetPrimaryKeysResp) Write(oprot thrift.TProtocol) error {
 
 func (p *TGetPrimaryKeysResp) writeField1(oprot thrift.TProtocol) (err error) {
   if err := oprot.WriteFieldBegin("status", thrift.STRUCT, 1); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld begin error 1:status: ", p), err) }
+    return thrift.PrependError(fmt.Sprintf("%T write field begin error 1:status: ", p), err) }
   if err := p.Status.Write(oprot); err != nil {
     return thrift.PrependError(fmt.Sprintf("%T error writing struct: ", p.Status), err)
   }
   if err := oprot.WriteFieldEnd(); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld end error 1:status: ", p), err) }
+    return thrift.PrependError(fmt.Sprintf("%T write field end error 1:status: ", p), err) }
   return err
 }
 
 func (p *TGetPrimaryKeysResp) writeField2(oprot thrift.TProtocol) (err error) {
   if p.IsSetOperationHandle() {
     if err := oprot.WriteFieldBegin("operationHandle", thrift.STRUCT, 2); err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld begin error 2:operationHandle: ", p), err) }
+      return thrift.PrependError(fmt.Sprintf("%T write field begin error 2:operationHandle: ", p), err) }
     if err := p.OperationHandle.Write(oprot); err != nil {
       return thrift.PrependError(fmt.Sprintf("%T error writing struct: ", p.OperationHandle), err)
     }
     if err := oprot.WriteFieldEnd(); err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld end error 2:operationHandle: ", p), err) }
+      return thrift.PrependError(fmt.Sprintf("%T write field end error 2:operationHandle: ", p), err) }
   }
   return err
 }
@@ -11171,12 +11171,12 @@ func (p *TGetPrimaryKeysResp) String() string {
 //  - ForeignTableName
 type TGetCrossReferenceReq struct {
   SessionHandle *TSessionHandle `thrift:"sessionHandle,1,required" db:"sessionHandle" json:"sessionHandle"`
-  ParentCatalogName *TIdenti***REMOVED***er `thrift:"parentCatalogName,2" db:"parentCatalogName" json:"parentCatalogName,omitempty"`
-  ParentSchemaName *TIdenti***REMOVED***er `thrift:"parentSchemaName,3" db:"parentSchemaName" json:"parentSchemaName,omitempty"`
-  ParentTableName *TIdenti***REMOVED***er `thrift:"parentTableName,4" db:"parentTableName" json:"parentTableName,omitempty"`
-  ForeignCatalogName *TIdenti***REMOVED***er `thrift:"foreignCatalogName,5" db:"foreignCatalogName" json:"foreignCatalogName,omitempty"`
-  ForeignSchemaName *TIdenti***REMOVED***er `thrift:"foreignSchemaName,6" db:"foreignSchemaName" json:"foreignSchemaName,omitempty"`
-  ForeignTableName *TIdenti***REMOVED***er `thrift:"foreignTableName,7" db:"foreignTableName" json:"foreignTableName,omitempty"`
+  ParentCatalogName *TIdentifier `thrift:"parentCatalogName,2" db:"parentCatalogName" json:"parentCatalogName,omitempty"`
+  ParentSchemaName *TIdentifier `thrift:"parentSchemaName,3" db:"parentSchemaName" json:"parentSchemaName,omitempty"`
+  ParentTableName *TIdentifier `thrift:"parentTableName,4" db:"parentTableName" json:"parentTableName,omitempty"`
+  ForeignCatalogName *TIdentifier `thrift:"foreignCatalogName,5" db:"foreignCatalogName" json:"foreignCatalogName,omitempty"`
+  ForeignSchemaName *TIdentifier `thrift:"foreignSchemaName,6" db:"foreignSchemaName" json:"foreignSchemaName,omitempty"`
+  ForeignTableName *TIdentifier `thrift:"foreignTableName,7" db:"foreignTableName" json:"foreignTableName,omitempty"`
 }
 
 func NewTGetCrossReferenceReq() *TGetCrossReferenceReq {
@@ -11190,43 +11190,43 @@ func (p *TGetCrossReferenceReq) GetSessionHandle() *TSessionHandle {
   }
 return p.SessionHandle
 }
-var TGetCrossReferenceReq_ParentCatalogName_DEFAULT TIdenti***REMOVED***er
-func (p *TGetCrossReferenceReq) GetParentCatalogName() TIdenti***REMOVED***er {
+var TGetCrossReferenceReq_ParentCatalogName_DEFAULT TIdentifier
+func (p *TGetCrossReferenceReq) GetParentCatalogName() TIdentifier {
   if !p.IsSetParentCatalogName() {
     return TGetCrossReferenceReq_ParentCatalogName_DEFAULT
   }
 return *p.ParentCatalogName
 }
-var TGetCrossReferenceReq_ParentSchemaName_DEFAULT TIdenti***REMOVED***er
-func (p *TGetCrossReferenceReq) GetParentSchemaName() TIdenti***REMOVED***er {
+var TGetCrossReferenceReq_ParentSchemaName_DEFAULT TIdentifier
+func (p *TGetCrossReferenceReq) GetParentSchemaName() TIdentifier {
   if !p.IsSetParentSchemaName() {
     return TGetCrossReferenceReq_ParentSchemaName_DEFAULT
   }
 return *p.ParentSchemaName
 }
-var TGetCrossReferenceReq_ParentTableName_DEFAULT TIdenti***REMOVED***er
-func (p *TGetCrossReferenceReq) GetParentTableName() TIdenti***REMOVED***er {
+var TGetCrossReferenceReq_ParentTableName_DEFAULT TIdentifier
+func (p *TGetCrossReferenceReq) GetParentTableName() TIdentifier {
   if !p.IsSetParentTableName() {
     return TGetCrossReferenceReq_ParentTableName_DEFAULT
   }
 return *p.ParentTableName
 }
-var TGetCrossReferenceReq_ForeignCatalogName_DEFAULT TIdenti***REMOVED***er
-func (p *TGetCrossReferenceReq) GetForeignCatalogName() TIdenti***REMOVED***er {
+var TGetCrossReferenceReq_ForeignCatalogName_DEFAULT TIdentifier
+func (p *TGetCrossReferenceReq) GetForeignCatalogName() TIdentifier {
   if !p.IsSetForeignCatalogName() {
     return TGetCrossReferenceReq_ForeignCatalogName_DEFAULT
   }
 return *p.ForeignCatalogName
 }
-var TGetCrossReferenceReq_ForeignSchemaName_DEFAULT TIdenti***REMOVED***er
-func (p *TGetCrossReferenceReq) GetForeignSchemaName() TIdenti***REMOVED***er {
+var TGetCrossReferenceReq_ForeignSchemaName_DEFAULT TIdentifier
+func (p *TGetCrossReferenceReq) GetForeignSchemaName() TIdentifier {
   if !p.IsSetForeignSchemaName() {
     return TGetCrossReferenceReq_ForeignSchemaName_DEFAULT
   }
 return *p.ForeignSchemaName
 }
-var TGetCrossReferenceReq_ForeignTableName_DEFAULT TIdenti***REMOVED***er
-func (p *TGetCrossReferenceReq) GetForeignTableName() TIdenti***REMOVED***er {
+var TGetCrossReferenceReq_ForeignTableName_DEFAULT TIdentifier
+func (p *TGetCrossReferenceReq) GetForeignTableName() TIdentifier {
   if !p.IsSetForeignTableName() {
     return TGetCrossReferenceReq_ForeignTableName_DEFAULT
   }
@@ -11268,85 +11268,85 @@ func (p *TGetCrossReferenceReq) Read(iprot thrift.TProtocol) error {
   var issetSessionHandle bool = false;
 
   for {
-    _, ***REMOVED***eldTypeId, ***REMOVED***eldId, err := iprot.ReadFieldBegin()
+    _, fieldTypeId, fieldId, err := iprot.ReadFieldBegin()
     if err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T ***REMOVED***eld %d read error: ", p, ***REMOVED***eldId), err)
+      return thrift.PrependError(fmt.Sprintf("%T field %d read error: ", p, fieldId), err)
     }
-    if ***REMOVED***eldTypeId == thrift.STOP { break; }
-    switch ***REMOVED***eldId {
+    if fieldTypeId == thrift.STOP { break; }
+    switch fieldId {
     case 1:
-      if ***REMOVED***eldTypeId == thrift.STRUCT {
+      if fieldTypeId == thrift.STRUCT {
         if err := p.ReadField1(iprot); err != nil {
           return err
         }
-      } ***REMOVED*** {
-        if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      } else {
+        if err := iprot.Skip(fieldTypeId); err != nil {
           return err
         }
       }
       issetSessionHandle = true
     case 2:
-      if ***REMOVED***eldTypeId == thrift.STRING {
+      if fieldTypeId == thrift.STRING {
         if err := p.ReadField2(iprot); err != nil {
           return err
         }
-      } ***REMOVED*** {
-        if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      } else {
+        if err := iprot.Skip(fieldTypeId); err != nil {
           return err
         }
       }
     case 3:
-      if ***REMOVED***eldTypeId == thrift.STRING {
+      if fieldTypeId == thrift.STRING {
         if err := p.ReadField3(iprot); err != nil {
           return err
         }
-      } ***REMOVED*** {
-        if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      } else {
+        if err := iprot.Skip(fieldTypeId); err != nil {
           return err
         }
       }
     case 4:
-      if ***REMOVED***eldTypeId == thrift.STRING {
+      if fieldTypeId == thrift.STRING {
         if err := p.ReadField4(iprot); err != nil {
           return err
         }
-      } ***REMOVED*** {
-        if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      } else {
+        if err := iprot.Skip(fieldTypeId); err != nil {
           return err
         }
       }
     case 5:
-      if ***REMOVED***eldTypeId == thrift.STRING {
+      if fieldTypeId == thrift.STRING {
         if err := p.ReadField5(iprot); err != nil {
           return err
         }
-      } ***REMOVED*** {
-        if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      } else {
+        if err := iprot.Skip(fieldTypeId); err != nil {
           return err
         }
       }
     case 6:
-      if ***REMOVED***eldTypeId == thrift.STRING {
+      if fieldTypeId == thrift.STRING {
         if err := p.ReadField6(iprot); err != nil {
           return err
         }
-      } ***REMOVED*** {
-        if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      } else {
+        if err := iprot.Skip(fieldTypeId); err != nil {
           return err
         }
       }
     case 7:
-      if ***REMOVED***eldTypeId == thrift.STRING {
+      if fieldTypeId == thrift.STRING {
         if err := p.ReadField7(iprot); err != nil {
           return err
         }
-      } ***REMOVED*** {
-        if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      } else {
+        if err := iprot.Skip(fieldTypeId); err != nil {
           return err
         }
       }
     default:
-      if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      if err := iprot.Skip(fieldTypeId); err != nil {
         return err
       }
     }
@@ -11358,7 +11358,7 @@ func (p *TGetCrossReferenceReq) Read(iprot thrift.TProtocol) error {
     return thrift.PrependError(fmt.Sprintf("%T read struct end error: ", p), err)
   }
   if !issetSessionHandle{
-    return thrift.NewTProtocolExceptionWithType(thrift.INVALID_DATA, fmt.Errorf("Required ***REMOVED***eld SessionHandle is not set"));
+    return thrift.NewTProtocolExceptionWithType(thrift.INVALID_DATA, fmt.Errorf("Required field SessionHandle is not set"));
   }
   return nil
 }
@@ -11373,9 +11373,9 @@ func (p *TGetCrossReferenceReq)  ReadField1(iprot thrift.TProtocol) error {
 
 func (p *TGetCrossReferenceReq)  ReadField2(iprot thrift.TProtocol) error {
   if v, err := iprot.ReadString(); err != nil {
-  return thrift.PrependError("error reading ***REMOVED***eld 2: ", err)
-} ***REMOVED*** {
-  temp := TIdenti***REMOVED***er(v)
+  return thrift.PrependError("error reading field 2: ", err)
+} else {
+  temp := TIdentifier(v)
   p.ParentCatalogName = &temp
 }
   return nil
@@ -11383,9 +11383,9 @@ func (p *TGetCrossReferenceReq)  ReadField2(iprot thrift.TProtocol) error {
 
 func (p *TGetCrossReferenceReq)  ReadField3(iprot thrift.TProtocol) error {
   if v, err := iprot.ReadString(); err != nil {
-  return thrift.PrependError("error reading ***REMOVED***eld 3: ", err)
-} ***REMOVED*** {
-  temp := TIdenti***REMOVED***er(v)
+  return thrift.PrependError("error reading field 3: ", err)
+} else {
+  temp := TIdentifier(v)
   p.ParentSchemaName = &temp
 }
   return nil
@@ -11393,9 +11393,9 @@ func (p *TGetCrossReferenceReq)  ReadField3(iprot thrift.TProtocol) error {
 
 func (p *TGetCrossReferenceReq)  ReadField4(iprot thrift.TProtocol) error {
   if v, err := iprot.ReadString(); err != nil {
-  return thrift.PrependError("error reading ***REMOVED***eld 4: ", err)
-} ***REMOVED*** {
-  temp := TIdenti***REMOVED***er(v)
+  return thrift.PrependError("error reading field 4: ", err)
+} else {
+  temp := TIdentifier(v)
   p.ParentTableName = &temp
 }
   return nil
@@ -11403,9 +11403,9 @@ func (p *TGetCrossReferenceReq)  ReadField4(iprot thrift.TProtocol) error {
 
 func (p *TGetCrossReferenceReq)  ReadField5(iprot thrift.TProtocol) error {
   if v, err := iprot.ReadString(); err != nil {
-  return thrift.PrependError("error reading ***REMOVED***eld 5: ", err)
-} ***REMOVED*** {
-  temp := TIdenti***REMOVED***er(v)
+  return thrift.PrependError("error reading field 5: ", err)
+} else {
+  temp := TIdentifier(v)
   p.ForeignCatalogName = &temp
 }
   return nil
@@ -11413,9 +11413,9 @@ func (p *TGetCrossReferenceReq)  ReadField5(iprot thrift.TProtocol) error {
 
 func (p *TGetCrossReferenceReq)  ReadField6(iprot thrift.TProtocol) error {
   if v, err := iprot.ReadString(); err != nil {
-  return thrift.PrependError("error reading ***REMOVED***eld 6: ", err)
-} ***REMOVED*** {
-  temp := TIdenti***REMOVED***er(v)
+  return thrift.PrependError("error reading field 6: ", err)
+} else {
+  temp := TIdentifier(v)
   p.ForeignSchemaName = &temp
 }
   return nil
@@ -11423,9 +11423,9 @@ func (p *TGetCrossReferenceReq)  ReadField6(iprot thrift.TProtocol) error {
 
 func (p *TGetCrossReferenceReq)  ReadField7(iprot thrift.TProtocol) error {
   if v, err := iprot.ReadString(); err != nil {
-  return thrift.PrependError("error reading ***REMOVED***eld 7: ", err)
-} ***REMOVED*** {
-  temp := TIdenti***REMOVED***er(v)
+  return thrift.PrependError("error reading field 7: ", err)
+} else {
+  temp := TIdentifier(v)
   p.ForeignTableName = &temp
 }
   return nil
@@ -11444,7 +11444,7 @@ func (p *TGetCrossReferenceReq) Write(oprot thrift.TProtocol) error {
     if err := p.writeField7(oprot); err != nil { return err }
   }
   if err := oprot.WriteFieldStop(); err != nil {
-    return thrift.PrependError("write ***REMOVED***eld stop error: ", err) }
+    return thrift.PrependError("write field stop error: ", err) }
   if err := oprot.WriteStructEnd(); err != nil {
     return thrift.PrependError("write struct stop error: ", err) }
   return nil
@@ -11452,23 +11452,23 @@ func (p *TGetCrossReferenceReq) Write(oprot thrift.TProtocol) error {
 
 func (p *TGetCrossReferenceReq) writeField1(oprot thrift.TProtocol) (err error) {
   if err := oprot.WriteFieldBegin("sessionHandle", thrift.STRUCT, 1); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld begin error 1:sessionHandle: ", p), err) }
+    return thrift.PrependError(fmt.Sprintf("%T write field begin error 1:sessionHandle: ", p), err) }
   if err := p.SessionHandle.Write(oprot); err != nil {
     return thrift.PrependError(fmt.Sprintf("%T error writing struct: ", p.SessionHandle), err)
   }
   if err := oprot.WriteFieldEnd(); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld end error 1:sessionHandle: ", p), err) }
+    return thrift.PrependError(fmt.Sprintf("%T write field end error 1:sessionHandle: ", p), err) }
   return err
 }
 
 func (p *TGetCrossReferenceReq) writeField2(oprot thrift.TProtocol) (err error) {
   if p.IsSetParentCatalogName() {
     if err := oprot.WriteFieldBegin("parentCatalogName", thrift.STRING, 2); err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld begin error 2:parentCatalogName: ", p), err) }
+      return thrift.PrependError(fmt.Sprintf("%T write field begin error 2:parentCatalogName: ", p), err) }
     if err := oprot.WriteString(string(*p.ParentCatalogName)); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T.parentCatalogName (2) ***REMOVED***eld write error: ", p), err) }
+    return thrift.PrependError(fmt.Sprintf("%T.parentCatalogName (2) field write error: ", p), err) }
     if err := oprot.WriteFieldEnd(); err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld end error 2:parentCatalogName: ", p), err) }
+      return thrift.PrependError(fmt.Sprintf("%T write field end error 2:parentCatalogName: ", p), err) }
   }
   return err
 }
@@ -11476,11 +11476,11 @@ func (p *TGetCrossReferenceReq) writeField2(oprot thrift.TProtocol) (err error) 
 func (p *TGetCrossReferenceReq) writeField3(oprot thrift.TProtocol) (err error) {
   if p.IsSetParentSchemaName() {
     if err := oprot.WriteFieldBegin("parentSchemaName", thrift.STRING, 3); err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld begin error 3:parentSchemaName: ", p), err) }
+      return thrift.PrependError(fmt.Sprintf("%T write field begin error 3:parentSchemaName: ", p), err) }
     if err := oprot.WriteString(string(*p.ParentSchemaName)); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T.parentSchemaName (3) ***REMOVED***eld write error: ", p), err) }
+    return thrift.PrependError(fmt.Sprintf("%T.parentSchemaName (3) field write error: ", p), err) }
     if err := oprot.WriteFieldEnd(); err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld end error 3:parentSchemaName: ", p), err) }
+      return thrift.PrependError(fmt.Sprintf("%T write field end error 3:parentSchemaName: ", p), err) }
   }
   return err
 }
@@ -11488,11 +11488,11 @@ func (p *TGetCrossReferenceReq) writeField3(oprot thrift.TProtocol) (err error) 
 func (p *TGetCrossReferenceReq) writeField4(oprot thrift.TProtocol) (err error) {
   if p.IsSetParentTableName() {
     if err := oprot.WriteFieldBegin("parentTableName", thrift.STRING, 4); err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld begin error 4:parentTableName: ", p), err) }
+      return thrift.PrependError(fmt.Sprintf("%T write field begin error 4:parentTableName: ", p), err) }
     if err := oprot.WriteString(string(*p.ParentTableName)); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T.parentTableName (4) ***REMOVED***eld write error: ", p), err) }
+    return thrift.PrependError(fmt.Sprintf("%T.parentTableName (4) field write error: ", p), err) }
     if err := oprot.WriteFieldEnd(); err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld end error 4:parentTableName: ", p), err) }
+      return thrift.PrependError(fmt.Sprintf("%T write field end error 4:parentTableName: ", p), err) }
   }
   return err
 }
@@ -11500,11 +11500,11 @@ func (p *TGetCrossReferenceReq) writeField4(oprot thrift.TProtocol) (err error) 
 func (p *TGetCrossReferenceReq) writeField5(oprot thrift.TProtocol) (err error) {
   if p.IsSetForeignCatalogName() {
     if err := oprot.WriteFieldBegin("foreignCatalogName", thrift.STRING, 5); err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld begin error 5:foreignCatalogName: ", p), err) }
+      return thrift.PrependError(fmt.Sprintf("%T write field begin error 5:foreignCatalogName: ", p), err) }
     if err := oprot.WriteString(string(*p.ForeignCatalogName)); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T.foreignCatalogName (5) ***REMOVED***eld write error: ", p), err) }
+    return thrift.PrependError(fmt.Sprintf("%T.foreignCatalogName (5) field write error: ", p), err) }
     if err := oprot.WriteFieldEnd(); err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld end error 5:foreignCatalogName: ", p), err) }
+      return thrift.PrependError(fmt.Sprintf("%T write field end error 5:foreignCatalogName: ", p), err) }
   }
   return err
 }
@@ -11512,11 +11512,11 @@ func (p *TGetCrossReferenceReq) writeField5(oprot thrift.TProtocol) (err error) 
 func (p *TGetCrossReferenceReq) writeField6(oprot thrift.TProtocol) (err error) {
   if p.IsSetForeignSchemaName() {
     if err := oprot.WriteFieldBegin("foreignSchemaName", thrift.STRING, 6); err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld begin error 6:foreignSchemaName: ", p), err) }
+      return thrift.PrependError(fmt.Sprintf("%T write field begin error 6:foreignSchemaName: ", p), err) }
     if err := oprot.WriteString(string(*p.ForeignSchemaName)); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T.foreignSchemaName (6) ***REMOVED***eld write error: ", p), err) }
+    return thrift.PrependError(fmt.Sprintf("%T.foreignSchemaName (6) field write error: ", p), err) }
     if err := oprot.WriteFieldEnd(); err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld end error 6:foreignSchemaName: ", p), err) }
+      return thrift.PrependError(fmt.Sprintf("%T write field end error 6:foreignSchemaName: ", p), err) }
   }
   return err
 }
@@ -11524,11 +11524,11 @@ func (p *TGetCrossReferenceReq) writeField6(oprot thrift.TProtocol) (err error) 
 func (p *TGetCrossReferenceReq) writeField7(oprot thrift.TProtocol) (err error) {
   if p.IsSetForeignTableName() {
     if err := oprot.WriteFieldBegin("foreignTableName", thrift.STRING, 7); err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld begin error 7:foreignTableName: ", p), err) }
+      return thrift.PrependError(fmt.Sprintf("%T write field begin error 7:foreignTableName: ", p), err) }
     if err := oprot.WriteString(string(*p.ForeignTableName)); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T.foreignTableName (7) ***REMOVED***eld write error: ", p), err) }
+    return thrift.PrependError(fmt.Sprintf("%T.foreignTableName (7) field write error: ", p), err) }
     if err := oprot.WriteFieldEnd(); err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld end error 7:foreignTableName: ", p), err) }
+      return thrift.PrependError(fmt.Sprintf("%T write field end error 7:foreignTableName: ", p), err) }
   }
   return err
 }
@@ -11582,35 +11582,35 @@ func (p *TGetCrossReferenceResp) Read(iprot thrift.TProtocol) error {
   var issetStatus bool = false;
 
   for {
-    _, ***REMOVED***eldTypeId, ***REMOVED***eldId, err := iprot.ReadFieldBegin()
+    _, fieldTypeId, fieldId, err := iprot.ReadFieldBegin()
     if err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T ***REMOVED***eld %d read error: ", p, ***REMOVED***eldId), err)
+      return thrift.PrependError(fmt.Sprintf("%T field %d read error: ", p, fieldId), err)
     }
-    if ***REMOVED***eldTypeId == thrift.STOP { break; }
-    switch ***REMOVED***eldId {
+    if fieldTypeId == thrift.STOP { break; }
+    switch fieldId {
     case 1:
-      if ***REMOVED***eldTypeId == thrift.STRUCT {
+      if fieldTypeId == thrift.STRUCT {
         if err := p.ReadField1(iprot); err != nil {
           return err
         }
-      } ***REMOVED*** {
-        if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      } else {
+        if err := iprot.Skip(fieldTypeId); err != nil {
           return err
         }
       }
       issetStatus = true
     case 2:
-      if ***REMOVED***eldTypeId == thrift.STRUCT {
+      if fieldTypeId == thrift.STRUCT {
         if err := p.ReadField2(iprot); err != nil {
           return err
         }
-      } ***REMOVED*** {
-        if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      } else {
+        if err := iprot.Skip(fieldTypeId); err != nil {
           return err
         }
       }
     default:
-      if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      if err := iprot.Skip(fieldTypeId); err != nil {
         return err
       }
     }
@@ -11622,7 +11622,7 @@ func (p *TGetCrossReferenceResp) Read(iprot thrift.TProtocol) error {
     return thrift.PrependError(fmt.Sprintf("%T read struct end error: ", p), err)
   }
   if !issetStatus{
-    return thrift.NewTProtocolExceptionWithType(thrift.INVALID_DATA, fmt.Errorf("Required ***REMOVED***eld Status is not set"));
+    return thrift.NewTProtocolExceptionWithType(thrift.INVALID_DATA, fmt.Errorf("Required field Status is not set"));
   }
   return nil
 }
@@ -11651,7 +11651,7 @@ func (p *TGetCrossReferenceResp) Write(oprot thrift.TProtocol) error {
     if err := p.writeField2(oprot); err != nil { return err }
   }
   if err := oprot.WriteFieldStop(); err != nil {
-    return thrift.PrependError("write ***REMOVED***eld stop error: ", err) }
+    return thrift.PrependError("write field stop error: ", err) }
   if err := oprot.WriteStructEnd(); err != nil {
     return thrift.PrependError("write struct stop error: ", err) }
   return nil
@@ -11659,24 +11659,24 @@ func (p *TGetCrossReferenceResp) Write(oprot thrift.TProtocol) error {
 
 func (p *TGetCrossReferenceResp) writeField1(oprot thrift.TProtocol) (err error) {
   if err := oprot.WriteFieldBegin("status", thrift.STRUCT, 1); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld begin error 1:status: ", p), err) }
+    return thrift.PrependError(fmt.Sprintf("%T write field begin error 1:status: ", p), err) }
   if err := p.Status.Write(oprot); err != nil {
     return thrift.PrependError(fmt.Sprintf("%T error writing struct: ", p.Status), err)
   }
   if err := oprot.WriteFieldEnd(); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld end error 1:status: ", p), err) }
+    return thrift.PrependError(fmt.Sprintf("%T write field end error 1:status: ", p), err) }
   return err
 }
 
 func (p *TGetCrossReferenceResp) writeField2(oprot thrift.TProtocol) (err error) {
   if p.IsSetOperationHandle() {
     if err := oprot.WriteFieldBegin("operationHandle", thrift.STRUCT, 2); err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld begin error 2:operationHandle: ", p), err) }
+      return thrift.PrependError(fmt.Sprintf("%T write field begin error 2:operationHandle: ", p), err) }
     if err := p.OperationHandle.Write(oprot); err != nil {
       return thrift.PrependError(fmt.Sprintf("%T error writing struct: ", p.OperationHandle), err)
     }
     if err := oprot.WriteFieldEnd(); err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld end error 2:operationHandle: ", p), err) }
+      return thrift.PrependError(fmt.Sprintf("%T write field end error 2:operationHandle: ", p), err) }
   }
   return err
 }
@@ -11730,35 +11730,35 @@ func (p *TGetOperationStatusReq) Read(iprot thrift.TProtocol) error {
   var issetOperationHandle bool = false;
 
   for {
-    _, ***REMOVED***eldTypeId, ***REMOVED***eldId, err := iprot.ReadFieldBegin()
+    _, fieldTypeId, fieldId, err := iprot.ReadFieldBegin()
     if err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T ***REMOVED***eld %d read error: ", p, ***REMOVED***eldId), err)
+      return thrift.PrependError(fmt.Sprintf("%T field %d read error: ", p, fieldId), err)
     }
-    if ***REMOVED***eldTypeId == thrift.STOP { break; }
-    switch ***REMOVED***eldId {
+    if fieldTypeId == thrift.STOP { break; }
+    switch fieldId {
     case 1:
-      if ***REMOVED***eldTypeId == thrift.STRUCT {
+      if fieldTypeId == thrift.STRUCT {
         if err := p.ReadField1(iprot); err != nil {
           return err
         }
-      } ***REMOVED*** {
-        if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      } else {
+        if err := iprot.Skip(fieldTypeId); err != nil {
           return err
         }
       }
       issetOperationHandle = true
     case 2:
-      if ***REMOVED***eldTypeId == thrift.BOOL {
+      if fieldTypeId == thrift.BOOL {
         if err := p.ReadField2(iprot); err != nil {
           return err
         }
-      } ***REMOVED*** {
-        if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      } else {
+        if err := iprot.Skip(fieldTypeId); err != nil {
           return err
         }
       }
     default:
-      if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      if err := iprot.Skip(fieldTypeId); err != nil {
         return err
       }
     }
@@ -11770,7 +11770,7 @@ func (p *TGetOperationStatusReq) Read(iprot thrift.TProtocol) error {
     return thrift.PrependError(fmt.Sprintf("%T read struct end error: ", p), err)
   }
   if !issetOperationHandle{
-    return thrift.NewTProtocolExceptionWithType(thrift.INVALID_DATA, fmt.Errorf("Required ***REMOVED***eld OperationHandle is not set"));
+    return thrift.NewTProtocolExceptionWithType(thrift.INVALID_DATA, fmt.Errorf("Required field OperationHandle is not set"));
   }
   return nil
 }
@@ -11785,8 +11785,8 @@ func (p *TGetOperationStatusReq)  ReadField1(iprot thrift.TProtocol) error {
 
 func (p *TGetOperationStatusReq)  ReadField2(iprot thrift.TProtocol) error {
   if v, err := iprot.ReadBool(); err != nil {
-  return thrift.PrependError("error reading ***REMOVED***eld 2: ", err)
-} ***REMOVED*** {
+  return thrift.PrependError("error reading field 2: ", err)
+} else {
   p.GetProgressUpdate = &v
 }
   return nil
@@ -11800,7 +11800,7 @@ func (p *TGetOperationStatusReq) Write(oprot thrift.TProtocol) error {
     if err := p.writeField2(oprot); err != nil { return err }
   }
   if err := oprot.WriteFieldStop(); err != nil {
-    return thrift.PrependError("write ***REMOVED***eld stop error: ", err) }
+    return thrift.PrependError("write field stop error: ", err) }
   if err := oprot.WriteStructEnd(); err != nil {
     return thrift.PrependError("write struct stop error: ", err) }
   return nil
@@ -11808,23 +11808,23 @@ func (p *TGetOperationStatusReq) Write(oprot thrift.TProtocol) error {
 
 func (p *TGetOperationStatusReq) writeField1(oprot thrift.TProtocol) (err error) {
   if err := oprot.WriteFieldBegin("operationHandle", thrift.STRUCT, 1); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld begin error 1:operationHandle: ", p), err) }
+    return thrift.PrependError(fmt.Sprintf("%T write field begin error 1:operationHandle: ", p), err) }
   if err := p.OperationHandle.Write(oprot); err != nil {
     return thrift.PrependError(fmt.Sprintf("%T error writing struct: ", p.OperationHandle), err)
   }
   if err := oprot.WriteFieldEnd(); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld end error 1:operationHandle: ", p), err) }
+    return thrift.PrependError(fmt.Sprintf("%T write field end error 1:operationHandle: ", p), err) }
   return err
 }
 
 func (p *TGetOperationStatusReq) writeField2(oprot thrift.TProtocol) (err error) {
   if p.IsSetGetProgressUpdate() {
     if err := oprot.WriteFieldBegin("getProgressUpdate", thrift.BOOL, 2); err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld begin error 2:getProgressUpdate: ", p), err) }
+      return thrift.PrependError(fmt.Sprintf("%T write field begin error 2:getProgressUpdate: ", p), err) }
     if err := oprot.WriteBool(bool(*p.GetProgressUpdate)); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T.getProgressUpdate (2) ***REMOVED***eld write error: ", p), err) }
+    return thrift.PrependError(fmt.Sprintf("%T.getProgressUpdate (2) field write error: ", p), err) }
     if err := oprot.WriteFieldEnd(); err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld end error 2:getProgressUpdate: ", p), err) }
+      return thrift.PrependError(fmt.Sprintf("%T write field end error 2:getProgressUpdate: ", p), err) }
   }
   return err
 }
@@ -11982,115 +11982,115 @@ func (p *TGetOperationStatusResp) Read(iprot thrift.TProtocol) error {
   var issetStatus bool = false;
 
   for {
-    _, ***REMOVED***eldTypeId, ***REMOVED***eldId, err := iprot.ReadFieldBegin()
+    _, fieldTypeId, fieldId, err := iprot.ReadFieldBegin()
     if err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T ***REMOVED***eld %d read error: ", p, ***REMOVED***eldId), err)
+      return thrift.PrependError(fmt.Sprintf("%T field %d read error: ", p, fieldId), err)
     }
-    if ***REMOVED***eldTypeId == thrift.STOP { break; }
-    switch ***REMOVED***eldId {
+    if fieldTypeId == thrift.STOP { break; }
+    switch fieldId {
     case 1:
-      if ***REMOVED***eldTypeId == thrift.STRUCT {
+      if fieldTypeId == thrift.STRUCT {
         if err := p.ReadField1(iprot); err != nil {
           return err
         }
-      } ***REMOVED*** {
-        if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      } else {
+        if err := iprot.Skip(fieldTypeId); err != nil {
           return err
         }
       }
       issetStatus = true
     case 2:
-      if ***REMOVED***eldTypeId == thrift.I32 {
+      if fieldTypeId == thrift.I32 {
         if err := p.ReadField2(iprot); err != nil {
           return err
         }
-      } ***REMOVED*** {
-        if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      } else {
+        if err := iprot.Skip(fieldTypeId); err != nil {
           return err
         }
       }
     case 3:
-      if ***REMOVED***eldTypeId == thrift.STRING {
+      if fieldTypeId == thrift.STRING {
         if err := p.ReadField3(iprot); err != nil {
           return err
         }
-      } ***REMOVED*** {
-        if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      } else {
+        if err := iprot.Skip(fieldTypeId); err != nil {
           return err
         }
       }
     case 4:
-      if ***REMOVED***eldTypeId == thrift.I32 {
+      if fieldTypeId == thrift.I32 {
         if err := p.ReadField4(iprot); err != nil {
           return err
         }
-      } ***REMOVED*** {
-        if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      } else {
+        if err := iprot.Skip(fieldTypeId); err != nil {
           return err
         }
       }
     case 5:
-      if ***REMOVED***eldTypeId == thrift.STRING {
+      if fieldTypeId == thrift.STRING {
         if err := p.ReadField5(iprot); err != nil {
           return err
         }
-      } ***REMOVED*** {
-        if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      } else {
+        if err := iprot.Skip(fieldTypeId); err != nil {
           return err
         }
       }
     case 6:
-      if ***REMOVED***eldTypeId == thrift.STRING {
+      if fieldTypeId == thrift.STRING {
         if err := p.ReadField6(iprot); err != nil {
           return err
         }
-      } ***REMOVED*** {
-        if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      } else {
+        if err := iprot.Skip(fieldTypeId); err != nil {
           return err
         }
       }
     case 7:
-      if ***REMOVED***eldTypeId == thrift.I64 {
+      if fieldTypeId == thrift.I64 {
         if err := p.ReadField7(iprot); err != nil {
           return err
         }
-      } ***REMOVED*** {
-        if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      } else {
+        if err := iprot.Skip(fieldTypeId); err != nil {
           return err
         }
       }
     case 8:
-      if ***REMOVED***eldTypeId == thrift.I64 {
+      if fieldTypeId == thrift.I64 {
         if err := p.ReadField8(iprot); err != nil {
           return err
         }
-      } ***REMOVED*** {
-        if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      } else {
+        if err := iprot.Skip(fieldTypeId); err != nil {
           return err
         }
       }
     case 9:
-      if ***REMOVED***eldTypeId == thrift.BOOL {
+      if fieldTypeId == thrift.BOOL {
         if err := p.ReadField9(iprot); err != nil {
           return err
         }
-      } ***REMOVED*** {
-        if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      } else {
+        if err := iprot.Skip(fieldTypeId); err != nil {
           return err
         }
       }
     case 10:
-      if ***REMOVED***eldTypeId == thrift.STRUCT {
+      if fieldTypeId == thrift.STRUCT {
         if err := p.ReadField10(iprot); err != nil {
           return err
         }
-      } ***REMOVED*** {
-        if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      } else {
+        if err := iprot.Skip(fieldTypeId); err != nil {
           return err
         }
       }
     default:
-      if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      if err := iprot.Skip(fieldTypeId); err != nil {
         return err
       }
     }
@@ -12102,7 +12102,7 @@ func (p *TGetOperationStatusResp) Read(iprot thrift.TProtocol) error {
     return thrift.PrependError(fmt.Sprintf("%T read struct end error: ", p), err)
   }
   if !issetStatus{
-    return thrift.NewTProtocolExceptionWithType(thrift.INVALID_DATA, fmt.Errorf("Required ***REMOVED***eld Status is not set"));
+    return thrift.NewTProtocolExceptionWithType(thrift.INVALID_DATA, fmt.Errorf("Required field Status is not set"));
   }
   return nil
 }
@@ -12117,8 +12117,8 @@ func (p *TGetOperationStatusResp)  ReadField1(iprot thrift.TProtocol) error {
 
 func (p *TGetOperationStatusResp)  ReadField2(iprot thrift.TProtocol) error {
   if v, err := iprot.ReadI32(); err != nil {
-  return thrift.PrependError("error reading ***REMOVED***eld 2: ", err)
-} ***REMOVED*** {
+  return thrift.PrependError("error reading field 2: ", err)
+} else {
   temp := TOperationState(v)
   p.OperationState = &temp
 }
@@ -12127,8 +12127,8 @@ func (p *TGetOperationStatusResp)  ReadField2(iprot thrift.TProtocol) error {
 
 func (p *TGetOperationStatusResp)  ReadField3(iprot thrift.TProtocol) error {
   if v, err := iprot.ReadString(); err != nil {
-  return thrift.PrependError("error reading ***REMOVED***eld 3: ", err)
-} ***REMOVED*** {
+  return thrift.PrependError("error reading field 3: ", err)
+} else {
   p.SqlState = &v
 }
   return nil
@@ -12136,8 +12136,8 @@ func (p *TGetOperationStatusResp)  ReadField3(iprot thrift.TProtocol) error {
 
 func (p *TGetOperationStatusResp)  ReadField4(iprot thrift.TProtocol) error {
   if v, err := iprot.ReadI32(); err != nil {
-  return thrift.PrependError("error reading ***REMOVED***eld 4: ", err)
-} ***REMOVED*** {
+  return thrift.PrependError("error reading field 4: ", err)
+} else {
   p.ErrorCode = &v
 }
   return nil
@@ -12145,8 +12145,8 @@ func (p *TGetOperationStatusResp)  ReadField4(iprot thrift.TProtocol) error {
 
 func (p *TGetOperationStatusResp)  ReadField5(iprot thrift.TProtocol) error {
   if v, err := iprot.ReadString(); err != nil {
-  return thrift.PrependError("error reading ***REMOVED***eld 5: ", err)
-} ***REMOVED*** {
+  return thrift.PrependError("error reading field 5: ", err)
+} else {
   p.ErrorMessage = &v
 }
   return nil
@@ -12154,8 +12154,8 @@ func (p *TGetOperationStatusResp)  ReadField5(iprot thrift.TProtocol) error {
 
 func (p *TGetOperationStatusResp)  ReadField6(iprot thrift.TProtocol) error {
   if v, err := iprot.ReadString(); err != nil {
-  return thrift.PrependError("error reading ***REMOVED***eld 6: ", err)
-} ***REMOVED*** {
+  return thrift.PrependError("error reading field 6: ", err)
+} else {
   p.TaskStatus = &v
 }
   return nil
@@ -12163,8 +12163,8 @@ func (p *TGetOperationStatusResp)  ReadField6(iprot thrift.TProtocol) error {
 
 func (p *TGetOperationStatusResp)  ReadField7(iprot thrift.TProtocol) error {
   if v, err := iprot.ReadI64(); err != nil {
-  return thrift.PrependError("error reading ***REMOVED***eld 7: ", err)
-} ***REMOVED*** {
+  return thrift.PrependError("error reading field 7: ", err)
+} else {
   p.OperationStarted = &v
 }
   return nil
@@ -12172,8 +12172,8 @@ func (p *TGetOperationStatusResp)  ReadField7(iprot thrift.TProtocol) error {
 
 func (p *TGetOperationStatusResp)  ReadField8(iprot thrift.TProtocol) error {
   if v, err := iprot.ReadI64(); err != nil {
-  return thrift.PrependError("error reading ***REMOVED***eld 8: ", err)
-} ***REMOVED*** {
+  return thrift.PrependError("error reading field 8: ", err)
+} else {
   p.OperationCompleted = &v
 }
   return nil
@@ -12181,8 +12181,8 @@ func (p *TGetOperationStatusResp)  ReadField8(iprot thrift.TProtocol) error {
 
 func (p *TGetOperationStatusResp)  ReadField9(iprot thrift.TProtocol) error {
   if v, err := iprot.ReadBool(); err != nil {
-  return thrift.PrependError("error reading ***REMOVED***eld 9: ", err)
-} ***REMOVED*** {
+  return thrift.PrependError("error reading field 9: ", err)
+} else {
   p.HasResultSet = &v
 }
   return nil
@@ -12212,7 +12212,7 @@ func (p *TGetOperationStatusResp) Write(oprot thrift.TProtocol) error {
     if err := p.writeField10(oprot); err != nil { return err }
   }
   if err := oprot.WriteFieldStop(); err != nil {
-    return thrift.PrependError("write ***REMOVED***eld stop error: ", err) }
+    return thrift.PrependError("write field stop error: ", err) }
   if err := oprot.WriteStructEnd(); err != nil {
     return thrift.PrependError("write struct stop error: ", err) }
   return nil
@@ -12220,23 +12220,23 @@ func (p *TGetOperationStatusResp) Write(oprot thrift.TProtocol) error {
 
 func (p *TGetOperationStatusResp) writeField1(oprot thrift.TProtocol) (err error) {
   if err := oprot.WriteFieldBegin("status", thrift.STRUCT, 1); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld begin error 1:status: ", p), err) }
+    return thrift.PrependError(fmt.Sprintf("%T write field begin error 1:status: ", p), err) }
   if err := p.Status.Write(oprot); err != nil {
     return thrift.PrependError(fmt.Sprintf("%T error writing struct: ", p.Status), err)
   }
   if err := oprot.WriteFieldEnd(); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld end error 1:status: ", p), err) }
+    return thrift.PrependError(fmt.Sprintf("%T write field end error 1:status: ", p), err) }
   return err
 }
 
 func (p *TGetOperationStatusResp) writeField2(oprot thrift.TProtocol) (err error) {
   if p.IsSetOperationState() {
     if err := oprot.WriteFieldBegin("operationState", thrift.I32, 2); err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld begin error 2:operationState: ", p), err) }
+      return thrift.PrependError(fmt.Sprintf("%T write field begin error 2:operationState: ", p), err) }
     if err := oprot.WriteI32(int32(*p.OperationState)); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T.operationState (2) ***REMOVED***eld write error: ", p), err) }
+    return thrift.PrependError(fmt.Sprintf("%T.operationState (2) field write error: ", p), err) }
     if err := oprot.WriteFieldEnd(); err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld end error 2:operationState: ", p), err) }
+      return thrift.PrependError(fmt.Sprintf("%T write field end error 2:operationState: ", p), err) }
   }
   return err
 }
@@ -12244,11 +12244,11 @@ func (p *TGetOperationStatusResp) writeField2(oprot thrift.TProtocol) (err error
 func (p *TGetOperationStatusResp) writeField3(oprot thrift.TProtocol) (err error) {
   if p.IsSetSqlState() {
     if err := oprot.WriteFieldBegin("sqlState", thrift.STRING, 3); err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld begin error 3:sqlState: ", p), err) }
+      return thrift.PrependError(fmt.Sprintf("%T write field begin error 3:sqlState: ", p), err) }
     if err := oprot.WriteString(string(*p.SqlState)); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T.sqlState (3) ***REMOVED***eld write error: ", p), err) }
+    return thrift.PrependError(fmt.Sprintf("%T.sqlState (3) field write error: ", p), err) }
     if err := oprot.WriteFieldEnd(); err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld end error 3:sqlState: ", p), err) }
+      return thrift.PrependError(fmt.Sprintf("%T write field end error 3:sqlState: ", p), err) }
   }
   return err
 }
@@ -12256,11 +12256,11 @@ func (p *TGetOperationStatusResp) writeField3(oprot thrift.TProtocol) (err error
 func (p *TGetOperationStatusResp) writeField4(oprot thrift.TProtocol) (err error) {
   if p.IsSetErrorCode() {
     if err := oprot.WriteFieldBegin("errorCode", thrift.I32, 4); err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld begin error 4:errorCode: ", p), err) }
+      return thrift.PrependError(fmt.Sprintf("%T write field begin error 4:errorCode: ", p), err) }
     if err := oprot.WriteI32(int32(*p.ErrorCode)); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T.errorCode (4) ***REMOVED***eld write error: ", p), err) }
+    return thrift.PrependError(fmt.Sprintf("%T.errorCode (4) field write error: ", p), err) }
     if err := oprot.WriteFieldEnd(); err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld end error 4:errorCode: ", p), err) }
+      return thrift.PrependError(fmt.Sprintf("%T write field end error 4:errorCode: ", p), err) }
   }
   return err
 }
@@ -12268,11 +12268,11 @@ func (p *TGetOperationStatusResp) writeField4(oprot thrift.TProtocol) (err error
 func (p *TGetOperationStatusResp) writeField5(oprot thrift.TProtocol) (err error) {
   if p.IsSetErrorMessage() {
     if err := oprot.WriteFieldBegin("errorMessage", thrift.STRING, 5); err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld begin error 5:errorMessage: ", p), err) }
+      return thrift.PrependError(fmt.Sprintf("%T write field begin error 5:errorMessage: ", p), err) }
     if err := oprot.WriteString(string(*p.ErrorMessage)); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T.errorMessage (5) ***REMOVED***eld write error: ", p), err) }
+    return thrift.PrependError(fmt.Sprintf("%T.errorMessage (5) field write error: ", p), err) }
     if err := oprot.WriteFieldEnd(); err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld end error 5:errorMessage: ", p), err) }
+      return thrift.PrependError(fmt.Sprintf("%T write field end error 5:errorMessage: ", p), err) }
   }
   return err
 }
@@ -12280,11 +12280,11 @@ func (p *TGetOperationStatusResp) writeField5(oprot thrift.TProtocol) (err error
 func (p *TGetOperationStatusResp) writeField6(oprot thrift.TProtocol) (err error) {
   if p.IsSetTaskStatus() {
     if err := oprot.WriteFieldBegin("taskStatus", thrift.STRING, 6); err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld begin error 6:taskStatus: ", p), err) }
+      return thrift.PrependError(fmt.Sprintf("%T write field begin error 6:taskStatus: ", p), err) }
     if err := oprot.WriteString(string(*p.TaskStatus)); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T.taskStatus (6) ***REMOVED***eld write error: ", p), err) }
+    return thrift.PrependError(fmt.Sprintf("%T.taskStatus (6) field write error: ", p), err) }
     if err := oprot.WriteFieldEnd(); err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld end error 6:taskStatus: ", p), err) }
+      return thrift.PrependError(fmt.Sprintf("%T write field end error 6:taskStatus: ", p), err) }
   }
   return err
 }
@@ -12292,11 +12292,11 @@ func (p *TGetOperationStatusResp) writeField6(oprot thrift.TProtocol) (err error
 func (p *TGetOperationStatusResp) writeField7(oprot thrift.TProtocol) (err error) {
   if p.IsSetOperationStarted() {
     if err := oprot.WriteFieldBegin("operationStarted", thrift.I64, 7); err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld begin error 7:operationStarted: ", p), err) }
+      return thrift.PrependError(fmt.Sprintf("%T write field begin error 7:operationStarted: ", p), err) }
     if err := oprot.WriteI64(int64(*p.OperationStarted)); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T.operationStarted (7) ***REMOVED***eld write error: ", p), err) }
+    return thrift.PrependError(fmt.Sprintf("%T.operationStarted (7) field write error: ", p), err) }
     if err := oprot.WriteFieldEnd(); err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld end error 7:operationStarted: ", p), err) }
+      return thrift.PrependError(fmt.Sprintf("%T write field end error 7:operationStarted: ", p), err) }
   }
   return err
 }
@@ -12304,11 +12304,11 @@ func (p *TGetOperationStatusResp) writeField7(oprot thrift.TProtocol) (err error
 func (p *TGetOperationStatusResp) writeField8(oprot thrift.TProtocol) (err error) {
   if p.IsSetOperationCompleted() {
     if err := oprot.WriteFieldBegin("operationCompleted", thrift.I64, 8); err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld begin error 8:operationCompleted: ", p), err) }
+      return thrift.PrependError(fmt.Sprintf("%T write field begin error 8:operationCompleted: ", p), err) }
     if err := oprot.WriteI64(int64(*p.OperationCompleted)); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T.operationCompleted (8) ***REMOVED***eld write error: ", p), err) }
+    return thrift.PrependError(fmt.Sprintf("%T.operationCompleted (8) field write error: ", p), err) }
     if err := oprot.WriteFieldEnd(); err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld end error 8:operationCompleted: ", p), err) }
+      return thrift.PrependError(fmt.Sprintf("%T write field end error 8:operationCompleted: ", p), err) }
   }
   return err
 }
@@ -12316,11 +12316,11 @@ func (p *TGetOperationStatusResp) writeField8(oprot thrift.TProtocol) (err error
 func (p *TGetOperationStatusResp) writeField9(oprot thrift.TProtocol) (err error) {
   if p.IsSetHasResultSet() {
     if err := oprot.WriteFieldBegin("hasResultSet", thrift.BOOL, 9); err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld begin error 9:hasResultSet: ", p), err) }
+      return thrift.PrependError(fmt.Sprintf("%T write field begin error 9:hasResultSet: ", p), err) }
     if err := oprot.WriteBool(bool(*p.HasResultSet)); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T.hasResultSet (9) ***REMOVED***eld write error: ", p), err) }
+    return thrift.PrependError(fmt.Sprintf("%T.hasResultSet (9) field write error: ", p), err) }
     if err := oprot.WriteFieldEnd(); err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld end error 9:hasResultSet: ", p), err) }
+      return thrift.PrependError(fmt.Sprintf("%T write field end error 9:hasResultSet: ", p), err) }
   }
   return err
 }
@@ -12328,12 +12328,12 @@ func (p *TGetOperationStatusResp) writeField9(oprot thrift.TProtocol) (err error
 func (p *TGetOperationStatusResp) writeField10(oprot thrift.TProtocol) (err error) {
   if p.IsSetProgressUpdateResponse() {
     if err := oprot.WriteFieldBegin("progressUpdateResponse", thrift.STRUCT, 10); err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld begin error 10:progressUpdateResponse: ", p), err) }
+      return thrift.PrependError(fmt.Sprintf("%T write field begin error 10:progressUpdateResponse: ", p), err) }
     if err := p.ProgressUpdateResponse.Write(oprot); err != nil {
       return thrift.PrependError(fmt.Sprintf("%T error writing struct: ", p.ProgressUpdateResponse), err)
     }
     if err := oprot.WriteFieldEnd(); err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld end error 10:progressUpdateResponse: ", p), err) }
+      return thrift.PrependError(fmt.Sprintf("%T write field end error 10:progressUpdateResponse: ", p), err) }
   }
   return err
 }
@@ -12374,25 +12374,25 @@ func (p *TCancelOperationReq) Read(iprot thrift.TProtocol) error {
   var issetOperationHandle bool = false;
 
   for {
-    _, ***REMOVED***eldTypeId, ***REMOVED***eldId, err := iprot.ReadFieldBegin()
+    _, fieldTypeId, fieldId, err := iprot.ReadFieldBegin()
     if err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T ***REMOVED***eld %d read error: ", p, ***REMOVED***eldId), err)
+      return thrift.PrependError(fmt.Sprintf("%T field %d read error: ", p, fieldId), err)
     }
-    if ***REMOVED***eldTypeId == thrift.STOP { break; }
-    switch ***REMOVED***eldId {
+    if fieldTypeId == thrift.STOP { break; }
+    switch fieldId {
     case 1:
-      if ***REMOVED***eldTypeId == thrift.STRUCT {
+      if fieldTypeId == thrift.STRUCT {
         if err := p.ReadField1(iprot); err != nil {
           return err
         }
-      } ***REMOVED*** {
-        if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      } else {
+        if err := iprot.Skip(fieldTypeId); err != nil {
           return err
         }
       }
       issetOperationHandle = true
     default:
-      if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      if err := iprot.Skip(fieldTypeId); err != nil {
         return err
       }
     }
@@ -12404,7 +12404,7 @@ func (p *TCancelOperationReq) Read(iprot thrift.TProtocol) error {
     return thrift.PrependError(fmt.Sprintf("%T read struct end error: ", p), err)
   }
   if !issetOperationHandle{
-    return thrift.NewTProtocolExceptionWithType(thrift.INVALID_DATA, fmt.Errorf("Required ***REMOVED***eld OperationHandle is not set"));
+    return thrift.NewTProtocolExceptionWithType(thrift.INVALID_DATA, fmt.Errorf("Required field OperationHandle is not set"));
   }
   return nil
 }
@@ -12424,7 +12424,7 @@ func (p *TCancelOperationReq) Write(oprot thrift.TProtocol) error {
     if err := p.writeField1(oprot); err != nil { return err }
   }
   if err := oprot.WriteFieldStop(); err != nil {
-    return thrift.PrependError("write ***REMOVED***eld stop error: ", err) }
+    return thrift.PrependError("write field stop error: ", err) }
   if err := oprot.WriteStructEnd(); err != nil {
     return thrift.PrependError("write struct stop error: ", err) }
   return nil
@@ -12432,12 +12432,12 @@ func (p *TCancelOperationReq) Write(oprot thrift.TProtocol) error {
 
 func (p *TCancelOperationReq) writeField1(oprot thrift.TProtocol) (err error) {
   if err := oprot.WriteFieldBegin("operationHandle", thrift.STRUCT, 1); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld begin error 1:operationHandle: ", p), err) }
+    return thrift.PrependError(fmt.Sprintf("%T write field begin error 1:operationHandle: ", p), err) }
   if err := p.OperationHandle.Write(oprot); err != nil {
     return thrift.PrependError(fmt.Sprintf("%T error writing struct: ", p.OperationHandle), err)
   }
   if err := oprot.WriteFieldEnd(); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld end error 1:operationHandle: ", p), err) }
+    return thrift.PrependError(fmt.Sprintf("%T write field end error 1:operationHandle: ", p), err) }
   return err
 }
 
@@ -12477,25 +12477,25 @@ func (p *TCancelOperationResp) Read(iprot thrift.TProtocol) error {
   var issetStatus bool = false;
 
   for {
-    _, ***REMOVED***eldTypeId, ***REMOVED***eldId, err := iprot.ReadFieldBegin()
+    _, fieldTypeId, fieldId, err := iprot.ReadFieldBegin()
     if err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T ***REMOVED***eld %d read error: ", p, ***REMOVED***eldId), err)
+      return thrift.PrependError(fmt.Sprintf("%T field %d read error: ", p, fieldId), err)
     }
-    if ***REMOVED***eldTypeId == thrift.STOP { break; }
-    switch ***REMOVED***eldId {
+    if fieldTypeId == thrift.STOP { break; }
+    switch fieldId {
     case 1:
-      if ***REMOVED***eldTypeId == thrift.STRUCT {
+      if fieldTypeId == thrift.STRUCT {
         if err := p.ReadField1(iprot); err != nil {
           return err
         }
-      } ***REMOVED*** {
-        if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      } else {
+        if err := iprot.Skip(fieldTypeId); err != nil {
           return err
         }
       }
       issetStatus = true
     default:
-      if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      if err := iprot.Skip(fieldTypeId); err != nil {
         return err
       }
     }
@@ -12507,7 +12507,7 @@ func (p *TCancelOperationResp) Read(iprot thrift.TProtocol) error {
     return thrift.PrependError(fmt.Sprintf("%T read struct end error: ", p), err)
   }
   if !issetStatus{
-    return thrift.NewTProtocolExceptionWithType(thrift.INVALID_DATA, fmt.Errorf("Required ***REMOVED***eld Status is not set"));
+    return thrift.NewTProtocolExceptionWithType(thrift.INVALID_DATA, fmt.Errorf("Required field Status is not set"));
   }
   return nil
 }
@@ -12527,7 +12527,7 @@ func (p *TCancelOperationResp) Write(oprot thrift.TProtocol) error {
     if err := p.writeField1(oprot); err != nil { return err }
   }
   if err := oprot.WriteFieldStop(); err != nil {
-    return thrift.PrependError("write ***REMOVED***eld stop error: ", err) }
+    return thrift.PrependError("write field stop error: ", err) }
   if err := oprot.WriteStructEnd(); err != nil {
     return thrift.PrependError("write struct stop error: ", err) }
   return nil
@@ -12535,12 +12535,12 @@ func (p *TCancelOperationResp) Write(oprot thrift.TProtocol) error {
 
 func (p *TCancelOperationResp) writeField1(oprot thrift.TProtocol) (err error) {
   if err := oprot.WriteFieldBegin("status", thrift.STRUCT, 1); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld begin error 1:status: ", p), err) }
+    return thrift.PrependError(fmt.Sprintf("%T write field begin error 1:status: ", p), err) }
   if err := p.Status.Write(oprot); err != nil {
     return thrift.PrependError(fmt.Sprintf("%T error writing struct: ", p.Status), err)
   }
   if err := oprot.WriteFieldEnd(); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld end error 1:status: ", p), err) }
+    return thrift.PrependError(fmt.Sprintf("%T write field end error 1:status: ", p), err) }
   return err
 }
 
@@ -12580,25 +12580,25 @@ func (p *TCloseOperationReq) Read(iprot thrift.TProtocol) error {
   var issetOperationHandle bool = false;
 
   for {
-    _, ***REMOVED***eldTypeId, ***REMOVED***eldId, err := iprot.ReadFieldBegin()
+    _, fieldTypeId, fieldId, err := iprot.ReadFieldBegin()
     if err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T ***REMOVED***eld %d read error: ", p, ***REMOVED***eldId), err)
+      return thrift.PrependError(fmt.Sprintf("%T field %d read error: ", p, fieldId), err)
     }
-    if ***REMOVED***eldTypeId == thrift.STOP { break; }
-    switch ***REMOVED***eldId {
+    if fieldTypeId == thrift.STOP { break; }
+    switch fieldId {
     case 1:
-      if ***REMOVED***eldTypeId == thrift.STRUCT {
+      if fieldTypeId == thrift.STRUCT {
         if err := p.ReadField1(iprot); err != nil {
           return err
         }
-      } ***REMOVED*** {
-        if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      } else {
+        if err := iprot.Skip(fieldTypeId); err != nil {
           return err
         }
       }
       issetOperationHandle = true
     default:
-      if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      if err := iprot.Skip(fieldTypeId); err != nil {
         return err
       }
     }
@@ -12610,7 +12610,7 @@ func (p *TCloseOperationReq) Read(iprot thrift.TProtocol) error {
     return thrift.PrependError(fmt.Sprintf("%T read struct end error: ", p), err)
   }
   if !issetOperationHandle{
-    return thrift.NewTProtocolExceptionWithType(thrift.INVALID_DATA, fmt.Errorf("Required ***REMOVED***eld OperationHandle is not set"));
+    return thrift.NewTProtocolExceptionWithType(thrift.INVALID_DATA, fmt.Errorf("Required field OperationHandle is not set"));
   }
   return nil
 }
@@ -12630,7 +12630,7 @@ func (p *TCloseOperationReq) Write(oprot thrift.TProtocol) error {
     if err := p.writeField1(oprot); err != nil { return err }
   }
   if err := oprot.WriteFieldStop(); err != nil {
-    return thrift.PrependError("write ***REMOVED***eld stop error: ", err) }
+    return thrift.PrependError("write field stop error: ", err) }
   if err := oprot.WriteStructEnd(); err != nil {
     return thrift.PrependError("write struct stop error: ", err) }
   return nil
@@ -12638,12 +12638,12 @@ func (p *TCloseOperationReq) Write(oprot thrift.TProtocol) error {
 
 func (p *TCloseOperationReq) writeField1(oprot thrift.TProtocol) (err error) {
   if err := oprot.WriteFieldBegin("operationHandle", thrift.STRUCT, 1); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld begin error 1:operationHandle: ", p), err) }
+    return thrift.PrependError(fmt.Sprintf("%T write field begin error 1:operationHandle: ", p), err) }
   if err := p.OperationHandle.Write(oprot); err != nil {
     return thrift.PrependError(fmt.Sprintf("%T error writing struct: ", p.OperationHandle), err)
   }
   if err := oprot.WriteFieldEnd(); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld end error 1:operationHandle: ", p), err) }
+    return thrift.PrependError(fmt.Sprintf("%T write field end error 1:operationHandle: ", p), err) }
   return err
 }
 
@@ -12683,25 +12683,25 @@ func (p *TCloseOperationResp) Read(iprot thrift.TProtocol) error {
   var issetStatus bool = false;
 
   for {
-    _, ***REMOVED***eldTypeId, ***REMOVED***eldId, err := iprot.ReadFieldBegin()
+    _, fieldTypeId, fieldId, err := iprot.ReadFieldBegin()
     if err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T ***REMOVED***eld %d read error: ", p, ***REMOVED***eldId), err)
+      return thrift.PrependError(fmt.Sprintf("%T field %d read error: ", p, fieldId), err)
     }
-    if ***REMOVED***eldTypeId == thrift.STOP { break; }
-    switch ***REMOVED***eldId {
+    if fieldTypeId == thrift.STOP { break; }
+    switch fieldId {
     case 1:
-      if ***REMOVED***eldTypeId == thrift.STRUCT {
+      if fieldTypeId == thrift.STRUCT {
         if err := p.ReadField1(iprot); err != nil {
           return err
         }
-      } ***REMOVED*** {
-        if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      } else {
+        if err := iprot.Skip(fieldTypeId); err != nil {
           return err
         }
       }
       issetStatus = true
     default:
-      if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      if err := iprot.Skip(fieldTypeId); err != nil {
         return err
       }
     }
@@ -12713,7 +12713,7 @@ func (p *TCloseOperationResp) Read(iprot thrift.TProtocol) error {
     return thrift.PrependError(fmt.Sprintf("%T read struct end error: ", p), err)
   }
   if !issetStatus{
-    return thrift.NewTProtocolExceptionWithType(thrift.INVALID_DATA, fmt.Errorf("Required ***REMOVED***eld Status is not set"));
+    return thrift.NewTProtocolExceptionWithType(thrift.INVALID_DATA, fmt.Errorf("Required field Status is not set"));
   }
   return nil
 }
@@ -12733,7 +12733,7 @@ func (p *TCloseOperationResp) Write(oprot thrift.TProtocol) error {
     if err := p.writeField1(oprot); err != nil { return err }
   }
   if err := oprot.WriteFieldStop(); err != nil {
-    return thrift.PrependError("write ***REMOVED***eld stop error: ", err) }
+    return thrift.PrependError("write field stop error: ", err) }
   if err := oprot.WriteStructEnd(); err != nil {
     return thrift.PrependError("write struct stop error: ", err) }
   return nil
@@ -12741,12 +12741,12 @@ func (p *TCloseOperationResp) Write(oprot thrift.TProtocol) error {
 
 func (p *TCloseOperationResp) writeField1(oprot thrift.TProtocol) (err error) {
   if err := oprot.WriteFieldBegin("status", thrift.STRUCT, 1); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld begin error 1:status: ", p), err) }
+    return thrift.PrependError(fmt.Sprintf("%T write field begin error 1:status: ", p), err) }
   if err := p.Status.Write(oprot); err != nil {
     return thrift.PrependError(fmt.Sprintf("%T error writing struct: ", p.Status), err)
   }
   if err := oprot.WriteFieldEnd(); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld end error 1:status: ", p), err) }
+    return thrift.PrependError(fmt.Sprintf("%T write field end error 1:status: ", p), err) }
   return err
 }
 
@@ -12786,25 +12786,25 @@ func (p *TGetResultSetMetadataReq) Read(iprot thrift.TProtocol) error {
   var issetOperationHandle bool = false;
 
   for {
-    _, ***REMOVED***eldTypeId, ***REMOVED***eldId, err := iprot.ReadFieldBegin()
+    _, fieldTypeId, fieldId, err := iprot.ReadFieldBegin()
     if err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T ***REMOVED***eld %d read error: ", p, ***REMOVED***eldId), err)
+      return thrift.PrependError(fmt.Sprintf("%T field %d read error: ", p, fieldId), err)
     }
-    if ***REMOVED***eldTypeId == thrift.STOP { break; }
-    switch ***REMOVED***eldId {
+    if fieldTypeId == thrift.STOP { break; }
+    switch fieldId {
     case 1:
-      if ***REMOVED***eldTypeId == thrift.STRUCT {
+      if fieldTypeId == thrift.STRUCT {
         if err := p.ReadField1(iprot); err != nil {
           return err
         }
-      } ***REMOVED*** {
-        if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      } else {
+        if err := iprot.Skip(fieldTypeId); err != nil {
           return err
         }
       }
       issetOperationHandle = true
     default:
-      if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      if err := iprot.Skip(fieldTypeId); err != nil {
         return err
       }
     }
@@ -12816,7 +12816,7 @@ func (p *TGetResultSetMetadataReq) Read(iprot thrift.TProtocol) error {
     return thrift.PrependError(fmt.Sprintf("%T read struct end error: ", p), err)
   }
   if !issetOperationHandle{
-    return thrift.NewTProtocolExceptionWithType(thrift.INVALID_DATA, fmt.Errorf("Required ***REMOVED***eld OperationHandle is not set"));
+    return thrift.NewTProtocolExceptionWithType(thrift.INVALID_DATA, fmt.Errorf("Required field OperationHandle is not set"));
   }
   return nil
 }
@@ -12836,7 +12836,7 @@ func (p *TGetResultSetMetadataReq) Write(oprot thrift.TProtocol) error {
     if err := p.writeField1(oprot); err != nil { return err }
   }
   if err := oprot.WriteFieldStop(); err != nil {
-    return thrift.PrependError("write ***REMOVED***eld stop error: ", err) }
+    return thrift.PrependError("write field stop error: ", err) }
   if err := oprot.WriteStructEnd(); err != nil {
     return thrift.PrependError("write struct stop error: ", err) }
   return nil
@@ -12844,12 +12844,12 @@ func (p *TGetResultSetMetadataReq) Write(oprot thrift.TProtocol) error {
 
 func (p *TGetResultSetMetadataReq) writeField1(oprot thrift.TProtocol) (err error) {
   if err := oprot.WriteFieldBegin("operationHandle", thrift.STRUCT, 1); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld begin error 1:operationHandle: ", p), err) }
+    return thrift.PrependError(fmt.Sprintf("%T write field begin error 1:operationHandle: ", p), err) }
   if err := p.OperationHandle.Write(oprot); err != nil {
     return thrift.PrependError(fmt.Sprintf("%T error writing struct: ", p.OperationHandle), err)
   }
   if err := oprot.WriteFieldEnd(); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld end error 1:operationHandle: ", p), err) }
+    return thrift.PrependError(fmt.Sprintf("%T write field end error 1:operationHandle: ", p), err) }
   return err
 }
 
@@ -12902,35 +12902,35 @@ func (p *TGetResultSetMetadataResp) Read(iprot thrift.TProtocol) error {
   var issetStatus bool = false;
 
   for {
-    _, ***REMOVED***eldTypeId, ***REMOVED***eldId, err := iprot.ReadFieldBegin()
+    _, fieldTypeId, fieldId, err := iprot.ReadFieldBegin()
     if err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T ***REMOVED***eld %d read error: ", p, ***REMOVED***eldId), err)
+      return thrift.PrependError(fmt.Sprintf("%T field %d read error: ", p, fieldId), err)
     }
-    if ***REMOVED***eldTypeId == thrift.STOP { break; }
-    switch ***REMOVED***eldId {
+    if fieldTypeId == thrift.STOP { break; }
+    switch fieldId {
     case 1:
-      if ***REMOVED***eldTypeId == thrift.STRUCT {
+      if fieldTypeId == thrift.STRUCT {
         if err := p.ReadField1(iprot); err != nil {
           return err
         }
-      } ***REMOVED*** {
-        if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      } else {
+        if err := iprot.Skip(fieldTypeId); err != nil {
           return err
         }
       }
       issetStatus = true
     case 2:
-      if ***REMOVED***eldTypeId == thrift.STRUCT {
+      if fieldTypeId == thrift.STRUCT {
         if err := p.ReadField2(iprot); err != nil {
           return err
         }
-      } ***REMOVED*** {
-        if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      } else {
+        if err := iprot.Skip(fieldTypeId); err != nil {
           return err
         }
       }
     default:
-      if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      if err := iprot.Skip(fieldTypeId); err != nil {
         return err
       }
     }
@@ -12942,7 +12942,7 @@ func (p *TGetResultSetMetadataResp) Read(iprot thrift.TProtocol) error {
     return thrift.PrependError(fmt.Sprintf("%T read struct end error: ", p), err)
   }
   if !issetStatus{
-    return thrift.NewTProtocolExceptionWithType(thrift.INVALID_DATA, fmt.Errorf("Required ***REMOVED***eld Status is not set"));
+    return thrift.NewTProtocolExceptionWithType(thrift.INVALID_DATA, fmt.Errorf("Required field Status is not set"));
   }
   return nil
 }
@@ -12971,7 +12971,7 @@ func (p *TGetResultSetMetadataResp) Write(oprot thrift.TProtocol) error {
     if err := p.writeField2(oprot); err != nil { return err }
   }
   if err := oprot.WriteFieldStop(); err != nil {
-    return thrift.PrependError("write ***REMOVED***eld stop error: ", err) }
+    return thrift.PrependError("write field stop error: ", err) }
   if err := oprot.WriteStructEnd(); err != nil {
     return thrift.PrependError("write struct stop error: ", err) }
   return nil
@@ -12979,24 +12979,24 @@ func (p *TGetResultSetMetadataResp) Write(oprot thrift.TProtocol) error {
 
 func (p *TGetResultSetMetadataResp) writeField1(oprot thrift.TProtocol) (err error) {
   if err := oprot.WriteFieldBegin("status", thrift.STRUCT, 1); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld begin error 1:status: ", p), err) }
+    return thrift.PrependError(fmt.Sprintf("%T write field begin error 1:status: ", p), err) }
   if err := p.Status.Write(oprot); err != nil {
     return thrift.PrependError(fmt.Sprintf("%T error writing struct: ", p.Status), err)
   }
   if err := oprot.WriteFieldEnd(); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld end error 1:status: ", p), err) }
+    return thrift.PrependError(fmt.Sprintf("%T write field end error 1:status: ", p), err) }
   return err
 }
 
 func (p *TGetResultSetMetadataResp) writeField2(oprot thrift.TProtocol) (err error) {
   if p.IsSetSchema() {
     if err := oprot.WriteFieldBegin("schema", thrift.STRUCT, 2); err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld begin error 2:schema: ", p), err) }
+      return thrift.PrependError(fmt.Sprintf("%T write field begin error 2:schema: ", p), err) }
     if err := p.Schema.Write(oprot); err != nil {
       return thrift.PrependError(fmt.Sprintf("%T error writing struct: ", p.Schema), err)
     }
     if err := oprot.WriteFieldEnd(); err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld end error 2:schema: ", p), err) }
+      return thrift.PrependError(fmt.Sprintf("%T write field end error 2:schema: ", p), err) }
   }
   return err
 }
@@ -13064,57 +13064,57 @@ func (p *TFetchResultsReq) Read(iprot thrift.TProtocol) error {
   var issetMaxRows bool = false;
 
   for {
-    _, ***REMOVED***eldTypeId, ***REMOVED***eldId, err := iprot.ReadFieldBegin()
+    _, fieldTypeId, fieldId, err := iprot.ReadFieldBegin()
     if err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T ***REMOVED***eld %d read error: ", p, ***REMOVED***eldId), err)
+      return thrift.PrependError(fmt.Sprintf("%T field %d read error: ", p, fieldId), err)
     }
-    if ***REMOVED***eldTypeId == thrift.STOP { break; }
-    switch ***REMOVED***eldId {
+    if fieldTypeId == thrift.STOP { break; }
+    switch fieldId {
     case 1:
-      if ***REMOVED***eldTypeId == thrift.STRUCT {
+      if fieldTypeId == thrift.STRUCT {
         if err := p.ReadField1(iprot); err != nil {
           return err
         }
-      } ***REMOVED*** {
-        if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      } else {
+        if err := iprot.Skip(fieldTypeId); err != nil {
           return err
         }
       }
       issetOperationHandle = true
     case 2:
-      if ***REMOVED***eldTypeId == thrift.I32 {
+      if fieldTypeId == thrift.I32 {
         if err := p.ReadField2(iprot); err != nil {
           return err
         }
-      } ***REMOVED*** {
-        if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      } else {
+        if err := iprot.Skip(fieldTypeId); err != nil {
           return err
         }
       }
       issetOrientation = true
     case 3:
-      if ***REMOVED***eldTypeId == thrift.I64 {
+      if fieldTypeId == thrift.I64 {
         if err := p.ReadField3(iprot); err != nil {
           return err
         }
-      } ***REMOVED*** {
-        if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      } else {
+        if err := iprot.Skip(fieldTypeId); err != nil {
           return err
         }
       }
       issetMaxRows = true
     case 4:
-      if ***REMOVED***eldTypeId == thrift.I16 {
+      if fieldTypeId == thrift.I16 {
         if err := p.ReadField4(iprot); err != nil {
           return err
         }
-      } ***REMOVED*** {
-        if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      } else {
+        if err := iprot.Skip(fieldTypeId); err != nil {
           return err
         }
       }
     default:
-      if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      if err := iprot.Skip(fieldTypeId); err != nil {
         return err
       }
     }
@@ -13126,13 +13126,13 @@ func (p *TFetchResultsReq) Read(iprot thrift.TProtocol) error {
     return thrift.PrependError(fmt.Sprintf("%T read struct end error: ", p), err)
   }
   if !issetOperationHandle{
-    return thrift.NewTProtocolExceptionWithType(thrift.INVALID_DATA, fmt.Errorf("Required ***REMOVED***eld OperationHandle is not set"));
+    return thrift.NewTProtocolExceptionWithType(thrift.INVALID_DATA, fmt.Errorf("Required field OperationHandle is not set"));
   }
   if !issetOrientation{
-    return thrift.NewTProtocolExceptionWithType(thrift.INVALID_DATA, fmt.Errorf("Required ***REMOVED***eld Orientation is not set"));
+    return thrift.NewTProtocolExceptionWithType(thrift.INVALID_DATA, fmt.Errorf("Required field Orientation is not set"));
   }
   if !issetMaxRows{
-    return thrift.NewTProtocolExceptionWithType(thrift.INVALID_DATA, fmt.Errorf("Required ***REMOVED***eld MaxRows is not set"));
+    return thrift.NewTProtocolExceptionWithType(thrift.INVALID_DATA, fmt.Errorf("Required field MaxRows is not set"));
   }
   return nil
 }
@@ -13147,8 +13147,8 @@ func (p *TFetchResultsReq)  ReadField1(iprot thrift.TProtocol) error {
 
 func (p *TFetchResultsReq)  ReadField2(iprot thrift.TProtocol) error {
   if v, err := iprot.ReadI32(); err != nil {
-  return thrift.PrependError("error reading ***REMOVED***eld 2: ", err)
-} ***REMOVED*** {
+  return thrift.PrependError("error reading field 2: ", err)
+} else {
   temp := TFetchOrientation(v)
   p.Orientation = temp
 }
@@ -13157,8 +13157,8 @@ func (p *TFetchResultsReq)  ReadField2(iprot thrift.TProtocol) error {
 
 func (p *TFetchResultsReq)  ReadField3(iprot thrift.TProtocol) error {
   if v, err := iprot.ReadI64(); err != nil {
-  return thrift.PrependError("error reading ***REMOVED***eld 3: ", err)
-} ***REMOVED*** {
+  return thrift.PrependError("error reading field 3: ", err)
+} else {
   p.MaxRows = v
 }
   return nil
@@ -13166,8 +13166,8 @@ func (p *TFetchResultsReq)  ReadField3(iprot thrift.TProtocol) error {
 
 func (p *TFetchResultsReq)  ReadField4(iprot thrift.TProtocol) error {
   if v, err := iprot.ReadI16(); err != nil {
-  return thrift.PrependError("error reading ***REMOVED***eld 4: ", err)
-} ***REMOVED*** {
+  return thrift.PrependError("error reading field 4: ", err)
+} else {
   p.FetchType = v
 }
   return nil
@@ -13183,7 +13183,7 @@ func (p *TFetchResultsReq) Write(oprot thrift.TProtocol) error {
     if err := p.writeField4(oprot); err != nil { return err }
   }
   if err := oprot.WriteFieldStop(); err != nil {
-    return thrift.PrependError("write ***REMOVED***eld stop error: ", err) }
+    return thrift.PrependError("write field stop error: ", err) }
   if err := oprot.WriteStructEnd(); err != nil {
     return thrift.PrependError("write struct stop error: ", err) }
   return nil
@@ -13191,43 +13191,43 @@ func (p *TFetchResultsReq) Write(oprot thrift.TProtocol) error {
 
 func (p *TFetchResultsReq) writeField1(oprot thrift.TProtocol) (err error) {
   if err := oprot.WriteFieldBegin("operationHandle", thrift.STRUCT, 1); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld begin error 1:operationHandle: ", p), err) }
+    return thrift.PrependError(fmt.Sprintf("%T write field begin error 1:operationHandle: ", p), err) }
   if err := p.OperationHandle.Write(oprot); err != nil {
     return thrift.PrependError(fmt.Sprintf("%T error writing struct: ", p.OperationHandle), err)
   }
   if err := oprot.WriteFieldEnd(); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld end error 1:operationHandle: ", p), err) }
+    return thrift.PrependError(fmt.Sprintf("%T write field end error 1:operationHandle: ", p), err) }
   return err
 }
 
 func (p *TFetchResultsReq) writeField2(oprot thrift.TProtocol) (err error) {
   if err := oprot.WriteFieldBegin("orientation", thrift.I32, 2); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld begin error 2:orientation: ", p), err) }
+    return thrift.PrependError(fmt.Sprintf("%T write field begin error 2:orientation: ", p), err) }
   if err := oprot.WriteI32(int32(p.Orientation)); err != nil {
-  return thrift.PrependError(fmt.Sprintf("%T.orientation (2) ***REMOVED***eld write error: ", p), err) }
+  return thrift.PrependError(fmt.Sprintf("%T.orientation (2) field write error: ", p), err) }
   if err := oprot.WriteFieldEnd(); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld end error 2:orientation: ", p), err) }
+    return thrift.PrependError(fmt.Sprintf("%T write field end error 2:orientation: ", p), err) }
   return err
 }
 
 func (p *TFetchResultsReq) writeField3(oprot thrift.TProtocol) (err error) {
   if err := oprot.WriteFieldBegin("maxRows", thrift.I64, 3); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld begin error 3:maxRows: ", p), err) }
+    return thrift.PrependError(fmt.Sprintf("%T write field begin error 3:maxRows: ", p), err) }
   if err := oprot.WriteI64(int64(p.MaxRows)); err != nil {
-  return thrift.PrependError(fmt.Sprintf("%T.maxRows (3) ***REMOVED***eld write error: ", p), err) }
+  return thrift.PrependError(fmt.Sprintf("%T.maxRows (3) field write error: ", p), err) }
   if err := oprot.WriteFieldEnd(); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld end error 3:maxRows: ", p), err) }
+    return thrift.PrependError(fmt.Sprintf("%T write field end error 3:maxRows: ", p), err) }
   return err
 }
 
 func (p *TFetchResultsReq) writeField4(oprot thrift.TProtocol) (err error) {
   if p.IsSetFetchType() {
     if err := oprot.WriteFieldBegin("fetchType", thrift.I16, 4); err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld begin error 4:fetchType: ", p), err) }
+      return thrift.PrependError(fmt.Sprintf("%T write field begin error 4:fetchType: ", p), err) }
     if err := oprot.WriteI16(int16(p.FetchType)); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T.fetchType (4) ***REMOVED***eld write error: ", p), err) }
+    return thrift.PrependError(fmt.Sprintf("%T.fetchType (4) field write error: ", p), err) }
     if err := oprot.WriteFieldEnd(); err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld end error 4:fetchType: ", p), err) }
+      return thrift.PrependError(fmt.Sprintf("%T write field end error 4:fetchType: ", p), err) }
   }
   return err
 }
@@ -13294,45 +13294,45 @@ func (p *TFetchResultsResp) Read(iprot thrift.TProtocol) error {
   var issetStatus bool = false;
 
   for {
-    _, ***REMOVED***eldTypeId, ***REMOVED***eldId, err := iprot.ReadFieldBegin()
+    _, fieldTypeId, fieldId, err := iprot.ReadFieldBegin()
     if err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T ***REMOVED***eld %d read error: ", p, ***REMOVED***eldId), err)
+      return thrift.PrependError(fmt.Sprintf("%T field %d read error: ", p, fieldId), err)
     }
-    if ***REMOVED***eldTypeId == thrift.STOP { break; }
-    switch ***REMOVED***eldId {
+    if fieldTypeId == thrift.STOP { break; }
+    switch fieldId {
     case 1:
-      if ***REMOVED***eldTypeId == thrift.STRUCT {
+      if fieldTypeId == thrift.STRUCT {
         if err := p.ReadField1(iprot); err != nil {
           return err
         }
-      } ***REMOVED*** {
-        if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      } else {
+        if err := iprot.Skip(fieldTypeId); err != nil {
           return err
         }
       }
       issetStatus = true
     case 2:
-      if ***REMOVED***eldTypeId == thrift.BOOL {
+      if fieldTypeId == thrift.BOOL {
         if err := p.ReadField2(iprot); err != nil {
           return err
         }
-      } ***REMOVED*** {
-        if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      } else {
+        if err := iprot.Skip(fieldTypeId); err != nil {
           return err
         }
       }
     case 3:
-      if ***REMOVED***eldTypeId == thrift.STRUCT {
+      if fieldTypeId == thrift.STRUCT {
         if err := p.ReadField3(iprot); err != nil {
           return err
         }
-      } ***REMOVED*** {
-        if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      } else {
+        if err := iprot.Skip(fieldTypeId); err != nil {
           return err
         }
       }
     default:
-      if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      if err := iprot.Skip(fieldTypeId); err != nil {
         return err
       }
     }
@@ -13344,7 +13344,7 @@ func (p *TFetchResultsResp) Read(iprot thrift.TProtocol) error {
     return thrift.PrependError(fmt.Sprintf("%T read struct end error: ", p), err)
   }
   if !issetStatus{
-    return thrift.NewTProtocolExceptionWithType(thrift.INVALID_DATA, fmt.Errorf("Required ***REMOVED***eld Status is not set"));
+    return thrift.NewTProtocolExceptionWithType(thrift.INVALID_DATA, fmt.Errorf("Required field Status is not set"));
   }
   return nil
 }
@@ -13359,8 +13359,8 @@ func (p *TFetchResultsResp)  ReadField1(iprot thrift.TProtocol) error {
 
 func (p *TFetchResultsResp)  ReadField2(iprot thrift.TProtocol) error {
   if v, err := iprot.ReadBool(); err != nil {
-  return thrift.PrependError("error reading ***REMOVED***eld 2: ", err)
-} ***REMOVED*** {
+  return thrift.PrependError("error reading field 2: ", err)
+} else {
   p.HasMoreRows = &v
 }
   return nil
@@ -13383,7 +13383,7 @@ func (p *TFetchResultsResp) Write(oprot thrift.TProtocol) error {
     if err := p.writeField3(oprot); err != nil { return err }
   }
   if err := oprot.WriteFieldStop(); err != nil {
-    return thrift.PrependError("write ***REMOVED***eld stop error: ", err) }
+    return thrift.PrependError("write field stop error: ", err) }
   if err := oprot.WriteStructEnd(); err != nil {
     return thrift.PrependError("write struct stop error: ", err) }
   return nil
@@ -13391,23 +13391,23 @@ func (p *TFetchResultsResp) Write(oprot thrift.TProtocol) error {
 
 func (p *TFetchResultsResp) writeField1(oprot thrift.TProtocol) (err error) {
   if err := oprot.WriteFieldBegin("status", thrift.STRUCT, 1); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld begin error 1:status: ", p), err) }
+    return thrift.PrependError(fmt.Sprintf("%T write field begin error 1:status: ", p), err) }
   if err := p.Status.Write(oprot); err != nil {
     return thrift.PrependError(fmt.Sprintf("%T error writing struct: ", p.Status), err)
   }
   if err := oprot.WriteFieldEnd(); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld end error 1:status: ", p), err) }
+    return thrift.PrependError(fmt.Sprintf("%T write field end error 1:status: ", p), err) }
   return err
 }
 
 func (p *TFetchResultsResp) writeField2(oprot thrift.TProtocol) (err error) {
   if p.IsSetHasMoreRows() {
     if err := oprot.WriteFieldBegin("hasMoreRows", thrift.BOOL, 2); err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld begin error 2:hasMoreRows: ", p), err) }
+      return thrift.PrependError(fmt.Sprintf("%T write field begin error 2:hasMoreRows: ", p), err) }
     if err := oprot.WriteBool(bool(*p.HasMoreRows)); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T.hasMoreRows (2) ***REMOVED***eld write error: ", p), err) }
+    return thrift.PrependError(fmt.Sprintf("%T.hasMoreRows (2) field write error: ", p), err) }
     if err := oprot.WriteFieldEnd(); err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld end error 2:hasMoreRows: ", p), err) }
+      return thrift.PrependError(fmt.Sprintf("%T write field end error 2:hasMoreRows: ", p), err) }
   }
   return err
 }
@@ -13415,12 +13415,12 @@ func (p *TFetchResultsResp) writeField2(oprot thrift.TProtocol) (err error) {
 func (p *TFetchResultsResp) writeField3(oprot thrift.TProtocol) (err error) {
   if p.IsSetResults() {
     if err := oprot.WriteFieldBegin("results", thrift.STRUCT, 3); err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld begin error 3:results: ", p), err) }
+      return thrift.PrependError(fmt.Sprintf("%T write field begin error 3:results: ", p), err) }
     if err := p.Results.Write(oprot); err != nil {
       return thrift.PrependError(fmt.Sprintf("%T error writing struct: ", p.Results), err)
     }
     if err := oprot.WriteFieldEnd(); err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld end error 3:results: ", p), err) }
+      return thrift.PrependError(fmt.Sprintf("%T write field end error 3:results: ", p), err) }
   }
   return err
 }
@@ -13475,47 +13475,47 @@ func (p *TGetDelegationTokenReq) Read(iprot thrift.TProtocol) error {
   var issetRenewer bool = false;
 
   for {
-    _, ***REMOVED***eldTypeId, ***REMOVED***eldId, err := iprot.ReadFieldBegin()
+    _, fieldTypeId, fieldId, err := iprot.ReadFieldBegin()
     if err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T ***REMOVED***eld %d read error: ", p, ***REMOVED***eldId), err)
+      return thrift.PrependError(fmt.Sprintf("%T field %d read error: ", p, fieldId), err)
     }
-    if ***REMOVED***eldTypeId == thrift.STOP { break; }
-    switch ***REMOVED***eldId {
+    if fieldTypeId == thrift.STOP { break; }
+    switch fieldId {
     case 1:
-      if ***REMOVED***eldTypeId == thrift.STRUCT {
+      if fieldTypeId == thrift.STRUCT {
         if err := p.ReadField1(iprot); err != nil {
           return err
         }
-      } ***REMOVED*** {
-        if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      } else {
+        if err := iprot.Skip(fieldTypeId); err != nil {
           return err
         }
       }
       issetSessionHandle = true
     case 2:
-      if ***REMOVED***eldTypeId == thrift.STRING {
+      if fieldTypeId == thrift.STRING {
         if err := p.ReadField2(iprot); err != nil {
           return err
         }
-      } ***REMOVED*** {
-        if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      } else {
+        if err := iprot.Skip(fieldTypeId); err != nil {
           return err
         }
       }
       issetOwner = true
     case 3:
-      if ***REMOVED***eldTypeId == thrift.STRING {
+      if fieldTypeId == thrift.STRING {
         if err := p.ReadField3(iprot); err != nil {
           return err
         }
-      } ***REMOVED*** {
-        if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      } else {
+        if err := iprot.Skip(fieldTypeId); err != nil {
           return err
         }
       }
       issetRenewer = true
     default:
-      if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      if err := iprot.Skip(fieldTypeId); err != nil {
         return err
       }
     }
@@ -13527,13 +13527,13 @@ func (p *TGetDelegationTokenReq) Read(iprot thrift.TProtocol) error {
     return thrift.PrependError(fmt.Sprintf("%T read struct end error: ", p), err)
   }
   if !issetSessionHandle{
-    return thrift.NewTProtocolExceptionWithType(thrift.INVALID_DATA, fmt.Errorf("Required ***REMOVED***eld SessionHandle is not set"));
+    return thrift.NewTProtocolExceptionWithType(thrift.INVALID_DATA, fmt.Errorf("Required field SessionHandle is not set"));
   }
   if !issetOwner{
-    return thrift.NewTProtocolExceptionWithType(thrift.INVALID_DATA, fmt.Errorf("Required ***REMOVED***eld Owner is not set"));
+    return thrift.NewTProtocolExceptionWithType(thrift.INVALID_DATA, fmt.Errorf("Required field Owner is not set"));
   }
   if !issetRenewer{
-    return thrift.NewTProtocolExceptionWithType(thrift.INVALID_DATA, fmt.Errorf("Required ***REMOVED***eld Renewer is not set"));
+    return thrift.NewTProtocolExceptionWithType(thrift.INVALID_DATA, fmt.Errorf("Required field Renewer is not set"));
   }
   return nil
 }
@@ -13548,8 +13548,8 @@ func (p *TGetDelegationTokenReq)  ReadField1(iprot thrift.TProtocol) error {
 
 func (p *TGetDelegationTokenReq)  ReadField2(iprot thrift.TProtocol) error {
   if v, err := iprot.ReadString(); err != nil {
-  return thrift.PrependError("error reading ***REMOVED***eld 2: ", err)
-} ***REMOVED*** {
+  return thrift.PrependError("error reading field 2: ", err)
+} else {
   p.Owner = v
 }
   return nil
@@ -13557,8 +13557,8 @@ func (p *TGetDelegationTokenReq)  ReadField2(iprot thrift.TProtocol) error {
 
 func (p *TGetDelegationTokenReq)  ReadField3(iprot thrift.TProtocol) error {
   if v, err := iprot.ReadString(); err != nil {
-  return thrift.PrependError("error reading ***REMOVED***eld 3: ", err)
-} ***REMOVED*** {
+  return thrift.PrependError("error reading field 3: ", err)
+} else {
   p.Renewer = v
 }
   return nil
@@ -13573,7 +13573,7 @@ func (p *TGetDelegationTokenReq) Write(oprot thrift.TProtocol) error {
     if err := p.writeField3(oprot); err != nil { return err }
   }
   if err := oprot.WriteFieldStop(); err != nil {
-    return thrift.PrependError("write ***REMOVED***eld stop error: ", err) }
+    return thrift.PrependError("write field stop error: ", err) }
   if err := oprot.WriteStructEnd(); err != nil {
     return thrift.PrependError("write struct stop error: ", err) }
   return nil
@@ -13581,32 +13581,32 @@ func (p *TGetDelegationTokenReq) Write(oprot thrift.TProtocol) error {
 
 func (p *TGetDelegationTokenReq) writeField1(oprot thrift.TProtocol) (err error) {
   if err := oprot.WriteFieldBegin("sessionHandle", thrift.STRUCT, 1); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld begin error 1:sessionHandle: ", p), err) }
+    return thrift.PrependError(fmt.Sprintf("%T write field begin error 1:sessionHandle: ", p), err) }
   if err := p.SessionHandle.Write(oprot); err != nil {
     return thrift.PrependError(fmt.Sprintf("%T error writing struct: ", p.SessionHandle), err)
   }
   if err := oprot.WriteFieldEnd(); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld end error 1:sessionHandle: ", p), err) }
+    return thrift.PrependError(fmt.Sprintf("%T write field end error 1:sessionHandle: ", p), err) }
   return err
 }
 
 func (p *TGetDelegationTokenReq) writeField2(oprot thrift.TProtocol) (err error) {
   if err := oprot.WriteFieldBegin("owner", thrift.STRING, 2); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld begin error 2:owner: ", p), err) }
+    return thrift.PrependError(fmt.Sprintf("%T write field begin error 2:owner: ", p), err) }
   if err := oprot.WriteString(string(p.Owner)); err != nil {
-  return thrift.PrependError(fmt.Sprintf("%T.owner (2) ***REMOVED***eld write error: ", p), err) }
+  return thrift.PrependError(fmt.Sprintf("%T.owner (2) field write error: ", p), err) }
   if err := oprot.WriteFieldEnd(); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld end error 2:owner: ", p), err) }
+    return thrift.PrependError(fmt.Sprintf("%T write field end error 2:owner: ", p), err) }
   return err
 }
 
 func (p *TGetDelegationTokenReq) writeField3(oprot thrift.TProtocol) (err error) {
   if err := oprot.WriteFieldBegin("renewer", thrift.STRING, 3); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld begin error 3:renewer: ", p), err) }
+    return thrift.PrependError(fmt.Sprintf("%T write field begin error 3:renewer: ", p), err) }
   if err := oprot.WriteString(string(p.Renewer)); err != nil {
-  return thrift.PrependError(fmt.Sprintf("%T.renewer (3) ***REMOVED***eld write error: ", p), err) }
+  return thrift.PrependError(fmt.Sprintf("%T.renewer (3) field write error: ", p), err) }
   if err := oprot.WriteFieldEnd(); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld end error 3:renewer: ", p), err) }
+    return thrift.PrependError(fmt.Sprintf("%T write field end error 3:renewer: ", p), err) }
   return err
 }
 
@@ -13659,35 +13659,35 @@ func (p *TGetDelegationTokenResp) Read(iprot thrift.TProtocol) error {
   var issetStatus bool = false;
 
   for {
-    _, ***REMOVED***eldTypeId, ***REMOVED***eldId, err := iprot.ReadFieldBegin()
+    _, fieldTypeId, fieldId, err := iprot.ReadFieldBegin()
     if err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T ***REMOVED***eld %d read error: ", p, ***REMOVED***eldId), err)
+      return thrift.PrependError(fmt.Sprintf("%T field %d read error: ", p, fieldId), err)
     }
-    if ***REMOVED***eldTypeId == thrift.STOP { break; }
-    switch ***REMOVED***eldId {
+    if fieldTypeId == thrift.STOP { break; }
+    switch fieldId {
     case 1:
-      if ***REMOVED***eldTypeId == thrift.STRUCT {
+      if fieldTypeId == thrift.STRUCT {
         if err := p.ReadField1(iprot); err != nil {
           return err
         }
-      } ***REMOVED*** {
-        if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      } else {
+        if err := iprot.Skip(fieldTypeId); err != nil {
           return err
         }
       }
       issetStatus = true
     case 2:
-      if ***REMOVED***eldTypeId == thrift.STRING {
+      if fieldTypeId == thrift.STRING {
         if err := p.ReadField2(iprot); err != nil {
           return err
         }
-      } ***REMOVED*** {
-        if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      } else {
+        if err := iprot.Skip(fieldTypeId); err != nil {
           return err
         }
       }
     default:
-      if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      if err := iprot.Skip(fieldTypeId); err != nil {
         return err
       }
     }
@@ -13699,7 +13699,7 @@ func (p *TGetDelegationTokenResp) Read(iprot thrift.TProtocol) error {
     return thrift.PrependError(fmt.Sprintf("%T read struct end error: ", p), err)
   }
   if !issetStatus{
-    return thrift.NewTProtocolExceptionWithType(thrift.INVALID_DATA, fmt.Errorf("Required ***REMOVED***eld Status is not set"));
+    return thrift.NewTProtocolExceptionWithType(thrift.INVALID_DATA, fmt.Errorf("Required field Status is not set"));
   }
   return nil
 }
@@ -13714,8 +13714,8 @@ func (p *TGetDelegationTokenResp)  ReadField1(iprot thrift.TProtocol) error {
 
 func (p *TGetDelegationTokenResp)  ReadField2(iprot thrift.TProtocol) error {
   if v, err := iprot.ReadString(); err != nil {
-  return thrift.PrependError("error reading ***REMOVED***eld 2: ", err)
-} ***REMOVED*** {
+  return thrift.PrependError("error reading field 2: ", err)
+} else {
   p.DelegationToken = &v
 }
   return nil
@@ -13729,7 +13729,7 @@ func (p *TGetDelegationTokenResp) Write(oprot thrift.TProtocol) error {
     if err := p.writeField2(oprot); err != nil { return err }
   }
   if err := oprot.WriteFieldStop(); err != nil {
-    return thrift.PrependError("write ***REMOVED***eld stop error: ", err) }
+    return thrift.PrependError("write field stop error: ", err) }
   if err := oprot.WriteStructEnd(); err != nil {
     return thrift.PrependError("write struct stop error: ", err) }
   return nil
@@ -13737,23 +13737,23 @@ func (p *TGetDelegationTokenResp) Write(oprot thrift.TProtocol) error {
 
 func (p *TGetDelegationTokenResp) writeField1(oprot thrift.TProtocol) (err error) {
   if err := oprot.WriteFieldBegin("status", thrift.STRUCT, 1); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld begin error 1:status: ", p), err) }
+    return thrift.PrependError(fmt.Sprintf("%T write field begin error 1:status: ", p), err) }
   if err := p.Status.Write(oprot); err != nil {
     return thrift.PrependError(fmt.Sprintf("%T error writing struct: ", p.Status), err)
   }
   if err := oprot.WriteFieldEnd(); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld end error 1:status: ", p), err) }
+    return thrift.PrependError(fmt.Sprintf("%T write field end error 1:status: ", p), err) }
   return err
 }
 
 func (p *TGetDelegationTokenResp) writeField2(oprot thrift.TProtocol) (err error) {
   if p.IsSetDelegationToken() {
     if err := oprot.WriteFieldBegin("delegationToken", thrift.STRING, 2); err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld begin error 2:delegationToken: ", p), err) }
+      return thrift.PrependError(fmt.Sprintf("%T write field begin error 2:delegationToken: ", p), err) }
     if err := oprot.WriteString(string(*p.DelegationToken)); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T.delegationToken (2) ***REMOVED***eld write error: ", p), err) }
+    return thrift.PrependError(fmt.Sprintf("%T.delegationToken (2) field write error: ", p), err) }
     if err := oprot.WriteFieldEnd(); err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld end error 2:delegationToken: ", p), err) }
+      return thrift.PrependError(fmt.Sprintf("%T write field end error 2:delegationToken: ", p), err) }
   }
   return err
 }
@@ -13801,36 +13801,36 @@ func (p *TCancelDelegationTokenReq) Read(iprot thrift.TProtocol) error {
   var issetDelegationToken bool = false;
 
   for {
-    _, ***REMOVED***eldTypeId, ***REMOVED***eldId, err := iprot.ReadFieldBegin()
+    _, fieldTypeId, fieldId, err := iprot.ReadFieldBegin()
     if err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T ***REMOVED***eld %d read error: ", p, ***REMOVED***eldId), err)
+      return thrift.PrependError(fmt.Sprintf("%T field %d read error: ", p, fieldId), err)
     }
-    if ***REMOVED***eldTypeId == thrift.STOP { break; }
-    switch ***REMOVED***eldId {
+    if fieldTypeId == thrift.STOP { break; }
+    switch fieldId {
     case 1:
-      if ***REMOVED***eldTypeId == thrift.STRUCT {
+      if fieldTypeId == thrift.STRUCT {
         if err := p.ReadField1(iprot); err != nil {
           return err
         }
-      } ***REMOVED*** {
-        if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      } else {
+        if err := iprot.Skip(fieldTypeId); err != nil {
           return err
         }
       }
       issetSessionHandle = true
     case 2:
-      if ***REMOVED***eldTypeId == thrift.STRING {
+      if fieldTypeId == thrift.STRING {
         if err := p.ReadField2(iprot); err != nil {
           return err
         }
-      } ***REMOVED*** {
-        if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      } else {
+        if err := iprot.Skip(fieldTypeId); err != nil {
           return err
         }
       }
       issetDelegationToken = true
     default:
-      if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      if err := iprot.Skip(fieldTypeId); err != nil {
         return err
       }
     }
@@ -13842,10 +13842,10 @@ func (p *TCancelDelegationTokenReq) Read(iprot thrift.TProtocol) error {
     return thrift.PrependError(fmt.Sprintf("%T read struct end error: ", p), err)
   }
   if !issetSessionHandle{
-    return thrift.NewTProtocolExceptionWithType(thrift.INVALID_DATA, fmt.Errorf("Required ***REMOVED***eld SessionHandle is not set"));
+    return thrift.NewTProtocolExceptionWithType(thrift.INVALID_DATA, fmt.Errorf("Required field SessionHandle is not set"));
   }
   if !issetDelegationToken{
-    return thrift.NewTProtocolExceptionWithType(thrift.INVALID_DATA, fmt.Errorf("Required ***REMOVED***eld DelegationToken is not set"));
+    return thrift.NewTProtocolExceptionWithType(thrift.INVALID_DATA, fmt.Errorf("Required field DelegationToken is not set"));
   }
   return nil
 }
@@ -13860,8 +13860,8 @@ func (p *TCancelDelegationTokenReq)  ReadField1(iprot thrift.TProtocol) error {
 
 func (p *TCancelDelegationTokenReq)  ReadField2(iprot thrift.TProtocol) error {
   if v, err := iprot.ReadString(); err != nil {
-  return thrift.PrependError("error reading ***REMOVED***eld 2: ", err)
-} ***REMOVED*** {
+  return thrift.PrependError("error reading field 2: ", err)
+} else {
   p.DelegationToken = v
 }
   return nil
@@ -13875,7 +13875,7 @@ func (p *TCancelDelegationTokenReq) Write(oprot thrift.TProtocol) error {
     if err := p.writeField2(oprot); err != nil { return err }
   }
   if err := oprot.WriteFieldStop(); err != nil {
-    return thrift.PrependError("write ***REMOVED***eld stop error: ", err) }
+    return thrift.PrependError("write field stop error: ", err) }
   if err := oprot.WriteStructEnd(); err != nil {
     return thrift.PrependError("write struct stop error: ", err) }
   return nil
@@ -13883,22 +13883,22 @@ func (p *TCancelDelegationTokenReq) Write(oprot thrift.TProtocol) error {
 
 func (p *TCancelDelegationTokenReq) writeField1(oprot thrift.TProtocol) (err error) {
   if err := oprot.WriteFieldBegin("sessionHandle", thrift.STRUCT, 1); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld begin error 1:sessionHandle: ", p), err) }
+    return thrift.PrependError(fmt.Sprintf("%T write field begin error 1:sessionHandle: ", p), err) }
   if err := p.SessionHandle.Write(oprot); err != nil {
     return thrift.PrependError(fmt.Sprintf("%T error writing struct: ", p.SessionHandle), err)
   }
   if err := oprot.WriteFieldEnd(); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld end error 1:sessionHandle: ", p), err) }
+    return thrift.PrependError(fmt.Sprintf("%T write field end error 1:sessionHandle: ", p), err) }
   return err
 }
 
 func (p *TCancelDelegationTokenReq) writeField2(oprot thrift.TProtocol) (err error) {
   if err := oprot.WriteFieldBegin("delegationToken", thrift.STRING, 2); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld begin error 2:delegationToken: ", p), err) }
+    return thrift.PrependError(fmt.Sprintf("%T write field begin error 2:delegationToken: ", p), err) }
   if err := oprot.WriteString(string(p.DelegationToken)); err != nil {
-  return thrift.PrependError(fmt.Sprintf("%T.delegationToken (2) ***REMOVED***eld write error: ", p), err) }
+  return thrift.PrependError(fmt.Sprintf("%T.delegationToken (2) field write error: ", p), err) }
   if err := oprot.WriteFieldEnd(); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld end error 2:delegationToken: ", p), err) }
+    return thrift.PrependError(fmt.Sprintf("%T write field end error 2:delegationToken: ", p), err) }
   return err
 }
 
@@ -13938,25 +13938,25 @@ func (p *TCancelDelegationTokenResp) Read(iprot thrift.TProtocol) error {
   var issetStatus bool = false;
 
   for {
-    _, ***REMOVED***eldTypeId, ***REMOVED***eldId, err := iprot.ReadFieldBegin()
+    _, fieldTypeId, fieldId, err := iprot.ReadFieldBegin()
     if err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T ***REMOVED***eld %d read error: ", p, ***REMOVED***eldId), err)
+      return thrift.PrependError(fmt.Sprintf("%T field %d read error: ", p, fieldId), err)
     }
-    if ***REMOVED***eldTypeId == thrift.STOP { break; }
-    switch ***REMOVED***eldId {
+    if fieldTypeId == thrift.STOP { break; }
+    switch fieldId {
     case 1:
-      if ***REMOVED***eldTypeId == thrift.STRUCT {
+      if fieldTypeId == thrift.STRUCT {
         if err := p.ReadField1(iprot); err != nil {
           return err
         }
-      } ***REMOVED*** {
-        if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      } else {
+        if err := iprot.Skip(fieldTypeId); err != nil {
           return err
         }
       }
       issetStatus = true
     default:
-      if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      if err := iprot.Skip(fieldTypeId); err != nil {
         return err
       }
     }
@@ -13968,7 +13968,7 @@ func (p *TCancelDelegationTokenResp) Read(iprot thrift.TProtocol) error {
     return thrift.PrependError(fmt.Sprintf("%T read struct end error: ", p), err)
   }
   if !issetStatus{
-    return thrift.NewTProtocolExceptionWithType(thrift.INVALID_DATA, fmt.Errorf("Required ***REMOVED***eld Status is not set"));
+    return thrift.NewTProtocolExceptionWithType(thrift.INVALID_DATA, fmt.Errorf("Required field Status is not set"));
   }
   return nil
 }
@@ -13988,7 +13988,7 @@ func (p *TCancelDelegationTokenResp) Write(oprot thrift.TProtocol) error {
     if err := p.writeField1(oprot); err != nil { return err }
   }
   if err := oprot.WriteFieldStop(); err != nil {
-    return thrift.PrependError("write ***REMOVED***eld stop error: ", err) }
+    return thrift.PrependError("write field stop error: ", err) }
   if err := oprot.WriteStructEnd(); err != nil {
     return thrift.PrependError("write struct stop error: ", err) }
   return nil
@@ -13996,12 +13996,12 @@ func (p *TCancelDelegationTokenResp) Write(oprot thrift.TProtocol) error {
 
 func (p *TCancelDelegationTokenResp) writeField1(oprot thrift.TProtocol) (err error) {
   if err := oprot.WriteFieldBegin("status", thrift.STRUCT, 1); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld begin error 1:status: ", p), err) }
+    return thrift.PrependError(fmt.Sprintf("%T write field begin error 1:status: ", p), err) }
   if err := p.Status.Write(oprot); err != nil {
     return thrift.PrependError(fmt.Sprintf("%T error writing struct: ", p.Status), err)
   }
   if err := oprot.WriteFieldEnd(); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld end error 1:status: ", p), err) }
+    return thrift.PrependError(fmt.Sprintf("%T write field end error 1:status: ", p), err) }
   return err
 }
 
@@ -14048,36 +14048,36 @@ func (p *TRenewDelegationTokenReq) Read(iprot thrift.TProtocol) error {
   var issetDelegationToken bool = false;
 
   for {
-    _, ***REMOVED***eldTypeId, ***REMOVED***eldId, err := iprot.ReadFieldBegin()
+    _, fieldTypeId, fieldId, err := iprot.ReadFieldBegin()
     if err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T ***REMOVED***eld %d read error: ", p, ***REMOVED***eldId), err)
+      return thrift.PrependError(fmt.Sprintf("%T field %d read error: ", p, fieldId), err)
     }
-    if ***REMOVED***eldTypeId == thrift.STOP { break; }
-    switch ***REMOVED***eldId {
+    if fieldTypeId == thrift.STOP { break; }
+    switch fieldId {
     case 1:
-      if ***REMOVED***eldTypeId == thrift.STRUCT {
+      if fieldTypeId == thrift.STRUCT {
         if err := p.ReadField1(iprot); err != nil {
           return err
         }
-      } ***REMOVED*** {
-        if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      } else {
+        if err := iprot.Skip(fieldTypeId); err != nil {
           return err
         }
       }
       issetSessionHandle = true
     case 2:
-      if ***REMOVED***eldTypeId == thrift.STRING {
+      if fieldTypeId == thrift.STRING {
         if err := p.ReadField2(iprot); err != nil {
           return err
         }
-      } ***REMOVED*** {
-        if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      } else {
+        if err := iprot.Skip(fieldTypeId); err != nil {
           return err
         }
       }
       issetDelegationToken = true
     default:
-      if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      if err := iprot.Skip(fieldTypeId); err != nil {
         return err
       }
     }
@@ -14089,10 +14089,10 @@ func (p *TRenewDelegationTokenReq) Read(iprot thrift.TProtocol) error {
     return thrift.PrependError(fmt.Sprintf("%T read struct end error: ", p), err)
   }
   if !issetSessionHandle{
-    return thrift.NewTProtocolExceptionWithType(thrift.INVALID_DATA, fmt.Errorf("Required ***REMOVED***eld SessionHandle is not set"));
+    return thrift.NewTProtocolExceptionWithType(thrift.INVALID_DATA, fmt.Errorf("Required field SessionHandle is not set"));
   }
   if !issetDelegationToken{
-    return thrift.NewTProtocolExceptionWithType(thrift.INVALID_DATA, fmt.Errorf("Required ***REMOVED***eld DelegationToken is not set"));
+    return thrift.NewTProtocolExceptionWithType(thrift.INVALID_DATA, fmt.Errorf("Required field DelegationToken is not set"));
   }
   return nil
 }
@@ -14107,8 +14107,8 @@ func (p *TRenewDelegationTokenReq)  ReadField1(iprot thrift.TProtocol) error {
 
 func (p *TRenewDelegationTokenReq)  ReadField2(iprot thrift.TProtocol) error {
   if v, err := iprot.ReadString(); err != nil {
-  return thrift.PrependError("error reading ***REMOVED***eld 2: ", err)
-} ***REMOVED*** {
+  return thrift.PrependError("error reading field 2: ", err)
+} else {
   p.DelegationToken = v
 }
   return nil
@@ -14122,7 +14122,7 @@ func (p *TRenewDelegationTokenReq) Write(oprot thrift.TProtocol) error {
     if err := p.writeField2(oprot); err != nil { return err }
   }
   if err := oprot.WriteFieldStop(); err != nil {
-    return thrift.PrependError("write ***REMOVED***eld stop error: ", err) }
+    return thrift.PrependError("write field stop error: ", err) }
   if err := oprot.WriteStructEnd(); err != nil {
     return thrift.PrependError("write struct stop error: ", err) }
   return nil
@@ -14130,22 +14130,22 @@ func (p *TRenewDelegationTokenReq) Write(oprot thrift.TProtocol) error {
 
 func (p *TRenewDelegationTokenReq) writeField1(oprot thrift.TProtocol) (err error) {
   if err := oprot.WriteFieldBegin("sessionHandle", thrift.STRUCT, 1); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld begin error 1:sessionHandle: ", p), err) }
+    return thrift.PrependError(fmt.Sprintf("%T write field begin error 1:sessionHandle: ", p), err) }
   if err := p.SessionHandle.Write(oprot); err != nil {
     return thrift.PrependError(fmt.Sprintf("%T error writing struct: ", p.SessionHandle), err)
   }
   if err := oprot.WriteFieldEnd(); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld end error 1:sessionHandle: ", p), err) }
+    return thrift.PrependError(fmt.Sprintf("%T write field end error 1:sessionHandle: ", p), err) }
   return err
 }
 
 func (p *TRenewDelegationTokenReq) writeField2(oprot thrift.TProtocol) (err error) {
   if err := oprot.WriteFieldBegin("delegationToken", thrift.STRING, 2); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld begin error 2:delegationToken: ", p), err) }
+    return thrift.PrependError(fmt.Sprintf("%T write field begin error 2:delegationToken: ", p), err) }
   if err := oprot.WriteString(string(p.DelegationToken)); err != nil {
-  return thrift.PrependError(fmt.Sprintf("%T.delegationToken (2) ***REMOVED***eld write error: ", p), err) }
+  return thrift.PrependError(fmt.Sprintf("%T.delegationToken (2) field write error: ", p), err) }
   if err := oprot.WriteFieldEnd(); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld end error 2:delegationToken: ", p), err) }
+    return thrift.PrependError(fmt.Sprintf("%T write field end error 2:delegationToken: ", p), err) }
   return err
 }
 
@@ -14185,25 +14185,25 @@ func (p *TRenewDelegationTokenResp) Read(iprot thrift.TProtocol) error {
   var issetStatus bool = false;
 
   for {
-    _, ***REMOVED***eldTypeId, ***REMOVED***eldId, err := iprot.ReadFieldBegin()
+    _, fieldTypeId, fieldId, err := iprot.ReadFieldBegin()
     if err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T ***REMOVED***eld %d read error: ", p, ***REMOVED***eldId), err)
+      return thrift.PrependError(fmt.Sprintf("%T field %d read error: ", p, fieldId), err)
     }
-    if ***REMOVED***eldTypeId == thrift.STOP { break; }
-    switch ***REMOVED***eldId {
+    if fieldTypeId == thrift.STOP { break; }
+    switch fieldId {
     case 1:
-      if ***REMOVED***eldTypeId == thrift.STRUCT {
+      if fieldTypeId == thrift.STRUCT {
         if err := p.ReadField1(iprot); err != nil {
           return err
         }
-      } ***REMOVED*** {
-        if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      } else {
+        if err := iprot.Skip(fieldTypeId); err != nil {
           return err
         }
       }
       issetStatus = true
     default:
-      if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      if err := iprot.Skip(fieldTypeId); err != nil {
         return err
       }
     }
@@ -14215,7 +14215,7 @@ func (p *TRenewDelegationTokenResp) Read(iprot thrift.TProtocol) error {
     return thrift.PrependError(fmt.Sprintf("%T read struct end error: ", p), err)
   }
   if !issetStatus{
-    return thrift.NewTProtocolExceptionWithType(thrift.INVALID_DATA, fmt.Errorf("Required ***REMOVED***eld Status is not set"));
+    return thrift.NewTProtocolExceptionWithType(thrift.INVALID_DATA, fmt.Errorf("Required field Status is not set"));
   }
   return nil
 }
@@ -14235,7 +14235,7 @@ func (p *TRenewDelegationTokenResp) Write(oprot thrift.TProtocol) error {
     if err := p.writeField1(oprot); err != nil { return err }
   }
   if err := oprot.WriteFieldStop(); err != nil {
-    return thrift.PrependError("write ***REMOVED***eld stop error: ", err) }
+    return thrift.PrependError("write field stop error: ", err) }
   if err := oprot.WriteStructEnd(); err != nil {
     return thrift.PrependError("write struct stop error: ", err) }
   return nil
@@ -14243,12 +14243,12 @@ func (p *TRenewDelegationTokenResp) Write(oprot thrift.TProtocol) error {
 
 func (p *TRenewDelegationTokenResp) writeField1(oprot thrift.TProtocol) (err error) {
   if err := oprot.WriteFieldBegin("status", thrift.STRUCT, 1); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld begin error 1:status: ", p), err) }
+    return thrift.PrependError(fmt.Sprintf("%T write field begin error 1:status: ", p), err) }
   if err := p.Status.Write(oprot); err != nil {
     return thrift.PrependError(fmt.Sprintf("%T error writing struct: ", p.Status), err)
   }
   if err := oprot.WriteFieldEnd(); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld end error 1:status: ", p), err) }
+    return thrift.PrependError(fmt.Sprintf("%T write field end error 1:status: ", p), err) }
   return err
 }
 
@@ -14316,80 +14316,80 @@ func (p *TProgressUpdateResp) Read(iprot thrift.TProtocol) error {
   var issetStartTime bool = false;
 
   for {
-    _, ***REMOVED***eldTypeId, ***REMOVED***eldId, err := iprot.ReadFieldBegin()
+    _, fieldTypeId, fieldId, err := iprot.ReadFieldBegin()
     if err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T ***REMOVED***eld %d read error: ", p, ***REMOVED***eldId), err)
+      return thrift.PrependError(fmt.Sprintf("%T field %d read error: ", p, fieldId), err)
     }
-    if ***REMOVED***eldTypeId == thrift.STOP { break; }
-    switch ***REMOVED***eldId {
+    if fieldTypeId == thrift.STOP { break; }
+    switch fieldId {
     case 1:
-      if ***REMOVED***eldTypeId == thrift.LIST {
+      if fieldTypeId == thrift.LIST {
         if err := p.ReadField1(iprot); err != nil {
           return err
         }
-      } ***REMOVED*** {
-        if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      } else {
+        if err := iprot.Skip(fieldTypeId); err != nil {
           return err
         }
       }
       issetHeaderNames = true
     case 2:
-      if ***REMOVED***eldTypeId == thrift.LIST {
+      if fieldTypeId == thrift.LIST {
         if err := p.ReadField2(iprot); err != nil {
           return err
         }
-      } ***REMOVED*** {
-        if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      } else {
+        if err := iprot.Skip(fieldTypeId); err != nil {
           return err
         }
       }
       issetRows = true
     case 3:
-      if ***REMOVED***eldTypeId == thrift.DOUBLE {
+      if fieldTypeId == thrift.DOUBLE {
         if err := p.ReadField3(iprot); err != nil {
           return err
         }
-      } ***REMOVED*** {
-        if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      } else {
+        if err := iprot.Skip(fieldTypeId); err != nil {
           return err
         }
       }
       issetProgressedPercentage = true
     case 4:
-      if ***REMOVED***eldTypeId == thrift.I32 {
+      if fieldTypeId == thrift.I32 {
         if err := p.ReadField4(iprot); err != nil {
           return err
         }
-      } ***REMOVED*** {
-        if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      } else {
+        if err := iprot.Skip(fieldTypeId); err != nil {
           return err
         }
       }
       issetStatus = true
     case 5:
-      if ***REMOVED***eldTypeId == thrift.STRING {
+      if fieldTypeId == thrift.STRING {
         if err := p.ReadField5(iprot); err != nil {
           return err
         }
-      } ***REMOVED*** {
-        if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      } else {
+        if err := iprot.Skip(fieldTypeId); err != nil {
           return err
         }
       }
       issetFooterSummary = true
     case 6:
-      if ***REMOVED***eldTypeId == thrift.I64 {
+      if fieldTypeId == thrift.I64 {
         if err := p.ReadField6(iprot); err != nil {
           return err
         }
-      } ***REMOVED*** {
-        if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      } else {
+        if err := iprot.Skip(fieldTypeId); err != nil {
           return err
         }
       }
       issetStartTime = true
     default:
-      if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      if err := iprot.Skip(fieldTypeId); err != nil {
         return err
       }
     }
@@ -14401,22 +14401,22 @@ func (p *TProgressUpdateResp) Read(iprot thrift.TProtocol) error {
     return thrift.PrependError(fmt.Sprintf("%T read struct end error: ", p), err)
   }
   if !issetHeaderNames{
-    return thrift.NewTProtocolExceptionWithType(thrift.INVALID_DATA, fmt.Errorf("Required ***REMOVED***eld HeaderNames is not set"));
+    return thrift.NewTProtocolExceptionWithType(thrift.INVALID_DATA, fmt.Errorf("Required field HeaderNames is not set"));
   }
   if !issetRows{
-    return thrift.NewTProtocolExceptionWithType(thrift.INVALID_DATA, fmt.Errorf("Required ***REMOVED***eld Rows is not set"));
+    return thrift.NewTProtocolExceptionWithType(thrift.INVALID_DATA, fmt.Errorf("Required field Rows is not set"));
   }
   if !issetProgressedPercentage{
-    return thrift.NewTProtocolExceptionWithType(thrift.INVALID_DATA, fmt.Errorf("Required ***REMOVED***eld ProgressedPercentage is not set"));
+    return thrift.NewTProtocolExceptionWithType(thrift.INVALID_DATA, fmt.Errorf("Required field ProgressedPercentage is not set"));
   }
   if !issetStatus{
-    return thrift.NewTProtocolExceptionWithType(thrift.INVALID_DATA, fmt.Errorf("Required ***REMOVED***eld Status is not set"));
+    return thrift.NewTProtocolExceptionWithType(thrift.INVALID_DATA, fmt.Errorf("Required field Status is not set"));
   }
   if !issetFooterSummary{
-    return thrift.NewTProtocolExceptionWithType(thrift.INVALID_DATA, fmt.Errorf("Required ***REMOVED***eld FooterSummary is not set"));
+    return thrift.NewTProtocolExceptionWithType(thrift.INVALID_DATA, fmt.Errorf("Required field FooterSummary is not set"));
   }
   if !issetStartTime{
-    return thrift.NewTProtocolExceptionWithType(thrift.INVALID_DATA, fmt.Errorf("Required ***REMOVED***eld StartTime is not set"));
+    return thrift.NewTProtocolExceptionWithType(thrift.INVALID_DATA, fmt.Errorf("Required field StartTime is not set"));
   }
   return nil
 }
@@ -14431,8 +14431,8 @@ func (p *TProgressUpdateResp)  ReadField1(iprot thrift.TProtocol) error {
   for i := 0; i < size; i ++ {
 var _elem27 string
     if v, err := iprot.ReadString(); err != nil {
-    return thrift.PrependError("error reading ***REMOVED***eld 0: ", err)
-} ***REMOVED*** {
+    return thrift.PrependError("error reading field 0: ", err)
+} else {
     _elem27 = v
 }
     p.HeaderNames = append(p.HeaderNames, _elem27)
@@ -14460,8 +14460,8 @@ func (p *TProgressUpdateResp)  ReadField2(iprot thrift.TProtocol) error {
     for i := 0; i < size; i ++ {
 var _elem29 string
       if v, err := iprot.ReadString(); err != nil {
-      return thrift.PrependError("error reading ***REMOVED***eld 0: ", err)
-} ***REMOVED*** {
+      return thrift.PrependError("error reading field 0: ", err)
+} else {
       _elem29 = v
 }
       _elem28 = append(_elem28, _elem29)
@@ -14479,8 +14479,8 @@ var _elem29 string
 
 func (p *TProgressUpdateResp)  ReadField3(iprot thrift.TProtocol) error {
   if v, err := iprot.ReadDouble(); err != nil {
-  return thrift.PrependError("error reading ***REMOVED***eld 3: ", err)
-} ***REMOVED*** {
+  return thrift.PrependError("error reading field 3: ", err)
+} else {
   p.ProgressedPercentage = v
 }
   return nil
@@ -14488,8 +14488,8 @@ func (p *TProgressUpdateResp)  ReadField3(iprot thrift.TProtocol) error {
 
 func (p *TProgressUpdateResp)  ReadField4(iprot thrift.TProtocol) error {
   if v, err := iprot.ReadI32(); err != nil {
-  return thrift.PrependError("error reading ***REMOVED***eld 4: ", err)
-} ***REMOVED*** {
+  return thrift.PrependError("error reading field 4: ", err)
+} else {
   temp := TJobExecutionStatus(v)
   p.Status = temp
 }
@@ -14498,8 +14498,8 @@ func (p *TProgressUpdateResp)  ReadField4(iprot thrift.TProtocol) error {
 
 func (p *TProgressUpdateResp)  ReadField5(iprot thrift.TProtocol) error {
   if v, err := iprot.ReadString(); err != nil {
-  return thrift.PrependError("error reading ***REMOVED***eld 5: ", err)
-} ***REMOVED*** {
+  return thrift.PrependError("error reading field 5: ", err)
+} else {
   p.FooterSummary = v
 }
   return nil
@@ -14507,8 +14507,8 @@ func (p *TProgressUpdateResp)  ReadField5(iprot thrift.TProtocol) error {
 
 func (p *TProgressUpdateResp)  ReadField6(iprot thrift.TProtocol) error {
   if v, err := iprot.ReadI64(); err != nil {
-  return thrift.PrependError("error reading ***REMOVED***eld 6: ", err)
-} ***REMOVED*** {
+  return thrift.PrependError("error reading field 6: ", err)
+} else {
   p.StartTime = v
 }
   return nil
@@ -14526,7 +14526,7 @@ func (p *TProgressUpdateResp) Write(oprot thrift.TProtocol) error {
     if err := p.writeField6(oprot); err != nil { return err }
   }
   if err := oprot.WriteFieldStop(); err != nil {
-    return thrift.PrependError("write ***REMOVED***eld stop error: ", err) }
+    return thrift.PrependError("write field stop error: ", err) }
   if err := oprot.WriteStructEnd(); err != nil {
     return thrift.PrependError("write struct stop error: ", err) }
   return nil
@@ -14534,25 +14534,25 @@ func (p *TProgressUpdateResp) Write(oprot thrift.TProtocol) error {
 
 func (p *TProgressUpdateResp) writeField1(oprot thrift.TProtocol) (err error) {
   if err := oprot.WriteFieldBegin("headerNames", thrift.LIST, 1); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld begin error 1:headerNames: ", p), err) }
+    return thrift.PrependError(fmt.Sprintf("%T write field begin error 1:headerNames: ", p), err) }
   if err := oprot.WriteListBegin(thrift.STRING, len(p.HeaderNames)); err != nil {
     return thrift.PrependError("error writing list begin: ", err)
   }
   for _, v := range p.HeaderNames {
     if err := oprot.WriteString(string(v)); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T. (0) ***REMOVED***eld write error: ", p), err) }
+    return thrift.PrependError(fmt.Sprintf("%T. (0) field write error: ", p), err) }
   }
   if err := oprot.WriteListEnd(); err != nil {
     return thrift.PrependError("error writing list end: ", err)
   }
   if err := oprot.WriteFieldEnd(); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld end error 1:headerNames: ", p), err) }
+    return thrift.PrependError(fmt.Sprintf("%T write field end error 1:headerNames: ", p), err) }
   return err
 }
 
 func (p *TProgressUpdateResp) writeField2(oprot thrift.TProtocol) (err error) {
   if err := oprot.WriteFieldBegin("rows", thrift.LIST, 2); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld begin error 2:rows: ", p), err) }
+    return thrift.PrependError(fmt.Sprintf("%T write field begin error 2:rows: ", p), err) }
   if err := oprot.WriteListBegin(thrift.LIST, len(p.Rows)); err != nil {
     return thrift.PrependError("error writing list begin: ", err)
   }
@@ -14562,7 +14562,7 @@ func (p *TProgressUpdateResp) writeField2(oprot thrift.TProtocol) (err error) {
     }
     for _, v := range v {
       if err := oprot.WriteString(string(v)); err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T. (0) ***REMOVED***eld write error: ", p), err) }
+      return thrift.PrependError(fmt.Sprintf("%T. (0) field write error: ", p), err) }
     }
     if err := oprot.WriteListEnd(); err != nil {
       return thrift.PrependError("error writing list end: ", err)
@@ -14572,47 +14572,47 @@ func (p *TProgressUpdateResp) writeField2(oprot thrift.TProtocol) (err error) {
     return thrift.PrependError("error writing list end: ", err)
   }
   if err := oprot.WriteFieldEnd(); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld end error 2:rows: ", p), err) }
+    return thrift.PrependError(fmt.Sprintf("%T write field end error 2:rows: ", p), err) }
   return err
 }
 
 func (p *TProgressUpdateResp) writeField3(oprot thrift.TProtocol) (err error) {
   if err := oprot.WriteFieldBegin("progressedPercentage", thrift.DOUBLE, 3); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld begin error 3:progressedPercentage: ", p), err) }
+    return thrift.PrependError(fmt.Sprintf("%T write field begin error 3:progressedPercentage: ", p), err) }
   if err := oprot.WriteDouble(float64(p.ProgressedPercentage)); err != nil {
-  return thrift.PrependError(fmt.Sprintf("%T.progressedPercentage (3) ***REMOVED***eld write error: ", p), err) }
+  return thrift.PrependError(fmt.Sprintf("%T.progressedPercentage (3) field write error: ", p), err) }
   if err := oprot.WriteFieldEnd(); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld end error 3:progressedPercentage: ", p), err) }
+    return thrift.PrependError(fmt.Sprintf("%T write field end error 3:progressedPercentage: ", p), err) }
   return err
 }
 
 func (p *TProgressUpdateResp) writeField4(oprot thrift.TProtocol) (err error) {
   if err := oprot.WriteFieldBegin("status", thrift.I32, 4); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld begin error 4:status: ", p), err) }
+    return thrift.PrependError(fmt.Sprintf("%T write field begin error 4:status: ", p), err) }
   if err := oprot.WriteI32(int32(p.Status)); err != nil {
-  return thrift.PrependError(fmt.Sprintf("%T.status (4) ***REMOVED***eld write error: ", p), err) }
+  return thrift.PrependError(fmt.Sprintf("%T.status (4) field write error: ", p), err) }
   if err := oprot.WriteFieldEnd(); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld end error 4:status: ", p), err) }
+    return thrift.PrependError(fmt.Sprintf("%T write field end error 4:status: ", p), err) }
   return err
 }
 
 func (p *TProgressUpdateResp) writeField5(oprot thrift.TProtocol) (err error) {
   if err := oprot.WriteFieldBegin("footerSummary", thrift.STRING, 5); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld begin error 5:footerSummary: ", p), err) }
+    return thrift.PrependError(fmt.Sprintf("%T write field begin error 5:footerSummary: ", p), err) }
   if err := oprot.WriteString(string(p.FooterSummary)); err != nil {
-  return thrift.PrependError(fmt.Sprintf("%T.footerSummary (5) ***REMOVED***eld write error: ", p), err) }
+  return thrift.PrependError(fmt.Sprintf("%T.footerSummary (5) field write error: ", p), err) }
   if err := oprot.WriteFieldEnd(); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld end error 5:footerSummary: ", p), err) }
+    return thrift.PrependError(fmt.Sprintf("%T write field end error 5:footerSummary: ", p), err) }
   return err
 }
 
 func (p *TProgressUpdateResp) writeField6(oprot thrift.TProtocol) (err error) {
   if err := oprot.WriteFieldBegin("startTime", thrift.I64, 6); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld begin error 6:startTime: ", p), err) }
+    return thrift.PrependError(fmt.Sprintf("%T write field begin error 6:startTime: ", p), err) }
   if err := oprot.WriteI64(int64(p.StartTime)); err != nil {
-  return thrift.PrependError(fmt.Sprintf("%T.startTime (6) ***REMOVED***eld write error: ", p), err) }
+  return thrift.PrependError(fmt.Sprintf("%T.startTime (6) field write error: ", p), err) }
   if err := oprot.WriteFieldEnd(); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld end error 6:startTime: ", p), err) }
+    return thrift.PrependError(fmt.Sprintf("%T write field end error 6:startTime: ", p), err) }
   return err
 }
 
@@ -15054,7 +15054,7 @@ var retval *TOpenSessionResp
     oprot.WriteMessageEnd()
     oprot.Flush()
     return true, err2
-  } ***REMOVED*** {
+  } else {
     result.Success = retval
 }
   if err2 = oprot.WriteMessageBegin("OpenSession", thrift.REPLY, seqId); err2 != nil {
@@ -15102,7 +15102,7 @@ var retval *TCloseSessionResp
     oprot.WriteMessageEnd()
     oprot.Flush()
     return true, err2
-  } ***REMOVED*** {
+  } else {
     result.Success = retval
 }
   if err2 = oprot.WriteMessageBegin("CloseSession", thrift.REPLY, seqId); err2 != nil {
@@ -15150,7 +15150,7 @@ var retval *TGetInfoResp
     oprot.WriteMessageEnd()
     oprot.Flush()
     return true, err2
-  } ***REMOVED*** {
+  } else {
     result.Success = retval
 }
   if err2 = oprot.WriteMessageBegin("GetInfo", thrift.REPLY, seqId); err2 != nil {
@@ -15198,7 +15198,7 @@ var retval *TExecuteStatementResp
     oprot.WriteMessageEnd()
     oprot.Flush()
     return true, err2
-  } ***REMOVED*** {
+  } else {
     result.Success = retval
 }
   if err2 = oprot.WriteMessageBegin("ExecuteStatement", thrift.REPLY, seqId); err2 != nil {
@@ -15246,7 +15246,7 @@ var retval *TGetTypeInfoResp
     oprot.WriteMessageEnd()
     oprot.Flush()
     return true, err2
-  } ***REMOVED*** {
+  } else {
     result.Success = retval
 }
   if err2 = oprot.WriteMessageBegin("GetTypeInfo", thrift.REPLY, seqId); err2 != nil {
@@ -15294,7 +15294,7 @@ var retval *TGetCatalogsResp
     oprot.WriteMessageEnd()
     oprot.Flush()
     return true, err2
-  } ***REMOVED*** {
+  } else {
     result.Success = retval
 }
   if err2 = oprot.WriteMessageBegin("GetCatalogs", thrift.REPLY, seqId); err2 != nil {
@@ -15342,7 +15342,7 @@ var retval *TGetSchemasResp
     oprot.WriteMessageEnd()
     oprot.Flush()
     return true, err2
-  } ***REMOVED*** {
+  } else {
     result.Success = retval
 }
   if err2 = oprot.WriteMessageBegin("GetSchemas", thrift.REPLY, seqId); err2 != nil {
@@ -15390,7 +15390,7 @@ var retval *TGetTablesResp
     oprot.WriteMessageEnd()
     oprot.Flush()
     return true, err2
-  } ***REMOVED*** {
+  } else {
     result.Success = retval
 }
   if err2 = oprot.WriteMessageBegin("GetTables", thrift.REPLY, seqId); err2 != nil {
@@ -15438,7 +15438,7 @@ var retval *TGetTableTypesResp
     oprot.WriteMessageEnd()
     oprot.Flush()
     return true, err2
-  } ***REMOVED*** {
+  } else {
     result.Success = retval
 }
   if err2 = oprot.WriteMessageBegin("GetTableTypes", thrift.REPLY, seqId); err2 != nil {
@@ -15486,7 +15486,7 @@ var retval *TGetColumnsResp
     oprot.WriteMessageEnd()
     oprot.Flush()
     return true, err2
-  } ***REMOVED*** {
+  } else {
     result.Success = retval
 }
   if err2 = oprot.WriteMessageBegin("GetColumns", thrift.REPLY, seqId); err2 != nil {
@@ -15534,7 +15534,7 @@ var retval *TGetFunctionsResp
     oprot.WriteMessageEnd()
     oprot.Flush()
     return true, err2
-  } ***REMOVED*** {
+  } else {
     result.Success = retval
 }
   if err2 = oprot.WriteMessageBegin("GetFunctions", thrift.REPLY, seqId); err2 != nil {
@@ -15582,7 +15582,7 @@ var retval *TGetPrimaryKeysResp
     oprot.WriteMessageEnd()
     oprot.Flush()
     return true, err2
-  } ***REMOVED*** {
+  } else {
     result.Success = retval
 }
   if err2 = oprot.WriteMessageBegin("GetPrimaryKeys", thrift.REPLY, seqId); err2 != nil {
@@ -15630,7 +15630,7 @@ var retval *TGetCrossReferenceResp
     oprot.WriteMessageEnd()
     oprot.Flush()
     return true, err2
-  } ***REMOVED*** {
+  } else {
     result.Success = retval
 }
   if err2 = oprot.WriteMessageBegin("GetCrossReference", thrift.REPLY, seqId); err2 != nil {
@@ -15678,7 +15678,7 @@ var retval *TGetOperationStatusResp
     oprot.WriteMessageEnd()
     oprot.Flush()
     return true, err2
-  } ***REMOVED*** {
+  } else {
     result.Success = retval
 }
   if err2 = oprot.WriteMessageBegin("GetOperationStatus", thrift.REPLY, seqId); err2 != nil {
@@ -15726,7 +15726,7 @@ var retval *TCancelOperationResp
     oprot.WriteMessageEnd()
     oprot.Flush()
     return true, err2
-  } ***REMOVED*** {
+  } else {
     result.Success = retval
 }
   if err2 = oprot.WriteMessageBegin("CancelOperation", thrift.REPLY, seqId); err2 != nil {
@@ -15774,7 +15774,7 @@ var retval *TCloseOperationResp
     oprot.WriteMessageEnd()
     oprot.Flush()
     return true, err2
-  } ***REMOVED*** {
+  } else {
     result.Success = retval
 }
   if err2 = oprot.WriteMessageBegin("CloseOperation", thrift.REPLY, seqId); err2 != nil {
@@ -15822,7 +15822,7 @@ var retval *TGetResultSetMetadataResp
     oprot.WriteMessageEnd()
     oprot.Flush()
     return true, err2
-  } ***REMOVED*** {
+  } else {
     result.Success = retval
 }
   if err2 = oprot.WriteMessageBegin("GetResultSetMetadata", thrift.REPLY, seqId); err2 != nil {
@@ -15870,7 +15870,7 @@ var retval *TFetchResultsResp
     oprot.WriteMessageEnd()
     oprot.Flush()
     return true, err2
-  } ***REMOVED*** {
+  } else {
     result.Success = retval
 }
   if err2 = oprot.WriteMessageBegin("FetchResults", thrift.REPLY, seqId); err2 != nil {
@@ -15918,7 +15918,7 @@ var retval *TGetDelegationTokenResp
     oprot.WriteMessageEnd()
     oprot.Flush()
     return true, err2
-  } ***REMOVED*** {
+  } else {
     result.Success = retval
 }
   if err2 = oprot.WriteMessageBegin("GetDelegationToken", thrift.REPLY, seqId); err2 != nil {
@@ -15966,7 +15966,7 @@ var retval *TCancelDelegationTokenResp
     oprot.WriteMessageEnd()
     oprot.Flush()
     return true, err2
-  } ***REMOVED*** {
+  } else {
     result.Success = retval
 }
   if err2 = oprot.WriteMessageBegin("CancelDelegationToken", thrift.REPLY, seqId); err2 != nil {
@@ -16014,7 +16014,7 @@ var retval *TRenewDelegationTokenResp
     oprot.WriteMessageEnd()
     oprot.Flush()
     return true, err2
-  } ***REMOVED*** {
+  } else {
     result.Success = retval
 }
   if err2 = oprot.WriteMessageBegin("RenewDelegationToken", thrift.REPLY, seqId); err2 != nil {
@@ -16066,24 +16066,24 @@ func (p *TCLIServiceOpenSessionArgs) Read(iprot thrift.TProtocol) error {
 
 
   for {
-    _, ***REMOVED***eldTypeId, ***REMOVED***eldId, err := iprot.ReadFieldBegin()
+    _, fieldTypeId, fieldId, err := iprot.ReadFieldBegin()
     if err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T ***REMOVED***eld %d read error: ", p, ***REMOVED***eldId), err)
+      return thrift.PrependError(fmt.Sprintf("%T field %d read error: ", p, fieldId), err)
     }
-    if ***REMOVED***eldTypeId == thrift.STOP { break; }
-    switch ***REMOVED***eldId {
+    if fieldTypeId == thrift.STOP { break; }
+    switch fieldId {
     case 1:
-      if ***REMOVED***eldTypeId == thrift.STRUCT {
+      if fieldTypeId == thrift.STRUCT {
         if err := p.ReadField1(iprot); err != nil {
           return err
         }
-      } ***REMOVED*** {
-        if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      } else {
+        if err := iprot.Skip(fieldTypeId); err != nil {
           return err
         }
       }
     default:
-      if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      if err := iprot.Skip(fieldTypeId); err != nil {
         return err
       }
     }
@@ -16114,7 +16114,7 @@ func (p *TCLIServiceOpenSessionArgs) Write(oprot thrift.TProtocol) error {
     if err := p.writeField1(oprot); err != nil { return err }
   }
   if err := oprot.WriteFieldStop(); err != nil {
-    return thrift.PrependError("write ***REMOVED***eld stop error: ", err) }
+    return thrift.PrependError("write field stop error: ", err) }
   if err := oprot.WriteStructEnd(); err != nil {
     return thrift.PrependError("write struct stop error: ", err) }
   return nil
@@ -16122,12 +16122,12 @@ func (p *TCLIServiceOpenSessionArgs) Write(oprot thrift.TProtocol) error {
 
 func (p *TCLIServiceOpenSessionArgs) writeField1(oprot thrift.TProtocol) (err error) {
   if err := oprot.WriteFieldBegin("req", thrift.STRUCT, 1); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld begin error 1:req: ", p), err) }
+    return thrift.PrependError(fmt.Sprintf("%T write field begin error 1:req: ", p), err) }
   if err := p.Req.Write(oprot); err != nil {
     return thrift.PrependError(fmt.Sprintf("%T error writing struct: ", p.Req), err)
   }
   if err := oprot.WriteFieldEnd(); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld end error 1:req: ", p), err) }
+    return thrift.PrependError(fmt.Sprintf("%T write field end error 1:req: ", p), err) }
   return err
 }
 
@@ -16166,24 +16166,24 @@ func (p *TCLIServiceOpenSessionResult) Read(iprot thrift.TProtocol) error {
 
 
   for {
-    _, ***REMOVED***eldTypeId, ***REMOVED***eldId, err := iprot.ReadFieldBegin()
+    _, fieldTypeId, fieldId, err := iprot.ReadFieldBegin()
     if err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T ***REMOVED***eld %d read error: ", p, ***REMOVED***eldId), err)
+      return thrift.PrependError(fmt.Sprintf("%T field %d read error: ", p, fieldId), err)
     }
-    if ***REMOVED***eldTypeId == thrift.STOP { break; }
-    switch ***REMOVED***eldId {
+    if fieldTypeId == thrift.STOP { break; }
+    switch fieldId {
     case 0:
-      if ***REMOVED***eldTypeId == thrift.STRUCT {
+      if fieldTypeId == thrift.STRUCT {
         if err := p.ReadField0(iprot); err != nil {
           return err
         }
-      } ***REMOVED*** {
-        if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      } else {
+        if err := iprot.Skip(fieldTypeId); err != nil {
           return err
         }
       }
     default:
-      if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      if err := iprot.Skip(fieldTypeId); err != nil {
         return err
       }
     }
@@ -16214,7 +16214,7 @@ func (p *TCLIServiceOpenSessionResult) Write(oprot thrift.TProtocol) error {
     if err := p.writeField0(oprot); err != nil { return err }
   }
   if err := oprot.WriteFieldStop(); err != nil {
-    return thrift.PrependError("write ***REMOVED***eld stop error: ", err) }
+    return thrift.PrependError("write field stop error: ", err) }
   if err := oprot.WriteStructEnd(); err != nil {
     return thrift.PrependError("write struct stop error: ", err) }
   return nil
@@ -16223,12 +16223,12 @@ func (p *TCLIServiceOpenSessionResult) Write(oprot thrift.TProtocol) error {
 func (p *TCLIServiceOpenSessionResult) writeField0(oprot thrift.TProtocol) (err error) {
   if p.IsSetSuccess() {
     if err := oprot.WriteFieldBegin("success", thrift.STRUCT, 0); err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld begin error 0:success: ", p), err) }
+      return thrift.PrependError(fmt.Sprintf("%T write field begin error 0:success: ", p), err) }
     if err := p.Success.Write(oprot); err != nil {
       return thrift.PrependError(fmt.Sprintf("%T error writing struct: ", p.Success), err)
     }
     if err := oprot.WriteFieldEnd(); err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld end error 0:success: ", p), err) }
+      return thrift.PrependError(fmt.Sprintf("%T write field end error 0:success: ", p), err) }
   }
   return err
 }
@@ -16268,24 +16268,24 @@ func (p *TCLIServiceCloseSessionArgs) Read(iprot thrift.TProtocol) error {
 
 
   for {
-    _, ***REMOVED***eldTypeId, ***REMOVED***eldId, err := iprot.ReadFieldBegin()
+    _, fieldTypeId, fieldId, err := iprot.ReadFieldBegin()
     if err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T ***REMOVED***eld %d read error: ", p, ***REMOVED***eldId), err)
+      return thrift.PrependError(fmt.Sprintf("%T field %d read error: ", p, fieldId), err)
     }
-    if ***REMOVED***eldTypeId == thrift.STOP { break; }
-    switch ***REMOVED***eldId {
+    if fieldTypeId == thrift.STOP { break; }
+    switch fieldId {
     case 1:
-      if ***REMOVED***eldTypeId == thrift.STRUCT {
+      if fieldTypeId == thrift.STRUCT {
         if err := p.ReadField1(iprot); err != nil {
           return err
         }
-      } ***REMOVED*** {
-        if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      } else {
+        if err := iprot.Skip(fieldTypeId); err != nil {
           return err
         }
       }
     default:
-      if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      if err := iprot.Skip(fieldTypeId); err != nil {
         return err
       }
     }
@@ -16314,7 +16314,7 @@ func (p *TCLIServiceCloseSessionArgs) Write(oprot thrift.TProtocol) error {
     if err := p.writeField1(oprot); err != nil { return err }
   }
   if err := oprot.WriteFieldStop(); err != nil {
-    return thrift.PrependError("write ***REMOVED***eld stop error: ", err) }
+    return thrift.PrependError("write field stop error: ", err) }
   if err := oprot.WriteStructEnd(); err != nil {
     return thrift.PrependError("write struct stop error: ", err) }
   return nil
@@ -16322,12 +16322,12 @@ func (p *TCLIServiceCloseSessionArgs) Write(oprot thrift.TProtocol) error {
 
 func (p *TCLIServiceCloseSessionArgs) writeField1(oprot thrift.TProtocol) (err error) {
   if err := oprot.WriteFieldBegin("req", thrift.STRUCT, 1); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld begin error 1:req: ", p), err) }
+    return thrift.PrependError(fmt.Sprintf("%T write field begin error 1:req: ", p), err) }
   if err := p.Req.Write(oprot); err != nil {
     return thrift.PrependError(fmt.Sprintf("%T error writing struct: ", p.Req), err)
   }
   if err := oprot.WriteFieldEnd(); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld end error 1:req: ", p), err) }
+    return thrift.PrependError(fmt.Sprintf("%T write field end error 1:req: ", p), err) }
   return err
 }
 
@@ -16366,24 +16366,24 @@ func (p *TCLIServiceCloseSessionResult) Read(iprot thrift.TProtocol) error {
 
 
   for {
-    _, ***REMOVED***eldTypeId, ***REMOVED***eldId, err := iprot.ReadFieldBegin()
+    _, fieldTypeId, fieldId, err := iprot.ReadFieldBegin()
     if err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T ***REMOVED***eld %d read error: ", p, ***REMOVED***eldId), err)
+      return thrift.PrependError(fmt.Sprintf("%T field %d read error: ", p, fieldId), err)
     }
-    if ***REMOVED***eldTypeId == thrift.STOP { break; }
-    switch ***REMOVED***eldId {
+    if fieldTypeId == thrift.STOP { break; }
+    switch fieldId {
     case 0:
-      if ***REMOVED***eldTypeId == thrift.STRUCT {
+      if fieldTypeId == thrift.STRUCT {
         if err := p.ReadField0(iprot); err != nil {
           return err
         }
-      } ***REMOVED*** {
-        if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      } else {
+        if err := iprot.Skip(fieldTypeId); err != nil {
           return err
         }
       }
     default:
-      if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      if err := iprot.Skip(fieldTypeId); err != nil {
         return err
       }
     }
@@ -16412,7 +16412,7 @@ func (p *TCLIServiceCloseSessionResult) Write(oprot thrift.TProtocol) error {
     if err := p.writeField0(oprot); err != nil { return err }
   }
   if err := oprot.WriteFieldStop(); err != nil {
-    return thrift.PrependError("write ***REMOVED***eld stop error: ", err) }
+    return thrift.PrependError("write field stop error: ", err) }
   if err := oprot.WriteStructEnd(); err != nil {
     return thrift.PrependError("write struct stop error: ", err) }
   return nil
@@ -16421,12 +16421,12 @@ func (p *TCLIServiceCloseSessionResult) Write(oprot thrift.TProtocol) error {
 func (p *TCLIServiceCloseSessionResult) writeField0(oprot thrift.TProtocol) (err error) {
   if p.IsSetSuccess() {
     if err := oprot.WriteFieldBegin("success", thrift.STRUCT, 0); err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld begin error 0:success: ", p), err) }
+      return thrift.PrependError(fmt.Sprintf("%T write field begin error 0:success: ", p), err) }
     if err := p.Success.Write(oprot); err != nil {
       return thrift.PrependError(fmt.Sprintf("%T error writing struct: ", p.Success), err)
     }
     if err := oprot.WriteFieldEnd(); err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld end error 0:success: ", p), err) }
+      return thrift.PrependError(fmt.Sprintf("%T write field end error 0:success: ", p), err) }
   }
   return err
 }
@@ -16466,24 +16466,24 @@ func (p *TCLIServiceGetInfoArgs) Read(iprot thrift.TProtocol) error {
 
 
   for {
-    _, ***REMOVED***eldTypeId, ***REMOVED***eldId, err := iprot.ReadFieldBegin()
+    _, fieldTypeId, fieldId, err := iprot.ReadFieldBegin()
     if err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T ***REMOVED***eld %d read error: ", p, ***REMOVED***eldId), err)
+      return thrift.PrependError(fmt.Sprintf("%T field %d read error: ", p, fieldId), err)
     }
-    if ***REMOVED***eldTypeId == thrift.STOP { break; }
-    switch ***REMOVED***eldId {
+    if fieldTypeId == thrift.STOP { break; }
+    switch fieldId {
     case 1:
-      if ***REMOVED***eldTypeId == thrift.STRUCT {
+      if fieldTypeId == thrift.STRUCT {
         if err := p.ReadField1(iprot); err != nil {
           return err
         }
-      } ***REMOVED*** {
-        if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      } else {
+        if err := iprot.Skip(fieldTypeId); err != nil {
           return err
         }
       }
     default:
-      if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      if err := iprot.Skip(fieldTypeId); err != nil {
         return err
       }
     }
@@ -16512,7 +16512,7 @@ func (p *TCLIServiceGetInfoArgs) Write(oprot thrift.TProtocol) error {
     if err := p.writeField1(oprot); err != nil { return err }
   }
   if err := oprot.WriteFieldStop(); err != nil {
-    return thrift.PrependError("write ***REMOVED***eld stop error: ", err) }
+    return thrift.PrependError("write field stop error: ", err) }
   if err := oprot.WriteStructEnd(); err != nil {
     return thrift.PrependError("write struct stop error: ", err) }
   return nil
@@ -16520,12 +16520,12 @@ func (p *TCLIServiceGetInfoArgs) Write(oprot thrift.TProtocol) error {
 
 func (p *TCLIServiceGetInfoArgs) writeField1(oprot thrift.TProtocol) (err error) {
   if err := oprot.WriteFieldBegin("req", thrift.STRUCT, 1); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld begin error 1:req: ", p), err) }
+    return thrift.PrependError(fmt.Sprintf("%T write field begin error 1:req: ", p), err) }
   if err := p.Req.Write(oprot); err != nil {
     return thrift.PrependError(fmt.Sprintf("%T error writing struct: ", p.Req), err)
   }
   if err := oprot.WriteFieldEnd(); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld end error 1:req: ", p), err) }
+    return thrift.PrependError(fmt.Sprintf("%T write field end error 1:req: ", p), err) }
   return err
 }
 
@@ -16564,24 +16564,24 @@ func (p *TCLIServiceGetInfoResult) Read(iprot thrift.TProtocol) error {
 
 
   for {
-    _, ***REMOVED***eldTypeId, ***REMOVED***eldId, err := iprot.ReadFieldBegin()
+    _, fieldTypeId, fieldId, err := iprot.ReadFieldBegin()
     if err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T ***REMOVED***eld %d read error: ", p, ***REMOVED***eldId), err)
+      return thrift.PrependError(fmt.Sprintf("%T field %d read error: ", p, fieldId), err)
     }
-    if ***REMOVED***eldTypeId == thrift.STOP { break; }
-    switch ***REMOVED***eldId {
+    if fieldTypeId == thrift.STOP { break; }
+    switch fieldId {
     case 0:
-      if ***REMOVED***eldTypeId == thrift.STRUCT {
+      if fieldTypeId == thrift.STRUCT {
         if err := p.ReadField0(iprot); err != nil {
           return err
         }
-      } ***REMOVED*** {
-        if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      } else {
+        if err := iprot.Skip(fieldTypeId); err != nil {
           return err
         }
       }
     default:
-      if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      if err := iprot.Skip(fieldTypeId); err != nil {
         return err
       }
     }
@@ -16610,7 +16610,7 @@ func (p *TCLIServiceGetInfoResult) Write(oprot thrift.TProtocol) error {
     if err := p.writeField0(oprot); err != nil { return err }
   }
   if err := oprot.WriteFieldStop(); err != nil {
-    return thrift.PrependError("write ***REMOVED***eld stop error: ", err) }
+    return thrift.PrependError("write field stop error: ", err) }
   if err := oprot.WriteStructEnd(); err != nil {
     return thrift.PrependError("write struct stop error: ", err) }
   return nil
@@ -16619,12 +16619,12 @@ func (p *TCLIServiceGetInfoResult) Write(oprot thrift.TProtocol) error {
 func (p *TCLIServiceGetInfoResult) writeField0(oprot thrift.TProtocol) (err error) {
   if p.IsSetSuccess() {
     if err := oprot.WriteFieldBegin("success", thrift.STRUCT, 0); err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld begin error 0:success: ", p), err) }
+      return thrift.PrependError(fmt.Sprintf("%T write field begin error 0:success: ", p), err) }
     if err := p.Success.Write(oprot); err != nil {
       return thrift.PrependError(fmt.Sprintf("%T error writing struct: ", p.Success), err)
     }
     if err := oprot.WriteFieldEnd(); err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld end error 0:success: ", p), err) }
+      return thrift.PrependError(fmt.Sprintf("%T write field end error 0:success: ", p), err) }
   }
   return err
 }
@@ -16664,24 +16664,24 @@ func (p *TCLIServiceExecuteStatementArgs) Read(iprot thrift.TProtocol) error {
 
 
   for {
-    _, ***REMOVED***eldTypeId, ***REMOVED***eldId, err := iprot.ReadFieldBegin()
+    _, fieldTypeId, fieldId, err := iprot.ReadFieldBegin()
     if err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T ***REMOVED***eld %d read error: ", p, ***REMOVED***eldId), err)
+      return thrift.PrependError(fmt.Sprintf("%T field %d read error: ", p, fieldId), err)
     }
-    if ***REMOVED***eldTypeId == thrift.STOP { break; }
-    switch ***REMOVED***eldId {
+    if fieldTypeId == thrift.STOP { break; }
+    switch fieldId {
     case 1:
-      if ***REMOVED***eldTypeId == thrift.STRUCT {
+      if fieldTypeId == thrift.STRUCT {
         if err := p.ReadField1(iprot); err != nil {
           return err
         }
-      } ***REMOVED*** {
-        if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      } else {
+        if err := iprot.Skip(fieldTypeId); err != nil {
           return err
         }
       }
     default:
-      if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      if err := iprot.Skip(fieldTypeId); err != nil {
         return err
       }
     }
@@ -16710,7 +16710,7 @@ func (p *TCLIServiceExecuteStatementArgs) Write(oprot thrift.TProtocol) error {
     if err := p.writeField1(oprot); err != nil { return err }
   }
   if err := oprot.WriteFieldStop(); err != nil {
-    return thrift.PrependError("write ***REMOVED***eld stop error: ", err) }
+    return thrift.PrependError("write field stop error: ", err) }
   if err := oprot.WriteStructEnd(); err != nil {
     return thrift.PrependError("write struct stop error: ", err) }
   return nil
@@ -16718,12 +16718,12 @@ func (p *TCLIServiceExecuteStatementArgs) Write(oprot thrift.TProtocol) error {
 
 func (p *TCLIServiceExecuteStatementArgs) writeField1(oprot thrift.TProtocol) (err error) {
   if err := oprot.WriteFieldBegin("req", thrift.STRUCT, 1); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld begin error 1:req: ", p), err) }
+    return thrift.PrependError(fmt.Sprintf("%T write field begin error 1:req: ", p), err) }
   if err := p.Req.Write(oprot); err != nil {
     return thrift.PrependError(fmt.Sprintf("%T error writing struct: ", p.Req), err)
   }
   if err := oprot.WriteFieldEnd(); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld end error 1:req: ", p), err) }
+    return thrift.PrependError(fmt.Sprintf("%T write field end error 1:req: ", p), err) }
   return err
 }
 
@@ -16762,24 +16762,24 @@ func (p *TCLIServiceExecuteStatementResult) Read(iprot thrift.TProtocol) error {
 
 
   for {
-    _, ***REMOVED***eldTypeId, ***REMOVED***eldId, err := iprot.ReadFieldBegin()
+    _, fieldTypeId, fieldId, err := iprot.ReadFieldBegin()
     if err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T ***REMOVED***eld %d read error: ", p, ***REMOVED***eldId), err)
+      return thrift.PrependError(fmt.Sprintf("%T field %d read error: ", p, fieldId), err)
     }
-    if ***REMOVED***eldTypeId == thrift.STOP { break; }
-    switch ***REMOVED***eldId {
+    if fieldTypeId == thrift.STOP { break; }
+    switch fieldId {
     case 0:
-      if ***REMOVED***eldTypeId == thrift.STRUCT {
+      if fieldTypeId == thrift.STRUCT {
         if err := p.ReadField0(iprot); err != nil {
           return err
         }
-      } ***REMOVED*** {
-        if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      } else {
+        if err := iprot.Skip(fieldTypeId); err != nil {
           return err
         }
       }
     default:
-      if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      if err := iprot.Skip(fieldTypeId); err != nil {
         return err
       }
     }
@@ -16808,7 +16808,7 @@ func (p *TCLIServiceExecuteStatementResult) Write(oprot thrift.TProtocol) error 
     if err := p.writeField0(oprot); err != nil { return err }
   }
   if err := oprot.WriteFieldStop(); err != nil {
-    return thrift.PrependError("write ***REMOVED***eld stop error: ", err) }
+    return thrift.PrependError("write field stop error: ", err) }
   if err := oprot.WriteStructEnd(); err != nil {
     return thrift.PrependError("write struct stop error: ", err) }
   return nil
@@ -16817,12 +16817,12 @@ func (p *TCLIServiceExecuteStatementResult) Write(oprot thrift.TProtocol) error 
 func (p *TCLIServiceExecuteStatementResult) writeField0(oprot thrift.TProtocol) (err error) {
   if p.IsSetSuccess() {
     if err := oprot.WriteFieldBegin("success", thrift.STRUCT, 0); err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld begin error 0:success: ", p), err) }
+      return thrift.PrependError(fmt.Sprintf("%T write field begin error 0:success: ", p), err) }
     if err := p.Success.Write(oprot); err != nil {
       return thrift.PrependError(fmt.Sprintf("%T error writing struct: ", p.Success), err)
     }
     if err := oprot.WriteFieldEnd(); err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld end error 0:success: ", p), err) }
+      return thrift.PrependError(fmt.Sprintf("%T write field end error 0:success: ", p), err) }
   }
   return err
 }
@@ -16862,24 +16862,24 @@ func (p *TCLIServiceGetTypeInfoArgs) Read(iprot thrift.TProtocol) error {
 
 
   for {
-    _, ***REMOVED***eldTypeId, ***REMOVED***eldId, err := iprot.ReadFieldBegin()
+    _, fieldTypeId, fieldId, err := iprot.ReadFieldBegin()
     if err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T ***REMOVED***eld %d read error: ", p, ***REMOVED***eldId), err)
+      return thrift.PrependError(fmt.Sprintf("%T field %d read error: ", p, fieldId), err)
     }
-    if ***REMOVED***eldTypeId == thrift.STOP { break; }
-    switch ***REMOVED***eldId {
+    if fieldTypeId == thrift.STOP { break; }
+    switch fieldId {
     case 1:
-      if ***REMOVED***eldTypeId == thrift.STRUCT {
+      if fieldTypeId == thrift.STRUCT {
         if err := p.ReadField1(iprot); err != nil {
           return err
         }
-      } ***REMOVED*** {
-        if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      } else {
+        if err := iprot.Skip(fieldTypeId); err != nil {
           return err
         }
       }
     default:
-      if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      if err := iprot.Skip(fieldTypeId); err != nil {
         return err
       }
     }
@@ -16908,7 +16908,7 @@ func (p *TCLIServiceGetTypeInfoArgs) Write(oprot thrift.TProtocol) error {
     if err := p.writeField1(oprot); err != nil { return err }
   }
   if err := oprot.WriteFieldStop(); err != nil {
-    return thrift.PrependError("write ***REMOVED***eld stop error: ", err) }
+    return thrift.PrependError("write field stop error: ", err) }
   if err := oprot.WriteStructEnd(); err != nil {
     return thrift.PrependError("write struct stop error: ", err) }
   return nil
@@ -16916,12 +16916,12 @@ func (p *TCLIServiceGetTypeInfoArgs) Write(oprot thrift.TProtocol) error {
 
 func (p *TCLIServiceGetTypeInfoArgs) writeField1(oprot thrift.TProtocol) (err error) {
   if err := oprot.WriteFieldBegin("req", thrift.STRUCT, 1); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld begin error 1:req: ", p), err) }
+    return thrift.PrependError(fmt.Sprintf("%T write field begin error 1:req: ", p), err) }
   if err := p.Req.Write(oprot); err != nil {
     return thrift.PrependError(fmt.Sprintf("%T error writing struct: ", p.Req), err)
   }
   if err := oprot.WriteFieldEnd(); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld end error 1:req: ", p), err) }
+    return thrift.PrependError(fmt.Sprintf("%T write field end error 1:req: ", p), err) }
   return err
 }
 
@@ -16960,24 +16960,24 @@ func (p *TCLIServiceGetTypeInfoResult) Read(iprot thrift.TProtocol) error {
 
 
   for {
-    _, ***REMOVED***eldTypeId, ***REMOVED***eldId, err := iprot.ReadFieldBegin()
+    _, fieldTypeId, fieldId, err := iprot.ReadFieldBegin()
     if err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T ***REMOVED***eld %d read error: ", p, ***REMOVED***eldId), err)
+      return thrift.PrependError(fmt.Sprintf("%T field %d read error: ", p, fieldId), err)
     }
-    if ***REMOVED***eldTypeId == thrift.STOP { break; }
-    switch ***REMOVED***eldId {
+    if fieldTypeId == thrift.STOP { break; }
+    switch fieldId {
     case 0:
-      if ***REMOVED***eldTypeId == thrift.STRUCT {
+      if fieldTypeId == thrift.STRUCT {
         if err := p.ReadField0(iprot); err != nil {
           return err
         }
-      } ***REMOVED*** {
-        if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      } else {
+        if err := iprot.Skip(fieldTypeId); err != nil {
           return err
         }
       }
     default:
-      if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      if err := iprot.Skip(fieldTypeId); err != nil {
         return err
       }
     }
@@ -17006,7 +17006,7 @@ func (p *TCLIServiceGetTypeInfoResult) Write(oprot thrift.TProtocol) error {
     if err := p.writeField0(oprot); err != nil { return err }
   }
   if err := oprot.WriteFieldStop(); err != nil {
-    return thrift.PrependError("write ***REMOVED***eld stop error: ", err) }
+    return thrift.PrependError("write field stop error: ", err) }
   if err := oprot.WriteStructEnd(); err != nil {
     return thrift.PrependError("write struct stop error: ", err) }
   return nil
@@ -17015,12 +17015,12 @@ func (p *TCLIServiceGetTypeInfoResult) Write(oprot thrift.TProtocol) error {
 func (p *TCLIServiceGetTypeInfoResult) writeField0(oprot thrift.TProtocol) (err error) {
   if p.IsSetSuccess() {
     if err := oprot.WriteFieldBegin("success", thrift.STRUCT, 0); err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld begin error 0:success: ", p), err) }
+      return thrift.PrependError(fmt.Sprintf("%T write field begin error 0:success: ", p), err) }
     if err := p.Success.Write(oprot); err != nil {
       return thrift.PrependError(fmt.Sprintf("%T error writing struct: ", p.Success), err)
     }
     if err := oprot.WriteFieldEnd(); err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld end error 0:success: ", p), err) }
+      return thrift.PrependError(fmt.Sprintf("%T write field end error 0:success: ", p), err) }
   }
   return err
 }
@@ -17060,24 +17060,24 @@ func (p *TCLIServiceGetCatalogsArgs) Read(iprot thrift.TProtocol) error {
 
 
   for {
-    _, ***REMOVED***eldTypeId, ***REMOVED***eldId, err := iprot.ReadFieldBegin()
+    _, fieldTypeId, fieldId, err := iprot.ReadFieldBegin()
     if err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T ***REMOVED***eld %d read error: ", p, ***REMOVED***eldId), err)
+      return thrift.PrependError(fmt.Sprintf("%T field %d read error: ", p, fieldId), err)
     }
-    if ***REMOVED***eldTypeId == thrift.STOP { break; }
-    switch ***REMOVED***eldId {
+    if fieldTypeId == thrift.STOP { break; }
+    switch fieldId {
     case 1:
-      if ***REMOVED***eldTypeId == thrift.STRUCT {
+      if fieldTypeId == thrift.STRUCT {
         if err := p.ReadField1(iprot); err != nil {
           return err
         }
-      } ***REMOVED*** {
-        if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      } else {
+        if err := iprot.Skip(fieldTypeId); err != nil {
           return err
         }
       }
     default:
-      if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      if err := iprot.Skip(fieldTypeId); err != nil {
         return err
       }
     }
@@ -17106,7 +17106,7 @@ func (p *TCLIServiceGetCatalogsArgs) Write(oprot thrift.TProtocol) error {
     if err := p.writeField1(oprot); err != nil { return err }
   }
   if err := oprot.WriteFieldStop(); err != nil {
-    return thrift.PrependError("write ***REMOVED***eld stop error: ", err) }
+    return thrift.PrependError("write field stop error: ", err) }
   if err := oprot.WriteStructEnd(); err != nil {
     return thrift.PrependError("write struct stop error: ", err) }
   return nil
@@ -17114,12 +17114,12 @@ func (p *TCLIServiceGetCatalogsArgs) Write(oprot thrift.TProtocol) error {
 
 func (p *TCLIServiceGetCatalogsArgs) writeField1(oprot thrift.TProtocol) (err error) {
   if err := oprot.WriteFieldBegin("req", thrift.STRUCT, 1); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld begin error 1:req: ", p), err) }
+    return thrift.PrependError(fmt.Sprintf("%T write field begin error 1:req: ", p), err) }
   if err := p.Req.Write(oprot); err != nil {
     return thrift.PrependError(fmt.Sprintf("%T error writing struct: ", p.Req), err)
   }
   if err := oprot.WriteFieldEnd(); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld end error 1:req: ", p), err) }
+    return thrift.PrependError(fmt.Sprintf("%T write field end error 1:req: ", p), err) }
   return err
 }
 
@@ -17158,24 +17158,24 @@ func (p *TCLIServiceGetCatalogsResult) Read(iprot thrift.TProtocol) error {
 
 
   for {
-    _, ***REMOVED***eldTypeId, ***REMOVED***eldId, err := iprot.ReadFieldBegin()
+    _, fieldTypeId, fieldId, err := iprot.ReadFieldBegin()
     if err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T ***REMOVED***eld %d read error: ", p, ***REMOVED***eldId), err)
+      return thrift.PrependError(fmt.Sprintf("%T field %d read error: ", p, fieldId), err)
     }
-    if ***REMOVED***eldTypeId == thrift.STOP { break; }
-    switch ***REMOVED***eldId {
+    if fieldTypeId == thrift.STOP { break; }
+    switch fieldId {
     case 0:
-      if ***REMOVED***eldTypeId == thrift.STRUCT {
+      if fieldTypeId == thrift.STRUCT {
         if err := p.ReadField0(iprot); err != nil {
           return err
         }
-      } ***REMOVED*** {
-        if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      } else {
+        if err := iprot.Skip(fieldTypeId); err != nil {
           return err
         }
       }
     default:
-      if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      if err := iprot.Skip(fieldTypeId); err != nil {
         return err
       }
     }
@@ -17204,7 +17204,7 @@ func (p *TCLIServiceGetCatalogsResult) Write(oprot thrift.TProtocol) error {
     if err := p.writeField0(oprot); err != nil { return err }
   }
   if err := oprot.WriteFieldStop(); err != nil {
-    return thrift.PrependError("write ***REMOVED***eld stop error: ", err) }
+    return thrift.PrependError("write field stop error: ", err) }
   if err := oprot.WriteStructEnd(); err != nil {
     return thrift.PrependError("write struct stop error: ", err) }
   return nil
@@ -17213,12 +17213,12 @@ func (p *TCLIServiceGetCatalogsResult) Write(oprot thrift.TProtocol) error {
 func (p *TCLIServiceGetCatalogsResult) writeField0(oprot thrift.TProtocol) (err error) {
   if p.IsSetSuccess() {
     if err := oprot.WriteFieldBegin("success", thrift.STRUCT, 0); err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld begin error 0:success: ", p), err) }
+      return thrift.PrependError(fmt.Sprintf("%T write field begin error 0:success: ", p), err) }
     if err := p.Success.Write(oprot); err != nil {
       return thrift.PrependError(fmt.Sprintf("%T error writing struct: ", p.Success), err)
     }
     if err := oprot.WriteFieldEnd(); err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld end error 0:success: ", p), err) }
+      return thrift.PrependError(fmt.Sprintf("%T write field end error 0:success: ", p), err) }
   }
   return err
 }
@@ -17258,24 +17258,24 @@ func (p *TCLIServiceGetSchemasArgs) Read(iprot thrift.TProtocol) error {
 
 
   for {
-    _, ***REMOVED***eldTypeId, ***REMOVED***eldId, err := iprot.ReadFieldBegin()
+    _, fieldTypeId, fieldId, err := iprot.ReadFieldBegin()
     if err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T ***REMOVED***eld %d read error: ", p, ***REMOVED***eldId), err)
+      return thrift.PrependError(fmt.Sprintf("%T field %d read error: ", p, fieldId), err)
     }
-    if ***REMOVED***eldTypeId == thrift.STOP { break; }
-    switch ***REMOVED***eldId {
+    if fieldTypeId == thrift.STOP { break; }
+    switch fieldId {
     case 1:
-      if ***REMOVED***eldTypeId == thrift.STRUCT {
+      if fieldTypeId == thrift.STRUCT {
         if err := p.ReadField1(iprot); err != nil {
           return err
         }
-      } ***REMOVED*** {
-        if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      } else {
+        if err := iprot.Skip(fieldTypeId); err != nil {
           return err
         }
       }
     default:
-      if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      if err := iprot.Skip(fieldTypeId); err != nil {
         return err
       }
     }
@@ -17304,7 +17304,7 @@ func (p *TCLIServiceGetSchemasArgs) Write(oprot thrift.TProtocol) error {
     if err := p.writeField1(oprot); err != nil { return err }
   }
   if err := oprot.WriteFieldStop(); err != nil {
-    return thrift.PrependError("write ***REMOVED***eld stop error: ", err) }
+    return thrift.PrependError("write field stop error: ", err) }
   if err := oprot.WriteStructEnd(); err != nil {
     return thrift.PrependError("write struct stop error: ", err) }
   return nil
@@ -17312,12 +17312,12 @@ func (p *TCLIServiceGetSchemasArgs) Write(oprot thrift.TProtocol) error {
 
 func (p *TCLIServiceGetSchemasArgs) writeField1(oprot thrift.TProtocol) (err error) {
   if err := oprot.WriteFieldBegin("req", thrift.STRUCT, 1); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld begin error 1:req: ", p), err) }
+    return thrift.PrependError(fmt.Sprintf("%T write field begin error 1:req: ", p), err) }
   if err := p.Req.Write(oprot); err != nil {
     return thrift.PrependError(fmt.Sprintf("%T error writing struct: ", p.Req), err)
   }
   if err := oprot.WriteFieldEnd(); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld end error 1:req: ", p), err) }
+    return thrift.PrependError(fmt.Sprintf("%T write field end error 1:req: ", p), err) }
   return err
 }
 
@@ -17356,24 +17356,24 @@ func (p *TCLIServiceGetSchemasResult) Read(iprot thrift.TProtocol) error {
 
 
   for {
-    _, ***REMOVED***eldTypeId, ***REMOVED***eldId, err := iprot.ReadFieldBegin()
+    _, fieldTypeId, fieldId, err := iprot.ReadFieldBegin()
     if err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T ***REMOVED***eld %d read error: ", p, ***REMOVED***eldId), err)
+      return thrift.PrependError(fmt.Sprintf("%T field %d read error: ", p, fieldId), err)
     }
-    if ***REMOVED***eldTypeId == thrift.STOP { break; }
-    switch ***REMOVED***eldId {
+    if fieldTypeId == thrift.STOP { break; }
+    switch fieldId {
     case 0:
-      if ***REMOVED***eldTypeId == thrift.STRUCT {
+      if fieldTypeId == thrift.STRUCT {
         if err := p.ReadField0(iprot); err != nil {
           return err
         }
-      } ***REMOVED*** {
-        if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      } else {
+        if err := iprot.Skip(fieldTypeId); err != nil {
           return err
         }
       }
     default:
-      if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      if err := iprot.Skip(fieldTypeId); err != nil {
         return err
       }
     }
@@ -17402,7 +17402,7 @@ func (p *TCLIServiceGetSchemasResult) Write(oprot thrift.TProtocol) error {
     if err := p.writeField0(oprot); err != nil { return err }
   }
   if err := oprot.WriteFieldStop(); err != nil {
-    return thrift.PrependError("write ***REMOVED***eld stop error: ", err) }
+    return thrift.PrependError("write field stop error: ", err) }
   if err := oprot.WriteStructEnd(); err != nil {
     return thrift.PrependError("write struct stop error: ", err) }
   return nil
@@ -17411,12 +17411,12 @@ func (p *TCLIServiceGetSchemasResult) Write(oprot thrift.TProtocol) error {
 func (p *TCLIServiceGetSchemasResult) writeField0(oprot thrift.TProtocol) (err error) {
   if p.IsSetSuccess() {
     if err := oprot.WriteFieldBegin("success", thrift.STRUCT, 0); err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld begin error 0:success: ", p), err) }
+      return thrift.PrependError(fmt.Sprintf("%T write field begin error 0:success: ", p), err) }
     if err := p.Success.Write(oprot); err != nil {
       return thrift.PrependError(fmt.Sprintf("%T error writing struct: ", p.Success), err)
     }
     if err := oprot.WriteFieldEnd(); err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld end error 0:success: ", p), err) }
+      return thrift.PrependError(fmt.Sprintf("%T write field end error 0:success: ", p), err) }
   }
   return err
 }
@@ -17456,24 +17456,24 @@ func (p *TCLIServiceGetTablesArgs) Read(iprot thrift.TProtocol) error {
 
 
   for {
-    _, ***REMOVED***eldTypeId, ***REMOVED***eldId, err := iprot.ReadFieldBegin()
+    _, fieldTypeId, fieldId, err := iprot.ReadFieldBegin()
     if err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T ***REMOVED***eld %d read error: ", p, ***REMOVED***eldId), err)
+      return thrift.PrependError(fmt.Sprintf("%T field %d read error: ", p, fieldId), err)
     }
-    if ***REMOVED***eldTypeId == thrift.STOP { break; }
-    switch ***REMOVED***eldId {
+    if fieldTypeId == thrift.STOP { break; }
+    switch fieldId {
     case 1:
-      if ***REMOVED***eldTypeId == thrift.STRUCT {
+      if fieldTypeId == thrift.STRUCT {
         if err := p.ReadField1(iprot); err != nil {
           return err
         }
-      } ***REMOVED*** {
-        if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      } else {
+        if err := iprot.Skip(fieldTypeId); err != nil {
           return err
         }
       }
     default:
-      if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      if err := iprot.Skip(fieldTypeId); err != nil {
         return err
       }
     }
@@ -17502,7 +17502,7 @@ func (p *TCLIServiceGetTablesArgs) Write(oprot thrift.TProtocol) error {
     if err := p.writeField1(oprot); err != nil { return err }
   }
   if err := oprot.WriteFieldStop(); err != nil {
-    return thrift.PrependError("write ***REMOVED***eld stop error: ", err) }
+    return thrift.PrependError("write field stop error: ", err) }
   if err := oprot.WriteStructEnd(); err != nil {
     return thrift.PrependError("write struct stop error: ", err) }
   return nil
@@ -17510,12 +17510,12 @@ func (p *TCLIServiceGetTablesArgs) Write(oprot thrift.TProtocol) error {
 
 func (p *TCLIServiceGetTablesArgs) writeField1(oprot thrift.TProtocol) (err error) {
   if err := oprot.WriteFieldBegin("req", thrift.STRUCT, 1); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld begin error 1:req: ", p), err) }
+    return thrift.PrependError(fmt.Sprintf("%T write field begin error 1:req: ", p), err) }
   if err := p.Req.Write(oprot); err != nil {
     return thrift.PrependError(fmt.Sprintf("%T error writing struct: ", p.Req), err)
   }
   if err := oprot.WriteFieldEnd(); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld end error 1:req: ", p), err) }
+    return thrift.PrependError(fmt.Sprintf("%T write field end error 1:req: ", p), err) }
   return err
 }
 
@@ -17554,24 +17554,24 @@ func (p *TCLIServiceGetTablesResult) Read(iprot thrift.TProtocol) error {
 
 
   for {
-    _, ***REMOVED***eldTypeId, ***REMOVED***eldId, err := iprot.ReadFieldBegin()
+    _, fieldTypeId, fieldId, err := iprot.ReadFieldBegin()
     if err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T ***REMOVED***eld %d read error: ", p, ***REMOVED***eldId), err)
+      return thrift.PrependError(fmt.Sprintf("%T field %d read error: ", p, fieldId), err)
     }
-    if ***REMOVED***eldTypeId == thrift.STOP { break; }
-    switch ***REMOVED***eldId {
+    if fieldTypeId == thrift.STOP { break; }
+    switch fieldId {
     case 0:
-      if ***REMOVED***eldTypeId == thrift.STRUCT {
+      if fieldTypeId == thrift.STRUCT {
         if err := p.ReadField0(iprot); err != nil {
           return err
         }
-      } ***REMOVED*** {
-        if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      } else {
+        if err := iprot.Skip(fieldTypeId); err != nil {
           return err
         }
       }
     default:
-      if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      if err := iprot.Skip(fieldTypeId); err != nil {
         return err
       }
     }
@@ -17600,7 +17600,7 @@ func (p *TCLIServiceGetTablesResult) Write(oprot thrift.TProtocol) error {
     if err := p.writeField0(oprot); err != nil { return err }
   }
   if err := oprot.WriteFieldStop(); err != nil {
-    return thrift.PrependError("write ***REMOVED***eld stop error: ", err) }
+    return thrift.PrependError("write field stop error: ", err) }
   if err := oprot.WriteStructEnd(); err != nil {
     return thrift.PrependError("write struct stop error: ", err) }
   return nil
@@ -17609,12 +17609,12 @@ func (p *TCLIServiceGetTablesResult) Write(oprot thrift.TProtocol) error {
 func (p *TCLIServiceGetTablesResult) writeField0(oprot thrift.TProtocol) (err error) {
   if p.IsSetSuccess() {
     if err := oprot.WriteFieldBegin("success", thrift.STRUCT, 0); err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld begin error 0:success: ", p), err) }
+      return thrift.PrependError(fmt.Sprintf("%T write field begin error 0:success: ", p), err) }
     if err := p.Success.Write(oprot); err != nil {
       return thrift.PrependError(fmt.Sprintf("%T error writing struct: ", p.Success), err)
     }
     if err := oprot.WriteFieldEnd(); err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld end error 0:success: ", p), err) }
+      return thrift.PrependError(fmt.Sprintf("%T write field end error 0:success: ", p), err) }
   }
   return err
 }
@@ -17654,24 +17654,24 @@ func (p *TCLIServiceGetTableTypesArgs) Read(iprot thrift.TProtocol) error {
 
 
   for {
-    _, ***REMOVED***eldTypeId, ***REMOVED***eldId, err := iprot.ReadFieldBegin()
+    _, fieldTypeId, fieldId, err := iprot.ReadFieldBegin()
     if err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T ***REMOVED***eld %d read error: ", p, ***REMOVED***eldId), err)
+      return thrift.PrependError(fmt.Sprintf("%T field %d read error: ", p, fieldId), err)
     }
-    if ***REMOVED***eldTypeId == thrift.STOP { break; }
-    switch ***REMOVED***eldId {
+    if fieldTypeId == thrift.STOP { break; }
+    switch fieldId {
     case 1:
-      if ***REMOVED***eldTypeId == thrift.STRUCT {
+      if fieldTypeId == thrift.STRUCT {
         if err := p.ReadField1(iprot); err != nil {
           return err
         }
-      } ***REMOVED*** {
-        if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      } else {
+        if err := iprot.Skip(fieldTypeId); err != nil {
           return err
         }
       }
     default:
-      if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      if err := iprot.Skip(fieldTypeId); err != nil {
         return err
       }
     }
@@ -17700,7 +17700,7 @@ func (p *TCLIServiceGetTableTypesArgs) Write(oprot thrift.TProtocol) error {
     if err := p.writeField1(oprot); err != nil { return err }
   }
   if err := oprot.WriteFieldStop(); err != nil {
-    return thrift.PrependError("write ***REMOVED***eld stop error: ", err) }
+    return thrift.PrependError("write field stop error: ", err) }
   if err := oprot.WriteStructEnd(); err != nil {
     return thrift.PrependError("write struct stop error: ", err) }
   return nil
@@ -17708,12 +17708,12 @@ func (p *TCLIServiceGetTableTypesArgs) Write(oprot thrift.TProtocol) error {
 
 func (p *TCLIServiceGetTableTypesArgs) writeField1(oprot thrift.TProtocol) (err error) {
   if err := oprot.WriteFieldBegin("req", thrift.STRUCT, 1); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld begin error 1:req: ", p), err) }
+    return thrift.PrependError(fmt.Sprintf("%T write field begin error 1:req: ", p), err) }
   if err := p.Req.Write(oprot); err != nil {
     return thrift.PrependError(fmt.Sprintf("%T error writing struct: ", p.Req), err)
   }
   if err := oprot.WriteFieldEnd(); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld end error 1:req: ", p), err) }
+    return thrift.PrependError(fmt.Sprintf("%T write field end error 1:req: ", p), err) }
   return err
 }
 
@@ -17752,24 +17752,24 @@ func (p *TCLIServiceGetTableTypesResult) Read(iprot thrift.TProtocol) error {
 
 
   for {
-    _, ***REMOVED***eldTypeId, ***REMOVED***eldId, err := iprot.ReadFieldBegin()
+    _, fieldTypeId, fieldId, err := iprot.ReadFieldBegin()
     if err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T ***REMOVED***eld %d read error: ", p, ***REMOVED***eldId), err)
+      return thrift.PrependError(fmt.Sprintf("%T field %d read error: ", p, fieldId), err)
     }
-    if ***REMOVED***eldTypeId == thrift.STOP { break; }
-    switch ***REMOVED***eldId {
+    if fieldTypeId == thrift.STOP { break; }
+    switch fieldId {
     case 0:
-      if ***REMOVED***eldTypeId == thrift.STRUCT {
+      if fieldTypeId == thrift.STRUCT {
         if err := p.ReadField0(iprot); err != nil {
           return err
         }
-      } ***REMOVED*** {
-        if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      } else {
+        if err := iprot.Skip(fieldTypeId); err != nil {
           return err
         }
       }
     default:
-      if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      if err := iprot.Skip(fieldTypeId); err != nil {
         return err
       }
     }
@@ -17798,7 +17798,7 @@ func (p *TCLIServiceGetTableTypesResult) Write(oprot thrift.TProtocol) error {
     if err := p.writeField0(oprot); err != nil { return err }
   }
   if err := oprot.WriteFieldStop(); err != nil {
-    return thrift.PrependError("write ***REMOVED***eld stop error: ", err) }
+    return thrift.PrependError("write field stop error: ", err) }
   if err := oprot.WriteStructEnd(); err != nil {
     return thrift.PrependError("write struct stop error: ", err) }
   return nil
@@ -17807,12 +17807,12 @@ func (p *TCLIServiceGetTableTypesResult) Write(oprot thrift.TProtocol) error {
 func (p *TCLIServiceGetTableTypesResult) writeField0(oprot thrift.TProtocol) (err error) {
   if p.IsSetSuccess() {
     if err := oprot.WriteFieldBegin("success", thrift.STRUCT, 0); err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld begin error 0:success: ", p), err) }
+      return thrift.PrependError(fmt.Sprintf("%T write field begin error 0:success: ", p), err) }
     if err := p.Success.Write(oprot); err != nil {
       return thrift.PrependError(fmt.Sprintf("%T error writing struct: ", p.Success), err)
     }
     if err := oprot.WriteFieldEnd(); err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld end error 0:success: ", p), err) }
+      return thrift.PrependError(fmt.Sprintf("%T write field end error 0:success: ", p), err) }
   }
   return err
 }
@@ -17852,24 +17852,24 @@ func (p *TCLIServiceGetColumnsArgs) Read(iprot thrift.TProtocol) error {
 
 
   for {
-    _, ***REMOVED***eldTypeId, ***REMOVED***eldId, err := iprot.ReadFieldBegin()
+    _, fieldTypeId, fieldId, err := iprot.ReadFieldBegin()
     if err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T ***REMOVED***eld %d read error: ", p, ***REMOVED***eldId), err)
+      return thrift.PrependError(fmt.Sprintf("%T field %d read error: ", p, fieldId), err)
     }
-    if ***REMOVED***eldTypeId == thrift.STOP { break; }
-    switch ***REMOVED***eldId {
+    if fieldTypeId == thrift.STOP { break; }
+    switch fieldId {
     case 1:
-      if ***REMOVED***eldTypeId == thrift.STRUCT {
+      if fieldTypeId == thrift.STRUCT {
         if err := p.ReadField1(iprot); err != nil {
           return err
         }
-      } ***REMOVED*** {
-        if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      } else {
+        if err := iprot.Skip(fieldTypeId); err != nil {
           return err
         }
       }
     default:
-      if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      if err := iprot.Skip(fieldTypeId); err != nil {
         return err
       }
     }
@@ -17898,7 +17898,7 @@ func (p *TCLIServiceGetColumnsArgs) Write(oprot thrift.TProtocol) error {
     if err := p.writeField1(oprot); err != nil { return err }
   }
   if err := oprot.WriteFieldStop(); err != nil {
-    return thrift.PrependError("write ***REMOVED***eld stop error: ", err) }
+    return thrift.PrependError("write field stop error: ", err) }
   if err := oprot.WriteStructEnd(); err != nil {
     return thrift.PrependError("write struct stop error: ", err) }
   return nil
@@ -17906,12 +17906,12 @@ func (p *TCLIServiceGetColumnsArgs) Write(oprot thrift.TProtocol) error {
 
 func (p *TCLIServiceGetColumnsArgs) writeField1(oprot thrift.TProtocol) (err error) {
   if err := oprot.WriteFieldBegin("req", thrift.STRUCT, 1); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld begin error 1:req: ", p), err) }
+    return thrift.PrependError(fmt.Sprintf("%T write field begin error 1:req: ", p), err) }
   if err := p.Req.Write(oprot); err != nil {
     return thrift.PrependError(fmt.Sprintf("%T error writing struct: ", p.Req), err)
   }
   if err := oprot.WriteFieldEnd(); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld end error 1:req: ", p), err) }
+    return thrift.PrependError(fmt.Sprintf("%T write field end error 1:req: ", p), err) }
   return err
 }
 
@@ -17950,24 +17950,24 @@ func (p *TCLIServiceGetColumnsResult) Read(iprot thrift.TProtocol) error {
 
 
   for {
-    _, ***REMOVED***eldTypeId, ***REMOVED***eldId, err := iprot.ReadFieldBegin()
+    _, fieldTypeId, fieldId, err := iprot.ReadFieldBegin()
     if err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T ***REMOVED***eld %d read error: ", p, ***REMOVED***eldId), err)
+      return thrift.PrependError(fmt.Sprintf("%T field %d read error: ", p, fieldId), err)
     }
-    if ***REMOVED***eldTypeId == thrift.STOP { break; }
-    switch ***REMOVED***eldId {
+    if fieldTypeId == thrift.STOP { break; }
+    switch fieldId {
     case 0:
-      if ***REMOVED***eldTypeId == thrift.STRUCT {
+      if fieldTypeId == thrift.STRUCT {
         if err := p.ReadField0(iprot); err != nil {
           return err
         }
-      } ***REMOVED*** {
-        if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      } else {
+        if err := iprot.Skip(fieldTypeId); err != nil {
           return err
         }
       }
     default:
-      if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      if err := iprot.Skip(fieldTypeId); err != nil {
         return err
       }
     }
@@ -17996,7 +17996,7 @@ func (p *TCLIServiceGetColumnsResult) Write(oprot thrift.TProtocol) error {
     if err := p.writeField0(oprot); err != nil { return err }
   }
   if err := oprot.WriteFieldStop(); err != nil {
-    return thrift.PrependError("write ***REMOVED***eld stop error: ", err) }
+    return thrift.PrependError("write field stop error: ", err) }
   if err := oprot.WriteStructEnd(); err != nil {
     return thrift.PrependError("write struct stop error: ", err) }
   return nil
@@ -18005,12 +18005,12 @@ func (p *TCLIServiceGetColumnsResult) Write(oprot thrift.TProtocol) error {
 func (p *TCLIServiceGetColumnsResult) writeField0(oprot thrift.TProtocol) (err error) {
   if p.IsSetSuccess() {
     if err := oprot.WriteFieldBegin("success", thrift.STRUCT, 0); err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld begin error 0:success: ", p), err) }
+      return thrift.PrependError(fmt.Sprintf("%T write field begin error 0:success: ", p), err) }
     if err := p.Success.Write(oprot); err != nil {
       return thrift.PrependError(fmt.Sprintf("%T error writing struct: ", p.Success), err)
     }
     if err := oprot.WriteFieldEnd(); err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld end error 0:success: ", p), err) }
+      return thrift.PrependError(fmt.Sprintf("%T write field end error 0:success: ", p), err) }
   }
   return err
 }
@@ -18050,24 +18050,24 @@ func (p *TCLIServiceGetFunctionsArgs) Read(iprot thrift.TProtocol) error {
 
 
   for {
-    _, ***REMOVED***eldTypeId, ***REMOVED***eldId, err := iprot.ReadFieldBegin()
+    _, fieldTypeId, fieldId, err := iprot.ReadFieldBegin()
     if err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T ***REMOVED***eld %d read error: ", p, ***REMOVED***eldId), err)
+      return thrift.PrependError(fmt.Sprintf("%T field %d read error: ", p, fieldId), err)
     }
-    if ***REMOVED***eldTypeId == thrift.STOP { break; }
-    switch ***REMOVED***eldId {
+    if fieldTypeId == thrift.STOP { break; }
+    switch fieldId {
     case 1:
-      if ***REMOVED***eldTypeId == thrift.STRUCT {
+      if fieldTypeId == thrift.STRUCT {
         if err := p.ReadField1(iprot); err != nil {
           return err
         }
-      } ***REMOVED*** {
-        if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      } else {
+        if err := iprot.Skip(fieldTypeId); err != nil {
           return err
         }
       }
     default:
-      if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      if err := iprot.Skip(fieldTypeId); err != nil {
         return err
       }
     }
@@ -18096,7 +18096,7 @@ func (p *TCLIServiceGetFunctionsArgs) Write(oprot thrift.TProtocol) error {
     if err := p.writeField1(oprot); err != nil { return err }
   }
   if err := oprot.WriteFieldStop(); err != nil {
-    return thrift.PrependError("write ***REMOVED***eld stop error: ", err) }
+    return thrift.PrependError("write field stop error: ", err) }
   if err := oprot.WriteStructEnd(); err != nil {
     return thrift.PrependError("write struct stop error: ", err) }
   return nil
@@ -18104,12 +18104,12 @@ func (p *TCLIServiceGetFunctionsArgs) Write(oprot thrift.TProtocol) error {
 
 func (p *TCLIServiceGetFunctionsArgs) writeField1(oprot thrift.TProtocol) (err error) {
   if err := oprot.WriteFieldBegin("req", thrift.STRUCT, 1); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld begin error 1:req: ", p), err) }
+    return thrift.PrependError(fmt.Sprintf("%T write field begin error 1:req: ", p), err) }
   if err := p.Req.Write(oprot); err != nil {
     return thrift.PrependError(fmt.Sprintf("%T error writing struct: ", p.Req), err)
   }
   if err := oprot.WriteFieldEnd(); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld end error 1:req: ", p), err) }
+    return thrift.PrependError(fmt.Sprintf("%T write field end error 1:req: ", p), err) }
   return err
 }
 
@@ -18148,24 +18148,24 @@ func (p *TCLIServiceGetFunctionsResult) Read(iprot thrift.TProtocol) error {
 
 
   for {
-    _, ***REMOVED***eldTypeId, ***REMOVED***eldId, err := iprot.ReadFieldBegin()
+    _, fieldTypeId, fieldId, err := iprot.ReadFieldBegin()
     if err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T ***REMOVED***eld %d read error: ", p, ***REMOVED***eldId), err)
+      return thrift.PrependError(fmt.Sprintf("%T field %d read error: ", p, fieldId), err)
     }
-    if ***REMOVED***eldTypeId == thrift.STOP { break; }
-    switch ***REMOVED***eldId {
+    if fieldTypeId == thrift.STOP { break; }
+    switch fieldId {
     case 0:
-      if ***REMOVED***eldTypeId == thrift.STRUCT {
+      if fieldTypeId == thrift.STRUCT {
         if err := p.ReadField0(iprot); err != nil {
           return err
         }
-      } ***REMOVED*** {
-        if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      } else {
+        if err := iprot.Skip(fieldTypeId); err != nil {
           return err
         }
       }
     default:
-      if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      if err := iprot.Skip(fieldTypeId); err != nil {
         return err
       }
     }
@@ -18194,7 +18194,7 @@ func (p *TCLIServiceGetFunctionsResult) Write(oprot thrift.TProtocol) error {
     if err := p.writeField0(oprot); err != nil { return err }
   }
   if err := oprot.WriteFieldStop(); err != nil {
-    return thrift.PrependError("write ***REMOVED***eld stop error: ", err) }
+    return thrift.PrependError("write field stop error: ", err) }
   if err := oprot.WriteStructEnd(); err != nil {
     return thrift.PrependError("write struct stop error: ", err) }
   return nil
@@ -18203,12 +18203,12 @@ func (p *TCLIServiceGetFunctionsResult) Write(oprot thrift.TProtocol) error {
 func (p *TCLIServiceGetFunctionsResult) writeField0(oprot thrift.TProtocol) (err error) {
   if p.IsSetSuccess() {
     if err := oprot.WriteFieldBegin("success", thrift.STRUCT, 0); err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld begin error 0:success: ", p), err) }
+      return thrift.PrependError(fmt.Sprintf("%T write field begin error 0:success: ", p), err) }
     if err := p.Success.Write(oprot); err != nil {
       return thrift.PrependError(fmt.Sprintf("%T error writing struct: ", p.Success), err)
     }
     if err := oprot.WriteFieldEnd(); err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld end error 0:success: ", p), err) }
+      return thrift.PrependError(fmt.Sprintf("%T write field end error 0:success: ", p), err) }
   }
   return err
 }
@@ -18248,24 +18248,24 @@ func (p *TCLIServiceGetPrimaryKeysArgs) Read(iprot thrift.TProtocol) error {
 
 
   for {
-    _, ***REMOVED***eldTypeId, ***REMOVED***eldId, err := iprot.ReadFieldBegin()
+    _, fieldTypeId, fieldId, err := iprot.ReadFieldBegin()
     if err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T ***REMOVED***eld %d read error: ", p, ***REMOVED***eldId), err)
+      return thrift.PrependError(fmt.Sprintf("%T field %d read error: ", p, fieldId), err)
     }
-    if ***REMOVED***eldTypeId == thrift.STOP { break; }
-    switch ***REMOVED***eldId {
+    if fieldTypeId == thrift.STOP { break; }
+    switch fieldId {
     case 1:
-      if ***REMOVED***eldTypeId == thrift.STRUCT {
+      if fieldTypeId == thrift.STRUCT {
         if err := p.ReadField1(iprot); err != nil {
           return err
         }
-      } ***REMOVED*** {
-        if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      } else {
+        if err := iprot.Skip(fieldTypeId); err != nil {
           return err
         }
       }
     default:
-      if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      if err := iprot.Skip(fieldTypeId); err != nil {
         return err
       }
     }
@@ -18294,7 +18294,7 @@ func (p *TCLIServiceGetPrimaryKeysArgs) Write(oprot thrift.TProtocol) error {
     if err := p.writeField1(oprot); err != nil { return err }
   }
   if err := oprot.WriteFieldStop(); err != nil {
-    return thrift.PrependError("write ***REMOVED***eld stop error: ", err) }
+    return thrift.PrependError("write field stop error: ", err) }
   if err := oprot.WriteStructEnd(); err != nil {
     return thrift.PrependError("write struct stop error: ", err) }
   return nil
@@ -18302,12 +18302,12 @@ func (p *TCLIServiceGetPrimaryKeysArgs) Write(oprot thrift.TProtocol) error {
 
 func (p *TCLIServiceGetPrimaryKeysArgs) writeField1(oprot thrift.TProtocol) (err error) {
   if err := oprot.WriteFieldBegin("req", thrift.STRUCT, 1); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld begin error 1:req: ", p), err) }
+    return thrift.PrependError(fmt.Sprintf("%T write field begin error 1:req: ", p), err) }
   if err := p.Req.Write(oprot); err != nil {
     return thrift.PrependError(fmt.Sprintf("%T error writing struct: ", p.Req), err)
   }
   if err := oprot.WriteFieldEnd(); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld end error 1:req: ", p), err) }
+    return thrift.PrependError(fmt.Sprintf("%T write field end error 1:req: ", p), err) }
   return err
 }
 
@@ -18346,24 +18346,24 @@ func (p *TCLIServiceGetPrimaryKeysResult) Read(iprot thrift.TProtocol) error {
 
 
   for {
-    _, ***REMOVED***eldTypeId, ***REMOVED***eldId, err := iprot.ReadFieldBegin()
+    _, fieldTypeId, fieldId, err := iprot.ReadFieldBegin()
     if err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T ***REMOVED***eld %d read error: ", p, ***REMOVED***eldId), err)
+      return thrift.PrependError(fmt.Sprintf("%T field %d read error: ", p, fieldId), err)
     }
-    if ***REMOVED***eldTypeId == thrift.STOP { break; }
-    switch ***REMOVED***eldId {
+    if fieldTypeId == thrift.STOP { break; }
+    switch fieldId {
     case 0:
-      if ***REMOVED***eldTypeId == thrift.STRUCT {
+      if fieldTypeId == thrift.STRUCT {
         if err := p.ReadField0(iprot); err != nil {
           return err
         }
-      } ***REMOVED*** {
-        if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      } else {
+        if err := iprot.Skip(fieldTypeId); err != nil {
           return err
         }
       }
     default:
-      if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      if err := iprot.Skip(fieldTypeId); err != nil {
         return err
       }
     }
@@ -18392,7 +18392,7 @@ func (p *TCLIServiceGetPrimaryKeysResult) Write(oprot thrift.TProtocol) error {
     if err := p.writeField0(oprot); err != nil { return err }
   }
   if err := oprot.WriteFieldStop(); err != nil {
-    return thrift.PrependError("write ***REMOVED***eld stop error: ", err) }
+    return thrift.PrependError("write field stop error: ", err) }
   if err := oprot.WriteStructEnd(); err != nil {
     return thrift.PrependError("write struct stop error: ", err) }
   return nil
@@ -18401,12 +18401,12 @@ func (p *TCLIServiceGetPrimaryKeysResult) Write(oprot thrift.TProtocol) error {
 func (p *TCLIServiceGetPrimaryKeysResult) writeField0(oprot thrift.TProtocol) (err error) {
   if p.IsSetSuccess() {
     if err := oprot.WriteFieldBegin("success", thrift.STRUCT, 0); err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld begin error 0:success: ", p), err) }
+      return thrift.PrependError(fmt.Sprintf("%T write field begin error 0:success: ", p), err) }
     if err := p.Success.Write(oprot); err != nil {
       return thrift.PrependError(fmt.Sprintf("%T error writing struct: ", p.Success), err)
     }
     if err := oprot.WriteFieldEnd(); err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld end error 0:success: ", p), err) }
+      return thrift.PrependError(fmt.Sprintf("%T write field end error 0:success: ", p), err) }
   }
   return err
 }
@@ -18446,24 +18446,24 @@ func (p *TCLIServiceGetCrossReferenceArgs) Read(iprot thrift.TProtocol) error {
 
 
   for {
-    _, ***REMOVED***eldTypeId, ***REMOVED***eldId, err := iprot.ReadFieldBegin()
+    _, fieldTypeId, fieldId, err := iprot.ReadFieldBegin()
     if err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T ***REMOVED***eld %d read error: ", p, ***REMOVED***eldId), err)
+      return thrift.PrependError(fmt.Sprintf("%T field %d read error: ", p, fieldId), err)
     }
-    if ***REMOVED***eldTypeId == thrift.STOP { break; }
-    switch ***REMOVED***eldId {
+    if fieldTypeId == thrift.STOP { break; }
+    switch fieldId {
     case 1:
-      if ***REMOVED***eldTypeId == thrift.STRUCT {
+      if fieldTypeId == thrift.STRUCT {
         if err := p.ReadField1(iprot); err != nil {
           return err
         }
-      } ***REMOVED*** {
-        if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      } else {
+        if err := iprot.Skip(fieldTypeId); err != nil {
           return err
         }
       }
     default:
-      if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      if err := iprot.Skip(fieldTypeId); err != nil {
         return err
       }
     }
@@ -18492,7 +18492,7 @@ func (p *TCLIServiceGetCrossReferenceArgs) Write(oprot thrift.TProtocol) error {
     if err := p.writeField1(oprot); err != nil { return err }
   }
   if err := oprot.WriteFieldStop(); err != nil {
-    return thrift.PrependError("write ***REMOVED***eld stop error: ", err) }
+    return thrift.PrependError("write field stop error: ", err) }
   if err := oprot.WriteStructEnd(); err != nil {
     return thrift.PrependError("write struct stop error: ", err) }
   return nil
@@ -18500,12 +18500,12 @@ func (p *TCLIServiceGetCrossReferenceArgs) Write(oprot thrift.TProtocol) error {
 
 func (p *TCLIServiceGetCrossReferenceArgs) writeField1(oprot thrift.TProtocol) (err error) {
   if err := oprot.WriteFieldBegin("req", thrift.STRUCT, 1); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld begin error 1:req: ", p), err) }
+    return thrift.PrependError(fmt.Sprintf("%T write field begin error 1:req: ", p), err) }
   if err := p.Req.Write(oprot); err != nil {
     return thrift.PrependError(fmt.Sprintf("%T error writing struct: ", p.Req), err)
   }
   if err := oprot.WriteFieldEnd(); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld end error 1:req: ", p), err) }
+    return thrift.PrependError(fmt.Sprintf("%T write field end error 1:req: ", p), err) }
   return err
 }
 
@@ -18544,24 +18544,24 @@ func (p *TCLIServiceGetCrossReferenceResult) Read(iprot thrift.TProtocol) error 
 
 
   for {
-    _, ***REMOVED***eldTypeId, ***REMOVED***eldId, err := iprot.ReadFieldBegin()
+    _, fieldTypeId, fieldId, err := iprot.ReadFieldBegin()
     if err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T ***REMOVED***eld %d read error: ", p, ***REMOVED***eldId), err)
+      return thrift.PrependError(fmt.Sprintf("%T field %d read error: ", p, fieldId), err)
     }
-    if ***REMOVED***eldTypeId == thrift.STOP { break; }
-    switch ***REMOVED***eldId {
+    if fieldTypeId == thrift.STOP { break; }
+    switch fieldId {
     case 0:
-      if ***REMOVED***eldTypeId == thrift.STRUCT {
+      if fieldTypeId == thrift.STRUCT {
         if err := p.ReadField0(iprot); err != nil {
           return err
         }
-      } ***REMOVED*** {
-        if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      } else {
+        if err := iprot.Skip(fieldTypeId); err != nil {
           return err
         }
       }
     default:
-      if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      if err := iprot.Skip(fieldTypeId); err != nil {
         return err
       }
     }
@@ -18590,7 +18590,7 @@ func (p *TCLIServiceGetCrossReferenceResult) Write(oprot thrift.TProtocol) error
     if err := p.writeField0(oprot); err != nil { return err }
   }
   if err := oprot.WriteFieldStop(); err != nil {
-    return thrift.PrependError("write ***REMOVED***eld stop error: ", err) }
+    return thrift.PrependError("write field stop error: ", err) }
   if err := oprot.WriteStructEnd(); err != nil {
     return thrift.PrependError("write struct stop error: ", err) }
   return nil
@@ -18599,12 +18599,12 @@ func (p *TCLIServiceGetCrossReferenceResult) Write(oprot thrift.TProtocol) error
 func (p *TCLIServiceGetCrossReferenceResult) writeField0(oprot thrift.TProtocol) (err error) {
   if p.IsSetSuccess() {
     if err := oprot.WriteFieldBegin("success", thrift.STRUCT, 0); err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld begin error 0:success: ", p), err) }
+      return thrift.PrependError(fmt.Sprintf("%T write field begin error 0:success: ", p), err) }
     if err := p.Success.Write(oprot); err != nil {
       return thrift.PrependError(fmt.Sprintf("%T error writing struct: ", p.Success), err)
     }
     if err := oprot.WriteFieldEnd(); err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld end error 0:success: ", p), err) }
+      return thrift.PrependError(fmt.Sprintf("%T write field end error 0:success: ", p), err) }
   }
   return err
 }
@@ -18644,24 +18644,24 @@ func (p *TCLIServiceGetOperationStatusArgs) Read(iprot thrift.TProtocol) error {
 
 
   for {
-    _, ***REMOVED***eldTypeId, ***REMOVED***eldId, err := iprot.ReadFieldBegin()
+    _, fieldTypeId, fieldId, err := iprot.ReadFieldBegin()
     if err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T ***REMOVED***eld %d read error: ", p, ***REMOVED***eldId), err)
+      return thrift.PrependError(fmt.Sprintf("%T field %d read error: ", p, fieldId), err)
     }
-    if ***REMOVED***eldTypeId == thrift.STOP { break; }
-    switch ***REMOVED***eldId {
+    if fieldTypeId == thrift.STOP { break; }
+    switch fieldId {
     case 1:
-      if ***REMOVED***eldTypeId == thrift.STRUCT {
+      if fieldTypeId == thrift.STRUCT {
         if err := p.ReadField1(iprot); err != nil {
           return err
         }
-      } ***REMOVED*** {
-        if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      } else {
+        if err := iprot.Skip(fieldTypeId); err != nil {
           return err
         }
       }
     default:
-      if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      if err := iprot.Skip(fieldTypeId); err != nil {
         return err
       }
     }
@@ -18690,7 +18690,7 @@ func (p *TCLIServiceGetOperationStatusArgs) Write(oprot thrift.TProtocol) error 
     if err := p.writeField1(oprot); err != nil { return err }
   }
   if err := oprot.WriteFieldStop(); err != nil {
-    return thrift.PrependError("write ***REMOVED***eld stop error: ", err) }
+    return thrift.PrependError("write field stop error: ", err) }
   if err := oprot.WriteStructEnd(); err != nil {
     return thrift.PrependError("write struct stop error: ", err) }
   return nil
@@ -18698,12 +18698,12 @@ func (p *TCLIServiceGetOperationStatusArgs) Write(oprot thrift.TProtocol) error 
 
 func (p *TCLIServiceGetOperationStatusArgs) writeField1(oprot thrift.TProtocol) (err error) {
   if err := oprot.WriteFieldBegin("req", thrift.STRUCT, 1); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld begin error 1:req: ", p), err) }
+    return thrift.PrependError(fmt.Sprintf("%T write field begin error 1:req: ", p), err) }
   if err := p.Req.Write(oprot); err != nil {
     return thrift.PrependError(fmt.Sprintf("%T error writing struct: ", p.Req), err)
   }
   if err := oprot.WriteFieldEnd(); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld end error 1:req: ", p), err) }
+    return thrift.PrependError(fmt.Sprintf("%T write field end error 1:req: ", p), err) }
   return err
 }
 
@@ -18742,24 +18742,24 @@ func (p *TCLIServiceGetOperationStatusResult) Read(iprot thrift.TProtocol) error
 
 
   for {
-    _, ***REMOVED***eldTypeId, ***REMOVED***eldId, err := iprot.ReadFieldBegin()
+    _, fieldTypeId, fieldId, err := iprot.ReadFieldBegin()
     if err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T ***REMOVED***eld %d read error: ", p, ***REMOVED***eldId), err)
+      return thrift.PrependError(fmt.Sprintf("%T field %d read error: ", p, fieldId), err)
     }
-    if ***REMOVED***eldTypeId == thrift.STOP { break; }
-    switch ***REMOVED***eldId {
+    if fieldTypeId == thrift.STOP { break; }
+    switch fieldId {
     case 0:
-      if ***REMOVED***eldTypeId == thrift.STRUCT {
+      if fieldTypeId == thrift.STRUCT {
         if err := p.ReadField0(iprot); err != nil {
           return err
         }
-      } ***REMOVED*** {
-        if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      } else {
+        if err := iprot.Skip(fieldTypeId); err != nil {
           return err
         }
       }
     default:
-      if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      if err := iprot.Skip(fieldTypeId); err != nil {
         return err
       }
     }
@@ -18788,7 +18788,7 @@ func (p *TCLIServiceGetOperationStatusResult) Write(oprot thrift.TProtocol) erro
     if err := p.writeField0(oprot); err != nil { return err }
   }
   if err := oprot.WriteFieldStop(); err != nil {
-    return thrift.PrependError("write ***REMOVED***eld stop error: ", err) }
+    return thrift.PrependError("write field stop error: ", err) }
   if err := oprot.WriteStructEnd(); err != nil {
     return thrift.PrependError("write struct stop error: ", err) }
   return nil
@@ -18797,12 +18797,12 @@ func (p *TCLIServiceGetOperationStatusResult) Write(oprot thrift.TProtocol) erro
 func (p *TCLIServiceGetOperationStatusResult) writeField0(oprot thrift.TProtocol) (err error) {
   if p.IsSetSuccess() {
     if err := oprot.WriteFieldBegin("success", thrift.STRUCT, 0); err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld begin error 0:success: ", p), err) }
+      return thrift.PrependError(fmt.Sprintf("%T write field begin error 0:success: ", p), err) }
     if err := p.Success.Write(oprot); err != nil {
       return thrift.PrependError(fmt.Sprintf("%T error writing struct: ", p.Success), err)
     }
     if err := oprot.WriteFieldEnd(); err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld end error 0:success: ", p), err) }
+      return thrift.PrependError(fmt.Sprintf("%T write field end error 0:success: ", p), err) }
   }
   return err
 }
@@ -18842,24 +18842,24 @@ func (p *TCLIServiceCancelOperationArgs) Read(iprot thrift.TProtocol) error {
 
 
   for {
-    _, ***REMOVED***eldTypeId, ***REMOVED***eldId, err := iprot.ReadFieldBegin()
+    _, fieldTypeId, fieldId, err := iprot.ReadFieldBegin()
     if err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T ***REMOVED***eld %d read error: ", p, ***REMOVED***eldId), err)
+      return thrift.PrependError(fmt.Sprintf("%T field %d read error: ", p, fieldId), err)
     }
-    if ***REMOVED***eldTypeId == thrift.STOP { break; }
-    switch ***REMOVED***eldId {
+    if fieldTypeId == thrift.STOP { break; }
+    switch fieldId {
     case 1:
-      if ***REMOVED***eldTypeId == thrift.STRUCT {
+      if fieldTypeId == thrift.STRUCT {
         if err := p.ReadField1(iprot); err != nil {
           return err
         }
-      } ***REMOVED*** {
-        if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      } else {
+        if err := iprot.Skip(fieldTypeId); err != nil {
           return err
         }
       }
     default:
-      if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      if err := iprot.Skip(fieldTypeId); err != nil {
         return err
       }
     }
@@ -18888,7 +18888,7 @@ func (p *TCLIServiceCancelOperationArgs) Write(oprot thrift.TProtocol) error {
     if err := p.writeField1(oprot); err != nil { return err }
   }
   if err := oprot.WriteFieldStop(); err != nil {
-    return thrift.PrependError("write ***REMOVED***eld stop error: ", err) }
+    return thrift.PrependError("write field stop error: ", err) }
   if err := oprot.WriteStructEnd(); err != nil {
     return thrift.PrependError("write struct stop error: ", err) }
   return nil
@@ -18896,12 +18896,12 @@ func (p *TCLIServiceCancelOperationArgs) Write(oprot thrift.TProtocol) error {
 
 func (p *TCLIServiceCancelOperationArgs) writeField1(oprot thrift.TProtocol) (err error) {
   if err := oprot.WriteFieldBegin("req", thrift.STRUCT, 1); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld begin error 1:req: ", p), err) }
+    return thrift.PrependError(fmt.Sprintf("%T write field begin error 1:req: ", p), err) }
   if err := p.Req.Write(oprot); err != nil {
     return thrift.PrependError(fmt.Sprintf("%T error writing struct: ", p.Req), err)
   }
   if err := oprot.WriteFieldEnd(); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld end error 1:req: ", p), err) }
+    return thrift.PrependError(fmt.Sprintf("%T write field end error 1:req: ", p), err) }
   return err
 }
 
@@ -18940,24 +18940,24 @@ func (p *TCLIServiceCancelOperationResult) Read(iprot thrift.TProtocol) error {
 
 
   for {
-    _, ***REMOVED***eldTypeId, ***REMOVED***eldId, err := iprot.ReadFieldBegin()
+    _, fieldTypeId, fieldId, err := iprot.ReadFieldBegin()
     if err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T ***REMOVED***eld %d read error: ", p, ***REMOVED***eldId), err)
+      return thrift.PrependError(fmt.Sprintf("%T field %d read error: ", p, fieldId), err)
     }
-    if ***REMOVED***eldTypeId == thrift.STOP { break; }
-    switch ***REMOVED***eldId {
+    if fieldTypeId == thrift.STOP { break; }
+    switch fieldId {
     case 0:
-      if ***REMOVED***eldTypeId == thrift.STRUCT {
+      if fieldTypeId == thrift.STRUCT {
         if err := p.ReadField0(iprot); err != nil {
           return err
         }
-      } ***REMOVED*** {
-        if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      } else {
+        if err := iprot.Skip(fieldTypeId); err != nil {
           return err
         }
       }
     default:
-      if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      if err := iprot.Skip(fieldTypeId); err != nil {
         return err
       }
     }
@@ -18986,7 +18986,7 @@ func (p *TCLIServiceCancelOperationResult) Write(oprot thrift.TProtocol) error {
     if err := p.writeField0(oprot); err != nil { return err }
   }
   if err := oprot.WriteFieldStop(); err != nil {
-    return thrift.PrependError("write ***REMOVED***eld stop error: ", err) }
+    return thrift.PrependError("write field stop error: ", err) }
   if err := oprot.WriteStructEnd(); err != nil {
     return thrift.PrependError("write struct stop error: ", err) }
   return nil
@@ -18995,12 +18995,12 @@ func (p *TCLIServiceCancelOperationResult) Write(oprot thrift.TProtocol) error {
 func (p *TCLIServiceCancelOperationResult) writeField0(oprot thrift.TProtocol) (err error) {
   if p.IsSetSuccess() {
     if err := oprot.WriteFieldBegin("success", thrift.STRUCT, 0); err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld begin error 0:success: ", p), err) }
+      return thrift.PrependError(fmt.Sprintf("%T write field begin error 0:success: ", p), err) }
     if err := p.Success.Write(oprot); err != nil {
       return thrift.PrependError(fmt.Sprintf("%T error writing struct: ", p.Success), err)
     }
     if err := oprot.WriteFieldEnd(); err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld end error 0:success: ", p), err) }
+      return thrift.PrependError(fmt.Sprintf("%T write field end error 0:success: ", p), err) }
   }
   return err
 }
@@ -19040,24 +19040,24 @@ func (p *TCLIServiceCloseOperationArgs) Read(iprot thrift.TProtocol) error {
 
 
   for {
-    _, ***REMOVED***eldTypeId, ***REMOVED***eldId, err := iprot.ReadFieldBegin()
+    _, fieldTypeId, fieldId, err := iprot.ReadFieldBegin()
     if err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T ***REMOVED***eld %d read error: ", p, ***REMOVED***eldId), err)
+      return thrift.PrependError(fmt.Sprintf("%T field %d read error: ", p, fieldId), err)
     }
-    if ***REMOVED***eldTypeId == thrift.STOP { break; }
-    switch ***REMOVED***eldId {
+    if fieldTypeId == thrift.STOP { break; }
+    switch fieldId {
     case 1:
-      if ***REMOVED***eldTypeId == thrift.STRUCT {
+      if fieldTypeId == thrift.STRUCT {
         if err := p.ReadField1(iprot); err != nil {
           return err
         }
-      } ***REMOVED*** {
-        if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      } else {
+        if err := iprot.Skip(fieldTypeId); err != nil {
           return err
         }
       }
     default:
-      if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      if err := iprot.Skip(fieldTypeId); err != nil {
         return err
       }
     }
@@ -19086,7 +19086,7 @@ func (p *TCLIServiceCloseOperationArgs) Write(oprot thrift.TProtocol) error {
     if err := p.writeField1(oprot); err != nil { return err }
   }
   if err := oprot.WriteFieldStop(); err != nil {
-    return thrift.PrependError("write ***REMOVED***eld stop error: ", err) }
+    return thrift.PrependError("write field stop error: ", err) }
   if err := oprot.WriteStructEnd(); err != nil {
     return thrift.PrependError("write struct stop error: ", err) }
   return nil
@@ -19094,12 +19094,12 @@ func (p *TCLIServiceCloseOperationArgs) Write(oprot thrift.TProtocol) error {
 
 func (p *TCLIServiceCloseOperationArgs) writeField1(oprot thrift.TProtocol) (err error) {
   if err := oprot.WriteFieldBegin("req", thrift.STRUCT, 1); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld begin error 1:req: ", p), err) }
+    return thrift.PrependError(fmt.Sprintf("%T write field begin error 1:req: ", p), err) }
   if err := p.Req.Write(oprot); err != nil {
     return thrift.PrependError(fmt.Sprintf("%T error writing struct: ", p.Req), err)
   }
   if err := oprot.WriteFieldEnd(); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld end error 1:req: ", p), err) }
+    return thrift.PrependError(fmt.Sprintf("%T write field end error 1:req: ", p), err) }
   return err
 }
 
@@ -19138,24 +19138,24 @@ func (p *TCLIServiceCloseOperationResult) Read(iprot thrift.TProtocol) error {
 
 
   for {
-    _, ***REMOVED***eldTypeId, ***REMOVED***eldId, err := iprot.ReadFieldBegin()
+    _, fieldTypeId, fieldId, err := iprot.ReadFieldBegin()
     if err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T ***REMOVED***eld %d read error: ", p, ***REMOVED***eldId), err)
+      return thrift.PrependError(fmt.Sprintf("%T field %d read error: ", p, fieldId), err)
     }
-    if ***REMOVED***eldTypeId == thrift.STOP { break; }
-    switch ***REMOVED***eldId {
+    if fieldTypeId == thrift.STOP { break; }
+    switch fieldId {
     case 0:
-      if ***REMOVED***eldTypeId == thrift.STRUCT {
+      if fieldTypeId == thrift.STRUCT {
         if err := p.ReadField0(iprot); err != nil {
           return err
         }
-      } ***REMOVED*** {
-        if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      } else {
+        if err := iprot.Skip(fieldTypeId); err != nil {
           return err
         }
       }
     default:
-      if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      if err := iprot.Skip(fieldTypeId); err != nil {
         return err
       }
     }
@@ -19184,7 +19184,7 @@ func (p *TCLIServiceCloseOperationResult) Write(oprot thrift.TProtocol) error {
     if err := p.writeField0(oprot); err != nil { return err }
   }
   if err := oprot.WriteFieldStop(); err != nil {
-    return thrift.PrependError("write ***REMOVED***eld stop error: ", err) }
+    return thrift.PrependError("write field stop error: ", err) }
   if err := oprot.WriteStructEnd(); err != nil {
     return thrift.PrependError("write struct stop error: ", err) }
   return nil
@@ -19193,12 +19193,12 @@ func (p *TCLIServiceCloseOperationResult) Write(oprot thrift.TProtocol) error {
 func (p *TCLIServiceCloseOperationResult) writeField0(oprot thrift.TProtocol) (err error) {
   if p.IsSetSuccess() {
     if err := oprot.WriteFieldBegin("success", thrift.STRUCT, 0); err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld begin error 0:success: ", p), err) }
+      return thrift.PrependError(fmt.Sprintf("%T write field begin error 0:success: ", p), err) }
     if err := p.Success.Write(oprot); err != nil {
       return thrift.PrependError(fmt.Sprintf("%T error writing struct: ", p.Success), err)
     }
     if err := oprot.WriteFieldEnd(); err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld end error 0:success: ", p), err) }
+      return thrift.PrependError(fmt.Sprintf("%T write field end error 0:success: ", p), err) }
   }
   return err
 }
@@ -19238,24 +19238,24 @@ func (p *TCLIServiceGetResultSetMetadataArgs) Read(iprot thrift.TProtocol) error
 
 
   for {
-    _, ***REMOVED***eldTypeId, ***REMOVED***eldId, err := iprot.ReadFieldBegin()
+    _, fieldTypeId, fieldId, err := iprot.ReadFieldBegin()
     if err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T ***REMOVED***eld %d read error: ", p, ***REMOVED***eldId), err)
+      return thrift.PrependError(fmt.Sprintf("%T field %d read error: ", p, fieldId), err)
     }
-    if ***REMOVED***eldTypeId == thrift.STOP { break; }
-    switch ***REMOVED***eldId {
+    if fieldTypeId == thrift.STOP { break; }
+    switch fieldId {
     case 1:
-      if ***REMOVED***eldTypeId == thrift.STRUCT {
+      if fieldTypeId == thrift.STRUCT {
         if err := p.ReadField1(iprot); err != nil {
           return err
         }
-      } ***REMOVED*** {
-        if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      } else {
+        if err := iprot.Skip(fieldTypeId); err != nil {
           return err
         }
       }
     default:
-      if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      if err := iprot.Skip(fieldTypeId); err != nil {
         return err
       }
     }
@@ -19284,7 +19284,7 @@ func (p *TCLIServiceGetResultSetMetadataArgs) Write(oprot thrift.TProtocol) erro
     if err := p.writeField1(oprot); err != nil { return err }
   }
   if err := oprot.WriteFieldStop(); err != nil {
-    return thrift.PrependError("write ***REMOVED***eld stop error: ", err) }
+    return thrift.PrependError("write field stop error: ", err) }
   if err := oprot.WriteStructEnd(); err != nil {
     return thrift.PrependError("write struct stop error: ", err) }
   return nil
@@ -19292,12 +19292,12 @@ func (p *TCLIServiceGetResultSetMetadataArgs) Write(oprot thrift.TProtocol) erro
 
 func (p *TCLIServiceGetResultSetMetadataArgs) writeField1(oprot thrift.TProtocol) (err error) {
   if err := oprot.WriteFieldBegin("req", thrift.STRUCT, 1); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld begin error 1:req: ", p), err) }
+    return thrift.PrependError(fmt.Sprintf("%T write field begin error 1:req: ", p), err) }
   if err := p.Req.Write(oprot); err != nil {
     return thrift.PrependError(fmt.Sprintf("%T error writing struct: ", p.Req), err)
   }
   if err := oprot.WriteFieldEnd(); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld end error 1:req: ", p), err) }
+    return thrift.PrependError(fmt.Sprintf("%T write field end error 1:req: ", p), err) }
   return err
 }
 
@@ -19336,24 +19336,24 @@ func (p *TCLIServiceGetResultSetMetadataResult) Read(iprot thrift.TProtocol) err
 
 
   for {
-    _, ***REMOVED***eldTypeId, ***REMOVED***eldId, err := iprot.ReadFieldBegin()
+    _, fieldTypeId, fieldId, err := iprot.ReadFieldBegin()
     if err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T ***REMOVED***eld %d read error: ", p, ***REMOVED***eldId), err)
+      return thrift.PrependError(fmt.Sprintf("%T field %d read error: ", p, fieldId), err)
     }
-    if ***REMOVED***eldTypeId == thrift.STOP { break; }
-    switch ***REMOVED***eldId {
+    if fieldTypeId == thrift.STOP { break; }
+    switch fieldId {
     case 0:
-      if ***REMOVED***eldTypeId == thrift.STRUCT {
+      if fieldTypeId == thrift.STRUCT {
         if err := p.ReadField0(iprot); err != nil {
           return err
         }
-      } ***REMOVED*** {
-        if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      } else {
+        if err := iprot.Skip(fieldTypeId); err != nil {
           return err
         }
       }
     default:
-      if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      if err := iprot.Skip(fieldTypeId); err != nil {
         return err
       }
     }
@@ -19382,7 +19382,7 @@ func (p *TCLIServiceGetResultSetMetadataResult) Write(oprot thrift.TProtocol) er
     if err := p.writeField0(oprot); err != nil { return err }
   }
   if err := oprot.WriteFieldStop(); err != nil {
-    return thrift.PrependError("write ***REMOVED***eld stop error: ", err) }
+    return thrift.PrependError("write field stop error: ", err) }
   if err := oprot.WriteStructEnd(); err != nil {
     return thrift.PrependError("write struct stop error: ", err) }
   return nil
@@ -19391,12 +19391,12 @@ func (p *TCLIServiceGetResultSetMetadataResult) Write(oprot thrift.TProtocol) er
 func (p *TCLIServiceGetResultSetMetadataResult) writeField0(oprot thrift.TProtocol) (err error) {
   if p.IsSetSuccess() {
     if err := oprot.WriteFieldBegin("success", thrift.STRUCT, 0); err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld begin error 0:success: ", p), err) }
+      return thrift.PrependError(fmt.Sprintf("%T write field begin error 0:success: ", p), err) }
     if err := p.Success.Write(oprot); err != nil {
       return thrift.PrependError(fmt.Sprintf("%T error writing struct: ", p.Success), err)
     }
     if err := oprot.WriteFieldEnd(); err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld end error 0:success: ", p), err) }
+      return thrift.PrependError(fmt.Sprintf("%T write field end error 0:success: ", p), err) }
   }
   return err
 }
@@ -19436,24 +19436,24 @@ func (p *TCLIServiceFetchResultsArgs) Read(iprot thrift.TProtocol) error {
 
 
   for {
-    _, ***REMOVED***eldTypeId, ***REMOVED***eldId, err := iprot.ReadFieldBegin()
+    _, fieldTypeId, fieldId, err := iprot.ReadFieldBegin()
     if err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T ***REMOVED***eld %d read error: ", p, ***REMOVED***eldId), err)
+      return thrift.PrependError(fmt.Sprintf("%T field %d read error: ", p, fieldId), err)
     }
-    if ***REMOVED***eldTypeId == thrift.STOP { break; }
-    switch ***REMOVED***eldId {
+    if fieldTypeId == thrift.STOP { break; }
+    switch fieldId {
     case 1:
-      if ***REMOVED***eldTypeId == thrift.STRUCT {
+      if fieldTypeId == thrift.STRUCT {
         if err := p.ReadField1(iprot); err != nil {
           return err
         }
-      } ***REMOVED*** {
-        if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      } else {
+        if err := iprot.Skip(fieldTypeId); err != nil {
           return err
         }
       }
     default:
-      if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      if err := iprot.Skip(fieldTypeId); err != nil {
         return err
       }
     }
@@ -19484,7 +19484,7 @@ func (p *TCLIServiceFetchResultsArgs) Write(oprot thrift.TProtocol) error {
     if err := p.writeField1(oprot); err != nil { return err }
   }
   if err := oprot.WriteFieldStop(); err != nil {
-    return thrift.PrependError("write ***REMOVED***eld stop error: ", err) }
+    return thrift.PrependError("write field stop error: ", err) }
   if err := oprot.WriteStructEnd(); err != nil {
     return thrift.PrependError("write struct stop error: ", err) }
   return nil
@@ -19492,12 +19492,12 @@ func (p *TCLIServiceFetchResultsArgs) Write(oprot thrift.TProtocol) error {
 
 func (p *TCLIServiceFetchResultsArgs) writeField1(oprot thrift.TProtocol) (err error) {
   if err := oprot.WriteFieldBegin("req", thrift.STRUCT, 1); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld begin error 1:req: ", p), err) }
+    return thrift.PrependError(fmt.Sprintf("%T write field begin error 1:req: ", p), err) }
   if err := p.Req.Write(oprot); err != nil {
     return thrift.PrependError(fmt.Sprintf("%T error writing struct: ", p.Req), err)
   }
   if err := oprot.WriteFieldEnd(); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld end error 1:req: ", p), err) }
+    return thrift.PrependError(fmt.Sprintf("%T write field end error 1:req: ", p), err) }
   return err
 }
 
@@ -19536,24 +19536,24 @@ func (p *TCLIServiceFetchResultsResult) Read(iprot thrift.TProtocol) error {
 
 
   for {
-    _, ***REMOVED***eldTypeId, ***REMOVED***eldId, err := iprot.ReadFieldBegin()
+    _, fieldTypeId, fieldId, err := iprot.ReadFieldBegin()
     if err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T ***REMOVED***eld %d read error: ", p, ***REMOVED***eldId), err)
+      return thrift.PrependError(fmt.Sprintf("%T field %d read error: ", p, fieldId), err)
     }
-    if ***REMOVED***eldTypeId == thrift.STOP { break; }
-    switch ***REMOVED***eldId {
+    if fieldTypeId == thrift.STOP { break; }
+    switch fieldId {
     case 0:
-      if ***REMOVED***eldTypeId == thrift.STRUCT {
+      if fieldTypeId == thrift.STRUCT {
         if err := p.ReadField0(iprot); err != nil {
           return err
         }
-      } ***REMOVED*** {
-        if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      } else {
+        if err := iprot.Skip(fieldTypeId); err != nil {
           return err
         }
       }
     default:
-      if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      if err := iprot.Skip(fieldTypeId); err != nil {
         return err
       }
     }
@@ -19582,7 +19582,7 @@ func (p *TCLIServiceFetchResultsResult) Write(oprot thrift.TProtocol) error {
     if err := p.writeField0(oprot); err != nil { return err }
   }
   if err := oprot.WriteFieldStop(); err != nil {
-    return thrift.PrependError("write ***REMOVED***eld stop error: ", err) }
+    return thrift.PrependError("write field stop error: ", err) }
   if err := oprot.WriteStructEnd(); err != nil {
     return thrift.PrependError("write struct stop error: ", err) }
   return nil
@@ -19591,12 +19591,12 @@ func (p *TCLIServiceFetchResultsResult) Write(oprot thrift.TProtocol) error {
 func (p *TCLIServiceFetchResultsResult) writeField0(oprot thrift.TProtocol) (err error) {
   if p.IsSetSuccess() {
     if err := oprot.WriteFieldBegin("success", thrift.STRUCT, 0); err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld begin error 0:success: ", p), err) }
+      return thrift.PrependError(fmt.Sprintf("%T write field begin error 0:success: ", p), err) }
     if err := p.Success.Write(oprot); err != nil {
       return thrift.PrependError(fmt.Sprintf("%T error writing struct: ", p.Success), err)
     }
     if err := oprot.WriteFieldEnd(); err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld end error 0:success: ", p), err) }
+      return thrift.PrependError(fmt.Sprintf("%T write field end error 0:success: ", p), err) }
   }
   return err
 }
@@ -19636,24 +19636,24 @@ func (p *TCLIServiceGetDelegationTokenArgs) Read(iprot thrift.TProtocol) error {
 
 
   for {
-    _, ***REMOVED***eldTypeId, ***REMOVED***eldId, err := iprot.ReadFieldBegin()
+    _, fieldTypeId, fieldId, err := iprot.ReadFieldBegin()
     if err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T ***REMOVED***eld %d read error: ", p, ***REMOVED***eldId), err)
+      return thrift.PrependError(fmt.Sprintf("%T field %d read error: ", p, fieldId), err)
     }
-    if ***REMOVED***eldTypeId == thrift.STOP { break; }
-    switch ***REMOVED***eldId {
+    if fieldTypeId == thrift.STOP { break; }
+    switch fieldId {
     case 1:
-      if ***REMOVED***eldTypeId == thrift.STRUCT {
+      if fieldTypeId == thrift.STRUCT {
         if err := p.ReadField1(iprot); err != nil {
           return err
         }
-      } ***REMOVED*** {
-        if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      } else {
+        if err := iprot.Skip(fieldTypeId); err != nil {
           return err
         }
       }
     default:
-      if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      if err := iprot.Skip(fieldTypeId); err != nil {
         return err
       }
     }
@@ -19682,7 +19682,7 @@ func (p *TCLIServiceGetDelegationTokenArgs) Write(oprot thrift.TProtocol) error 
     if err := p.writeField1(oprot); err != nil { return err }
   }
   if err := oprot.WriteFieldStop(); err != nil {
-    return thrift.PrependError("write ***REMOVED***eld stop error: ", err) }
+    return thrift.PrependError("write field stop error: ", err) }
   if err := oprot.WriteStructEnd(); err != nil {
     return thrift.PrependError("write struct stop error: ", err) }
   return nil
@@ -19690,12 +19690,12 @@ func (p *TCLIServiceGetDelegationTokenArgs) Write(oprot thrift.TProtocol) error 
 
 func (p *TCLIServiceGetDelegationTokenArgs) writeField1(oprot thrift.TProtocol) (err error) {
   if err := oprot.WriteFieldBegin("req", thrift.STRUCT, 1); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld begin error 1:req: ", p), err) }
+    return thrift.PrependError(fmt.Sprintf("%T write field begin error 1:req: ", p), err) }
   if err := p.Req.Write(oprot); err != nil {
     return thrift.PrependError(fmt.Sprintf("%T error writing struct: ", p.Req), err)
   }
   if err := oprot.WriteFieldEnd(); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld end error 1:req: ", p), err) }
+    return thrift.PrependError(fmt.Sprintf("%T write field end error 1:req: ", p), err) }
   return err
 }
 
@@ -19734,24 +19734,24 @@ func (p *TCLIServiceGetDelegationTokenResult) Read(iprot thrift.TProtocol) error
 
 
   for {
-    _, ***REMOVED***eldTypeId, ***REMOVED***eldId, err := iprot.ReadFieldBegin()
+    _, fieldTypeId, fieldId, err := iprot.ReadFieldBegin()
     if err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T ***REMOVED***eld %d read error: ", p, ***REMOVED***eldId), err)
+      return thrift.PrependError(fmt.Sprintf("%T field %d read error: ", p, fieldId), err)
     }
-    if ***REMOVED***eldTypeId == thrift.STOP { break; }
-    switch ***REMOVED***eldId {
+    if fieldTypeId == thrift.STOP { break; }
+    switch fieldId {
     case 0:
-      if ***REMOVED***eldTypeId == thrift.STRUCT {
+      if fieldTypeId == thrift.STRUCT {
         if err := p.ReadField0(iprot); err != nil {
           return err
         }
-      } ***REMOVED*** {
-        if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      } else {
+        if err := iprot.Skip(fieldTypeId); err != nil {
           return err
         }
       }
     default:
-      if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      if err := iprot.Skip(fieldTypeId); err != nil {
         return err
       }
     }
@@ -19780,7 +19780,7 @@ func (p *TCLIServiceGetDelegationTokenResult) Write(oprot thrift.TProtocol) erro
     if err := p.writeField0(oprot); err != nil { return err }
   }
   if err := oprot.WriteFieldStop(); err != nil {
-    return thrift.PrependError("write ***REMOVED***eld stop error: ", err) }
+    return thrift.PrependError("write field stop error: ", err) }
   if err := oprot.WriteStructEnd(); err != nil {
     return thrift.PrependError("write struct stop error: ", err) }
   return nil
@@ -19789,12 +19789,12 @@ func (p *TCLIServiceGetDelegationTokenResult) Write(oprot thrift.TProtocol) erro
 func (p *TCLIServiceGetDelegationTokenResult) writeField0(oprot thrift.TProtocol) (err error) {
   if p.IsSetSuccess() {
     if err := oprot.WriteFieldBegin("success", thrift.STRUCT, 0); err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld begin error 0:success: ", p), err) }
+      return thrift.PrependError(fmt.Sprintf("%T write field begin error 0:success: ", p), err) }
     if err := p.Success.Write(oprot); err != nil {
       return thrift.PrependError(fmt.Sprintf("%T error writing struct: ", p.Success), err)
     }
     if err := oprot.WriteFieldEnd(); err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld end error 0:success: ", p), err) }
+      return thrift.PrependError(fmt.Sprintf("%T write field end error 0:success: ", p), err) }
   }
   return err
 }
@@ -19834,24 +19834,24 @@ func (p *TCLIServiceCancelDelegationTokenArgs) Read(iprot thrift.TProtocol) erro
 
 
   for {
-    _, ***REMOVED***eldTypeId, ***REMOVED***eldId, err := iprot.ReadFieldBegin()
+    _, fieldTypeId, fieldId, err := iprot.ReadFieldBegin()
     if err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T ***REMOVED***eld %d read error: ", p, ***REMOVED***eldId), err)
+      return thrift.PrependError(fmt.Sprintf("%T field %d read error: ", p, fieldId), err)
     }
-    if ***REMOVED***eldTypeId == thrift.STOP { break; }
-    switch ***REMOVED***eldId {
+    if fieldTypeId == thrift.STOP { break; }
+    switch fieldId {
     case 1:
-      if ***REMOVED***eldTypeId == thrift.STRUCT {
+      if fieldTypeId == thrift.STRUCT {
         if err := p.ReadField1(iprot); err != nil {
           return err
         }
-      } ***REMOVED*** {
-        if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      } else {
+        if err := iprot.Skip(fieldTypeId); err != nil {
           return err
         }
       }
     default:
-      if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      if err := iprot.Skip(fieldTypeId); err != nil {
         return err
       }
     }
@@ -19880,7 +19880,7 @@ func (p *TCLIServiceCancelDelegationTokenArgs) Write(oprot thrift.TProtocol) err
     if err := p.writeField1(oprot); err != nil { return err }
   }
   if err := oprot.WriteFieldStop(); err != nil {
-    return thrift.PrependError("write ***REMOVED***eld stop error: ", err) }
+    return thrift.PrependError("write field stop error: ", err) }
   if err := oprot.WriteStructEnd(); err != nil {
     return thrift.PrependError("write struct stop error: ", err) }
   return nil
@@ -19888,12 +19888,12 @@ func (p *TCLIServiceCancelDelegationTokenArgs) Write(oprot thrift.TProtocol) err
 
 func (p *TCLIServiceCancelDelegationTokenArgs) writeField1(oprot thrift.TProtocol) (err error) {
   if err := oprot.WriteFieldBegin("req", thrift.STRUCT, 1); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld begin error 1:req: ", p), err) }
+    return thrift.PrependError(fmt.Sprintf("%T write field begin error 1:req: ", p), err) }
   if err := p.Req.Write(oprot); err != nil {
     return thrift.PrependError(fmt.Sprintf("%T error writing struct: ", p.Req), err)
   }
   if err := oprot.WriteFieldEnd(); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld end error 1:req: ", p), err) }
+    return thrift.PrependError(fmt.Sprintf("%T write field end error 1:req: ", p), err) }
   return err
 }
 
@@ -19932,24 +19932,24 @@ func (p *TCLIServiceCancelDelegationTokenResult) Read(iprot thrift.TProtocol) er
 
 
   for {
-    _, ***REMOVED***eldTypeId, ***REMOVED***eldId, err := iprot.ReadFieldBegin()
+    _, fieldTypeId, fieldId, err := iprot.ReadFieldBegin()
     if err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T ***REMOVED***eld %d read error: ", p, ***REMOVED***eldId), err)
+      return thrift.PrependError(fmt.Sprintf("%T field %d read error: ", p, fieldId), err)
     }
-    if ***REMOVED***eldTypeId == thrift.STOP { break; }
-    switch ***REMOVED***eldId {
+    if fieldTypeId == thrift.STOP { break; }
+    switch fieldId {
     case 0:
-      if ***REMOVED***eldTypeId == thrift.STRUCT {
+      if fieldTypeId == thrift.STRUCT {
         if err := p.ReadField0(iprot); err != nil {
           return err
         }
-      } ***REMOVED*** {
-        if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      } else {
+        if err := iprot.Skip(fieldTypeId); err != nil {
           return err
         }
       }
     default:
-      if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      if err := iprot.Skip(fieldTypeId); err != nil {
         return err
       }
     }
@@ -19978,7 +19978,7 @@ func (p *TCLIServiceCancelDelegationTokenResult) Write(oprot thrift.TProtocol) e
     if err := p.writeField0(oprot); err != nil { return err }
   }
   if err := oprot.WriteFieldStop(); err != nil {
-    return thrift.PrependError("write ***REMOVED***eld stop error: ", err) }
+    return thrift.PrependError("write field stop error: ", err) }
   if err := oprot.WriteStructEnd(); err != nil {
     return thrift.PrependError("write struct stop error: ", err) }
   return nil
@@ -19987,12 +19987,12 @@ func (p *TCLIServiceCancelDelegationTokenResult) Write(oprot thrift.TProtocol) e
 func (p *TCLIServiceCancelDelegationTokenResult) writeField0(oprot thrift.TProtocol) (err error) {
   if p.IsSetSuccess() {
     if err := oprot.WriteFieldBegin("success", thrift.STRUCT, 0); err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld begin error 0:success: ", p), err) }
+      return thrift.PrependError(fmt.Sprintf("%T write field begin error 0:success: ", p), err) }
     if err := p.Success.Write(oprot); err != nil {
       return thrift.PrependError(fmt.Sprintf("%T error writing struct: ", p.Success), err)
     }
     if err := oprot.WriteFieldEnd(); err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld end error 0:success: ", p), err) }
+      return thrift.PrependError(fmt.Sprintf("%T write field end error 0:success: ", p), err) }
   }
   return err
 }
@@ -20032,24 +20032,24 @@ func (p *TCLIServiceRenewDelegationTokenArgs) Read(iprot thrift.TProtocol) error
 
 
   for {
-    _, ***REMOVED***eldTypeId, ***REMOVED***eldId, err := iprot.ReadFieldBegin()
+    _, fieldTypeId, fieldId, err := iprot.ReadFieldBegin()
     if err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T ***REMOVED***eld %d read error: ", p, ***REMOVED***eldId), err)
+      return thrift.PrependError(fmt.Sprintf("%T field %d read error: ", p, fieldId), err)
     }
-    if ***REMOVED***eldTypeId == thrift.STOP { break; }
-    switch ***REMOVED***eldId {
+    if fieldTypeId == thrift.STOP { break; }
+    switch fieldId {
     case 1:
-      if ***REMOVED***eldTypeId == thrift.STRUCT {
+      if fieldTypeId == thrift.STRUCT {
         if err := p.ReadField1(iprot); err != nil {
           return err
         }
-      } ***REMOVED*** {
-        if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      } else {
+        if err := iprot.Skip(fieldTypeId); err != nil {
           return err
         }
       }
     default:
-      if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      if err := iprot.Skip(fieldTypeId); err != nil {
         return err
       }
     }
@@ -20078,7 +20078,7 @@ func (p *TCLIServiceRenewDelegationTokenArgs) Write(oprot thrift.TProtocol) erro
     if err := p.writeField1(oprot); err != nil { return err }
   }
   if err := oprot.WriteFieldStop(); err != nil {
-    return thrift.PrependError("write ***REMOVED***eld stop error: ", err) }
+    return thrift.PrependError("write field stop error: ", err) }
   if err := oprot.WriteStructEnd(); err != nil {
     return thrift.PrependError("write struct stop error: ", err) }
   return nil
@@ -20086,12 +20086,12 @@ func (p *TCLIServiceRenewDelegationTokenArgs) Write(oprot thrift.TProtocol) erro
 
 func (p *TCLIServiceRenewDelegationTokenArgs) writeField1(oprot thrift.TProtocol) (err error) {
   if err := oprot.WriteFieldBegin("req", thrift.STRUCT, 1); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld begin error 1:req: ", p), err) }
+    return thrift.PrependError(fmt.Sprintf("%T write field begin error 1:req: ", p), err) }
   if err := p.Req.Write(oprot); err != nil {
     return thrift.PrependError(fmt.Sprintf("%T error writing struct: ", p.Req), err)
   }
   if err := oprot.WriteFieldEnd(); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld end error 1:req: ", p), err) }
+    return thrift.PrependError(fmt.Sprintf("%T write field end error 1:req: ", p), err) }
   return err
 }
 
@@ -20130,24 +20130,24 @@ func (p *TCLIServiceRenewDelegationTokenResult) Read(iprot thrift.TProtocol) err
 
 
   for {
-    _, ***REMOVED***eldTypeId, ***REMOVED***eldId, err := iprot.ReadFieldBegin()
+    _, fieldTypeId, fieldId, err := iprot.ReadFieldBegin()
     if err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T ***REMOVED***eld %d read error: ", p, ***REMOVED***eldId), err)
+      return thrift.PrependError(fmt.Sprintf("%T field %d read error: ", p, fieldId), err)
     }
-    if ***REMOVED***eldTypeId == thrift.STOP { break; }
-    switch ***REMOVED***eldId {
+    if fieldTypeId == thrift.STOP { break; }
+    switch fieldId {
     case 0:
-      if ***REMOVED***eldTypeId == thrift.STRUCT {
+      if fieldTypeId == thrift.STRUCT {
         if err := p.ReadField0(iprot); err != nil {
           return err
         }
-      } ***REMOVED*** {
-        if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      } else {
+        if err := iprot.Skip(fieldTypeId); err != nil {
           return err
         }
       }
     default:
-      if err := iprot.Skip(***REMOVED***eldTypeId); err != nil {
+      if err := iprot.Skip(fieldTypeId); err != nil {
         return err
       }
     }
@@ -20176,7 +20176,7 @@ func (p *TCLIServiceRenewDelegationTokenResult) Write(oprot thrift.TProtocol) er
     if err := p.writeField0(oprot); err != nil { return err }
   }
   if err := oprot.WriteFieldStop(); err != nil {
-    return thrift.PrependError("write ***REMOVED***eld stop error: ", err) }
+    return thrift.PrependError("write field stop error: ", err) }
   if err := oprot.WriteStructEnd(); err != nil {
     return thrift.PrependError("write struct stop error: ", err) }
   return nil
@@ -20185,12 +20185,12 @@ func (p *TCLIServiceRenewDelegationTokenResult) Write(oprot thrift.TProtocol) er
 func (p *TCLIServiceRenewDelegationTokenResult) writeField0(oprot thrift.TProtocol) (err error) {
   if p.IsSetSuccess() {
     if err := oprot.WriteFieldBegin("success", thrift.STRUCT, 0); err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld begin error 0:success: ", p), err) }
+      return thrift.PrependError(fmt.Sprintf("%T write field begin error 0:success: ", p), err) }
     if err := p.Success.Write(oprot); err != nil {
       return thrift.PrependError(fmt.Sprintf("%T error writing struct: ", p.Success), err)
     }
     if err := oprot.WriteFieldEnd(); err != nil {
-      return thrift.PrependError(fmt.Sprintf("%T write ***REMOVED***eld end error 0:success: ", p), err) }
+      return thrift.PrependError(fmt.Sprintf("%T write field end error 0:success: ", p), err) }
   }
   return err
 }

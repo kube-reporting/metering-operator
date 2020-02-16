@@ -2,7 +2,7 @@
 Copyright 2014 The Kubernetes Authors.
 
 Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this ***REMOVED***le except in compliance with the License.
+you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
 
     http://www.apache.org/licenses/LICENSE-2.0
@@ -10,7 +10,7 @@ You may obtain a copy of the License at
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the speci***REMOVED***c language governing permissions and
+See the License for the specific language governing permissions and
 limitations under the License.
 */
 
@@ -36,7 +36,7 @@ var (
 var PanicHandlers = []func(interface{}){logPanic}
 
 // HandleCrash simply catches a crash and logs an error. Meant to be called via
-// defer.  Additional context-speci***REMOVED***c handlers can be provided, and will be
+// defer.  Additional context-specific handlers can be provided, and will be
 // called in case of panic.  HandleCrash actually crashes, after calling the
 // handlers and logging the panic message.
 //
@@ -65,7 +65,7 @@ func logPanic(r interface{}) {
 	callers := getCallers(r)
 	if _, ok := r.(string); ok {
 		klog.Errorf("Observed a panic: %s\n%v", r, callers)
-	} ***REMOVED*** {
+	} else {
 		klog.Errorf("Observed a panic: %#v (%v)\n%v", r, r, callers)
 	}
 }
@@ -73,11 +73,11 @@ func logPanic(r interface{}) {
 func getCallers(r interface{}) string {
 	callers := ""
 	for i := 0; true; i++ {
-		_, ***REMOVED***le, line, ok := runtime.Caller(i)
+		_, file, line, ok := runtime.Caller(i)
 		if !ok {
 			break
 		}
-		callers = callers + fmt.Sprintf("%v:%v\n", ***REMOVED***le, line)
+		callers = callers + fmt.Sprintf("%v:%v\n", file, line)
 	}
 
 	return callers
@@ -93,7 +93,7 @@ var ErrorHandlers = []func(error){
 		lastErrorTime: time.Now(),
 		// 1ms was the number folks were able to stomach as a global rate limit.
 		// If you need to log errors more than 1000 times a second you
-		// should probably consider ***REMOVED***xing your code instead. :)
+		// should probably consider fixing your code instead. :)
 		minPeriod: time.Millisecond,
 	}).OnError,
 }
@@ -145,12 +145,12 @@ func GetCaller() string {
 	runtime.Callers(3, pc[:])
 	f := runtime.FuncForPC(pc[0])
 	if f == nil {
-		return fmt.Sprintf("Unable to ***REMOVED***nd caller")
+		return fmt.Sprintf("Unable to find caller")
 	}
 	return f.Name()
 }
 
-// RecoverFromPanic replaces the speci***REMOVED***ed error with an error containing the
+// RecoverFromPanic replaces the specified error with an error containing the
 // original error, and  the call tree when a panic occurs. This enables error
 // handlers to handle errors and panics the same way.
 func RecoverFromPanic(err *error) {

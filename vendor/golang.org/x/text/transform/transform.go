@@ -1,6 +1,6 @@
 // Copyright 2013 The Go Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE ***REMOVED***le.
+// license that can be found in the LICENSE file.
 
 // Package transform provides reader and writer wrappers that transform the
 // bytes passing through as well as various transformations. Example
@@ -20,7 +20,7 @@ var (
 	// receive all of the transformed bytes.
 	ErrShortDst = errors.New("transform: short destination buffer")
 
-	// ErrShortSrc means that the source buffer has insuf***REMOVED***cient data to
+	// ErrShortSrc means that the source buffer has insufficient data to
 	// complete the transformation.
 	ErrShortSrc = errors.New("transform: short source buffer")
 
@@ -54,7 +54,7 @@ type Transformer interface {
 	// the converse is not necessarily true.
 	//
 	// ErrShortDst means that dst was too short to receive all of the
-	// transformed bytes. ErrShortSrc means that src had insuf***REMOVED***cient data
+	// transformed bytes. ErrShortSrc means that src had insufficient data
 	// to complete the transformation. If both conditions apply, then
 	// either error may be returned. Other than the error conditions listed
 	// here, implementations are free to report other errors that arise.
@@ -85,7 +85,7 @@ type SpanningTransformer interface {
 	// ErrEndOfSpan means that the Transformer output may differ from the
 	// input after n bytes. Note that n may be len(src), meaning that the output
 	// would contain additional bytes after otherwise identical output.
-	// ErrShortSrc means that src had insuf***REMOVED***cient data to determine whether the
+	// ErrShortSrc means that src had insufficient data to determine whether the
 	// remaining bytes would change. Other than the error conditions listed
 	// here, implementations are free to report other errors that arise.
 	//
@@ -93,7 +93,7 @@ type SpanningTransformer interface {
 	// effect, it does the transformation just as calling Transform would, only
 	// without copying to a destination buffer and only up to a point it can
 	// determine the input and output bytes are the same. This is obviously more
-	// limited than calling Transform, but can be more ef***REMOVED***cient in terms of
+	// limited than calling Transform, but can be more efficient in terms of
 	// copying and allocating buffers. Calls to Span and Transform may be
 	// interleaved.
 	Span(src []byte, atEOF bool) (n int, err error)
@@ -145,7 +145,7 @@ func NewReader(r io.Reader, t Transformer) *Reader {
 func (r *Reader) Read(p []byte) (int, error) {
 	n, err := 0, error(nil)
 	for {
-		// Copy out any transformed bytes and return the ***REMOVED***nal error if we are done.
+		// Copy out any transformed bytes and return the final error if we are done.
 		if r.dst0 != r.dst1 {
 			n = copy(p, r.dst[r.dst0:r.dst1])
 			r.dst0 += n
@@ -153,7 +153,7 @@ func (r *Reader) Read(p []byte) (int, error) {
 				return n, r.err
 			}
 			return n, nil
-		} ***REMOVED*** if r.transformComplete {
+		} else if r.transformComplete {
 			return 0, r.err
 		}
 
@@ -235,7 +235,7 @@ func (w *Writer) Write(data []byte) (n int, err error) {
 	src := data
 	if w.n > 0 {
 		// Append bytes from data to the last remainder.
-		// TODO: limit the amount copied on ***REMOVED***rst try.
+		// TODO: limit the amount copied on first try.
 		n = copy(w.src[w.n:], data)
 		w.n += n
 		src = w.src[:w.n]
@@ -248,7 +248,7 @@ func (w *Writer) Write(data []byte) (n int, err error) {
 		src = src[nSrc:]
 		if w.n == 0 {
 			n += nSrc
-		} ***REMOVED*** if len(src) <= n {
+		} else if len(src) <= n {
 			// Enough bytes from w.src have been consumed. We make src point
 			// to data instead to reduce the copying.
 			w.n = 0
@@ -274,7 +274,7 @@ func (w *Writer) Write(data []byte) (n int, err error) {
 				}
 				w.n = m
 				err = nil
-			} ***REMOVED*** if nDst > 0 || nSrc > 0 {
+			} else if nDst > 0 || nSrc > 0 {
 				// Not enough buffer to store the remainder. Keep processing as
 				// long as there is progress. Without this case, transforms that
 				// require a lookahead larger than the buffer may result in an
@@ -337,7 +337,7 @@ var (
 )
 
 // chain is a sequence of links. A chain with N Transformers has N+1 links and
-// N+1 buffers. Of those N+1 buffers, the ***REMOVED***rst and last are the src and dst
+// N+1 buffers. Of those N+1 buffers, the first and last are the src and dst
 // buffers given to chain.Transform and the middle N-1 buffers are intermediate
 // buffers owned by the chain. The i'th link transforms bytes from the i'th
 // buffer chain.link[i].b at read offset chain.link[i].p to the i+1'th buffer
@@ -416,7 +416,7 @@ func (c *chain) Transform(dst, src []byte, atEOF bool) (nDst, nSrc int, err erro
 	// low is the lowest index for which c.link[low] may still produce bytes.
 	// high is the highest index for which c.link[high] has a Transformer.
 	// The error returned by Transform determines whether to increase or
-	// decrease i. We try to completely ***REMOVED***ll a buffer before converting it.
+	// decrease i. We try to completely fill a buffer before converting it.
 	for low, i, high := c.errStart, c.errStart, len(c.link)-2; low <= i && i <= high; {
 		in, out := &c.link[i], &c.link[i+1]
 		nDst, nSrc, err0 := in.t.Transform(out.dst(), in.src(), atEOF && low == i)
@@ -451,7 +451,7 @@ func (c *chain) Transform(dst, src []byte, atEOF bool) (nDst, nSrc int, err erro
 				err = ErrShortSrc
 				break
 			}
-			// Source bytes were depleted before ***REMOVED***lling up the destination buffer.
+			// Source bytes were depleted before filling up the destination buffer.
 			// Verify we made some progress, move the remaining bytes to the errStart
 			// and try to get more source bytes.
 			if needProgress && nSrc == 0 || in.n-in.p == len(in.b) {
@@ -508,7 +508,7 @@ func (t removeF) Transform(dst, src []byte, atEOF bool) (nDst, nSrc int, err err
 
 		if r = rune(src[0]); r < utf8.RuneSelf {
 			sz = 1
-		} ***REMOVED*** {
+		} else {
 			r, sz = utf8.DecodeRune(src)
 
 			if sz == 1 {
@@ -545,15 +545,15 @@ func (t removeF) Transform(dst, src []byte, atEOF bool) (nDst, nSrc int, err err
 	return
 }
 
-// grow returns a new []byte that is longer than b, and copies the ***REMOVED***rst n bytes
+// grow returns a new []byte that is longer than b, and copies the first n bytes
 // of b to the start of the new slice.
 func grow(b []byte, n int) []byte {
 	m := len(b)
 	if m <= 32 {
 		m = 64
-	} ***REMOVED*** if m <= 256 {
+	} else if m <= 256 {
 		m *= 2
-	} ***REMOVED*** {
+	} else {
 		m += m >> 1
 	}
 	buf := make([]byte, m)
@@ -587,15 +587,15 @@ func String(t Transformer, s string) (result string, n int, err error) {
 	nDst, nSrc := 0, 0
 	pDst, pSrc := 0, 0
 
-	// pPre***REMOVED***x is the length of a common pre***REMOVED***x: the ***REMOVED***rst pPre***REMOVED***x bytes of the
-	// result will equal the ***REMOVED***rst pPre***REMOVED***x bytes of s. It is not guaranteed to
-	// be the largest such value, but if pPre***REMOVED***x, len(result) and len(s) are
-	// all equal after the ***REMOVED***nal transform (i.e. calling Transform with atEOF
+	// pPrefix is the length of a common prefix: the first pPrefix bytes of the
+	// result will equal the first pPrefix bytes of s. It is not guaranteed to
+	// be the largest such value, but if pPrefix, len(result) and len(s) are
+	// all equal after the final transform (i.e. calling Transform with atEOF
 	// being true returned nil error) then we don't need to allocate a new
 	// result string.
-	pPre***REMOVED***x := 0
+	pPrefix := 0
 	for {
-		// Invariant: pDst == pPre***REMOVED***x && pSrc == pPre***REMOVED***x.
+		// Invariant: pDst == pPrefix && pSrc == pPrefix.
 
 		n := copy(src, s[pSrc:])
 		nDst, nSrc, err = t.Transform(dst, src[:n], pSrc+n == len(s))
@@ -607,34 +607,34 @@ func String(t Transformer, s string) (result string, n int, err error) {
 		if !bytes.Equal(dst[:nDst], src[:nSrc]) {
 			break
 		}
-		pPre***REMOVED***x = pSrc
+		pPrefix = pSrc
 		if err == ErrShortDst {
-			// A buffer can only be short if a transformer modi***REMOVED***es its input.
+			// A buffer can only be short if a transformer modifies its input.
 			break
-		} ***REMOVED*** if err == ErrShortSrc {
+		} else if err == ErrShortSrc {
 			if nSrc == 0 {
 				// No progress was made.
 				break
 			}
 			// Equal so far and !atEOF, so continue checking.
-		} ***REMOVED*** if err != nil || pPre***REMOVED***x == len(s) {
-			return string(s[:pPre***REMOVED***x]), pPre***REMOVED***x, err
+		} else if err != nil || pPrefix == len(s) {
+			return string(s[:pPrefix]), pPrefix, err
 		}
 	}
-	// Post-condition: pDst == pPre***REMOVED***x + nDst && pSrc == pPre***REMOVED***x + nSrc.
+	// Post-condition: pDst == pPrefix + nDst && pSrc == pPrefix + nSrc.
 
-	// We have transformed the ***REMOVED***rst pSrc bytes of the input s to become pDst
-	// transformed bytes. Those transformed bytes are discontiguous: the ***REMOVED***rst
-	// pPre***REMOVED***x of them equal s[:pPre***REMOVED***x] and the last nDst of them equal
+	// We have transformed the first pSrc bytes of the input s to become pDst
+	// transformed bytes. Those transformed bytes are discontiguous: the first
+	// pPrefix of them equal s[:pPrefix] and the last nDst of them equal
 	// dst[:nDst]. We copy them around, into a new dst buffer if necessary, so
 	// that they become one contiguous slice: dst[:pDst].
-	if pPre***REMOVED***x != 0 {
+	if pPrefix != 0 {
 		newDst := dst
 		if pDst > len(newDst) {
 			newDst = make([]byte, len(s)+nDst-nSrc)
 		}
-		copy(newDst[pPre***REMOVED***x:pDst], dst[:nDst])
-		copy(newDst[:pPre***REMOVED***x], s[:pPre***REMOVED***x])
+		copy(newDst[pPrefix:pDst], dst[:nDst])
+		copy(newDst[:pPrefix], s[:pPrefix])
 		dst = newDst
 	}
 
@@ -658,11 +658,11 @@ func String(t Transformer, s string) (result string, n int, err error) {
 			if nDst == 0 {
 				dst = grow(dst, pDst)
 			}
-		} ***REMOVED*** if err == ErrShortSrc {
+		} else if err == ErrShortSrc {
 			if nSrc == 0 {
 				src = grow(src, 0)
 			}
-		} ***REMOVED*** if err != nil || pSrc == len(s) {
+		} else if err != nil || pSrc == len(s) {
 			return string(dst[:pDst]), pSrc, err
 		}
 	}

@@ -21,9 +21,9 @@ from the HTTP transaction that was performed, including the response body,
 HTTP headers, and any errors that happened.
 
 Generally, each Result type will have an Extract method that can be used to
-further interpret the result's payload in a speci***REMOVED***c context. Extensions or
+further interpret the result's payload in a specific context. Extensions or
 providers can then provide additional extraction functions to pull out
-provider- or extension-speci***REMOVED***c information as well.
+provider- or extension-specific information as well.
 */
 type Result struct {
 	// Body is the payload of the HTTP response from the server. In most cases,
@@ -40,7 +40,7 @@ type Result struct {
 
 // ExtractInto allows users to provide an object into which `Extract` will extract
 // the `Result.Body`. This would be useful for OpenStack providers that have
-// different ***REMOVED***elds in the response object than OpenStack proper.
+// different fields in the response object than OpenStack proper.
 func (r Result) ExtractInto(to interface{}) error {
 	if r.Err != nil {
 		return r.Err
@@ -128,7 +128,7 @@ func (r Result) extractIntoPtr(to interface{}, label string) error {
 
 				// "to" should now be properly modeled to receive the
 				// JSON response body and unmarshal into all the correct
-				// ***REMOVED***elds of the struct or composed extension struct
+				// fields of the struct or composed extension struct
 				// at the end of this method.
 				toValue.Set(newSlice)
 			}
@@ -160,7 +160,7 @@ func (r Result) extractIntoPtr(to interface{}, label string) error {
 //
 // `to` must be a pointer to an underlying struct type
 //
-// If provided, `label` will be ***REMOVED***ltered out of the response
+// If provided, `label` will be filtered out of the response
 // body prior to `r` being unmarshalled into `to`.
 func (r Result) ExtractIntoStructPtr(to interface{}, label string) error {
 	if r.Err != nil {
@@ -186,7 +186,7 @@ func (r Result) ExtractIntoStructPtr(to interface{}, label string) error {
 //
 // `to` must be a pointer to an underlying slice type
 //
-// If provided, `label` will be ***REMOVED***ltered out of the response
+// If provided, `label` will be filtered out of the response
 // body prior to `r` being unmarshalled into `to`.
 func (r Result) ExtractIntoSlicePtr(to interface{}, label string) error {
 	if r.Err != nil {
@@ -206,7 +206,7 @@ func (r Result) ExtractIntoSlicePtr(to interface{}, label string) error {
 }
 
 // PrettyPrintJSON creates a string containing the full response body as
-// pretty-printed JSON. It's useful for capturing test ***REMOVED***xtures and for
+// pretty-printed JSON. It's useful for capturing test fixtures and for
 // debugging extraction bugs. If you include its output in an issue related to
 // a buggy extraction function, we will all love you forever.
 func (r Result) PrettyPrintJSON() string {
@@ -222,7 +222,7 @@ func (r Result) PrettyPrintJSON() string {
 // types.
 //
 // It represents results that only contain a potential error and
-// nothing ***REMOVED***. Usually, if the operation executed successfully, the Err ***REMOVED***eld
+// nothing else. Usually, if the operation executed successfully, the Err field
 // will be nil; otherwise it will be stocked with a relevant error. Use the
 // ExtractErr method
 // to cleanly pull it out.
@@ -417,7 +417,7 @@ paginated in a certain way.
 
 It's a response substructure common to many paginated collection results that is
 used to point to related pages. Usually, the one we care about is the one with
-Rel ***REMOVED***eld set to "next".
+Rel field set to "next".
 */
 type Link struct {
 	Href string `json:"href"`

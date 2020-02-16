@@ -2,7 +2,7 @@
 Copyright 2016 The Kubernetes Authors.
 
 Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this ***REMOVED***le except in compliance with the License.
+you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
 
     http://www.apache.org/licenses/LICENSE-2.0
@@ -10,7 +10,7 @@ You may obtain a copy of the License at
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the speci***REMOVED***c language governing permissions and
+See the License for the specific language governing permissions and
 limitations under the License.
 */
 
@@ -23,14 +23,14 @@ import (
 	"k8s.io/apimachinery/pkg/util/clock"
 )
 
-// This ***REMOVED***le provides abstractions for setting the provider (e.g., prometheus)
+// This file provides abstractions for setting the provider (e.g., prometheus)
 // of metrics.
 
 type queueMetrics interface {
 	add(item t)
 	get(item t)
 	done(item t)
-	updateUn***REMOVED***nishedWork()
+	updateUnfinishedWork()
 }
 
 // GaugeMetric represents a single numerical value that can arbitrarily go up
@@ -80,7 +80,7 @@ type defaultQueueMetrics struct {
 	processingStartTimes map[t]time.Time
 
 	// how long have current threads been working?
-	un***REMOVED***nishedWorkSeconds   SettableGaugeMetric
+	unfinishedWorkSeconds   SettableGaugeMetric
 	longestRunningProcessor SettableGaugeMetric
 }
 
@@ -120,7 +120,7 @@ func (m *defaultQueueMetrics) done(item t) {
 	}
 }
 
-func (m *defaultQueueMetrics) updateUn***REMOVED***nishedWork() {
+func (m *defaultQueueMetrics) updateUnfinishedWork() {
 	// Note that a summary metric would be better for this, but prometheus
 	// doesn't seem to have non-hacky ways to reset the summary metrics.
 	var total float64
@@ -134,7 +134,7 @@ func (m *defaultQueueMetrics) updateUn***REMOVED***nishedWork() {
 	}
 	// Convert to seconds; microseconds is unhelpfully granular for this.
 	total /= 1000000
-	m.un***REMOVED***nishedWorkSeconds.Set(total)
+	m.unfinishedWorkSeconds.Set(total)
 	m.longestRunningProcessor.Set(oldest) // in microseconds.
 }
 
@@ -143,9 +143,9 @@ type noMetrics struct{}
 func (noMetrics) add(item t)            {}
 func (noMetrics) get(item t)            {}
 func (noMetrics) done(item t)           {}
-func (noMetrics) updateUn***REMOVED***nishedWork() {}
+func (noMetrics) updateUnfinishedWork() {}
 
-// Gets the time since the speci***REMOVED***ed start in microseconds.
+// Gets the time since the specified start in microseconds.
 func (m *defaultQueueMetrics) sinceInMicroseconds(start time.Time) float64 {
 	return float64(m.clock.Since(start).Nanoseconds() / time.Microsecond.Nanoseconds())
 }
@@ -172,7 +172,7 @@ type MetricsProvider interface {
 	NewAddsMetric(name string) CounterMetric
 	NewLatencyMetric(name string) SummaryMetric
 	NewWorkDurationMetric(name string) SummaryMetric
-	NewUn***REMOVED***nishedWorkSecondsMetric(name string) SettableGaugeMetric
+	NewUnfinishedWorkSecondsMetric(name string) SettableGaugeMetric
 	NewLongestRunningProcessorMicrosecondsMetric(name string) SettableGaugeMetric
 	NewRetriesMetric(name string) CounterMetric
 }
@@ -195,7 +195,7 @@ func (_ noopMetricsProvider) NewWorkDurationMetric(name string) SummaryMetric {
 	return noopMetric{}
 }
 
-func (_ noopMetricsProvider) NewUn***REMOVED***nishedWorkSecondsMetric(name string) SettableGaugeMetric {
+func (_ noopMetricsProvider) NewUnfinishedWorkSecondsMetric(name string) SettableGaugeMetric {
 	return noopMetric{}
 }
 
@@ -234,7 +234,7 @@ func (f *queueMetricsFactory) newQueueMetrics(name string, clock clock.Clock) qu
 		adds:                    mp.NewAddsMetric(name),
 		latency:                 mp.NewLatencyMetric(name),
 		workDuration:            mp.NewWorkDurationMetric(name),
-		un***REMOVED***nishedWorkSeconds:   mp.NewUn***REMOVED***nishedWorkSecondsMetric(name),
+		unfinishedWorkSeconds:   mp.NewUnfinishedWorkSecondsMetric(name),
 		longestRunningProcessor: mp.NewLongestRunningProcessorMicrosecondsMetric(name),
 		addTimes:                map[t]time.Time{},
 		processingStartTimes:    map[t]time.Time{},
@@ -252,7 +252,7 @@ func newRetryMetrics(name string) retryMetrics {
 }
 
 // SetProvider sets the metrics provider for all subsequently created work
-// queues. Only the ***REMOVED***rst call has an effect.
+// queues. Only the first call has an effect.
 func SetProvider(metricsProvider MetricsProvider) {
 	globalMetricsFactory.setProvider(metricsProvider)
 }

@@ -1,6 +1,6 @@
 // Copyright 2018 The Prometheus Authors
 // Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this ***REMOVED***le except in compliance with the License.
+// you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 //
 // http://www.apache.org/licenses/LICENSE-2.0
@@ -8,13 +8,13 @@
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the speci***REMOVED***c language governing permissions and
+// See the License for the specific language governing permissions and
 // limitations under the License.
 
 package procfs
 
 import (
-	"bu***REMOVED***o"
+	"bufio"
 	"encoding/hex"
 	"errors"
 	"fmt"
@@ -34,9 +34,9 @@ type IPVSStats struct {
 	IncomingPackets uint64
 	// Total outgoing packages processed.
 	OutgoingPackets uint64
-	// Total incoming traf***REMOVED***c.
+	// Total incoming traffic.
 	IncomingBytes uint64
-	// Total outgoing traf***REMOVED***c.
+	// Total outgoing traffic.
 	OutgoingBytes uint64
 }
 
@@ -50,7 +50,7 @@ type IPVSBackendStatus struct {
 	LocalPort uint16
 	// The remote (real) port.
 	RemotePort uint16
-	// The local ***REMOVED***rewall mark
+	// The local firewall mark
 	LocalMark string
 	// The transport protocol (TCP, UDP).
 	Proto string
@@ -72,19 +72,19 @@ func NewIPVSStats() (IPVSStats, error) {
 	return fs.NewIPVSStats()
 }
 
-// NewIPVSStats reads the IPVS statistics from the speci***REMOVED***ed `proc` ***REMOVED***lesystem.
+// NewIPVSStats reads the IPVS statistics from the specified `proc` filesystem.
 func (fs FS) NewIPVSStats() (IPVSStats, error) {
-	***REMOVED***le, err := os.Open(fs.Path("net/ip_vs_stats"))
+	file, err := os.Open(fs.Path("net/ip_vs_stats"))
 	if err != nil {
 		return IPVSStats{}, err
 	}
-	defer ***REMOVED***le.Close()
+	defer file.Close()
 
-	return parseIPVSStats(***REMOVED***le)
+	return parseIPVSStats(file)
 }
 
 // parseIPVSStats performs the actual parsing of `ip_vs_stats`.
-func parseIPVSStats(***REMOVED***le io.Reader) (IPVSStats, error) {
+func parseIPVSStats(file io.Reader) (IPVSStats, error) {
 	var (
 		statContent []byte
 		statLines   []string
@@ -92,7 +92,7 @@ func parseIPVSStats(***REMOVED***le io.Reader) (IPVSStats, error) {
 		stats       IPVSStats
 	)
 
-	statContent, err := ioutil.ReadAll(***REMOVED***le)
+	statContent, err := ioutil.ReadAll(file)
 	if err != nil {
 		return IPVSStats{}, err
 	}
@@ -104,7 +104,7 @@ func parseIPVSStats(***REMOVED***le io.Reader) (IPVSStats, error) {
 
 	statFields = strings.Fields(statLines[2])
 	if len(statFields) != 5 {
-		return IPVSStats{}, errors.New("ip_vs_stats corrupt: unexpected number of ***REMOVED***elds")
+		return IPVSStats{}, errors.New("ip_vs_stats corrupt: unexpected number of fields")
 	}
 
 	stats.Connections, err = strconv.ParseUint(statFields[0], 16, 64)
@@ -141,21 +141,21 @@ func NewIPVSBackendStatus() ([]IPVSBackendStatus, error) {
 	return fs.NewIPVSBackendStatus()
 }
 
-// NewIPVSBackendStatus reads and returns the status of all (virtual,real) server pairs from the speci***REMOVED***ed `proc` ***REMOVED***lesystem.
+// NewIPVSBackendStatus reads and returns the status of all (virtual,real) server pairs from the specified `proc` filesystem.
 func (fs FS) NewIPVSBackendStatus() ([]IPVSBackendStatus, error) {
-	***REMOVED***le, err := os.Open(fs.Path("net/ip_vs"))
+	file, err := os.Open(fs.Path("net/ip_vs"))
 	if err != nil {
 		return nil, err
 	}
-	defer ***REMOVED***le.Close()
+	defer file.Close()
 
-	return parseIPVSBackendStatus(***REMOVED***le)
+	return parseIPVSBackendStatus(file)
 }
 
-func parseIPVSBackendStatus(***REMOVED***le io.Reader) ([]IPVSBackendStatus, error) {
+func parseIPVSBackendStatus(file io.Reader) ([]IPVSBackendStatus, error) {
 	var (
 		status       []IPVSBackendStatus
-		scanner      = bu***REMOVED***o.NewScanner(***REMOVED***le)
+		scanner      = bufio.NewScanner(file)
 		proto        string
 		localMark    string
 		localAddress net.IP
@@ -164,48 +164,48 @@ func parseIPVSBackendStatus(***REMOVED***le io.Reader) ([]IPVSBackendStatus, err
 	)
 
 	for scanner.Scan() {
-		***REMOVED***elds := strings.Fields(scanner.Text())
-		if len(***REMOVED***elds) == 0 {
+		fields := strings.Fields(scanner.Text())
+		if len(fields) == 0 {
 			continue
 		}
 		switch {
-		case ***REMOVED***elds[0] == "IP" || ***REMOVED***elds[0] == "Prot" || ***REMOVED***elds[1] == "RemoteAddress:Port":
+		case fields[0] == "IP" || fields[0] == "Prot" || fields[1] == "RemoteAddress:Port":
 			continue
-		case ***REMOVED***elds[0] == "TCP" || ***REMOVED***elds[0] == "UDP":
-			if len(***REMOVED***elds) < 2 {
+		case fields[0] == "TCP" || fields[0] == "UDP":
+			if len(fields) < 2 {
 				continue
 			}
-			proto = ***REMOVED***elds[0]
+			proto = fields[0]
 			localMark = ""
-			localAddress, localPort, err = parseIPPort(***REMOVED***elds[1])
+			localAddress, localPort, err = parseIPPort(fields[1])
 			if err != nil {
 				return nil, err
 			}
-		case ***REMOVED***elds[0] == "FWM":
-			if len(***REMOVED***elds) < 2 {
+		case fields[0] == "FWM":
+			if len(fields) < 2 {
 				continue
 			}
-			proto = ***REMOVED***elds[0]
-			localMark = ***REMOVED***elds[1]
+			proto = fields[0]
+			localMark = fields[1]
 			localAddress = nil
 			localPort = 0
-		case ***REMOVED***elds[0] == "->":
-			if len(***REMOVED***elds) < 6 {
+		case fields[0] == "->":
+			if len(fields) < 6 {
 				continue
 			}
-			remoteAddress, remotePort, err := parseIPPort(***REMOVED***elds[1])
+			remoteAddress, remotePort, err := parseIPPort(fields[1])
 			if err != nil {
 				return nil, err
 			}
-			weight, err := strconv.ParseUint(***REMOVED***elds[3], 10, 64)
+			weight, err := strconv.ParseUint(fields[3], 10, 64)
 			if err != nil {
 				return nil, err
 			}
-			activeConn, err := strconv.ParseUint(***REMOVED***elds[4], 10, 64)
+			activeConn, err := strconv.ParseUint(fields[4], 10, 64)
 			if err != nil {
 				return nil, err
 			}
-			inactConn, err := strconv.ParseUint(***REMOVED***elds[5], 10, 64)
+			inactConn, err := strconv.ParseUint(fields[5], 10, 64)
 			if err != nil {
 				return nil, err
 			}

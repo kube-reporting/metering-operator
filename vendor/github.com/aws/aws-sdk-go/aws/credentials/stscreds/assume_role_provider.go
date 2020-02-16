@@ -23,9 +23,9 @@ with the SDKs's stscreds package.
 	// referenced by the "myRoleARN" ARN.
 	creds := stscreds.NewCredentials(sess, "myRoleArn")
 
-	// Create service client value con***REMOVED***gured for credentials
+	// Create service client value configured for credentials
 	// from assumed role.
-	svc := s3.New(sess, &aws.Con***REMOVED***g{Credentials: creds})
+	svc := s3.New(sess, &aws.Config{Credentials: creds})
 
 Assume Role with static MFA Token
 
@@ -45,20 +45,20 @@ credentials.
 		p.TokenCode = aws.String("00000000")
 	})
 
-	// Create service client value con***REMOVED***gured for credentials
+	// Create service client value configured for credentials
 	// from assumed role.
-	svc := s3.New(sess, &aws.Con***REMOVED***g{Credentials: creds})
+	svc := s3.New(sess, &aws.Config{Credentials: creds})
 
 Assume Role with MFA Token Provider
 
 To assume an IAM role with MFA for longer running tasks where the credentials
-may need to be refreshed setting the TokenProvider ***REMOVED***eld of AssumeRoleProvider
+may need to be refreshed setting the TokenProvider field of AssumeRoleProvider
 will allow the credential provider to prompt for new MFA token code when the
 role's credentials need to be refreshed.
 
 The StdinTokenProvider function is available to prompt on stdin to retrieve
 the MFA token code from the user. You can also implement custom prompts by
-satis***REMOVED***ng the TokenProvider function signature.
+satisfing the TokenProvider function signature.
 
 Using StdinTokenProvider with multiple AssumeRoleProviders, or Credentials will
 have undesirable results as the StdinTokenProvider will not be synchronized. A
@@ -71,9 +71,9 @@ single Credentials with an AssumeRoleProvider can be shared safely.
 		p.TokenProvider = stscreds.StdinTokenProvider
 	})
 
-	// Create service client value con***REMOVED***gured for credentials
+	// Create service client value configured for credentials
 	// from assumed role.
-	svc := s3.New(sess, &aws.Con***REMOVED***g{Credentials: creds})
+	svc := s3.New(sess, &aws.Config{Credentials: creds})
 
 */
 package stscreds
@@ -126,8 +126,8 @@ var DefaultDuration = time.Duration(15) * time.Minute
 // keeps track of their expiration time.
 //
 // This credential provider will be used by the SDKs default credential change
-// when shared con***REMOVED***guration is enabled, and the shared con***REMOVED***g or shared credentials
-// ***REMOVED***le con***REMOVED***gure assume role. See Session docs for how to do this.
+// when shared configuration is enabled, and the shared config or shared credentials
+// file configure assume role. See Session docs for how to do this.
 //
 // AssumeRoleProvider does not provide any synchronization and it is not safe
 // to share this value across multiple Credentials, Sessions, or service clients
@@ -141,7 +141,7 @@ type AssumeRoleProvider struct {
 	// Role to be assumed.
 	RoleARN string
 
-	// Session name, if you wish to reuse the credentials ***REMOVED***where.
+	// Session name, if you wish to reuse the credentials elsewhere.
 	RoleSessionName string
 
 	// Expiry duration of the STS credentials. Defaults to 15 minutes if not set.
@@ -157,7 +157,7 @@ type AssumeRoleProvider struct {
 	// size.
 	Policy *string
 
-	// The identi***REMOVED***cation number of the MFA device that is associated with the user
+	// The identification number of the MFA device that is associated with the user
 	// who is making the AssumeRole call. Specify this value if the trust policy
 	// of the role being assumed includes a condition that requires MFA authentication.
 	// The value is either the serial number for a hardware device (such as GAHT12345678)
@@ -186,7 +186,7 @@ type AssumeRoleProvider struct {
 	TokenProvider func() (string, error)
 
 	// ExpiryWindow will allow the credentials to trigger refreshing prior to
-	// the credentials actually expiring. This is bene***REMOVED***cial so race conditions
+	// the credentials actually expiring. This is beneficial so race conditions
 	// with expiring credentials do not cause request to fail unexpectedly
 	// due to ExpiredTokenException exceptions.
 	//
@@ -213,13 +213,13 @@ type AssumeRoleProvider struct {
 // AssumeRoleProvider. The credentials will expire every 15 minutes and the
 // role will be named after a nanosecond timestamp of this operation.
 //
-// Takes a Con***REMOVED***g provider to create the STS client. The Con***REMOVED***gProvider is
-// satis***REMOVED***ed by the session.Session type.
+// Takes a Config provider to create the STS client. The ConfigProvider is
+// satisfied by the session.Session type.
 //
 // It is safe to share the returned Credentials with multiple Sessions and
 // service clients. All access to the credentials and refreshing them
 // will be synchronized.
-func NewCredentials(c client.Con***REMOVED***gProvider, roleARN string, options ...func(*AssumeRoleProvider)) *credentials.Credentials {
+func NewCredentials(c client.ConfigProvider, roleARN string, options ...func(*AssumeRoleProvider)) *credentials.Credentials {
 	p := &AssumeRoleProvider{
 		Client:   sts.New(c),
 		RoleARN:  roleARN,
@@ -237,7 +237,7 @@ func NewCredentials(c client.Con***REMOVED***gProvider, roleARN string, options 
 // AssumeRoleProvider. The credentials will expire every 15 minutes and the
 // role will be named after a nanosecond timestamp of this operation.
 //
-// Takes an AssumeRoler which can be satis***REMOVED***ed by the STS client.
+// Takes an AssumeRoler which can be satisfied by the STS client.
 //
 // It is safe to share the returned Credentials with multiple Sessions and
 // service clients. All access to the credentials and refreshing them
@@ -281,14 +281,14 @@ func (p *AssumeRoleProvider) Retrieve() (credentials.Value, error) {
 		if p.TokenCode != nil {
 			input.SerialNumber = p.SerialNumber
 			input.TokenCode = p.TokenCode
-		} ***REMOVED*** if p.TokenProvider != nil {
+		} else if p.TokenProvider != nil {
 			input.SerialNumber = p.SerialNumber
 			code, err := p.TokenProvider()
 			if err != nil {
 				return credentials.Value{ProviderName: ProviderName}, err
 			}
 			input.TokenCode = aws.String(code)
-		} ***REMOVED*** {
+		} else {
 			return credentials.Value{ProviderName: ProviderName},
 				awserr.New("AssumeRoleTokenNotAvailable",
 					"assume role with MFA enabled, but neither TokenCode nor TokenProvider are set", nil)

@@ -67,11 +67,11 @@ func last(list interface{}) interface{} {
 
 		return l2.Index(l - 1).Interface()
 	default:
-		panic(fmt.Sprintf("Cannot ***REMOVED***nd last on type %s", tp))
+		panic(fmt.Sprintf("Cannot find last on type %s", tp))
 	}
 }
 
-func ***REMOVED***rst(list interface{}) interface{} {
+func first(list interface{}) interface{} {
 	tp := reflect.TypeOf(list).Kind()
 	switch tp {
 	case reflect.Slice, reflect.Array:
@@ -84,7 +84,7 @@ func ***REMOVED***rst(list interface{}) interface{} {
 
 		return l2.Index(0).Interface()
 	default:
-		panic(fmt.Sprintf("Cannot ***REMOVED***nd ***REMOVED***rst on type %s", tp))
+		panic(fmt.Sprintf("Cannot find first on type %s", tp))
 	}
 }
 
@@ -106,7 +106,7 @@ func rest(list interface{}) []interface{} {
 
 		return nl
 	default:
-		panic(fmt.Sprintf("Cannot ***REMOVED***nd rest on type %s", tp))
+		panic(fmt.Sprintf("Cannot find rest on type %s", tp))
 	}
 }
 
@@ -128,7 +128,7 @@ func initial(list interface{}) []interface{} {
 
 		return nl
 	default:
-		panic(fmt.Sprintf("Cannot ***REMOVED***nd initial on type %s", tp))
+		panic(fmt.Sprintf("Cannot find initial on type %s", tp))
 	}
 }
 
@@ -159,7 +159,7 @@ func reverse(v interface{}) []interface{} {
 
 		return nl
 	default:
-		panic(fmt.Sprintf("Cannot ***REMOVED***nd reverse on type %s", tp))
+		panic(fmt.Sprintf("Cannot find reverse on type %s", tp))
 	}
 }
 
@@ -203,7 +203,7 @@ func uniq(list interface{}) []interface{} {
 
 		return dest
 	default:
-		panic(fmt.Sprintf("Cannot ***REMOVED***nd uniq on type %s", tp))
+		panic(fmt.Sprintf("Cannot find uniq on type %s", tp))
 	}
 }
 
@@ -234,7 +234,7 @@ func without(list interface{}, omit ...interface{}) []interface{} {
 
 		return res
 	default:
-		panic(fmt.Sprintf("Cannot ***REMOVED***nd without on type %s", tp))
+		panic(fmt.Sprintf("Cannot find without on type %s", tp))
 	}
 }
 
@@ -254,7 +254,7 @@ func has(needle interface{}, haystack interface{}) bool {
 
 		return false
 	default:
-		panic(fmt.Sprintf("Cannot ***REMOVED***nd has on type %s", tp))
+		panic(fmt.Sprintf("Cannot find has on type %s", tp))
 	}
 }
 
@@ -280,7 +280,7 @@ func slice(list interface{}, indices ...interface{}) interface{} {
 		}
 		if len(indices) < 2 {
 			end = l
-		} ***REMOVED*** {
+		} else {
 			end = toInt(indices[1])
 		}
 

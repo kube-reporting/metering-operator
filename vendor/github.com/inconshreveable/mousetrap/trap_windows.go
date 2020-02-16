@@ -11,7 +11,7 @@ import (
 )
 
 const (
-	// de***REMOVED***ned by the Win32 API
+	// defined by the Win32 API
 	th32cs_snapprocess uintptr = 0x2
 )
 
@@ -22,7 +22,7 @@ var (
 	Process32Next            = kernel.MustFindProc("Process32NextW")
 )
 
-// ProcessEntry32 structure de***REMOVED***ned by the Win32 API
+// ProcessEntry32 structure defined by the Win32 API
 type processEntry32 struct {
 	dwSize              uint32
 	cntUsage            uint32

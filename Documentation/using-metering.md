@@ -16,14 +16,14 @@ Use 'kubectl' to query the Metering namespace for a list of available  `ReportQu
 kubectl get reportqueries -n $METERING_NAMESPACE
 ```
 
-Each ReportQuery is designed to report on a speci***REMOVED***c resource, usually a `pod`, `namespace` or `node`, and on a speci***REMOVED***c metric, like `cpu` or `memory`, on a speci***REMOVED***c resource. Some reports correlate several of these metrics in a single report. See the [Reports][report-md] guide for more information on the returns provided by each report query.
+Each ReportQuery is designed to report on a specific resource, usually a `pod`, `namespace` or `node`, and on a specific metric, like `cpu` or `memory`, on a specific resource. Some reports correlate several of these metrics in a single report. See the [Reports][report-md] guide for more information on the returns provided by each report query.
 
 ## Creating a report
 
 A report can be created for Metering to run using `kubectl`.
 The report should be created in the same namespace as Metering is installed.
 
-First, create an example report. Save the following into a ***REMOVED***le called `report.yaml` (times are UTC):
+First, create an example report. Save the following into a file called `report.yaml` (times are UTC):
 
 ```
 apiVersion: metering.openshift.io/v1
@@ -84,12 +84,12 @@ For example, if we wanted the results of a report with the name `namespace-cpu-r
 curl -H "Authorization: Bearer $TOKEN" -k "https://$METERING_ROUTE_HOSTNAME/api/v1/reports/get?name=namespace-cpu-request&namespace=$METERING_NAMESPACE&format=csv"
 ```
 
-If you're using Kubernetes, we ***REMOVED***rst need to setup a proxy to access Kubernetes services:
+If you're using Kubernetes, we first need to setup a proxy to access Kubernetes services:
 ```
 $ kubectl proxy
 ```
 
-Using `kubectl proxy` requires that the URL be accessed through a pre***REMOVED***x that
+Using `kubectl proxy` requires that the URL be accessed through a prefix that
 points to the Kubernetes service. (See the upstream documentation on
 [manually constructing apiserver proxy URLs][accessing-services] for more details.) The following example assumes that the `$METERING_NAMESPACE` environment variable is properly set:
 

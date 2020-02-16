@@ -4,7 +4,7 @@ This package was debianized by Thrift Developer's <dev@thrift.apache.org>.
 This package and the Debian packaging is licensed under the Apache License,
 see `/usr/share/common-licenses/Apache-2.0'.
 
-The following information was copied from Apache Thrift LICENSE ***REMOVED***le.
+The following information was copied from Apache Thrift LICENSE file.
 
 --------------------------------------------------
 SOFTWARE DISTRIBUTED WITH THRIFT:
@@ -15,19 +15,19 @@ code for the these subcomponents is subject to the terms and
 conditions of the following licenses.
 
 --------------------------------------------------
-Portions of the following ***REMOVED***les are licensed under the MIT License:
+Portions of the following files are licensed under the MIT License:
 
-  lib/erl/src/Make***REMOVED***le.am
+  lib/erl/src/Makefile.am
 
 Please see doc/otp-base-license.txt for the full terms of this license.
 
 
 --------------------------------------------------
-The following ***REMOVED***les contain some portions of code contributed under
+The following files contain some portions of code contributed under
 the Thrift Software License (see doc/old-thrift-license.txt), and relicensed
 under the Apache 2.0 License:
 
-  compiler/cpp/Make***REMOVED***le.am
+  compiler/cpp/Makefile.am
   compiler/cpp/src/generate/t_cocoa_generator.cc
   compiler/cpp/src/generate/t_cpp_generator.cc
   compiler/cpp/src/generate/t_csharp_generator.cc
@@ -42,7 +42,7 @@ under the Apache 2.0 License:
   compiler/cpp/src/generate/t_st_generator.cc
   compiler/cpp/src/generate/t_xsd_generator.cc
   compiler/cpp/src/main.cc
-  compiler/cpp/src/parse/t_***REMOVED***eld.h
+  compiler/cpp/src/parse/t_field.h
   compiler/cpp/src/parse/t_program.h
   compiler/cpp/src/platform.h
   compiler/cpp/src/thriftl.ll
@@ -89,8 +89,8 @@ For the aclocal/ax_boost_base.m4 and contrib/fb303/aclocal/ax_boost_base.m4 comp
 
 #   Copyright (c) 2007 Thomas Porschberg <thomas@randspringer.de>
 #
-#   Copying and distribution of this ***REMOVED***le, with or without
-#   modi***REMOVED***cation, are permitted in any medium without royalty provided
+#   Copying and distribution of this file, with or without
+#   modification, are permitted in any medium without royalty provided
 #   the copyright notice and this notice are preserved.
 
 --------------------------------------------------
@@ -122,7 +122,7 @@ For the compiler/cpp/src/md5.[ch] components:
 
 ---------------------------------------------------
 For the lib/rb/setup.rb: Copyright (c) 2000-2005 Minero Aoki,
-lib/ocaml/OCamlMake***REMOVED***le and lib/ocaml/README-OCamlMake***REMOVED***le components:
+lib/ocaml/OCamlMakefile and lib/ocaml/README-OCamlMakefile components:
      Copyright (C) 1999 - 2007  Markus Mottl
 
 Licensed under the terms of the GNU Lesser General Public License 2.1

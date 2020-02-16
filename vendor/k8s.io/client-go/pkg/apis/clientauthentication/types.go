@@ -2,7 +2,7 @@
 Copyright 2018 The Kubernetes Authors.
 
 Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this ***REMOVED***le except in compliance with the License.
+you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
 
     http://www.apache.org/licenses/LICENSE-2.0
@@ -10,7 +10,7 @@ You may obtain a copy of the License at
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the speci***REMOVED***c language governing permissions and
+See the License for the specific language governing permissions and
 limitations under the License.
 */
 
@@ -28,16 +28,16 @@ type ExecCredential struct {
 	metav1.TypeMeta
 
 	// Spec holds information passed to the plugin by the transport. This contains
-	// request and runtime speci***REMOVED***c information, such as if the session is interactive.
+	// request and runtime specific information, such as if the session is interactive.
 	Spec ExecCredentialSpec
 
-	// Status is ***REMOVED***lled in by the plugin and holds the credentials that the transport
+	// Status is filled in by the plugin and holds the credentials that the transport
 	// should use to contact the API.
 	// +optional
 	Status *ExecCredentialStatus
 }
 
-// ExecCredenitalSpec holds request and runtime speci***REMOVED***c information provided by
+// ExecCredenitalSpec holds request and runtime specific information provided by
 // the transport.
 type ExecCredentialSpec struct {
 	// Response is populated when the transport encounters HTTP status codes, such as 401,
@@ -59,15 +59,15 @@ type ExecCredentialStatus struct {
 	// Token is a bearer token used by the client for request authentication.
 	// +optional
 	Token string
-	// PEM-encoded client TLS certi***REMOVED***cate.
+	// PEM-encoded client TLS certificate.
 	// +optional
-	ClientCerti***REMOVED***cateData string
+	ClientCertificateData string
 	// PEM-encoded client TLS private key.
 	// +optional
 	ClientKeyData string
 }
 
-// Response de***REMOVED***nes metadata about a failed request, including HTTP status code and
+// Response defines metadata about a failed request, including HTTP status code and
 // response headers.
 type Response struct {
 	// Headers holds HTTP headers returned by the server.

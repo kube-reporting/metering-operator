@@ -23,7 +23,7 @@ import (
 
 // Errorf is a wrapper for fmt.Errorf that treats each argument as if it were
 // passed with a default Formatter interface returned by NewFormatter.  It
-// returns the formatted string as a value that satis***REMOVED***es error.  See
+// returns the formatted string as a value that satisfies error.  See
 // NewFormatter for formatting details.
 //
 // This function is shorthand for the following syntax:

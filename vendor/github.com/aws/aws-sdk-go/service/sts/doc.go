@@ -17,8 +17,8 @@
 // products, go to AWS Services That Work with IAM (https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_aws-services-that-work-with-iam.html)
 // in the IAM User Guide.
 //
-// If you're new to AWS and need additional technical information about a speci***REMOVED***c
-// AWS product, you can ***REMOVED***nd the product's technical documentation at http://aws.amazon.com/documentation/
+// If you're new to AWS and need additional technical information about a specific
+// AWS product, you can find the product's technical documentation at http://aws.amazon.com/documentation/
 // (http://aws.amazon.com/documentation/).
 //
 // Endpoints
@@ -33,7 +33,7 @@
 //
 // Most AWS Regions are enabled for operations in all AWS services by default.
 // Those Regions are automatically activated for use with AWS STS. Some Regions,
-// such as Asia Paci***REMOVED***c (Hong Kong), must be manually enabled. To learn more
+// such as Asia Pacific (Hong Kong), must be manually enabled. To learn more
 // about enabling and disabling AWS Regions, see Managing AWS Regions (https://docs.aws.amazon.com/general/latest/gr/rande-manage.html)
 // in the AWS General Reference. When you enable these AWS Regions, they are
 // automatically activated for use with AWS STS. You cannot activate the STS
@@ -47,7 +47,7 @@
 // After you activate a Region for use with AWS STS, you can direct AWS STS
 // API calls to that Region. AWS STS recommends that you provide both the Region
 // and endpoint when you make calls to a Regional endpoint. You can provide
-// the Region alone for manually enabled Regions, such as Asia Paci***REMOVED***c (Hong
+// the Region alone for manually enabled Regions, such as Asia Pacific (Hong
 // Kong). In this case, the calls are directed to the STS Regional endpoint.
 // However, if you provide the Region alone for Regions enabled by default,
 // the calls are directed to the global endpoint of https://sts.amazonaws.com.
@@ -59,7 +59,7 @@
 // Recording API requests
 //
 // STS supports AWS CloudTrail, which is a service that records AWS calls for
-// your AWS account and delivers log ***REMOVED***les to an Amazon S3 bucket. By using
+// your AWS account and delivers log files to an Amazon S3 bucket. By using
 // information collected by CloudTrail, you can determine what requests were
 // successfully made to STS, who made the request, when it was made, and so
 // on.
@@ -82,8 +82,8 @@
 // Region and calls to sts.eu-central-1.amazonaws.com are published to the EU
 // (Frankfurt) Region.
 //
-// To learn more about CloudTrail, including how to turn it on and ***REMOVED***nd your
-// log ***REMOVED***les, see the AWS CloudTrail User Guide (https://docs.aws.amazon.com/awscloudtrail/latest/userguide/what_is_cloud_trail_top_level.html).
+// To learn more about CloudTrail, including how to turn it on and find your
+// log files, see the AWS CloudTrail User Guide (https://docs.aws.amazon.com/awscloudtrail/latest/userguide/what_is_cloud_trail_top_level.html).
 //
 // See https://docs.aws.amazon.com/goto/WebAPI/sts-2011-06-15 for more information on this service.
 //
@@ -99,8 +99,8 @@
 // See the SDK's documentation for more information on how to use the SDK.
 // https://docs.aws.amazon.com/sdk-for-go/api/
 //
-// See aws.Con***REMOVED***g documentation for more information on con***REMOVED***guring SDK clients.
-// https://docs.aws.amazon.com/sdk-for-go/api/aws/#Con***REMOVED***g
+// See aws.Config documentation for more information on configuring SDK clients.
+// https://docs.aws.amazon.com/sdk-for-go/api/aws/#Config
 //
 // See the AWS Security Token Service client STS for more
 // information on creating client for this service.

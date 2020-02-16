@@ -1,6 +1,6 @@
 // Copyright 2014 The Prometheus Authors
 // Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this ***REMOVED***le except in compliance with the License.
+// you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 //
 // http://www.apache.org/licenses/LICENSE-2.0
@@ -8,7 +8,7 @@
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the speci***REMOVED***c language governing permissions and
+// See the License for the specific language governing permissions and
 // limitations under the License.
 
 package prometheus
@@ -26,7 +26,7 @@ import (
 	dto "github.com/prometheus/client_model/go"
 )
 
-// quantileLabel is used for the label that de***REMOVED***nes the quantile in a
+// quantileLabel is used for the label that defines the quantile in a
 // summary.
 const quantileLabel = "quantile"
 
@@ -78,13 +78,13 @@ const (
 )
 
 // SummaryOpts bundles the options for creating a Summary metric. It is
-// mandatory to set Name and Help to a non-empty string. All other ***REMOVED***elds are
+// mandatory to set Name and Help to a non-empty string. All other fields are
 // optional and can safely be left at their zero value.
 type SummaryOpts struct {
-	// Namespace, Subsystem, and Name are components of the fully-quali***REMOVED***ed
+	// Namespace, Subsystem, and Name are components of the fully-qualified
 	// name of the Summary (created by joining these components with
 	// "_"). Only Name is mandatory, the others merely help structuring the
-	// name. Note that the fully-quali***REMOVED***ed name of the Summary must be a
+	// name. Note that the fully-qualified name of the Summary must be a
 	// valid Prometheus metric name.
 	Namespace string
 	Subsystem string
@@ -92,12 +92,12 @@ type SummaryOpts struct {
 
 	// Help provides information about this Summary. Mandatory!
 	//
-	// Metrics with the same fully-quali***REMOVED***ed name must have the same Help
+	// Metrics with the same fully-qualified name must have the same Help
 	// string.
 	Help string
 
-	// ConstLabels are used to attach ***REMOVED***xed labels to this
-	// Summary. Summaries with the same fully-quali***REMOVED***ed name must have the
+	// ConstLabels are used to attach fixed labels to this
+	// Summary. Summaries with the same fully-qualified name must have the
 	// same label names in their ConstLabels.
 	//
 	// Note that in most cases, labels have a value that varies during the
@@ -106,7 +106,7 @@ type SummaryOpts struct {
 	// special case where the value of a label does not change during the
 	// lifetime of a process, e.g. if the revision of the running binary is
 	// put into a label. Another, more advanced purpose is if more than one
-	// Collector needs to collect Summaries with the same fully-quali***REMOVED***ed
+	// Collector needs to collect Summaries with the same fully-qualified
 	// name. In that case, those Summaries must differ in the values of
 	// their ConstLabels. See the Collector examples.
 	//
@@ -115,7 +115,7 @@ type SummaryOpts struct {
 	// metric name).
 	ConstLabels Labels
 
-	// Objectives de***REMOVED***nes the quantile rank estimates with their respective
+	// Objectives defines the quantile rank estimates with their respective
 	// absolute error. If Objectives[q] = e, then the value reported for q
 	// will be the φ-quantile value for some φ between q-e and q+e.  The
 	// default value is DefObjectives. It is used if Objectives is left at
@@ -127,7 +127,7 @@ type SummaryOpts struct {
 	// library. Please explicitly set Objectives to the desired value.
 	Objectives map[float64]float64
 
-	// MaxAge de***REMOVED***nes the duration for which an observation stays relevant
+	// MaxAge defines the duration for which an observation stays relevant
 	// for the summary. Must be positive. The default value is DefMaxAge.
 	MaxAge time.Duration
 
@@ -140,8 +140,8 @@ type SummaryOpts struct {
 	// passed. The default value is DefAgeBuckets.
 	AgeBuckets uint32
 
-	// BufCap de***REMOVED***nes the default sample stream buffer size.  The default
-	// value of DefBufCap should suf***REMOVED***ce for most uses. If there is a need
+	// BufCap defines the default sample stream buffer size.  The default
+	// value of DefBufCap should suffice for most uses. If there is a need
 	// to increase the value, a multiple of 500 is recommended (because that
 	// is the internal buffer size of the underlying package
 	// "github.com/bmizerany/perks/quantile").
@@ -150,8 +150,8 @@ type SummaryOpts struct {
 
 // Great fuck-up with the sliding-window decay algorithm... The Merge method of
 // perk/quantile is actually not working as advertised - and it might be
-// un***REMOVED***xable, as the underlying algorithm is apparently not capable of merging
-// summaries in the ***REMOVED***rst place. To avoid using Merge, we are currently adding
+// unfixable, as the underlying algorithm is apparently not capable of merging
+// summaries in the first place. To avoid using Merge, we are currently adding
 // observations to _each_ age bucket, i.e. the effort to add a sample is
 // essentially multiplied by the number of age buckets. When rotating age
 // buckets, we empty the previous head stream. On scrape time, we simply take
@@ -159,7 +159,7 @@ type SummaryOpts struct {
 // on observation time, less effort on scrape time, which is exactly the
 // opposite of what we try to accomplish, but at least the results are correct.
 //
-// The quite elegant previous contraption to merge the age buckets ef***REMOVED***ciently
+// The quite elegant previous contraption to merge the age buckets efficiently
 // on scrape time (see code up commit 6b9530d72ea715f0ba612c0120e6e09fbf1d49d0)
 // can't be used anymore.
 
@@ -302,7 +302,7 @@ func (s *summary) Write(out *dto.Metric) error {
 		var q float64
 		if s.headStream.Count() == 0 {
 			q = math.NaN()
-		} ***REMOVED*** {
+		} else {
 			q = s.headStream.Query(rank)
 		}
 		qs = append(qs, &dto.Quantile{
@@ -334,7 +334,7 @@ func (s *summary) asyncFlush(now time.Time) {
 
 	// Unblock the original goroutine that was responsible for the mutation
 	// that triggered the compaction.  But hold onto the global non-buffer
-	// state mutex until the operation ***REMOVED***nishes.
+	// state mutex until the operation finishes.
 	go func() {
 		s.flushColdBuf()
 		s.mtx.Unlock()
@@ -420,7 +420,7 @@ func NewSummaryVec(opts SummaryOpts, labelNames []string) *SummaryVec {
 
 // GetMetricWithLabelValues returns the Summary for the given slice of label
 // values (same order as the VariableLabels in Desc). If that combination of
-// label values is accessed for the ***REMOVED***rst time, a new Summary is created.
+// label values is accessed for the first time, a new Summary is created.
 //
 // It is possible to call this method without using the returned Summary to only
 // create the new Summary but leave it at its starting value, a Summary without
@@ -452,7 +452,7 @@ func (m *SummaryVec) GetMetricWithLabelValues(lvs ...string) (Observer, error) {
 
 // GetMetricWith returns the Summary for the given Labels map (the label names
 // must match those of the VariableLabels in Desc). If that label map is
-// accessed for the ***REMOVED***rst time, a new Summary is created. Implications of
+// accessed for the first time, a new Summary is created. Implications of
 // creating a Summary without using it and keeping the Summary for later use are
 // the same as for GetMetricWithLabelValues.
 //
@@ -522,7 +522,7 @@ func (s *constSummary) Write(out *dto.Metric) error {
 	return nil
 }
 
-// NewConstSummary returns a metric representing a Prometheus summary with ***REMOVED***xed
+// NewConstSummary returns a metric representing a Prometheus summary with fixed
 // values for the count, sum, and quantiles. As those parameters cannot be
 // changed, the returned value does not implement the Summary interface (but
 // only the Metric interface). Users of this package will not have much use for

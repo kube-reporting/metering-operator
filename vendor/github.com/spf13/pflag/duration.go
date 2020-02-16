@@ -37,7 +37,7 @@ func (f *FlagSet) GetDuration(name string) (time.Duration, error) {
 	return val.(time.Duration), nil
 }
 
-// DurationVar de***REMOVED***nes a time.Duration flag with speci***REMOVED***ed name, default value, and usage string.
+// DurationVar defines a time.Duration flag with specified name, default value, and usage string.
 // The argument p points to a time.Duration variable in which to store the value of the flag.
 func (f *FlagSet) DurationVar(p *time.Duration, name string, value time.Duration, usage string) {
 	f.VarP(newDurationValue(value, p), name, "", usage)
@@ -48,7 +48,7 @@ func (f *FlagSet) DurationVarP(p *time.Duration, name, shorthand string, value t
 	f.VarP(newDurationValue(value, p), name, shorthand, usage)
 }
 
-// DurationVar de***REMOVED***nes a time.Duration flag with speci***REMOVED***ed name, default value, and usage string.
+// DurationVar defines a time.Duration flag with specified name, default value, and usage string.
 // The argument p points to a time.Duration variable in which to store the value of the flag.
 func DurationVar(p *time.Duration, name string, value time.Duration, usage string) {
 	CommandLine.VarP(newDurationValue(value, p), name, "", usage)
@@ -59,7 +59,7 @@ func DurationVarP(p *time.Duration, name, shorthand string, value time.Duration,
 	CommandLine.VarP(newDurationValue(value, p), name, shorthand, usage)
 }
 
-// Duration de***REMOVED***nes a time.Duration flag with speci***REMOVED***ed name, default value, and usage string.
+// Duration defines a time.Duration flag with specified name, default value, and usage string.
 // The return value is the address of a time.Duration variable that stores the value of the flag.
 func (f *FlagSet) Duration(name string, value time.Duration, usage string) *time.Duration {
 	p := new(time.Duration)
@@ -74,7 +74,7 @@ func (f *FlagSet) DurationP(name, shorthand string, value time.Duration, usage s
 	return p
 }
 
-// Duration de***REMOVED***nes a time.Duration flag with speci***REMOVED***ed name, default value, and usage string.
+// Duration defines a time.Duration flag with specified name, default value, and usage string.
 // The return value is the address of a time.Duration variable that stores the value of the flag.
 func Duration(name string, value time.Duration, usage string) *time.Duration {
 	return CommandLine.DurationP(name, "", value, usage)

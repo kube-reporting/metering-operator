@@ -10,7 +10,7 @@ type UnsafeStructType struct {
 	likePtr bool
 }
 
-func newUnsafeStructType(cfg *frozenCon***REMOVED***g, type1 reflect.Type) *UnsafeStructType {
+func newUnsafeStructType(cfg *frozenConfig, type1 reflect.Type) *UnsafeStructType {
 	return &UnsafeStructType{
 		unsafeType: *newUnsafeType(cfg, type1),
 		likePtr:    likePtrType(type1),
@@ -53,7 +53,7 @@ func (type2 *UnsafeStructType) FieldByIndex(index []int) StructField {
 func (type2 *UnsafeStructType) FieldByNameFunc(match func(string) bool) StructField {
 	structField, found := type2.Type.FieldByNameFunc(match)
 	if !found {
-		panic("***REMOVED***eld match condition not found in " + type2.Type.String())
+		panic("field match condition not found in " + type2.Type.String())
 	}
 	return newUnsafeStructField(type2, structField)
 }

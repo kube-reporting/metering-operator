@@ -4,7 +4,7 @@
 // https://github.com/golang/protobuf
 //
 // Redistribution and use in source and binary forms, with or without
-// modi***REMOVED***cation, are permitted provided that the following conditions are
+// modification, are permitted provided that the following conditions are
 // met:
 //
 //     * Redistributions of source code must retain the above copyright
@@ -15,7 +15,7 @@
 // distribution.
 //     * Neither the name of Google Inc. nor the names of its
 // contributors may be used to endorse or promote products derived from
-// this software without speci***REMOVED***c prior written permission.
+// this software without specific prior written permission.
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
 // "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
@@ -42,30 +42,30 @@ import (
 )
 
 // RequiredNotSetError is the error returned if Marshal is called with
-// a protocol buffer struct whose required ***REMOVED***elds have not
+// a protocol buffer struct whose required fields have not
 // all been initialized. It is also the error returned if Unmarshal is
 // called with an encoded protocol buffer that does not include all the
-// required ***REMOVED***elds.
+// required fields.
 //
-// When printed, RequiredNotSetError reports the ***REMOVED***rst unset required ***REMOVED***eld in a
-// message. If the ***REMOVED***eld cannot be precisely determined, it is reported as
+// When printed, RequiredNotSetError reports the first unset required field in a
+// message. If the field cannot be precisely determined, it is reported as
 // "{Unknown}".
 type RequiredNotSetError struct {
-	***REMOVED***eld string
+	field string
 }
 
 func (e *RequiredNotSetError) Error() string {
-	return fmt.Sprintf("proto: required ***REMOVED***eld %q not set", e.***REMOVED***eld)
+	return fmt.Sprintf("proto: required field %q not set", e.field)
 }
 
 var (
 	// errRepeatedHasNil is the error returned if Marshal is called with
-	// a struct with a repeated ***REMOVED***eld containing a nil element.
-	errRepeatedHasNil = errors.New("proto: repeated ***REMOVED***eld has nil element")
+	// a struct with a repeated field containing a nil element.
+	errRepeatedHasNil = errors.New("proto: repeated field has nil element")
 
 	// errOneofHasNil is the error returned if Marshal is called with
-	// a struct with a oneof ***REMOVED***eld containing a nil element.
-	errOneofHasNil = errors.New("proto: oneof ***REMOVED***eld has nil value")
+	// a struct with a oneof field containing a nil element.
+	errOneofHasNil = errors.New("proto: oneof field has nil value")
 
 	// ErrNil is the error returned if Marshal is called with nil.
 	ErrNil = errors.New("proto: Marshal called with nil")
@@ -139,7 +139,7 @@ func SizeVarint(x uint64) int {
 
 // EncodeFixed64 writes a 64-bit integer to the Buffer.
 // This is the format for the
-// ***REMOVED***xed64, s***REMOVED***xed64, and double protocol buffer types.
+// fixed64, sfixed64, and double protocol buffer types.
 func (p *Buffer) EncodeFixed64(x uint64) error {
 	p.buf = append(p.buf,
 		uint8(x),
@@ -155,7 +155,7 @@ func (p *Buffer) EncodeFixed64(x uint64) error {
 
 // EncodeFixed32 writes a 32-bit integer to the Buffer.
 // This is the format for the
-// ***REMOVED***xed32, s***REMOVED***xed32, and float protocol buffer types.
+// fixed32, sfixed32, and float protocol buffer types.
 func (p *Buffer) EncodeFixed32(x uint64) error {
 	p.buf = append(p.buf,
 		uint8(x),
@@ -204,14 +204,14 @@ type Marshaler interface {
 }
 
 // EncodeMessage writes the protocol buffer to the Buffer,
-// pre***REMOVED***xed by a varint-encoded length.
+// prefixed by a varint-encoded length.
 func (p *Buffer) EncodeMessage(pb Message) error {
 	siz := Size(pb)
 	p.EncodeVarint(uint64(siz))
 	return p.Marshal(pb)
 }
 
-// All protocol buffer ***REMOVED***elds are nillable, but be careful.
+// All protocol buffer fields are nillable, but be careful.
 func isNil(v reflect.Value) bool {
 	switch v.Kind() {
 	case reflect.Interface, reflect.Map, reflect.Ptr, reflect.Slice:

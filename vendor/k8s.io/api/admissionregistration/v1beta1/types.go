@@ -2,7 +2,7 @@
 Copyright 2017 The Kubernetes Authors.
 
 Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this ***REMOVED***le except in compliance with the License.
+you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
 
     http://www.apache.org/licenses/LICENSE-2.0
@@ -10,7 +10,7 @@ You may obtain a copy of the License at
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the speci***REMOVED***c language governing permissions and
+See the License for the specific language governing permissions and
 limitations under the License.
 */
 
@@ -80,8 +80,8 @@ const (
 // +genclient:nonNamespaced
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
 
-// ValidatingWebhookCon***REMOVED***guration describes the con***REMOVED***guration of and admission webhook that accept or reject and object without changing it.
-type ValidatingWebhookCon***REMOVED***guration struct {
+// ValidatingWebhookConfiguration describes the configuration of and admission webhook that accept or reject and object without changing it.
+type ValidatingWebhookConfiguration struct {
 	metav1.TypeMeta `json:",inline"`
 	// Standard object metadata; More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#metadata.
 	// +optional
@@ -95,23 +95,23 @@ type ValidatingWebhookCon***REMOVED***guration struct {
 
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
 
-// ValidatingWebhookCon***REMOVED***gurationList is a list of ValidatingWebhookCon***REMOVED***guration.
-type ValidatingWebhookCon***REMOVED***gurationList struct {
+// ValidatingWebhookConfigurationList is a list of ValidatingWebhookConfiguration.
+type ValidatingWebhookConfigurationList struct {
 	metav1.TypeMeta `json:",inline"`
 	// Standard list metadata.
 	// More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#types-kinds
 	// +optional
 	metav1.ListMeta `json:"metadata,omitempty" protobuf:"bytes,1,opt,name=metadata"`
-	// List of ValidatingWebhookCon***REMOVED***guration.
-	Items []ValidatingWebhookCon***REMOVED***guration `json:"items" protobuf:"bytes,2,rep,name=items"`
+	// List of ValidatingWebhookConfiguration.
+	Items []ValidatingWebhookConfiguration `json:"items" protobuf:"bytes,2,rep,name=items"`
 }
 
 // +genclient
 // +genclient:nonNamespaced
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
 
-// MutatingWebhookCon***REMOVED***guration describes the con***REMOVED***guration of and admission webhook that accept or reject and may change the object.
-type MutatingWebhookCon***REMOVED***guration struct {
+// MutatingWebhookConfiguration describes the configuration of and admission webhook that accept or reject and may change the object.
+type MutatingWebhookConfiguration struct {
 	metav1.TypeMeta `json:",inline"`
 	// Standard object metadata; More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#metadata.
 	// +optional
@@ -125,39 +125,39 @@ type MutatingWebhookCon***REMOVED***guration struct {
 
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
 
-// MutatingWebhookCon***REMOVED***gurationList is a list of MutatingWebhookCon***REMOVED***guration.
-type MutatingWebhookCon***REMOVED***gurationList struct {
+// MutatingWebhookConfigurationList is a list of MutatingWebhookConfiguration.
+type MutatingWebhookConfigurationList struct {
 	metav1.TypeMeta `json:",inline"`
 	// Standard list metadata.
 	// More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#types-kinds
 	// +optional
 	metav1.ListMeta `json:"metadata,omitempty" protobuf:"bytes,1,opt,name=metadata"`
-	// List of MutatingWebhookCon***REMOVED***guration.
-	Items []MutatingWebhookCon***REMOVED***guration `json:"items" protobuf:"bytes,2,rep,name=items"`
+	// List of MutatingWebhookConfiguration.
+	Items []MutatingWebhookConfiguration `json:"items" protobuf:"bytes,2,rep,name=items"`
 }
 
 // Webhook describes an admission webhook and the resources and operations it applies to.
 type Webhook struct {
 	// The name of the admission webhook.
-	// Name should be fully quali***REMOVED***ed, e.g., imagepolicy.kubernetes.io, where
+	// Name should be fully qualified, e.g., imagepolicy.kubernetes.io, where
 	// "imagepolicy" is the name of the webhook, and kubernetes.io is the name
 	// of the organization.
 	// Required.
 	Name string `json:"name" protobuf:"bytes,1,opt,name=name"`
 
-	// ClientCon***REMOVED***g de***REMOVED***nes how to communicate with the hook.
+	// ClientConfig defines how to communicate with the hook.
 	// Required
-	ClientCon***REMOVED***g WebhookClientCon***REMOVED***g `json:"clientCon***REMOVED***g" protobuf:"bytes,2,opt,name=clientCon***REMOVED***g"`
+	ClientConfig WebhookClientConfig `json:"clientConfig" protobuf:"bytes,2,opt,name=clientConfig"`
 
 	// Rules describes what operations on what resources/subresources the webhook cares about.
 	// The webhook cares about an operation if it matches _any_ Rule.
 	// However, in order to prevent ValidatingAdmissionWebhooks and MutatingAdmissionWebhooks
 	// from putting the cluster in a state which cannot be recovered from without completely
 	// disabling the plugin, ValidatingAdmissionWebhooks and MutatingAdmissionWebhooks are never called
-	// on admission requests for ValidatingWebhookCon***REMOVED***guration and MutatingWebhookCon***REMOVED***guration objects.
+	// on admission requests for ValidatingWebhookConfiguration and MutatingWebhookConfiguration objects.
 	Rules []RuleWithOperations `json:"rules,omitempty" protobuf:"bytes,3,rep,name=rules"`
 
-	// FailurePolicy de***REMOVED***nes how unrecognized errors from the admission endpoint are handled -
+	// FailurePolicy defines how unrecognized errors from the admission endpoint are handled -
 	// allowed values are Ignore or Fail. Defaults to Ignore.
 	// +optional
 	FailurePolicy *FailurePolicyType `json:"failurePolicy,omitempty" protobuf:"bytes,4,opt,name=failurePolicy,casttype=FailurePolicyType"`
@@ -233,7 +233,7 @@ type RuleWithOperations struct {
 
 type OperationType string
 
-// The constants should be kept in sync with those de***REMOVED***ned in k8s.io/kubernetes/pkg/admission/interface.go.
+// The constants should be kept in sync with those defined in k8s.io/kubernetes/pkg/admission/interface.go.
 const (
 	OperationAll OperationType = "*"
 	Create       OperationType = "CREATE"
@@ -242,15 +242,15 @@ const (
 	Connect      OperationType = "CONNECT"
 )
 
-// WebhookClientCon***REMOVED***g contains the information to make a TLS
+// WebhookClientConfig contains the information to make a TLS
 // connection with the webhook
-type WebhookClientCon***REMOVED***g struct {
+type WebhookClientConfig struct {
 	// `url` gives the location of the webhook, in standard URL form
 	// (`scheme://host:port/path`). Exactly one of `url` or `service`
-	// must be speci***REMOVED***ed.
+	// must be specified.
 	//
 	// The `host` should not refer to a service running in the cluster; use
-	// the `service` ***REMOVED***eld instead. The host might be resolved via external
+	// the `service` field instead. The host might be resolved via external
 	// DNS in some apiservers (e.g., `kube-apiserver` cannot resolve
 	// in-cluster DNS as that would be a layering violation). `host` may
 	// also be an IP address.
@@ -265,7 +265,7 @@ type WebhookClientCon***REMOVED***g struct {
 	//
 	// A path is optional, and if present may be any string permissible in
 	// a URL. You may use the path to pass an arbitrary string to the
-	// webhook, for example, a cluster identi***REMOVED***er.
+	// webhook, for example, a cluster identifier.
 	//
 	// Attempting to use a user or basic auth e.g. "user:password@" is not
 	// allowed. Fragments ("#...") and query parameters ("?...") are not
@@ -275,7 +275,7 @@ type WebhookClientCon***REMOVED***g struct {
 	URL *string `json:"url,omitempty" protobuf:"bytes,3,opt,name=url"`
 
 	// `service` is a reference to the service for this webhook. Either
-	// `service` or `url` must be speci***REMOVED***ed.
+	// `service` or `url` must be specified.
 	//
 	// If the webhook is running within the cluster, then you should use `service`.
 	//
@@ -284,8 +284,8 @@ type WebhookClientCon***REMOVED***g struct {
 	// +optional
 	Service *ServiceReference `json:"service,omitempty" protobuf:"bytes,1,opt,name=service"`
 
-	// `caBundle` is a PEM encoded CA bundle which will be used to validate the webhook's server certi***REMOVED***cate.
-	// If unspeci***REMOVED***ed, system trust roots on the apiserver are used.
+	// `caBundle` is a PEM encoded CA bundle which will be used to validate the webhook's server certificate.
+	// If unspecified, system trust roots on the apiserver are used.
 	// +optional
 	CABundle []byte `json:"caBundle,omitempty" protobuf:"bytes,2,opt,name=caBundle"`
 }

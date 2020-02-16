@@ -117,8 +117,8 @@ var genericMap = map[string]interface{}{
 	"trimall": func(a, b string) string { return strings.Trim(b, a) },
 	// Switch order so that "$foo" | trimall "$"
 	"trimAll":      func(a, b string) string { return strings.Trim(b, a) },
-	"trimSuf***REMOVED***x":   func(a, b string) string { return strings.TrimSuf***REMOVED***x(b, a) },
-	"trimPre***REMOVED***x":   func(a, b string) string { return strings.TrimPre***REMOVED***x(b, a) },
+	"trimSuffix":   func(a, b string) string { return strings.TrimSuffix(b, a) },
+	"trimPrefix":   func(a, b string) string { return strings.TrimPrefix(b, a) },
 	"nospace":      util.DeleteWhiteSpace,
 	"initials":     initials,
 	"randAlphaNum": randAlphaNumeric,
@@ -133,8 +133,8 @@ var genericMap = map[string]interface{}{
 	"wrapWith":     func(l int, sep, str string) string { return util.WrapCustom(str, l, sep, true) },
 	// Switch order so that "foobar" | contains "foo"
 	"contains":  func(substr string, str string) bool { return strings.Contains(str, substr) },
-	"hasPre***REMOVED***x": func(substr string, str string) bool { return strings.HasPre***REMOVED***x(str, substr) },
-	"hasSuf***REMOVED***x": func(substr string, str string) bool { return strings.HasSuf***REMOVED***x(str, substr) },
+	"hasPrefix": func(substr string, str string) bool { return strings.HasPrefix(str, substr) },
+	"hasSuffix": func(substr string, str string) bool { return strings.HasSuffix(str, substr) },
 	"quote":     quote,
 	"squote":    squote,
 	"cat":       cat,
@@ -247,7 +247,7 @@ var genericMap = map[string]interface{}{
 
 	"append": push, "push": push,
 	"prepend": prepend,
-	"***REMOVED***rst":   ***REMOVED***rst,
+	"first":   first,
 	"rest":    rest,
 	"last":    last,
 	"initial": initial,
@@ -260,10 +260,10 @@ var genericMap = map[string]interface{}{
 	// Crypto:
 	"genPrivateKey":     generatePrivateKey,
 	"derivePassword":    derivePassword,
-	"buildCustomCert":   buildCustomCerti***REMOVED***cate,
-	"genCA":             generateCerti***REMOVED***cateAuthority,
-	"genSelfSignedCert": generateSelfSignedCerti***REMOVED***cate,
-	"genSignedCert":     generateSignedCerti***REMOVED***cate,
+	"buildCustomCert":   buildCustomCertificate,
+	"genCA":             generateCertificateAuthority,
+	"genSelfSignedCert": generateSelfSignedCertificate,
+	"genSignedCert":     generateSignedCertificate,
 
 	// UUIDs:
 	"uuidv4": uuidv4,

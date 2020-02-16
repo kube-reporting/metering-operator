@@ -1,5 +1,5 @@
 apiVersion: metering.openshift.io/v1
-kind: MeteringCon***REMOVED***g
+kind: MeteringConfig
 metadata:
   name: "operator-metering"
 spec:
@@ -8,14 +8,14 @@ spec:
     # uncomment one of the hive sections below, picking one of S3, Azure, or
     # sharedPVC
     #
-    # # AWS S3 con***REMOVED***guration
+    # # AWS S3 configuration
     # hive:
     #   type: "s3"
     #   s3:
     #     bucket: "bucketname/path/"
     #     secretName: "my-aws-secret"
     #
-    # # Azure Blob Storage con***REMOVED***guration
+    # # Azure Blob Storage configuration
     # hive:
     #   type: "azure"
     #   azure:
@@ -29,7 +29,7 @@ spec:
     #   sharedPVC:
     #     # change claimName to your PVC's name
     #     claimName: "metering-nfs"
-    #     # uncomment the lines below to provision a new PVC using the speci***REMOVED***ed storageClass.
+    #     # uncomment the lines below to provision a new PVC using the specified storageClass.
     #     # createPVC: true
     #     # storageClass: "my-nfs-storage-class"
     #     # size: 5Gi

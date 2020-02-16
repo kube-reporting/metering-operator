@@ -41,12 +41,12 @@ spec:
     type: ReportQuery
     default: aws-ec2-billing-data
   query: |
-    WITH aws_billing_***REMOVED***ltered AS (
+    WITH aws_billing_filtered AS (
       {| renderReportQuery .Report.Inputs.AwsEc2BillingDataQueryName . |}
     ),
     aws_billing_sum AS (
-        SELECT sum(aws_billing_***REMOVED***ltered.period_cost * aws_billing_***REMOVED***ltered.period_percent) as cluster_cost
-        FROM aws_billing_***REMOVED***ltered
+        SELECT sum(aws_billing_filtered.period_cost * aws_billing_filtered.period_percent) as cluster_cost
+        FROM aws_billing_filtered
     ),
     node_memory_allocatable AS (
       SELECT sum(node_allocatable_memory_byte_seconds) as node_allocatable_memory_byte_seconds
@@ -124,12 +124,12 @@ spec:
     type: ReportQuery
     default: aws-ec2-billing-data
   query: |
-    WITH aws_billing_***REMOVED***ltered AS (
+    WITH aws_billing_filtered AS (
       {| renderReportQuery .Report.Inputs.AwsEc2BillingDataQueryName . |}
     ),
     aws_billing_sum AS (
-        SELECT sum(aws_billing_***REMOVED***ltered.period_cost * aws_billing_***REMOVED***ltered.period_percent) as cluster_cost
-        FROM aws_billing_***REMOVED***ltered
+        SELECT sum(aws_billing_filtered.period_cost * aws_billing_filtered.period_percent) as cluster_cost
+        FROM aws_billing_filtered
     ),
     node_memory_allocatable AS (
       SELECT sum(node_allocatable_memory_byte_seconds) as node_allocatable_memory_byte_seconds

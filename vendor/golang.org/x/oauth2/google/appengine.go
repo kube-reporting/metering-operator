@@ -1,6 +1,6 @@
 // Copyright 2014 The Go Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE ***REMOVED***le.
+// license that can be found in the LICENSE file.
 
 package google
 
@@ -26,7 +26,7 @@ var appengineAppIDFunc func(c context.Context) string
 // AppEngineTokenSource returns a token source that fetches tokens
 // issued to the current App Engine application's service account.
 // If you are implementing a 3-legged OAuth 2.0 flow on App Engine
-// that involves user accounts, see oauth2.Con***REMOVED***g instead.
+// that involves user accounts, see oauth2.Config instead.
 //
 // The provided context must have come from appengine.NewContext.
 func AppEngineTokenSource(ctx context.Context, scope ...string) oauth2.TokenSource {

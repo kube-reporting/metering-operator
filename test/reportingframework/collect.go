@@ -45,7 +45,7 @@ func (rf *ReportingFramework) CollectMetricsOnce(t *testing.T) (time.Time, time.
 		respBody, respCode, err := rf.ReportingOperatorPOSTRequest(collectEndpoint, body)
 		require.Equal(t, http.StatusOK, respCode, "http response status code should be ok")
 		require.NoErrorf(t, err, "expected no errors triggering data collection")
-		t.Logf("***REMOVED***nished querying %s, took: %s to ***REMOVED***nish", collectEndpoint, time.Now().UTC().Sub(now))
+		t.Logf("finished querying %s, took: %s to finish", collectEndpoint, time.Now().UTC().Sub(now))
 		require.NoError(t, err, "reading response body should succeed")
 		var collectResp operator.CollectPrometheusMetricsDataResponse
 		err = json.Unmarshal(respBody, &collectResp)

@@ -116,7 +116,7 @@ type InterfaceType interface {
 	NumMethod() int
 }
 
-type Con***REMOVED***g struct {
+type Config struct {
 	UseSafeImplementation bool
 }
 
@@ -125,22 +125,22 @@ type API interface {
 	Type2(type1 reflect.Type) Type
 }
 
-var Con***REMOVED***gUnsafe = Con***REMOVED***g{UseSafeImplementation: false}.Froze()
-var Con***REMOVED***gSafe = Con***REMOVED***g{UseSafeImplementation: true}.Froze()
+var ConfigUnsafe = Config{UseSafeImplementation: false}.Froze()
+var ConfigSafe = Config{UseSafeImplementation: true}.Froze()
 
-type frozenCon***REMOVED***g struct {
+type frozenConfig struct {
 	useSafeImplementation bool
 	cache                 *concurrent.Map
 }
 
-func (cfg Con***REMOVED***g) Froze() *frozenCon***REMOVED***g {
-	return &frozenCon***REMOVED***g{
+func (cfg Config) Froze() *frozenConfig {
+	return &frozenConfig{
 		useSafeImplementation: cfg.UseSafeImplementation,
 		cache: concurrent.NewMap(),
 	}
 }
 
-func (cfg *frozenCon***REMOVED***g) TypeOf(obj interface{}) Type {
+func (cfg *frozenConfig) TypeOf(obj interface{}) Type {
 	cacheKey := uintptr(unpackEFace(obj).rtype)
 	typeObj, found := cfg.cache.Load(cacheKey)
 	if found {
@@ -149,7 +149,7 @@ func (cfg *frozenCon***REMOVED***g) TypeOf(obj interface{}) Type {
 	return cfg.Type2(reflect.TypeOf(obj))
 }
 
-func (cfg *frozenCon***REMOVED***g) Type2(type1 reflect.Type) Type {
+func (cfg *frozenConfig) Type2(type1 reflect.Type) Type {
 	if type1 == nil {
 		return nil
 	}
@@ -163,7 +163,7 @@ func (cfg *frozenCon***REMOVED***g) Type2(type1 reflect.Type) Type {
 	return type2
 }
 
-func (cfg *frozenCon***REMOVED***g) wrapType(type1 reflect.Type) Type {
+func (cfg *frozenConfig) wrapType(type1 reflect.Type) Type {
 	safeType := safeType{Type: type1, cfg: cfg}
 	switch type1.Kind() {
 	case reflect.Struct:
@@ -208,7 +208,7 @@ func (cfg *frozenCon***REMOVED***g) wrapType(type1 reflect.Type) Type {
 }
 
 func TypeOf(obj interface{}) Type {
-	return Con***REMOVED***gUnsafe.TypeOf(obj)
+	return ConfigUnsafe.TypeOf(obj)
 }
 
 func TypeOfPtr(obj interface{}) PtrType {
@@ -219,7 +219,7 @@ func Type2(type1 reflect.Type) Type {
 	if type1 == nil {
 		return nil
 	}
-	return Con***REMOVED***gUnsafe.Type2(type1)
+	return ConfigUnsafe.Type2(type1)
 }
 
 func PtrTo(typ Type) Type {

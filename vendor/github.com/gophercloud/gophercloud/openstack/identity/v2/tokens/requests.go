@@ -20,10 +20,10 @@ type TokenCredentialsV2 struct {
 type AuthOptionsV2 struct {
 	PasswordCredentials *PasswordCredentialsV2 `json:"passwordCredentials,omitempty" xor:"TokenCredentials"`
 
-	// The TenantID and TenantName ***REMOVED***elds are optional for the Identity V2 API.
+	// The TenantID and TenantName fields are optional for the Identity V2 API.
 	// Some providers allow you to specify a TenantName instead of the TenantId.
 	// Some require both. Your provider's authentication policies will determine
-	// how these ***REMOVED***elds influence authentication.
+	// how these fields influence authentication.
 	TenantID   string `json:"tenantId,omitempty"`
 	TenantName string `json:"tenantName,omitempty"`
 
@@ -41,7 +41,7 @@ type AuthOptionsBuilder interface {
 }
 
 // AuthOptions are the valid options for Openstack Identity v2 authentication.
-// For ***REMOVED***eld descriptions, see gophercloud.AuthOptions.
+// For field descriptions, see gophercloud.AuthOptions.
 type AuthOptions struct {
 	IdentityEndpoint string `json:"-"`
 	Username         string `json:"username,omitempty"`
@@ -64,7 +64,7 @@ func (opts AuthOptions) ToTokenV2CreateMap() (map[string]interface{}, error) {
 			Username: opts.Username,
 			Password: opts.Password,
 		}
-	} ***REMOVED*** {
+	} else {
 		v2Opts.TokenCredentials = &TokenCredentialsV2{
 			ID: opts.TokenID,
 		}

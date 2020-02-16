@@ -1,6 +1,6 @@
 // Copyright 2012 The Go Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE ***REMOVED***le.
+// license that can be found in the LICENSE file.
 
 // +build ignore
 
@@ -11,7 +11,7 @@ package main
 
 import (
 	"archive/zip"
-	"bu***REMOVED***o"
+	"bufio"
 	"bytes"
 	"flag"
 	"fmt"
@@ -40,7 +40,7 @@ var (
 	draft = flag.Bool("draft", false, `Use draft versions, when available.`)
 	tags  = flag.String("tags", "", "build tags to be included after +build directive")
 	pkg   = flag.String("package", "collate",
-		"the name of the package in which the generated ***REMOVED***le is to be included")
+		"the name of the package in which the generated file is to be included")
 
 	tables = flagStringSetAllowAll("tables", "collate", "collate,chars",
 		"comma-spearated list of tables to generate.")
@@ -55,7 +55,7 @@ var (
 )
 
 // stringSet implements an ordered set based on a list.  It implements flag.Value
-// to allow a set to be speci***REMOVED***ed as a comma-separated list.
+// to allow a set to be specified as a comma-separated list.
 type stringSet struct {
 	s        []string
 	allowed  *stringSet
@@ -80,7 +80,7 @@ func flagStringSetAllowAll(name, def, allowed, usage string) *stringSet {
 	ss := &stringSet{allowAll: true}
 	if allowed == "" {
 		flag.Var(ss, name, usage+fmt.Sprintf(` Use "all" to select all.`))
-	} ***REMOVED*** {
+	} else {
 		ss.allowed = &stringSet{}
 		failOnError(ss.allowed.Set(allowed))
 		flag.Var(ss, name, usage+fmt.Sprintf(` (allowed values: "all" or any of %s)`, allowed))
@@ -195,13 +195,13 @@ func openArchive() *zip.Reader {
 }
 
 // parseUCA parses a Default Unicode Collation Element Table of the format
-// speci***REMOVED***ed in http://www.unicode.org/reports/tr10/#File_Format.
+// specified in http://www.unicode.org/reports/tr10/#File_Format.
 // It returns the variable top.
 func parseUCA(builder *build.Builder) {
 	var r io.ReadCloser
 	var err error
 	for _, f := range openArchive().File {
-		if strings.HasSuf***REMOVED***x(f.Name, "allkeys_CLDR.txt") {
+		if strings.HasSuffix(f.Name, "allkeys_CLDR.txt") {
 			r, err = f.Open()
 		}
 	}
@@ -210,7 +210,7 @@ func parseUCA(builder *build.Builder) {
 	}
 	failOnError(err)
 	defer r.Close()
-	scanner := bu***REMOVED***o.NewScanner(r)
+	scanner := bufio.NewScanner(r)
 	colelem := regexp.MustCompile(`\[([.*])([0-9A-F.]+)\]`)
 	for i := 1; scanner.Scan(); i++ {
 		line := scanner.Text()
@@ -220,17 +220,17 @@ func parseUCA(builder *build.Builder) {
 		if line[0] == '@' {
 			// parse properties
 			switch {
-			case strings.HasPre***REMOVED***x(line[1:], "version "):
+			case strings.HasPrefix(line[1:], "version "):
 				a := strings.Split(line[1:], " ")
 				if a[1] != gen.UnicodeVersion() {
 					log.Fatalf("incompatible version %s; want %s", a[1], gen.UnicodeVersion())
 				}
-			case strings.HasPre***REMOVED***x(line[1:], "backwards "):
+			case strings.HasPrefix(line[1:], "backwards "):
 				log.Fatalf("%d: unsupported option backwards", i)
 			default:
 				log.Printf("%d: unknown option %s", i, line[1:])
 			}
-		} ***REMOVED*** {
+		} else {
 			// parse entries
 			part := strings.Split(line, " ; ")
 			if len(part) != 2 {
@@ -331,7 +331,7 @@ func decodeCLDR(d *cldr.Decoder) *cldr.CLDR {
 	return data
 }
 
-// parseMain parses XML ***REMOVED***les in the main directory of the CLDR core.zip ***REMOVED***le.
+// parseMain parses XML files in the main directory of the CLDR core.zip file.
 func parseMain() {
 	d := &cldr.Decoder{}
 	d.SetDirFilter("main")
@@ -388,7 +388,7 @@ func parseCharacters(chars string) []string {
 			}
 			list = append(list, string(buf))
 			last = 0
-		} ***REMOVED*** { // single character
+		} else { // single character
 			escaped := false
 			r, chars, escaped = parseSingle(chars)
 			if r != ' ' {
@@ -401,7 +401,7 @@ func parseCharacters(chars string) []string {
 						list = append(list, string(last))
 					}
 					last = 0
-				} ***REMOVED*** {
+				} else {
 					list = append(list, string(r))
 					last = r
 				}
@@ -411,7 +411,7 @@ func parseCharacters(chars string) []string {
 	return list
 }
 
-var ***REMOVED***leRe = regexp.MustCompile(`.*/collation/(.*)\.xml`)
+var fileRe = regexp.MustCompile(`.*/collation/(.*)\.xml`)
 
 // typeMap translates legacy type keys to their BCP47 equivalent.
 var typeMap = map[string]string{
@@ -419,7 +419,7 @@ var typeMap = map[string]string{
 	"traditional": "trad",
 }
 
-// parseCollation parses XML ***REMOVED***les in the collation directory of the CLDR core.zip ***REMOVED***le.
+// parseCollation parses XML files in the collation directory of the CLDR core.zip file.
 func parseCollation(b *build.Builder) {
 	d := &cldr.Decoder{}
 	d.SetDirFilter("collation")
@@ -434,7 +434,7 @@ func parseCollation(b *build.Builder) {
 		sl := cldr.MakeSlice(&cs)
 		if len(types.s) == 0 {
 			sl.SelectAnyOf("type", x.Collations.Default())
-		} ***REMOVED*** if !types.all {
+		} else if !types.all {
 			sl.SelectAnyOf("type", types.s...)
 		}
 		sl.SelectOnePerGroup("alt", altInclude())
@@ -449,7 +449,7 @@ func parseCollation(b *build.Builder) {
 			d := c.Type
 			if x.Collations.DefaultCollation == nil {
 				d = x.Collations.Default()
-			} ***REMOVED*** {
+			} else {
 				d = x.Collations.DefaultCollation.Data()
 			}
 			// We assume tables are being built either for search or collation,
@@ -475,7 +475,7 @@ type processor struct {
 func (p processor) Reset(anchor string, before int) (err error) {
 	if before != 0 {
 		err = p.t.SetAnchorBefore(anchor)
-	} ***REMOVED*** {
+	} else {
 		err = p.t.SetAnchor(anchor)
 	}
 	failOnError(err)
@@ -535,7 +535,7 @@ func main() {
 
 	if *test {
 		testCollator(collate.NewFromTable(c))
-	} ***REMOVED*** {
+	} else {
 		w := &bytes.Buffer{}
 
 		gen.WriteUnicodeVersion(w)

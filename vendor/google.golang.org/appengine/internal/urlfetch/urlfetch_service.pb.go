@@ -5,7 +5,7 @@
 /*
 Package urlfetch is a generated protocol buffer package.
 
-It is generated from these ***REMOVED***les:
+It is generated from these files:
 	google.golang.org/appengine/internal/urlfetch/urlfetch_service.proto
 
 It has these top-level messages:
@@ -149,8 +149,8 @@ type URLFetchRequest struct {
 	Header                        []*URLFetchRequest_Header      `protobuf:"group,3,rep,name=Header" json:"header,omitempty"`
 	Payload                       []byte                         `protobuf:"bytes,6,opt,name=Payload" json:"Payload,omitempty"`
 	FollowRedirects               *bool                          `protobuf:"varint,7,opt,name=FollowRedirects,def=1" json:"FollowRedirects,omitempty"`
-	Deadline                      *float64                       `protobuf:"***REMOVED***xed64,8,opt,name=Deadline" json:"Deadline,omitempty"`
-	MustValidateServerCerti***REMOVED***cate *bool                          `protobuf:"varint,9,opt,name=MustValidateServerCerti***REMOVED***cate,def=1" json:"MustValidateServerCerti***REMOVED***cate,omitempty"`
+	Deadline                      *float64                       `protobuf:"fixed64,8,opt,name=Deadline" json:"Deadline,omitempty"`
+	MustValidateServerCertificate *bool                          `protobuf:"varint,9,opt,name=MustValidateServerCertificate,def=1" json:"MustValidateServerCertificate,omitempty"`
 	XXX_unrecognized              []byte                         `json:"-"`
 }
 
@@ -159,7 +159,7 @@ func (m *URLFetchRequest) String() string { return proto.CompactTextString(m) }
 func (*URLFetchRequest) ProtoMessage()    {}
 
 const Default_URLFetchRequest_FollowRedirects bool = true
-const Default_URLFetchRequest_MustValidateServerCerti***REMOVED***cate bool = true
+const Default_URLFetchRequest_MustValidateServerCertificate bool = true
 
 func (m *URLFetchRequest) GetMethod() URLFetchRequest_RequestMethod {
 	if m != nil && m.Method != nil {
@@ -203,11 +203,11 @@ func (m *URLFetchRequest) GetDeadline() float64 {
 	return 0
 }
 
-func (m *URLFetchRequest) GetMustValidateServerCerti***REMOVED***cate() bool {
-	if m != nil && m.MustValidateServerCerti***REMOVED***cate != nil {
-		return *m.MustValidateServerCerti***REMOVED***cate
+func (m *URLFetchRequest) GetMustValidateServerCertificate() bool {
+	if m != nil && m.MustValidateServerCertificate != nil {
+		return *m.MustValidateServerCertificate
 	}
-	return Default_URLFetchRequest_MustValidateServerCerti***REMOVED***cate
+	return Default_URLFetchRequest_MustValidateServerCertificate
 }
 
 type URLFetchRequest_Header struct {

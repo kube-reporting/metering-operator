@@ -16,9 +16,9 @@ var (
 
 // URLFormat is a middleware that parses the url extension from a request path and stores it
 // on the context as a string under the key `middleware.URLFormatCtxKey`. The middleware will
-// trim the suf***REMOVED***x from the routing path and continue routing.
+// trim the suffix from the routing path and continue routing.
 //
-// Routers should not include a url parameter for the suf***REMOVED***x when using this middleware.
+// Routers should not include a url parameter for the suffix when using this middleware.
 //
 // Sample usage.. for url paths: `/articles/1`, `/articles/1.json` and `/articles/1.xml`
 //

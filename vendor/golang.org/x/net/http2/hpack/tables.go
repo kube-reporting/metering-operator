@@ -1,6 +1,6 @@
 // Copyright 2014 The Go Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE ***REMOVED***le.
+// license that can be found in the LICENSE file.
 
 package hpack
 
@@ -16,7 +16,7 @@ type headerFieldTable struct {
 	// For dynamic tables, entries are evicted from ents[0] and added to the end.
 	// Each entry has a unique id that starts at one and increments for each
 	// entry that is added. This unique id is stable across evictions, meaning
-	// it can be used as a pointer to a speci***REMOVED***c entry. As in hpack, unique ids
+	// it can be used as a pointer to a specific entry. As in hpack, unique ids
 	// are 1-based. The unique id for ents[k] is k + evictCount + 1.
 	//
 	// Zero is not a valid unique id.
@@ -30,11 +30,11 @@ type headerFieldTable struct {
 	evictCount uint64
 
 	// byName maps a HeaderField name to the unique id of the newest entry with
-	// the same name. See above for a de***REMOVED***nition of "unique id".
+	// the same name. See above for a definition of "unique id".
 	byName map[string]uint64
 
 	// byNameValue maps a HeaderField name/value pair to the unique id of the newest
-	// entry with the same name and value. See above for a de***REMOVED***nition of "unique id".
+	// entry with the same name and value. See above for a definition of "unique id".
 	byNameValue map[pairNameValue]uint64
 }
 
@@ -86,7 +86,7 @@ func (t *headerFieldTable) evictOldest(n int) {
 	t.evictCount += uint64(n)
 }
 
-// search ***REMOVED***nds f in the table. If there is no match, i is 0.
+// search finds f in the table. If there is no match, i is 0.
 // If both name and value match, i is the matched index and nameValueMatch
 // becomes true. If only name matches, i points to that index and
 // nameValueMatch becomes false.
@@ -167,11 +167,11 @@ var staticTableEntries = [...]HeaderField{
 	{Name: "from"},
 	{Name: "host"},
 	{Name: "if-match"},
-	{Name: "if-modi***REMOVED***ed-since"},
+	{Name: "if-modified-since"},
 	{Name: "if-none-match"},
 	{Name: "if-range"},
-	{Name: "if-unmodi***REMOVED***ed-since"},
-	{Name: "last-modi***REMOVED***ed"},
+	{Name: "if-unmodified-since"},
+	{Name: "last-modified"},
 	{Name: "link"},
 	{Name: "location"},
 	{Name: "max-forwards"},

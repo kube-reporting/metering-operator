@@ -1,9 +1,9 @@
 // Copyright 2009 The Go Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE ***REMOVED***le.
+// license that can be found in the LICENSE file.
 
 // Solaris system calls.
-// This ***REMOVED***le is compiled as ordinary Go code,
+// This file is compiled as ordinary Go code,
 // but it is also input to mksyscall,
 // which parses the //sys lines and generates system call stubs.
 // Note that sometimes we use a lowercase //sys name and wrap
@@ -161,7 +161,7 @@ func Getgroups() (gids []int, err error) {
 			return nil, err
 		}
 		return nil, EINVAL
-	} ***REMOVED*** if n == 0 {
+	} else if n == 0 {
 		return nil, nil
 	}
 
@@ -327,7 +327,7 @@ func FcntlFlock(fd uintptr, cmd int, lk *Flock_t) error {
 	return nil
 }
 
-//sys	futimesat(***REMOVED***ldes int, path *byte, times *[2]Timeval) (err error)
+//sys	futimesat(fildes int, path *byte, times *[2]Timeval) (err error)
 
 func Futimesat(dirfd int, path string, tv []Timeval) error {
 	pathp, err := BytePtrFromString(path)
@@ -344,7 +344,7 @@ func Futimesat(dirfd int, path string, tv []Timeval) error {
 }
 
 // Solaris doesn't have an futimes function because it allows NULL to be
-// speci***REMOVED***ed as the path for futimesat. However, Go doesn't like
+// specified as the path for futimesat. However, Go doesn't like
 // NULL-style string interfaces, so this simple wrapper is provided.
 func Futimes(fd int, tv []Timeval) error {
 	if tv == nil {
@@ -364,7 +364,7 @@ func anyToSockaddr(rsa *RawSockaddrAny) (Sockaddr, error) {
 		// Assume path ends at NUL.
 		// This is not technically the Solaris semantics for
 		// abstract Unix domain sockets -- they are supposed
-		// to be uninterpreted ***REMOVED***xed-size binary blobs -- but
+		// to be uninterpreted fixed-size binary blobs -- but
 		// everyone uses this convention.
 		n := 0
 		for n < len(pp.Path) && pp.Path[n] != 0 {
@@ -442,7 +442,7 @@ func Recvmsg(fd int, p, oob []byte, flags int) (n, oobn int, recvflags int, from
 		return
 	}
 	oobn = int(msg.Accrightslen)
-	// source address is only speci***REMOVED***ed if the socket is unconnected
+	// source address is only specified if the socket is unconnected
 	if rsa.Addr.Family != AF_UNSPEC {
 		from, err = anyToSockaddr(&rsa)
 	}
@@ -627,8 +627,8 @@ func Poll(fds []PollFd, timeout int) (n int, err error) {
 //sys	Madvise(b []byte, advice int) (err error)
 //sys	Mkdir(path string, mode uint32) (err error)
 //sys	Mkdirat(dirfd int, path string, mode uint32) (err error)
-//sys	Mk***REMOVED***fo(path string, mode uint32) (err error)
-//sys	Mk***REMOVED***foat(dirfd int, path string, mode uint32) (err error)
+//sys	Mkfifo(path string, mode uint32) (err error)
+//sys	Mkfifoat(dirfd int, path string, mode uint32) (err error)
 //sys	Mknod(path string, mode uint32, dev int) (err error)
 //sys	Mknodat(dirfd int, path string, mode uint32, dev int) (err error)
 //sys	Mlock(b []byte) (err error)
@@ -682,7 +682,7 @@ func Poll(fds []PollFd, timeout int) (n int, err error) {
 //sys	connect(s int, addr unsafe.Pointer, addrlen _Socklen) (err error) = libsocket.__xnet_connect
 //sys	mmap(addr uintptr, length uintptr, prot int, flag int, fd int, pos int64) (ret uintptr, err error)
 //sys	munmap(addr uintptr, length uintptr) (err error)
-//sys	send***REMOVED***le(outfd int, infd int, offset *int64, count int) (written int, err error) = libsend***REMOVED***le.send***REMOVED***le
+//sys	sendfile(outfd int, infd int, offset *int64, count int) (written int, err error) = libsendfile.sendfile
 //sys	sendto(s int, buf []byte, flags int, to unsafe.Pointer, addrlen _Socklen) (err error) = libsocket.__xnet_sendto
 //sys	socket(domain int, typ int, proto int) (fd int, err error) = libsocket.__xnet_socket
 //sysnb	socketpair(domain int, typ int, proto int, fd *[2]int32) (err error) = libsocket.__xnet_socketpair

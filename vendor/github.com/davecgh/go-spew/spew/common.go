@@ -82,10 +82,10 @@ func catchPanic(w io.Writer, v reflect.Value) {
 //
 // It handles panics in any called methods by catching and displaying the error
 // as the formatted value.
-func handleMethods(cs *Con***REMOVED***gState, w io.Writer, v reflect.Value) (handled bool) {
+func handleMethods(cs *ConfigState, w io.Writer, v reflect.Value) (handled bool) {
 	// We need an interface to check if the type implements the error or
 	// Stringer interface.  However, the reflect package won't give us an
-	// interface on certain things like unexported struct ***REMOVED***elds in order
+	// interface on certain things like unexported struct fields in order
 	// to enforce visibility rules.  We use unsafe, when it's available,
 	// to bypass these restrictions since this package does not mutate the
 	// values.
@@ -144,7 +144,7 @@ func handleMethods(cs *Con***REMOVED***gState, w io.Writer, v reflect.Value) (ha
 func printBool(w io.Writer, val bool) {
 	if val {
 		w.Write(trueBytes)
-	} ***REMOVED*** {
+	} else {
 		w.Write(falseBytes)
 	}
 }
@@ -159,13 +159,13 @@ func printUint(w io.Writer, val uint64, base int) {
 	w.Write([]byte(strconv.FormatUint(val, base)))
 }
 
-// printFloat outputs a floating point value using the speci***REMOVED***ed precision,
+// printFloat outputs a floating point value using the specified precision,
 // which is expected to be 32 or 64bit, to Writer w.
 func printFloat(w io.Writer, val float64, precision int) {
 	w.Write([]byte(strconv.FormatFloat(val, 'g', -1, precision)))
 }
 
-// printComplex outputs a complex value using the speci***REMOVED***ed float precision
+// printComplex outputs a complex value using the specified float precision
 // for the real and imaginary parts to Writer w.
 func printComplex(w io.Writer, c complex128, floatPrecision int) {
 	r := real(c)
@@ -181,7 +181,7 @@ func printComplex(w io.Writer, c complex128, floatPrecision int) {
 }
 
 // printHexPtr outputs a uintptr formatted as hexidecimal with a leading '0x'
-// pre***REMOVED***x to Writer w.
+// prefix to Writer w.
 func printHexPtr(w io.Writer, p uintptr) {
 	// Null pointer.
 	num := uint64(p)
@@ -190,7 +190,7 @@ func printHexPtr(w io.Writer, p uintptr) {
 		return
 	}
 
-	// Max uint64 is 16 bytes in hex + 2 bytes for '0x' pre***REMOVED***x
+	// Max uint64 is 16 bytes in hex + 2 bytes for '0x' prefix
 	buf := make([]byte, 18)
 
 	// It's simpler to construct the hex string right to left.
@@ -203,7 +203,7 @@ func printHexPtr(w io.Writer, p uintptr) {
 	}
 	buf[i] = hexDigits[num]
 
-	// Add '0x' pre***REMOVED***x.
+	// Add '0x' prefix.
 	i--
 	buf[i] = 'x'
 	i--
@@ -219,13 +219,13 @@ func printHexPtr(w io.Writer, p uintptr) {
 type valuesSorter struct {
 	values  []reflect.Value
 	strings []string // either nil or same len and values
-	cs      *Con***REMOVED***gState
+	cs      *ConfigState
 }
 
 // newValuesSorter initializes a valuesSorter instance, which holds a set of
 // surrogate keys on which the data should be sorted.  It uses flags in
-// Con***REMOVED***gState to decide if and how to populate those surrogate keys.
-func newValuesSorter(values []reflect.Value, cs *Con***REMOVED***gState) sort.Interface {
+// ConfigState to decide if and how to populate those surrogate keys.
+func newValuesSorter(values []reflect.Value, cs *ConfigState) sort.Interface {
 	vs := &valuesSorter{values: values, cs: cs}
 	if canSortSimply(vs.values[0].Kind()) {
 		return vs
@@ -252,7 +252,7 @@ func newValuesSorter(values []reflect.Value, cs *Con***REMOVED***gState) sort.In
 
 // canSortSimply tests whether a reflect.Kind is a primitive that can be sorted
 // directly, or whether it should be considered for sorting by surrogate keys
-// (if the Con***REMOVED***gState allows it).
+// (if the ConfigState allows it).
 func canSortSimply(kind reflect.Kind) bool {
 	// This switch parallels valueSortLess, except for the default case.
 	switch kind {
@@ -289,7 +289,7 @@ func (s *valuesSorter) Swap(i, j int) {
 	}
 }
 
-// valueSortLess returns whether the ***REMOVED***rst value should sort before the second
+// valueSortLess returns whether the first value should sort before the second
 // value.  It is used by valueSorter.Less as part of the sort.Interface
 // implementation.
 func valueSortLess(a, b reflect.Value) bool {
@@ -333,7 +333,7 @@ func (s *valuesSorter) Less(i, j int) bool {
 // sortValues is a sort function that handles both native types and any type that
 // can be converted to error or Stringer.  Other inputs are sorted according to
 // their Value.String() value to ensure display stability.
-func sortValues(values []reflect.Value, cs *Con***REMOVED***gState) {
+func sortValues(values []reflect.Value, cs *ConfigState) {
 	if len(values) == 0 {
 		return
 	}

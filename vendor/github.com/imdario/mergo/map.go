@@ -1,9 +1,9 @@
 // Copyright 2014 Dario Castañé. All rights reserved.
 // Copyright 2009 The Go Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE ***REMOVED***le.
+// license that can be found in the LICENSE file.
 
-// Based on src/pkg/reflect/deepequal.go from of***REMOVED***cial
+// Based on src/pkg/reflect/deepequal.go from official
 // golang's stdlib.
 
 package mergo
@@ -23,16 +23,16 @@ func changeInitialCase(s string, mapper func(rune) rune) string {
 	return string(mapper(r)) + s[n:]
 }
 
-func isExported(***REMOVED***eld reflect.StructField) bool {
-	r, _ := utf8.DecodeRuneInString(***REMOVED***eld.Name)
+func isExported(field reflect.StructField) bool {
+	r, _ := utf8.DecodeRuneInString(field.Name)
 	return r >= 'A' && r <= 'Z'
 }
 
-// Traverses recursively both values, assigning src's ***REMOVED***elds values to dst.
+// Traverses recursively both values, assigning src's fields values to dst.
 // The map argument tracks comparisons that have already been seen, which allows
 // short circuiting on recursive types.
-func deepMap(dst, src reflect.Value, visited map[uintptr]*visit, depth int, con***REMOVED***g *Con***REMOVED***g) (err error) {
-	overwrite := con***REMOVED***g.Overwrite
+func deepMap(dst, src reflect.Value, visited map[uintptr]*visit, depth int, config *Config) (err error) {
+	overwrite := config.Overwrite
 	if dst.CanAddr() {
 		addr := dst.UnsafeAddr()
 		h := 17 * addr
@@ -52,14 +52,14 @@ func deepMap(dst, src reflect.Value, visited map[uintptr]*visit, depth int, con*
 		dstMap := dst.Interface().(map[string]interface{})
 		for i, n := 0, src.NumField(); i < n; i++ {
 			srcType := src.Type()
-			***REMOVED***eld := srcType.Field(i)
-			if !isExported(***REMOVED***eld) {
+			field := srcType.Field(i)
+			if !isExported(field) {
 				continue
 			}
-			***REMOVED***eldName := ***REMOVED***eld.Name
-			***REMOVED***eldName = changeInitialCase(***REMOVED***eldName, unicode.ToLower)
-			if v, ok := dstMap[***REMOVED***eldName]; !ok || (isEmptyValue(reflect.ValueOf(v)) || overwrite) {
-				dstMap[***REMOVED***eldName] = src.Field(i).Interface()
+			fieldName := field.Name
+			fieldName = changeInitialCase(fieldName, unicode.ToLower)
+			if v, ok := dstMap[fieldName]; !ok || (isEmptyValue(reflect.ValueOf(v)) || overwrite) {
+				dstMap[fieldName] = src.Field(i).Interface()
 			}
 		}
 	case reflect.Ptr:
@@ -73,10 +73,10 @@ func deepMap(dst, src reflect.Value, visited map[uintptr]*visit, depth int, con*
 		srcMap := src.Interface().(map[string]interface{})
 		for key := range srcMap {
 			srcValue := srcMap[key]
-			***REMOVED***eldName := changeInitialCase(key, unicode.ToUpper)
-			dstElement := dst.FieldByName(***REMOVED***eldName)
+			fieldName := changeInitialCase(key, unicode.ToUpper)
+			dstElement := dst.FieldByName(fieldName)
 			if dstElement == zeroValue {
-				// We discard it because the ***REMOVED***eld doesn't exist.
+				// We discard it because the field doesn't exist.
 				continue
 			}
 			srcElement := reflect.ValueOf(srcValue)
@@ -85,7 +85,7 @@ func deepMap(dst, src reflect.Value, visited map[uintptr]*visit, depth int, con*
 			if srcKind == reflect.Ptr && dstKind != reflect.Ptr {
 				srcElement = srcElement.Elem()
 				srcKind = reflect.TypeOf(srcElement.Interface()).Kind()
-			} ***REMOVED*** if dstKind == reflect.Ptr {
+			} else if dstKind == reflect.Ptr {
 				// Can this work? I guess it can't.
 				if srcKind != reflect.Ptr && srcElement.CanAddr() {
 					srcPtr := srcElement.Addr()
@@ -98,56 +98,56 @@ func deepMap(dst, src reflect.Value, visited map[uintptr]*visit, depth int, con*
 				continue
 			}
 			if srcKind == dstKind {
-				if err = deepMerge(dstElement, srcElement, visited, depth+1, con***REMOVED***g); err != nil {
+				if err = deepMerge(dstElement, srcElement, visited, depth+1, config); err != nil {
 					return
 				}
-			} ***REMOVED*** if dstKind == reflect.Interface && dstElement.Kind() == reflect.Interface {
-				if err = deepMerge(dstElement, srcElement, visited, depth+1, con***REMOVED***g); err != nil {
+			} else if dstKind == reflect.Interface && dstElement.Kind() == reflect.Interface {
+				if err = deepMerge(dstElement, srcElement, visited, depth+1, config); err != nil {
 					return
 				}
-			} ***REMOVED*** if srcKind == reflect.Map {
-				if err = deepMap(dstElement, srcElement, visited, depth+1, con***REMOVED***g); err != nil {
+			} else if srcKind == reflect.Map {
+				if err = deepMap(dstElement, srcElement, visited, depth+1, config); err != nil {
 					return
 				}
-			} ***REMOVED*** {
-				return fmt.Errorf("type mismatch on %s ***REMOVED***eld: found %v, expected %v", ***REMOVED***eldName, srcKind, dstKind)
+			} else {
+				return fmt.Errorf("type mismatch on %s field: found %v, expected %v", fieldName, srcKind, dstKind)
 			}
 		}
 	}
 	return
 }
 
-// Map sets ***REMOVED***elds' values in dst from src.
+// Map sets fields' values in dst from src.
 // src can be a map with string keys or a struct. dst must be the opposite:
 // if src is a map, dst must be a valid pointer to struct. If src is a struct,
 // dst must be map[string]interface{}.
-// It won't merge unexported (private) ***REMOVED***elds and will do recursively
-// any exported ***REMOVED***eld.
-// If dst is a map, keys will be src ***REMOVED***elds' names in lower camel case.
-// Missing key in src that doesn't match a ***REMOVED***eld in dst will be skipped. This
+// It won't merge unexported (private) fields and will do recursively
+// any exported field.
+// If dst is a map, keys will be src fields' names in lower camel case.
+// Missing key in src that doesn't match a field in dst will be skipped. This
 // doesn't apply if dst is a map.
 // This is separated method from Merge because it is cleaner and it keeps sane
 // semantics: merging equal types, mapping different (restricted) types.
-func Map(dst, src interface{}, opts ...func(*Con***REMOVED***g)) error {
+func Map(dst, src interface{}, opts ...func(*Config)) error {
 	return _map(dst, src, opts...)
 }
 
 // MapWithOverwrite will do the same as Map except that non-empty dst attributes will be overridden by
 // non-empty src attribute values.
 // Deprecated: Use Map(…) with WithOverride
-func MapWithOverwrite(dst, src interface{}, opts ...func(*Con***REMOVED***g)) error {
+func MapWithOverwrite(dst, src interface{}, opts ...func(*Config)) error {
 	return _map(dst, src, append(opts, WithOverride)...)
 }
 
-func _map(dst, src interface{}, opts ...func(*Con***REMOVED***g)) error {
+func _map(dst, src interface{}, opts ...func(*Config)) error {
 	var (
 		vDst, vSrc reflect.Value
 		err        error
 	)
-	con***REMOVED***g := &Con***REMOVED***g{}
+	config := &Config{}
 
 	for _, opt := range opts {
-		opt(con***REMOVED***g)
+		opt(config)
 	}
 
 	if vDst, vSrc, err = resolveValues(dst, src); err != nil {
@@ -156,7 +156,7 @@ func _map(dst, src interface{}, opts ...func(*Con***REMOVED***g)) error {
 	// To be friction-less, we redirect equal-type arguments
 	// to deepMerge. Only because arguments can be anything.
 	if vSrc.Kind() == vDst.Kind() {
-		return deepMerge(vDst, vSrc, make(map[uintptr]*visit), 0, con***REMOVED***g)
+		return deepMerge(vDst, vSrc, make(map[uintptr]*visit), 0, config)
 	}
 	switch vSrc.Kind() {
 	case reflect.Struct:
@@ -170,5 +170,5 @@ func _map(dst, src interface{}, opts ...func(*Con***REMOVED***g)) error {
 	default:
 		return ErrNotSupported
 	}
-	return deepMap(vDst, vSrc, make(map[uintptr]*visit), 0, con***REMOVED***g)
+	return deepMap(vDst, vSrc, make(map[uintptr]*visit), 0, config)
 }

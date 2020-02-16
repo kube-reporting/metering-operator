@@ -1,6 +1,6 @@
 // Copyright 2018 The Prometheus Authors
 // Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this ***REMOVED***le except in compliance with the License.
+// you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 //
 // http://www.apache.org/licenses/LICENSE-2.0
@@ -8,7 +8,7 @@
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the speci***REMOVED***c language governing permissions and
+// See the License for the specific language governing permissions and
 // limitations under the License.
 
 package procfs
@@ -50,15 +50,15 @@ func (p Proc) NewNamespaces() (Namespaces, error) {
 			return nil, err
 		}
 
-		***REMOVED***elds := strings.SplitN(target, ":", 2)
-		if len(***REMOVED***elds) != 2 {
+		fields := strings.SplitN(target, ":", 2)
+		if len(fields) != 2 {
 			return nil, fmt.Errorf("failed to parse namespace type and inode from '%v'", target)
 		}
 
-		typ := ***REMOVED***elds[0]
-		inode, err := strconv.ParseUint(strings.Trim(***REMOVED***elds[1], "[]"), 10, 32)
+		typ := fields[0]
+		inode, err := strconv.ParseUint(strings.Trim(fields[1], "[]"), 10, 32)
 		if err != nil {
-			return nil, fmt.Errorf("failed to parse inode from '%v': %v", ***REMOVED***elds[1], err)
+			return nil, fmt.Errorf("failed to parse inode from '%v': %v", fields[1], err)
 		}
 
 		ns[name] = Namespace{typ, uint32(inode)}

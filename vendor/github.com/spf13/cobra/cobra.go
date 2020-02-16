@@ -1,14 +1,14 @@
 // Copyright © 2013 Steve Francia <spf@spf13.com>.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this ***REMOVED***le except in compliance with the License.
+// you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 // http://www.apache.org/licenses/LICENSE-2.0
 //
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the speci***REMOVED***c language governing permissions and
+// See the License for the specific language governing permissions and
 // limitations under the License.
 
 // Commands similar to git, go tools and other modern CLI tools
@@ -38,10 +38,10 @@ var templateFuncs = template.FuncMap{
 
 var initializers []func()
 
-// EnablePre***REMOVED***xMatching allows to set automatic pre***REMOVED***x matching. Automatic pre***REMOVED***x matching can be a dangerous thing
+// EnablePrefixMatching allows to set automatic prefix matching. Automatic prefix matching can be a dangerous thing
 // to automatically enable in CLI tools.
 // Set this to true to enable it.
-var EnablePre***REMOVED***xMatching = false
+var EnablePrefixMatching = false
 
 // EnableCommandSorting controls sorting of the slice of commands, which is turned on by default.
 // To disable sorting, set it to false.
@@ -78,8 +78,8 @@ func OnInitialize(y ...func()) {
 
 // FIXME Gt is unused by cobra and should be removed in a version 2. It exists only for compatibility with users of cobra.
 
-// Gt takes two types and checks whether the ***REMOVED***rst type is greater than the second. In case of types Arrays, Chans,
-// Maps and Slices, Gt will compare their lengths. Ints are compared directly while strings are ***REMOVED***rst parsed as
+// Gt takes two types and checks whether the first type is greater than the second. In case of types Arrays, Chans,
+// Maps and Slices, Gt will compare their lengths. Ints are compared directly while strings are first parsed as
 // ints and then compared.
 func Gt(a interface{}, b interface{}) bool {
 	var left, right int64
@@ -174,7 +174,7 @@ func ld(s, t string, ignoreCase bool) int {
 		for i := 1; i <= len(s); i++ {
 			if s[i-1] == t[j-1] {
 				d[i][j] = d[i-1][j-1]
-			} ***REMOVED*** {
+			} else {
 				min := d[i-1][j]
 				if d[i][j-1] < min {
 					min = d[i][j-1]

@@ -7,7 +7,7 @@ import (
 	"github.com/aws/aws-sdk-go/aws/request"
 )
 
-// RequestFailure provides additional S3 speci***REMOVED***c metadata for the request
+// RequestFailure provides additional S3 specific metadata for the request
 // failure.
 type RequestFailure struct {
 	awserr.RequestFailure
@@ -16,7 +16,7 @@ type RequestFailure struct {
 }
 
 // NewRequestFailure returns a request failure error decordated with S3
-// speci***REMOVED***c metadata.
+// specific metadata.
 func NewRequestFailure(err awserr.RequestFailure, hostID string) *RequestFailure {
 	return &RequestFailure{RequestFailure: err, hostID: hostID}
 }

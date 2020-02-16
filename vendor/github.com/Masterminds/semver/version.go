@@ -71,22 +71,22 @@ func NewVersion(v string) (*Version, error) {
 	sv.major = temp
 
 	if m[2] != "" {
-		temp, err = strconv.ParseInt(strings.TrimPre***REMOVED***x(m[2], "."), 10, 64)
+		temp, err = strconv.ParseInt(strings.TrimPrefix(m[2], "."), 10, 64)
 		if err != nil {
 			return nil, fmt.Errorf("Error parsing version segment: %s", err)
 		}
 		sv.minor = temp
-	} ***REMOVED*** {
+	} else {
 		sv.minor = 0
 	}
 
 	if m[3] != "" {
-		temp, err = strconv.ParseInt(strings.TrimPre***REMOVED***x(m[3], "."), 10, 64)
+		temp, err = strconv.ParseInt(strings.TrimPrefix(m[3], "."), 10, 64)
 		if err != nil {
 			return nil, fmt.Errorf("Error parsing version segment: %s", err)
 		}
 		sv.patch = temp
-	} ***REMOVED*** {
+	} else {
 		sv.patch = 0
 	}
 
@@ -151,10 +151,10 @@ func (v *Version) Metadata() string {
 	return v.metadata
 }
 
-// originalVPre***REMOVED***x returns the original 'v' pre***REMOVED***x if any.
-func (v *Version) originalVPre***REMOVED***x() string {
+// originalVPrefix returns the original 'v' prefix if any.
+func (v *Version) originalVPrefix() string {
 
-	// Note, only lowercase v is supported as a pre***REMOVED***x by the parser.
+	// Note, only lowercase v is supported as a prefix by the parser.
 	if v.original != "" && v.original[:1] == "v" {
 		return v.original[:1]
 	}
@@ -175,12 +175,12 @@ func (v Version) IncPatch() Version {
 	if v.pre != "" {
 		vNext.metadata = ""
 		vNext.pre = ""
-	} ***REMOVED*** {
+	} else {
 		vNext.metadata = ""
 		vNext.pre = ""
 		vNext.patch = v.patch + 1
 	}
-	vNext.original = v.originalVPre***REMOVED***x() + "" + vNext.String()
+	vNext.original = v.originalVPrefix() + "" + vNext.String()
 	return vNext
 }
 
@@ -195,7 +195,7 @@ func (v Version) IncMinor() Version {
 	vNext.pre = ""
 	vNext.patch = 0
 	vNext.minor = v.minor + 1
-	vNext.original = v.originalVPre***REMOVED***x() + "" + vNext.String()
+	vNext.original = v.originalVPrefix() + "" + vNext.String()
 	return vNext
 }
 
@@ -212,31 +212,31 @@ func (v Version) IncMajor() Version {
 	vNext.patch = 0
 	vNext.minor = 0
 	vNext.major = v.major + 1
-	vNext.original = v.originalVPre***REMOVED***x() + "" + vNext.String()
+	vNext.original = v.originalVPrefix() + "" + vNext.String()
 	return vNext
 }
 
-// SetPrerelease de***REMOVED***nes the prerelease value.
-// Value must not include the required 'hypen' pre***REMOVED***x.
+// SetPrerelease defines the prerelease value.
+// Value must not include the required 'hypen' prefix.
 func (v Version) SetPrerelease(prerelease string) (Version, error) {
 	vNext := v
 	if len(prerelease) > 0 && !validPrereleaseRegex.MatchString(prerelease) {
 		return vNext, ErrInvalidPrerelease
 	}
 	vNext.pre = prerelease
-	vNext.original = v.originalVPre***REMOVED***x() + "" + vNext.String()
+	vNext.original = v.originalVPrefix() + "" + vNext.String()
 	return vNext, nil
 }
 
-// SetMetadata de***REMOVED***nes metadata value.
-// Value must not include the required 'plus' pre***REMOVED***x.
+// SetMetadata defines metadata value.
+// Value must not include the required 'plus' prefix.
 func (v Version) SetMetadata(metadata string) (Version, error) {
 	vNext := v
 	if len(metadata) > 0 && !validPrereleaseRegex.MatchString(metadata) {
 		return vNext, ErrInvalidMetadata
 	}
 	vNext.metadata = metadata
-	vNext.original = v.originalVPre***REMOVED***x() + "" + vNext.String()
+	vNext.original = v.originalVPrefix() + "" + vNext.String()
 	return vNext, nil
 }
 
@@ -367,7 +367,7 @@ func comparePrerelease(v, o string) int {
 
 	// Reaching here means two versions are of equal value but have different
 	// metadata (the part following a +). They are not identical in string form
-	// but the version comparison ***REMOVED***nds them to be equal.
+	// but the version comparison finds them to be equal.
 	return 0
 }
 
@@ -405,10 +405,10 @@ func comparePrePart(s, o string) int {
 			return 1
 		}
 		return -1
-	} ***REMOVED*** if n1 != nil {
+	} else if n1 != nil {
 		// o is a string and s is a number
 		return -1
-	} ***REMOVED*** if n2 != nil {
+	} else if n2 != nil {
 		// s is a string and o is a number
 		return 1
 	}

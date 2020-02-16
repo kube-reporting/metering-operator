@@ -15,8 +15,8 @@ Internally, Operator Metering uses a database called [Presto][presto-overview] t
 When we use terms like `tables`, `views`, `SQL`, `statement`, or `query` in this document, we're referring to them in the context of the Presto database, and we're using SQL as the primary method of doing analysis and reporting on the data that Operator Metering collects.
 
 To briefly summarize how metering works, it watches for a number of custom resources for changes.
-Most of these custom resources are what you might consider con***REMOVED***guration, and allow for developers or end-users to extend what kind of data the operator can access, collect, report on, and in the case of reports, how to calculate the reports.
-Upon being noti***REMOVED***ed that a particular resource has been created, the operator uses all of these resources to create tables or views in Presto, and eventually executes user-de***REMOVED***ned SQL queries on the data it has access to, or has already collected, and stores the data for retrieval as a report in a CSV or JSON ***REMOVED***le later.
+Most of these custom resources are what you might consider configuration, and allow for developers or end-users to extend what kind of data the operator can access, collect, report on, and in the case of reports, how to calculate the reports.
+Upon being notified that a particular resource has been created, the operator uses all of these resources to create tables or views in Presto, and eventually executes user-defined SQL queries on the data it has access to, or has already collected, and stores the data for retrieval as a report in a CSV or JSON file later.
 
 The end goal of all of this is that Operator Metering provides building blocks for doing custom reporting and metering on any data that we can store into Presto.
 Currently this is primarily focused on making Prometheus metrics and billing data accessible, but in the future we can expect other integrations to be added that allow accessing data stored in other locations.
@@ -25,50 +25,50 @@ The rest of this document covers how each custom resource that metering consumes
 
 ## How the operator handles custom resources
 
-There are 6 custom resources that Operator Metering de***REMOVED***nes that you need to be aware of:
+There are 6 custom resources that Operator Metering defines that you need to be aware of:
 
 - `StorageLocations`: Provides a place to store data. Is used by `ReportDataSources`, `Reports`, `HiveTables` and `PrestoTables`.
-- `PrestoTables`: De***REMOVED***nes a table in Presto. A PrestoTable can be "unmanaged" to expose a table that already exists, or "managed" to instruct metering to create a table as a result of the resource being created.
-- `HiveTables`: De***REMOVED***nes a table in Hive. When created, it instructs metering to create the table in Hive which causes the table to be available to Presto.
+- `PrestoTables`: Defines a table in Presto. A PrestoTable can be "unmanaged" to expose a table that already exists, or "managed" to instruct metering to create a table as a result of the resource being created.
+- `HiveTables`: Defines a table in Hive. When created, it instructs metering to create the table in Hive which causes the table to be available to Presto.
 - `ReportDataSources`: Controls what data is available (Prometheus data, AWS billing data, Presto tables, views into other tables).
 - `ReportQueries`: Controls how we query the data available within ReportDataSources. If referenced by a `Report` it will manage what it will be reporting on when the report is run. If it's referenced by a `ReportDataSource` it will instruct metering to create a view within Presto based on the rendered query.
-- `Reports`: Causes reports to be generated using the con***REMOVED***gured `ReportQuery` resource. This is the primary resource an end-user of Operator Metering would interact with. Can be con***REMOVED***gured to run on a schedule.
+- `Reports`: Causes reports to be generated using the configured `ReportQuery` resource. This is the primary resource an end-user of Operator Metering would interact with. Can be configured to run on a schedule.
 
 In the sections below, we will cover the resources described above in more detail.
 
 ### StorageLocation
 
-For user-docs containing a description of the ***REMOVED***elds, and examples, see [StorageLocations][storagelocations].
+For user-docs containing a description of the fields, and examples, see [StorageLocations][storagelocations].
 
 A `StorageLocation` roughly maps to a [connector in Presto][presto-connector], which is effectively how Presto adapts to other datasources like Hive (and thus HDFS), S3 which we support. This also means we can eventually support others too, such as PostgreSQL.
 
-In terms of Operator Metering, a `StorageLocation` is intended to abstract some of those details away and expose the minimum con***REMOVED***guration required to expose where data is actually persisted at.
-Today there is the concept of an default StorageLocation which is uses an HDFS cluster within the metering namespace. You can also de***REMOVED***ne a custom storage location to default to S3 or a ReadWriteMany PVC.
-In both cases, the data is persisted as ORC ***REMOVED***les in either S3, HDFS, or a ReadWriteMany PVC via Presto.
+In terms of Operator Metering, a `StorageLocation` is intended to abstract some of those details away and expose the minimum configuration required to expose where data is actually persisted at.
+Today there is the concept of an default StorageLocation which is uses an HDFS cluster within the metering namespace. You can also define a custom storage location to default to S3 or a ReadWriteMany PVC.
+In both cases, the data is persisted as ORC files in either S3, HDFS, or a ReadWriteMany PVC via Presto.
 
 ### ReportDataSource
 
-For user-docs containing a description of the ***REMOVED***elds, and examples, see [ReportDataSources][reportdatasources].
+For user-docs containing a description of the fields, and examples, see [ReportDataSources][reportdatasources].
 
 A `ReportDataSource` indicates where a database table lives.
 There are many types of ReportDataSources, with the most common being a "PrometheusMetricsImporter" ReportDataSource.
 
 A PrometheusMetricsImporter ReportDataSource instructs the reporting-operator to create a database table for storing Prometheus metric data and to being the process of importing Prometheus metrics.
-You can also de***REMOVED***ne a AWSBilling ReportDataSource to create table pointing at an existing S3 bucket containing AWS Cost and Usage reports.
+You can also define a AWSBilling ReportDataSource to create table pointing at an existing S3 bucket containing AWS Cost and Usage reports.
 Additionally, there are ReportQueryView ReportDataSource's which create views in Presto, and PrestoTable ReportDataSource's which just expose an existing PrestoTable as a ReportDataSource.
 
 
 #### PrometheusMetricsImporter ReportDataSources
 
-A `PrometheusMetricsImporter` ReportDataSource con***REMOVED***gures the reporting-operator to periodically poll Prometheus for metrics.
+A `PrometheusMetricsImporter` ReportDataSource configures the reporting-operator to periodically poll Prometheus for metrics.
 
 When the ReportDataSource is created, the reporting operator does the following:
 
-- Checks if this `ReportDataSource` has a table created for it yet by checking the `status.tableRef` ***REMOVED***eld.
-- If the ***REMOVED***eld is empty it creates the table by creating a `HiveTable` resource, and waiting for it's `status.tableName` to be set, indicating the table has been created, then records the HiveTable name as the `status.tableRef`.
-  - The underlying storage for this table is controlled using the `StorageLocationRef` con***REMOVED***guration in `spec.prometheusMetricsImporter.storage`, which controls what options to use when creating the Presto table, such as what Presto connector is used. Currently only Hive StorageLocation's are supported.
+- Checks if this `ReportDataSource` has a table created for it yet by checking the `status.tableRef` field.
+- If the field is empty it creates the table by creating a `HiveTable` resource, and waiting for it's `status.tableName` to be set, indicating the table has been created, then records the HiveTable name as the `status.tableRef`.
+  - The underlying storage for this table is controlled using the `StorageLocationRef` configuration in `spec.prometheusMetricsImporter.storage`, which controls what options to use when creating the Presto table, such as what Presto connector is used. Currently only Hive StorageLocation's are supported.
 
-Additionally, in the background the reporting-operator is periodically listing all `ReportDataSources` and if the `spec.prometheusMetricsImporter` section is speci***REMOVED***ed, does the following to attempt to poll Prometheus metrics for each:
+Additionally, in the background the reporting-operator is periodically listing all `ReportDataSources` and if the `spec.prometheusMetricsImporter` section is specified, does the following to attempt to poll Prometheus metrics for each:
 
 - Checks if the table for this ReportDataSource exists, and if it doesn't, it will skip collecting any data until the next poll for the `ReportDataSource` again.
 - Executes the Prometheus query contained in `spec.prometheusMetricsImporter.query` against the Prometheus server.
@@ -76,57 +76,57 @@ Additionally, in the background the reporting-operator is periodically listing a
   - Currently this is done using an `INSERT` query using Presto, but this is subject to change as other `StorageLocations` are added.
 
 Currently, multiple `PrometheusMetricsImporter` ReportDataSources are collected at the same time concurrently.
-Metric resolution, and poll intervals are controlled at a global level on the metering operator via the `MeteringCon***REMOVED***g` resource's `spec.reporting-operator.con***REMOVED***g` section.
+Metric resolution, and poll intervals are controlled at a global level on the metering operator via the `MeteringConfig` resource's `spec.reporting-operator.config` section.
 
 #### AWSBilling ReportDataSources
 
-An `awsBilling` ReportDataSource con***REMOVED***gures the reporting-operator to periodically scan the speci***REMOVED***ed AWS S3 bucket for [AWS Cost and Usage reports][AWS-billing].
+An `awsBilling` ReportDataSource configures the reporting-operator to periodically scan the specified AWS S3 bucket for [AWS Cost and Usage reports][AWS-billing].
 
 When the ReportDataSource is created, the reporting-operator does the following:
 
 - Checks if this `ReportDataSource` has a table created for it yet, and if not, creates the table.
-  - In the case of an `awsBilling` ReportDataSource, the operator creates the table using Hive. When creating the table, it's con***REMOVED***gured to point at the S3 Bucket con***REMOVED***gured in the `spec.awsBilling` section and reads the gzipped CSV ***REMOVED***les (`.csv.gz`, the ***REMOVED***le format the cost and usage reports are in).
+  - In the case of an `awsBilling` ReportDataSource, the operator creates the table using Hive. When creating the table, it's configured to point at the S3 Bucket configured in the `spec.awsBilling` section and reads the gzipped CSV files (`.csv.gz`, the file format the cost and usage reports are in).
 
-Additionally, in the background the reporting-operator is periodically listing all `ReportDataSources` and if the `awsBilling` section is speci***REMOVED***ed, does the following to con***REMOVED***gure the table partitions for each:
+Additionally, in the background the reporting-operator is periodically listing all `ReportDataSources` and if the `awsBilling` section is specified, does the following to configure the table partitions for each:
 
-- Checks if the table for this ReportDataSource exists, and if it doesn't, it will skip con***REMOVED***guring the partitions of the table ReportDataSource, until the next poll for all `ReportDataSources` again.
-- Scans the con***REMOVED***gured S3 bucket for the cost usage report JSON manifests. There is a manifest for each billing period, and each manifest contains information about what reports are the most up-to-date for a given billing period.
-- For each manifest, the operator determines which S3 directory contains the most up to date report ***REMOVED***les for the billing period, and then creates a partition in the table, pointing at the directory containing the cost & usage reports. If the partition already exists for the speci***REMOVED***ed billing period, the operator will remove it and replace it with the more up-to-date S3 directory.
+- Checks if the table for this ReportDataSource exists, and if it doesn't, it will skip configuring the partitions of the table ReportDataSource, until the next poll for all `ReportDataSources` again.
+- Scans the configured S3 bucket for the cost usage report JSON manifests. There is a manifest for each billing period, and each manifest contains information about what reports are the most up-to-date for a given billing period.
+- For each manifest, the operator determines which S3 directory contains the most up to date report files for the billing period, and then creates a partition in the table, pointing at the directory containing the cost & usage reports. If the partition already exists for the specified billing period, the operator will remove it and replace it with the more up-to-date S3 directory.
 
 This results in a table that has multiple partitions in it. There will be one partition per AWS billing period, and each partition points to an S3 directory containing the most up-to-date billing information for that billing period.
 
-By default, Operator Metering has an section in the `MeteringCon***REMOVED***g` resource for con***REMOVED***guring an awsBilling `ReportDataSource`, so you generally shouldn't need to create one directly.
-For more details on con***REMOVED***guring this read the [AWS billing correlation section in the Metering Con***REMOVED***guration doc][metering-aws-billing-conf].
+By default, Operator Metering has an section in the `MeteringConfig` resource for configuring an awsBilling `ReportDataSource`, so you generally shouldn't need to create one directly.
+For more details on configuring this read the [AWS billing correlation section in the Metering Configuration doc][metering-aws-billing-conf].
 
 
 #### ReportQueryView View ReportDataSources
 
-A `ReportQuery` ReportDataSource con***REMOVED***gures the reporting-operator to create a Presto view based on the query speci***REMOVED***ed.
+A `ReportQuery` ReportDataSource configures the reporting-operator to create a Presto view based on the query specified.
 
 When the ReportDataSource is created, the reporting-operator:
 
-- Checks if the `ReportDataSource` has a view created for it yet by checking the `status.tableRef` ***REMOVED***eld.
-- If it ***REMOVED***eld is empty, it creates a view by creating a `PrestoTable` resource with `spec.view` set to true, and `spec.query` set the rendered value of the ReportQuery's spec.query ***REMOVED***eld.
+- Checks if the `ReportDataSource` has a view created for it yet by checking the `status.tableRef` field.
+- If it field is empty, it creates a view by creating a `PrestoTable` resource with `spec.view` set to true, and `spec.query` set the rendered value of the ReportQuery's spec.query field.
 - It then waits for the PrestoTable's `spec.tableName` to be set, and updates the ReportDataSource's `spec.tableRef` to indicate the view was created successfully.
 
 #### PrestoTable ReportDataSources
 
-A `PrestoTable` ReportDataSource con***REMOVED***gures the reporting-operator to simply lookup the speci***REMOVED***ed `PrestoTable` and associate it with the ReportDataSource.
+A `PrestoTable` ReportDataSource configures the reporting-operator to simply lookup the specified `PrestoTable` and associate it with the ReportDataSource.
 
 When the ReportDataSource is created, the reporting-operator:
 
-- Lookups the `PrestoTable` resource and veri***REMOVED***es it's `status.tableName` is set.
+- Lookups the `PrestoTable` resource and verifies it's `status.tableName` is set.
 - If the `status.tableName` is set then it will update the ReportDataSource's `spec.tableRef` to the tableName.
 
 ### ReportQuery
 
-For user-docs containing a description of the ***REMOVED***elds, and examples, see [ReportQueries][reportqueries].
+For user-docs containing a description of the fields, and examples, see [ReportQueries][reportqueries].
 
 When the reporting operator sees a new `ReportQuery` in its namespace, it will reprocess anything that depends on it (ReportDataSources or Reports).
 
 ### Report
 
-For user-docs containing a description of the ***REMOVED***elds, and examples, see [Reports][reports].
+For user-docs containing a description of the fields, and examples, see [Reports][reports].
 
 When a `Report` is created, and it sees the creation event, it does the following to generate the results:
 
@@ -134,7 +134,7 @@ When a `Report` is created, and it sees the creation event, it does the followin
 - For each `ReportQuery`, `ReportDataSource` and `Report` input in the `spec.inputs`, retrieve and validate them, and any of their dependencies.
 - Update the Report status to indicate we're beginning to generate the report.
 - Evaluate the `ReportQuery` template, passing the StartPeriod & EndPeriod into the template context.
-- Create a database table using Hive named after the Report. This table is either con***REMOVED***gured to use HDFS or S3 based on the Report's StorageLocation.
+- Create a database table using Hive named after the Report. This table is either configured to use HDFS or S3 based on the Report's StorageLocation.
 - Execute the query using Presto.
 - Update the Report status that everything succeeded.
 
@@ -142,7 +142,7 @@ When a `Report` is created, and it sees the creation event, it does the followin
 [hive-overview]: https://cwiki.apache.org/confluence/display/Hive/Home#Home-ApacheHive
 [presto-connector]: https://prestosql.io/docs/current/overview/concepts.html#connector
 [AWS-billing]: https://docs.aws.amazon.com/awsaccountbilling/latest/aboutv2/billing-reports-costusage.html
-[metering-aws-billing-conf]: con***REMOVED***guring-aws-billing.md
+[metering-aws-billing-conf]: configuring-aws-billing.md
 [storagelocations]: storagelocations.md
 [reportdatasources]: reportdatasources.md
 [reportqueries]: reportqueries.md

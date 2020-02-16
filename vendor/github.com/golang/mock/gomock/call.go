@@ -1,7 +1,7 @@
 // Copyright 2010 Google Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this ***REMOVED***le except in compliance with the License.
+// you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 //
 //     http://www.apache.org/licenses/LICENSE-2.0
@@ -9,7 +9,7 @@
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the speci***REMOVED***c language governing permissions and
+// See the License for the specific language governing permissions and
 // limitations under the License.
 
 package gomock
@@ -29,7 +29,7 @@ type Call struct {
 	method     string       // the name of the method
 	methodType reflect.Type // the type of the method
 	args       []Matcher    // the args
-	origin     string       // ***REMOVED***le and line number of call setup
+	origin     string       // file and line number of call setup
 
 	preReqs []*Call // prerequisite calls
 
@@ -56,11 +56,11 @@ func newCall(t TestReporter, receiver interface{}, method string, methodType ref
 	for i, arg := range args {
 		if m, ok := arg.(Matcher); ok {
 			margs[i] = m
-		} ***REMOVED*** if arg == nil {
+		} else if arg == nil {
 			// Handle nil specially so that passing a nil interface value
 			// will match the typed nils of concrete args.
 			margs[i] = Nil()
-		} ***REMOVED*** {
+		} else {
 			margs[i] = Eq(arg)
 		}
 	}
@@ -80,12 +80,12 @@ func newCall(t TestReporter, receiver interface{}, method string, methodType ref
 
 // AnyTimes allows the expectation to be called 0 or more times
 func (c *Call) AnyTimes() *Call {
-	c.minCalls, c.maxCalls = 0, 1e8 // close enough to in***REMOVED***nity
+	c.minCalls, c.maxCalls = 0, 1e8 // close enough to infinity
 	return c
 }
 
 // MinTimes requires the call to occur at least n times. If AnyTimes or MaxTimes have not been called, MinTimes also
-// sets the maximum number of calls to in***REMOVED***nity.
+// sets the maximum number of calls to infinity.
 func (c *Call) MinTimes(n int) *Call {
 	c.minCalls = n
 	if c.maxCalls == 1 {
@@ -108,7 +108,7 @@ func (c *Call) MaxTimes(n int) *Call {
 // The return values from this function are returned by the mocked function.
 // It takes an interface{} argument to support n-arity functions.
 func (c *Call) DoAndReturn(f interface{}) *Call {
-	// TODO: Check arity and types here, rather than dying badly ***REMOVED***where.
+	// TODO: Check arity and types here, rather than dying badly elsewhere.
 	v := reflect.ValueOf(f)
 
 	c.addAction(func(args []interface{}) []interface{} {
@@ -117,7 +117,7 @@ func (c *Call) DoAndReturn(f interface{}) *Call {
 		for i := 0; i < len(args); i++ {
 			if args[i] != nil {
 				vargs[i] = reflect.ValueOf(args[i])
-			} ***REMOVED*** {
+			} else {
 				// Use the zero value for the arg.
 				vargs[i] = reflect.Zero(ft.In(i))
 			}
@@ -137,7 +137,7 @@ func (c *Call) DoAndReturn(f interface{}) *Call {
 // return values call DoAndReturn.
 // It takes an interface{} argument to support n-arity functions.
 func (c *Call) Do(f interface{}) *Call {
-	// TODO: Check arity and types here, rather than dying badly ***REMOVED***where.
+	// TODO: Check arity and types here, rather than dying badly elsewhere.
 	v := reflect.ValueOf(f)
 
 	c.addAction(func(args []interface{}) []interface{} {
@@ -146,7 +146,7 @@ func (c *Call) Do(f interface{}) *Call {
 		for i := 0; i < len(args); i++ {
 			if args[i] != nil {
 				vargs[i] = reflect.ValueOf(args[i])
-			} ***REMOVED*** {
+			} else {
 				// Use the zero value for the arg.
 				vargs[i] = reflect.Zero(ft.In(i))
 			}
@@ -171,7 +171,7 @@ func (c *Call) Return(rets ...interface{}) *Call {
 	for i, ret := range rets {
 		if got, want := reflect.TypeOf(ret), mt.Out(i); got == want {
 			// Identical types; nothing to do.
-		} ***REMOVED*** if got == nil {
+		} else if got == nil {
 			// Nil needs special handling.
 			switch want.Kind() {
 			case reflect.Chan, reflect.Func, reflect.Interface, reflect.Map, reflect.Ptr, reflect.Slice:
@@ -180,13 +180,13 @@ func (c *Call) Return(rets ...interface{}) *Call {
 				c.t.Fatalf("argument %d to Return for %T.%v is nil, but %v is not nillable [%s]",
 					i, c.receiver, c.method, want, c.origin)
 			}
-		} ***REMOVED*** if got.AssignableTo(want) {
+		} else if got.AssignableTo(want) {
 			// Assignable type relation. Make the assignment now so that the generated code
 			// can return the values with a type assertion.
 			v := reflect.New(want).Elem()
 			v.Set(reflect.ValueOf(ret))
 			rets[i] = v.Interface()
-		} ***REMOVED*** {
+		} else {
 			c.t.Fatalf("wrong type of argument %d to Return for %T.%v: %v is not assignable to %v [%s]",
 				i, c.receiver, c.method, got, want, c.origin)
 		}
@@ -280,7 +280,7 @@ func (c *Call) After(preReq *Call) *Call {
 }
 
 // Returns true if the minimum number of calls have been made.
-func (c *Call) satis***REMOVED***ed() bool {
+func (c *Call) satisfied() bool {
 	return c.numCalls >= c.minCalls
 }
 
@@ -313,7 +313,7 @@ func (c *Call) matches(args []interface{}) error {
 					c.origin, strconv.Itoa(i), args[i], m)
 			}
 		}
-	} ***REMOVED*** {
+	} else {
 		if len(c.args) < c.methodType.NumIn()-1 {
 			return fmt.Errorf("Expected call at %s has the wrong number of matchers. Got: %d, want: %d",
 				c.origin, len(c.args), c.methodType.NumIn()-1)
@@ -380,10 +380,10 @@ func (c *Call) matches(args []interface{}) error {
 		}
 	}
 
-	// Check that all prerequisite calls have been satis***REMOVED***ed.
+	// Check that all prerequisite calls have been satisfied.
 	for _, preReqCall := range c.preReqs {
-		if !preReqCall.satis***REMOVED***ed() {
-			return fmt.Errorf("Expected call at %s doesn't have a prerequisite call satis***REMOVED***ed:\n%v\nshould be called before:\n%v",
+		if !preReqCall.satisfied() {
+			return fmt.Errorf("Expected call at %s doesn't have a prerequisite call satisfied:\n%v\nshould be called before:\n%v",
 				c.origin, preReqCall, c)
 		}
 	}

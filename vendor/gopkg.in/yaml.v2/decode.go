@@ -117,7 +117,7 @@ func (p *parser) fail() {
 		if p.parser.error == yaml_SCANNER_ERROR {
 			line++
 		}
-	} ***REMOVED*** if p.parser.context_mark.line != 0 {
+	} else if p.parser.context_mark.line != 0 {
 		line = p.parser.context_mark.line
 	}
 	if line != 0 {
@@ -126,7 +126,7 @@ func (p *parser) fail() {
 	var msg string
 	if len(p.parser.problem) > 0 {
 		msg = p.parser.problem
-	} ***REMOVED*** {
+	} else {
 		msg = "unknown problem parsing YAML content"
 	}
 	failf("%s%s", where, msg)
@@ -254,7 +254,7 @@ func (d *decoder) terror(n *node, tag string, out reflect.Value) {
 	if tag != yaml_SEQ_TAG && tag != yaml_MAP_TAG {
 		if len(value) > 10 {
 			value = " `" + value[:7] + "...`"
-		} ***REMOVED*** {
+		} else {
 			value = " `" + value + "`"
 		}
 	}
@@ -372,7 +372,7 @@ func (d *decoder) scalar(n *node, out reflect.Value) bool {
 	if n.tag == "" && !n.implicit {
 		tag = yaml_STR_TAG
 		resolved = n.value
-	} ***REMOVED*** {
+	} else {
 		tag, resolved = resolve(n.tag, n.value)
 		if tag == yaml_BINARY_TAG {
 			data, err := base64.StdEncoding.DecodeString(resolved.(string))
@@ -385,7 +385,7 @@ func (d *decoder) scalar(n *node, out reflect.Value) bool {
 	if resolved == nil {
 		if out.Kind() == reflect.Map && !out.CanAddr() {
 			resetMap(out)
-		} ***REMOVED*** {
+		} else {
 			out.Set(reflect.Zero(out.Type()))
 		}
 		return true
@@ -403,7 +403,7 @@ func (d *decoder) scalar(n *node, out reflect.Value) bool {
 			var text []byte
 			if tag == yaml_BINARY_TAG {
 				text = []byte(resolved.(string))
-			} ***REMOVED*** {
+			} else {
 				// We let any value be unmarshaled into TextUnmarshaler.
 				// That might be more lax than we'd like, but the
 				// TextUnmarshaler itself should bowl out any dubious values.
@@ -429,14 +429,14 @@ func (d *decoder) scalar(n *node, out reflect.Value) bool {
 	case reflect.Interface:
 		if resolved == nil {
 			out.Set(reflect.Zero(out.Type()))
-		} ***REMOVED*** if tag == yaml_TIMESTAMP_TAG {
+		} else if tag == yaml_TIMESTAMP_TAG {
 			// It looks like a timestamp but for backward compatibility
 			// reasons we set it as a string, so that code that unmarshals
 			// timestamp-like values into interface{} will continue to
 			// see a string and not a time.Time.
 			// TODO(v3) Drop this.
 			out.Set(reflect.ValueOf(n.value))
-		} ***REMOVED*** {
+		} else {
 			out.Set(reflect.ValueOf(resolved))
 		}
 		return true
@@ -591,7 +591,7 @@ func (d *decoder) mapping(n *node, out reflect.Value) (good bool) {
 			iface := out
 			out = reflect.MakeMap(d.mapType)
 			iface.Set(out)
-		} ***REMOVED*** {
+		} else {
 			slicev := reflect.New(d.mapType).Elem()
 			if !d.mappingSlice(n, slicev) {
 				return false
@@ -711,27 +711,27 @@ func (d *decoder) mappingStruct(n *node, out reflect.Value) (good bool) {
 		if info, ok := sinfo.FieldsMap[name.String()]; ok {
 			if d.strict {
 				if doneFields[info.Id] {
-					d.terrors = append(d.terrors, fmt.Sprintf("line %d: ***REMOVED***eld %s already set in type %s", ni.line+1, name.String(), out.Type()))
+					d.terrors = append(d.terrors, fmt.Sprintf("line %d: field %s already set in type %s", ni.line+1, name.String(), out.Type()))
 					continue
 				}
 				doneFields[info.Id] = true
 			}
-			var ***REMOVED***eld reflect.Value
+			var field reflect.Value
 			if info.Inline == nil {
-				***REMOVED***eld = out.Field(info.Num)
-			} ***REMOVED*** {
-				***REMOVED***eld = out.FieldByIndex(info.Inline)
+				field = out.Field(info.Num)
+			} else {
+				field = out.FieldByIndex(info.Inline)
 			}
-			d.unmarshal(n.children[i+1], ***REMOVED***eld)
-		} ***REMOVED*** if sinfo.InlineMap != -1 {
+			d.unmarshal(n.children[i+1], field)
+		} else if sinfo.InlineMap != -1 {
 			if inlineMap.IsNil() {
 				inlineMap.Set(reflect.MakeMap(inlineMap.Type()))
 			}
 			value := reflect.New(elemType).Elem()
 			d.unmarshal(n.children[i+1], value)
 			d.setMapIndex(n.children[i+1], inlineMap, name, value)
-		} ***REMOVED*** if d.strict {
-			d.terrors = append(d.terrors, fmt.Sprintf("line %d: ***REMOVED***eld %s not found in type %s", ni.line+1, name.String(), out.Type()))
+		} else if d.strict {
+			d.terrors = append(d.terrors, fmt.Sprintf("line %d: field %s not found in type %s", ni.line+1, name.String(), out.Type()))
 		}
 	}
 	return true
@@ -760,7 +760,7 @@ func (d *decoder) merge(n *node, out reflect.Value) {
 				if ok && an.kind != mappingNode {
 					failWantMap()
 				}
-			} ***REMOVED*** if ni.kind != mappingNode {
+			} else if ni.kind != mappingNode {
 				failWantMap()
 			}
 			d.unmarshal(ni, out)

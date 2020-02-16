@@ -94,7 +94,7 @@ func TestValidateQueryDependencies(t *testing.T) {
 			err := ValidateQueryDependencies(&tt.deps, nil)
 			if tt.expectErr {
 				assert.NotNil(t, err, "expected a validation error")
-			} ***REMOVED*** {
+			} else {
 				assert.NoError(t, err, "expected validation to pass")
 			}
 		})

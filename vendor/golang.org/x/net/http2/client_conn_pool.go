@@ -1,6 +1,6 @@
 // Copyright 2015 The Go Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE ***REMOVED***le.
+// license that can be found in the LICENSE file.
 
 // Transport code's client connection pooling.
 
@@ -166,7 +166,7 @@ func (c *addConnCall) run(t *Transport, key string, tc *tls.Conn) {
 	p.mu.Lock()
 	if err != nil {
 		c.err = err
-	} ***REMOVED*** {
+	} else {
 		p.addConnLocked(key, cc)
 	}
 	delete(p.addConnCalls, key)
@@ -205,10 +205,10 @@ func (p *clientConnPool) MarkDead(cc *ClientConn) {
 		if !ok {
 			continue
 		}
-		newList := ***REMOVED***lterOutClientConn(vv, cc)
+		newList := filterOutClientConn(vv, cc)
 		if len(newList) > 0 {
 			p.conns[key] = newList
-		} ***REMOVED*** {
+		} else {
 			delete(p.conns, key)
 		}
 	}
@@ -222,7 +222,7 @@ func (p *clientConnPool) closeIdleConnections() {
 	// milliseconds ago and has never been used. There's currently
 	// a small race window with the HTTP/1 Transport's integration
 	// where it can add an idle conn just before using it, and
-	// somebody ***REMOVED*** can concurrently call CloseIdleConns and
+	// somebody else can concurrently call CloseIdleConns and
 	// break some caller's RoundTrip.
 	for _, vv := range p.conns {
 		for _, cc := range vv {
@@ -231,14 +231,14 @@ func (p *clientConnPool) closeIdleConnections() {
 	}
 }
 
-func ***REMOVED***lterOutClientConn(in []*ClientConn, exclude *ClientConn) []*ClientConn {
+func filterOutClientConn(in []*ClientConn, exclude *ClientConn) []*ClientConn {
 	out := in[:0]
 	for _, v := range in {
 		if v != exclude {
 			out = append(out, v)
 		}
 	}
-	// If we ***REMOVED***ltered it out, zero out the last item to prevent
+	// If we filtered it out, zero out the last item to prevent
 	// the GC from seeing it.
 	if len(in) != len(out) {
 		in[len(in)-1] = nil

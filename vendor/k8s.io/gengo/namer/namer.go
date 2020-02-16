@@ -2,7 +2,7 @@
 Copyright 2015 The Kubernetes Authors.
 
 Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this ***REMOVED***le except in compliance with the License.
+you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
 
     http://www.apache.org/licenses/LICENSE-2.0
@@ -10,14 +10,14 @@ You may obtain a copy of the License at
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the speci***REMOVED***c language governing permissions and
+See the License for the specific language governing permissions and
 limitations under the License.
 */
 
 package namer
 
 import (
-	"path/***REMOVED***lepath"
+	"path/filepath"
 	"strings"
 
 	"k8s.io/gengo/types"
@@ -25,7 +25,7 @@ import (
 
 const (
 	// GoSeperator is used to split go import paths.
-	// Forward slash is used instead of ***REMOVED***lepath.Seperator because it is the
+	// Forward slash is used instead of filepath.Seperator because it is the
 	// only universally-accepted path delimiter and the only delimiter not
 	// potentially forbidden by Go compilers. (In particular gc does not allow
 	// the use of backslashes in import paths.)
@@ -86,7 +86,7 @@ func NewRawNamer(pkg string, tracker ImportTracker) *rawNamer {
 	return &rawNamer{pkg: pkg, tracker: tracker}
 }
 
-// Names is a map from Type to name, as de***REMOVED***ned by some Namer.
+// Names is a map from Type to name, as defined by some Namer.
 type Names map[*types.Type]string
 
 // Namer takes a type, and assigns a name.
@@ -96,7 +96,7 @@ type Names map[*types.Type]string
 // public interface, a private implementation struct, and also to reference
 // literally the type name.
 //
-// Note that it is safe to call your own Name() function recursively to ***REMOVED***nd
+// Note that it is safe to call your own Name() function recursively to find
 // the names of keys, elements, etc. This is because anonymous types can't have
 // cycles in their names, and named types don't require the sort of recursion
 // that would be problematic.
@@ -111,8 +111,8 @@ type NameSystems map[string]Namer
 // Public/PrivateNamer variables, and modify the members you wish to change.
 //
 // The Name method produces a name for the given type, of the forms:
-// Anonymous types: <Pre***REMOVED***x><Type description><Suf***REMOVED***x>
-// Named types: <Pre***REMOVED***x><Optional Prepended Package name(s)><Original name><Suf***REMOVED***x>
+// Anonymous types: <Prefix><Type description><Suffix>
+// Named types: <Prefix><Optional Prepended Package name(s)><Original name><Suffix>
 //
 // In all cases, every part of the name is run through the capitalization
 // functions.
@@ -120,14 +120,14 @@ type NameSystems map[string]Namer
 // The IgnoreWords map can be set if you have directory names that are
 // semantically meaningless for naming purposes, e.g. "proto".
 //
-// Pre***REMOVED***x and Suf***REMOVED***x can be used to disambiguate parallel systems of type
+// Prefix and Suffix can be used to disambiguate parallel systems of type
 // names. For example, if you want to generate an interface and an
-// implementation, you might want to suf***REMOVED***x one with "Interface" and the other
+// implementation, you might want to suffix one with "Interface" and the other
 // with "Implementation". Another common use-- if you want to generate private
 // types, and one of your source types could be "string", you can't use the
-// default lowercase private namer. You'll have to add a suf***REMOVED***x or pre***REMOVED***x.
+// default lowercase private namer. You'll have to add a suffix or prefix.
 type NameStrategy struct {
-	Pre***REMOVED***x, Suf***REMOVED***x string
+	Prefix, Suffix string
 	Join           func(pre string, parts []string, post string) string
 
 	// Add non-meaningful package directory names here (e.g. "proto") and
@@ -147,7 +147,7 @@ type NameStrategy struct {
 	Names
 }
 
-// IC ensures the ***REMOVED***rst character is uppercase.
+// IC ensures the first character is uppercase.
 func IC(in string) string {
 	if in == "" {
 		return in
@@ -155,7 +155,7 @@ func IC(in string) string {
 	return strings.ToUpper(in[:1]) + in[1:]
 }
 
-// IL ensures the ***REMOVED***rst character is lowercase.
+// IL ensures the first character is lowercase.
 func IL(in string) string {
 	if in == "" {
 		return in
@@ -166,28 +166,28 @@ func IL(in string) string {
 // Joiner lets you specify functions that preprocess the various components of
 // a name before joining them. You can construct e.g. camelCase or CamelCase or
 // any other way of joining words. (See the IC and IL convenience functions.)
-func Joiner(***REMOVED***rst, others func(string) string) func(pre string, in []string, post string) string {
+func Joiner(first, others func(string) string) func(pre string, in []string, post string) string {
 	return func(pre string, in []string, post string) string {
 		tmp := []string{others(pre)}
 		for i := range in {
 			tmp = append(tmp, others(in[i]))
 		}
 		tmp = append(tmp, others(post))
-		return ***REMOVED***rst(strings.Join(tmp, ""))
+		return first(strings.Join(tmp, ""))
 	}
 }
 
-func (ns *NameStrategy) removePre***REMOVED***xAndSuf***REMOVED***x(s string) string {
+func (ns *NameStrategy) removePrefixAndSuffix(s string) string {
 	// The join function may have changed capitalization.
 	lowerIn := strings.ToLower(s)
-	lowerP := strings.ToLower(ns.Pre***REMOVED***x)
-	lowerS := strings.ToLower(ns.Suf***REMOVED***x)
+	lowerP := strings.ToLower(ns.Prefix)
+	lowerS := strings.ToLower(ns.Suffix)
 	b, e := 0, len(s)
-	if strings.HasPre***REMOVED***x(lowerIn, lowerP) {
-		b = len(ns.Pre***REMOVED***x)
+	if strings.HasPrefix(lowerIn, lowerP) {
+		b = len(ns.Prefix)
 	}
-	if strings.HasSuf***REMOVED***x(lowerIn, lowerS) {
-		e -= len(ns.Suf***REMOVED***x)
+	if strings.HasSuffix(lowerIn, lowerS) {
+		e -= len(ns.Suffix)
 	}
 	return s[b:e]
 }
@@ -196,8 +196,8 @@ var (
 	importPathNameSanitizer = strings.NewReplacer("-", "_", ".", "")
 )
 
-// ***REMOVED***lters out unwanted directory names and sanitizes remaining names.
-func (ns *NameStrategy) ***REMOVED***lterDirs(path string) []string {
+// filters out unwanted directory names and sanitizes remaining names.
+func (ns *NameStrategy) filterDirs(path string) []string {
 	allDirs := strings.Split(path, GoSeperator)
 	dirs := make([]string, 0, len(allDirs))
 	for _, p := range allDirs {
@@ -218,13 +218,13 @@ func (ns *NameStrategy) Name(t *types.Type) string {
 	}
 
 	if t.Name.Package != "" {
-		dirs := append(ns.***REMOVED***lterDirs(t.Name.Package), t.Name.Name)
+		dirs := append(ns.filterDirs(t.Name.Package), t.Name.Name)
 		i := ns.PrependPackageNames + 1
 		dn := len(dirs)
 		if i > dn {
 			i = dn
 		}
-		name := ns.Join(ns.Pre***REMOVED***x, dirs[dn-i:], ns.Suf***REMOVED***x)
+		name := ns.Join(ns.Prefix, dirs[dn-i:], ns.Suffix)
 		ns.Names[t] = name
 		return name
 	}
@@ -233,35 +233,35 @@ func (ns *NameStrategy) Name(t *types.Type) string {
 	var name string
 	switch t.Kind {
 	case types.Builtin:
-		name = ns.Join(ns.Pre***REMOVED***x, []string{t.Name.Name}, ns.Suf***REMOVED***x)
+		name = ns.Join(ns.Prefix, []string{t.Name.Name}, ns.Suffix)
 	case types.Map:
-		name = ns.Join(ns.Pre***REMOVED***x, []string{
+		name = ns.Join(ns.Prefix, []string{
 			"Map",
-			ns.removePre***REMOVED***xAndSuf***REMOVED***x(ns.Name(t.Key)),
+			ns.removePrefixAndSuffix(ns.Name(t.Key)),
 			"To",
-			ns.removePre***REMOVED***xAndSuf***REMOVED***x(ns.Name(t.Elem)),
-		}, ns.Suf***REMOVED***x)
+			ns.removePrefixAndSuffix(ns.Name(t.Elem)),
+		}, ns.Suffix)
 	case types.Slice:
-		name = ns.Join(ns.Pre***REMOVED***x, []string{
+		name = ns.Join(ns.Prefix, []string{
 			"Slice",
-			ns.removePre***REMOVED***xAndSuf***REMOVED***x(ns.Name(t.Elem)),
-		}, ns.Suf***REMOVED***x)
+			ns.removePrefixAndSuffix(ns.Name(t.Elem)),
+		}, ns.Suffix)
 	case types.Pointer:
-		name = ns.Join(ns.Pre***REMOVED***x, []string{
+		name = ns.Join(ns.Prefix, []string{
 			"Pointer",
-			ns.removePre***REMOVED***xAndSuf***REMOVED***x(ns.Name(t.Elem)),
-		}, ns.Suf***REMOVED***x)
+			ns.removePrefixAndSuffix(ns.Name(t.Elem)),
+		}, ns.Suffix)
 	case types.Struct:
 		names := []string{"Struct"}
 		for _, m := range t.Members {
-			names = append(names, ns.removePre***REMOVED***xAndSuf***REMOVED***x(ns.Name(m.Type)))
+			names = append(names, ns.removePrefixAndSuffix(ns.Name(m.Type)))
 		}
-		name = ns.Join(ns.Pre***REMOVED***x, names, ns.Suf***REMOVED***x)
+		name = ns.Join(ns.Prefix, names, ns.Suffix)
 	case types.Chan:
-		name = ns.Join(ns.Pre***REMOVED***x, []string{
+		name = ns.Join(ns.Prefix, []string{
 			"Chan",
-			ns.removePre***REMOVED***xAndSuf***REMOVED***x(ns.Name(t.Elem)),
-		}, ns.Suf***REMOVED***x)
+			ns.removePrefixAndSuffix(ns.Name(t.Elem)),
+		}, ns.Suffix)
 	case types.Interface:
 		// TODO: add to name test
 		names := []string{"Interface"}
@@ -269,18 +269,18 @@ func (ns *NameStrategy) Name(t *types.Type) string {
 			// TODO: include function signature
 			names = append(names, m.Name.Name)
 		}
-		name = ns.Join(ns.Pre***REMOVED***x, names, ns.Suf***REMOVED***x)
+		name = ns.Join(ns.Prefix, names, ns.Suffix)
 	case types.Func:
 		// TODO: add to name test
 		parts := []string{"Func"}
 		for _, pt := range t.Signature.Parameters {
-			parts = append(parts, ns.removePre***REMOVED***xAndSuf***REMOVED***x(ns.Name(pt)))
+			parts = append(parts, ns.removePrefixAndSuffix(ns.Name(pt)))
 		}
 		parts = append(parts, "Returns")
 		for _, rt := range t.Signature.Results {
-			parts = append(parts, ns.removePre***REMOVED***xAndSuf***REMOVED***x(ns.Name(rt)))
+			parts = append(parts, ns.removePrefixAndSuffix(ns.Name(rt)))
 		}
-		name = ns.Join(ns.Pre***REMOVED***x, parts, ns.Suf***REMOVED***x)
+		name = ns.Join(ns.Prefix, parts, ns.Suffix)
 	default:
 		name = "unnameable_" + string(t.Kind)
 	}
@@ -305,7 +305,7 @@ type rawNamer struct {
 
 // Name makes a name the way you'd write it to literally refer to type t,
 // making ordinary assumptions about how you've imported t's package (or using
-// r.tracker to speci***REMOVED***cally track the package imports).
+// r.tracker to specifically track the package imports).
 func (r *rawNamer) Name(t *types.Type) string {
 	if r.Names == nil {
 		r.Names = Names{}
@@ -319,14 +319,14 @@ func (r *rawNamer) Name(t *types.Type) string {
 			r.tracker.AddType(t)
 			if t.Name.Package == r.pkg {
 				name = t.Name.Name
-			} ***REMOVED*** {
+			} else {
 				name = r.tracker.LocalNameOf(t.Name.Package) + "." + t.Name.Name
 			}
-		} ***REMOVED*** {
+		} else {
 			if t.Name.Package == r.pkg {
 				name = t.Name.Name
-			} ***REMOVED*** {
-				name = ***REMOVED***lepath.Base(t.Name.Package) + "." + t.Name.Name
+			} else {
+				name = filepath.Base(t.Name.Package) + "." + t.Name.Name
 			}
 		}
 		r.Names[t] = name
@@ -372,7 +372,7 @@ func (r *rawNamer) Name(t *types.Type) string {
 		name = "func(" + strings.Join(params, ",") + ")"
 		if len(results) == 1 {
 			name += " " + results[0]
-		} ***REMOVED*** if len(results) > 1 {
+		} else if len(results) > 1 {
 			name += " (" + strings.Join(results, ",") + ")"
 		}
 	default:

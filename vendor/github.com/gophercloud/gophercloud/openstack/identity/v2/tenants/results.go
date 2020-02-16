@@ -7,7 +7,7 @@ import (
 
 // Tenant is a grouping of users in the identity service.
 type Tenant struct {
-	// ID is a unique identi***REMOVED***er for this tenant.
+	// ID is a unique identifier for this tenant.
 	ID string `json:"id"`
 
 	// Name is a friendlier user-facing name for this tenant.

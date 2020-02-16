@@ -41,7 +41,7 @@ func NewDependencyResolver(
 	}
 }
 
-func (resolver *DependencyResolver) ResolveDependencies(namespace string, inputDefs []metering.ReportQueryInputDe***REMOVED***nition, inputVals []metering.ReportQueryInputValue) (*DependencyResolutionResult, error) {
+func (resolver *DependencyResolver) ResolveDependencies(namespace string, inputDefs []metering.ReportQueryInputDefinition, inputVals []metering.ReportQueryInputValue) (*DependencyResolutionResult, error) {
 	resolverCtx := &resolverContext{
 		reportAccumulator:     make(map[string]*metering.Report),
 		queryAccumulator:      make(map[string]*metering.ReportQuery),
@@ -92,7 +92,7 @@ type resolverContext struct {
 	inputValues           map[string]interface{}
 }
 
-func (resolver *DependencyResolver) resolveDependencies(namespace string, resolverCtx *resolverContext, inputDefs []metering.ReportQueryInputDe***REMOVED***nition, inputVals []metering.ReportQueryInputValue, depth, maxDepth int) error {
+func (resolver *DependencyResolver) resolveDependencies(namespace string, resolverCtx *resolverContext, inputDefs []metering.ReportQueryInputDefinition, inputVals []metering.ReportQueryInputValue, depth, maxDepth int) error {
 	if depth >= maxDepth {
 		return fmt.Errorf("detected a cycle at depth %d", depth)
 	}
@@ -139,7 +139,7 @@ func (resolver *DependencyResolver) resolveDependencies(namespace string, resolv
 			inputType = "time"
 		}
 
-		// unmarshal the data based on the input de***REMOVED***nition type
+		// unmarshal the data based on the input definition type
 		var dst interface{}
 		var err error
 		switch inputType {

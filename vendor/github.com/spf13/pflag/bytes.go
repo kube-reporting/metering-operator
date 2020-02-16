@@ -56,7 +56,7 @@ func (f *FlagSet) GetBytesHex(name string) ([]byte, error) {
 	return val.([]byte), nil
 }
 
-// BytesHexVar de***REMOVED***nes an []byte flag with speci***REMOVED***ed name, default value, and usage string.
+// BytesHexVar defines an []byte flag with specified name, default value, and usage string.
 // The argument p points to an []byte variable in which to store the value of the flag.
 func (f *FlagSet) BytesHexVar(p *[]byte, name string, value []byte, usage string) {
 	f.VarP(newBytesHexValue(value, p), name, "", usage)
@@ -67,7 +67,7 @@ func (f *FlagSet) BytesHexVarP(p *[]byte, name, shorthand string, value []byte, 
 	f.VarP(newBytesHexValue(value, p), name, shorthand, usage)
 }
 
-// BytesHexVar de***REMOVED***nes an []byte flag with speci***REMOVED***ed name, default value, and usage string.
+// BytesHexVar defines an []byte flag with specified name, default value, and usage string.
 // The argument p points to an []byte variable in which to store the value of the flag.
 func BytesHexVar(p *[]byte, name string, value []byte, usage string) {
 	CommandLine.VarP(newBytesHexValue(value, p), name, "", usage)
@@ -78,7 +78,7 @@ func BytesHexVarP(p *[]byte, name, shorthand string, value []byte, usage string)
 	CommandLine.VarP(newBytesHexValue(value, p), name, shorthand, usage)
 }
 
-// BytesHex de***REMOVED***nes an []byte flag with speci***REMOVED***ed name, default value, and usage string.
+// BytesHex defines an []byte flag with specified name, default value, and usage string.
 // The return value is the address of an []byte variable that stores the value of the flag.
 func (f *FlagSet) BytesHex(name string, value []byte, usage string) *[]byte {
 	p := new([]byte)
@@ -93,7 +93,7 @@ func (f *FlagSet) BytesHexP(name, shorthand string, value []byte, usage string) 
 	return p
 }
 
-// BytesHex de***REMOVED***nes an []byte flag with speci***REMOVED***ed name, default value, and usage string.
+// BytesHex defines an []byte flag with specified name, default value, and usage string.
 // The return value is the address of an []byte variable that stores the value of the flag.
 func BytesHex(name string, value []byte, usage string) *[]byte {
 	return CommandLine.BytesHexP(name, "", value, usage)

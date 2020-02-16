@@ -60,7 +60,7 @@ func (c *reports) Get(name string, options metav1.GetOptions) (result *v1.Report
 	return
 }
 
-// List takes label and ***REMOVED***eld selectors, and returns the list of Reports that match those selectors.
+// List takes label and field selectors, and returns the list of Reports that match those selectors.
 func (c *reports) List(opts metav1.ListOptions) (result *v1.ReportList, err error) {
 	var timeout time.Duration
 	if opts.TimeoutSeconds != nil {

@@ -1,6 +1,6 @@
 // Copyright 2015 The Go Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE ***REMOVED***le.
+// license that can be found in the LICENSE file.
 
 // +build ignore
 
@@ -17,7 +17,7 @@ import (
 // These tables are hand-extracted from:
 // http://www.unicode.org/Public/8.0.0/ucd/extracted/DerivedBidiClass.txt
 func visitDefaults(fn func(r rune, c Class)) {
-	// ***REMOVED***rst write default values for ranges listed above.
+	// first write default values for ranges listed above.
 	visitRunes(fn, AL, []rune{
 		0x0600, 0x07BF, // Arabic
 		0x08A0, 0x08FF, // Arabic Extended-A

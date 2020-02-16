@@ -2,7 +2,7 @@
 Copyright 2014 The Kubernetes Authors.
 
 Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this ***REMOVED***le except in compliance with the License.
+you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
 
     http://www.apache.org/licenses/LICENSE-2.0
@@ -10,7 +10,7 @@ You may obtain a copy of the License at
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the speci***REMOVED***c language governing permissions and
+See the License for the specific language governing permissions and
 limitations under the License.
 */
 
@@ -44,7 +44,7 @@ type tokenBucketRateLimiter struct {
 // NewTokenBucketRateLimiter creates a rate limiter which implements a token bucket approach.
 // The rate limiter allows bursts of up to 'burst' to exceed the QPS, while still maintaining a
 // smoothed qps rate of 'qps'.
-// The bucket is initially ***REMOVED***lled with 'burst' tokens, and re***REMOVED***lls at a rate of 'qps'.
+// The bucket is initially filled with 'burst' tokens, and refills at a rate of 'qps'.
 // The maximum number of tokens in the bucket is capped at 'burst'.
 func NewTokenBucketRateLimiter(qps float32, burst int) RateLimiter {
 	limiter := rate.NewLimiter(rate.Limit(qps), burst)

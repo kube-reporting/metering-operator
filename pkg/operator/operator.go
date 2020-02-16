@@ -57,19 +57,19 @@ const (
 	DefaultPrometheusQueryStepSize                       = time.Minute      // Query data from Prometheus at a 60 second resolution (one data point per minute max)
 	DefaultPrometheusQueryChunkSize                      = 5 * time.Minute  // the default value for how much data we will insert into Presto per Prometheus query.
 	DefaultPrometheusDataSourceMaxQueryRangeDuration     = 10 * time.Minute // how much data we will query from Prometheus at once
-	DefaultPrometheusDataSourceMaxBack***REMOVED***llImportDuration = 2 * time.Hour    // how far we will query for backlogged data.
+	DefaultPrometheusDataSourceMaxBackfillImportDuration = 2 * time.Hour    // how far we will query for backlogged data.
 )
 
-type TLSCon***REMOVED***g struct {
+type TLSConfig struct {
 	UseTLS  bool
 	TLSCert string
 	TLSKey  string
 }
 
-func (cfg *TLSCon***REMOVED***g) Valid() error {
+func (cfg *TLSConfig) Valid() error {
 	if cfg.UseTLS {
 		if cfg.TLSCert == "" {
-			return fmt.Errorf("Must set TLS certi***REMOVED***cate if TLS is enabled")
+			return fmt.Errorf("Must set TLS certificate if TLS is enabled")
 		}
 		if cfg.TLSKey == "" {
 			return fmt.Errorf("Must set TLS private key if TLS is enabled")
@@ -78,7 +78,7 @@ func (cfg *TLSCon***REMOVED***g) Valid() error {
 	return nil
 }
 
-type PrometheusCon***REMOVED***g struct {
+type PrometheusConfig struct {
 	Address         string
 	SkipTLSVerify   bool
 	BearerToken     string
@@ -86,14 +86,14 @@ type PrometheusCon***REMOVED***g struct {
 	CAFile          string
 }
 
-type Con***REMOVED***g struct {
+type Config struct {
 	Hostname     string
 	OwnNamespace string
 
 	AllNamespaces    bool
 	TargetNamespaces []string
 
-	Kubecon***REMOVED***g string
+	Kubeconfig string
 
 	APIListen     string
 	MetricsListen string
@@ -125,21 +125,21 @@ type Con***REMOVED***g struct {
 	LogDMLQueries bool
 	LogDDLQueries bool
 
-	PrometheusQueryCon***REMOVED***g                         metering.PrometheusQueryCon***REMOVED***g
+	PrometheusQueryConfig                         metering.PrometheusQueryConfig
 	PrometheusDataSourceMaxQueryRangeDuration     time.Duration
-	PrometheusDataSourceMaxBack***REMOVED***llImportDuration time.Duration
+	PrometheusDataSourceMaxBackfillImportDuration time.Duration
 	PrometheusDataSourceGlobalImportFromTime      *time.Time
 
 	LeaderLeaseDuration time.Duration
 
-	APITLSCon***REMOVED***g     TLSCon***REMOVED***g
-	MetricsTLSCon***REMOVED***g TLSCon***REMOVED***g
-	PrometheusCon***REMOVED***g PrometheusCon***REMOVED***g
+	APITLSConfig     TLSConfig
+	MetricsTLSConfig TLSConfig
+	PrometheusConfig PrometheusConfig
 }
 
 type Reporting struct {
-	cfg        Con***REMOVED***g
-	kubeCon***REMOVED***g *rest.Con***REMOVED***g
+	cfg        Config
+	kubeConfig *rest.Config
 
 	meteringClient cbClientset.Interface
 	kubeClient     corev1.CoreV1Interface
@@ -187,49 +187,49 @@ type Reporting struct {
 	importers   map[string]*prestostore.PrometheusImporter
 }
 
-func New(logger log.FieldLogger, cfg Con***REMOVED***g) (*Reporting, error) {
-	if err := cfg.APITLSCon***REMOVED***g.Valid(); err != nil {
+func New(logger log.FieldLogger, cfg Config) (*Reporting, error) {
+	if err := cfg.APITLSConfig.Valid(); err != nil {
 		return nil, err
 	}
-	if err := cfg.MetricsTLSCon***REMOVED***g.Valid(); err != nil {
+	if err := cfg.MetricsTLSConfig.Valid(); err != nil {
 		return nil, err
 	}
 
-	logger.Debugf("con***REMOVED***g: %s", spew.Sprintf("%+v", cfg))
+	logger.Debugf("config: %s", spew.Sprintf("%+v", cfg))
 
 	if cfg.AllNamespaces {
 		logger.Infof("watching all namespaces for metering.openshift.io resources")
-	} ***REMOVED*** {
+	} else {
 		logger.Infof("watching namespaces %q for metering.openshift.io resources", cfg.TargetNamespaces)
 	}
 
-	con***REMOVED***gOverrides := &clientcmd.Con***REMOVED***gOverrides{}
-	var clientCon***REMOVED***g clientcmd.ClientCon***REMOVED***g
-	if cfg.Kubecon***REMOVED***g == "" {
-		loadingRules := clientcmd.NewDefaultClientCon***REMOVED***gLoadingRules()
-		clientCon***REMOVED***g = clientcmd.NewNonInteractiveDeferredLoadingClientCon***REMOVED***g(loadingRules, con***REMOVED***gOverrides)
-	} ***REMOVED*** {
-		apiCfg, err := clientcmd.LoadFromFile(cfg.Kubecon***REMOVED***g)
+	configOverrides := &clientcmd.ConfigOverrides{}
+	var clientConfig clientcmd.ClientConfig
+	if cfg.Kubeconfig == "" {
+		loadingRules := clientcmd.NewDefaultClientConfigLoadingRules()
+		clientConfig = clientcmd.NewNonInteractiveDeferredLoadingClientConfig(loadingRules, configOverrides)
+	} else {
+		apiCfg, err := clientcmd.LoadFromFile(cfg.Kubeconfig)
 		if err != nil {
 			return nil, err
 		}
-		clientCon***REMOVED***g = clientcmd.NewDefaultClientCon***REMOVED***g(*apiCfg, con***REMOVED***gOverrides)
+		clientConfig = clientcmd.NewDefaultClientConfig(*apiCfg, configOverrides)
 	}
 
 	var err error
-	kubeCon***REMOVED***g, err := clientCon***REMOVED***g.ClientCon***REMOVED***g()
+	kubeConfig, err := clientConfig.ClientConfig()
 	if err != nil {
-		return nil, fmt.Errorf("Unable to get Kubernetes client con***REMOVED***g: %v", err)
+		return nil, fmt.Errorf("Unable to get Kubernetes client config: %v", err)
 	}
 
 	logger.Debugf("setting up Kubernetes client...")
-	kubeClient, err := corev1.NewForCon***REMOVED***g(kubeCon***REMOVED***g)
+	kubeClient, err := corev1.NewForConfig(kubeConfig)
 	if err != nil {
 		return nil, fmt.Errorf("Unable to create Kubernetes client: %v", err)
 	}
 
 	logger.Debugf("setting up Metering client...")
-	meteringClient, err := cbClientset.NewForCon***REMOVED***g(kubeCon***REMOVED***g)
+	meteringClient, err := cbClientset.NewForConfig(kubeConfig)
 	if err != nil {
 		return nil, fmt.Errorf("Unable to create Metering client: %v", err)
 	}
@@ -237,18 +237,18 @@ func New(logger log.FieldLogger, cfg Con***REMOVED***g) (*Reporting, error) {
 	var informerNamespace string
 	if cfg.AllNamespaces {
 		informerNamespace = metav1.NamespaceAll
-	} ***REMOVED*** if len(cfg.TargetNamespaces) == 1 {
+	} else if len(cfg.TargetNamespaces) == 1 {
 		informerNamespace = cfg.TargetNamespaces[0]
-	} ***REMOVED*** if len(cfg.TargetNamespaces) > 1 && !cfg.AllNamespaces {
+	} else if len(cfg.TargetNamespaces) > 1 && !cfg.AllNamespaces {
 		return nil, fmt.Errorf("must set --all-namespaces if more than one namespace is passed to --target-namespaces")
-	} ***REMOVED*** {
+	} else {
 		informerNamespace = cfg.OwnNamespace
 	}
 
 	clock := clock.RealClock{}
 	rand := rand.New(rand.NewSource(clock.Now().Unix()))
 
-	op := newReportingOperator(logger, clock, rand, cfg, kubeCon***REMOVED***g, kubeClient, meteringClient, informerNamespace)
+	op := newReportingOperator(logger, clock, rand, cfg, kubeConfig, kubeClient, meteringClient, informerNamespace)
 
 	return op, nil
 }
@@ -257,8 +257,8 @@ func newReportingOperator(
 	logger log.FieldLogger,
 	clock clock.Clock,
 	rand *rand.Rand,
-	cfg Con***REMOVED***g,
-	kubeCon***REMOVED***g *rest.Con***REMOVED***g,
+	cfg Config,
+	kubeConfig *rest.Config,
 	kubeClient corev1.CoreV1Interface,
 	meteringClient cbClientset.Interface,
 	informerNamespace string,
@@ -297,7 +297,7 @@ func newReportingOperator(
 	op := &Reporting{
 		logger:         logger,
 		cfg:            cfg,
-		kubeCon***REMOVED***g:     kubeCon***REMOVED***g,
+		kubeConfig:     kubeConfig,
 		meteringClient: meteringClient,
 		kubeClient:     kubeClient,
 
@@ -326,7 +326,7 @@ func newReportingOperator(
 	}
 
 	// all eventHandlers are wrapped in an
-	// inTargetNamespaceResourceEventHandler which veri***REMOVED***es the resources
+	// inTargetNamespaceResourceEventHandler which verifies the resources
 	// passed to the eventHandler functions have a metadata.namespace contained
 	// in the list of TargetNamespaces, and if so, runs the eventHandler func.
 	// If TargetNamespaces is empty, it will no-op and return the original
@@ -389,10 +389,10 @@ func (op *Reporting) Run(ctx context.Context) error {
 	go func() {
 		defer wg.Done()
 		var srvErr error
-		if op.cfg.MetricsTLSCon***REMOVED***g.UseTLS {
+		if op.cfg.MetricsTLSConfig.UseTLS {
 			op.logger.Infof("Prometheus metrics server listening with TLS on %s", op.cfg.MetricsListen)
-			srvErr = promServer.ListenAndServeTLS(op.cfg.MetricsTLSCon***REMOVED***g.TLSCert, op.cfg.MetricsTLSCon***REMOVED***g.TLSKey)
-		} ***REMOVED*** {
+			srvErr = promServer.ListenAndServeTLS(op.cfg.MetricsTLSConfig.TLSCert, op.cfg.MetricsTLSConfig.TLSKey)
+		} else {
 			op.logger.Infof("Prometheus metrics server listening on %s", op.cfg.MetricsListen)
 			srvErr = promServer.ListenAndServe()
 		}
@@ -418,7 +418,7 @@ func (op *Reporting) Run(ctx context.Context) error {
 		rootCertPool := x509.NewCertPool()
 		rootCertPool.AppendCertsFromPEM(rootCert)
 
-		hiveTLSCon***REMOVED***g := &tls.Con***REMOVED***g{
+		hiveTLSConfig := &tls.Config{
 			RootCAs:            rootCertPool,
 			InsecureSkipVerify: op.cfg.HiveTLSInsecureSkipVerify,
 		}
@@ -429,12 +429,12 @@ func (op *Reporting) Run(ctx context.Context) error {
 				return fmt.Errorf("error loading Hive client cert/key: %v", err)
 			}
 
-			// mutate the necessary structure ***REMOVED***elds in hiveTLSCon***REMOVED***g to work with client certi***REMOVED***cates
-			hiveTLSCon***REMOVED***g.Certi***REMOVED***cates = []tls.Certi***REMOVED***cate{clientCert}
+			// mutate the necessary structure fields in hiveTLSConfig to work with client certificates
+			hiveTLSConfig.Certificates = []tls.Certificate{clientCert}
 		}
 
 		hiveDialer = hive.TLSDialer{
-			Con***REMOVED***g: hiveTLSCon***REMOVED***g,
+			Config: hiveTLSConfig,
 		}
 	}
 	hiveDB, err := hive.NewConnectorWithDialer(hiveDialer, fmt.Sprintf("hive://%s?batch=500", op.cfg.HiveHost))
@@ -468,7 +468,7 @@ func (op *Reporting) Run(ctx context.Context) error {
 		rootCertPool := x509.NewCertPool()
 		rootCertPool.AppendCertsFromPEM(rootCert)
 
-		prestoTLSCon***REMOVED***g := &tls.Con***REMOVED***g{
+		prestoTLSConfig := &tls.Config{
 			RootCAs:            rootCertPool,
 			InsecureSkipVerify: op.cfg.PrestoTLSInsecureSkipVerify,
 		}
@@ -476,16 +476,16 @@ func (op *Reporting) Run(ctx context.Context) error {
 		if op.cfg.PrestoUseClientCertAuth {
 			clientCert, err := tls.LoadX509KeyPair(op.cfg.PrestoClientCertFile, op.cfg.PrestoClientKeyFile)
 			if err != nil {
-				return fmt.Errorf("presto: Error loading SSL Client cert/key ***REMOVED***le: %v", err)
+				return fmt.Errorf("presto: Error loading SSL Client cert/key file: %v", err)
 			}
-			// mutate the necessary structure ***REMOVED***elds in prestoTLSCon***REMOVED***g to work with client certi***REMOVED***cates
-			prestoTLSCon***REMOVED***g.Certi***REMOVED***cates = []tls.Certi***REMOVED***cate{clientCert}
+			// mutate the necessary structure fields in prestoTLSConfig to work with client certificates
+			prestoTLSConfig.Certificates = []tls.Certificate{clientCert}
 		}
 
-		// build up the http client structure to use the correct certi***REMOVED***cates when TLS/auth is enabled/disabled
+		// build up the http client structure to use the correct certificates when TLS/auth is enabled/disabled
 		httpClient := &http.Client{
 			Transport: &http.Transport{
-				TLSClientCon***REMOVED***g: prestoTLSCon***REMOVED***g,
+				TLSClientConfig: prestoTLSConfig,
 			},
 		}
 
@@ -504,7 +504,7 @@ func (op *Reporting) Run(ctx context.Context) error {
 	}
 	defer prestoQueryer.Close()
 
-	op.promConn, err = op.newPrometheusConnFromURL(op.cfg.PrometheusCon***REMOVED***g.Address)
+	op.promConn, err = op.newPrometheusConnFromURL(op.cfg.PrometheusConfig.Address)
 	if err != nil {
 		return err
 	}
@@ -554,10 +554,10 @@ func (op *Reporting) Run(ctx context.Context) error {
 	go func() {
 		defer wg.Done()
 		var srvErr error
-		if op.cfg.APITLSCon***REMOVED***g.UseTLS {
+		if op.cfg.APITLSConfig.UseTLS {
 			op.logger.Infof("HTTP API server listening with TLS on %s", op.cfg.APIListen)
-			srvErr = httpServer.ListenAndServeTLS(op.cfg.APITLSCon***REMOVED***g.TLSCert, op.cfg.APITLSCon***REMOVED***g.TLSKey)
-		} ***REMOVED*** {
+			srvErr = httpServer.ListenAndServeTLS(op.cfg.APITLSConfig.TLSCert, op.cfg.APITLSConfig.TLSKey)
+		} else {
 			op.logger.Infof("HTTP API server listening on %s", op.cfg.APIListen)
 			srvErr = httpServer.ListenAndServe()
 		}
@@ -593,9 +593,9 @@ func (op *Reporting) Run(ctx context.Context) error {
 	eventBroadcaster.StartRecordingToSink(&corev1.EventSinkImpl{Interface: op.kubeClient.Events(op.cfg.OwnNamespace)})
 	eventRecorder := eventBroadcaster.NewRecorder(scheme.Scheme, v1.EventSource{Component: op.cfg.Hostname})
 
-	rl, err := resourcelock.New(resourcelock.Con***REMOVED***gMapsResourceLock,
+	rl, err := resourcelock.New(resourcelock.ConfigMapsResourceLock,
 		op.cfg.OwnNamespace, "reporting-operator-leader-lease", op.kubeClient,
-		resourcelock.ResourceLockCon***REMOVED***g{
+		resourcelock.ResourceLockConfig{
 			Identity:      op.cfg.Hostname,
 			EventRecorder: eventRecorder,
 		})
@@ -609,7 +609,7 @@ func (op *Reporting) Run(ctx context.Context) error {
 	lostLeaderCtx, leaderCancel := context.WithCancel(context.Background())
 	defer leaderCancel()
 
-	leader, err := leaderelection.NewLeaderElector(leaderelection.LeaderElectionCon***REMOVED***g{
+	leader, err := leaderelection.NewLeaderElector(leaderelection.LeaderElectionConfig{
 		Lock:          rl,
 		LeaseDuration: op.cfg.LeaderLeaseDuration,
 		RenewDeadline: op.cfg.LeaderLeaseDuration / 2,
@@ -689,39 +689,39 @@ func (op *Reporting) Run(ctx context.Context) error {
 }
 
 func (op *Reporting) newPrometheusConnFromURL(url string) (prom.API, error) {
-	transportCon***REMOVED***g := &transport.Con***REMOVED***g{}
-	if op.cfg.PrometheusCon***REMOVED***g.CAFile != "" {
-		if _, err := os.Stat(op.cfg.PrometheusCon***REMOVED***g.CAFile); err == nil {
-			// Use the con***REMOVED***gured CA for communicating to Prometheus
-			transportCon***REMOVED***g.TLS.CAFile = op.cfg.PrometheusCon***REMOVED***g.CAFile
-			op.logger.Infof("using %s as CA for Prometheus", op.cfg.PrometheusCon***REMOVED***g.CAFile)
-		} ***REMOVED*** {
+	transportConfig := &transport.Config{}
+	if op.cfg.PrometheusConfig.CAFile != "" {
+		if _, err := os.Stat(op.cfg.PrometheusConfig.CAFile); err == nil {
+			// Use the configured CA for communicating to Prometheus
+			transportConfig.TLS.CAFile = op.cfg.PrometheusConfig.CAFile
+			op.logger.Infof("using %s as CA for Prometheus", op.cfg.PrometheusConfig.CAFile)
+		} else {
 			return nil, err
 		}
-	} ***REMOVED*** {
+	} else {
 		op.logger.Infof("using system CAs for Prometheus")
-		transportCon***REMOVED***g.TLS.CAData = nil
-		transportCon***REMOVED***g.TLS.CAFile = ""
+		transportConfig.TLS.CAData = nil
+		transportConfig.TLS.CAFile = ""
 	}
 
-	if op.cfg.PrometheusCon***REMOVED***g.SkipTLSVerify {
-		transportCon***REMOVED***g.TLS.Insecure = op.cfg.PrometheusCon***REMOVED***g.SkipTLSVerify
-		transportCon***REMOVED***g.TLS.CAData = nil
-		transportCon***REMOVED***g.TLS.CAFile = ""
+	if op.cfg.PrometheusConfig.SkipTLSVerify {
+		transportConfig.TLS.Insecure = op.cfg.PrometheusConfig.SkipTLSVerify
+		transportConfig.TLS.CAData = nil
+		transportConfig.TLS.CAFile = ""
 	}
-	if op.cfg.PrometheusCon***REMOVED***g.BearerToken != "" {
-		transportCon***REMOVED***g.BearerToken = op.cfg.PrometheusCon***REMOVED***g.BearerToken
+	if op.cfg.PrometheusConfig.BearerToken != "" {
+		transportConfig.BearerToken = op.cfg.PrometheusConfig.BearerToken
 	}
-	if op.cfg.PrometheusCon***REMOVED***g.BearerTokenFile != "" {
-		transportCon***REMOVED***g.BearerTokenFile = op.cfg.PrometheusCon***REMOVED***g.BearerTokenFile
+	if op.cfg.PrometheusConfig.BearerTokenFile != "" {
+		transportConfig.BearerTokenFile = op.cfg.PrometheusConfig.BearerTokenFile
 	}
 
-	roundTripper, err := transport.New(transportCon***REMOVED***g)
+	roundTripper, err := transport.New(transportConfig)
 	if err != nil {
 		return nil, err
 	}
 
-	return op.newPrometheusConn(promapi.Con***REMOVED***g{
+	return op.newPrometheusConn(promapi.Config{
 		Address:      url,
 		RoundTripper: roundTripper,
 	})
@@ -792,8 +792,8 @@ func (op *Reporting) isInitialized() bool {
 	return initialized
 }
 
-func (op *Reporting) newPrometheusConn(promCon***REMOVED***g promapi.Con***REMOVED***g) (prom.API, error) {
-	client, err := promapi.NewClient(promCon***REMOVED***g)
+func (op *Reporting) newPrometheusConn(promConfig promapi.Config) (prom.API, error) {
+	client, err := promapi.NewClient(promConfig)
 	if err != nil {
 		return nil, fmt.Errorf("can't connect to prometheus: %v", err)
 	}
@@ -801,5 +801,5 @@ func (op *Reporting) newPrometheusConn(promCon***REMOVED***g promapi.Con***REMOV
 }
 
 type DependencyResolver interface {
-	ResolveDependencies(namespace string, inputDefs []metering.ReportQueryInputDe***REMOVED***nition, inputVals []metering.ReportQueryInputValue) (*reporting.DependencyResolutionResult, error)
+	ResolveDependencies(namespace string, inputDefs []metering.ReportQueryInputDefinition, inputVals []metering.ReportQueryInputValue) (*reporting.DependencyResolutionResult, error)
 }

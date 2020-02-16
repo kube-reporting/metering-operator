@@ -2,7 +2,7 @@
 Copyright The Kubernetes Authors.
 
 Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this ***REMOVED***le except in compliance with the License.
+you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
 
     http://www.apache.org/licenses/LICENSE-2.0
@@ -10,7 +10,7 @@ You may obtain a copy of the License at
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the speci***REMOVED***c language governing permissions and
+See the License for the specific language governing permissions and
 limitations under the License.
 */
 
@@ -29,42 +29,42 @@ import (
 	rest "k8s.io/client-go/rest"
 )
 
-// MutatingWebhookCon***REMOVED***gurationsGetter has a method to return a MutatingWebhookCon***REMOVED***gurationInterface.
+// MutatingWebhookConfigurationsGetter has a method to return a MutatingWebhookConfigurationInterface.
 // A group's client should implement this interface.
-type MutatingWebhookCon***REMOVED***gurationsGetter interface {
-	MutatingWebhookCon***REMOVED***gurations() MutatingWebhookCon***REMOVED***gurationInterface
+type MutatingWebhookConfigurationsGetter interface {
+	MutatingWebhookConfigurations() MutatingWebhookConfigurationInterface
 }
 
-// MutatingWebhookCon***REMOVED***gurationInterface has methods to work with MutatingWebhookCon***REMOVED***guration resources.
-type MutatingWebhookCon***REMOVED***gurationInterface interface {
-	Create(*v1beta1.MutatingWebhookCon***REMOVED***guration) (*v1beta1.MutatingWebhookCon***REMOVED***guration, error)
-	Update(*v1beta1.MutatingWebhookCon***REMOVED***guration) (*v1beta1.MutatingWebhookCon***REMOVED***guration, error)
+// MutatingWebhookConfigurationInterface has methods to work with MutatingWebhookConfiguration resources.
+type MutatingWebhookConfigurationInterface interface {
+	Create(*v1beta1.MutatingWebhookConfiguration) (*v1beta1.MutatingWebhookConfiguration, error)
+	Update(*v1beta1.MutatingWebhookConfiguration) (*v1beta1.MutatingWebhookConfiguration, error)
 	Delete(name string, options *v1.DeleteOptions) error
 	DeleteCollection(options *v1.DeleteOptions, listOptions v1.ListOptions) error
-	Get(name string, options v1.GetOptions) (*v1beta1.MutatingWebhookCon***REMOVED***guration, error)
-	List(opts v1.ListOptions) (*v1beta1.MutatingWebhookCon***REMOVED***gurationList, error)
+	Get(name string, options v1.GetOptions) (*v1beta1.MutatingWebhookConfiguration, error)
+	List(opts v1.ListOptions) (*v1beta1.MutatingWebhookConfigurationList, error)
 	Watch(opts v1.ListOptions) (watch.Interface, error)
-	Patch(name string, pt types.PatchType, data []byte, subresources ...string) (result *v1beta1.MutatingWebhookCon***REMOVED***guration, err error)
-	MutatingWebhookCon***REMOVED***gurationExpansion
+	Patch(name string, pt types.PatchType, data []byte, subresources ...string) (result *v1beta1.MutatingWebhookConfiguration, err error)
+	MutatingWebhookConfigurationExpansion
 }
 
-// mutatingWebhookCon***REMOVED***gurations implements MutatingWebhookCon***REMOVED***gurationInterface
-type mutatingWebhookCon***REMOVED***gurations struct {
+// mutatingWebhookConfigurations implements MutatingWebhookConfigurationInterface
+type mutatingWebhookConfigurations struct {
 	client rest.Interface
 }
 
-// newMutatingWebhookCon***REMOVED***gurations returns a MutatingWebhookCon***REMOVED***gurations
-func newMutatingWebhookCon***REMOVED***gurations(c *AdmissionregistrationV1beta1Client) *mutatingWebhookCon***REMOVED***gurations {
-	return &mutatingWebhookCon***REMOVED***gurations{
+// newMutatingWebhookConfigurations returns a MutatingWebhookConfigurations
+func newMutatingWebhookConfigurations(c *AdmissionregistrationV1beta1Client) *mutatingWebhookConfigurations {
+	return &mutatingWebhookConfigurations{
 		client: c.RESTClient(),
 	}
 }
 
-// Get takes name of the mutatingWebhookCon***REMOVED***guration, and returns the corresponding mutatingWebhookCon***REMOVED***guration object, and an error if there is any.
-func (c *mutatingWebhookCon***REMOVED***gurations) Get(name string, options v1.GetOptions) (result *v1beta1.MutatingWebhookCon***REMOVED***guration, err error) {
-	result = &v1beta1.MutatingWebhookCon***REMOVED***guration{}
+// Get takes name of the mutatingWebhookConfiguration, and returns the corresponding mutatingWebhookConfiguration object, and an error if there is any.
+func (c *mutatingWebhookConfigurations) Get(name string, options v1.GetOptions) (result *v1beta1.MutatingWebhookConfiguration, err error) {
+	result = &v1beta1.MutatingWebhookConfiguration{}
 	err = c.client.Get().
-		Resource("mutatingwebhookcon***REMOVED***gurations").
+		Resource("mutatingwebhookconfigurations").
 		Name(name).
 		VersionedParams(&options, scheme.ParameterCodec).
 		Do().
@@ -72,15 +72,15 @@ func (c *mutatingWebhookCon***REMOVED***gurations) Get(name string, options v1.G
 	return
 }
 
-// List takes label and ***REMOVED***eld selectors, and returns the list of MutatingWebhookCon***REMOVED***gurations that match those selectors.
-func (c *mutatingWebhookCon***REMOVED***gurations) List(opts v1.ListOptions) (result *v1beta1.MutatingWebhookCon***REMOVED***gurationList, err error) {
+// List takes label and field selectors, and returns the list of MutatingWebhookConfigurations that match those selectors.
+func (c *mutatingWebhookConfigurations) List(opts v1.ListOptions) (result *v1beta1.MutatingWebhookConfigurationList, err error) {
 	var timeout time.Duration
 	if opts.TimeoutSeconds != nil {
 		timeout = time.Duration(*opts.TimeoutSeconds) * time.Second
 	}
-	result = &v1beta1.MutatingWebhookCon***REMOVED***gurationList{}
+	result = &v1beta1.MutatingWebhookConfigurationList{}
 	err = c.client.Get().
-		Resource("mutatingwebhookcon***REMOVED***gurations").
+		Resource("mutatingwebhookconfigurations").
 		VersionedParams(&opts, scheme.ParameterCodec).
 		Timeout(timeout).
 		Do().
@@ -88,47 +88,47 @@ func (c *mutatingWebhookCon***REMOVED***gurations) List(opts v1.ListOptions) (re
 	return
 }
 
-// Watch returns a watch.Interface that watches the requested mutatingWebhookCon***REMOVED***gurations.
-func (c *mutatingWebhookCon***REMOVED***gurations) Watch(opts v1.ListOptions) (watch.Interface, error) {
+// Watch returns a watch.Interface that watches the requested mutatingWebhookConfigurations.
+func (c *mutatingWebhookConfigurations) Watch(opts v1.ListOptions) (watch.Interface, error) {
 	var timeout time.Duration
 	if opts.TimeoutSeconds != nil {
 		timeout = time.Duration(*opts.TimeoutSeconds) * time.Second
 	}
 	opts.Watch = true
 	return c.client.Get().
-		Resource("mutatingwebhookcon***REMOVED***gurations").
+		Resource("mutatingwebhookconfigurations").
 		VersionedParams(&opts, scheme.ParameterCodec).
 		Timeout(timeout).
 		Watch()
 }
 
-// Create takes the representation of a mutatingWebhookCon***REMOVED***guration and creates it.  Returns the server's representation of the mutatingWebhookCon***REMOVED***guration, and an error, if there is any.
-func (c *mutatingWebhookCon***REMOVED***gurations) Create(mutatingWebhookCon***REMOVED***guration *v1beta1.MutatingWebhookCon***REMOVED***guration) (result *v1beta1.MutatingWebhookCon***REMOVED***guration, err error) {
-	result = &v1beta1.MutatingWebhookCon***REMOVED***guration{}
+// Create takes the representation of a mutatingWebhookConfiguration and creates it.  Returns the server's representation of the mutatingWebhookConfiguration, and an error, if there is any.
+func (c *mutatingWebhookConfigurations) Create(mutatingWebhookConfiguration *v1beta1.MutatingWebhookConfiguration) (result *v1beta1.MutatingWebhookConfiguration, err error) {
+	result = &v1beta1.MutatingWebhookConfiguration{}
 	err = c.client.Post().
-		Resource("mutatingwebhookcon***REMOVED***gurations").
-		Body(mutatingWebhookCon***REMOVED***guration).
+		Resource("mutatingwebhookconfigurations").
+		Body(mutatingWebhookConfiguration).
 		Do().
 		Into(result)
 	return
 }
 
-// Update takes the representation of a mutatingWebhookCon***REMOVED***guration and updates it. Returns the server's representation of the mutatingWebhookCon***REMOVED***guration, and an error, if there is any.
-func (c *mutatingWebhookCon***REMOVED***gurations) Update(mutatingWebhookCon***REMOVED***guration *v1beta1.MutatingWebhookCon***REMOVED***guration) (result *v1beta1.MutatingWebhookCon***REMOVED***guration, err error) {
-	result = &v1beta1.MutatingWebhookCon***REMOVED***guration{}
+// Update takes the representation of a mutatingWebhookConfiguration and updates it. Returns the server's representation of the mutatingWebhookConfiguration, and an error, if there is any.
+func (c *mutatingWebhookConfigurations) Update(mutatingWebhookConfiguration *v1beta1.MutatingWebhookConfiguration) (result *v1beta1.MutatingWebhookConfiguration, err error) {
+	result = &v1beta1.MutatingWebhookConfiguration{}
 	err = c.client.Put().
-		Resource("mutatingwebhookcon***REMOVED***gurations").
-		Name(mutatingWebhookCon***REMOVED***guration.Name).
-		Body(mutatingWebhookCon***REMOVED***guration).
+		Resource("mutatingwebhookconfigurations").
+		Name(mutatingWebhookConfiguration.Name).
+		Body(mutatingWebhookConfiguration).
 		Do().
 		Into(result)
 	return
 }
 
-// Delete takes name of the mutatingWebhookCon***REMOVED***guration and deletes it. Returns an error if one occurs.
-func (c *mutatingWebhookCon***REMOVED***gurations) Delete(name string, options *v1.DeleteOptions) error {
+// Delete takes name of the mutatingWebhookConfiguration and deletes it. Returns an error if one occurs.
+func (c *mutatingWebhookConfigurations) Delete(name string, options *v1.DeleteOptions) error {
 	return c.client.Delete().
-		Resource("mutatingwebhookcon***REMOVED***gurations").
+		Resource("mutatingwebhookconfigurations").
 		Name(name).
 		Body(options).
 		Do().
@@ -136,13 +136,13 @@ func (c *mutatingWebhookCon***REMOVED***gurations) Delete(name string, options *
 }
 
 // DeleteCollection deletes a collection of objects.
-func (c *mutatingWebhookCon***REMOVED***gurations) DeleteCollection(options *v1.DeleteOptions, listOptions v1.ListOptions) error {
+func (c *mutatingWebhookConfigurations) DeleteCollection(options *v1.DeleteOptions, listOptions v1.ListOptions) error {
 	var timeout time.Duration
 	if listOptions.TimeoutSeconds != nil {
 		timeout = time.Duration(*listOptions.TimeoutSeconds) * time.Second
 	}
 	return c.client.Delete().
-		Resource("mutatingwebhookcon***REMOVED***gurations").
+		Resource("mutatingwebhookconfigurations").
 		VersionedParams(&listOptions, scheme.ParameterCodec).
 		Timeout(timeout).
 		Body(options).
@@ -150,11 +150,11 @@ func (c *mutatingWebhookCon***REMOVED***gurations) DeleteCollection(options *v1.
 		Error()
 }
 
-// Patch applies the patch and returns the patched mutatingWebhookCon***REMOVED***guration.
-func (c *mutatingWebhookCon***REMOVED***gurations) Patch(name string, pt types.PatchType, data []byte, subresources ...string) (result *v1beta1.MutatingWebhookCon***REMOVED***guration, err error) {
-	result = &v1beta1.MutatingWebhookCon***REMOVED***guration{}
+// Patch applies the patch and returns the patched mutatingWebhookConfiguration.
+func (c *mutatingWebhookConfigurations) Patch(name string, pt types.PatchType, data []byte, subresources ...string) (result *v1beta1.MutatingWebhookConfiguration, err error) {
+	result = &v1beta1.MutatingWebhookConfiguration{}
 	err = c.client.Patch(pt).
-		Resource("mutatingwebhookcon***REMOVED***gurations").
+		Resource("mutatingwebhookconfigurations").
 		SubResource(subresources...).
 		Name(name).
 		Body(data).

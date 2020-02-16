@@ -11,11 +11,11 @@ import (
 	"github.com/operator-framework/operator-metering/test/reportingframework"
 )
 
-func testInvalidMeteringCon***REMOVED***gMissingStorageSpec(t *testing.T, rf *reportingframework.ReportingFramework) {
+func testInvalidMeteringConfigMissingStorageSpec(t *testing.T, rf *reportingframework.ReportingFramework) {
 	require.NotNil(t, rf, "expected the reportingframework object would not be nil")
-	require.NotNil(t, rf.MeteringClient, "expected the reportingframework.MeteringClient ***REMOVED***eld would not be nil")
-	require.NotEmpty(t, rf.Namespace, "expected the reportingframework.Namespace ***REMOVED***eld would not be empty")
+	require.NotNil(t, rf.MeteringClient, "expected the reportingframework.MeteringClient field would not be nil")
+	require.NotEmpty(t, rf.Namespace, "expected the reportingframework.Namespace field would not be empty")
 
-	mc, err := rf.MeteringClient.MeteringCon***REMOVED***gs(rf.Namespace).Get("operator-metering", meta.GetOptions{})
-	require.Truef(t, apierrors.IsNotFound(err), "expected the MeteringCon***REMOVED***g to not exist, got: %v, err: %v", mc, err)
+	mc, err := rf.MeteringClient.MeteringConfigs(rf.Namespace).Get("operator-metering", meta.GetOptions{})
+	require.Truef(t, apierrors.IsNotFound(err), "expected the MeteringConfig to not exist, got: %v, err: %v", mc, err)
 }

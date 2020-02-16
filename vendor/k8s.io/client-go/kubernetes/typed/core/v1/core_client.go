@@ -2,7 +2,7 @@
 Copyright The Kubernetes Authors.
 
 Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this ***REMOVED***le except in compliance with the License.
+you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
 
     http://www.apache.org/licenses/LICENSE-2.0
@@ -10,7 +10,7 @@ You may obtain a copy of the License at
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the speci***REMOVED***c language governing permissions and
+See the License for the specific language governing permissions and
 limitations under the License.
 */
 
@@ -28,7 +28,7 @@ import (
 type CoreV1Interface interface {
 	RESTClient() rest.Interface
 	ComponentStatusesGetter
-	Con***REMOVED***gMapsGetter
+	ConfigMapsGetter
 	EndpointsGetter
 	EventsGetter
 	LimitRangesGetter
@@ -54,8 +54,8 @@ func (c *CoreV1Client) ComponentStatuses() ComponentStatusInterface {
 	return newComponentStatuses(c)
 }
 
-func (c *CoreV1Client) Con***REMOVED***gMaps(namespace string) Con***REMOVED***gMapInterface {
-	return newCon***REMOVED***gMaps(c, namespace)
+func (c *CoreV1Client) ConfigMaps(namespace string) ConfigMapInterface {
+	return newConfigMaps(c, namespace)
 }
 
 func (c *CoreV1Client) Endpoints(namespace string) EndpointsInterface {
@@ -114,23 +114,23 @@ func (c *CoreV1Client) ServiceAccounts(namespace string) ServiceAccountInterface
 	return newServiceAccounts(c, namespace)
 }
 
-// NewForCon***REMOVED***g creates a new CoreV1Client for the given con***REMOVED***g.
-func NewForCon***REMOVED***g(c *rest.Con***REMOVED***g) (*CoreV1Client, error) {
-	con***REMOVED***g := *c
-	if err := setCon***REMOVED***gDefaults(&con***REMOVED***g); err != nil {
+// NewForConfig creates a new CoreV1Client for the given config.
+func NewForConfig(c *rest.Config) (*CoreV1Client, error) {
+	config := *c
+	if err := setConfigDefaults(&config); err != nil {
 		return nil, err
 	}
-	client, err := rest.RESTClientFor(&con***REMOVED***g)
+	client, err := rest.RESTClientFor(&config)
 	if err != nil {
 		return nil, err
 	}
 	return &CoreV1Client{client}, nil
 }
 
-// NewForCon***REMOVED***gOrDie creates a new CoreV1Client for the given con***REMOVED***g and
-// panics if there is an error in the con***REMOVED***g.
-func NewForCon***REMOVED***gOrDie(c *rest.Con***REMOVED***g) *CoreV1Client {
-	client, err := NewForCon***REMOVED***g(c)
+// NewForConfigOrDie creates a new CoreV1Client for the given config and
+// panics if there is an error in the config.
+func NewForConfigOrDie(c *rest.Config) *CoreV1Client {
+	client, err := NewForConfig(c)
 	if err != nil {
 		panic(err)
 	}
@@ -142,14 +142,14 @@ func New(c rest.Interface) *CoreV1Client {
 	return &CoreV1Client{c}
 }
 
-func setCon***REMOVED***gDefaults(con***REMOVED***g *rest.Con***REMOVED***g) error {
+func setConfigDefaults(config *rest.Config) error {
 	gv := v1.SchemeGroupVersion
-	con***REMOVED***g.GroupVersion = &gv
-	con***REMOVED***g.APIPath = "/api"
-	con***REMOVED***g.NegotiatedSerializer = serializer.DirectCodecFactory{CodecFactory: scheme.Codecs}
+	config.GroupVersion = &gv
+	config.APIPath = "/api"
+	config.NegotiatedSerializer = serializer.DirectCodecFactory{CodecFactory: scheme.Codecs}
 
-	if con***REMOVED***g.UserAgent == "" {
-		con***REMOVED***g.UserAgent = rest.DefaultKubernetesUserAgent()
+	if config.UserAgent == "" {
+		config.UserAgent = rest.DefaultKubernetesUserAgent()
 	}
 
 	return nil

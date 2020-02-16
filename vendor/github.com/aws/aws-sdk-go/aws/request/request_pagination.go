@@ -14,8 +14,8 @@ import (
 // "S3.ListObjectsPages", and "S3.ListObjectsPagesWithContext" methods.
 //
 // Pagination differs from a Paginator type in that pagination is the type that
-// does the pagination between API operations, and Paginator de***REMOVED***nes the
-// con***REMOVED***guration that will be used per page request.
+// does the pagination between API operations, and Paginator defines the
+// configuration that will be used per page request.
 //
 //     cont := true
 //     for p.Next() && cont {
@@ -28,12 +28,12 @@ import (
 // use the Pagination type.
 type Pagination struct {
 	// Function to return a Request value for each pagination request.
-	// Any con***REMOVED***guration or handlers that need to be applied to the request
+	// Any configuration or handlers that need to be applied to the request
 	// prior to getting the next page should be done here before the request
 	// returned.
 	//
 	// NewRequest should always be built from the same API operations. It is
-	// unde***REMOVED***ned if different API operations are returned on subsequent calls.
+	// undefined if different API operations are returned on subsequent calls.
 	NewRequest func() (*Request, error)
 	// EndPageOnSameToken, when enabled, will allow the paginator to stop on
 	// token that are the same as its previous tokens.
@@ -70,7 +70,7 @@ func (p *Pagination) Err() error {
 }
 
 // Page returns the current page. Page should only be called after a successful
-// call to Next. It is unde***REMOVED***ned what Page will return if Page is called after
+// call to Next. It is undefined what Page will return if Page is called after
 // Next returns false.
 func (p *Pagination) Page() interface{} {
 	return p.curPage
@@ -115,9 +115,9 @@ func (p *Pagination) Next() bool {
 	return true
 }
 
-// A Paginator is the con***REMOVED***guration data that de***REMOVED***nes how an API operation
-// should be paginated. This type is used by the API service models to de***REMOVED***ne
-// the generated pagination con***REMOVED***g for service APIs.
+// A Paginator is the configuration data that defines how an API operation
+// should be paginated. This type is used by the API service models to define
+// the generated pagination config for service APIs.
 //
 // The Pagination type is what provides iterating between pages of an API. It
 // is only used to store the token metadata the SDK should use for performing
@@ -203,10 +203,10 @@ var (
 
 // HasNextPage returns true if this request has more pages of data available.
 //
-// Deprecated Use Pagination type for con***REMOVED***gurable pagination of API operations
+// Deprecated Use Pagination type for configurable pagination of API operations
 func (r *Request) HasNextPage() bool {
-	logDeprecatedf(r.Con***REMOVED***g.Logger, &logDeprecatedHasNextPage,
-		"Request.HasNextPage deprecated. Use Pagination type for con***REMOVED***gurable pagination of API operations")
+	logDeprecatedf(r.Config.Logger, &logDeprecatedHasNextPage,
+		"Request.HasNextPage deprecated. Use Pagination type for configurable pagination of API operations")
 
 	return len(r.nextPageTokens()) > 0
 }
@@ -214,10 +214,10 @@ func (r *Request) HasNextPage() bool {
 // NextPage returns a new Request that can be executed to return the next
 // page of result data. Call .Send() on this request to execute it.
 //
-// Deprecated Use Pagination type for con***REMOVED***gurable pagination of API operations
+// Deprecated Use Pagination type for configurable pagination of API operations
 func (r *Request) NextPage() *Request {
-	logDeprecatedf(r.Con***REMOVED***g.Logger, &logDeprecatedNextPage,
-		"Request.NextPage deprecated. Use Pagination type for con***REMOVED***gurable pagination of API operations")
+	logDeprecatedf(r.Config.Logger, &logDeprecatedNextPage,
+		"Request.NextPage deprecated. Use Pagination type for configurable pagination of API operations")
 
 	tokens := r.nextPageTokens()
 	if len(tokens) == 0 {
@@ -225,7 +225,7 @@ func (r *Request) NextPage() *Request {
 	}
 
 	data := reflect.New(reflect.TypeOf(r.Data).Elem()).Interface()
-	nr := New(r.Con***REMOVED***g, r.ClientInfo, r.Handlers, r.Retryer, r.Operation, awsutil.CopyOf(r.Params), data)
+	nr := New(r.Config, r.ClientInfo, r.Handlers, r.Retryer, r.Operation, awsutil.CopyOf(r.Params), data)
 	for i, intok := range nr.Operation.InputTokens {
 		awsutil.SetValueAtPath(nr.Params, intok, tokens[i])
 	}
@@ -246,10 +246,10 @@ func (r *Request) NextPage() *Request {
 // the last page of data or not. The return value of this function should
 // return true to keep iterating or false to stop.
 //
-// Deprecated Use Pagination type for con***REMOVED***gurable pagination of API operations
+// Deprecated Use Pagination type for configurable pagination of API operations
 func (r *Request) EachPage(fn func(data interface{}, isLastPage bool) (shouldContinue bool)) error {
-	logDeprecatedf(r.Con***REMOVED***g.Logger, &logDeprecatedEachPage,
-		"Request.EachPage deprecated. Use Pagination type for con***REMOVED***gurable pagination of API operations")
+	logDeprecatedf(r.Config.Logger, &logDeprecatedEachPage,
+		"Request.EachPage deprecated. Use Pagination type for configurable pagination of API operations")
 
 	for page := r; page != nil; page = page.NextPage() {
 		if err := page.Send(); err != nil {

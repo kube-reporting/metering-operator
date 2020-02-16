@@ -8,9 +8,9 @@ import (
 	"github.com/aws/aws-sdk-go/aws/awserr"
 )
 
-type modelDe***REMOVED***nition map[string]json.RawMessage
+type modelDefinition map[string]json.RawMessage
 
-// A DecodeModelOptions are the options for how the endpoints model de***REMOVED***nition
+// A DecodeModelOptions are the options for how the endpoints model definition
 // are decoded.
 type DecodeModelOptions struct {
 	SkipCustomizations bool
@@ -23,8 +23,8 @@ func (d *DecodeModelOptions) Set(optFns ...func(*DecodeModelOptions)) {
 	}
 }
 
-// DecodeModel unmarshals a Regions and Endpoint model de***REMOVED***nition ***REMOVED***le into
-// a endpoint Resolver. If the ***REMOVED***le format is not supported, or an error occurs
+// DecodeModel unmarshals a Regions and Endpoint model definition file into
+// a endpoint Resolver. If the file format is not supported, or an error occurs
 // when unmarshaling the model an error will be returned.
 //
 // Casting the return value of this func to a EnumPartitions will
@@ -41,9 +41,9 @@ func DecodeModel(r io.Reader, optFns ...func(*DecodeModelOptions)) (Resolver, er
 	var opts DecodeModelOptions
 	opts.Set(optFns...)
 
-	// Get the version of the partition ***REMOVED***le to determine what
+	// Get the version of the partition file to determine what
 	// unmarshaling model to use.
-	modelDef := modelDe***REMOVED***nition{}
+	modelDef := modelDefinition{}
 	if err := json.NewDecoder(r).Decode(&modelDef); err != nil {
 		return nil, newDecodeModelError("failed to decode endpoints model", err)
 	}
@@ -51,7 +51,7 @@ func DecodeModel(r io.Reader, optFns ...func(*DecodeModelOptions)) (Resolver, er
 	var version string
 	if b, ok := modelDef["version"]; ok {
 		version = string(b)
-	} ***REMOVED*** {
+	} else {
 		return nil, newDecodeModelError("endpoints version not found in model", nil)
 	}
 
@@ -63,7 +63,7 @@ func DecodeModel(r io.Reader, optFns ...func(*DecodeModelOptions)) (Resolver, er
 		fmt.Sprintf("endpoints version %s, not supported", version), nil)
 }
 
-func decodeV3Endpoints(modelDef modelDe***REMOVED***nition, opts DecodeModelOptions) (Resolver, error) {
+func decodeV3Endpoints(modelDef modelDefinition, opts DecodeModelOptions) (Resolver, error) {
 	b, ok := modelDef["partitions"]
 	if !ok {
 		return nil, newDecodeModelError("endpoints model missing partitions", nil)
@@ -107,7 +107,7 @@ func custAddDualstack(p *partition, svcName string) {
 	}
 
 	s.Defaults.HasDualStack = boxedTrue
-	s.Defaults.DualStackHostname = "{service}.dualstack.{region}.{dnsSuf***REMOVED***x}"
+	s.Defaults.DualStackHostname = "{service}.dualstack.{region}.{dnsSuffix}"
 
 	p.Services[svcName] = s
 }

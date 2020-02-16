@@ -43,7 +43,7 @@ type HiveStorage struct {
 
 type HiveStorageDefaultTableProperties struct {
 	RowFormat  string `json:"rowFormat,omitempty"`
-	FileFormat string `json:"***REMOVED***leFormat,omitempty"`
+	FileFormat string `json:"fileFormat,omitempty"`
 }
 
 type StorageLocationStatus struct {

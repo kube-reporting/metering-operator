@@ -8,7 +8,7 @@ import (
 	"time"
 )
 
-// Transport that should be used when a custom CA bundle is speci***REMOVED***ed with the
+// Transport that should be used when a custom CA bundle is specified with the
 // SDK.
 func getCABundleTransport() *http.Transport {
 	return &http.Transport{

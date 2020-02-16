@@ -1,13 +1,13 @@
 package aws
 
 import (
-	"path/***REMOVED***lepath"
+	"path/filepath"
 	"time"
 
 	"github.com/sirupsen/logrus"
 )
 
-// Manifest is a representation of the ***REMOVED***le AWS provides with metadata for current usage information.
+// Manifest is a representation of the file AWS provides with metadata for current usage information.
 type Manifest struct {
 	AssemblyID             string               `json:"assemblyId"`
 	Account                string               `json:"account"`
@@ -28,7 +28,7 @@ type BillingPeriod struct {
 	End   Time `json:"end"`
 }
 
-// Column is a description of a ***REMOVED***eld from a AWS usage report manifest ***REMOVED***le.
+// Column is a description of a field from a AWS usage report manifest file.
 type Column struct {
 	Category string `json:"category"`
 	Name     string `json:"name"`
@@ -58,7 +58,7 @@ func (m Manifest) paths() []string {
 	seen := make(map[string]struct{})
 	var paths []string
 	for _, key := range m.ReportKeys {
-		dirPath := ***REMOVED***lepath.Dir(key)
+		dirPath := filepath.Dir(key)
 		if _, exists := seen[dirPath]; exists {
 			continue
 		}

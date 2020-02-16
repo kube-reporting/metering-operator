@@ -56,19 +56,19 @@ func init() {
 	}
 }
 
-const longTagPre***REMOVED***x = "tag:yaml.org,2002:"
+const longTagPrefix = "tag:yaml.org,2002:"
 
 func shortTag(tag string) string {
 	// TODO This can easily be made faster and produce less garbage.
-	if strings.HasPre***REMOVED***x(tag, longTagPre***REMOVED***x) {
-		return "!!" + tag[len(longTagPre***REMOVED***x):]
+	if strings.HasPrefix(tag, longTagPrefix) {
+		return "!!" + tag[len(longTagPrefix):]
 	}
 	return tag
 }
 
 func longTag(tag string) string {
-	if strings.HasPre***REMOVED***x(tag, "!!") {
-		return longTagPre***REMOVED***x + tag[2:]
+	if strings.HasPrefix(tag, "!!") {
+		return longTagPrefix + tag[2:]
 	}
 	return tag
 }
@@ -110,7 +110,7 @@ func resolve(tag string, in string) (rtag string, out interface{}) {
 	}()
 
 	// Any data is accepted as a !!str or !!binary.
-	// Otherwise, the pre***REMOVED***x is enough of a hint about what it might be.
+	// Otherwise, the prefix is enough of a hint about what it might be.
 	hint := byte('N')
 	if in != "" {
 		hint = resolveTable[in[0]]
@@ -152,7 +152,7 @@ func resolve(tag string, in string) (rtag string, out interface{}) {
 			if err == nil {
 				if intv == int64(int(intv)) {
 					return yaml_INT_TAG, int(intv)
-				} ***REMOVED*** {
+				} else {
 					return yaml_INT_TAG, intv
 				}
 			}
@@ -166,12 +166,12 @@ func resolve(tag string, in string) (rtag string, out interface{}) {
 					return yaml_FLOAT_TAG, floatv
 				}
 			}
-			if strings.HasPre***REMOVED***x(plain, "0b") {
+			if strings.HasPrefix(plain, "0b") {
 				intv, err := strconv.ParseInt(plain[2:], 2, 64)
 				if err == nil {
 					if intv == int64(int(intv)) {
 						return yaml_INT_TAG, int(intv)
-					} ***REMOVED*** {
+					} else {
 						return yaml_INT_TAG, intv
 					}
 				}
@@ -179,12 +179,12 @@ func resolve(tag string, in string) (rtag string, out interface{}) {
 				if err == nil {
 					return yaml_INT_TAG, uintv
 				}
-			} ***REMOVED*** if strings.HasPre***REMOVED***x(plain, "-0b") {
+			} else if strings.HasPrefix(plain, "-0b") {
 				intv, err := strconv.ParseInt("-" + plain[3:], 2, 64)
 				if err == nil {
 					if true || intv == int64(int(intv)) {
 						return yaml_INT_TAG, int(intv)
-					} ***REMOVED*** {
+					} else {
 						return yaml_INT_TAG, intv
 					}
 				}
@@ -222,10 +222,10 @@ func encodeBase64(s string) string {
 }
 
 // This is a subset of the formats allowed by the regular expression
-// de***REMOVED***ned at http://yaml.org/type/timestamp.html.
+// defined at http://yaml.org/type/timestamp.html.
 var allowedTimestampFormats = []string{
-	"2006-1-2T15:4:5.999999999Z07:00", // RCF3339Nano with short date ***REMOVED***elds.
-	"2006-1-2t15:4:5.999999999Z07:00", // RFC3339Nano with short date ***REMOVED***elds and lower-case "t".
+	"2006-1-2T15:4:5.999999999Z07:00", // RCF3339Nano with short date fields.
+	"2006-1-2t15:4:5.999999999Z07:00", // RFC3339Nano with short date fields and lower-case "t".
 	"2006-1-2 15:4:5.999999999",       // space separated with no time zone
 	"2006-1-2",                        // date only
 	// Notable exception: time.Parse cannot handle: "2001-12-14 21:59:43.10 -5"
@@ -234,7 +234,7 @@ var allowedTimestampFormats = []string{
 
 // parseTimestamp parses s as a timestamp string and
 // returns the timestamp and reports whether it succeeded.
-// Timestamp formats are de***REMOVED***ned at http://yaml.org/type/timestamp.html
+// Timestamp formats are defined at http://yaml.org/type/timestamp.html
 func parseTimestamp(s string) (time.Time, bool) {
 	// TODO write code to check all the formats supported by
 	// http://yaml.org/type/timestamp.html instead of using time.Parse.

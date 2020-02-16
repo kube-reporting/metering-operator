@@ -1,10 +1,10 @@
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements. See the NOTICE ***REMOVED***le
+ * or more contributor license agreements. See the NOTICE file
  * distributed with this work for additional information
- * regarding copyright ownership. The ASF licenses this ***REMOVED***le
+ * regarding copyright ownership. The ASF licenses this file
  * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this ***REMOVED***le except in compliance
+ * "License"); you may not use this file except in compliance
  * with the License. You may obtain a copy of the License at
  *
  *   http://www.apache.org/licenses/LICENSE-2.0
@@ -13,7 +13,7 @@
  * software distributed under the License is distributed on an
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
  * KIND, either express or implied. See the License for the
- * speci***REMOVED***c language governing permissions and limitations
+ * specific language governing permissions and limitations
  * under the License.
  */
 
@@ -27,27 +27,27 @@ import (
 
 type TSSLSocket struct {
 	conn net.Conn
-	// hostPort contains host:port (e.g. "asdf.com:12345"). The ***REMOVED***eld is
+	// hostPort contains host:port (e.g. "asdf.com:12345"). The field is
 	// only valid if addr is nil.
 	hostPort string
 	// addr is nil when hostPort is not "", and is only used when the
 	// TSSLSocket is constructed from a net.Addr.
 	addr    net.Addr
 	timeout time.Duration
-	cfg     *tls.Con***REMOVED***g
+	cfg     *tls.Config
 }
 
-// NewTSSLSocket creates a net.Conn-backed TTransport, given a host and port and tls Con***REMOVED***guration
+// NewTSSLSocket creates a net.Conn-backed TTransport, given a host and port and tls Configuration
 //
 // Example:
 // 	trans, err := thrift.NewTSSLSocket("localhost:9090", nil)
-func NewTSSLSocket(hostPort string, cfg *tls.Con***REMOVED***g) (*TSSLSocket, error) {
+func NewTSSLSocket(hostPort string, cfg *tls.Config) (*TSSLSocket, error) {
 	return NewTSSLSocketTimeout(hostPort, cfg, 0)
 }
 
 // NewTSSLSocketTimeout creates a net.Conn-backed TTransport, given a host and port
-// it also accepts a tls Con***REMOVED***guration and a timeout as a time.Duration
-func NewTSSLSocketTimeout(hostPort string, cfg *tls.Con***REMOVED***g, timeout time.Duration) (*TSSLSocket, error) {
+// it also accepts a tls Configuration and a timeout as a time.Duration
+func NewTSSLSocketTimeout(hostPort string, cfg *tls.Config, timeout time.Duration) (*TSSLSocket, error) {
 	if cfg.MinVersion == 0 {
 		cfg.MinVersion = tls.VersionTLS10
 	}
@@ -55,12 +55,12 @@ func NewTSSLSocketTimeout(hostPort string, cfg *tls.Con***REMOVED***g, timeout t
 }
 
 // Creates a TSSLSocket from a net.Addr
-func NewTSSLSocketFromAddrTimeout(addr net.Addr, cfg *tls.Con***REMOVED***g, timeout time.Duration) *TSSLSocket {
+func NewTSSLSocketFromAddrTimeout(addr net.Addr, cfg *tls.Config, timeout time.Duration) *TSSLSocket {
 	return &TSSLSocket{addr: addr, timeout: timeout, cfg: cfg}
 }
 
 // Creates a TSSLSocket from an existing net.Conn
-func NewTSSLSocketFromConnTimeout(conn net.Conn, cfg *tls.Con***REMOVED***g, timeout time.Duration) *TSSLSocket {
+func NewTSSLSocketFromConnTimeout(conn net.Conn, cfg *tls.Config, timeout time.Duration) *TSSLSocket {
 	return &TSSLSocket{conn: conn, addr: conn.RemoteAddr(), timeout: timeout, cfg: cfg}
 }
 
@@ -77,9 +77,9 @@ func (p *TSSLSocket) pushDeadline(read, write bool) {
 	}
 	if read && write {
 		p.conn.SetDeadline(t)
-	} ***REMOVED*** if read {
+	} else if read {
 		p.conn.SetReadDeadline(t)
-	} ***REMOVED*** if write {
+	} else if write {
 		p.conn.SetWriteDeadline(t)
 	}
 }
@@ -88,13 +88,13 @@ func (p *TSSLSocket) pushDeadline(read, write bool) {
 func (p *TSSLSocket) Open() error {
 	var err error
 	// If we have a hostname, we need to pass the hostname to tls.Dial for
-	// certi***REMOVED***cate hostname checks.
+	// certificate hostname checks.
 	if p.hostPort != "" {
 		if p.conn, err = tls.DialWithDialer(&net.Dialer{
 			Timeout: p.timeout}, "tcp", p.hostPort, p.cfg); err != nil {
 			return NewTTransportException(NOT_OPEN, err.Error())
 		}
-	} ***REMOVED*** {
+	} else {
 		if p.IsOpen() {
 			return NewTTransportException(ALREADY_OPEN, "Socket already connected.")
 		}

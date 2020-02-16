@@ -1,4 +1,4 @@
-# Input ***REMOVED***le is the role binding we're creating multiple copies of.
+# Input file is the role binding we're creating multiple copies of.
 . as $rolebinding
 # $METERING_OPERATOR_TARGET_NAMESPACES is a comma separated list of namespaces
 # to create this rolebinding in. Falls back to $METERING_NAMESPACE.
@@ -15,7 +15,7 @@
         . as $namespace
         # The base rolebinding going into the list.
         | $rolebinding
-        # Update the rolebinding's name to be pre***REMOVED***xed with our namespace,
+        # Update the rolebinding's name to be prefixed with our namespace,
         # in case other metering-operators are targeting the namespace.
         | .metadata.name = $namespace + "-" + .metadata.name
         # Update the rolebinding's namespace.

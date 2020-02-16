@@ -77,14 +77,14 @@ func buildLocationElements(r *request.Request, v reflect.Value, buildGETQuery bo
 		}
 
 		if m.IsValid() {
-			***REMOVED***eld := v.Type().Field(i)
-			name := ***REMOVED***eld.Tag.Get("locationName")
+			field := v.Type().Field(i)
+			name := field.Tag.Get("locationName")
 			if name == "" {
-				name = ***REMOVED***eld.Name
+				name = field.Name
 			}
 			if kind := m.Kind(); kind == reflect.Ptr {
 				m = m.Elem()
-			} ***REMOVED*** if kind == reflect.Interface {
+			} else if kind == reflect.Interface {
 				if !m.Elem().IsValid() {
 					continue
 				}
@@ -92,7 +92,7 @@ func buildLocationElements(r *request.Request, v reflect.Value, buildGETQuery bo
 			if !m.IsValid() {
 				continue
 			}
-			if ***REMOVED***eld.Tag.Get("ignore") != "" {
+			if field.Tag.Get("ignore") != "" {
 				continue
 			}
 
@@ -100,23 +100,23 @@ func buildLocationElements(r *request.Request, v reflect.Value, buildGETQuery bo
 			// blob even though they were modeled as a string. Required for S3
 			// API operations like SSECustomerKey is modeled as stirng but
 			// required to be base64 encoded in request.
-			if ***REMOVED***eld.Tag.Get("marshal-as") == "blob" {
+			if field.Tag.Get("marshal-as") == "blob" {
 				m = m.Convert(byteSliceType)
 			}
 
 			var err error
-			switch ***REMOVED***eld.Tag.Get("location") {
+			switch field.Tag.Get("location") {
 			case "headers": // header maps
-				err = buildHeaderMap(&r.HTTPRequest.Header, m, ***REMOVED***eld.Tag)
+				err = buildHeaderMap(&r.HTTPRequest.Header, m, field.Tag)
 			case "header":
-				err = buildHeader(&r.HTTPRequest.Header, m, name, ***REMOVED***eld.Tag)
+				err = buildHeader(&r.HTTPRequest.Header, m, name, field.Tag)
 			case "uri":
-				err = buildURI(r.HTTPRequest.URL, m, name, ***REMOVED***eld.Tag)
+				err = buildURI(r.HTTPRequest.URL, m, name, field.Tag)
 			case "querystring":
-				err = buildQueryString(query, m, name, ***REMOVED***eld.Tag)
+				err = buildQueryString(query, m, name, field.Tag)
 			default:
 				if buildGETQuery {
-					err = buildQueryString(query, m, name, ***REMOVED***eld.Tag)
+					err = buildQueryString(query, m, name, field.Tag)
 				}
 			}
 			r.Error = err
@@ -127,16 +127,16 @@ func buildLocationElements(r *request.Request, v reflect.Value, buildGETQuery bo
 	}
 
 	r.HTTPRequest.URL.RawQuery = query.Encode()
-	if !aws.BoolValue(r.Con***REMOVED***g.DisableRestProtocolURICleaning) {
+	if !aws.BoolValue(r.Config.DisableRestProtocolURICleaning) {
 		cleanPath(r.HTTPRequest.URL)
 	}
 }
 
 func buildBody(r *request.Request, v reflect.Value) {
-	if ***REMOVED***eld, ok := v.Type().FieldByName("_"); ok {
-		if payloadName := ***REMOVED***eld.Tag.Get("payload"); payloadName != "" {
-			p***REMOVED***eld, _ := v.Type().FieldByName(payloadName)
-			if ptag := p***REMOVED***eld.Tag.Get("type"); ptag != "" && ptag != "structure" {
+	if field, ok := v.Type().FieldByName("_"); ok {
+		if payloadName := field.Tag.Get("payload"); payloadName != "" {
+			pfield, _ := v.Type().FieldByName(payloadName)
+			if ptag := pfield.Tag.Get("type"); ptag != "" && ptag != "structure" {
 				payload := reflect.Indirect(v.FieldByName(payloadName))
 				if payload.IsValid() && payload.Interface() != nil {
 					switch reader := payload.Interface().(type) {
@@ -161,7 +161,7 @@ func buildHeader(header *http.Header, v reflect.Value, name string, tag reflect.
 	str, err := convertType(v, tag)
 	if err == errValueNotSet {
 		return nil
-	} ***REMOVED*** if err != nil {
+	} else if err != nil {
 		return awserr.New(request.ErrCodeSerialization, "failed to encode REST request", err)
 	}
 
@@ -174,19 +174,19 @@ func buildHeader(header *http.Header, v reflect.Value, name string, tag reflect.
 }
 
 func buildHeaderMap(header *http.Header, v reflect.Value, tag reflect.StructTag) error {
-	pre***REMOVED***x := tag.Get("locationName")
+	prefix := tag.Get("locationName")
 	for _, key := range v.MapKeys() {
 		str, err := convertType(v.MapIndex(key), tag)
 		if err == errValueNotSet {
 			continue
-		} ***REMOVED*** if err != nil {
+		} else if err != nil {
 			return awserr.New(request.ErrCodeSerialization, "failed to encode REST request", err)
 
 		}
 		keyStr := strings.TrimSpace(key.String())
 		str = strings.TrimSpace(str)
 
-		header.Add(pre***REMOVED***x+keyStr, str)
+		header.Add(prefix+keyStr, str)
 	}
 	return nil
 }
@@ -195,7 +195,7 @@ func buildURI(u *url.URL, v reflect.Value, name string, tag reflect.StructTag) e
 	value, err := convertType(v, tag)
 	if err == errValueNotSet {
 		return nil
-	} ***REMOVED*** if err != nil {
+	} else if err != nil {
 		return awserr.New(request.ErrCodeSerialization, "failed to encode REST request", err)
 	}
 
@@ -228,7 +228,7 @@ func buildQueryString(query url.Values, v reflect.Value, name string, tag reflec
 		str, err := convertType(v, tag)
 		if err == errValueNotSet {
 			return nil
-		} ***REMOVED*** if err != nil {
+		} else if err != nil {
 			return awserr.New(request.ErrCodeSerialization, "failed to encode REST request", err)
 		}
 		query.Set(name, str)
@@ -238,13 +238,13 @@ func buildQueryString(query url.Values, v reflect.Value, name string, tag reflec
 }
 
 func cleanPath(u *url.URL) {
-	hasSlash := strings.HasSuf***REMOVED***x(u.Path, "/")
+	hasSlash := strings.HasSuffix(u.Path, "/")
 
 	// clean up path, removing duplicate `/`
 	u.Path = path.Clean(u.Path)
 	u.RawPath = path.Clean(u.RawPath)
 
-	if hasSlash && !strings.HasSuf***REMOVED***x(u.Path, "/") {
+	if hasSlash && !strings.HasSuffix(u.Path, "/") {
 		u.Path += "/"
 		u.RawPath += "/"
 	}
@@ -257,7 +257,7 @@ func EscapePath(path string, encodeSep bool) string {
 		c := path[i]
 		if noEscape[c] || (c == '/' && !encodeSep) {
 			buf.WriteByte(c)
-		} ***REMOVED*** {
+		} else {
 			fmt.Fprintf(&buf, "%%%02X", c)
 		}
 	}

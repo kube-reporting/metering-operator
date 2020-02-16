@@ -1,6 +1,6 @@
 // Copyright 2017 Prometheus Team
 // Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this ***REMOVED***le except in compliance with the License.
+// you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 //
 // http://www.apache.org/licenses/LICENSE-2.0
@@ -8,13 +8,13 @@
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the speci***REMOVED***c language governing permissions and
+// See the License for the specific language governing permissions and
 // limitations under the License.
 
 package procfs
 
 import (
-	"bu***REMOVED***o"
+	"bufio"
 	"fmt"
 	"os"
 	"strconv"
@@ -32,10 +32,10 @@ type XfrmStat struct {
 	// No state found
 	// i.e. either inbound SPI, address, or IPSEC protocol at SA is wrong
 	XfrmInNoStates int
-	// Transformation protocol speci***REMOVED***c error
+	// Transformation protocol specific error
 	// e.g. SA Key is wrong
 	XfrmInStateProtoError int
-	// Transformation mode speci***REMOVED***c error
+	// Transformation mode specific error
 	XfrmInStateModeError int
 	// Sequence error
 	// e.g. sequence number is out of window
@@ -65,9 +65,9 @@ type XfrmStat struct {
 	XfrmOutBundleCheckError int
 	// No state was found
 	XfrmOutNoStates int
-	// Transformation protocol speci***REMOVED***c error
+	// Transformation protocol specific error
 	XfrmOutStateProtoError int
-	// Transportation mode speci***REMOVED***c error
+	// Transportation mode specific error
 	XfrmOutStateModeError int
 	// Sequence error
 	// i.e sequence number overflow
@@ -95,29 +95,29 @@ func NewXfrmStat() (XfrmStat, error) {
 	return fs.NewXfrmStat()
 }
 
-// NewXfrmStat reads the xfrm_stat statistics from the 'proc' ***REMOVED***lesystem.
+// NewXfrmStat reads the xfrm_stat statistics from the 'proc' filesystem.
 func (fs FS) NewXfrmStat() (XfrmStat, error) {
-	***REMOVED***le, err := os.Open(fs.Path("net/xfrm_stat"))
+	file, err := os.Open(fs.Path("net/xfrm_stat"))
 	if err != nil {
 		return XfrmStat{}, err
 	}
-	defer ***REMOVED***le.Close()
+	defer file.Close()
 
 	var (
 		x = XfrmStat{}
-		s = bu***REMOVED***o.NewScanner(***REMOVED***le)
+		s = bufio.NewScanner(file)
 	)
 
 	for s.Scan() {
-		***REMOVED***elds := strings.Fields(s.Text())
+		fields := strings.Fields(s.Text())
 
-		if len(***REMOVED***elds) != 2 {
+		if len(fields) != 2 {
 			return XfrmStat{}, fmt.Errorf(
-				"couldn't parse %s line %s", ***REMOVED***le.Name(), s.Text())
+				"couldn't parse %s line %s", file.Name(), s.Text())
 		}
 
-		name := ***REMOVED***elds[0]
-		value, err := strconv.Atoi(***REMOVED***elds[1])
+		name := fields[0]
+		value, err := strconv.Atoi(fields[1])
 		if err != nil {
 			return XfrmStat{}, err
 		}

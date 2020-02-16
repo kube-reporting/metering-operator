@@ -2,7 +2,7 @@
 Copyright The Kubernetes Authors.
 
 Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this ***REMOVED***le except in compliance with the License.
+you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
 
     http://www.apache.org/licenses/LICENSE-2.0
@@ -10,13 +10,13 @@ You may obtain a copy of the License at
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the speci***REMOVED***c language governing permissions and
+See the License for the specific language governing permissions and
 limitations under the License.
 */
 
 package v1
 
-// This ***REMOVED***le contains a collection of methods that can be used from go-restful to
+// This file contains a collection of methods that can be used from go-restful to
 // generate Swagger API documentation for its models. Please read this PR for more
 // information on the implementation: https://github.com/emicklei/go-restful/pull/215
 //
@@ -28,9 +28,9 @@ package v1
 
 // AUTO-GENERATED FUNCTIONS START HERE. DO NOT EDIT.
 var map_Job = map[string]string{
-	"":         "Job represents the con***REMOVED***guration of a single job.",
+	"":         "Job represents the configuration of a single job.",
 	"metadata": "Standard object's metadata. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#metadata",
-	"spec":     "Speci***REMOVED***cation of the desired behavior of a job. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#spec-and-status",
+	"spec":     "Specification of the desired behavior of a job. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#spec-and-status",
 	"status":   "Current status of a job. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#spec-and-status",
 }
 
@@ -64,14 +64,14 @@ func (JobList) SwaggerDoc() map[string]string {
 
 var map_JobSpec = map[string]string{
 	"":                        "JobSpec describes how the job execution will look like.",
-	"parallelism":             "Speci***REMOVED***es the maximum desired number of pods the job should run at any given time. The actual number of pods running in steady state will be less than this number when ((.spec.completions - .status.successful) < .spec.parallelism), i.e. when the work left to do is less than max parallelism. More info: https://kubernetes.io/docs/concepts/workloads/controllers/jobs-run-to-completion/",
-	"completions":             "Speci***REMOVED***es the desired number of successfully ***REMOVED***nished pods the job should be run with.  Setting to nil means that the success of any pod signals the success of all pods, and allows parallelism to have any positive value.  Setting to 1 means that parallelism is limited to 1 and the success of that pod signals the success of the job. More info: https://kubernetes.io/docs/concepts/workloads/controllers/jobs-run-to-completion/",
-	"activeDeadlineSeconds":   "Speci***REMOVED***es the duration in seconds relative to the startTime that the job may be active before the system tries to terminate it; value must be positive integer",
-	"backoffLimit":            "Speci***REMOVED***es the number of retries before marking this job failed. Defaults to 6",
-	"selector":                "A label query over pods that should match the pod count. Normally, the system sets this ***REMOVED***eld for you. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/#label-selectors",
+	"parallelism":             "Specifies the maximum desired number of pods the job should run at any given time. The actual number of pods running in steady state will be less than this number when ((.spec.completions - .status.successful) < .spec.parallelism), i.e. when the work left to do is less than max parallelism. More info: https://kubernetes.io/docs/concepts/workloads/controllers/jobs-run-to-completion/",
+	"completions":             "Specifies the desired number of successfully finished pods the job should be run with.  Setting to nil means that the success of any pod signals the success of all pods, and allows parallelism to have any positive value.  Setting to 1 means that parallelism is limited to 1 and the success of that pod signals the success of the job. More info: https://kubernetes.io/docs/concepts/workloads/controllers/jobs-run-to-completion/",
+	"activeDeadlineSeconds":   "Specifies the duration in seconds relative to the startTime that the job may be active before the system tries to terminate it; value must be positive integer",
+	"backoffLimit":            "Specifies the number of retries before marking this job failed. Defaults to 6",
+	"selector":                "A label query over pods that should match the pod count. Normally, the system sets this field for you. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/#label-selectors",
 	"manualSelector":          "manualSelector controls generation of pod labels and pod selectors. Leave `manualSelector` unset unless you are certain what you are doing. When false or unset, the system pick labels unique to this job and appends those labels to the pod template.  When true, the user is responsible for picking unique labels and specifying the selector.  Failure to pick a unique label may cause this and other jobs to not function correctly.  However, You may see `manualSelector=true` in jobs that were created with the old `extensions/v1beta1` API. More info: https://kubernetes.io/docs/concepts/workloads/controllers/jobs-run-to-completion/#specifying-your-own-pod-selector",
 	"template":                "Describes the pod that will be created when executing a job. More info: https://kubernetes.io/docs/concepts/workloads/controllers/jobs-run-to-completion/",
-	"ttlSecondsAfterFinished": "ttlSecondsAfterFinished limits the lifetime of a Job that has ***REMOVED***nished execution (either Complete or Failed). If this ***REMOVED***eld is set, ttlSecondsAfterFinished after the Job ***REMOVED***nishes, it is eligible to be automatically deleted. When the Job is being deleted, its lifecycle guarantees (e.g. ***REMOVED***nalizers) will be honored. If this ***REMOVED***eld is unset, the Job won't be automatically deleted. If this ***REMOVED***eld is set to zero, the Job becomes eligible to be deleted immediately after it ***REMOVED***nishes. This ***REMOVED***eld is alpha-level and is only honored by servers that enable the TTLAfterFinished feature.",
+	"ttlSecondsAfterFinished": "ttlSecondsAfterFinished limits the lifetime of a Job that has finished execution (either Complete or Failed). If this field is set, ttlSecondsAfterFinished after the Job finishes, it is eligible to be automatically deleted. When the Job is being deleted, its lifecycle guarantees (e.g. finalizers) will be honored. If this field is unset, the Job won't be automatically deleted. If this field is set to zero, the Job becomes eligible to be deleted immediately after it finishes. This field is alpha-level and is only honored by servers that enable the TTLAfterFinished feature.",
 }
 
 func (JobSpec) SwaggerDoc() map[string]string {

@@ -2,7 +2,7 @@
 Copyright 2016 The Kubernetes Authors.
 
 Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this ***REMOVED***le except in compliance with the License.
+you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
 
     http://www.apache.org/licenses/LICENSE-2.0
@@ -10,7 +10,7 @@ You may obtain a copy of the License at
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the speci***REMOVED***c language governing permissions and
+See the License for the specific language governing permissions and
 limitations under the License.
 */
 
@@ -19,7 +19,7 @@ package generators
 import (
 	"fmt"
 	"io"
-	"path/***REMOVED***lepath"
+	"path/filepath"
 	"strings"
 
 	clientgentypes "k8s.io/code-generator/cmd/client-gen/types"
@@ -58,7 +58,7 @@ func (g *genClientset) Imports(c *generator.Context) (imports []string) {
 	imports = append(imports, g.imports.ImportLines()...)
 	for _, group := range g.groups {
 		for _, version := range group.Versions {
-			typedClientPath := ***REMOVED***lepath.Join(g.clientsetPackage, "typed", strings.ToLower(group.PackageName), strings.ToLower(version.NonEmpty()))
+			typedClientPath := filepath.Join(g.clientsetPackage, "typed", strings.ToLower(group.PackageName), strings.ToLower(version.NonEmpty()))
 			groupAlias := strings.ToLower(g.groupGoNames[clientgentypes.GroupVersion{Group: group.Group, Version: version.Version}])
 			imports = append(imports, fmt.Sprintf("%s%s \"%s\"", groupAlias, strings.ToLower(version.NonEmpty()), typedClientPath))
 		}
@@ -74,13 +74,13 @@ func (g *genClientset) GenerateType(c *generator.Context, t *types.Type, w io.Wr
 	allGroups := clientgentypes.ToGroupVersionInfo(g.groups, g.groupGoNames)
 	m := map[string]interface{}{
 		"allGroups":                            allGroups,
-		"Con***REMOVED***g":                               c.Universe.Type(types.Name{Package: "k8s.io/client-go/rest", Name: "Con***REMOVED***g"}),
+		"Config":                               c.Universe.Type(types.Name{Package: "k8s.io/client-go/rest", Name: "Config"}),
 		"DefaultKubernetesUserAgent":           c.Universe.Function(types.Name{Package: "k8s.io/client-go/rest", Name: "DefaultKubernetesUserAgent"}),
 		"RESTClientInterface":                  c.Universe.Type(types.Name{Package: "k8s.io/client-go/rest", Name: "Interface"}),
 		"DiscoveryInterface":                   c.Universe.Type(types.Name{Package: "k8s.io/client-go/discovery", Name: "DiscoveryInterface"}),
 		"DiscoveryClient":                      c.Universe.Type(types.Name{Package: "k8s.io/client-go/discovery", Name: "DiscoveryClient"}),
-		"NewDiscoveryClientForCon***REMOVED***g":          c.Universe.Function(types.Name{Package: "k8s.io/client-go/discovery", Name: "NewDiscoveryClientForCon***REMOVED***g"}),
-		"NewDiscoveryClientForCon***REMOVED***gOrDie":     c.Universe.Function(types.Name{Package: "k8s.io/client-go/discovery", Name: "NewDiscoveryClientForCon***REMOVED***gOrDie"}),
+		"NewDiscoveryClientForConfig":          c.Universe.Function(types.Name{Package: "k8s.io/client-go/discovery", Name: "NewDiscoveryClientForConfig"}),
+		"NewDiscoveryClientForConfigOrDie":     c.Universe.Function(types.Name{Package: "k8s.io/client-go/discovery", Name: "NewDiscoveryClientForConfigOrDie"}),
 		"NewDiscoveryClient":                   c.Universe.Function(types.Name{Package: "k8s.io/client-go/discovery", Name: "NewDiscoveryClient"}),
 		"flowcontrolNewTokenBucketRateLimiter": c.Universe.Function(types.Name{Package: "k8s.io/client-go/util/flowcontrol", Name: "NewTokenBucketRateLimiter"}),
 	}
@@ -94,8 +94,8 @@ func (g *genClientset) GenerateType(c *generator.Context, t *types.Type, w io.Wr
 		}
 	}
 	sw.Do(getDiscoveryTemplate, m)
-	sw.Do(newClientsetForCon***REMOVED***gTemplate, m)
-	sw.Do(newClientsetForCon***REMOVED***gOrDieTemplate, m)
+	sw.Do(newClientsetForConfigTemplate, m)
+	sw.Do(newClientsetForConfigOrDieTemplate, m)
 	sw.Do(newClientsetForRESTClientTemplate, m)
 
 	return sw.Error()
@@ -146,21 +146,21 @@ func (c *Clientset) Discovery() $.DiscoveryInterface|raw$ {
 }
 `
 
-var newClientsetForCon***REMOVED***gTemplate = `
-// NewForCon***REMOVED***g creates a new Clientset for the given con***REMOVED***g.
-func NewForCon***REMOVED***g(c *$.Con***REMOVED***g|raw$) (*Clientset, error) {
-	con***REMOVED***gShallowCopy := *c
-	if con***REMOVED***gShallowCopy.RateLimiter == nil && con***REMOVED***gShallowCopy.QPS > 0 {
-		con***REMOVED***gShallowCopy.RateLimiter = $.flowcontrolNewTokenBucketRateLimiter|raw$(con***REMOVED***gShallowCopy.QPS, con***REMOVED***gShallowCopy.Burst)
+var newClientsetForConfigTemplate = `
+// NewForConfig creates a new Clientset for the given config.
+func NewForConfig(c *$.Config|raw$) (*Clientset, error) {
+	configShallowCopy := *c
+	if configShallowCopy.RateLimiter == nil && configShallowCopy.QPS > 0 {
+		configShallowCopy.RateLimiter = $.flowcontrolNewTokenBucketRateLimiter|raw$(configShallowCopy.QPS, configShallowCopy.Burst)
 	}
 	var cs Clientset
 	var err error
-$range .allGroups$    cs.$.LowerCaseGroupGoName$$.Version$, err =$.PackageAlias$.NewForCon***REMOVED***g(&con***REMOVED***gShallowCopy)
+$range .allGroups$    cs.$.LowerCaseGroupGoName$$.Version$, err =$.PackageAlias$.NewForConfig(&configShallowCopy)
 	if err!=nil {
 		return nil, err
 	}
 $end$
-	cs.DiscoveryClient, err = $.NewDiscoveryClientForCon***REMOVED***g|raw$(&con***REMOVED***gShallowCopy)
+	cs.DiscoveryClient, err = $.NewDiscoveryClientForConfig|raw$(&configShallowCopy)
 	if err!=nil {
 		return nil, err
 	}
@@ -168,14 +168,14 @@ $end$
 }
 `
 
-var newClientsetForCon***REMOVED***gOrDieTemplate = `
-// NewForCon***REMOVED***gOrDie creates a new Clientset for the given con***REMOVED***g and
-// panics if there is an error in the con***REMOVED***g.
-func NewForCon***REMOVED***gOrDie(c *$.Con***REMOVED***g|raw$) *Clientset {
+var newClientsetForConfigOrDieTemplate = `
+// NewForConfigOrDie creates a new Clientset for the given config and
+// panics if there is an error in the config.
+func NewForConfigOrDie(c *$.Config|raw$) *Clientset {
 	var cs Clientset
-$range .allGroups$    cs.$.LowerCaseGroupGoName$$.Version$ =$.PackageAlias$.NewForCon***REMOVED***gOrDie(c)
+$range .allGroups$    cs.$.LowerCaseGroupGoName$$.Version$ =$.PackageAlias$.NewForConfigOrDie(c)
 $end$
-	cs.DiscoveryClient = $.NewDiscoveryClientForCon***REMOVED***gOrDie|raw$(c)
+	cs.DiscoveryClient = $.NewDiscoveryClientForConfigOrDie|raw$(c)
 	return &cs
 }
 `

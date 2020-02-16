@@ -44,7 +44,7 @@ func printableValue(v reflect.Value) (interface{}, bool) {
 	if !v.Type().Implements(errorType) && !v.Type().Implements(fmtStringerType) {
 		if v.CanAddr() && (reflect.PtrTo(v.Type()).Implements(errorType) || reflect.PtrTo(v.Type()).Implements(fmtStringerType)) {
 			v = v.Addr()
-		} ***REMOVED*** {
+		} else {
 			switch v.Kind() {
 			case reflect.Chan, reflect.Func:
 				return nil, false

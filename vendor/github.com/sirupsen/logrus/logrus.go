@@ -72,7 +72,7 @@ const (
 	// FatalLevel level. Logs and then calls `os.Exit(1)`. It will exit even if the
 	// logging level is set to Panic.
 	FatalLevel
-	// ErrorLevel level. Logs. Used for errors that should de***REMOVED***nitely be noted.
+	// ErrorLevel level. Logs. Used for errors that should definitely be noted.
 	// Commonly used for hooks to send errors to an error tracking service.
 	ErrorLevel
 	// WarnLevel level. Non-critical entries that deserve eyes.
@@ -111,7 +111,7 @@ type StdLogger interface {
 // The FieldLogger interface generalizes the Entry and Logger types
 type FieldLogger interface {
 	WithField(key string, value interface{}) *Entry
-	WithFields(***REMOVED***elds Fields) *Entry
+	WithFields(fields Fields) *Entry
 	WithError(err error) *Entry
 
 	Debugf(format string, args ...interface{})

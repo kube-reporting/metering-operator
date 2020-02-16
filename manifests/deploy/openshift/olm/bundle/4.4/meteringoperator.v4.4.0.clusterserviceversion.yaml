@@ -8,7 +8,7 @@ metadata:
       [
         {
           "apiVersion": "metering.openshift.io/v1",
-          "kind": "MeteringCon***REMOVED***g",
+          "kind": "MeteringConfig",
           "metadata": {
             "name": "operator-metering"
           },
@@ -195,7 +195,7 @@ metadata:
             ],
             "databaseName": "default",
             "external": true,
-            "***REMOVED***leFormat": "TEXTFILE",
+            "fileFormat": "TEXTFILE",
             "location": "s3a://my-bucket/apache_logs",
             "rowFormat": "SERDE 'org.apache.hadoop.hive.serde2.RegexSerDe'\nWITH SERDEPROPERTIES (\n  \"input.regex\" = \"([^ ]*) ([^ ]*) ([^ ]*) (-|\\\\[[^\\\\]]*\\\\]) ([^ \\\"]*|\\\"[^\\\"]*\\\") (-|[0-9]*) (-|[0-9]*)(?: ([^ \\\"]*|\\\"[^\\\"]*\\\") ([^ \\\"]*|\\\"[^\\\"]*\\\"))?\"\n)\n",
             "tableName": "apache_log"
@@ -204,7 +204,7 @@ metadata:
       ]
     capabilities: Basic Install
     categories: OpenShift Optional, Monitoring
-    certi***REMOVED***ed: "false"
+    certified: "false"
     containerImage: quay.io/openshift/origin-metering-ansible-operator:4.4
     createdAt: 2019-01-01T11:59:59Z
     description: Chargeback and reporting tool to provide accountability for how resources
@@ -217,7 +217,7 @@ spec:
   description: |
     Operator Metering is a chargeback and reporting tool to provide accountability for how resources are used across a cluster. Cluster admins can schedule reports based on historical usage data by Pod, Namespace, and Cluster wide. Operator Metering is part of the [Operator Framework](https://coreos.com/blog/introducing-operator-framework-metering).
 
-    Read the user guide for more details on [running and viewing your ***REMOVED***rst report](https://docs.openshift.com/container-platform/4.4/metering/metering-using-metering.html).
+    Read the user guide for more details on [running and viewing your first report](https://docs.openshift.com/container-platform/4.4/metering/metering-using-metering.html).
 
     ### Core capabilities
 
@@ -237,13 +237,13 @@ spec:
     At least one Node should have 2GB of RAM and 2 CPU cores.
     Memory and CPU consumption may often be lower, but will spike when running reports, or collecting data for larger clusters.
 
-    Metering requires con***REMOVED***guring storage, please review the [con***REMOVED***guring persistent storage documentation](https://docs.openshift.com/container-platform/4.4/metering/con***REMOVED***guring-metering/metering-con***REMOVED***gure-persistent-storage.html) before proceeding.
+    Metering requires configuring storage, please review the [configuring persistent storage documentation](https://docs.openshift.com/container-platform/4.4/metering/configuring-metering/metering-configure-persistent-storage.html) before proceeding.
 
-    ### Common Con***REMOVED***gurations
+    ### Common Configurations
 
-    * **Store data in object storage or in a PersistentVolume** - Store your report output [in an object storage bucket or in a PersistentVolume](https://docs.openshift.com/container-platform/4.4/metering/con***REMOVED***guring-metering/metering-con***REMOVED***gure-persistent-storage.html).
+    * **Store data in object storage or in a PersistentVolume** - Store your report output [in an object storage bucket or in a PersistentVolume](https://docs.openshift.com/container-platform/4.4/metering/configuring-metering/metering-configure-persistent-storage.html).
 
-    * **Con***REMOVED***gure AWS Billing Data Source** - Assign Pod $$ costs on using your [AWS billing reports stored in S3](https://docs.openshift.com/container-platform/4.4/metering/con***REMOVED***guring-metering/metering-con***REMOVED***gure-aws-billing-correlation.html).
+    * **Configure AWS Billing Data Source** - Assign Pod $$ costs on using your [AWS billing reports stored in S3](https://docs.openshift.com/container-platform/4.4/metering/configuring-metering/metering-configure-aws-billing-correlation.html).
 
     * **Use Reports** - Customize what how you process data. [Specify what you want to report on, set the schedule, and reporting time period](https://docs.openshift.com/container-platform/4.4/metering/reports/metering-about-reports.html#metering-reports_metering-about-reports).
 
@@ -297,7 +297,7 @@ spec:
             - get
             - list
           - apiGroups:
-            - con***REMOVED***g.openshift.io
+            - config.openshift.io
             resources:
             - networks
             verbs:
@@ -351,7 +351,7 @@ spec:
           - apiGroups:
             - ""
             resources:
-            - con***REMOVED***gmaps
+            - configmaps
             - endpoints
             - persistentvolumeclaims
             - secrets
@@ -392,7 +392,7 @@ spec:
             resources:
             - daemonsets
             - deployments
-            - deployments/***REMOVED***nalizers
+            - deployments/finalizers
             - deployments/rollback
             - deployments/scale
             - replicasets
@@ -471,12 +471,12 @@ spec:
                     value: "false"
                   - name: WATCH_NAMESPACE
                     valueFrom:
-                      ***REMOVED***eldRef:
-                        ***REMOVED***eldPath: metadata.annotations['olm.targetNamespaces']
+                      fieldRef:
+                        fieldPath: metadata.annotations['olm.targetNamespaces']
                   - name: POD_NAME
                     valueFrom:
-                      ***REMOVED***eldRef:
-                        ***REMOVED***eldPath: metadata.name
+                      fieldRef:
+                        fieldPath: metadata.name
                   - name: METERING_ANSIBLE_OPERATOR_IMAGE
                     value: "quay.io/openshift/origin-metering-ansible-operator:4.4"
                   - name: METERING_REPORTING_OPERATOR_IMAGE
@@ -509,15 +509,15 @@ spec:
                 terminationGracePeriodSeconds: 30
                 serviceAccount: metering-operator
 
-  customresourcede***REMOVED***nitions:
+  customresourcedefinitions:
     owned:
-    - description: An instance of Metering with high-level con***REMOVED***guration
-      displayName: Metering Con***REMOVED***guration
-      kind: MeteringCon***REMOVED***g
-      name: meteringcon***REMOVED***gs.metering.openshift.io
+    - description: An instance of Metering with high-level configuration
+      displayName: Metering Configuration
+      kind: MeteringConfig
+      name: meteringconfigs.metering.openshift.io
       version: v1
     - description: A scheduled or on-off Metering Report summarizes data based on the
-        query speci***REMOVED***ed.
+        query specified.
       displayName: Metering Report
       kind: Report
       name: reports.metering.openshift.io
@@ -534,7 +534,7 @@ spec:
       kind: ReportDataSource
       name: reportdatasources.metering.openshift.io
       version: v1
-    - description: Represents a con***REMOVED***gurable storage location for Metering to store metering
+    - description: Represents a configurable storage location for Metering to store metering
         and report data.
       displayName: Metering Storage Location
       kind: StorageLocation

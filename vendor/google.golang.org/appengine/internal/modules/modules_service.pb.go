@@ -5,7 +5,7 @@
 /*
 Package modules is a generated protocol buffer package.
 
-It is generated from these ***REMOVED***les:
+It is generated from these files:
 	google.golang.org/appengine/internal/modules/modules_service.proto
 
 It has these top-level messages:

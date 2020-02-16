@@ -2,7 +2,7 @@
 Copyright The Kubernetes Authors.
 
 Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this ***REMOVED***le except in compliance with the License.
+you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
 
     http://www.apache.org/licenses/LICENSE-2.0
@@ -10,7 +10,7 @@ You may obtain a copy of the License at
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the speci***REMOVED***c language governing permissions and
+See the License for the specific language governing permissions and
 limitations under the License.
 */
 
@@ -19,62 +19,62 @@ limitations under the License.
 package v1beta1
 
 import (
-	v1beta1 "k8s.io/api/certi***REMOVED***cates/v1beta1"
+	v1beta1 "k8s.io/api/certificates/v1beta1"
 	serializer "k8s.io/apimachinery/pkg/runtime/serializer"
 	"k8s.io/client-go/kubernetes/scheme"
 	rest "k8s.io/client-go/rest"
 )
 
-type Certi***REMOVED***catesV1beta1Interface interface {
+type CertificatesV1beta1Interface interface {
 	RESTClient() rest.Interface
-	Certi***REMOVED***cateSigningRequestsGetter
+	CertificateSigningRequestsGetter
 }
 
-// Certi***REMOVED***catesV1beta1Client is used to interact with features provided by the certi***REMOVED***cates.k8s.io group.
-type Certi***REMOVED***catesV1beta1Client struct {
+// CertificatesV1beta1Client is used to interact with features provided by the certificates.k8s.io group.
+type CertificatesV1beta1Client struct {
 	restClient rest.Interface
 }
 
-func (c *Certi***REMOVED***catesV1beta1Client) Certi***REMOVED***cateSigningRequests() Certi***REMOVED***cateSigningRequestInterface {
-	return newCerti***REMOVED***cateSigningRequests(c)
+func (c *CertificatesV1beta1Client) CertificateSigningRequests() CertificateSigningRequestInterface {
+	return newCertificateSigningRequests(c)
 }
 
-// NewForCon***REMOVED***g creates a new Certi***REMOVED***catesV1beta1Client for the given con***REMOVED***g.
-func NewForCon***REMOVED***g(c *rest.Con***REMOVED***g) (*Certi***REMOVED***catesV1beta1Client, error) {
-	con***REMOVED***g := *c
-	if err := setCon***REMOVED***gDefaults(&con***REMOVED***g); err != nil {
+// NewForConfig creates a new CertificatesV1beta1Client for the given config.
+func NewForConfig(c *rest.Config) (*CertificatesV1beta1Client, error) {
+	config := *c
+	if err := setConfigDefaults(&config); err != nil {
 		return nil, err
 	}
-	client, err := rest.RESTClientFor(&con***REMOVED***g)
+	client, err := rest.RESTClientFor(&config)
 	if err != nil {
 		return nil, err
 	}
-	return &Certi***REMOVED***catesV1beta1Client{client}, nil
+	return &CertificatesV1beta1Client{client}, nil
 }
 
-// NewForCon***REMOVED***gOrDie creates a new Certi***REMOVED***catesV1beta1Client for the given con***REMOVED***g and
-// panics if there is an error in the con***REMOVED***g.
-func NewForCon***REMOVED***gOrDie(c *rest.Con***REMOVED***g) *Certi***REMOVED***catesV1beta1Client {
-	client, err := NewForCon***REMOVED***g(c)
+// NewForConfigOrDie creates a new CertificatesV1beta1Client for the given config and
+// panics if there is an error in the config.
+func NewForConfigOrDie(c *rest.Config) *CertificatesV1beta1Client {
+	client, err := NewForConfig(c)
 	if err != nil {
 		panic(err)
 	}
 	return client
 }
 
-// New creates a new Certi***REMOVED***catesV1beta1Client for the given RESTClient.
-func New(c rest.Interface) *Certi***REMOVED***catesV1beta1Client {
-	return &Certi***REMOVED***catesV1beta1Client{c}
+// New creates a new CertificatesV1beta1Client for the given RESTClient.
+func New(c rest.Interface) *CertificatesV1beta1Client {
+	return &CertificatesV1beta1Client{c}
 }
 
-func setCon***REMOVED***gDefaults(con***REMOVED***g *rest.Con***REMOVED***g) error {
+func setConfigDefaults(config *rest.Config) error {
 	gv := v1beta1.SchemeGroupVersion
-	con***REMOVED***g.GroupVersion = &gv
-	con***REMOVED***g.APIPath = "/apis"
-	con***REMOVED***g.NegotiatedSerializer = serializer.DirectCodecFactory{CodecFactory: scheme.Codecs}
+	config.GroupVersion = &gv
+	config.APIPath = "/apis"
+	config.NegotiatedSerializer = serializer.DirectCodecFactory{CodecFactory: scheme.Codecs}
 
-	if con***REMOVED***g.UserAgent == "" {
-		con***REMOVED***g.UserAgent = rest.DefaultKubernetesUserAgent()
+	if config.UserAgent == "" {
+		config.UserAgent = rest.DefaultKubernetesUserAgent()
 	}
 
 	return nil
@@ -82,7 +82,7 @@ func setCon***REMOVED***gDefaults(con***REMOVED***g *rest.Con***REMOVED***g) err
 
 // RESTClient returns a RESTClient that is used to communicate
 // with API server by this client implementation.
-func (c *Certi***REMOVED***catesV1beta1Client) RESTClient() rest.Interface {
+func (c *CertificatesV1beta1Client) RESTClient() rest.Interface {
 	if c == nil {
 		return nil
 	}

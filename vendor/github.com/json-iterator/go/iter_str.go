@@ -15,16 +15,16 @@ func (iter *Iterator) ReadString() (ret string) {
 				ret = string(iter.buf[iter.head:i])
 				iter.head = i + 1
 				return ret
-			} ***REMOVED*** if c == '\\' {
+			} else if c == '\\' {
 				break
-			} ***REMOVED*** if c < ' ' {
+			} else if c < ' ' {
 				iter.ReportError("ReadString",
 					fmt.Sprintf(`invalid control character found: %d`, c))
 				return
 			}
 		}
 		return iter.readStringSlowPath()
-	} ***REMOVED*** if c == 'n' {
+	} else if c == 'n' {
 		iter.skipThreeBytes('u', 'l', 'l')
 		return ""
 	}
@@ -43,7 +43,7 @@ func (iter *Iterator) readStringSlowPath() (ret string) {
 		if c == '\\' {
 			c = iter.readByte()
 			str = iter.readEscapedChar(c, str)
-		} ***REMOVED*** {
+		} else {
 			str = append(str, c)
 		}
 	}
@@ -81,10 +81,10 @@ func (iter *Iterator) readEscapedChar(c byte, str []byte) []byte {
 			if combined == '\uFFFD' {
 				str = appendRune(str, r)
 				str = appendRune(str, r2)
-			} ***REMOVED*** {
+			} else {
 				str = appendRune(str, combined)
 			}
-		} ***REMOVED*** {
+		} else {
 			str = appendRune(str, r)
 		}
 	case '"':
@@ -118,7 +118,7 @@ func (iter *Iterator) ReadStringAsSlice() (ret []byte) {
 	if c == '"' {
 		for i := iter.head; i < iter.tail; i++ {
 			// require ascii string and no escape
-			// for: ***REMOVED***eld name, base64, number
+			// for: field name, base64, number
 			if iter.buf[i] == '"' {
 				// fast path: reuse the underlying buffer
 				ret = iter.buf[iter.head:i]
@@ -151,11 +151,11 @@ func (iter *Iterator) readU4() (ret rune) {
 		}
 		if c >= '0' && c <= '9' {
 			ret = ret*16 + rune(c-'0')
-		} ***REMOVED*** if c >= 'a' && c <= 'f' {
+		} else if c >= 'a' && c <= 'f' {
 			ret = ret*16 + rune(c-'a'+10)
-		} ***REMOVED*** if c >= 'A' && c <= 'F' {
+		} else if c >= 'A' && c <= 'F' {
 			ret = ret*16 + rune(c-'A'+10)
-		} ***REMOVED*** {
+		} else {
 			iter.ReportError("readU4", "expects 0~9 or a~f, but found "+string([]byte{c}))
 			return
 		}

@@ -60,7 +60,7 @@ func (c *prestoTables) Get(name string, options metav1.GetOptions) (result *v1.P
 	return
 }
 
-// List takes label and ***REMOVED***eld selectors, and returns the list of PrestoTables that match those selectors.
+// List takes label and field selectors, and returns the list of PrestoTables that match those selectors.
 func (c *prestoTables) List(opts metav1.ListOptions) (result *v1.PrestoTableList, err error) {
 	var timeout time.Duration
 	if opts.TimeoutSeconds != nil {

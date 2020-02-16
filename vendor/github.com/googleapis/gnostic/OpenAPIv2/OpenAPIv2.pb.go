@@ -5,7 +5,7 @@
 /*
 Package openapi_v2 is a generated protocol buffer package.
 
-It is generated from these ***REMOVED***les:
+It is generated from these files:
 	OpenAPIv2/OpenAPIv2.proto
 
 It has these top-level messages:
@@ -16,7 +16,7 @@ It has these top-level messages:
 	BodyParameter
 	Contact
 	Default
-	De***REMOVED***nitions
+	Definitions
 	Document
 	Examples
 	ExternalDocs
@@ -36,7 +36,7 @@ It has these top-level messages:
 	NamedResponse
 	NamedResponseValue
 	NamedSchema
-	NamedSecurityDe***REMOVED***nitionsItem
+	NamedSecurityDefinitionsItem
 	NamedString
 	NamedStringArray
 	NonBodyParameter
@@ -47,7 +47,7 @@ It has these top-level messages:
 	Oauth2Scopes
 	Operation
 	Parameter
-	ParameterDe***REMOVED***nitions
+	ParameterDefinitions
 	ParametersItem
 	PathItem
 	PathParameterSubSchema
@@ -56,13 +56,13 @@ It has these top-level messages:
 	Properties
 	QueryParameterSubSchema
 	Response
-	ResponseDe***REMOVED***nitions
+	ResponseDefinitions
 	ResponseValue
 	Responses
 	Schema
 	SchemaItem
-	SecurityDe***REMOVED***nitions
-	SecurityDe***REMOVED***nitionsItem
+	SecurityDefinitions
+	SecurityDefinitionsItem
 	SecurityRequirement
 	StringArray
 	Tag
@@ -82,7 +82,7 @@ var _ = proto.Marshal
 var _ = fmt.Errorf
 var _ = math.Inf
 
-// This is a compile-time assertion to ensure that this generated ***REMOVED***le
+// This is a compile-time assertion to ensure that this generated file
 // is compatible with the proto package it is being compiled against.
 // A compilation error at this line likely means your copy of the
 // proto package needs to be updated.
@@ -98,7 +98,7 @@ type AdditionalPropertiesItem struct {
 func (m *AdditionalPropertiesItem) Reset()                    { *m = AdditionalPropertiesItem{} }
 func (m *AdditionalPropertiesItem) String() string            { return proto.CompactTextString(m) }
 func (*AdditionalPropertiesItem) ProtoMessage()               {}
-func (*AdditionalPropertiesItem) Descriptor() ([]byte, []int) { return ***REMOVED***leDescriptor0, []int{0} }
+func (*AdditionalPropertiesItem) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{0} }
 
 type isAdditionalPropertiesItem_Oneof interface {
 	isAdditionalPropertiesItem_Oneof()
@@ -216,7 +216,7 @@ type Any struct {
 func (m *Any) Reset()                    { *m = Any{} }
 func (m *Any) String() string            { return proto.CompactTextString(m) }
 func (*Any) ProtoMessage()               {}
-func (*Any) Descriptor() ([]byte, []int) { return ***REMOVED***leDescriptor0, []int{1} }
+func (*Any) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{1} }
 
 func (m *Any) GetValue() *google_protobuf.Any {
 	if m != nil {
@@ -243,7 +243,7 @@ type ApiKeySecurity struct {
 func (m *ApiKeySecurity) Reset()                    { *m = ApiKeySecurity{} }
 func (m *ApiKeySecurity) String() string            { return proto.CompactTextString(m) }
 func (*ApiKeySecurity) ProtoMessage()               {}
-func (*ApiKeySecurity) Descriptor() ([]byte, []int) { return ***REMOVED***leDescriptor0, []int{2} }
+func (*ApiKeySecurity) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{2} }
 
 func (m *ApiKeySecurity) GetType() string {
 	if m != nil {
@@ -289,7 +289,7 @@ type BasicAuthenticationSecurity struct {
 func (m *BasicAuthenticationSecurity) Reset()                    { *m = BasicAuthenticationSecurity{} }
 func (m *BasicAuthenticationSecurity) String() string            { return proto.CompactTextString(m) }
 func (*BasicAuthenticationSecurity) ProtoMessage()               {}
-func (*BasicAuthenticationSecurity) Descriptor() ([]byte, []int) { return ***REMOVED***leDescriptor0, []int{3} }
+func (*BasicAuthenticationSecurity) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{3} }
 
 func (m *BasicAuthenticationSecurity) GetType() string {
 	if m != nil {
@@ -328,7 +328,7 @@ type BodyParameter struct {
 func (m *BodyParameter) Reset()                    { *m = BodyParameter{} }
 func (m *BodyParameter) String() string            { return proto.CompactTextString(m) }
 func (*BodyParameter) ProtoMessage()               {}
-func (*BodyParameter) Descriptor() ([]byte, []int) { return ***REMOVED***leDescriptor0, []int{4} }
+func (*BodyParameter) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{4} }
 
 func (m *BodyParameter) GetDescription() string {
 	if m != nil {
@@ -386,7 +386,7 @@ type Contact struct {
 func (m *Contact) Reset()                    { *m = Contact{} }
 func (m *Contact) String() string            { return proto.CompactTextString(m) }
 func (*Contact) ProtoMessage()               {}
-func (*Contact) Descriptor() ([]byte, []int) { return ***REMOVED***leDescriptor0, []int{5} }
+func (*Contact) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{5} }
 
 func (m *Contact) GetName() string {
 	if m != nil {
@@ -423,7 +423,7 @@ type Default struct {
 func (m *Default) Reset()                    { *m = Default{} }
 func (m *Default) String() string            { return proto.CompactTextString(m) }
 func (*Default) ProtoMessage()               {}
-func (*Default) Descriptor() ([]byte, []int) { return ***REMOVED***leDescriptor0, []int{6} }
+func (*Default) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{6} }
 
 func (m *Default) GetAdditionalProperties() []*NamedAny {
 	if m != nil {
@@ -433,16 +433,16 @@ func (m *Default) GetAdditionalProperties() []*NamedAny {
 }
 
 // One or more JSON objects describing the schemas being consumed and produced by the API.
-type De***REMOVED***nitions struct {
+type Definitions struct {
 	AdditionalProperties []*NamedSchema `protobuf:"bytes,1,rep,name=additional_properties,json=additionalProperties" json:"additional_properties,omitempty"`
 }
 
-func (m *De***REMOVED***nitions) Reset()                    { *m = De***REMOVED***nitions{} }
-func (m *De***REMOVED***nitions) String() string            { return proto.CompactTextString(m) }
-func (*De***REMOVED***nitions) ProtoMessage()               {}
-func (*De***REMOVED***nitions) Descriptor() ([]byte, []int) { return ***REMOVED***leDescriptor0, []int{7} }
+func (m *Definitions) Reset()                    { *m = Definitions{} }
+func (m *Definitions) String() string            { return proto.CompactTextString(m) }
+func (*Definitions) ProtoMessage()               {}
+func (*Definitions) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{7} }
 
-func (m *De***REMOVED***nitions) GetAdditionalProperties() []*NamedSchema {
+func (m *Definitions) GetAdditionalProperties() []*NamedSchema {
 	if m != nil {
 		return m.AdditionalProperties
 	}
@@ -464,11 +464,11 @@ type Document struct {
 	// A list of MIME types the API can produce.
 	Produces            []string               `protobuf:"bytes,7,rep,name=produces" json:"produces,omitempty"`
 	Paths               *Paths                 `protobuf:"bytes,8,opt,name=paths" json:"paths,omitempty"`
-	De***REMOVED***nitions         *De***REMOVED***nitions           `protobuf:"bytes,9,opt,name=de***REMOVED***nitions" json:"de***REMOVED***nitions,omitempty"`
-	Parameters          *ParameterDe***REMOVED***nitions  `protobuf:"bytes,10,opt,name=parameters" json:"parameters,omitempty"`
-	Responses           *ResponseDe***REMOVED***nitions   `protobuf:"bytes,11,opt,name=responses" json:"responses,omitempty"`
+	Definitions         *Definitions           `protobuf:"bytes,9,opt,name=definitions" json:"definitions,omitempty"`
+	Parameters          *ParameterDefinitions  `protobuf:"bytes,10,opt,name=parameters" json:"parameters,omitempty"`
+	Responses           *ResponseDefinitions   `protobuf:"bytes,11,opt,name=responses" json:"responses,omitempty"`
 	Security            []*SecurityRequirement `protobuf:"bytes,12,rep,name=security" json:"security,omitempty"`
-	SecurityDe***REMOVED***nitions *SecurityDe***REMOVED***nitions   `protobuf:"bytes,13,opt,name=security_de***REMOVED***nitions,json=securityDe***REMOVED***nitions" json:"security_de***REMOVED***nitions,omitempty"`
+	SecurityDefinitions *SecurityDefinitions   `protobuf:"bytes,13,opt,name=security_definitions,json=securityDefinitions" json:"security_definitions,omitempty"`
 	Tags                []*Tag                 `protobuf:"bytes,14,rep,name=tags" json:"tags,omitempty"`
 	ExternalDocs        *ExternalDocs          `protobuf:"bytes,15,opt,name=external_docs,json=externalDocs" json:"external_docs,omitempty"`
 	VendorExtension     []*NamedAny            `protobuf:"bytes,16,rep,name=vendor_extension,json=vendorExtension" json:"vendor_extension,omitempty"`
@@ -477,7 +477,7 @@ type Document struct {
 func (m *Document) Reset()                    { *m = Document{} }
 func (m *Document) String() string            { return proto.CompactTextString(m) }
 func (*Document) ProtoMessage()               {}
-func (*Document) Descriptor() ([]byte, []int) { return ***REMOVED***leDescriptor0, []int{8} }
+func (*Document) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{8} }
 
 func (m *Document) GetSwagger() string {
 	if m != nil {
@@ -535,21 +535,21 @@ func (m *Document) GetPaths() *Paths {
 	return nil
 }
 
-func (m *Document) GetDe***REMOVED***nitions() *De***REMOVED***nitions {
+func (m *Document) GetDefinitions() *Definitions {
 	if m != nil {
-		return m.De***REMOVED***nitions
+		return m.Definitions
 	}
 	return nil
 }
 
-func (m *Document) GetParameters() *ParameterDe***REMOVED***nitions {
+func (m *Document) GetParameters() *ParameterDefinitions {
 	if m != nil {
 		return m.Parameters
 	}
 	return nil
 }
 
-func (m *Document) GetResponses() *ResponseDe***REMOVED***nitions {
+func (m *Document) GetResponses() *ResponseDefinitions {
 	if m != nil {
 		return m.Responses
 	}
@@ -563,9 +563,9 @@ func (m *Document) GetSecurity() []*SecurityRequirement {
 	return nil
 }
 
-func (m *Document) GetSecurityDe***REMOVED***nitions() *SecurityDe***REMOVED***nitions {
+func (m *Document) GetSecurityDefinitions() *SecurityDefinitions {
 	if m != nil {
-		return m.SecurityDe***REMOVED***nitions
+		return m.SecurityDefinitions
 	}
 	return nil
 }
@@ -598,7 +598,7 @@ type Examples struct {
 func (m *Examples) Reset()                    { *m = Examples{} }
 func (m *Examples) String() string            { return proto.CompactTextString(m) }
 func (*Examples) ProtoMessage()               {}
-func (*Examples) Descriptor() ([]byte, []int) { return ***REMOVED***leDescriptor0, []int{9} }
+func (*Examples) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{9} }
 
 func (m *Examples) GetAdditionalProperties() []*NamedAny {
 	if m != nil {
@@ -617,7 +617,7 @@ type ExternalDocs struct {
 func (m *ExternalDocs) Reset()                    { *m = ExternalDocs{} }
 func (m *ExternalDocs) String() string            { return proto.CompactTextString(m) }
 func (*ExternalDocs) ProtoMessage()               {}
-func (*ExternalDocs) Descriptor() ([]byte, []int) { return ***REMOVED***leDescriptor0, []int{10} }
+func (*ExternalDocs) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{10} }
 
 func (m *ExternalDocs) GetDescription() string {
 	if m != nil {
@@ -657,7 +657,7 @@ type FileSchema struct {
 func (m *FileSchema) Reset()                    { *m = FileSchema{} }
 func (m *FileSchema) String() string            { return proto.CompactTextString(m) }
 func (*FileSchema) ProtoMessage()               {}
-func (*FileSchema) Descriptor() ([]byte, []int) { return ***REMOVED***leDescriptor0, []int{11} }
+func (*FileSchema) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{11} }
 
 func (m *FileSchema) GetFormat() string {
 	if m != nil {
@@ -745,9 +745,9 @@ type FormDataParameterSubSchema struct {
 	Items            *PrimitivesItems `protobuf:"bytes,8,opt,name=items" json:"items,omitempty"`
 	CollectionFormat string           `protobuf:"bytes,9,opt,name=collection_format,json=collectionFormat" json:"collection_format,omitempty"`
 	Default          *Any             `protobuf:"bytes,10,opt,name=default" json:"default,omitempty"`
-	Maximum          float64          `protobuf:"***REMOVED***xed64,11,opt,name=maximum" json:"maximum,omitempty"`
+	Maximum          float64          `protobuf:"fixed64,11,opt,name=maximum" json:"maximum,omitempty"`
 	ExclusiveMaximum bool             `protobuf:"varint,12,opt,name=exclusive_maximum,json=exclusiveMaximum" json:"exclusive_maximum,omitempty"`
-	Minimum          float64          `protobuf:"***REMOVED***xed64,13,opt,name=minimum" json:"minimum,omitempty"`
+	Minimum          float64          `protobuf:"fixed64,13,opt,name=minimum" json:"minimum,omitempty"`
 	ExclusiveMinimum bool             `protobuf:"varint,14,opt,name=exclusive_minimum,json=exclusiveMinimum" json:"exclusive_minimum,omitempty"`
 	MaxLength        int64            `protobuf:"varint,15,opt,name=max_length,json=maxLength" json:"max_length,omitempty"`
 	MinLength        int64            `protobuf:"varint,16,opt,name=min_length,json=minLength" json:"min_length,omitempty"`
@@ -756,14 +756,14 @@ type FormDataParameterSubSchema struct {
 	MinItems         int64            `protobuf:"varint,19,opt,name=min_items,json=minItems" json:"min_items,omitempty"`
 	UniqueItems      bool             `protobuf:"varint,20,opt,name=unique_items,json=uniqueItems" json:"unique_items,omitempty"`
 	Enum             []*Any           `protobuf:"bytes,21,rep,name=enum" json:"enum,omitempty"`
-	MultipleOf       float64          `protobuf:"***REMOVED***xed64,22,opt,name=multiple_of,json=multipleOf" json:"multiple_of,omitempty"`
+	MultipleOf       float64          `protobuf:"fixed64,22,opt,name=multiple_of,json=multipleOf" json:"multiple_of,omitempty"`
 	VendorExtension  []*NamedAny      `protobuf:"bytes,23,rep,name=vendor_extension,json=vendorExtension" json:"vendor_extension,omitempty"`
 }
 
 func (m *FormDataParameterSubSchema) Reset()                    { *m = FormDataParameterSubSchema{} }
 func (m *FormDataParameterSubSchema) String() string            { return proto.CompactTextString(m) }
 func (*FormDataParameterSubSchema) ProtoMessage()               {}
-func (*FormDataParameterSubSchema) Descriptor() ([]byte, []int) { return ***REMOVED***leDescriptor0, []int{12} }
+func (*FormDataParameterSubSchema) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{12} }
 
 func (m *FormDataParameterSubSchema) GetRequired() bool {
 	if m != nil {
@@ -932,9 +932,9 @@ type Header struct {
 	Items            *PrimitivesItems `protobuf:"bytes,3,opt,name=items" json:"items,omitempty"`
 	CollectionFormat string           `protobuf:"bytes,4,opt,name=collection_format,json=collectionFormat" json:"collection_format,omitempty"`
 	Default          *Any             `protobuf:"bytes,5,opt,name=default" json:"default,omitempty"`
-	Maximum          float64          `protobuf:"***REMOVED***xed64,6,opt,name=maximum" json:"maximum,omitempty"`
+	Maximum          float64          `protobuf:"fixed64,6,opt,name=maximum" json:"maximum,omitempty"`
 	ExclusiveMaximum bool             `protobuf:"varint,7,opt,name=exclusive_maximum,json=exclusiveMaximum" json:"exclusive_maximum,omitempty"`
-	Minimum          float64          `protobuf:"***REMOVED***xed64,8,opt,name=minimum" json:"minimum,omitempty"`
+	Minimum          float64          `protobuf:"fixed64,8,opt,name=minimum" json:"minimum,omitempty"`
 	ExclusiveMinimum bool             `protobuf:"varint,9,opt,name=exclusive_minimum,json=exclusiveMinimum" json:"exclusive_minimum,omitempty"`
 	MaxLength        int64            `protobuf:"varint,10,opt,name=max_length,json=maxLength" json:"max_length,omitempty"`
 	MinLength        int64            `protobuf:"varint,11,opt,name=min_length,json=minLength" json:"min_length,omitempty"`
@@ -943,7 +943,7 @@ type Header struct {
 	MinItems         int64            `protobuf:"varint,14,opt,name=min_items,json=minItems" json:"min_items,omitempty"`
 	UniqueItems      bool             `protobuf:"varint,15,opt,name=unique_items,json=uniqueItems" json:"unique_items,omitempty"`
 	Enum             []*Any           `protobuf:"bytes,16,rep,name=enum" json:"enum,omitempty"`
-	MultipleOf       float64          `protobuf:"***REMOVED***xed64,17,opt,name=multiple_of,json=multipleOf" json:"multiple_of,omitempty"`
+	MultipleOf       float64          `protobuf:"fixed64,17,opt,name=multiple_of,json=multipleOf" json:"multiple_of,omitempty"`
 	Description      string           `protobuf:"bytes,18,opt,name=description" json:"description,omitempty"`
 	VendorExtension  []*NamedAny      `protobuf:"bytes,19,rep,name=vendor_extension,json=vendorExtension" json:"vendor_extension,omitempty"`
 }
@@ -951,7 +951,7 @@ type Header struct {
 func (m *Header) Reset()                    { *m = Header{} }
 func (m *Header) String() string            { return proto.CompactTextString(m) }
 func (*Header) ProtoMessage()               {}
-func (*Header) Descriptor() ([]byte, []int) { return ***REMOVED***leDescriptor0, []int{13} }
+func (*Header) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{13} }
 
 func (m *Header) GetType() string {
 	if m != nil {
@@ -1100,9 +1100,9 @@ type HeaderParameterSubSchema struct {
 	Items            *PrimitivesItems `protobuf:"bytes,7,opt,name=items" json:"items,omitempty"`
 	CollectionFormat string           `protobuf:"bytes,8,opt,name=collection_format,json=collectionFormat" json:"collection_format,omitempty"`
 	Default          *Any             `protobuf:"bytes,9,opt,name=default" json:"default,omitempty"`
-	Maximum          float64          `protobuf:"***REMOVED***xed64,10,opt,name=maximum" json:"maximum,omitempty"`
+	Maximum          float64          `protobuf:"fixed64,10,opt,name=maximum" json:"maximum,omitempty"`
 	ExclusiveMaximum bool             `protobuf:"varint,11,opt,name=exclusive_maximum,json=exclusiveMaximum" json:"exclusive_maximum,omitempty"`
-	Minimum          float64          `protobuf:"***REMOVED***xed64,12,opt,name=minimum" json:"minimum,omitempty"`
+	Minimum          float64          `protobuf:"fixed64,12,opt,name=minimum" json:"minimum,omitempty"`
 	ExclusiveMinimum bool             `protobuf:"varint,13,opt,name=exclusive_minimum,json=exclusiveMinimum" json:"exclusive_minimum,omitempty"`
 	MaxLength        int64            `protobuf:"varint,14,opt,name=max_length,json=maxLength" json:"max_length,omitempty"`
 	MinLength        int64            `protobuf:"varint,15,opt,name=min_length,json=minLength" json:"min_length,omitempty"`
@@ -1111,14 +1111,14 @@ type HeaderParameterSubSchema struct {
 	MinItems         int64            `protobuf:"varint,18,opt,name=min_items,json=minItems" json:"min_items,omitempty"`
 	UniqueItems      bool             `protobuf:"varint,19,opt,name=unique_items,json=uniqueItems" json:"unique_items,omitempty"`
 	Enum             []*Any           `protobuf:"bytes,20,rep,name=enum" json:"enum,omitempty"`
-	MultipleOf       float64          `protobuf:"***REMOVED***xed64,21,opt,name=multiple_of,json=multipleOf" json:"multiple_of,omitempty"`
+	MultipleOf       float64          `protobuf:"fixed64,21,opt,name=multiple_of,json=multipleOf" json:"multiple_of,omitempty"`
 	VendorExtension  []*NamedAny      `protobuf:"bytes,22,rep,name=vendor_extension,json=vendorExtension" json:"vendor_extension,omitempty"`
 }
 
 func (m *HeaderParameterSubSchema) Reset()                    { *m = HeaderParameterSubSchema{} }
 func (m *HeaderParameterSubSchema) String() string            { return proto.CompactTextString(m) }
 func (*HeaderParameterSubSchema) ProtoMessage()               {}
-func (*HeaderParameterSubSchema) Descriptor() ([]byte, []int) { return ***REMOVED***leDescriptor0, []int{14} }
+func (*HeaderParameterSubSchema) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{14} }
 
 func (m *HeaderParameterSubSchema) GetRequired() bool {
 	if m != nil {
@@ -1281,7 +1281,7 @@ type Headers struct {
 func (m *Headers) Reset()                    { *m = Headers{} }
 func (m *Headers) String() string            { return proto.CompactTextString(m) }
 func (*Headers) ProtoMessage()               {}
-func (*Headers) Descriptor() ([]byte, []int) { return ***REMOVED***leDescriptor0, []int{15} }
+func (*Headers) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{15} }
 
 func (m *Headers) GetAdditionalProperties() []*NamedHeader {
 	if m != nil {
@@ -1308,7 +1308,7 @@ type Info struct {
 func (m *Info) Reset()                    { *m = Info{} }
 func (m *Info) String() string            { return proto.CompactTextString(m) }
 func (*Info) ProtoMessage()               {}
-func (*Info) Descriptor() ([]byte, []int) { return ***REMOVED***leDescriptor0, []int{16} }
+func (*Info) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{16} }
 
 func (m *Info) GetTitle() string {
 	if m != nil {
@@ -1366,7 +1366,7 @@ type ItemsItem struct {
 func (m *ItemsItem) Reset()                    { *m = ItemsItem{} }
 func (m *ItemsItem) String() string            { return proto.CompactTextString(m) }
 func (*ItemsItem) ProtoMessage()               {}
-func (*ItemsItem) Descriptor() ([]byte, []int) { return ***REMOVED***leDescriptor0, []int{17} }
+func (*ItemsItem) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{17} }
 
 func (m *ItemsItem) GetSchema() []*Schema {
 	if m != nil {
@@ -1383,7 +1383,7 @@ type JsonReference struct {
 func (m *JsonReference) Reset()                    { *m = JsonReference{} }
 func (m *JsonReference) String() string            { return proto.CompactTextString(m) }
 func (*JsonReference) ProtoMessage()               {}
-func (*JsonReference) Descriptor() ([]byte, []int) { return ***REMOVED***leDescriptor0, []int{18} }
+func (*JsonReference) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{18} }
 
 func (m *JsonReference) GetXRef() string {
 	if m != nil {
@@ -1410,7 +1410,7 @@ type License struct {
 func (m *License) Reset()                    { *m = License{} }
 func (m *License) String() string            { return proto.CompactTextString(m) }
 func (*License) ProtoMessage()               {}
-func (*License) Descriptor() ([]byte, []int) { return ***REMOVED***leDescriptor0, []int{19} }
+func (*License) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{19} }
 
 func (m *License) GetName() string {
 	if m != nil {
@@ -1444,7 +1444,7 @@ type NamedAny struct {
 func (m *NamedAny) Reset()                    { *m = NamedAny{} }
 func (m *NamedAny) String() string            { return proto.CompactTextString(m) }
 func (*NamedAny) ProtoMessage()               {}
-func (*NamedAny) Descriptor() ([]byte, []int) { return ***REMOVED***leDescriptor0, []int{20} }
+func (*NamedAny) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{20} }
 
 func (m *NamedAny) GetName() string {
 	if m != nil {
@@ -1471,7 +1471,7 @@ type NamedHeader struct {
 func (m *NamedHeader) Reset()                    { *m = NamedHeader{} }
 func (m *NamedHeader) String() string            { return proto.CompactTextString(m) }
 func (*NamedHeader) ProtoMessage()               {}
-func (*NamedHeader) Descriptor() ([]byte, []int) { return ***REMOVED***leDescriptor0, []int{21} }
+func (*NamedHeader) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{21} }
 
 func (m *NamedHeader) GetName() string {
 	if m != nil {
@@ -1498,7 +1498,7 @@ type NamedParameter struct {
 func (m *NamedParameter) Reset()                    { *m = NamedParameter{} }
 func (m *NamedParameter) String() string            { return proto.CompactTextString(m) }
 func (*NamedParameter) ProtoMessage()               {}
-func (*NamedParameter) Descriptor() ([]byte, []int) { return ***REMOVED***leDescriptor0, []int{22} }
+func (*NamedParameter) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{22} }
 
 func (m *NamedParameter) GetName() string {
 	if m != nil {
@@ -1525,7 +1525,7 @@ type NamedPathItem struct {
 func (m *NamedPathItem) Reset()                    { *m = NamedPathItem{} }
 func (m *NamedPathItem) String() string            { return proto.CompactTextString(m) }
 func (*NamedPathItem) ProtoMessage()               {}
-func (*NamedPathItem) Descriptor() ([]byte, []int) { return ***REMOVED***leDescriptor0, []int{23} }
+func (*NamedPathItem) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{23} }
 
 func (m *NamedPathItem) GetName() string {
 	if m != nil {
@@ -1552,7 +1552,7 @@ type NamedResponse struct {
 func (m *NamedResponse) Reset()                    { *m = NamedResponse{} }
 func (m *NamedResponse) String() string            { return proto.CompactTextString(m) }
 func (*NamedResponse) ProtoMessage()               {}
-func (*NamedResponse) Descriptor() ([]byte, []int) { return ***REMOVED***leDescriptor0, []int{24} }
+func (*NamedResponse) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{24} }
 
 func (m *NamedResponse) GetName() string {
 	if m != nil {
@@ -1579,7 +1579,7 @@ type NamedResponseValue struct {
 func (m *NamedResponseValue) Reset()                    { *m = NamedResponseValue{} }
 func (m *NamedResponseValue) String() string            { return proto.CompactTextString(m) }
 func (*NamedResponseValue) ProtoMessage()               {}
-func (*NamedResponseValue) Descriptor() ([]byte, []int) { return ***REMOVED***leDescriptor0, []int{25} }
+func (*NamedResponseValue) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{25} }
 
 func (m *NamedResponseValue) GetName() string {
 	if m != nil {
@@ -1606,7 +1606,7 @@ type NamedSchema struct {
 func (m *NamedSchema) Reset()                    { *m = NamedSchema{} }
 func (m *NamedSchema) String() string            { return proto.CompactTextString(m) }
 func (*NamedSchema) ProtoMessage()               {}
-func (*NamedSchema) Descriptor() ([]byte, []int) { return ***REMOVED***leDescriptor0, []int{26} }
+func (*NamedSchema) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{26} }
 
 func (m *NamedSchema) GetName() string {
 	if m != nil {
@@ -1622,27 +1622,27 @@ func (m *NamedSchema) GetValue() *Schema {
 	return nil
 }
 
-// Automatically-generated message used to represent maps of SecurityDe***REMOVED***nitionsItem as ordered (name,value) pairs.
-type NamedSecurityDe***REMOVED***nitionsItem struct {
+// Automatically-generated message used to represent maps of SecurityDefinitionsItem as ordered (name,value) pairs.
+type NamedSecurityDefinitionsItem struct {
 	// Map key
 	Name string `protobuf:"bytes,1,opt,name=name" json:"name,omitempty"`
 	// Mapped value
-	Value *SecurityDe***REMOVED***nitionsItem `protobuf:"bytes,2,opt,name=value" json:"value,omitempty"`
+	Value *SecurityDefinitionsItem `protobuf:"bytes,2,opt,name=value" json:"value,omitempty"`
 }
 
-func (m *NamedSecurityDe***REMOVED***nitionsItem) Reset()                    { *m = NamedSecurityDe***REMOVED***nitionsItem{} }
-func (m *NamedSecurityDe***REMOVED***nitionsItem) String() string            { return proto.CompactTextString(m) }
-func (*NamedSecurityDe***REMOVED***nitionsItem) ProtoMessage()               {}
-func (*NamedSecurityDe***REMOVED***nitionsItem) Descriptor() ([]byte, []int) { return ***REMOVED***leDescriptor0, []int{27} }
+func (m *NamedSecurityDefinitionsItem) Reset()                    { *m = NamedSecurityDefinitionsItem{} }
+func (m *NamedSecurityDefinitionsItem) String() string            { return proto.CompactTextString(m) }
+func (*NamedSecurityDefinitionsItem) ProtoMessage()               {}
+func (*NamedSecurityDefinitionsItem) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{27} }
 
-func (m *NamedSecurityDe***REMOVED***nitionsItem) GetName() string {
+func (m *NamedSecurityDefinitionsItem) GetName() string {
 	if m != nil {
 		return m.Name
 	}
 	return ""
 }
 
-func (m *NamedSecurityDe***REMOVED***nitionsItem) GetValue() *SecurityDe***REMOVED***nitionsItem {
+func (m *NamedSecurityDefinitionsItem) GetValue() *SecurityDefinitionsItem {
 	if m != nil {
 		return m.Value
 	}
@@ -1660,7 +1660,7 @@ type NamedString struct {
 func (m *NamedString) Reset()                    { *m = NamedString{} }
 func (m *NamedString) String() string            { return proto.CompactTextString(m) }
 func (*NamedString) ProtoMessage()               {}
-func (*NamedString) Descriptor() ([]byte, []int) { return ***REMOVED***leDescriptor0, []int{28} }
+func (*NamedString) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{28} }
 
 func (m *NamedString) GetName() string {
 	if m != nil {
@@ -1687,7 +1687,7 @@ type NamedStringArray struct {
 func (m *NamedStringArray) Reset()                    { *m = NamedStringArray{} }
 func (m *NamedStringArray) String() string            { return proto.CompactTextString(m) }
 func (*NamedStringArray) ProtoMessage()               {}
-func (*NamedStringArray) Descriptor() ([]byte, []int) { return ***REMOVED***leDescriptor0, []int{29} }
+func (*NamedStringArray) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{29} }
 
 func (m *NamedStringArray) GetName() string {
 	if m != nil {
@@ -1715,7 +1715,7 @@ type NonBodyParameter struct {
 func (m *NonBodyParameter) Reset()                    { *m = NonBodyParameter{} }
 func (m *NonBodyParameter) String() string            { return proto.CompactTextString(m) }
 func (*NonBodyParameter) ProtoMessage()               {}
-func (*NonBodyParameter) Descriptor() ([]byte, []int) { return ***REMOVED***leDescriptor0, []int{30} }
+func (*NonBodyParameter) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{30} }
 
 type isNonBodyParameter_Oneof interface {
 	isNonBodyParameter_Oneof()
@@ -1899,7 +1899,7 @@ type Oauth2AccessCodeSecurity struct {
 func (m *Oauth2AccessCodeSecurity) Reset()                    { *m = Oauth2AccessCodeSecurity{} }
 func (m *Oauth2AccessCodeSecurity) String() string            { return proto.CompactTextString(m) }
 func (*Oauth2AccessCodeSecurity) ProtoMessage()               {}
-func (*Oauth2AccessCodeSecurity) Descriptor() ([]byte, []int) { return ***REMOVED***leDescriptor0, []int{31} }
+func (*Oauth2AccessCodeSecurity) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{31} }
 
 func (m *Oauth2AccessCodeSecurity) GetType() string {
 	if m != nil {
@@ -1962,7 +1962,7 @@ type Oauth2ApplicationSecurity struct {
 func (m *Oauth2ApplicationSecurity) Reset()                    { *m = Oauth2ApplicationSecurity{} }
 func (m *Oauth2ApplicationSecurity) String() string            { return proto.CompactTextString(m) }
 func (*Oauth2ApplicationSecurity) ProtoMessage()               {}
-func (*Oauth2ApplicationSecurity) Descriptor() ([]byte, []int) { return ***REMOVED***leDescriptor0, []int{32} }
+func (*Oauth2ApplicationSecurity) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{32} }
 
 func (m *Oauth2ApplicationSecurity) GetType() string {
 	if m != nil {
@@ -2018,7 +2018,7 @@ type Oauth2ImplicitSecurity struct {
 func (m *Oauth2ImplicitSecurity) Reset()                    { *m = Oauth2ImplicitSecurity{} }
 func (m *Oauth2ImplicitSecurity) String() string            { return proto.CompactTextString(m) }
 func (*Oauth2ImplicitSecurity) ProtoMessage()               {}
-func (*Oauth2ImplicitSecurity) Descriptor() ([]byte, []int) { return ***REMOVED***leDescriptor0, []int{33} }
+func (*Oauth2ImplicitSecurity) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{33} }
 
 func (m *Oauth2ImplicitSecurity) GetType() string {
 	if m != nil {
@@ -2074,7 +2074,7 @@ type Oauth2PasswordSecurity struct {
 func (m *Oauth2PasswordSecurity) Reset()                    { *m = Oauth2PasswordSecurity{} }
 func (m *Oauth2PasswordSecurity) String() string            { return proto.CompactTextString(m) }
 func (*Oauth2PasswordSecurity) ProtoMessage()               {}
-func (*Oauth2PasswordSecurity) Descriptor() ([]byte, []int) { return ***REMOVED***leDescriptor0, []int{34} }
+func (*Oauth2PasswordSecurity) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{34} }
 
 func (m *Oauth2PasswordSecurity) GetType() string {
 	if m != nil {
@@ -2125,7 +2125,7 @@ type Oauth2Scopes struct {
 func (m *Oauth2Scopes) Reset()                    { *m = Oauth2Scopes{} }
 func (m *Oauth2Scopes) String() string            { return proto.CompactTextString(m) }
 func (*Oauth2Scopes) ProtoMessage()               {}
-func (*Oauth2Scopes) Descriptor() ([]byte, []int) { return ***REMOVED***leDescriptor0, []int{35} }
+func (*Oauth2Scopes) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{35} }
 
 func (m *Oauth2Scopes) GetAdditionalProperties() []*NamedString {
 	if m != nil {
@@ -2141,7 +2141,7 @@ type Operation struct {
 	// A longer description of the operation, GitHub Flavored Markdown is allowed.
 	Description  string        `protobuf:"bytes,3,opt,name=description" json:"description,omitempty"`
 	ExternalDocs *ExternalDocs `protobuf:"bytes,4,opt,name=external_docs,json=externalDocs" json:"external_docs,omitempty"`
-	// A unique identi***REMOVED***er of the operation.
+	// A unique identifier of the operation.
 	OperationId string `protobuf:"bytes,5,opt,name=operation_id,json=operationId" json:"operation_id,omitempty"`
 	// A list of MIME types the API can produce.
 	Produces []string `protobuf:"bytes,6,rep,name=produces" json:"produces,omitempty"`
@@ -2160,7 +2160,7 @@ type Operation struct {
 func (m *Operation) Reset()                    { *m = Operation{} }
 func (m *Operation) String() string            { return proto.CompactTextString(m) }
 func (*Operation) ProtoMessage()               {}
-func (*Operation) Descriptor() ([]byte, []int) { return ***REMOVED***leDescriptor0, []int{36} }
+func (*Operation) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{36} }
 
 func (m *Operation) GetTags() []string {
 	if m != nil {
@@ -2263,7 +2263,7 @@ type Parameter struct {
 func (m *Parameter) Reset()                    { *m = Parameter{} }
 func (m *Parameter) String() string            { return proto.CompactTextString(m) }
 func (*Parameter) ProtoMessage()               {}
-func (*Parameter) Descriptor() ([]byte, []int) { return ***REMOVED***leDescriptor0, []int{37} }
+func (*Parameter) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{37} }
 
 type isParameter_Oneof interface {
 	isParameter_Oneof()
@@ -2375,16 +2375,16 @@ func _Parameter_OneofSizer(msg proto.Message) (n int) {
 }
 
 // One or more JSON representations for parameters
-type ParameterDe***REMOVED***nitions struct {
+type ParameterDefinitions struct {
 	AdditionalProperties []*NamedParameter `protobuf:"bytes,1,rep,name=additional_properties,json=additionalProperties" json:"additional_properties,omitempty"`
 }
 
-func (m *ParameterDe***REMOVED***nitions) Reset()                    { *m = ParameterDe***REMOVED***nitions{} }
-func (m *ParameterDe***REMOVED***nitions) String() string            { return proto.CompactTextString(m) }
-func (*ParameterDe***REMOVED***nitions) ProtoMessage()               {}
-func (*ParameterDe***REMOVED***nitions) Descriptor() ([]byte, []int) { return ***REMOVED***leDescriptor0, []int{38} }
+func (m *ParameterDefinitions) Reset()                    { *m = ParameterDefinitions{} }
+func (m *ParameterDefinitions) String() string            { return proto.CompactTextString(m) }
+func (*ParameterDefinitions) ProtoMessage()               {}
+func (*ParameterDefinitions) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{38} }
 
-func (m *ParameterDe***REMOVED***nitions) GetAdditionalProperties() []*NamedParameter {
+func (m *ParameterDefinitions) GetAdditionalProperties() []*NamedParameter {
 	if m != nil {
 		return m.AdditionalProperties
 	}
@@ -2401,7 +2401,7 @@ type ParametersItem struct {
 func (m *ParametersItem) Reset()                    { *m = ParametersItem{} }
 func (m *ParametersItem) String() string            { return proto.CompactTextString(m) }
 func (*ParametersItem) ProtoMessage()               {}
-func (*ParametersItem) Descriptor() ([]byte, []int) { return ***REMOVED***leDescriptor0, []int{39} }
+func (*ParametersItem) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{39} }
 
 type isParametersItem_Oneof interface {
 	isParametersItem_Oneof()
@@ -2529,7 +2529,7 @@ type PathItem struct {
 func (m *PathItem) Reset()                    { *m = PathItem{} }
 func (m *PathItem) String() string            { return proto.CompactTextString(m) }
 func (*PathItem) ProtoMessage()               {}
-func (*PathItem) Descriptor() ([]byte, []int) { return ***REMOVED***leDescriptor0, []int{40} }
+func (*PathItem) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{40} }
 
 func (m *PathItem) GetXRef() string {
 	if m != nil {
@@ -2615,9 +2615,9 @@ type PathParameterSubSchema struct {
 	Items            *PrimitivesItems `protobuf:"bytes,7,opt,name=items" json:"items,omitempty"`
 	CollectionFormat string           `protobuf:"bytes,8,opt,name=collection_format,json=collectionFormat" json:"collection_format,omitempty"`
 	Default          *Any             `protobuf:"bytes,9,opt,name=default" json:"default,omitempty"`
-	Maximum          float64          `protobuf:"***REMOVED***xed64,10,opt,name=maximum" json:"maximum,omitempty"`
+	Maximum          float64          `protobuf:"fixed64,10,opt,name=maximum" json:"maximum,omitempty"`
 	ExclusiveMaximum bool             `protobuf:"varint,11,opt,name=exclusive_maximum,json=exclusiveMaximum" json:"exclusive_maximum,omitempty"`
-	Minimum          float64          `protobuf:"***REMOVED***xed64,12,opt,name=minimum" json:"minimum,omitempty"`
+	Minimum          float64          `protobuf:"fixed64,12,opt,name=minimum" json:"minimum,omitempty"`
 	ExclusiveMinimum bool             `protobuf:"varint,13,opt,name=exclusive_minimum,json=exclusiveMinimum" json:"exclusive_minimum,omitempty"`
 	MaxLength        int64            `protobuf:"varint,14,opt,name=max_length,json=maxLength" json:"max_length,omitempty"`
 	MinLength        int64            `protobuf:"varint,15,opt,name=min_length,json=minLength" json:"min_length,omitempty"`
@@ -2626,14 +2626,14 @@ type PathParameterSubSchema struct {
 	MinItems         int64            `protobuf:"varint,18,opt,name=min_items,json=minItems" json:"min_items,omitempty"`
 	UniqueItems      bool             `protobuf:"varint,19,opt,name=unique_items,json=uniqueItems" json:"unique_items,omitempty"`
 	Enum             []*Any           `protobuf:"bytes,20,rep,name=enum" json:"enum,omitempty"`
-	MultipleOf       float64          `protobuf:"***REMOVED***xed64,21,opt,name=multiple_of,json=multipleOf" json:"multiple_of,omitempty"`
+	MultipleOf       float64          `protobuf:"fixed64,21,opt,name=multiple_of,json=multipleOf" json:"multiple_of,omitempty"`
 	VendorExtension  []*NamedAny      `protobuf:"bytes,22,rep,name=vendor_extension,json=vendorExtension" json:"vendor_extension,omitempty"`
 }
 
 func (m *PathParameterSubSchema) Reset()                    { *m = PathParameterSubSchema{} }
 func (m *PathParameterSubSchema) String() string            { return proto.CompactTextString(m) }
 func (*PathParameterSubSchema) ProtoMessage()               {}
-func (*PathParameterSubSchema) Descriptor() ([]byte, []int) { return ***REMOVED***leDescriptor0, []int{41} }
+func (*PathParameterSubSchema) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{41} }
 
 func (m *PathParameterSubSchema) GetRequired() bool {
 	if m != nil {
@@ -2798,7 +2798,7 @@ type Paths struct {
 func (m *Paths) Reset()                    { *m = Paths{} }
 func (m *Paths) String() string            { return proto.CompactTextString(m) }
 func (*Paths) ProtoMessage()               {}
-func (*Paths) Descriptor() ([]byte, []int) { return ***REMOVED***leDescriptor0, []int{42} }
+func (*Paths) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{42} }
 
 func (m *Paths) GetVendorExtension() []*NamedAny {
 	if m != nil {
@@ -2820,9 +2820,9 @@ type PrimitivesItems struct {
 	Items            *PrimitivesItems `protobuf:"bytes,3,opt,name=items" json:"items,omitempty"`
 	CollectionFormat string           `protobuf:"bytes,4,opt,name=collection_format,json=collectionFormat" json:"collection_format,omitempty"`
 	Default          *Any             `protobuf:"bytes,5,opt,name=default" json:"default,omitempty"`
-	Maximum          float64          `protobuf:"***REMOVED***xed64,6,opt,name=maximum" json:"maximum,omitempty"`
+	Maximum          float64          `protobuf:"fixed64,6,opt,name=maximum" json:"maximum,omitempty"`
 	ExclusiveMaximum bool             `protobuf:"varint,7,opt,name=exclusive_maximum,json=exclusiveMaximum" json:"exclusive_maximum,omitempty"`
-	Minimum          float64          `protobuf:"***REMOVED***xed64,8,opt,name=minimum" json:"minimum,omitempty"`
+	Minimum          float64          `protobuf:"fixed64,8,opt,name=minimum" json:"minimum,omitempty"`
 	ExclusiveMinimum bool             `protobuf:"varint,9,opt,name=exclusive_minimum,json=exclusiveMinimum" json:"exclusive_minimum,omitempty"`
 	MaxLength        int64            `protobuf:"varint,10,opt,name=max_length,json=maxLength" json:"max_length,omitempty"`
 	MinLength        int64            `protobuf:"varint,11,opt,name=min_length,json=minLength" json:"min_length,omitempty"`
@@ -2831,14 +2831,14 @@ type PrimitivesItems struct {
 	MinItems         int64            `protobuf:"varint,14,opt,name=min_items,json=minItems" json:"min_items,omitempty"`
 	UniqueItems      bool             `protobuf:"varint,15,opt,name=unique_items,json=uniqueItems" json:"unique_items,omitempty"`
 	Enum             []*Any           `protobuf:"bytes,16,rep,name=enum" json:"enum,omitempty"`
-	MultipleOf       float64          `protobuf:"***REMOVED***xed64,17,opt,name=multiple_of,json=multipleOf" json:"multiple_of,omitempty"`
+	MultipleOf       float64          `protobuf:"fixed64,17,opt,name=multiple_of,json=multipleOf" json:"multiple_of,omitempty"`
 	VendorExtension  []*NamedAny      `protobuf:"bytes,18,rep,name=vendor_extension,json=vendorExtension" json:"vendor_extension,omitempty"`
 }
 
 func (m *PrimitivesItems) Reset()                    { *m = PrimitivesItems{} }
 func (m *PrimitivesItems) String() string            { return proto.CompactTextString(m) }
 func (*PrimitivesItems) ProtoMessage()               {}
-func (*PrimitivesItems) Descriptor() ([]byte, []int) { return ***REMOVED***leDescriptor0, []int{43} }
+func (*PrimitivesItems) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{43} }
 
 func (m *PrimitivesItems) GetType() string {
 	if m != nil {
@@ -2973,7 +2973,7 @@ type Properties struct {
 func (m *Properties) Reset()                    { *m = Properties{} }
 func (m *Properties) String() string            { return proto.CompactTextString(m) }
 func (*Properties) ProtoMessage()               {}
-func (*Properties) Descriptor() ([]byte, []int) { return ***REMOVED***leDescriptor0, []int{44} }
+func (*Properties) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{44} }
 
 func (m *Properties) GetAdditionalProperties() []*NamedSchema {
 	if m != nil {
@@ -2998,9 +2998,9 @@ type QueryParameterSubSchema struct {
 	Items            *PrimitivesItems `protobuf:"bytes,8,opt,name=items" json:"items,omitempty"`
 	CollectionFormat string           `protobuf:"bytes,9,opt,name=collection_format,json=collectionFormat" json:"collection_format,omitempty"`
 	Default          *Any             `protobuf:"bytes,10,opt,name=default" json:"default,omitempty"`
-	Maximum          float64          `protobuf:"***REMOVED***xed64,11,opt,name=maximum" json:"maximum,omitempty"`
+	Maximum          float64          `protobuf:"fixed64,11,opt,name=maximum" json:"maximum,omitempty"`
 	ExclusiveMaximum bool             `protobuf:"varint,12,opt,name=exclusive_maximum,json=exclusiveMaximum" json:"exclusive_maximum,omitempty"`
-	Minimum          float64          `protobuf:"***REMOVED***xed64,13,opt,name=minimum" json:"minimum,omitempty"`
+	Minimum          float64          `protobuf:"fixed64,13,opt,name=minimum" json:"minimum,omitempty"`
 	ExclusiveMinimum bool             `protobuf:"varint,14,opt,name=exclusive_minimum,json=exclusiveMinimum" json:"exclusive_minimum,omitempty"`
 	MaxLength        int64            `protobuf:"varint,15,opt,name=max_length,json=maxLength" json:"max_length,omitempty"`
 	MinLength        int64            `protobuf:"varint,16,opt,name=min_length,json=minLength" json:"min_length,omitempty"`
@@ -3009,14 +3009,14 @@ type QueryParameterSubSchema struct {
 	MinItems         int64            `protobuf:"varint,19,opt,name=min_items,json=minItems" json:"min_items,omitempty"`
 	UniqueItems      bool             `protobuf:"varint,20,opt,name=unique_items,json=uniqueItems" json:"unique_items,omitempty"`
 	Enum             []*Any           `protobuf:"bytes,21,rep,name=enum" json:"enum,omitempty"`
-	MultipleOf       float64          `protobuf:"***REMOVED***xed64,22,opt,name=multiple_of,json=multipleOf" json:"multiple_of,omitempty"`
+	MultipleOf       float64          `protobuf:"fixed64,22,opt,name=multiple_of,json=multipleOf" json:"multiple_of,omitempty"`
 	VendorExtension  []*NamedAny      `protobuf:"bytes,23,rep,name=vendor_extension,json=vendorExtension" json:"vendor_extension,omitempty"`
 }
 
 func (m *QueryParameterSubSchema) Reset()                    { *m = QueryParameterSubSchema{} }
 func (m *QueryParameterSubSchema) String() string            { return proto.CompactTextString(m) }
 func (*QueryParameterSubSchema) ProtoMessage()               {}
-func (*QueryParameterSubSchema) Descriptor() ([]byte, []int) { return ***REMOVED***leDescriptor0, []int{45} }
+func (*QueryParameterSubSchema) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{45} }
 
 func (m *QueryParameterSubSchema) GetRequired() bool {
 	if m != nil {
@@ -3190,7 +3190,7 @@ type Response struct {
 func (m *Response) Reset()                    { *m = Response{} }
 func (m *Response) String() string            { return proto.CompactTextString(m) }
 func (*Response) ProtoMessage()               {}
-func (*Response) Descriptor() ([]byte, []int) { return ***REMOVED***leDescriptor0, []int{46} }
+func (*Response) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{46} }
 
 func (m *Response) GetDescription() string {
 	if m != nil {
@@ -3228,16 +3228,16 @@ func (m *Response) GetVendorExtension() []*NamedAny {
 }
 
 // One or more JSON representations for parameters
-type ResponseDe***REMOVED***nitions struct {
+type ResponseDefinitions struct {
 	AdditionalProperties []*NamedResponse `protobuf:"bytes,1,rep,name=additional_properties,json=additionalProperties" json:"additional_properties,omitempty"`
 }
 
-func (m *ResponseDe***REMOVED***nitions) Reset()                    { *m = ResponseDe***REMOVED***nitions{} }
-func (m *ResponseDe***REMOVED***nitions) String() string            { return proto.CompactTextString(m) }
-func (*ResponseDe***REMOVED***nitions) ProtoMessage()               {}
-func (*ResponseDe***REMOVED***nitions) Descriptor() ([]byte, []int) { return ***REMOVED***leDescriptor0, []int{47} }
+func (m *ResponseDefinitions) Reset()                    { *m = ResponseDefinitions{} }
+func (m *ResponseDefinitions) String() string            { return proto.CompactTextString(m) }
+func (*ResponseDefinitions) ProtoMessage()               {}
+func (*ResponseDefinitions) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{47} }
 
-func (m *ResponseDe***REMOVED***nitions) GetAdditionalProperties() []*NamedResponse {
+func (m *ResponseDefinitions) GetAdditionalProperties() []*NamedResponse {
 	if m != nil {
 		return m.AdditionalProperties
 	}
@@ -3254,7 +3254,7 @@ type ResponseValue struct {
 func (m *ResponseValue) Reset()                    { *m = ResponseValue{} }
 func (m *ResponseValue) String() string            { return proto.CompactTextString(m) }
 func (*ResponseValue) ProtoMessage()               {}
-func (*ResponseValue) Descriptor() ([]byte, []int) { return ***REMOVED***leDescriptor0, []int{48} }
+func (*ResponseValue) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{48} }
 
 type isResponseValue_Oneof interface {
 	isResponseValue_Oneof()
@@ -3374,7 +3374,7 @@ type Responses struct {
 func (m *Responses) Reset()                    { *m = Responses{} }
 func (m *Responses) String() string            { return proto.CompactTextString(m) }
 func (*Responses) ProtoMessage()               {}
-func (*Responses) Descriptor() ([]byte, []int) { return ***REMOVED***leDescriptor0, []int{49} }
+func (*Responses) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{49} }
 
 func (m *Responses) GetResponseCode() []*NamedResponseValue {
 	if m != nil {
@@ -3397,10 +3397,10 @@ type Schema struct {
 	Title                string                    `protobuf:"bytes,3,opt,name=title" json:"title,omitempty"`
 	Description          string                    `protobuf:"bytes,4,opt,name=description" json:"description,omitempty"`
 	Default              *Any                      `protobuf:"bytes,5,opt,name=default" json:"default,omitempty"`
-	MultipleOf           float64                   `protobuf:"***REMOVED***xed64,6,opt,name=multiple_of,json=multipleOf" json:"multiple_of,omitempty"`
-	Maximum              float64                   `protobuf:"***REMOVED***xed64,7,opt,name=maximum" json:"maximum,omitempty"`
+	MultipleOf           float64                   `protobuf:"fixed64,6,opt,name=multiple_of,json=multipleOf" json:"multiple_of,omitempty"`
+	Maximum              float64                   `protobuf:"fixed64,7,opt,name=maximum" json:"maximum,omitempty"`
 	ExclusiveMaximum     bool                      `protobuf:"varint,8,opt,name=exclusive_maximum,json=exclusiveMaximum" json:"exclusive_maximum,omitempty"`
-	Minimum              float64                   `protobuf:"***REMOVED***xed64,9,opt,name=minimum" json:"minimum,omitempty"`
+	Minimum              float64                   `protobuf:"fixed64,9,opt,name=minimum" json:"minimum,omitempty"`
 	ExclusiveMinimum     bool                      `protobuf:"varint,10,opt,name=exclusive_minimum,json=exclusiveMinimum" json:"exclusive_minimum,omitempty"`
 	MaxLength            int64                     `protobuf:"varint,11,opt,name=max_length,json=maxLength" json:"max_length,omitempty"`
 	MinLength            int64                     `protobuf:"varint,12,opt,name=min_length,json=minLength" json:"min_length,omitempty"`
@@ -3428,7 +3428,7 @@ type Schema struct {
 func (m *Schema) Reset()                    { *m = Schema{} }
 func (m *Schema) String() string            { return proto.CompactTextString(m) }
 func (*Schema) ProtoMessage()               {}
-func (*Schema) Descriptor() ([]byte, []int) { return ***REMOVED***leDescriptor0, []int{50} }
+func (*Schema) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{50} }
 
 func (m *Schema) GetXRef() string {
 	if m != nil {
@@ -3657,7 +3657,7 @@ type SchemaItem struct {
 func (m *SchemaItem) Reset()                    { *m = SchemaItem{} }
 func (m *SchemaItem) String() string            { return proto.CompactTextString(m) }
 func (*SchemaItem) ProtoMessage()               {}
-func (*SchemaItem) Descriptor() ([]byte, []int) { return ***REMOVED***leDescriptor0, []int{51} }
+func (*SchemaItem) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{51} }
 
 type isSchemaItem_Oneof interface {
 	isSchemaItem_Oneof()
@@ -3667,7 +3667,7 @@ type SchemaItem_Schema struct {
 	Schema *Schema `protobuf:"bytes,1,opt,name=schema,oneof"`
 }
 type SchemaItem_FileSchema struct {
-	FileSchema *FileSchema `protobuf:"bytes,2,opt,name=***REMOVED***le_schema,json=***REMOVED***leSchema,oneof"`
+	FileSchema *FileSchema `protobuf:"bytes,2,opt,name=file_schema,json=fileSchema,oneof"`
 }
 
 func (*SchemaItem_Schema) isSchemaItem_Oneof()     {}
@@ -3734,7 +3734,7 @@ func _SchemaItem_OneofUnmarshaler(msg proto.Message, tag, wire int, b *proto.Buf
 		err := b.DecodeMessage(msg)
 		m.Oneof = &SchemaItem_Schema{msg}
 		return true, err
-	case 2: // oneof.***REMOVED***le_schema
+	case 2: // oneof.file_schema
 		if wire != proto.WireBytes {
 			return true, proto.ErrInternalBadWireType
 		}
@@ -3768,172 +3768,172 @@ func _SchemaItem_OneofSizer(msg proto.Message) (n int) {
 	return n
 }
 
-type SecurityDe***REMOVED***nitions struct {
-	AdditionalProperties []*NamedSecurityDe***REMOVED***nitionsItem `protobuf:"bytes,1,rep,name=additional_properties,json=additionalProperties" json:"additional_properties,omitempty"`
+type SecurityDefinitions struct {
+	AdditionalProperties []*NamedSecurityDefinitionsItem `protobuf:"bytes,1,rep,name=additional_properties,json=additionalProperties" json:"additional_properties,omitempty"`
 }
 
-func (m *SecurityDe***REMOVED***nitions) Reset()                    { *m = SecurityDe***REMOVED***nitions{} }
-func (m *SecurityDe***REMOVED***nitions) String() string            { return proto.CompactTextString(m) }
-func (*SecurityDe***REMOVED***nitions) ProtoMessage()               {}
-func (*SecurityDe***REMOVED***nitions) Descriptor() ([]byte, []int) { return ***REMOVED***leDescriptor0, []int{52} }
+func (m *SecurityDefinitions) Reset()                    { *m = SecurityDefinitions{} }
+func (m *SecurityDefinitions) String() string            { return proto.CompactTextString(m) }
+func (*SecurityDefinitions) ProtoMessage()               {}
+func (*SecurityDefinitions) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{52} }
 
-func (m *SecurityDe***REMOVED***nitions) GetAdditionalProperties() []*NamedSecurityDe***REMOVED***nitionsItem {
+func (m *SecurityDefinitions) GetAdditionalProperties() []*NamedSecurityDefinitionsItem {
 	if m != nil {
 		return m.AdditionalProperties
 	}
 	return nil
 }
 
-type SecurityDe***REMOVED***nitionsItem struct {
+type SecurityDefinitionsItem struct {
 	// Types that are valid to be assigned to Oneof:
-	//	*SecurityDe***REMOVED***nitionsItem_BasicAuthenticationSecurity
-	//	*SecurityDe***REMOVED***nitionsItem_ApiKeySecurity
-	//	*SecurityDe***REMOVED***nitionsItem_Oauth2ImplicitSecurity
-	//	*SecurityDe***REMOVED***nitionsItem_Oauth2PasswordSecurity
-	//	*SecurityDe***REMOVED***nitionsItem_Oauth2ApplicationSecurity
-	//	*SecurityDe***REMOVED***nitionsItem_Oauth2AccessCodeSecurity
-	Oneof isSecurityDe***REMOVED***nitionsItem_Oneof `protobuf_oneof:"oneof"`
+	//	*SecurityDefinitionsItem_BasicAuthenticationSecurity
+	//	*SecurityDefinitionsItem_ApiKeySecurity
+	//	*SecurityDefinitionsItem_Oauth2ImplicitSecurity
+	//	*SecurityDefinitionsItem_Oauth2PasswordSecurity
+	//	*SecurityDefinitionsItem_Oauth2ApplicationSecurity
+	//	*SecurityDefinitionsItem_Oauth2AccessCodeSecurity
+	Oneof isSecurityDefinitionsItem_Oneof `protobuf_oneof:"oneof"`
 }
 
-func (m *SecurityDe***REMOVED***nitionsItem) Reset()                    { *m = SecurityDe***REMOVED***nitionsItem{} }
-func (m *SecurityDe***REMOVED***nitionsItem) String() string            { return proto.CompactTextString(m) }
-func (*SecurityDe***REMOVED***nitionsItem) ProtoMessage()               {}
-func (*SecurityDe***REMOVED***nitionsItem) Descriptor() ([]byte, []int) { return ***REMOVED***leDescriptor0, []int{53} }
+func (m *SecurityDefinitionsItem) Reset()                    { *m = SecurityDefinitionsItem{} }
+func (m *SecurityDefinitionsItem) String() string            { return proto.CompactTextString(m) }
+func (*SecurityDefinitionsItem) ProtoMessage()               {}
+func (*SecurityDefinitionsItem) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{53} }
 
-type isSecurityDe***REMOVED***nitionsItem_Oneof interface {
-	isSecurityDe***REMOVED***nitionsItem_Oneof()
+type isSecurityDefinitionsItem_Oneof interface {
+	isSecurityDefinitionsItem_Oneof()
 }
 
-type SecurityDe***REMOVED***nitionsItem_BasicAuthenticationSecurity struct {
+type SecurityDefinitionsItem_BasicAuthenticationSecurity struct {
 	BasicAuthenticationSecurity *BasicAuthenticationSecurity `protobuf:"bytes,1,opt,name=basic_authentication_security,json=basicAuthenticationSecurity,oneof"`
 }
-type SecurityDe***REMOVED***nitionsItem_ApiKeySecurity struct {
+type SecurityDefinitionsItem_ApiKeySecurity struct {
 	ApiKeySecurity *ApiKeySecurity `protobuf:"bytes,2,opt,name=api_key_security,json=apiKeySecurity,oneof"`
 }
-type SecurityDe***REMOVED***nitionsItem_Oauth2ImplicitSecurity struct {
+type SecurityDefinitionsItem_Oauth2ImplicitSecurity struct {
 	Oauth2ImplicitSecurity *Oauth2ImplicitSecurity `protobuf:"bytes,3,opt,name=oauth2_implicit_security,json=oauth2ImplicitSecurity,oneof"`
 }
-type SecurityDe***REMOVED***nitionsItem_Oauth2PasswordSecurity struct {
+type SecurityDefinitionsItem_Oauth2PasswordSecurity struct {
 	Oauth2PasswordSecurity *Oauth2PasswordSecurity `protobuf:"bytes,4,opt,name=oauth2_password_security,json=oauth2PasswordSecurity,oneof"`
 }
-type SecurityDe***REMOVED***nitionsItem_Oauth2ApplicationSecurity struct {
+type SecurityDefinitionsItem_Oauth2ApplicationSecurity struct {
 	Oauth2ApplicationSecurity *Oauth2ApplicationSecurity `protobuf:"bytes,5,opt,name=oauth2_application_security,json=oauth2ApplicationSecurity,oneof"`
 }
-type SecurityDe***REMOVED***nitionsItem_Oauth2AccessCodeSecurity struct {
+type SecurityDefinitionsItem_Oauth2AccessCodeSecurity struct {
 	Oauth2AccessCodeSecurity *Oauth2AccessCodeSecurity `protobuf:"bytes,6,opt,name=oauth2_access_code_security,json=oauth2AccessCodeSecurity,oneof"`
 }
 
-func (*SecurityDe***REMOVED***nitionsItem_BasicAuthenticationSecurity) isSecurityDe***REMOVED***nitionsItem_Oneof() {}
-func (*SecurityDe***REMOVED***nitionsItem_ApiKeySecurity) isSecurityDe***REMOVED***nitionsItem_Oneof()              {}
-func (*SecurityDe***REMOVED***nitionsItem_Oauth2ImplicitSecurity) isSecurityDe***REMOVED***nitionsItem_Oneof()      {}
-func (*SecurityDe***REMOVED***nitionsItem_Oauth2PasswordSecurity) isSecurityDe***REMOVED***nitionsItem_Oneof()      {}
-func (*SecurityDe***REMOVED***nitionsItem_Oauth2ApplicationSecurity) isSecurityDe***REMOVED***nitionsItem_Oneof()   {}
-func (*SecurityDe***REMOVED***nitionsItem_Oauth2AccessCodeSecurity) isSecurityDe***REMOVED***nitionsItem_Oneof()    {}
+func (*SecurityDefinitionsItem_BasicAuthenticationSecurity) isSecurityDefinitionsItem_Oneof() {}
+func (*SecurityDefinitionsItem_ApiKeySecurity) isSecurityDefinitionsItem_Oneof()              {}
+func (*SecurityDefinitionsItem_Oauth2ImplicitSecurity) isSecurityDefinitionsItem_Oneof()      {}
+func (*SecurityDefinitionsItem_Oauth2PasswordSecurity) isSecurityDefinitionsItem_Oneof()      {}
+func (*SecurityDefinitionsItem_Oauth2ApplicationSecurity) isSecurityDefinitionsItem_Oneof()   {}
+func (*SecurityDefinitionsItem_Oauth2AccessCodeSecurity) isSecurityDefinitionsItem_Oneof()    {}
 
-func (m *SecurityDe***REMOVED***nitionsItem) GetOneof() isSecurityDe***REMOVED***nitionsItem_Oneof {
+func (m *SecurityDefinitionsItem) GetOneof() isSecurityDefinitionsItem_Oneof {
 	if m != nil {
 		return m.Oneof
 	}
 	return nil
 }
 
-func (m *SecurityDe***REMOVED***nitionsItem) GetBasicAuthenticationSecurity() *BasicAuthenticationSecurity {
-	if x, ok := m.GetOneof().(*SecurityDe***REMOVED***nitionsItem_BasicAuthenticationSecurity); ok {
+func (m *SecurityDefinitionsItem) GetBasicAuthenticationSecurity() *BasicAuthenticationSecurity {
+	if x, ok := m.GetOneof().(*SecurityDefinitionsItem_BasicAuthenticationSecurity); ok {
 		return x.BasicAuthenticationSecurity
 	}
 	return nil
 }
 
-func (m *SecurityDe***REMOVED***nitionsItem) GetApiKeySecurity() *ApiKeySecurity {
-	if x, ok := m.GetOneof().(*SecurityDe***REMOVED***nitionsItem_ApiKeySecurity); ok {
+func (m *SecurityDefinitionsItem) GetApiKeySecurity() *ApiKeySecurity {
+	if x, ok := m.GetOneof().(*SecurityDefinitionsItem_ApiKeySecurity); ok {
 		return x.ApiKeySecurity
 	}
 	return nil
 }
 
-func (m *SecurityDe***REMOVED***nitionsItem) GetOauth2ImplicitSecurity() *Oauth2ImplicitSecurity {
-	if x, ok := m.GetOneof().(*SecurityDe***REMOVED***nitionsItem_Oauth2ImplicitSecurity); ok {
+func (m *SecurityDefinitionsItem) GetOauth2ImplicitSecurity() *Oauth2ImplicitSecurity {
+	if x, ok := m.GetOneof().(*SecurityDefinitionsItem_Oauth2ImplicitSecurity); ok {
 		return x.Oauth2ImplicitSecurity
 	}
 	return nil
 }
 
-func (m *SecurityDe***REMOVED***nitionsItem) GetOauth2PasswordSecurity() *Oauth2PasswordSecurity {
-	if x, ok := m.GetOneof().(*SecurityDe***REMOVED***nitionsItem_Oauth2PasswordSecurity); ok {
+func (m *SecurityDefinitionsItem) GetOauth2PasswordSecurity() *Oauth2PasswordSecurity {
+	if x, ok := m.GetOneof().(*SecurityDefinitionsItem_Oauth2PasswordSecurity); ok {
 		return x.Oauth2PasswordSecurity
 	}
 	return nil
 }
 
-func (m *SecurityDe***REMOVED***nitionsItem) GetOauth2ApplicationSecurity() *Oauth2ApplicationSecurity {
-	if x, ok := m.GetOneof().(*SecurityDe***REMOVED***nitionsItem_Oauth2ApplicationSecurity); ok {
+func (m *SecurityDefinitionsItem) GetOauth2ApplicationSecurity() *Oauth2ApplicationSecurity {
+	if x, ok := m.GetOneof().(*SecurityDefinitionsItem_Oauth2ApplicationSecurity); ok {
 		return x.Oauth2ApplicationSecurity
 	}
 	return nil
 }
 
-func (m *SecurityDe***REMOVED***nitionsItem) GetOauth2AccessCodeSecurity() *Oauth2AccessCodeSecurity {
-	if x, ok := m.GetOneof().(*SecurityDe***REMOVED***nitionsItem_Oauth2AccessCodeSecurity); ok {
+func (m *SecurityDefinitionsItem) GetOauth2AccessCodeSecurity() *Oauth2AccessCodeSecurity {
+	if x, ok := m.GetOneof().(*SecurityDefinitionsItem_Oauth2AccessCodeSecurity); ok {
 		return x.Oauth2AccessCodeSecurity
 	}
 	return nil
 }
 
 // XXX_OneofFuncs is for the internal use of the proto package.
-func (*SecurityDe***REMOVED***nitionsItem) XXX_OneofFuncs() (func(msg proto.Message, b *proto.Buffer) error, func(msg proto.Message, tag, wire int, b *proto.Buffer) (bool, error), func(msg proto.Message) (n int), []interface{}) {
-	return _SecurityDe***REMOVED***nitionsItem_OneofMarshaler, _SecurityDe***REMOVED***nitionsItem_OneofUnmarshaler, _SecurityDe***REMOVED***nitionsItem_OneofSizer, []interface{}{
-		(*SecurityDe***REMOVED***nitionsItem_BasicAuthenticationSecurity)(nil),
-		(*SecurityDe***REMOVED***nitionsItem_ApiKeySecurity)(nil),
-		(*SecurityDe***REMOVED***nitionsItem_Oauth2ImplicitSecurity)(nil),
-		(*SecurityDe***REMOVED***nitionsItem_Oauth2PasswordSecurity)(nil),
-		(*SecurityDe***REMOVED***nitionsItem_Oauth2ApplicationSecurity)(nil),
-		(*SecurityDe***REMOVED***nitionsItem_Oauth2AccessCodeSecurity)(nil),
+func (*SecurityDefinitionsItem) XXX_OneofFuncs() (func(msg proto.Message, b *proto.Buffer) error, func(msg proto.Message, tag, wire int, b *proto.Buffer) (bool, error), func(msg proto.Message) (n int), []interface{}) {
+	return _SecurityDefinitionsItem_OneofMarshaler, _SecurityDefinitionsItem_OneofUnmarshaler, _SecurityDefinitionsItem_OneofSizer, []interface{}{
+		(*SecurityDefinitionsItem_BasicAuthenticationSecurity)(nil),
+		(*SecurityDefinitionsItem_ApiKeySecurity)(nil),
+		(*SecurityDefinitionsItem_Oauth2ImplicitSecurity)(nil),
+		(*SecurityDefinitionsItem_Oauth2PasswordSecurity)(nil),
+		(*SecurityDefinitionsItem_Oauth2ApplicationSecurity)(nil),
+		(*SecurityDefinitionsItem_Oauth2AccessCodeSecurity)(nil),
 	}
 }
 
-func _SecurityDe***REMOVED***nitionsItem_OneofMarshaler(msg proto.Message, b *proto.Buffer) error {
-	m := msg.(*SecurityDe***REMOVED***nitionsItem)
+func _SecurityDefinitionsItem_OneofMarshaler(msg proto.Message, b *proto.Buffer) error {
+	m := msg.(*SecurityDefinitionsItem)
 	// oneof
 	switch x := m.Oneof.(type) {
-	case *SecurityDe***REMOVED***nitionsItem_BasicAuthenticationSecurity:
+	case *SecurityDefinitionsItem_BasicAuthenticationSecurity:
 		b.EncodeVarint(1<<3 | proto.WireBytes)
 		if err := b.EncodeMessage(x.BasicAuthenticationSecurity); err != nil {
 			return err
 		}
-	case *SecurityDe***REMOVED***nitionsItem_ApiKeySecurity:
+	case *SecurityDefinitionsItem_ApiKeySecurity:
 		b.EncodeVarint(2<<3 | proto.WireBytes)
 		if err := b.EncodeMessage(x.ApiKeySecurity); err != nil {
 			return err
 		}
-	case *SecurityDe***REMOVED***nitionsItem_Oauth2ImplicitSecurity:
+	case *SecurityDefinitionsItem_Oauth2ImplicitSecurity:
 		b.EncodeVarint(3<<3 | proto.WireBytes)
 		if err := b.EncodeMessage(x.Oauth2ImplicitSecurity); err != nil {
 			return err
 		}
-	case *SecurityDe***REMOVED***nitionsItem_Oauth2PasswordSecurity:
+	case *SecurityDefinitionsItem_Oauth2PasswordSecurity:
 		b.EncodeVarint(4<<3 | proto.WireBytes)
 		if err := b.EncodeMessage(x.Oauth2PasswordSecurity); err != nil {
 			return err
 		}
-	case *SecurityDe***REMOVED***nitionsItem_Oauth2ApplicationSecurity:
+	case *SecurityDefinitionsItem_Oauth2ApplicationSecurity:
 		b.EncodeVarint(5<<3 | proto.WireBytes)
 		if err := b.EncodeMessage(x.Oauth2ApplicationSecurity); err != nil {
 			return err
 		}
-	case *SecurityDe***REMOVED***nitionsItem_Oauth2AccessCodeSecurity:
+	case *SecurityDefinitionsItem_Oauth2AccessCodeSecurity:
 		b.EncodeVarint(6<<3 | proto.WireBytes)
 		if err := b.EncodeMessage(x.Oauth2AccessCodeSecurity); err != nil {
 			return err
 		}
 	case nil:
 	default:
-		return fmt.Errorf("SecurityDe***REMOVED***nitionsItem.Oneof has unexpected type %T", x)
+		return fmt.Errorf("SecurityDefinitionsItem.Oneof has unexpected type %T", x)
 	}
 	return nil
 }
 
-func _SecurityDe***REMOVED***nitionsItem_OneofUnmarshaler(msg proto.Message, tag, wire int, b *proto.Buffer) (bool, error) {
-	m := msg.(*SecurityDe***REMOVED***nitionsItem)
+func _SecurityDefinitionsItem_OneofUnmarshaler(msg proto.Message, tag, wire int, b *proto.Buffer) (bool, error) {
+	m := msg.(*SecurityDefinitionsItem)
 	switch tag {
 	case 1: // oneof.basic_authentication_security
 		if wire != proto.WireBytes {
@@ -3941,7 +3941,7 @@ func _SecurityDe***REMOVED***nitionsItem_OneofUnmarshaler(msg proto.Message, tag
 		}
 		msg := new(BasicAuthenticationSecurity)
 		err := b.DecodeMessage(msg)
-		m.Oneof = &SecurityDe***REMOVED***nitionsItem_BasicAuthenticationSecurity{msg}
+		m.Oneof = &SecurityDefinitionsItem_BasicAuthenticationSecurity{msg}
 		return true, err
 	case 2: // oneof.api_key_security
 		if wire != proto.WireBytes {
@@ -3949,7 +3949,7 @@ func _SecurityDe***REMOVED***nitionsItem_OneofUnmarshaler(msg proto.Message, tag
 		}
 		msg := new(ApiKeySecurity)
 		err := b.DecodeMessage(msg)
-		m.Oneof = &SecurityDe***REMOVED***nitionsItem_ApiKeySecurity{msg}
+		m.Oneof = &SecurityDefinitionsItem_ApiKeySecurity{msg}
 		return true, err
 	case 3: // oneof.oauth2_implicit_security
 		if wire != proto.WireBytes {
@@ -3957,7 +3957,7 @@ func _SecurityDe***REMOVED***nitionsItem_OneofUnmarshaler(msg proto.Message, tag
 		}
 		msg := new(Oauth2ImplicitSecurity)
 		err := b.DecodeMessage(msg)
-		m.Oneof = &SecurityDe***REMOVED***nitionsItem_Oauth2ImplicitSecurity{msg}
+		m.Oneof = &SecurityDefinitionsItem_Oauth2ImplicitSecurity{msg}
 		return true, err
 	case 4: // oneof.oauth2_password_security
 		if wire != proto.WireBytes {
@@ -3965,7 +3965,7 @@ func _SecurityDe***REMOVED***nitionsItem_OneofUnmarshaler(msg proto.Message, tag
 		}
 		msg := new(Oauth2PasswordSecurity)
 		err := b.DecodeMessage(msg)
-		m.Oneof = &SecurityDe***REMOVED***nitionsItem_Oauth2PasswordSecurity{msg}
+		m.Oneof = &SecurityDefinitionsItem_Oauth2PasswordSecurity{msg}
 		return true, err
 	case 5: // oneof.oauth2_application_security
 		if wire != proto.WireBytes {
@@ -3973,7 +3973,7 @@ func _SecurityDe***REMOVED***nitionsItem_OneofUnmarshaler(msg proto.Message, tag
 		}
 		msg := new(Oauth2ApplicationSecurity)
 		err := b.DecodeMessage(msg)
-		m.Oneof = &SecurityDe***REMOVED***nitionsItem_Oauth2ApplicationSecurity{msg}
+		m.Oneof = &SecurityDefinitionsItem_Oauth2ApplicationSecurity{msg}
 		return true, err
 	case 6: // oneof.oauth2_access_code_security
 		if wire != proto.WireBytes {
@@ -3981,43 +3981,43 @@ func _SecurityDe***REMOVED***nitionsItem_OneofUnmarshaler(msg proto.Message, tag
 		}
 		msg := new(Oauth2AccessCodeSecurity)
 		err := b.DecodeMessage(msg)
-		m.Oneof = &SecurityDe***REMOVED***nitionsItem_Oauth2AccessCodeSecurity{msg}
+		m.Oneof = &SecurityDefinitionsItem_Oauth2AccessCodeSecurity{msg}
 		return true, err
 	default:
 		return false, nil
 	}
 }
 
-func _SecurityDe***REMOVED***nitionsItem_OneofSizer(msg proto.Message) (n int) {
-	m := msg.(*SecurityDe***REMOVED***nitionsItem)
+func _SecurityDefinitionsItem_OneofSizer(msg proto.Message) (n int) {
+	m := msg.(*SecurityDefinitionsItem)
 	// oneof
 	switch x := m.Oneof.(type) {
-	case *SecurityDe***REMOVED***nitionsItem_BasicAuthenticationSecurity:
+	case *SecurityDefinitionsItem_BasicAuthenticationSecurity:
 		s := proto.Size(x.BasicAuthenticationSecurity)
 		n += proto.SizeVarint(1<<3 | proto.WireBytes)
 		n += proto.SizeVarint(uint64(s))
 		n += s
-	case *SecurityDe***REMOVED***nitionsItem_ApiKeySecurity:
+	case *SecurityDefinitionsItem_ApiKeySecurity:
 		s := proto.Size(x.ApiKeySecurity)
 		n += proto.SizeVarint(2<<3 | proto.WireBytes)
 		n += proto.SizeVarint(uint64(s))
 		n += s
-	case *SecurityDe***REMOVED***nitionsItem_Oauth2ImplicitSecurity:
+	case *SecurityDefinitionsItem_Oauth2ImplicitSecurity:
 		s := proto.Size(x.Oauth2ImplicitSecurity)
 		n += proto.SizeVarint(3<<3 | proto.WireBytes)
 		n += proto.SizeVarint(uint64(s))
 		n += s
-	case *SecurityDe***REMOVED***nitionsItem_Oauth2PasswordSecurity:
+	case *SecurityDefinitionsItem_Oauth2PasswordSecurity:
 		s := proto.Size(x.Oauth2PasswordSecurity)
 		n += proto.SizeVarint(4<<3 | proto.WireBytes)
 		n += proto.SizeVarint(uint64(s))
 		n += s
-	case *SecurityDe***REMOVED***nitionsItem_Oauth2ApplicationSecurity:
+	case *SecurityDefinitionsItem_Oauth2ApplicationSecurity:
 		s := proto.Size(x.Oauth2ApplicationSecurity)
 		n += proto.SizeVarint(5<<3 | proto.WireBytes)
 		n += proto.SizeVarint(uint64(s))
 		n += s
-	case *SecurityDe***REMOVED***nitionsItem_Oauth2AccessCodeSecurity:
+	case *SecurityDefinitionsItem_Oauth2AccessCodeSecurity:
 		s := proto.Size(x.Oauth2AccessCodeSecurity)
 		n += proto.SizeVarint(6<<3 | proto.WireBytes)
 		n += proto.SizeVarint(uint64(s))
@@ -4036,7 +4036,7 @@ type SecurityRequirement struct {
 func (m *SecurityRequirement) Reset()                    { *m = SecurityRequirement{} }
 func (m *SecurityRequirement) String() string            { return proto.CompactTextString(m) }
 func (*SecurityRequirement) ProtoMessage()               {}
-func (*SecurityRequirement) Descriptor() ([]byte, []int) { return ***REMOVED***leDescriptor0, []int{54} }
+func (*SecurityRequirement) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{54} }
 
 func (m *SecurityRequirement) GetAdditionalProperties() []*NamedStringArray {
 	if m != nil {
@@ -4052,7 +4052,7 @@ type StringArray struct {
 func (m *StringArray) Reset()                    { *m = StringArray{} }
 func (m *StringArray) String() string            { return proto.CompactTextString(m) }
 func (*StringArray) ProtoMessage()               {}
-func (*StringArray) Descriptor() ([]byte, []int) { return ***REMOVED***leDescriptor0, []int{55} }
+func (*StringArray) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{55} }
 
 func (m *StringArray) GetValue() []string {
 	if m != nil {
@@ -4071,7 +4071,7 @@ type Tag struct {
 func (m *Tag) Reset()                    { *m = Tag{} }
 func (m *Tag) String() string            { return proto.CompactTextString(m) }
 func (*Tag) ProtoMessage()               {}
-func (*Tag) Descriptor() ([]byte, []int) { return ***REMOVED***leDescriptor0, []int{56} }
+func (*Tag) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{56} }
 
 func (m *Tag) GetName() string {
 	if m != nil {
@@ -4108,7 +4108,7 @@ type TypeItem struct {
 func (m *TypeItem) Reset()                    { *m = TypeItem{} }
 func (m *TypeItem) String() string            { return proto.CompactTextString(m) }
 func (*TypeItem) ProtoMessage()               {}
-func (*TypeItem) Descriptor() ([]byte, []int) { return ***REMOVED***leDescriptor0, []int{57} }
+func (*TypeItem) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{57} }
 
 func (m *TypeItem) GetValue() []string {
 	if m != nil {
@@ -4125,7 +4125,7 @@ type VendorExtension struct {
 func (m *VendorExtension) Reset()                    { *m = VendorExtension{} }
 func (m *VendorExtension) String() string            { return proto.CompactTextString(m) }
 func (*VendorExtension) ProtoMessage()               {}
-func (*VendorExtension) Descriptor() ([]byte, []int) { return ***REMOVED***leDescriptor0, []int{58} }
+func (*VendorExtension) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{58} }
 
 func (m *VendorExtension) GetAdditionalProperties() []*NamedAny {
 	if m != nil {
@@ -4137,7 +4137,7 @@ func (m *VendorExtension) GetAdditionalProperties() []*NamedAny {
 type Xml struct {
 	Name            string      `protobuf:"bytes,1,opt,name=name" json:"name,omitempty"`
 	Namespace       string      `protobuf:"bytes,2,opt,name=namespace" json:"namespace,omitempty"`
-	Pre***REMOVED***x          string      `protobuf:"bytes,3,opt,name=pre***REMOVED***x" json:"pre***REMOVED***x,omitempty"`
+	Prefix          string      `protobuf:"bytes,3,opt,name=prefix" json:"prefix,omitempty"`
 	Attribute       bool        `protobuf:"varint,4,opt,name=attribute" json:"attribute,omitempty"`
 	Wrapped         bool        `protobuf:"varint,5,opt,name=wrapped" json:"wrapped,omitempty"`
 	VendorExtension []*NamedAny `protobuf:"bytes,6,rep,name=vendor_extension,json=vendorExtension" json:"vendor_extension,omitempty"`
@@ -4146,7 +4146,7 @@ type Xml struct {
 func (m *Xml) Reset()                    { *m = Xml{} }
 func (m *Xml) String() string            { return proto.CompactTextString(m) }
 func (*Xml) ProtoMessage()               {}
-func (*Xml) Descriptor() ([]byte, []int) { return ***REMOVED***leDescriptor0, []int{59} }
+func (*Xml) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{59} }
 
 func (m *Xml) GetName() string {
 	if m != nil {
@@ -4162,9 +4162,9 @@ func (m *Xml) GetNamespace() string {
 	return ""
 }
 
-func (m *Xml) GetPre***REMOVED***x() string {
+func (m *Xml) GetPrefix() string {
 	if m != nil {
-		return m.Pre***REMOVED***x
+		return m.Prefix
 	}
 	return ""
 }
@@ -4198,7 +4198,7 @@ func init() {
 	proto.RegisterType((*BodyParameter)(nil), "openapi.v2.BodyParameter")
 	proto.RegisterType((*Contact)(nil), "openapi.v2.Contact")
 	proto.RegisterType((*Default)(nil), "openapi.v2.Default")
-	proto.RegisterType((*De***REMOVED***nitions)(nil), "openapi.v2.De***REMOVED***nitions")
+	proto.RegisterType((*Definitions)(nil), "openapi.v2.Definitions")
 	proto.RegisterType((*Document)(nil), "openapi.v2.Document")
 	proto.RegisterType((*Examples)(nil), "openapi.v2.Examples")
 	proto.RegisterType((*ExternalDocs)(nil), "openapi.v2.ExternalDocs")
@@ -4218,7 +4218,7 @@ func init() {
 	proto.RegisterType((*NamedResponse)(nil), "openapi.v2.NamedResponse")
 	proto.RegisterType((*NamedResponseValue)(nil), "openapi.v2.NamedResponseValue")
 	proto.RegisterType((*NamedSchema)(nil), "openapi.v2.NamedSchema")
-	proto.RegisterType((*NamedSecurityDe***REMOVED***nitionsItem)(nil), "openapi.v2.NamedSecurityDe***REMOVED***nitionsItem")
+	proto.RegisterType((*NamedSecurityDefinitionsItem)(nil), "openapi.v2.NamedSecurityDefinitionsItem")
 	proto.RegisterType((*NamedString)(nil), "openapi.v2.NamedString")
 	proto.RegisterType((*NamedStringArray)(nil), "openapi.v2.NamedStringArray")
 	proto.RegisterType((*NonBodyParameter)(nil), "openapi.v2.NonBodyParameter")
@@ -4229,7 +4229,7 @@ func init() {
 	proto.RegisterType((*Oauth2Scopes)(nil), "openapi.v2.Oauth2Scopes")
 	proto.RegisterType((*Operation)(nil), "openapi.v2.Operation")
 	proto.RegisterType((*Parameter)(nil), "openapi.v2.Parameter")
-	proto.RegisterType((*ParameterDe***REMOVED***nitions)(nil), "openapi.v2.ParameterDe***REMOVED***nitions")
+	proto.RegisterType((*ParameterDefinitions)(nil), "openapi.v2.ParameterDefinitions")
 	proto.RegisterType((*ParametersItem)(nil), "openapi.v2.ParametersItem")
 	proto.RegisterType((*PathItem)(nil), "openapi.v2.PathItem")
 	proto.RegisterType((*PathParameterSubSchema)(nil), "openapi.v2.PathParameterSubSchema")
@@ -4238,13 +4238,13 @@ func init() {
 	proto.RegisterType((*Properties)(nil), "openapi.v2.Properties")
 	proto.RegisterType((*QueryParameterSubSchema)(nil), "openapi.v2.QueryParameterSubSchema")
 	proto.RegisterType((*Response)(nil), "openapi.v2.Response")
-	proto.RegisterType((*ResponseDe***REMOVED***nitions)(nil), "openapi.v2.ResponseDe***REMOVED***nitions")
+	proto.RegisterType((*ResponseDefinitions)(nil), "openapi.v2.ResponseDefinitions")
 	proto.RegisterType((*ResponseValue)(nil), "openapi.v2.ResponseValue")
 	proto.RegisterType((*Responses)(nil), "openapi.v2.Responses")
 	proto.RegisterType((*Schema)(nil), "openapi.v2.Schema")
 	proto.RegisterType((*SchemaItem)(nil), "openapi.v2.SchemaItem")
-	proto.RegisterType((*SecurityDe***REMOVED***nitions)(nil), "openapi.v2.SecurityDe***REMOVED***nitions")
-	proto.RegisterType((*SecurityDe***REMOVED***nitionsItem)(nil), "openapi.v2.SecurityDe***REMOVED***nitionsItem")
+	proto.RegisterType((*SecurityDefinitions)(nil), "openapi.v2.SecurityDefinitions")
+	proto.RegisterType((*SecurityDefinitionsItem)(nil), "openapi.v2.SecurityDefinitionsItem")
 	proto.RegisterType((*SecurityRequirement)(nil), "openapi.v2.SecurityRequirement")
 	proto.RegisterType((*StringArray)(nil), "openapi.v2.StringArray")
 	proto.RegisterType((*Tag)(nil), "openapi.v2.Tag")
@@ -4253,9 +4253,9 @@ func init() {
 	proto.RegisterType((*Xml)(nil), "openapi.v2.Xml")
 }
 
-func init() { proto.RegisterFile("OpenAPIv2/OpenAPIv2.proto", ***REMOVED***leDescriptor0) }
+func init() { proto.RegisterFile("OpenAPIv2/OpenAPIv2.proto", fileDescriptor0) }
 
-var ***REMOVED***leDescriptor0 = []byte{
+var fileDescriptor0 = []byte{
 	// 3129 bytes of a gzipped FileDescriptorProto
 	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x09, 0x6e, 0x88, 0x02, 0xff, 0xec, 0x3b, 0x4b, 0x73, 0x1c, 0x57,
 	0xd5, 0xf3, 0x7e, 0x1c, 0x69, 0x46, 0xa3, 0x96, 0x2c, 0xb7, 0x24, 0xc7, 0x71, 0xe4, 0x3c, 0x6c,

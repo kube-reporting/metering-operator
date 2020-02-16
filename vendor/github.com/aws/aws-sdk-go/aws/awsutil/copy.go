@@ -9,7 +9,7 @@ import (
 // Copy deeply copies a src structure to dst. Useful for copying request and
 // response structures.
 //
-// Can copy between structs of different type, but will only copy ***REMOVED***elds which
+// Can copy between structs of different type, but will only copy fields which
 // are assignable, and exist in both structs. Fields which are not assignable,
 // or do not exist in both structs are ignored.
 func Copy(dst, src interface{}) {
@@ -44,15 +44,15 @@ func rcopy(dst, src reflect.Value, root bool) {
 		if _, ok := src.Interface().(io.Reader); ok {
 			if dst.Kind() == reflect.Ptr && dst.Elem().CanSet() {
 				dst.Elem().Set(src)
-			} ***REMOVED*** if dst.CanSet() {
+			} else if dst.CanSet() {
 				dst.Set(src)
 			}
-		} ***REMOVED*** {
+		} else {
 			e := src.Type().Elem()
 			if dst.CanSet() && !src.IsNil() {
 				if _, ok := src.Interface().(*time.Time); !ok {
 					dst.Set(reflect.New(e))
-				} ***REMOVED*** {
+				} else {
 					tempValue := reflect.New(e)
 					tempValue.Elem().Set(src.Elem())
 					// Sets time.Time's unexported values

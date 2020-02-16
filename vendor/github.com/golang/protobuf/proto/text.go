@@ -4,7 +4,7 @@
 // https://github.com/golang/protobuf
 //
 // Redistribution and use in source and binary forms, with or without
-// modi***REMOVED***cation, are permitted provided that the following conditions are
+// modification, are permitted provided that the following conditions are
 // met:
 //
 //     * Redistributions of source code must retain the above copyright
@@ -15,7 +15,7 @@
 // distribution.
 //     * Neither the name of Google Inc. nor the names of its
 // contributors may be used to endorse or promote products derived from
-// this software without speci***REMOVED***c prior written permission.
+// this software without specific prior written permission.
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
 // "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
@@ -34,7 +34,7 @@ package proto
 // Functions for writing the text protocol buffer format.
 
 import (
-	"bu***REMOVED***o"
+	"bufio"
 	"bytes"
 	"encoding"
 	"errors"
@@ -229,12 +229,12 @@ func (tm *TextMarshaler) writeProto3Any(w *textWriter, sv reflect.Value) (bool, 
 	u := turl.String()
 	if requiresQuotes(u) {
 		writeString(w, u)
-	} ***REMOVED*** {
+	} else {
 		w.Write([]byte(u))
 	}
 	if w.compact {
 		w.Write([]byte("]:<"))
-	} ***REMOVED*** {
+	} else {
 		w.Write([]byte("]: <\n"))
 		w.ind++
 	}
@@ -243,7 +243,7 @@ func (tm *TextMarshaler) writeProto3Any(w *textWriter, sv reflect.Value) (bool, 
 	}
 	if w.compact {
 		w.Write([]byte("> "))
-	} ***REMOVED*** {
+	} else {
 		w.ind--
 		w.Write([]byte(">\n"))
 	}
@@ -267,11 +267,11 @@ func (tm *TextMarshaler) writeStruct(w *textWriter, sv reflect.Value) error {
 			continue
 		}
 
-		if strings.HasPre***REMOVED***x(name, "XXX_") {
-			// There are two XXX_ ***REMOVED***elds:
+		if strings.HasPrefix(name, "XXX_") {
+			// There are two XXX_ fields:
 			//   XXX_unrecognized []byte
 			//   XXX_extensions   map[int32]proto.Extension
-			// The ***REMOVED***rst is handled here;
+			// The first is handled here;
 			// the second is handled at the bottom of this function.
 			if name == "XXX_unrecognized" && !fv.IsNil() {
 				if err := writeUnknownStruct(w, fv.Interface().([]byte)); err != nil {
@@ -281,18 +281,18 @@ func (tm *TextMarshaler) writeStruct(w *textWriter, sv reflect.Value) error {
 			continue
 		}
 		if fv.Kind() == reflect.Ptr && fv.IsNil() {
-			// Field not ***REMOVED***lled in. This could be an optional ***REMOVED***eld or
-			// a required ***REMOVED***eld that wasn't ***REMOVED***lled in. Either way, there
+			// Field not filled in. This could be an optional field or
+			// a required field that wasn't filled in. Either way, there
 			// isn't anything we can show for it.
 			continue
 		}
 		if fv.Kind() == reflect.Slice && fv.IsNil() {
-			// Repeated ***REMOVED***eld that is empty, or a bytes ***REMOVED***eld that is unused.
+			// Repeated field that is empty, or a bytes field that is unused.
 			continue
 		}
 
 		if props.Repeated && fv.Kind() == reflect.Slice {
-			// Repeated ***REMOVED***eld.
+			// Repeated field.
 			for j := 0; j < fv.Len(); j++ {
 				if err := writeName(w, props); err != nil {
 					return err
@@ -304,7 +304,7 @@ func (tm *TextMarshaler) writeStruct(w *textWriter, sv reflect.Value) error {
 				}
 				v := fv.Index(j)
 				if v.Kind() == reflect.Ptr && v.IsNil() {
-					// A nil message in a repeated ***REMOVED***eld is not valid,
+					// A nil message in a repeated field is not valid,
 					// but we can handle that more gracefully than panicking.
 					if _, err := w.Write([]byte("<nil>\n")); err != nil {
 						return err
@@ -321,7 +321,7 @@ func (tm *TextMarshaler) writeStruct(w *textWriter, sv reflect.Value) error {
 			continue
 		}
 		if fv.Kind() == reflect.Map {
-			// Map ***REMOVED***elds are rendered as a repeated struct with key/value ***REMOVED***elds.
+			// Map fields are rendered as a repeated struct with key/value fields.
 			keys := fv.MapKeys()
 			sort.Sort(mapKeys(keys))
 			for _, key := range keys {
@@ -389,11 +389,11 @@ func (tm *TextMarshaler) writeStruct(w *textWriter, sv reflect.Value) error {
 			continue
 		}
 		if props.proto3 && fv.Kind() == reflect.Slice && fv.Len() == 0 {
-			// empty bytes ***REMOVED***eld
+			// empty bytes field
 			continue
 		}
 		if fv.Kind() != reflect.Ptr && fv.Kind() != reflect.Slice {
-			// proto3 non-repeated scalar ***REMOVED***eld; skip if zero value
+			// proto3 non-repeated scalar field; skip if zero value
 			if isProto3Zero(fv) {
 				continue
 			}
@@ -403,7 +403,7 @@ func (tm *TextMarshaler) writeStruct(w *textWriter, sv reflect.Value) error {
 			// Check if it is a oneof.
 			if st.Field(i).Tag.Get("protobuf_oneof") != "" {
 				// fv is nil, or holds a pointer to generated struct.
-				// That generated struct has exactly one ***REMOVED***eld,
+				// That generated struct has exactly one field,
 				// which has a protobuf struct tag.
 				if fv.IsNil() {
 					continue
@@ -435,7 +435,7 @@ func (tm *TextMarshaler) writeStruct(w *textWriter, sv reflect.Value) error {
 			}
 		}
 
-		// Enums have a String method, so writeAny will work ***REMOVED***ne.
+		// Enums have a String method, so writeAny will work fine.
 		if err := tm.writeAny(w, fv, props); err != nil {
 			return err
 		}
@@ -445,7 +445,7 @@ func (tm *TextMarshaler) writeStruct(w *textWriter, sv reflect.Value) error {
 		}
 	}
 
-	// Extensions (the XXX_extensions ***REMOVED***eld).
+	// Extensions (the XXX_extensions field).
 	pv := sv.Addr()
 	if _, err := extendable(pv.Interface()); err == nil {
 		if err := tm.writeExtensions(w, pv); err != nil {
@@ -456,7 +456,7 @@ func (tm *TextMarshaler) writeStruct(w *textWriter, sv reflect.Value) error {
 	return nil
 }
 
-// writeAny writes an arbitrary ***REMOVED***eld.
+// writeAny writes an arbitrary field.
 func (tm *TextMarshaler) writeAny(w *textWriter, v reflect.Value, props *Properties) error {
 	v = reflect.Indirect(v)
 
@@ -483,7 +483,7 @@ func (tm *TextMarshaler) writeAny(w *textWriter, v reflect.Value, props *Propert
 	// that can occur in protocol buffers.
 	switch v.Kind() {
 	case reflect.Slice:
-		// Should only be a []byte; repeated ***REMOVED***elds are handled in writeStruct.
+		// Should only be a []byte; repeated fields are handled in writeStruct.
 		if err := writeString(w, string(v.Bytes())); err != nil {
 			return err
 		}
@@ -527,7 +527,7 @@ func (tm *TextMarshaler) writeAny(w *textWriter, v reflect.Value, props *Propert
 			if _, err = w.Write(text); err != nil {
 				return err
 			}
-		} ***REMOVED*** {
+		} else {
 			if v.Kind() == reflect.Ptr {
 				v = v.Elem()
 			}
@@ -581,7 +581,7 @@ func writeString(w *textWriter, s string) error {
 		default:
 			if isprint(c) {
 				err = w.w.WriteByte(c)
-			} ***REMOVED*** {
+			} else {
 				_, err = fmt.Fprintf(w.w, "\\%03o", c)
 			}
 		}
@@ -631,7 +631,7 @@ func writeUnknownStruct(w *textWriter, data []byte) (err error) {
 			buf, e := b.DecodeRawBytes(false)
 			if e == nil {
 				_, err = fmt.Fprintf(w, "%q", buf)
-			} ***REMOVED*** {
+			} else {
 				_, err = fmt.Fprintf(w, "/* %v */", e)
 			}
 		case WireFixed32:
@@ -662,7 +662,7 @@ func writeUnknownStruct(w *textWriter, data []byte) (err error) {
 func writeUnknownInt(w *textWriter, x uint64, err error) error {
 	if err == nil {
 		_, err = fmt.Fprint(w, x)
-	} ***REMOVED*** {
+	} else {
 		_, err = fmt.Fprintf(w, "/* %v */", err)
 	}
 	return err
@@ -719,7 +719,7 @@ func (tm *TextMarshaler) writeExtensions(w *textWriter, pv reflect.Value) error 
 			if err := tm.writeExtension(w, desc.Name, pb); err != nil {
 				return err
 			}
-		} ***REMOVED*** {
+		} else {
 			v := reflect.ValueOf(pb)
 			for i := 0; i < v.Len(); i++ {
 				if err := tm.writeExtension(w, desc.Name, v.Index(i).Interface()); err != nil {
@@ -765,7 +765,7 @@ func (w *textWriter) writeIndent() {
 	w.complete = false
 }
 
-// TextMarshaler is a con***REMOVED***gurable text format marshaler.
+// TextMarshaler is a configurable text format marshaler.
 type TextMarshaler struct {
 	Compact   bool // use compact text format (one line).
 	ExpandAny bool // expand google.protobuf.Any messages of known types
@@ -779,10 +779,10 @@ func (tm *TextMarshaler) Marshal(w io.Writer, pb Message) error {
 		w.Write([]byte("<nil>"))
 		return nil
 	}
-	var bw *bu***REMOVED***o.Writer
+	var bw *bufio.Writer
 	ww, ok := w.(writer)
 	if !ok {
-		bw = bu***REMOVED***o.NewWriter(w)
+		bw = bufio.NewWriter(w)
 		ww = bw
 	}
 	aw := &textWriter{

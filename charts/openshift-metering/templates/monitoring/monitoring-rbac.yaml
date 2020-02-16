@@ -1,6 +1,6 @@
 {{- if and .Values.monitoring.enabled .Values.monitoring.createRBAC }}
 # Grant Prometheus permissions to discover our services, endpoints, and pods so
-# it can ***REMOVED***gure out what needs to be monitored.
+# it can figure out what needs to be monitored.
 apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
 metadata:

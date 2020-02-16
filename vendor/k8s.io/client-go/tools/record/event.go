@@ -2,7 +2,7 @@
 Copyright 2014 The Kubernetes Authors.
 
 Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this ***REMOVED***le except in compliance with the License.
+you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
 
     http://www.apache.org/licenses/LICENSE-2.0
@@ -10,7 +10,7 @@ You may obtain a copy of the License at
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the speci***REMOVED***c language governing permissions and
+See the License for the specific language governing permissions and
 limitations under the License.
 */
 
@@ -67,10 +67,10 @@ type EventRecorder interface {
 	// The resulting event will be created in the same namespace as the reference object.
 	Event(object runtime.Object, eventtype, reason, message string)
 
-	// Eventf is just like Event, but with Sprintf for the message ***REMOVED***eld.
+	// Eventf is just like Event, but with Sprintf for the message field.
 	Eventf(object runtime.Object, eventtype, reason, messageFmt string, args ...interface{})
 
-	// PastEventf is just like Eventf, but with an option to specify the event's 'timestamp' ***REMOVED***eld.
+	// PastEventf is just like Eventf, but with an option to specify the event's 'timestamp' field.
 	PastEventf(object runtime.Object, timestamp metav1.Time, eventtype, reason, messageFmt string, args ...interface{})
 
 	// AnnotatedEventf is just like eventf, but with annotations attached
@@ -111,7 +111,7 @@ type eventBroadcasterImpl struct {
 	sleepDuration time.Duration
 }
 
-// StartRecordingToSink starts sending events received from the speci***REMOVED***ed eventBroadcaster to the given sink.
+// StartRecordingToSink starts sending events received from the specified eventBroadcaster to the given sink.
 // The return value can be ignored or used to stop recording, if desired.
 // TODO: make me an object with parameterizable queue length and retry interval
 func (eventBroadcaster *eventBroadcasterImpl) StartRecordingToSink(sink EventSink) watch.Interface {
@@ -126,7 +126,7 @@ func (eventBroadcaster *eventBroadcasterImpl) StartRecordingToSink(sink EventSin
 }
 
 func recordToSink(sink EventSink, event *v1.Event, eventCorrelator *EventCorrelator, randGen *rand.Rand, sleepDuration time.Duration) {
-	// Make a copy before modi***REMOVED***cation, because there could be multiple listeners.
+	// Make a copy before modification, because there could be multiple listeners.
 	// Events are safe to copy like this.
 	eventCopy := *event
 	event = &eventCopy
@@ -147,11 +147,11 @@ func recordToSink(sink EventSink, event *v1.Event, eventCorrelator *EventCorrela
 			klog.Errorf("Unable to write event '%#v' (retry limit exceeded!)", event)
 			break
 		}
-		// Randomize the ***REMOVED***rst sleep so that various clients won't all be
+		// Randomize the first sleep so that various clients won't all be
 		// synced up if the master goes down.
 		if tries == 1 {
 			time.Sleep(time.Duration(float64(sleepDuration) * randGen.Float64()))
-		} ***REMOVED*** {
+		} else {
 			time.Sleep(sleepDuration)
 		}
 	}
@@ -199,7 +199,7 @@ func recordEvent(sink EventSink, event *v1.Event, patch []byte, updateExistingEv
 	case *errors.StatusError:
 		if errors.IsAlreadyExists(err) {
 			klog.V(5).Infof("Server rejected event '%#v': '%v' (will not retry!)", event, err)
-		} ***REMOVED*** {
+		} else {
 			klog.Errorf("Server rejected event '%#v': '%v' (will not retry!)", event, err)
 		}
 		return true

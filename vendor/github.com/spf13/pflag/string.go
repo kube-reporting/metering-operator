@@ -31,7 +31,7 @@ func (f *FlagSet) GetString(name string) (string, error) {
 	return val.(string), nil
 }
 
-// StringVar de***REMOVED***nes a string flag with speci***REMOVED***ed name, default value, and usage string.
+// StringVar defines a string flag with specified name, default value, and usage string.
 // The argument p points to a string variable in which to store the value of the flag.
 func (f *FlagSet) StringVar(p *string, name string, value string, usage string) {
 	f.VarP(newStringValue(value, p), name, "", usage)
@@ -42,7 +42,7 @@ func (f *FlagSet) StringVarP(p *string, name, shorthand string, value string, us
 	f.VarP(newStringValue(value, p), name, shorthand, usage)
 }
 
-// StringVar de***REMOVED***nes a string flag with speci***REMOVED***ed name, default value, and usage string.
+// StringVar defines a string flag with specified name, default value, and usage string.
 // The argument p points to a string variable in which to store the value of the flag.
 func StringVar(p *string, name string, value string, usage string) {
 	CommandLine.VarP(newStringValue(value, p), name, "", usage)
@@ -53,7 +53,7 @@ func StringVarP(p *string, name, shorthand string, value string, usage string) {
 	CommandLine.VarP(newStringValue(value, p), name, shorthand, usage)
 }
 
-// String de***REMOVED***nes a string flag with speci***REMOVED***ed name, default value, and usage string.
+// String defines a string flag with specified name, default value, and usage string.
 // The return value is the address of a string variable that stores the value of the flag.
 func (f *FlagSet) String(name string, value string, usage string) *string {
 	p := new(string)
@@ -68,7 +68,7 @@ func (f *FlagSet) StringP(name, shorthand string, value string, usage string) *s
 	return p
 }
 
-// String de***REMOVED***nes a string flag with speci***REMOVED***ed name, default value, and usage string.
+// String defines a string flag with specified name, default value, and usage string.
 // The return value is the address of a string variable that stores the value of the flag.
 func String(name string, value string, usage string) *string {
 	return CommandLine.StringP(name, "", value, usage)

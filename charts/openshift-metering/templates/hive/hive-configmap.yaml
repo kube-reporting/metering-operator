@@ -1,10 +1,10 @@
 apiVersion: v1
-kind: Con***REMOVED***gMap
+kind: ConfigMap
 metadata:
-  name: hive-con***REMOVED***g
+  name: hive-config
 data:
   hive-site.xml: |
-    <con***REMOVED***guration>
+    <configuration>
       <property>
         <name>hive.server2.enable.doAs</name>
         <value>false</value>
@@ -31,75 +31,75 @@ data:
       </property>
       <property>
         <name>hive.server2.thrift.bind.host</name>
-{{- if .Values.hive.spec.server.con***REMOVED***g.tls.enabled }}
+{{- if .Values.hive.spec.server.config.tls.enabled }}
         <value>127.0.0.1</value>
-{{- ***REMOVED*** }}
+{{- else }}
         <value>0.0.0.0</value>
 {{- end }}
       </property>
       <property>
         <name>hive.metastore.thrift.bind.host</name>
-{{- if .Values.hive.spec.metastore.con***REMOVED***g.tls.enabled }}
+{{- if .Values.hive.spec.metastore.config.tls.enabled }}
         <value>127.0.0.1</value>
-{{- ***REMOVED*** }}
+{{- else }}
         <value>0.0.0.0</value>
 {{- end }}
       </property>
       <property>
         <name>hive.metastore.uris</name>
-{{- if .Values.hive.spec.metastore.con***REMOVED***g.tls.enabled }}
+{{- if .Values.hive.spec.metastore.config.tls.enabled }}
         <value>thrift://localhost:9083</value>
-{{- ***REMOVED*** }}
+{{- else }}
         <value>thrift://hive-metastore:9083</value>
 {{- end }}
       </property>
       <property>
         <name>javax.jdo.option.ConnectionURL</name>
-        <value>{{ .Values.hive.spec.con***REMOVED***g.db.url }}</value>
+        <value>{{ .Values.hive.spec.config.db.url }}</value>
       </property>
       <property>
         <name>javax.jdo.option.ConnectionDriverName</name>
-        <value>{{ .Values.hive.spec.con***REMOVED***g.db.driver }}</value>
+        <value>{{ .Values.hive.spec.config.db.driver }}</value>
       </property>
-{{- if .Values.hive.spec.con***REMOVED***g.db.username }}
+{{- if .Values.hive.spec.config.db.username }}
       <property>
         <name>javax.jdo.option.ConnectionUserName</name>
-        <value>{{ .Values.hive.spec.con***REMOVED***g.db.username }}</value>
+        <value>{{ .Values.hive.spec.config.db.username }}</value>
       </property>
 {{- end }}
-{{- if .Values.hive.spec.con***REMOVED***g.db.password }}
+{{- if .Values.hive.spec.config.db.password }}
       <property>
         <name>javax.jdo.option.ConnectionPassword</name>
-        <value>{{ .Values.hive.spec.con***REMOVED***g.db.password }}</value>
+        <value>{{ .Values.hive.spec.config.db.password }}</value>
       </property>
 {{- end }}
       <property>
         <name>datanucleus.schema.autoCreateAll</name>
-        <value>{{ .Values.hive.spec.con***REMOVED***g.db.autoCreateMetastoreSchema }}</value>
+        <value>{{ .Values.hive.spec.config.db.autoCreateMetastoreSchema }}</value>
       </property>
       <property>
-        <name>hive.metastore.schema.veri***REMOVED***cation</name>
-        <value>{{ .Values.hive.spec.con***REMOVED***g.db.enableMetastoreSchemaVeri***REMOVED***cation }}</value>
+        <name>hive.metastore.schema.verification</name>
+        <value>{{ .Values.hive.spec.config.db.enableMetastoreSchemaVerification }}</value>
       </property>
-{{- if .Values.hive.spec.con***REMOVED***g.defaultFileFormat }}
+{{- if .Values.hive.spec.config.defaultFileFormat }}
       <property>
-        <name>hive.default.***REMOVED***leformat</name>
-        <value>{{ .Values.hive.spec.con***REMOVED***g.defaultFileFormat }}</value>
+        <name>hive.default.fileformat</name>
+        <value>{{ .Values.hive.spec.config.defaultFileFormat }}</value>
       </property>
 {{- end }}
-{{- if .Values.hive.spec.con***REMOVED***g.metastoreWarehouseDir }}
+{{- if .Values.hive.spec.config.metastoreWarehouseDir }}
       <property>
         <name>hive.metastore.warehouse.dir</name>
-        <value>{{ .Values.hive.spec.con***REMOVED***g.metastoreWarehouseDir }}</value>
+        <value>{{ .Values.hive.spec.config.metastoreWarehouseDir }}</value>
       </property>
 {{- end }}
-{{- if .Values.hive.spec.con***REMOVED***g.metastoreClientSocketTimeout }}
+{{- if .Values.hive.spec.config.metastoreClientSocketTimeout }}
       <property>
         <name>hive.metastore.client.socket.timeout</name>
-        <value>{{ .Values.hive.spec.con***REMOVED***g.metastoreClientSocketTimeout }}</value>
+        <value>{{ .Values.hive.spec.config.metastoreClientSocketTimeout }}</value>
       </property>
 {{- end }}
-    </con***REMOVED***guration>
+    </configuration>
 
 
   hive-log4j2.properties: |
@@ -111,7 +111,7 @@ data:
     property.hive.log.level = INFO
     property.hive.root.logger = console
     property.hive.log.dir = ${sys:java.io.tmpdir}/${sys:user.name}
-    property.hive.log.***REMOVED***le = hive.log
+    property.hive.log.file = hive.log
 
     # list of all appenders
     appenders = console
@@ -155,7 +155,7 @@ data:
     property.hive.log.level = INFO
     property.hive.root.logger = console
     property.hive.log.dir = ${sys:java.io.tmpdir}/${sys:user.name}
-    property.hive.log.***REMOVED***le = hive.log
+    property.hive.log.file = hive.log
 
     # list of all appenders
     appenders = console

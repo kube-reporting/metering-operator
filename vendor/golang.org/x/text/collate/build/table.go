@@ -1,6 +1,6 @@
 // Copyright 2012 The Go Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE ***REMOVED***le.
+// license that can be found in the LICENSE file.
 
 package build
 
@@ -19,7 +19,7 @@ type table struct {
 	root *trieHandle
 }
 
-// print writes the table as Go compilable code to w. It pre***REMOVED***xes the
+// print writes the table as Go compilable code to w. It prefixes the
 // variable names with name. It returns the number of bytes written
 // and the size of the resulting table.
 func (t *table) fprint(w io.Writer, name string) (n, size int, err error) {

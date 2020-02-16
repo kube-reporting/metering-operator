@@ -2,7 +2,7 @@
 Copyright 2015 The Kubernetes Authors.
 
 Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this ***REMOVED***le except in compliance with the License.
+you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
 
     http://www.apache.org/licenses/LICENSE-2.0
@@ -10,7 +10,7 @@ You may obtain a copy of the License at
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the speci***REMOVED***c language governing permissions and
+See the License for the specific language governing permissions and
 limitations under the License.
 */
 
@@ -37,13 +37,13 @@ type Package interface {
 	// this package.
 	Filter(*Context, *types.Type) bool
 
-	// Header should return a header for the ***REMOVED***le, including comment markers.
+	// Header should return a header for the file, including comment markers.
 	// Useful for copyright notices and doc strings. Include an
 	// autogeneration notice! Do not include the "package x" line.
-	Header(***REMOVED***lename string) []byte
+	Header(filename string) []byte
 
 	// Generators returns the list of generators for this package. It is
-	// allowed for more than one generator to write to the same ***REMOVED***le.
+	// allowed for more than one generator to write to the same file.
 	// A Context is passed in case the list of generators depends on the
 	// input types.
 	Generators(*Context) []Generator
@@ -82,7 +82,7 @@ type Packages []Package
 // 6. GenerateType()  // Called N times, once per type in the context's Order.
 // 7. Imports()
 //
-// You may have multiple generators for the same ***REMOVED***le.
+// You may have multiple generators for the same file.
 type Generator interface {
 	// The name of this generator. Will be included in generated comments.
 	Name() string
@@ -92,7 +92,7 @@ type Generator interface {
 	//
 	// Filter is called before any of the generator's other functions;
 	// subsequent calls will get a context with only the types that passed
-	// this ***REMOVED***lter.
+	// this filter.
 	Filter(*Context, *types.Type) bool
 
 	// If this generator needs special namers, return them here. These will
@@ -105,12 +105,12 @@ type Generator interface {
 	Namers(*Context) namer.NameSystems
 
 	// Init should write an init function, and any other content that's not
-	// generated per-type. (It's not intended for generator speci***REMOVED***c
+	// generated per-type. (It's not intended for generator specific
 	// initialization! Do that when your Package constructs the
 	// Generators.)
 	Init(*Context, io.Writer) error
 
-	// Finalize should write ***REMOVED***nish up functions, and any other content that's not
+	// Finalize should write finish up functions, and any other content that's not
 	// generated per-type.
 	Finalize(*Context, io.Writer) error
 
@@ -135,14 +135,14 @@ type Generator interface {
 	// you to keep track of what imports you actually need.
 	Imports(*Context) []string
 
-	// Preferred ***REMOVED***le name of this generator, not including a path. It is
-	// allowed for multiple generators to use the same ***REMOVED***lename, but it's
+	// Preferred file name of this generator, not including a path. It is
+	// allowed for multiple generators to use the same filename, but it's
 	// up to you to make sure they don't have colliding import names.
-	// TODO: provide per-***REMOVED***le import tracking, removing the requirement
+	// TODO: provide per-file import tracking, removing the requirement
 	// that generators coordinate..
 	Filename() string
 
-	// A registered ***REMOVED***le type in the context to generate this ***REMOVED***le with. If
+	// A registered file type in the context to generate this file with. If
 	// the FileType is not found in the context, execution will stop.
 	FileType() string
 }
@@ -156,15 +156,15 @@ type Context struct {
 	// All the types, in case you want to look up something.
 	Universe types.Universe
 
-	// All the user-speci***REMOVED***ed packages.  This is after recursive expansion.
+	// All the user-specified packages.  This is after recursive expansion.
 	Inputs []string
 
-	// The canonical ordering of the types (will be ***REMOVED***ltered by both the
+	// The canonical ordering of the types (will be filtered by both the
 	// Package's and Generator's Filter methods).
 	Order []*types.Type
 
 	// A set of types this context can process. If this is empty or nil,
-	// the default "golang" ***REMOVED***letype will be provided.
+	// the default "golang" filetype will be provided.
 	FileTypes map[string]FileType
 
 	// If true, Execute* calls will just verify that the existing output is
@@ -203,7 +203,7 @@ func NewContext(b *parser.Builder, nameSystems namer.NameSystems, canonicalOrder
 	return c, nil
 }
 
-// AddDir adds a Go package to the context. The speci***REMOVED***ed path must be a single
+// AddDir adds a Go package to the context. The specified path must be a single
 // go package import path.  GOPATH, GOROOT, and the location of your go binary
 // (`which go`) will all be searched, in the normal Go fashion.
 // Deprecated. Please use AddDirectory.
@@ -211,7 +211,7 @@ func (ctxt *Context) AddDir(path string) error {
 	return ctxt.builder.AddDirTo(path, &ctxt.Universe)
 }
 
-// AddDirectory adds a Go package to the context. The speci***REMOVED***ed path must be a
+// AddDirectory adds a Go package to the context. The specified path must be a
 // single go package import path.  GOPATH, GOROOT, and the location of your go
 // binary (`which go`) will all be searched, in the normal Go fashion.
 func (ctxt *Context) AddDirectory(path string) (*types.Package, error) {

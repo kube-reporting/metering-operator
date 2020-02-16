@@ -1,6 +1,6 @@
 // Copyright 2011 Google Inc. All rights reserved.
 // Use of this source code is governed by the Apache 2.0
-// license that can be found in the LICENSE ***REMOVED***le.
+// license that can be found in the LICENSE file.
 
 // Package internal provides support for package appengine.
 //
@@ -38,12 +38,12 @@ func RegisterTimeoutErrorCode(service string, code int32) {
 }
 
 // APIError is the type returned by appengine.Context's Call method
-// when an API call fails in an API-speci***REMOVED***c way. This may be, for instance,
+// when an API call fails in an API-specific way. This may be, for instance,
 // a taskqueue API call failing with TaskQueueServiceError::UNKNOWN_QUEUE.
 type APIError struct {
 	Service string
 	Detail  string
-	Code    int32 // API-speci***REMOVED***c error code
+	Code    int32 // API-specific error code
 }
 
 func (e *APIError) Error() string {
@@ -56,7 +56,7 @@ func (e *APIError) Error() string {
 	s := fmt.Sprintf("API error %d", e.Code)
 	if m, ok := errorCodeMaps[e.Service]; ok {
 		s += " (" + e.Service + ": " + m[e.Code] + ")"
-	} ***REMOVED*** {
+	} else {
 		// Shouldn't happen, but provide a bit more detail if it does.
 		s = e.Service + " " + s
 	}
@@ -106,5 +106,5 @@ func (e *CallError) IsTimeout() bool {
 
 // NamespaceMods is a map from API service to a function that will mutate an RPC request to attach a namespace.
 // The function should be prepared to be called on the same message more than once; it should only modify the
-// RPC request the ***REMOVED***rst time.
+// RPC request the first time.
 var NamespaceMods = make(map[string]func(m proto.Message, namespace string))

@@ -39,7 +39,7 @@ func (f *FlagSet) GetUint64(name string) (uint64, error) {
 	return val.(uint64), nil
 }
 
-// Uint64Var de***REMOVED***nes a uint64 flag with speci***REMOVED***ed name, default value, and usage string.
+// Uint64Var defines a uint64 flag with specified name, default value, and usage string.
 // The argument p points to a uint64 variable in which to store the value of the flag.
 func (f *FlagSet) Uint64Var(p *uint64, name string, value uint64, usage string) {
 	f.VarP(newUint64Value(value, p), name, "", usage)
@@ -50,7 +50,7 @@ func (f *FlagSet) Uint64VarP(p *uint64, name, shorthand string, value uint64, us
 	f.VarP(newUint64Value(value, p), name, shorthand, usage)
 }
 
-// Uint64Var de***REMOVED***nes a uint64 flag with speci***REMOVED***ed name, default value, and usage string.
+// Uint64Var defines a uint64 flag with specified name, default value, and usage string.
 // The argument p points to a uint64 variable in which to store the value of the flag.
 func Uint64Var(p *uint64, name string, value uint64, usage string) {
 	CommandLine.VarP(newUint64Value(value, p), name, "", usage)
@@ -61,7 +61,7 @@ func Uint64VarP(p *uint64, name, shorthand string, value uint64, usage string) {
 	CommandLine.VarP(newUint64Value(value, p), name, shorthand, usage)
 }
 
-// Uint64 de***REMOVED***nes a uint64 flag with speci***REMOVED***ed name, default value, and usage string.
+// Uint64 defines a uint64 flag with specified name, default value, and usage string.
 // The return value is the address of a uint64 variable that stores the value of the flag.
 func (f *FlagSet) Uint64(name string, value uint64, usage string) *uint64 {
 	p := new(uint64)
@@ -76,7 +76,7 @@ func (f *FlagSet) Uint64P(name, shorthand string, value uint64, usage string) *u
 	return p
 }
 
-// Uint64 de***REMOVED***nes a uint64 flag with speci***REMOVED***ed name, default value, and usage string.
+// Uint64 defines a uint64 flag with specified name, default value, and usage string.
 // The return value is the address of a uint64 variable that stores the value of the flag.
 func Uint64(name string, value uint64, usage string) *uint64 {
 	return CommandLine.Uint64P(name, "", value, usage)

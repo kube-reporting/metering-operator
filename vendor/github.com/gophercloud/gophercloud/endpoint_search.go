@@ -1,6 +1,6 @@
 package gophercloud
 
-// Availability indicates to whom a speci***REMOVED***c service endpoint is accessible:
+// Availability indicates to whom a specific service endpoint is accessible:
 // the internet at large, internal networks only, or only to administrators.
 // Different identity services use different terminology for these. Identity v2
 // lists them as different kinds of URLs within the service catalog ("adminURL",
@@ -22,7 +22,7 @@ const (
 	AvailabilityInternal Availability = "internal"
 )
 
-// EndpointOpts speci***REMOVED***es search criteria used by queries against an
+// EndpointOpts specifies search criteria used by queries against an
 // OpenStack service catalog. The options must contain enough information to
 // unambiguously identify one, and only one, endpoint within the catalog.
 //
@@ -57,14 +57,14 @@ type EndpointOpts struct {
 EndpointLocator is an internal function to be used by provider implementations.
 
 It provides an implementation that locates a single endpoint from a service
-catalog for a speci***REMOVED***c ProviderClient based on user-provided EndpointOpts. The
+catalog for a specific ProviderClient based on user-provided EndpointOpts. The
 provider then uses it to discover related ServiceClients.
 */
 type EndpointLocator func(EndpointOpts) (string, error)
 
 // ApplyDefaults is an internal method to be used by provider implementations.
 //
-// It sets EndpointOpts ***REMOVED***elds if not already set, including a default type.
+// It sets EndpointOpts fields if not already set, including a default type.
 // Currently, EndpointOpts.Availability defaults to the public endpoint.
 func (eo *EndpointOpts) ApplyDefaults(t string) {
 	if eo.Type == "" {

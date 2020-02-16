@@ -4,7 +4,7 @@
 // http://github.com/gogo/protobuf
 //
 // Redistribution and use in source and binary forms, with or without
-// modi***REMOVED***cation, are permitted provided that the following conditions are
+// modification, are permitted provided that the following conditions are
 // met:
 //
 //     * Redistributions of source code must retain the above copyright
@@ -28,7 +28,7 @@
 
 // +build !purego !appengine,!js
 
-// This ***REMOVED***le contains the implementation of the proto ***REMOVED***eld accesses using package unsafe.
+// This file contains the implementation of the proto field accesses using package unsafe.
 
 package proto
 

@@ -12,13 +12,13 @@ var _ = proto.Marshal
 var _ = fmt.Errorf
 var _ = math.Inf
 
-// This is a compile-time assertion to ensure that this generated ***REMOVED***le
+// This is a compile-time assertion to ensure that this generated file
 // is compatible with the proto package it is being compiled against.
 // A compilation error at this line likely means your copy of the
 // proto package needs to be updated.
 const _ = proto.ProtoPackageIsVersion2 // please upgrade the proto package
 
-// A Duration represents a signed, ***REMOVED***xed-length span of time represented
+// A Duration represents a signed, fixed-length span of time represented
 // as a count of seconds and fractions of seconds at nanosecond
 // resolution. It is independent of any calendar and concepts like "day"
 // or "month". It is related to Timestamp in that the difference between
@@ -39,7 +39,7 @@ const _ = proto.ProtoPackageIsVersion2 // please upgrade the proto package
 //     if (duration.seconds < 0 && duration.nanos > 0) {
 //       duration.seconds += 1;
 //       duration.nanos -= 1000000000;
-//     } ***REMOVED*** if (durations.seconds > 0 && duration.nanos < 0) {
+//     } else if (durations.seconds > 0 && duration.nanos < 0) {
 //       duration.seconds -= 1;
 //       duration.nanos += 1000000000;
 //     }
@@ -56,7 +56,7 @@ const _ = proto.ProtoPackageIsVersion2 // please upgrade the proto package
 //     if (end.nanos < 0) {
 //       end.seconds -= 1;
 //       end.nanos += 1000000000;
-//     } ***REMOVED*** if (end.nanos >= 1000000000) {
+//     } else if (end.nanos >= 1000000000) {
 //       end.seconds += 1;
 //       end.nanos -= 1000000000;
 //     }
@@ -70,7 +70,7 @@ const _ = proto.ProtoPackageIsVersion2 // please upgrade the proto package
 // # JSON Mapping
 //
 // In JSON format, the Duration type is encoded as a string rather than an
-// object, where the string ends in the suf***REMOVED***x "s" (indicating seconds) and
+// object, where the string ends in the suffix "s" (indicating seconds) and
 // is preceded by the number of seconds, with nanoseconds expressed as
 // fractional seconds. For example, 3 seconds with 0 nanoseconds should be
 // encoded in JSON format as "3s", while 3 seconds and 1 nanosecond should
@@ -85,9 +85,9 @@ type Duration struct {
 	Seconds int64 `protobuf:"varint,1,opt,name=seconds" json:"seconds,omitempty"`
 	// Signed fractions of a second at nanosecond resolution of the span
 	// of time. Durations less than one second are represented with a 0
-	// `seconds` ***REMOVED***eld and a positive or negative `nanos` ***REMOVED***eld. For durations
-	// of one second or more, a non-zero value for the `nanos` ***REMOVED***eld must be
-	// of the same sign as the `seconds` ***REMOVED***eld. Must be from -999,999,999
+	// `seconds` field and a positive or negative `nanos` field. For durations
+	// of one second or more, a non-zero value for the `nanos` field must be
+	// of the same sign as the `seconds` field. Must be from -999,999,999
 	// to +999,999,999 inclusive.
 	Nanos                int32    `protobuf:"varint,2,opt,name=nanos" json:"nanos,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
@@ -99,7 +99,7 @@ func (m *Duration) Reset()         { *m = Duration{} }
 func (m *Duration) String() string { return proto.CompactTextString(m) }
 func (*Duration) ProtoMessage()    {}
 func (*Duration) Descriptor() ([]byte, []int) {
-	return ***REMOVED***leDescriptor_duration_e7d612259e3f0613, []int{0}
+	return fileDescriptor_duration_e7d612259e3f0613, []int{0}
 }
 func (*Duration) XXX_WellKnownType() string { return "Duration" }
 func (m *Duration) XXX_Unmarshal(b []byte) error {
@@ -139,10 +139,10 @@ func init() {
 }
 
 func init() {
-	proto.RegisterFile("google/protobuf/duration.proto", ***REMOVED***leDescriptor_duration_e7d612259e3f0613)
+	proto.RegisterFile("google/protobuf/duration.proto", fileDescriptor_duration_e7d612259e3f0613)
 }
 
-var ***REMOVED***leDescriptor_duration_e7d612259e3f0613 = []byte{
+var fileDescriptor_duration_e7d612259e3f0613 = []byte{
 	// 190 bytes of a gzipped FileDescriptorProto
 	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xe2, 0x92, 0x4b, 0xcf, 0xcf, 0x4f,
 	0xcf, 0x49, 0xd5, 0x2f, 0x28, 0xca, 0x2f, 0xc9, 0x4f, 0x2a, 0x4d, 0xd3, 0x4f, 0x29, 0x2d, 0x4a,

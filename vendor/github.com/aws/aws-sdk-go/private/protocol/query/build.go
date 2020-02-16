@@ -29,7 +29,7 @@ func Build(r *request.Request) {
 		r.HTTPRequest.Method = "POST"
 		r.HTTPRequest.Header.Set("Content-Type", "application/x-www-form-urlencoded; charset=utf-8")
 		r.SetBufferBody([]byte(body.Encode()))
-	} ***REMOVED*** { // This is a pre-signed request
+	} else { // This is a pre-signed request
 		r.HTTPRequest.Method = "GET"
 		r.HTTPRequest.URL.RawQuery = body.Encode()
 	}

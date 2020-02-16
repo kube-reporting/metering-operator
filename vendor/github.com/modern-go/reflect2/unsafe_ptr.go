@@ -9,7 +9,7 @@ type UnsafePtrType struct {
 	unsafeType
 }
 
-func newUnsafePtrType(cfg *frozenCon***REMOVED***g, type1 reflect.Type) *UnsafePtrType {
+func newUnsafePtrType(cfg *frozenConfig, type1 reflect.Type) *UnsafePtrType {
 	return &UnsafePtrType{
 		unsafeType: *newUnsafeType(cfg, type1),
 	}

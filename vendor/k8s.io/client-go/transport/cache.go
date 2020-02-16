@@ -2,7 +2,7 @@
 Copyright 2015 The Kubernetes Authors.
 
 Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this ***REMOVED***le except in compliance with the License.
+you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
 
     http://www.apache.org/licenses/LICENSE-2.0
@@ -10,7 +10,7 @@ You may obtain a copy of the License at
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the speci***REMOVED***c language governing permissions and
+See the License for the specific language governing permissions and
 limitations under the License.
 */
 
@@ -26,9 +26,9 @@ import (
 	utilnet "k8s.io/apimachinery/pkg/util/net"
 )
 
-// TlsTransportCache caches TLS http.RoundTrippers different con***REMOVED***gurations. The
-// same RoundTripper will be returned for con***REMOVED***gs with identical TLS options If
-// the con***REMOVED***g has no custom TLS options, http.DefaultTransport is returned.
+// TlsTransportCache caches TLS http.RoundTrippers different configurations. The
+// same RoundTripper will be returned for configs with identical TLS options If
+// the config has no custom TLS options, http.DefaultTransport is returned.
 type tlsTransportCache struct {
 	mu         sync.Mutex
 	transports map[tlsCacheKey]*http.Transport
@@ -56,8 +56,8 @@ func (t tlsCacheKey) String() string {
 	return fmt.Sprintf("insecure:%v, caData:%#v, certData:%#v, keyData:%s, getCert: %s, serverName:%s, dial:%s", t.insecure, t.caData, t.certData, keyText, t.getCert, t.serverName, t.dial)
 }
 
-func (c *tlsTransportCache) get(con***REMOVED***g *Con***REMOVED***g) (http.RoundTripper, error) {
-	key, err := tlsCon***REMOVED***gKey(con***REMOVED***g)
+func (c *tlsTransportCache) get(config *Config) (http.RoundTripper, error) {
+	key, err := tlsConfigKey(config)
 	if err != nil {
 		return nil, err
 	}
@@ -66,22 +66,22 @@ func (c *tlsTransportCache) get(con***REMOVED***g *Con***REMOVED***g) (http.Roun
 	c.mu.Lock()
 	defer c.mu.Unlock()
 
-	// See if we already have a custom transport for this con***REMOVED***g
+	// See if we already have a custom transport for this config
 	if t, ok := c.transports[key]; ok {
 		return t, nil
 	}
 
-	// Get the TLS options for this client con***REMOVED***g
-	tlsCon***REMOVED***g, err := TLSCon***REMOVED***gFor(con***REMOVED***g)
+	// Get the TLS options for this client config
+	tlsConfig, err := TLSConfigFor(config)
 	if err != nil {
 		return nil, err
 	}
-	// The options didn't require a custom TLS con***REMOVED***g
-	if tlsCon***REMOVED***g == nil && con***REMOVED***g.Dial == nil {
+	// The options didn't require a custom TLS config
+	if tlsConfig == nil && config.Dial == nil {
 		return http.DefaultTransport, nil
 	}
 
-	dial := con***REMOVED***g.Dial
+	dial := config.Dial
 	if dial == nil {
 		dial = (&net.Dialer{
 			Timeout:   30 * time.Second,
@@ -92,15 +92,15 @@ func (c *tlsTransportCache) get(con***REMOVED***g *Con***REMOVED***g) (http.Roun
 	c.transports[key] = utilnet.SetTransportDefaults(&http.Transport{
 		Proxy:               http.ProxyFromEnvironment,
 		TLSHandshakeTimeout: 10 * time.Second,
-		TLSClientCon***REMOVED***g:     tlsCon***REMOVED***g,
+		TLSClientConfig:     tlsConfig,
 		MaxIdleConnsPerHost: idleConnsPerHost,
 		DialContext:         dial,
 	})
 	return c.transports[key], nil
 }
 
-// tlsCon***REMOVED***gKey returns a unique key for tls.Con***REMOVED***g objects returned from TLSCon***REMOVED***gFor
-func tlsCon***REMOVED***gKey(c *Con***REMOVED***g) (tlsCacheKey, error) {
+// tlsConfigKey returns a unique key for tls.Config objects returned from TLSConfigFor
+func tlsConfigKey(c *Config) (tlsCacheKey, error) {
 	// Make sure ca/key/cert content is loaded
 	if err := loadTLSFiles(c); err != nil {
 		return tlsCacheKey{}, err

@@ -130,7 +130,7 @@ func (r *prometheusMetricRepo) GetLastTimestampForTable(tableName string) (*time
 	return nil, nil
 }
 
-// PrometheusMetric is a receipt of a usage determined by a query within a speci***REMOVED***c time range.
+// PrometheusMetric is a receipt of a usage determined by a query within a specific time range.
 type PrometheusMetric struct {
 	Labels    map[string]string `json:"labels"`
 	Amount    float64           `json:"amount"`
@@ -140,7 +140,7 @@ type PrometheusMetric struct {
 }
 
 // storePrometheusMetricsWithBuffer handles storing Prometheus metrics into the
-// speci***REMOVED***ed Presto table.
+// specified Presto table.
 func StorePrometheusMetricsWithBuffer(queryBuf *bytes.Buffer, ctx context.Context, queryer db.Queryer, tableName string, metrics []*PrometheusMetric) error {
 	bufferCapacity := queryBuf.Cap()
 
@@ -192,7 +192,7 @@ func StorePrometheusMetricsWithBuffer(queryBuf *bytes.Buffer, ctx context.Contex
 			// no metrics in buffer means we need to prepend "VALUES " before
 			// we write metricSQL
 			toWrite = valuesStmtStr + metricSQLStr
-		} ***REMOVED*** {
+		} else {
 			// existing metrics in buffer means we need to prepend "," before
 			// we write metricSQL since that separates each record
 			toWrite = commaStr + metricSQLStr
@@ -262,7 +262,7 @@ func GetPrometheusMetrics(queryer db.Queryer, tableName string, start, end time.
 	if !end.IsZero() {
 		if !start.IsZero() {
 			whereClause += " AND "
-		} ***REMOVED*** {
+		} else {
 			whereClause += " WHERE "
 		}
 		whereClause += fmt.Sprintf(`"timestamp" <= timestamp '%s'`, end.Format(presto.TimestampFormat))

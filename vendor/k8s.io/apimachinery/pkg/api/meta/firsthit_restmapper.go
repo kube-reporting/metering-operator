@@ -2,7 +2,7 @@
 Copyright 2014 The Kubernetes Authors.
 
 Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this ***REMOVED***le except in compliance with the License.
+you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
 
     http://www.apache.org/licenses/LICENSE-2.0
@@ -10,7 +10,7 @@ You may obtain a copy of the License at
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the speci***REMOVED***c language governing permissions and
+See the License for the specific language governing permissions and
 limitations under the License.
 */
 
@@ -24,7 +24,7 @@ import (
 )
 
 // FirstHitRESTMapper is a wrapper for multiple RESTMappers which returns the
-// ***REMOVED***rst successful result for the singular requests
+// first successful result for the singular requests
 type FirstHitRESTMapper struct {
 	MultiRESTMapper
 }
@@ -61,7 +61,7 @@ func (m FirstHitRESTMapper) KindFor(resource schema.GroupVersionResource) (schem
 
 // RESTMapping provides the REST mapping for the resource based on the
 // kind and version. This implementation supports multiple REST schemas and
-// return the ***REMOVED***rst match.
+// return the first match.
 func (m FirstHitRESTMapper) RESTMapping(gk schema.GroupKind, versions ...string) (*RESTMapping, error) {
 	errors := []error{}
 	for _, t := range m.MultiRESTMapper {

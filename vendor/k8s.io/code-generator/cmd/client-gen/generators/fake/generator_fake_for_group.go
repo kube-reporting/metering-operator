@@ -2,7 +2,7 @@
 Copyright 2015 The Kubernetes Authors.
 
 Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this ***REMOVED***le except in compliance with the License.
+you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
 
     http://www.apache.org/licenses/LICENSE-2.0
@@ -10,7 +10,7 @@ You may obtain a copy of the License at
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the speci***REMOVED***c language governing permissions and
+See the License for the specific language governing permissions and
 limitations under the License.
 */
 
@@ -19,7 +19,7 @@ package fake
 import (
 	"fmt"
 	"io"
-	"path/***REMOVED***lepath"
+	"path/filepath"
 	"strings"
 
 	"k8s.io/gengo/generator"
@@ -29,7 +29,7 @@ import (
 	"k8s.io/code-generator/cmd/client-gen/generators/util"
 )
 
-// genFakeForGroup produces a ***REMOVED***le for a group client, e.g. ExtensionsClient for the extension group.
+// genFakeForGroup produces a file for a group client, e.g. ExtensionsClient for the extension group.
 type genFakeForGroup struct {
 	generator.DefaultGen
 	outputPackage     string
@@ -64,7 +64,7 @@ func (g *genFakeForGroup) Namers(c *generator.Context) namer.NameSystems {
 func (g *genFakeForGroup) Imports(c *generator.Context) (imports []string) {
 	imports = g.imports.ImportLines()
 	if len(g.types) != 0 {
-		imports = append(imports, fmt.Sprintf("%s \"%s\"", strings.ToLower(***REMOVED***lepath.Base(g.realClientPackage)), g.realClientPackage))
+		imports = append(imports, fmt.Sprintf("%s \"%s\"", strings.ToLower(filepath.Base(g.realClientPackage)), g.realClientPackage))
 	}
 	return imports
 }
@@ -90,7 +90,7 @@ func (g *genFakeForGroup) GenerateType(c *generator.Context, t *types.Type, w io
 			"type":              t,
 			"GroupGoName":       g.groupGoName,
 			"Version":           namer.IC(g.version),
-			"realClientPackage": strings.ToLower(***REMOVED***lepath.Base(g.realClientPackage)),
+			"realClientPackage": strings.ToLower(filepath.Base(g.realClientPackage)),
 		}
 		if tags.NonNamespaced {
 			sw.Do(getterImplNonNamespaced, wrapper)

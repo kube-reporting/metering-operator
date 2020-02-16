@@ -31,7 +31,7 @@ func (s *uintSliceValue) Set(val string) error {
 	}
 	if !s.changed {
 		*s.value = out
-	} ***REMOVED*** {
+	} else {
 		*s.value = append(*s.value, out...)
 	}
 	s.changed = true
@@ -77,7 +77,7 @@ func (f *FlagSet) GetUintSlice(name string) ([]uint, error) {
 	return val.([]uint), nil
 }
 
-// UintSliceVar de***REMOVED***nes a uintSlice flag with speci***REMOVED***ed name, default value, and usage string.
+// UintSliceVar defines a uintSlice flag with specified name, default value, and usage string.
 // The argument p points to a []uint variable in which to store the value of the flag.
 func (f *FlagSet) UintSliceVar(p *[]uint, name string, value []uint, usage string) {
 	f.VarP(newUintSliceValue(value, p), name, "", usage)
@@ -88,7 +88,7 @@ func (f *FlagSet) UintSliceVarP(p *[]uint, name, shorthand string, value []uint,
 	f.VarP(newUintSliceValue(value, p), name, shorthand, usage)
 }
 
-// UintSliceVar de***REMOVED***nes a uint[] flag with speci***REMOVED***ed name, default value, and usage string.
+// UintSliceVar defines a uint[] flag with specified name, default value, and usage string.
 // The argument p points to a uint[] variable in which to store the value of the flag.
 func UintSliceVar(p *[]uint, name string, value []uint, usage string) {
 	CommandLine.VarP(newUintSliceValue(value, p), name, "", usage)
@@ -99,7 +99,7 @@ func UintSliceVarP(p *[]uint, name, shorthand string, value []uint, usage string
 	CommandLine.VarP(newUintSliceValue(value, p), name, shorthand, usage)
 }
 
-// UintSlice de***REMOVED***nes a []uint flag with speci***REMOVED***ed name, default value, and usage string.
+// UintSlice defines a []uint flag with specified name, default value, and usage string.
 // The return value is the address of a []uint variable that stores the value of the flag.
 func (f *FlagSet) UintSlice(name string, value []uint, usage string) *[]uint {
 	p := []uint{}
@@ -114,7 +114,7 @@ func (f *FlagSet) UintSliceP(name, shorthand string, value []uint, usage string)
 	return &p
 }
 
-// UintSlice de***REMOVED***nes a []uint flag with speci***REMOVED***ed name, default value, and usage string.
+// UintSlice defines a []uint flag with specified name, default value, and usage string.
 // The return value is the address of a []uint variable that stores the value of the flag.
 func UintSlice(name string, value []uint, usage string) *[]uint {
 	return CommandLine.UintSliceP(name, "", value, usage)

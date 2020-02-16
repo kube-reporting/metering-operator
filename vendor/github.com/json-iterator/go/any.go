@@ -201,8 +201,8 @@ func (iter *Iterator) readArrayAny() Any {
 
 func locateObjectField(iter *Iterator, target string) []byte {
 	var found []byte
-	iter.ReadObjectCB(func(iter *Iterator, ***REMOVED***eld string) bool {
-		if ***REMOVED***eld == target {
+	iter.ReadObjectCB(func(iter *Iterator, field string) bool {
+		if field == target {
 			found = iter.SkipAndReturnBytes()
 			return false
 		}

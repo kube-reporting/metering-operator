@@ -15,7 +15,7 @@ func (current SinglePageBase) NextPageURL() (string, error) {
 	return "", nil
 }
 
-// IsEmpty satisi***REMOVED***es the IsEmpty method of the Page interface
+// IsEmpty satisifies the IsEmpty method of the Page interface
 func (current SinglePageBase) IsEmpty() (bool, error) {
 	if b, ok := current.Body.([]interface{}); ok {
 		return len(b) == 0, nil

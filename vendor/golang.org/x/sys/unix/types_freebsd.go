@@ -1,6 +1,6 @@
 // Copyright 2009 The Go Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE ***REMOVED***le.
+// license that can be found in the LICENSE file.
 
 // +build ignore
 
@@ -14,7 +14,7 @@ Input to cgo -godefs.  See README.md
 package unix
 
 /*
-#de***REMOVED***ne KERNEL
+#define KERNEL
 #include <dirent.h>
 #include <fcntl.h>
 #include <poll.h>
@@ -51,7 +51,7 @@ enum {
 };
 
 union sockaddr_all {
-	struct sockaddr s1;	// this one gets used for ***REMOVED***elds
+	struct sockaddr s1;	// this one gets used for fields
 	struct sockaddr_in s2;	// these pad it out
 	struct sockaddr_in6 s3;
 	struct sockaddr_un s4;
@@ -81,7 +81,7 @@ struct stat8 {
 	struct  timespec st_atimespec;
 	struct  timespec st_mtimespec;
 	struct  timespec st_ctimespec;
-#***REMOVED***
+#else
 	time_t    st_atime;
 	long      __st_atimensec;
 	time_t    st_mtime;
@@ -99,7 +99,7 @@ struct stat8 {
 	struct timespec st_birthtimespec;
 	unsigned int :(8 / 2) * (16 - (int)sizeof(struct timespec));
 	unsigned int :(8 / 2) * (16 - (int)sizeof(struct timespec));
-#***REMOVED***
+#else
 	time_t    st_birthtime;
 	long      st_birthtimensec;
 	unsigned int :(8 / 2) * (16 - (int)sizeof(struct __timespec));
@@ -110,34 +110,34 @@ struct stat8 {
 // This structure is a duplicate of if_data on FreeBSD 8-STABLE.
 // See /usr/include/net/if.h.
 struct if_data8 {
-	u_char  i***REMOVED***_type;
-	u_char  i***REMOVED***_physical;
-	u_char  i***REMOVED***_addrlen;
-	u_char  i***REMOVED***_hdrlen;
-	u_char  i***REMOVED***_link_state;
-	u_char  i***REMOVED***_spare_char1;
-	u_char  i***REMOVED***_spare_char2;
-	u_char  i***REMOVED***_datalen;
-	u_long  i***REMOVED***_mtu;
-	u_long  i***REMOVED***_metric;
-	u_long  i***REMOVED***_baudrate;
-	u_long  i***REMOVED***_ipackets;
-	u_long  i***REMOVED***_ierrors;
-	u_long  i***REMOVED***_opackets;
-	u_long  i***REMOVED***_oerrors;
-	u_long  i***REMOVED***_collisions;
-	u_long  i***REMOVED***_ibytes;
-	u_long  i***REMOVED***_obytes;
-	u_long  i***REMOVED***_imcasts;
-	u_long  i***REMOVED***_omcasts;
-	u_long  i***REMOVED***_iqdrops;
-	u_long  i***REMOVED***_noproto;
-	u_long  i***REMOVED***_hwassist;
-// FIXME: these are now unions, so maybe need to change de***REMOVED***nitions?
-#undef i***REMOVED***_epoch
-	time_t  i***REMOVED***_epoch;
-#undef i***REMOVED***_lastchange
-	struct  timeval i***REMOVED***_lastchange;
+	u_char  ifi_type;
+	u_char  ifi_physical;
+	u_char  ifi_addrlen;
+	u_char  ifi_hdrlen;
+	u_char  ifi_link_state;
+	u_char  ifi_spare_char1;
+	u_char  ifi_spare_char2;
+	u_char  ifi_datalen;
+	u_long  ifi_mtu;
+	u_long  ifi_metric;
+	u_long  ifi_baudrate;
+	u_long  ifi_ipackets;
+	u_long  ifi_ierrors;
+	u_long  ifi_opackets;
+	u_long  ifi_oerrors;
+	u_long  ifi_collisions;
+	u_long  ifi_ibytes;
+	u_long  ifi_obytes;
+	u_long  ifi_imcasts;
+	u_long  ifi_omcasts;
+	u_long  ifi_iqdrops;
+	u_long  ifi_noproto;
+	u_long  ifi_hwassist;
+// FIXME: these are now unions, so maybe need to change definitions?
+#undef ifi_epoch
+	time_t  ifi_epoch;
+#undef ifi_lastchange
+	struct  timeval ifi_lastchange;
 };
 
 // This structure is a duplicate of if_msghdr on FreeBSD 8-STABLE.
@@ -267,7 +267,7 @@ type Inet6Pktinfo C.struct_in6_pktinfo
 
 type IPv6MTUInfo C.struct_ip6_mtuinfo
 
-type ICMPv6Filter C.struct_icmp6_***REMOVED***lter
+type ICMPv6Filter C.struct_icmp6_filter
 
 const (
 	SizeofSockaddrInet4    = C.sizeof_struct_sockaddr_in
@@ -283,7 +283,7 @@ const (
 	SizeofCmsghdr          = C.sizeof_struct_cmsghdr
 	SizeofInet6Pktinfo     = C.sizeof_struct_in6_pktinfo
 	SizeofIPv6MTUInfo      = C.sizeof_struct_ip6_mtuinfo
-	SizeofICMPv6Filter     = C.sizeof_struct_icmp6_***REMOVED***lter
+	SizeofICMPv6Filter     = C.sizeof_struct_icmp6_filter
 )
 
 // Ptrace requests
@@ -334,7 +334,7 @@ type RtMsghdr C.struct_rt_msghdr
 
 type RtMetrics C.struct_rt_metrics
 
-// Berkeley packet ***REMOVED***lter
+// Berkeley packet filter
 
 const (
 	SizeofBpfVersion    = C.sizeof_struct_bpf_version

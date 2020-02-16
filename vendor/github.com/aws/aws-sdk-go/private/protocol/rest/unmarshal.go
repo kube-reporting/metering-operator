@@ -46,10 +46,10 @@ func UnmarshalMeta(r *request.Request) {
 }
 
 func unmarshalBody(r *request.Request, v reflect.Value) {
-	if ***REMOVED***eld, ok := v.Type().FieldByName("_"); ok {
-		if payloadName := ***REMOVED***eld.Tag.Get("payload"); payloadName != "" {
-			p***REMOVED***eld, _ := v.Type().FieldByName(payloadName)
-			if ptag := p***REMOVED***eld.Tag.Get("type"); ptag != "" && ptag != "structure" {
+	if field, ok := v.Type().FieldByName("_"); ok {
+		if payloadName := field.Tag.Get("payload"); payloadName != "" {
+			pfield, _ := v.Type().FieldByName(payloadName)
+			if ptag := pfield.Tag.Get("type"); ptag != "" && ptag != "structure" {
 				payload := v.FieldByName(payloadName)
 				if payload.IsValid() {
 					switch payload.Interface().(type) {
@@ -58,7 +58,7 @@ func unmarshalBody(r *request.Request, v reflect.Value) {
 						b, err := ioutil.ReadAll(r.HTTPResponse.Body)
 						if err != nil {
 							r.Error = awserr.New(request.ErrCodeSerialization, "failed to decode REST response", err)
-						} ***REMOVED*** {
+						} else {
 							payload.Set(reflect.ValueOf(b))
 						}
 					case *string:
@@ -66,7 +66,7 @@ func unmarshalBody(r *request.Request, v reflect.Value) {
 						b, err := ioutil.ReadAll(r.HTTPResponse.Body)
 						if err != nil {
 							r.Error = awserr.New(request.ErrCodeSerialization, "failed to decode REST response", err)
-						} ***REMOVED*** {
+						} else {
 							str := string(b)
 							payload.Set(reflect.ValueOf(&str))
 						}
@@ -98,29 +98,29 @@ func unmarshalBody(r *request.Request, v reflect.Value) {
 
 func unmarshalLocationElements(r *request.Request, v reflect.Value) {
 	for i := 0; i < v.NumField(); i++ {
-		m, ***REMOVED***eld := v.Field(i), v.Type().Field(i)
-		if n := ***REMOVED***eld.Name; n[0:1] == strings.ToLower(n[0:1]) {
+		m, field := v.Field(i), v.Type().Field(i)
+		if n := field.Name; n[0:1] == strings.ToLower(n[0:1]) {
 			continue
 		}
 
 		if m.IsValid() {
-			name := ***REMOVED***eld.Tag.Get("locationName")
+			name := field.Tag.Get("locationName")
 			if name == "" {
-				name = ***REMOVED***eld.Name
+				name = field.Name
 			}
 
-			switch ***REMOVED***eld.Tag.Get("location") {
+			switch field.Tag.Get("location") {
 			case "statusCode":
 				unmarshalStatusCode(m, r.HTTPResponse.StatusCode)
 			case "header":
-				err := unmarshalHeader(m, r.HTTPResponse.Header.Get(name), ***REMOVED***eld.Tag)
+				err := unmarshalHeader(m, r.HTTPResponse.Header.Get(name), field.Tag)
 				if err != nil {
 					r.Error = awserr.New(request.ErrCodeSerialization, "failed to decode REST response", err)
 					break
 				}
 			case "headers":
-				pre***REMOVED***x := ***REMOVED***eld.Tag.Get("locationName")
-				err := unmarshalHeaderMap(m, r.HTTPResponse.Header, pre***REMOVED***x)
+				prefix := field.Tag.Get("locationName")
+				err := unmarshalHeaderMap(m, r.HTTPResponse.Header, prefix)
 				if err != nil {
 					r.Error = awserr.New(request.ErrCodeSerialization, "failed to decode REST response", err)
 					break
@@ -145,7 +145,7 @@ func unmarshalStatusCode(v reflect.Value, statusCode int) {
 	}
 }
 
-func unmarshalHeaderMap(r reflect.Value, headers http.Header, pre***REMOVED***x string) error {
+func unmarshalHeaderMap(r reflect.Value, headers http.Header, prefix string) error {
 	if len(headers) == 0 {
 		return nil
 	}
@@ -154,8 +154,8 @@ func unmarshalHeaderMap(r reflect.Value, headers http.Header, pre***REMOVED***x 
 		out := map[string]*string{}
 		for k, v := range headers {
 			k = http.CanonicalHeaderKey(k)
-			if strings.HasPre***REMOVED***x(strings.ToLower(k), strings.ToLower(pre***REMOVED***x)) {
-				out[k[len(pre***REMOVED***x):]] = &v[0]
+			if strings.HasPrefix(strings.ToLower(k), strings.ToLower(prefix)) {
+				out[k[len(prefix):]] = &v[0]
 			}
 		}
 		if len(out) != 0 {

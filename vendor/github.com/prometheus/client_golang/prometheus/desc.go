@@ -1,6 +1,6 @@
 // Copyright 2016 The Prometheus Authors
 // Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this ***REMOVED***le except in compliance with the License.
+// you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 //
 // http://www.apache.org/licenses/LICENSE-2.0
@@ -8,7 +8,7 @@
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the speci***REMOVED***c language governing permissions and
+// See the License for the specific language governing permissions and
 // limitations under the License.
 
 package prometheus
@@ -31,13 +31,13 @@ import (
 // deal with Desc if they use advanced features like the ExpvarCollector or
 // custom Collectors and Metrics.
 //
-// Descriptors registered with the same registry have to ful***REMOVED***ll certain
-// consistency and uniqueness criteria if they share the same fully-quali***REMOVED***ed
+// Descriptors registered with the same registry have to fulfill certain
+// consistency and uniqueness criteria if they share the same fully-qualified
 // name: They must have the same help string and the same label names (aka label
 // dimensions) in each, constLabels and variableLabels, but they must differ in
 // the values of the constLabels.
 //
-// Descriptors that share the same fully-quali***REMOVED***ed names and the same label
+// Descriptors that share the same fully-qualified names and the same label
 // values of their constLabels are considered equal.
 //
 // Use NewDesc to create new Desc instances.
@@ -54,7 +54,7 @@ type Desc struct {
 	variableLabels []string
 	// id is a hash of the values of the ConstLabels and fqName. This
 	// must be unique among all registered descriptors and can therefore be
-	// used as an identi***REMOVED***er of the descriptor.
+	// used as an identifier of the descriptor.
 	id uint64
 	// dimHash is a hash of the label names (preset and variable) and the
 	// Help string. Each Desc with the same fqName must have the same
@@ -73,7 +73,7 @@ type Desc struct {
 // and therefore not part of the Desc. (They are managed within the Metric.)
 //
 // For constLabels, the label values are constant. Therefore, they are fully
-// speci***REMOVED***ed in the Desc. See the Opts documentation for the implications of
+// specified in the Desc. See the Opts documentation for the implications of
 // constant labels.
 func NewDesc(fqName, help string, variableLabels []string, constLabels Labels) *Desc {
 	d := &Desc{
@@ -115,7 +115,7 @@ func NewDesc(fqName, help string, variableLabels []string, constLabels Labels) *
 		d.err = err
 		return d
 	}
-	// Now add the variable label names, but pre***REMOVED***x them with something that
+	// Now add the variable label names, but prefix them with something that
 	// cannot be in a regular label name. That prevents matching the label
 	// dimension with a different mix between preset and variable labels.
 	for _, labelName := range variableLabels {

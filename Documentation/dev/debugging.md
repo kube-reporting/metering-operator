@@ -1,6 +1,6 @@
 # Debugging Metering
 
-Debugging metering can be fairly dif***REMOVED***cult if you do not know how to directly interact with the components the operator is speaking to.
+Debugging metering can be fairly difficult if you do not know how to directly interact with the components the operator is speaking to.
 Below, we detail how you can connect and query Presto and Hive, as well as view the dashboards of the Presto and HDFS components.
 For debugging issues surrounding the metering-ansible-operator, see the [ansible-operator](#metering-ansible-operator) section.
 
@@ -20,7 +20,7 @@ $ kubectl -n $METERING_NAMESPACE logs "$(kubectl -n $METERING_NAMESPACE get pods
 
 ## Query Presto using presto-cli
 
-The following will open up an interactive presto-cli session where you can interactively query Presto. One thing to note is that this runs in the same container as Presto and launches an additional Java instance, meaning you may run into memory limits for the pod. If this occurs, you should increase the memory request & limits of the Presto pod. By default, Presto is con***REMOVED***gured to communicate using TLS, and you would need to run the following command in order to run Presto queries:
+The following will open up an interactive presto-cli session where you can interactively query Presto. One thing to note is that this runs in the same container as Presto and launches an additional Java instance, meaning you may run into memory limits for the pod. If this occurs, you should increase the memory request & limits of the Presto pod. By default, Presto is configured to communicate using TLS, and you would need to run the following command in order to run Presto queries:
 ```bash
 $ kubectl -n $METERING_NAMESPACE exec -it "$(kubectl -n $METERING_NAMESPACE get pods -l app=presto,presto=coordinator -o name | cut -d/ -f2)"  -- /usr/local/bin/presto-cli --server https://presto:8080 --catalog hive --schema default --user root --keystore-path /opt/presto/tls/keystore.pem
 ```
@@ -136,7 +136,7 @@ It will show what queries are running, which have succeeded, and which queries h
 
 **Note**: Due to client-side authentication being enabled in Presto by default, you won't be able to view the Presto web UI.
 
-However, you can specify `spec.tls.enabled: false` and stop there to disable TLS/auth entirely, or only con***REMOVED***gure Presto to work with TLS (`spec.presto.tls`), and not client-side authentication.
+However, you can specify `spec.tls.enabled: false` and stop there to disable TLS/auth entirely, or only configure Presto to work with TLS (`spec.presto.tls`), and not client-side authentication.
 
 ```bash
 $ kubectl -n $METERING_NAMESPACE get pods  -l app=presto,presto=coordinator -o name | cut -d/ -f2 | xargs -I{} kubectl -n $METERING_NAMESPACE port-forward {} 8080
@@ -175,7 +175,7 @@ To check other datanodes, run the above command, and replace `hdfs-datanode-0` w
 ## Metering Ansible Operator
 Metering uses the ansible-operator to watch and reconcile resources in a cluster environment.
 
-When debugging a failed Metering install, it can be helpful to view the Ansible logs or status of your `MeteringCon***REMOVED***g` custom resource.
+When debugging a failed Metering install, it can be helpful to view the Ansible logs or status of your `MeteringConfig` custom resource.
 
 ##### Accessing Ansible Logs
 There are a couple of ways of accessing the Ansible logs depending on how you installed the Metering resources.
@@ -189,20 +189,20 @@ Alternatively, you can view the logs of the `operator` container (replace `-c an
 
 If you are running the Metering operator locally (i.e. `make run-metering-operator-local`), there won't be a dedicated pod, and so you would need to check the docker container logs:
 ```bash
-$ docker exec -it metering-operator bash -c 'tail -n +1 -f /tmp/ansible-operator/runner/metering.openshift.io/v1/MeteringCon***REMOVED***g/*/*/artifacts/*/stdout'
+$ docker exec -it metering-operator bash -c 'tail -n +1 -f /tmp/ansible-operator/runner/metering.openshift.io/v1/MeteringConfig/*/*/artifacts/*/stdout'
 ```
 
 When tracking down a failed task, you may encounter this output:
 ```yaml
-changed: [localhost] => (item=None) => {"censored": "the output has been hidden due to the fact that 'no_log: true' was speci***REMOVED***ed for this result", "changed": true}
+changed: [localhost] => (item=None) => {"censored": "the output has been hidden due to the fact that 'no_log: true' was specified for this result", "changed": true}
 ```
 
 This is because we use the Ansible module, `no_log`, on output-extensive tasks (running helm template, creation of resources, etc.) through the metering-ansible-operator.
 
-If your install fails during the Helm templating task, you can specify `spec.logHelmTemplate: true` in your `MeteringCon***REMOVED***g` CR, which will enable logging for that task, and then you can re-run your installation for more information on why it failed.
+If your install fails during the Helm templating task, you can specify `spec.logHelmTemplate: true` in your `MeteringConfig` CR, which will enable logging for that task, and then you can re-run your installation for more information on why it failed.
 
-##### Checking the `MeteringCon***REMOVED***g` Status
-It can be helpful to view the `.status` ***REMOVED***eld of your `MeteringCon***REMOVED***g` custom resource to debug any recent failures. You can do this with the following command:
+##### Checking the `MeteringConfig` Status
+It can be helpful to view the `.status` field of your `MeteringConfig` custom resource to debug any recent failures. You can do this with the following command:
 ```bash
-$ kubectl -n $METERING_NAMESPACE get meteringcon***REMOVED***g operator-metering -o json | jq '.status'
+$ kubectl -n $METERING_NAMESPACE get meteringconfig operator-metering -o json | jq '.status'
 ```

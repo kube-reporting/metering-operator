@@ -2,7 +2,7 @@
 Copyright 2016 The Kubernetes Authors.
 
 Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this ***REMOVED***le except in compliance with the License.
+you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
 
     http://www.apache.org/licenses/LICENSE-2.0
@@ -10,13 +10,13 @@ You may obtain a copy of the License at
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the speci***REMOVED***c language governing permissions and
+See the License for the specific language governing permissions and
 limitations under the License.
 */
 
 package cache
 
-// FakeStore lets you de***REMOVED***ne custom functions for store operations
+// FakeStore lets you define custom functions for store operations
 type FakeCustomStore struct {
 	AddFunc      func(obj interface{}) error
 	UpdateFunc   func(obj interface{}) error
@@ -29,7 +29,7 @@ type FakeCustomStore struct {
 	ResyncFunc   func() error
 }
 
-// Add calls the custom Add function if de***REMOVED***ned
+// Add calls the custom Add function if defined
 func (f *FakeCustomStore) Add(obj interface{}) error {
 	if f.AddFunc != nil {
 		return f.AddFunc(obj)
@@ -37,7 +37,7 @@ func (f *FakeCustomStore) Add(obj interface{}) error {
 	return nil
 }
 
-// Update calls the custom Update function if de***REMOVED***ned
+// Update calls the custom Update function if defined
 func (f *FakeCustomStore) Update(obj interface{}) error {
 	if f.UpdateFunc != nil {
 		return f.Update(obj)
@@ -45,7 +45,7 @@ func (f *FakeCustomStore) Update(obj interface{}) error {
 	return nil
 }
 
-// Delete calls the custom Delete function if de***REMOVED***ned
+// Delete calls the custom Delete function if defined
 func (f *FakeCustomStore) Delete(obj interface{}) error {
 	if f.DeleteFunc != nil {
 		return f.DeleteFunc(obj)
@@ -53,7 +53,7 @@ func (f *FakeCustomStore) Delete(obj interface{}) error {
 	return nil
 }
 
-// List calls the custom List function if de***REMOVED***ned
+// List calls the custom List function if defined
 func (f *FakeCustomStore) List() []interface{} {
 	if f.ListFunc != nil {
 		return f.ListFunc()
@@ -61,7 +61,7 @@ func (f *FakeCustomStore) List() []interface{} {
 	return nil
 }
 
-// ListKeys calls the custom ListKeys function if de***REMOVED***ned
+// ListKeys calls the custom ListKeys function if defined
 func (f *FakeCustomStore) ListKeys() []string {
 	if f.ListKeysFunc != nil {
 		return f.ListKeysFunc()
@@ -69,7 +69,7 @@ func (f *FakeCustomStore) ListKeys() []string {
 	return nil
 }
 
-// Get calls the custom Get function if de***REMOVED***ned
+// Get calls the custom Get function if defined
 func (f *FakeCustomStore) Get(obj interface{}) (item interface{}, exists bool, err error) {
 	if f.GetFunc != nil {
 		return f.GetFunc(obj)
@@ -77,7 +77,7 @@ func (f *FakeCustomStore) Get(obj interface{}) (item interface{}, exists bool, e
 	return nil, false, nil
 }
 
-// GetByKey calls the custom GetByKey function if de***REMOVED***ned
+// GetByKey calls the custom GetByKey function if defined
 func (f *FakeCustomStore) GetByKey(key string) (item interface{}, exists bool, err error) {
 	if f.GetByKeyFunc != nil {
 		return f.GetByKeyFunc(key)
@@ -85,7 +85,7 @@ func (f *FakeCustomStore) GetByKey(key string) (item interface{}, exists bool, e
 	return nil, false, nil
 }
 
-// Replace calls the custom Replace function if de***REMOVED***ned
+// Replace calls the custom Replace function if defined
 func (f *FakeCustomStore) Replace(list []interface{}, resourceVersion string) error {
 	if f.ReplaceFunc != nil {
 		return f.ReplaceFunc(list, resourceVersion)
@@ -93,7 +93,7 @@ func (f *FakeCustomStore) Replace(list []interface{}, resourceVersion string) er
 	return nil
 }
 
-// Resync calls the custom Resync function if de***REMOVED***ned
+// Resync calls the custom Resync function if defined
 func (f *FakeCustomStore) Resync() error {
 	if f.ResyncFunc != nil {
 		return f.ResyncFunc()

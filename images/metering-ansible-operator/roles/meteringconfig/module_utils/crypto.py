@@ -16,12 +16,12 @@
 # along with Ansible.  If not, see <http://www.gnu.org/licenses/>.
 #
 # ----------------------------------------------------------------------
-# A clearly marked portion of this ***REMOVED***le is licensed under the BSD license
+# A clearly marked portion of this file is licensed under the BSD license
 # Copyright (c) 2015, 2016 Paul Kehrer (@reaperhulk)
 # Copyright (c) 2017 Fraser Tweedale (@frasertweedale)
 # For more details, search for the function _obj2txt().
 # ---------------------------------------------------------------------
-# A clearly marked portion of this ***REMOVED***le is extracted from a project that
+# A clearly marked portion of this file is extracted from a project that
 # is licensed under the Apache License 2.0
 # Copyright (c) the OpenSSL contributors
 # For more details, search for the function _OID_MAP.
@@ -54,9 +54,9 @@ try:
     # general name objects (DNSName, IPAddress, ...), while providing overloaded
     # equality and string representation operations. This makes it impossible to
     # use them in hash-based data structures such as set or dict. Since we are
-    # actually doing that in openssl_certi***REMOVED***cate, and potentially in other code,
+    # actually doing that in openssl_certificate, and potentially in other code,
     # we need to monkey-patch __hash__ for these classes to make sure our code
-    # works ***REMOVED***ne.
+    # works fine.
     if LooseVersion(cryptography.__version__) < LooseVersion('2.1'):
         # A very simply hash function which relies on the representation
         # of an object to be implemented. This is the case since at least
@@ -79,7 +79,7 @@ try:
             # https://github.com/pyca/cryptography/commit/b642deed88a8696e5f01ce6855ccf89985fc35d0
             # https://github.com/pyca/cryptography/commit/d1b5681f6db2bde7a14625538bd7907b08dfb486
             x509.RFC822Name.__hash__ = simple_hash
-            x509.UniformResourceIdenti***REMOVED***er.__hash__ = simple_hash
+            x509.UniformResourceIdentifier.__hash__ = simple_hash
 
     # Test whether we have support for X25519, X448, Ed25519 and/or Ed448
     try:
@@ -126,7 +126,7 @@ import errno
 import hashlib
 import os
 import re
-import temp***REMOVED***le
+import tempfile
 
 from ansible.module_utils import six
 from ansible.module_utils._text import to_bytes, to_text
@@ -140,10 +140,10 @@ class OpenSSLBadPassphraseError(OpenSSLObjectError):
     pass
 
 
-def get_***REMOVED***ngerprint_of_bytes(source):
-    """Generate the ***REMOVED***ngerprint of the given bytes."""
+def get_fingerprint_of_bytes(source):
+    """Generate the fingerprint of the given bytes."""
 
-    ***REMOVED***ngerprint = {}
+    fingerprint = {}
 
     try:
         algorithms = hashlib.algorithms
@@ -167,13 +167,13 @@ def get_***REMOVED***ngerprint_of_bytes(source):
             pubkey_digest = h.hexdigest()
         except TypeError:
             pubkey_digest = h.hexdigest(32)
-        ***REMOVED***ngerprint[algo] = ':'.join(pubkey_digest[i:i + 2] for i in range(0, len(pubkey_digest), 2))
+        fingerprint[algo] = ':'.join(pubkey_digest[i:i + 2] for i in range(0, len(pubkey_digest), 2))
 
-    return ***REMOVED***ngerprint
+    return fingerprint
 
 
-def get_***REMOVED***ngerprint(path, passphrase=None, content=None):
-    """Generate the ***REMOVED***ngerprint of the public key. """
+def get_fingerprint(path, passphrase=None, content=None):
+    """Generate the fingerprint of the public key. """
 
     privatekey = load_privatekey(path, passphrase=passphrase, content=content, check_passphrase=False)
     try:
@@ -188,15 +188,15 @@ def get_***REMOVED***ngerprint(path, passphrase=None, content=None):
             publickey = crypto._bio_to_string(bio)
         except AttributeError:
             # By doing this we prevent the code from raising an error
-            # yet we return no value in the ***REMOVED***ngerprint hash.
+            # yet we return no value in the fingerprint hash.
             return None
-    return get_***REMOVED***ngerprint_of_bytes(publickey)
+    return get_fingerprint_of_bytes(publickey)
 
 
 def load_privatekey(path, passphrase=None, check_passphrase=True, content=None, backend='pyopenssl'):
-    """Load the speci***REMOVED***ed OpenSSL private key.
+    """Load the specified OpenSSL private key.
 
-    The content can also be speci***REMOVED***ed via content; in that case,
+    The content can also be specified via content; in that case,
     this function will not load the key from disk.
     """
 
@@ -204,7 +204,7 @@ def load_privatekey(path, passphrase=None, check_passphrase=True, content=None, 
         if content is None:
             with open(path, 'rb') as b_priv_key_fh:
                 priv_key_detail = b_priv_key_fh.read()
-        ***REMOVED***:
+        else:
             priv_key_detail = content
 
         if backend == 'pyopenssl':
@@ -222,7 +222,7 @@ def load_privatekey(path, passphrase=None, check_passphrase=True, content=None, 
                         # This happens in case we have the wrong passphrase.
                         if passphrase is not None:
                             raise OpenSSLBadPassphraseError('Wrong passphrase provided for private key!')
-                        ***REMOVED***:
+                        else:
                             raise OpenSSLBadPassphraseError('No passphrase provided, but private key is password-protected!')
                 raise OpenSSLObjectError('Error while deserializing key: {0}'.format(e))
             if check_passphrase:
@@ -232,7 +232,7 @@ def load_privatekey(path, passphrase=None, check_passphrase=True, content=None, 
                 try:
                     crypto.load_privatekey(crypto.FILETYPE_PEM,
                                            priv_key_detail,
-                                           to_bytes('y' if passphrase == 'x' ***REMOVED*** 'x'))
+                                           to_bytes('y' if passphrase == 'x' else 'x'))
                     if passphrase is not None:
                         # Since we can load the key without an exception, the
                         # key isn't password-protected
@@ -246,7 +246,7 @@ def load_privatekey(path, passphrase=None, check_passphrase=True, content=None, 
         elif backend == 'cryptography':
             try:
                 result = load_pem_private_key(priv_key_detail,
-                                              None if passphrase is None ***REMOVED*** to_bytes(passphrase),
+                                              None if passphrase is None else to_bytes(passphrase),
                                               cryptography_backend())
             except TypeError as dummy:
                 raise OpenSSLBadPassphraseError('Wrong or empty passphrase provided for private key')
@@ -258,40 +258,40 @@ def load_privatekey(path, passphrase=None, check_passphrase=True, content=None, 
         raise OpenSSLObjectError(exc)
 
 
-def load_certi***REMOVED***cate(path, content=None, backend='pyopenssl'):
-    """Load the speci***REMOVED***ed certi***REMOVED***cate."""
+def load_certificate(path, content=None, backend='pyopenssl'):
+    """Load the specified certificate."""
 
     try:
         if content is None:
             with open(path, 'rb') as cert_fh:
                 cert_content = cert_fh.read()
-        ***REMOVED***:
+        else:
             cert_content = content
         if backend == 'pyopenssl':
-            return crypto.load_certi***REMOVED***cate(crypto.FILETYPE_PEM, cert_content)
+            return crypto.load_certificate(crypto.FILETYPE_PEM, cert_content)
         elif backend == 'cryptography':
-            return x509.load_pem_x509_certi***REMOVED***cate(cert_content, cryptography_backend())
+            return x509.load_pem_x509_certificate(cert_content, cryptography_backend())
     except (IOError, OSError) as exc:
         raise OpenSSLObjectError(exc)
 
 
-def load_certi***REMOVED***cate_request(path, content=None, backend='pyopenssl'):
-    """Load the speci***REMOVED***ed certi***REMOVED***cate signing request."""
+def load_certificate_request(path, content=None, backend='pyopenssl'):
+    """Load the specified certificate signing request."""
     try:
         if content is None:
             with open(path, 'rb') as csr_fh:
                 csr_content = csr_fh.read()
-        ***REMOVED***:
+        else:
             csr_content = content
     except (IOError, OSError) as exc:
         raise OpenSSLObjectError(exc)
     if backend == 'pyopenssl':
-        return crypto.load_certi***REMOVED***cate_request(crypto.FILETYPE_PEM, csr_content)
+        return crypto.load_certificate_request(crypto.FILETYPE_PEM, csr_content)
     elif backend == 'cryptography':
         return x509.load_pem_x509_csr(csr_content, cryptography_backend())
 
 
-def parse_name_***REMOVED***eld(input_dict):
+def parse_name_field(input_dict):
     """Take a dict with key: value or key: list_of_values mappings and return a list of tuples"""
 
     result = []
@@ -299,16 +299,16 @@ def parse_name_***REMOVED***eld(input_dict):
         if isinstance(input_dict[key], list):
             for entry in input_dict[key]:
                 result.append((key, entry))
-        ***REMOVED***:
+        else:
             result.append((key, input_dict[key]))
     return result
 
 
 def convert_relative_to_datetime(relative_time_string):
-    """Get a datetime.datetime or None from a string in the time format described in sshd_con***REMOVED***g(5)"""
+    """Get a datetime.datetime or None from a string in the time format described in sshd_config(5)"""
 
     parsed_result = re.match(
-        r"^(?P<pre***REMOVED***x>[+-])((?P<weeks>\d+)[wW])?((?P<days>\d+)[dD])?((?P<hours>\d+)[hH])?((?P<minutes>\d+)[mM])?((?P<seconds>\d+)[sS]?)?$",
+        r"^(?P<prefix>[+-])((?P<weeks>\d+)[wW])?((?P<days>\d+)[dD])?((?P<hours>\d+)[hH])?((?P<minutes>\d+)[mM])?((?P<seconds>\d+)[sS]?)?$",
         relative_time_string)
 
     if parsed_result is None or len(relative_time_string) == 1:
@@ -329,9 +329,9 @@ def convert_relative_to_datetime(relative_time_string):
         offset += datetime.timedelta(
             seconds=int(parsed_result.group("seconds")))
 
-    if parsed_result.group("pre***REMOVED***x") == "+":
+    if parsed_result.group("prefix") == "+":
         return datetime.datetime.utcnow() + offset
-    ***REMOVED***:
+    else:
         return datetime.datetime.utcnow() - offset
 
 
@@ -350,44 +350,44 @@ def select_message_digest(digest_string):
     return digest
 
 
-def write_***REMOVED***le(module, content, default_mode=None, path=None):
+def write_file(module, content, default_mode=None, path=None):
     '''
-    Writes content into destination ***REMOVED***le as securely as possible.
-    Uses ***REMOVED***le arguments from module.
+    Writes content into destination file as securely as possible.
+    Uses file arguments from module.
     '''
-    # Find out parameters for ***REMOVED***le
-    ***REMOVED***le_args = module.load_***REMOVED***le_common_arguments(module.params)
-    if ***REMOVED***le_args['mode'] is None:
-        ***REMOVED***le_args['mode'] = default_mode
+    # Find out parameters for file
+    file_args = module.load_file_common_arguments(module.params)
+    if file_args['mode'] is None:
+        file_args['mode'] = default_mode
     # If the path was set to override module path
     if path is not None:
-        ***REMOVED***le_args['path'] = path
-    # Create temp***REMOVED***le name
-    tmp_fd, tmp_name = temp***REMOVED***le.mkstemp(pre***REMOVED***x=b'.ansible_tmp')
+        file_args['path'] = path
+    # Create tempfile name
+    tmp_fd, tmp_name = tempfile.mkstemp(prefix=b'.ansible_tmp')
     try:
         os.close(tmp_fd)
     except Exception as dummy:
         pass
-    module.add_cleanup_***REMOVED***le(tmp_name)  # if we fail, let Ansible try to remove the ***REMOVED***le
+    module.add_cleanup_file(tmp_name)  # if we fail, let Ansible try to remove the file
     try:
         try:
-            # Create temp***REMOVED***le
-            ***REMOVED***le = os.open(tmp_name, os.O_WRONLY | os.O_CREAT | os.O_TRUNC, 0o600)
-            os.write(***REMOVED***le, content)
-            os.close(***REMOVED***le)
+            # Create tempfile
+            file = os.open(tmp_name, os.O_WRONLY | os.O_CREAT | os.O_TRUNC, 0o600)
+            os.write(file, content)
+            os.close(file)
         except Exception as e:
             try:
                 os.remove(tmp_name)
             except Exception as dummy:
                 pass
-            module.fail_json(msg='Error while writing result into temporary ***REMOVED***le: {0}'.format(e))
+            module.fail_json(msg='Error while writing result into temporary file: {0}'.format(e))
         # Update destination to wanted permissions
-        if os.path.exists(***REMOVED***le_args['path']):
-            module.set_fs_attributes_if_different(***REMOVED***le_args, False)
-        # Move temp***REMOVED***le to ***REMOVED***nal destination
-        module.atomic_move(tmp_name, ***REMOVED***le_args['path'])
+        if os.path.exists(file_args['path']):
+            module.set_fs_attributes_if_different(file_args, False)
+        # Move tempfile to final destination
+        module.atomic_move(tmp_name, file_args['path'])
         # Try to update permissions again
-        module.set_fs_attributes_if_different(***REMOVED***le_args, False)
+        module.set_fs_attributes_if_different(file_args, False)
     except Exception as e:
         try:
             os.remove(tmp_name)
@@ -414,8 +414,8 @@ class OpenSSLObject(object):
             return os.path.exists(self.path)
 
         def _check_perms(module):
-            ***REMOVED***le_args = module.load_***REMOVED***le_common_arguments(module.params)
-            return not module.set_fs_attributes_if_different(***REMOVED***le_args, False)
+            file_args = module.load_file_common_arguments(module.params)
+            return not module.set_fs_attributes_if_different(file_args, False)
 
         if not perms_required:
             return _check_state()
@@ -435,7 +435,7 @@ class OpenSSLObject(object):
         pass
 
     def remove(self, module):
-        """Remove the resource from the ***REMOVED***lesystem."""
+        """Remove the resource from the filesystem."""
 
         try:
             os.remove(self.path)
@@ -443,7 +443,7 @@ class OpenSSLObject(object):
         except OSError as exc:
             if exc.errno != errno.ENOENT:
                 raise OpenSSLObjectError(exc)
-            ***REMOVED***:
+            else:
                 pass
 
 
@@ -497,7 +497,7 @@ _OID_MAP = {
     '0.9.2342.19200300.100.1.8': ('userClass', ),
     '0.9.2342.19200300.100.1.9': ('host', ),
     '0.9.2342.19200300.100.1.10': ('manager', ),
-    '0.9.2342.19200300.100.1.11': ('documentIdenti***REMOVED***er', ),
+    '0.9.2342.19200300.100.1.11': ('documentIdentifier', ),
     '0.9.2342.19200300.100.1.12': ('documentTitle', ),
     '0.9.2342.19200300.100.1.13': ('documentVersion', ),
     '0.9.2342.19200300.100.1.14': ('documentAuthor', ),
@@ -505,8 +505,8 @@ _OID_MAP = {
     '0.9.2342.19200300.100.1.20': ('homeTelephoneNumber', ),
     '0.9.2342.19200300.100.1.21': ('secretary', ),
     '0.9.2342.19200300.100.1.22': ('otherMailbox', ),
-    '0.9.2342.19200300.100.1.23': ('lastModi***REMOVED***edTime', ),
-    '0.9.2342.19200300.100.1.24': ('lastModi***REMOVED***edBy', ),
+    '0.9.2342.19200300.100.1.23': ('lastModifiedTime', ),
+    '0.9.2342.19200300.100.1.24': ('lastModifiedBy', ),
     '0.9.2342.19200300.100.1.25': ('domainComponent', 'DC'),
     '0.9.2342.19200300.100.1.26': ('aRecord', ),
     '0.9.2342.19200300.100.1.27': ('pilotAttributeType27', ),
@@ -521,7 +521,7 @@ _OID_MAP = {
     '0.9.2342.19200300.100.1.41': ('mobileTelephoneNumber', ),
     '0.9.2342.19200300.100.1.42': ('pagerTelephoneNumber', ),
     '0.9.2342.19200300.100.1.43': ('friendlyCountryName', ),
-    '0.9.2342.19200300.100.1.44': ('uniqueIdenti***REMOVED***er', 'uid'),
+    '0.9.2342.19200300.100.1.44': ('uniqueIdentifier', 'uid'),
     '0.9.2342.19200300.100.1.45': ('organizationalStatus', ),
     '0.9.2342.19200300.100.1.46': ('janetMailbox', ),
     '0.9.2342.19200300.100.1.47': ('mailPreferenceOption', ),
@@ -733,9 +733,9 @@ _OID_MAP = {
     '1.2.840.10040.4.1': ('dsaEncryption', 'DSA'),
     '1.2.840.10040.4.3': ('dsaWithSHA1', 'DSA-SHA1'),
     '1.2.840.10045': ('ANSI X9.62', 'ansi-X9-62'),
-    '1.2.840.10045.1': ('id-***REMOVED***eldType', ),
-    '1.2.840.10045.1.1': ('prime-***REMOVED***eld', ),
-    '1.2.840.10045.1.2': ('characteristic-two-***REMOVED***eld', ),
+    '1.2.840.10045.1': ('id-fieldType', ),
+    '1.2.840.10045.1.1': ('prime-field', ),
+    '1.2.840.10045.1.2': ('characteristic-two-field', ),
     '1.2.840.10045.1.2.3': ('id-characteristic-two-basis', ),
     '1.2.840.10045.1.2.3.1': ('onBasis', ),
     '1.2.840.10045.1.2.3.2': ('tpBasis', ),
@@ -775,7 +775,7 @@ _OID_MAP = {
     '1.2.840.10045.4': ('id-ecSigType', ),
     '1.2.840.10045.4.1': ('ecdsa-with-SHA1', ),
     '1.2.840.10045.4.2': ('ecdsa-with-Recommended', ),
-    '1.2.840.10045.4.3': ('ecdsa-with-Speci***REMOVED***ed', ),
+    '1.2.840.10045.4.3': ('ecdsa-with-Specified', ),
     '1.2.840.10045.4.3.1': ('ecdsa-with-SHA224', ),
     '1.2.840.10045.4.3.2': ('ecdsa-with-SHA256', ),
     '1.2.840.10045.4.3.3': ('ecdsa-with-SHA384', ),
@@ -784,7 +784,7 @@ _OID_MAP = {
     '1.2.840.113533.7.66.10': ('cast5-cbc', 'CAST5-CBC'),
     '1.2.840.113533.7.66.12': ('pbeWithMD5AndCast5CBC', ),
     '1.2.840.113533.7.66.13': ('password based MAC', 'id-PasswordBasedMAC'),
-    '1.2.840.113533.7.66.30': ('Dif***REMOVED***e-Hellman based MAC', 'id-DHBasedMac'),
+    '1.2.840.113533.7.66.30': ('Diffie-Hellman based MAC', 'id-DHBasedMac'),
     '1.2.840.113549': ('RSA Data Security, Inc.', 'rsadsi'),
     '1.2.840.113549.1': ('RSA Data Security, Inc. PKCS', 'pkcs'),
     '1.2.840.113549.1.1': ('pkcs1', ),
@@ -796,7 +796,7 @@ _OID_MAP = {
     '1.2.840.113549.1.1.6': ('rsaOAEPEncryptionSET', ),
     '1.2.840.113549.1.1.7': ('rsaesOaep', 'RSAES-OAEP'),
     '1.2.840.113549.1.1.8': ('mgf1', 'MGF1'),
-    '1.2.840.113549.1.1.9': ('pSpeci***REMOVED***ed', 'PSPECIFIED'),
+    '1.2.840.113549.1.1.9': ('pSpecified', 'PSPECIFIED'),
     '1.2.840.113549.1.1.10': ('rsassaPss', 'RSASSA-PSS'),
     '1.2.840.113549.1.1.11': ('sha256WithRSAEncryption', 'RSA-SHA256'),
     '1.2.840.113549.1.1.12': ('sha384WithRSAEncryption', 'RSA-SHA384'),
@@ -832,7 +832,7 @@ _OID_MAP = {
     '1.2.840.113549.1.9.6': ('countersignature', ),
     '1.2.840.113549.1.9.7': ('challengePassword', ),
     '1.2.840.113549.1.9.8': ('unstructuredAddress', ),
-    '1.2.840.113549.1.9.9': ('extendedCerti***REMOVED***cateAttributes', ),
+    '1.2.840.113549.1.9.9': ('extendedCertificateAttributes', ),
     '1.2.840.113549.1.9.14': ('Extension Request', 'extReq'),
     '1.2.840.113549.1.9.15': ('S/MIME Capabilities', 'SMIME-CAPS'),
     '1.2.840.113549.1.9.16': ('S/MIME', 'SMIME'),
@@ -866,12 +866,12 @@ _OID_MAP = {
     '1.2.840.113549.1.9.16.2.4': ('id-smime-aa-contentHint', ),
     '1.2.840.113549.1.9.16.2.5': ('id-smime-aa-msgSigDigest', ),
     '1.2.840.113549.1.9.16.2.6': ('id-smime-aa-encapContentType', ),
-    '1.2.840.113549.1.9.16.2.7': ('id-smime-aa-contentIdenti***REMOVED***er', ),
+    '1.2.840.113549.1.9.16.2.7': ('id-smime-aa-contentIdentifier', ),
     '1.2.840.113549.1.9.16.2.8': ('id-smime-aa-macValue', ),
     '1.2.840.113549.1.9.16.2.9': ('id-smime-aa-equivalentLabels', ),
     '1.2.840.113549.1.9.16.2.10': ('id-smime-aa-contentReference', ),
     '1.2.840.113549.1.9.16.2.11': ('id-smime-aa-encrypKeyPref', ),
-    '1.2.840.113549.1.9.16.2.12': ('id-smime-aa-signingCerti***REMOVED***cate', ),
+    '1.2.840.113549.1.9.16.2.12': ('id-smime-aa-signingCertificate', ),
     '1.2.840.113549.1.9.16.2.13': ('id-smime-aa-smimeEncryptCerts', ),
     '1.2.840.113549.1.9.16.2.14': ('id-smime-aa-timeStampToken', ),
     '1.2.840.113549.1.9.16.2.15': ('id-smime-aa-ets-sigPolicyId', ),
@@ -880,7 +880,7 @@ _OID_MAP = {
     '1.2.840.113549.1.9.16.2.18': ('id-smime-aa-ets-signerAttr', ),
     '1.2.840.113549.1.9.16.2.19': ('id-smime-aa-ets-otherSigCert', ),
     '1.2.840.113549.1.9.16.2.20': ('id-smime-aa-ets-contentTimestamp', ),
-    '1.2.840.113549.1.9.16.2.21': ('id-smime-aa-ets-Certi***REMOVED***cateRefs', ),
+    '1.2.840.113549.1.9.16.2.21': ('id-smime-aa-ets-CertificateRefs', ),
     '1.2.840.113549.1.9.16.2.22': ('id-smime-aa-ets-RevocationRefs', ),
     '1.2.840.113549.1.9.16.2.23': ('id-smime-aa-ets-certValues', ),
     '1.2.840.113549.1.9.16.2.24': ('id-smime-aa-ets-revocationValues', ),
@@ -889,7 +889,7 @@ _OID_MAP = {
     '1.2.840.113549.1.9.16.2.27': ('id-smime-aa-ets-archiveTimeStamp', ),
     '1.2.840.113549.1.9.16.2.28': ('id-smime-aa-signatureType', ),
     '1.2.840.113549.1.9.16.2.29': ('id-smime-aa-dvcs-dvc', ),
-    '1.2.840.113549.1.9.16.2.47': ('id-smime-aa-signingCerti***REMOVED***cateV2', ),
+    '1.2.840.113549.1.9.16.2.47': ('id-smime-aa-signingCertificateV2', ),
     '1.2.840.113549.1.9.16.3': ('id-smime-alg', ),
     '1.2.840.113549.1.9.16.3.1': ('id-smime-alg-ESDHwith3DES', ),
     '1.2.840.113549.1.9.16.3.2': ('id-smime-alg-ESDHwithRC2', ),
@@ -915,8 +915,8 @@ _OID_MAP = {
     '1.2.840.113549.1.9.20': ('friendlyName', ),
     '1.2.840.113549.1.9.21': ('localKeyID', ),
     '1.2.840.113549.1.9.22': ('certTypes', ),
-    '1.2.840.113549.1.9.22.1': ('x509Certi***REMOVED***cate', ),
-    '1.2.840.113549.1.9.22.2': ('sdsiCerti***REMOVED***cate', ),
+    '1.2.840.113549.1.9.22.1': ('x509Certificate', ),
+    '1.2.840.113549.1.9.22.2': ('sdsiCertificate', ),
     '1.2.840.113549.1.9.23': ('crlTypes', ),
     '1.2.840.113549.1.9.23.1': ('x509Crl', ),
     '1.2.840.113549.1.12': ('pkcs12', ),
@@ -951,7 +951,7 @@ _OID_MAP = {
     '1.2.840.113549.3.7': ('des-ede3-cbc', 'DES-EDE3-CBC'),
     '1.2.840.113549.3.8': ('rc5-cbc', 'RC5-CBC'),
     '1.2.840.113549.3.10': ('des-cdmf', 'DES-CDMF'),
-    '1.3': ('identi***REMOVED***ed-organization', 'org', 'ORG'),
+    '1.3': ('identified-organization', 'org', 'ORG'),
     '1.3.6': ('dod', 'DOD'),
     '1.3.6.1': ('iana', 'IANA', 'internet'),
     '1.3.6.1.1': ('Directory', 'directory'),
@@ -977,10 +977,10 @@ _OID_MAP = {
     '1.3.6.1.4.1.1722.12.2.1.16': ('blake2b512', 'BLAKE2b512'),
     '1.3.6.1.4.1.1722.12.2.2.8': ('blake2s256', 'BLAKE2s256'),
     '1.3.6.1.4.1.3029.1.2': ('bf-cbc', 'BF-CBC'),
-    '1.3.6.1.4.1.11129.2.4.2': ('CT Precerti***REMOVED***cate SCTs', 'ct_precert_scts'),
-    '1.3.6.1.4.1.11129.2.4.3': ('CT Precerti***REMOVED***cate Poison', 'ct_precert_poison'),
-    '1.3.6.1.4.1.11129.2.4.4': ('CT Precerti***REMOVED***cate Signer', 'ct_precert_signer'),
-    '1.3.6.1.4.1.11129.2.4.5': ('CT Certi***REMOVED***cate SCTs', 'ct_cert_scts'),
+    '1.3.6.1.4.1.11129.2.4.2': ('CT Precertificate SCTs', 'ct_precert_scts'),
+    '1.3.6.1.4.1.11129.2.4.3': ('CT Precertificate Poison', 'ct_precert_poison'),
+    '1.3.6.1.4.1.11129.2.4.4': ('CT Precertificate Signer', 'ct_precert_signer'),
+    '1.3.6.1.4.1.11129.2.4.5': ('CT Certificate SCTs', 'ct_cert_scts'),
     '1.3.6.1.4.1.11591.4.11': ('scrypt', 'id-scrypt'),
     '1.3.6.1.5': ('Security', 'security'),
     '1.3.6.1.5.2.3': ('id-pkinit', ),
@@ -994,11 +994,11 @@ _OID_MAP = {
     '1.3.6.1.5.5.7.0.4': ('id-pkix1-implicit-93', ),
     '1.3.6.1.5.5.7.0.5': ('id-mod-crmf', ),
     '1.3.6.1.5.5.7.0.6': ('id-mod-cmc', ),
-    '1.3.6.1.5.5.7.0.7': ('id-mod-kea-pro***REMOVED***le-88', ),
-    '1.3.6.1.5.5.7.0.8': ('id-mod-kea-pro***REMOVED***le-93', ),
+    '1.3.6.1.5.5.7.0.7': ('id-mod-kea-profile-88', ),
+    '1.3.6.1.5.5.7.0.8': ('id-mod-kea-profile-93', ),
     '1.3.6.1.5.5.7.0.9': ('id-mod-cmp', ),
-    '1.3.6.1.5.5.7.0.10': ('id-mod-quali***REMOVED***ed-cert-88', ),
-    '1.3.6.1.5.5.7.0.11': ('id-mod-quali***REMOVED***ed-cert-93', ),
+    '1.3.6.1.5.5.7.0.10': ('id-mod-qualified-cert-88', ),
+    '1.3.6.1.5.5.7.0.11': ('id-mod-qualified-cert-93', ),
     '1.3.6.1.5.5.7.0.12': ('id-mod-attribute-cert', ),
     '1.3.6.1.5.5.7.0.13': ('id-mod-timestamp-protocol', ),
     '1.3.6.1.5.5.7.0.14': ('id-mod-ocsp', ),
@@ -1013,14 +1013,14 @@ _OID_MAP = {
     '1.3.6.1.5.5.7.1.6': ('aaControls', ),
     '1.3.6.1.5.5.7.1.7': ('sbgp-ipAddrBlock', ),
     '1.3.6.1.5.5.7.1.8': ('sbgp-autonomousSysNum', ),
-    '1.3.6.1.5.5.7.1.9': ('sbgp-routerIdenti***REMOVED***er', ),
+    '1.3.6.1.5.5.7.1.9': ('sbgp-routerIdentifier', ),
     '1.3.6.1.5.5.7.1.10': ('ac-proxying', ),
     '1.3.6.1.5.5.7.1.11': ('Subject Information Access', 'subjectInfoAccess'),
-    '1.3.6.1.5.5.7.1.14': ('Proxy Certi***REMOVED***cate Information', 'proxyCertInfo'),
+    '1.3.6.1.5.5.7.1.14': ('Proxy Certificate Information', 'proxyCertInfo'),
     '1.3.6.1.5.5.7.1.24': ('TLS Feature', 'tlsfeature'),
     '1.3.6.1.5.5.7.2': ('id-qt', ),
-    '1.3.6.1.5.5.7.2.1': ('Policy Quali***REMOVED***er CPS', 'id-qt-cps'),
-    '1.3.6.1.5.5.7.2.2': ('Policy Quali***REMOVED***er User Notice', 'id-qt-unotice'),
+    '1.3.6.1.5.5.7.2.1': ('Policy Qualifier CPS', 'id-qt-cps'),
+    '1.3.6.1.5.5.7.2.2': ('Policy Qualifier User Notice', 'id-qt-unotice'),
     '1.3.6.1.5.5.7.2.3': ('textNotice', ),
     '1.3.6.1.5.5.7.3': ('id-kp', ),
     '1.3.6.1.5.5.7.3.1': ('TLS Web Server Authentication', 'serverAuth'),
@@ -1042,7 +1042,7 @@ _OID_MAP = {
     '1.3.6.1.5.5.7.3.24': ('Send Proxied Router', 'sendProxiedRouter'),
     '1.3.6.1.5.5.7.3.25': ('Send Owner', 'sendOwner'),
     '1.3.6.1.5.5.7.3.26': ('Send Proxied Owner', 'sendProxiedOwner'),
-    '1.3.6.1.5.5.7.3.27': ('CMC Certi***REMOVED***cate Authority', 'cmcCA'),
+    '1.3.6.1.5.5.7.3.27': ('CMC Certificate Authority', 'cmcCA'),
     '1.3.6.1.5.5.7.3.28': ('CMC Registration Authority', 'cmcRA'),
     '1.3.6.1.5.5.7.4': ('id-it', ),
     '1.3.6.1.5.5.7.4.1': ('id-it-caProtEncCert', ),
@@ -1057,8 +1057,8 @@ _OID_MAP = {
     '1.3.6.1.5.5.7.4.10': ('id-it-keyPairParamReq', ),
     '1.3.6.1.5.5.7.4.11': ('id-it-keyPairParamRep', ),
     '1.3.6.1.5.5.7.4.12': ('id-it-revPassphrase', ),
-    '1.3.6.1.5.5.7.4.13': ('id-it-implicitCon***REMOVED***rm', ),
-    '1.3.6.1.5.5.7.4.14': ('id-it-con***REMOVED***rmWaitTime', ),
+    '1.3.6.1.5.5.7.4.13': ('id-it-implicitConfirm', ),
+    '1.3.6.1.5.5.7.4.14': ('id-it-confirmWaitTime', ),
     '1.3.6.1.5.5.7.4.15': ('id-it-origPKIMessage', ),
     '1.3.6.1.5.5.7.4.16': ('id-it-suppLangTags', ),
     '1.3.6.1.5.5.7.5': ('id-pkip', ),
@@ -1079,7 +1079,7 @@ _OID_MAP = {
     '1.3.6.1.5.5.7.6.4': ('id-alg-dh-pop', ),
     '1.3.6.1.5.5.7.7': ('id-cmc', ),
     '1.3.6.1.5.5.7.7.1': ('id-cmc-statusInfo', ),
-    '1.3.6.1.5.5.7.7.2': ('id-cmc-identi***REMOVED***cation', ),
+    '1.3.6.1.5.5.7.7.2': ('id-cmc-identification', ),
     '1.3.6.1.5.5.7.7.3': ('id-cmc-identityProof', ),
     '1.3.6.1.5.5.7.7.4': ('id-cmc-dataReturn', ),
     '1.3.6.1.5.5.7.7.5': ('id-cmc-transactionId', ),
@@ -1097,10 +1097,10 @@ _OID_MAP = {
     '1.3.6.1.5.5.7.7.21': ('id-cmc-queryPending', ),
     '1.3.6.1.5.5.7.7.22': ('id-cmc-popLinkRandom', ),
     '1.3.6.1.5.5.7.7.23': ('id-cmc-popLinkWitness', ),
-    '1.3.6.1.5.5.7.7.24': ('id-cmc-con***REMOVED***rmCertAcceptance', ),
+    '1.3.6.1.5.5.7.7.24': ('id-cmc-confirmCertAcceptance', ),
     '1.3.6.1.5.5.7.8': ('id-on', ),
     '1.3.6.1.5.5.7.8.1': ('id-on-personalData', ),
-    '1.3.6.1.5.5.7.8.3': ('Permanent Identi***REMOVED***er', 'id-on-permanentIdenti***REMOVED***er'),
+    '1.3.6.1.5.5.7.8.3': ('Permanent Identifier', 'id-on-permanentIdentifier'),
     '1.3.6.1.5.5.7.9': ('id-pda', ),
     '1.3.6.1.5.5.7.9.1': ('id-pda-dateOfBirth', ),
     '1.3.6.1.5.5.7.9.2': ('id-pda-placeOfBirth', ),
@@ -1256,11 +1256,11 @@ _OID_MAP = {
     '2.5.4.15': ('businessCategory', ),
     '2.5.4.16': ('postalAddress', ),
     '2.5.4.17': ('postalCode', ),
-    '2.5.4.18': ('postOf***REMOVED***ceBox', ),
-    '2.5.4.19': ('physicalDeliveryOf***REMOVED***ceName', ),
+    '2.5.4.18': ('postOfficeBox', ),
+    '2.5.4.19': ('physicalDeliveryOfficeName', ),
     '2.5.4.20': ('telephoneNumber', ),
     '2.5.4.21': ('telexNumber', ),
-    '2.5.4.22': ('teletexTerminalIdenti***REMOVED***er', ),
+    '2.5.4.22': ('teletexTerminalIdentifier', ),
     '2.5.4.23': ('facsimileTelephoneNumber', ),
     '2.5.4.24': ('x121Address', ),
     '2.5.4.25': ('internationaliSDNNumber', ),
@@ -1274,28 +1274,28 @@ _OID_MAP = {
     '2.5.4.33': ('roleOccupant', ),
     '2.5.4.34': ('seeAlso', ),
     '2.5.4.35': ('userPassword', ),
-    '2.5.4.36': ('userCerti***REMOVED***cate', ),
-    '2.5.4.37': ('cACerti***REMOVED***cate', ),
+    '2.5.4.36': ('userCertificate', ),
+    '2.5.4.37': ('cACertificate', ),
     '2.5.4.38': ('authorityRevocationList', ),
-    '2.5.4.39': ('certi***REMOVED***cateRevocationList', ),
-    '2.5.4.40': ('crossCerti***REMOVED***catePair', ),
+    '2.5.4.39': ('certificateRevocationList', ),
+    '2.5.4.40': ('crossCertificatePair', ),
     '2.5.4.41': ('name', 'name'),
     '2.5.4.42': ('givenName', 'GN'),
     '2.5.4.43': ('initials', 'initials'),
-    '2.5.4.44': ('generationQuali***REMOVED***er', ),
-    '2.5.4.45': ('x500UniqueIdenti***REMOVED***er', ),
-    '2.5.4.46': ('dnQuali***REMOVED***er', 'dnQuali***REMOVED***er'),
+    '2.5.4.44': ('generationQualifier', ),
+    '2.5.4.45': ('x500UniqueIdentifier', ),
+    '2.5.4.46': ('dnQualifier', 'dnQualifier'),
     '2.5.4.47': ('enhancedSearchGuide', ),
     '2.5.4.48': ('protocolInformation', ),
     '2.5.4.49': ('distinguishedName', ),
     '2.5.4.50': ('uniqueMember', ),
-    '2.5.4.51': ('houseIdenti***REMOVED***er', ),
+    '2.5.4.51': ('houseIdentifier', ),
     '2.5.4.52': ('supportedAlgorithms', ),
     '2.5.4.53': ('deltaRevocationList', ),
     '2.5.4.54': ('dmdName', ),
     '2.5.4.65': ('pseudonym', ),
     '2.5.4.72': ('role', 'role'),
-    '2.5.4.97': ('organizationIdenti***REMOVED***er', ),
+    '2.5.4.97': ('organizationIdentifier', ),
     '2.5.4.98': ('countryCode3c', 'c3'),
     '2.5.4.99': ('countryCode3n', 'n3'),
     '2.5.4.100': ('dnsName', ),
@@ -1305,7 +1305,7 @@ _OID_MAP = {
     '2.5.8.3.101': ('mdc2', 'MDC2'),
     '2.5.29': ('id-ce', ),
     '2.5.29.9': ('X509v3 Subject Directory Attributes', 'subjectDirectoryAttributes'),
-    '2.5.29.14': ('X509v3 Subject Key Identi***REMOVED***er', 'subjectKeyIdenti***REMOVED***er'),
+    '2.5.29.14': ('X509v3 Subject Key Identifier', 'subjectKeyIdentifier'),
     '2.5.29.15': ('X509v3 Key Usage', 'keyUsage'),
     '2.5.29.16': ('X509v3 Private Key Usage Period', 'privateKeyUsagePeriod'),
     '2.5.29.17': ('X509v3 Subject Alternative Name', 'subjectAltName'),
@@ -1317,13 +1317,13 @@ _OID_MAP = {
     '2.5.29.24': ('Invalidity Date', 'invalidityDate'),
     '2.5.29.27': ('X509v3 Delta CRL Indicator', 'deltaCRL'),
     '2.5.29.28': ('X509v3 Issuing Distribution Point', 'issuingDistributionPoint'),
-    '2.5.29.29': ('X509v3 Certi***REMOVED***cate Issuer', 'certi***REMOVED***cateIssuer'),
+    '2.5.29.29': ('X509v3 Certificate Issuer', 'certificateIssuer'),
     '2.5.29.30': ('X509v3 Name Constraints', 'nameConstraints'),
     '2.5.29.31': ('X509v3 CRL Distribution Points', 'crlDistributionPoints'),
-    '2.5.29.32': ('X509v3 Certi***REMOVED***cate Policies', 'certi***REMOVED***catePolicies'),
+    '2.5.29.32': ('X509v3 Certificate Policies', 'certificatePolicies'),
     '2.5.29.32.0': ('X509v3 Any Policy', 'anyPolicy'),
     '2.5.29.33': ('X509v3 Policy Mappings', 'policyMappings'),
-    '2.5.29.35': ('X509v3 Authority Key Identi***REMOVED***er', 'authorityKeyIdenti***REMOVED***er'),
+    '2.5.29.35': ('X509v3 Authority Key Identifier', 'authorityKeyIdentifier'),
     '2.5.29.36': ('X509v3 Policy Constraints', 'policyConstraints'),
     '2.5.29.37': ('X509v3 Extended Key Usage', 'extendedKeyUsage'),
     '2.5.29.37.0': ('Any Extended Key Usage', 'anyExtendedKeyUsage'),
@@ -1393,7 +1393,7 @@ _OID_MAP = {
     '2.16.840.1.101.3.4.3.15': ('RSA-SHA3-384', 'id-rsassa-pkcs1-v1_5-with-sha3-384'),
     '2.16.840.1.101.3.4.3.16': ('RSA-SHA3-512', 'id-rsassa-pkcs1-v1_5-with-sha3-512'),
     '2.16.840.1.113730': ('Netscape Communications Corp.', 'Netscape'),
-    '2.16.840.1.113730.1': ('Netscape Certi***REMOVED***cate Extension', 'nsCertExt'),
+    '2.16.840.1.113730.1': ('Netscape Certificate Extension', 'nsCertExt'),
     '2.16.840.1.113730.1.1': ('Netscape Cert Type', 'nsCertType'),
     '2.16.840.1.113730.1.2': ('Netscape Base Url', 'nsBaseUrl'),
     '2.16.840.1.113730.1.3': ('Netscape Revocation Url', 'nsRevocationUrl'),
@@ -1403,7 +1403,7 @@ _OID_MAP = {
     '2.16.840.1.113730.1.12': ('Netscape SSL Server Name', 'nsSslServerName'),
     '2.16.840.1.113730.1.13': ('Netscape Comment', 'nsComment'),
     '2.16.840.1.113730.2': ('Netscape Data Type', 'nsDataType'),
-    '2.16.840.1.113730.2.5': ('Netscape Certi***REMOVED***cate Sequence', 'nsCertSequence'),
+    '2.16.840.1.113730.2.5': ('Netscape Certificate Sequence', 'nsCertSequence'),
     '2.16.840.1.113730.4.1': ('Netscape Server Gated Crypto', 'nsSGC'),
     '2.23': ('International Organizations', 'international-organizations'),
     '2.23.42': ('Secure Electronic Transactions', 'id-set'),
@@ -1487,8 +1487,8 @@ _OID_MAP = {
     '2.23.42.0.77': ('setct-CertReqTBE', ),
     '2.23.42.0.78': ('setct-CertReqTBEX', ),
     '2.23.42.0.79': ('setct-CertResTBE', ),
-    '2.23.42.0.80': ('setct-CRLNoti***REMOVED***cationTBS', ),
-    '2.23.42.0.81': ('setct-CRLNoti***REMOVED***cationResTBS', ),
+    '2.23.42.0.80': ('setct-CRLNotificationTBS', ),
+    '2.23.42.0.81': ('setct-CRLNotificationResTBS', ),
     '2.23.42.0.82': ('setct-BCIDistributionTBS', ),
     '2.23.42.1': ('message extensions', 'set-msgExt'),
     '2.23.42.1.1': ('generic cryptogram', 'setext-genCrypt'),
@@ -1496,7 +1496,7 @@ _OID_MAP = {
     '2.23.42.1.4': ('setext-pinSecure', ),
     '2.23.42.1.5': ('setext-pinAny', ),
     '2.23.42.1.7': ('setext-track2', ),
-    '2.23.42.1.8': ('additional veri***REMOVED***cation', 'setext-cv'),
+    '2.23.42.1.8': ('additional verification', 'setext-cv'),
     '2.23.42.3': ('set-attr', ),
     '2.23.42.3.0': ('setAttr-Cert', ),
     '2.23.42.3.0.0': ('set-rootKeyThumb', ),
@@ -1516,7 +1516,7 @@ _OID_MAP = {
     '2.23.42.3.3.5.2': ('secure device signature', 'setAttr-SecDevSig'),
     '2.23.42.5': ('set-policy', ),
     '2.23.42.5.0': ('set-policy-root', ),
-    '2.23.42.7': ('certi***REMOVED***cate extensions', 'set-certExt'),
+    '2.23.42.7': ('certificate extensions', 'set-certExt'),
     '2.23.42.7.0': ('setCext-hashedRoot', ),
     '2.23.42.7.1': ('setCext-certType', ),
     '2.23.42.7.2': ('setCext-merchData', ),
@@ -1525,7 +1525,7 @@ _OID_MAP = {
     '2.23.42.7.5': ('setCext-setExt', ),
     '2.23.42.7.6': ('setCext-setQualf', ),
     '2.23.42.7.7': ('setCext-PGWYcapabilities', ),
-    '2.23.42.7.8': ('setCext-TokenIdenti***REMOVED***er', ),
+    '2.23.42.7.8': ('setCext-TokenIdentifier', ),
     '2.23.42.7.9': ('setCext-Track2Data', ),
     '2.23.42.7.10': ('setCext-TokenType', ),
     '2.23.42.7.11': ('setCext-IssuerCapabilities', ),
@@ -1584,17 +1584,17 @@ def pyopenssl_normalize_name(name, short=False):
     nid = OpenSSL._util.lib.OBJ_txt2nid(to_bytes(name))
     if nid != 0:
         b_name = OpenSSL._util.lib.OBJ_nid2ln(nid)
-        name = to_text(OpenSSL._util.f***REMOVED***.string(b_name))
+        name = to_text(OpenSSL._util.ffi.string(b_name))
     if short:
         return _NORMALIZE_NAMES_SHORT.get(name, name)
-    ***REMOVED***:
+    else:
         return _NORMALIZE_NAMES.get(name, name)
 
 
 # #####################################################################################
 # #####################################################################################
 # # This excerpt is dual licensed under the terms of the Apache License, Version
-# # 2.0, and the BSD License. See the LICENSE ***REMOVED***le at
+# # 2.0, and the BSD License. See the LICENSE file at
 # # https://github.com/pyca/cryptography/blob/master/LICENSE for complete details.
 # #
 # # Adapted from cryptography's hazmat/backends/openssl/decode_asn1.py
@@ -1610,7 +1610,7 @@ def pyopenssl_normalize_name(name, short=False):
 # #    pyca/cryptography@2917e460993c475c72d7146c50dc3bbc2414280d
 # #    pyca/cryptography@3057f91ea9a05fb593825006d87a391286a4d828
 # #    pyca/cryptography@d607dd7e5bc5c08854ec0c9baff70ba4a35be36f
-def _obj2txt(openssl_lib, openssl_f***REMOVED***, obj):
+def _obj2txt(openssl_lib, openssl_ffi, obj):
     # Set to 80 on the recommendation of
     # https://www.openssl.org/docs/crypto/OBJ_nid2ln.html#return_values
     #
@@ -1620,7 +1620,7 @@ def _obj2txt(openssl_lib, openssl_f***REMOVED***, obj):
     # big enough.
     #
     buf_len = 80
-    buf = openssl_f***REMOVED***.new("char[]", buf_len)
+    buf = openssl_ffi.new("char[]", buf_len)
 
     # 'res' is the number of bytes that *would* be written if the
     # buffer is large enough.  If 'res' > buf_len - 1, we need to
@@ -1628,9 +1628,9 @@ def _obj2txt(openssl_lib, openssl_f***REMOVED***, obj):
     res = openssl_lib.OBJ_obj2txt(buf, buf_len, obj, 1)
     if res > buf_len - 1:  # account for terminating null byte
         buf_len = res + 1
-        buf = openssl_f***REMOVED***.new("char[]", buf_len)
+        buf = openssl_ffi.new("char[]", buf_len)
         res = openssl_lib.OBJ_obj2txt(buf, buf_len, obj, 1)
-    return openssl_f***REMOVED***.buffer(buf, res)[:].decode()
+    return openssl_ffi.buffer(buf, res)[:].decode()
 # #####################################################################################
 # #####################################################################################
 
@@ -1645,17 +1645,17 @@ def cryptography_get_extensions_from_cert(cert):
 
     for i in range(backend._lib.X509_get_ext_count(x509_obj)):
         ext = backend._lib.X509_get_ext(x509_obj, i)
-        if ext == backend._f***REMOVED***.NULL:
+        if ext == backend._ffi.NULL:
             continue
         crit = backend._lib.X509_EXTENSION_get_critical(ext)
         data = backend._lib.X509_EXTENSION_get_data(ext)
-        backend.openssl_assert(data != backend._f***REMOVED***.NULL)
-        der = backend._f***REMOVED***.buffer(data.data, data.length)[:]
+        backend.openssl_assert(data != backend._ffi.NULL)
+        der = backend._ffi.buffer(data.data, data.length)[:]
         entry = dict(
             critical=(crit == 1),
             value=base64.b64encode(der),
         )
-        oid = _obj2txt(backend._lib, backend._f***REMOVED***, backend._lib.X509_EXTENSION_get_object(ext))
+        oid = _obj2txt(backend._lib, backend._ffi, backend._lib.X509_EXTENSION_get_object(ext))
         result[oid] = entry
     return result
 
@@ -1668,27 +1668,27 @@ def cryptography_get_extensions_from_csr(csr):
     backend = csr._backend
 
     extensions = backend._lib.X509_REQ_get_extensions(csr._x509_req)
-    extensions = backend._f***REMOVED***.gc(
+    extensions = backend._ffi.gc(
         extensions,
         lambda ext: backend._lib.sk_X509_EXTENSION_pop_free(
             ext,
-            backend._f***REMOVED***.addressof(backend._lib._original_lib, "X509_EXTENSION_free")
+            backend._ffi.addressof(backend._lib._original_lib, "X509_EXTENSION_free")
         )
     )
 
     for i in range(backend._lib.sk_X509_EXTENSION_num(extensions)):
         ext = backend._lib.sk_X509_EXTENSION_value(extensions, i)
-        if ext == backend._f***REMOVED***.NULL:
+        if ext == backend._ffi.NULL:
             continue
         crit = backend._lib.X509_EXTENSION_get_critical(ext)
         data = backend._lib.X509_EXTENSION_get_data(ext)
-        backend.openssl_assert(data != backend._f***REMOVED***.NULL)
-        der = backend._f***REMOVED***.buffer(data.data, data.length)[:]
+        backend.openssl_assert(data != backend._ffi.NULL)
+        der = backend._ffi.buffer(data.data, data.length)[:]
         entry = dict(
             critical=(crit == 1),
             value=base64.b64encode(der),
         )
-        oid = _obj2txt(backend._lib, backend._f***REMOVED***, backend._lib.X509_EXTENSION_get_object(ext))
+        oid = _obj2txt(backend._lib, backend._ffi, backend._lib.X509_EXTENSION_get_object(ext))
         result[oid] = entry
     return result
 
@@ -1707,12 +1707,12 @@ def pyopenssl_get_extensions_from_cert(cert):
         )
         oid = _obj2txt(
             OpenSSL._util.lib,
-            OpenSSL._util.f***REMOVED***,
+            OpenSSL._util.ffi,
             OpenSSL._util.lib.X509_EXTENSION_get_object(ext._extension)
         )
         # This could also be done a bit simpler:
         #
-        #   oid = _obj2txt(OpenSSL._util.lib, OpenSSL._util.f***REMOVED***, OpenSSL._util.lib.OBJ_nid2obj(ext._nid))
+        #   oid = _obj2txt(OpenSSL._util.lib, OpenSSL._util.ffi, OpenSSL._util.lib.OBJ_nid2obj(ext._nid))
         #
         # Unfortunately this gives the wrong result in case the linked OpenSSL
         # doesn't know the OID. That's why we have to get the OID dotted string
@@ -1733,12 +1733,12 @@ def pyopenssl_get_extensions_from_csr(csr):
         )
         oid = _obj2txt(
             OpenSSL._util.lib,
-            OpenSSL._util.f***REMOVED***,
+            OpenSSL._util.ffi,
             OpenSSL._util.lib.X509_EXTENSION_get_object(ext._extension)
         )
         # This could also be done a bit simpler:
         #
-        #   oid = _obj2txt(OpenSSL._util.lib, OpenSSL._util.f***REMOVED***, OpenSSL._util.lib.OBJ_nid2obj(ext._nid))
+        #   oid = _obj2txt(OpenSSL._util.lib, OpenSSL._util.ffi, OpenSSL._util.lib.OBJ_nid2obj(ext._nid))
         #
         # Unfortunately this gives the wrong result in case the linked OpenSSL
         # doesn't know the OID. That's why we have to get the OID dotted string
@@ -1750,17 +1750,17 @@ def pyopenssl_get_extensions_from_csr(csr):
 def cryptography_name_to_oid(name):
     dotted = _OID_LOOKUP.get(name)
     if dotted is None:
-        raise OpenSSLObjectError('Cannot ***REMOVED***nd OID for "{0}"'.format(name))
-    return x509.oid.ObjectIdenti***REMOVED***er(dotted)
+        raise OpenSSLObjectError('Cannot find OID for "{0}"'.format(name))
+    return x509.oid.ObjectIdentifier(dotted)
 
 
 def cryptography_oid_to_name(oid, short=False):
     dotted_string = oid.dotted_string
     names = _OID_MAP.get(dotted_string)
-    name = names[0] if names ***REMOVED*** oid._name
+    name = names[0] if names else oid._name
     if short:
         return _NORMALIZE_NAMES_SHORT.get(name, name)
-    ***REMOVED***:
+    else:
         return _NORMALIZE_NAMES.get(name, name)
 
 
@@ -1777,11 +1777,11 @@ def cryptography_get_name(name):
         if name.startswith('email:'):
             return x509.RFC822Name(to_text(name[6:]))
         if name.startswith('URI:'):
-            return x509.UniformResourceIdenti***REMOVED***er(to_text(name[4:]))
+            return x509.UniformResourceIdentifier(to_text(name[4:]))
     except Exception as e:
         raise OpenSSLObjectError('Cannot parse Subject Alternative Name "{0}": {1}'.format(name, e))
     if ':' not in name:
-        raise OpenSSLObjectError('Cannot parse Subject Alternative Name "{0}" (forgot "DNS:" pre***REMOVED***x?)'.format(name))
+        raise OpenSSLObjectError('Cannot parse Subject Alternative Name "{0}" (forgot "DNS:" prefix?)'.format(name))
     raise OpenSSLObjectError('Cannot parse Subject Alternative Name "{0}" (potentially unsupported by cryptography backend)'.format(name))
 
 
@@ -1804,7 +1804,7 @@ def cryptography_decode_name(name):
         return 'IP:{0}'.format(name.value.compressed)
     if isinstance(name, x509.RFC822Name):
         return 'email:{0}'.format(name.value)
-    if isinstance(name, x509.UniformResourceIdenti***REMOVED***er):
+    if isinstance(name, x509.UniformResourceIdentifier):
         return 'URI:{0}'.format(name.value)
     if isinstance(name, x509.DirectoryName):
         # FIXME: test
@@ -1820,8 +1820,8 @@ def cryptography_decode_name(name):
 
 def _cryptography_get_keyusage(usage):
     '''
-    Given a key usage identi***REMOVED***er string, returns the parameter name used by cryptography's x509.KeyUsage().
-    Raises an OpenSSLObjectError if the identi***REMOVED***er is unknown.
+    Given a key usage identifier string, returns the parameter name used by cryptography's x509.KeyUsage().
+    Raises an OpenSSLObjectError if the identifier is unknown.
     '''
     if usage in ('Digital Signature', 'digitalSignature'):
         return 'digital_signature'
@@ -1833,7 +1833,7 @@ def _cryptography_get_keyusage(usage):
         return 'data_encipherment'
     if usage in ('Key Agreement', 'keyAgreement'):
         return 'key_agreement'
-    if usage in ('Certi***REMOVED***cate Sign', 'keyCertSign'):
+    if usage in ('Certificate Sign', 'keyCertSign'):
         return 'key_cert_sign'
     if usage in ('CRL Sign', 'cRLSign'):
         return 'crl_sign'
@@ -1846,8 +1846,8 @@ def _cryptography_get_keyusage(usage):
 
 def cryptography_parse_key_usage_params(usages):
     '''
-    Given a list of key usage identi***REMOVED***er strings, returns the parameters for cryptography's x509.KeyUsage().
-    Raises an OpenSSLObjectError if an identi***REMOVED***er is unknown.
+    Given a list of key usage identifier strings, returns the parameters for cryptography's x509.KeyUsage().
+    Raises an OpenSSLObjectError if an identifier is unknown.
     '''
     params = dict(
         digital_signature=False,
@@ -1879,7 +1879,7 @@ def cryptography_get_basic_constraints(constraints):
                     ca = True
                 elif constraint == 'CA:FALSE':
                     ca = False
-                ***REMOVED***:
+                else:
                     raise OpenSSLObjectError('Unknown basic constraint value "{0}" for CA'.format(constraint[3:]))
             elif constraint.startswith('pathlen:'):
                 v = constraint[len('pathlen:'):]
@@ -1887,7 +1887,7 @@ def cryptography_get_basic_constraints(constraints):
                     path_length = int(v)
                 except Exception as e:
                     raise OpenSSLObjectError('Cannot parse path length constraint "{0}" ({1})'.format(v, e))
-            ***REMOVED***:
+            else:
                 raise OpenSSLObjectError('Unknown basic constraint "{0}"'.format(constraint))
     return ca, path_length
 
@@ -1927,7 +1927,7 @@ def quick_is_not_prime(n):
     # The constant in the next line is the product of all primes < 200
     if simple_gcd(n, 7799922041683461553249199106329813876687996789903550945093032474868511536164700810) > 1:
         return True
-    # TODO: maybe do some iterations of Miller-Rabin to increase con***REMOVED***dence
+    # TODO: maybe do some iterations of Miller-Rabin to increase confidence
     # (https://en.wikipedia.org/wiki/Miller%E2%80%93Rabin_primality_test)
     return False
 
@@ -1940,7 +1940,7 @@ if python_version >= (2, 7) or python_version >= (3, 1):
         if no == 0:
             return 0
         return no.bit_length()
-***REMOVED***:
+else:
     # Slow, but works
     def count_bits(no):
         no = abs(no)
@@ -1958,7 +1958,7 @@ PKCS1_PRIVATEKEY_SUFFIX = ' PRIVATE KEY'
 
 
 def identify_private_key_format(content):
-    '''Given the contents of a private key ***REMOVED***le, identi***REMOVED***es its format.'''
+    '''Given the contents of a private key file, identifies its format.'''
     # See https://github.com/openssl/openssl/blob/master/crypto/pem/pem_pkey.c#L40-L85
     # (PEM_read_bio_PrivateKey)
     # and https://github.com/openssl/openssl/blob/master/include/openssl/pem.h#L46-L47

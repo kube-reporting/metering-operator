@@ -1,6 +1,6 @@
 // Copyright 2014 The Go Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE ***REMOVED***le.
+// license that can be found in the LICENSE file.
 
 // Package oauth2 provides support for making
 // OAuth2 authorized and authenticated HTTP requests.
@@ -26,7 +26,7 @@ import (
 var NoContext = context.TODO()
 
 // RegisterBrokenAuthHeaderProvider registers an OAuth2 server
-// identi***REMOVED***ed by the tokenURL pre***REMOVED***x as an OAuth2 implementation
+// identified by the tokenURL prefix as an OAuth2 implementation
 // which doesn't support the HTTP Basic authentication
 // scheme to authenticate with the authorization server.
 // Once a server is registered, credentials (client_id and client_secret)
@@ -37,11 +37,11 @@ func RegisterBrokenAuthHeaderProvider(tokenURL string) {
 	internal.RegisterBrokenAuthHeaderProvider(tokenURL)
 }
 
-// Con***REMOVED***g describes a typical 3-legged OAuth2 flow, with both the
+// Config describes a typical 3-legged OAuth2 flow, with both the
 // client application information and the server's endpoint URLs.
 // For the client credentials 2-legged OAuth2 flow, see the clientcredentials
 // package (https://golang.org/x/oauth2/clientcredentials).
-type Con***REMOVED***g struct {
+type Config struct {
 	// ClientID is the application's ID.
 	ClientID string
 
@@ -49,8 +49,8 @@ type Con***REMOVED***g struct {
 	ClientSecret string
 
 	// Endpoint contains the resource server's token endpoint
-	// URLs. These are constants speci***REMOVED***c to each server and are
-	// often available via site-speci***REMOVED***c packages, such as
+	// URLs. These are constants specific to each server and are
+	// often available via site-specific packages, such as
 	// google.Endpoint or github.Endpoint.
 	Endpoint Endpoint
 
@@ -58,7 +58,7 @@ type Con***REMOVED***g struct {
 	// the OAuth flow, after the resource owner's URLs.
 	RedirectURL string
 
-	// Scope speci***REMOVED***es optional requested permissions.
+	// Scope specifies optional requested permissions.
 	Scopes []string
 }
 
@@ -66,7 +66,7 @@ type Con***REMOVED***g struct {
 type TokenSource interface {
 	// Token returns a token or an error.
 	// Token must be safe for concurrent use by multiple goroutines.
-	// The returned Token must not be modi***REMOVED***ed.
+	// The returned Token must not be modified.
 	Token() (*Token, error)
 }
 
@@ -80,25 +80,25 @@ type Endpoint struct {
 var (
 	// AccessTypeOnline and AccessTypeOffline are options passed
 	// to the Options.AuthCodeURL method. They modify the
-	// "access_type" ***REMOVED***eld that gets sent in the URL returned by
+	// "access_type" field that gets sent in the URL returned by
 	// AuthCodeURL.
 	//
-	// Online is the default if neither is speci***REMOVED***ed. If your
+	// Online is the default if neither is specified. If your
 	// application needs to refresh access tokens when the user
 	// is not present at the browser, then use offline. This will
 	// result in your application obtaining a refresh token the
-	// ***REMOVED***rst time your application exchanges an authorization
+	// first time your application exchanges an authorization
 	// code for a user.
 	AccessTypeOnline  AuthCodeOption = SetAuthURLParam("access_type", "online")
 	AccessTypeOffline AuthCodeOption = SetAuthURLParam("access_type", "offline")
 
 	// ApprovalForce forces the users to view the consent dialog
-	// and con***REMOVED***rm the permissions request at the URL returned
+	// and confirm the permissions request at the URL returned
 	// from AuthCodeURL, even if they've already done so.
 	ApprovalForce AuthCodeOption = SetAuthURLParam("approval_prompt", "force")
 )
 
-// An AuthCodeOption is passed to Con***REMOVED***g.AuthCodeURL.
+// An AuthCodeOption is passed to Config.AuthCodeURL.
 type AuthCodeOption interface {
 	setValue(url.Values)
 }
@@ -123,7 +123,7 @@ func SetAuthURLParam(key, value string) AuthCodeOption {
 //
 // Opts may include AccessTypeOnline or AccessTypeOffline, as well
 // as ApprovalForce.
-func (c *Con***REMOVED***g) AuthCodeURL(state string, opts ...AuthCodeOption) string {
+func (c *Config) AuthCodeURL(state string, opts ...AuthCodeOption) string {
 	var buf bytes.Buffer
 	buf.WriteString(c.Endpoint.AuthURL)
 	v := url.Values{
@@ -145,7 +145,7 @@ func (c *Con***REMOVED***g) AuthCodeURL(state string, opts ...AuthCodeOption) st
 	}
 	if strings.Contains(c.Endpoint.AuthURL, "?") {
 		buf.WriteByte('&')
-	} ***REMOVED*** {
+	} else {
 		buf.WriteByte('?')
 	}
 	buf.WriteString(v.Encode())
@@ -163,7 +163,7 @@ func (c *Con***REMOVED***g) AuthCodeURL(state string, opts ...AuthCodeOption) st
 //
 // The HTTP client to use is derived from the context.
 // If nil, http.DefaultClient is used.
-func (c *Con***REMOVED***g) PasswordCredentialsToken(ctx context.Context, username, password string) (*Token, error) {
+func (c *Config) PasswordCredentialsToken(ctx context.Context, username, password string) (*Token, error) {
 	v := url.Values{
 		"grant_type": {"password"},
 		"username":   {username},
@@ -185,7 +185,7 @@ func (c *Con***REMOVED***g) PasswordCredentialsToken(ctx context.Context, userna
 //
 // The code will be in the *http.Request.FormValue("code"). Before
 // calling Exchange, be sure to validate FormValue("state").
-func (c *Con***REMOVED***g) Exchange(ctx context.Context, code string) (*Token, error) {
+func (c *Config) Exchange(ctx context.Context, code string) (*Token, error) {
 	v := url.Values{
 		"grant_type": {"authorization_code"},
 		"code":       {code},
@@ -199,16 +199,16 @@ func (c *Con***REMOVED***g) Exchange(ctx context.Context, code string) (*Token, 
 // Client returns an HTTP client using the provided token.
 // The token will auto-refresh as necessary. The underlying
 // HTTP transport will be obtained using the provided context.
-// The returned client and its Transport should not be modi***REMOVED***ed.
-func (c *Con***REMOVED***g) Client(ctx context.Context, t *Token) *http.Client {
+// The returned client and its Transport should not be modified.
+func (c *Config) Client(ctx context.Context, t *Token) *http.Client {
 	return NewClient(ctx, c.TokenSource(ctx, t))
 }
 
 // TokenSource returns a TokenSource that returns t until t expires,
 // automatically refreshing it as necessary using the provided context.
 //
-// Most users will use Con***REMOVED***g.Client instead.
-func (c *Con***REMOVED***g) TokenSource(ctx context.Context, t *Token) TokenSource {
+// Most users will use Config.Client instead.
+func (c *Config) TokenSource(ctx context.Context, t *Token) TokenSource {
 	tkr := &tokenRefresher{
 		ctx:  ctx,
 		conf: c,
@@ -226,12 +226,12 @@ func (c *Con***REMOVED***g) TokenSource(ctx context.Context, t *Token) TokenSour
 // HTTP requests to renew a token using a RefreshToken.
 type tokenRefresher struct {
 	ctx          context.Context // used to get HTTP requests
-	conf         *Con***REMOVED***g
+	conf         *Config
 	refreshToken string
 }
 
 // WARNING: Token is not safe for concurrent access, as it
-// updates the tokenRefresher's refreshToken ***REMOVED***eld.
+// updates the tokenRefresher's refreshToken field.
 // Within this package, it is used by reuseTokenSource which
 // synchronizes calls to this method with its own mutex.
 func (tf *tokenRefresher) Token() (*Token, error) {
@@ -264,7 +264,7 @@ type reuseTokenSource struct {
 	t  *Token
 }
 
-// Token returns the current token if it's still valid, ***REMOVED*** will
+// Token returns the current token if it's still valid, else will
 // refresh the current token (using r.Context for HTTP client
 // information) and return the new one.
 func (s *reuseTokenSource) Token() (*Token, error) {
@@ -305,7 +305,7 @@ var HTTPClient internal.ContextKey
 // The returned client is not valid beyond the lifetime of the context.
 //
 // Note that if a custom *http.Client is provided via the Context it
-// is used only for token acquisition and is not used to con***REMOVED***gure the
+// is used only for token acquisition and is not used to configure the
 // *http.Client returned from NewClient.
 //
 // As a special case, if src is nil, a non-OAuth2 client is returned
@@ -328,7 +328,7 @@ func NewClient(ctx context.Context, src TokenSource) *http.Client {
 // When its cached token is invalid, a new token is obtained from src.
 //
 // ReuseTokenSource is typically used to reuse tokens from a cache
-// (such as a ***REMOVED***le on disk) between runs of a program, rather than
+// (such as a file on disk) between runs of a program, rather than
 // obtaining new tokens unnecessarily.
 //
 // The initial token t may be nil, in which case the TokenSource is

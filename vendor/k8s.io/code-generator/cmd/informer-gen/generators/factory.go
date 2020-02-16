@@ -2,7 +2,7 @@
 Copyright 2016 The Kubernetes Authors.
 
 Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this ***REMOVED***le except in compliance with the License.
+you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
 
     http://www.apache.org/licenses/LICENSE-2.0
@@ -10,7 +10,7 @@ You may obtain a copy of the License at
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the speci***REMOVED***c language governing permissions and
+See the License for the specific language governing permissions and
 limitations under the License.
 */
 
@@ -28,7 +28,7 @@ import (
 	"k8s.io/klog"
 )
 
-// factoryGenerator produces a ***REMOVED***le of listers for a given GroupVersion and
+// factoryGenerator produces a file of listers for a given GroupVersion and
 // type.
 type factoryGenerator struct {
 	generator.DefaultGen
@@ -38,14 +38,14 @@ type factoryGenerator struct {
 	gvGoNames                 map[string]string
 	clientSetPackage          string
 	internalInterfacesPackage string
-	***REMOVED***ltered                  bool
+	filtered                  bool
 }
 
 var _ generator.Generator = &factoryGenerator{}
 
 func (g *factoryGenerator) Filter(c *generator.Context, t *types.Type) bool {
-	if !g.***REMOVED***ltered {
-		g.***REMOVED***ltered = true
+	if !g.filtered {
+		g.filtered = true
 		return true
 	}
 	return false
@@ -99,7 +99,7 @@ func (g *factoryGenerator) GenerateType(c *generator.Context, t *types.Type, w i
 }
 
 var sharedInformerFactoryStruct = `
-// SharedInformerOption de***REMOVED***nes the functional option type for SharedInformerFactory.
+// SharedInformerOption defines the functional option type for SharedInformerFactory.
 type SharedInformerOption func(*sharedInformerFactory) *sharedInformerFactory
 
 type sharedInformerFactory struct {
@@ -116,17 +116,17 @@ type sharedInformerFactory struct {
 	startedInformers map[{{.reflectType|raw}}]bool
 }
 
-// WithCustomResyncCon***REMOVED***g sets a custom resync period for the speci***REMOVED***ed informer types.
-func WithCustomResyncCon***REMOVED***g(resyncCon***REMOVED***g map[{{.object|raw}}]{{.timeDuration|raw}}) SharedInformerOption {
+// WithCustomResyncConfig sets a custom resync period for the specified informer types.
+func WithCustomResyncConfig(resyncConfig map[{{.object|raw}}]{{.timeDuration|raw}}) SharedInformerOption {
 	return func(factory *sharedInformerFactory) *sharedInformerFactory {
-		for k, v := range resyncCon***REMOVED***g {
+		for k, v := range resyncConfig {
 			factory.customResync[reflect.TypeOf(k)] = v
 		}
 		return factory
 	}
 }
 
-// WithTweakListOptions sets a custom ***REMOVED***lter on all listers of the con***REMOVED***gured SharedInformerFactory.
+// WithTweakListOptions sets a custom filter on all listers of the configured SharedInformerFactory.
 func WithTweakListOptions(tweakListOptions internalinterfaces.TweakListOptionsFunc) SharedInformerOption {
 	return func(factory *sharedInformerFactory) *sharedInformerFactory {
 		factory.tweakListOptions = tweakListOptions
@@ -134,7 +134,7 @@ func WithTweakListOptions(tweakListOptions internalinterfaces.TweakListOptionsFu
 	}
 }
 
-// WithNamespace limits the SharedInformerFactory to the speci***REMOVED***ed namespace.
+// WithNamespace limits the SharedInformerFactory to the specified namespace.
 func WithNamespace(namespace string) SharedInformerOption {
 	return func(factory *sharedInformerFactory) *sharedInformerFactory {
 		factory.namespace = namespace
@@ -148,8 +148,8 @@ func NewSharedInformerFactory(client {{.clientSetInterface|raw}}, defaultResync 
 }
 
 // NewFilteredSharedInformerFactory constructs a new instance of sharedInformerFactory.
-// Listers obtained via this SharedInformerFactory will be subject to the same ***REMOVED***lters
-// as speci***REMOVED***ed here.
+// Listers obtained via this SharedInformerFactory will be subject to the same filters
+// as specified here.
 // Deprecated: Please use NewSharedInformerFactoryWithOptions instead
 func NewFilteredSharedInformerFactory(client {{.clientSetInterface|raw}}, defaultResync {{.timeDuration|raw}}, namespace string, tweakListOptions {{.interfacesTweakListOptionsFunc|raw}}) SharedInformerFactory {
 	return NewSharedInformerFactoryWithOptions(client, defaultResync, WithNamespace(namespace), WithTweakListOptions(tweakListOptions)) 

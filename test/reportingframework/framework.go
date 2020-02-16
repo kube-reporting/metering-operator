@@ -51,11 +51,11 @@ func New(
 	routeBearerToken,
 	reportingAPIURL,
 	reportOutputDir string,
-	kubecon***REMOVED***g *rest.Con***REMOVED***g,
+	kubeconfig *rest.Config,
 	kubeClient kubernetes.Interface,
 	meteringClient metering.MeteringV1Interface,
 ) (*ReportingFramework, error) {
-	kubeAPIURL, kubeAPIPath, err := rest.DefaultServerURL(kubecon***REMOVED***g.Host, kubecon***REMOVED***g.APIPath, schema.GroupVersion{}, true)
+	kubeAPIURL, kubeAPIPath, err := rest.DefaultServerURL(kubeconfig.Host, kubeconfig.APIPath, schema.GroupVersion{}, true)
 	if err != nil {
 		return nil, fmt.Errorf("getting kubeAPI url failed: err %v", err)
 	}
@@ -68,18 +68,18 @@ func New(
 		}
 	}
 
-	con***REMOVED***gCopy := *kubecon***REMOVED***g
-	transport, err := rest.TransportFor(&con***REMOVED***gCopy)
+	configCopy := *kubeconfig
+	transport, err := rest.TransportFor(&configCopy)
 	if err != nil {
 		return nil, fmt.Errorf("creating transport for HTTP client failed: err %v", err)
 	}
 
 	httpc := &http.Client{Transport: transport}
-	if con***REMOVED***gCopy.Timeout > 0 {
-		httpc.Timeout = con***REMOVED***gCopy.Timeout
+	if configCopy.Timeout > 0 {
+		httpc.Timeout = configCopy.Timeout
 	}
 
-	routeClient, err := routev1client.NewForCon***REMOVED***g(kubecon***REMOVED***g)
+	routeClient, err := routev1client.NewForConfig(kubeconfig)
 	if err != nil {
 		return nil, fmt.Errorf("creating openshift route client failed, err: %v", err)
 	}

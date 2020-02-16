@@ -23,7 +23,7 @@ func TestDependencyResolver(t *testing.T) {
 	ds2 := testhelpers.NewReportDataSource("datasource2", testNs)
 	ds3 := testhelpers.NewReportDataSource("datasource4", testNs)
 
-	testInputs := []metering.ReportQueryInputDe***REMOVED***nition{
+	testInputs := []metering.ReportQueryInputDefinition{
 		{
 			Name:     "ds1",
 			Type:     "ReportDataSource",
@@ -56,7 +56,7 @@ func TestDependencyResolver(t *testing.T) {
 			Namespace: testNs,
 		},
 		Spec: metering.ReportQuerySpec{
-			Inputs: []metering.ReportQueryInputDe***REMOVED***nition{
+			Inputs: []metering.ReportQueryInputDefinition{
 				{
 					Name:     "ds3",
 					Type:     "ReportDataSource",
@@ -73,7 +73,7 @@ func TestDependencyResolver(t *testing.T) {
 			Namespace: testNs,
 		},
 		Spec: metering.ReportQuerySpec{
-			Inputs: []metering.ReportQueryInputDe***REMOVED***nition{
+			Inputs: []metering.ReportQueryInputDefinition{
 				{
 					Name:     "q3",
 					Type:     "ReportQuery",

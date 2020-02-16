@@ -1,6 +1,6 @@
 // Copyright 2013 The Go Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE ***REMOVED***le.
+// license that can be found in the LICENSE file.
 
 package language
 
@@ -83,7 +83,7 @@ func makeScannerString(s string) scanner {
 	scan := scanner{}
 	if len(s) <= len(scan.bytes) {
 		scan.b = scan.bytes[:copy(scan.bytes[:], s)]
-	} ***REMOVED*** {
+	} else {
 		scan.b = []byte(s)
 	}
 	scan.init()
@@ -91,7 +91,7 @@ func makeScannerString(s string) scanner {
 }
 
 // makeScanner returns a scanner using b as the input buffer.
-// b is not copied and may be modi***REMOVED***ed by the scanner routines.
+// b is not copied and may be modified by the scanner routines.
 func makeScanner(b []byte) scanner {
 	scan := scanner{b: b}
 	scan.init()
@@ -124,7 +124,7 @@ func (s *scanner) setError(e error) {
 }
 
 // resizeRange shrinks or grows the array at position oldStart such that
-// a new string of size newSize can ***REMOVED***t between oldStart and oldEnd.
+// a new string of size newSize can fit between oldStart and oldEnd.
 // Sets the scan point to after the resized range.
 func (s *scanner) resizeRange(oldStart, oldEnd, newSize int) {
 	s.start = oldStart
@@ -135,7 +135,7 @@ func (s *scanner) resizeRange(oldStart, oldEnd, newSize int) {
 			copy(b, s.b[:oldStart])
 			copy(b[end:], s.b[oldEnd:])
 			s.b = b
-		} ***REMOVED*** {
+		} else {
 			s.b = append(s.b[end:], s.b[oldEnd:]...)
 		}
 		s.next = end + (s.next - s.end)
@@ -156,7 +156,7 @@ func (s *scanner) gobble(e error) {
 	if s.start == 0 {
 		s.b = s.b[:+copy(s.b, s.b[s.next:])]
 		s.end = 0
-	} ***REMOVED*** {
+	} else {
 		s.b = s.b[:s.start-1+copy(s.b[s.start-1:], s.b[s.end:])]
 		s.end = s.start - 1
 	}
@@ -186,7 +186,7 @@ func (s *scanner) scan() (end int) {
 			s.end = len(s.b)
 			s.next = len(s.b)
 			i = s.end - s.start
-		} ***REMOVED*** {
+		} else {
 			s.end = s.next + i
 			s.next = s.end + 1
 		}
@@ -222,8 +222,8 @@ func (s *scanner) acceptMinSize(min int) (end int) {
 // If parsing succeeded but an unknown value was found, it returns
 // ValueError. The Tag returned in this case is just stripped of the unknown
 // value. All other values are preserved. It accepts tags in the BCP 47 format
-// and extensions to this standard de***REMOVED***ned in
-// http://www.unicode.org/reports/tr35/#Unicode_Language_and_Locale_Identi***REMOVED***ers.
+// and extensions to this standard defined in
+// http://www.unicode.org/reports/tr35/#Unicode_Language_and_Locale_Identifiers.
 // The resulting tag is canonicalized using the default canonicalization type.
 func Parse(s string) (t Tag, err error) {
 	return Default.Parse(s)
@@ -234,8 +234,8 @@ func Parse(s string) (t Tag, err error) {
 // If parsing succeeded but an unknown value was found, it returns
 // ValueError. The Tag returned in this case is just stripped of the unknown
 // value. All other values are preserved. It accepts tags in the BCP 47 format
-// and extensions to this standard de***REMOVED***ned in
-// http://www.unicode.org/reports/tr35/#Unicode_Language_and_Locale_Identi***REMOVED***ers.
+// and extensions to this standard defined in
+// http://www.unicode.org/reports/tr35/#Unicode_Language_and_Locale_Identifiers.
 // The resulting tag is canonicalized using the the canonicalization type c.
 func (c CanonType) Parse(s string) (t Tag, err error) {
 	// TODO: consider supporting old-style locale key-value pairs.
@@ -248,7 +248,7 @@ func (c CanonType) Parse(s string) (t Tag, err error) {
 			// Generating invalid UTF-8 is okay as it won't match.
 			if 'A' <= c && c <= 'Z' {
 				c += 'a' - 'A'
-			} ***REMOVED*** if c == '_' {
+			} else if c == '_' {
 				c = '-'
 			}
 			b[i] = byte(c)
@@ -275,14 +275,14 @@ func parse(scan *scanner, s string) (t Tag, err error) {
 			return t, errSyntax
 		}
 		end = parseExtensions(scan)
-	} ***REMOVED*** if n >= 4 {
+	} else if n >= 4 {
 		return und, errSyntax
-	} ***REMOVED*** { // the usual case
+	} else { // the usual case
 		t, end = parseTag(scan)
 		if n := len(scan.token); n == 1 {
 			t.pExt = uint16(end)
 			end = parseExtensions(scan)
-		} ***REMOVED*** if end < len(scan.b) {
+		} else if end < len(scan.b) {
 			scan.setError(errSyntax)
 			scan.b = scan.b[:end]
 		}
@@ -293,10 +293,10 @@ func parse(scan *scanner, s string) (t Tag, err error) {
 		}
 		if len(s) > 0 && tag.Compare(s, scan.b) == 0 {
 			t.str = s
-		} ***REMOVED*** {
+		} else {
 			t.str = string(scan.b)
 		}
-	} ***REMOVED*** {
+	} else {
 		t.pVariant, t.pExt = 0, 0
 	}
 	return t, scan.err
@@ -336,7 +336,7 @@ func parseTag(scan *scanner) (t Tag, end int) {
 		t.region, e = getRegionID(scan.token)
 		if t.region == 0 {
 			scan.gobble(e)
-		} ***REMOVED*** {
+		} else {
 			scan.replace(t.region.String())
 		}
 		end = scan.scan()
@@ -366,7 +366,7 @@ func parseVariants(scan *scanner, end int, t Tag) int {
 		v, ok := variantIndex[string(scan.token)]
 		if !ok {
 			// unknown variant
-			// TODO: allow user-de***REMOVED***ned variants?
+			// TODO: allow user-defined variants?
 			scan.gobble(mkErrInvalid(scan.token))
 			continue
 		}
@@ -375,7 +375,7 @@ func parseVariants(scan *scanner, end int, t Tag) int {
 		if !needSort {
 			if last < int(v) {
 				last = int(v)
-			} ***REMOVED*** {
+			} else {
 				needSort = true
 				// There is no legal combinations of more than 7 variants
 				// (and this is by no means a useful sequence).
@@ -403,7 +403,7 @@ func parseVariants(scan *scanner, end int, t Tag) int {
 		}
 		if str := bytes.Join(variant[:k], separator); len(str) == 0 {
 			end = start - 1
-		} ***REMOVED*** {
+		} else {
 			scan.resizeRange(start, end, len(str))
 			copy(scan.b[scan.start:], str)
 			end = scan.end
@@ -461,10 +461,10 @@ func parseExtensions(scan *scanner) int {
 			scan.setError(errSyntax)
 			end = extStart
 			continue
-		} ***REMOVED*** if start == extStart && (ext == 'x' || scan.start == len(scan.b)) {
+		} else if start == extStart && (ext == 'x' || scan.start == len(scan.b)) {
 			scan.b = scan.b[:end]
 			return end
-		} ***REMOVED*** if ext == 'x' {
+		} else if ext == 'x' {
 			private = extension
 			break
 		}
@@ -477,7 +477,7 @@ func parseExtensions(scan *scanner) int {
 	scan.b = scan.b[:start]
 	if len(exts) > 0 {
 		scan.b = append(scan.b, bytes.Join(exts, separator)...)
-	} ***REMOVED*** if start > 0 {
+	} else if start > 0 {
 		// Strip trailing '-'.
 		scan.b = scan.b[:start-1]
 	}
@@ -526,7 +526,7 @@ func parseExtension(scan *scanner) int {
 					end = scan.acceptMinSize(3)
 					if keyEnd != end {
 						keys = append(keys, scan.b[keyStart:end])
-					} ***REMOVED*** {
+					} else {
 						scan.setError(errSyntax)
 						end = keyStart
 					}
@@ -564,7 +564,7 @@ func parseExtension(scan *scanner) int {
 // than once, the latter will overwrite the former. Variants and Extensions are
 // accumulated, but if two extensions of the same type are passed, the latter
 // will replace the former. A Tag overwrites all former values and typically
-// only makes sense as the ***REMOVED***rst argument. The resulting tag is returned after
+// only makes sense as the first argument. The resulting tag is returned after
 // canonicalizing using the Default CanonType. If one or more errors are
 // encountered, one of the errors is returned.
 func Compose(part ...interface{}) (t Tag, err error) {
@@ -577,7 +577,7 @@ func Compose(part ...interface{}) (t Tag, err error) {
 // than once, the latter will overwrite the former. Variants and Extensions are
 // accumulated, but if two extensions of the same type are passed, the latter
 // will replace the former. A Tag overwrites all former values and typically
-// only makes sense as the ***REMOVED***rst argument. The resulting tag is returned after
+// only makes sense as the first argument. The resulting tag is returned after
 // canonicalizing using CanonType c. If one or more errors are encountered,
 // one of the errors is returned.
 func (c CanonType) Compose(part ...interface{}) (t Tag, err error) {
@@ -601,7 +601,7 @@ func (c CanonType) Compose(part ...interface{}) (t Tag, err error) {
 		t.pExt = uint16(p)
 		p += appendTokens(buf[p:], b.ext...)
 		t.str = string(buf[:p])
-	} ***REMOVED*** if b.private != "" {
+	} else if b.private != "" {
 		t.str = b.private
 		t.remakeString()
 	}
@@ -620,9 +620,9 @@ type builder struct {
 
 func (b *builder) addExt(e string) {
 	if e == "" {
-	} ***REMOVED*** if e[0] == 'x' {
+	} else if e[0] == 'x' {
 		b.private = e
-	} ***REMOVED*** {
+	} else {
 		b.ext = append(b.ext, e)
 	}
 }
@@ -724,7 +724,7 @@ func (s sortVariant) Less(i, j int) bool {
 	return variantIndex[s[i]] < variantIndex[s[j]]
 }
 
-func ***REMOVED***ndExt(list []string, x byte) int {
+func findExt(list []string, x byte) int {
 	for i, e := range list {
 		if e[0] == x {
 			return i
@@ -745,7 +745,7 @@ func getExtension(s string, p int) (end int, ext string) {
 	return end, s[p:end]
 }
 
-// nextExtension ***REMOVED***nds the next extension within the string, searching
+// nextExtension finds the next extension within the string, searching
 // for the -<char>- pattern from position p.
 // In the fast majority of cases, language tags will have at most
 // one extension and extensions tend to be small.
@@ -756,7 +756,7 @@ func nextExtension(s string, p int) int {
 				return p
 			}
 			p += 3
-		} ***REMOVED*** {
+		} else {
 			p++
 		}
 	}
@@ -766,10 +766,10 @@ func nextExtension(s string, p int) int {
 var errInvalidWeight = errors.New("ParseAcceptLanguage: invalid weight")
 
 // ParseAcceptLanguage parses the contents of an Accept-Language header as
-// de***REMOVED***ned in http://www.ietf.org/rfc/rfc2616.txt and returns a list of Tags and
+// defined in http://www.ietf.org/rfc/rfc2616.txt and returns a list of Tags and
 // a list of corresponding quality weights. It is more permissive than RFC 2616
 // and may return non-nil slices even if the input is not valid.
-// The Tags will be sorted by highest weight ***REMOVED***rst and then by ***REMOVED***rst occurrence.
+// The Tags will be sorted by highest weight first and then by first occurrence.
 // Tags with a weight of zero will be dropped. An error will be returned if the
 // input could not be parsed.
 func ParseAcceptLanguage(s string) (tag []Tag, q []float32, err error) {
@@ -837,7 +837,7 @@ var acceptFallback = map[string]langID{
 	"deutsch": _de,
 	"italian": _it,
 	"french":  _fr,
-	"*":       _mul, // de***REMOVED***ned in the spec to match all languages.
+	"*":       _mul, // defined in the spec to match all languages.
 }
 
 type tagSort struct {

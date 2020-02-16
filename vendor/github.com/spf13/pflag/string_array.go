@@ -17,7 +17,7 @@ func (s *stringArrayValue) Set(val string) error {
 	if !s.changed {
 		*s.value = []string{val}
 		s.changed = true
-	} ***REMOVED*** {
+	} else {
 		*s.value = append(*s.value, val)
 	}
 	return nil
@@ -50,7 +50,7 @@ func (f *FlagSet) GetStringArray(name string) ([]string, error) {
 	return val.([]string), nil
 }
 
-// StringArrayVar de***REMOVED***nes a string flag with speci***REMOVED***ed name, default value, and usage string.
+// StringArrayVar defines a string flag with specified name, default value, and usage string.
 // The argument p points to a []string variable in which to store the values of the multiple flags.
 // The value of each argument will not try to be separated by comma. Use a StringSlice for that.
 func (f *FlagSet) StringArrayVar(p *[]string, name string, value []string, usage string) {
@@ -62,7 +62,7 @@ func (f *FlagSet) StringArrayVarP(p *[]string, name, shorthand string, value []s
 	f.VarP(newStringArrayValue(value, p), name, shorthand, usage)
 }
 
-// StringArrayVar de***REMOVED***nes a string flag with speci***REMOVED***ed name, default value, and usage string.
+// StringArrayVar defines a string flag with specified name, default value, and usage string.
 // The argument p points to a []string variable in which to store the value of the flag.
 // The value of each argument will not try to be separated by comma. Use a StringSlice for that.
 func StringArrayVar(p *[]string, name string, value []string, usage string) {
@@ -74,7 +74,7 @@ func StringArrayVarP(p *[]string, name, shorthand string, value []string, usage 
 	CommandLine.VarP(newStringArrayValue(value, p), name, shorthand, usage)
 }
 
-// StringArray de***REMOVED***nes a string flag with speci***REMOVED***ed name, default value, and usage string.
+// StringArray defines a string flag with specified name, default value, and usage string.
 // The return value is the address of a []string variable that stores the value of the flag.
 // The value of each argument will not try to be separated by comma. Use a StringSlice for that.
 func (f *FlagSet) StringArray(name string, value []string, usage string) *[]string {
@@ -90,7 +90,7 @@ func (f *FlagSet) StringArrayP(name, shorthand string, value []string, usage str
 	return &p
 }
 
-// StringArray de***REMOVED***nes a string flag with speci***REMOVED***ed name, default value, and usage string.
+// StringArray defines a string flag with specified name, default value, and usage string.
 // The return value is the address of a []string variable that stores the value of the flag.
 // The value of each argument will not try to be separated by comma. Use a StringSlice for that.
 func StringArray(name string, value []string, usage string) *[]string {

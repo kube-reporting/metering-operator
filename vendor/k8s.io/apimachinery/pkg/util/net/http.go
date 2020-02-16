@@ -2,7 +2,7 @@
 Copyright 2016 The Kubernetes Authors.
 
 Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this ***REMOVED***le except in compliance with the License.
+you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
 
     http://www.apache.org/licenses/LICENSE-2.0
@@ -10,14 +10,14 @@ You may obtain a copy of the License at
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the speci***REMOVED***c language governing permissions and
+See the License for the specific language governing permissions and
 limitations under the License.
 */
 
 package net
 
 import (
-	"bu***REMOVED***o"
+	"bufio"
 	"bytes"
 	"context"
 	"crypto/tls"
@@ -35,17 +35,17 @@ import (
 	"k8s.io/klog"
 )
 
-// JoinPreservingTrailingSlash does a path.Join of the speci***REMOVED***ed elements,
+// JoinPreservingTrailingSlash does a path.Join of the specified elements,
 // preserving any trailing slash on the last non-empty segment
 func JoinPreservingTrailingSlash(elem ...string) string {
 	// do the basic path join
 	result := path.Join(elem...)
 
-	// ***REMOVED***nd the last non-empty segment
+	// find the last non-empty segment
 	for i := len(elem) - 1; i >= 0; i-- {
 		if len(elem[i]) > 0 {
 			// if the last segment ended in a slash, ensure our result does as well
-			if strings.HasSuf***REMOVED***x(elem[i], "/") && !strings.HasSuf***REMOVED***x(result, "/") {
+			if strings.HasSuffix(elem[i], "/") && !strings.HasSuffix(result, "/") {
 				result += "/"
 			}
 			break
@@ -84,7 +84,7 @@ func IsProbableEOF(err error) bool {
 var defaultTransport = http.DefaultTransport.(*http.Transport)
 
 // SetOldTransportDefaults applies the defaults from http.DefaultTransport
-// for the Proxy, Dial, and TLSHandshakeTimeout ***REMOVED***elds if unset
+// for the Proxy, Dial, and TLSHandshakeTimeout fields if unset
 func SetOldTransportDefaults(t *http.Transport) *http.Transport {
 	if t.Proxy == nil || isDefault(t.Proxy) {
 		// http.ProxyFromEnvironment doesn't respect CIDRs and that makes it impossible to exclude things like pod and service IPs from proxy settings
@@ -102,15 +102,15 @@ func SetOldTransportDefaults(t *http.Transport) *http.Transport {
 }
 
 // SetTransportDefaults applies the defaults from http.DefaultTransport
-// for the Proxy, Dial, and TLSHandshakeTimeout ***REMOVED***elds if unset
+// for the Proxy, Dial, and TLSHandshakeTimeout fields if unset
 func SetTransportDefaults(t *http.Transport) *http.Transport {
 	t = SetOldTransportDefaults(t)
 	// Allow clients to disable http2 if needed.
 	if s := os.Getenv("DISABLE_HTTP2"); len(s) > 0 {
 		klog.Infof("HTTP2 has been explicitly disabled")
-	} ***REMOVED*** {
-		if err := http2.Con***REMOVED***gureTransport(t); err != nil {
-			klog.Warningf("Transport failed http2 con***REMOVED***guration: %v", err)
+	} else {
+		if err := http2.ConfigureTransport(t); err != nil {
+			klog.Warningf("Transport failed http2 configuration: %v", err)
 		}
 	}
 	return t
@@ -149,22 +149,22 @@ func DialerFor(transport http.RoundTripper) (DialFunc, error) {
 	}
 }
 
-type TLSClientCon***REMOVED***gHolder interface {
-	TLSClientCon***REMOVED***g() *tls.Con***REMOVED***g
+type TLSClientConfigHolder interface {
+	TLSClientConfig() *tls.Config
 }
 
-func TLSClientCon***REMOVED***g(transport http.RoundTripper) (*tls.Con***REMOVED***g, error) {
+func TLSClientConfig(transport http.RoundTripper) (*tls.Config, error) {
 	if transport == nil {
 		return nil, nil
 	}
 
 	switch transport := transport.(type) {
 	case *http.Transport:
-		return transport.TLSClientCon***REMOVED***g, nil
-	case TLSClientCon***REMOVED***gHolder:
-		return transport.TLSClientCon***REMOVED***g(), nil
+		return transport.TLSClientConfig, nil
+	case TLSClientConfigHolder:
+		return transport.TLSClientConfig(), nil
 	case RoundTripperWrapper:
-		return TLSClientCon***REMOVED***g(transport.WrappedRoundTripper())
+		return TLSClientConfig(transport.WrappedRoundTripper())
 	default:
 		return nil, fmt.Errorf("unknown transport type: %T", transport)
 	}
@@ -194,7 +194,7 @@ func SourceIPs(req *http.Request) []net.IP {
 	forwardedForIPs := []net.IP{}
 	if hdrForwardedFor != "" {
 		// X-Forwarded-For can be a csv of IPs in case of multiple proxies.
-		// Use the ***REMOVED***rst valid one.
+		// Use the first valid one.
 		parts := strings.Split(hdrForwardedFor, ",")
 		for _, part := range parts {
 			ip := net.ParseIP(strings.TrimSpace(part))
@@ -217,7 +217,7 @@ func SourceIPs(req *http.Request) []net.IP {
 	}
 
 	// Fallback to Remote Address in request, which will give the correct client IP when there is no proxy.
-	// Remote Address in Go's HTTP server is in the form host:port so we need to split that ***REMOVED***rst.
+	// Remote Address in Go's HTTP server is in the form host:port so we need to split that first.
 	host, _, err := net.SplitHostPort(req.RemoteAddr)
 	if err == nil {
 		if remoteIP := net.ParseIP(host); remoteIP != nil {
@@ -249,7 +249,7 @@ func GetClientIP(req *http.Request) net.IP {
 func AppendForwardedForHeader(req *http.Request) {
 	// Copied from net/http/httputil/reverseproxy.go:
 	if clientIP, _, err := net.SplitHostPort(req.RemoteAddr); err == nil {
-		// If we aren't the ***REMOVED***rst proxy retain prior
+		// If we aren't the first proxy retain prior
 		// X-Forwarded-For information as a comma+space
 		// separated list and fold multiple headers into one.
 		if prior, ok := req.Header["X-Forwarded-For"]; ok {
@@ -314,7 +314,7 @@ func (fn DialerFunc) Dial(req *http.Request) (net.Conn, error) {
 
 // Dialer dials a host and writes a request to it.
 type Dialer interface {
-	// Dial connects to the host speci***REMOVED***ed by req's URL, writes the request to the connection, and
+	// Dial connects to the host specified by req's URL, writes the request to the connection, and
 	// returns the opened net.Conn.
 	Dial(req *http.Request) (net.Conn, error)
 }
@@ -362,7 +362,7 @@ redirectLoop:
 
 		// Peek at the backend response.
 		rawResponse.Reset()
-		respReader := bu***REMOVED***o.NewReader(io.TeeReader(
+		respReader := bufio.NewReader(io.TeeReader(
 			io.LimitReader(intermediateConn, maxResponseSize), // Don't read more than maxResponseSize bytes.
 			rawResponse)) // Save the raw response.
 		resp, err := http.ReadResponse(respReader, nil)

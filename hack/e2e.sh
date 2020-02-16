@@ -14,9 +14,9 @@ function cleanup() {
     if [[ "${METERING_RUN_DEV_TEST_SETUP}" = false ]]; then
         echo "Removing namespaces with the 'name=metering-testing-ns' label"
         kubectl delete ns -l "name=metering-testing-ns" || true
-    ***REMOVED***
+    else
         echo "Skipping the namespace deletion"
-    ***REMOVED***
+    fi
 
     echo "Exiting hack/e2e.sh"
     exit "$exit_status"
@@ -61,8 +61,8 @@ go test \
     -parallel 10 \
     -timeout 60m \
     "./test/e2e" \
-    -kubecon***REMOVED***g="${KUBECONFIG}" \
-    -namespace-pre***REMOVED***x="${METERING_NAMESPACE}" \
+    -kubeconfig="${KUBECONFIG}" \
+    -namespace-prefix="${METERING_NAMESPACE}" \
     -test-output-path="${TEST_OUTPUT_PATH}" \
     -log-level="${TEST_LOG_LEVEL}" \
     -run-tests-local="${METERING_RUN_TESTS_LOCALLY}" \
@@ -73,6 +73,6 @@ go test \
 # if go-junit-report is installed, create a junit report also
 if command -v go-junit-report >/dev/null 2>&1; then
     go-junit-report < "$TEST_LOG_FILE_PATH" > "${TEST_JUNIT_REPORT_FILE_PATH}"
-***REMOVED***
+fi
 
 exit "$TEST_EXIT_CODE"

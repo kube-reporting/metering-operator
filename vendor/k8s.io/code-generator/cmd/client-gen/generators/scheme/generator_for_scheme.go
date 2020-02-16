@@ -2,7 +2,7 @@
 Copyright 2017 The Kubernetes Authors.
 
 Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this ***REMOVED***le except in compliance with the License.
+you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
 
     http://www.apache.org/licenses/LICENSE-2.0
@@ -10,7 +10,7 @@ You may obtain a copy of the License at
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the speci***REMOVED***c language governing permissions and
+See the License for the specific language governing permissions and
 limitations under the License.
 */
 
@@ -20,7 +20,7 @@ import (
 	"fmt"
 	"io"
 	"os"
-	"path/***REMOVED***lepath"
+	"path/filepath"
 	"strings"
 
 	"k8s.io/code-generator/cmd/client-gen/path"
@@ -66,13 +66,13 @@ func (g *GenScheme) Imports(c *generator.Context) (imports []string) {
 			if g.CreateRegistry {
 				// import the install package for internal clientsets instead of the type package with register.go
 				if version.Version != "" {
-					packagePath = ***REMOVED***lepath.Dir(packagePath)
+					packagePath = filepath.Dir(packagePath)
 				}
-				packagePath = ***REMOVED***lepath.Join(packagePath, "install")
+				packagePath = filepath.Join(packagePath, "install")
 
 				imports = append(imports, fmt.Sprintf("%s \"%s\"", groupAlias, path.Vendorless(packagePath)))
 				break
-			} ***REMOVED*** {
+			} else {
 				imports = append(imports, fmt.Sprintf("%s%s \"%s\"", groupAlias, strings.ToLower(version.Version.NonEmpty()), path.Vendorless(packagePath)))
 			}
 		}
@@ -108,7 +108,7 @@ func (g *GenScheme) GenerateType(c *generator.Context, t *types.Type, w io.Write
 	for k, v := range globals {
 		if g.PrivateScheme {
 			m[k] = strings.ToLower(v[0:1]) + v[1:]
-		} ***REMOVED*** {
+		} else {
 			m[k] = v
 		}
 	}
@@ -116,14 +116,14 @@ func (g *GenScheme) GenerateType(c *generator.Context, t *types.Type, w io.Write
 	sw.Do(globalsTemplate, m)
 
 	if g.OutputPath != "" {
-		if _, err := os.Stat(***REMOVED***lepath.Join(g.OutputPath, strings.ToLower("register_custom.go"))); err == nil {
+		if _, err := os.Stat(filepath.Join(g.OutputPath, strings.ToLower("register_custom.go"))); err == nil {
 			m["customRegister"] = true
 		}
 	}
 
 	if g.CreateRegistry {
 		sw.Do(registryRegistration, m)
-	} ***REMOVED*** {
+	} else {
 		sw.Do(simpleRegistration, m)
 	}
 
@@ -172,7 +172,7 @@ var localSchemeBuilder = $.runtimeSchemeBuilder|raw${
 //     aggregatorclientsetscheme "k8s.io/kube-aggregator/pkg/client/clientset_generated/clientset/scheme"
 //   )
 //
-//   kclientset, _ := kubernetes.NewForCon***REMOVED***g(c)
+//   kclientset, _ := kubernetes.NewForConfig(c)
 //   _ = aggregatorclientsetscheme.AddToScheme(clientsetscheme.Scheme)
 //
 // After this, RawExtensions in Kubernetes types will serialize kube-aggregator types

@@ -130,7 +130,7 @@ func TestIsReportFinished(t *testing.T) {
 			expectFinished: false,
 		},
 		{
-			name: "***REMOVED***nished status on run-once report returns true",
+			name: "finished status on run-once report returns true",
 			report: testhelpers.NewReport(testReportName, testNamespace, testQueryName, reportStart, reportEnd, metering.ReportStatus{
 				Conditions: []metering.ReportCondition{
 					*meteringUtil.NewReportCondition(metering.ReportRunning, v1.ConditionFalse, meteringUtil.ReportFinishedReason, testReportMessage),
@@ -260,7 +260,7 @@ func TestValidateReport(t *testing.T) {
 			Namespace: testNamespace,
 		},
 		Spec: metering.ReportQuerySpec{
-			Inputs: []metering.ReportQueryInputDe***REMOVED***nition{
+			Inputs: []metering.ReportQueryInputDefinition{
 				{
 					Name:     "ds",
 					Type:     "ReportDataSource",
@@ -277,7 +277,7 @@ func TestValidateReport(t *testing.T) {
 			Namespace: testNamespace,
 		},
 		Spec: metering.ReportQuerySpec{
-			Inputs: []metering.ReportQueryInputDe***REMOVED***nition{
+			Inputs: []metering.ReportQueryInputDefinition{
 				{
 					Name:     "ds",
 					Type:     "ReportDataSource",
@@ -294,7 +294,7 @@ func TestValidateReport(t *testing.T) {
 			Namespace: testNamespace,
 		},
 		Spec: metering.ReportQuerySpec{
-			Inputs: []metering.ReportQueryInputDe***REMOVED***nition{
+			Inputs: []metering.ReportQueryInputDefinition{
 				{
 					Name:     "ds",
 					Type:     "ReportDataSource",
@@ -373,7 +373,7 @@ func TestValidateReport(t *testing.T) {
 
 			if testCase.expectErr {
 				assert.EqualErrorf(t, err, testCase.expectErrMsg, "expected that validateReport would return the correct error message")
-			} ***REMOVED*** {
+			} else {
 				assert.NoErrorf(t, err, "expected the report would return no error, but got '%v'", err)
 			}
 		})
@@ -410,42 +410,42 @@ func TestGetReportPeriod(t *testing.T) {
 		expectPanic bool
 	}{
 		{
-			name:      "invalid report with an unset spec.Schedule ***REMOVED***eld returns an error",
+			name:      "invalid report with an unset spec.Schedule field returns an error",
 			report:    testhelpers.NewReport(testReportName, testNamespace, testQueryName, nil, nil, metering.ReportStatus{}, nil, false),
 			expectErr: true,
 		},
 		{
-			name:      "valid report with an unset spec.Schedule ***REMOVED***eld returns nil",
+			name:      "valid report with an unset spec.Schedule field returns nil",
 			report:    testhelpers.NewReport(testReportName, testNamespace, testQueryName, reportStart, reportEnd, metering.ReportStatus{}, nil, false),
 			expectErr: false,
 		},
 		{
-			name:      "invalid schedule with a set spec.Schedule ***REMOVED***eld returns error",
+			name:      "invalid schedule with a set spec.Schedule field returns error",
 			report:    testhelpers.NewReport(testReportName, testNamespace, testQueryName, reportStart, reportEnd, metering.ReportStatus{}, invalidSchedule, false),
 			expectErr: true,
 		},
 		{
-			name:      "valid schedule with a set spec.Schedule ***REMOVED***eld and an unset Spec.Status.LastReportTime returns nil",
+			name:      "valid schedule with a set spec.Schedule field and an unset Spec.Status.LastReportTime returns nil",
 			report:    testhelpers.NewReport(testReportName, testNamespace, testQueryName, reportStart, reportEnd, metering.ReportStatus{}, validSchedule, false),
 			expectErr: false,
 		},
 		{
-			name:      "valid schedule with a set spec.Schedule ***REMOVED***eld and a set Spec.Status.LastReportTime returns nil",
+			name:      "valid schedule with a set spec.Schedule field and a set Spec.Status.LastReportTime returns nil",
 			report:    testhelpers.NewReport(testReportName, testNamespace, testQueryName, reportStart, reportEnd, metering.ReportStatus{LastReportTime: lastReportTime}, validSchedule, false),
 			expectErr: false,
 		},
 		{
-			name:      "valid schedule with a set spec.Schedule ***REMOVED***eld and an unset Spec.Status.LastReportTime and a set Spec.ReportingStart returns nil",
+			name:      "valid schedule with a set spec.Schedule field and an unset Spec.Status.LastReportTime and a set Spec.ReportingStart returns nil",
 			report:    testhelpers.NewReport(testReportName, testNamespace, testQueryName, reportStart, reportEnd, metering.ReportStatus{}, validSchedule, false),
 			expectErr: false,
 		},
 		{
-			name:      "valid schedule with a set spec.Schedule ***REMOVED***eld and an unset Spec.Status.LastReportTime and an unset Spec.ReportingStart returns nil",
+			name:      "valid schedule with a set spec.Schedule field and an unset Spec.Status.LastReportTime and an unset Spec.ReportingStart returns nil",
 			report:    testhelpers.NewReport(testReportName, testNamespace, testQueryName, nil, reportEnd, metering.ReportStatus{}, validSchedule, false),
 			expectErr: false,
 		},
 		{
-			name:      "valid schedule with a set spec.Schedule ***REMOVED***eld and an unset Spec.Status.LastReportTime and a set Spec.NextReportTime returns nil",
+			name:      "valid schedule with a set spec.Schedule field and an unset Spec.Status.LastReportTime and a set Spec.NextReportTime returns nil",
 			report:    testhelpers.NewReport(testReportName, testNamespace, testQueryName, nil, reportEnd, metering.ReportStatus{NextReportTime: nextReportTime}, validSchedule, false),
 			expectErr: false,
 		},
@@ -464,11 +464,11 @@ func TestGetReportPeriod(t *testing.T) {
 		t.Run(testCase.name, func(t *testing.T) {
 			if testCase.expectPanic {
 				assert.Panics(t, func() { getReportPeriod(time.Now(), mockLogger, testCase.report) }, "expected the test case would panic, but it did not")
-			} ***REMOVED*** {
+			} else {
 				_, err := getReportPeriod(time.Now(), mockLogger, testCase.report)
 				if testCase.expectErr {
 					assert.Error(t, err, "expected that getting the report period  would return a non-nil error")
-				} ***REMOVED*** {
+				} else {
 					assert.Nil(t, err, "expected that getting the report period would return a nil error")
 				}
 			}

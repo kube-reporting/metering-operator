@@ -1,6 +1,6 @@
 // Copyright 2013 The Go Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE ***REMOVED***le.
+// license that can be found in the LICENSE file.
 
 // Package singleflight provides a duplicate function call suppression
 // mechanism.
@@ -12,12 +12,12 @@ import "sync"
 type call struct {
 	wg sync.WaitGroup
 
-	// These ***REMOVED***elds are written once before the WaitGroup is done
+	// These fields are written once before the WaitGroup is done
 	// and are only read after the WaitGroup is done.
 	val interface{}
 	err error
 
-	// These ***REMOVED***elds are read and written with the singleflight
+	// These fields are read and written with the singleflight
 	// mutex held before the WaitGroup is done, and are read but
 	// not written after the WaitGroup is done.
 	dups  int

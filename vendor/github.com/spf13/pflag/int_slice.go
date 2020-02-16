@@ -32,7 +32,7 @@ func (s *intSliceValue) Set(val string) error {
 	}
 	if !s.changed {
 		*s.value = out
-	} ***REMOVED*** {
+	} else {
 		*s.value = append(*s.value, out...)
 	}
 	s.changed = true
@@ -79,7 +79,7 @@ func (f *FlagSet) GetIntSlice(name string) ([]int, error) {
 	return val.([]int), nil
 }
 
-// IntSliceVar de***REMOVED***nes a intSlice flag with speci***REMOVED***ed name, default value, and usage string.
+// IntSliceVar defines a intSlice flag with specified name, default value, and usage string.
 // The argument p points to a []int variable in which to store the value of the flag.
 func (f *FlagSet) IntSliceVar(p *[]int, name string, value []int, usage string) {
 	f.VarP(newIntSliceValue(value, p), name, "", usage)
@@ -90,7 +90,7 @@ func (f *FlagSet) IntSliceVarP(p *[]int, name, shorthand string, value []int, us
 	f.VarP(newIntSliceValue(value, p), name, shorthand, usage)
 }
 
-// IntSliceVar de***REMOVED***nes a int[] flag with speci***REMOVED***ed name, default value, and usage string.
+// IntSliceVar defines a int[] flag with specified name, default value, and usage string.
 // The argument p points to a int[] variable in which to store the value of the flag.
 func IntSliceVar(p *[]int, name string, value []int, usage string) {
 	CommandLine.VarP(newIntSliceValue(value, p), name, "", usage)
@@ -101,7 +101,7 @@ func IntSliceVarP(p *[]int, name, shorthand string, value []int, usage string) {
 	CommandLine.VarP(newIntSliceValue(value, p), name, shorthand, usage)
 }
 
-// IntSlice de***REMOVED***nes a []int flag with speci***REMOVED***ed name, default value, and usage string.
+// IntSlice defines a []int flag with specified name, default value, and usage string.
 // The return value is the address of a []int variable that stores the value of the flag.
 func (f *FlagSet) IntSlice(name string, value []int, usage string) *[]int {
 	p := []int{}
@@ -116,7 +116,7 @@ func (f *FlagSet) IntSliceP(name, shorthand string, value []int, usage string) *
 	return &p
 }
 
-// IntSlice de***REMOVED***nes a []int flag with speci***REMOVED***ed name, default value, and usage string.
+// IntSlice defines a []int flag with specified name, default value, and usage string.
 // The return value is the address of a []int variable that stores the value of the flag.
 func IntSlice(name string, value []int, usage string) *[]int {
 	return CommandLine.IntSliceP(name, "", value, usage)

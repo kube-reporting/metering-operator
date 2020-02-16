@@ -2,7 +2,7 @@
 Copyright The Kubernetes Authors.
 
 Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this ***REMOVED***le except in compliance with the License.
+you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
 
     http://www.apache.org/licenses/LICENSE-2.0
@@ -10,7 +10,7 @@ You may obtain a copy of the License at
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the speci***REMOVED***c language governing permissions and
+See the License for the specific language governing permissions and
 limitations under the License.
 */
 
@@ -37,23 +37,23 @@ func (c *SecondExampleClient) TestTypes(namespace string) TestTypeInterface {
 	return newTestTypes(c, namespace)
 }
 
-// NewForCon***REMOVED***g creates a new SecondExampleClient for the given con***REMOVED***g.
-func NewForCon***REMOVED***g(c *rest.Con***REMOVED***g) (*SecondExampleClient, error) {
-	con***REMOVED***g := *c
-	if err := setCon***REMOVED***gDefaults(&con***REMOVED***g); err != nil {
+// NewForConfig creates a new SecondExampleClient for the given config.
+func NewForConfig(c *rest.Config) (*SecondExampleClient, error) {
+	config := *c
+	if err := setConfigDefaults(&config); err != nil {
 		return nil, err
 	}
-	client, err := rest.RESTClientFor(&con***REMOVED***g)
+	client, err := rest.RESTClientFor(&config)
 	if err != nil {
 		return nil, err
 	}
 	return &SecondExampleClient{client}, nil
 }
 
-// NewForCon***REMOVED***gOrDie creates a new SecondExampleClient for the given con***REMOVED***g and
-// panics if there is an error in the con***REMOVED***g.
-func NewForCon***REMOVED***gOrDie(c *rest.Con***REMOVED***g) *SecondExampleClient {
-	client, err := NewForCon***REMOVED***g(c)
+// NewForConfigOrDie creates a new SecondExampleClient for the given config and
+// panics if there is an error in the config.
+func NewForConfigOrDie(c *rest.Config) *SecondExampleClient {
+	client, err := NewForConfig(c)
 	if err != nil {
 		panic(err)
 	}
@@ -65,22 +65,22 @@ func New(c rest.Interface) *SecondExampleClient {
 	return &SecondExampleClient{c}
 }
 
-func setCon***REMOVED***gDefaults(con***REMOVED***g *rest.Con***REMOVED***g) error {
-	con***REMOVED***g.APIPath = "/apis"
-	if con***REMOVED***g.UserAgent == "" {
-		con***REMOVED***g.UserAgent = rest.DefaultKubernetesUserAgent()
+func setConfigDefaults(config *rest.Config) error {
+	config.APIPath = "/apis"
+	if config.UserAgent == "" {
+		config.UserAgent = rest.DefaultKubernetesUserAgent()
 	}
-	if con***REMOVED***g.GroupVersion == nil || con***REMOVED***g.GroupVersion.Group != scheme.Scheme.PrioritizedVersionsForGroup("example.test.apiserver.code-generator.k8s.io")[0].Group {
+	if config.GroupVersion == nil || config.GroupVersion.Group != scheme.Scheme.PrioritizedVersionsForGroup("example.test.apiserver.code-generator.k8s.io")[0].Group {
 		gv := scheme.Scheme.PrioritizedVersionsForGroup("example.test.apiserver.code-generator.k8s.io")[0]
-		con***REMOVED***g.GroupVersion = &gv
+		config.GroupVersion = &gv
 	}
-	con***REMOVED***g.NegotiatedSerializer = scheme.Codecs
+	config.NegotiatedSerializer = scheme.Codecs
 
-	if con***REMOVED***g.QPS == 0 {
-		con***REMOVED***g.QPS = 5
+	if config.QPS == 0 {
+		config.QPS = 5
 	}
-	if con***REMOVED***g.Burst == 0 {
-		con***REMOVED***g.Burst = 10
+	if config.Burst == 0 {
+		config.Burst = 10
 	}
 
 	return nil

@@ -134,7 +134,7 @@ The schema below was obtained from Presto by running `describe datasource_aws_bi
  reservation_amortizedupfrontfeeforbillingperiod           | varchar   |               |
  reservation_effectivecost                                 | varchar   |               |
  reservation_endtime                                       | varchar   |               |
- reservation_modi***REMOVED***cationstatus                            | varchar   |               |
+ reservation_modificationstatus                            | varchar   |               |
  reservation_recurringfeeforusage                          | varchar   |               |
  reservation_starttime                                     | varchar   |               |
  reservation_unusedamortizedupfrontfeeforbillingperiod     | varchar   |               |

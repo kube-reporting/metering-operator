@@ -1,15 +1,15 @@
-{{- if and .Values.hive.spec.con***REMOVED***g.sharedVolume.enabled .Values.hive.spec.con***REMOVED***g.sharedVolume.createPVC }}
+{{- if and .Values.hive.spec.config.sharedVolume.enabled .Values.hive.spec.config.sharedVolume.createPVC }}
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: {{ .Values.hive.spec.con***REMOVED***g.sharedVolume.claimName }}
+  name: {{ .Values.hive.spec.config.sharedVolume.claimName }}
 spec:
   accessModes:
   - ReadWriteMany
-{{- if .Values.hive.spec.con***REMOVED***g.sharedVolume.storageClass }}
-  storageClassName: {{ .Values.hive.spec.con***REMOVED***g.sharedVolume.storageClass }}
+{{- if .Values.hive.spec.config.sharedVolume.storageClass }}
+  storageClassName: {{ .Values.hive.spec.config.sharedVolume.storageClass }}
 {{- end }}
   resources:
     requests:
-      storage: {{ .Values.hive.spec.con***REMOVED***g.sharedVolume.size }}
+      storage: {{ .Values.hive.spec.config.sharedVolume.size }}
 {{- end }}

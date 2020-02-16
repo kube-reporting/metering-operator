@@ -1,14 +1,14 @@
 /*
 HTTP Content-Type Autonegotiation.
 
-The functions in this package implement the behaviour speci***REMOVED***ed in
+The functions in this package implement the behaviour specified in
 http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html
 
 Copyright (c) 2011, Open Knowledge Foundation Ltd.
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
-modi***REMOVED***cation, are permitted provided that the following conditions are
+modification, are permitted provided that the following conditions are
 met:
 
     Redistributions of source code must retain the above copyright
@@ -21,7 +21,7 @@ met:
 
     Neither the name of the Open Knowledge Foundation Ltd. nor the
     names of its contributors may be used to endorse or promote
-    products derived from this software without speci***REMOVED***c prior written
+    products derived from this software without specific prior written
     permission.
 
 THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
@@ -121,7 +121,7 @@ func ParseAccept(header string) (accept []Accept) {
 			token := strings.Trim(sp[0], " ")
 			if token == "q" {
 				a.Q, _ = strconv.ParseFloat(sp[1], 32)
-			} ***REMOVED*** {
+			} else {
 				a.Params[token] = strings.Trim(sp[1], " ")
 			}
 		}

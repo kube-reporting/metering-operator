@@ -63,7 +63,7 @@ var mappings string = "" + // Size: 8176 bytes
 	"\x0510日\x0511日\x0512日\x0513日\x0514日\x0515日\x0516日\x0517日\x0518日\x0519日" +
 	"\x0520日\x0521日\x0522日\x0523日\x0524日\x0525日\x0526日\x0527日\x0528日\x0529日" +
 	"\x0530日\x0531日\x02ь\x02ɦ\x02ɬ\x02ʞ\x02ʇ\x02œ\x04𤋮\x04𢡊\x04𢡄\x04𣏕\x04𥉉" +
-	"\x04𥳐\x04𧻓\x02ff\x02***REMOVED***\x02fl\x02st\x04մն\x04մե\x04մի\x04վն\x04մխ\x04יִ" +
+	"\x04𥳐\x04𧻓\x02ff\x02fi\x02fl\x02st\x04մն\x04մե\x04մի\x04վն\x04մխ\x04יִ" +
 	"\x04ײַ\x02ע\x02ה\x02כ\x02ל\x02ם\x02ר\x02ת\x04שׁ\x04שׂ\x06שּׁ\x06שּׂ\x04א" +
 	"ַ\x04אָ\x04אּ\x04בּ\x04גּ\x04דּ\x04הּ\x04וּ\x04זּ\x04טּ\x04יּ\x04ךּ\x04" +
 	"כּ\x04לּ\x04מּ\x04נּ\x04סּ\x04ףּ\x04פּ\x04צּ\x04קּ\x04רּ\x04שּ\x04תּ" +
@@ -374,7 +374,7 @@ var xorData string = "" + // Size: 4855 bytes
 	"\x065+\x03\x06>7\x03\x06\x049\x03\x05+\x1e\x03\x05,\x17\x03\x05 \x1d\x03" +
 	"\x05\x22\x05\x03\x050\x1d"
 
-// lookup returns the trie value for the ***REMOVED***rst UTF-8 encoding in s and
+// lookup returns the trie value for the first UTF-8 encoding in s and
 // the width in bytes of this encoding. The size will be 0 if s does not
 // hold enough bytes to complete the encoding. len(s) must be greater than 0.
 func (t *idnaTrie) lookup(s []byte) (v uint16, sz int) {
@@ -437,7 +437,7 @@ func (t *idnaTrie) lookup(s []byte) (v uint16, sz int) {
 	return 0, 1
 }
 
-// lookupUnsafe returns the trie value for the ***REMOVED***rst UTF-8 encoding in s.
+// lookupUnsafe returns the trie value for the first UTF-8 encoding in s.
 // s must start with a full and valid UTF-8 encoded rune.
 func (t *idnaTrie) lookupUnsafe(s []byte) uint16 {
 	c0 := s[0]
@@ -459,7 +459,7 @@ func (t *idnaTrie) lookupUnsafe(s []byte) uint16 {
 	return 0
 }
 
-// lookupString returns the trie value for the ***REMOVED***rst UTF-8 encoding in s and
+// lookupString returns the trie value for the first UTF-8 encoding in s and
 // the width in bytes of this encoding. The size will be 0 if s does not
 // hold enough bytes to complete the encoding. len(s) must be greater than 0.
 func (t *idnaTrie) lookupString(s string) (v uint16, sz int) {
@@ -522,7 +522,7 @@ func (t *idnaTrie) lookupString(s string) (v uint16, sz int) {
 	return 0, 1
 }
 
-// lookupStringUnsafe returns the trie value for the ***REMOVED***rst UTF-8 encoding in s.
+// lookupStringUnsafe returns the trie value for the first UTF-8 encoding in s.
 // s must start with a full and valid UTF-8 encoded rune.
 func (t *idnaTrie) lookupStringUnsafe(s string) uint16 {
 	c0 := s[0]

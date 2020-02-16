@@ -3,7 +3,7 @@ package adal
 // Copyright 2017 Microsoft Corporation
 //
 //  Licensed under the Apache License, Version 2.0 (the "License");
-//  you may not use this ***REMOVED***le except in compliance with the License.
+//  you may not use this file except in compliance with the License.
 //  You may obtain a copy of the License at
 //
 //      http://www.apache.org/licenses/LICENSE-2.0
@@ -11,7 +11,7 @@ package adal
 //  Unless required by applicable law or agreed to in writing, software
 //  distributed under the License is distributed on an "AS IS" BASIS,
 //  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-//  See the License for the speci***REMOVED***c language governing permissions and
+//  See the License for the specific language governing permissions and
 //  limitations under the License.
 
 import (
@@ -47,7 +47,7 @@ func (sf SenderFunc) Do(r *http.Request) (*http.Response, error) {
 }
 
 // SendDecorator takes and possibly decorates, by wrapping, a Sender. Decorators may affect the
-// http.Request and pass it along or, ***REMOVED***rst, pass the http.Request along then react to the
+// http.Request and pass it along or, first, pass the http.Request along then react to the
 // http.Response result.
 type SendDecorator func(Sender) Sender
 
@@ -80,7 +80,7 @@ func sender() Sender {
 			IdleConnTimeout:       defaultTransport.IdleConnTimeout,
 			TLSHandshakeTimeout:   defaultTransport.TLSHandshakeTimeout,
 			ExpectContinueTimeout: defaultTransport.ExpectContinueTimeout,
-			TLSClientCon***REMOVED***g: &tls.Con***REMOVED***g{
+			TLSClientConfig: &tls.Config{
 				MinVersion: tls.VersionTLS12,
 			},
 		}

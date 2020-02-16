@@ -13,13 +13,13 @@ To determine if the issue is with resources or scheduling, follow the troublesho
 
 If a container's status is `pending`, the issue is most likely with scheduling.
 
-## Storage Class not con***REMOVED***gured
+## Storage Class not configured
 
-Metering requires that a default Storage Class be con***REMOVED***gured for dynamic provisioning.
+Metering requires that a default Storage Class be configured for dynamic provisioning.
 
-See [con***REMOVED***guring metering][con***REMOVED***guring-metering-storage] for information on how to check if there are any StorageClasses con***REMOVED***gured for the cluster, how to set the default, and how to con***REMOVED***gure Metering to use a StorageClass other than the default.
+See [configuring metering][configuring-metering-storage] for information on how to check if there are any StorageClasses configured for the cluster, how to set the default, and how to configure Metering to use a StorageClass other than the default.
 
 
-[resource-troubleshooting]: https://kubernetes.io/docs/concepts/con***REMOVED***guration/manage-compute-resources-container/#troubleshooting
+[resource-troubleshooting]: https://kubernetes.io/docs/concepts/configuration/manage-compute-resources-container/#troubleshooting
 [prerequisites]: install-metering.md#prerequisites
-[con***REMOVED***guring-metering-storage]: metering-con***REMOVED***g.md#dynamically-provisioning-persistent-volumes-using-storage-classes
+[configuring-metering-storage]: metering-config.md#dynamically-provisioning-persistent-volumes-using-storage-classes

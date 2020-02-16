@@ -1,6 +1,6 @@
 // Copyright 2013 The Go Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE ***REMOVED***le.
+// license that can be found in the LICENSE file.
 
 //go:generate go run gen.go gen_common.go -output tables.go
 //go:generate go run gen_index.go
@@ -31,7 +31,7 @@ const (
 )
 
 // Tag represents a BCP 47 language tag. It is used to specify an instance of a
-// speci***REMOVED***c language or locale. All language tag values are guaranteed to be
+// specific language or locale. All language tag values are guaranteed to be
 // well-formed.
 type Tag struct {
 	lang   langID
@@ -41,11 +41,11 @@ type Tag struct {
 	// have a lookup table from this code to its expansion. This greatly speeds
 	// up table lookup, speed up common variant cases.
 	// This will also immediately free up 3 extra bytes. Also, the pVariant
-	// ***REMOVED***eld can now be moved to the lookup table, as the compact index uniquely
+	// field can now be moved to the lookup table, as the compact index uniquely
 	// determines the offset of a possible variant.
 	script   scriptID
 	pVariant byte   // offset in str, includes preceding '-'
-	pExt     uint16 // offset of ***REMOVED***rst extension, includes preceding '-'
+	pExt     uint16 // offset of first extension, includes preceding '-'
 
 	// str is the string representation of the Tag. It will only be used if the
 	// tag has variants or extensions.
@@ -101,8 +101,8 @@ const (
 	DeprecatedRegion
 	// Remove redundant scripts.
 	SuppressScript
-	// Normalize legacy encodings. This includes legacy languages de***REMOVED***ned in
-	// CLDR as well as bibliographic codes de***REMOVED***ned in ISO-639.
+	// Normalize legacy encodings. This includes legacy languages defined in
+	// CLDR as well as bibliographic codes defined in ISO-639.
 	Legacy
 	// Map the dominant language of a macro language group to the macro language
 	// subtag. For example cmn -> zh.
@@ -164,7 +164,7 @@ func (t Tag) canonicalize(c CanonType) (Tag, bool) {
 				case langMacro:
 					if c&Macro != 0 {
 						// We deviate here from CLDR. The mapping "nb" -> "no"
-						// quali***REMOVED***es as a typical Macro language mapping.  However,
+						// qualifies as a typical Macro language mapping.  However,
 						// for legacy reasons, CLDR maps "no", the macro language
 						// code for Norwegian, to the dominant variant "nb". This
 						// change is currently under consideration for CLDR as well.
@@ -188,7 +188,7 @@ func (t Tag) canonicalize(c CanonType) (Tag, bool) {
 						continue
 					}
 				}
-			} ***REMOVED*** if c&Legacy != 0 && t.lang == _no && c&CLDR != 0 {
+			} else if c&Legacy != 0 && t.lang == _no && c&CLDR != 0 {
 				t.lang = _nb
 				changed = true
 			}
@@ -219,23 +219,23 @@ func (c CanonType) Canonicalize(t Tag) (Tag, error) {
 	return t, nil
 }
 
-// Con***REMOVED***dence indicates the level of certainty for a given return value.
+// Confidence indicates the level of certainty for a given return value.
 // For example, Serbian may be written in Cyrillic or Latin script.
-// The con***REMOVED***dence level indicates whether a value was explicitly speci***REMOVED***ed,
+// The confidence level indicates whether a value was explicitly specified,
 // whether it is typically the only possible value, or whether there is
 // an ambiguity.
-type Con***REMOVED***dence int
+type Confidence int
 
 const (
-	No    Con***REMOVED***dence = iota // full con***REMOVED***dence that there was no match
+	No    Confidence = iota // full confidence that there was no match
 	Low                     // most likely value picked out of a set of alternatives
 	High                    // value is generally assumed to be the correct match
-	Exact                   // exact match or explicitly speci***REMOVED***ed value
+	Exact                   // exact match or explicitly specified value
 )
 
 var confName = []string{"No", "Low", "High", "Exact"}
 
-func (c Con***REMOVED***dence) String() string {
+func (c Confidence) String() string {
 	return confName[c]
 }
 
@@ -250,7 +250,7 @@ func (t *Tag) remakeString() {
 	if t.pVariant > 0 {
 		extra = extra[1:]
 	}
-	if t.equalTags(und) && strings.HasPre***REMOVED***x(extra, "x-") {
+	if t.equalTags(und) && strings.HasPrefix(extra, "x-") {
 		t.str = extra
 		t.pVariant = 0
 		t.pExt = 0
@@ -264,7 +264,7 @@ func (t *Tag) remakeString() {
 		b = append(b, extra...)
 		t.pVariant = uint8(int(t.pVariant) + diff)
 		t.pExt = uint16(int(t.pExt) + diff)
-	} ***REMOVED*** {
+	} else {
 		t.pVariant = uint8(len(b))
 		t.pExt = uint16(len(b))
 	}
@@ -303,9 +303,9 @@ func (t Tag) String() string {
 func (t Tag) MarshalText() (text []byte, err error) {
 	if t.str != "" {
 		text = append(text, t.str...)
-	} ***REMOVED*** if t.script == 0 && t.region == 0 {
+	} else if t.script == 0 && t.region == 0 {
 		text = append(text, t.lang.String()...)
-	} ***REMOVED*** {
+	} else {
 		buf := [maxCoreSize]byte{}
 		text = buf[:t.genCoreBytes(buf[:])]
 	}
@@ -320,9 +320,9 @@ func (t *Tag) UnmarshalText(text []byte) error {
 }
 
 // Base returns the base language of the language tag. If the base language is
-// unspeci***REMOVED***ed, an attempt will be made to infer it from the context.
+// unspecified, an attempt will be made to infer it from the context.
 // It uses a variant of CLDR's Add Likely Subtags algorithm. This is subject to change.
-func (t Tag) Base() (Base, Con***REMOVED***dence) {
+func (t Tag) Base() (Base, Confidence) {
 	if t.lang != 0 {
 		return Base{t.lang}, Exact
 	}
@@ -339,18 +339,18 @@ func (t Tag) Base() (Base, Con***REMOVED***dence) {
 // Script infers the script for the language tag. If it was not explicitly given, it will infer
 // a most likely candidate.
 // If more than one script is commonly used for a language, the most likely one
-// is returned with a low con***REMOVED***dence indication. For example, it returns (Cyrl, Low)
+// is returned with a low confidence indication. For example, it returns (Cyrl, Low)
 // for Serbian.
 // If a script cannot be inferred (Zzzz, No) is returned. We do not use Zyyy (undetermined)
 // as one would suspect from the IANA registry for BCP 47. In a Unicode context Zyyy marks
 // common characters (like 1, 2, 3, '.', etc.) and is therefore more like multiple scripts.
 // See http://www.unicode.org/reports/tr24/#Values for more details. Zzzz is also used for
-// unknown value in CLDR.  (Zzzz, Exact) is returned if Zzzz was explicitly speci***REMOVED***ed.
+// unknown value in CLDR.  (Zzzz, Exact) is returned if Zzzz was explicitly specified.
 // Note that an inferred script is never guaranteed to be the correct one. Latin is
 // almost exclusively used for Afrikaans, but Arabic has been used for some texts
 // in the past.  Also, the script that is commonly used may change over time.
 // It uses a variant of CLDR's Add Likely Subtags algorithm. This is subject to change.
-func (t Tag) Script() (Script, Con***REMOVED***dence) {
+func (t Tag) Script() (Script, Confidence) {
 	if t.script != 0 {
 		return Script{t.script}, Exact
 	}
@@ -369,7 +369,7 @@ func (t Tag) Script() (Script, Con***REMOVED***dence) {
 		if tag.script != sc {
 			sc, c = tag.script, Low
 		}
-	} ***REMOVED*** {
+	} else {
 		t, _ = (Deprecated | Macro).Canonicalize(t)
 		if tag, err := addTags(t); err == nil && tag.script != sc {
 			sc, c = tag.script, Low
@@ -381,7 +381,7 @@ func (t Tag) Script() (Script, Con***REMOVED***dence) {
 // Region returns the region for the language tag. If it was not explicitly given, it will
 // infer a most likely candidate from the context.
 // It uses a variant of CLDR's Add Likely Subtags algorithm. This is subject to change.
-func (t Tag) Region() (Region, Con***REMOVED***dence) {
+func (t Tag) Region() (Region, Confidence) {
 	if t.region != 0 {
 		return Region{t.region}, Exact
 	}
@@ -395,8 +395,8 @@ func (t Tag) Region() (Region, Con***REMOVED***dence) {
 	return Region{_ZZ}, No // TODO: return world instead of undetermined?
 }
 
-// Variant returns the variants speci***REMOVED***ed explicitly for this language tag.
-// or nil if no variant was speci***REMOVED***ed.
+// Variant returns the variants specified explicitly for this language tag.
+// or nil if no variant was specified.
 func (t Tag) Variants() []Variant {
 	v := []Variant{}
 	if int(t.pVariant) < int(t.pExt) {
@@ -408,8 +408,8 @@ func (t Tag) Variants() []Variant {
 	return v
 }
 
-// Parent returns the CLDR parent of t. In CLDR, missing ***REMOVED***elds in data for a
-// speci***REMOVED***c language are substituted with ***REMOVED***elds from the parent language.
+// Parent returns the CLDR parent of t. In CLDR, missing fields in data for a
+// specific language are substituted with fields from the parent language.
 // The parent for a language may change for newer versions of CLDR.
 func (t Tag) Parent() Tag {
 	if t.str != "" {
@@ -451,7 +451,7 @@ func (t Tag) Parent() Tag {
 				return Tag{lang: t.lang, script: maxScript}
 			}
 			return Tag{lang: t.lang}
-		} ***REMOVED*** if t.script != 0 {
+		} else if t.script != 0 {
 			// The parent for an base-script pair with a non-default script is
 			// "und" instead of the base language.
 			base, _ := addTags(Tag{lang: t.lang})
@@ -540,11 +540,11 @@ func (t Tag) Extensions() []Extension {
 }
 
 // TypeForKey returns the type associated with the given key, where key and type
-// are of the allowed values de***REMOVED***ned for the Unicode locale extension ('u') in
-// http://www.unicode.org/reports/tr35/#Unicode_Language_and_Locale_Identi***REMOVED***ers.
+// are of the allowed values defined for the Unicode locale extension ('u') in
+// http://www.unicode.org/reports/tr35/#Unicode_Language_and_Locale_Identifiers.
 // TypeForKey will traverse the inheritance chain to get the correct value.
 func (t Tag) TypeForKey(key string) string {
-	if start, end, _ := t.***REMOVED***ndTypeForKey(key); end != start {
+	if start, end, _ := t.findTypeForKey(key); end != start {
 		return t.str[start:end]
 	}
 	return ""
@@ -556,8 +556,8 @@ var (
 )
 
 // SetTypeForKey returns a new Tag with the key set to type, where key and type
-// are of the allowed values de***REMOVED***ned for the Unicode locale extension ('u') in
-// http://www.unicode.org/reports/tr35/#Unicode_Language_and_Locale_Identi***REMOVED***ers.
+// are of the allowed values defined for the Unicode locale extension ('u') in
+// http://www.unicode.org/reports/tr35/#Unicode_Language_and_Locale_Identifiers.
 // An empty value removes an existing pair with the same key.
 func (t Tag) SetTypeForKey(key, value string) (Tag, error) {
 	if t.private() {
@@ -569,7 +569,7 @@ func (t Tag) SetTypeForKey(key, value string) (Tag, error) {
 
 	// Remove the setting if value is "".
 	if value == "" {
-		start, end, _ := t.***REMOVED***ndTypeForKey(key)
+		start, end, _ := t.findTypeForKey(key)
 		if start != end {
 			// Remove key tag and leading '-'.
 			start -= 4
@@ -581,7 +581,7 @@ func (t Tag) SetTypeForKey(key, value string) (Tag, error) {
 			if start == int(t.pVariant) && end == len(t.str) {
 				t.str = ""
 				t.pVariant, t.pExt = 0, 0
-			} ***REMOVED*** {
+			} else {
 				t.str = fmt.Sprintf("%s%s", t.str[:start], t.str[end:])
 			}
 		}
@@ -619,27 +619,27 @@ func (t Tag) SetTypeForKey(key, value string) (Tag, error) {
 	if t.str == "" {
 		t.pVariant, t.pExt = byte(uStart-1), uint16(uStart-1)
 		t.str = string(buf[:uStart+len(b)])
-	} ***REMOVED*** {
+	} else {
 		s := t.str
-		start, end, hasExt := t.***REMOVED***ndTypeForKey(key)
+		start, end, hasExt := t.findTypeForKey(key)
 		if start == end {
 			if hasExt {
 				b = b[2:]
 			}
 			t.str = fmt.Sprintf("%s-%s%s", s[:start], b, s[end:])
-		} ***REMOVED*** {
+		} else {
 			t.str = fmt.Sprintf("%s%s%s", s[:start], value, s[end:])
 		}
 	}
 	return t, nil
 }
 
-// ***REMOVED***ndKeyAndType returns the start and end position for the type corresponding
+// findKeyAndType returns the start and end position for the type corresponding
 // to key or the point at which to insert the key-value pair if the type
 // wasn't found. The hasExt return value reports whether an -u extension was present.
 // Note: the extensions are typically very small and are likely to contain
 // only one key-type pair.
-func (t Tag) ***REMOVED***ndTypeForKey(key string) (start, end int, hasExt bool) {
+func (t Tag) findTypeForKey(key string) (start, end int, hasExt bool) {
 	p := int(t.pExt)
 	if len(key) != 2 || p == len(t.str) || p == 0 {
 		return p, p, false
@@ -680,7 +680,7 @@ func (t Tag) ***REMOVED***ndTypeForKey(key string) (start, end int, hasExt bool)
 			start = p + 4
 			// A type is at least 3 characters long.
 			p += 7 // 4 + 3
-		} ***REMOVED*** {
+		} else {
 			// Attribute or type, which is at least 3 characters long.
 			p += 4
 		}
@@ -713,8 +713,8 @@ func CompactIndex(t Tag) (index int, ok bool) {
 	//       possibilities for optimization, so don't do this quite yet.
 	b, s, r := t.Raw()
 	if len(t.str) > 0 {
-		if strings.HasPre***REMOVED***x(t.str, "x-") {
-			// We have no entries for user-de***REMOVED***ned tags.
+		if strings.HasPrefix(t.str, "x-") {
+			// We have no entries for user-defined tags.
 			return 0, false
 		}
 		if uint16(t.pVariant) != t.pExt {
@@ -723,7 +723,7 @@ func CompactIndex(t Tag) (index int, ok bool) {
 				return 0, false
 			}
 			t, _ = Raw.Compose(b, s, r, t.Variants())
-		} ***REMOVED*** if _, ok := t.Extension('u'); ok {
+		} else if _, ok := t.Extension('u'); ok {
 			// Strip all but the 'va' entry.
 			variant := t.TypeForKey("va")
 			t, _ = Raw.Compose(b, s, r)
@@ -739,7 +739,7 @@ func CompactIndex(t Tag) (index int, ok bool) {
 			return 0, false
 		}
 	}
-	// No variants speci***REMOVED***ed: just compare core components.
+	// No variants specified: just compare core components.
 	// The key has the form lllssrrr, where l, s, and r are nibbles for
 	// respectively the langID, scriptID, and regionID.
 	key := uint32(b.langID) << (8 + 12)
@@ -756,7 +756,7 @@ type Base struct {
 }
 
 // ParseBase parses a 2- or 3-letter ISO 639 code.
-// It returns a ValueError if s is a well-formed but unknown language identi***REMOVED***er
+// It returns a ValueError if s is a well-formed but unknown language identifier
 // or another error if another error occurred.
 func ParseBase(s string) (Base, error) {
 	if n := len(s); n < 2 || 3 < n {
@@ -774,7 +774,7 @@ type Script struct {
 }
 
 // ParseScript parses a 4-letter ISO 15924 code.
-// It returns a ValueError if s is a well-formed but unknown script identi***REMOVED***er
+// It returns a ValueError if s is a well-formed but unknown script identifier
 // or another error if another error occurred.
 func ParseScript(s string) (Script, error) {
 	if len(s) != 4 {
@@ -798,7 +798,7 @@ func EncodeM49(r int) (Region, error) {
 }
 
 // ParseRegion parses a 2- or 3-letter ISO 3166-1 or a UN M.49 code.
-// It returns a ValueError if s is a well-formed but unknown region identi***REMOVED***er
+// It returns a ValueError if s is a well-formed but unknown region identifier
 // or another error if another error occurred.
 func ParseRegion(s string) (Region, error) {
 	if n := len(s); n < 2 || 3 < n {
@@ -810,7 +810,7 @@ func ParseRegion(s string) (Region, error) {
 }
 
 // IsCountry returns whether this region is a country or autonomous area. This
-// includes non-standard de***REMOVED***nitions from CLDR.
+// includes non-standard definitions from CLDR.
 func (r Region) IsCountry() bool {
 	if r.regionID == 0 || r.IsGroup() || r.IsPrivateUse() && r.regionID != _XK {
 		return false
@@ -818,8 +818,8 @@ func (r Region) IsCountry() bool {
 	return true
 }
 
-// IsGroup returns whether this region de***REMOVED***nes a collection of regions. This
-// includes non-standard de***REMOVED***nitions from CLDR.
+// IsGroup returns whether this region defines a collection of regions. This
+// includes non-standard definitions from CLDR.
 func (r Region) IsGroup() bool {
 	if r.regionID == 0 {
 		return false
@@ -861,7 +861,7 @@ var errNoTLD = errors.New("language: region is not a valid ccTLD")
 // In all other cases it returns either the region itself or an error.
 //
 // This method may return an error for a region for which there exists a
-// canonical form with a ccTLD. To get that ccTLD canonicalize r ***REMOVED***rst. The
+// canonical form with a ccTLD. To get that ccTLD canonicalize r first. The
 // region will already be canonicalized it was obtained from a Tag that was
 // obtained using any of the default methods.
 func (r Region) TLD() (Region, error) {
@@ -886,7 +886,7 @@ func (r Region) Canonicalize() Region {
 	return r
 }
 
-// Variant represents a registered variant of a language as de***REMOVED***ned by BCP 47.
+// Variant represents a registered variant of a language as defined by BCP 47.
 type Variant struct {
 	variant string
 }

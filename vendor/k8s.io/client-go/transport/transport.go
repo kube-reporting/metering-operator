@@ -2,7 +2,7 @@
 Copyright 2015 The Kubernetes Authors.
 
 Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this ***REMOVED***le except in compliance with the License.
+you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
 
     http://www.apache.org/licenses/LICENSE-2.0
@@ -10,7 +10,7 @@ You may obtain a copy of the License at
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the speci***REMOVED***c language governing permissions and
+See the License for the specific language governing permissions and
 limitations under the License.
 */
 
@@ -25,11 +25,11 @@ import (
 )
 
 // New returns an http.RoundTripper that will provide the authentication
-// or transport level security de***REMOVED***ned by the provided Con***REMOVED***g.
-func New(con***REMOVED***g *Con***REMOVED***g) (http.RoundTripper, error) {
+// or transport level security defined by the provided Config.
+func New(config *Config) (http.RoundTripper, error) {
 	// Set transport level security
-	if con***REMOVED***g.Transport != nil && (con***REMOVED***g.HasCA() || con***REMOVED***g.HasCertAuth() || con***REMOVED***g.HasCertCallback() || con***REMOVED***g.TLS.Insecure) {
-		return nil, fmt.Errorf("using a custom transport with TLS certi***REMOVED***cate options or the insecure flag is not allowed")
+	if config.Transport != nil && (config.HasCA() || config.HasCertAuth() || config.HasCertCallback() || config.TLS.Insecure) {
+		return nil, fmt.Errorf("using a custom transport with TLS certificate options or the insecure flag is not allowed")
 	}
 
 	var (
@@ -37,32 +37,32 @@ func New(con***REMOVED***g *Con***REMOVED***g) (http.RoundTripper, error) {
 		err error
 	)
 
-	if con***REMOVED***g.Transport != nil {
-		rt = con***REMOVED***g.Transport
-	} ***REMOVED*** {
-		rt, err = tlsCache.get(con***REMOVED***g)
+	if config.Transport != nil {
+		rt = config.Transport
+	} else {
+		rt, err = tlsCache.get(config)
 		if err != nil {
 			return nil, err
 		}
 	}
 
-	return HTTPWrappersForCon***REMOVED***g(con***REMOVED***g, rt)
+	return HTTPWrappersForConfig(config, rt)
 }
 
-// TLSCon***REMOVED***gFor returns a tls.Con***REMOVED***g that will provide the transport level security de***REMOVED***ned
-// by the provided Con***REMOVED***g. Will return nil if no transport level security is requested.
-func TLSCon***REMOVED***gFor(c *Con***REMOVED***g) (*tls.Con***REMOVED***g, error) {
+// TLSConfigFor returns a tls.Config that will provide the transport level security defined
+// by the provided Config. Will return nil if no transport level security is requested.
+func TLSConfigFor(c *Config) (*tls.Config, error) {
 	if !(c.HasCA() || c.HasCertAuth() || c.HasCertCallback() || c.TLS.Insecure || len(c.TLS.ServerName) > 0) {
 		return nil, nil
 	}
 	if c.HasCA() && c.TLS.Insecure {
-		return nil, fmt.Errorf("specifying a root certi***REMOVED***cates ***REMOVED***le with the insecure flag is not allowed")
+		return nil, fmt.Errorf("specifying a root certificates file with the insecure flag is not allowed")
 	}
 	if err := loadTLSFiles(c); err != nil {
 		return nil, err
 	}
 
-	tlsCon***REMOVED***g := &tls.Con***REMOVED***g{
+	tlsConfig := &tls.Config{
 		// Can't use SSLv3 because of POODLE and BEAST
 		// Can't use TLSv1.0 because of POODLE and BEAST using CBC cipher
 		// Can't use TLSv1.1 because of RC4 cipher usage
@@ -72,13 +72,13 @@ func TLSCon***REMOVED***gFor(c *Con***REMOVED***g) (*tls.Con***REMOVED***g, erro
 	}
 
 	if c.HasCA() {
-		tlsCon***REMOVED***g.RootCAs = rootCertPool(c.TLS.CAData)
+		tlsConfig.RootCAs = rootCertPool(c.TLS.CAData)
 	}
 
-	var staticCert *tls.Certi***REMOVED***cate
+	var staticCert *tls.Certificate
 	if c.HasCertAuth() {
 		// If key/cert were provided, verify them before setting up
-		// tlsCon***REMOVED***g.GetClientCerti***REMOVED***cate.
+		// tlsConfig.GetClientCertificate.
 		cert, err := tls.X509KeyPair(c.TLS.CertData, c.TLS.KeyData)
 		if err != nil {
 			return nil, err
@@ -87,7 +87,7 @@ func TLSCon***REMOVED***gFor(c *Con***REMOVED***g) (*tls.Con***REMOVED***g, erro
 	}
 
 	if c.HasCertAuth() || c.HasCertCallback() {
-		tlsCon***REMOVED***g.GetClientCerti***REMOVED***cate = func(*tls.Certi***REMOVED***cateRequestInfo) (*tls.Certi***REMOVED***cate, error) {
+		tlsConfig.GetClientCertificate = func(*tls.CertificateRequestInfo) (*tls.Certificate, error) {
 			// Note: static key/cert data always take precedence over cert
 			// callback.
 			if staticCert != nil {
@@ -105,19 +105,19 @@ func TLSCon***REMOVED***gFor(c *Con***REMOVED***g) (*tls.Con***REMOVED***g, erro
 			}
 
 			// Both c.TLS.CertData/KeyData were unset and GetCert didn't return
-			// anything. Return an empty tls.Certi***REMOVED***cate, no client cert will
+			// anything. Return an empty tls.Certificate, no client cert will
 			// be sent to the server.
-			return &tls.Certi***REMOVED***cate{}, nil
+			return &tls.Certificate{}, nil
 		}
 	}
 
-	return tlsCon***REMOVED***g, nil
+	return tlsConfig, nil
 }
 
-// loadTLSFiles copies the data from the CertFile, KeyFile, and CAFile ***REMOVED***elds into the CertData,
-// KeyData, and CAFile ***REMOVED***elds, or returns an error. If no error is returned, all three ***REMOVED***elds are
+// loadTLSFiles copies the data from the CertFile, KeyFile, and CAFile fields into the CertData,
+// KeyData, and CAFile fields, or returns an error. If no error is returned, all three fields are
 // either populated or were empty to start.
-func loadTLSFiles(c *Con***REMOVED***g) error {
+func loadTLSFiles(c *Config) error {
 	var err error
 	c.TLS.CAData, err = dataFromSliceOrFile(c.TLS.CAData, c.TLS.CAFile)
 	if err != nil {
@@ -136,18 +136,18 @@ func loadTLSFiles(c *Con***REMOVED***g) error {
 	return nil
 }
 
-// dataFromSliceOrFile returns data from the slice (if non-empty), or from the ***REMOVED***le,
-// or an error if an error occurred reading the ***REMOVED***le
-func dataFromSliceOrFile(data []byte, ***REMOVED***le string) ([]byte, error) {
+// dataFromSliceOrFile returns data from the slice (if non-empty), or from the file,
+// or an error if an error occurred reading the file
+func dataFromSliceOrFile(data []byte, file string) ([]byte, error) {
 	if len(data) > 0 {
 		return data, nil
 	}
-	if len(***REMOVED***le) > 0 {
-		***REMOVED***leData, err := ioutil.ReadFile(***REMOVED***le)
+	if len(file) > 0 {
+		fileData, err := ioutil.ReadFile(file)
 		if err != nil {
 			return []byte{}, err
 		}
-		return ***REMOVED***leData, nil
+		return fileData, nil
 	}
 	return nil, nil
 }
@@ -155,8 +155,8 @@ func dataFromSliceOrFile(data []byte, ***REMOVED***le string) ([]byte, error) {
 // rootCertPool returns nil if caData is empty.  When passed along, this will mean "use system CAs".
 // When caData is not empty, it will be the ONLY information used in the CertPool.
 func rootCertPool(caData []byte) *x509.CertPool {
-	// What we really want is a copy of x509.systemRootsPool, but that isn't exposed.  It's dif***REMOVED***cult to build (see the go
-	// code for a look at the platform speci***REMOVED***c insanity), so we'll use the fact that RootCAs == nil gives us the system values
+	// What we really want is a copy of x509.systemRootsPool, but that isn't exposed.  It's difficult to build (see the go
+	// code for a look at the platform specific insanity), so we'll use the fact that RootCAs == nil gives us the system values
 	// It doesn't allow trusting either/or, but hopefully that won't be an issue
 	if len(caData) == 0 {
 		return nil

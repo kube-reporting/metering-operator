@@ -13,7 +13,7 @@ var xorMasks = []int32{ // 8 elements
 	0, 1, 6, 7, 3, 15, 29, 63,
 } // Size: 56 bytes
 
-// lookup returns the trie value for the ***REMOVED***rst UTF-8 encoding in s and
+// lookup returns the trie value for the first UTF-8 encoding in s and
 // the width in bytes of this encoding. The size will be 0 if s does not
 // hold enough bytes to complete the encoding. len(s) must be greater than 0.
 func (t *bidiTrie) lookup(s []byte) (v uint8, sz int) {
@@ -76,7 +76,7 @@ func (t *bidiTrie) lookup(s []byte) (v uint8, sz int) {
 	return 0, 1
 }
 
-// lookupUnsafe returns the trie value for the ***REMOVED***rst UTF-8 encoding in s.
+// lookupUnsafe returns the trie value for the first UTF-8 encoding in s.
 // s must start with a full and valid UTF-8 encoded rune.
 func (t *bidiTrie) lookupUnsafe(s []byte) uint8 {
 	c0 := s[0]
@@ -98,7 +98,7 @@ func (t *bidiTrie) lookupUnsafe(s []byte) uint8 {
 	return 0
 }
 
-// lookupString returns the trie value for the ***REMOVED***rst UTF-8 encoding in s and
+// lookupString returns the trie value for the first UTF-8 encoding in s and
 // the width in bytes of this encoding. The size will be 0 if s does not
 // hold enough bytes to complete the encoding. len(s) must be greater than 0.
 func (t *bidiTrie) lookupString(s string) (v uint8, sz int) {
@@ -161,7 +161,7 @@ func (t *bidiTrie) lookupString(s string) (v uint8, sz int) {
 	return 0, 1
 }
 
-// lookupStringUnsafe returns the trie value for the ***REMOVED***rst UTF-8 encoding in s.
+// lookupStringUnsafe returns the trie value for the first UTF-8 encoding in s.
 // s must start with a full and valid UTF-8 encoded rune.
 func (t *bidiTrie) lookupStringUnsafe(s string) uint8 {
 	c0 := s[0]

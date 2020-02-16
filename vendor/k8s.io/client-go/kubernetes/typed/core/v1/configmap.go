@@ -2,7 +2,7 @@
 Copyright The Kubernetes Authors.
 
 Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this ***REMOVED***le except in compliance with the License.
+you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
 
     http://www.apache.org/licenses/LICENSE-2.0
@@ -10,7 +10,7 @@ You may obtain a copy of the License at
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the speci***REMOVED***c language governing permissions and
+See the License for the specific language governing permissions and
 limitations under the License.
 */
 
@@ -29,45 +29,45 @@ import (
 	rest "k8s.io/client-go/rest"
 )
 
-// Con***REMOVED***gMapsGetter has a method to return a Con***REMOVED***gMapInterface.
+// ConfigMapsGetter has a method to return a ConfigMapInterface.
 // A group's client should implement this interface.
-type Con***REMOVED***gMapsGetter interface {
-	Con***REMOVED***gMaps(namespace string) Con***REMOVED***gMapInterface
+type ConfigMapsGetter interface {
+	ConfigMaps(namespace string) ConfigMapInterface
 }
 
-// Con***REMOVED***gMapInterface has methods to work with Con***REMOVED***gMap resources.
-type Con***REMOVED***gMapInterface interface {
-	Create(*v1.Con***REMOVED***gMap) (*v1.Con***REMOVED***gMap, error)
-	Update(*v1.Con***REMOVED***gMap) (*v1.Con***REMOVED***gMap, error)
+// ConfigMapInterface has methods to work with ConfigMap resources.
+type ConfigMapInterface interface {
+	Create(*v1.ConfigMap) (*v1.ConfigMap, error)
+	Update(*v1.ConfigMap) (*v1.ConfigMap, error)
 	Delete(name string, options *metav1.DeleteOptions) error
 	DeleteCollection(options *metav1.DeleteOptions, listOptions metav1.ListOptions) error
-	Get(name string, options metav1.GetOptions) (*v1.Con***REMOVED***gMap, error)
-	List(opts metav1.ListOptions) (*v1.Con***REMOVED***gMapList, error)
+	Get(name string, options metav1.GetOptions) (*v1.ConfigMap, error)
+	List(opts metav1.ListOptions) (*v1.ConfigMapList, error)
 	Watch(opts metav1.ListOptions) (watch.Interface, error)
-	Patch(name string, pt types.PatchType, data []byte, subresources ...string) (result *v1.Con***REMOVED***gMap, err error)
-	Con***REMOVED***gMapExpansion
+	Patch(name string, pt types.PatchType, data []byte, subresources ...string) (result *v1.ConfigMap, err error)
+	ConfigMapExpansion
 }
 
-// con***REMOVED***gMaps implements Con***REMOVED***gMapInterface
-type con***REMOVED***gMaps struct {
+// configMaps implements ConfigMapInterface
+type configMaps struct {
 	client rest.Interface
 	ns     string
 }
 
-// newCon***REMOVED***gMaps returns a Con***REMOVED***gMaps
-func newCon***REMOVED***gMaps(c *CoreV1Client, namespace string) *con***REMOVED***gMaps {
-	return &con***REMOVED***gMaps{
+// newConfigMaps returns a ConfigMaps
+func newConfigMaps(c *CoreV1Client, namespace string) *configMaps {
+	return &configMaps{
 		client: c.RESTClient(),
 		ns:     namespace,
 	}
 }
 
-// Get takes name of the con***REMOVED***gMap, and returns the corresponding con***REMOVED***gMap object, and an error if there is any.
-func (c *con***REMOVED***gMaps) Get(name string, options metav1.GetOptions) (result *v1.Con***REMOVED***gMap, err error) {
-	result = &v1.Con***REMOVED***gMap{}
+// Get takes name of the configMap, and returns the corresponding configMap object, and an error if there is any.
+func (c *configMaps) Get(name string, options metav1.GetOptions) (result *v1.ConfigMap, err error) {
+	result = &v1.ConfigMap{}
 	err = c.client.Get().
 		Namespace(c.ns).
-		Resource("con***REMOVED***gmaps").
+		Resource("configmaps").
 		Name(name).
 		VersionedParams(&options, scheme.ParameterCodec).
 		Do().
@@ -75,16 +75,16 @@ func (c *con***REMOVED***gMaps) Get(name string, options metav1.GetOptions) (res
 	return
 }
 
-// List takes label and ***REMOVED***eld selectors, and returns the list of Con***REMOVED***gMaps that match those selectors.
-func (c *con***REMOVED***gMaps) List(opts metav1.ListOptions) (result *v1.Con***REMOVED***gMapList, err error) {
+// List takes label and field selectors, and returns the list of ConfigMaps that match those selectors.
+func (c *configMaps) List(opts metav1.ListOptions) (result *v1.ConfigMapList, err error) {
 	var timeout time.Duration
 	if opts.TimeoutSeconds != nil {
 		timeout = time.Duration(*opts.TimeoutSeconds) * time.Second
 	}
-	result = &v1.Con***REMOVED***gMapList{}
+	result = &v1.ConfigMapList{}
 	err = c.client.Get().
 		Namespace(c.ns).
-		Resource("con***REMOVED***gmaps").
+		Resource("configmaps").
 		VersionedParams(&opts, scheme.ParameterCodec).
 		Timeout(timeout).
 		Do().
@@ -92,8 +92,8 @@ func (c *con***REMOVED***gMaps) List(opts metav1.ListOptions) (result *v1.Con***
 	return
 }
 
-// Watch returns a watch.Interface that watches the requested con***REMOVED***gMaps.
-func (c *con***REMOVED***gMaps) Watch(opts metav1.ListOptions) (watch.Interface, error) {
+// Watch returns a watch.Interface that watches the requested configMaps.
+func (c *configMaps) Watch(opts metav1.ListOptions) (watch.Interface, error) {
 	var timeout time.Duration
 	if opts.TimeoutSeconds != nil {
 		timeout = time.Duration(*opts.TimeoutSeconds) * time.Second
@@ -101,42 +101,42 @@ func (c *con***REMOVED***gMaps) Watch(opts metav1.ListOptions) (watch.Interface,
 	opts.Watch = true
 	return c.client.Get().
 		Namespace(c.ns).
-		Resource("con***REMOVED***gmaps").
+		Resource("configmaps").
 		VersionedParams(&opts, scheme.ParameterCodec).
 		Timeout(timeout).
 		Watch()
 }
 
-// Create takes the representation of a con***REMOVED***gMap and creates it.  Returns the server's representation of the con***REMOVED***gMap, and an error, if there is any.
-func (c *con***REMOVED***gMaps) Create(con***REMOVED***gMap *v1.Con***REMOVED***gMap) (result *v1.Con***REMOVED***gMap, err error) {
-	result = &v1.Con***REMOVED***gMap{}
+// Create takes the representation of a configMap and creates it.  Returns the server's representation of the configMap, and an error, if there is any.
+func (c *configMaps) Create(configMap *v1.ConfigMap) (result *v1.ConfigMap, err error) {
+	result = &v1.ConfigMap{}
 	err = c.client.Post().
 		Namespace(c.ns).
-		Resource("con***REMOVED***gmaps").
-		Body(con***REMOVED***gMap).
+		Resource("configmaps").
+		Body(configMap).
 		Do().
 		Into(result)
 	return
 }
 
-// Update takes the representation of a con***REMOVED***gMap and updates it. Returns the server's representation of the con***REMOVED***gMap, and an error, if there is any.
-func (c *con***REMOVED***gMaps) Update(con***REMOVED***gMap *v1.Con***REMOVED***gMap) (result *v1.Con***REMOVED***gMap, err error) {
-	result = &v1.Con***REMOVED***gMap{}
+// Update takes the representation of a configMap and updates it. Returns the server's representation of the configMap, and an error, if there is any.
+func (c *configMaps) Update(configMap *v1.ConfigMap) (result *v1.ConfigMap, err error) {
+	result = &v1.ConfigMap{}
 	err = c.client.Put().
 		Namespace(c.ns).
-		Resource("con***REMOVED***gmaps").
-		Name(con***REMOVED***gMap.Name).
-		Body(con***REMOVED***gMap).
+		Resource("configmaps").
+		Name(configMap.Name).
+		Body(configMap).
 		Do().
 		Into(result)
 	return
 }
 
-// Delete takes name of the con***REMOVED***gMap and deletes it. Returns an error if one occurs.
-func (c *con***REMOVED***gMaps) Delete(name string, options *metav1.DeleteOptions) error {
+// Delete takes name of the configMap and deletes it. Returns an error if one occurs.
+func (c *configMaps) Delete(name string, options *metav1.DeleteOptions) error {
 	return c.client.Delete().
 		Namespace(c.ns).
-		Resource("con***REMOVED***gmaps").
+		Resource("configmaps").
 		Name(name).
 		Body(options).
 		Do().
@@ -144,14 +144,14 @@ func (c *con***REMOVED***gMaps) Delete(name string, options *metav1.DeleteOption
 }
 
 // DeleteCollection deletes a collection of objects.
-func (c *con***REMOVED***gMaps) DeleteCollection(options *metav1.DeleteOptions, listOptions metav1.ListOptions) error {
+func (c *configMaps) DeleteCollection(options *metav1.DeleteOptions, listOptions metav1.ListOptions) error {
 	var timeout time.Duration
 	if listOptions.TimeoutSeconds != nil {
 		timeout = time.Duration(*listOptions.TimeoutSeconds) * time.Second
 	}
 	return c.client.Delete().
 		Namespace(c.ns).
-		Resource("con***REMOVED***gmaps").
+		Resource("configmaps").
 		VersionedParams(&listOptions, scheme.ParameterCodec).
 		Timeout(timeout).
 		Body(options).
@@ -159,12 +159,12 @@ func (c *con***REMOVED***gMaps) DeleteCollection(options *metav1.DeleteOptions, 
 		Error()
 }
 
-// Patch applies the patch and returns the patched con***REMOVED***gMap.
-func (c *con***REMOVED***gMaps) Patch(name string, pt types.PatchType, data []byte, subresources ...string) (result *v1.Con***REMOVED***gMap, err error) {
-	result = &v1.Con***REMOVED***gMap{}
+// Patch applies the patch and returns the patched configMap.
+func (c *configMaps) Patch(name string, pt types.PatchType, data []byte, subresources ...string) (result *v1.ConfigMap, err error) {
+	result = &v1.ConfigMap{}
 	err = c.client.Patch(pt).
 		Namespace(c.ns).
-		Resource("con***REMOVED***gmaps").
+		Resource("configmaps").
 		SubResource(subresources...).
 		Name(name).
 		Body(data).

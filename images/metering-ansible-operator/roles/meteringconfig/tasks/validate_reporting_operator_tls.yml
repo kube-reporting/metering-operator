@@ -1,17 +1,17 @@
 ---
 
 #
-# Validate that the user-provided reporting-operator Presto ***REMOVED***elds were properly con***REMOVED***gured
+# Validate that the user-provided reporting-operator Presto fields were properly configured
 #
-- name: Validate that the user-provided Presto server TLS ***REMOVED***elds are not empty
+- name: Validate that the user-provided Presto server TLS fields are not empty
   block:
-  - name: Validate that the user provided a non-empty TLS CA certi***REMOVED***cate value
+  - name: Validate that the user provided a non-empty TLS CA certificate value
     assert:
       that:
-        - meteringcon***REMOVED***g_spec['reporting-operator'].spec.con***REMOVED***g.presto.tls.caCerti***REMOVED***cate != ""
-      msg: "reporting-operator.spec.con***REMOVED***g.presto.tls.caCerti***REMOVED***cate cannot be empty if createSecret: true and secretName != ''"
+        - meteringconfig_spec['reporting-operator'].spec.config.presto.tls.caCertificate != ""
+      msg: "reporting-operator.spec.config.presto.tls.caCertificate cannot be empty if createSecret: true and secretName != ''"
   rescue:
-  - include_tasks: update_meteringcon***REMOVED***g_status.yml
+  - include_tasks: update_meteringconfig_status.yml
     vars:
       end_play_after_updating_status: true
       current_conditions:
@@ -21,29 +21,29 @@
           "Failed task name: {{ ansible_failed_task.name }}"
           "Failed task message: {{ ansible_failed_result.msg }}"
         lastTransitionTime: "{{ now(utc=False).isoformat() + 'Z' }}"
-  when: meteringcon***REMOVED***g_template_presto_tls_secret
+  when: meteringconfig_template_presto_tls_secret
 
-- name: Validate that the user-provided Presto client Auth ***REMOVED***elds are not empty
+- name: Validate that the user-provided Presto client Auth fields are not empty
   block:
-  - name: Validate that the user provided a non-empty auth certi***REMOVED***cate value
+  - name: Validate that the user provided a non-empty auth certificate value
     assert:
       that:
-        - meteringcon***REMOVED***g_spec['reporting-operator'].spec.con***REMOVED***g.presto.auth.certi***REMOVED***cate != ""
-      msg: "reporting-operator.spec.con***REMOVED***g.presto.auth.certi***REMOVED***cate cannot be empty if createSecret: true and secretName != ''"
+        - meteringconfig_spec['reporting-operator'].spec.config.presto.auth.certificate != ""
+      msg: "reporting-operator.spec.config.presto.auth.certificate cannot be empty if createSecret: true and secretName != ''"
 
   - name: Validate that the user provided a non-empty auth key value
     assert:
       that:
-        - meteringcon***REMOVED***g_spec['reporting-operator'].spec.con***REMOVED***g.presto.auth.key != ""
-      msg: "reporting-operator.spec.con***REMOVED***g.presto.auth.key cannot be empty if createSecret: true and secretName != ''"
+        - meteringconfig_spec['reporting-operator'].spec.config.presto.auth.key != ""
+      msg: "reporting-operator.spec.config.presto.auth.key cannot be empty if createSecret: true and secretName != ''"
 
   - name: Validate that TLS is enabled when auth is enabled
     assert:
       that:
-        - meteringcon***REMOVED***g_spec['reporting-operator'].spec.con***REMOVED***g.presto.tls.enabled and meteringcon***REMOVED***g_spec['reporting-operator'].spec.con***REMOVED***g.presto.auth.enabled
-      msg: "Invalid con***REMOVED***guration: you cannot enable auth but disable TLS."
+        - meteringconfig_spec['reporting-operator'].spec.config.presto.tls.enabled and meteringconfig_spec['reporting-operator'].spec.config.presto.auth.enabled
+      msg: "Invalid configuration: you cannot enable auth but disable TLS."
   rescue:
-  - include_tasks: update_meteringcon***REMOVED***g_status.yml
+  - include_tasks: update_meteringconfig_status.yml
     vars:
       end_play_after_updating_status: true
       current_conditions:
@@ -53,38 +53,38 @@
           "Failed task name: {{ ansible_failed_task.name }}"
           "Failed task message: {{ ansible_failed_result.msg }}"
         lastTransitionTime: "{{ now(utc=False).isoformat() + 'Z' }}"
-  when: meteringcon***REMOVED***g_template_presto_auth_secret
+  when: meteringconfig_template_presto_auth_secret
 
 #
-# Validate that the user-provided reporting-operator Hive ***REMOVED***elds were properly con***REMOVED***gured
+# Validate that the user-provided reporting-operator Hive fields were properly configured
 #
-- name: Validate that the user-provided Hive TLS/auth ***REMOVED***elds are not empty
+- name: Validate that the user-provided Hive TLS/auth fields are not empty
   block:
-  - name: Validate that the user provided a non-empty Hive TLS CA certi***REMOVED***cate value
+  - name: Validate that the user provided a non-empty Hive TLS CA certificate value
     assert:
       that:
-        - meteringcon***REMOVED***g_spec['reporting-operator'].spec.con***REMOVED***g.hive.tls.caCerti***REMOVED***cate != ""
-      msg: "reporting-operator.spec.con***REMOVED***g.presto.tls.caCerti***REMOVED***cate cannot be empty if createSecret: true and secretName != ''"
+        - meteringconfig_spec['reporting-operator'].spec.config.hive.tls.caCertificate != ""
+      msg: "reporting-operator.spec.config.presto.tls.caCertificate cannot be empty if createSecret: true and secretName != ''"
 
-  - name: Validate that the user provided a non-empty Hive auth certi***REMOVED***cate value
+  - name: Validate that the user provided a non-empty Hive auth certificate value
     assert:
       that:
-        - meteringcon***REMOVED***g_spec['reporting-operator'].spec.con***REMOVED***g.hive.auth.certi***REMOVED***cate != ""
-      msg: "reporting-operator.spec.con***REMOVED***g.hive.auth.certi***REMOVED***cate cannot be empty if createSecret: true and secretName != ''"
+        - meteringconfig_spec['reporting-operator'].spec.config.hive.auth.certificate != ""
+      msg: "reporting-operator.spec.config.hive.auth.certificate cannot be empty if createSecret: true and secretName != ''"
 
   - name: Validate that the user provided a non-empty Hive auth key value
     assert:
       that:
-        - meteringcon***REMOVED***g_spec['reporting-operator'].spec.con***REMOVED***g.hive.auth.key != ""
-      msg: "reporting-operator.spec.con***REMOVED***g.hive.auth.key cannot be empty if createSecret: true and secretName != ''"
+        - meteringconfig_spec['reporting-operator'].spec.config.hive.auth.key != ""
+      msg: "reporting-operator.spec.config.hive.auth.key cannot be empty if createSecret: true and secretName != ''"
 
   - name: Validate that TLS is enabled when auth is enabled
     assert:
       that:
-        - meteringcon***REMOVED***g_spec['reporting-operator'].spec.con***REMOVED***g.hive.tls.enabled and meteringcon***REMOVED***g_spec['reporting-operator'].spec.con***REMOVED***g.hive.auth.enabled
-      msg: "Invalid con***REMOVED***guration: you cannot enable auth but disable TLS."
+        - meteringconfig_spec['reporting-operator'].spec.config.hive.tls.enabled and meteringconfig_spec['reporting-operator'].spec.config.hive.auth.enabled
+      msg: "Invalid configuration: you cannot enable auth but disable TLS."
   rescue:
-  - include_tasks: update_meteringcon***REMOVED***g_status.yml
+  - include_tasks: update_meteringconfig_status.yml
     vars:
       end_play_after_updating_status: true
       current_conditions:
@@ -94,35 +94,35 @@
           "Failed task name: {{ ansible_failed_task.name }}"
           "Failed task message: {{ ansible_failed_result.msg }}"
         lastTransitionTime: "{{ now(utc=False).isoformat() + 'Z' }}"
-  when: meteringcon***REMOVED***g_template_hive_secrets
+  when: meteringconfig_template_hive_secrets
 
 #
-# Validate that the user-provided authProxy ***REMOVED***elds were properly con***REMOVED***gured
+# Validate that the user-provided authProxy fields were properly configured
 #
-- name: Validate the user-provided authProxy ***REMOVED***elds are not empty
+- name: Validate the user-provided authProxy fields are not empty
   block:
   - name: Verify that authProxy.cookie.secretName is not empty
     assert:
       that:
         # note: we already do validation of the seed being non-empty
-        - meteringcon***REMOVED***g_spec['reporting-operator'].spec.authProxy.cookie.secretName != ""
+        - meteringconfig_spec['reporting-operator'].spec.authProxy.cookie.secretName != ""
       msg: "spec.reporting-operator.spec.authProxy.cookie.secretName cannot be empty when createSecret is set to true"
 
   - name: Verify that authProxy.htpasswd.secretName is not empty
     assert:
       that:
-        - meteringcon***REMOVED***g_spec['reporting-operator'].spec.authProxy.htpasswd.secretName != ""
+        - meteringconfig_spec['reporting-operator'].spec.authProxy.htpasswd.secretName != ""
       msg: "spec.reporting-operator.spec.authProxy.htpasswd.secretName cannot be empty when createSecret is set to true"
 
-  - name: Verify that authProxy.authenticatedEmails was con***REMOVED***gured properly
+  - name: Verify that authProxy.authenticatedEmails was configured properly
     assert:
       that:
-        - meteringcon***REMOVED***g_spec['reporting-operator'].spec.authProxy.authenticatedEmails.secretName != ""
-        - meteringcon***REMOVED***g_spec['reporting-operator'].spec.authProxy.authenticatedEmails.data != ""
+        - meteringconfig_spec['reporting-operator'].spec.authProxy.authenticatedEmails.secretName != ""
+        - meteringconfig_spec['reporting-operator'].spec.authProxy.authenticatedEmails.data != ""
       msg: "spec.reporting-operator.spec.authProxy.authenticatedEmails: secretName and/or data key(s) cannot be empty when enabled and createSecret is set to true"
-    when: meteringcon***REMOVED***g_spec['reporting-operator'].spec.authProxy.authenticatedEmails.enabled and meteringcon***REMOVED***g_spec['reporting-operator'].spec.authProxy.authenticatedEmails.createSecret
+    when: meteringconfig_spec['reporting-operator'].spec.authProxy.authenticatedEmails.enabled and meteringconfig_spec['reporting-operator'].spec.authProxy.authenticatedEmails.createSecret
   rescue:
-  - include_tasks: update_meteringcon***REMOVED***g_status.yml
+  - include_tasks: update_meteringconfig_status.yml
     vars:
       end_play_after_updating_status: true
       current_conditions:

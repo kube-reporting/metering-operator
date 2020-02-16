@@ -2,7 +2,7 @@
 Copyright 2016 The Kubernetes Authors.
 
 Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this ***REMOVED***le except in compliance with the License.
+you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
 
     http://www.apache.org/licenses/LICENSE-2.0
@@ -10,7 +10,7 @@ You may obtain a copy of the License at
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the speci***REMOVED***c language governing permissions and
+See the License for the specific language governing permissions and
 limitations under the License.
 */
 
@@ -21,7 +21,7 @@ import (
 
 	"k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/apimachinery/pkg/***REMOVED***elds"
+	"k8s.io/apimachinery/pkg/fields"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/types"
 	ref "k8s.io/client-go/tools/reference"
@@ -34,11 +34,11 @@ type EventExpansion interface {
 	// UpdateWithEventNamespace is the same as a Update, except that it sends the request to the event.Namespace.
 	UpdateWithEventNamespace(event *v1.Event) (*v1.Event, error)
 	PatchWithEventNamespace(event *v1.Event, data []byte) (*v1.Event, error)
-	// Search ***REMOVED***nds events about the speci***REMOVED***ed object
+	// Search finds events about the specified object
 	Search(scheme *runtime.Scheme, objOrRef runtime.Object) (*v1.EventList, error)
-	// Returns the appropriate ***REMOVED***eld selector based on the API version being used to communicate with the server.
-	// The returned ***REMOVED***eld selector can be used with List and Watch to ***REMOVED***lter desired events.
-	GetFieldSelector(involvedObjectName, involvedObjectNamespace, involvedObjectKind, involvedObjectUID *string) ***REMOVED***elds.Selector
+	// Returns the appropriate field selector based on the API version being used to communicate with the server.
+	// The returned field selector can be used with List and Watch to filter desired events.
+	GetFieldSelector(involvedObjectName, involvedObjectNamespace, involvedObjectKind, involvedObjectUID *string) fields.Selector
 }
 
 // CreateWithEventNamespace makes a new event. Returns the copy of the event the server returns,
@@ -59,7 +59,7 @@ func (e *events) CreateWithEventNamespace(event *v1.Event) (*v1.Event, error) {
 	return result, err
 }
 
-// UpdateWithEventNamespace modi***REMOVED***es an existing event. It returns the copy of the event that the server returns,
+// UpdateWithEventNamespace modifies an existing event. It returns the copy of the event that the server returns,
 // or an error. The namespace and key to update the event within is deduced from the event. The
 // namespace must either match this event client's namespace, or this event client must have been
 // created with the "" namespace. Update also requires the ResourceVersion to be set in the event
@@ -76,7 +76,7 @@ func (e *events) UpdateWithEventNamespace(event *v1.Event) (*v1.Event, error) {
 	return result, err
 }
 
-// PatchWithEventNamespace modi***REMOVED***es an existing event. It returns the copy of
+// PatchWithEventNamespace modifies an existing event. It returns the copy of
 // the event that the server returns, or an error. The namespace and name of the
 // target event is deduced from the incompleteEvent. The namespace must either
 // match this event client's namespace, or this event client must have been
@@ -96,7 +96,7 @@ func (e *events) PatchWithEventNamespace(incompleteEvent *v1.Event, data []byte)
 	return result, err
 }
 
-// Search ***REMOVED***nds events about the speci***REMOVED***ed object. The namespace of the
+// Search finds events about the specified object. The namespace of the
 // object must match this event's client namespace unless the event client
 // was made with the "" namespace.
 func (e *events) Search(scheme *runtime.Scheme, objOrRef runtime.Object) (*v1.EventList, error) {
@@ -105,7 +105,7 @@ func (e *events) Search(scheme *runtime.Scheme, objOrRef runtime.Object) (*v1.Ev
 		return nil, err
 	}
 	if e.ns != "" && ref.Namespace != e.ns {
-		return nil, fmt.Errorf("won't be able to ***REMOVED***nd any events of namespace '%v' in namespace '%v'", ref.Namespace, e.ns)
+		return nil, fmt.Errorf("won't be able to find any events of namespace '%v' in namespace '%v'", ref.Namespace, e.ns)
 	}
 	stringRefKind := string(ref.Kind)
 	var refKind *string
@@ -117,31 +117,31 @@ func (e *events) Search(scheme *runtime.Scheme, objOrRef runtime.Object) (*v1.Ev
 	if stringRefUID != "" {
 		refUID = &stringRefUID
 	}
-	***REMOVED***eldSelector := e.GetFieldSelector(&ref.Name, &ref.Namespace, refKind, refUID)
-	return e.List(metav1.ListOptions{FieldSelector: ***REMOVED***eldSelector.String()})
+	fieldSelector := e.GetFieldSelector(&ref.Name, &ref.Namespace, refKind, refUID)
+	return e.List(metav1.ListOptions{FieldSelector: fieldSelector.String()})
 }
 
-// Returns the appropriate ***REMOVED***eld selector based on the API version being used to communicate with the server.
-// The returned ***REMOVED***eld selector can be used with List and Watch to ***REMOVED***lter desired events.
-func (e *events) GetFieldSelector(involvedObjectName, involvedObjectNamespace, involvedObjectKind, involvedObjectUID *string) ***REMOVED***elds.Selector {
+// Returns the appropriate field selector based on the API version being used to communicate with the server.
+// The returned field selector can be used with List and Watch to filter desired events.
+func (e *events) GetFieldSelector(involvedObjectName, involvedObjectNamespace, involvedObjectKind, involvedObjectUID *string) fields.Selector {
 	apiVersion := e.client.APIVersion().String()
-	***REMOVED***eld := ***REMOVED***elds.Set{}
+	field := fields.Set{}
 	if involvedObjectName != nil {
-		***REMOVED***eld[GetInvolvedObjectNameFieldLabel(apiVersion)] = *involvedObjectName
+		field[GetInvolvedObjectNameFieldLabel(apiVersion)] = *involvedObjectName
 	}
 	if involvedObjectNamespace != nil {
-		***REMOVED***eld["involvedObject.namespace"] = *involvedObjectNamespace
+		field["involvedObject.namespace"] = *involvedObjectNamespace
 	}
 	if involvedObjectKind != nil {
-		***REMOVED***eld["involvedObject.kind"] = *involvedObjectKind
+		field["involvedObject.kind"] = *involvedObjectKind
 	}
 	if involvedObjectUID != nil {
-		***REMOVED***eld["involvedObject.uid"] = *involvedObjectUID
+		field["involvedObject.uid"] = *involvedObjectUID
 	}
-	return ***REMOVED***eld.AsSelector()
+	return field.AsSelector()
 }
 
-// Returns the appropriate ***REMOVED***eld label to use for name of the involved object as per the given API version.
+// Returns the appropriate field label to use for name of the involved object as per the given API version.
 func GetInvolvedObjectNameFieldLabel(version string) string {
 	return "involvedObject.name"
 }

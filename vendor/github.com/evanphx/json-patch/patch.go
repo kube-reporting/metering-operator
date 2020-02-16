@@ -279,7 +279,7 @@ Loop:
 	return false
 }
 
-func ***REMOVED***ndObject(pd *container, path string) (container, string) {
+func findObject(pd *container, path string) (container, string) {
 	doc := *pd
 
 	split := strings.Split(path, "/")
@@ -308,7 +308,7 @@ func ***REMOVED***ndObject(pd *container, path string) (container, string) {
 			if err != nil {
 				return nil, ""
 			}
-		} ***REMOVED*** {
+		} else {
 			doc, err = next.intoDoc()
 
 			if err != nil {
@@ -462,7 +462,7 @@ func (d *partialArray) remove(key string) error {
 func (p Patch) add(doc *container, op operation) error {
 	path := op.path()
 
-	con, key := ***REMOVED***ndObject(doc, path)
+	con, key := findObject(doc, path)
 
 	if con == nil {
 		return fmt.Errorf("jsonpatch add operation does not apply: doc is missing path: \"%s\"", path)
@@ -474,7 +474,7 @@ func (p Patch) add(doc *container, op operation) error {
 func (p Patch) remove(doc *container, op operation) error {
 	path := op.path()
 
-	con, key := ***REMOVED***ndObject(doc, path)
+	con, key := findObject(doc, path)
 
 	if con == nil {
 		return fmt.Errorf("jsonpatch remove operation does not apply: doc is missing path: \"%s\"", path)
@@ -486,7 +486,7 @@ func (p Patch) remove(doc *container, op operation) error {
 func (p Patch) replace(doc *container, op operation) error {
 	path := op.path()
 
-	con, key := ***REMOVED***ndObject(doc, path)
+	con, key := findObject(doc, path)
 
 	if con == nil {
 		return fmt.Errorf("jsonpatch replace operation does not apply: doc is missing path: %s", path)
@@ -503,7 +503,7 @@ func (p Patch) replace(doc *container, op operation) error {
 func (p Patch) move(doc *container, op operation) error {
 	from := op.from()
 
-	con, key := ***REMOVED***ndObject(doc, from)
+	con, key := findObject(doc, from)
 
 	if con == nil {
 		return fmt.Errorf("jsonpatch move operation does not apply: doc is missing from path: %s", from)
@@ -521,7 +521,7 @@ func (p Patch) move(doc *container, op operation) error {
 
 	path := op.path()
 
-	con, key = ***REMOVED***ndObject(doc, path)
+	con, key = findObject(doc, path)
 
 	if con == nil {
 		return fmt.Errorf("jsonpatch move operation does not apply: doc is missing destination path: %s", path)
@@ -533,7 +533,7 @@ func (p Patch) move(doc *container, op operation) error {
 func (p Patch) test(doc *container, op operation) error {
 	path := op.path()
 
-	con, key := ***REMOVED***ndObject(doc, path)
+	con, key := findObject(doc, path)
 
 	if con == nil {
 		return fmt.Errorf("jsonpatch test operation does not apply: is missing path: %s", path)
@@ -550,7 +550,7 @@ func (p Patch) test(doc *container, op operation) error {
 			return nil
 		}
 		return fmt.Errorf("Testing value %s failed", path)
-	} ***REMOVED*** if op.value() == nil {
+	} else if op.value() == nil {
 		return fmt.Errorf("Testing value %s failed", path)
 	}
 
@@ -564,7 +564,7 @@ func (p Patch) test(doc *container, op operation) error {
 func (p Patch) copy(doc *container, op operation) error {
 	from := op.from()
 
-	con, key := ***REMOVED***ndObject(doc, from)
+	con, key := findObject(doc, from)
 
 	if con == nil {
 		return fmt.Errorf("jsonpatch copy operation does not apply: doc is missing from path: %s", from)
@@ -577,7 +577,7 @@ func (p Patch) copy(doc *container, op operation) error {
 
 	path := op.path()
 
-	con, key = ***REMOVED***ndObject(doc, path)
+	con, key = findObject(doc, path)
 
 	if con == nil {
 		return fmt.Errorf("jsonpatch copy operation does not apply: doc is missing destination path: %s", path)
@@ -624,7 +624,7 @@ func (p Patch) ApplyIndent(doc []byte, indent string) ([]byte, error) {
 	var pd container
 	if doc[0] == '[' {
 		pd = &partialArray{}
-	} ***REMOVED*** {
+	} else {
 		pd = &partialDoc{}
 	}
 
@@ -669,7 +669,7 @@ func (p Patch) ApplyIndent(doc []byte, indent string) ([]byte, error) {
 // From http://tools.ietf.org/html/rfc6901#section-4 :
 //
 // Evaluation of each reference token begins by decoding any escaped
-// character sequence.  This is performed by ***REMOVED***rst transforming any
+// character sequence.  This is performed by first transforming any
 // occurrence of the sequence '~1' to '/', and then transforming any
 // occurrence of the sequence '~0' to '~'.
 

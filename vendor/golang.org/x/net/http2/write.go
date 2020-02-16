@@ -1,6 +1,6 @@
 // Copyright 2014 The Go Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE ***REMOVED***le.
+// license that can be found in the LICENSE file.
 
 package http2
 
@@ -147,10 +147,10 @@ func (writeSettingsAck) writeFrame(ctx writeContext) error {
 
 func (writeSettingsAck) staysWithinBuffer(max int) bool { return frameHeaderLen <= max }
 
-// splitHeaderBlock splits headerBlock into fragments so that each fragment ***REMOVED***ts
-// in a single frame, then calls fn for each fragment. ***REMOVED***rstFrag/lastFrag are true
-// for the ***REMOVED***rst/last fragment, respectively.
-func splitHeaderBlock(ctx writeContext, headerBlock []byte, fn func(ctx writeContext, frag []byte, ***REMOVED***rstFrag, lastFrag bool) error) error {
+// splitHeaderBlock splits headerBlock into fragments so that each fragment fits
+// in a single frame, then calls fn for each fragment. firstFrag/lastFrag are true
+// for the first/last fragment, respectively.
+func splitHeaderBlock(ctx writeContext, headerBlock []byte, fn func(ctx writeContext, frag []byte, firstFrag, lastFrag bool) error) error {
 	// For now we're lazy and just pick the minimum MAX_FRAME_SIZE
 	// that all peers must support (16KB). Later we could care
 	// more and send larger frames if the peer advertised it, but
@@ -159,17 +159,17 @@ func splitHeaderBlock(ctx writeContext, headerBlock []byte, fn func(ctx writeCon
 	// only waste 9 bytes anyway.
 	const maxFrameSize = 16384
 
-	***REMOVED***rst := true
+	first := true
 	for len(headerBlock) > 0 {
 		frag := headerBlock
 		if len(frag) > maxFrameSize {
 			frag = frag[:maxFrameSize]
 		}
 		headerBlock = headerBlock[len(frag):]
-		if err := fn(ctx, frag, ***REMOVED***rst, len(headerBlock) == 0); err != nil {
+		if err := fn(ctx, frag, first, len(headerBlock) == 0); err != nil {
 			return err
 		}
-		***REMOVED***rst = false
+		first = false
 	}
 	return nil
 }
@@ -199,10 +199,10 @@ func (w *writeResHeaders) staysWithinBuffer(max int) bool {
 	// TODO: this is a common one. It'd be nice to return true
 	// here and get into the fast path if we could be clever and
 	// calculate the size fast enough, or at least a conservative
-	// uppper bound that usually ***REMOVED***res. (Maybe if w.h and
+	// uppper bound that usually fires. (Maybe if w.h and
 	// w.trailers are nil, so we don't need to enumerate it.)
 	// Otherwise I'm afraid that just calculating the length to
-	// answer this question would be slower than the ~2µs bene***REMOVED***t.
+	// answer this question would be slower than the ~2µs benefit.
 	return false
 }
 
@@ -234,15 +234,15 @@ func (w *writeResHeaders) writeFrame(ctx writeContext) error {
 	return splitHeaderBlock(ctx, headerBlock, w.writeHeaderBlock)
 }
 
-func (w *writeResHeaders) writeHeaderBlock(ctx writeContext, frag []byte, ***REMOVED***rstFrag, lastFrag bool) error {
-	if ***REMOVED***rstFrag {
+func (w *writeResHeaders) writeHeaderBlock(ctx writeContext, frag []byte, firstFrag, lastFrag bool) error {
+	if firstFrag {
 		return ctx.Framer().WriteHeaders(HeadersFrameParam{
 			StreamID:      w.streamID,
 			BlockFragment: frag,
 			EndStream:     w.endStream,
 			EndHeaders:    lastFrag,
 		})
-	} ***REMOVED*** {
+	} else {
 		return ctx.Framer().WriteContinuation(w.streamID, lastFrag, frag)
 	}
 }
@@ -283,15 +283,15 @@ func (w *writePushPromise) writeFrame(ctx writeContext) error {
 	return splitHeaderBlock(ctx, headerBlock, w.writeHeaderBlock)
 }
 
-func (w *writePushPromise) writeHeaderBlock(ctx writeContext, frag []byte, ***REMOVED***rstFrag, lastFrag bool) error {
-	if ***REMOVED***rstFrag {
+func (w *writePushPromise) writeHeaderBlock(ctx writeContext, frag []byte, firstFrag, lastFrag bool) error {
+	if firstFrag {
 		return ctx.Framer().WritePushPromise(PushPromiseParam{
 			StreamID:      w.streamID,
 			PromiseID:     w.promisedID,
 			BlockFragment: frag,
 			EndHeaders:    lastFrag,
 		})
-	} ***REMOVED*** {
+	} else {
 		return ctx.Framer().WriteContinuation(w.streamID, lastFrag, frag)
 	}
 }
@@ -355,7 +355,7 @@ func encodeHeaders(enc *hpack.Encoder, h http.Header, keys []string) {
 				// For now just omit it.
 				continue
 			}
-			// TODO: more of "8.1.2.2 Connection-Speci***REMOVED***c Header Fields"
+			// TODO: more of "8.1.2.2 Connection-Specific Header Fields"
 			if isTE && v != "trailers" {
 				continue
 			}

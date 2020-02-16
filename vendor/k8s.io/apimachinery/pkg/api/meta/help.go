@@ -2,7 +2,7 @@
 Copyright 2015 The Kubernetes Authors.
 
 Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this ***REMOVED***le except in compliance with the License.
+you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
 
     http://www.apache.org/licenses/LICENSE-2.0
@@ -10,7 +10,7 @@ You may obtain a copy of the License at
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the speci***REMOVED***c language governing permissions and
+See the License for the specific language governing permissions and
 limitations under the License.
 */
 
@@ -48,7 +48,7 @@ func GetItemsPtr(list runtime.Object) (interface{}, error) {
 
 	items := v.FieldByName("Items")
 	if !items.IsValid() {
-		return nil, fmt.Errorf("no Items ***REMOVED***eld in %#v", list)
+		return nil, fmt.Errorf("no Items field in %#v", list)
 	}
 	switch items.Kind() {
 	case reflect.Interface, reflect.Ptr:
@@ -194,9 +194,9 @@ func SetList(list runtime.Object, objects []runtime.Object) error {
 		}
 		if src.Type().AssignableTo(dest.Type()) {
 			dest.Set(src)
-		} ***REMOVED*** if src.Type().ConvertibleTo(dest.Type()) {
+		} else if src.Type().ConvertibleTo(dest.Type()) {
 			dest.Set(src.Convert(dest.Type()))
-		} ***REMOVED*** {
+		} else {
 			return fmt.Errorf("item[%d]: can't assign or convert %v into %v", i, src.Type(), dest.Type())
 		}
 	}

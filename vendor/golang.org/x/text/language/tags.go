@@ -1,13 +1,13 @@
 // Copyright 2013 The Go Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE ***REMOVED***le.
+// license that can be found in the LICENSE file.
 
 package language
 
 // TODO: Various sets of commonly use tags and regions.
 
 // MustParse is like Parse, but panics if the given BCP 47 tag cannot be parsed.
-// It simpli***REMOVED***es safe initialization of Tag values.
+// It simplifies safe initialization of Tag values.
 func MustParse(s string) Tag {
 	t, err := Parse(s)
 	if err != nil {
@@ -17,7 +17,7 @@ func MustParse(s string) Tag {
 }
 
 // MustParse is like Parse, but panics if the given BCP 47 tag cannot be parsed.
-// It simpli***REMOVED***es safe initialization of Tag values.
+// It simplifies safe initialization of Tag values.
 func (c CanonType) MustParse(s string) Tag {
 	t, err := c.Parse(s)
 	if err != nil {
@@ -27,7 +27,7 @@ func (c CanonType) MustParse(s string) Tag {
 }
 
 // MustParseBase is like ParseBase, but panics if the given base cannot be parsed.
-// It simpli***REMOVED***es safe initialization of Base values.
+// It simplifies safe initialization of Base values.
 func MustParseBase(s string) Base {
 	b, err := ParseBase(s)
 	if err != nil {
@@ -37,7 +37,7 @@ func MustParseBase(s string) Base {
 }
 
 // MustParseScript is like ParseScript, but panics if the given script cannot be
-// parsed. It simpli***REMOVED***es safe initialization of Script values.
+// parsed. It simplifies safe initialization of Script values.
 func MustParseScript(s string) Script {
 	scr, err := ParseScript(s)
 	if err != nil {
@@ -47,7 +47,7 @@ func MustParseScript(s string) Script {
 }
 
 // MustParseRegion is like ParseRegion, but panics if the given region cannot be
-// parsed. It simpli***REMOVED***es safe initialization of Region values.
+// parsed. It simplifies safe initialization of Region values.
 func MustParseRegion(s string) Region {
 	r, err := ParseRegion(s)
 	if err != nil {
@@ -81,8 +81,8 @@ var (
 	LatinAmericanSpanish Tag = Tag{lang: _es, region: _419}  //  es-419
 	Estonian             Tag = Tag{lang: _et}                //  et
 	Persian              Tag = Tag{lang: _fa}                //  fa
-	Finnish              Tag = Tag{lang: _***REMOVED***}                //  ***REMOVED***
-	Filipino             Tag = Tag{lang: _***REMOVED***l}               //  ***REMOVED***l
+	Finnish              Tag = Tag{lang: _fi}                //  fi
+	Filipino             Tag = Tag{lang: _fil}               //  fil
 	French               Tag = Tag{lang: _fr}                //  fr
 	CanadianFrench       Tag = Tag{lang: _fr, region: _CA}   //  fr-CA
 	Gujarati             Tag = Tag{lang: _gu}                //  gu
@@ -137,7 +137,7 @@ var (
 	Uzbek                Tag = Tag{lang: _uz}                //  uz
 	Vietnamese           Tag = Tag{lang: _vi}                //  vi
 	Chinese              Tag = Tag{lang: _zh}                //  zh
-	Simpli***REMOVED***edChinese    Tag = Tag{lang: _zh, script: _Hans} //  zh-Hans
+	SimplifiedChinese    Tag = Tag{lang: _zh, script: _Hans} //  zh-Hans
 	TraditionalChinese   Tag = Tag{lang: _zh, script: _Hant} //  zh-Hant
 	Zulu                 Tag = Tag{lang: _zu}                //  zu
 )

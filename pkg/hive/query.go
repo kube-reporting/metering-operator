@@ -146,7 +146,7 @@ func generateSortedByColumnListSQL(columns []SortColumn) string {
 		if col.Decending != nil {
 			if *col.Decending {
 				val += " DESC"
-			} ***REMOVED*** {
+			} else {
 				val += " ASC"
 			}
 		}

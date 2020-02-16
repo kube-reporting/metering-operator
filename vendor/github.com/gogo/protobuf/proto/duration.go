@@ -4,7 +4,7 @@
 // https://github.com/golang/protobuf
 //
 // Redistribution and use in source and binary forms, with or without
-// modi***REMOVED***cation, are permitted provided that the following conditions are
+// modification, are permitted provided that the following conditions are
 // met:
 //
 //     * Redistributions of source code must retain the above copyright
@@ -15,7 +15,7 @@
 // distribution.
 //     * Neither the name of Google Inc. nor the names of its
 // contributors may be used to endorse or promote products derived from
-// this software without speci***REMOVED***c prior written permission.
+// this software without specific prior written permission.
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
 // "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
@@ -31,7 +31,7 @@
 
 package proto
 
-// This ***REMOVED***le implements conversions between google.protobuf.Duration
+// This file implements conversions between google.protobuf.Duration
 // and time.Duration.
 
 import (
@@ -41,15 +41,15 @@ import (
 )
 
 const (
-	// Range of a Duration in seconds, as speci***REMOVED***ed in
+	// Range of a Duration in seconds, as specified in
 	// google/protobuf/duration.proto. This is about 10,000 years in seconds.
 	maxSeconds = int64(10000 * 365.25 * 24 * 60 * 60)
 	minSeconds = -maxSeconds
 )
 
 // validateDuration determines whether the Duration is valid according to the
-// de***REMOVED***nition in google/protobuf/duration.proto. A valid Duration
-// may still be too large to ***REMOVED***t into a time.Duration (the range of Duration
+// definition in google/protobuf/duration.proto. A valid Duration
+// may still be too large to fit into a time.Duration (the range of Duration
 // is about 10,000 years, and the range of time.Duration is about 290).
 func validateDuration(d *duration) error {
 	if d == nil {

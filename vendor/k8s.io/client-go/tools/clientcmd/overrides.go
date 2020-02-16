@@ -2,7 +2,7 @@
 Copyright 2014 The Kubernetes Authors.
 
 Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this ***REMOVED***le except in compliance with the License.
+you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
 
     http://www.apache.org/licenses/LICENSE-2.0
@@ -10,7 +10,7 @@ You may obtain a copy of the License at
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the speci***REMOVED***c language governing permissions and
+See the License for the specific language governing permissions and
 limitations under the License.
 */
 
@@ -25,11 +25,11 @@ import (
 	clientcmdapi "k8s.io/client-go/tools/clientcmd/api"
 )
 
-// Con***REMOVED***gOverrides holds values that should override whatever information is pulled from the actual Con***REMOVED***g object.  You can't
-// simply use an actual Con***REMOVED***g object, because Con***REMOVED***gs hold maps, but overrides are restricted to "at most one"
-type Con***REMOVED***gOverrides struct {
+// ConfigOverrides holds values that should override whatever information is pulled from the actual Config object.  You can't
+// simply use an actual Config object, because Configs hold maps, but overrides are restricted to "at most one"
+type ConfigOverrides struct {
 	AuthInfo clientcmdapi.AuthInfo
-	// ClusterDefaults are applied before the con***REMOVED***gured cluster info is loaded.
+	// ClusterDefaults are applied before the configured cluster info is loaded.
 	ClusterDefaults clientcmdapi.Cluster
 	ClusterInfo     clientcmdapi.Cluster
 	Context         clientcmdapi.Context
@@ -37,9 +37,9 @@ type Con***REMOVED***gOverrides struct {
 	Timeout         string
 }
 
-// Con***REMOVED***gOverrideFlags holds the flag names to be used for binding command line flags. Notice that this structure tightly
-// corresponds to Con***REMOVED***gOverrides
-type Con***REMOVED***gOverrideFlags struct {
+// ConfigOverrideFlags holds the flag names to be used for binding command line flags. Notice that this structure tightly
+// corresponds to ConfigOverrides
+type ConfigOverrideFlags struct {
 	AuthOverrideFlags    AuthOverrideFlags
 	ClusterOverrideFlags ClusterOverrideFlags
 	ContextOverrideFlags ContextOverrideFlags
@@ -49,7 +49,7 @@ type Con***REMOVED***gOverrideFlags struct {
 
 // AuthOverrideFlags holds the flag names to be used for binding command line flags for AuthInfo objects
 type AuthOverrideFlags struct {
-	ClientCerti***REMOVED***cate FlagInfo
+	ClientCertificate FlagInfo
 	ClientKey         FlagInfo
 	Token             FlagInfo
 	Impersonate       FlagInfo
@@ -69,7 +69,7 @@ type ContextOverrideFlags struct {
 type ClusterOverrideFlags struct {
 	APIServer             FlagInfo
 	APIVersion            FlagInfo
-	Certi***REMOVED***cateAuthority  FlagInfo
+	CertificateAuthority  FlagInfo
 	InsecureSkipTLSVerify FlagInfo
 }
 
@@ -89,7 +89,7 @@ type FlagInfo struct {
 
 // AddSecretAnnotation add secret flag to Annotation.
 func (f FlagInfo) AddSecretAnnotation(flags *pflag.FlagSet) FlagInfo {
-	flags.SetAnnotation(f.LongName, "classi***REMOVED***ed", []string{"true"})
+	flags.SetAnnotation(f.LongName, "classified", []string{"true"})
 	return f
 }
 
@@ -146,9 +146,9 @@ const (
 	FlagNamespace        = "namespace"
 	FlagAPIServer        = "server"
 	FlagInsecure         = "insecure-skip-tls-verify"
-	FlagCertFile         = "client-certi***REMOVED***cate"
+	FlagCertFile         = "client-certificate"
 	FlagKeyFile          = "client-key"
-	FlagCAFile           = "certi***REMOVED***cate-authority"
+	FlagCAFile           = "certificate-authority"
 	FlagEmbedCerts       = "embed-certs"
 	FlagBearerToken      = "token"
 	FlagImpersonate      = "as"
@@ -158,51 +158,51 @@ const (
 	FlagTimeout          = "request-timeout"
 )
 
-// RecommendedCon***REMOVED***gOverrideFlags is a convenience method to return recommended flag names pre***REMOVED***xed with a string of your choosing
-func RecommendedCon***REMOVED***gOverrideFlags(pre***REMOVED***x string) Con***REMOVED***gOverrideFlags {
-	return Con***REMOVED***gOverrideFlags{
-		AuthOverrideFlags:    RecommendedAuthOverrideFlags(pre***REMOVED***x),
-		ClusterOverrideFlags: RecommendedClusterOverrideFlags(pre***REMOVED***x),
-		ContextOverrideFlags: RecommendedContextOverrideFlags(pre***REMOVED***x),
+// RecommendedConfigOverrideFlags is a convenience method to return recommended flag names prefixed with a string of your choosing
+func RecommendedConfigOverrideFlags(prefix string) ConfigOverrideFlags {
+	return ConfigOverrideFlags{
+		AuthOverrideFlags:    RecommendedAuthOverrideFlags(prefix),
+		ClusterOverrideFlags: RecommendedClusterOverrideFlags(prefix),
+		ContextOverrideFlags: RecommendedContextOverrideFlags(prefix),
 
-		CurrentContext: FlagInfo{pre***REMOVED***x + FlagContext, "", "", "The name of the kubecon***REMOVED***g context to use"},
-		Timeout:        FlagInfo{pre***REMOVED***x + FlagTimeout, "", "0", "The length of time to wait before giving up on a single server request. Non-zero values should contain a corresponding time unit (e.g. 1s, 2m, 3h). A value of zero means don't timeout requests."},
+		CurrentContext: FlagInfo{prefix + FlagContext, "", "", "The name of the kubeconfig context to use"},
+		Timeout:        FlagInfo{prefix + FlagTimeout, "", "0", "The length of time to wait before giving up on a single server request. Non-zero values should contain a corresponding time unit (e.g. 1s, 2m, 3h). A value of zero means don't timeout requests."},
 	}
 }
 
-// RecommendedAuthOverrideFlags is a convenience method to return recommended flag names pre***REMOVED***xed with a string of your choosing
-func RecommendedAuthOverrideFlags(pre***REMOVED***x string) AuthOverrideFlags {
+// RecommendedAuthOverrideFlags is a convenience method to return recommended flag names prefixed with a string of your choosing
+func RecommendedAuthOverrideFlags(prefix string) AuthOverrideFlags {
 	return AuthOverrideFlags{
-		ClientCerti***REMOVED***cate: FlagInfo{pre***REMOVED***x + FlagCertFile, "", "", "Path to a client certi***REMOVED***cate ***REMOVED***le for TLS"},
-		ClientKey:         FlagInfo{pre***REMOVED***x + FlagKeyFile, "", "", "Path to a client key ***REMOVED***le for TLS"},
-		Token:             FlagInfo{pre***REMOVED***x + FlagBearerToken, "", "", "Bearer token for authentication to the API server"},
-		Impersonate:       FlagInfo{pre***REMOVED***x + FlagImpersonate, "", "", "Username to impersonate for the operation"},
-		ImpersonateGroups: FlagInfo{pre***REMOVED***x + FlagImpersonateGroup, "", "", "Group to impersonate for the operation, this flag can be repeated to specify multiple groups."},
-		Username:          FlagInfo{pre***REMOVED***x + FlagUsername, "", "", "Username for basic authentication to the API server"},
-		Password:          FlagInfo{pre***REMOVED***x + FlagPassword, "", "", "Password for basic authentication to the API server"},
+		ClientCertificate: FlagInfo{prefix + FlagCertFile, "", "", "Path to a client certificate file for TLS"},
+		ClientKey:         FlagInfo{prefix + FlagKeyFile, "", "", "Path to a client key file for TLS"},
+		Token:             FlagInfo{prefix + FlagBearerToken, "", "", "Bearer token for authentication to the API server"},
+		Impersonate:       FlagInfo{prefix + FlagImpersonate, "", "", "Username to impersonate for the operation"},
+		ImpersonateGroups: FlagInfo{prefix + FlagImpersonateGroup, "", "", "Group to impersonate for the operation, this flag can be repeated to specify multiple groups."},
+		Username:          FlagInfo{prefix + FlagUsername, "", "", "Username for basic authentication to the API server"},
+		Password:          FlagInfo{prefix + FlagPassword, "", "", "Password for basic authentication to the API server"},
 	}
 }
 
-// RecommendedClusterOverrideFlags is a convenience method to return recommended flag names pre***REMOVED***xed with a string of your choosing
-func RecommendedClusterOverrideFlags(pre***REMOVED***x string) ClusterOverrideFlags {
+// RecommendedClusterOverrideFlags is a convenience method to return recommended flag names prefixed with a string of your choosing
+func RecommendedClusterOverrideFlags(prefix string) ClusterOverrideFlags {
 	return ClusterOverrideFlags{
-		APIServer:             FlagInfo{pre***REMOVED***x + FlagAPIServer, "", "", "The address and port of the Kubernetes API server"},
-		Certi***REMOVED***cateAuthority:  FlagInfo{pre***REMOVED***x + FlagCAFile, "", "", "Path to a cert ***REMOVED***le for the certi***REMOVED***cate authority"},
-		InsecureSkipTLSVerify: FlagInfo{pre***REMOVED***x + FlagInsecure, "", "false", "If true, the server's certi***REMOVED***cate will not be checked for validity. This will make your HTTPS connections insecure"},
+		APIServer:             FlagInfo{prefix + FlagAPIServer, "", "", "The address and port of the Kubernetes API server"},
+		CertificateAuthority:  FlagInfo{prefix + FlagCAFile, "", "", "Path to a cert file for the certificate authority"},
+		InsecureSkipTLSVerify: FlagInfo{prefix + FlagInsecure, "", "false", "If true, the server's certificate will not be checked for validity. This will make your HTTPS connections insecure"},
 	}
 }
 
-// RecommendedContextOverrideFlags is a convenience method to return recommended flag names pre***REMOVED***xed with a string of your choosing
-func RecommendedContextOverrideFlags(pre***REMOVED***x string) ContextOverrideFlags {
+// RecommendedContextOverrideFlags is a convenience method to return recommended flag names prefixed with a string of your choosing
+func RecommendedContextOverrideFlags(prefix string) ContextOverrideFlags {
 	return ContextOverrideFlags{
-		ClusterName:  FlagInfo{pre***REMOVED***x + FlagClusterName, "", "", "The name of the kubecon***REMOVED***g cluster to use"},
-		AuthInfoName: FlagInfo{pre***REMOVED***x + FlagAuthInfoName, "", "", "The name of the kubecon***REMOVED***g user to use"},
-		Namespace:    FlagInfo{pre***REMOVED***x + FlagNamespace, "n", "", "If present, the namespace scope for this CLI request"},
+		ClusterName:  FlagInfo{prefix + FlagClusterName, "", "", "The name of the kubeconfig cluster to use"},
+		AuthInfoName: FlagInfo{prefix + FlagAuthInfoName, "", "", "The name of the kubeconfig user to use"},
+		Namespace:    FlagInfo{prefix + FlagNamespace, "n", "", "If present, the namespace scope for this CLI request"},
 	}
 }
 
-// BindOverrideFlags is a convenience method to bind the speci***REMOVED***ed flags to their associated variables
-func BindOverrideFlags(overrides *Con***REMOVED***gOverrides, flags *pflag.FlagSet, flagNames Con***REMOVED***gOverrideFlags) {
+// BindOverrideFlags is a convenience method to bind the specified flags to their associated variables
+func BindOverrideFlags(overrides *ConfigOverrides, flags *pflag.FlagSet, flagNames ConfigOverrideFlags) {
 	BindAuthInfoFlags(&overrides.AuthInfo, flags, flagNames.AuthOverrideFlags)
 	BindClusterFlags(&overrides.ClusterInfo, flags, flagNames.ClusterOverrideFlags)
 	BindContextFlags(&overrides.Context, flags, flagNames.ContextOverrideFlags)
@@ -210,9 +210,9 @@ func BindOverrideFlags(overrides *Con***REMOVED***gOverrides, flags *pflag.FlagS
 	flagNames.Timeout.BindStringFlag(flags, &overrides.Timeout)
 }
 
-// BindAuthInfoFlags is a convenience method to bind the speci***REMOVED***ed flags to their associated variables
+// BindAuthInfoFlags is a convenience method to bind the specified flags to their associated variables
 func BindAuthInfoFlags(authInfo *clientcmdapi.AuthInfo, flags *pflag.FlagSet, flagNames AuthOverrideFlags) {
-	flagNames.ClientCerti***REMOVED***cate.BindStringFlag(flags, &authInfo.ClientCerti***REMOVED***cate).AddSecretAnnotation(flags)
+	flagNames.ClientCertificate.BindStringFlag(flags, &authInfo.ClientCertificate).AddSecretAnnotation(flags)
 	flagNames.ClientKey.BindStringFlag(flags, &authInfo.ClientKey).AddSecretAnnotation(flags)
 	flagNames.Token.BindStringFlag(flags, &authInfo.Token).AddSecretAnnotation(flags)
 	flagNames.Impersonate.BindStringFlag(flags, &authInfo.Impersonate).AddSecretAnnotation(flags)
@@ -221,25 +221,25 @@ func BindAuthInfoFlags(authInfo *clientcmdapi.AuthInfo, flags *pflag.FlagSet, fl
 	flagNames.Password.BindStringFlag(flags, &authInfo.Password).AddSecretAnnotation(flags)
 }
 
-// BindClusterFlags is a convenience method to bind the speci***REMOVED***ed flags to their associated variables
+// BindClusterFlags is a convenience method to bind the specified flags to their associated variables
 func BindClusterFlags(clusterInfo *clientcmdapi.Cluster, flags *pflag.FlagSet, flagNames ClusterOverrideFlags) {
 	flagNames.APIServer.BindStringFlag(flags, &clusterInfo.Server)
-	flagNames.Certi***REMOVED***cateAuthority.BindStringFlag(flags, &clusterInfo.Certi***REMOVED***cateAuthority)
+	flagNames.CertificateAuthority.BindStringFlag(flags, &clusterInfo.CertificateAuthority)
 	flagNames.InsecureSkipTLSVerify.BindBoolFlag(flags, &clusterInfo.InsecureSkipTLSVerify)
 }
 
-// BindFlags is a convenience method to bind the speci***REMOVED***ed flags to their associated variables
+// BindFlags is a convenience method to bind the specified flags to their associated variables
 func BindContextFlags(contextInfo *clientcmdapi.Context, flags *pflag.FlagSet, flagNames ContextOverrideFlags) {
 	flagNames.ClusterName.BindStringFlag(flags, &contextInfo.Cluster)
 	flagNames.AuthInfoName.BindStringFlag(flags, &contextInfo.AuthInfo)
-	flagNames.Namespace.BindTransformingStringFlag(flags, &contextInfo.Namespace, RemoveNamespacesPre***REMOVED***x)
+	flagNames.Namespace.BindTransformingStringFlag(flags, &contextInfo.Namespace, RemoveNamespacesPrefix)
 }
 
-// RemoveNamespacesPre***REMOVED***x is a transformer that strips "ns/", "namespace/" and "namespaces/" pre***REMOVED***xes case-insensitively
-func RemoveNamespacesPre***REMOVED***x(value string) (string, error) {
-	for _, pre***REMOVED***x := range []string{"namespaces/", "namespace/", "ns/"} {
-		if len(value) > len(pre***REMOVED***x) && strings.EqualFold(value[0:len(pre***REMOVED***x)], pre***REMOVED***x) {
-			value = value[len(pre***REMOVED***x):]
+// RemoveNamespacesPrefix is a transformer that strips "ns/", "namespace/" and "namespaces/" prefixes case-insensitively
+func RemoveNamespacesPrefix(value string) (string, error) {
+	for _, prefix := range []string{"namespaces/", "namespace/", "ns/"} {
+		if len(value) > len(prefix) && strings.EqualFold(value[0:len(prefix)], prefix) {
+			value = value[len(prefix):]
 			break
 		}
 	}

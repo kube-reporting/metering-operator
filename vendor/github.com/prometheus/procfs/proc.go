@@ -1,6 +1,6 @@
 // Copyright 2018 The Prometheus Authors
 // Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this ***REMOVED***le except in compliance with the License.
+// you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 //
 // http://www.apache.org/licenses/LICENSE-2.0
@@ -8,7 +8,7 @@
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the speci***REMOVED***c language governing permissions and
+// See the License for the specific language governing permissions and
 // limitations under the License.
 
 package procfs
@@ -156,9 +156,9 @@ func (p Proc) Executable() (string, error) {
 	return exe, err
 }
 
-// FileDescriptors returns the currently open ***REMOVED***le descriptors of a process.
+// FileDescriptors returns the currently open file descriptors of a process.
 func (p Proc) FileDescriptors() ([]uintptr, error) {
-	names, err := p.***REMOVED***leDescriptors()
+	names, err := p.fileDescriptors()
 	if err != nil {
 		return nil, err
 	}
@@ -175,10 +175,10 @@ func (p Proc) FileDescriptors() ([]uintptr, error) {
 	return fds, nil
 }
 
-// FileDescriptorTargets returns the targets of all ***REMOVED***le descriptors of a process.
-// If a ***REMOVED***le descriptor is not a symlink to a ***REMOVED***le (like a socket), that value will be the empty string.
+// FileDescriptorTargets returns the targets of all file descriptors of a process.
+// If a file descriptor is not a symlink to a file (like a socket), that value will be the empty string.
 func (p Proc) FileDescriptorTargets() ([]string, error) {
-	names, err := p.***REMOVED***leDescriptors()
+	names, err := p.fileDescriptors()
 	if err != nil {
 		return nil, err
 	}
@@ -195,10 +195,10 @@ func (p Proc) FileDescriptorTargets() ([]string, error) {
 	return targets, nil
 }
 
-// FileDescriptorsLen returns the number of currently open ***REMOVED***le descriptors of
+// FileDescriptorsLen returns the number of currently open file descriptors of
 // a process.
 func (p Proc) FileDescriptorsLen() (int, error) {
-	fds, err := p.***REMOVED***leDescriptors()
+	fds, err := p.fileDescriptors()
 	if err != nil {
 		return 0, err
 	}
@@ -206,7 +206,7 @@ func (p Proc) FileDescriptorsLen() (int, error) {
 	return len(fds), nil
 }
 
-// MountStats retrieves statistics and con***REMOVED***guration for mount points in a
+// MountStats retrieves statistics and configuration for mount points in a
 // process's namespace.
 func (p Proc) MountStats() ([]*Mount, error) {
 	f, err := os.Open(p.path("mountstats"))
@@ -218,7 +218,7 @@ func (p Proc) MountStats() ([]*Mount, error) {
 	return parseMountStats(f)
 }
 
-func (p Proc) ***REMOVED***leDescriptors() ([]string, error) {
+func (p Proc) fileDescriptors() ([]string, error) {
 	d, err := os.Open(p.path("fd"))
 	if err != nil {
 		return nil, err

@@ -2,7 +2,7 @@
 Copyright 2018 The Kubernetes Authors.
 
 Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this ***REMOVED***le except in compliance with the License.
+you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
 
     http://www.apache.org/licenses/LICENSE-2.0
@@ -10,7 +10,7 @@ You may obtain a copy of the License at
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the speci***REMOVED***c language governing permissions and
+See the License for the specific language governing permissions and
 limitations under the License.
 */
 
@@ -62,7 +62,7 @@ func parseKubeVersion(v string) (majorVersion int, vType versionType, minorVersi
 
 // CompareKubeAwareVersionStrings compares two kube-like version strings.
 // Kube-like version strings are starting with a v, followed by a major version, optional "alpha" or "beta" strings
-// followed by a minor version (e.g. v1, v2beta1). Versions will be sorted based on GA/alpha/beta ***REMOVED***rst and then major
+// followed by a minor version (e.g. v1, v2beta1). Versions will be sorted based on GA/alpha/beta first and then major
 // and minor versions. e.g. v2, v1, v1beta2, v1beta1, v1alpha1.
 func CompareKubeAwareVersionStrings(v1, v2 string) int {
 	if v1 == v2 {

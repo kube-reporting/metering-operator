@@ -1,13 +1,13 @@
 package deployframework
 
 import (
-	"bu***REMOVED***o"
+	"bufio"
 	"fmt"
 	"net/http"
 	"net/url"
 	"os"
 	"os/exec"
-	"path/***REMOVED***lepath"
+	"path/filepath"
 	"strings"
 	"time"
 
@@ -45,7 +45,7 @@ func createResourceDirs(namespace, path string) ([]string, error) {
 	testDirsMap := map[string]string{
 		logDir:              "LOG_DIR",
 		reportsDir:          "REPORTS_DIR",
-		meteringcon***REMOVED***gDir:   "METERINGCONFIGS_DIR",
+		meteringconfigDir:   "METERINGCONFIGS_DIR",
 		datasourcesDir:      "DATASOURCES_DIR",
 		reportqueriesDir:    "REPORTQUERIES_DIR",
 		hivetablesDir:       "HIVETABLES_DIR",
@@ -54,7 +54,7 @@ func createResourceDirs(namespace, path string) ([]string, error) {
 	}
 
 	for dirname, env := range testDirsMap {
-		dirPath := ***REMOVED***lepath.Join(path, dirname)
+		dirPath := filepath.Join(path, dirname)
 
 		err := os.MkdirAll(dirPath, 0777)
 		if err != nil {
@@ -80,7 +80,7 @@ func logPollingSummary(logger logrus.FieldLogger, targetPods int, readyPods []st
 	}
 }
 
-func validateImageCon***REMOVED***g(image metering.ImageCon***REMOVED***g) error {
+func validateImageConfig(image metering.ImageConfig) error {
 	var errArr []string
 
 	if image.Repository == "" {
@@ -152,7 +152,7 @@ func (pw *PodWaiter) WaitForPods(namespace string, targetPodsCount int) error {
 }
 
 // GetServiceAccountToken queries the namespace for the service account and attempts
-// to ***REMOVED***nd the secret that contains the serviceAccount token and return it.
+// to find the secret that contains the serviceAccount token and return it.
 func GetServiceAccountToken(client kubernetes.Interface, initialDelay, timeoutPeriod time.Duration, namespace, serviceAccountName string) (string, error) {
 	var (
 		sa  *v1.ServiceAccount
@@ -239,7 +239,7 @@ func runCleanupScript(logger logrus.FieldLogger, namespace, outputPath, scriptPa
 	}
 
 	go func() {
-		scanner := bu***REMOVED***o.NewScanner(cleanupStdout)
+		scanner := bufio.NewScanner(cleanupStdout)
 		for scanner.Scan() {
 			line := scanner.Text()
 			logger.Infof(line)
@@ -277,8 +277,8 @@ func cleanupLocalCmds(logger logrus.FieldLogger, commands ...exec.Cmd) error {
 		if err != nil {
 			_, ok := err.(*exec.ExitError)
 			if !ok {
-				logger.Infof("There was an error while waiting for the %s command to ***REMOVED***nish running: %v", cmd.Path, err)
-				errArr = append(errArr, fmt.Sprintf("failed to wait for the %s command to ***REMOVED***nish running: %v", cmd.Path, err))
+				logger.Infof("There was an error while waiting for the %s command to finish running: %v", cmd.Path, err)
+				errArr = append(errArr, fmt.Sprintf("failed to wait for the %s command to finish running: %v", cmd.Path, err))
 			}
 		}
 	}

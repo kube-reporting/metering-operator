@@ -31,8 +31,8 @@ func contentMD5(r *request.Request) {
 	h := md5.New()
 
 	if !aws.IsReaderSeekable(r.Body) {
-		if r.Con***REMOVED***g.Logger != nil {
-			r.Con***REMOVED***g.Logger.Log(fmt.Sprintf(
+		if r.Config.Logger != nil {
+			r.Config.Logger.Log(fmt.Sprintf(
 				"Unable to compute Content-MD5 for unseekable body, S3.%s",
 				r.Operation.Name))
 		}
@@ -53,7 +53,7 @@ func contentMD5(r *request.Request) {
 // request. If the body is not seekable or S3DisableContentMD5Validation set
 // this handler will be ignored.
 func computeBodyHashes(r *request.Request) {
-	if aws.BoolValue(r.Con***REMOVED***g.S3DisableContentMD5Validation) {
+	if aws.BoolValue(r.Config.S3DisableContentMD5Validation) {
 		return
 	}
 	if r.IsPresigned() {
@@ -125,7 +125,7 @@ func copySeekableBody(dst io.Writer, src io.ReadSeeker) (int64, error) {
 		return 0, err
 	}
 
-	// hash the body.  seek back to the ***REMOVED***rst position after reading to reset
+	// hash the body.  seek back to the first position after reading to reset
 	// the body for transmission.  copy errors may be assumed to be from the
 	// body.
 	n, err := io.Copy(dst, src)
@@ -147,7 +147,7 @@ func copySeekableBody(dst io.Writer, src io.ReadSeeker) (int64, error) {
 // Will not ask for append MD5 if disabled, the request is presigned or,
 // or the API operation does not support content MD5 validation.
 func askForTxEncodingAppendMD5(r *request.Request) {
-	if aws.BoolValue(r.Con***REMOVED***g.S3DisableContentMD5Validation) {
+	if aws.BoolValue(r.Config.S3DisableContentMD5Validation) {
 		return
 	}
 	if r.IsPresigned() {

@@ -1,7 +1,7 @@
 # Guide: Roll-Up Reports
 
 Often, it makes sense to report on data collected in other reports, called roll-up reports.
-Roll-up reports can combine datatypes (memory *and* CPU usage per namespace) and can combine smaller periods of time into larger ones — for instance, in an environment where a large amount of data is collected, splitting up processing over a month instead of waiting for the end of the month can be an effective way to spread out compute time and get a quicker ***REMOVED***nal report.
+Roll-up reports can combine datatypes (memory *and* CPU usage per namespace) and can combine smaller periods of time into larger ones — for instance, in an environment where a large amount of data is collected, splitting up processing over a month instead of waiting for the end of the month can be an effective way to spread out compute time and get a quicker final report.
 
 In the following guide, we will create a daily report that aggregates hourly reports.
 
@@ -69,7 +69,7 @@ spec:
     WHERE period_start  >= timestamp '{| default .Report.ReportingStart .Report.Inputs.ReportingStart | prestoTimestamp |}'
     AND period_end <= timestamp '{| default .Report.ReportingEnd .Report.Inputs.ReportingEnd | prestoTimestamp |}'
     GROUP BY namespace
-    {|- ***REMOVED*** |}
+    {|- else |}
       namespace,
       sum(pod_usage_cpu_core_seconds) as pod_usage_cpu_core_seconds
     FROM {| dataSourceTableName .Report.Inputs.PodCpuUsageRawDataSourceName |}

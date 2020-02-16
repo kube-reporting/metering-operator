@@ -1,6 +1,6 @@
 // Copyright 2016 Google Inc.  All rights reserved.
 // Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE ***REMOVED***le.
+// license that can be found in the LICENSE file.
 
 package uuid
 
@@ -71,7 +71,7 @@ func getTime() (Time, uint16, error) {
 //
 // The uuid package does not use global static storage for the clock sequence or
 // the last time a UUID was generated.  Unless SetClockSequence is used, a new
-// random clock sequence is generated the ***REMOVED***rst time a clock sequence is
+// random clock sequence is generated the first time a clock sequence is
 // requested by ClockSequence, GetTime, or NewUUID.  (section 4.2.1.1)
 func ClockSequence() int {
 	defer timeMu.Unlock()
@@ -108,7 +108,7 @@ func setClockSequence(seq int) {
 }
 
 // Time returns the time in 100s of nanoseconds since 15 Oct 1582 encoded in
-// uuid.  The time is only de***REMOVED***ned for version 1 and 2 UUIDs.
+// uuid.  The time is only defined for version 1 and 2 UUIDs.
 func (uuid UUID) Time() Time {
 	time := int64(binary.BigEndian.Uint32(uuid[0:4]))
 	time |= int64(binary.BigEndian.Uint16(uuid[4:6])) << 32
@@ -117,7 +117,7 @@ func (uuid UUID) Time() Time {
 }
 
 // ClockSequence returns the clock sequence encoded in uuid.
-// The clock sequence is only well de***REMOVED***ned for version 1 and 2 UUIDs.
+// The clock sequence is only well defined for version 1 and 2 UUIDs.
 func (uuid UUID) ClockSequence() int {
 	return int(binary.BigEndian.Uint16(uuid[8:10])) & 0x3fff
 }

@@ -40,7 +40,7 @@ func NewConstraint(c string) (*Constraints, error) {
 	return o, nil
 }
 
-// Check tests if a version satis***REMOVED***es the constraints.
+// Check tests if a version satisfies the constraints.
 func (cs Constraints) Check(v *Version) bool {
 	// loop over the ORs and check the inner ANDs
 	for _, o := range cs.constraints {
@@ -60,7 +60,7 @@ func (cs Constraints) Check(v *Version) bool {
 	return false
 }
 
-// Validate checks if a version satis***REMOVED***es a constraint. If not a slice of
+// Validate checks if a version satisfies a constraint. If not a slice of
 // reasons for the failure are returned in addition to a bool.
 func (cs Constraints) Validate(v *Version) (bool, []error) {
 	// loop over the ORs and check the inner ANDs
@@ -175,11 +175,11 @@ func parseConstraint(c string) (*constraint, error) {
 	if isX(m[3]) {
 		ver = "0.0.0"
 		dirty = true
-	} ***REMOVED*** if isX(strings.TrimPre***REMOVED***x(m[4], ".")) || m[4] == "" {
+	} else if isX(strings.TrimPrefix(m[4], ".")) || m[4] == "" {
 		minorDirty = true
 		dirty = true
 		ver = fmt.Sprintf("%s.0.0%s", m[3], m[6])
-	} ***REMOVED*** if isX(strings.TrimPre***REMOVED***x(m[5], ".")) {
+	} else if isX(strings.TrimPrefix(m[5], ".")) {
 		dirty = true
 		patchDirty = true
 		ver = fmt.Sprintf("%s%s.0%s", m[3], m[4], m[6])
@@ -221,7 +221,7 @@ func constraintNotEqual(v *Version, c *constraint) bool {
 		}
 		if c.con.Minor() != v.Minor() && !c.minorDirty {
 			return true
-		} ***REMOVED*** if c.minorDirty {
+		} else if c.minorDirty {
 			return false
 		}
 
@@ -263,7 +263,7 @@ func constraintLessThan(v *Version, c *constraint) bool {
 
 	if v.Major() > c.con.Major() {
 		return false
-	} ***REMOVED*** if v.Minor() > c.con.Minor() && !c.minorDirty {
+	} else if v.Minor() > c.con.Minor() && !c.minorDirty {
 		return false
 	}
 
@@ -301,7 +301,7 @@ func constraintLessThanEqual(v *Version, c *constraint) bool {
 
 	if v.Major() > c.con.Major() {
 		return false
-	} ***REMOVED*** if v.Minor() > c.con.Minor() && !c.minorDirty {
+	} else if v.Minor() > c.con.Minor() && !c.minorDirty {
 		return false
 	}
 

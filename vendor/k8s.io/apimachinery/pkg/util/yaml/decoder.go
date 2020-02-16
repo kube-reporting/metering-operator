@@ -2,7 +2,7 @@
 Copyright 2014 The Kubernetes Authors.
 
 Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this ***REMOVED***le except in compliance with the License.
+you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
 
     http://www.apache.org/licenses/LICENSE-2.0
@@ -10,14 +10,14 @@ You may obtain a copy of the License at
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the speci***REMOVED***c language governing permissions and
+See the License for the specific language governing permissions and
 limitations under the License.
 */
 
 package yaml
 
 import (
-	"bu***REMOVED***o"
+	"bufio"
 	"bytes"
 	"encoding/json"
 	"fmt"
@@ -33,27 +33,27 @@ import (
 // ToJSON converts a single YAML document into a JSON document
 // or returns an error. If the document appears to be JSON the
 // YAML decoding path is not used (so that error messages are
-// JSON speci***REMOVED***c).
+// JSON specific).
 func ToJSON(data []byte) ([]byte, error) {
-	if hasJSONPre***REMOVED***x(data) {
+	if hasJSONPrefix(data) {
 		return data, nil
 	}
 	return yaml.YAMLToJSON(data)
 }
 
 // YAMLToJSONDecoder decodes YAML documents from an io.Reader by
-// separating individual documents. It ***REMOVED***rst converts the YAML
+// separating individual documents. It first converts the YAML
 // body to JSON, then unmarshals the JSON.
 type YAMLToJSONDecoder struct {
 	reader Reader
 }
 
 // NewYAMLToJSONDecoder decodes YAML documents from the provided
-// stream in chunks by converting each document (as de***REMOVED***ned by
+// stream in chunks by converting each document (as defined by
 // the YAML spec) into its own chunk, converting it to JSON via
 // yaml.YAMLToJSON, and then passing it to json.Decoder.
 func NewYAMLToJSONDecoder(r io.Reader) *YAMLToJSONDecoder {
-	reader := bu***REMOVED***o.NewReader(r)
+	reader := bufio.NewReader(r)
 	return &YAMLToJSONDecoder{
 		reader: NewYAMLReader(reader),
 	}
@@ -78,20 +78,20 @@ func (d *YAMLToJSONDecoder) Decode(into interface{}) error {
 }
 
 // YAMLDecoder reads chunks of objects and returns ErrShortBuffer if
-// the data is not suf***REMOVED***cient.
+// the data is not sufficient.
 type YAMLDecoder struct {
 	r         io.ReadCloser
-	scanner   *bu***REMOVED***o.Scanner
+	scanner   *bufio.Scanner
 	remaining []byte
 }
 
 // NewDocumentDecoder decodes YAML documents from the provided
-// stream in chunks by converting each document (as de***REMOVED***ned by
+// stream in chunks by converting each document (as defined by
 // the YAML spec) into its own chunk. io.ErrShortBuffer will be
 // returned if the entire buffer could not be read to assist
 // the caller in framing the chunk.
 func NewDocumentDecoder(r io.ReadCloser) io.ReadCloser {
-	scanner := bu***REMOVED***o.NewScanner(r)
+	scanner := bufio.NewScanner(r)
 	scanner.Split(splitYAMLDocument)
 	return &YAMLDecoder{
 		r:       r,
@@ -118,7 +118,7 @@ func (d *YAMLDecoder) Read(data []byte) (n int, err error) {
 		left = len(out)
 	}
 
-	// ***REMOVED***ts within data
+	// fits within data
 	if left <= len(data) {
 		copy(data, d.remaining)
 		d.remaining = nil
@@ -138,7 +138,7 @@ func (d *YAMLDecoder) Close() error {
 const yamlSeparator = "\n---"
 const separator = "---"
 
-// splitYAMLDocument is a bu***REMOVED***o.SplitFunc for splitting YAML streams into individual documents.
+// splitYAMLDocument is a bufio.SplitFunc for splitting YAML streams into individual documents.
 func splitYAMLDocument(data []byte, atEOF bool) (advance int, token []byte, err error) {
 	if atEOF && len(data) == 0 {
 		return 0, nil, nil
@@ -160,7 +160,7 @@ func splitYAMLDocument(data []byte, atEOF bool) (advance int, token []byte, err 
 		}
 		return 0, nil, nil
 	}
-	// If we're at EOF, we have a ***REMOVED***nal, non-terminated line. Return it.
+	// If we're at EOF, we have a final, non-terminated line. Return it.
 	if atEOF {
 		return len(data), data, nil
 	}
@@ -174,7 +174,7 @@ type decoder interface {
 }
 
 // YAMLOrJSONDecoder attempts to decode a stream of JSON documents or
-// YAML documents by snif***REMOVED***ng for a leading { character.
+// YAML documents by sniffing for a leading { character.
 type YAMLOrJSONDecoder struct {
 	r          io.Reader
 	bufferSize int
@@ -202,7 +202,7 @@ func (e YAMLSyntaxError) Error() string {
 
 // NewYAMLOrJSONDecoder returns a decoder that will process YAML documents
 // or JSON documents from the given reader as a stream. bufferSize determines
-// how far into the stream the decoder will look to ***REMOVED***gure out whether this
+// how far into the stream the decoder will look to figure out whether this
 // is a JSON stream (has whitespace followed by an open brace).
 func NewYAMLOrJSONDecoder(r io.Reader, bufferSize int) *YAMLOrJSONDecoder {
 	return &YAMLOrJSONDecoder{
@@ -220,7 +220,7 @@ func (d *YAMLOrJSONDecoder) Decode(into interface{}) error {
 			klog.V(4).Infof("decoding stream as JSON")
 			d.decoder = json.NewDecoder(buffer)
 			d.rawData = origData
-		} ***REMOVED*** {
+		} else {
 			klog.V(4).Infof("decoding stream as YAML")
 			d.decoder = NewYAMLToJSONDecoder(buffer)
 		}
@@ -259,7 +259,7 @@ type YAMLReader struct {
 	reader Reader
 }
 
-func NewYAMLReader(r *bu***REMOVED***o.Reader) *YAMLReader {
+func NewYAMLReader(r *bufio.Reader) *YAMLReader {
 	return &YAMLReader{
 		reader: &LineReader{reader: r},
 	}
@@ -290,7 +290,7 @@ func (r *YAMLReader) Read() ([]byte, error) {
 		}
 		if err == io.EOF {
 			if buffer.Len() != 0 {
-				// If we're at EOF, we have a ***REMOVED***nal, non-terminated line. Return it.
+				// If we're at EOF, we have a final, non-terminated line. Return it.
 				return buffer.Bytes(), nil
 			}
 			return nil, err
@@ -300,21 +300,21 @@ func (r *YAMLReader) Read() ([]byte, error) {
 }
 
 type LineReader struct {
-	reader *bu***REMOVED***o.Reader
+	reader *bufio.Reader
 }
 
 // Read returns a single line (with '\n' ended) from the underlying reader.
 // An error is returned iff there is an error with the underlying reader.
 func (r *LineReader) Read() ([]byte, error) {
 	var (
-		isPre***REMOVED***x bool  = true
+		isPrefix bool  = true
 		err      error = nil
 		line     []byte
 		buffer   bytes.Buffer
 	)
 
-	for isPre***REMOVED***x && err == nil {
-		line, isPre***REMOVED***x, err = r.reader.ReadLine()
+	for isPrefix && err == nil {
+		line, isPrefix, err = r.reader.ReadLine()
 		buffer.Write(line)
 	}
 	buffer.WriteByte('\n')
@@ -323,24 +323,24 @@ func (r *LineReader) Read() ([]byte, error) {
 
 // GuessJSONStream scans the provided reader up to size, looking
 // for an open brace indicating this is JSON. It will return the
-// bu***REMOVED***o.Reader it creates for the consumer.
+// bufio.Reader it creates for the consumer.
 func GuessJSONStream(r io.Reader, size int) (io.Reader, []byte, bool) {
-	buffer := bu***REMOVED***o.NewReaderSize(r, size)
+	buffer := bufio.NewReaderSize(r, size)
 	b, _ := buffer.Peek(size)
-	return buffer, b, hasJSONPre***REMOVED***x(b)
+	return buffer, b, hasJSONPrefix(b)
 }
 
-var jsonPre***REMOVED***x = []byte("{")
+var jsonPrefix = []byte("{")
 
-// hasJSONPre***REMOVED***x returns true if the provided buffer appears to start with
+// hasJSONPrefix returns true if the provided buffer appears to start with
 // a JSON open brace.
-func hasJSONPre***REMOVED***x(buf []byte) bool {
-	return hasPre***REMOVED***x(buf, jsonPre***REMOVED***x)
+func hasJSONPrefix(buf []byte) bool {
+	return hasPrefix(buf, jsonPrefix)
 }
 
-// Return true if the ***REMOVED***rst non-whitespace bytes in buf is
-// pre***REMOVED***x.
-func hasPre***REMOVED***x(buf []byte, pre***REMOVED***x []byte) bool {
+// Return true if the first non-whitespace bytes in buf is
+// prefix.
+func hasPrefix(buf []byte, prefix []byte) bool {
 	trim := bytes.TrimLeftFunc(buf, unicode.IsSpace)
-	return bytes.HasPre***REMOVED***x(trim, pre***REMOVED***x)
+	return bytes.HasPrefix(trim, prefix)
 }

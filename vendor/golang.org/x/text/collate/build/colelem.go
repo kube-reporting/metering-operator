@@ -1,6 +1,6 @@
 // Copyright 2012 The Go Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE ***REMOVED***le.
+// license that can be found in the LICENSE file.
 
 package build
 
@@ -48,8 +48,8 @@ func makeCE(ce rawCE) (uint32, error) {
 
 // For contractions, collation elements are of the form
 // 110bbbbb bbbbbbbb iiiiiiii iiiinnnn, where
-//   - n* is the size of the ***REMOVED***rst node in the contraction trie.
-//   - i* is the index of the ***REMOVED***rst node in the contraction trie.
+//   - n* is the size of the first node in the contraction trie.
+//   - i* is the index of the first node in the contraction trie.
 //   - b* is the offset into the contraction collation element table.
 // See contract.go for details on the contraction trie.
 const (
@@ -102,7 +102,7 @@ func makeExpansionHeader(n int) (uint32, error) {
 // elements for each rune in the decomposition and modify the tertiary weights.
 // The collation element, in this case, is of the form
 // 11110000 00000000 wwwwwwww vvvvvvvv, where
-//   - v* is the replacement tertiary weight for the ***REMOVED***rst rune,
+//   - v* is the replacement tertiary weight for the first rune,
 //   - w* is the replacement tertiary weight for the second rune,
 // Tertiary weights of subsequent runes should be replaced with maxTertiary.
 // See http://www.unicode.org/reports/tr10/#Compatibility_Decompositions for more details.
@@ -112,7 +112,7 @@ const (
 
 func makeDecompose(t1, t2 int) (uint32, error) {
 	if t1 >= 256 || t1 < 0 {
-		return 0, fmt.Errorf("***REMOVED***rst tertiary weight out of bounds: %d >= 256", t1)
+		return 0, fmt.Errorf("first tertiary weight out of bounds: %d >= 256", t1)
 	}
 	if t2 >= 256 || t2 < 0 {
 		return 0, fmt.Errorf("second tertiary weight out of bounds: %d >= 256", t2)
@@ -122,16 +122,16 @@ func makeDecompose(t1, t2 int) (uint32, error) {
 
 const (
 	// These constants were taken from http://www.unicode.org/versions/Unicode6.0.0/ch12.pdf.
-	minUni***REMOVED***ed       rune = 0x4E00
-	maxUni***REMOVED***ed            = 0x9FFF
+	minUnified       rune = 0x4E00
+	maxUnified            = 0x9FFF
 	minCompatibility      = 0xF900
 	maxCompatibility      = 0xFAFF
 	minRare               = 0x3400
 	maxRare               = 0x4DBF
 )
 const (
-	commonUni***REMOVED***edOffset = 0x10000
-	rareUni***REMOVED***edOffset   = 0x20000 // largest rune in common is U+FAFF
+	commonUnifiedOffset = 0x10000
+	rareUnifiedOffset   = 0x20000 // largest rune in common is U+FAFF
 	otherOffset         = 0x50000 // largest rune in rare is U+2FA1D
 	illegalOffset       = otherOffset + int(unicode.MaxRune)
 	maxPrimary          = illegalOffset + 1
@@ -139,21 +139,21 @@ const (
 
 // implicitPrimary returns the primary weight for the a rune
 // for which there is no entry for the rune in the collation table.
-// We take a different approach from the one speci***REMOVED***ed in
+// We take a different approach from the one specified in
 // http://unicode.org/reports/tr10/#Implicit_Weights,
 // but preserve the resulting relative ordering of the runes.
 func implicitPrimary(r rune) int {
 	if unicode.Is(unicode.Ideographic, r) {
-		if r >= minUni***REMOVED***ed && r <= maxUni***REMOVED***ed {
+		if r >= minUnified && r <= maxUnified {
 			// The most common case for CJK.
-			return int(r) + commonUni***REMOVED***edOffset
+			return int(r) + commonUnifiedOffset
 		}
 		if r >= minCompatibility && r <= maxCompatibility {
-			// This will typically not hit. The DUCET explicitly speci***REMOVED***es mappings
+			// This will typically not hit. The DUCET explicitly specifies mappings
 			// for all characters that do not decompose.
-			return int(r) + commonUni***REMOVED***edOffset
+			return int(r) + commonUnifiedOffset
 		}
-		return int(r) + rareUni***REMOVED***edOffset
+		return int(r) + rareUnifiedOffset
 	}
 	return int(r) + otherOffset
 }
@@ -188,7 +188,7 @@ func convertLargeWeights(elems []rawCE) (res []rawCE, err error) {
 		}
 		if p >= illegalPrimary {
 			ce[0] = illegalOffset + p - illegalPrimary
-		} ***REMOVED*** {
+		} else {
 			if i+1 >= len(elems) {
 				return elems, fmt.Errorf("second part of double primary weight missing: %v", elems)
 			}
@@ -198,9 +198,9 @@ func convertLargeWeights(elems []rawCE) (res []rawCE, err error) {
 			np := ((p & highBitsMask) << shiftBits) + elems[i+1].w[0]&lowBitsMask
 			switch {
 			case p < rarePrimaryStart:
-				np += commonUni***REMOVED***edOffset
+				np += commonUnifiedOffset
 			case p < otherPrimaryStart:
-				np += rareUni***REMOVED***edOffset
+				np += rareUnifiedOffset
 			default:
 				p += otherOffset
 			}
@@ -214,7 +214,7 @@ func convertLargeWeights(elems []rawCE) (res []rawCE, err error) {
 	return elems, nil
 }
 
-// nextWeight computes the ***REMOVED***rst possible collation weights following elems
+// nextWeight computes the first possible collation weights following elems
 // for the given level.
 func nextWeight(level colltab.Level, elems []rawCE) []rawCE {
 	if level == colltab.Identity {
@@ -263,7 +263,7 @@ func compareWeights(a, b []rawCE) (result int, level colltab.Level) {
 			if va != vb {
 				if va < vb {
 					return -1, level
-				} ***REMOVED*** {
+				} else {
 					return 1, level
 				}
 			}

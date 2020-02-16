@@ -88,7 +88,7 @@ func (op *Reporting) handleReportDataSource(logger log.FieldLogger, dataSource *
 	case dataSource.Spec.ReportQueryView != nil:
 		err = op.handleReportQueryViewDataSource(logger, dataSource)
 	default:
-		err = fmt.Errorf("ReportDataSource %s: improperly con***REMOVED***gured missing prometheusMetricsImporter, awsBilling, reportQueryView or prestoTable con***REMOVED***guration", dataSource.Name)
+		err = fmt.Errorf("ReportDataSource %s: improperly configured missing prometheusMetricsImporter, awsBilling, reportQueryView or prestoTable configuration", dataSource.Name)
 	}
 	return err
 
@@ -106,17 +106,17 @@ func (op *Reporting) handlePrometheusMetricsDataSource(logger log.FieldLogger, d
 		if err != nil {
 			return fmt.Errorf("unable to get PrestoTable %s for ReportDataSource %s, %s", dataSource.Status.TableRef, dataSource.Name, err)
 		}
-		tableName, err := reportingutil.FullyQuali***REMOVED***edTableName(prestoTable)
+		tableName, err := reportingutil.FullyQualifiedTableName(prestoTable)
 		if err != nil {
 			return err
 		}
 		logger.Infof("existing Prometheus ReportDataSource discovered, tableName: %s", tableName)
-	} ***REMOVED*** {
+	} else {
 		logger.Infof("new Prometheus ReportDataSource %s discovered", dataSource.Name)
 		tableName := reportingutil.DataSourceTableName(dataSource.Namespace, dataSource.Name)
 		hiveStorage, err := op.getHiveStorage(dataSource.Spec.PrometheusMetricsImporter.Storage, dataSource.Namespace)
 		if err != nil {
-			return fmt.Errorf("storage incorrectly con***REMOVED***gured for ReportDataSource %s, err: %v", dataSource.Name, err)
+			return fmt.Errorf("storage incorrectly configured for ReportDataSource %s, err: %v", dataSource.Name, err)
 		}
 		if hiveStorage.Status.Hive.DatabaseName == "" {
 			op.enqueueStorageLocation(hiveStorage)
@@ -178,7 +178,7 @@ func (op *Reporting) handlePrometheusMetricsDataSource(logger log.FieldLogger, d
 	}
 
 	query := dataSource.Spec.PrometheusMetricsImporter.Query
-	tableName, err := reportingutil.FullyQuali***REMOVED***edTableName(prestoTable)
+	tableName, err := reportingutil.FullyQualifiedTableName(prestoTable)
 	if err != nil {
 		return err
 	}
@@ -199,8 +199,8 @@ func (op *Reporting) handlePrometheusMetricsDataSource(logger log.FieldLogger, d
 		defer op.importersMu.Unlock()
 		importer, exists := op.importers[dataSource.Name]
 		if exists {
-			dataSourceLogger.Debugf("ReportDataSource %s already has an importer, updating con***REMOVED***guration", dataSource.Name)
-			importer.UpdateCon***REMOVED***g(importerCfg)
+			dataSourceLogger.Debugf("ReportDataSource %s already has an importer, updating configuration", dataSource.Name)
+			importer.UpdateConfig(importerCfg)
 			return importer, nil
 		}
 		// don't already have an importer, so create a new one
@@ -229,22 +229,22 @@ func (op *Reporting) handlePrometheusMetricsDataSource(logger log.FieldLogger, d
 		return fmt.Errorf("ImportFromLastTimestamp errored: %v", err)
 	}
 
-	// Default to importing at the con***REMOVED***gured import interval.
+	// Default to importing at the configured import interval.
 	importDelay := op.getQueryIntervalForReportDataSource(dataSource)
 
 	if len(results.ProcessedTimeRanges) == 0 {
 		logger.Warnf("no time ranges processed for ReportDataSource %s", dataSource.Name)
-	} ***REMOVED*** {
+	} else {
 		// This is the last timeRange we processed, and we use the End time on
 		// this to determine what time range the importer attempted to import
 		// up until, for tracking our process
-		***REMOVED***rstTimeRange := results.ProcessedTimeRanges[0]
+		firstTimeRange := results.ProcessedTimeRanges[0]
 		lastTimeRange := results.ProcessedTimeRanges[len(results.ProcessedTimeRanges)-1]
 
-		// Update the timestamp which records the ***REMOVED***rst timestamp we attempted
+		// Update the timestamp which records the first timestamp we attempted
 		// to query from.
-		if importStatus.ImportDataStartTime == nil || ***REMOVED***rstTimeRange.Start.Before(importStatus.ImportDataStartTime.Time) {
-			importStatus.ImportDataStartTime = &metav1.Time{Time: ***REMOVED***rstTimeRange.Start}
+		if importStatus.ImportDataStartTime == nil || firstTimeRange.Start.Before(importStatus.ImportDataStartTime.Time) {
+			importStatus.ImportDataStartTime = &metav1.Time{Time: firstTimeRange.Start}
 		}
 		// Update the timestamp which records the latest we've attempted to query
 		// up until.
@@ -266,17 +266,17 @@ func (op *Reporting) handlePrometheusMetricsDataSource(logger log.FieldLogger, d
 		}
 
 		if len(results.Metrics) != 0 {
-			// These are the ***REMOVED***rst and last metric from the import, which we use to
+			// These are the first and last metric from the import, which we use to
 			// determine the data we've actually imported, versus what we've asked
 			// for.
-			***REMOVED***rstMetric := results.Metrics[0]
+			firstMetric := results.Metrics[0]
 			lastMetric := results.Metrics[len(results.Metrics)-1]
 
-			// if there is no existing timestamp then this must be the ***REMOVED***rst import
+			// if there is no existing timestamp then this must be the first import
 			// and we should set the earliestImportedMetricTime
 			if importStatus.EarliestImportedMetricTime == nil {
-				importStatus.EarliestImportedMetricTime = &metav1.Time{Time: ***REMOVED***rstMetric.Timestamp}
-			} ***REMOVED*** if importStatus.EarliestImportedMetricTime.After(***REMOVED***rstMetric.Timestamp) {
+				importStatus.EarliestImportedMetricTime = &metav1.Time{Time: firstMetric.Timestamp}
+			} else if importStatus.EarliestImportedMetricTime.After(firstMetric.Timestamp) {
 				dataSourceLogger.Errorf("detected time new metric import has older data than previously imported, data is likely duplicated.")
 				// TODO(chance): Look at adding an error to the status.
 				return nil // strop processing this ReportDataSource
@@ -316,18 +316,18 @@ func (op *Reporting) handlePrometheusMetricsDataSource(logger log.FieldLogger, d
 func (op *Reporting) handleAWSBillingDataSource(logger log.FieldLogger, dataSource *metering.ReportDataSource) error {
 	source := dataSource.Spec.AWSBilling.Source
 	if source == nil {
-		return fmt.Errorf("ReportDataSource %q: improperly con***REMOVED***gured datasource, source is empty", dataSource.Name)
+		return fmt.Errorf("ReportDataSource %q: improperly configured datasource, source is empty", dataSource.Name)
 	}
 
 	logger.Debugf("querying bucket %#v for AWS Billing manifests for ReportDataSource %s", source, dataSource.Name)
-	manifestRetriever := aws.NewManifestRetriever(logger, source.Region, source.Bucket, source.Pre***REMOVED***x)
+	manifestRetriever := aws.NewManifestRetriever(logger, source.Region, source.Bucket, source.Prefix)
 	manifests, err := manifestRetriever.RetrieveManifests()
 	if err != nil {
 		return err
 	}
 
 	if len(manifests) == 0 {
-		logger.Warnf("ReportDataSource %q has no report manifests in it's bucket, the ***REMOVED***rst report has likely not been generated yet", dataSource.Name)
+		logger.Warnf("ReportDataSource %q has no report manifests in it's bucket, the first report has likely not been generated yet", dataSource.Name)
 		return nil
 	}
 
@@ -335,8 +335,8 @@ func (op *Reporting) handleAWSBillingDataSource(logger log.FieldLogger, dataSour
 	if dataSource.Status.TableRef.Name == "" {
 		logger.Infof("new AWSBilling ReportDataSource discovered")
 		tableName := reportingutil.DataSourceTableName(dataSource.Namespace, dataSource.Name)
-		logger.Debugf("creating AWS Billing DataSource table %s pointing to s3 bucket %s at pre***REMOVED***x %s", tableName, source.Bucket, source.Pre***REMOVED***x)
-		hiveTable, err = op.createAWSUsageHiveTableCR(logger, dataSource, tableName, source.Bucket, source.Pre***REMOVED***x, manifests)
+		logger.Debugf("creating AWS Billing DataSource table %s pointing to s3 bucket %s at prefix %s", tableName, source.Bucket, source.Prefix)
+		hiveTable, err = op.createAWSUsageHiveTableCR(logger, dataSource, tableName, source.Bucket, source.Prefix, manifests)
 		if err != nil {
 			return err
 		}
@@ -345,12 +345,12 @@ func (op *Reporting) handleAWSBillingDataSource(logger log.FieldLogger, dataSour
 		if err != nil {
 			return fmt.Errorf("unable to get PrestoTable %s for HiveTable %s, %s", hiveTable.Name, hiveTable.Name, err)
 		}
-		tableName, err = reportingutil.FullyQuali***REMOVED***edTableName(prestoTable)
+		tableName, err = reportingutil.FullyQualifiedTableName(prestoTable)
 		if err != nil {
 			return err
 		}
 
-		logger.Debugf("successfully created AWS Billing DataSource table %s pointing to s3 bucket %s at pre***REMOVED***x %s", tableName, source.Bucket, source.Pre***REMOVED***x)
+		logger.Debugf("successfully created AWS Billing DataSource table %s pointing to s3 bucket %s at prefix %s", tableName, source.Bucket, source.Prefix)
 		dsClient := op.meteringClient.MeteringV1().ReportDataSources(dataSource.Namespace)
 		dataSource, err = updateReportDataSource(dsClient, dataSource.Name, func(newDS *metering.ReportDataSource) {
 			newDS.Status.TableRef = v1.LocalObjectReference{Name: hiveTable.Name}
@@ -358,7 +358,7 @@ func (op *Reporting) handleAWSBillingDataSource(logger log.FieldLogger, dataSour
 		if err != nil {
 			return err
 		}
-	} ***REMOVED*** {
+	} else {
 		hiveTableResourceName := reportingutil.TableResourceNameFromKind("ReportDataSource", dataSource.Namespace, dataSource.Name)
 		hiveTable, err = op.hiveTableLister.HiveTables(dataSource.Namespace).Get(hiveTableResourceName)
 		if err != nil {
@@ -368,7 +368,7 @@ func (op *Reporting) handleAWSBillingDataSource(logger log.FieldLogger, dataSour
 				if err != nil {
 					return err
 				}
-			} ***REMOVED*** {
+			} else {
 				return err
 			}
 		}
@@ -376,7 +376,7 @@ func (op *Reporting) handleAWSBillingDataSource(logger log.FieldLogger, dataSour
 		if err != nil {
 			return fmt.Errorf("unable to get PrestoTable %s for HiveTable %s, %s", hiveTable.Name, hiveTable.Name, err)
 		}
-		tableName, err := reportingutil.FullyQuali***REMOVED***edTableName(prestoTable)
+		tableName, err := reportingutil.FullyQualifiedTableName(prestoTable)
 		if err != nil {
 			return err
 		}
@@ -421,7 +421,7 @@ func (op *Reporting) handleExistingPrestoTableDataSource(logger log.FieldLogger,
 		if err != nil {
 			return fmt.Errorf("unable to get the ExistingPrestoTable %s for ReportDataSource %s, %s", dataSource.Status.TableRef.Name, dataSource.Name, err)
 		}
-		tableName, err := reportingutil.FullyQuali***REMOVED***edTableName(prestoTable)
+		tableName, err := reportingutil.FullyQualifiedTableName(prestoTable)
 		if err != nil {
 			return err
 		}
@@ -432,7 +432,7 @@ func (op *Reporting) handleExistingPrestoTableDataSource(logger log.FieldLogger,
 	meta := strings.Split(dataSource.Spec.ExistingPrestoTable.TableName, ".")
 
 	if len(meta) != 3 {
-		return fmt.Errorf("spec.ExistingPrestoTable.TableName is not in the format of a fully-quali***REMOVED***ed table name")
+		return fmt.Errorf("spec.ExistingPrestoTable.TableName is not in the format of a fully-qualified table name")
 	}
 
 	catalog := meta[0]
@@ -447,7 +447,7 @@ func (op *Reporting) handleExistingPrestoTableDataSource(logger log.FieldLogger,
 		return fmt.Errorf("failed to successfully discover the %s Presto table metadata: %v", dataSource.Spec.ExistingPrestoTable.TableName, err)
 	}
 
-	prestoTable, err = op.createPrestoTableCR(dataSource, metering.ReportDataSourceGVK, catalog, schema, tableName, cols, true, false, "")
+	prestoTable, err = op.createPrestoTableCR(dataSource, metering.ReportDataSourceGVK, catalog, schema, tableName, cols, true, false, false, "")
 	if err != nil {
 		return fmt.Errorf("failed to create a PrestoTable custom resource for the %s ReportDataSource: %v", dataSource.Name, err)
 	}
@@ -464,7 +464,7 @@ func (op *Reporting) handleExistingPrestoTableDataSource(logger log.FieldLogger,
 		newDS.Status.TableRef = v1.LocalObjectReference{Name: prestoTable.Name}
 	})
 	if err != nil {
-		logger.WithError(err).Errorf("failed to update the %s ReportDataSource status.tableRef ***REMOVED***eld to the %s PrestoTable. Here is the datasource object: %+v", dataSource.Name, prestoTable.Name, dataSource.Spec.ExistingPrestoTable)
+		logger.WithError(err).Errorf("failed to update the %s ReportDataSource status.tableRef field to the %s PrestoTable. Here is the datasource object: %+v", dataSource.Name, prestoTable.Name, dataSource.Spec.ExistingPrestoTable)
 		return err
 	}
 	dataSource.Status = status.Status
@@ -487,12 +487,12 @@ func (op *Reporting) handlePrestoTableDataSource(logger log.FieldLogger, dataSou
 		if err != nil {
 			return fmt.Errorf("unable to get PrestoTable %s for ReportDataSource %s, %s", dataSource.Status.TableRef, dataSource.Name, err)
 		}
-		tableName, err := reportingutil.FullyQuali***REMOVED***edTableName(prestoTable)
+		tableName, err := reportingutil.FullyQualifiedTableName(prestoTable)
 		if err != nil {
 			return err
 		}
 		logger.Infof("existing PrestoTable ReportDataSource discovered, tableName: %s", tableName)
-	} ***REMOVED*** {
+	} else {
 		logger.Infof("new PrestoTable ReportDataSource discovered, tableName: %s", dataSource.Spec.PrestoTable.TableRef.Name)
 		var err error
 		prestoTable, err = op.waitForPrestoTable(dataSource.Namespace, dataSource.Spec.PrestoTable.TableRef.Name, time.Second, 10*time.Second)
@@ -505,7 +505,7 @@ func (op *Reporting) handlePrestoTableDataSource(logger log.FieldLogger, dataSou
 			newDS.Status.TableRef = v1.LocalObjectReference{Name: prestoTable.Name}
 		})
 		if err != nil {
-			logger.WithError(err).Errorf("failed to update ReportDataSource status.tableRef ***REMOVED***eld %q", prestoTable.Name)
+			logger.WithError(err).Errorf("failed to update ReportDataSource status.tableRef field %q", prestoTable.Name)
 			return err
 		}
 	}
@@ -532,12 +532,12 @@ func (op *Reporting) handleReportQueryViewDataSource(logger log.FieldLogger, dat
 		logger.Infof("new ReportDataSource discovered")
 		viewName = reportingutil.DataSourceTableName(dataSource.Namespace, dataSource.Name)
 		createView = true
-	} ***REMOVED*** {
+	} else {
 		prestoTable, err := op.prestoTableLister.PrestoTables(dataSource.Namespace).Get(dataSource.Status.TableRef.Name)
 		if err != nil {
 			return fmt.Errorf("unable to get PrestoTable %s for ReportDataSource %s, %s", dataSource.Status.TableRef, dataSource.Name, err)
 		}
-		tableName, err := reportingutil.FullyQuali***REMOVED***edTableName(prestoTable)
+		tableName, err := reportingutil.FullyQualifiedTableName(prestoTable)
 		if err != nil {
 			return err
 		}
@@ -559,13 +559,13 @@ func (op *Reporting) handleReportQueryViewDataSource(logger log.FieldLogger, dat
 			// dependencies become initialized. After they're initialized they
 			// will queue anything that depends on them, including this query.
 			return nil
-		} ***REMOVED*** if reporting.IsInvalidDependencyError(err) {
+		} else if reporting.IsInvalidDependencyError(err) {
 			logger.WithError(err).Errorf("unable to validate ReportQuery %s, has invalid dependencies, dropping off queue", query.Name)
 			// Invalid dependency means it will not resolve itself, so do not
 			// return an error since we do not want to be requeued unless the
-			// resource is modi***REMOVED***ed, or it's dependencies are modi***REMOVED***ed.
+			// resource is modified, or it's dependencies are modified.
 			return nil
-		} ***REMOVED*** {
+		} else {
 			// The error occurred when getting the dependencies or for an
 			// unknown reason so we want to retry up to a limit. This most
 			// commonly occurs when fetching a dependency from the API fails,
@@ -577,7 +577,7 @@ func (op *Reporting) handleReportQueryViewDataSource(logger log.FieldLogger, dat
 	if createView {
 		hiveStorage, err := op.getHiveStorage(nil, dataSource.Namespace)
 		if err != nil {
-			return fmt.Errorf("storage incorrectly con***REMOVED***gured for ReportDataSource %s, err: %v", dataSource.Name, err)
+			return fmt.Errorf("storage incorrectly configured for ReportDataSource %s, err: %v", dataSource.Name, err)
 		}
 		if hiveStorage.Status.Hive.DatabaseName == "" {
 			op.enqueueStorageLocation(hiveStorage)
@@ -588,7 +588,7 @@ func (op *Reporting) handleReportQueryViewDataSource(logger log.FieldLogger, dat
 			return err
 		}
 
-		requiredInputs := reportingutil.ConvertInputDe***REMOVED***nitionsIntoInputList(query.Spec.Inputs)
+		requiredInputs := reportingutil.ConvertInputDefinitionsIntoInputList(query.Spec.Inputs)
 		queryCtx := &reporting.ReportQueryTemplateContext{
 			Namespace:         dataSource.Namespace,
 			Query:             query.Spec.Query,
@@ -609,7 +609,7 @@ func (op *Reporting) handleReportQueryViewDataSource(logger log.FieldLogger, dat
 
 		columns := reportingutil.GeneratePrestoColumns(query)
 		logger.Infof("creating view %s", viewName)
-		prestoTable, err := op.createPrestoTableCR(dataSource, metering.ReportDataSourceGVK, "hive", hiveStorage.Status.Hive.DatabaseName, viewName, columns, false, true, renderedQuery)
+		prestoTable, err := op.createPrestoTableCR(dataSource, metering.ReportDataSourceGVK, "hive", hiveStorage.Status.Hive.DatabaseName, viewName, columns, false, true, false, renderedQuery)
 		if err != nil {
 			return fmt.Errorf("error creating view %s for ReportDataSource %s: %v", viewName, dataSource.Name, err)
 		}
@@ -625,7 +625,7 @@ func (op *Reporting) handleReportQueryViewDataSource(logger log.FieldLogger, dat
 			newDS.Status.TableRef.Name = prestoTable.Name
 		})
 		if err != nil {
-			logger.WithError(err).Errorf("failed to update ReportDataSource tableRef ***REMOVED***eld to %q", prestoTable.Name)
+			logger.WithError(err).Errorf("failed to update ReportDataSource tableRef field to %q", prestoTable.Name)
 			return err
 		}
 	}
@@ -645,10 +645,10 @@ func (op *Reporting) addReportDataSourceFinalizer(ds *metering.ReportDataSource)
 	newReportDataSource, err := op.meteringClient.MeteringV1().ReportDataSources(ds.Namespace).Update(ds)
 	logger := op.logger.WithFields(log.Fields{"reportDataSource": ds.Name, "namespace": ds.Namespace})
 	if err != nil {
-		logger.WithError(err).Errorf("error adding %s ***REMOVED***nalizer to ReportDataSource: %s/%s", reportDataSourceFinalizer, ds.Namespace, ds.Name)
+		logger.WithError(err).Errorf("error adding %s finalizer to ReportDataSource: %s/%s", reportDataSourceFinalizer, ds.Namespace, ds.Name)
 		return nil, err
 	}
-	logger.Infof("added %s ***REMOVED***nalizer to ReportDataSource: %s/%s", reportDataSourceFinalizer, ds.Namespace, ds.Name)
+	logger.Infof("added %s finalizer to ReportDataSource: %s/%s", reportDataSourceFinalizer, ds.Namespace, ds.Name)
 	return newReportDataSource, nil
 }
 
@@ -660,10 +660,10 @@ func (op *Reporting) removeReportDataSourceFinalizer(ds *metering.ReportDataSour
 	newReportDataSource, err := op.meteringClient.MeteringV1().ReportDataSources(ds.Namespace).Update(ds)
 	logger := op.logger.WithFields(log.Fields{"reportDataSource": ds.Name, "namespace": ds.Namespace})
 	if err != nil {
-		logger.WithError(err).Errorf("error removing %s ***REMOVED***nalizer from ReportDataSource: %s/%s", reportDataSourceFinalizer, ds.Namespace, ds.Name)
+		logger.WithError(err).Errorf("error removing %s finalizer from ReportDataSource: %s/%s", reportDataSourceFinalizer, ds.Namespace, ds.Name)
 		return nil, err
 	}
-	logger.Infof("removed %s ***REMOVED***nalizer from ReportDataSource: %s/%s", reportDataSourceFinalizer, ds.Namespace, ds.Name)
+	logger.Infof("removed %s finalizer from ReportDataSource: %s/%s", reportDataSourceFinalizer, ds.Namespace, ds.Name)
 	return newReportDataSource, nil
 }
 

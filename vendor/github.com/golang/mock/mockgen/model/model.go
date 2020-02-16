@@ -1,7 +1,7 @@
 // Copyright 2012 Google Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this ***REMOVED***le except in compliance with the License.
+// you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 //
 //     http://www.apache.org/licenses/LICENSE-2.0
@@ -9,7 +9,7 @@
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the speci***REMOVED***c language governing permissions and
+// See the License for the specific language governing permissions and
 // limitations under the License.
 
 // Package model contains the data model necessary for generating mock implementations.
@@ -209,7 +209,7 @@ func (ft *FuncType) String(pm map[string]string, pkgOverride string) string {
 	retString := strings.Join(rets, ", ")
 	if nOut := len(ft.Out); nOut == 1 {
 		retString = " " + retString
-	} ***REMOVED*** if nOut > 1 {
+	} else if nOut > 1 {
 		retString = " (" + retString + ")"
 	}
 	return "func(" + strings.Join(args, ", ") + ")" + retString

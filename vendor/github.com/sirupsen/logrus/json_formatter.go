@@ -5,19 +5,19 @@ import (
 	"fmt"
 )
 
-type ***REMOVED***eldKey string
+type fieldKey string
 
-// FieldMap allows customization of the key names for default ***REMOVED***elds.
-type FieldMap map[***REMOVED***eldKey]string
+// FieldMap allows customization of the key names for default fields.
+type FieldMap map[fieldKey]string
 
-// Default key names for the default ***REMOVED***elds
+// Default key names for the default fields
 const (
 	FieldKeyMsg   = "msg"
 	FieldKeyLevel = "level"
 	FieldKeyTime  = "time"
 )
 
-func (f FieldMap) resolve(key ***REMOVED***eldKey) string {
+func (f FieldMap) resolve(key fieldKey) string {
 	if k, ok := f[key]; ok {
 		return k
 	}
@@ -33,7 +33,7 @@ type JSONFormatter struct {
 	// DisableTimestamp allows disabling automatic timestamps in output
 	DisableTimestamp bool
 
-	// FieldMap allows users to customize the names of keys for default ***REMOVED***elds.
+	// FieldMap allows users to customize the names of keys for default fields.
 	// As an example:
 	// formatter := &JSONFormatter{
 	//   	FieldMap: FieldMap{
@@ -58,7 +58,7 @@ func (f *JSONFormatter) Format(entry *Entry) ([]byte, error) {
 			data[k] = v
 		}
 	}
-	pre***REMOVED***xFieldClashes(data)
+	prefixFieldClashes(data)
 
 	timestampFormat := f.TimestampFormat
 	if timestampFormat == "" {
@@ -73,7 +73,7 @@ func (f *JSONFormatter) Format(entry *Entry) ([]byte, error) {
 
 	serialized, err := json.Marshal(data)
 	if err != nil {
-		return nil, fmt.Errorf("Failed to marshal ***REMOVED***elds to JSON, %v", err)
+		return nil, fmt.Errorf("Failed to marshal fields to JSON, %v", err)
 	}
 	return append(serialized, '\n'), nil
 }

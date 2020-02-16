@@ -43,8 +43,8 @@ func isLitValue(want, have []rune) bool {
 // a byte slice is a number. A number is delimited by whitespace or
 // the newline token.
 //
-// A number is de***REMOVED***ned to be in a binary, octal, decimal (int | float), hex format,
-// or in scienti***REMOVED***c notation.
+// A number is defined to be in a binary, octal, decimal (int | float), hex format,
+// or in scientific notation.
 func isNumberValue(b []rune) bool {
 	negativeIndex := 0
 	helper := numberHelper{}
@@ -203,7 +203,7 @@ func (v *Value) Append(tok Token) {
 	}
 	if tok.Type() != TokenLit {
 		v.raw = append(v.raw, tok.Raw()...)
-	} ***REMOVED*** {
+	} else {
 		v.raw = append(v.raw, r...)
 	}
 }
@@ -237,7 +237,7 @@ func newLitToken(b []rune) (Token, int, error) {
 		}
 
 		token = newToken(TokenLit, b[:n], QuotedStringType)
-	} ***REMOVED*** if isNumberValue(b) {
+	} else if isNumberValue(b) {
 		var base int
 		base, n, err = getNumericalValue(b)
 		if err != nil {
@@ -251,11 +251,11 @@ func newLitToken(b []rune) (Token, int, error) {
 		}
 		token = newToken(TokenLit, value, vType)
 		token.base = base
-	} ***REMOVED*** if isBoolValue(b) {
+	} else if isBoolValue(b) {
 		n, err = getBoolValue(b)
 
 		token = newToken(TokenLit, b[:n], BoolType)
-	} ***REMOVED*** {
+	} else {
 		n, err = getValue(b)
 		token = newToken(TokenLit, b[:n], StringType)
 	}

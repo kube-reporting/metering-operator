@@ -2,7 +2,7 @@
 Copyright 2016 The Kubernetes Authors.
 
 Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this ***REMOVED***le except in compliance with the License.
+you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
 
     http://www.apache.org/licenses/LICENSE-2.0
@@ -10,7 +10,7 @@ You may obtain a copy of the License at
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the speci***REMOVED***c language governing permissions and
+See the License for the specific language governing permissions and
 limitations under the License.
 */
 
@@ -55,8 +55,8 @@ var ReadonlyVerbs = []string{
 	"watch",
 }
 
-// genClientPre***REMOVED***x is the default pre***REMOVED***x for all genclient tags.
-const genClientPre***REMOVED***x = "genclient:"
+// genClientPrefix is the default prefix for all genclient tags.
+const genClientPrefix = "genclient:"
 
 // unsupportedExtensionVerbs is a list of verbs we don't support generating
 // extension client functions for.
@@ -85,7 +85,7 @@ var resultTypeSupportedVerbs = []string{
 }
 
 // Extensions allows to extend the default set of client verbs
-// (CRUD+watch+patch+list+deleteCollection) for a given type with custom de***REMOVED***ned
+// (CRUD+watch+patch+list+deleteCollection) for a given type with custom defined
 // verbs. Custom verbs can have custom input and result types and also allow to
 // use a sub-resource in a request instead of top-level resource type.
 //
@@ -108,7 +108,7 @@ type extension struct {
 	// VerbType is the type of the verb (only verbs from SupportedVerbs are
 	// supported)
 	VerbType string
-	// SubResourcePath de***REMOVED***nes a path to a sub-resource to use in the request.
+	// SubResourcePath defines a path to a sub-resource to use in the request.
 	// (optional)
 	SubResourcePath string
 	// InputTypeOverride overrides the input parameter type for the verb. By
@@ -145,7 +145,7 @@ func (e *extension) Result() (string, string) {
 	return parts[len(parts)-1], strings.Join(parts[0:len(parts)-1], ".")
 }
 
-// Tags represents a genclient con***REMOVED***guration for a single type.
+// Tags represents a genclient configuration for a single type.
 type Tags struct {
 	// +genclient
 	GenerateClient bool
@@ -162,7 +162,7 @@ type Tags struct {
 	Extensions []extension
 }
 
-// HasVerb returns true if we should include the given verb in ***REMOVED***nal client interface and
+// HasVerb returns true if we should include the given verb in final client interface and
 // generate the function for it.
 func (t Tags) HasVerb(verb string) bool {
 	if len(t.SkipVerbs) == 0 {
@@ -196,25 +196,25 @@ func ParseClientGenTags(lines []string) (Tags, error) {
 	if len(value) > 0 && len(value[0]) > 0 {
 		return ret, fmt.Errorf("+genclient=%s is invalid, use //+genclient if you want to generate client or omit it when you want to disable generation", value)
 	}
-	_, ret.NonNamespaced = values[genClientPre***REMOVED***x+"nonNamespaced"]
+	_, ret.NonNamespaced = values[genClientPrefix+"nonNamespaced"]
 	// Check the old format and error when used
 	if value := values["nonNamespaced"]; len(value) > 0 && len(value[0]) > 0 {
 		return ret, fmt.Errorf("+nonNamespaced=%s is invalid, use //+genclient:nonNamespaced instead", value[0])
 	}
-	_, ret.NoVerbs = values[genClientPre***REMOVED***x+"noVerbs"]
-	_, ret.NoStatus = values[genClientPre***REMOVED***x+"noStatus"]
+	_, ret.NoVerbs = values[genClientPrefix+"noVerbs"]
+	_, ret.NoStatus = values[genClientPrefix+"noStatus"]
 	onlyVerbs := []string{}
-	if _, isReadonly := values[genClientPre***REMOVED***x+"readonly"]; isReadonly {
+	if _, isReadonly := values[genClientPrefix+"readonly"]; isReadonly {
 		onlyVerbs = ReadonlyVerbs
 	}
 	// Check the old format and error when used
 	if value := values["readonly"]; len(value) > 0 && len(value[0]) > 0 {
 		return ret, fmt.Errorf("+readonly=%s is invalid, use //+genclient:readonly instead", value[0])
 	}
-	if v, exists := values[genClientPre***REMOVED***x+"skipVerbs"]; exists {
+	if v, exists := values[genClientPrefix+"skipVerbs"]; exists {
 		ret.SkipVerbs = strings.Split(v[0], ",")
 	}
-	if v, exists := values[genClientPre***REMOVED***x+"onlyVerbs"]; exists || len(onlyVerbs) > 0 {
+	if v, exists := values[genClientPrefix+"onlyVerbs"]; exists || len(onlyVerbs) > 0 {
 		if len(v) > 0 {
 			onlyVerbs = append(onlyVerbs, strings.Split(v[0], ",")...)
 		}
@@ -249,7 +249,7 @@ func ParseClientGenTags(lines []string) (Tags, error) {
 func parseClientExtensions(tags map[string][]string) ([]extension, error) {
 	var ret []extension
 	for name, values := range tags {
-		if !strings.HasPre***REMOVED***x(name, genClientPre***REMOVED***x+"method") {
+		if !strings.HasPrefix(name, genClientPrefix+"method") {
 			continue
 		}
 		for _, value := range values {
@@ -259,7 +259,7 @@ func parseClientExtensions(tags map[string][]string) ([]extension, error) {
 			if len(parts) == 0 {
 				return nil, fmt.Errorf("invalid of empty extension verb name: %q", value)
 			}
-			// The ***REMOVED***rst part represents the name of the extension
+			// The first part represents the name of the extension
 			ext.VerbName = parts[0]
 			if len(ext.VerbName) == 0 {
 				return nil, fmt.Errorf("must specify a verb name (// +genclient:method=Foo,verb=create)")
@@ -269,7 +269,7 @@ func parseClientExtensions(tags map[string][]string) ([]extension, error) {
 			for _, p := range params {
 				parts := strings.Split(p, "=")
 				if len(parts) != 2 {
-					return nil, fmt.Errorf("invalid extension tag speci***REMOVED***cation %q", p)
+					return nil, fmt.Errorf("invalid extension tag specification %q", p)
 				}
 				key, val := strings.TrimSpace(parts[0]), strings.TrimSpace(parts[1])
 				if len(val) == 0 {
@@ -285,12 +285,12 @@ func parseClientExtensions(tags map[string][]string) ([]extension, error) {
 				case "result":
 					ext.ResultTypeOverride = val
 				default:
-					return nil, fmt.Errorf("unknown extension con***REMOVED***guration key %q", key)
+					return nil, fmt.Errorf("unknown extension configuration key %q", key)
 				}
 			}
-			// Validate resulting extension con***REMOVED***guration
+			// Validate resulting extension configuration
 			if len(ext.VerbType) == 0 {
-				return nil, fmt.Errorf("verb type must be speci***REMOVED***ed (use '// +genclient:method=%s,verb=create')", ext.VerbName)
+				return nil, fmt.Errorf("verb type must be specified (use '// +genclient:method=%s,verb=create')", ext.VerbName)
 			}
 			if len(ext.ResultTypeOverride) > 0 {
 				supported := false
@@ -333,7 +333,7 @@ func validateClientGenTags(values map[string][]string) error {
 		delete(values, k)
 	}
 	for key := range values {
-		if strings.HasPre***REMOVED***x(key, strings.TrimSuf***REMOVED***x(genClientPre***REMOVED***x, ":")) {
+		if strings.HasPrefix(key, strings.TrimSuffix(genClientPrefix, ":")) {
 			return errors.New("unknown tag detected: " + key)
 		}
 	}

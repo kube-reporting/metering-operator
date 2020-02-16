@@ -35,7 +35,7 @@ func AWSBillingPeriodTimestamp(date time.Time) string {
 	return date.Format(AWSUsagePartitionDateStringLayout)
 }
 
-func FullyQuali***REMOVED***edTableName(prestoTable *metering.PrestoTable) (string, error) {
+func FullyQualifiedTableName(prestoTable *metering.PrestoTable) (string, error) {
 	var errs []string
 	if len(prestoTable.Status.Catalog) == 0 {
 		errs = append(errs, "prestoTable.Status.Catalog is unset")
@@ -51,21 +51,21 @@ func FullyQuali***REMOVED***edTableName(prestoTable *metering.PrestoTable) (stri
 		return "", fmt.Errorf("PrestoTable status is invalid: %s", strings.Join(errs, ", "))
 	}
 
-	return presto.FullyQuali***REMOVED***edTableName(prestoTable.Status.Catalog, prestoTable.Status.Schema, prestoTable.Status.TableName), nil
+	return presto.FullyQualifiedTableName(prestoTable.Status.Catalog, prestoTable.Status.Schema, prestoTable.Status.TableName), nil
 }
 
-func IsValidSQLIdenti***REMOVED***er(id string) bool {
+func IsValidSQLIdentifier(id string) bool {
 	if len(id) == 0 {
 		return false
 	}
 
 	// First character must be a letter or underscore
-	***REMOVED***rstChar := rune(id[0])
-	if !unicode.IsLetter(***REMOVED***rstChar) && ***REMOVED***rstChar != '_' {
+	firstChar := rune(id[0])
+	if !unicode.IsLetter(firstChar) && firstChar != '_' {
 		return false
 	}
 
-	// Everything ***REMOVED*** character must be a letter, digit or underscore
+	// Everything else character must be a letter, digit or underscore
 	rest := id[1:]
 	for _, r := range rest {
 		if !unicode.IsLetter(r) && !unicode.IsDigit(r) && r != '_' {
@@ -139,7 +139,7 @@ func HiveColumnToPrestoColumn(column hive.Column) (presto.Column, error) {
 			Name: column.Name,
 			Type: colType,
 		}, nil
-	} ***REMOVED*** {
+	} else {
 		colType = strings.ToUpper(column.Type)
 		switch {
 		case strings.Contains(colType, "MAP"):
@@ -150,15 +150,15 @@ func HiveColumnToPrestoColumn(column hive.Column) (presto.Column, error) {
 			beginMapIndex := strings.Index(colType, "<")
 			endMapIndex := strings.Index(colType, ">")
 			if beginMapIndex == -1 || endMapIndex == -1 {
-				return presto.Column{}, fmt.Errorf("unable to ***REMOVED***nd matching <, > pair for column %q, type: %q", column.Name, column.Type)
+				return presto.Column{}, fmt.Errorf("unable to find matching <, > pair for column %q, type: %q", column.Name, column.Type)
 			}
 			if beginMapIndex+1 >= len(colType) {
-				return presto.Column{}, fmt.Errorf("invalid map de***REMOVED***nition in column type, column %q, type: %q", column.Name, column.Type)
+				return presto.Column{}, fmt.Errorf("invalid map definition in column type, column %q, type: %q", column.Name, column.Type)
 			}
 			mapComponents := colType[beginMapIndex+1 : endMapIndex]
 			mapComponentsSplit := strings.SplitN(mapComponents, ",", 2)
 			if len(mapComponentsSplit) != 2 {
-				return presto.Column{}, fmt.Errorf("invalid map de***REMOVED***nition in column type, column %q, type: %q", column.Name, column.Type)
+				return presto.Column{}, fmt.Errorf("invalid map definition in column type, column %q, type: %q", column.Name, column.Type)
 			}
 			keyType := strings.TrimSpace(mapComponentsSplit[0])
 			valueType := strings.TrimSpace(mapComponentsSplit[1])
@@ -208,7 +208,7 @@ func PrestoColumnToHiveColumn(column presto.Column) (hive.Column, error) {
 			Name: column.Name,
 			Type: colType,
 		}, nil
-	} ***REMOVED*** {
+	} else {
 		colType = strings.ToUpper(column.Type)
 		switch {
 		case strings.Contains(colType, "MAP"):
@@ -219,15 +219,15 @@ func PrestoColumnToHiveColumn(column presto.Column) (hive.Column, error) {
 			beginMapIndex := strings.Index(colType, "(")
 			endMapIndex := strings.Index(colType, ")")
 			if beginMapIndex == -1 || endMapIndex == -1 {
-				return hive.Column{}, fmt.Errorf("unable to ***REMOVED***nd matching (, ) pair for column %q, type: %q", column.Name, column.Type)
+				return hive.Column{}, fmt.Errorf("unable to find matching (, ) pair for column %q, type: %q", column.Name, column.Type)
 			}
 			if beginMapIndex+1 >= len(colType) {
-				return hive.Column{}, fmt.Errorf("invalid map de***REMOVED***nition in column type, column %q, type: %q", column.Name, column.Type)
+				return hive.Column{}, fmt.Errorf("invalid map definition in column type, column %q, type: %q", column.Name, column.Type)
 			}
 			mapComponents := colType[beginMapIndex+1 : endMapIndex]
 			mapComponentsSplit := strings.SplitN(mapComponents, ",", 2)
 			if len(mapComponentsSplit) != 2 {
-				return hive.Column{}, fmt.Errorf("invalid map de***REMOVED***nition in column type, column %q, type: %q", column.Name, column.Type)
+				return hive.Column{}, fmt.Errorf("invalid map definition in column type, column %q, type: %q", column.Name, column.Type)
 			}
 			keyType := strings.TrimSpace(mapComponentsSplit[0])
 			valueType := strings.TrimSpace(mapComponentsSplit[1])
@@ -254,7 +254,7 @@ func PrestoColumnToHiveColumn(column presto.Column) (hive.Column, error) {
 	return hive.Column{}, fmt.Errorf("unsupported hive type: %q", column.Type)
 }
 
-func ConvertInputDe***REMOVED***nitionsIntoInputList(defs []metering.ReportQueryInputDe***REMOVED***nition) (required []string) {
+func ConvertInputDefinitionsIntoInputList(defs []metering.ReportQueryInputDefinition) (required []string) {
 	for _, def := range defs {
 		if def.Required {
 			required = append(required, def.Name)

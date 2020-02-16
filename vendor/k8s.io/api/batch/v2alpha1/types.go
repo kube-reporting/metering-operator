@@ -2,7 +2,7 @@
 Copyright 2016 The Kubernetes Authors.
 
 Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this ***REMOVED***le except in compliance with the License.
+you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
 
     http://www.apache.org/licenses/LICENSE-2.0
@@ -10,7 +10,7 @@ You may obtain a copy of the License at
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the speci***REMOVED***c language governing permissions and
+See the License for the specific language governing permissions and
 limitations under the License.
 */
 
@@ -24,7 +24,7 @@ import (
 
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
 
-// JobTemplate describes a template for creating copies of a prede***REMOVED***ned pod.
+// JobTemplate describes a template for creating copies of a predefined pod.
 type JobTemplate struct {
 	metav1.TypeMeta `json:",inline"`
 	// Standard object's metadata.
@@ -32,7 +32,7 @@ type JobTemplate struct {
 	// +optional
 	metav1.ObjectMeta `json:"metadata,omitempty" protobuf:"bytes,1,opt,name=metadata"`
 
-	// De***REMOVED***nes jobs that will be created from this template.
+	// Defines jobs that will be created from this template.
 	// https://git.k8s.io/community/contributors/devel/api-conventions.md#spec-and-status
 	// +optional
 	Template JobTemplateSpec `json:"template,omitempty" protobuf:"bytes,2,opt,name=template"`
@@ -45,7 +45,7 @@ type JobTemplateSpec struct {
 	// +optional
 	metav1.ObjectMeta `json:"metadata,omitempty" protobuf:"bytes,1,opt,name=metadata"`
 
-	// Speci***REMOVED***cation of the desired behavior of the job.
+	// Specification of the desired behavior of the job.
 	// More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#spec-and-status
 	// +optional
 	Spec batchv1.JobSpec `json:"spec,omitempty" protobuf:"bytes,2,opt,name=spec"`
@@ -54,7 +54,7 @@ type JobTemplateSpec struct {
 // +genclient
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
 
-// CronJob represents the con***REMOVED***guration of a single cron job.
+// CronJob represents the configuration of a single cron job.
 type CronJob struct {
 	metav1.TypeMeta `json:",inline"`
 	// Standard object's metadata.
@@ -62,7 +62,7 @@ type CronJob struct {
 	// +optional
 	metav1.ObjectMeta `json:"metadata,omitempty" protobuf:"bytes,1,opt,name=metadata"`
 
-	// Speci***REMOVED***cation of the desired behavior of a cron job, including the schedule.
+	// Specification of the desired behavior of a cron job, including the schedule.
 	// More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#spec-and-status
 	// +optional
 	Spec CronJobSpec `json:"spec,omitempty" protobuf:"bytes,2,opt,name=spec"`
@@ -99,10 +99,10 @@ type CronJobSpec struct {
 	// +optional
 	StartingDeadlineSeconds *int64 `json:"startingDeadlineSeconds,omitempty" protobuf:"varint,2,opt,name=startingDeadlineSeconds"`
 
-	// Speci***REMOVED***es how to treat concurrent executions of a Job.
+	// Specifies how to treat concurrent executions of a Job.
 	// Valid values are:
 	// - "Allow" (default): allows CronJobs to run concurrently;
-	// - "Forbid": forbids concurrent runs, skipping next run if previous run hasn't ***REMOVED***nished yet;
+	// - "Forbid": forbids concurrent runs, skipping next run if previous run hasn't finished yet;
 	// - "Replace": cancels currently running job and replaces it with a new one
 	// +optional
 	ConcurrencyPolicy ConcurrencyPolicy `json:"concurrencyPolicy,omitempty" protobuf:"bytes,3,opt,name=concurrencyPolicy,casttype=ConcurrencyPolicy"`
@@ -112,23 +112,23 @@ type CronJobSpec struct {
 	// +optional
 	Suspend *bool `json:"suspend,omitempty" protobuf:"varint,4,opt,name=suspend"`
 
-	// Speci***REMOVED***es the job that will be created when executing a CronJob.
+	// Specifies the job that will be created when executing a CronJob.
 	JobTemplate JobTemplateSpec `json:"jobTemplate" protobuf:"bytes,5,opt,name=jobTemplate"`
 
-	// The number of successful ***REMOVED***nished jobs to retain.
-	// This is a pointer to distinguish between explicit zero and not speci***REMOVED***ed.
+	// The number of successful finished jobs to retain.
+	// This is a pointer to distinguish between explicit zero and not specified.
 	// +optional
 	SuccessfulJobsHistoryLimit *int32 `json:"successfulJobsHistoryLimit,omitempty" protobuf:"varint,6,opt,name=successfulJobsHistoryLimit"`
 
-	// The number of failed ***REMOVED***nished jobs to retain.
-	// This is a pointer to distinguish between explicit zero and not speci***REMOVED***ed.
+	// The number of failed finished jobs to retain.
+	// This is a pointer to distinguish between explicit zero and not specified.
 	// +optional
 	FailedJobsHistoryLimit *int32 `json:"failedJobsHistoryLimit,omitempty" protobuf:"varint,7,opt,name=failedJobsHistoryLimit"`
 }
 
 // ConcurrencyPolicy describes how the job will be handled.
-// Only one of the following concurrent policies may be speci***REMOVED***ed.
-// If none of the following policies is speci***REMOVED***ed, the default one
+// Only one of the following concurrent policies may be specified.
+// If none of the following policies is specified, the default one
 // is AllowConcurrent.
 type ConcurrencyPolicy string
 
@@ -137,7 +137,7 @@ const (
 	AllowConcurrent ConcurrencyPolicy = "Allow"
 
 	// ForbidConcurrent forbids concurrent runs, skipping next run if previous
-	// hasn't ***REMOVED***nished yet.
+	// hasn't finished yet.
 	ForbidConcurrent ConcurrencyPolicy = "Forbid"
 
 	// ReplaceConcurrent cancels currently running job and replaces it with a new one.

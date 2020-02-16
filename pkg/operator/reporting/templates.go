@@ -18,7 +18,7 @@ import (
 )
 
 // ReportQueryTemplateContext is used to hold all information about a ReportQuery that will be
-// needed when rendering the templating inside of a ReportQuery's query ***REMOVED***eld.
+// needed when rendering the templating inside of a ReportQuery's query field.
 type ReportQueryTemplateContext struct {
 	Namespace      string
 	Query          string
@@ -44,7 +44,7 @@ type ReportTemplateInfo struct {
 }
 
 // dataSourceTableName is a receiver method for ReportQueryTemplateContext, which validates that
-// certain ***REMOVED***elds in the ctx.DataSources are properly set. This returns the name of the Presto Table
+// certain fields in the ctx.DataSources are properly set. This returns the name of the Presto Table
 // that the DataSource references (DataSource.Status.TableRef) and nil, or an empty string and an error
 // if the TableRef.Name is unset, or unable to be found in the ctx.PrestoTables.
 func (ctx *ReportQueryTemplateContext) dataSourceTableName(name string) (string, error) {
@@ -55,7 +55,7 @@ func (ctx *ReportQueryTemplateContext) dataSourceTableName(name string) (string,
 			}
 			for _, prestoTable := range ctx.PrestoTables {
 				if prestoTable.Name == ds.Status.TableRef.Name {
-					return reportingutil.FullyQuali***REMOVED***edTableName(prestoTable)
+					return reportingutil.FullyQualifiedTableName(prestoTable)
 				}
 			}
 			return "", fmt.Errorf("tableRef PrestoTable %s not found", ds.Status.TableRef.Name)
@@ -65,7 +65,7 @@ func (ctx *ReportQueryTemplateContext) dataSourceTableName(name string) (string,
 }
 
 // reportTableName is a receiver method for ReportQueryTemplateContext, which validates that
-// that certain ***REMOVED***elds in ctx.Reports are properly set. This returns the name of the Presto Table
+// that certain fields in ctx.Reports are properly set. This returns the name of the Presto Table
 // that the Report references (Report.Status.TableRef) and nil, or an empty string and an error
 // if the TableRef.Name is unset, or unable to be found in the ctx.PrestoTables
 func (ctx *ReportQueryTemplateContext) reportTableName(name string) (string, error) {
@@ -76,7 +76,7 @@ func (ctx *ReportQueryTemplateContext) reportTableName(name string) (string, err
 			}
 			for _, prestoTable := range ctx.PrestoTables {
 				if prestoTable.Name == r.Status.TableRef.Name {
-					return reportingutil.FullyQuali***REMOVED***edTableName(prestoTable)
+					return reportingutil.FullyQualifiedTableName(prestoTable)
 				}
 			}
 			return "", fmt.Errorf("tableRef PrestoTable %s not found", r.Status.TableRef.Name)
@@ -87,7 +87,7 @@ func (ctx *ReportQueryTemplateContext) reportTableName(name string) (string, err
 
 // renderReportQuery takes two parameters: a string parameter referencing a ReportQuery's name, and a TemplateContext
 // parameter, which is typically just `.` in the template. If the tmplCtx.ReportQuery is valid, this returns
-// a string containing the speci***REMOVED***ed ReportQuery in its rendered form, using the second argument as the context
+// a string containing the specified ReportQuery in its rendered form, using the second argument as the context
 // for templating rendering, or an error due to an unkown ReportQuery name or the inability to render that query.
 func (ctx *ReportQueryTemplateContext) renderReportQuery(name string, tmplCtx TemplateContext) (string, error) {
 	var reportQuery *metering.ReportQuery
@@ -103,7 +103,7 @@ func (ctx *ReportQueryTemplateContext) renderReportQuery(name string, tmplCtx Te
 
 	// copy context and replace the query we're rendering
 	newCtx := *ctx
-	newCtx.RequiredInputs = reportingutil.ConvertInputDe***REMOVED***nitionsIntoInputList(reportQuery.Spec.Inputs)
+	newCtx.RequiredInputs = reportingutil.ConvertInputDefinitionsIntoInputList(reportQuery.Spec.Inputs)
 	newCtx.Query = reportQuery.Spec.Query
 
 	renderedQuery, err := RenderQuery(&newCtx, tmplCtx)
@@ -131,7 +131,7 @@ func (ctx *ReportQueryTemplateContext) newQueryTemplate() (*template.Template, e
 }
 
 // RenderQuery creates a new query template by calling the ctx parameter's method, newQueryTemplate,
-// and checks if the returned error is nil. If nil, return an empty string and the error, ***REMOVED*** return
+// and checks if the returned error is nil. If nil, return an empty string and the error, else return
 // the function call to renderTemplate, passing in the new query template and tmplCtx parameter.
 func RenderQuery(ctx *ReportQueryTemplateContext, tmplCtx TemplateContext) (string, error) {
 	requiredInputs := sets.NewString(ctx.RequiredInputs...)
@@ -164,7 +164,7 @@ func renderTemplate(tmpl *template.Template, tmplCtx TemplateContext) (string, e
 }
 
 // TimestampFormat checks the type of the input interface parameter and returns that parameter in
-// the form speci***REMOVED***ed by the format string parameter, or an error if it's not able to be converted.
+// the form specified by the format string parameter, or an error if it's not able to be converted.
 func TimestampFormat(input interface{}, format string) (string, error) {
 	var err error
 	var d time.Time

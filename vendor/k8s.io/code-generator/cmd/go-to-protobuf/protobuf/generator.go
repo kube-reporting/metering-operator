@@ -2,7 +2,7 @@
 Copyright 2015 The Kubernetes Authors.
 
 Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this ***REMOVED***le except in compliance with the License.
+you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
 
     http://www.apache.org/licenses/LICENSE-2.0
@@ -10,7 +10,7 @@ You may obtain a copy of the License at
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the speci***REMOVED***c language governing permissions and
+See the License for the specific language governing permissions and
 limitations under the License.
 */
 
@@ -58,7 +58,7 @@ func (g *genProtoIDL) PackageVars(c *generator.Context) []string {
 		"option (gogoproto.stringer_all) = true;",
 		"option (gogoproto.unmarshaler_all) = true;",
 		"option (gogoproto.goproto_unrecognized_all) = false;",
-		"option (gogoproto.goproto_enum_pre***REMOVED***x_all) = false;",
+		"option (gogoproto.goproto_enum_prefix_all) = false;",
 		"option (gogoproto.goproto_getters_all) = false;",
 		fmt.Sprintf("option go_package = %q;", g.localGoPackage.Name),
 	}
@@ -73,16 +73,16 @@ func (g *genProtoIDL) Namers(c *generator.Context) namer.NameSystems {
 	}
 }
 
-// Filter ignores types that are identi***REMOVED***ed as not exportable.
+// Filter ignores types that are identified as not exportable.
 func (g *genProtoIDL) Filter(c *generator.Context, t *types.Type) bool {
 	tagVals := types.ExtractCommentTags("+", t.CommentLines)["protobuf"]
 	if tagVals != nil {
 		if tagVals[0] == "false" {
-			// Type speci***REMOVED***ed "false".
+			// Type specified "false".
 			return false
 		}
 		if tagVals[0] == "true" {
-			// Type speci***REMOVED***ed "true".
+			// Type specified "true".
 			return true
 		}
 		klog.Fatalf(`Comment tag "protobuf" must be true or false, found: %q`, tagVals[0])
@@ -133,7 +133,7 @@ func isProtoable(seen map[*types.Type]bool, t *types.Type) bool {
 	}
 }
 
-// isOptionalAlias should return true if the speci***REMOVED***ed type has an underlying type
+// isOptionalAlias should return true if the specified type has an underlying type
 // (is an alias) of a map or slice and has the comment tag protobuf.nullable=true,
 // indicating that the type should be nullable in protobuf.
 func isOptionalAlias(t *types.Type) bool {
@@ -158,7 +158,7 @@ func (g *genProtoIDL) Imports(c *generator.Context) (imports []string) {
 	return lines
 }
 
-// GenerateType makes the body of a ***REMOVED***le implementing a set for type t.
+// GenerateType makes the body of a file implementing a set for type t.
 func (g *genProtoIDL) GenerateType(c *generator.Context, t *types.Type, w io.Writer) error {
 	sw := generator.NewSnippetWriter(w, c, "$", "$")
 	b := bodyGen{
@@ -186,7 +186,7 @@ func (g *genProtoIDL) GenerateType(c *generator.Context, t *types.Type, w io.Wri
 	}
 }
 
-// ProtobufFromGoNamer ***REMOVED***nds the protobuf name of a type (and its package, and
+// ProtobufFromGoNamer finds the protobuf name of a type (and its package, and
 // the package path) from its Go name.
 type ProtobufFromGoNamer interface {
 	GoNameToProtoName(name types.Name) types.Name
@@ -302,13 +302,13 @@ func (b bodyGen) doStruct(sw *generator.SnippetWriter) error {
 	}
 
 	var alias *types.Type
-	var ***REMOVED***elds []protoField
+	var fields []protoField
 	options := []string{}
 	allOptions := types.ExtractCommentTags("+", b.t.CommentLines)
 	for k, v := range allOptions {
 		switch {
-		case strings.HasPre***REMOVED***x(k, "protobuf.options."):
-			key := strings.TrimPre***REMOVED***x(k, "protobuf.options.")
+		case strings.HasPrefix(k, "protobuf.options."):
+			key := strings.TrimPrefix(k, "protobuf.options.")
 			switch key {
 			case "marshal":
 				if v[0] == "false" {
@@ -321,7 +321,7 @@ func (b bodyGen) doStruct(sw *generator.SnippetWriter) error {
 					}
 				}
 			default:
-				if !b.omitGogo || !strings.HasPre***REMOVED***x(key, "(gogoproto.") {
+				if !b.omitGogo || !strings.HasPrefix(key, "(gogoproto.") {
 					if key == "(gogoproto.goproto_stringer)" && v[0] == "false" {
 						options = append(options, "(gogoproto.stringer) = false")
 					}
@@ -330,14 +330,14 @@ func (b bodyGen) doStruct(sw *generator.SnippetWriter) error {
 			}
 		// protobuf.as allows a type to have the same message contents as another Go type
 		case k == "protobuf.as":
-			***REMOVED***elds = nil
+			fields = nil
 			if alias = b.locator.GoTypeForName(types.Name{Name: v[0]}); alias == nil {
 				return fmt.Errorf("type %v references alias %q which does not exist", b.t, v[0])
 			}
 		// protobuf.embed instructs the generator to use the named type in this package
 		// as an embedded message.
 		case k == "protobuf.embed":
-			***REMOVED***elds = []protoField{
+			fields = []protoField{
 				{
 					Tag:  1,
 					Name: v[0],
@@ -356,13 +356,13 @@ func (b bodyGen) doStruct(sw *generator.SnippetWriter) error {
 		alias = b.t
 	}
 
-	// If we don't explicitly embed anything, generate ***REMOVED***elds by traversing ***REMOVED***elds.
-	if ***REMOVED***elds == nil {
+	// If we don't explicitly embed anything, generate fields by traversing fields.
+	if fields == nil {
 		memberFields, err := membersToFields(b.locator, alias, b.localPackage, b.omitFieldTypes)
 		if err != nil {
 			return fmt.Errorf("type %v cannot be converted to protobuf: %v", b.t, err)
 		}
-		***REMOVED***elds = memberFields
+		fields = memberFields
 	}
 
 	out := sw.Out()
@@ -378,23 +378,23 @@ func (b bodyGen) doStruct(sw *generator.SnippetWriter) error {
 		fmt.Fprintln(out)
 	}
 
-	for i, ***REMOVED***eld := range ***REMOVED***elds {
-		genComment(out, ***REMOVED***eld.CommentLines, "  ")
+	for i, field := range fields {
+		genComment(out, field.CommentLines, "  ")
 		fmt.Fprintf(out, "  ")
 		switch {
-		case ***REMOVED***eld.Map:
-		case ***REMOVED***eld.Repeated:
+		case field.Map:
+		case field.Repeated:
 			fmt.Fprintf(out, "repeated ")
-		case ***REMOVED***eld.Required:
+		case field.Required:
 			fmt.Fprintf(out, "required ")
 		default:
 			fmt.Fprintf(out, "optional ")
 		}
-		sw.Do(`$.Type|local$ $.Name$ = $.Tag$`, ***REMOVED***eld)
-		if len(***REMOVED***eld.Extras) > 0 {
+		sw.Do(`$.Type|local$ $.Name$ = $.Tag$`, field)
+		if len(field.Extras) > 0 {
 			extras := []string{}
-			for k, v := range ***REMOVED***eld.Extras {
-				if b.omitGogo && strings.HasPre***REMOVED***x(k, "(gogoproto.") {
+			for k, v := range field.Extras {
+				if b.omitGogo && strings.HasPrefix(k, "(gogoproto.") {
 					continue
 				}
 				extras = append(extras, fmt.Sprintf("%s = %s", k, v))
@@ -407,7 +407,7 @@ func (b bodyGen) doStruct(sw *generator.SnippetWriter) error {
 			}
 		}
 		fmt.Fprintf(out, ";\n")
-		if i != len(***REMOVED***elds)-1 {
+		if i != len(fields)-1 {
 			fmt.Fprintf(out, "\n")
 		}
 	}
@@ -469,13 +469,13 @@ func isFundamentalProtoType(t *types.Type) (*types.Type, bool) {
 	return t, false
 }
 
-func memberTypeToProtobufField(locator ProtobufLocator, ***REMOVED***eld *protoField, t *types.Type) error {
+func memberTypeToProtobufField(locator ProtobufLocator, field *protoField, t *types.Type) error {
 	var err error
 	switch t.Kind {
 	case types.Protobuf:
-		***REMOVED***eld.Type, err = locator.ProtoTypeFor(t)
+		field.Type, err = locator.ProtoTypeFor(t)
 	case types.Builtin:
-		***REMOVED***eld.Type, err = locator.ProtoTypeFor(t)
+		field.Type, err = locator.ProtoTypeFor(t)
 	case types.Map:
 		valueField := &protoField{}
 		if err := memberTypeToProtobufField(locator, valueField, t.Elem); err != nil {
@@ -487,58 +487,58 @@ func memberTypeToProtobufField(locator ProtobufLocator, ***REMOVED***eld *protoF
 		}
 		// All other protobuf types have kind types.Protobuf, so setting types.Map
 		// here would be very misleading.
-		***REMOVED***eld.Type = &types.Type{
+		field.Type = &types.Type{
 			Kind: types.Protobuf,
 			Key:  keyField.Type,
 			Elem: valueField.Type,
 		}
-		if !strings.HasPre***REMOVED***x(t.Name.Name, "map[") {
-			***REMOVED***eld.Extras["(gogoproto.casttype)"] = strconv.Quote(locator.CastTypeName(t.Name))
+		if !strings.HasPrefix(t.Name.Name, "map[") {
+			field.Extras["(gogoproto.casttype)"] = strconv.Quote(locator.CastTypeName(t.Name))
 		}
 		if k, ok := keyField.Extras["(gogoproto.casttype)"]; ok {
-			***REMOVED***eld.Extras["(gogoproto.castkey)"] = k
+			field.Extras["(gogoproto.castkey)"] = k
 		}
 		if v, ok := valueField.Extras["(gogoproto.casttype)"]; ok {
-			***REMOVED***eld.Extras["(gogoproto.castvalue)"] = v
+			field.Extras["(gogoproto.castvalue)"] = v
 		}
-		***REMOVED***eld.Map = true
+		field.Map = true
 	case types.Pointer:
-		if err := memberTypeToProtobufField(locator, ***REMOVED***eld, t.Elem); err != nil {
+		if err := memberTypeToProtobufField(locator, field, t.Elem); err != nil {
 			return err
 		}
-		***REMOVED***eld.Nullable = true
+		field.Nullable = true
 	case types.Alias:
 		if isOptionalAlias(t) {
-			***REMOVED***eld.Type, err = locator.ProtoTypeFor(t)
-			***REMOVED***eld.Nullable = true
-		} ***REMOVED*** {
-			if err := memberTypeToProtobufField(locator, ***REMOVED***eld, t.Underlying); err != nil {
+			field.Type, err = locator.ProtoTypeFor(t)
+			field.Nullable = true
+		} else {
+			if err := memberTypeToProtobufField(locator, field, t.Underlying); err != nil {
 				log.Printf("failed to alias: %s %s: err %v", t.Name, t.Underlying.Name, err)
 				return err
 			}
 			// If this is not an alias to a slice, cast to the alias
-			if !***REMOVED***eld.Repeated {
-				if ***REMOVED***eld.Extras == nil {
-					***REMOVED***eld.Extras = make(map[string]string)
+			if !field.Repeated {
+				if field.Extras == nil {
+					field.Extras = make(map[string]string)
 				}
-				***REMOVED***eld.Extras["(gogoproto.casttype)"] = strconv.Quote(locator.CastTypeName(t.Name))
+				field.Extras["(gogoproto.casttype)"] = strconv.Quote(locator.CastTypeName(t.Name))
 			}
 		}
 	case types.Slice:
 		if t.Elem.Name.Name == "byte" && len(t.Elem.Name.Package) == 0 {
-			***REMOVED***eld.Type = &types.Type{Name: types.Name{Name: "bytes"}, Kind: types.Protobuf}
+			field.Type = &types.Type{Name: types.Name{Name: "bytes"}, Kind: types.Protobuf}
 			return nil
 		}
-		if err := memberTypeToProtobufField(locator, ***REMOVED***eld, t.Elem); err != nil {
+		if err := memberTypeToProtobufField(locator, field, t.Elem); err != nil {
 			return err
 		}
-		***REMOVED***eld.Repeated = true
+		field.Repeated = true
 	case types.Struct:
 		if len(t.Name.Name) == 0 {
 			return errUnrecognizedType
 		}
-		***REMOVED***eld.Type, err = locator.ProtoTypeFor(t)
-		***REMOVED***eld.Nullable = false
+		field.Type, err = locator.ProtoTypeFor(t)
+		field.Nullable = false
 	default:
 		return errUnrecognizedType
 	}
@@ -546,7 +546,7 @@ func memberTypeToProtobufField(locator ProtobufLocator, ***REMOVED***eld *protoF
 }
 
 // protobufTagToField extracts information from an existing protobuf tag
-func protobufTagToField(tag string, ***REMOVED***eld *protoField, m types.Member, t *types.Type, localPackage types.Name) error {
+func protobufTagToField(tag string, field *protoField, m types.Member, t *types.Type, localPackage types.Name) error {
 	if len(tag) == 0 || tag == "-" {
 		return nil
 	}
@@ -558,12 +558,12 @@ func protobufTagToField(tag string, ***REMOVED***eld *protoField, m types.Member
 	}
 	protoTag, err := strconv.Atoi(parts[1])
 	if err != nil {
-		return fmt.Errorf("member %q of %q malformed 'protobuf' tag, ***REMOVED***eld ID is %q which is not an integer: %v\n", m.Name, t.Name, parts[1], err)
+		return fmt.Errorf("member %q of %q malformed 'protobuf' tag, field ID is %q which is not an integer: %v\n", m.Name, t.Name, parts[1], err)
 	}
-	***REMOVED***eld.Tag = protoTag
+	field.Tag = protoTag
 
 	// In general there is doesn't make sense to parse the protobuf tags to get the type,
-	// as all auto-generated once will have wire type "bytes", "varint" or "***REMOVED***xed64".
+	// as all auto-generated once will have wire type "bytes", "varint" or "fixed64".
 	// However, sometimes we explicitly set them to have a custom serialization, e.g.:
 	//   type Time struct {
 	//     time.Time `protobuf:"Timestamp,1,req,name=time"`
@@ -571,24 +571,24 @@ func protobufTagToField(tag string, ***REMOVED***eld *protoField, m types.Member
 	// to force the generator to use a given type (that we manually wrote serialization &
 	// deserialization methods for).
 	switch parts[0] {
-	case "varint", "***REMOVED***xed32", "***REMOVED***xed64", "bytes", "group":
+	case "varint", "fixed32", "fixed64", "bytes", "group":
 	default:
 		name := types.Name{}
 		if last := strings.LastIndex(parts[0], "."); last != -1 {
-			pre***REMOVED***x := parts[0][:last]
+			prefix := parts[0][:last]
 			name = types.Name{
 				Name:    parts[0][last+1:],
-				Package: pre***REMOVED***x,
-				Path:    strings.Replace(pre***REMOVED***x, ".", "/", -1),
+				Package: prefix,
+				Path:    strings.Replace(prefix, ".", "/", -1),
 			}
-		} ***REMOVED*** {
+		} else {
 			name = types.Name{
 				Name:    parts[0],
 				Package: localPackage.Package,
 				Path:    localPackage.Path,
 			}
 		}
-		***REMOVED***eld.Type = &types.Type{
+		field.Type = &types.Type{
 			Name: name,
 			Kind: types.Protobuf,
 		}
@@ -609,9 +609,9 @@ func protobufTagToField(tag string, ***REMOVED***eld *protoField, m types.Member
 		}
 	}
 
-	***REMOVED***eld.Extras = protoExtra
+	field.Extras = protoExtra
 	if name, ok := protoExtra["name"]; ok {
-		***REMOVED***eld.Name = name
+		field.Name = name
 		delete(protoExtra, "name")
 	}
 
@@ -619,18 +619,18 @@ func protobufTagToField(tag string, ***REMOVED***eld *protoField, m types.Member
 }
 
 func membersToFields(locator ProtobufLocator, t *types.Type, localPackage types.Name, omitFieldTypes map[types.Name]struct{}) ([]protoField, error) {
-	***REMOVED***elds := []protoField{}
+	fields := []protoField{}
 
 	for _, m := range t.Members {
 		if namer.IsPrivateGoName(m.Name) {
-			// skip private ***REMOVED***elds
+			// skip private fields
 			continue
 		}
 		if _, ok := omitFieldTypes[types.Name{Name: m.Type.Name.Name, Package: m.Type.Name.Package}]; ok {
 			continue
 		}
 		tags := reflect.StructTag(m.Tags)
-		***REMOVED***eld := protoField{
+		field := protoField{
 			LocalPackage: localPackage,
 
 			Tag:    -1,
@@ -642,77 +642,77 @@ func membersToFields(locator ProtobufLocator, t *types.Type, localPackage types.
 			continue
 		}
 
-		if err := protobufTagToField(protobufTag, &***REMOVED***eld, m, t, localPackage); err != nil {
+		if err := protobufTagToField(protobufTag, &field, m, t, localPackage); err != nil {
 			return nil, err
 		}
 
-		// extract information from JSON ***REMOVED***eld tag
+		// extract information from JSON field tag
 		if tag := tags.Get("json"); len(tag) > 0 {
 			parts := strings.Split(tag, ",")
-			if len(***REMOVED***eld.Name) == 0 && len(parts[0]) != 0 {
-				***REMOVED***eld.Name = parts[0]
+			if len(field.Name) == 0 && len(parts[0]) != 0 {
+				field.Name = parts[0]
 			}
-			if ***REMOVED***eld.Tag == -1 && ***REMOVED***eld.Name == "-" {
+			if field.Tag == -1 && field.Name == "-" {
 				continue
 			}
 		}
 
-		if ***REMOVED***eld.Type == nil {
-			if err := memberTypeToProtobufField(locator, &***REMOVED***eld, m.Type); err != nil {
-				return nil, fmt.Errorf("unable to embed type %q as ***REMOVED***eld %q in %q: %v", m.Type, ***REMOVED***eld.Name, t.Name, err)
+		if field.Type == nil {
+			if err := memberTypeToProtobufField(locator, &field, m.Type); err != nil {
+				return nil, fmt.Errorf("unable to embed type %q as field %q in %q: %v", m.Type, field.Name, t.Name, err)
 			}
 		}
-		if len(***REMOVED***eld.Name) == 0 {
-			***REMOVED***eld.Name = namer.IL(m.Name)
+		if len(field.Name) == 0 {
+			field.Name = namer.IL(m.Name)
 		}
 
-		if ***REMOVED***eld.Map && ***REMOVED***eld.Repeated {
+		if field.Map && field.Repeated {
 			// maps cannot be repeated
-			***REMOVED***eld.Repeated = false
-			***REMOVED***eld.Nullable = true
+			field.Repeated = false
+			field.Nullable = true
 		}
 
-		if !***REMOVED***eld.Nullable {
-			***REMOVED***eld.Extras["(gogoproto.nullable)"] = "false"
+		if !field.Nullable {
+			field.Extras["(gogoproto.nullable)"] = "false"
 		}
-		if (***REMOVED***eld.Type.Name.Name == "bytes" && ***REMOVED***eld.Type.Name.Package == "") || (***REMOVED***eld.Repeated && ***REMOVED***eld.Type.Name.Package == "" && namer.IsPrivateGoName(***REMOVED***eld.Type.Name.Name)) {
-			delete(***REMOVED***eld.Extras, "(gogoproto.nullable)")
+		if (field.Type.Name.Name == "bytes" && field.Type.Name.Package == "") || (field.Repeated && field.Type.Name.Package == "" && namer.IsPrivateGoName(field.Type.Name.Name)) {
+			delete(field.Extras, "(gogoproto.nullable)")
 		}
-		if ***REMOVED***eld.Name != m.Name {
-			***REMOVED***eld.Extras["(gogoproto.customname)"] = strconv.Quote(m.Name)
+		if field.Name != m.Name {
+			field.Extras["(gogoproto.customname)"] = strconv.Quote(m.Name)
 		}
-		***REMOVED***eld.CommentLines = m.CommentLines
-		***REMOVED***elds = append(***REMOVED***elds, ***REMOVED***eld)
+		field.CommentLines = m.CommentLines
+		fields = append(fields, field)
 	}
 
 	// assign tags
 	highest := 0
 	byTag := make(map[int]*protoField)
-	// ***REMOVED***elds are in Go struct order, which we preserve
-	for i := range ***REMOVED***elds {
-		***REMOVED***eld := &***REMOVED***elds[i]
-		tag := ***REMOVED***eld.Tag
+	// fields are in Go struct order, which we preserve
+	for i := range fields {
+		field := &fields[i]
+		tag := field.Tag
 		if tag != -1 {
 			if existing, ok := byTag[tag]; ok {
-				return nil, fmt.Errorf("***REMOVED***eld %q and %q both have tag %d", ***REMOVED***eld.Name, existing.Name, tag)
+				return nil, fmt.Errorf("field %q and %q both have tag %d", field.Name, existing.Name, tag)
 			}
-			byTag[tag] = ***REMOVED***eld
+			byTag[tag] = field
 		}
 		if tag > highest {
 			highest = tag
 		}
 	}
-	// starting from the highest observed tag, assign new ***REMOVED***eld tags
-	for i := range ***REMOVED***elds {
-		***REMOVED***eld := &***REMOVED***elds[i]
-		if ***REMOVED***eld.Tag != -1 {
+	// starting from the highest observed tag, assign new field tags
+	for i := range fields {
+		field := &fields[i]
+		if field.Tag != -1 {
 			continue
 		}
 		highest++
-		***REMOVED***eld.Tag = highest
-		byTag[***REMOVED***eld.Tag] = ***REMOVED***eld
+		field.Tag = highest
+		byTag[field.Tag] = field
 	}
-	return ***REMOVED***elds, nil
+	return fields, nil
 }
 
 func genComment(out io.Writer, lines []string, indent string) {

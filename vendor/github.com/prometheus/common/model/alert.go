@@ -1,6 +1,6 @@
 // Copyright 2013 The Prometheus Authors
 // Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this ***REMOVED***le except in compliance with the License.
+// you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 //
 // http://www.apache.org/licenses/LICENSE-2.0
@@ -8,7 +8,7 @@
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the speci***REMOVED***c language governing permissions and
+// See the License for the specific language governing permissions and
 // limitations under the License.
 
 package model
@@ -21,7 +21,7 @@ import (
 type AlertStatus string
 
 const (
-	AlertFiring   AlertStatus = "***REMOVED***ring"
+	AlertFiring   AlertStatus = "firing"
 	AlertResolved AlertStatus = "resolved"
 )
 
@@ -31,7 +31,7 @@ type Alert struct {
 	// dispatching. This must minimally include an "alertname" label.
 	Labels LabelSet `json:"labels"`
 
-	// Extra key/value information which does not de***REMOVED***ne alert identity.
+	// Extra key/value information which does not define alert identity.
 	Annotations LabelSet `json:"annotations"`
 
 	// The known time range for this alert. Both ends are optional.
@@ -46,7 +46,7 @@ func (a *Alert) Name() string {
 }
 
 // Fingerprint returns a unique hash for the alert. It is equivalent to
-// the ***REMOVED***ngerprint of the alert's label set.
+// the fingerprint of the alert's label set.
 func (a *Alert) Fingerprint() Fingerprint {
 	return a.Labels.Fingerprint()
 }
@@ -127,7 +127,7 @@ func (as Alerts) HasFiring() bool {
 	return false
 }
 
-// Status returns StatusFiring iff at least one of the alerts is ***REMOVED***ring.
+// Status returns StatusFiring iff at least one of the alerts is firing.
 func (as Alerts) Status() AlertStatus {
 	if as.HasFiring() {
 		return AlertFiring

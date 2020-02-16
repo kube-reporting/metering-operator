@@ -1,6 +1,6 @@
 // Copyright 2014 The Go Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE ***REMOVED***le.
+// license that can be found in the LICENSE file.
 
 package http2
 
@@ -9,7 +9,7 @@ import (
 	"fmt"
 )
 
-// An ErrCode is an unsigned 32-bit error code as de***REMOVED***ned in the HTTP/2 spec.
+// An ErrCode is an unsigned 32-bit error code as defined in the HTTP/2 spec.
 type ErrCode uint32
 
 const (
@@ -92,7 +92,7 @@ func (goAwayFlowError) Error() string { return "connection exceeded flow control
 //
 // Errors of this type are only returned by the frame parser functions
 // and converted into ConnectionError(Code), after stashing away
-// the Reason into the Framer's errDetail ***REMOVED***eld, accessible via
+// the Reason into the Framer's errDetail field, accessible via
 // the (*Framer).ErrorDetail method.
 type connError struct {
 	Code   ErrCode // the ConnectionError error code
@@ -118,16 +118,16 @@ func (e duplicatePseudoHeaderError) Error() string {
 type headerFieldNameError string
 
 func (e headerFieldNameError) Error() string {
-	return fmt.Sprintf("invalid header ***REMOVED***eld name %q", string(e))
+	return fmt.Sprintf("invalid header field name %q", string(e))
 }
 
 type headerFieldValueError string
 
 func (e headerFieldValueError) Error() string {
-	return fmt.Sprintf("invalid header ***REMOVED***eld value %q", string(e))
+	return fmt.Sprintf("invalid header field value %q", string(e))
 }
 
 var (
 	errMixPseudoHeaderTypes = errors.New("mix of request and response pseudo headers")
-	errPseudoAfterRegular   = errors.New("pseudo header ***REMOVED***eld after regular")
+	errPseudoAfterRegular   = errors.New("pseudo header field after regular")
 )

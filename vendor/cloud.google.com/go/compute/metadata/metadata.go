@@ -1,7 +1,7 @@
 // Copyright 2014 Google LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this ***REMOVED***le except in compliance with the License.
+// you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 //
 //      http://www.apache.org/licenses/LICENSE-2.0
@@ -9,7 +9,7 @@
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the speci***REMOVED***c language governing permissions and
+// See the License for the specific language governing permissions and
 // limitations under the License.
 
 // Package metadata provides access to Google Compute Engine (GCE)
@@ -41,7 +41,7 @@ const (
 	// metadataHostEnv is the environment variable specifying the
 	// GCE metadata hostname.  If empty, the default value of
 	// metadataIP ("169.254.169.254") is used instead.
-	// This is variable name is not de***REMOVED***ned by any spec, as far as
+	// This is variable name is not defined by any spec, as far as
 	// I know; it was made up for the Go package.
 	metadataHostEnv = "GCE_METADATA_HOST"
 
@@ -81,16 +81,16 @@ var (
 	}}
 )
 
-// NotDe***REMOVED***nedError is returned when requested metadata is not de***REMOVED***ned.
+// NotDefinedError is returned when requested metadata is not defined.
 //
-// The underlying string is the suf***REMOVED***x after "/computeMetadata/v1/".
+// The underlying string is the suffix after "/computeMetadata/v1/".
 //
-// This error is not returned if the value is de***REMOVED***ned to be the empty
+// This error is not returned if the value is defined to be the empty
 // string.
-type NotDe***REMOVED***nedError string
+type NotDefinedError string
 
-func (suf***REMOVED***x NotDe***REMOVED***nedError) Error() string {
-	return fmt.Sprintf("metadata: GCE metadata %q not de***REMOVED***ned", string(suf***REMOVED***x))
+func (suffix NotDefinedError) Error() string {
+	return fmt.Sprintf("metadata: GCE metadata %q not defined", string(suffix))
 }
 
 func (c *cachedValue) get(cl *Client) (v string, err error) {
@@ -101,7 +101,7 @@ func (c *cachedValue) get(cl *Client) (v string, err error) {
 	}
 	if c.trim {
 		v, err = cl.getTrimmed(c.k)
-	} ***REMOVED*** {
+	} else {
 		v, err = cl.Get(c.k)
 	}
 	if err == nil {
@@ -163,7 +163,7 @@ func testOnGCE() bool {
 	if tryHarder {
 		res := <-resc
 		if res {
-			// The ***REMOVED***rst strategy succeeded, so let's use it.
+			// The first strategy succeeded, so let's use it.
 			return true
 		}
 		// Wait for either the DNS or metadata server probe to
@@ -182,13 +182,13 @@ func testOnGCE() bool {
 	}
 
 	// There's no hint from the system info that we're running on
-	// GCE, so use the ***REMOVED***rst probe's result as truth, whether it's
+	// GCE, so use the first probe's result as truth, whether it's
 	// true or false. The goal here is to optimize for speed for
 	// users who are NOT running on GCE. We can't assume that
 	// either a DNS lookup or an HTTP request to a blackholed IP
 	// address is fast. Worst case this should return when the
 	// metaClient's Transport.ResponseHeaderTimeout or
-	// Transport.Dial.Timeout ***REMOVED***res (in two seconds).
+	// Transport.Dial.Timeout fires (in two seconds).
 	return <-resc
 }
 
@@ -208,12 +208,12 @@ func systemInfoSuggestsGCE() bool {
 
 // Subscribe calls Client.Subscribe on a client designed for subscribing (one with no
 // ResponseHeaderTimeout).
-func Subscribe(suf***REMOVED***x string, fn func(v string, ok bool) error) error {
-	return subscribeClient.Subscribe(suf***REMOVED***x, fn)
+func Subscribe(suffix string, fn func(v string, ok bool) error) error {
+	return subscribeClient.Subscribe(suffix, fn)
 }
 
 // Get calls Client.Get on the default client.
-func Get(suf***REMOVED***x string) (string, error) { return defaultClient.Get(suf***REMOVED***x) }
+func Get(suffix string) (string, error) { return defaultClient.Get(suffix) }
 
 // ProjectID returns the current instance's project ID string.
 func ProjectID() (string, error) { return defaultClient.ProjectID() }
@@ -231,7 +231,7 @@ func ExternalIP() (string, error) { return defaultClient.ExternalIP() }
 // "<instanceID>.c.<projID>.internal".
 func Hostname() (string, error) { return defaultClient.Hostname() }
 
-// InstanceTags returns the list of user-de***REMOVED***ned instance tags,
+// InstanceTags returns the list of user-defined instance tags,
 // assigned when initially creating a GCE instance.
 func InstanceTags() ([]string, error) { return defaultClient.InstanceTags() }
 
@@ -285,22 +285,22 @@ func NewClient(c *http.Client) *Client {
 
 // getETag returns a value from the metadata service as well as the associated ETag.
 // This func is otherwise equivalent to Get.
-func (c *Client) getETag(suf***REMOVED***x string) (value, etag string, err error) {
-	// Using a ***REMOVED***xed IP makes it very dif***REMOVED***cult to spoof the metadata service in
+func (c *Client) getETag(suffix string) (value, etag string, err error) {
+	// Using a fixed IP makes it very difficult to spoof the metadata service in
 	// a container, which is an important use-case for local testing of cloud
-	// deployments. To enable spoo***REMOVED***ng of the metadata service, the environment
-	// variable GCE_METADATA_HOST is ***REMOVED***rst inspected to decide where metadata
+	// deployments. To enable spoofing of the metadata service, the environment
+	// variable GCE_METADATA_HOST is first inspected to decide where metadata
 	// requests shall go.
 	host := os.Getenv(metadataHostEnv)
 	if host == "" {
 		// Using 169.254.169.254 instead of "metadata" here because Go
 		// binaries built with the "netgo" tag and without cgo won't
-		// know the search suf***REMOVED***x for "metadata" is
+		// know the search suffix for "metadata" is
 		// ".google.internal", and this IP address is documented as
 		// being stable anyway.
 		host = metadataIP
 	}
-	u := "http://" + host + "/computeMetadata/v1/" + suf***REMOVED***x
+	u := "http://" + host + "/computeMetadata/v1/" + suffix
 	req, _ := http.NewRequest("GET", u, nil)
 	req.Header.Set("Metadata-Flavor", "Google")
 	req.Header.Set("User-Agent", userAgent)
@@ -310,7 +310,7 @@ func (c *Client) getETag(suf***REMOVED***x string) (value, etag string, err erro
 	}
 	defer res.Body.Close()
 	if res.StatusCode == http.StatusNotFound {
-		return "", "", NotDe***REMOVED***nedError(suf***REMOVED***x)
+		return "", "", NotDefinedError(suffix)
 	}
 	all, err := ioutil.ReadAll(res.Body)
 	if err != nil {
@@ -323,26 +323,26 @@ func (c *Client) getETag(suf***REMOVED***x string) (value, etag string, err erro
 }
 
 // Get returns a value from the metadata service.
-// The suf***REMOVED***x is appended to "http://${GCE_METADATA_HOST}/computeMetadata/v1/".
+// The suffix is appended to "http://${GCE_METADATA_HOST}/computeMetadata/v1/".
 //
-// If the GCE_METADATA_HOST environment variable is not de***REMOVED***ned, a default of
+// If the GCE_METADATA_HOST environment variable is not defined, a default of
 // 169.254.169.254 will be used instead.
 //
-// If the requested metadata is not de***REMOVED***ned, the returned error will
-// be of type NotDe***REMOVED***nedError.
-func (c *Client) Get(suf***REMOVED***x string) (string, error) {
-	val, _, err := c.getETag(suf***REMOVED***x)
+// If the requested metadata is not defined, the returned error will
+// be of type NotDefinedError.
+func (c *Client) Get(suffix string) (string, error) {
+	val, _, err := c.getETag(suffix)
 	return val, err
 }
 
-func (c *Client) getTrimmed(suf***REMOVED***x string) (s string, err error) {
-	s, err = c.Get(suf***REMOVED***x)
+func (c *Client) getTrimmed(suffix string) (s string, err error) {
+	s, err = c.Get(suffix)
 	s = strings.TrimSpace(s)
 	return
 }
 
-func (c *Client) lines(suf***REMOVED***x string) ([]string, error) {
-	j, err := c.Get(suf***REMOVED***x)
+func (c *Client) lines(suffix string) ([]string, error) {
+	j, err := c.Get(suffix)
 	if err != nil {
 		return nil, err
 	}
@@ -369,7 +369,7 @@ func (c *Client) InternalIP() (string, error) {
 
 // ExternalIP returns the instance's primary external (public) IP address.
 func (c *Client) ExternalIP() (string, error) {
-	return c.getTrimmed("instance/network-interfaces/0/access-con***REMOVED***gs/0/external-ip")
+	return c.getTrimmed("instance/network-interfaces/0/access-configs/0/external-ip")
 }
 
 // Hostname returns the instance's hostname. This will be of the form
@@ -378,7 +378,7 @@ func (c *Client) Hostname() (string, error) {
 	return c.getTrimmed("instance/hostname")
 }
 
-// InstanceTags returns the list of user-de***REMOVED***ned instance tags,
+// InstanceTags returns the list of user-defined instance tags,
 // assigned when initially creating a GCE instance.
 func (c *Client) InstanceTags() ([]string, error) {
 	var s []string
@@ -411,12 +411,12 @@ func (c *Client) Zone() (string, error) {
 	return zone[strings.LastIndex(zone, "/")+1:], nil
 }
 
-// InstanceAttributes returns the list of user-de***REMOVED***ned attributes,
+// InstanceAttributes returns the list of user-defined attributes,
 // assigned when initially creating a GCE VM instance. The value of an
 // attribute can be obtained with InstanceAttributeValue.
 func (c *Client) InstanceAttributes() ([]string, error) { return c.lines("instance/attributes/") }
 
-// ProjectAttributes returns the list of user-de***REMOVED***ned attributes
+// ProjectAttributes returns the list of user-defined attributes
 // applying to the project as a whole, not just this VM.  The value of
 // an attribute can be obtained with ProjectAttributeValue.
 func (c *Client) ProjectAttributes() ([]string, error) { return c.lines("project/attributes/") }
@@ -424,11 +424,11 @@ func (c *Client) ProjectAttributes() ([]string, error) { return c.lines("project
 // InstanceAttributeValue returns the value of the provided VM
 // instance attribute.
 //
-// If the requested attribute is not de***REMOVED***ned, the returned error will
-// be of type NotDe***REMOVED***nedError.
+// If the requested attribute is not defined, the returned error will
+// be of type NotDefinedError.
 //
 // InstanceAttributeValue may return ("", nil) if the attribute was
-// de***REMOVED***ned to be the empty string.
+// defined to be the empty string.
 func (c *Client) InstanceAttributeValue(attr string) (string, error) {
 	return c.Get("instance/attributes/" + attr)
 }
@@ -436,11 +436,11 @@ func (c *Client) InstanceAttributeValue(attr string) (string, error) {
 // ProjectAttributeValue returns the value of the provided
 // project attribute.
 //
-// If the requested attribute is not de***REMOVED***ned, the returned error will
-// be of type NotDe***REMOVED***nedError.
+// If the requested attribute is not defined, the returned error will
+// be of type NotDefinedError.
 //
 // ProjectAttributeValue may return ("", nil) if the attribute was
-// de***REMOVED***ned to be the empty string.
+// defined to be the empty string.
 func (c *Client) ProjectAttributeValue(attr string) (string, error) {
 	return c.Get("project/attributes/" + attr)
 }
@@ -456,19 +456,19 @@ func (c *Client) Scopes(serviceAccount string) ([]string, error) {
 }
 
 // Subscribe subscribes to a value from the metadata service.
-// The suf***REMOVED***x is appended to "http://${GCE_METADATA_HOST}/computeMetadata/v1/".
-// The suf***REMOVED***x may contain query parameters.
+// The suffix is appended to "http://${GCE_METADATA_HOST}/computeMetadata/v1/".
+// The suffix may contain query parameters.
 //
 // Subscribe calls fn with the latest metadata value indicated by the provided
-// suf***REMOVED***x. If the metadata value is deleted, fn is called with the empty string
+// suffix. If the metadata value is deleted, fn is called with the empty string
 // and ok false. Subscribe blocks until fn returns a non-nil error or the value
 // is deleted. Subscribe returns the error value returned from the last call to
 // fn, which may be nil when ok == false.
-func (c *Client) Subscribe(suf***REMOVED***x string, fn func(v string, ok bool) error) error {
+func (c *Client) Subscribe(suffix string, fn func(v string, ok bool) error) error {
 	const failedSubscribeSleep = time.Second * 5
 
 	// First check to see if the metadata value exists at all.
-	val, lastETag, err := c.getETag(suf***REMOVED***x)
+	val, lastETag, err := c.getETag(suffix)
 	if err != nil {
 		return err
 	}
@@ -478,15 +478,15 @@ func (c *Client) Subscribe(suf***REMOVED***x string, fn func(v string, ok bool) 
 	}
 
 	ok := true
-	if strings.ContainsRune(suf***REMOVED***x, '?') {
-		suf***REMOVED***x += "&wait_for_change=true&last_etag="
-	} ***REMOVED*** {
-		suf***REMOVED***x += "?wait_for_change=true&last_etag="
+	if strings.ContainsRune(suffix, '?') {
+		suffix += "&wait_for_change=true&last_etag="
+	} else {
+		suffix += "?wait_for_change=true&last_etag="
 	}
 	for {
-		val, etag, err := c.getETag(suf***REMOVED***x + url.QueryEscape(lastETag))
+		val, etag, err := c.getETag(suffix + url.QueryEscape(lastETag))
 		if err != nil {
-			if _, deleted := err.(NotDe***REMOVED***nedError); !deleted {
+			if _, deleted := err.(NotDefinedError); !deleted {
 				time.Sleep(failedSubscribeSleep)
 				continue // Retry on other errors.
 			}

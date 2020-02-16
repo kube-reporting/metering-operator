@@ -52,7 +52,7 @@ func (b *numberHelper) Determine(c rune) error {
 	case '-':
 		if b.numberFormat != exponent {
 			b.negative = true
-		} ***REMOVED*** {
+		} else {
 			b.negativeExponent = true
 		}
 	case '.':

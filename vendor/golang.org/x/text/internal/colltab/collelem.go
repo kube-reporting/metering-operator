@@ -1,6 +1,6 @@
 // Copyright 2012 The Go Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE ***REMOVED***le.
+// license that can be found in the LICENSE file.
 
 package colltab
 
@@ -9,7 +9,7 @@ import (
 	"unicode"
 )
 
-// Level identi***REMOVED***es the collation comparison level.
+// Level identifies the collation comparison level.
 // The primary level corresponds to the basic sorting of text.
 // The secondary level corresponds to accents and related linguistic elements.
 // The tertiary level corresponds to casing and related concepts.
@@ -65,7 +65,7 @@ func (ce Elem) ctype() ceType {
 	}
 	if ce <= maxContract {
 		return ceContractionIndex
-	} ***REMOVED*** {
+	} else {
 		if ce <= maxExpand {
 			return ceExpansionIndex
 		}
@@ -106,7 +106,7 @@ const (
 	ceType4                 = 0xA0000000
 	ceTypeQ                 = 0xC0000000
 	Ignore                  = ceType4
-	***REMOVED***rstNonPrimary         = 0x80000000
+	firstNonPrimary         = 0x80000000
 	lastSpecialPrimary      = 0xA0000000
 	secondaryMask           = 0x80000000
 	hasTertiaryMask         = 0x40000000
@@ -153,13 +153,13 @@ func MakeElem(primary, secondary, tertiary int, ccc uint8) (Elem, error) {
 			ce |= Elem(ccc) << compactPrimaryBits
 			ce |= Elem(primary)
 			ce |= ceType3or4
-		} ***REMOVED*** if tertiary == defaultTertiary {
+		} else if tertiary == defaultTertiary {
 			if secondary >= 1<<maxSecondaryCompactBits {
 				return 0, fmt.Errorf("makeCE: secondary weight with non-zero primary out of bounds: %x >= %x", secondary, 1<<maxSecondaryCompactBits)
 			}
 			ce = Elem(primary<<(maxSecondaryCompactBits+1) + secondary)
 			ce |= ceType1
-		} ***REMOVED*** {
+		} else {
 			d := secondary - defaultSecondary + maxSecondaryDiffBits
 			if d >= 1<<maxSecondaryDiffBits || d < 0 {
 				return 0, fmt.Errorf("makeCE: secondary weight diff out of bounds: %x < 0 || %x > %x", d, d, 1<<maxSecondaryDiffBits)
@@ -170,7 +170,7 @@ func MakeElem(primary, secondary, tertiary int, ccc uint8) (Elem, error) {
 			ce = Elem(primary<<maxSecondaryDiffBits + d)
 			ce = ce<<maxTertiaryCompactBits + Elem(tertiary)
 		}
-	} ***REMOVED*** {
+	} else {
 		ce = Elem(secondary<<maxTertiaryBits + tertiary)
 		ce += Elem(ccc) << (maxSecondaryBits + maxTertiaryBits)
 		ce |= ceType4
@@ -204,7 +204,7 @@ func (ce Elem) CCC() uint8 {
 
 // Primary returns the primary collation weight for ce.
 func (ce Elem) Primary() int {
-	if ce >= ***REMOVED***rstNonPrimary {
+	if ce >= firstNonPrimary {
 		if ce > lastSpecialPrimary {
 			return 0
 		}
@@ -241,7 +241,7 @@ func (ce Elem) Tertiary() uint8 {
 			return uint8(ce)
 		}
 		return uint8(ce>>24) & 0x1F // type 2
-	} ***REMOVED*** if ce&ceTypeMask == ceType1 {
+	} else if ce&ceTypeMask == ceType1 {
 		return defaultTertiary
 	}
 	// ce is a quaternary value.
@@ -254,23 +254,23 @@ func (ce Elem) updateTertiary(t uint8) Elem {
 		nce := ce & primaryValueMask
 		nce |= Elem(uint8(ce)-minCompactSecondary) << compactSecondaryShift
 		ce = nce
-	} ***REMOVED*** if ce&ceTypeMaskExt == ceType3or4 {
+	} else if ce&ceTypeMaskExt == ceType3or4 {
 		ce &= ^Elem(maxTertiary << 24)
 		return ce | (Elem(t) << 24)
-	} ***REMOVED*** {
+	} else {
 		// type 2 or 4
 		ce &= ^Elem(maxTertiary)
 	}
 	return ce | Elem(t)
 }
 
-// Quaternary returns the quaternary value if explicitly speci***REMOVED***ed,
+// Quaternary returns the quaternary value if explicitly specified,
 // 0 if ce == Ignore, or MaxQuaternary otherwise.
 // Quaternary values are used only for shifted variants.
 func (ce Elem) Quaternary() int {
 	if ce&ceTypeMask == ceTypeQ {
 		return int(ce&primaryValueMask) >> primaryShift
-	} ***REMOVED*** if ce&ceIgnoreMask == Ignore {
+	} else if ce&ceIgnoreMask == Ignore {
 		return 0
 	}
 	return MaxQuaternary
@@ -288,13 +288,13 @@ func (ce Elem) Weight(l Level) int {
 	case Quaternary:
 		return ce.Quaternary()
 	}
-	return 0 // return 0 (ignore) for unde***REMOVED***ned levels.
+	return 0 // return 0 (ignore) for undefined levels.
 }
 
 // For contractions, collation elements are of the form
 // 110bbbbb bbbbbbbb iiiiiiii iiiinnnn, where
-//   - n* is the size of the ***REMOVED***rst node in the contraction trie.
-//   - i* is the index of the ***REMOVED***rst node in the contraction trie.
+//   - n* is the size of the first node in the contraction trie.
+//   - i* is the index of the first node in the contraction trie.
 //   - b* is the offset into the contraction collation element table.
 // See contract.go for details on the contraction trie.
 const (
@@ -324,7 +324,7 @@ func splitExpandIndex(ce Elem) (index int) {
 // sequence of collation elements, we decompose the rune and lookup the collation
 // elements for each rune in the decomposition and modify the tertiary weights.
 // The Elem, in this case, is of the form 11110000 00000000 wwwwwwww vvvvvvvv, where
-//   - v* is the replacement tertiary weight for the ***REMOVED***rst rune,
+//   - v* is the replacement tertiary weight for the first rune,
 //   - w* is the replacement tertiary weight for the second rune,
 // Tertiary weights of subsequent runes should be replaced with maxTertiary.
 // See http://www.unicode.org/reports/tr10/#Compatibility_Decompositions for more details.
@@ -334,16 +334,16 @@ func splitDecompose(ce Elem) (t1, t2 uint8) {
 
 const (
 	// These constants were taken from http://www.unicode.org/versions/Unicode6.0.0/ch12.pdf.
-	minUni***REMOVED***ed       rune = 0x4E00
-	maxUni***REMOVED***ed            = 0x9FFF
+	minUnified       rune = 0x4E00
+	maxUnified            = 0x9FFF
 	minCompatibility      = 0xF900
 	maxCompatibility      = 0xFAFF
 	minRare               = 0x3400
 	maxRare               = 0x4DBF
 )
 const (
-	commonUni***REMOVED***edOffset = 0x10000
-	rareUni***REMOVED***edOffset   = 0x20000 // largest rune in common is U+FAFF
+	commonUnifiedOffset = 0x10000
+	rareUnifiedOffset   = 0x20000 // largest rune in common is U+FAFF
 	otherOffset         = 0x50000 // largest rune in rare is U+2FA1D
 	illegalOffset       = otherOffset + int(unicode.MaxRune)
 	maxPrimary          = illegalOffset + 1
@@ -351,21 +351,21 @@ const (
 
 // implicitPrimary returns the primary weight for the a rune
 // for which there is no entry for the rune in the collation table.
-// We take a different approach from the one speci***REMOVED***ed in
+// We take a different approach from the one specified in
 // http://unicode.org/reports/tr10/#Implicit_Weights,
 // but preserve the resulting relative ordering of the runes.
 func implicitPrimary(r rune) int {
 	if unicode.Is(unicode.Ideographic, r) {
-		if r >= minUni***REMOVED***ed && r <= maxUni***REMOVED***ed {
+		if r >= minUnified && r <= maxUnified {
 			// The most common case for CJK.
-			return int(r) + commonUni***REMOVED***edOffset
+			return int(r) + commonUnifiedOffset
 		}
 		if r >= minCompatibility && r <= maxCompatibility {
-			// This will typically not hit. The DUCET explicitly speci***REMOVED***es mappings
+			// This will typically not hit. The DUCET explicitly specifies mappings
 			// for all characters that do not decompose.
-			return int(r) + commonUni***REMOVED***edOffset
+			return int(r) + commonUnifiedOffset
 		}
-		return int(r) + rareUni***REMOVED***edOffset
+		return int(r) + rareUnifiedOffset
 	}
 	return int(r) + otherOffset
 }

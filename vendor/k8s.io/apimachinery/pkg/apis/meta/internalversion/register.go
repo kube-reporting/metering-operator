@@ -2,7 +2,7 @@
 Copyright 2017 The Kubernetes Authors.
 
 Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this ***REMOVED***le except in compliance with the License.
+you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
 
     http://www.apache.org/licenses/LICENSE-2.0
@@ -10,7 +10,7 @@ You may obtain a copy of the License at
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the speci***REMOVED***c language governing permissions and
+See the License for the specific language governing permissions and
 limitations under the License.
 */
 
@@ -47,7 +47,7 @@ var SchemeGroupVersion = schema.GroupVersion{Group: GroupName, Version: runtime.
 // ParameterCodec handles versioning of objects that are converted to query parameters.
 var ParameterCodec = runtime.NewParameterCodec(scheme)
 
-// Kind takes an unquali***REMOVED***ed kind and returns a Group quali***REMOVED***ed GroupKind
+// Kind takes an unqualified kind and returns a Group qualified GroupKind
 func Kind(kind string) schema.GroupKind {
 	return SchemeGroupVersion.WithKind(kind).GroupKind()
 }
@@ -61,8 +61,8 @@ func addToGroupVersion(scheme *runtime.Scheme, groupVersion schema.GroupVersion)
 		metav1.Convert_string_To_labels_Selector,
 		metav1.Convert_labels_Selector_To_string,
 
-		metav1.Convert_string_To_***REMOVED***elds_Selector,
-		metav1.Convert_***REMOVED***elds_Selector_To_string,
+		metav1.Convert_string_To_fields_Selector,
+		metav1.Convert_fields_Selector_To_string,
 
 		metav1.Convert_Map_string_To_string_To_v1_LabelSelector,
 		metav1.Convert_v1_LabelSelector_To_Map_string_To_string,
@@ -73,7 +73,7 @@ func addToGroupVersion(scheme *runtime.Scheme, groupVersion schema.GroupVersion)
 	if err != nil {
 		return err
 	}
-	// ListOptions is the only options struct which needs conversion (it exposes labels and ***REMOVED***elds
+	// ListOptions is the only options struct which needs conversion (it exposes labels and fields
 	// as selectors for convenience). The other types have only a single representation today.
 	scheme.AddKnownTypes(SchemeGroupVersion,
 		&ListOptions{},

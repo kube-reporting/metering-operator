@@ -2,7 +2,7 @@
 Copyright 2014 The Kubernetes Authors.
 
 Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this ***REMOVED***le except in compliance with the License.
+you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
 
     http://www.apache.org/licenses/LICENSE-2.0
@@ -10,7 +10,7 @@ You may obtain a copy of the License at
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the speci***REMOVED***c language governing permissions and
+See the License for the specific language governing permissions and
 limitations under the License.
 */
 
@@ -27,7 +27,7 @@ import (
 
 	"github.com/davecgh/go-spew/spew"
 
-	"k8s.io/apimachinery/pkg/util/validation/***REMOVED***eld"
+	"k8s.io/apimachinery/pkg/util/validation/field"
 )
 
 // StringDiff diffs a and b and returns a human readable diff.
@@ -51,7 +51,7 @@ func StringDiff(a, b string) string {
 }
 
 // ObjectDiff writes the two objects out as JSON and prints out the identical part of
-// the objects followed by the remaining part of 'a' and ***REMOVED***nally the remaining part of 'b'.
+// the objects followed by the remaining part of 'a' and finally the remaining part of 'b'.
 // For debugging tests.
 func ObjectDiff(a, b interface{}) string {
 	ab, err := json.Marshal(a)
@@ -68,10 +68,10 @@ func ObjectDiff(a, b interface{}) string {
 // ObjectGoPrintDiff is like ObjectDiff, but uses go-spew to print the objects,
 // which shows absolutely everything by recursing into every single pointer
 // (go's %#v formatters OTOH stop at a certain point). This is needed when you
-// can't ***REMOVED***gure out why reflect.DeepEqual is returning false and nothing is
+// can't figure out why reflect.DeepEqual is returning false and nothing is
 // showing you differences. This will.
 func ObjectGoPrintDiff(a, b interface{}) string {
-	s := spew.Con***REMOVED***gState{DisableMethods: true}
+	s := spew.ConfigState{DisableMethods: true}
 	return StringDiff(
 		s.Sprintf("%#v", a),
 		s.Sprintf("%#v", b),
@@ -83,7 +83,7 @@ func ObjectReflectDiff(a, b interface{}) string {
 	if vA.Type() != vB.Type() {
 		return fmt.Sprintf("type A %T and type B %T do not match", a, b)
 	}
-	diffs := objectReflectDiff(***REMOVED***eld.NewPath("object"), vA, vB)
+	diffs := objectReflectDiff(field.NewPath("object"), vA, vB)
 	if len(diffs) == 0 {
 		return "<no diffs>"
 	}
@@ -100,13 +100,13 @@ func ObjectReflectDiff(a, b interface{}) string {
 }
 
 // limit:
-// 1. stringi***REMOVED***es aObj and bObj
-// 2. elides identical pre***REMOVED***xes if either is too long
+// 1. stringifies aObj and bObj
+// 2. elides identical prefixes if either is too long
 // 3. elides remaining content from the end if either is too long
 func limit(aObj, bObj interface{}, max int) (string, string) {
-	elidedPre***REMOVED***x := ""
-	elidedASuf***REMOVED***x := ""
-	elidedBSuf***REMOVED***x := ""
+	elidedPrefix := ""
+	elidedASuffix := ""
+	elidedBSuffix := ""
 	a, b := fmt.Sprintf("%#v", aObj), fmt.Sprintf("%#v", bObj)
 
 	if aObj != nil && bObj != nil {
@@ -119,28 +119,28 @@ func limit(aObj, bObj interface{}, max int) (string, string) {
 	for {
 		switch {
 		case len(a) > max && len(a) > 4 && len(b) > 4 && a[:4] == b[:4]:
-			// a is too long, b has data, and the ***REMOVED***rst several characters are the same
-			elidedPre***REMOVED***x = "..."
+			// a is too long, b has data, and the first several characters are the same
+			elidedPrefix = "..."
 			a = a[2:]
 			b = b[2:]
 
 		case len(b) > max && len(b) > 4 && len(a) > 4 && a[:4] == b[:4]:
-			// b is too long, a has data, and the ***REMOVED***rst several characters are the same
-			elidedPre***REMOVED***x = "..."
+			// b is too long, a has data, and the first several characters are the same
+			elidedPrefix = "..."
 			a = a[2:]
 			b = b[2:]
 
 		case len(a) > max:
 			a = a[:max]
-			elidedASuf***REMOVED***x = "..."
+			elidedASuffix = "..."
 
 		case len(b) > max:
 			b = b[:max]
-			elidedBSuf***REMOVED***x = "..."
+			elidedBSuffix = "..."
 
 		default:
 			// both are short enough
-			return elidedPre***REMOVED***x + a + elidedASuf***REMOVED***x, elidedPre***REMOVED***x + b + elidedBSuf***REMOVED***x
+			return elidedPrefix + a + elidedASuffix, elidedPrefix + b + elidedBSuffix
 		}
 	}
 }
@@ -153,7 +153,7 @@ func public(s string) bool {
 }
 
 type diff struct {
-	path ****REMOVED***eld.Path
+	path *field.Path
 	a, b interface{}
 }
 
@@ -169,7 +169,7 @@ func (d orderedDiffs) Less(i, j int) bool {
 	return false
 }
 
-func objectReflectDiff(path ****REMOVED***eld.Path, a, b reflect.Value) []diff {
+func objectReflectDiff(path *field.Path, a, b reflect.Value) []diff {
 	switch a.Type().Kind() {
 	case reflect.Struct:
 		var changes []diff
@@ -269,7 +269,7 @@ func objectReflectDiff(path ****REMOVED***eld.Path, a, b reflect.Value) []diff {
 // ObjectGoPrintSideBySide prints a and b as textual dumps side by side,
 // enabling easy visual scanning for mismatches.
 func ObjectGoPrintSideBySide(a, b interface{}) string {
-	s := spew.Con***REMOVED***gState{
+	s := spew.ConfigState{
 		Indent: " ",
 		// Extra deep spew.
 		DisableMethods: true,

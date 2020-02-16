@@ -2,7 +2,7 @@
 Copyright 2016 The Kubernetes Authors.
 
 Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this ***REMOVED***le except in compliance with the License.
+you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
 
     http://www.apache.org/licenses/LICENSE-2.0
@@ -10,7 +10,7 @@ You may obtain a copy of the License at
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the speci***REMOVED***c language governing permissions and
+See the License for the specific language governing permissions and
 limitations under the License.
 */
 
@@ -46,7 +46,7 @@ func ServerSupportsVersion(client DiscoveryInterface, requiredGV schema.GroupVer
 	groups, err := client.ServerGroups()
 	if err != nil {
 		// This is almost always a connection error, and higher level code should treat this as a generic error,
-		// not a negotiation speci***REMOVED***c error.
+		// not a negotiation specific error.
 		return err
 	}
 	versions := metav1.ExtractGroupVersions(groups)
@@ -83,19 +83,19 @@ func GroupVersionResources(rls []*metav1.APIResourceList) (map[schema.GroupVersi
 	return gvrs, nil
 }
 
-// FilteredBy ***REMOVED***lters by the given predicate. Empty APIResourceLists are dropped.
+// FilteredBy filters by the given predicate. Empty APIResourceLists are dropped.
 func FilteredBy(pred ResourcePredicate, rls []*metav1.APIResourceList) []*metav1.APIResourceList {
 	result := []*metav1.APIResourceList{}
 	for _, rl := range rls {
-		***REMOVED***ltered := *rl
-		***REMOVED***ltered.APIResources = nil
+		filtered := *rl
+		filtered.APIResources = nil
 		for i := range rl.APIResources {
 			if pred.Match(rl.GroupVersion, &rl.APIResources[i]) {
-				***REMOVED***ltered.APIResources = append(***REMOVED***ltered.APIResources, rl.APIResources[i])
+				filtered.APIResources = append(filtered.APIResources, rl.APIResources[i])
 			}
 		}
-		if ***REMOVED***ltered.APIResources != nil {
-			result = append(result, &***REMOVED***ltered)
+		if filtered.APIResources != nil {
+			result = append(result, &filtered)
 		}
 	}
 	return result

@@ -37,10 +37,10 @@ type PrometheusImporter struct {
 	promConn              prom.API
 	prometheusMetricsRepo PrometheusMetricsRepo
 	clock                 clock.Clock
-	cfg                   Con***REMOVED***g
+	cfg                   Config
 
 	// importLock ensures only one import is running at a time, protecting the
-	// lastTimestamp and metrics ***REMOVED***elds
+	// lastTimestamp and metrics fields
 	importLock sync.Mutex
 
 	// lastTimestamp is the lastTimestamp stored for this PrometheusImporter
@@ -50,7 +50,7 @@ type PrometheusImporter struct {
 	metricsCollectors ImporterMetricsCollectors
 }
 
-type Con***REMOVED***g struct {
+type Config struct {
 	PrometheusQuery           string
 	PrestoTableName           string
 	ChunkSize                 time.Duration
@@ -58,10 +58,10 @@ type Con***REMOVED***g struct {
 	MaxTimeRanges             int64
 	MaxQueryRangeDuration     time.Duration
 	ImportFromTime            *time.Time
-	MaxBack***REMOVED***llImportDuration time.Duration
+	MaxBackfillImportDuration time.Duration
 }
 
-func NewPrometheusImporter(logger logrus.FieldLogger, promConn prom.API, prometheusMetricsRepo PrometheusMetricsRepo, clock clock.Clock, cfg Con***REMOVED***g, collectors ImporterMetricsCollectors) *PrometheusImporter {
+func NewPrometheusImporter(logger logrus.FieldLogger, promConn prom.API, prometheusMetricsRepo PrometheusMetricsRepo, clock clock.Clock, cfg Config, collectors ImporterMetricsCollectors) *PrometheusImporter {
 	logger = logger.WithFields(logrus.Fields{
 		"component": "PrometheusImporter",
 		"tableName": cfg.PrestoTableName,
@@ -78,7 +78,7 @@ func NewPrometheusImporter(logger logrus.FieldLogger, promConn prom.API, prometh
 	}
 }
 
-func (importer *PrometheusImporter) UpdateCon***REMOVED***g(cfg Con***REMOVED***g) {
+func (importer *PrometheusImporter) UpdateConfig(cfg Config) {
 	importer.importLock.Lock()
 	importer.cfg = cfg
 	importer.logger = importer.logger.WithFields(logrus.Fields{
@@ -98,7 +98,7 @@ func (importer *PrometheusImporter) UpdateCon***REMOVED***g(cfg Con***REMOVED***
 func (importer *PrometheusImporter) ImportFromLastTimestamp(ctx context.Context) (*PrometheusImportResults, error) {
 	importer.importLock.Lock()
 	importer.logger.Debugf("PrometheusImporter ImportFromLastTimestamp started")
-	defer importer.logger.Debugf("PrometheusImporter ImportFromLastTimestamp ***REMOVED***nished")
+	defer importer.logger.Debugf("PrometheusImporter ImportFromLastTimestamp finished")
 	defer importer.importLock.Unlock()
 
 	endTime := importer.clock.Now().UTC()
@@ -107,7 +107,7 @@ func (importer *PrometheusImporter) ImportFromLastTimestamp(ctx context.Context)
 
 	// if importer.lastTimestamp is null then it's because we haven't run
 	// before, we have been restarted (error, or not) and do not know the
-	// last time we collected and need to re-query Presto to ***REMOVED***gure out
+	// last time we collected and need to re-query Presto to figure out
 	// the last timestamp
 	if importer.lastTimestamp == nil {
 		var err error
@@ -121,7 +121,7 @@ func (importer *PrometheusImporter) ImportFromLastTimestamp(ctx context.Context)
 
 	var startTime time.Time
 	// if lastTimestamp is still nil, but we didn't error than there is no
-	// last timestamp and this is the ***REMOVED***rst collection, if not then our query
+	// last timestamp and this is the first collection, if not then our query
 	// above found a timestamp in the table
 	if importer.lastTimestamp != nil {
 		importer.logger.Debugf("lastTimestamp for table %s: %s", cfg.PrestoTableName, importer.lastTimestamp.String())
@@ -129,17 +129,17 @@ func (importer *PrometheusImporter) ImportFromLastTimestamp(ctx context.Context)
 		// the step size so that we start at the next interval no longer in
 		// our range.
 		startTime = importer.lastTimestamp.Add(cfg.StepSize)
-	} ***REMOVED*** {
-		// check if we're supposed to start from a speci***REMOVED***c
-		// time, and if not back***REMOVED***ll a default amount
+	} else {
+		// check if we're supposed to start from a specific
+		// time, and if not backfill a default amount
 		if cfg.ImportFromTime != nil {
 			importer.logger.Debugf("importFromTimestamp for table %s: %s", cfg.PrestoTableName, cfg.ImportFromTime.String())
 			startTime = *cfg.ImportFromTime
-		} ***REMOVED*** {
-			importer.logger.Debugf("no lastTimestamp or importFromTime for table %s: back***REMOVED***lling %s", cfg.PrestoTableName, cfg.MaxBack***REMOVED***llImportDuration)
-			startTime = endTime.Add(-cfg.MaxBack***REMOVED***llImportDuration)
+		} else {
+			importer.logger.Debugf("no lastTimestamp or importFromTime for table %s: backfilling %s", cfg.PrestoTableName, cfg.MaxBackfillImportDuration)
+			startTime = endTime.Add(-cfg.MaxBackfillImportDuration)
 		}
-		importer.logger.Infof("no data in table %s: back***REMOVED***lling from %s until %s", cfg.PrestoTableName, startTime, endTime)
+		importer.logger.Infof("no data in table %s: backfilling from %s until %s", cfg.PrestoTableName, startTime, endTime)
 	}
 
 	if startTime.After(endTime) {

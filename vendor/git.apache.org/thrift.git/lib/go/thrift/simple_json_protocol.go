@@ -1,10 +1,10 @@
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements. See the NOTICE ***REMOVED***le
+ * or more contributor license agreements. See the NOTICE file
  * distributed with this work for additional information
- * regarding copyright ownership. The ASF licenses this ***REMOVED***le
+ * regarding copyright ownership. The ASF licenses this file
  * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this ***REMOVED***le except in compliance
+ * "License"); you may not use this file except in compliance
  * with the License. You may obtain a copy of the License at
  *
  *   http://www.apache.org/licenses/LICENSE-2.0
@@ -13,14 +13,14 @@
  * software distributed under the License is distributed on an
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
  * KIND, either express or implied. See the License for the
- * speci***REMOVED***c language governing permissions and limitations
+ * specific language governing permissions and limitations
  * under the License.
  */
 
 package thrift
 
 import (
-	"bu***REMOVED***o"
+	"bufio"
 	"bytes"
 	"encoding/base64"
 	"encoding/json"
@@ -71,15 +71,15 @@ type TSimpleJSONProtocol struct {
 	parseContextStack []int
 	dumpContext       []int
 
-	writer *bu***REMOVED***o.Writer
-	reader *bu***REMOVED***o.Reader
+	writer *bufio.Writer
+	reader *bufio.Reader
 }
 
 // Constructor
 func NewTSimpleJSONProtocol(t TTransport) *TSimpleJSONProtocol {
 	v := &TSimpleJSONProtocol{trans: t,
-		writer: bu***REMOVED***o.NewWriter(t),
-		reader: bu***REMOVED***o.NewReader(t),
+		writer: bufio.NewWriter(t),
+		reader: bufio.NewReader(t),
 	}
 	v.parseContextStack = append(v.parseContextStack, int(_CONTEXT_IN_TOPLEVEL))
 	v.dumpContext = append(v.dumpContext, int(_CONTEXT_IN_TOPLEVEL))
@@ -130,8 +130,8 @@ func init() {
 	JSON_NULL = []byte{'n', 'u', 'l', 'l'}
 	JSON_TRUE = []byte{'t', 'r', 'u', 'e'}
 	JSON_FALSE = []byte{'f', 'a', 'l', 's', 'e'}
-	JSON_INFINITY = "In***REMOVED***nity"
-	JSON_NEGATIVE_INFINITY = "-In***REMOVED***nity"
+	JSON_INFINITY = "Infinity"
+	JSON_NEGATIVE_INFINITY = "-Infinity"
 	JSON_NAN = "NaN"
 	JSON_INFINITY_BYTES = []byte{'I', 'n', 'f', 'i', 'n', 'i', 't', 'y'}
 	JSON_NEGATIVE_INFINITY_BYTES = []byte{'-', 'I', 'n', 'f', 'i', 'n', 'i', 't', 'y'}
@@ -265,7 +265,7 @@ func (p *TSimpleJSONProtocol) WriteString(v string) error {
 func (p *TSimpleJSONProtocol) WriteBinary(v []byte) error {
 	// JSON library only takes in a string,
 	// not an arbitrary byte array, to ensure bytes are transmitted
-	// ef***REMOVED***ciently we must convert this into a valid JSON string
+	// efficiently we must convert this into a valid JSON string
 	// therefore we use base64 encoding to avoid excessive escaping/quoting
 	if e := p.OutputPreValue(); e != nil {
 		return e
@@ -428,7 +428,7 @@ func (p *TSimpleJSONProtocol) ReadBool() (bool, error) {
 			}
 			if string(b) == string(JSON_TRUE) {
 				value = true
-			} ***REMOVED*** {
+			} else {
 				e := fmt.Errorf("Expected \"true\" but found: %s", string(b))
 				return value, NewTProtocolExceptionWithType(INVALID_DATA, e)
 			}
@@ -441,7 +441,7 @@ func (p *TSimpleJSONProtocol) ReadBool() (bool, error) {
 			}
 			if string(b) == string(JSON_FALSE) {
 				value = false
-			} ***REMOVED*** {
+			} else {
 				e := fmt.Errorf("Expected \"false\" but found: %s", string(b))
 				return value, NewTProtocolExceptionWithType(INVALID_DATA, e)
 			}
@@ -454,7 +454,7 @@ func (p *TSimpleJSONProtocol) ReadBool() (bool, error) {
 			}
 			if string(b) == string(JSON_NULL) {
 				value = false
-			} ***REMOVED*** {
+			} else {
 				e := fmt.Errorf("Expected \"null\" but found: %s", string(b))
 				return value, NewTProtocolExceptionWithType(INVALID_DATA, e)
 			}
@@ -504,7 +504,7 @@ func (p *TSimpleJSONProtocol) ReadString() (string, error) {
 		if err != nil {
 			return v, err
 		}
-	} ***REMOVED*** if len(f) > 0 && f[0] == JSON_NULL[0] {
+	} else if len(f) > 0 && f[0] == JSON_NULL[0] {
 		b := make([]byte, len(JSON_NULL))
 		_, err := p.reader.Read(b)
 		if err != nil {
@@ -514,7 +514,7 @@ func (p *TSimpleJSONProtocol) ReadString() (string, error) {
 			e := fmt.Errorf("Expected a JSON string, found unquoted data started with %s", string(b))
 			return v, NewTProtocolExceptionWithType(INVALID_DATA, e)
 		}
-	} ***REMOVED*** {
+	} else {
 		e := fmt.Errorf("Expected a JSON string, found unquoted data started with %s", string(f))
 		return v, NewTProtocolExceptionWithType(INVALID_DATA, e)
 	}
@@ -534,7 +534,7 @@ func (p *TSimpleJSONProtocol) ReadBinary() ([]byte, error) {
 		if err != nil {
 			return v, err
 		}
-	} ***REMOVED*** if len(f) > 0 && f[0] == JSON_NULL[0] {
+	} else if len(f) > 0 && f[0] == JSON_NULL[0] {
 		b := make([]byte, len(JSON_NULL))
 		_, err := p.reader.Read(b)
 		if err != nil {
@@ -544,7 +544,7 @@ func (p *TSimpleJSONProtocol) ReadBinary() ([]byte, error) {
 			e := fmt.Errorf("Expected a JSON string, found unquoted data started with %s", string(b))
 			return v, NewTProtocolExceptionWithType(INVALID_DATA, e)
 		}
-	} ***REMOVED*** {
+	} else {
 		e := fmt.Errorf("Expected a JSON string, found unquoted data started with %s", string(f))
 		return v, NewTProtocolExceptionWithType(INVALID_DATA, e)
 	}
@@ -556,8 +556,8 @@ func (p *TSimpleJSONProtocol) Flush() (err error) {
 	return NewTProtocolException(p.writer.Flush())
 }
 
-func (p *TSimpleJSONProtocol) Skip(***REMOVED***eldType TType) (err error) {
-	return SkipDefaultDepth(p, ***REMOVED***eldType)
+func (p *TSimpleJSONProtocol) Skip(fieldType TType) (err error) {
+	return SkipDefaultDepth(p, fieldType)
 }
 
 func (p *TSimpleJSONProtocol) Transport() TTransport {
@@ -611,7 +611,7 @@ func (p *TSimpleJSONProtocol) OutputBool(value bool) error {
 	var v string
 	if value {
 		v = string(JSON_TRUE)
-	} ***REMOVED*** {
+	} else {
 		v = string(JSON_FALSE)
 	}
 	switch _ParseContext(p.dumpContext[len(p.dumpContext)-1]) {
@@ -642,11 +642,11 @@ func (p *TSimpleJSONProtocol) OutputF64(value float64) error {
 	var v string
 	if math.IsNaN(value) {
 		v = string(JSON_QUOTE) + JSON_NAN + string(JSON_QUOTE)
-	} ***REMOVED*** if math.IsInf(value, 1) {
+	} else if math.IsInf(value, 1) {
 		v = string(JSON_QUOTE) + JSON_INFINITY + string(JSON_QUOTE)
-	} ***REMOVED*** if math.IsInf(value, -1) {
+	} else if math.IsInf(value, -1) {
 		v = string(JSON_QUOTE) + JSON_NEGATIVE_INFINITY + string(JSON_QUOTE)
-	} ***REMOVED*** {
+	} else {
 		v = strconv.FormatFloat(value, 'g', -1, 64)
 		switch _ParseContext(p.dumpContext[len(p.dumpContext)-1]) {
 		case _CONTEXT_IN_OBJECT_FIRST, _CONTEXT_IN_OBJECT_NEXT_KEY:
@@ -749,7 +749,7 @@ func (p *TSimpleJSONProtocol) OutputElemListBegin(elemType TType, size int) erro
 }
 
 func (p *TSimpleJSONProtocol) ParsePreValue() error {
-	if e := p.readNonSigni***REMOVED***cantWhitespace(); e != nil {
+	if e := p.readNonSignificantWhitespace(); e != nil {
 		return NewTProtocolException(e)
 	}
 	cxt := _ParseContext(p.parseContextStack[len(p.parseContextStack)-1])
@@ -762,7 +762,7 @@ func (p *TSimpleJSONProtocol) ParsePreValue() error {
 				return nil
 			case JSON_COMMA[0]:
 				p.reader.ReadByte()
-				if e := p.readNonSigni***REMOVED***cantWhitespace(); e != nil {
+				if e := p.readNonSignificantWhitespace(); e != nil {
 					return NewTProtocolException(e)
 				}
 				return nil
@@ -779,7 +779,7 @@ func (p *TSimpleJSONProtocol) ParsePreValue() error {
 				return nil
 			case JSON_COMMA[0]:
 				p.reader.ReadByte()
-				if e := p.readNonSigni***REMOVED***cantWhitespace(); e != nil {
+				if e := p.readNonSignificantWhitespace(); e != nil {
 					return NewTProtocolException(e)
 				}
 				return nil
@@ -794,7 +794,7 @@ func (p *TSimpleJSONProtocol) ParsePreValue() error {
 			switch b[0] {
 			case JSON_COLON[0]:
 				p.reader.ReadByte()
-				if e := p.readNonSigni***REMOVED***cantWhitespace(); e != nil {
+				if e := p.readNonSignificantWhitespace(); e != nil {
 					return NewTProtocolException(e)
 				}
 				return nil
@@ -809,7 +809,7 @@ func (p *TSimpleJSONProtocol) ParsePreValue() error {
 }
 
 func (p *TSimpleJSONProtocol) ParsePostValue() error {
-	if e := p.readNonSigni***REMOVED***cantWhitespace(); e != nil {
+	if e := p.readNonSignificantWhitespace(); e != nil {
 		return NewTProtocolException(e)
 	}
 	cxt := _ParseContext(p.parseContextStack[len(p.parseContextStack)-1])
@@ -830,7 +830,7 @@ func (p *TSimpleJSONProtocol) ParsePostValue() error {
 	return nil
 }
 
-func (p *TSimpleJSONProtocol) readNonSigni***REMOVED***cantWhitespace() error {
+func (p *TSimpleJSONProtocol) readNonSignificantWhitespace() error {
 	for {
 		b, _ := p.reader.Peek(1)
 		if len(b) < 1 {
@@ -914,8 +914,8 @@ func (p *TSimpleJSONProtocol) ParseBase64EncodedBody() ([]byte, error) {
 	l := len(line2)
 	if (l % 4) != 0 {
 		pad := 4 - (l % 4)
-		***REMOVED***ll := [...]byte{'=', '=', '='}
-		line2 = append(line2, ***REMOVED***ll[:pad]...)
+		fill := [...]byte{'=', '=', '='}
+		line2 = append(line2, fill[:pad]...)
 		l = len(line2)
 	}
 	output := make([]byte, base64.StdEncoding.DecodedLen(l))
@@ -932,7 +932,7 @@ func (p *TSimpleJSONProtocol) ParseI64() (int64, bool, error) {
 	if p.safePeekContains(JSON_NULL) {
 		p.reader.Read(make([]byte, len(JSON_NULL)))
 		isnull = true
-	} ***REMOVED*** {
+	} else {
 		num, err := p.readNumeric()
 		isnull = (num == nil)
 		if !isnull {
@@ -954,7 +954,7 @@ func (p *TSimpleJSONProtocol) ParseF64() (float64, bool, error) {
 	if p.safePeekContains(JSON_NULL) {
 		p.reader.Read(make([]byte, len(JSON_NULL)))
 		isnull = true
-	} ***REMOVED*** {
+	} else {
 		num, err := p.readNumeric()
 		isnull = (num == nil)
 		if !isnull {
@@ -980,7 +980,7 @@ func (p *TSimpleJSONProtocol) ParseObjectStart() (bool, error) {
 		p.reader.ReadByte()
 		p.parseContextStack = append(p.parseContextStack, int(_CONTEXT_IN_OBJECT_FIRST))
 		return false, nil
-	} ***REMOVED*** if p.safePeekContains(JSON_NULL) {
+	} else if p.safePeekContains(JSON_NULL) {
 		return true, nil
 	}
 	e := fmt.Errorf("Expected '{' or null, but found '%s'", string(b))
@@ -1026,9 +1026,9 @@ func (p *TSimpleJSONProtocol) ParseListBegin() (isNull bool, err error) {
 		p.parseContextStack = append(p.parseContextStack, int(_CONTEXT_IN_LIST_FIRST))
 		p.reader.ReadByte()
 		isNull = false
-	} ***REMOVED*** if p.safePeekContains(JSON_NULL) {
+	} else if p.safePeekContains(JSON_NULL) {
 		isNull = true
-	} ***REMOVED*** {
+	} else {
 		err = fmt.Errorf("Expected \"null\" or \"[\", received %q", b)
 	}
 	return isNull, NewTProtocolExceptionWithType(INVALID_DATA, err)
@@ -1078,7 +1078,7 @@ func (p *TSimpleJSONProtocol) ParseListEnd() error {
 }
 
 func (p *TSimpleJSONProtocol) readSingleValue() (interface{}, TType, error) {
-	e := p.readNonSigni***REMOVED***cantWhitespace()
+	e := p.readNonSignificantWhitespace()
 	if e != nil {
 		return nil, VOID, NewTProtocolException(e)
 	}
@@ -1105,9 +1105,9 @@ func (p *TSimpleJSONProtocol) readSingleValue() (interface{}, TType, error) {
 			}
 			if v == JSON_INFINITY {
 				return INFINITY, DOUBLE, nil
-			} ***REMOVED*** if v == JSON_NEGATIVE_INFINITY {
+			} else if v == JSON_NEGATIVE_INFINITY {
 				return NEGATIVE_INFINITY, DOUBLE, nil
-			} ***REMOVED*** if v == JSON_NAN {
+			} else if v == JSON_NAN {
 				return NAN, DOUBLE, nil
 			}
 			return v, UTF8, nil
@@ -1253,7 +1253,7 @@ func (p *TSimpleJSONProtocol) readNumeric() (Numeric, error) {
 					p.readQuoteIfNext()
 				}
 				return NAN, nil
-			} ***REMOVED*** {
+			} else {
 				e := fmt.Errorf("Unable to parse number starting with character '%c'", c)
 				return NUMERIC_NULL, NewTProtocolExceptionWithType(INVALID_DATA, e)
 			}
@@ -1273,7 +1273,7 @@ func (p *TSimpleJSONProtocol) readNumeric() (Numeric, error) {
 					p.readQuoteIfNext()
 				}
 				return INFINITY, nil
-			} ***REMOVED*** if buf.Len() == 1 && buf.Bytes()[0] == JSON_NEGATIVE_INFINITY[0] {
+			} else if buf.Len() == 1 && buf.Bytes()[0] == JSON_NEGATIVE_INFINITY[0] {
 				buffer := make([]byte, len(JSON_NEGATIVE_INFINITY))
 				buffer[0] = JSON_NEGATIVE_INFINITY[0]
 				buffer[1] = c
@@ -1289,14 +1289,14 @@ func (p *TSimpleJSONProtocol) readNumeric() (Numeric, error) {
 					p.readQuoteIfNext()
 				}
 				return NEGATIVE_INFINITY, nil
-			} ***REMOVED*** {
+			} else {
 				e := fmt.Errorf("Unable to parse number starting with character '%c' due to existing buffer %s", c, buf.String())
 				return NUMERIC_NULL, NewTProtocolExceptionWithType(INVALID_DATA, e)
 			}
 		case JSON_QUOTE:
 			if !inQuotes {
 				inQuotes = true
-			} ***REMOVED*** {
+			} else {
 				break
 			}
 		default:

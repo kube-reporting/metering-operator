@@ -91,11 +91,11 @@ func (op *Reporting) handleStorageLocation(logger log.FieldLogger, storageLocati
 				storageLocation.Status.Hive.Location = storageLocation.Spec.Hive.Location
 				needsUpdate = true
 			}
-		} ***REMOVED*** {
+		} else {
 			if storageLocation.Spec.Hive.DatabaseName == "" {
 				return fmt.Errorf("spec.hive.databaseName is required if spec.hive is set")
 			}
-			if !reportingutil.IsValidSQLIdenti***REMOVED***er(storageLocation.Spec.Hive.DatabaseName) {
+			if !reportingutil.IsValidSQLIdentifier(storageLocation.Spec.Hive.DatabaseName) {
 				return fmt.Errorf("spec.hive.databaseName %s is invalid, must contain only alpha numeric values, underscores, and start with a letter or underscore", storageLocation.Spec.Hive.DatabaseName)
 			}
 			if storageLocation.Status.Hive.DatabaseName == "" {
@@ -136,10 +136,10 @@ func (op *Reporting) addStorageLocationFinalizer(storageLocation *metering.Stora
 	newStorageLocation, err := op.meteringClient.MeteringV1().StorageLocations(storageLocation.Namespace).Update(storageLocation)
 	logger := op.logger.WithFields(log.Fields{"storageLocation": storageLocation.Name, "namespace": storageLocation.Namespace})
 	if err != nil {
-		logger.WithError(err).Errorf("error adding %s ***REMOVED***nalizer to StorageLocation: %s/%s", storageLocationFinalizer, storageLocation.Namespace, storageLocation.Name)
+		logger.WithError(err).Errorf("error adding %s finalizer to StorageLocation: %s/%s", storageLocationFinalizer, storageLocation.Namespace, storageLocation.Name)
 		return nil, err
 	}
-	logger.Infof("added %s ***REMOVED***nalizer to StorageLocation: %s/%s", storageLocationFinalizer, storageLocation.Namespace, storageLocation.Name)
+	logger.Infof("added %s finalizer to StorageLocation: %s/%s", storageLocationFinalizer, storageLocation.Namespace, storageLocation.Name)
 	return newStorageLocation, nil
 }
 
@@ -151,10 +151,10 @@ func (op *Reporting) removeStorageLocationFinalizer(storageLocation *metering.St
 	newStorageLocation, err := op.meteringClient.MeteringV1().StorageLocations(storageLocation.Namespace).Update(storageLocation)
 	logger := op.logger.WithFields(log.Fields{"storageLocation": storageLocation.Name, "namespace": storageLocation.Namespace})
 	if err != nil {
-		logger.WithError(err).Errorf("error removing %s ***REMOVED***nalizer from StorageLocation: %s/%s", storageLocationFinalizer, storageLocation.Namespace, storageLocation.Name)
+		logger.WithError(err).Errorf("error removing %s finalizer from StorageLocation: %s/%s", storageLocationFinalizer, storageLocation.Namespace, storageLocation.Name)
 		return nil, err
 	}
-	logger.Infof("removed %s ***REMOVED***nalizer from StorageLocation: %s/%s", storageLocationFinalizer, storageLocation.Namespace, storageLocation.Name)
+	logger.Infof("removed %s finalizer from StorageLocation: %s/%s", storageLocationFinalizer, storageLocation.Namespace, storageLocation.Name)
 	return newStorageLocation, nil
 }
 

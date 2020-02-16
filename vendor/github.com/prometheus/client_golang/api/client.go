@@ -1,6 +1,6 @@
 // Copyright 2015 The Prometheus Authors
 // Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this ***REMOVED***le except in compliance with the License.
+// you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 //
 // http://www.apache.org/licenses/LICENSE-2.0
@@ -8,7 +8,7 @@
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the speci***REMOVED***c language governing permissions and
+// See the License for the specific language governing permissions and
 // limitations under the License.
 
 // +build go1.7
@@ -27,7 +27,7 @@ import (
 	"time"
 )
 
-// DefaultRoundTripper is used if no RoundTripper is set in Con***REMOVED***g.
+// DefaultRoundTripper is used if no RoundTripper is set in Config.
 var DefaultRoundTripper http.RoundTripper = &http.Transport{
 	Proxy: http.ProxyFromEnvironment,
 	Dial: (&net.Dialer{
@@ -37,8 +37,8 @@ var DefaultRoundTripper http.RoundTripper = &http.Transport{
 	TLSHandshakeTimeout: 10 * time.Second,
 }
 
-// Con***REMOVED***g de***REMOVED***nes con***REMOVED***guration parameters for a new client.
-type Con***REMOVED***g struct {
+// Config defines configuration parameters for a new client.
+type Config struct {
 	// The address of the Prometheus to connect to.
 	Address string
 
@@ -47,7 +47,7 @@ type Con***REMOVED***g struct {
 	RoundTripper http.RoundTripper
 }
 
-func (cfg *Con***REMOVED***g) roundTripper() http.RoundTripper {
+func (cfg *Config) roundTripper() http.RoundTripper {
 	if cfg.RoundTripper == nil {
 		return DefaultRoundTripper
 	}
@@ -63,7 +63,7 @@ type Client interface {
 // NewClient returns a new Client.
 //
 // It is safe to use the returned Client from multiple goroutines.
-func NewClient(cfg Con***REMOVED***g) (Client, error) {
+func NewClient(cfg Config) (Client, error) {
 	u, err := url.Parse(cfg.Address)
 	if err != nil {
 		return nil, err

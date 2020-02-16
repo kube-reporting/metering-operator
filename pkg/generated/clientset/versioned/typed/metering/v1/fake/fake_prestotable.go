@@ -33,7 +33,7 @@ func (c *FakePrestoTables) Get(name string, options v1.GetOptions) (result *mete
 	return obj.(*meteringv1.PrestoTable), err
 }
 
-// List takes label and ***REMOVED***eld selectors, and returns the list of PrestoTables that match those selectors.
+// List takes label and field selectors, and returns the list of PrestoTables that match those selectors.
 func (c *FakePrestoTables) List(opts v1.ListOptions) (result *meteringv1.PrestoTableList, err error) {
 	obj, err := c.Fake.
 		Invokes(testing.NewListAction(prestotablesResource, prestotablesKind, c.ns, opts), &meteringv1.PrestoTableList{})

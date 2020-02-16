@@ -28,7 +28,7 @@ type TableParameters struct {
 
 	Location        string            `json:"location,omitempty"`
 	RowFormat       string            `json:"rowFormat,omitempty"`
-	FileFormat      string            `json:"***REMOVED***leFormat,omitempty"`
+	FileFormat      string            `json:"fileFormat,omitempty"`
 	TableProperties map[string]string `json:"tableProperties,omitempty"`
 	External        bool              `json:"external,omitempty"`
 }
@@ -52,9 +52,9 @@ func ExecuteDropTable(execer db.Execer, dbName, tableName string, ignoreNotExist
 	return err
 }
 
-// s3Location returns the HDFS path based on an S3 bucket and pre***REMOVED***x.
-func S3Location(bucket, pre***REMOVED***x string) (string, error) {
-	bucket = path.Join(bucket, pre***REMOVED***x)
+// s3Location returns the HDFS path based on an S3 bucket and prefix.
+func S3Location(bucket, prefix string) (string, error) {
+	bucket = path.Join(bucket, prefix)
 	// Ensure the bucket URL has a trailing slash
 	if bucket[len(bucket)-1] != '/' {
 		bucket = bucket + "/"

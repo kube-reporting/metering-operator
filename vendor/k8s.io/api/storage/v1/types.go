@@ -2,7 +2,7 @@
 Copyright 2017 The Kubernetes Authors.
 
 Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this ***REMOVED***le except in compliance with the License.
+you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
 
     http://www.apache.org/licenses/LICENSE-2.0
@@ -10,7 +10,7 @@ You may obtain a copy of the License at
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the speci***REMOVED***c language governing permissions and
+See the License for the specific language governing permissions and
 limitations under the License.
 */
 
@@ -62,14 +62,14 @@ type StorageClass struct {
 
 	// VolumeBindingMode indicates how PersistentVolumeClaims should be
 	// provisioned and bound.  When unset, VolumeBindingImmediate is used.
-	// This ***REMOVED***eld is only honored by servers that enable the VolumeScheduling feature.
+	// This field is only honored by servers that enable the VolumeScheduling feature.
 	// +optional
 	VolumeBindingMode *VolumeBindingMode `json:"volumeBindingMode,omitempty" protobuf:"bytes,7,opt,name=volumeBindingMode"`
 
 	// Restrict the node topologies where volumes can be dynamically provisioned.
-	// Each volume plugin de***REMOVED***nes its own supported topology speci***REMOVED***cations.
+	// Each volume plugin defines its own supported topology specifications.
 	// An empty TopologySelectorTerm list means there is no topology restriction.
-	// This ***REMOVED***eld is only honored by servers that enable the VolumeScheduling feature.
+	// This field is only honored by servers that enable the VolumeScheduling feature.
 	// +optional
 	AllowedTopologies []v1.TopologySelectorTerm `json:"allowedTopologies,omitempty" protobuf:"bytes,8,rep,name=allowedTopologies"`
 }
@@ -97,7 +97,7 @@ const (
 	VolumeBindingImmediate VolumeBindingMode = "Immediate"
 
 	// VolumeBindingWaitForFirstConsumer indicates that PersistentVolumeClaims
-	// should not be provisioned and bound until the ***REMOVED***rst Pod is created that
+	// should not be provisioned and bound until the first Pod is created that
 	// references the PeristentVolumeClaim.  The volume provisioning and
 	// binding will occur during Pod scheduing.
 	VolumeBindingWaitForFirstConsumer VolumeBindingMode = "WaitForFirstConsumer"
@@ -107,8 +107,8 @@ const (
 // +genclient:nonNamespaced
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
 
-// VolumeAttachment captures the intent to attach or detach the speci***REMOVED***ed volume
-// to/from the speci***REMOVED***ed node.
+// VolumeAttachment captures the intent to attach or detach the specified volume
+// to/from the specified node.
 //
 // VolumeAttachment objects are non-namespaced.
 type VolumeAttachment struct {
@@ -119,7 +119,7 @@ type VolumeAttachment struct {
 	// +optional
 	metav1.ObjectMeta `json:"metadata,omitempty" protobuf:"bytes,1,opt,name=metadata"`
 
-	// Speci***REMOVED***cation of the desired attach/detach volume behavior.
+	// Specification of the desired attach/detach volume behavior.
 	// Populated by the Kubernetes system.
 	Spec VolumeAttachmentSpec `json:"spec" protobuf:"bytes,2,opt,name=spec"`
 
@@ -144,7 +144,7 @@ type VolumeAttachmentList struct {
 	Items []VolumeAttachment `json:"items" protobuf:"bytes,2,rep,name=items"`
 }
 
-// VolumeAttachmentSpec is the speci***REMOVED***cation of a VolumeAttachment request.
+// VolumeAttachmentSpec is the specification of a VolumeAttachment request.
 type VolumeAttachmentSpec struct {
 	// Attacher indicates the name of the volume driver that MUST handle this
 	// request. This is the name returned by GetPluginName().
@@ -172,26 +172,26 @@ type VolumeAttachmentSource struct {
 // VolumeAttachmentStatus is the status of a VolumeAttachment request.
 type VolumeAttachmentStatus struct {
 	// Indicates the volume is successfully attached.
-	// This ***REMOVED***eld must only be set by the entity completing the attach
+	// This field must only be set by the entity completing the attach
 	// operation, i.e. the external-attacher.
 	Attached bool `json:"attached" protobuf:"varint,1,opt,name=attached"`
 
-	// Upon successful attach, this ***REMOVED***eld is populated with any
+	// Upon successful attach, this field is populated with any
 	// information returned by the attach operation that must be passed
 	// into subsequent WaitForAttach or Mount calls.
-	// This ***REMOVED***eld must only be set by the entity completing the attach
+	// This field must only be set by the entity completing the attach
 	// operation, i.e. the external-attacher.
 	// +optional
 	AttachmentMetadata map[string]string `json:"attachmentMetadata,omitempty" protobuf:"bytes,2,rep,name=attachmentMetadata"`
 
 	// The last error encountered during attach operation, if any.
-	// This ***REMOVED***eld must only be set by the entity completing the attach
+	// This field must only be set by the entity completing the attach
 	// operation, i.e. the external-attacher.
 	// +optional
 	AttachError *VolumeError `json:"attachError,omitempty" protobuf:"bytes,3,opt,name=attachError,casttype=VolumeError"`
 
 	// The last error encountered during detach operation, if any.
-	// This ***REMOVED***eld must only be set by the entity completing the detach
+	// This field must only be set by the entity completing the detach
 	// operation, i.e. the external-attacher.
 	// +optional
 	DetachError *VolumeError `json:"detachError,omitempty" protobuf:"bytes,4,opt,name=detachError,casttype=VolumeError"`

@@ -4,8 +4,8 @@ import (
 	"math/big"
 )
 
-// Rounder represents a method for rounding the (possibly in***REMOVED***nite decimal)
-// result of a division to a ***REMOVED***nite Dec. It is used by Dec.Round() and
+// Rounder represents a method for rounding the (possibly infinite decimal)
+// result of a division to a finite Dec. It is used by Dec.Round() and
 // Dec.Quo().
 //
 // See the Example for results of using each Rounder with some sample values.
@@ -13,12 +13,12 @@ import (
 type Rounder rounder
 
 // See http://speleotrove.com/decimal/damodel.html#refround for more detailed
-// de***REMOVED***nitions of these rounding modes.
+// definitions of these rounding modes.
 var (
 	RoundDown     Rounder // towards 0
 	RoundUp       Rounder // away from 0
-	RoundFloor    Rounder // towards -in***REMOVED***nity
-	RoundCeil     Rounder // towards +in***REMOVED***nity
+	RoundFloor    Rounder // towards -infinity
+	RoundCeil     Rounder // towards +infinity
 	RoundHalfDown Rounder // to nearest; towards 0 if same distance
 	RoundHalfUp   Rounder // to nearest; away from 0 if same distance
 	RoundHalfEven Rounder // to nearest; even last digit if same distance
@@ -83,7 +83,7 @@ func roundHalf(f func(c int, odd uint) (roundUp bool)) func(z, q *Dec, rA, rB *b
 				rA2.Neg(rA2)
 			}
 			roundUp = f(rA2.Cmp(rB)*srB, z.UnscaledBig().Bit(0))
-		} ***REMOVED*** {
+		} else {
 			// brA > brB-1 => |rA| > |rB/2|
 			roundUp = true
 		}

@@ -2,7 +2,7 @@
 Copyright 2017 The Kubernetes Authors.
 
 Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this ***REMOVED***le except in compliance with the License.
+you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
 
     http://www.apache.org/licenses/LICENSE-2.0
@@ -10,7 +10,7 @@ You may obtain a copy of the License at
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the speci***REMOVED***c language governing permissions and
+See the License for the specific language governing permissions and
 limitations under the License.
 */
 
@@ -36,7 +36,7 @@ type SubjectAccessReview struct {
 	// Spec holds information about the request being evaluated
 	Spec SubjectAccessReviewSpec `json:"spec" protobuf:"bytes,2,opt,name=spec"`
 
-	// Status is ***REMOVED***lled in by the server and indicates whether the request is allowed or not
+	// Status is filled in by the server and indicates whether the request is allowed or not
 	// +optional
 	Status SubjectAccessReviewStatus `json:"status,omitempty" protobuf:"bytes,3,opt,name=status"`
 }
@@ -46,7 +46,7 @@ type SubjectAccessReview struct {
 // +genclient:noVerbs
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
 
-// SelfSubjectAccessReview checks whether or the current user can perform an action.  Not ***REMOVED***lling in a
+// SelfSubjectAccessReview checks whether or the current user can perform an action.  Not filling in a
 // spec.namespace means "in all namespaces".  Self is a special case, because users should always be able
 // to check whether they can perform an action
 type SelfSubjectAccessReview struct {
@@ -57,7 +57,7 @@ type SelfSubjectAccessReview struct {
 	// Spec holds information about the request being evaluated.  user and groups must be empty
 	Spec SelfSubjectAccessReviewSpec `json:"spec" protobuf:"bytes,2,opt,name=spec"`
 
-	// Status is ***REMOVED***lled in by the server and indicates whether the request is allowed or not
+	// Status is filled in by the server and indicates whether the request is allowed or not
 	// +optional
 	Status SubjectAccessReviewStatus `json:"status,omitempty" protobuf:"bytes,3,opt,name=status"`
 }
@@ -78,7 +78,7 @@ type LocalSubjectAccessReview struct {
 	// you made the request against.  If empty, it is defaulted.
 	Spec SubjectAccessReviewSpec `json:"spec" protobuf:"bytes,2,opt,name=spec"`
 
-	// Status is ***REMOVED***lled in by the server and indicates whether the request is allowed or not
+	// Status is filled in by the server and indicates whether the request is allowed or not
 	// +optional
 	Status SubjectAccessReviewStatus `json:"status,omitempty" protobuf:"bytes,3,opt,name=status"`
 }
@@ -206,7 +206,7 @@ type SelfSubjectRulesReview struct {
 	// Spec holds information about the request being evaluated.
 	Spec SelfSubjectRulesReviewSpec `json:"spec" protobuf:"bytes,2,opt,name=spec"`
 
-	// Status is ***REMOVED***lled in by the server and indicates the set of actions a user can perform.
+	// Status is filled in by the server and indicates the set of actions a user can perform.
 	// +optional
 	Status SubjectRulesReviewStatus `json:"status,omitempty" protobuf:"bytes,3,opt,name=status"`
 }
@@ -217,15 +217,15 @@ type SelfSubjectRulesReviewSpec struct {
 }
 
 // SubjectRulesReviewStatus contains the result of a rules check. This check can be incomplete depending on
-// the set of authorizers the server is con***REMOVED***gured with and any errors experienced during evaluation.
+// the set of authorizers the server is configured with and any errors experienced during evaluation.
 // Because authorization rules are additive, if a rule appears in a list it's safe to assume the subject has that permission,
 // even if that list is incomplete.
 type SubjectRulesReviewStatus struct {
 	// ResourceRules is the list of actions the subject is allowed to perform on resources.
-	// The list ordering isn't signi***REMOVED***cant, may contain duplicates, and possibly be incomplete.
+	// The list ordering isn't significant, may contain duplicates, and possibly be incomplete.
 	ResourceRules []ResourceRule `json:"resourceRules" protobuf:"bytes,1,rep,name=resourceRules"`
 	// NonResourceRules is the list of actions the subject is allowed to perform on non-resources.
-	// The list ordering isn't signi***REMOVED***cant, may contain duplicates, and possibly be incomplete.
+	// The list ordering isn't significant, may contain duplicates, and possibly be incomplete.
 	NonResourceRules []NonResourceRule `json:"nonResourceRules" protobuf:"bytes,2,rep,name=nonResourceRules"`
 	// Incomplete is true when the rules returned by this call are incomplete. This is most commonly
 	// encountered when an authorizer, such as an external authorizer, doesn't support rules evaluation.
@@ -237,18 +237,18 @@ type SubjectRulesReviewStatus struct {
 	EvaluationError string `json:"evaluationError,omitempty" protobuf:"bytes,4,opt,name=evaluationError"`
 }
 
-// ResourceRule is the list of actions the subject is allowed to perform on resources. The list ordering isn't signi***REMOVED***cant,
+// ResourceRule is the list of actions the subject is allowed to perform on resources. The list ordering isn't significant,
 // may contain duplicates, and possibly be incomplete.
 type ResourceRule struct {
 	// Verb is a list of kubernetes resource API verbs, like: get, list, watch, create, update, delete, proxy.  "*" means all.
 	Verbs []string `json:"verbs" protobuf:"bytes,1,rep,name=verbs"`
 
-	// APIGroups is the name of the APIGroup that contains the resources.  If multiple API groups are speci***REMOVED***ed, any action requested against one of
+	// APIGroups is the name of the APIGroup that contains the resources.  If multiple API groups are specified, any action requested against one of
 	// the enumerated resources in any API group will be allowed.  "*" means all.
 	// +optional
 	APIGroups []string `json:"apiGroups,omitempty" protobuf:"bytes,2,rep,name=apiGroups"`
-	// Resources is a list of resources this rule applies to.  "*" means all in the speci***REMOVED***ed apiGroups.
-	//  "*/foo" represents the subresource 'foo' for all resources in the speci***REMOVED***ed apiGroups.
+	// Resources is a list of resources this rule applies to.  "*" means all in the specified apiGroups.
+	//  "*/foo" represents the subresource 'foo' for all resources in the specified apiGroups.
 	// +optional
 	Resources []string `json:"resources,omitempty" protobuf:"bytes,3,rep,name=resources"`
 	// ResourceNames is an optional white list of names that the rule applies to.  An empty set means that everything is allowed.  "*" means all.
@@ -262,7 +262,7 @@ type NonResourceRule struct {
 	Verbs []string `json:"verbs" protobuf:"bytes,1,rep,name=verbs"`
 
 	// NonResourceURLs is a set of partial urls that a user should have access to.  *s are allowed, but only as the full,
-	// ***REMOVED***nal step in the path.  "*" means all.
+	// final step in the path.  "*" means all.
 	// +optional
 	NonResourceURLs []string `json:"nonResourceURLs,omitempty" protobuf:"bytes,2,rep,name=nonResourceURLs"`
 }

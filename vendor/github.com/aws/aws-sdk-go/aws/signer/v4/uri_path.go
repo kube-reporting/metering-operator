@@ -12,7 +12,7 @@ func getURIPath(u *url.URL) string {
 
 	if len(u.Opaque) > 0 {
 		uri = "/" + strings.Join(strings.Split(u.Opaque, "/")[3:], "/")
-	} ***REMOVED*** {
+	} else {
 		uri = u.EscapedPath()
 	}
 

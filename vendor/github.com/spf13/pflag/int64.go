@@ -35,7 +35,7 @@ func (f *FlagSet) GetInt64(name string) (int64, error) {
 	return val.(int64), nil
 }
 
-// Int64Var de***REMOVED***nes an int64 flag with speci***REMOVED***ed name, default value, and usage string.
+// Int64Var defines an int64 flag with specified name, default value, and usage string.
 // The argument p points to an int64 variable in which to store the value of the flag.
 func (f *FlagSet) Int64Var(p *int64, name string, value int64, usage string) {
 	f.VarP(newInt64Value(value, p), name, "", usage)
@@ -46,7 +46,7 @@ func (f *FlagSet) Int64VarP(p *int64, name, shorthand string, value int64, usage
 	f.VarP(newInt64Value(value, p), name, shorthand, usage)
 }
 
-// Int64Var de***REMOVED***nes an int64 flag with speci***REMOVED***ed name, default value, and usage string.
+// Int64Var defines an int64 flag with specified name, default value, and usage string.
 // The argument p points to an int64 variable in which to store the value of the flag.
 func Int64Var(p *int64, name string, value int64, usage string) {
 	CommandLine.VarP(newInt64Value(value, p), name, "", usage)
@@ -57,7 +57,7 @@ func Int64VarP(p *int64, name, shorthand string, value int64, usage string) {
 	CommandLine.VarP(newInt64Value(value, p), name, shorthand, usage)
 }
 
-// Int64 de***REMOVED***nes an int64 flag with speci***REMOVED***ed name, default value, and usage string.
+// Int64 defines an int64 flag with specified name, default value, and usage string.
 // The return value is the address of an int64 variable that stores the value of the flag.
 func (f *FlagSet) Int64(name string, value int64, usage string) *int64 {
 	p := new(int64)
@@ -72,7 +72,7 @@ func (f *FlagSet) Int64P(name, shorthand string, value int64, usage string) *int
 	return p
 }
 
-// Int64 de***REMOVED***nes an int64 flag with speci***REMOVED***ed name, default value, and usage string.
+// Int64 defines an int64 flag with specified name, default value, and usage string.
 // The return value is the address of an int64 variable that stores the value of the flag.
 func Int64(name string, value int64, usage string) *int64 {
 	return CommandLine.Int64P(name, "", value, usage)

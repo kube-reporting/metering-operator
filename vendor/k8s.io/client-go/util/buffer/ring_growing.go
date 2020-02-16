@@ -2,7 +2,7 @@
 Copyright 2017 The Kubernetes Authors.
 
 Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this ***REMOVED***le except in compliance with the License.
+you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
 
     http://www.apache.org/licenses/LICENSE-2.0
@@ -10,7 +10,7 @@ You may obtain a copy of the License at
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the speci***REMOVED***c language governing permissions and
+See the License for the specific language governing permissions and
 limitations under the License.
 */
 
@@ -33,7 +33,7 @@ func NewRingGrowing(initialSize int) *RingGrowing {
 	}
 }
 
-// ReadOne reads (consumes) ***REMOVED***rst item from the buffer if it is available, otherwise returns false.
+// ReadOne reads (consumes) first item from the buffer if it is available, otherwise returns false.
 func (r *RingGrowing) ReadOne() (data interface{}, ok bool) {
 	if r.readable == 0 {
 		return nil, false
@@ -44,7 +44,7 @@ func (r *RingGrowing) ReadOne() (data interface{}, ok bool) {
 	if r.beg == r.n-1 {
 		// Was the last element
 		r.beg = 0
-	} ***REMOVED*** {
+	} else {
 		r.beg++
 	}
 	return element, true
@@ -59,7 +59,7 @@ func (r *RingGrowing) WriteOne(data interface{}) {
 		to := r.beg + r.readable
 		if to <= r.n {
 			copy(newData, r.data[r.beg:to])
-		} ***REMOVED*** {
+		} else {
 			copied := copy(newData, r.data[r.beg:])
 			copy(newData[copied:], r.data[:(to%r.n)])
 		}

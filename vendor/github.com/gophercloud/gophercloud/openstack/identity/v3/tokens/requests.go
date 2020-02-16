@@ -2,7 +2,7 @@ package tokens
 
 import "github.com/gophercloud/gophercloud"
 
-// Scope allows a created token to be limited to a speci***REMOVED***c domain or project.
+// Scope allows a created token to be limited to a specific domain or project.
 type Scope struct {
 	ProjectID   string
 	ProjectName string
@@ -22,7 +22,7 @@ type AuthOptionsBuilder interface {
 
 // AuthOptions represents options for authenticating a user.
 type AuthOptions struct {
-	// IdentityEndpoint speci***REMOVED***es the HTTP endpoint that is required to work with
+	// IdentityEndpoint specifies the HTTP endpoint that is required to work with
 	// the Identity API of the appropriate version. While it's ultimately needed
 	// by all of the identity services, it will often be populated by a
 	// provider-level function.
@@ -140,7 +140,7 @@ func Get(c *gophercloud.ServiceClient, token string) (r GetResult) {
 	return
 }
 
-// Validate determines if a speci***REMOVED***ed token is valid or not.
+// Validate determines if a specified token is valid or not.
 func Validate(c *gophercloud.ServiceClient, token string) (bool, error) {
 	resp, err := c.Head(tokenURL(c), &gophercloud.RequestOpts{
 		MoreHeaders: subjectTokenHeaders(c, token),
@@ -153,7 +153,7 @@ func Validate(c *gophercloud.ServiceClient, token string) (bool, error) {
 	return resp.StatusCode == 200 || resp.StatusCode == 204, nil
 }
 
-// Revoke immediately makes speci***REMOVED***ed token invalid.
+// Revoke immediately makes specified token invalid.
 func Revoke(c *gophercloud.ServiceClient, token string) (r RevokeResult) {
 	_, r.Err = c.Delete(tokenURL(c), &gophercloud.RequestOpts{
 		MoreHeaders: subjectTokenHeaders(c, token),
