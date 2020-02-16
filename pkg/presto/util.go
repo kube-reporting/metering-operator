@@ -31,6 +31,12 @@ func GetRowsWhere(queryer db.Queryer, tableName string, columns []Column, whereC
 	return ExecuteSelect(queryer, GenerateGetRowsSQLWithWhere(tableName, columns, whereClause))
 }
 
+func CreateSchema(queryer db.Queryer, catalog, schema string) error {
+	query := fmt.Sprintf("CREATE SCHEMA IF NOT EXISTS %s.%s", catalog, schema)
+	_, err := queryer.Query(query)
+	return err
+}
+
 func CreateTable(queryer db.Queryer, catalog, schema, tableName string, columns []Column, comment string, properties map[string]string, ignoreExists bool) error {
 	query := generateCreateTableSQL(catalog, schema, tableName, columns, comment, properties, ignoreExists)
 	_, err := queryer.Query(query)

@@ -35,6 +35,7 @@ type StorageLocationSpec struct {
 
 type HiveStorage struct {
 	UnmanagedDatabase      bool                               `json:"unmanagedDatabase"`
+	UseLocalStorage        bool                               `json:"useLocalStorage,omitempty"`
 	DatabaseName           string                             `json:"databaseName"`
 	Location               string                             `json:"location,omitempty"`
 	DefaultTableProperties *HiveStorageDefaultTableProperties `json:"defaultTableProperties,omitempty"`

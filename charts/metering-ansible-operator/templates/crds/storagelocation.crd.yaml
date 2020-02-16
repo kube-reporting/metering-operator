@@ -63,6 +63,11 @@ spec:
                     ***REMOVED***lesystem URL for Hive is used.
                     Note: this is an optional ***REMOVED***eld.
                   format: uri
+                useLocalStorage:
+                  type: boolean
+                  description: |
+                    UseLocalStorage determines whether or not to use a ***REMOVED***le-based metastore
+                    mounted in Presto
                 defaultTableProperties:
                   type: object
                   description: |

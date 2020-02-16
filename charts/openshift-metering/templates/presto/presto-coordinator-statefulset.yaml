@@ -138,6 +138,11 @@ spec:
           mountPath: /var/presto/data
         - name: presto-logs
           mountPath: /var/presto/logs
+        # TODO: this should be a shared PVC or some long-term storage
+        # TODO: what happens when AWS billing is used?
+        # TODO: should we always use this local ***REMOVED***le-based metastore?
+        - name: presto-hive
+          mountPath: /var/presto-hive/
 {{- if .Values.hive.spec.con***REMOVED***g.sharedVolume.enabled }}
         - name: hive-warehouse-data
           mountPath: /var/presto-hive/
@@ -163,6 +168,8 @@ spec:
       - name: presto-data
         emptyDir: {}
       - name: presto-logs
+        emptyDir: {}
+      - name: presto-hive
         emptyDir: {}
 {{- if or .Values.presto.spec.con***REMOVED***g.gcs.secretName .Values.presto.spec.con***REMOVED***g.gcs.createSecret }}
       - name: gcs-json

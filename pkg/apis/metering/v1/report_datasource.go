@@ -72,8 +72,7 @@ type PrometheusMetricsImporterDataSource struct {
 }
 
 type ExistingPrestoTableDataSource struct {
-	TableRef  v1.LocalObjectReference `json:"tableRef,omitempty"`
-	TableName string                  `json:"tableName"`
+	TableName string `json:"tableName"`
 }
 
 type PrestoTableDataSource struct {

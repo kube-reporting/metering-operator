@@ -128,14 +128,6 @@ spec:
                 tableName:
                   type: string
                   minLength: 1
-                tableRef:
-                  type: object
-                  properties:
-                    name:
-                      description: |
-                        Name is the name of an existing PrestoTable custom resource.
-                      type: string
-                      minLength: 1
             prestoTable:
               type: object
               properties:

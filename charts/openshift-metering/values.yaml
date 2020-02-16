@@ -62,6 +62,7 @@ openshift-reporting:
       isDefault: true
       name: hive
       type: hive
+      useLocalStorage: true
       hive:
         databaseName: metering
         unmanagedDatabase: false
@@ -73,6 +74,10 @@ openshift-reporting:
       base:
         enabled: true
         items:
+          - name: prometheus-connector-cpu-cores-limits
+            spec:
+              existingPrestoTable:
+                tableName: prometheus.default.kube_pod_container_resource_limits_cpu_cores
           # views
           # - name: cluster-cpu-capacity-raw
           #   spec:
@@ -701,7 +706,7 @@ hive:
 
       sharedVolume:
         enabled: false
-        mountPath: /user/hive/warehouse
+        mountPath: /var/presto-hive
 
         createPVC: false
         claimName: hive-warehouse-data

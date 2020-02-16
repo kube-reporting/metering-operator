@@ -78,6 +78,7 @@ func FmtPartitionSpec(partitionColumns []hive.Column, partSpec hive.PartitionSpe
 }
 
 type PrestoTableManager interface {
+	CreateSchema(catalog, schema string) error
 	CreateTable(catalog, schema, tableName string, columns []presto.Column, comment string, properties map[string]string, ignoreExists bool) error
 	CreateTableAs(catalog, schema, tableName string, columns []presto.Column, comment string, properties map[string]string, ignoreExists bool, query string) error
 	DropTable(catalog, schema, tableName string, ignoreNotExists bool) error
@@ -93,6 +94,10 @@ type PrestoTableManagerImpl struct {
 
 func NewPrestoTableManager(queryer db.Queryer) *PrestoTableManagerImpl {
 	return &PrestoTableManagerImpl{queryer: queryer}
+}
+
+func (c *PrestoTableManagerImpl) CreateSchema(catalog, schema string) error {
+	return presto.CreateSchema(c.queryer, catalog, schema)
 }
 
 func (c *PrestoTableManagerImpl) CreateTable(catalog, schema, tableName string, columns []presto.Column, comment string, properties map[string]string, ignoreExists bool) error {
