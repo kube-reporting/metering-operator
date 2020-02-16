@@ -2,7 +2,8 @@
 FROM quay.io/openshift/origin-metering-helm:latest as helm
 # final image needs kubectl, so we copy `oc` from cli image to use as kubectl.
 FROM openshift/origin-cli:latest as cli
-# real base
+# the base image is the ansible-operator's origin images
+# TODO: stop using the latest tag for base images
 FROM quay.io/openshift/origin-ansible-operator:latest
 
 USER root
@@ -28,7 +29,8 @@ RUN ln -f -s /tini /usr/bin/tini
 # 1. botocore and boto3 are used by the aws-related modules (aws_s3)
 # 2. netaddr is needed to use the ipv4/ipv6 jinja filter
 # 3. cryptography is used by the openssl_* modules for TLS/authentication purposes
-RUN pip install --no-cache-dir --upgrade openshift botocore boto3 cryptography netaddr
+# TODO: the ansible-operator base image uses setuptools >= 45.2.0 which needs python 3.5 so this is a temporary fix
+RUN pip install --no-cache-dir --upgrade openshift botocore boto3 cryptography netaddr "setuptools<=45.1.0"
 # In order to use the 'ansible_failed_result' and 'ansible_failed_task' variables in a block/rescue,
 # we need to ensure that the 2.8 version is being used while this is fixed in 2.9 upstream.
 # TODO: revert this change once the issue mentioned above is resolved.
