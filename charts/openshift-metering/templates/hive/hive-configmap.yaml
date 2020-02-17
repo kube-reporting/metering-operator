@@ -31,23 +31,33 @@ data:
       </property>
       <property>
         <name>hive.server2.thrift.bind.host</name>
-{{- if .Values.hive.spec.server.config.tls.enabled }}
+{{- if and .Values.hive.spec.server.config.tls.enabled .Values.useIPV6Networking }}
+        <value>[::1]</value>
+{{- else if .Values.hive.spec.server.config.tls.enabled }}
         <value>127.0.0.1</value>
+{{- else if .Values.useIPV6Networking }}
+        <value>[::]</value>
 {{- else }}
         <value>0.0.0.0</value>
 {{- end }}
       </property>
       <property>
         <name>hive.metastore.thrift.bind.host</name>
-{{- if .Values.hive.spec.metastore.config.tls.enabled }}
+{{- if and .Values.hive.spec.metastore.config.tls.enabled .Values.useIPV6Networking }}
+        <value>[::1]</value>
+{{- else if .Values.hive.spec.metastore.config.tls.enabled }}
         <value>127.0.0.1</value>
+{{- else if .Values.useIPV6Networking }}
+        <value>[::]</value>
 {{- else }}
         <value>0.0.0.0</value>
 {{- end }}
       </property>
       <property>
         <name>hive.metastore.uris</name>
-{{- if .Values.hive.spec.metastore.config.tls.enabled }}
+{{- if and .Values.hive.spec.metastore.config.tls.enabled .Values.useIPV6Networking }}
+        <value>thrift://[::1]:9083</value>
+{{- else if .Values.hive.spec.metastore.config.tls.enabled }}
         <value>thrift://localhost:9083</value>
 {{- else }}
         <value>thrift://hive-metastore:9083</value>
