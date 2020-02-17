@@ -3500,6 +3500,8 @@ objects:
               - awsBilling
             - required:
               - prestoTable
+            - required:
+              - linkExistingTable
             properties:
               awsBilling:
                 properties:
@@ -3519,6 +3521,16 @@ objects:
                     type: object
                 required:
                 - source
+                type: object
+              linkExistingTable:
+                properties:
+                  tableName:
+                    description: |
+                      TableName is the fully-qualified table name (i.e. catalog.schema.table_name) of an existing Presto table.
+                    minLength: 1
+                    type: string
+                required:
+                - tableName
                 type: object
               prestoTable:
                 properties:
