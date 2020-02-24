@@ -249,7 +249,7 @@ reporting-operator:
     image:
       pullPolicy: Always
       defaultRepository: quay.io/openshift/origin-metering-reporting-operator
-      defaultTag: "4.4"
+      defaultTag: "4.5"
       defaultOverride: null
       repository: null
       tag: null
@@ -409,7 +409,7 @@ reporting-operator:
       image:
         pullPolicy: Always
         defaultRepository: quay.io/openshift/origin-oauth-proxy
-        defaultTag: "4.4"
+        defaultTag: "4.5"
         defaultOverride: null
         repository: null
         tag: null
@@ -461,7 +461,7 @@ presto:
     image:
       pullPolicy: Always
       defaultRepository: quay.io/openshift/origin-metering-presto
-      defaultTag: "4.4"
+      defaultTag: "4.5"
       defaultOverride: null
       repository: null
       tag: null
@@ -711,7 +711,7 @@ hive:
     image:
       pullPolicy: Always
       defaultRepository: quay.io/openshift/origin-metering-hive
-      defaultTag: "4.4"
+      defaultTag: "4.5"
       defaultOverride: null
       repository: null
       tag: null
@@ -848,7 +848,7 @@ __ghostunnel:
   image:
     pullPolicy: Always
     defaultRepository: quay.io/openshift/origin-ghostunnel
-    defaultTag: "4.4"
+    defaultTag: "4.5"
     defaultOverride: null
     repository: null
     tag: null
@@ -892,7 +892,7 @@ hadoop:
     image:
       pullPolicy: Always
       defaultRepository: quay.io/openshift/origin-metering-hadoop
-      defaultTag: "4.4"
+      defaultTag: "4.5"
       defaultOverride: null
       repository: null
       tag: null
