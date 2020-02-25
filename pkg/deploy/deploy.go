@@ -2,7 +2,11 @@ package deploy
 
 import (
 	"fmt"
+	"github.com/sirupsen/logrus"
+	"time"
 
+	olmclientv1 "github.com/operator-framework/operator-lifecycle-manager/pkg/api/client/clientset/versioned/typed/operators/v1"
+	olmclientv1alpha1 "github.com/operator-framework/operator-lifecycle-manager/pkg/api/client/clientset/versioned/typed/operators/v1alpha1"
 	metering "github.com/operator-framework/operator-metering/pkg/apis/metering/v1"
 	meteringclient "github.com/operator-framework/operator-metering/pkg/generated/clientset/versioned/typed/metering/v1"
 	apiextv1beta1 "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1beta1"
@@ -11,8 +15,6 @@ import (
 	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
 	rbacv1 "k8s.io/api/rbac/v1"
-
-	log "github.com/sirupsen/logrus"
 	"k8s.io/client-go/kubernetes"
 )
 
@@ -22,13 +24,21 @@ const (
 	openshiftManifestDirname  = "openshift"
 	ocpTestingManifestDirname = "ocp-testing"
 
-	hivetableFile        = "hive.crd.yaml"
-	prestotableFile      = "prestotable.crd.yaml"
-	meteringconfigFile   = "meteringconfig.crd.yaml"
-	reportFile           = "report.crd.yaml"
-	reportdatasourceFile = "reportdatasource.crd.yaml"
-	reportqueryFile      = "reportquery.crd.yaml"
-	storagelocationFile  = "storagelocation.crd.yaml"
+	packageName            = "metering-ocp"
+	catalogSourceName      = "redhat-operators"
+	catalogSourceNamespace = "openshift-marketplace"
+
+	crdPollTimeout = 20 * time.Second
+	crdInitialPoll = 1 * time.Second
+
+	hivetableFile         = "hive.crd.yaml"
+	prestotableFile       = "prestotable.crd.yaml"
+	meteringconfigFile    = "meteringconfig.crd.yaml"
+	reportFile            = "report.crd.yaml"
+	reportdatasourceFile  = "reportdatasource.crd.yaml"
+	reportqueryFile       = "reportquery.crd.yaml"
+	storagelocationFile   = "storagelocation.crd.yaml"
+	meteringconfigCRDName = "meteringconfigs.metering.openshift.io"
 
 	meteringDeploymentFile         = "metering-operator-deployment.yaml"
 	meteringServiceAccountFile     = "metering-operator-service-account.yaml"
@@ -63,6 +73,8 @@ type Config struct {
 	Platform                 string
 	Repo                     string
 	Tag                      string
+	Channel                  string
+	SubscriptionName         string
 	ExtraNamespaceLabels     map[string]string
 	OperatorResources        *OperatorResources
 	MeteringConfig           *metering.MeteringConfig
@@ -85,11 +97,13 @@ type OperatorResources struct {
 // to provision and remove all the metering resources, and a customized
 // deployment configuration.
 type Deployer struct {
-	config         Config
-	logger         log.FieldLogger
-	client         kubernetes.Interface
-	apiExtClient   apiextclientv1beta1.CustomResourceDefinitionsGetter
-	meteringClient meteringclient.MeteringV1Interface
+	config            Config
+	logger            logrus.FieldLogger
+	client            kubernetes.Interface
+	apiExtClient      apiextclientv1beta1.CustomResourceDefinitionsGetter
+	meteringClient    meteringclient.MeteringV1Interface
+	olmV1Client       olmclientv1.OperatorsV1Interface
+	olmV1Alpha1Client olmclientv1alpha1.OperatorsV1alpha1Interface
 }
 
 // NewDeployer creates a new reference to a deploy structure, and then calls helper
@@ -98,17 +112,21 @@ type Deployer struct {
 // deploy structure
 func NewDeployer(
 	cfg Config,
-	logger log.FieldLogger,
+	logger logrus.FieldLogger,
 	client kubernetes.Interface,
 	apiextClient apiextclientv1beta1.CustomResourceDefinitionsGetter,
 	meteringClient meteringclient.MeteringV1Interface,
+	olmV1Client olmclientv1.OperatorsV1Interface,
+	olmV1Alpha1Client olmclientv1alpha1.OperatorsV1alpha1Interface,
 ) (*Deployer, error) {
 	deploy := &Deployer{
-		client:         client,
-		apiExtClient:   apiextClient,
-		meteringClient: meteringClient,
-		logger:         logger,
-		config:         cfg,
+		client:            client,
+		apiExtClient:      apiextClient,
+		meteringClient:    meteringClient,
+		olmV1Client:       olmV1Client,
+		olmV1Alpha1Client: olmV1Alpha1Client,
+		logger:            logger,
+		config:            cfg,
 	}
 
 	deploy.logger.Infof("Metering Deploy Namespace: %s", deploy.config.Namespace)
@@ -126,6 +144,34 @@ func NewDeployer(
 	}
 
 	return deploy, nil
+}
+
+// InstallOLM is the drive function that manages the process of creating
+// all of the OLM-related resources that is needed to deploy a Metering
+// installation. Note: the Subscription created uses the redhat-operators
+// CatalogSource in the openshift-marketplace namespace.
+func (deploy *Deployer) InstallOLM() error {
+	err := deploy.installNamespace()
+	if err != nil {
+		return fmt.Errorf("failed to create the %s namespace: %v", deploy.config.Namespace, err)
+	}
+
+	err = deploy.installMeteringOperatorGroup()
+	if err != nil {
+		return fmt.Errorf("failed to create the metering OperatorGroup: %v", err)
+	}
+
+	err = deploy.installMeteringSubscription()
+	if err != nil {
+		return fmt.Errorf("failed to create the metering Subscription: %v", err)
+	}
+
+	err = deploy.installMeteringConfig()
+	if err != nil {
+		return fmt.Errorf("failed to create the MeteringConfig resource: %v", err)
+	}
+
+	return nil
 }
 
 // Install is the driver function that manages the process of creating all
@@ -151,6 +197,48 @@ func (deploy *Deployer) Install() error {
 	err = deploy.installMeteringConfig()
 	if err != nil {
 		return fmt.Errorf("failed to create the MeteringConfig resource: %v", err)
+	}
+
+	return nil
+}
+
+// UninstallOLM is the driver function that manages deleting all of the OLM-related
+// metering resources that get created: the OperatorGroup, Subscription, CSV, etc.
+// Deleting the ClusterServiceVersion object will delete the resources that were
+// provisioned from the CSV, so deleting the MeteringConfig custom resource is still
+// needed to fully cleanup any non-CRD resources, e.g. the reporting-operator pod.
+func (deploy *Deployer) UninstallOLM() error {
+	err := deploy.uninstallMeteringConfig()
+	if err != nil {
+		return fmt.Errorf("failed to delete the MeteringConfig resource: %v", err)
+	}
+
+	err = deploy.uninstallMeteringCSV()
+	if err != nil {
+		return fmt.Errorf("failed to delete the metering ClusterServiceVersion: %v", err)
+	}
+
+	err = deploy.uninstallMeteringSubscription()
+	if err != nil {
+		return fmt.Errorf("failed to uninstall the metering Subscription: %v", err)
+	}
+
+	err = deploy.uninstallMeteringOperatorGroup()
+	if err != nil {
+		return fmt.Errorf("failed to uninstall the metering OperatorGroup: %v", err)
+	}
+
+	if deploy.config.DeleteCRDs {
+		err = deploy.uninstallMeteringCRDs()
+		if err != nil {
+			return fmt.Errorf("failed to uninstall the metering-related CRDs: %v", err)
+		}
+	}
+	if deploy.config.DeleteNamespace {
+		err = deploy.uninstallNamespace()
+		if err != nil {
+			return fmt.Errorf("failed to uninstall the %s metering namespace: %v", deploy.config.Namespace, err)
+		}
 	}
 
 	return nil

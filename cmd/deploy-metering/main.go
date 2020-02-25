@@ -8,6 +8,8 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
 
+	olmclientv1 "github.com/operator-framework/operator-lifecycle-manager/pkg/api/client/clientset/versioned/typed/operators/v1"
+	olmclientv1alpha1 "github.com/operator-framework/operator-lifecycle-manager/pkg/api/client/clientset/versioned/typed/operators/v1alpha1"
 	meteringclient "github.com/operator-framework/operator-metering/pkg/generated/clientset/versioned/typed/metering/v1"
 	apiextclientv1beta1 "k8s.io/apiextensions-apiserver/pkg/client/clientset/clientset/typed/apiextensions/v1beta1"
 
@@ -33,12 +35,32 @@ var (
 		},
 	}
 
+	olmInstallCmd = &cobra.Command{
+		Use:     "olm-install",
+		Short:   "Install the metering operator through OLM",
+		Example: "./bin/deploy-metering olm-install --channel 4.3",
+		PreRun: func(cmd *cobra.Command, args []string) {
+			deployType = "olm-install"
+		},
+		RunE: runDeployMetering,
+	}
+
 	installCmd = &cobra.Command{
 		Use:     "install",
 		Short:   "Install the metering operator",
-		Example: "operator-metering install --platform upstream",
+		Example: "./bin/deploy-metering install --platform upstream",
 		PreRun: func(cmd *cobra.Command, args []string) {
 			deployType = "install"
+		},
+		RunE: runDeployMetering,
+	}
+
+	olmUninstallCmd = &cobra.Command{
+		Use:     "olm-uninstall",
+		Short:   "Uninstall the metering operator and OLM resources",
+		Example: "./bin/deploy-metering olm-uninstall --delete-namespace",
+		PreRun: func(cmd *cobra.Command, args []string) {
+			deployType = "olm-uninstall"
 		},
 		RunE: runDeployMetering,
 	}
@@ -46,7 +68,7 @@ var (
 	uninstallCmd = &cobra.Command{
 		Use:     "uninstall",
 		Short:   "Uninstall the metering operator",
-		Example: "operator-metering uninstall --delete--all",
+		Example: "./bin/deploy-metering uninstall --delete--all",
 		PreRun: func(cmd *cobra.Command, args []string) {
 			deployType = "uninstall"
 		},
@@ -67,10 +89,16 @@ func init() {
 	uninstallCmd.Flags().BoolVar(&cfg.DeletePVCs, "delete-pvc", true, "If true, this would delete the PVCs used by metering resources during an uninstall. This can also be specified through the METERING_DELETE_PVCS ENV var.")
 	uninstallCmd.Flags().BoolVar(&cfg.DeleteAll, "delete-all", false, "If true, this would delete the all metering resources during an uninstall. This can also be specified through the METERING_DELETE_ALL ENV var.")
 
+	olmUninstallCmd.Flags().BoolVar(&cfg.DeleteCRDs, "delete-crd", false, "If true, this would delete the metering CRDs during an uninstall. This can also be specified through the METERING_DELETE_CRDS ENV var.")
+	olmUninstallCmd.Flags().BoolVar(&cfg.DeleteNamespace, "delete-namespace", false, "If true, this would delete the namespace during an uninstall. This can also be specified through the METERING_DELETE_NAMESPACE ENV var.")
+
 	installCmd.Flags().StringVar(&cfg.Repo, "repo", "", "The name of the metering-ansible-operator image repository. This can also be specified through the METERING_OPERATOR_IMAGE_REPO ENV var.")
 	installCmd.Flags().StringVar(&cfg.Tag, "tag", "", "The name of the metering-ansible-operator image tag. This can also be specified through the METERING_OPERATOR_IMAGE_TAG ENV var.")
 	installCmd.Flags().BoolVar(&cfg.SkipMeteringDeployment, "skip-metering-operator-deployment", false, "If true, only create the metering namespace, CRDs, and MeteringConfig resources. This can also be specified through the SKIP_METERING_OPERATOR_DEPLOY ENV var.")
 	installCmd.Flags().BoolVar(&cfg.RunMeteringOperatorLocal, "run-metering-operator-local", false, "If true, skip installing the metering deployment. This can also be specified through the $SKIP_METERING_OPERATOR_DEPLOYMENT ENV var.")
+
+	olmInstallCmd.Flags().StringVar(&cfg.SubscriptionName, "subscription", "metering-ocp", "The name of the metering subscription that gets created.")
+	olmInstallCmd.Flags().StringVar(&cfg.Channel, "channel", "4.2", "The metering channel to subscribe to. Examples: 4.2, 4.3, etc.")
 
 	if err := initFlagsFromEnv(); err != nil {
 		log.WithError(err).Fatalf("Failed to update flags from ENV vars: %v", err)
@@ -78,7 +106,7 @@ func init() {
 }
 
 func main() {
-	rootCmd.AddCommand(installCmd, uninstallCmd)
+	rootCmd.AddCommand(installCmd, olmInstallCmd, uninstallCmd, olmUninstallCmd)
 
 	err := rootCmd.Execute()
 	if err != nil {
@@ -130,23 +158,52 @@ func runDeployMetering(cmd *cobra.Command, args []string) error {
 		return fmt.Errorf("failed to initialize the metering clientset: %v", err)
 	}
 
-	deployObj, err := deploy.NewDeployer(cfg, logger, client, apiextClient, meteringClient)
+	olmV1Client, err := olmclientv1.NewForConfig(restconfig)
+	if err != nil {
+		return fmt.Errorf("failed to initialize the v1 OLM clientset: %v", err)
+	}
+
+	olmV1Alpha1Client, err := olmclientv1alpha1.NewForConfig(restconfig)
+	if err != nil {
+		return fmt.Errorf("failed to initialize the v1alpha OLM clientset: %v", err)
+	}
+
+	deployObj, err := deploy.NewDeployer(cfg, logger, client, apiextClient, meteringClient, olmV1Client, olmV1Alpha1Client)
 	if err != nil {
 		return fmt.Errorf("failed to deploy metering: %v", err)
 	}
 
-	if deployType == "install" {
+	switch deployType {
+	case "install":
 		err := deployObj.Install()
 		if err != nil {
 			return fmt.Errorf("failed to install metering: %v", err)
 		}
 		logger.Infof("Finished installing metering")
-	} else if deployType == "uninstall" {
+
+	case "olm-install":
+		err := deployObj.InstallOLM()
+		if err != nil {
+			return fmt.Errorf("failed to install metering through OLM: %v", err)
+		}
+		logger.Infof("Finished installing metering through OLM")
+
+	case "uninstall":
 		err := deployObj.Uninstall()
 		if err != nil {
 			return fmt.Errorf("failed to uninstall metering: %v", err)
 		}
 		logger.Infof("Finished uninstall metering")
+
+	case "olm-uninstall":
+		err := deployObj.UninstallOLM()
+		if err != nil {
+			return fmt.Errorf("failed to uninstall metering OLM resources: %v", err)
+		}
+		logger.Infof("Finished uninstalling metering OLM resources")
+
+	default:
+		return fmt.Errorf("invalid deployType encountered: %v", deployType)
 	}
 
 	return nil
