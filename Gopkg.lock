@@ -113,6 +113,14 @@
   revision = "3a771d992973f24aa725d07868b467d1ddfceafb"
 
 [[projects]]
+  digest = "1:45c41cd27a8d986998680bfc86da0bbff5fa4f90d0f446c00636c8b099028ffe"
+  name = "github.com/blang/semver"
+  packages = ["."]
+  pruneopts = "NUT"
+  revision = "ba2c2ddd89069b46a7011d4106f6868f17ee1705"
+  version = "v3.6.1"
+
+[[projects]]
   digest = "1:a2c1d0e43bd3baaa071d1b9ed72c27d78169b2b269f71c105ac4ba34b1be4a39"
   name = "github.com/davecgh/go-spew"
   packages = ["spew"]
@@ -355,6 +363,22 @@
   ]
   pruneopts = "NUT"
   revision = "c44a8b61b9f46cd9e802384dfeda0bc9942db68a"
+
+[[projects]]
+  digest = "1:1452e2a7f3c43eb3ff7835e34f4c674b36572926302c55eb9128e534845a0cdd"
+  name = "github.com/operator-framework/operator-lifecycle-manager"
+  packages = [
+    "pkg/api/apis/operators",
+    "pkg/api/apis/operators/v1",
+    "pkg/api/apis/operators/v1alpha1",
+    "pkg/api/client/clientset/versioned/scheme",
+    "pkg/api/client/clientset/versioned/typed/operators/v1",
+    "pkg/api/client/clientset/versioned/typed/operators/v1alpha1",
+    "pkg/lib/version",
+  ]
+  pruneopts = "NUT"
+  revision = ""
+  version = "0.12.0"
 
 [[projects]]
   branch = "master"
@@ -904,6 +928,10 @@
     "github.com/golang/mock/mockgen",
     "github.com/golang/mock/mockgen/model",
     "github.com/openshift/client-go/route/clientset/versioned/typed/route/v1",
+    "github.com/operator-framework/operator-lifecycle-manager/pkg/api/apis/operators/v1",
+    "github.com/operator-framework/operator-lifecycle-manager/pkg/api/apis/operators/v1alpha1",
+    "github.com/operator-framework/operator-lifecycle-manager/pkg/api/client/clientset/versioned/typed/operators/v1",
+    "github.com/operator-framework/operator-lifecycle-manager/pkg/api/client/clientset/versioned/typed/operators/v1alpha1",
     "github.com/prestodb/presto-go-client/presto",
     "github.com/prometheus/client_golang/api",
     "github.com/prometheus/client_golang/api/prometheus/v1",
