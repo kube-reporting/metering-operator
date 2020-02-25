@@ -1,47 +1,47 @@
 operator:
   image:
     repository: image-registry.openshift-image-registry.svc:5000/openshift/ose-metering-ansible-operator
-    tag: "v4.4"
+    tag: "v4.5"
 
 olm:
   imageTags:
   - name: metering-ansible-operator
     from:
       kind: DockerImage
-      name: image-registry.openshift-image-registry.svc:5000/openshift/ose-metering-ansible-operator:v4.4
+      name: image-registry.openshift-image-registry.svc:5000/openshift/ose-metering-ansible-operator:v4.5
   - name: metering-reporting-operator
     from:
       kind: DockerImage
-      name: image-registry.openshift-image-registry.svc:5000/openshift/ose-metering-reporting-operator:v4.4
+      name: image-registry.openshift-image-registry.svc:5000/openshift/ose-metering-reporting-operator:v4.5
   - name: metering-presto
     from:
       kind: DockerImage
-      name: image-registry.openshift-image-registry.svc:5000/openshift/ose-metering-presto:v4.4
+      name: image-registry.openshift-image-registry.svc:5000/openshift/ose-metering-presto:v4.5
   - name: metering-hive
     from:
       kind: DockerImage
-      name: image-registry.openshift-image-registry.svc:5000/openshift/ose-metering-hive:v4.4
+      name: image-registry.openshift-image-registry.svc:5000/openshift/ose-metering-hive:v4.5
   - name: metering-hadoop
     from:
       kind: DockerImage
-      name: image-registry.openshift-image-registry.svc:5000/openshift/ose-metering-hadoop:v4.4
+      name: image-registry.openshift-image-registry.svc:5000/openshift/ose-metering-hadoop:v4.5
   - name: ghostunnel
     from:
       kind: DockerImage
-      name: image-registry.openshift-image-registry.svc:5000/openshift/ose-ghostunnel:v4.4
+      name: image-registry.openshift-image-registry.svc:5000/openshift/ose-ghostunnel:v4.5
   - name: oauth-proxy
     from:
       kind: DockerImage
-      name: image-registry.openshift-image-registry.svc:5000/openshift/ose-oauth-proxy:v4.4
+      name: image-registry.openshift-image-registry.svc:5000/openshift/ose-oauth-proxy:v4.5
 
   skipARTPackage: true
 
   channels:
-  - name: "4.4"
-    currentCSV: metering-operator.v4.4.0
+  - name: "4.5"
+    currentCSV: metering-operator.v4.5.0
   csv:
-    name : metering-operator-testing.v4.4.0
-    version: "4.4.0"
+    name : metering-operator-testing.v4.5.0
+    version: "4.5.0"
     provider:
       name: Metering OCP testing
 
