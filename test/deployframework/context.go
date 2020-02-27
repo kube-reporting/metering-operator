@@ -98,7 +98,7 @@ func (df *DeployFramework) NewDeployerCtx(
 
 	df.Logger.Debugf("Deployer config: %+v", cfg)
 
-	deployer, err := deploy.NewDeployer(*cfg, df.Logger, df.Client, df.APIExtClient, df.MeteringClient)
+	deployer, err := deploy.NewDeployer(*cfg, df.Logger, df.Client, df.APIExtClient, df.MeteringClient, df.OLMV1Client, df.OLMV1Alpha1Client)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create a new deployer instance: %v", err)
 	}

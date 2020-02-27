@@ -6,6 +6,9 @@ import (
 	"path/filepath"
 
 	"github.com/sirupsen/logrus"
+
+	olmclientv1 "github.com/operator-framework/operator-lifecycle-manager/pkg/api/client/clientset/versioned/typed/operators/v1"
+	olmclientv1alpha1 "github.com/operator-framework/operator-lifecycle-manager/pkg/api/client/clientset/versioned/typed/operators/v1alpha1"
 	apiextclientv1beta1 "k8s.io/apiextensions-apiserver/pkg/client/clientset/clientset/typed/apiextensions/v1beta1"
 	meta "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
@@ -53,6 +56,8 @@ type DeployFramework struct {
 	Client            kubernetes.Interface
 	APIExtClient      apiextclientv1beta1.CustomResourceDefinitionsGetter
 	MeteringClient    meteringclient.MeteringV1Interface
+	OLMV1Client       olmclientv1.OperatorsV1Interface
+	OLMV1Alpha1Client olmclientv1alpha1.OperatorsV1alpha1Interface
 }
 
 // New is the constructor function that creates and returns a new DeployFramework object
@@ -75,6 +80,16 @@ func New(logger logrus.FieldLogger, runLocal, runDevSetup bool, nsPrefix, repoDi
 	meteringClient, err := meteringclient.NewForConfig(config)
 	if err != nil {
 		return nil, fmt.Errorf("failed to initialize the metering clientset: %v", err)
+	}
+
+	olmV1Client, err := olmclientv1.NewForConfig(config)
+	if err != nil {
+		return nil, fmt.Errorf("failed to initialize the v1 OLM clientset: %v", err)
+	}
+
+	olmV1Alpha1Client, err := olmclientv1alpha1.NewForConfig(config)
+	if err != nil {
+		return nil, fmt.Errorf("failed to initialize the v1alpha OLM clientset: %v", err)
 	}
 
 	manifestsDir, err := filepath.Abs(filepath.Join(repoDir, manifestsDeployDir))
@@ -102,6 +117,8 @@ func New(logger logrus.FieldLogger, runLocal, runDevSetup bool, nsPrefix, repoDi
 		Client:            client,
 		APIExtClient:      apiextClient,
 		MeteringClient:    meteringClient,
+		OLMV1Client:       olmV1Client,
+		OLMV1Alpha1Client: olmV1Alpha1Client,
 	}
 
 	return deployFramework, nil
