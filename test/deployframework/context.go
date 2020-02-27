@@ -7,6 +7,8 @@ import (
 	"strings"
 	"time"
 
+	olmclientv1 "github.com/operator-framework/operator-lifecycle-manager/pkg/api/client/clientset/versioned/typed/operators/v1"
+	olmclientv1alpha1 "github.com/operator-framework/operator-lifecycle-manager/pkg/api/client/clientset/versioned/typed/operators/v1alpha1"
 	"github.com/sirupsen/logrus"
 	apiextclientv1beta1 "k8s.io/apiextensions-apiserver/pkg/client/clientset/clientset/typed/apiextensions/v1beta1"
 	"k8s.io/client-go/kubernetes"
@@ -58,6 +60,8 @@ type DeployerCtx struct {
 	Client                    kubernetes.Interface
 	APIExtClient              apiextclientv1beta1.CustomResourceDefinitionsGetter
 	MeteringClient            meteringclient.MeteringV1Interface
+	OLMV1Client               olmclientv1.OperatorsV1Interface
+	OLMV1Alpha1Client         olmclientv1alpha1.OperatorsV1alpha1Interface
 }
 
 // NewDeployerCtx constructs and returns a new DeployerCtx object
@@ -120,6 +124,8 @@ func (df *DeployFramework) NewDeployerCtx(
 		Client:                    df.Client,
 		APIExtClient:              df.APIExtClient,
 		MeteringClient:            df.MeteringClient,
+		OLMV1Client:               df.OLMV1Client,
+		OLMV1Alpha1Client:         df.OLMV1Alpha1Client,
 	}, nil
 }
 
