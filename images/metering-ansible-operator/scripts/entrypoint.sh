@@ -17,5 +17,12 @@ if ! whoami &> /dev/null; then
     fi
 fi
 
+OPERATOR_SDK_RUN_CMD=${OPERATOR_SDK_RUN_CMD:-"run ansible"}
+USE_EXEC_ENTRYPOINT_CMD=${USE_EXEC_ENTRYPOINT_CMD:-false}
+
+if [[ $USE_EXEC_ENTRYPOINT_CMD = true ]]; then
+    OPERATOR_SDK_RUN_CMD="exec-entrypoint ansible"
+fi
+
 # we expect tini to be in the $PATH
-exec tini -- /usr/local/bin/ansible-operator run ansible --watches-file=/opt/ansible/watches.yaml "$@"
+exec tini -- /usr/local/bin/ansible-operator ${OPERATOR_SDK_RUN_CMD} --watches-file=/opt/ansible/watches.yaml "$@"
