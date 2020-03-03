@@ -20,6 +20,7 @@ RUN yum -y update python2-openshift python2-cryptography
 
 ENV HOME /opt/ansible
 ENV HELM_CHART_PATH ${HOME}/charts/openshift-metering
+ENV USE_EXEC_ENTRYPOINT_CMD true
 
 COPY images/metering-ansible-operator/roles/ ${HOME}/roles/
 COPY images/metering-ansible-operator/watches.yaml ${HOME}/watches.yaml
