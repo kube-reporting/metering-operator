@@ -2,7 +2,7 @@
 
 # Get the Openshift cluster's networking config object
 - name: Check the IP version infrastructure provisioned
-  k8s_facts:
+  k8s_info:
     api_version: "config.openshift.io/v1"
     kind: Network
     name: cluster
