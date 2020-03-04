@@ -3,10 +3,13 @@ package deploy
 import (
 	"fmt"
 
-	apierrors "k8s.io/apimachinery/pkg/api/errors"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	olmv1 "github.com/operator-framework/operator-lifecycle-manager/pkg/api/apis/operators/v1"
+	olmv1alpha1 "github.com/operator-framework/operator-lifecycle-manager/pkg/api/apis/operators/v1alpha1"
 
 	v1 "k8s.io/api/core/v1"
+	apierrors "k8s.io/apimachinery/pkg/api/errors"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/util/wait"
 )
 
 func (deploy *Deployer) installNamespace() error {
@@ -66,6 +69,26 @@ func (deploy *Deployer) installNamespace() error {
 }
 
 func (deploy *Deployer) installMeteringConfig() error {
+	// ensure the MeteringConfig CRD has already been created to avoid
+	// any errors while instantiating a MeteringConfig custom resource
+	err := wait.Poll(crdInitialPoll, crdPollTimeout, func() (done bool, err error) {
+		deploy.logger.Infof("Waiting for the MeteringConfig CRD to be created")
+
+		_, err = deploy.apiExtClient.CustomResourceDefinitions().Get(meteringconfigCRDName, metav1.GetOptions{})
+		if apierrors.IsNotFound(err) {
+			// re-poll as the MeteringConfig CRD does not already exist
+			return false, nil
+		}
+		if err != nil {
+			return false, err
+		}
+
+		return true, nil
+	})
+	if err != nil {
+		return fmt.Errorf("failed to wait for the MeteringConfig CRD to be created: %v", err)
+	}
+
 	mc, err := deploy.meteringClient.MeteringConfigs(deploy.config.Namespace).Get(deploy.config.MeteringConfig.Name, metav1.GetOptions{})
 	if apierrors.IsNotFound(err) {
 		_, err = deploy.meteringClient.MeteringConfigs(deploy.config.Namespace).Create(deploy.config.MeteringConfig)
@@ -81,6 +104,66 @@ func (deploy *Deployer) installMeteringConfig() error {
 			return fmt.Errorf("failed to update the MeteringConfig: %v", err)
 		}
 		deploy.logger.Infof("The MeteringConfig resource has been updated")
+	} else {
+		return err
+	}
+
+	return nil
+}
+
+func (deploy *Deployer) installMeteringOperatorGroup() error {
+	opgrp, err := deploy.olmV1Client.OperatorGroups(deploy.config.Namespace).Get(deploy.config.Namespace, metav1.GetOptions{})
+	if apierrors.IsNotFound(err) {
+		opgrp := &olmv1.OperatorGroup{
+			ObjectMeta: metav1.ObjectMeta{
+				Name:      deploy.config.Namespace,
+				Namespace: deploy.config.Namespace,
+			},
+			Spec: olmv1.OperatorGroupSpec{
+				TargetNamespaces: []string{
+					deploy.config.Namespace,
+				},
+			},
+		}
+
+		_, err = deploy.olmV1Client.OperatorGroups(deploy.config.Namespace).Create(opgrp)
+		if err != nil {
+			return err
+		}
+		deploy.logger.Infof("Created the %s metering OperatorGroup", opgrp.Name)
+	} else if err == nil {
+		deploy.logger.Infof("The %s metering OperatorGroup resource already exists", opgrp.Name)
+	} else {
+		return err
+	}
+
+	return nil
+}
+
+func (deploy *Deployer) installMeteringSubscription() error {
+	_, err := deploy.olmV1Alpha1Client.Subscriptions(deploy.config.Namespace).Get(deploy.config.SubscriptionName, metav1.GetOptions{})
+	if apierrors.IsNotFound(err) {
+		sub := &olmv1alpha1.Subscription{
+			ObjectMeta: metav1.ObjectMeta{
+				Name:      deploy.config.SubscriptionName,
+				Namespace: deploy.config.Namespace,
+			},
+			Spec: &olmv1alpha1.SubscriptionSpec{
+				CatalogSource:          catalogSourceName,
+				CatalogSourceNamespace: catalogSourceNamespace,
+				Package:                packageName,
+				Channel:                deploy.config.Channel,
+				InstallPlanApproval:    olmv1alpha1.ApprovalAutomatic,
+			},
+		}
+
+		_, err := deploy.olmV1Alpha1Client.Subscriptions(deploy.config.Namespace).Create(sub)
+		if err != nil {
+			return fmt.Errorf("failed to create the %s Subscription: %v", deploy.config.SubscriptionName, err)
+		}
+		deploy.logger.Infof("Created the metering Subscription")
+	} else if err == nil {
+		deploy.logger.Infof("The metering Subscription already exists")
 	} else {
 		return err
 	}
