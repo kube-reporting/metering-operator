@@ -29,11 +29,7 @@ COPY charts/openshift-metering ${HELM_CHART_PATH}
 
 COPY manifests/deploy/openshift/olm/bundle /manifests
 
-# to allow running as non-root
-RUN chown -R 1001:0 $HOME && \
-    chmod -R 774 $HOME /etc/passwd
-
-ENTRYPOINT ["/opt/ansible/scripts/entrypoint.sh"]
+ENTRYPOINT ["tini", "--", "/usr/local/bin/ansible-operator", "exec-entrypoint", "ansible", "--watches-file", "/opt/ansible/watches.yaml"]
 
 USER 1001
 
