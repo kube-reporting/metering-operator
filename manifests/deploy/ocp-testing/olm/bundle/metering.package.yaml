@@ -1,5 +1,0 @@
-packageName: metering-ocp-testing
-channels:
-- currentCSV: metering-operator.v4.5.0
-  name: "4.5"
-

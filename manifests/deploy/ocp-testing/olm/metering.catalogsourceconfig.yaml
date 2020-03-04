@@ -1,9 +1,0 @@
-apiVersion: operators.coreos.com/v1
-kind: CatalogSourceConfig
-metadata:
-  name: installed-custom-metering-operators-openshift-metering
-  namespace: openshift-marketplace
-spec:
-  targetNamespace: openshift-metering
-  packages: metering-ocp-testing
-
