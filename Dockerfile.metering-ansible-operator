@@ -4,7 +4,7 @@ FROM quay.io/openshift/origin-metering-helm:latest as helm
 FROM openshift/origin-cli:latest as cli
 # the base image is the ansible-operator's origin images
 # TODO: stop using the latest tag for base images
-FROM quay.io/openshift/origin-ansible-operator:latest
+FROM quay.io/openshift/origin-ansible-operator:4.5
 
 USER root
 RUN set -x; INSTALL_PKGS="curl bash ca-certificates less which inotify-tools openssl" \
@@ -49,7 +49,7 @@ COPY manifests/deploy/openshift/olm/bundle /manifests
 
 USER 1001
 
-ENTRYPOINT ["tini", "--", "/usr/local/bin/ansible-operator", "run", "ansible", "--watches-file", "/opt/ansible/watches.yaml"]
+ENTRYPOINT ["tini", "--", "/usr/local/bin/ansible-operator", "exec-entrypoint", "ansible", "--watches-file", "/opt/ansible/watches.yaml"]
 
 LABEL io.k8s.display-name="OpenShift metering-ansible-operator" \
       io.k8s.description="This is a component of OpenShift Container Platform and manages installation and configuration of all other metering components." \
