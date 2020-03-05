@@ -13,6 +13,13 @@ rules:
   - apiGroups:
     - config.openshift.io
     resources:
+    - proxies
+    verbs:
+    - list
+    - get
+  - apiGroups:
+    - config.openshift.io
+    resources:
     - networks
     verbs:
     - list
