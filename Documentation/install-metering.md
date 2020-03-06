@@ -56,7 +56,7 @@ For instructions on installing using our manual install scripts follow the [manu
 First, wait until the Metering Ansible operator deploys all of the Metering components:
 
 ```
-kubectl get pods -n $METERING_NAMESPACE -l app=metering-operator -o name | cut -d/ -f2 | xargs -I{} kubectl -n $METERING_NAMESPACE logs -f {} -c metering-operator
+kubectl get pods -n $METERING_NAMESPACE -l app=metering-operator -o name | cut -d/ -f2 | xargs -I{} kubectl -n $METERING_NAMESPACE logs -f {} -c operator
 ```
 
 This can potentially take a minute or two to complete, but when it's done, you should see log output similar the following:
@@ -86,7 +86,7 @@ presto-coordinator-0                  1/1     Running   0          3m
 Check the logs of the `reporting-operator` pod for signs of any persistent errors:
 
 ```
-$ kubectl get pods -n $METERING_NAMESPACE -l app=reporting-operator -o name | cut -d/ -f2 | xargs -I{} kubectl -n $METERING_NAMESPACE logs {} -f
+$ kubectl get pods -n $METERING_NAMESPACE -l app=reporting-operator -o name | cut -d/ -f2 | xargs -I{} kubectl -n $METERING_NAMESPACE logs {} -f -c reporting-operator
 ```
 
 Next, verify that the ReportDataSources are beginning to import data, indicated by a valid timestamp in the `EARLIEST METRIC` column (this may take a few minutes).
