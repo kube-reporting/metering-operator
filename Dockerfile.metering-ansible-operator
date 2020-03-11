@@ -31,7 +31,10 @@ RUN ln -f -s /tini /usr/bin/tini
 # 3. cryptography is used by the openssl_* modules for TLS/authentication purposes
 # TODO: the ansible-operator base image uses setuptools >= 45.2.0 which needs python 3.5 so this is a temporary fix
 RUN pip install --no-cache-dir --upgrade openshift botocore boto3 cryptography netaddr "setuptools<=45.1.0"
-RUN pip install --upgrade ansible>=2.8
+# In order to use the 'ansible_failed_result' and 'ansible_failed_task' variables in a block/rescue,
+# we need to ensure that the 2.8 version is being used while this is fixed in 2.9 upstream.
+# TODO: revert this change once the issue mentioned above is resolved.
+RUN pip install --upgrade ansible==2.8
 
 ENV HOME /opt/ansible
 ENV HELM_CHART_PATH ${HOME}/charts/openshift-metering
