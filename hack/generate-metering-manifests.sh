@@ -20,12 +20,3 @@ msg "Generating Upstream Manifests"
     "$UPSTREAM_OLM_MANIFESTS_DIR" \
     "$OCP_TELEMETER_MANIFESTS_DIR" \
     "$ROOT_DIR/charts/metering-ansible-operator/upstream-values.yaml"
-
-msg "Generating OCP Testing Manifests"
-
-"$ROOT_DIR/hack/create-metering-manifests.sh" \
-    "$OCP_TESTING_INSTALLER_MANIFESTS_DIR" \
-    "$OCP_TESTING_OLM_MANIFESTS_DIR" \
-    "$OCP_TELEMETER_MANIFESTS_DIR" \
-    "$ROOT_DIR/charts/metering-ansible-operator/ocp-testing-values.yaml"
-
