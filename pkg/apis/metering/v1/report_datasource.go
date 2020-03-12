@@ -35,6 +35,9 @@ type ReportDataSourceSpec struct {
 	// PrestoTable represents a datasource which points to an existing
 	// PrestoTable CR.
 	PrestoTable *PrestoTableDataSource `json:"prestoTable,omitempty"`
+	// LinkExistingTable represents a datasource that points to an
+	// table in Presto. As a result, this will create an unmanaged PrestoTable
+	LinkExistingTable *LinkExistingTableDataSource `json:"linkExistingTable,omitempty"`
 
 	// ReportQueryView  represents a datasource which creates a Presto
 	// view from a ReportQuery
@@ -71,6 +74,10 @@ type PrometheusMetricsImporterDataSource struct {
 
 type PrestoTableDataSource struct {
 	TableRef v1.LocalObjectReference `json:"tableRef"`
+}
+
+type LinkExistingTableDataSource struct {
+	TableName string `json:"tableName"`
 }
 
 type ReportQueryViewDataSource struct {

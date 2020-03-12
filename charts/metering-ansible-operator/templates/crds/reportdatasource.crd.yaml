@@ -133,6 +133,16 @@ spec:
                     name:
                       type: string
                       minLength: 1
+            linkExistingTable:
+              type: object
+              required:
+              - tableName
+              properties:
+                tableName:
+                  description: |
+                    TableName is the fully-qualified table name (i.e. catalog.schema.table_name) of an existing Presto table.
+                  type: string
+                  minLength: 1
           oneOf:
           - required:
             - prometheusMetricsImporter
@@ -142,3 +152,5 @@ spec:
             - awsBilling
           - required:
             - prestoTable
+          - required:
+            - linkExistingTable

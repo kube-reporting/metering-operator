@@ -3,6 +3,7 @@ package operator
 import (
 	"context"
 	"fmt"
+	"strings"
 	"time"
 
 	log "github.com/sirupsen/logrus"
@@ -27,6 +28,10 @@ import (
 const (
 	reportDataSourceFinalizer = metering.GroupName + "/reportdatasource"
 	partitionUpdateInterval   = 30 * time.Minute
+	// given a table_name in the form of "catalog.schema.table_name", we
+	// expect that splitting this overall string by the `.` delimiter
+	// will yield an array of three string elements
+	expectedArrSplitElementsFQTN = 3
 )
 
 func (op *Reporting) runReportDataSourceWorker() {
@@ -82,6 +87,8 @@ func (op *Reporting) handleReportDataSource(logger log.FieldLogger, dataSource *
 		err = op.handleAWSBillingDataSource(logger, dataSource)
 	case dataSource.Spec.PrestoTable != nil:
 		err = op.handlePrestoTableDataSource(logger, dataSource)
+	case dataSource.Spec.LinkExistingTable != nil:
+		err = op.handleLinkExistingTable(logger, dataSource)
 	case dataSource.Spec.ReportQueryView != nil:
 		err = op.handleReportQueryViewDataSource(logger, dataSource)
 	default:
@@ -436,6 +443,75 @@ func (op *Reporting) handlePrestoTableDataSource(logger log.FieldLogger, dataSou
 			return err
 		}
 	}
+
+	return nil
+}
+
+// handleLinkExistingTable is reponsible for managing a linkExistingTable ReportDataSource sub-type.
+// When a new custom resource is detected, we first validate the @dataSource object and check if the
+// tableName is in the form of a fully-qualified table name. In the case where the operator hasn't
+// processed this resource before, query the Presto table's metadata and then create an unmanaged
+// PrestoTable custom resource with the columns returned from the query. Once the PrestoTable resource
+// has been created, update the @dataSource Status field to refer to the name of the created PrestoTable.
+func (op *Reporting) handleLinkExistingTable(logger log.FieldLogger, dataSource *metering.ReportDataSource) error {
+	if dataSource.Spec.LinkExistingTable.TableName == "" {
+		return fmt.Errorf("invalid configuration passed: spec.linkExistingTable.tableName field cannot be empty")
+	}
+	inputs := strings.Split(dataSource.Spec.LinkExistingTable.TableName, ".")
+	if len(inputs) != expectedArrSplitElementsFQTN {
+		return fmt.Errorf("invalid configuration passed: spec.linkExistingTable.tableName is not a fully-qualified table name")
+	}
+
+	// check if this resource has already been processed and we can exit early
+	if dataSource.Status.TableRef.Name != "" {
+		prestoTable, err := op.prestoTableLister.PrestoTables(dataSource.Namespace).Get(dataSource.Status.TableRef.Name)
+		if err != nil {
+			return fmt.Errorf("failed to get the %s PrestoTable listed in the %s ReportDataSource Status: %v", dataSource.Status.TableRef.Name, dataSource.Name, err)
+		}
+		tableName, err := reportingutil.FullyQualifiedTableName(prestoTable)
+		if err != nil {
+			return err
+		}
+		logger.Infof("existing LinkExistingTable ReportDataSource discovered, tableName: %s", tableName)
+		return nil
+	}
+
+	catalog := inputs[0]
+	schema := inputs[1]
+	tableName := inputs[2]
+	unmanagedTable := true
+
+	// using the fully-qualified table name from the resource, verify we can query the existing table's
+	// properties for its metadata. We can then use that information and create a PrestoTable resource.
+	cols, err := op.prestoTableManager.QueryMetadata(catalog, schema, tableName)
+	if err != nil {
+		return fmt.Errorf("failed to query the %s.%s.%s Presto table metadata: %v", catalog, schema, tableName, err)
+	}
+
+	var (
+		createView bool
+		tableQuery string
+	)
+	// attempt to create an unmanaged PrestoTable CR as we're linking an existing table in Presto to
+	// this particular ReportDataSource and don't need the reporting-operator to create this table for us.
+	prestoTable, err := op.createPrestoTableCR(dataSource, metering.ReportDataSourceGVK, catalog, schema, tableName, cols, unmanagedTable, createView, tableQuery)
+	if err != nil {
+		return fmt.Errorf("failed to create the PrestoTable for the %s ReportDataSource: %v", dataSource.Name, err)
+	}
+	prestoTable, err = op.waitForPrestoTable(prestoTable.Namespace, prestoTable.Name, time.Second, 10*time.Second)
+	if err != nil {
+		return fmt.Errorf("error waiting for the %s PrestoTable to be created for ReportDataSource %s: %v", prestoTable.Name, dataSource.Name, err)
+	}
+	// update the ReportDataSource.Status and point to the newly created PrestoTable
+	dsClient := op.meteringClient.MeteringV1().ReportDataSources(dataSource.Namespace)
+	updatedDS, err := updateReportDataSource(dsClient, dataSource.Name, func(newDS *metering.ReportDataSource) {
+		newDS.Status.TableRef.Name = prestoTable.Name
+	})
+	if err != nil {
+		logger.WithError(err).Errorf("failed to update the %s ReportDataSource tableRef field to %q", dataSource.Name, prestoTable.Name)
+		return err
+	}
+	dataSource.Status = updatedDS.Status
 
 	return nil
 }
