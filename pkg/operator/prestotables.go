@@ -110,8 +110,8 @@ func (op *Reporting) handlePrestoTable(logger log.FieldLogger, prestoTable *mete
 	if prestoTable.Spec.TableName == "" {
 		return fmt.Errorf("spec.tableName must be set")
 	}
-	if len(prestoTable.Spec.Columns) == 0 {
-		return fmt.Errorf("spec.columns must be non-empty")
+	if !prestoTable.Spec.Unmanaged && len(prestoTable.Spec.Columns) == 0 {
+		return fmt.Errorf("spec.columns must be non-empty when spec.unmanaged is set to false")
 	}
 	if prestoTable.Spec.CreateTableAs && prestoTable.Spec.View {
 		return fmt.Errorf("spec.createTableAs and spec.view are mutually exclusive")
@@ -122,12 +122,20 @@ func (op *Reporting) handlePrestoTable(logger log.FieldLogger, prestoTable *mete
 		return nil
 	}
 
-	var needsUpdate bool
+	var (
+		needsUpdate bool
+		err         error
+	)
 	if prestoTable.Spec.Unmanaged {
 		logger.Infof("PrestoTable %s is unmanaged", prestoTable.Name)
+
+		prestoTable.Spec.Columns, err = op.prestoTableManager.QueryMetadata(prestoTable.Spec.Catalog, prestoTable.Spec.Schema, prestoTable.Spec.TableName)
+		if err != nil {
+			return fmt.Errorf("failed to query the %s Presto table metadata: %v", prestoTable.Spec.TableName, err)
+		}
+
 		needsUpdate = copyPrestoTableSpecToStatus(prestoTable)
 	} else {
-		var err error
 		var tableStr string
 		switch {
 		case prestoTable.Spec.View:
