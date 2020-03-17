@@ -77,10 +77,11 @@ It may take a couple of minutes, but eventually all pods should have a status of
 
 ```
 NAME                                  READY   STATUS    RESTARTS   AGE
-hive-metastore-0                      1/1     Running   0          3m
-hive-server-0                         1/1     Running   0          3m
+hive-metastore-0                      2/2     Running   0          3m
+hive-server-0                         3/3     Running   0          3m
 metering-operator-df67bb6cb-6d7vh     2/2     Running   0          4m
-presto-coordinator-0                  1/1     Running   0          3m
+presto-coordinator-0                  2/2     Running   0          3m
+reporting-operator-6fd758c9c7-crjsw   2/2     Running   0          3m
 ```
 
 Check the logs of the `reporting-operator` pod for signs of any persistent errors:
