@@ -217,4 +217,4 @@ update-codegen: $(CODEGEN_OUTPUT_GO_FILES)
 $(CODEGEN_OUTPUT_GO_FILES): $(CODEGEN_SOURCE_GO_FILES)
 
 verify-codegen:
-	./hack/verify-codegen.sh
+	SCRIPT_PACKAGE=$(GO_PKG) ./hack/verify-codegen.sh
