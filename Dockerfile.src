@@ -2,7 +2,7 @@
 FROM quay.io/openshift/origin-metering-helm:latest as helm
 
 # image needs kubectl, so we copy `oc` from cli image to use as kubectl.
-FROM openshift/origin-cli as cli
+FROM openshift/origin-cli:latest as cli
 
 FROM openshift/origin-release:golang-1.13
 
