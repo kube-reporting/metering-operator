@@ -363,9 +363,26 @@ _ocp_disabled_overrides:
           fsGroup: 0
 
 _ocp_enabled_use_ipv6_networking: false
+_ocp_enabled_global_proxy_enabled: false
 
 _ocp_enabled_overrides:
   useIPV6Networking: "{{ _ocp_enabled_use_ipv6_networking }}"
+  networking:
+    useGlobalProxyNetworking: "{{ _ocp_enabled_global_proxy_enabled }}"
+    proxy:
+      config:
+        http_proxy:
+          hostname: "{{ _ocp_enabled_http_proxy_hostname | default ('') }}"
+          port: "{{ _ocp_enabled_http_proxy_port | default ('') }}"
+          username: "{{ _ocp_enabled_http_proxy_username | default ('') }}"
+          password: "{{ _ocp_enabled_http_proxy_password | default ('') }}"
+        https_proxy:
+          hostname: "{{ _ocp_enabled_https_proxy_hostname | default ('') }}"
+          port: "{{ _ocp_enabled_https_proxy_port | default ('') }}"
+          username: "{{ _ocp_enabled_https_proxy_username | default ('') }}"
+          password: "{{ _ocp_enabled_https_proxy_password | default ('') }}"
+        no_proxy:  "{{ _ocp_enabled_global_proxy_no_proxy | default('') }}"
+        trusted_ca_bundle: "{{ _ocp_enabled_global_proxy_trusted_ca_bundle | default ('') }}"
 
   reporting-operator:
     spec:
