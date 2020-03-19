@@ -386,7 +386,7 @@ Here's a summary of what we did in this guide:
 [reports]: reports.md
 [install-metering]: install-metering.md
 [presto-cli-exec]:  dev/debugging.md#query-presto-using-presto-cli
-[reporting-operator-logs]:  dev/debugging.md#get-reporting-operator-logs
+[reporting-operator-logs]:  dev/debugging.md#view-the-reporting-operator-logs
 [presto-types]: https://prestodb.io/docs/current/language/types.html
 [using-metering]: using-metering.md
 [datasource-table-schema]: reportdatasources.md#table-schemas
