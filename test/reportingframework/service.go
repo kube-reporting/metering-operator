@@ -23,8 +23,6 @@ func (rf *ReportingFramework) doRequest(endpoint, method string, body []byte, qu
 	var u *url.URL
 
 	if rf.UseRouteForReportingAPI {
-		const routeName = "metering"
-
 		// query all routes for the metering route
 		meteringRoute, err := rf.RouteClient.Routes(rf.Namespace).Get(meteringRouteName, metav1.GetOptions{})
 		if err != nil {

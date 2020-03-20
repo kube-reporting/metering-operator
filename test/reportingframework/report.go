@@ -34,10 +34,10 @@ func (rf *ReportingFramework) GetMeteringReport(name string) (*metering.Report, 
 func (rf *ReportingFramework) NewSimpleReport(name, queryName string, schedule *metering.ReportSchedule, reportingStart, reportingEnd *time.Time) *metering.Report {
 	var start, end *meta.Time
 	if reportingStart != nil {
-		start = &meta.Time{*reportingStart}
+		start = &meta.Time{Time: *reportingStart}
 	}
 	if reportingEnd != nil {
-		end = &meta.Time{*reportingEnd}
+		end = &meta.Time{Time: *reportingEnd}
 	}
 	return &metering.Report{
 		ObjectMeta: meta.ObjectMeta{
