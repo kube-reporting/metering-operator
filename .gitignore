@@ -10,12 +10,6 @@
 # Output of the go coverage tool, specifically when used with LiteIDE
 *.out
 
-# Project-local glide cache, RE: https://github.com/Masterminds/glide/issues/736
-.glide/
-
-# Hive thift defintions and generated code (automated with Makefile)
-out
-
 # Distribution packages
 dist
 dist.zip
@@ -28,9 +22,7 @@ _tmp
 /client-gen
 /lister-gen
 /informer-gen
-/metering-custom.yaml
 /vendor/mockgen
-/reporting-operator-local
 bin/*
 coverage.out
 junit-metering.xml
