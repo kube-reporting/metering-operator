@@ -389,5 +389,5 @@ Here's a summary of what we did in this guide:
 [reporting-operator-logs]:  dev/debugging.md#view-the-reporting-operator-logs
 [presto-types]: https://prestodb.io/docs/current/language/types.html
 [using-metering]: using-metering.md
-[datasource-table-schema]: reportdatasources.md#table-schemas
+[datasource-table-schema]: reportdatasources.md#prometheusmetricsimporter-datasource
 [viewing-reports]: using-metering.md#viewing-reports
