@@ -20,7 +20,7 @@ kubectl -n $METERING_NAMESPACE logs "$(kubectl -n $METERING_NAMESPACE get pods -
 
 ## Query Presto using presto-cli
 
-The following will open up an interactive presto-cli session where you can interactively query Presto. One thing to note is that this runs in the same container as Presto and launches an additional Java instance, meaning you may run into memory limits for the pod. If this occurs, you should increase the memory request & limits of the Presto pod. By default, Presto is configured to communicate using TLS, and you would need to run the following command in order to run Presto queries:
+The following will open up an interactive [presto-cli](https://prestosql.io/docs/current/installation/cli.html) session where you can interactively query Presto. One thing to note is that this runs in the same container as Presto and launches an additional Java instance, meaning you may run into memory limits for the pod. If this occurs, you should increase the memory request & limits of the Presto pod. By default, Presto is configured to communicate using TLS, and you would need to run the following command in order to run Presto queries:
 
 ```bash
 kubectl -n $METERING_NAMESPACE exec -it "$(kubectl -n $METERING_NAMESPACE get pods -l app=presto,presto=coordinator -o name | cut -d/ -f2)"  -- /usr/local/bin/presto-cli --server https://presto:8080 --catalog hive --schema default --user root --keystore-path /opt/presto/tls/keystore.pem
@@ -81,7 +81,7 @@ presto:default>
 
 ## Query Hive using beeline
 
-The following will open up an interactive beeline session where you can interactively query Hive. One thing to note is that this runs in the same container as Hive and launches an additional Java instance, meaning you may run into memory limits for the pod. If this occurs, you should increase the memory request and limits of the Hive server Pod.
+The following will open up an interactive [beeline](https://cwiki.apache.org/confluence/display/Hive/HiveServer2+Clients#HiveServer2Clients-Beeline%E2%80%93CommandLineShell) session where you can interactively query Hive. One thing to note is that this runs in the same container as Hive and launches an additional Java instance, meaning you may run into memory limits for the pod. If this occurs, you should increase the memory request and limits of the Hive server Pod.
 
 ```bash
 kubectl -n $METERING_NAMESPACE exec -it $(kubectl -n $METERING_NAMESPACE get pods -l app=hive,hive=server -o name | cut -d/ -f2) -c hiveserver2 -- beeline -u 'jdbc:hive2://127.0.0.1:10000/default;auth=noSasl'
