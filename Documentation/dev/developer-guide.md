@@ -147,4 +147,4 @@ helm template CHART_DIR -x PATH_TO_TEMPLATE/file.yaml
 ## Developer install
 
 Developers should generally use the [manual-install guide](../manual-install.md) as it offers the most flexibility when installing.
-If you need a minimal storage configuration with no external dependencies, use the [manifests/metering-config/hdfs-minimal.yaml](manifests/metering-config/hdfs-minimal.yaml) example configuration.
+If you need a minimal storage configuration with no external dependencies, use the [manifests/metering-config/hdfs-minimal.yaml](../../manifests/metering-config/hdfs-minimal.yaml) example configuration.
