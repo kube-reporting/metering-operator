@@ -31,6 +31,8 @@ require (
 	k8s.io/apiextensions-apiserver v0.17.1
 	k8s.io/apimachinery v0.17.1
 	k8s.io/client-go v8.0.0+incompatible
+	k8s.io/code-generator v0.0.0-20190912054826-cd179ad6a269
+	k8s.io/kube-openapi v0.0.0-20190816220812-743ec37842bf
 )
 
 replace (
