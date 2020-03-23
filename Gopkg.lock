@@ -377,7 +377,7 @@
     "pkg/lib/version",
   ]
   pruneopts = "NUT"
-  revision = ""
+  revision = "a611449366805935939777d0182a86ba43b26cbd"
   version = "0.12.0"
 
 [[projects]]
