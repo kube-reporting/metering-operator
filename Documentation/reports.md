@@ -199,7 +199,7 @@ For cron periods, normal cron expressions are valid:
 
 ### reportingStart
 
-To support running a Report against existing data, you can set the `spec.reportingStart` field to a RFC3339 timestamp to tell the Report to run according to its `schedule` starting from `reportingStart` rather than the current time.
+To support running a Report against existing data, you can set the `spec.reportingStart` field to a [RFC3339][rfc3339] timestamp to tell the Report to run according to its `schedule` starting from `reportingStart` rather than the current time.
 One important thing to understand is that this will result in the reporting-operator running many queries in succession for each interval in the schedule that's between the `reportingStart` time and the current time.
 This could be thousands of queries if the period is less than daily and the `reportingStart` is more than a few months back.
 If `reportingStart` is left unset, the Report will run at the next full reportingPeriod after the time the report is created.
@@ -221,7 +221,7 @@ spec:
 
 ### reportingEnd
 
-To configure a Report to only run until a specified time, you can set the `spec.reportingEnd` field to an RFC3339 timestamp.
+To configure a Report to only run until a specified time, you can set the `spec.reportingEnd` field to an [RFC3339][rfc3339] timestamp.
 The value of this field will cause the Report to stop running on its schedule after it has finished generating reporting data for the period covered from its start time until `reportingEnd`.
 Because a schedule will most likely not align with reportingEnd, the last period in the schedule will be shortened to end at the specified reportingEnd time.
 If left unset, then the Report will run forever, or until a `reportingEnd` is set on the Report.
