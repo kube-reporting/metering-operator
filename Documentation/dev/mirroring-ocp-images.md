@@ -33,7 +33,7 @@ You can also copy the cluster's CA into the correct directory within `/etc/docke
 
 # Mirror images from Brew into your cluster's in-cluster image registry
 
-Make sure you're connected to the Red Hat in-cluster network (VPNed or using an ethernet connection on the Red Hat network) and run the `hack/mirror-ose-images-into-cluster.sh` script in the repo.
+Make sure you're connected to the Red Hat in-cluster network (VPNed or using an ethernet connection on the Red Hat network) and run the [`hack/mirror-ose-images-into-cluster.sh`](../../hack/mirror-ose-images-into-cluster.sh) script in the repo.
 This script does a few things:
 
 - Sets up a namespace for pushing the images into.
