@@ -95,8 +95,7 @@ fmt:
 	find . -name '*.go' -not -path "./vendor/*" | xargs gofmt -w
 
 # Update dependencies
-vendor: Gopkg.toml
-	dep ensure -v
+vendor:	go mod vendor
 
 test: unit
 
