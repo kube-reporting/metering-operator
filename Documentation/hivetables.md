@@ -14,7 +14,7 @@ A `HiveTable` resource is also implicitly created when a `PrometheusMetricsImpor
   - `name`: The name of the column.
   - `type`: The column data type. [See the Hive Language Manual section on types for more details][hiveTypes]. Currently the only complex types supported are map's of primitive types.
 ##### Optional fields:
-- `partitionedBy`: A list of columns that are used as partition columns. Columns in `partitionedBy` and `columns` must not overlap.
+- `partitionedBy`: A list of columns that are used as partition columns for [partitioned tables][hivePartitionedTables]. Columns in `partitionedBy` and `columns` must not overlap.
   - `name`: The name of the column.
   - `type`: The column data type. [See the Hive Language Manual section on types for more details][hiveTypes]. Currently the only complex types supported are map's of primitive types.
 - `clusteredBy`: A list of columns from `columns` to use for [bucketed tables][hiveBucketedTables]. Must set `numBuckets` if specified.
@@ -126,3 +126,5 @@ spec:
 [hiveTypes]: https://cwiki.apache.org/confluence/display/Hive/LanguageManual+Types
 [hiveTableProperties]: https://cwiki.apache.org/confluence/display/Hive/LanguageManual+DDL#LanguageManualDDL-listTableProperties
 [hiveExternalTable]: https://cwiki.apache.org/confluence/display/Hive/LanguageManual+DDL#LanguageManualDDL-ExternalTables
+[hivePartitionedTables]: https://cwiki.apache.org/confluence/display/Hive/LanguageManual+DDL#LanguageManualDDL-PartitionedTables
+
