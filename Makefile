@@ -8,7 +8,7 @@ GO_PKG := github.com/operator-framework/operator-metering
 REPORTING_OPERATOR_PKG := $(GO_PKG)/cmd/reporting-operator
 # these are directories/files which get auto-generated or get reformated by
 # gofmt
-VERIFY_FILE_PATHS := cmd pkg test manifests Gopkg.lock
+VERIFY_FILE_PATHS := cmd pkg test manifests
 
 DOCKER_BUILD_CMD = docker build
 OKD_BUILD = false

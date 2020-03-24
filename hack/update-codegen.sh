@@ -22,20 +22,23 @@ SCRIPT_PACKAGE=${SCRIPT_PACKAGE:-"github.com/operator-framework/operator-meterin
 SCRIPT_ROOT="$(realpath $(dirname ${BASH_SOURCE[0]})/..)"
 CODEGEN_PKG=${CODEGEN_PKG:-$(cd ${SCRIPT_ROOT}; ls -d -1 ./vendor/k8s.io/code-generator 2>/dev/null || echo k8s.io/code-generator)}
 
+# see https://github.com/kubernetes/code-generator/issues/72
+chmod u+x ${CODEGEN_PKG}/generate-groups.sh
+
 set -x
 
 # generate kubernetes client
 ${CODEGEN_PKG}/generate-groups.sh "deepcopy,client,informer,lister" \
     "${SCRIPT_PACKAGE}/pkg/generated" "${SCRIPT_PACKAGE}/pkg/apis" \
     metering:v1 \
-    --go-header-file ${SCRIPT_ROOT}/hack/boilerplate.go.txt
+    --go-header-file hack/boilerplate.go.txt
 
 # generate-groups doesn't do defaulters
 echo "Generating defaulters"
 ${GOPATH}/bin/defaulter-gen \
     --input-dirs "${SCRIPT_PACKAGE}/pkg/apis/metering/v1" \
     -O zz_generated.defaults \
-    --go-header-file ${SCRIPT_ROOT}/hack/boilerplate.go.txt
+    --go-header-file hack/boilerplate.go.txt
 
 # generate mocks
 go build -v -o "$SCRIPT_ROOT/vendor/mockgen" "./vendor/github.com/golang/mock/mockgen"
