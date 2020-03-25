@@ -44,7 +44,6 @@ required = [
   name = "k8s.io/code-generator"
   version = "kubernetes-1.13.3"
 
-
 [prune]
   go-tests = true
   unused-packages = true
@@ -107,10 +106,20 @@ required = [
   name = "k8s.io/gengo"
   revision = "b90029ef6cd877cb3f422d75b3a07707e3aac6b7"
 
-[[override]]
-  name = "github.com/openshift/client-go"
-  branch = "master"
-
 [[constraint]]
   name = "k8s.io/apiextensions-apiserver"
   version = "kubernetes-1.13.3"
+
+# we import the openshift/client-go to get an existing route
+# in a Metering install and extract it's hostname for us in
+# testing. Pin this version to the release-4.2 branch.
+# Note: the github.com/openshift/api is a required package
+# by the openshift client-go, so make this is an override
+# stanza and it's not directly imported anywhere in our code.
+[[constraint]]
+  branch = "release-4.2"
+  name = "github.com/openshift/client-go"
+
+[[override]]
+  branch = "release-4.2"
+  name = "github.com/openshift/api"
