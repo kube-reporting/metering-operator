@@ -17,7 +17,7 @@ Operator Metering requires the following components:
 - 4GB Memory and 4 CPU Cores available cluster capacity.
 - Minimum resources needed for the largest single pod is 2 GB of memory and 2 CPU cores.
     - Memory and CPU consumption may often be lower, but will spike when running reports, or collecting data for larger clusters.
-- A properly configured kubectl to access the Kubernetes cluster.
+- A properly configured [kubectl][kubectl-install] to access the Kubernetes cluster.
 
 In addition, Metering **storage must be configured before proceeding**.
 Available storage options are listed in the [configuring storage documentation][configuring-storage].
@@ -126,3 +126,5 @@ For further reading on using metering, see the [using metering documentation][us
 [manual-install]: manual-install.md
 [storage-classes]: https://kubernetes.io/docs/concepts/storage/storage-classes/
 [ansible-debugging]: dev/debugging.md#metering-ansible-operator
+[kubectl-install]: https://kubernetes.io/docs/tasks/tools/install-kubectl/
+
