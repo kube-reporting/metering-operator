@@ -14,27 +14,20 @@ require (
 	github.com/go-chi/chi v3.3.2+incompatible
 	github.com/golang/mock v1.3.1
 	github.com/gophercloud/gophercloud v0.3.0 // indirect
-	github.com/grpc-ecosystem/go-grpc-middleware v1.0.0 // indirect
 	github.com/huandu/xstrings v1.3.0 // indirect
 	github.com/openshift/client-go v0.0.0-20190923180330-3b6373338c9b
 	// olm 0.12.0
 	github.com/operator-framework/operator-lifecycle-manager v0.0.0-20190926160646-a61144936680
-	github.com/peterbourgon/diskv v2.0.1+incompatible // indirect
 	github.com/prestodb/presto-go-client v0.0.0-20180328163046-568bdb2f6dbc
 	github.com/prometheus/client_golang v1.2.1
 	github.com/prometheus/common v0.7.0
-	github.com/prometheus/procfs v0.0.0-20190104112138-b1a0a9a36d74 // indirect
 	github.com/robfig/cron v1.1.0
 	github.com/sirupsen/logrus v1.4.2
 	github.com/spf13/cobra v0.0.5
 	github.com/spf13/pflag v1.0.5
 	github.com/stretchr/testify v1.4.0
 	github.com/taozle/go-hive-driver v0.0.0-20181206100408-79951111cb07
-	github.com/tmc/grpc-websocket-proxy v0.0.0-20190109142713-0ad062ec5ee5 // indirect
-	github.com/xiang90/probing v0.0.0-20190116061207-43a291ad63a2 // indirect
-	go.uber.org/multierr v1.1.0 // indirect
 	golang.org/x/sync v0.0.0-20190423024810-112230192c58
-	gopkg.in/inf.v0 v0.9.1 // indirect
 	k8s.io/api v0.17.1
 	k8s.io/apiextensions-apiserver v0.17.1
 	k8s.io/apimachinery v0.17.1

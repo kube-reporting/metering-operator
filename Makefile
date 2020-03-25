@@ -92,10 +92,12 @@ metering-ansible-operator-docker-build: $(METERING_ANSIBLE_OPERATOR_DOCKERFILE)
 
 # Runs gofmt on all files in project except vendored source
 fmt:
+	@echo path: $(shell pwd)
 	find . -name '*.go' -not -path "./vendor/*" | xargs gofmt -w
 
 # Update dependencies
-vendor:	go mod vendor
+vendor:
+	go mod vendor
 
 test: unit
 
@@ -142,13 +144,7 @@ e2e-docker: metering-src-docker-build
 	docker cp metering-e2e-docker:/out bin/e2e-docker-test-output
 	docker rm metering-e2e-docker
 
-vet:
-	go vet $(GO_PKG)/cmd/... $(GO_PKG)/pkg/...
-
-verify: verify-codegen verify-olm-manifests verify-helm-templates fmt vet
-	@echo Checking for unstaged changes
-	# validates no unstaged changes exist in $(VERIFY_FILE_PATHS)
-	git diff --stat HEAD --ignore-submodules --exit-code -- $(VERIFY_FILE_PATHS)
+verify: update-codegen verify-olm-manifests verify-helm-templates fmt
 
 verify-helm-templates:
 	helm template ./charts/openshift-metering > /dev/null
