@@ -532,4 +532,4 @@ olm:
 
   operatorGroupName: metering-operators
   operatorGroupTargetNamespaces: ["openshift-metering"]
-  telemeterManifestGeneration: true
+  telemeterManifestGeneration: false
