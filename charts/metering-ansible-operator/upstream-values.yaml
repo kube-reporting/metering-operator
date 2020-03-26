@@ -101,10 +101,11 @@ olm:
   subscriptionName: metering
   subscriptionChannel: stable
 
-  catalogSourceConfigName: installed-upstream-metering-operators-metering
-  catalogSourceConfigNamespace: marketplace
-  catalogSourceConfigTargetNamespace: metering
-  catalogSourceConfigOperatorSource: upstream-community-operators
+  catalogSourceName: installed-upstream-metering-operators-metering
+  catalogSourceNamespace: marketplace
+  catalogSourceTargetNamespace: metering
+  catalogSourceSourceType: grpc
+  catalogSourceOperatorSource: upstream-community-operators
 
   operatorGroupName: metering-operators
   operatorGroupTargetNamespaces: ["metering"]

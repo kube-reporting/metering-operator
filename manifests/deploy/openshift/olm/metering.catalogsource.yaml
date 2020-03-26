@@ -1,9 +1,10 @@
-apiVersion: operators.coreos.com/v1
+apiVersion: operators.coreos.com/v1alpha1
 kind: CatalogSource
 metadata:
   name: installed-redhat-metering-operators-openshift-metering
   namespace: openshift-marketplace
 spec:
+  sourceType: grpc
   targetNamespace: openshift-metering
   packages: metering-ocp
 

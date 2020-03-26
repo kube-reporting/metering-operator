@@ -2,7 +2,7 @@ apiVersion: operators.coreos.com/v1
 kind: OperatorGroup
 metadata:
   name: {{ .Values.olm.operatorGroupName }}
-  namespace: {{ .Values.olm.catalogSourceConfigTargetNamespace }}
+  namespace: {{ .Values.olm.catalogSourceTargetNamespace }}
 spec:
   targetNamespaces:
 {{ toYaml .Values.olm.operatorGroupTargetNamespaces | indent 2 }}
