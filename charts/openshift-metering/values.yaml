@@ -7,6 +7,24 @@ unsupportedFeatures:
 disableOCPFeatures: false
 
 useIPV6Networking: false
+useGlobalProxyNetworking: false
+
+networking:
+  useGlobalProxyNetworking: false
+  proxy:
+    config:
+      http_proxy:
+        hostname: ""
+        port: ""
+        username: ""
+        password: ""
+      https_proxy:
+        hostname: ""
+        port: ""
+        username: ""
+        password: ""
+      no_proxy: ""
+      trusted_ca_bundle: ""
 
 storage:
   type: "hive"

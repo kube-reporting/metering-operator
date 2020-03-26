@@ -36,6 +36,14 @@ operator:
       verbs:
       - get
       - list
+    # grants access to view the proxy config
+    - apiGroups:
+      - config.openshift.io
+      resources:
+      - proxies
+      verbs:
+      - list
+      - get
     # grants access to view the networking config
     - apiGroups:
       - config.openshift.io

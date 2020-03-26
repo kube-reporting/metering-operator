@@ -26,3 +26,46 @@
   vars:
     serviceNetworkList: "{{ cluster_network_config.resources | first }}"
   when: cluster_network_config is defined and cluster_network_config.resources is defined and cluster_network_config.resources | length > 0
+
+#
+# Cluster Proxy Configuration
+#
+- name: Check if the cluster-wide Proxy configured
+  k8s_facts:
+    api_version: "config.openshift.io/v1"
+    kind: Proxy
+    name: cluster
+  register: cluster_proxy_config
+  when: not meteringconfig_ocp_disabled
+
+# In the case where a non-empty cluster-wide Proxy (.spec != nil) has
+# been configured, start pulling out information we care about. The
+# .status field should contain a more resolved copy of the httpProxy/httpsProxy/noProxy
+# fields, and depending on whether the admin has specified any additional CA trustbundles
+# for proxying HTTPS traffic, we would need to read that from the .spec object.
+- name: Detect if a cluster-wide Proxy has been configured
+  block:
+  - set_fact:
+      _ocp_enabled_global_proxy_enabled: true
+      _ocp_enabled_global_proxy_no_proxy: "{{ _cluster_proxy_config.status.noProxy }}"
+
+  - set_fact:
+      _ocp_enabled_global_proxy_trusted_ca_bundle: "{{ _cluster_proxy_config.spec.trustedCA.name }}"
+    when: _cluster_proxy_config.spec.trustedCA is defined
+
+  - set_fact:
+      _ocp_enabled_http_proxy_hostname: "{{ _ocp_enabled_global_proxy_http_proxy | urlsplit('hostname') }}"
+      _ocp_enabled_http_proxy_port: "{{ _ocp_enabled_global_proxy_http_proxy | urlsplit('port') }}"
+      _ocp_enabled_http_proxy_username: "{{ _ocp_enabled_global_proxy_http_proxy | urlsplit('username') }}"
+      _ocp_enabled_http_proxy_password: "{{ _ocp_enabled_global_proxy_http_proxy | urlsplit('password') }}"
+
+      _ocp_enabled_https_proxy_hostname: "{{ _ocp_enabled_global_proxy_https_proxy | urlsplit('hostname') }}"
+      _ocp_enabled_https_proxy_port: "{{ _ocp_enabled_global_proxy_https_proxy | urlsplit('port') }}"
+      _ocp_enabled_https_proxy_username: "{{ _ocp_enabled_global_proxy_https_proxy | urlsplit('username') }}"
+      _ocp_enabled_https_proxy_password: "{{ _ocp_enabled_global_proxy_https_proxy | urlsplit('password') }}"
+  vars:
+    _cluster_proxy_config: "{{ cluster_proxy_config.resources | first }}"
+    _ocp_enabled_global_proxy_http_proxy: "{{ _cluster_proxy_config.status.httpProxy }}"
+    _ocp_enabled_global_proxy_https_proxy: "{{ _cluster_proxy_config.status.httpsProxy }}"
+  no_log: true
+  when: cluster_proxy_config is defined and cluster_proxy_config.resources | length > 0 and cluster_proxy_config.status is defined
