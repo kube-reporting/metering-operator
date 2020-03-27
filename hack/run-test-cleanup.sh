@@ -2,8 +2,8 @@
 
 echo "Performing cleanup"
 echo "Storing pod descriptions and logs at $LOG_DIR"
-echo "Capturing pod descriptions"
 
+echo "Capturing pod descriptions"
 PODS="$(kubectl get pods --no-headers --namespace "$METERING_TEST_NAMESPACE" -o name | cut -d/ -f2)"
 while read -r pod; do
     if [[ -n "$pod" ]]; then
@@ -29,6 +29,26 @@ while read -r pod; do
         fi
     done
 done <<< "$PODS"
+
+echo "Capturing deployment descriptions"
+DEPLOYMENTS=$(kubectl get deployments --namespace "$METERING_TEST_NAMESPACE"  -o name | cut -d/ -f2)
+while read -r deployment; do
+    if [[ -z $deployment ]]; then
+        continue
+    fi
+
+    kubectl describe deployment "$deployment" --namespace "$METERING_TEST_NAMESPACE" > "$LOG_DIR/deployment-${deployment}-description.log"
+done <<< "$DEPLOYMENTS"
+
+echo "Capturing statefulset descriptions"
+STATEFULSETS=$(kubectl get statefulsets --namespace "$METERING_TEST_NAMESPACE" -o name | cut -d/ -f2)
+while read -r statefulset; do
+    if [[ -z $statefulset ]]; then
+        continue
+    fi
+
+    kubectl describe statefulset "$statefulset" --namespace "$METERING_TEST_NAMESPACE" > "$LOG_DIR/statefulset-${statefulset}-description.log"
+done <<< "$STATEFULSETS"
 
 echo "Capturing MeteringConfigs"
 METERINGCONFIGS="$(kubectl get meteringconfigs --no-headers --namespace "$METERING_TEST_NAMESPACE" -o name | cut -d/ -f2)"
