@@ -155,6 +155,9 @@ verify-helm-templates:
 	helm template ./charts/openshift-metering > /dev/null
 
 verify-olm-manifests: metering-manifests
+	@echo Generating metering manifests
+	$(MAKE) metering-manifests
+	@echo Verifying metering manifests
 	operator-courier verify --ui_validate_io ./manifests/deploy/openshift/olm/bundle
 	operator-courier verify --ui_validate_io ./manifests/deploy/upstream/olm/bundle
 
