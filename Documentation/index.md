@@ -9,7 +9,7 @@
     - [node selectors](common-configuration.md#node-selectors)
     - [image repositories and tags](common-configuration.md#image-repositories-and-tags)
   - [configuring reporting-operator](configuring-reporting-operator.md)
-    - [set the Prometheus URL](configuring-reporting-operator.md#prometheus-url)
+    - [set the Prometheus URL](configuring-reporting-operator.md#prometheus-connection)
     - [exposing the reporting API](configuring-reporting-operator.md#exposing-the-reporting-api)
     - [configuring Authentication on Openshift](configuring-reporting-operator.md#openshift-authentication)
   - [configuring storage](configuring-storage.md)
