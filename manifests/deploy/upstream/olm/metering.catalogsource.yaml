@@ -1,10 +1,9 @@
-apiVersion: operators.coreos.com/v1alpha1
+apiVersion: operators.coreos.com/v1
 kind: CatalogSource
 metadata:
   name: installed-upstream-metering-operators-metering
   namespace: marketplace
 spec:
-  sourceType: grpc
   targetNamespace: metering
   packages: metering-upstream
   source: upstream-community-operators

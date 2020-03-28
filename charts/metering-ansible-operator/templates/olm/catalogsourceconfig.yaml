@@ -1,0 +1,11 @@
+apiVersion: operators.coreos.com/v1
+kind: CatalogSourceConfig
+metadata:
+  name: {{ .Values.olm.catalogSourceConfigName }}
+  namespace: {{ .Values.olm.catalogSourceConfigNamespace }}
+spec:
+  targetNamespace: {{ .Values.olm.catalogSourceConfigTargetNamespace }}
+  packages: {{ .Values.olm.packageName }}
+{{- if .Values.olm.catalogSourceConfigOperatorSource }}
+  source: {{ .Values.olm.catalogSourceConfigOperatorSource  }}
+{{- end }}

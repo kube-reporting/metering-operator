@@ -13,8 +13,8 @@ if [ "$METERING_NAMESPACE" != "openshift-metering" ]; then
     "$FAQ_BIN" -f yaml -o yaml -M -c -r \
         --kwargs "namespace=$METERING_NAMESPACE" \
         '.spec.targetNamespace=$namespace' \
-        "$OLM_MANIFESTS_DIR/metering.catalogsource.yaml" \
-        > "$TMPDIR/metering.catalogsource.yaml"
+        "$OLM_MANIFESTS_DIR/metering.catalogsourceconfig.yaml" \
+        > "$TMPDIR/metering.catalogsourceconfig.yaml"
 
     "$FAQ_BIN" -f yaml -o yaml -M -c -r \
         --kwargs "namespace=$METERING_NAMESPACE" \
@@ -31,9 +31,9 @@ if [ "$METERING_NAMESPACE" != "openshift-metering" ]; then
         export OLM_MANIFESTS_DIR="$TMPDIR"
 fi
 
-msg "Installing Metering Catalog Source"
+msg "Installing Metering Catalog Source Config"
 kubectl apply -f \
-    "$OLM_MANIFESTS_DIR/metering.catalogsource.yaml"
+    "$OLM_MANIFESTS_DIR/metering.catalogsourceconfig.yaml"
 
 msg "Installing Metering Operator Group"
 kube-install \
