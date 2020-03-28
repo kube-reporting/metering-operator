@@ -2,9 +2,9 @@ apiVersion: operators.coreos.com/v1alpha1
 kind: Subscription
 metadata:
   name: {{ .Values.olm.subscriptionName }}
-  namespace: {{ .Values.olm.catalogSourceTargetNamespace }}
+  namespace: {{ .Values.olm.catalogSourceConfigTargetNamespace }}
 spec:
   channel: {{ .Values.olm.subscriptionChannel }}
   name: {{ .Values.olm.packageName }}
-  source: {{ .Values.olm.catalogSourceName  }}
-  sourceNamespace: {{ .Values.olm.catalogSourceTargetNamespace }}
+  source: {{ .Values.olm.catalogSourceConfigName  }}
+  sourceNamespace: {{ .Values.olm.catalogSourceConfigTargetNamespace }}

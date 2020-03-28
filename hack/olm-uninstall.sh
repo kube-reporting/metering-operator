@@ -13,8 +13,8 @@ if [ "$METERING_NAMESPACE" != "openshift-metering" ]; then
     "$FAQ_BIN" -f yaml -o yaml -M -c -r \
         --kwargs "namespace=$METERING_NAMESPACE" \
         '.spec.targetNamespace=$namespace' \
-        "$OLM_MANIFESTS_DIR/metering.catalogsource.yaml" \
-        > "$TMPDIR/metering.catalogsource.yaml"
+        "$OLM_MANIFESTS_DIR/metering.catalogsourceconfig.yaml" \
+        > "$TMPDIR/metering.catalogsourceconfig.yaml"
 
     "$FAQ_BIN" -f yaml -o yaml -M -c -r \
         --kwargs "namespace=$METERING_NAMESPACE" \
@@ -46,9 +46,9 @@ msg "Removing Metering Operator Group"
 kube-remove \
     "$OLM_MANIFESTS_DIR/metering.operatorgroup.yaml"
 
-msg "Removing Metering Catalog Source"
+msg "Removing Metering Catalog Source Config"
 kubectl delete -f \
-    "$OLM_MANIFESTS_DIR/metering.catalogsource.yaml"
+    "$OLM_MANIFESTS_DIR/metering.catalogsourceconfig.yaml"
 
 msg "Removing Metering Catalog Source Version"
 kubectl -n $METERING_NAMESPACE delete csv $CSV_NAME
