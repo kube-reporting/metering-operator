@@ -50,7 +50,7 @@ ifeq ($(OCP_BUILD), true)
 	METERING_ANSIBLE_OPERATOR_DOCKERFILE=Dockerfile.metering-ansible-operator.rhel
 endif
 
-GO_BUILD_ARGS := -ldflags '-extldflags "-static"'
+GO_BUILD_ARGS := -mod=vendor -ldflags '-extldflags "-static"'
 GOOS = "linux"
 CGO_ENABLED = 0
 
