@@ -147,6 +147,9 @@ e2e-docker: metering-src-docker-build
 	docker rm metering-e2e-docker
 
 verify: update-codegen verify-olm-manifests verify-helm-templates fmt
+	@echo Checking for unstaged changes
+	# validates no unstaged changes exist in $(VERIFY_FILE_PATHS)
+	git diff --stat HEAD --ignore-submodules --exit-code -- $(VERIFY_FILE_PATHS)
 
 verify-helm-templates:
 	helm template ./charts/openshift-metering > /dev/null
