@@ -27,6 +27,7 @@ import (
 	"k8s.io/apimachinery/pkg/util/clock"
 	"k8s.io/apimachinery/pkg/util/wait"
 	"k8s.io/client-go/kubernetes/scheme"
+	coordinatorv1 "k8s.io/client-go/kubernetes/typed/coordination/v1"
 	corev1 "k8s.io/client-go/kubernetes/typed/core/v1"
 	_ "k8s.io/client-go/plugin/pkg/client/auth/oidc"
 	"k8s.io/client-go/rest"
@@ -141,8 +142,9 @@ type Reporting struct {
 	cfg        Config
 	kubeConfig *rest.Config
 
-	meteringClient cbClientset.Interface
-	kubeClient     corev1.CoreV1Interface
+	kubeClient        corev1.CoreV1Interface
+	coordinatorClient coordinatorv1.CoordinationV1Interface
+	meteringClient    cbClientset.Interface
 
 	informerFactory factory.SharedInformerFactory
 
@@ -228,6 +230,12 @@ func New(logger log.FieldLogger, cfg Config) (*Reporting, error) {
 		return nil, fmt.Errorf("Unable to create Kubernetes client: %v", err)
 	}
 
+	logger.Debugf("setting up Kubernetes coordinator client...")
+	coordinatorClient, err := coordinatorv1.NewForConfig(kubeConfig)
+	if err != nil {
+		return nil, fmt.Errorf("Unable to create Kubernetes client: %v", err)
+	}
+
 	logger.Debugf("setting up Metering client...")
 	meteringClient, err := cbClientset.NewForConfig(kubeConfig)
 	if err != nil {
@@ -248,7 +256,7 @@ func New(logger log.FieldLogger, cfg Config) (*Reporting, error) {
 	clock := clock.RealClock{}
 	rand := rand.New(rand.NewSource(clock.Now().Unix()))
 
-	op := newReportingOperator(logger, clock, rand, cfg, kubeConfig, kubeClient, meteringClient, informerNamespace)
+	op := newReportingOperator(logger, clock, rand, cfg, kubeConfig, kubeClient, coordinatorClient, meteringClient, informerNamespace)
 
 	return op, nil
 }
@@ -260,6 +268,7 @@ func newReportingOperator(
 	cfg Config,
 	kubeConfig *rest.Config,
 	kubeClient corev1.CoreV1Interface,
+	coordinatorClient coordinatorv1.CoordinationV1Interface,
 	meteringClient cbClientset.Interface,
 	informerNamespace string,
 ) *Reporting {
@@ -295,11 +304,12 @@ func newReportingOperator(
 	)
 
 	op := &Reporting{
-		logger:         logger,
-		cfg:            cfg,
-		kubeConfig:     kubeConfig,
-		meteringClient: meteringClient,
-		kubeClient:     kubeClient,
+		logger:            logger,
+		cfg:               cfg,
+		kubeConfig:        kubeConfig,
+		kubeClient:        kubeClient,
+		coordinatorClient: coordinatorClient,
+		meteringClient:    meteringClient,
 
 		informerFactory: informerFactory,
 
@@ -593,12 +603,12 @@ func (op *Reporting) Run(ctx context.Context) error {
 	eventBroadcaster.StartRecordingToSink(&corev1.EventSinkImpl{Interface: op.kubeClient.Events(op.cfg.OwnNamespace)})
 	eventRecorder := eventBroadcaster.NewRecorder(scheme.Scheme, v1.EventSource{Component: op.cfg.Hostname})
 
-	rl, err := resourcelock.New(resourcelock.ConfigMapsResourceLock,
-		op.cfg.OwnNamespace, "reporting-operator-leader-lease", op.kubeClient,
+	rl, err := resourcelock.New(resourcelock.ConfigMapsResourceLock, op.cfg.OwnNamespace, "reporting-operator-leader-lease", op.kubeClient, op.coordinatorClient,
 		resourcelock.ResourceLockConfig{
 			Identity:      op.cfg.Hostname,
 			EventRecorder: eventRecorder,
-		})
+		},
+	)
 	if err != nil {
 		return fmt.Errorf("error creating lock %v", err)
 	}
