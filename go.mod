@@ -12,9 +12,12 @@ require (
 	github.com/beorn7/perks v1.0.1 // indirect
 	github.com/davecgh/go-spew v1.1.1
 	github.com/go-chi/chi v3.3.2+incompatible
+	github.com/gogo/protobuf v1.3.1 // indirect
 	github.com/golang/mock v1.3.1
+	github.com/google/gofuzz v1.1.0 // indirect
 	github.com/gophercloud/gophercloud v0.3.0 // indirect
 	github.com/huandu/xstrings v1.3.0 // indirect
+	github.com/openshift/api v0.0.0-20200205133042-34f0ec8dab87 // indirect
 	github.com/openshift/client-go v0.0.0-20190923180330-3b6373338c9b
 	// olm 0.12.0
 	github.com/operator-framework/operator-lifecycle-manager v0.0.0-20190926160646-a61144936680
@@ -27,12 +30,14 @@ require (
 	github.com/spf13/pflag v1.0.5
 	github.com/stretchr/testify v1.4.0
 	github.com/taozle/go-hive-driver v0.0.0-20181206100408-79951111cb07
+	golang.org/x/net v0.0.0-20200324143707-d3edc9973b7e // indirect
 	golang.org/x/sync v0.0.0-20190423024810-112230192c58
-	k8s.io/api v0.17.1
+	k8s.io/api v0.18.0
 	k8s.io/apiextensions-apiserver v0.17.1
-	k8s.io/apimachinery v0.17.1
+	k8s.io/apimachinery v0.18.0
 	k8s.io/client-go v8.0.0+incompatible
 	k8s.io/code-generator v0.0.0-20190912054826-cd179ad6a269
+	k8s.io/klog v1.0.0 // indirect
 )
 
 replace (
