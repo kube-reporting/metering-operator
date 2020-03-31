@@ -270,13 +270,16 @@ _base_storage_overrides:
         hdfs:
           enabled: false
 
-# overides the accountname(potentially empty) from a designated secret and generate the storage URL
-meteringconfig_storage_azure_create_secret: "{{ _storage_spec | json_query('hive.azure.createSecret') | default(false, true) }}"
-
-_azure_secret_account_name: ""
 #
 # Use _azure_account_overides when meteringconfig_storage_azure_create_secret is false to correctly set the defaultFS and metastoreWarehouseDir with the storage account name from the user's secret.
 #
+meteringconfig_storage_azure_container_name: "{{ _storage_spec | json_query('hive.azure.container') }}"
+meteringconfig_storage_azure_storage_account_name: "{{ _storage_spec | json_query('hive.azure.storageAccountName') }}"
+meteringconfig_storage_azure_credentials_secret_name: "{{ _storage_spec | json_query('hive.azure.secretName') }}"
+# overrides the accountname (potentially empty) from a designated secret and generate the storage URL
+meteringconfig_storage_azure_create_secret: "{{ _storage_spec | json_query('hive.azure.createSecret') | default(false, true) }}"
+_azure_secret_account_name: ""
+
 _azure_account_overides:
   azure:
     hadoop:
@@ -288,11 +291,18 @@ _azure_account_overides:
         config:
           metastoreWarehouseDir: "wasbs://{{ _storage_spec | json_query('hive.azure.container') }}@{{ _azure_secret_account_name }}.blob.core.windows.net{{ _storage_spec | json_query('hive.azure.rootDirectory')| default('/', True) | regex_replace('^\\/?', '/') }}"
 
-_meteringconfig_azure_overrides: "{{ meteringconfig_storage_azure_create_secret | ternary({} , _azure_account_overides ) | default({}, true) }}"
-_storage_overrides: "{{ _base_storage_overrides | combine(_meteringconfig_azure_overrides, recursive = True) }}"
-meteringconfig_storage_azure_container_name: "{{ _storage_spec | json_query('hive.azure.container') }}"
-meteringconfig_storage_azure_storage_account_name: "{{ _storage_spec | json_query('hive.azure.storageAccountName') }}"
-meteringconfig_storage_azure_credentials_secret_name: "{{ _storage_spec | json_query('hive.azure.secretName') }}"
+_meteringconfig_azure_overrides: "{{ meteringconfig_storage_azure_create_secret | ternary({}, _azure_account_overides ) | default({}, true) }}"
+
+_hive_metastore_database_overrides:
+  hive:
+    spec:
+      metastore:
+        storage:
+          create: false
+
+hive_metastore_database_overrides: "{{ meteringconfig_spec_overrides | json_query('hive.spec.config.db') | ternary(_hive_metastore_database_overrides, {}) }}"
+
+_storage_overrides: "{{ _base_storage_overrides | combine(_meteringconfig_azure_overrides, recursive=True) }}"
 meteringconfig_storage_hive_storage_type: "{{ _storage_spec | json_query('hive.type') }}"
 meteringconfig_storage_overrides: "{{ _storage_overrides[meteringconfig_storage_hive_storage_type] | default({}, true) }}"
 
@@ -593,7 +603,7 @@ meteringconfig_reporting_overrides:
           enabled: "{{ meteringconfig_reporting_enable_post_kube_1_14_datasources }}"
 
 # combine the _meteringconfig_tls_overrides dictionary last to enforce when spec.tls.enabled is specified and set to true
-meteringconfig_spec: "{{ meteringconfig_default_values | combine(meteringconfig_default_image_overrides, meteringconfig_storage_overrides, meteringconfig_reporting_overrides, _meteringconfig_root_ca_overrides, _meteringconfig_tls_overrides, _meteringconfig_ocp_disabled_overrides, meteringconfig_spec_overrides, recursive=True) }}"
+meteringconfig_spec: "{{ meteringconfig_default_values | combine(meteringconfig_default_image_overrides, meteringconfig_storage_overrides, hive_metastore_database_overrides, meteringconfig_reporting_overrides, _meteringconfig_root_ca_overrides, _meteringconfig_tls_overrides, _meteringconfig_ocp_disabled_overrides, meteringconfig_spec_overrides, recursive=True) }}"
 
 meteringconfig_storage_s3_create_bucket: "{{ meteringconfig_spec | json_query('storage.hive.s3.createBucket') }}"
 meteringconfig_storage_s3_bucket_name: "{{ (meteringconfig_spec | json_query('storage.hive.s3.bucket') | default('', true)).split('/')[0] }}"
