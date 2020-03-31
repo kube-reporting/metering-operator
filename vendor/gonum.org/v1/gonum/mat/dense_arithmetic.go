@@ -21,13 +21,13 @@ func (m *Dense) Add(a, b Matrix) {
 		panic(ErrShape)
 	}
 
-	aU, _ := untranspose(a)
-	bU, _ := untranspose(b)
-	m.reuseAs(ar, ac)
+	aU, _ := untransposeExtract(a)
+	bU, _ := untransposeExtract(b)
+	m.reuseAsNonZeroed(ar, ac)
 
-	if arm, ok := a.(RawMatrixer); ok {
-		if brm, ok := b.(RawMatrixer); ok {
-			amat, bmat := arm.RawMatrix(), brm.RawMatrix()
+	if arm, ok := a.(*Dense); ok {
+		if brm, ok := b.(*Dense); ok {
+			amat, bmat := arm.mat, brm.mat
 			if m != aU {
 				m.checkOverlap(amat)
 			}
@@ -70,13 +70,13 @@ func (m *Dense) Sub(a, b Matrix) {
 		panic(ErrShape)
 	}
 
-	aU, _ := untranspose(a)
-	bU, _ := untranspose(b)
-	m.reuseAs(ar, ac)
+	aU, _ := untransposeExtract(a)
+	bU, _ := untransposeExtract(b)
+	m.reuseAsNonZeroed(ar, ac)
 
-	if arm, ok := a.(RawMatrixer); ok {
-		if brm, ok := b.(RawMatrixer); ok {
-			amat, bmat := arm.RawMatrix(), brm.RawMatrix()
+	if arm, ok := a.(*Dense); ok {
+		if brm, ok := b.(*Dense); ok {
+			amat, bmat := arm.mat, brm.mat
 			if m != aU {
 				m.checkOverlap(amat)
 			}
@@ -120,13 +120,13 @@ func (m *Dense) MulElem(a, b Matrix) {
 		panic(ErrShape)
 	}
 
-	aU, _ := untranspose(a)
-	bU, _ := untranspose(b)
-	m.reuseAs(ar, ac)
+	aU, _ := untransposeExtract(a)
+	bU, _ := untransposeExtract(b)
+	m.reuseAsNonZeroed(ar, ac)
 
-	if arm, ok := a.(RawMatrixer); ok {
-		if brm, ok := b.(RawMatrixer); ok {
-			amat, bmat := arm.RawMatrix(), brm.RawMatrix()
+	if arm, ok := a.(*Dense); ok {
+		if brm, ok := b.(*Dense); ok {
+			amat, bmat := arm.mat, brm.mat
 			if m != aU {
 				m.checkOverlap(amat)
 			}
@@ -170,13 +170,13 @@ func (m *Dense) DivElem(a, b Matrix) {
 		panic(ErrShape)
 	}
 
-	aU, _ := untranspose(a)
-	bU, _ := untranspose(b)
-	m.reuseAs(ar, ac)
+	aU, _ := untransposeExtract(a)
+	bU, _ := untransposeExtract(b)
+	m.reuseAsNonZeroed(ar, ac)
 
-	if arm, ok := a.(RawMatrixer); ok {
-		if brm, ok := b.(RawMatrixer); ok {
-			amat, bmat := arm.RawMatrix(), brm.RawMatrix()
+	if arm, ok := a.(*Dense); ok {
+		if brm, ok := b.(*Dense); ok {
+			amat, bmat := arm.mat, brm.mat
 			if m != aU {
 				m.checkOverlap(amat)
 			}
@@ -220,12 +220,12 @@ func (m *Dense) Inverse(a Matrix) error {
 	if r != c {
 		panic(ErrSquare)
 	}
-	m.reuseAs(a.Dims())
-	aU, aTrans := untranspose(a)
+	m.reuseAsNonZeroed(a.Dims())
+	aU, aTrans := untransposeExtract(a)
 	switch rm := aU.(type) {
-	case RawMatrixer:
+	case *Dense:
 		if m != aU || aTrans {
-			if m == aU || m.checkOverlap(rm.RawMatrix()) {
+			if m == aU || m.checkOverlap(rm.mat) {
 				tmp := getWorkspace(r, c, false)
 				tmp.Copy(a)
 				m.Copy(tmp)
@@ -276,9 +276,9 @@ func (m *Dense) Mul(a, b Matrix) {
 		panic(ErrShape)
 	}
 
-	aU, aTrans := untranspose(a)
-	bU, bTrans := untranspose(b)
-	m.reuseAs(ar, bc)
+	aU, aTrans := untransposeExtract(a)
+	bU, bTrans := untransposeExtract(b)
+	m.reuseAsNonZeroed(ar, bc)
 	var restore func()
 	if m == aU {
 		m, restore = m.isolatedWorkspace(aU)
@@ -298,53 +298,49 @@ func (m *Dense) Mul(a, b Matrix) {
 
 	// Some of the cases do not have a transpose option, so create
 	// temporary memory.
-	// C = A^T * B = (B^T * A)^T
-	// C^T = B^T * A.
-	if aU, ok := aU.(RawMatrixer); ok {
-		amat := aU.RawMatrix()
+	// C = Aᵀ * B = (Bᵀ * A)ᵀ
+	// Cᵀ = Bᵀ * A.
+	if aU, ok := aU.(*Dense); ok {
 		if restore == nil {
-			m.checkOverlap(amat)
+			m.checkOverlap(aU.mat)
 		}
 		switch bU := bU.(type) {
-		case RawMatrixer:
-			bmat := bU.RawMatrix()
+		case *Dense:
 			if restore == nil {
-				m.checkOverlap(bmat)
+				m.checkOverlap(bU.mat)
 			}
-			blas64.Gemm(aT, bT, 1, amat, bmat, 0, m.mat)
+			blas64.Gemm(aT, bT, 1, aU.mat, bU.mat, 0, m.mat)
 			return
 
-		case RawSymmetricer:
-			bmat := bU.RawSymmetric()
+		case *SymDense:
 			if aTrans {
 				c := getWorkspace(ac, ar, false)
-				blas64.Symm(blas.Left, 1, bmat, amat, 0, c.mat)
+				blas64.Symm(blas.Left, 1, bU.mat, aU.mat, 0, c.mat)
 				strictCopy(m, c.T())
 				putWorkspace(c)
 				return
 			}
-			blas64.Symm(blas.Right, 1, bmat, amat, 0, m.mat)
+			blas64.Symm(blas.Right, 1, bU.mat, aU.mat, 0, m.mat)
 			return
 
-		case RawTriangular:
+		case *TriDense:
 			// Trmm updates in place, so copy aU first.
-			bmat := bU.RawTriangular()
 			if aTrans {
 				c := getWorkspace(ac, ar, false)
 				var tmp Dense
-				tmp.SetRawMatrix(amat)
+				tmp.SetRawMatrix(aU.mat)
 				c.Copy(&tmp)
 				bT := blas.Trans
 				if bTrans {
 					bT = blas.NoTrans
 				}
-				blas64.Trmm(blas.Left, bT, 1, bmat, c.mat)
+				blas64.Trmm(blas.Left, bT, 1, bU.mat, c.mat)
 				strictCopy(m, c.T())
 				putWorkspace(c)
 				return
 			}
 			m.Copy(a)
-			blas64.Trmm(blas.Right, bT, 1, bmat, m.mat)
+			blas64.Trmm(blas.Right, bT, 1, bU.mat, m.mat)
 			return
 
 		case *VecDense:
@@ -359,54 +355,51 @@ func (m *Dense) Mul(a, b Matrix) {
 					Stride: bvec.Inc,
 					Data:   bvec.Data,
 				}
-				blas64.Gemm(aT, bT, 1, amat, bmat, 0, m.mat)
+				blas64.Gemm(aT, bT, 1, aU.mat, bmat, 0, m.mat)
 				return
 			}
 			cvec := blas64.Vector{
 				Inc:  m.mat.Stride,
 				Data: m.mat.Data,
 			}
-			blas64.Gemv(aT, 1, amat, bvec, 0, cvec)
+			blas64.Gemv(aT, 1, aU.mat, bvec, 0, cvec)
 			return
 		}
 	}
-	if bU, ok := bU.(RawMatrixer); ok {
-		bmat := bU.RawMatrix()
+	if bU, ok := bU.(*Dense); ok {
 		if restore == nil {
-			m.checkOverlap(bmat)
+			m.checkOverlap(bU.mat)
 		}
 		switch aU := aU.(type) {
-		case RawSymmetricer:
-			amat := aU.RawSymmetric()
+		case *SymDense:
 			if bTrans {
 				c := getWorkspace(bc, br, false)
-				blas64.Symm(blas.Right, 1, amat, bmat, 0, c.mat)
+				blas64.Symm(blas.Right, 1, aU.mat, bU.mat, 0, c.mat)
 				strictCopy(m, c.T())
 				putWorkspace(c)
 				return
 			}
-			blas64.Symm(blas.Left, 1, amat, bmat, 0, m.mat)
+			blas64.Symm(blas.Left, 1, aU.mat, bU.mat, 0, m.mat)
 			return
 
-		case RawTriangular:
+		case *TriDense:
 			// Trmm updates in place, so copy bU first.
-			amat := aU.RawTriangular()
 			if bTrans {
 				c := getWorkspace(bc, br, false)
 				var tmp Dense
-				tmp.SetRawMatrix(bmat)
+				tmp.SetRawMatrix(bU.mat)
 				c.Copy(&tmp)
 				aT := blas.Trans
 				if aTrans {
 					aT = blas.NoTrans
 				}
-				blas64.Trmm(blas.Right, aT, 1, amat, c.mat)
+				blas64.Trmm(blas.Right, aT, 1, aU.mat, c.mat)
 				strictCopy(m, c.T())
 				putWorkspace(c)
 				return
 			}
 			m.Copy(b)
-			blas64.Trmm(blas.Left, aT, 1, amat, m.mat)
+			blas64.Trmm(blas.Left, aT, 1, aU.mat, m.mat)
 			return
 
 		case *VecDense:
@@ -423,7 +416,7 @@ func (m *Dense) Mul(a, b Matrix) {
 				if bTrans {
 					bT = blas.NoTrans
 				}
-				blas64.Gemv(bT, 1, bmat, avec, 0, cvec)
+				blas64.Gemv(bT, 1, bU.mat, avec, 0, cvec)
 				return
 			}
 			// {ar,1} x {1,bc} which is not a vector result.
@@ -434,7 +427,7 @@ func (m *Dense) Mul(a, b Matrix) {
 				Stride: avec.Inc,
 				Data:   avec.Data,
 			}
-			blas64.Gemm(aT, bT, 1, amat, bmat, 0, m.mat)
+			blas64.Gemm(aT, bT, 1, amat, bU.mat, 0, m.mat)
 			return
 		}
 	}
@@ -478,7 +471,7 @@ func (m *Dense) Exp(a Matrix) {
 		panic(ErrShape)
 	}
 
-	m.reuseAs(r, r)
+	m.reuseAsNonZeroed(r, r)
 	if r == 1 {
 		m.mat.Data[0] = math.Exp(a.At(0, 0))
 		return
@@ -552,7 +545,7 @@ func (m *Dense) Exp(a Matrix) {
 		vpu.Add(v, u)
 		vmu.Sub(v, u)
 
-		m.Solve(vmu, vpu)
+		_ = m.Solve(vmu, vpu)
 		return
 	}
 
@@ -622,7 +615,7 @@ func (m *Dense) Exp(a Matrix) {
 	vpu.Add(v, u)
 	vmu.Sub(v, u)
 
-	m.Solve(vmu, vpu)
+	_ = m.Solve(vmu, vpu)
 
 	for ; s > 0; s-- {
 		m.Mul(m, m)
@@ -633,14 +626,14 @@ func (m *Dense) Exp(a Matrix) {
 // in the receiver. Pow will panic if n is negative or if a is not square.
 func (m *Dense) Pow(a Matrix, n int) {
 	if n < 0 {
-		panic("matrix: illegal power")
+		panic("mat: illegal power")
 	}
 	r, c := a.Dims()
 	if r != c {
 		panic(ErrShape)
 	}
 
-	m.reuseAs(r, c)
+	m.reuseAsNonZeroed(r, c)
 
 	// Take possible fast paths.
 	switch n {
@@ -680,17 +673,31 @@ func (m *Dense) Pow(a Matrix, n int) {
 	putWorkspace(x)
 }
 
+// Kronecker calculates the Kronecker product of a and b, placing the result in
+// the receiver.
+func (m *Dense) Kronecker(a, b Matrix) {
+	ra, ca := a.Dims()
+	rb, cb := b.Dims()
+
+	m.reuseAsNonZeroed(ra*rb, ca*cb)
+	for i := 0; i < ra; i++ {
+		for j := 0; j < ca; j++ {
+			m.slice(i*rb, (i+1)*rb, j*cb, (j+1)*cb).Scale(a.At(i, j), b)
+		}
+	}
+}
+
 // Scale multiplies the elements of a by f, placing the result in the receiver.
 //
 // See the Scaler interface for more information.
 func (m *Dense) Scale(f float64, a Matrix) {
 	ar, ac := a.Dims()
 
-	m.reuseAs(ar, ac)
+	m.reuseAsNonZeroed(ar, ac)
 
-	aU, aTrans := untranspose(a)
-	if rm, ok := aU.(RawMatrixer); ok {
-		amat := rm.RawMatrix()
+	aU, aTrans := untransposeExtract(a)
+	if rm, ok := aU.(*Dense); ok {
+		amat := rm.mat
 		if m == aU || m.checkOverlap(amat) {
 			var restore func()
 			m, restore = m.isolatedWorkspace(a)
@@ -726,11 +733,11 @@ func (m *Dense) Scale(f float64, a Matrix) {
 func (m *Dense) Apply(fn func(i, j int, v float64) float64, a Matrix) {
 	ar, ac := a.Dims()
 
-	m.reuseAs(ar, ac)
+	m.reuseAsNonZeroed(ar, ac)
 
-	aU, aTrans := untranspose(a)
-	if rm, ok := aU.(RawMatrixer); ok {
-		amat := rm.RawMatrix()
+	aU, aTrans := untransposeExtract(a)
+	if rm, ok := aU.(*Dense); ok {
+		amat := rm.mat
 		if m == aU || m.checkOverlap(amat) {
 			var restore func()
 			m, restore = m.isolatedWorkspace(a)
@@ -762,8 +769,8 @@ func (m *Dense) Apply(fn func(i, j int, v float64) float64, a Matrix) {
 
 // RankOne performs a rank-one update to the matrix a with the vectors x and
 // y, where x and y are treated as column vectors. The result is stored in the
-// receiver. If a is zero, see Outer.
-//  m = a + alpha * x * y^T
+// receiver. The Outer method can be used instead of RankOne if a is not needed.
+//  m = a + alpha * x * yᵀ
 func (m *Dense) RankOne(a Matrix, alpha float64, x, y Vector) {
 	ar, ac := a.Dims()
 	if x.Len() != ar {
@@ -774,26 +781,26 @@ func (m *Dense) RankOne(a Matrix, alpha float64, x, y Vector) {
 	}
 
 	if a != m {
-		aU, _ := untranspose(a)
-		if rm, ok := aU.(RawMatrixer); ok {
+		aU, _ := untransposeExtract(a)
+		if rm, ok := aU.(*Dense); ok {
 			m.checkOverlap(rm.RawMatrix())
 		}
 	}
 
 	var xmat, ymat blas64.Vector
 	fast := true
-	xU, _ := untranspose(x)
-	if rv, ok := xU.(RawVectorer); ok {
+	xU, _ := untransposeExtract(x)
+	if rv, ok := xU.(*VecDense); ok {
 		r, c := xU.Dims()
-		xmat = rv.RawVector()
+		xmat = rv.mat
 		m.checkOverlap(generalFromVector(xmat, r, c))
 	} else {
 		fast = false
 	}
-	yU, _ := untranspose(y)
-	if rv, ok := yU.(RawVectorer); ok {
+	yU, _ := untransposeExtract(y)
+	if rv, ok := yU.(*VecDense); ok {
 		r, c := yU.Dims()
-		ymat = rv.RawVector()
+		ymat = rv.mat
 		m.checkOverlap(generalFromVector(ymat, r, c))
 	} else {
 		fast = false
@@ -801,14 +808,14 @@ func (m *Dense) RankOne(a Matrix, alpha float64, x, y Vector) {
 
 	if fast {
 		if m != a {
-			m.reuseAs(ar, ac)
+			m.reuseAsNonZeroed(ar, ac)
 			m.Copy(a)
 		}
 		blas64.Ger(alpha, xmat, ymat, m.mat)
 		return
 	}
 
-	m.reuseAs(ar, ac)
+	m.reuseAsNonZeroed(ar, ac)
 	for i := 0; i < ar; i++ {
 		for j := 0; j < ac; j++ {
 			m.set(i, j, a.At(i, j)+alpha*x.AtVec(i)*y.AtVec(j))
@@ -818,47 +825,27 @@ func (m *Dense) RankOne(a Matrix, alpha float64, x, y Vector) {
 
 // Outer calculates the outer product of the vectors x and y, where x and y
 // are treated as column vectors, and stores the result in the receiver.
-//  m = alpha * x * y^T
+//  m = alpha * x * yᵀ
 // In order to update an existing matrix, see RankOne.
 func (m *Dense) Outer(alpha float64, x, y Vector) {
 	r, c := x.Len(), y.Len()
 
-	// Copied from reuseAs with use replaced by useZeroed
-	// and a final zero of the matrix elements if we pass
-	// the shape checks.
-	// TODO(kortschak): Factor out into reuseZeroedAs if
-	// we find another case that needs it.
-	if m.mat.Rows > m.capRows || m.mat.Cols > m.capCols {
-		// Panic as a string, not a mat.Error.
-		panic("mat: caps not correctly set")
-	}
-	if m.IsZero() {
-		m.mat = blas64.General{
-			Rows:   r,
-			Cols:   c,
-			Stride: c,
-			Data:   useZeroed(m.mat.Data, r*c),
-		}
-		m.capRows = r
-		m.capCols = c
-	} else if r != m.mat.Rows || c != m.mat.Cols {
-		panic(ErrShape)
-	}
+	m.reuseAsZeroed(r, c)
 
 	var xmat, ymat blas64.Vector
 	fast := true
-	xU, _ := untranspose(x)
-	if rv, ok := xU.(RawVectorer); ok {
+	xU, _ := untransposeExtract(x)
+	if rv, ok := xU.(*VecDense); ok {
 		r, c := xU.Dims()
-		xmat = rv.RawVector()
+		xmat = rv.mat
 		m.checkOverlap(generalFromVector(xmat, r, c))
 	} else {
 		fast = false
 	}
-	yU, _ := untranspose(y)
-	if rv, ok := yU.(RawVectorer); ok {
+	yU, _ := untransposeExtract(y)
+	if rv, ok := yU.(*VecDense); ok {
 		r, c := yU.Dims()
-		ymat = rv.RawVector()
+		ymat = rv.mat
 		m.checkOverlap(generalFromVector(ymat, r, c))
 	} else {
 		fast = false
