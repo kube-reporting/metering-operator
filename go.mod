@@ -40,6 +40,7 @@ require (
 	k8s.io/apimachinery v0.0.0
 	k8s.io/client-go v8.0.0+incompatible
 	k8s.io/code-generator v0.0.0
+	k8s.io/klog v0.3.1
 )
 
 replace (
