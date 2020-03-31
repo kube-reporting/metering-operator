@@ -22,8 +22,6 @@ func (impl Implementation) Dlantr(norm lapack.MatrixNorm, uplo blas.Uplo, diag b
 		panic(badUplo)
 	case diag != blas.Unit && diag != blas.NonUnit:
 		panic(badDiag)
-	case m < 0:
-		panic(mLT0)
 	case n < 0:
 		panic(nLT0)
 	case lda < max(1, n):
@@ -44,6 +42,8 @@ func (impl Implementation) Dlantr(norm lapack.MatrixNorm, uplo blas.Uplo, diag b
 	}
 
 	switch norm {
+	default:
+		panic(badNorm)
 	case lapack.MaxAbs:
 		if diag == blas.Unit {
 			value := 1.0
@@ -171,7 +171,7 @@ func (impl Implementation) Dlantr(norm lapack.MatrixNorm, uplo blas.Uplo, diag b
 				}
 				return maxsum
 			} else {
-				for i := 0; i < m; i++ {
+				for i := 1; i < m; i++ {
 					var sum float64
 					if i < minmn {
 						sum = 1
@@ -219,38 +219,42 @@ func (impl Implementation) Dlantr(norm lapack.MatrixNorm, uplo blas.Uplo, diag b
 				return maxsum
 			}
 		}
-	default:
-		// lapack.Frobenius:
-		var scale, ssq float64
+	case lapack.Frobenius:
+		var nrm float64
 		if diag == blas.Unit {
-			scale = 1
-			ssq = float64(min(m, n))
 			if uplo == blas.Upper {
-				for i := 0; i < min(m, n); i++ {
-					rowscale, rowssq := impl.Dlassq(n-i-1, a[i*lda+i+1:], 1, 0, 1)
-					scale, ssq = impl.Dcombssq(scale, ssq, rowscale, rowssq)
+				for i := 0; i < m; i++ {
+					for j := i + 1; j < n; j++ {
+						tmp := a[i*lda+j]
+						nrm += tmp * tmp
+					}
 				}
 			} else {
 				for i := 1; i < m; i++ {
-					rowscale, rowssq := impl.Dlassq(min(i, n), a[i*lda:], 1, 0, 1)
-					scale, ssq = impl.Dcombssq(scale, ssq, rowscale, rowssq)
+					for j := 0; j < min(i, n); j++ {
+						tmp := a[i*lda+j]
+						nrm += tmp * tmp
+					}
 				}
 			}
+			nrm += float64(minmn)
 		} else {
-			scale = 0
-			ssq = 1
 			if uplo == blas.Upper {
-				for i := 0; i < min(m, n); i++ {
-					rowscale, rowssq := impl.Dlassq(n-i, a[i*lda+i:], 1, 0, 1)
-					scale, ssq = impl.Dcombssq(scale, ssq, rowscale, rowssq)
+				for i := 0; i < m; i++ {
+					for j := i; j < n; j++ {
+						tmp := math.Abs(a[i*lda+j])
+						nrm += tmp * tmp
+					}
 				}
 			} else {
 				for i := 0; i < m; i++ {
-					rowscale, rowssq := impl.Dlassq(min(i+1, n), a[i*lda:], 1, 0, 1)
-					scale, ssq = impl.Dcombssq(scale, ssq, rowscale, rowssq)
+					for j := 0; j <= min(i, n-1); j++ {
+						tmp := math.Abs(a[i*lda+j])
+						nrm += tmp * tmp
+					}
 				}
 			}
 		}
-		return scale * math.Sqrt(ssq)
+		return math.Sqrt(nrm)
 	}
 }

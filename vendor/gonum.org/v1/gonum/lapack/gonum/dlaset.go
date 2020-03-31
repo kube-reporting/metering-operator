@@ -32,20 +32,19 @@ func (impl Implementation) Dlaset(uplo blas.Uplo, m, n int, alpha, beta float64,
 		panic(shortA)
 	}
 
-	switch uplo {
-	case blas.Upper:
+	if uplo == blas.Upper {
 		for i := 0; i < m; i++ {
 			for j := i + 1; j < n; j++ {
 				a[i*lda+j] = alpha
 			}
 		}
-	case blas.Lower:
+	} else if uplo == blas.Lower {
 		for i := 0; i < m; i++ {
-			for j := 0; j < min(i, n); j++ {
+			for j := 0; j < min(i+1, n); j++ {
 				a[i*lda+j] = alpha
 			}
 		}
-	default:
+	} else {
 		for i := 0; i < m; i++ {
 			for j := 0; j < n; j++ {
 				a[i*lda+j] = alpha

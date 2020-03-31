@@ -58,7 +58,7 @@ func (lu *LU) updateCond(anorm float64, norm lapack.MatrixNorm) {
 // The LU factorization is computed with pivoting, and so really the decomposition
 // is a PLU decomposition where P is a permutation matrix. The individual matrix
 // factors can be extracted from the factorization using the Permutation method
-// on Dense, and the LU.LTo and LU.UTo methods.
+// on Dense, and the LU LTo and UTo methods.
 func (lu *LU) Factorize(a Matrix) {
 	lu.factorize(a, CondNorm)
 }
@@ -72,7 +72,7 @@ func (lu *LU) factorize(a Matrix, norm lapack.MatrixNorm) {
 		lu.lu = NewDense(r, r, nil)
 	} else {
 		lu.lu.Reset()
-		lu.lu.reuseAsNonZeroed(r, r)
+		lu.lu.reuseAs(r, r)
 	}
 	lu.lu.Copy(a)
 	if cap(lu.pivot) < r {
@@ -88,7 +88,7 @@ func (lu *LU) factorize(a Matrix, norm lapack.MatrixNorm) {
 
 // isValid returns whether the receiver contains a factorization.
 func (lu *LU) isValid() bool {
-	return lu.lu != nil && !lu.lu.IsEmpty()
+	return lu.lu != nil && !lu.lu.IsZero()
 }
 
 // Cond returns the condition number for the factorized matrix.
@@ -179,7 +179,7 @@ func (lu *LU) Pivot(swaps []int) []int {
 // RankOne updates an LU factorization as if a rank-one update had been applied to
 // the original matrix A, storing the result into the receiver. That is, if in
 // the original LU decomposition P * L * U = A, in the updated decomposition
-// P * L * U = A + alpha * x * yᵀ.
+// P * L * U = A + alpha * x * y^T.
 // RankOne will panic if orig does not contain a factorization.
 func (lu *LU) RankOne(orig *LU, alpha float64, x, y Vector) {
 	if !orig.isValid() {
@@ -205,7 +205,7 @@ func (lu *LU) RankOne(orig *LU, alpha float64, x, y Vector) {
 			if lu.lu == nil {
 				lu.lu = NewDense(n, n, nil)
 			} else {
-				lu.lu.reuseAsNonZeroed(n, n)
+				lu.lu.reuseAs(n, n)
 			}
 		} else if len(lu.pivot) != n {
 			panic(ErrShape)
@@ -250,27 +250,18 @@ func (lu *LU) RankOne(orig *LU, alpha float64, x, y Vector) {
 }
 
 // LTo extracts the lower triangular matrix from an LU factorization.
-//
-// If dst is empty, LTo will resize dst to be a lower-triangular n×n matrix.
-// When dst is non-empty, LTo will panic if dst is not n×n or not Lower.
-// LTo will also panic if the receiver does not contain a successful
-// factorization.
+// If dst is nil, a new matrix is allocated. The resulting L matrix is returned.
+// LTo will panic if the receiver does not contain a factorization.
 func (lu *LU) LTo(dst *TriDense) *TriDense {
 	if !lu.isValid() {
 		panic(badLU)
 	}
 
 	_, n := lu.lu.Dims()
-	if dst.IsEmpty() {
-		dst.ReuseAsTri(n, Lower)
+	if dst == nil {
+		dst = NewTriDense(n, Lower, nil)
 	} else {
-		n2, kind := dst.Triangle()
-		if n != n2 {
-			panic(ErrShape)
-		}
-		if kind != Lower {
-			panic(ErrTriangle)
-		}
+		dst.reuseAs(n, Lower)
 	}
 	// Extract the lower triangular elements.
 	for i := 0; i < n; i++ {
@@ -286,27 +277,18 @@ func (lu *LU) LTo(dst *TriDense) *TriDense {
 }
 
 // UTo extracts the upper triangular matrix from an LU factorization.
-//
-// If dst is empty, UTo will resize dst to be an upper-triangular n×n matrix.
-// When dst is non-empty, UTo will panic if dst is not n×n or not Upper.
-// UTo will also panic if the receiver does not contain a successful
-// factorization.
-func (lu *LU) UTo(dst *TriDense) {
+// If dst is nil, a new matrix is allocated. The resulting U matrix is returned.
+// UTo will panic if the receiver does not contain a factorization.
+func (lu *LU) UTo(dst *TriDense) *TriDense {
 	if !lu.isValid() {
 		panic(badLU)
 	}
 
 	_, n := lu.lu.Dims()
-	if dst.IsEmpty() {
-		dst.ReuseAsTri(n, Upper)
+	if dst == nil {
+		dst = NewTriDense(n, Upper, nil)
 	} else {
-		n2, kind := dst.Triangle()
-		if n != n2 {
-			panic(ErrShape)
-		}
-		if kind != Upper {
-			panic(ErrTriangle)
-		}
+		dst.reuseAs(n, Upper)
 	}
 	// Extract the upper triangular elements.
 	for i := 0; i < n; i++ {
@@ -314,6 +296,7 @@ func (lu *LU) UTo(dst *TriDense) {
 			dst.mat.Data[i*dst.mat.Stride+j] = lu.lu.mat.Data[i*lu.lu.mat.Stride+j]
 		}
 	}
+	return dst
 }
 
 // Permutation constructs an r×r permutation matrix with the given row swaps.
@@ -321,7 +304,7 @@ func (lu *LU) UTo(dst *TriDense) {
 // and all other elements equal to zero. swaps[i] specifies the row with which
 // i will be swapped, which is equivalent to the non-zero column of row i.
 func (m *Dense) Permutation(r int, swaps []int) {
-	m.reuseAsNonZeroed(r, r)
+	m.reuseAs(r, r)
 	for i := 0; i < r; i++ {
 		zero(m.mat.Data[i*m.mat.Stride : i*m.mat.Stride+r])
 		v := swaps[i]
@@ -335,7 +318,7 @@ func (m *Dense) Permutation(r int, swaps []int) {
 // SolveTo solves a system of linear equations using the LU decomposition of a matrix.
 // It computes
 //  A * X = B if trans == false
-//  Aᵀ * X = B if trans == true
+//  A^T * X = B if trans == true
 // In both cases, A is represented in LU factorized form, and the matrix X is
 // stored into dst.
 //
@@ -358,7 +341,7 @@ func (lu *LU) SolveTo(dst *Dense, trans bool, b Matrix) error {
 		return Condition(math.Inf(1))
 	}
 
-	dst.reuseAsNonZeroed(n, bc)
+	dst.reuseAs(n, bc)
 	bU, _ := untranspose(b)
 	var restore func()
 	if dst == bU {
@@ -383,7 +366,7 @@ func (lu *LU) SolveTo(dst *Dense, trans bool, b Matrix) error {
 // SolveVecTo solves a system of linear equations using the LU decomposition of a matrix.
 // It computes
 //  A * x = b if trans == false
-//  Aᵀ * x = b if trans == true
+//  A^T * x = b if trans == true
 // In both cases, A is represented in LU factorized form, and the vector x is
 // stored into dst.
 //
@@ -401,7 +384,7 @@ func (lu *LU) SolveVecTo(dst *VecDense, trans bool, b Vector) error {
 	}
 	switch rv := b.(type) {
 	default:
-		dst.reuseAsNonZeroed(n)
+		dst.reuseAs(n)
 		return lu.SolveTo(dst.asDense(), trans, b)
 	case RawVectorer:
 		if dst != b {
@@ -413,7 +396,7 @@ func (lu *LU) SolveVecTo(dst *VecDense, trans bool, b Vector) error {
 			return Condition(math.Inf(1))
 		}
 
-		dst.reuseAsNonZeroed(n)
+		dst.reuseAs(n)
 		var restore func()
 		if dst == b {
 			dst, restore = dst.isolatedWorkspace(b)

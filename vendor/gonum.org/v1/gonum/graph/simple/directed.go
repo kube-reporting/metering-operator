@@ -49,6 +49,8 @@ func (g *DirectedGraph) AddNode(n graph.Node) {
 		panic(fmt.Sprintf("simple: node ID collision: %d", n.ID()))
 	}
 	g.nodes[n.ID()] = n
+	g.from[n.ID()] = make(map[int64]graph.Edge)
+	g.to[n.ID()] = make(map[int64]graph.Edge)
 	g.nodeIDs.Use(n.ID())
 }
 
@@ -114,7 +116,7 @@ func (g *DirectedGraph) HasEdgeFromTo(uid, vid int64) bool {
 
 // NewEdge returns a new Edge from the source to the destination node.
 func (g *DirectedGraph) NewEdge(from, to graph.Node) graph.Edge {
-	return Edge{F: from, T: to}
+	return &Edge{F: from, T: to}
 }
 
 // NewNode returns a new unique Node to be added to g. The Node's ID does
@@ -210,21 +212,13 @@ func (g *DirectedGraph) SetEdge(e graph.Edge) {
 		g.nodes[tid] = to
 	}
 
-	if fm, ok := g.from[fid]; ok {
-		fm[tid] = e
-	} else {
-		g.from[fid] = map[int64]graph.Edge{tid: e}
-	}
-	if tm, ok := g.to[tid]; ok {
-		tm[fid] = e
-	} else {
-		g.to[tid] = map[int64]graph.Edge{fid: e}
-	}
+	g.from[fid][tid] = e
+	g.to[tid][fid] = e
 }
 
 // To returns all nodes in g that can reach directly to n.
 func (g *DirectedGraph) To(id int64) graph.Nodes {
-	if _, ok := g.to[id]; !ok {
+	if _, ok := g.from[id]; !ok {
 		return graph.Empty
 	}
 

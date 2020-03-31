@@ -16,8 +16,6 @@ var (
 
 	triBandDense *TriBandDense
 	_            Matrix           = triBandDense
-	_            allMatrix        = triBandDense
-	_            denseMatrix      = triBandDense
 	_            Triangular       = triBandDense
 	_            Banded           = triBandDense
 	_            TriBanded        = triBandDense
@@ -239,19 +237,17 @@ func (t *TriBandDense) T() Matrix {
 	return Transpose{t}
 }
 
-// IsEmpty returns whether the receiver is empty. Empty matrices can be the
-// receiver for size-restricted operations. The receiver can be emptied using
-// Reset.
-func (t *TriBandDense) IsEmpty() bool {
+// IsZero returns whether the receiver is zero-sized. Zero-sized matrices can be the
+// receiver for size-restricted operations. TriBandDense matrices can be zeroed using Reset.
+func (t *TriBandDense) IsZero() bool {
 	// It must be the case that t.Dims() returns
 	// zeros in this case. See comment in Reset().
 	return t.mat.Stride == 0
 }
 
-// Reset empties the matrix so that it can be reused as the
+// Reset zeros the dimensions of the matrix so that it can be reused as the
 // receiver of a dimensionally restricted operation.
 //
-// Reset should not be used when the matrix shares backing data.
 // See the Reseter interface for more information.
 func (t *TriBandDense) Reset() {
 	t.mat.N = 0
@@ -310,7 +306,7 @@ func (t *TriBandDense) TBand() Banded {
 // TriBand returns the number of rows/columns in the matrix, the
 // size of the bandwidth, and the orientation.
 func (t *TriBandDense) TriBand() (n, k int, kind TriKind) {
-	return t.mat.N, t.mat.K, TriKind(!t.IsEmpty()) && t.triKind()
+	return t.mat.N, t.mat.K, TriKind(!t.IsZero()) && t.triKind()
 }
 
 // TTriBand performs an implicit transpose by returning the receiver inside a TransposeTriBand.

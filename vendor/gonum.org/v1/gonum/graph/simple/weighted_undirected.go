@@ -55,6 +55,7 @@ func (g *WeightedUndirectedGraph) AddNode(n graph.Node) {
 		panic(fmt.Sprintf("simple: node ID collision: %d", n.ID()))
 	}
 	g.nodes[n.ID()] = n
+	g.edges[n.ID()] = make(map[int64]graph.WeightedEdge)
 	g.nodeIDs.Use(n.ID())
 }
 
@@ -132,7 +133,7 @@ func (g *WeightedUndirectedGraph) NewNode() graph.Node {
 
 // NewWeightedEdge returns a new weighted edge from the source to the destination node.
 func (g *WeightedUndirectedGraph) NewWeightedEdge(from, to graph.Node, weight float64) graph.WeightedEdge {
-	return WeightedEdge{F: from, T: to, W: weight}
+	return &WeightedEdge{F: from, T: to, W: weight}
 }
 
 // Node returns the node with the given ID if it exists in the graph,
@@ -211,16 +212,8 @@ func (g *WeightedUndirectedGraph) SetWeightedEdge(e graph.WeightedEdge) {
 		g.nodes[tid] = to
 	}
 
-	if fm, ok := g.edges[fid]; ok {
-		fm[tid] = e
-	} else {
-		g.edges[fid] = map[int64]graph.WeightedEdge{tid: e}
-	}
-	if tm, ok := g.edges[tid]; ok {
-		tm[fid] = e
-	} else {
-		g.edges[tid] = map[int64]graph.WeightedEdge{fid: e}
-	}
+	g.edges[fid][tid] = e
+	g.edges[tid][fid] = e
 }
 
 // Weight returns the weight for the edge between x and y if Edge(x, y) returns a non-nil Edge.

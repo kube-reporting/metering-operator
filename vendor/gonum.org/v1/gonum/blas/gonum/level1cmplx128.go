@@ -240,7 +240,7 @@ func (Implementation) Zcopy(n int, x []complex128, incX int, y []complex128, inc
 }
 
 // Zdotc computes the dot product
-//  xᴴ · y
+//  x^H · y
 // of two complex vectors x and y.
 func (Implementation) Zdotc(n int, x []complex128, incX int, y []complex128, incY int) complex128 {
 	if incX == 0 {
@@ -281,7 +281,7 @@ func (Implementation) Zdotc(n int, x []complex128, incX int, y []complex128, inc
 }
 
 // Zdotu computes the dot product
-//  xᵀ · y
+//  x^T · y
 // of two complex vectors x and y.
 func (Implementation) Zdotu(n int, x []complex128, incX int, y []complex128, incY int) complex128 {
 	if incX == 0 {

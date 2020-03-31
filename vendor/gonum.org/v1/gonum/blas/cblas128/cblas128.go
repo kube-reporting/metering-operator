@@ -28,7 +28,6 @@ func Implementation() blas.Complex128 {
 
 // Vector represents a vector with an associated element increment.
 type Vector struct {
-	N    int
 	Inc  int
 	Data []complex128
 }
@@ -108,42 +107,31 @@ type HermitianPacked SymmetricPacked
 
 // Level 1
 
-const (
-	negInc    = "cblas128: negative vector increment"
-	badLength = "cblas128: vector length mismatch"
-)
+const negInc = "cblas128: negative vector increment"
 
 // Dotu computes the dot product of the two vectors without
 // complex conjugation:
-//  xᵀ * y.
-// Dotu will panic if the lengths of x and y do not match.
-func Dotu(x, y Vector) complex128 {
-	if x.N != y.N {
-		panic(badLength)
-	}
-	return cblas128.Zdotu(x.N, x.Data, x.Inc, y.Data, y.Inc)
+//  x^T * y.
+func Dotu(n int, x, y Vector) complex128 {
+	return cblas128.Zdotu(n, x.Data, x.Inc, y.Data, y.Inc)
 }
 
 // Dotc computes the dot product of the two vectors with
 // complex conjugation:
-//  xᴴ * y.
-// Dotc will panic if the lengths of x and y do not match.
-func Dotc(x, y Vector) complex128 {
-	if x.N != y.N {
-		panic(badLength)
-	}
-	return cblas128.Zdotc(x.N, x.Data, x.Inc, y.Data, y.Inc)
+//  x^H * y.
+func Dotc(n int, x, y Vector) complex128 {
+	return cblas128.Zdotc(n, x.Data, x.Inc, y.Data, y.Inc)
 }
 
 // Nrm2 computes the Euclidean norm of the vector x:
 //  sqrt(\sum_i x[i] * x[i]).
 //
 // Nrm2 will panic if the vector increment is negative.
-func Nrm2(x Vector) float64 {
+func Nrm2(n int, x Vector) float64 {
 	if x.Inc < 0 {
 		panic(negInc)
 	}
-	return cblas128.Dznrm2(x.N, x.Data, x.Inc)
+	return cblas128.Dznrm2(n, x.Data, x.Inc)
 }
 
 // Asum computes the sum of magnitudes of the real and imaginary parts of
@@ -151,11 +139,11 @@ func Nrm2(x Vector) float64 {
 //  \sum_i (|Re x[i]| + |Im x[i]|).
 //
 // Asum will panic if the vector increment is negative.
-func Asum(x Vector) float64 {
+func Asum(n int, x Vector) float64 {
 	if x.Inc < 0 {
 		panic(negInc)
 	}
-	return cblas128.Dzasum(x.N, x.Data, x.Inc)
+	return cblas128.Dzasum(n, x.Data, x.Inc)
 }
 
 // Iamax returns the index of an element of x with the largest sum of
@@ -165,42 +153,30 @@ func Asum(x Vector) float64 {
 // Iamax returns -1 if n == 0.
 //
 // Iamax will panic if the vector increment is negative.
-func Iamax(x Vector) int {
+func Iamax(n int, x Vector) int {
 	if x.Inc < 0 {
 		panic(negInc)
 	}
-	return cblas128.Izamax(x.N, x.Data, x.Inc)
+	return cblas128.Izamax(n, x.Data, x.Inc)
 }
 
 // Swap exchanges the elements of two vectors:
 //  x[i], y[i] = y[i], x[i] for all i.
-// Swap will panic if the lengths of x and y do not match.
-func Swap(x, y Vector) {
-	if x.N != y.N {
-		panic(badLength)
-	}
-	cblas128.Zswap(x.N, x.Data, x.Inc, y.Data, y.Inc)
+func Swap(n int, x, y Vector) {
+	cblas128.Zswap(n, x.Data, x.Inc, y.Data, y.Inc)
 }
 
 // Copy copies the elements of x into the elements of y:
 //  y[i] = x[i] for all i.
-// Copy will panic if the lengths of x and y do not match.
-func Copy(x, y Vector) {
-	if x.N != y.N {
-		panic(badLength)
-	}
-	cblas128.Zcopy(x.N, x.Data, x.Inc, y.Data, y.Inc)
+func Copy(n int, x, y Vector) {
+	cblas128.Zcopy(n, x.Data, x.Inc, y.Data, y.Inc)
 }
 
 // Axpy computes
 //  y = alpha * x + y,
 // where x and y are vectors, and alpha is a scalar.
-// Axpy will panic if the lengths of x and y do not match.
-func Axpy(alpha complex128, x, y Vector) {
-	if x.N != y.N {
-		panic(badLength)
-	}
-	cblas128.Zaxpy(x.N, alpha, x.Data, x.Inc, y.Data, y.Inc)
+func Axpy(n int, alpha complex128, x, y Vector) {
+	cblas128.Zaxpy(n, alpha, x.Data, x.Inc, y.Data, y.Inc)
 }
 
 // Scal computes
@@ -208,11 +184,11 @@ func Axpy(alpha complex128, x, y Vector) {
 // where x is a vector, and alpha is a scalar.
 //
 // Scal will panic if the vector increment is negative.
-func Scal(alpha complex128, x Vector) {
+func Scal(n int, alpha complex128, x Vector) {
 	if x.Inc < 0 {
 		panic(negInc)
 	}
-	cblas128.Zscal(x.N, alpha, x.Data, x.Inc)
+	cblas128.Zscal(n, alpha, x.Data, x.Inc)
 }
 
 // Dscal computes
@@ -220,19 +196,19 @@ func Scal(alpha complex128, x Vector) {
 // where x is a vector, and alpha is a real scalar.
 //
 // Dscal will panic if the vector increment is negative.
-func Dscal(alpha float64, x Vector) {
+func Dscal(n int, alpha float64, x Vector) {
 	if x.Inc < 0 {
 		panic(negInc)
 	}
-	cblas128.Zdscal(x.N, alpha, x.Data, x.Inc)
+	cblas128.Zdscal(n, alpha, x.Data, x.Inc)
 }
 
 // Level 2
 
 // Gemv computes
-//  y = alpha * A * x + beta * y   if t == blas.NoTrans,
-//  y = alpha * Aᵀ * x + beta * y  if t == blas.Trans,
-//  y = alpha * Aᴴ * x + beta * y  if t == blas.ConjTrans,
+//  y = alpha * A * x + beta * y,   if t == blas.NoTrans,
+//  y = alpha * A^T * x + beta * y, if t == blas.Trans,
+//  y = alpha * A^H * x + beta * y, if t == blas.ConjTrans,
 // where A is an m×n dense matrix, x and y are vectors, and alpha and beta are
 // scalars.
 func Gemv(t blas.Transpose, alpha complex128, a General, x Vector, beta complex128, y Vector) {
@@ -240,9 +216,9 @@ func Gemv(t blas.Transpose, alpha complex128, a General, x Vector, beta complex1
 }
 
 // Gbmv computes
-//  y = alpha * A * x + beta * y   if t == blas.NoTrans,
-//  y = alpha * Aᵀ * x + beta * y  if t == blas.Trans,
-//  y = alpha * Aᴴ * x + beta * y  if t == blas.ConjTrans,
+//  y = alpha * A * x + beta * y,   if t == blas.NoTrans,
+//  y = alpha * A^T * x + beta * y, if t == blas.Trans,
+//  y = alpha * A^H * x + beta * y, if t == blas.ConjTrans,
 // where A is an m×n band matrix, x and y are vectors, and alpha and beta are
 // scalars.
 func Gbmv(t blas.Transpose, alpha complex128, a Band, x Vector, beta complex128, y Vector) {
@@ -250,36 +226,36 @@ func Gbmv(t blas.Transpose, alpha complex128, a Band, x Vector, beta complex128,
 }
 
 // Trmv computes
-//  x = A * x   if t == blas.NoTrans,
-//  x = Aᵀ * x  if t == blas.Trans,
-//  x = Aᴴ * x  if t == blas.ConjTrans,
+//  x = A * x,   if t == blas.NoTrans,
+//  x = A^T * x, if t == blas.Trans,
+//  x = A^H * x, if t == blas.ConjTrans,
 // where A is an n×n triangular matrix, and x is a vector.
 func Trmv(t blas.Transpose, a Triangular, x Vector) {
 	cblas128.Ztrmv(a.Uplo, t, a.Diag, a.N, a.Data, a.Stride, x.Data, x.Inc)
 }
 
 // Tbmv computes
-//  x = A * x   if t == blas.NoTrans,
-//  x = Aᵀ * x  if t == blas.Trans,
-//  x = Aᴴ * x  if t == blas.ConjTrans,
+//  x = A * x,   if t == blas.NoTrans,
+//  x = A^T * x, if t == blas.Trans,
+//  x = A^H * x, if t == blas.ConjTrans,
 // where A is an n×n triangular band matrix, and x is a vector.
 func Tbmv(t blas.Transpose, a TriangularBand, x Vector) {
 	cblas128.Ztbmv(a.Uplo, t, a.Diag, a.N, a.K, a.Data, a.Stride, x.Data, x.Inc)
 }
 
 // Tpmv computes
-//  x = A * x   if t == blas.NoTrans,
-//  x = Aᵀ * x  if t == blas.Trans,
-//  x = Aᴴ * x  if t == blas.ConjTrans,
+//  x = A * x,   if t == blas.NoTrans,
+//  x = A^T * x, if t == blas.Trans,
+//  x = A^H * x, if t == blas.ConjTrans,
 // where A is an n×n triangular matrix in packed format, and x is a vector.
 func Tpmv(t blas.Transpose, a TriangularPacked, x Vector) {
 	cblas128.Ztpmv(a.Uplo, t, a.Diag, a.N, a.Data, x.Data, x.Inc)
 }
 
 // Trsv solves
-//  A * x = b   if t == blas.NoTrans,
-//  Aᵀ * x = b  if t == blas.Trans,
-//  Aᴴ * x = b  if t == blas.ConjTrans,
+//  A * x = b,   if t == blas.NoTrans,
+//  A^T * x = b, if t == blas.Trans,
+//  A^H * x = b, if t == blas.ConjTrans,
 // where A is an n×n triangular matrix and x is a vector.
 //
 // At entry to the function, x contains the values of b, and the result is
@@ -292,9 +268,9 @@ func Trsv(t blas.Transpose, a Triangular, x Vector) {
 }
 
 // Tbsv solves
-//  A * x = b   if t == blas.NoTrans,
-//  Aᵀ * x = b  if t == blas.Trans,
-//  Aᴴ * x = b  if t == blas.ConjTrans,
+//  A * x = b,   if t == blas.NoTrans,
+//  A^T * x = b, if t == blas.Trans,
+//  A^H * x = b, if t == blas.ConjTrans,
 // where A is an n×n triangular band matrix, and x is a vector.
 //
 // At entry to the function, x contains the values of b, and the result is
@@ -307,9 +283,9 @@ func Tbsv(t blas.Transpose, a TriangularBand, x Vector) {
 }
 
 // Tpsv solves
-//  A * x = b   if t == blas.NoTrans,
-//  Aᵀ * x = b  if t == blas.Trans,
-//  Aᴴ * x = b  if t == blas.ConjTrans,
+//  A * x = b,   if t == blas.NoTrans,
+//  A^T * x = b, if t == blas.Trans,
+//  A^H * x = b, if t == blas.ConjTrans,
 // where A is an n×n triangular matrix in packed format and x is a vector.
 //
 // At entry to the function, x contains the values of b, and the result is
@@ -346,28 +322,28 @@ func Hpmv(alpha complex128, a HermitianPacked, x Vector, beta complex128, y Vect
 }
 
 // Geru performs a rank-1 update
-//  A += alpha * x * yᵀ,
+//  A += alpha * x * y^T,
 // where A is an m×n dense matrix, x and y are vectors, and alpha is a scalar.
 func Geru(alpha complex128, x, y Vector, a General) {
 	cblas128.Zgeru(a.Rows, a.Cols, alpha, x.Data, x.Inc, y.Data, y.Inc, a.Data, a.Stride)
 }
 
 // Gerc performs a rank-1 update
-//  A += alpha * x * yᴴ,
+//  A += alpha * x * y^H,
 // where A is an m×n dense matrix, x and y are vectors, and alpha is a scalar.
 func Gerc(alpha complex128, x, y Vector, a General) {
 	cblas128.Zgerc(a.Rows, a.Cols, alpha, x.Data, x.Inc, y.Data, y.Inc, a.Data, a.Stride)
 }
 
 // Her performs a rank-1 update
-//  A += alpha * x * yᵀ,
+//  A += alpha * x * y^T,
 // where A is an m×n Hermitian matrix, x and y are vectors, and alpha is a scalar.
 func Her(alpha float64, x Vector, a Hermitian) {
 	cblas128.Zher(a.Uplo, a.N, alpha, x.Data, x.Inc, a.Data, a.Stride)
 }
 
 // Hpr performs a rank-1 update
-//  A += alpha * x * xᴴ,
+//  A += alpha * x * x^H,
 // where A is an n×n Hermitian matrix in packed format, x is a vector, and
 // alpha is a scalar.
 func Hpr(alpha float64, x Vector, a HermitianPacked) {
@@ -375,14 +351,14 @@ func Hpr(alpha float64, x Vector, a HermitianPacked) {
 }
 
 // Her2 performs a rank-2 update
-//  A += alpha * x * yᴴ + conj(alpha) * y * xᴴ,
+//  A += alpha * x * y^H + conj(alpha) * y * x^H,
 // where A is an n×n Hermitian matrix, x and y are vectors, and alpha is a scalar.
 func Her2(alpha complex128, x, y Vector, a Hermitian) {
 	cblas128.Zher2(a.Uplo, a.N, alpha, x.Data, x.Inc, y.Data, y.Inc, a.Data, a.Stride)
 }
 
 // Hpr2 performs a rank-2 update
-//  A += alpha * x * yᴴ + conj(alpha) * y * xᴴ,
+//  A += alpha * x * y^H + conj(alpha) * y * x^H,
 // where A is an n×n Hermitian matrix in packed format, x and y are vectors,
 // and alpha is a scalar.
 func Hpr2(alpha complex128, x, y Vector, a HermitianPacked) {
@@ -411,8 +387,8 @@ func Gemm(tA, tB blas.Transpose, alpha complex128, a, b General, beta complex128
 }
 
 // Symm performs
-//  C = alpha * A * B + beta * C  if s == blas.Left,
-//  C = alpha * B * A + beta * C  if s == blas.Right,
+//  C = alpha * A * B + beta * C, if s == blas.Left,
+//  C = alpha * B * A + beta * C, if s == blas.Right,
 // where A is an n×n or m×m symmetric matrix, B and C are m×n matrices, and
 // alpha and beta are scalars.
 func Symm(s blas.Side, alpha complex128, a Symmetric, b General, beta complex128, c General) {
@@ -426,8 +402,8 @@ func Symm(s blas.Side, alpha complex128, a Symmetric, b General, beta complex128
 }
 
 // Syrk performs a symmetric rank-k update
-//  C = alpha * A * Aᵀ + beta * C  if t == blas.NoTrans,
-//  C = alpha * Aᵀ * A + beta * C  if t == blas.Trans,
+//  C = alpha * A * A^T + beta * C, if t == blas.NoTrans,
+//  C = alpha * A^T * A + beta * C, if t == blas.Trans,
 // where C is an n×n symmetric matrix, A is an n×k matrix if t == blas.NoTrans
 // and a k×n matrix otherwise, and alpha and beta are scalars.
 func Syrk(t blas.Transpose, alpha complex128, a General, beta complex128, c Symmetric) {
@@ -441,8 +417,8 @@ func Syrk(t blas.Transpose, alpha complex128, a General, beta complex128, c Symm
 }
 
 // Syr2k performs a symmetric rank-2k update
-//  C = alpha * A * Bᵀ + alpha * B * Aᵀ + beta * C  if t == blas.NoTrans,
-//  C = alpha * Aᵀ * B + alpha * Bᵀ * A + beta * C  if t == blas.Trans,
+//  C = alpha * A * B^T + alpha * B * A^T + beta * C, if t == blas.NoTrans,
+//  C = alpha * A^T * B + alpha * B^T * A + beta * C, if t == blas.Trans,
 // where C is an n×n symmetric matrix, A and B are n×k matrices if
 // t == blas.NoTrans and k×n otherwise, and alpha and beta are scalars.
 func Syr2k(t blas.Transpose, alpha complex128, a, b General, beta complex128, c Symmetric) {
@@ -456,12 +432,12 @@ func Syr2k(t blas.Transpose, alpha complex128, a, b General, beta complex128, c 
 }
 
 // Trmm performs
-//  B = alpha * A * B   if tA == blas.NoTrans and s == blas.Left,
-//  B = alpha * Aᵀ * B  if tA == blas.Trans and s == blas.Left,
-//  B = alpha * Aᴴ * B  if tA == blas.ConjTrans and s == blas.Left,
-//  B = alpha * B * A   if tA == blas.NoTrans and s == blas.Right,
-//  B = alpha * B * Aᵀ  if tA == blas.Trans and s == blas.Right,
-//  B = alpha * B * Aᴴ  if tA == blas.ConjTrans and s == blas.Right,
+//  B = alpha * A * B,   if tA == blas.NoTrans and s == blas.Left,
+//  B = alpha * A^T * B, if tA == blas.Trans and s == blas.Left,
+//  B = alpha * A^H * B, if tA == blas.ConjTrans and s == blas.Left,
+//  B = alpha * B * A,   if tA == blas.NoTrans and s == blas.Right,
+//  B = alpha * B * A^T, if tA == blas.Trans and s == blas.Right,
+//  B = alpha * B * A^H, if tA == blas.ConjTrans and s == blas.Right,
 // where A is an n×n or m×m triangular matrix, B is an m×n matrix, and alpha is
 // a scalar.
 func Trmm(s blas.Side, tA blas.Transpose, alpha complex128, a Triangular, b General) {
@@ -469,12 +445,12 @@ func Trmm(s blas.Side, tA blas.Transpose, alpha complex128, a Triangular, b Gene
 }
 
 // Trsm solves
-//  A * X = alpha * B   if tA == blas.NoTrans and s == blas.Left,
-//  Aᵀ * X = alpha * B  if tA == blas.Trans and s == blas.Left,
-//  Aᴴ * X = alpha * B  if tA == blas.ConjTrans and s == blas.Left,
-//  X * A = alpha * B   if tA == blas.NoTrans and s == blas.Right,
-//  X * Aᵀ = alpha * B  if tA == blas.Trans and s == blas.Right,
-//  X * Aᴴ = alpha * B  if tA == blas.ConjTrans and s == blas.Right,
+//  A * X = alpha * B,   if tA == blas.NoTrans and s == blas.Left,
+//  A^T * X = alpha * B, if tA == blas.Trans and s == blas.Left,
+//  A^H * X = alpha * B, if tA == blas.ConjTrans and s == blas.Left,
+//  X * A = alpha * B,   if tA == blas.NoTrans and s == blas.Right,
+//  X * A^T = alpha * B, if tA == blas.Trans and s == blas.Right,
+//  X * A^H = alpha * B, if tA == blas.ConjTrans and s == blas.Right,
 // where A is an n×n or m×m triangular matrix, X and B are m×n matrices, and
 // alpha is a scalar.
 //
@@ -487,8 +463,8 @@ func Trsm(s blas.Side, tA blas.Transpose, alpha complex128, a Triangular, b Gene
 }
 
 // Hemm performs
-//  C = alpha * A * B + beta * C  if s == blas.Left,
-//  C = alpha * B * A + beta * C  if s == blas.Right,
+//  C = alpha * A * B + beta * C, if s == blas.Left,
+//  C = alpha * B * A + beta * C, if s == blas.Right,
 // where A is an n×n or m×m Hermitian matrix, B and C are m×n matrices, and
 // alpha and beta are scalars.
 func Hemm(s blas.Side, alpha complex128, a Hermitian, b General, beta complex128, c General) {
@@ -502,8 +478,8 @@ func Hemm(s blas.Side, alpha complex128, a Hermitian, b General, beta complex128
 }
 
 // Herk performs the Hermitian rank-k update
-//  C = alpha * A * Aᴴ + beta*C  if t == blas.NoTrans,
-//  C = alpha * Aᴴ * A + beta*C  if t == blas.ConjTrans,
+//  C = alpha * A * A^H + beta*C, if t == blas.NoTrans,
+//  C = alpha * A^H * A + beta*C, if t == blas.ConjTrans,
 // where C is an n×n Hermitian matrix, A is an n×k matrix if t == blas.NoTrans
 // and a k×n matrix otherwise, and alpha and beta are scalars.
 func Herk(t blas.Transpose, alpha float64, a General, beta float64, c Hermitian) {
@@ -517,8 +493,8 @@ func Herk(t blas.Transpose, alpha float64, a General, beta float64, c Hermitian)
 }
 
 // Her2k performs the Hermitian rank-2k update
-//  C = alpha * A * Bᴴ + conj(alpha) * B * Aᴴ + beta * C  if t == blas.NoTrans,
-//  C = alpha * Aᴴ * B + conj(alpha) * Bᴴ * A + beta * C  if t == blas.ConjTrans,
+//  C = alpha * A * B^H + conj(alpha) * B * A^H + beta * C, if t == blas.NoTrans,
+//  C = alpha * A^H * B + conj(alpha) * B^H * A + beta * C, if t == blas.ConjTrans,
 // where C is an n×n Hermitian matrix, A and B are n×k matrices if t == NoTrans
 // and k×n matrices otherwise, and alpha and beta are scalars.
 func Her2k(t blas.Transpose, alpha complex128, a, b General, beta float64, c Hermitian) {

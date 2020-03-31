@@ -93,15 +93,15 @@ const (
 type ApplyOrtho byte
 
 const (
-	ApplyP ApplyOrtho = 'P' // Apply P or Pᵀ.
-	ApplyQ ApplyOrtho = 'Q' // Apply Q or Qᵀ.
+	ApplyP ApplyOrtho = 'P' // Apply P or P^T.
+	ApplyQ ApplyOrtho = 'Q' // Apply Q or Q^T.
 )
 
 // GenOrtho specifies which orthogonal matrix is generated in Dorgbr.
 type GenOrtho byte
 
 const (
-	GeneratePT GenOrtho = 'P' // Generate Pᵀ.
+	GeneratePT GenOrtho = 'P' // Generate P^T.
 	GenerateQ  GenOrtho = 'Q' // Generate Q.
 )
 

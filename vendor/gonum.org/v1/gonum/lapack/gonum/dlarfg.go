@@ -14,9 +14,9 @@ import (
 // a real elementary reflector of order n such that
 //  H * (alpha) = (beta)
 //      (    x)   (   0)
-//  Hᵀ * H = I
+//  H^T * H = I
 // H is represented in the form
-//  H = 1 - tau * (1; v) * (1 vᵀ)
+//  H = 1 - tau * (1; v) * (1 v^T)
 // where tau is a real scalar.
 //
 // On entry, x contains the vector x, on exit it contains v.

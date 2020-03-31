@@ -16,16 +16,17 @@ package autorest
 
 import (
 	"bytes"
-	"crypto/tls"
 	"fmt"
 	"io"
 	"io/ioutil"
 	"log"
 	"net/http"
+	"net/http/cookiejar"
 	"strings"
 	"time"
 
 	"github.com/Azure/go-autorest/logger"
+	"github.com/Azure/go-autorest/version"
 )
 
 const (
@@ -69,22 +70,6 @@ const (
 // last http.Response.
 type Response struct {
 	*http.Response `json:"-"`
-}
-
-// IsHTTPStatus returns true if the returned HTTP status code matches the provided status code.
-// If there was no response (i.e. the underlying http.Response is nil) the return value is false.
-func (r Response) IsHTTPStatus(statusCode int) bool {
-	if r.Response == nil {
-		return false
-	}
-	return r.Response.StatusCode == statusCode
-}
-
-// HasHTTPStatus returns true if the returned HTTP status code matches one of the provided status codes.
-// If there was no response (i.e. the underlying http.Response is nil) or not status codes are provided
-// the return value is false.
-func (r Response) HasHTTPStatus(statusCodes ...int) bool {
-	return ResponseHasStatusCode(r.Response, statusCodes...)
 }
 
 // LoggingInspector implements request and response inspectors that log the full request and
@@ -179,42 +164,19 @@ type Client struct {
 
 	// Set to true to skip attempted registration of resource providers (false by default).
 	SkipResourceProviderRegistration bool
-
-	// SendDecorators can be used to override the default chain of SendDecorators.
-	// This can be used to specify things like a custom retry SendDecorator.
-	// Set this to an empty slice to use no SendDecorators.
-	SendDecorators []SendDecorator
 }
 
 // NewClientWithUserAgent returns an instance of a Client with the UserAgent set to the passed
 // string.
 func NewClientWithUserAgent(ua string) Client {
-	return newClient(ua, tls.RenegotiateNever)
-}
-
-// ClientOptions contains various Client configuration options.
-type ClientOptions struct {
-	// UserAgent is an optional user-agent string to append to the default user agent.
-	UserAgent string
-
-	// Renegotiation is an optional setting to control client-side TLS renegotiation.
-	Renegotiation tls.RenegotiationSupport
-}
-
-// NewClientWithOptions returns an instance of a Client with the specified values.
-func NewClientWithOptions(options ClientOptions) Client {
-	return newClient(options.UserAgent, options.Renegotiation)
-}
-
-func newClient(ua string, renegotiation tls.RenegotiationSupport) Client {
 	c := Client{
 		PollingDelay:    DefaultPollingDelay,
 		PollingDuration: DefaultPollingDuration,
 		RetryAttempts:   DefaultRetryAttempts,
 		RetryDuration:   DefaultRetryDuration,
-		UserAgent:       UserAgent(),
+		UserAgent:       version.UserAgent(),
 	}
-	c.Sender = c.sender(renegotiation)
+	c.Sender = c.sender()
 	c.AddToUserAgent(ua)
 	return c
 }
@@ -258,16 +220,17 @@ func (c Client) Do(r *http.Request) (*http.Response, error) {
 			return true, v
 		},
 	})
-	resp, err := SendWithSender(c.sender(tls.RenegotiateNever), r)
+	resp, err := SendWithSender(c.sender(), r)
 	logger.Instance.WriteResponse(resp, logger.Filter{})
 	Respond(resp, c.ByInspecting())
 	return resp, err
 }
 
 // sender returns the Sender to which to send requests.
-func (c Client) sender(renengotiation tls.RenegotiationSupport) Sender {
+func (c Client) sender() Sender {
 	if c.Sender == nil {
-		return sender(renengotiation)
+		j, _ := cookiejar.New(nil)
+		return &http.Client{Jar: j}
 	}
 	return c.Sender
 }
@@ -302,22 +265,4 @@ func (c Client) ByInspecting() RespondDecorator {
 		return ByIgnoring()
 	}
 	return c.ResponseInspector
-}
-
-// Send sends the provided http.Request using the client's Sender or the default sender.
-// It returns the http.Response and possible error. It also accepts a, possibly empty,
-// default set of SendDecorators used when sending the request.
-// SendDecorators have the following precedence:
-// 1. In a request's context via WithSendDecorators()
-// 2. Specified on the client in SendDecorators
-// 3. The default values specified in this method
-func (c Client) Send(req *http.Request, decorators ...SendDecorator) (*http.Response, error) {
-	if c.SendDecorators != nil {
-		decorators = c.SendDecorators
-	}
-	inCtx := req.Context().Value(ctxSendDecorators{})
-	if sd, ok := inCtx.([]SendDecorator); ok {
-		decorators = sd
-	}
-	return SendWithSender(c, req, decorators...)
 }

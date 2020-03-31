@@ -15,8 +15,6 @@ var (
 	symDense *SymDense
 
 	_ Matrix           = symDense
-	_ allMatrix        = symDense
-	_ denseMatrix      = symDense
 	_ Symmetric        = symDense
 	_ RawSymmetricer   = symDense
 	_ MutableSymmetric = symDense
@@ -126,36 +124,14 @@ func (s *SymDense) SetRawSymmetric(mat blas64.Symmetric) {
 	s.mat = mat
 }
 
-// Reset empties the matrix so that it can be reused as the
+// Reset zeros the dimensions of the matrix so that it can be reused as the
 // receiver of a dimensionally restricted operation.
 //
-// Reset should not be used when the matrix shares backing data.
 // See the Reseter interface for more information.
 func (s *SymDense) Reset() {
 	// N and Stride must be zeroed in unison.
 	s.mat.N, s.mat.Stride = 0, 0
 	s.mat.Data = s.mat.Data[:0]
-}
-
-// ReuseAsSym changes the receiver if it IsEmpty() to be of size n×n.
-//
-// ReuseAsSym re-uses the backing data slice if it has sufficient capacity,
-// otherwise a new slice is allocated. The backing data is zero on return.
-//
-// ReuseAsSym panics if the receiver is not empty, and panics if
-// the input size is less than one. To empty the receiver for re-use,
-// Reset should be used.
-func (s *SymDense) ReuseAsSym(n int) {
-	if n <= 0 {
-		if n == 0 {
-			panic(ErrZeroLength)
-		}
-		panic(ErrNegativeDimension)
-	}
-	if !s.IsEmpty() {
-		panic(ErrReuseNonEmpty)
-	}
-	s.reuseAsZeroed(n)
 }
 
 // Zero sets all of the matrix elements to zero.
@@ -165,26 +141,24 @@ func (s *SymDense) Zero() {
 	}
 }
 
-// IsEmpty returns whether the receiver is empty. Empty matrices can be the
-// receiver for size-restricted operations. The receiver can be emptied using
-// Reset.
-func (s *SymDense) IsEmpty() bool {
+// IsZero returns whether the receiver is zero-sized. Zero-sized matrices can be the
+// receiver for size-restricted operations. SymDense matrices can be zeroed using Reset.
+func (s *SymDense) IsZero() bool {
 	// It must be the case that m.Dims() returns
 	// zeros in this case. See comment in Reset().
 	return s.mat.N == 0
 }
 
-// reuseAsNonZeroed resizes an empty matrix to a n×n matrix,
+// reuseAs resizes an empty matrix to a n×n matrix,
 // or checks that a non-empty matrix is n×n.
-func (s *SymDense) reuseAsNonZeroed(n int) {
-	// reuseAsNonZeroed must be kept in sync with reuseAsZeroed.
+func (s *SymDense) reuseAs(n int) {
 	if n == 0 {
 		panic(ErrZeroLength)
 	}
 	if s.mat.N > s.cap {
 		panic(badSymCap)
 	}
-	if s.IsEmpty() {
+	if s.IsZero() {
 		s.mat = blas64.Symmetric{
 			N:      n,
 			Stride: n,
@@ -200,36 +174,6 @@ func (s *SymDense) reuseAsNonZeroed(n int) {
 	if s.mat.N != n {
 		panic(ErrShape)
 	}
-}
-
-// reuseAsNonZeroed resizes an empty matrix to a n×n matrix,
-// or checks that a non-empty matrix is n×n. It then zeros the
-// elements of the matrix.
-func (s *SymDense) reuseAsZeroed(n int) {
-	// reuseAsZeroed must be kept in sync with reuseAsNonZeroed.
-	if n == 0 {
-		panic(ErrZeroLength)
-	}
-	if s.mat.N > s.cap {
-		panic(badSymCap)
-	}
-	if s.IsEmpty() {
-		s.mat = blas64.Symmetric{
-			N:      n,
-			Stride: n,
-			Data:   useZeroed(s.mat.Data, n*n),
-			Uplo:   blas.Upper,
-		}
-		s.cap = n
-		return
-	}
-	if s.mat.Uplo != blas.Upper {
-		panic(badSymTriangle)
-	}
-	if s.mat.N != n {
-		panic(ErrShape)
-	}
-	s.Zero()
 }
 
 func (s *SymDense) isolatedWorkspace(a Symmetric) (w *SymDense, restore func()) {
@@ -261,7 +205,7 @@ func (s *SymDense) AddSym(a, b Symmetric) {
 	if n != b.Symmetric() {
 		panic(ErrShape)
 	}
-	s.reuseAsNonZeroed(n)
+	s.reuseAs(n)
 
 	if a, ok := a.(RawSymmetricer); ok {
 		if b, ok := b.(RawSymmetricer); ok {
@@ -321,13 +265,13 @@ func (s *SymDense) CopySym(a Symmetric) int {
 
 // SymRankOne performs a symmetric rank-one update to the matrix a with x,
 // which is treated as a column vector, and stores the result in the receiver
-//  s = a + alpha * x * xᵀ
+//  s = a + alpha * x * x^T
 func (s *SymDense) SymRankOne(a Symmetric, alpha float64, x Vector) {
 	n := x.Len()
 	if a.Symmetric() != n {
 		panic(ErrShape)
 	}
-	s.reuseAsNonZeroed(n)
+	s.reuseAs(n)
 
 	if s != a {
 		if rs, ok := a.(RawSymmetricer); ok {
@@ -336,10 +280,10 @@ func (s *SymDense) SymRankOne(a Symmetric, alpha float64, x Vector) {
 		s.CopySym(a)
 	}
 
-	xU, _ := untransposeExtract(x)
-	if rv, ok := xU.(*VecDense); ok {
+	xU, _ := untranspose(x)
+	if rv, ok := xU.(RawVectorer); ok {
 		r, c := xU.Dims()
-		xmat := rv.mat
+		xmat := rv.RawVector()
 		s.checkOverlap(generalFromVector(xmat, r, c))
 		blas64.Syr(alpha, xmat, s.mat)
 		return
@@ -361,10 +305,10 @@ func (s *SymDense) SymRankK(a Symmetric, alpha float64, x Matrix) {
 	if r != n {
 		panic(ErrShape)
 	}
-	xMat, aTrans := untransposeExtract(x)
+	xMat, aTrans := untranspose(x)
 	var g blas64.General
-	if rm, ok := xMat.(*Dense); ok {
-		g = rm.mat
+	if rm, ok := xMat.(RawMatrixer); ok {
+		g = rm.RawMatrix()
 	} else {
 		g = DenseCopyOf(x).mat
 		aTrans = false
@@ -373,7 +317,7 @@ func (s *SymDense) SymRankK(a Symmetric, alpha float64, x Matrix) {
 		if rs, ok := a.(RawSymmetricer); ok {
 			s.checkOverlap(generalFromSymmetric(rs.RawSymmetric()))
 		}
-		s.reuseAsNonZeroed(n)
+		s.reuseAs(n)
 		s.CopySym(a)
 	}
 	t := blas.NoTrans
@@ -391,7 +335,7 @@ func (s *SymDense) SymRankK(a Symmetric, alpha float64, x Matrix) {
 func (s *SymDense) SymOuterK(alpha float64, x Matrix) {
 	n, _ := x.Dims()
 	switch {
-	case s.IsEmpty():
+	case s.IsZero():
 		s.mat = blas64.Symmetric{
 			N:      n,
 			Stride: n,
@@ -432,7 +376,7 @@ func (s *SymDense) SymOuterK(alpha float64, x Matrix) {
 // RankTwo performs a symmetric rank-two update to the matrix a with the
 // vectors x and y, which are treated as column vectors, and stores the
 // result in the receiver
-//  m = a + alpha * (x * yᵀ + y * xᵀ)
+//  m = a + alpha * (x * y^T + y * x^T)
 func (s *SymDense) RankTwo(a Symmetric, alpha float64, x, y Vector) {
 	n := s.mat.N
 	if x.Len() != n {
@@ -450,18 +394,18 @@ func (s *SymDense) RankTwo(a Symmetric, alpha float64, x, y Vector) {
 
 	var xmat, ymat blas64.Vector
 	fast := true
-	xU, _ := untransposeExtract(x)
-	if rv, ok := xU.(*VecDense); ok {
+	xU, _ := untranspose(x)
+	if rv, ok := xU.(RawVectorer); ok {
 		r, c := xU.Dims()
-		xmat = rv.mat
+		xmat = rv.RawVector()
 		s.checkOverlap(generalFromVector(xmat, r, c))
 	} else {
 		fast = false
 	}
-	yU, _ := untransposeExtract(y)
-	if rv, ok := yU.(*VecDense); ok {
+	yU, _ := untranspose(y)
+	if rv, ok := yU.(RawVectorer); ok {
 		r, c := yU.Dims()
-		ymat = rv.mat
+		ymat = rv.RawVector()
 		s.checkOverlap(generalFromVector(ymat, r, c))
 	} else {
 		fast = false
@@ -471,13 +415,13 @@ func (s *SymDense) RankTwo(a Symmetric, alpha float64, x, y Vector) {
 		if rs, ok := a.(RawSymmetricer); ok {
 			s.checkOverlap(generalFromSymmetric(rs.RawSymmetric()))
 		}
-		s.reuseAsNonZeroed(n)
+		s.reuseAs(n)
 		s.CopySym(a)
 	}
 
 	if fast {
 		if s != a {
-			s.reuseAsNonZeroed(n)
+			s.reuseAs(n)
 			s.CopySym(a)
 		}
 		blas64.Syr2(alpha, xmat, ymat, s.mat)
@@ -485,7 +429,7 @@ func (s *SymDense) RankTwo(a Symmetric, alpha float64, x, y Vector) {
 	}
 
 	for i := 0; i < n; i++ {
-		s.reuseAsNonZeroed(n)
+		s.reuseAs(n)
 		for j := i; j < n; j++ {
 			s.set(i, j, a.At(i, j)+alpha*(x.AtVec(i)*y.AtVec(j)+y.AtVec(i)*x.AtVec(j)))
 		}
@@ -495,7 +439,7 @@ func (s *SymDense) RankTwo(a Symmetric, alpha float64, x, y Vector) {
 // ScaleSym multiplies the elements of a by f, placing the result in the receiver.
 func (s *SymDense) ScaleSym(f float64, a Symmetric) {
 	n := a.Symmetric()
-	s.reuseAsNonZeroed(n)
+	s.reuseAs(n)
 	if a, ok := a.(RawSymmetricer); ok {
 		amat := a.RawSymmetric()
 		if s != a {
@@ -523,7 +467,7 @@ func (s *SymDense) ScaleSym(f float64, a Symmetric) {
 func (s *SymDense) SubsetSym(a Symmetric, set []int) {
 	n := len(set)
 	na := a.Symmetric()
-	s.reuseAsNonZeroed(n)
+	s.reuseAs(n)
 	var restore func()
 	if a == s {
 		s, restore = s.isolatedWorkspace(a)
@@ -563,10 +507,6 @@ func (s *SymDense) SubsetSym(a Symmetric, set []int) {
 // SliceSym panics with ErrIndexOutOfRange if the slice is outside the
 // capacity of the receiver.
 func (s *SymDense) SliceSym(i, k int) Symmetric {
-	return s.sliceSym(i, k)
-}
-
-func (s *SymDense) sliceSym(i, k int) *SymDense {
 	sz := s.cap
 	if i < 0 || sz < i || k < i || sz < k {
 		panic(ErrIndexOutOfRange)
@@ -634,11 +574,11 @@ func (s *SymDense) GrowSym(n int) Symmetric {
 
 // PowPSD computes a^pow where a is a positive symmetric definite matrix.
 //
-// PowPSD returns an error if the matrix is not not positive symmetric definite
-// or the Eigen decomposition is not successful.
+// PowPSD returns an error if the matrix is not  not positive symmetric definite
+// or the Eigendecomposition is not successful.
 func (s *SymDense) PowPSD(a Symmetric, pow float64) error {
 	dim := a.Symmetric()
-	s.reuseAsNonZeroed(dim)
+	s.reuseAs(dim)
 
 	var eigen EigenSym
 	ok := eigen.Factorize(a, true)
@@ -652,14 +592,13 @@ func (s *SymDense) PowPSD(a Symmetric, pow float64) error {
 		}
 		values[i] = math.Pow(v, pow)
 	}
-	var u Dense
-	eigen.VectorsTo(&u)
+	u := eigen.VectorsTo(nil)
 
 	s.SymOuterK(values[0], u.ColView(0))
 
 	var v VecDense
 	for i := 1; i < dim; i++ {
-		v.ColViewOf(&u, i)
+		v.ColViewOf(u, i)
 		s.SymRankOne(s, values[i], &v)
 	}
 	return nil

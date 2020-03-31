@@ -25,8 +25,8 @@ import (
 //  Q = H_0 * H_1 * ... * H_{nb-1}
 //  P = G_0 * G_1 * ... * G_{nb-1}
 // where
-//  H_i = I - tauQ[i] * v_i * v_iᵀ
-//  G_i = I - tauP[i] * u_i * u_iᵀ
+//  H_i = I - tauQ[i] * v_i * v_i^T
+//  G_i = I - tauP[i] * u_i * u_i^T
 //
 // As an example, on exit the entries of A when m = 6, n = 5, and nb = 2
 //  [ 1   1  u1  u1  u1]
@@ -44,7 +44,7 @@ import (
 //
 // Dlabrd also returns the matrices X and Y which are used with U and V to
 // apply the transformation to the unreduced part of the matrix
-//  A := A - V*Yᵀ - X*Uᵀ
+//  A := A - V*Y^T - X*U^T
 // and returns the matrices X and Y which are needed to apply the
 // transformation to the unreduced part of A.
 //

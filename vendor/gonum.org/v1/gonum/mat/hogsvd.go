@@ -33,12 +33,12 @@ func (gsvd *HOGSVD) succFact() bool {
 // of the n input r_i×c column tall matrices in m. HOGSV extends the GSVD case from 2 to n
 // input matrices.
 //
-//  M_0 = U_0 * Σ_0 * Vᵀ
-//  M_1 = U_1 * Σ_1 * Vᵀ
+//  M_0 = U_0 * Σ_0 * V^T
+//  M_1 = U_1 * Σ_1 * V^T
 //  .
 //  .
 //  .
-//  M_{n-1} = U_{n-1} * Σ_{n-1} * Vᵀ
+//  M_{n-1} = U_{n-1} * Σ_{n-1} * V^T
 //
 // where U_i are r_i×c matrices of singular vectors, Σ are c×c matrices singular values, and V
 // is a c×c matrix of singular vectors.
@@ -106,8 +106,7 @@ func (gsvd *HOGSVD) Factorize(m ...Matrix) (ok bool) {
 		gsvd.err = errors.New("hogsvd: eigen decomposition failed")
 		return false
 	}
-	var vc CDense
-	eig.VectorsTo(&vc)
+	vc := eig.VectorsTo(nil)
 	// vc is guaranteed to have real eigenvalues.
 	rc, cc := vc.Dims()
 	v := NewDense(rc, cc, nil)
@@ -129,7 +128,7 @@ func (gsvd *HOGSVD) Factorize(m ...Matrix) (ok bool) {
 	biT := getWorkspace(c, r, false)
 	defer putWorkspace(biT)
 	for i, d := range m {
-		// All calls to reset will leave an emptied
+		// All calls to reset will leave a zeroed
 		// matrix with capacity to store the result
 		// without additional allocation.
 		biT.Reset()
@@ -159,25 +158,22 @@ func (gsvd *HOGSVD) Len() int {
 
 // UTo extracts the matrix U_n from the singular value decomposition, storing
 // the result in-place into dst. U_n is size r×c.
+// If dst is nil, a new matrix is allocated. The resulting U matrix is returned.
 //
-// If dst is empty, UTo will resize dst to be r×c. When dst is
-// non-empty, UTo will panic if dst is not r×c. UTo will also
-// panic if the receiver does not contain a successful factorization.
-func (gsvd *HOGSVD) UTo(dst *Dense, n int) {
+// UTo will panic if the receiver does not contain a successful factorization.
+func (gsvd *HOGSVD) UTo(dst *Dense, n int) *Dense {
 	if !gsvd.succFact() {
 		panic(badFact)
 	}
 	if n < 0 || gsvd.n <= n {
 		panic("hogsvd: invalid index")
 	}
-	r, c := gsvd.b[n].Dims()
-	if dst.IsEmpty() {
-		dst.ReuseAs(r, c)
+
+	if dst == nil {
+		r, c := gsvd.b[n].Dims()
+		dst = NewDense(r, c, nil)
 	} else {
-		r2, c2 := dst.Dims()
-		if r != r2 || c != c2 {
-			panic(ErrShape)
-		}
+		dst.reuseAs(gsvd.b[n].Dims())
 	}
 	dst.Copy(&gsvd.b[n])
 	var v VecDense
@@ -185,6 +181,7 @@ func (gsvd *HOGSVD) UTo(dst *Dense, n int) {
 		v.ColViewOf(dst, j)
 		v.ScaleVec(1/f, &v)
 	}
+	return dst
 }
 
 // Values returns the nth set of singular values of the factorized system.
@@ -218,22 +215,19 @@ func (gsvd *HOGSVD) Values(s []float64, n int) []float64 {
 
 // VTo extracts the matrix V from the singular value decomposition, storing
 // the result in-place into dst. V is size c×c.
+// If dst is nil, a new matrix is allocated. The resulting V matrix is returned.
 //
-// If dst is empty, VTo will resize dst to be c×c. When dst is
-// non-empty, VTo will panic if dst is not c×c. VTo will also
-// panic if the receiver does not contain a successful factorization.
-func (gsvd *HOGSVD) VTo(dst *Dense) {
+// VTo will panic if the receiver does not contain a successful factorization.
+func (gsvd *HOGSVD) VTo(dst *Dense) *Dense {
 	if !gsvd.succFact() {
 		panic(badFact)
 	}
-	r, c := gsvd.v.Dims()
-	if dst.IsEmpty() {
-		dst.ReuseAs(r, c)
+	if dst == nil {
+		r, c := gsvd.v.Dims()
+		dst = NewDense(r, c, nil)
 	} else {
-		r2, c2 := dst.Dims()
-		if r != r2 || c != c2 {
-			panic(ErrShape)
-		}
+		dst.reuseAs(gsvd.v.Dims())
 	}
 	dst.Copy(gsvd.v)
+	return dst
 }

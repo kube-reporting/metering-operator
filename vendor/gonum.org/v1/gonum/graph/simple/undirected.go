@@ -47,6 +47,7 @@ func (g *UndirectedGraph) AddNode(n graph.Node) {
 		panic(fmt.Sprintf("simple: node ID collision: %d", n.ID()))
 	}
 	g.nodes[n.ID()] = n
+	g.edges[n.ID()] = make(map[int64]graph.Edge)
 	g.nodeIDs.Use(n.ID())
 }
 
@@ -119,7 +120,7 @@ func (g *UndirectedGraph) HasEdgeBetween(xid, yid int64) bool {
 
 // NewEdge returns a new Edge from the source to the destination node.
 func (g *UndirectedGraph) NewEdge(from, to graph.Node) graph.Edge {
-	return Edge{F: from, T: to}
+	return &Edge{F: from, T: to}
 }
 
 // NewNode returns a new unique Node to be added to g. The Node's ID does
@@ -210,14 +211,6 @@ func (g *UndirectedGraph) SetEdge(e graph.Edge) {
 		g.nodes[tid] = to
 	}
 
-	if fm, ok := g.edges[fid]; ok {
-		fm[tid] = e
-	} else {
-		g.edges[fid] = map[int64]graph.Edge{tid: e}
-	}
-	if tm, ok := g.edges[tid]; ok {
-		tm[fid] = e
-	} else {
-		g.edges[tid] = map[int64]graph.Edge{fid: e}
-	}
+	g.edges[fid][tid] = e
+	g.edges[tid][fid] = e
 }

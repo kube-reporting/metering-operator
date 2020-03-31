@@ -21,6 +21,7 @@ const maxLen = int64(int(^uint(0) >> 1))
 
 var (
 	headerSize  = binary.Size(storage{})
+	sizeInt64   = binary.Size(int64(0))
 	sizeFloat64 = binary.Size(float64(0))
 
 	errWrongType = errors.New("mat: wrong data type")
@@ -127,7 +128,7 @@ func (m Dense) MarshalBinaryTo(w io.Writer) (int, error) {
 }
 
 // UnmarshalBinary decodes the binary form into the receiver.
-// It panics if the receiver is a non-empty Dense matrix.
+// It panics if the receiver is a non-zero Dense matrix.
 //
 // See MarshalBinary for the on-disk layout.
 //
@@ -139,8 +140,8 @@ func (m Dense) MarshalBinaryTo(w io.Writer) (int, error) {
 // UnmarshalBinary does not limit the size of the unmarshaled matrix, and so
 // it should not be used on untrusted data.
 func (m *Dense) UnmarshalBinary(data []byte) error {
-	if !m.IsEmpty() {
-		panic("mat: unmarshal into non-empty matrix")
+	if !m.IsZero() {
+		panic("mat: unmarshal into non-zero matrix")
 	}
 
 	if len(data) < headerSize {
@@ -175,7 +176,7 @@ func (m *Dense) UnmarshalBinary(data []byte) error {
 	}
 
 	p := headerSize
-	m.reuseAsNonZeroed(int(rows), int(cols))
+	m.reuseAs(int(rows), int(cols))
 	for i := range m.mat.Data {
 		m.mat.Data[i] = math.Float64frombits(binary.LittleEndian.Uint64(data[p : p+sizeFloat64]))
 		p += sizeFloat64
@@ -186,7 +187,7 @@ func (m *Dense) UnmarshalBinary(data []byte) error {
 
 // UnmarshalBinaryFrom decodes the binary form into the receiver and returns
 // the number of bytes read and an error if any.
-// It panics if the receiver is a non-empty Dense matrix.
+// It panics if the receiver is a non-zero Dense matrix.
 //
 // See MarshalBinary for the on-disk layout.
 //
@@ -198,8 +199,8 @@ func (m *Dense) UnmarshalBinary(data []byte) error {
 // UnmarshalBinary does not limit the size of the unmarshaled matrix, and so
 // it should not be used on untrusted data.
 func (m *Dense) UnmarshalBinaryFrom(r io.Reader) (int, error) {
-	if !m.IsEmpty() {
-		panic("mat: unmarshal into non-empty matrix")
+	if !m.IsZero() {
+		panic("mat: unmarshal into non-zero matrix")
 	}
 
 	var header storage
@@ -226,7 +227,7 @@ func (m *Dense) UnmarshalBinaryFrom(r io.Reader) (int, error) {
 		return n, errTooBig
 	}
 
-	m.reuseAsNonZeroed(int(rows), int(cols))
+	m.reuseAs(int(rows), int(cols))
 	var b [8]byte
 	for i := range m.mat.Data {
 		nn, err := readFull(r, b[:])
@@ -313,7 +314,7 @@ func (v VecDense) MarshalBinaryTo(w io.Writer) (int, error) {
 }
 
 // UnmarshalBinary decodes the binary form into the receiver.
-// It panics if the receiver is a non-empty VecDense.
+// It panics if the receiver is a non-zero VecDense.
 //
 // See MarshalBinary for the on-disk layout.
 //
@@ -325,8 +326,8 @@ func (v VecDense) MarshalBinaryTo(w io.Writer) (int, error) {
 // UnmarshalBinary does not limit the size of the unmarshaled vector, and so
 // it should not be used on untrusted data.
 func (v *VecDense) UnmarshalBinary(data []byte) error {
-	if !v.IsEmpty() {
-		panic("mat: unmarshal into non-empty vector")
+	if !v.IsZero() {
+		panic("mat: unmarshal into non-zero vector")
 	}
 
 	if len(data) < headerSize {
@@ -362,7 +363,7 @@ func (v *VecDense) UnmarshalBinary(data []byte) error {
 	}
 
 	p := headerSize
-	v.reuseAsNonZeroed(int(n))
+	v.reuseAs(int(n))
 	for i := range v.mat.Data {
 		v.mat.Data[i] = math.Float64frombits(binary.LittleEndian.Uint64(data[p : p+sizeFloat64]))
 		p += sizeFloat64
@@ -373,13 +374,13 @@ func (v *VecDense) UnmarshalBinary(data []byte) error {
 
 // UnmarshalBinaryFrom decodes the binary form into the receiver, from the
 // io.Reader and returns the number of bytes read and an error if any.
-// It panics if the receiver is a non-empty VecDense.
+// It panics if the receiver is a non-zero VecDense.
 //
 // See MarshalBinary for the on-disk layout.
 // See UnmarshalBinary for the list of sanity checks performed on the input.
 func (v *VecDense) UnmarshalBinaryFrom(r io.Reader) (int, error) {
-	if !v.IsEmpty() {
-		panic("mat: unmarshal into non-empty vector")
+	if !v.IsZero() {
+		panic("mat: unmarshal into non-zero vector")
 	}
 
 	var header storage
@@ -407,7 +408,7 @@ func (v *VecDense) UnmarshalBinaryFrom(r io.Reader) (int, error) {
 		return n, errTooBig
 	}
 
-	v.reuseAsNonZeroed(int(l))
+	v.reuseAs(int(l))
 	var b [8]byte
 	for i := range v.mat.Data {
 		nn, err := readFull(r, b[:])

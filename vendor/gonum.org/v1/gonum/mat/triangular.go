@@ -15,8 +15,6 @@ import (
 var (
 	triDense *TriDense
 	_        Matrix            = triDense
-	_        allMatrix         = triDense
-	_        denseMatrix       = triDense
 	_        Triangular        = triDense
 	_        RawTriangular     = triDense
 	_        MutableTriangular = triDense
@@ -154,7 +152,7 @@ func (t *TriDense) Dims() (r, c int) {
 }
 
 // Triangle returns the dimension of t and its orientation. The returned
-// orientation is only valid when n is not empty.
+// orientation is only valid when n is not zero.
 func (t *TriDense) Triangle() (n int, kind TriKind) {
 	return t.mat.N, t.triKind()
 }
@@ -173,6 +171,17 @@ func isUpperUplo(u blas.Uplo) bool {
 		return true
 	case blas.Lower:
 		return false
+	default:
+		panic(badTriangle)
+	}
+}
+
+func uploToTriKind(u blas.Uplo) TriKind {
+	switch u {
+	case blas.Upper:
+		return Upper
+	case blas.Lower:
+		return Lower
 	default:
 		panic(badTriangle)
 	}
@@ -221,10 +230,9 @@ func (t *TriDense) SetRawTriangular(mat blas64.Triangular) {
 	t.mat = mat
 }
 
-// Reset empties the matrix so that it can be reused as the
+// Reset zeros the dimensions of the matrix so that it can be reused as the
 // receiver of a dimensionally restricted operation.
 //
-// Reset should not be used when the matrix shares backing data.
 // See the Reseter interface for more information.
 func (t *TriDense) Reset() {
 	// N and Stride must be zeroed in unison.
@@ -248,10 +256,9 @@ func (t *TriDense) Zero() {
 	}
 }
 
-// IsEmpty returns whether the receiver is empty. Empty matrices can be the
-// receiver for size-restricted operations. The receiver can be emptied using
-// Reset.
-func (t *TriDense) IsEmpty() bool {
+// IsZero returns whether the receiver is zero-sized. Zero-sized matrices can be the
+// receiver for size-restricted operations. TriDense matrices can be zeroed using Reset.
+func (t *TriDense) IsZero() bool {
 	// It must be the case that t.Dims() returns
 	// zeros in this case. See comment in Reset().
 	return t.mat.Stride == 0
@@ -267,32 +274,10 @@ func untransposeTri(a Triangular) (Triangular, bool) {
 	return a, false
 }
 
-// ReuseAsTri changes the receiver if it IsEmpty() to be of size n×n.
-//
-// ReuseAsTri re-uses the backing data slice if it has sufficient capacity,
-// otherwise a new slice is allocated. The backing data is zero on return.
-//
-// ReuseAsTri panics if the receiver is not empty, and panics if
-// the input size is less than one. To empty the receiver for re-use,
-// Reset should be used.
-func (t *TriDense) ReuseAsTri(n int, kind TriKind) {
-	if n <= 0 {
-		if n == 0 {
-			panic(ErrZeroLength)
-		}
-		panic(ErrNegativeDimension)
-	}
-	if !t.IsEmpty() {
-		panic(ErrReuseNonEmpty)
-	}
-	t.reuseAsZeroed(n, kind)
-}
-
-// reuseAsNonZeroed resizes a zero receiver to an n×n triangular matrix with the given
-// orientation. If the receiver is non-zero, reuseAsNonZeroed checks that the receiver
+// reuseAs resizes a zero receiver to an n×n triangular matrix with the given
+// orientation. If the receiver is non-zero, reuseAs checks that the receiver
 // is the correct size and orientation.
-func (t *TriDense) reuseAsNonZeroed(n int, kind TriKind) {
-	// reuseAsNonZeroed must be kept in sync with reuseAsZeroed.
+func (t *TriDense) reuseAs(n int, kind TriKind) {
 	if n == 0 {
 		panic(ErrZeroLength)
 	}
@@ -303,7 +288,7 @@ func (t *TriDense) reuseAsNonZeroed(n int, kind TriKind) {
 	if t.mat.N > t.cap {
 		panic(badTriCap)
 	}
-	if t.IsEmpty() {
+	if t.IsZero() {
 		t.mat = blas64.Triangular{
 			N:      n,
 			Stride: n,
@@ -320,41 +305,6 @@ func (t *TriDense) reuseAsNonZeroed(n int, kind TriKind) {
 	if t.mat.Uplo != ul {
 		panic(ErrTriangle)
 	}
-}
-
-// reuseAsZeroed resizes a zero receiver to an n×n triangular matrix with the given
-// orientation. If the receiver is non-zero, reuseAsZeroed checks that the receiver
-// is the correct size and orientation. It then zeros out the matrix data.
-func (t *TriDense) reuseAsZeroed(n int, kind TriKind) {
-	// reuseAsZeroed must be kept in sync with reuseAsNonZeroed.
-	if n == 0 {
-		panic(ErrZeroLength)
-	}
-	ul := blas.Lower
-	if kind == Upper {
-		ul = blas.Upper
-	}
-	if t.mat.N > t.cap {
-		panic(badTriCap)
-	}
-	if t.IsEmpty() {
-		t.mat = blas64.Triangular{
-			N:      n,
-			Stride: n,
-			Diag:   blas.NonUnit,
-			Data:   useZeroed(t.mat.Data, n*n),
-			Uplo:   ul,
-		}
-		t.cap = n
-		return
-	}
-	if t.mat.N != n {
-		panic(ErrShape)
-	}
-	if t.mat.Uplo != ul {
-		panic(ErrTriangle)
-	}
-	t.Zero()
 }
 
 // isolatedWorkspace returns a new TriDense matrix w with the size of a and
@@ -456,7 +406,7 @@ func (t *TriDense) Copy(a Matrix) (r, c int) {
 func (t *TriDense) InverseTri(a Triangular) error {
 	t.checkOverlapMatrix(a)
 	n, _ := a.Triangle()
-	t.reuseAsNonZeroed(a.Triangle())
+	t.reuseAs(a.Triangle())
 	t.Copy(a)
 	work := getFloats(3*n, false)
 	iwork := getInts(n, false)
@@ -493,7 +443,7 @@ func (t *TriDense) MulTri(a, b Triangular) {
 	bU, _ := untransposeTri(b)
 	t.checkOverlapMatrix(bU)
 	t.checkOverlapMatrix(aU)
-	t.reuseAsNonZeroed(n, kind)
+	t.reuseAs(n, kind)
 	var restore func()
 	if t == aU {
 		t, restore = t.isolatedWorkspace(aU)
@@ -556,7 +506,7 @@ func (t *TriDense) MulTri(a, b Triangular) {
 // the input, or ScaleTri will panic.
 func (t *TriDense) ScaleTri(f float64, a Triangular) {
 	n, kind := a.Triangle()
-	t.reuseAsNonZeroed(n, kind)
+	t.reuseAs(n, kind)
 
 	// TODO(btracey): Improve the set of fast-paths.
 	switch a := a.(type) {

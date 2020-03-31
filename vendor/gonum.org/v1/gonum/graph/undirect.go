@@ -20,10 +20,7 @@ func (g Undirect) Nodes() Nodes { return g.G.Nodes() }
 
 // From returns all nodes in g that can be reached directly from u.
 func (g Undirect) From(uid int64) Nodes {
-	if g.G.Node(uid) == nil {
-		return Empty
-	}
-	return newNodeIteratorPair(g.G.From(uid), g.G.To(uid))
+	return newNodeFilterIterator(g.G.From(uid), g.G.To(uid))
 }
 
 // HasEdgeBetween returns whether an edge exists between nodes x and y.
@@ -89,10 +86,7 @@ func (g UndirectWeighted) Nodes() Nodes { return g.G.Nodes() }
 
 // From returns all nodes in g that can be reached directly from u.
 func (g UndirectWeighted) From(uid int64) Nodes {
-	if g.G.Node(uid) == nil {
-		return Empty
-	}
-	return newNodeIteratorPair(g.G.From(uid), g.G.To(uid))
+	return newNodeFilterIterator(g.G.From(uid), g.G.To(uid))
 }
 
 // HasEdgeBetween returns whether an edge exists between nodes x and y.
@@ -224,61 +218,53 @@ func (e WeightedEdgePair) ReversedEdge() Edge {
 // Weight returns the merged edge weights of the two edges.
 func (e WeightedEdgePair) Weight() float64 { return e.W }
 
-// nodeIteratorPair combines two Nodes to produce a single stream of
+// nodeFilterIterator combines two Nodes to produce a single stream of
 // unique nodes.
-type nodeIteratorPair struct {
+type nodeFilterIterator struct {
 	a, b Nodes
-
-	curr, cnt int
 
 	// unique indicates the node in b with the key ID is unique.
 	unique map[int64]bool
 }
 
-func newNodeIteratorPair(a, b Nodes) *nodeIteratorPair {
-	n := nodeIteratorPair{a: a, b: b, unique: make(map[int64]bool)}
+func newNodeFilterIterator(a, b Nodes) *nodeFilterIterator {
+	n := nodeFilterIterator{a: a, b: b, unique: make(map[int64]bool)}
 	for n.b.Next() {
 		n.unique[n.b.Node().ID()] = true
-		n.cnt++
 	}
 	n.b.Reset()
 	for n.a.Next() {
-		if _, ok := n.unique[n.a.Node().ID()]; !ok {
-			n.cnt++
-		}
 		n.unique[n.a.Node().ID()] = false
 	}
 	n.a.Reset()
 	return &n
 }
 
-func (n *nodeIteratorPair) Len() int {
-	return n.cnt - n.curr
+func (n *nodeFilterIterator) Len() int {
+	return len(n.unique)
 }
 
-func (n *nodeIteratorPair) Next() bool {
+func (n *nodeFilterIterator) Next() bool {
+	n.Len()
 	if n.a.Next() {
-		n.curr++
 		return true
 	}
 	for n.b.Next() {
 		if n.unique[n.b.Node().ID()] {
-			n.curr++
 			return true
 		}
 	}
 	return false
 }
 
-func (n *nodeIteratorPair) Node() Node {
+func (n *nodeFilterIterator) Node() Node {
 	if n.a.Len() != 0 {
 		return n.a.Node()
 	}
 	return n.b.Node()
 }
 
-func (n *nodeIteratorPair) Reset() {
-	n.curr = 0
+func (n *nodeFilterIterator) Reset() {
 	n.a.Reset()
 	n.b.Reset()
 }
