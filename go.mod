@@ -85,9 +85,6 @@ replace (
 	git.apache.org/thrift.git v0.0.0-20171203172758-327ebb6c2b6d => github.com/apache/thrift v0.0.0-20171203172758-327ebb6c2b6d
 	// Required by Helm
 	github.com/docker/docker => github.com/moby/moby v0.7.3-0.20190826074503-38ab9da00309
-	// indirect of OLM
-	github.com/openshift/api => github.com/openshift/api v0.0.0-20200221181648-8ce0047d664f
-	github.com/openshift/client-go => github.com/openshift/client-go v0.0.0-20190627172412-c44a8b61b9f4
 	github.com/prometheus/client_golang => github.com/prometheus/client_golang v0.9.0-pre1
 	// required by operator-metering
 	github.com/taozle/go-hive-driver => github.com/chancez/go-hive-driver v0.0.0-20190516203049-b3c680b33c4f
