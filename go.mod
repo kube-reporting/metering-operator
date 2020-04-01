@@ -16,9 +16,7 @@ require (
 	github.com/google/gofuzz v1.1.0 // indirect
 	github.com/gophercloud/gophercloud v0.3.0 // indirect
 	github.com/huandu/xstrings v1.3.0 // indirect
-	github.com/openshift/client-go v0.0.0-20190923180330-3b6373338c9b
-	// olm 0.12.0
-	github.com/operator-framework/operator-lifecycle-manager v0.0.0-20191115003340-16619cd27fa5
+	github.com/openshift/client-go v0.0.0-20200116152001-92a2713fa240
 	github.com/prestodb/presto-go-client v0.0.0-20180328163046-568bdb2f6dbc
 	github.com/prometheus/client_golang v1.2.1
 	github.com/prometheus/common v0.7.0
@@ -28,44 +26,30 @@ require (
 	github.com/spf13/pflag v1.0.5
 	github.com/stretchr/testify v1.4.0
 	github.com/taozle/go-hive-driver v0.0.0-20181206100408-79951111cb07
-	golang.org/x/net v0.0.0-20200324143707-d3edc9973b7e
+	golang.org/x/net v0.0.0-20200324143707-d3edc9973b7e // indirect
 	golang.org/x/sync v0.0.0-20190911185100-cd5d95a43a6e
 )
 
 require (
-	bitbucket.org/ww/goautoneg v0.0.0-20120707110453-75cd24fc2f2c // indirect
-	github.com/PuerkitoBio/urlesc v0.0.0-20170810143723-de5bf2ad4578
-	github.com/elazarl/go-bindata-assetfs v1.0.0 // indirect
-	github.com/emicklei/go-restful v2.12.0+incompatible
-	github.com/emicklei/go-restful-swagger12 v0.0.0-20170926063155-7524189396c6 // indirect
+	github.com/emicklei/go-restful v2.12.0+incompatible // indirect
 	github.com/go-openapi/jsonreference v0.19.3 // indirect
-	github.com/go-openapi/spec v0.19.7
+	github.com/go-openapi/spec v0.19.7 // indirect
 	github.com/go-openapi/swag v0.19.8 // indirect
-	github.com/go-stack/stack v1.8.0 // indirect
-	github.com/golang/lint v0.0.0-20180702182130-06c8688daad7 // indirect
-	github.com/gregjones/httpcache v0.0.0-20190203031600-7a902570cb17 // indirect
 	github.com/json-iterator/go v1.1.9 // indirect
 	github.com/mailru/easyjson v0.7.1 // indirect
-	github.com/maxbrunsfeld/counterfeiter v0.0.0-20181017030959-1aadac120687 // indirect
-	github.com/maxbrunsfeld/counterfeiter/v6 v6.2.3 // indirect
-	github.com/operator-framework/go-appr v0.0.0-20180917210448-f2aef88446f2 // indirect
-	github.com/operator-framework/operator-marketplace v0.0.0-20190216021216-57300a3ef3ba // indirect
-	github.com/petar/GoLLRB v0.0.0-20130427215148-53be0d36a84c // indirect
+	github.com/onsi/gomega v1.9.0 // indirect
+	github.com/operator-framework/operator-lifecycle-manager v0.0.0-20191115003340-16619cd27fa5
 	github.com/prometheus/procfs v0.0.0-20190104112138-b1a0a9a36d74 // indirect
-	github.com/stevvooe/resumable v0.0.0-20180830230917-22b14a53ba50 // indirect
-	github.com/ugorji/go v1.1.1 // indirect
-	golang.org/x/text v0.3.2
 	golang.org/x/tools v0.0.0-20200331202046-9d5940d49312 // indirect
 	gonum.org/v1/gonum v0.7.0 // indirect
-	k8s.io/api v0.0.0
+	k8s.io/api v0.18.0
 	k8s.io/apiextensions-apiserver v0.0.0
-	k8s.io/apimachinery v0.0.0
+	k8s.io/apimachinery v0.18.0
 	k8s.io/client-go v8.0.0+incompatible
 	k8s.io/code-generator v0.18.0
-	k8s.io/gengo v0.0.0-20200205140755-e0e292d8aa12
+	k8s.io/gengo v0.0.0-20200205140755-e0e292d8aa12 // indirect
 	k8s.io/klog v1.0.0
-	k8s.io/kube-openapi v0.0.0-20200204173128-addea2498afe
-	sigs.k8s.io/controller-runtime v0.1.10 // indirect
+	k8s.io/kube-openapi v0.0.0-20200204173128-addea2498afe // indirect
 	sigs.k8s.io/yaml v1.2.0 // indirect
 )
 
