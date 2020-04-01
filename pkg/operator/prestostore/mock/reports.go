@@ -35,6 +35,7 @@ func (m *MockReportResultsRepo) EXPECT() *MockReportResultsRepoMockRecorder {
 
 // DeleteReportResults mocks base method
 func (m *MockReportResultsRepo) DeleteReportResults(arg0 string) error {
+	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "DeleteReportResults", arg0)
 	ret0, _ := ret[0].(error)
 	return ret0
@@ -42,11 +43,13 @@ func (m *MockReportResultsRepo) DeleteReportResults(arg0 string) error {
 
 // DeleteReportResults indicates an expected call of DeleteReportResults
 func (mr *MockReportResultsRepoMockRecorder) DeleteReportResults(arg0 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteReportResults", reflect.TypeOf((*MockReportResultsRepo)(nil).DeleteReportResults), arg0)
 }
 
 // GetReportResults mocks base method
 func (m *MockReportResultsRepo) GetReportResults(arg0 string, arg1 []presto.Column) ([]presto.Row, error) {
+	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetReportResults", arg0, arg1)
 	ret0, _ := ret[0].([]presto.Row)
 	ret1, _ := ret[1].(error)
@@ -55,11 +58,13 @@ func (m *MockReportResultsRepo) GetReportResults(arg0 string, arg1 []presto.Colu
 
 // GetReportResults indicates an expected call of GetReportResults
 func (mr *MockReportResultsRepoMockRecorder) GetReportResults(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetReportResults", reflect.TypeOf((*MockReportResultsRepo)(nil).GetReportResults), arg0, arg1)
 }
 
 // StoreReportResults mocks base method
 func (m *MockReportResultsRepo) StoreReportResults(arg0, arg1 string) error {
+	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "StoreReportResults", arg0, arg1)
 	ret0, _ := ret[0].(error)
 	return ret0
@@ -67,5 +72,6 @@ func (m *MockReportResultsRepo) StoreReportResults(arg0, arg1 string) error {
 
 // StoreReportResults indicates an expected call of StoreReportResults
 func (mr *MockReportResultsRepoMockRecorder) StoreReportResults(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "StoreReportResults", reflect.TypeOf((*MockReportResultsRepo)(nil).StoreReportResults), arg0, arg1)
 }
