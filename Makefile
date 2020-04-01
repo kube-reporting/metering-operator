@@ -8,7 +8,7 @@ GO_PKG := github.com/operator-framework/operator-metering
 REPORTING_OPERATOR_PKG := $(GO_PKG)/cmd/reporting-operator
 # these are directories/files which get auto-generated or get reformated by
 # gofmt
-VERIFY_FILE_PATHS := cmd pkg test manifests Gopkg.lock
+VERIFY_FILE_PATHS := cmd pkg test manifests
 
 DOCKER_BUILD_CMD = docker build
 OKD_BUILD = false
@@ -50,7 +50,7 @@ ifeq ($(OCP_BUILD), true)
 	METERING_ANSIBLE_OPERATOR_DOCKERFILE=Dockerfile.metering-ansible-operator.rhel
 endif
 
-GO_BUILD_ARGS := -ldflags '-extldflags "-static"'
+GO_BUILD_ARGS := -mod=vendor -ldflags '-extldflags "-static"'
 GOOS = "linux"
 CGO_ENABLED = 0
 
@@ -92,11 +92,14 @@ metering-ansible-operator-docker-build: $(METERING_ANSIBLE_OPERATOR_DOCKERFILE)
 
 # Runs gofmt on all files in project except vendored source
 fmt:
+	@echo path: $(shell pwd)
 	find . -name '*.go' -not -path "./vendor/*" | xargs gofmt -w
 
 # Update dependencies
-vendor: Gopkg.toml
-	dep ensure -v
+vendor:
+	go mod tidy
+	go mod vendor
+	go mod verify
 
 test: unit
 
@@ -143,10 +146,7 @@ e2e-docker: metering-src-docker-build
 	docker cp metering-e2e-docker:/out bin/e2e-docker-test-output
 	docker rm metering-e2e-docker
 
-vet:
-	go vet $(GO_PKG)/cmd/... $(GO_PKG)/pkg/...
-
-verify: verify-codegen verify-olm-manifests verify-helm-templates fmt vet
+verify: update-codegen verify-olm-manifests verify-helm-templates fmt
 	@echo Checking for unstaged changes
 	# validates no unstaged changes exist in $(VERIFY_FILE_PATHS)
 	git diff --stat HEAD --ignore-submodules --exit-code -- $(VERIFY_FILE_PATHS)
