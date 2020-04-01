@@ -388,7 +388,7 @@ _ocp_enabled_overrides:
     spec:
       config:
         prometheus:
-          url: "https://prometheus-k8s.openshift-monitoring.svc:9091/"
+          url: "https://thanos-querier.openshift-monitoring.svc:9091/"
 
   presto:
     spec:
@@ -397,7 +397,7 @@ _ocp_enabled_overrides:
           prometheus:
             enabled: true
             config:
-              uri: "https://prometheus-k8s.openshift-monitoring.svc:9091/"
+              uri: "https://thanos-querier.openshift-monitoring.svc:9091/"
 
             auth:
               bearerTokenFile: "/var/run/secrets/kubernetes.io/serviceaccount/token"

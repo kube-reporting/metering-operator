@@ -22,7 +22,7 @@ import (
 var (
 	defaultHiveHost      = "hive:10000"
 	defaultPrestoHost    = "presto:8080"
-	defaultPromHost      = "http://prometheus-k8s.monitoring.svc:9090/"
+	defaultPromHost      = "http://thanos-querier-openshift-monitoring.svc:9091/"
 	defaultLeaseDuration = time.Second * 60
 	// cfg is the config for our operator
 	cfg                            operator.Config
