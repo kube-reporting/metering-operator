@@ -1026,7 +1026,7 @@ func (in *HiveTable) DeepCopyObject() runtime.Object {
 func (in *HiveTableList) DeepCopyInto(out *HiveTableList) {
 	*out = *in
 	out.TypeMeta = in.TypeMeta
-	out.ListMeta = in.ListMeta
+	in.ListMeta.DeepCopyInto(&out.ListMeta)
 	if in.Items != nil {
 		in, out := &in.Items, &out.Items
 		*out = make([]*HiveTable, len(*in))
@@ -1266,7 +1266,7 @@ func (in *MeteringConfig) DeepCopyObject() runtime.Object {
 func (in *MeteringConfigList) DeepCopyInto(out *MeteringConfigList) {
 	*out = *in
 	out.TypeMeta = in.TypeMeta
-	out.ListMeta = in.ListMeta
+	in.ListMeta.DeepCopyInto(&out.ListMeta)
 	if in.Items != nil {
 		in, out := &in.Items, &out.Items
 		*out = make([]*MeteringConfig, len(*in))
@@ -2162,7 +2162,7 @@ func (in *PrestoTableDataSource) DeepCopy() *PrestoTableDataSource {
 func (in *PrestoTableList) DeepCopyInto(out *PrestoTableList) {
 	*out = *in
 	out.TypeMeta = in.TypeMeta
-	out.ListMeta = in.ListMeta
+	in.ListMeta.DeepCopyInto(&out.ListMeta)
 	if in.Items != nil {
 		in, out := &in.Items, &out.Items
 		*out = make([]*PrestoTable, len(*in))
@@ -2498,7 +2498,7 @@ func (in *ReportDataSource) DeepCopyObject() runtime.Object {
 func (in *ReportDataSourceList) DeepCopyInto(out *ReportDataSourceList) {
 	*out = *in
 	out.TypeMeta = in.TypeMeta
-	out.ListMeta = in.ListMeta
+	in.ListMeta.DeepCopyInto(&out.ListMeta)
 	if in.Items != nil {
 		in, out := &in.Items, &out.Items
 		*out = make([]*ReportDataSource, len(*in))
@@ -2598,7 +2598,7 @@ func (in *ReportDataSourceStatus) DeepCopy() *ReportDataSourceStatus {
 func (in *ReportList) DeepCopyInto(out *ReportList) {
 	*out = *in
 	out.TypeMeta = in.TypeMeta
-	out.ListMeta = in.ListMeta
+	in.ListMeta.DeepCopyInto(&out.ListMeta)
 	if in.Items != nil {
 		in, out := &in.Items, &out.Items
 		*out = make([]*Report, len(*in))
@@ -2751,7 +2751,7 @@ func (in ReportQueryInputValues) DeepCopy() ReportQueryInputValues {
 func (in *ReportQueryList) DeepCopyInto(out *ReportQueryList) {
 	*out = *in
 	out.TypeMeta = in.TypeMeta
-	out.ListMeta = in.ListMeta
+	in.ListMeta.DeepCopyInto(&out.ListMeta)
 	if in.Items != nil {
 		in, out := &in.Items, &out.Items
 		*out = make([]*ReportQuery, len(*in))
@@ -3954,7 +3954,7 @@ func (in *StorageLocation) DeepCopyObject() runtime.Object {
 func (in *StorageLocationList) DeepCopyInto(out *StorageLocationList) {
 	*out = *in
 	out.TypeMeta = in.TypeMeta
-	out.ListMeta = in.ListMeta
+	in.ListMeta.DeepCopyInto(&out.ListMeta)
 	if in.Items != nil {
 		in, out := &in.Items, &out.Items
 		*out = make([]*StorageLocation, len(*in))

@@ -1,0 +1,6 @@
+git.apache.org/thrift.git v0.0.0-20171203172758-327ebb6c2b6d h1:9AII6fCjHtTcJ8cztvJsQbdmI4Vm1nY+KZNqRyvpILM=
+git.apache.org/thrift.git v0.0.0-20171203172758-327ebb6c2b6d/go.mod h1:fPE2ZNJGynbRyZ4dJvy6G277gSllfV2HJqblrnkyeyg=
+github.com/emersion/go-sasl v0.0.0-20161116183048-7e096a0a6197 h1:rDJPbyliyym8ZL/Wt71kdolp6yaD4fLIQz638E6JEt0=
+github.com/emersion/go-sasl v0.0.0-20161116183048-7e096a0a6197/go.mod h1:G/dpzLu16WtQpBfQ/z3LYiYJn3ZhKSGWn83fyoyQe/k=
+golang.org/x/net v0.0.0-20181129055619-fae4c4e3ad76 h1:xx5MUFyRQRbPk6VjWjIE1epE/K5AoDD8QUN116NCy8k=
+golang.org/x/net v0.0.0-20181129055619-fae4c4e3ad76/go.mod h1:mL1N/T3taQHkDXs73rZJwtUhF3w3ftmwwsq0BUmARs4=
