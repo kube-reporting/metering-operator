@@ -4,7 +4,7 @@ This document describes setting up your environment, as well as installing Meter
 
 ## Development Dependencies
 
-- Go 1.12 or higher
+- Go 1.13 or higher
 - Helm CLI 2.6.2 or higher
 - Make
 - Docker
@@ -115,7 +115,7 @@ To add a new dependency, you can do the following:
 ```bash
 go get <dependency_repo_url>@<version_of_dependency>
 ```
-You can learn more about version specification here [https://blog.golang.org/using-go-modules].
+You can learn more about version specification here: (using-go-modules)[https://blog.golang.org/using-go-modules].
 
 `go get` will modify `go.mod` and `go.sum` for you. 
 
