@@ -29,19 +29,10 @@ $ pip3 install operator-courier
 
 ## Setup
 
-It is important that you clone the project to the right location in your $GOPATH.
-
-The repository path must be located at:
+Clone this repository:
 
 ```
-$GOPATH/src/github.com/operator-framework/operator-metering
-```
-
-When cloning this repository, you can run the following commands to ensure that the project files are stored in the right location:
-
-```
-mkdir -p $GOPATH/src/github.com/operator-framework/
-git clone https://github.com/operator-framework/operator-metering $GOPATH/src/github.com/operator-framework/operator-metering
+git clone https://github.com/operator-framework/operator-metering
 ```
 
 ## Building
@@ -111,30 +102,33 @@ make integration REPORTING_OPERATOR_IMAGE_TAG=pr-1234 METERING_OPERATOR_IMAGE_TA
 
 ## Go Dependencies
 
-We use [dep](https://golang.github.io/dep/docs/introduction.html) for managing
+We use `go mod` for managing
 dependencies.
 
-Dep installs dependencies into the `vendor/` directory at the
+`go mod` installs dependencies into the `vendor/` directory at the
 root of the repository, and to ensure everyone is using the same dependencies,
 and ensure that if dependencies disappear, we commit the contents of `vendor/`
 into git.
 
 ### Adding new dependencies
 
-To add a new dependencies, you can generally follow the dep documentation.
-Start by reading [https://golang.github.io/dep/docs/daily-dep.html](https://golang.github.io/dep/docs/daily-dep.html)
-and you it should cover the most common things you'll be using dep for.
+To add a new dependencies, you can generally do the following:
+```
+go get <dependency_repo_url>@<version_of_dependency>
+```
+You can learn more about version specification here [https://blog.golang.org/using-go-modules].
 
-Otherwise, you should be able to just add a new import, and run `make vendor`
-and the dependency will be installed.
+`go get` will modify `go.mod` and `go.sum` for you. 
+
+Run `make vendor` after adding dependencies with `go get` and before committing.
 
 When committing new dependencies, please use the following guidelines:
 
 - Always commit changes to dependencies separately from other changes.
-- Use one commit for changes to `Gopkg.toml`, and another commit for changes to
-  `Gopkg.lock` and `vendor`.' Commit messages should be in the following forms:
-  - `Gopkg.toml: Add new dependency $your_new_dependency`
-  - `Gopkg.lock,vendor: Add new dependency $your_new_dependency`
+- Use one commit for changes to `go.mod`, and another commit for changes to
+  `go.sum` and `vendor/`.' Commit messages should be in the following forms:
+  - `go.mod: Add new dependency $your_new_dependency`
+  - `go.sum,vendor: Add new dependency $your_new_dependency`
 
 ## Helm templates
 
@@ -147,4 +141,8 @@ helm template CHART_DIR -x PATH_TO_TEMPLATE/file.yaml
 ## Developer install
 
 Developers should generally use the [manual-install guide](../manual-install.md) as it offers the most flexibility when installing.
-If you need a minimal storage configuration with no external dependencies, use the [manifests/metering-config/hdfs-minimal.yaml](../../manifests/metering-config/hdfs-minimal.yaml) example configuration.
+If you need a minimal storage configuration with no external dependencies, use the [manifests/metering-config/hdfs-minimal.yaml](manifests/metering-config/hdfs-minimal.yaml) example configuration.
+
+### Testing OCP images
+
+See [Documentation/dev/testing-ocp-images.md](testing-ocp-images.md) for details on how to do a Metering install using OCP images instead of OKD (origin) images.
