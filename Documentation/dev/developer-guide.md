@@ -4,7 +4,7 @@ This document describes setting up your environment, as well as installing Meter
 
 ## Development Dependencies
 
-- Go 1.12 or higher
+- Go 1.13 or higher
 - Helm CLI 2.6.2 or higher
 - Make
 - Docker
@@ -21,7 +21,7 @@ This document describes setting up your environment, as well as installing Meter
 If you're using MacOS with homebrew you can install all of these using the
 following:
 
-```
+```bash
 $ brew tap jzelinskie/faq
 $ brew install go kubernetes-helm make docker dep coreutils jq faq python@3
 $ pip3 install operator-courier
@@ -29,32 +29,23 @@ $ pip3 install operator-courier
 
 ## Setup
 
-It is important that you clone the project to the right location in your $GOPATH.
+Clone this repository:
 
-The repository path must be located at:
-
-```
-$GOPATH/src/github.com/operator-framework/operator-metering
-```
-
-When cloning this repository, you can run the following commands to ensure that the project files are stored in the right location:
-
-```
-mkdir -p $GOPATH/src/github.com/operator-framework/
-git clone https://github.com/operator-framework/operator-metering $GOPATH/src/github.com/operator-framework/operator-metering
+```bash
+git clone https://github.com/operator-framework/operator-metering
 ```
 
 ## Building
 
 To build the reporting-operator binary using your local Go:
 
-```
+```bash
 make reporting-operator-bin
 ```
 
 If you want to build docker images locally:
 
-```
+```bash
 make docker-build-all
 ```
 
@@ -64,13 +55,13 @@ If you want to build OCP images locally see [the Building OCP images document](o
 
 To run unit tests:
 
-```
+```bash
 make unit
 ```
 
 To run the validation steps CI does:
 
-```
+```bash
 make verify
 ```
 
@@ -91,7 +82,7 @@ The first option can be broken down in a few steps:
 
 You can run one of the following commands to run either e2e or integration tests locally which will do the above steps, testing against a local reporting-operator:
 
-```
+```bash
 make e2e-local TEST_OUTPUT_PATH=/tmp/metering_e2e_output
 make integration-local TEST_OUTPUT_PATH=/tmp/metering_integration_output
 ```
@@ -104,43 +95,45 @@ The steps can be broken down into:
 
 Replace `pr-1234` with your image tag (usually built by CI), and run one of the following commands to run e2e or integration tests locally against fully deployed metering stack:
 
-```
+```bash
 make e2e REPORTING_OPERATOR_IMAGE_TAG=pr-1234 METERING_OPERATOR_IMAGE_TAG=pr-1234 TEST_OUTPUT_PATH=/tmp/metering_e2e_output
 make integration REPORTING_OPERATOR_IMAGE_TAG=pr-1234 METERING_OPERATOR_IMAGE_TAG=pr-1234 TEST_OUTPUT_PATH=/tmp/metering_integration_output
 ```
 
 ## Go Dependencies
 
-We use [dep](https://golang.github.io/dep/docs/introduction.html) for managing
-dependencies.
+We use Go modules for managing dependencies.
 
-Dep installs dependencies into the `vendor/` directory at the
+`go mod` installs dependencies into the `vendor/` directory at the
 root of the repository, and to ensure everyone is using the same dependencies,
 and ensure that if dependencies disappear, we commit the contents of `vendor/`
 into git.
 
 ### Adding new dependencies
 
-To add a new dependencies, you can generally follow the dep documentation.
-Start by reading [https://golang.github.io/dep/docs/daily-dep.html](https://golang.github.io/dep/docs/daily-dep.html)
-and you it should cover the most common things you'll be using dep for.
+To add a new dependency, you can do the following:
+```bash
+go get <dependency_repo_url>@<version_of_dependency>
+```
+You can learn more about version specification here: [using-go-modules](https://blog.golang.org/using-go-modules).
 
-Otherwise, you should be able to just add a new import, and run `make vendor`
-and the dependency will be installed.
+`go get` will modify `go.mod` and `go.sum` for you. 
+
+Run `make vendor` after adding dependencies with `go get` and before committing.
 
 When committing new dependencies, please use the following guidelines:
 
 - Always commit changes to dependencies separately from other changes.
-- Use one commit for changes to `Gopkg.toml`, and another commit for changes to
-  `Gopkg.lock` and `vendor`.' Commit messages should be in the following forms:
-  - `Gopkg.toml: Add new dependency $your_new_dependency`
-  - `Gopkg.lock,vendor: Add new dependency $your_new_dependency`
+- Use one commit for changes to `go.mod`, and another commit for changes to
+  `go.sum` and `vendor/`.' Commit messages should be in the following forms:
+  - `go.mod: Add new dependency $your_new_dependency`
+  - `go.sum,vendor: Add new dependency $your_new_dependency`
 
 ## Helm templates
 
 If you have added a new Helm Chart and would like to render the template to check the values and nesting within the yaml file you can run:
 
-```
+```bash
 helm template CHART_DIR -x PATH_TO_TEMPLATE/file.yaml
 ```
 
@@ -148,3 +141,7 @@ helm template CHART_DIR -x PATH_TO_TEMPLATE/file.yaml
 
 Developers should generally use the [manual-install guide](../manual-install.md) as it offers the most flexibility when installing.
 If you need a minimal storage configuration with no external dependencies, use the [manifests/metering-config/hdfs-minimal.yaml](../../manifests/metering-config/hdfs-minimal.yaml) example configuration.
+
+### Testing OCP images
+
+See [Documentation/dev/testing-ocp-images.md](testing-ocp-images.md) for details on how to do a Metering install using OCP images instead of OKD (origin) images.
