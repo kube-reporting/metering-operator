@@ -150,6 +150,20 @@ e2e-docker: metering-src-docker-build
 	docker cp metering-e2e-docker:/out bin/e2e-docker-test-output
 	docker rm metering-e2e-docker
 
+metering-manifests:
+	export \
+		METERING_OPERATOR_IMAGE_REPO=$(METERING_OPERATOR_IMAGE_REPO) \
+		METERING_OPERATOR_IMAGE_TAG=$(METERING_OPERATOR_IMAGE_TAG); \
+	./hack/generate-metering-manifests.sh
+
+$(CODEGEN_OUTPUT_GO_FILES): $(CODEGEN_SOURCE_GO_FILES)
+
+update-codegen: $(CODEGEN_OUTPUT_GO_FILES)
+	./hack/update-codegen.sh
+
+verify-codegen:
+	SCRIPT_PACKAGE=$(GO_PKG) ./hack/verify-codegen.sh
+
 verify: update-codegen verify-olm-manifests verify-helm-templates fmt
 	@echo Checking for unstaged changes
 	# validates no unstaged changes exist in $(VERIFY_FILE_PATHS)
@@ -201,12 +215,6 @@ build-reporting-operator: $(REPORTING_OPERATOR_BIN_DEPENDENCIES) $(GOFILES)
 	mkdir -p $(dir $(REPORTING_OPERATOR_BIN_OUT))
 	CGO_ENABLED=$(CGO_ENABLED) GOOS=$(GOOS) go build $(GO_BUILD_ARGS) -o $(REPORTING_OPERATOR_BIN_OUT) $(REPORTING_OPERATOR_PKG)
 
-metering-manifests:
-	export \
-		METERING_OPERATOR_IMAGE_REPO=$(METERING_OPERATOR_IMAGE_REPO) \
-		METERING_OPERATOR_IMAGE_TAG=$(METERING_OPERATOR_IMAGE_TAG); \
-	./hack/generate-metering-manifests.sh
-
 $(DEPLOY_METERING_BIN_OUT): $(GOFILES)
 	go build $(GO_BUILD_ARGS) -o $(DEPLOY_METERING_BIN_OUT) $(DEPLOY_METERING_PKG)
 
@@ -217,11 +225,3 @@ $(DEPLOY_METERING_BIN_OUT): $(GOFILES)
 	metering-src-docker-build \
 	build-reporting-operator reporting-operator-bin reporting-operator-local \
 	metering-manifests
-
-update-codegen: $(CODEGEN_OUTPUT_GO_FILES)
-	./hack/update-codegen.sh
-
-$(CODEGEN_OUTPUT_GO_FILES): $(CODEGEN_SOURCE_GO_FILES)
-
-verify-codegen:
-	SCRIPT_PACKAGE=$(GO_PKG) ./hack/verify-codegen.sh
