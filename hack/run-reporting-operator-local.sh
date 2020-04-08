@@ -9,7 +9,7 @@ source "${ROOT_DIR}/hack/common.sh"
 : "${METERING_USE_SERVICE_ACCOUNT_AS_PROM_TOKEN:=true}"
 
 : "${METERING_PROMETHEUS_NAMESPACE:=openshift-monitoring}"
-: "${METERING_PROMETHEUS_SVC:=prometheus-k8s}"
+: "${METERING_PROMETHEUS_SVC:=thanos-querier}"
 : "${METERING_PROMETHEUS_SVC_PORT:=9091}"
 : "${METERING_PROMETHEUS_SCHEME:=https}"
 : "${METERING_PROMETHEUS_PORT_FORWARD:=true}"

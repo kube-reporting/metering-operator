@@ -1,18 +1,20 @@
 # Configuring reporting-operator
 
 The reporting-operator is responsible for collecting data from Prometheus, storing the metrics in Presto, running report queries against Presto, and exposing their results via an HTTP API.
+
 Configuring the operator is primarily done within a `MeteringConfig` Custom Resources's `spec.reporting-operator.spec` section.
 
 ## Prometheus connection
 
-Depending on how you installed Metering, the default Prometheus URL varies.
-If you installed for Openshift then the default assumes Prometheus is available at `https://prometheus-k8s.openshift-monitoring.svc:9091/`.
-Otherwise it assumes that your Prometheus service is available at `http://prometheus-k8s.monitoring.svc:9090`.
-If you're not on Openshift and aren't using [kube-prometheus][kube-prometheus], then you will need to override the `reporting-operator.config.prometheus.url` configuration option.
+When deploying Metering on an Openshift cluster, the reporting-operator defaults to using the Thanos Querier interface in the openshift-monitoring namespace: `https://thanos-querier.openshift-monitoring.svc:9091/`.
+
+In the case where you aren't deploying Metering on an Openshift cluster, then you need to specify the Prometheus connection URL yourself in the `MeteringConfig` custom resource.
+
+If you don't have a dedicated Prometheus instance available, we recommend following the instructions listed in the [kube-prometheus][kube-prometheus] project.
 
 Below is an example of configuring Metering to use the service `prometheus` on port 9090 in the `cluster-monitoring` namespace:
 
-```
+```yaml
 spec:
   reporting-operator:
     spec:
@@ -23,7 +25,7 @@ spec:
 
 To secure the connection to Prometheus, the default Metering installation uses the Openshift certificate authority. If your Prometheus instance uses a different CA, the CA can be injected through a ConfigMap:
 
-```
+```yaml
 spec:
   reporting-operator:
     spec:
@@ -46,7 +48,7 @@ Alternatively, to use the system certificate authorities for publicly valid cert
 
 Reporting-operator can also be configured to use a specified bearer token to auth with Prometheus:
 
-```
+```yaml
 spec:
   reporting-operator:
     spec:
@@ -90,7 +92,7 @@ If your NodePorts and/or LoadBalancers are not accessible to others, then you ca
 
 Exposing the reporting API is as simple as changing the type of `Service` used for the reporting-operator:
 
-```
+```yaml
 apiVersion: metering.openshift.io/v1
 kind: MeteringConfig
 metadata:
@@ -108,7 +110,7 @@ spec:
 
 Accessing it is dependent on what kind of service you created, but information on the LoadBalancer or NodePort can be found using kubectl:
 
-```
+```yaml
 kubectl -n $METERING_NAMESPACE get service reporting-operator -o wide
 NAME                 TYPE           CLUSTER-IP      EXTERNAL-IP     PORT(S)          AGE   SELECTOR
 reporting-operator   LoadBalancer   172.30.21.195   35.227.172.86   8080:32313/TCP   55m   app=reporting-operator
@@ -116,7 +118,7 @@ reporting-operator   LoadBalancer   172.30.21.195   35.227.172.86   8080:32313/T
 
 In this example the externalIP of the LoadBalancer is `35.227.172.86` and the port is 8080:
 
-```
+```bash
 curl "http://35.227.172.86:8080/api/v1/reports/get?name=cluster-memory-capacity-hourly&namespace=openshift-metering&format=tab"
 ```
 
@@ -128,7 +130,7 @@ If you want to manually configure authentication in Openshift, disable it entire
 
 In order to access the reporting API, the metering operator exposes a route. Once that route has been installed, you can run the command below to get the route's hostname.
 
-```
+```bash
 METERING_ROUTE_HOSTNAME=$(oc -n $METERING_NAMESPACE get routes metering -o json | jq -r '.status.ingress[].host')
 ```
 
@@ -141,7 +143,7 @@ See the [token authentication](#token-authentication) section for more informati
 
 With this method, we use the token in the reporting operator's service account, and pass that bearer token to the Authorization header in the following command:
 
-```
+```bash
 TOKEN=$(oc -n $METERING_NAMESPACE serviceaccounts get-token reporting-operator)
 curl -H "Authorization: Bearer $TOKEN" -k "https://$METERING_ROUTE_HOSTNAME/api/v1/reports/get?name=[Report Name]&namespace=$METERING_NAMESPACE&format=[Format]"
 ```
@@ -152,7 +154,8 @@ Be sure to replace the `name=[Report Name]` and `format=[Format]` parameters in 
 We are able to do basic authentication using a username and password combination, which is specified in the contents of a htpasswd file. We, by default, create a secret containing an empty htpasswd data. You can, however, configure the `reporting-operator.spec.authProxy.htpasswd.data` and `reporting-operator.spec.authProxy.htpasswd.createSecret` keys to use this method. See the [basic authentication](#basic-authentication-usernamepassword) section for more information.
 
 Once you have specified the above in your `MeteringConfig` CR, you can run the following command:
-```
+
+```bash
 curl -u testuser:password123 -k "https://$METERING_ROUTE_HOSTNAME/api/v1/reports/get?name=[Report Name]&namespace=$METERING_NAMESPACE&format=[Format]"
 ```
 
