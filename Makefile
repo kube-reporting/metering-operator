@@ -6,6 +6,7 @@ include build/check_defined.mk
 # Package
 GO_PKG := github.com/operator-framework/operator-metering
 REPORTING_OPERATOR_PKG := $(GO_PKG)/cmd/reporting-operator
+DEPLOY_METERING_PKG := $(GO_PKG)/cmd/deploy-metering
 # these are directories/files which get auto-generated or get reformated by
 # gofmt
 VERIFY_FILE_PATHS := cmd pkg test manifests
@@ -204,7 +205,7 @@ metering-manifests:
 	./hack/generate-metering-manifests.sh
 
 $(DEPLOY_METERING_BIN_OUT): $(GOFILES)
-	go build -o $(DEPLOY_METERING_BIN_OUT) $(GO_PKG)/cmd/deploy-metering
+	go build $(GO_BUILD_ARGS) -o $(DEPLOY_METERING_BIN_OUT) $(DEPLOY_METERING_PKG)
 
 .PHONY: \
 	test vendor fmt verify \
