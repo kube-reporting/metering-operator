@@ -461,7 +461,7 @@ func testManualMeteringInstall(
 
 	deployerCtx.Logger.Infof("DeployerCtx: %+v", deployerCtx)
 
-	rf, err := deployerCtx.Setup(expectInstallErr)
+	rf, err := deployerCtx.Setup(deployerCtx.Deployer.Install, expectInstallErr)
 	if expectInstallErr {
 		testhelpers.AssertErrorContainsErrorMsgs(t, err, expectInstallErrMsg)
 	} else {
@@ -481,6 +481,6 @@ func testManualMeteringInstall(
 		}
 	}
 
-	err = deployerCtx.Teardown()
+	err = deployerCtx.Teardown(deployerCtx.Deployer.Uninstall)
 	assert.NoError(t, err, "capturing logs and uninstalling metering should produce no error")
 }

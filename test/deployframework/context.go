@@ -147,7 +147,7 @@ func (ctx *DeployerCtx) NewLocalCtx() *LocalCtx {
 // Setup handles the process of deploying metering, and waiting for all the necessary
 // resources to become ready in order to proceeed with running the reporting tests.
 // This returns an initialized reportingframework object, or an error if there is any.
-func (ctx *DeployerCtx) Setup(expectInstallErr bool) (*reportingframework.ReportingFramework, error) {
+func (ctx *DeployerCtx) Setup(installFunc func() error, expectInstallErr bool) (*reportingframework.ReportingFramework, error) {
 	var (
 		installErrMsg    string
 		routeBearerToken string
@@ -156,10 +156,11 @@ func (ctx *DeployerCtx) Setup(expectInstallErr bool) (*reportingframework.Report
 
 	// If we expect an install error, and there was an install error, then delay returning
 	// that error message until after the reportingframework has been constructed.
-	err := ctx.Deployer.Install()
+	err := installFunc()
 	if err != nil {
 		installErr = true
 		installErrMsg = fmt.Sprintf("failed to install metering: %v", err)
+		ctx.Logger.Infof(installErrMsg)
 
 		if !expectInstallErr {
 			return nil, fmt.Errorf(installErrMsg)
@@ -267,13 +268,13 @@ func (ctx *DeployerCtx) Setup(expectInstallErr bool) (*reportingframework.Report
 // cleanup bash script, while streaming the script output
 // to stdout. Once the cleanup script has finished execution, we can
 // uninstall the metering stack and return an error if there is any.
-func (ctx *DeployerCtx) Teardown() error {
-	var errArr []string
-
-	logger := ctx.Logger.WithFields(logrus.Fields{"component": "cleanup"})
-
+func (ctx *DeployerCtx) Teardown(uninstallFunc func() error) error {
+	var (
+		errArr []string
+		err    error
+	)
 	if ctx.RunTestLocal && ctx.LocalCtx != nil {
-		err := ctx.LocalCtx.CleanupLocal()
+		err = ctx.LocalCtx.CleanupLocal()
 		if err != nil {
 			errArr = append(errArr, fmt.Sprintf("failed to successfully cleanup local resources: %v", err))
 		}
@@ -299,7 +300,7 @@ func (ctx *DeployerCtx) Teardown() error {
 			errArr = append(errArr, fmt.Sprintf("failed to successfully run the cleanup script: %v", err))
 		}
 
-		err = ctx.Deployer.Uninstall()
+		err = uninstallFunc()
 		if err != nil {
 			errArr = append(errArr, fmt.Sprintf("failed to uninstall metering: %v", err))
 		}
