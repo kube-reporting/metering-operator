@@ -98,7 +98,6 @@ func (df *DeployFramework) NewDeployerCtx(
 	}
 
 	targetPodCount := defaultTargetPods
-
 	if df.RunLocal {
 		var replicas int32
 
@@ -109,7 +108,6 @@ func (df *DeployFramework) NewDeployerCtx(
 	}
 
 	df.Logger.Debugf("Deployer config: %+v", cfg)
-
 	deployer, err := deploy.NewDeployer(*cfg, df.Logger, df.Client, df.APIExtClient, df.MeteringClient, df.OLMV1Client, df.OLMV1Alpha1Client)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create a new deployer instance: %v", err)
@@ -178,7 +176,6 @@ func (ctx *DeployerCtx) Setup(installFunc func() error, expectInstallErr bool) (
 	if !installErr {
 		if ctx.RunTestLocal {
 			ctx.LocalCtx = ctx.NewLocalCtx()
-
 			err = ctx.LocalCtx.RunMeteringOperatorLocal()
 			if err != nil {
 				return nil, fmt.Errorf("failed to run the metering-operator docker container: %v", err)
@@ -187,9 +184,7 @@ func (ctx *DeployerCtx) Setup(installFunc func() error, expectInstallErr bool) (
 
 		ctx.Logger.Infof("Waiting for the metering pods to be ready")
 		start := time.Now()
-
 		initialDelay := 10 * time.Second
-
 		if ctx.RunDevSetup {
 			initialDelay = 1 * time.Second
 		}
@@ -206,7 +201,6 @@ func (ctx *DeployerCtx) Setup(installFunc func() error, expectInstallErr bool) (
 		}
 
 		ctx.Logger.Infof("Installing metering took %v", time.Since(start))
-
 		ctx.Logger.Infof("Getting the service account %s", reportingOperatorServiceAccountName)
 
 		routeBearerToken, err = GetServiceAccountToken(
@@ -230,9 +224,7 @@ func (ctx *DeployerCtx) Setup(installFunc func() error, expectInstallErr bool) (
 			if err != nil {
 				return nil, fmt.Errorf("failed to run the reporting-operator locally: %v", err)
 			}
-
 			reportingAPIHealthCheckURL := fmt.Sprintf("%s/%s", reportingAPIURL, healthCheckEndpoint)
-
 			err := waitForURLToReportStatusOK(ctx.Logger, reportingAPIHealthCheckURL, healthCheckTimeoutPeriod)
 			if err != nil {
 				return nil, fmt.Errorf("failed to wait for the reporting-operator to become healthy: %v", err)
@@ -245,7 +237,6 @@ func (ctx *DeployerCtx) Setup(installFunc func() error, expectInstallErr bool) (
 	if err != nil {
 		return nil, fmt.Errorf("failed to create the report results directory %s: %v", reportResultsPath, err)
 	}
-
 	ctx.Logger.Infof("Report results directory: %s", reportResultsPath)
 
 	rf, err := reportingframework.New(
@@ -266,6 +257,121 @@ func (ctx *DeployerCtx) Setup(installFunc func() error, expectInstallErr bool) (
 
 	if installErrMsg != "" {
 		return rf, fmt.Errorf(installErrMsg)
+	}
+
+	return rf, nil
+}
+
+// Upgrade is a method that is responsible for creating the necessary
+// resources to upgrade an existing Metering OLM install to use the most
+// up-to-date manifest files (CRDs, CSV, package.yaml). We store these
+// manifest files in a ConfigMap, which in turn a CatalogSource can
+// reference. Once those resources are created, and we have verified
+// their state, we can update the existing metering Subscription to
+// reference this new CatalogSource which holds the newest payload.
+// Once the Subscription has been updated, we need to verify that the
+// metering-operator and it's operands (namely the reporting-operator)
+// have reported a "Ready" status that we define, before we start
+// constructing and returning a reportingframework object.
+func (ctx *DeployerCtx) Upgrade(packageName, repoVersion string, purgeReports, purgeReportDataSources bool) (*reportingframework.ReportingFramework, error) {
+	var err error
+	if purgeReports {
+		err = DeleteAllTestReports(ctx.Logger, ctx.MeteringClient, ctx.Namespace)
+		if err != nil {
+			return nil, fmt.Errorf("failed to delete all of the Reports in the %s namespace: %v", ctx.Namespace, err)
+		}
+	}
+	if purgeReportDataSources {
+		err = DeleteAllReportDataSources(ctx.Logger, ctx.MeteringClient, ctx.Namespace)
+		if err != nil {
+			return nil, fmt.Errorf("failed to delete all of the Reports in the %s namespace: %v", ctx.Namespace, err)
+		}
+	}
+
+	err = CreateUpgradeConfigMap(ctx.Logger, packageName, ctx.Namespace, ctx.HackScriptPath)
+	if err != nil {
+		return nil, fmt.Errorf("failed to create the %s ConfigMap: %v", packageName, err)
+	}
+
+	err = VerifyConfigMap(ctx.Logger, ctx.Client, packageName, ctx.Namespace)
+	if err != nil {
+		return nil, fmt.Errorf("failed to verify the %s ConfigMap was successfully created: %v", packageName, err)
+	}
+
+	err = CreateCatalogSource(ctx.Logger, packageName, ctx.Namespace, packageName, ctx.OLMV1Alpha1Client)
+	if err != nil {
+		return nil, fmt.Errorf("failed to create the %s CatalogSource: %v", packageName, err)
+	}
+
+	err = VerifyCatalogSourcePod(ctx.Logger, ctx.Client, packageName, ctx.Namespace)
+	if err != nil {
+		return nil, fmt.Errorf("failed to verify the %s CatalogSource was successfully created: %v", packageName, err)
+	}
+
+	start := time.Now()
+	err = UpdateExistingSubscription(ctx.Logger, ctx.OLMV1Alpha1Client, packageName, repoVersion, ctx.Namespace)
+	if err != nil {
+		return nil, fmt.Errorf("failed to upgrade the existing %s Subscription: %v", packageName, err)
+	}
+
+	err = WaitForMeteringOperatorDeployment(ctx.Logger, ctx.Client, meteringOperatorDeploymentName, ctx.Namespace)
+	if err != nil {
+		return nil, fmt.Errorf("failed to wait for the %s deployment to report a successful upgrade: %v", meteringOperatorDeploymentName, err)
+	}
+
+	err = WaitForReportingOperatorDeployment(ctx.Logger, ctx.Client, reportingOperatorDeploymentName, ctx.Namespace)
+	if err != nil {
+		return nil, fmt.Errorf("failed to wait for the %s deployment to report a successful upgrade: %v", reportingOperatorDeploymentName, err)
+	}
+
+	if purgeReportDataSources {
+		// in the case where we deleted the ReportDataSources in the ctx.Namespace,
+		// we need to verify that the metering-operator has progressed to reconciling
+		// these resources before running any of the reporting tests
+		err = WaitForReportDataSources(ctx.Logger, ctx.MeteringClient, ctx.Namespace)
+		if err != nil {
+			return nil, fmt.Errorf("failed to wait for the ReportDataSources to exist")
+		}
+	}
+
+	initialDelay := 10 * time.Second
+	if ctx.RunDevSetup {
+		initialDelay = 1 * time.Second
+	}
+	ctx.Logger.Infof("Upgrading metering took %v", time.Since(start))
+
+	routeBearerToken, err := GetServiceAccountToken(
+		ctx.Client,
+		initialDelay,
+		waitingForServiceAccountTimePeriod,
+		ctx.Namespace,
+		reportingOperatorServiceAccountName,
+	)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get the route bearer token: %v", err)
+	}
+
+	reportResultsPath := filepath.Join(ctx.TestCaseOutputPath, reportResultsDir)
+	err = os.Mkdir(reportResultsPath, 0777)
+	if err != nil {
+		return nil, fmt.Errorf("failed to create the report results directory %s: %v", reportResultsPath, err)
+	}
+	ctx.Logger.Infof("Report results directory: %s", reportResultsPath)
+
+	rf, err := reportingframework.New(
+		useHTTPSAPI,
+		useKubeProxyForReportingAPI,
+		useRouteForReportingAPI,
+		ctx.Namespace,
+		routeBearerToken,
+		reportingAPIURL,
+		reportResultsPath,
+		ctx.Config,
+		ctx.Client,
+		ctx.MeteringClient,
+	)
+	if err != nil {
+		return nil, fmt.Errorf("failed to construct a reportingframework: %v", err)
 	}
 
 	return rf, nil

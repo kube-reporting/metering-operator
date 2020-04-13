@@ -39,9 +39,14 @@ var (
 	namespacePrefix            string
 	testOutputPath             string
 	repoPath                   string
+	repoVersion                string
 
-	kubeNamespaceCharLimit   = 63
-	namespacePrefixCharLimit = 10
+	kubeNamespaceCharLimit    = 63
+	namespacePrefixCharLimit  = 10
+	packageName               = "metering-ocp"
+	preUpgradeTestDirName     = "pre-upgrade"
+	postUpgradeTestDirName    = "post-upgrade"
+	gatherTestArtifactsScript = "gather-test-install-artifacts.sh"
 )
 
 func init() {
@@ -67,6 +72,7 @@ func TestMain(m *testing.M) {
 
 	flag.StringVar(&namespacePrefix, "namespace-prefix", "", "The namespace prefix to install the metering resources.")
 	flag.StringVar(&repoPath, "repo-path", "../../", "The absolute path to the operator-metering directory.")
+	flag.StringVar(&repoVersion, "repo-version", "", "The current version of the repository, e.g. 4.4, 4.5, etc.")
 	flag.StringVar(&testOutputPath, "test-output-path", "", "The absolute/relative path that you want to store test logs within.")
 	flag.Parse()
 
@@ -77,7 +83,7 @@ func TestMain(m *testing.M) {
 	}
 
 	var err error
-	if df, err = deployframework.New(logger, runTestsLocal, runDevSetup, namespacePrefix, repoPath, kubeConfig); err != nil {
+	if df, err = deployframework.New(logger, runTestsLocal, runDevSetup, namespacePrefix, repoPath, repoVersion, kubeConfig); err != nil {
 		logger.Fatalf("Failed to create a new deploy framework: %v", err)
 	}
 
@@ -88,6 +94,206 @@ type InstallTestCase struct {
 	Name         string
 	ExtraEnvVars []string
 	TestFunc     func(t *testing.T, testReportingFramework *reportingframework.ReportingFramework)
+}
+
+func TestMeteringUpgrades(t *testing.T) {
+	tt := []struct {
+		Name                      string
+		MeteringOperatorImageRepo string
+		MeteringOperatorImageTag  string
+		Skip                      bool
+		PurgeReports              bool
+		PurgeReportDataSources    bool
+		ExpectInstallErr          bool
+		ExpectInstallErrMsg       []string
+		InstallSubTest            InstallTestCase
+		MeteringConfigSpec        metering.MeteringConfigSpec
+	}{
+		{
+			Name:                      "HDFS-OLM-Upgrade",
+			MeteringOperatorImageRepo: meteringOperatorImageRepo,
+			MeteringOperatorImageTag:  meteringOperatorImageTag,
+			PurgeReports:              true,
+			PurgeReportDataSources:    true,
+			ExpectInstallErrMsg:       []string{},
+			InstallSubTest: InstallTestCase{
+				Name:     "testReportingProducesData",
+				TestFunc: testReportingProducesData,
+				ExtraEnvVars: []string{
+					"REPORTING_OPERATOR_PROMETHEUS_DATASOURCE_MAX_IMPORT_BACKFILL_DURATION=15m",
+					"REPORTING_OPERATOR_PROMETHEUS_METRICS_IMPORTER_INTERVAL=30s",
+					"REPORTING_OPERATOR_PROMETHEUS_METRICS_IMPORTER_CHUNK_SIZE=5m",
+					"REPORTING_OPERATOR_PROMETHEUS_METRICS_IMPORTER_INTERVAL=5m",
+					"REPORTING_OPERATOR_PROMETHEUS_METRICS_IMPORTER_STEP_SIZE=60s",
+				},
+			},
+			MeteringConfigSpec: metering.MeteringConfigSpec{
+				LogHelmTemplate: testhelpers.PtrToBool(true),
+				UnsupportedFeatures: &metering.UnsupportedFeaturesConfig{
+					EnableHDFS: testhelpers.PtrToBool(true),
+				},
+				Storage: &metering.StorageConfig{
+					Type: "hive",
+					Hive: &metering.HiveStorageConfig{
+						Type: "hdfs",
+						Hdfs: &metering.HiveHDFSConfig{
+							Namenode: "hdfs-namenode-0.hdfs-namenode:9820",
+						},
+					},
+				},
+				ReportingOperator: &metering.ReportingOperator{
+					Spec: &metering.ReportingOperatorSpec{
+						Resources: &v1.ResourceRequirements{
+							Requests: v1.ResourceList{
+								v1.ResourceCPU:    resource.MustParse("1"),
+								v1.ResourceMemory: resource.MustParse("250Mi"),
+							},
+						},
+						Image: &metering.ImageConfig{},
+						Config: &metering.ReportingOperatorConfig{
+							LogLevel: "debug",
+							Prometheus: &metering.ReportingOperatorPrometheusConfig{
+								MetricsImporter: &metering.ReportingOperatorPrometheusMetricsImporterConfig{
+									Config: &metering.ReportingOperatorPrometheusMetricsImporterConfigSpec{
+										ChunkSize:                 &meta.Duration{Duration: 5 * time.Minute},
+										PollInterval:              &meta.Duration{Duration: 30 * time.Second},
+										StepSize:                  &meta.Duration{Duration: 1 * time.Minute},
+										MaxImportBackfillDuration: &meta.Duration{Duration: 15 * time.Minute},
+										MaxQueryRangeDuration:     &meta.Duration{Duration: 5 * time.Minute},
+									},
+								},
+							},
+						},
+					},
+				},
+				Presto: &metering.Presto{
+					Spec: &metering.PrestoSpec{
+						Coordinator: &metering.PrestoCoordinatorSpec{
+							Resources: &v1.ResourceRequirements{
+								Requests: v1.ResourceList{
+									v1.ResourceCPU:    resource.MustParse("1"),
+									v1.ResourceMemory: resource.MustParse("1Gi"),
+								},
+							},
+						},
+					},
+				},
+			},
+		},
+	}
+
+	for _, testCase := range tt {
+		t := t
+		testCase := testCase
+
+		if testCase.Skip {
+			continue
+		}
+
+		t.Run(testCase.Name, func(t *testing.T) {
+			testManualOLMUpgradeInstall(
+				t,
+				testCase.Name,
+				namespacePrefix,
+				testCase.MeteringOperatorImageRepo,
+				testCase.MeteringOperatorImageTag,
+				testOutputPath,
+				testCase.ExpectInstallErrMsg,
+				testCase.ExpectInstallErr,
+				testCase.PurgeReports,
+				testCase.PurgeReportDataSources,
+				testCase.InstallSubTest,
+				testCase.MeteringConfigSpec,
+			)
+		})
+	}
+}
+
+func testManualOLMUpgradeInstall(
+	t *testing.T,
+	testCaseName,
+	namespacePrefix,
+	meteringOperatorImageRepo,
+	meteringOperatorImageTag,
+	testOutputPath string,
+	expectInstallErrMsg []string,
+	expectInstallErr,
+	purgeReports,
+	purgeReportDataSources bool,
+	testInstallFunction InstallTestCase,
+	testMeteringConfigSpec metering.MeteringConfigSpec,
+) {
+	// create a directory used to store the @testCaseName container and resource logs
+	testCaseOutputBaseDir := filepath.Join(testOutputPath, testCaseName)
+	err := os.Mkdir(testCaseOutputBaseDir, 0777)
+	require.NoError(t, err, "creating the test case output directory should produce no error")
+
+	// create a pre-upgrade test case directory
+	preUpgradeTestOutputDir := filepath.Join(testCaseOutputBaseDir, preUpgradeTestDirName)
+	err = os.Mkdir(preUpgradeTestOutputDir, 0777)
+	require.NoError(t, err, "creating the test case output directory should produce no error")
+
+	testFuncNamespace := fmt.Sprintf("%s-%s", namespacePrefix, strings.ToLower(testCaseName))
+	if len(testFuncNamespace) > kubeNamespaceCharLimit {
+		require.Fail(t, "The length of the test function namespace exceeded the kube namespace limit of %d characters", kubeNamespaceCharLimit)
+	}
+
+	deployerCtx, err := df.NewDeployerCtx(
+		testFuncNamespace,
+		meteringOperatorImageRepo,
+		meteringOperatorImageTag,
+		reportingOperatorImageRepo,
+		reportingOperatorImageTag,
+		preUpgradeTestOutputDir,
+		expectInstallErrMsg,
+		testMeteringConfigSpec,
+	)
+	require.NoError(t, err, "creating a new deployer context should produce no error")
+	deployerCtx.Logger.Infof("DeployerCtx: %+v", deployerCtx)
+
+	var (
+		canSafelyRunTest bool
+		rf               *reportingframework.ReportingFramework
+	)
+	rf, err = deployerCtx.Setup(deployerCtx.Deployer.InstallOLM, expectInstallErr)
+	if canSafelyRunTest = testhelpers.AssertCanSafelyRunReportingTests(t, err, expectInstallErr, expectInstallErrMsg); !canSafelyRunTest {
+		// if we encounter an unexpected Setup error, fail this test case
+		// early and gather the metering and OLM resource logs we care about.
+		err = deployerCtx.MustGatherMeteringResources(gatherTestArtifactsScript)
+		assert.NoError(t, err, "gathering metering resources should produce no error")
+		t.Fatal("Exiting test case early as the pre-upgrade tests failed")
+	}
+
+	preUpgradeTestName := fmt.Sprintf("pre-upgrade-%s", testInstallFunction.Name)
+	t.Run(preUpgradeTestName, func(t *testing.T) {
+		testInstallFunction.TestFunc(t, rf)
+	})
+
+	err = deployerCtx.MustGatherMeteringResources(gatherTestArtifactsScript)
+	assert.NoError(t, err, "gathering metering resources should produce no error")
+
+	// create a post-upgrade test case directory
+	postUpgradeTestOutputDir := filepath.Join(testCaseOutputBaseDir, postUpgradeTestDirName)
+	err = os.Mkdir(postUpgradeTestOutputDir, 0777)
+	assert.NoError(t, err, "creating the test case output directory should produce no error")
+
+	deployerCtx.TestCaseOutputPath = postUpgradeTestOutputDir
+	rf, err = deployerCtx.Upgrade(packageName, df.RepoVersion, purgeReports, purgeReportDataSources)
+	if canSafelyRunTest = testhelpers.AssertCanSafelyRunReportingTests(t, err, expectInstallErr, expectInstallErrMsg); !canSafelyRunTest {
+		err = deployerCtx.MustGatherMeteringResources(gatherTestArtifactsScript)
+		assert.NoError(t, err, "gathering metering resources should produce no error")
+	}
+
+	if canSafelyRunTest {
+		// run tests against the upgraded installation
+		postUpgradeTestName := fmt.Sprintf("post-upgrade-%s", testInstallFunction.Name)
+		t.Run(postUpgradeTestName, func(t *testing.T) {
+			testInstallFunction.TestFunc(t, rf)
+		})
+	}
+
+	err = deployerCtx.Teardown(deployerCtx.Deployer.UninstallOLM)
+	require.NoError(t, err, "capturing logs and uninstalling metering should produce no error")
 }
 
 func TestManualMeteringInstall(t *testing.T) {

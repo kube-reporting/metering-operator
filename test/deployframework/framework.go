@@ -33,14 +33,16 @@ const (
 	testNamespaceLabel                  = "metering-testing-ns"
 	meteringconfigMetadataName          = "operator-metering"
 	reportingOperatorServiceAccountName = "reporting-operator"
-	defaultPlatform                     = "openshift"
-	defaultDeleteNamespace              = true
+
+	defaultTargetPods       = 7
+	defaultPlatform         = "openshift"
+	defaultDeleteNamespace  = true
+	defaultSubscriptionName = "metering-ocp"
+	// TODO: support having this as a configurable option (test table flag, or framework flag)
+	defaultSubscriptionChannel = "4.3"
 
 	manifestsDeployDir = "manifests/deploy"
 	hackScriptDirName  = "hack"
-
-	defaultTargetPods             = 7
-	meteringOperatorContainerName = "metering-operator-e2e"
 )
 
 // DeployFramework contains all the information necessary to deploy
@@ -50,6 +52,7 @@ type DeployFramework struct {
 	RunDevSetup       bool
 	KubeConfigPath    string
 	RepoDir           string
+	RepoVersion       string
 	OperatorResources *deploy.OperatorResources
 	Logger            logrus.FieldLogger
 	Config            *rest.Config
@@ -61,7 +64,7 @@ type DeployFramework struct {
 }
 
 // New is the constructor function that creates and returns a new DeployFramework object
-func New(logger logrus.FieldLogger, runLocal, runDevSetup bool, nsPrefix, repoDir, kubeconfig string) (*DeployFramework, error) {
+func New(logger logrus.FieldLogger, runLocal, runDevSetup bool, nsPrefix, repoDir, repoVersion, kubeconfig string) (*DeployFramework, error) {
 	config, err := clientcmd.BuildConfigFromFlags("", kubeconfig)
 	if err != nil {
 		return nil, fmt.Errorf("failed to build a kube config from %s: %v", kubeconfig, err)
@@ -110,6 +113,7 @@ func New(logger logrus.FieldLogger, runLocal, runDevSetup bool, nsPrefix, repoDi
 		OperatorResources: operatorResources,
 		KubeConfigPath:    kubeconfig,
 		RepoDir:           repoDir,
+		RepoVersion:       repoVersion,
 		RunLocal:          runLocal,
 		RunDevSetup:       runDevSetup,
 		Logger:            logger,
@@ -175,16 +179,18 @@ func (df *DeployFramework) NewDeployerConfig(
 	}
 
 	return &deploy.Config{
-		Namespace:                namespace,
-		Repo:                     meteringOperatorImageRepo,
-		RunMeteringOperatorLocal: df.RunLocal,
-		Tag:                      meteringOperatorImageTag,
-		Platform:                 defaultPlatform,
-		DeleteNamespace:          defaultDeleteNamespace,
+		Namespace:        namespace,
+		Repo:             meteringOperatorImageRepo,
+		Tag:              meteringOperatorImageTag,
+		Platform:         defaultPlatform,
+		DeleteNamespace:  defaultDeleteNamespace,
+		SubscriptionName: defaultSubscriptionName,
+		Channel:          defaultSubscriptionChannel,
 		ExtraNamespaceLabels: map[string]string{
 			"name": testNamespaceLabel,
 		},
-		OperatorResources: df.OperatorResources,
-		MeteringConfig:    meteringConfig,
+		OperatorResources:        df.OperatorResources,
+		RunMeteringOperatorLocal: df.RunLocal,
+		MeteringConfig:           meteringConfig,
 	}, nil
 }
