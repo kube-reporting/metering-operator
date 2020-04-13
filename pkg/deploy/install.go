@@ -69,6 +69,13 @@ func (deploy *Deployer) installNamespace() error {
 }
 
 func (deploy *Deployer) installMeteringConfig() error {
+	if deploy.config.MeteringConfig == nil {
+		return fmt.Errorf("invalid deploy configuration: MeteringConfig object is nil")
+	}
+	if deploy.config.MeteringConfig.Name == "" {
+		return fmt.Errorf("invalid deploy configuration: metadata.Name is unset")
+	}
+
 	// ensure the MeteringConfig CRD has already been created to avoid
 	// any errors while instantiating a MeteringConfig custom resource
 	err := wait.Poll(crdInitialPoll, crdPollTimeout, func() (done bool, err error) {
@@ -88,6 +95,7 @@ func (deploy *Deployer) installMeteringConfig() error {
 	if err != nil {
 		return fmt.Errorf("failed to wait for the MeteringConfig CRD to be created: %v", err)
 	}
+	deploy.logger.Infof("The MeteringConfig CRD exists")
 
 	mc, err := deploy.meteringClient.MeteringConfigs(deploy.config.Namespace).Get(deploy.config.MeteringConfig.Name, metav1.GetOptions{})
 	if apierrors.IsNotFound(err) {
