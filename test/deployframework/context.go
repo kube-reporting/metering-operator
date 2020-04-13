@@ -40,6 +40,14 @@ var (
 	reportingAPIURL             string
 )
 
+const (
+	meteringOperatorDeploymentName  = "metering-operator"
+	reportingOperatorDeploymentName = "reporting-operator"
+
+	cleanupScriptName                = "gather-test-install-artifacts.sh"
+	createUpgradeConfigMapScriptName = "create-upgrade-configmap.sh"
+)
+
 // DeployerCtx contains all the information needed to manage the
 // full lifecycle of a single metering deployment
 type DeployerCtx struct {
@@ -280,26 +288,15 @@ func (ctx *DeployerCtx) Teardown(uninstallFunc func() error) error {
 		}
 	}
 
+	err = ctx.MustGatherMeteringResources(cleanupScriptName)
+	if err != nil {
+		errArr = append(errArr, fmt.Sprintf("failed to successfully gather all of the metering resources: %v", err))
+	}
+
 	// Check if the user wants to run the E2E suite using the developer setup.
-	// If true, we skip the process of deleting and logging of the metering
+	// If true, we skip the process of deleting the metering
 	// resources that were provisioned during the manual install.
 	if !ctx.RunDevSetup {
-		relPath := filepath.Join(ctx.HackScriptPath, cleanupScriptName)
-		targetScriptDir, err := filepath.Abs(relPath)
-		if err != nil {
-			errArr = append(errArr, fmt.Sprintf("failed to get the absolute path from '%s': %v", relPath, err))
-		}
-
-		_, err = os.Stat(targetScriptDir)
-		if err != nil {
-			errArr = append(errArr, fmt.Sprintf("failed to stat the '%s' path: %v", targetScriptDir, err))
-		}
-
-		err = runCleanupScript(logger, ctx.Namespace, ctx.TestCaseOutputPath, targetScriptDir)
-		if err != nil {
-			errArr = append(errArr, fmt.Sprintf("failed to successfully run the cleanup script: %v", err))
-		}
-
 		err = uninstallFunc()
 		if err != nil {
 			errArr = append(errArr, fmt.Sprintf("failed to uninstall metering: %v", err))
@@ -308,6 +305,28 @@ func (ctx *DeployerCtx) Teardown(uninstallFunc func() error) error {
 
 	if len(errArr) != 0 {
 		return fmt.Errorf(strings.Join(errArr, "\n"))
+	}
+
+	return nil
+}
+
+// MustGatherMeteringResources is a method that's responsible for
+// running the @scriptName bash script to gather metering-related resources.
+func (ctx *DeployerCtx) MustGatherMeteringResources(scriptName string) error {
+	relPath := filepath.Join(ctx.HackScriptPath, scriptName)
+	targetScriptDir, err := filepath.Abs(relPath)
+	if err != nil {
+		return fmt.Errorf("failed to get the absolute path from '%s': %v", relPath, err)
+	}
+	_, err = os.Stat(targetScriptDir)
+	if err != nil {
+		return fmt.Errorf("failed to stat the '%s' path: %v", targetScriptDir, err)
+	}
+
+	logger := ctx.Logger.WithFields(logrus.Fields{"component": "cleanup"})
+	err = runCleanupScript(logger, ctx.Namespace, ctx.TestCaseOutputPath, targetScriptDir)
+	if err != nil {
+		return fmt.Errorf("failed to successfully run the cleanup script: %v", err)
 	}
 
 	return nil
