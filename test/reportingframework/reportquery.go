@@ -20,6 +20,7 @@ func (rf *ReportingFramework) GetMeteringReportQuery(name string) (*metering.Rep
 
 func (rf *ReportingFramework) WaitForMeteringReportQuery(t *testing.T, name string, pollInterval, timeout time.Duration) (*metering.ReportQuery, error) {
 	t.Helper()
+
 	var reportQuery *metering.ReportQuery
 	return reportQuery, wait.PollImmediate(pollInterval, timeout, func() (bool, error) {
 		var err error
@@ -37,6 +38,7 @@ func (rf *ReportingFramework) WaitForMeteringReportQuery(t *testing.T, name stri
 
 func (rf *ReportingFramework) RequireReportQueriesReady(t *testing.T, queries []string, pollInterval, timeout time.Duration) {
 	t.Helper()
+
 	readyReportDataSources := make(map[string]struct{})
 	readyReportGenQueries := make(map[string]struct{})
 
@@ -75,14 +77,15 @@ func (rf *ReportingFramework) RequireReportQueriesReady(t *testing.T, queries []
 
 func (rf *ReportingFramework) RequireReportDataSourcesForQueryHaveData(t *testing.T, queries []string, collectResp operator.CollectPrometheusMetricsDataResponse) {
 	t.Helper()
-	reportGetter := reporting.NewReportClientGetter(rf.MeteringClient)
-	queryGetter := reporting.NewReportQueryClientGetter(rf.MeteringClient)
-	dataSourceGetter := reporting.NewReportDataSourceClientGetter(rf.MeteringClient)
 
 	metricsImportedForDS := make(map[string]int)
 	for _, res := range collectResp.Results {
 		metricsImportedForDS[res.ReportDataSource] = res.MetricsImportedCount
 	}
+
+	reportGetter := reporting.NewReportClientGetter(rf.MeteringClient)
+	queryGetter := reporting.NewReportQueryClientGetter(rf.MeteringClient)
+	dataSourceGetter := reporting.NewReportDataSourceClientGetter(rf.MeteringClient)
 
 	for _, queryName := range queries {
 		query, err := rf.GetMeteringReportQuery(queryName)

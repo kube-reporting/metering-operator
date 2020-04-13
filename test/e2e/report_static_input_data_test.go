@@ -218,11 +218,11 @@ var (
 )
 
 func testReportingProducesCorrectDataForInput(t *testing.T, testReportingFramework *reportingframework.ReportingFramework) {
-	var queries []string
 	t.Logf("Waiting for ReportDataSources tables to be created")
 	_, err := testReportingFramework.WaitForAllMeteringReportDataSourceTables(t, time.Second*5, 5*time.Minute)
 	require.NoError(t, err, "should not error when waiting for all ReportDataSource tables to be created")
 
+	var queries []string
 	for _, test := range testReportsProduceCorrectDataForInputTestCases {
 		queries = append(queries, test.queryName)
 	}
@@ -234,9 +234,9 @@ func testReportingProducesCorrectDataForInput(t *testing.T, testReportingFramewo
 
 	var reportStart, reportEnd time.Time
 	dataSourcesSubmitted := make(map[string]struct{})
+	t.Logf("Pushing fixture metrics required for tests into metering")
 
 	// Inject all the dataSources we require for each test case
-	t.Logf("Pushing fixture metrics required for tests into metering")
 	for _, test := range testReportsProduceCorrectDataForInputTestCases {
 		for _, dataSource := range test.dataSources {
 			if _, alreadySubmitted := dataSourcesSubmitted[dataSource.DatasourceName]; !alreadySubmitted {
