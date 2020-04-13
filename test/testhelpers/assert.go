@@ -74,9 +74,40 @@ func AssertReportResultsEqual(t *testing.T, expected, actual []map[string]interf
 func AssertErrorContainsErrorMsgs(t *testing.T, err error, errMsgArr []string) {
 	t.Helper()
 
-	require.NotNil(t, err, "expected the error would not be nil")
+	/*
+	  TODO: evaluate whether or not having this type of test assertion is something
+	  we should be relying on longer term.
 
+	  The current idea behind this test is that we want to be able to verify
+	  that the @err message matches what we expect in the @errMsgArr string array.
+
+	  This can be problematic in the case that we change the `pkg/deploy` package
+	  error handling, which changes the expected error messages we may encounter.
+	  The current workaround for that is to use regexes instead of strings, but
+	  we should continue to evaluate whether the current implementation of this
+	  check makes sense going forward.
+
+	  More information:
+	  https://github.com/operator-framework/operator-metering/pull/1140#discussion_r406410209
+	*/
+
+	require.NotNil(t, err, "expected the error would not be nil")
 	for _, msg := range errMsgArr {
 		assert.Regexp(t, regexp.MustCompile(msg), err, "expected the error message would contain '%s'", msg)
 	}
+}
+
+func AssertCanSafelyRunReportingTests(t *testing.T, err error, expectInstallErr bool, errMsgArr []string) bool {
+	t.Helper()
+
+	if expectInstallErr {
+		// verify that if we expect an error, that it is not
+		// nil, and that error matches what we expect in the
+		// @errMsgArr. In either case, return false as we
+		// cannot safely run post-install tests.
+		AssertErrorContainsErrorMsgs(t, err, errMsgArr)
+		return false
+	}
+
+	return assert.NoError(t, err, "expected there would be no error")
 }

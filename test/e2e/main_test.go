@@ -460,25 +460,15 @@ func testManualMeteringInstall(
 	require.NoError(t, err, "creating a new deployer context should produce no error")
 
 	deployerCtx.Logger.Infof("DeployerCtx: %+v", deployerCtx)
-
 	rf, err := deployerCtx.Setup(deployerCtx.Deployer.Install, expectInstallErr)
-	if expectInstallErr {
-		testhelpers.AssertErrorContainsErrorMsgs(t, err, expectInstallErrMsg)
-	} else {
-		assert.NoError(t, err, "expected there would be no error installing and setting up the metering stack")
-	}
 
-	if rf != nil {
-		canSafelyRunTest := (err != nil && expectInstallErr) || err == nil
-		assert.True(t, canSafelyRunTest, "received an unexpected error when no error was expected")
+	canSafelyRunTest := testhelpers.AssertCanSafelyRunReportingTests(t, err, expectInstallErr, expectInstallErrMsg)
+	if canSafelyRunTest {
+		t.Run(testInstallFunction.Name, func(t *testing.T) {
+			testInstallFunction.TestFunc(t, rf)
+		})
 
-		if canSafelyRunTest {
-			t.Run(testInstallFunction.Name, func(t *testing.T) {
-				testInstallFunction.TestFunc(t, rf)
-			})
-
-			deployerCtx.Logger.Infof("The %s test has finished running", testInstallFunction.Name)
-		}
+		deployerCtx.Logger.Infof("The %s test has finished running", testInstallFunction.Name)
 	}
 
 	err = deployerCtx.Teardown(deployerCtx.Deployer.Uninstall)
