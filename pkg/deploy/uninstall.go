@@ -154,7 +154,7 @@ func (deploy *Deployer) uninstallMeteringResources() error {
 func (deploy *Deployer) uninstallMeteringPVCs() error {
 	// Attempt to get a list of PVCs that match the hdfs or hive labels
 	pvcs, err := deploy.client.CoreV1().PersistentVolumeClaims(deploy.config.Namespace).List(metav1.ListOptions{
-		LabelSelector: "app in (hdfs,hive)",
+		LabelSelector: "app in (hdfs,hive-metastore)",
 	})
 	if err != nil {
 		return fmt.Errorf("failed to list all the metering PVCs in the %s namespace: %v", deploy.config.Namespace, err)
