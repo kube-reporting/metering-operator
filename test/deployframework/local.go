@@ -18,7 +18,7 @@ const (
 	reportingOperatorLogName            = "reporting-operator.log"
 	destKubeConfigPath                  = "/kubeconfig"
 	runReportingOperatorLocalScriptName = "run-reporting-operator-local.sh"
-	cleanupScriptName                   = "run-test-cleanup.sh"
+	meteringOperatorContainerName       = "metering-operator-e2e"
 
 	enableDebug        = true
 	disableOCPFeatures = false

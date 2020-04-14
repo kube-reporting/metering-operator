@@ -1,7 +1,6 @@
 package e2e
 
 import (
-	"fmt"
 	"testing"
 	"time"
 
@@ -22,7 +21,7 @@ func testReportingProducesData(t *testing.T, testReportingFramework *reportingfr
 	cronSchedule := &metering.ReportSchedule{
 		Period: metering.ReportPeriodCron,
 		Cron: &metering.ReportScheduleCron{
-			Expression: fmt.Sprintf("*/1 * * * *"),
+			Expression: "*/1 * * * *",
 		},
 	}
 
@@ -119,11 +118,9 @@ func testReportsProduceData(t *testing.T, testReportingFramework *reportingframe
 			// get all the datasources for the query used in our report
 			dependencies, err := reporting.GetQueryDependencies(queryGetter, dsGetter, reportGetter, query, nil)
 			require.NoError(t, err, "datasources for query should exist")
-
 			require.NotEqual(t, 0, len(dependencies.ReportDataSources), "Report should have at least 1 datasource dependency")
 
 			var reportStart time.Time
-
 			// for each datasource, wait until it's EarliestImportedMetricTime is set
 			for _, ds := range dependencies.ReportDataSources {
 				_, err := testReportingFramework.WaitForMeteringReportDataSource(t, ds.Name, 5*time.Second, 5*time.Minute, func(dataSource *metering.ReportDataSource) (bool, error) {

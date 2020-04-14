@@ -16,10 +16,10 @@ import (
 func NewReport(name, namespace, testQueryName string, reportStart, reportEnd *time.Time, status metering.ReportStatus, schedule *metering.ReportSchedule, runImmediately bool) *metering.Report {
 	var start, end *meta.Time
 	if reportStart != nil {
-		start = &meta.Time{*reportStart}
+		start = &meta.Time{Time: *reportStart}
 	}
 	if reportEnd != nil {
-		end = &meta.Time{*reportEnd}
+		end = &meta.Time{Time: *reportEnd}
 	}
 	return &metering.Report{
 		ObjectMeta: meta.ObjectMeta{

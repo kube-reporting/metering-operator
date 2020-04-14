@@ -2,8 +2,9 @@ package deploy
 
 import (
 	"fmt"
-	"github.com/sirupsen/logrus"
 	"time"
+
+	"github.com/sirupsen/logrus"
 
 	olmclientv1 "github.com/operator-framework/operator-lifecycle-manager/pkg/api/client/clientset/versioned/typed/operators/v1"
 	olmclientv1alpha1 "github.com/operator-framework/operator-lifecycle-manager/pkg/api/client/clientset/versioned/typed/operators/v1alpha1"
@@ -28,8 +29,8 @@ const (
 	catalogSourceName      = "redhat-operators"
 	catalogSourceNamespace = "openshift-marketplace"
 
-	crdPollTimeout = 20 * time.Second
-	crdInitialPoll = 1 * time.Second
+	crdPollTimeout = 5 * time.Minute
+	crdInitialPoll = 3 * time.Second
 
 	hivetableFile         = "hive.crd.yaml"
 	prestotableFile       = "prestotable.crd.yaml"

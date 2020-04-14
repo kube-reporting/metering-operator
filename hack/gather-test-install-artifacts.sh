@@ -126,3 +126,42 @@ while read -r report; do
         fi
     fi
 done <<< "$REPORTS"
+
+echo "Capturing reportdatasources listing"
+kubectl --namespace "$METERING_TEST_NAMESPACE" get reportdatasources > "$LOG_DIR/reportdatasources-metrics.log"
+
+#
+# OLM-specific resources
+#
+echo "Capturing subscription descriptions"
+SUBSCRIPTIONS=$(kubectl get subscriptions --namespace "$METERING_TEST_NAMESPACE" -o name | cut -d/ -f2)
+while read -r subscription; do
+    if [[ -z $subscription ]]; then
+        continue
+    fi
+
+    kubectl describe subscription "$subscription" --namespace "$METERING_TEST_NAMESPACE" > "$LOG_DIR/subscription-${subscription}-description.log"
+done <<< "$SUBSCRIPTIONS"
+
+echo "Capturing clusterserviceversion descriptions"
+CSVS=$(kubectl get csv --namespace "$METERING_TEST_NAMESPACE" -o name | cut -d/ -f2)
+while read -r csv; do
+    if [[ -z $csv ]]; then
+        continue
+    fi
+
+    kubectl describe csv "$csv" --namespace "$METERING_TEST_NAMESPACE" > "$LOG_DIR/csv-${csv}-description.log"
+done <<< "$CSVS"
+
+echo "Capturing operatorgroup descriptions"
+OPERATORGROUPS=$(kubectl get operatorgroups --namespace "$METERING_TEST_NAMESPACE" -o name | cut -d/ -f2)
+while read -r operatorgroups; do
+    if [[ -z $operatorgroups ]]; then
+        continue
+    fi
+
+    kubectl describe operatorgroups "$operatorgroups" --namespace "$METERING_TEST_NAMESPACE"> "$LOG_DIR/operatorgroups-${operatorgroups}-description.log"
+done <<< "$OPERATORGROUPS"
+
+echo "Capturing metering-ocp packagemanifest description"
+kubectl describe packagemanifests metering-ocp --namespace openshift-marketplace > "$LOG_DIR/packagemanifest-metering-ocp-description.log"
