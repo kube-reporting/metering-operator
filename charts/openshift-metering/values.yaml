@@ -7,7 +7,6 @@ unsupportedFeatures:
 disableOCPFeatures: false
 
 useIPV6Networking: false
-useGlobalProxyNetworking: false
 
 networking:
   useGlobalProxyNetworking: false

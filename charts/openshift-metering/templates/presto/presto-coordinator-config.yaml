@@ -59,6 +59,17 @@ data:
 {{- end }}
 
   jvm.config: |
+{{- if and .Values.networking.useGlobalProxyNetworking .Values.presto.spec.config.tls.enabled }}
+    -Dhttps.proxyHost={{ .Values.networking.proxy.config.https_proxy.hostname }}
+    -Dhttps.proxyPort={{ .Values.networking.proxy.config.https_proxy.port }}
+    -Dhttps.proxyUser={{ .Values.networking.proxy.config.https_proxy.username }}
+    -Dhttps.proxyPassword={{ .Values.networking.proxy.config.https_proxy.password }}
+{{- else if .Values.networking.useGlobalProxyNetworking }}
+    -Dhttp.proxyHost={{ .Values.networking.proxy.config.http_proxy.hostname }}
+    -Dhttp.proxyPort={{ .Values.networking.proxy.config.http_proxy.port }}
+    -Dhttp.proxyUser={{ .Values.networking.proxy.config.http_proxy.username }}
+    -Dhttp.proxyPassword={{ .Values.networking.proxy.config.http_proxy.password }}
+{{- end }}
     -server
     -XX:+UseContainerSupport
     -XX:+UseG1GC
