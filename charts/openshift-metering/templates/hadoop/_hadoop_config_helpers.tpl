@@ -108,5 +108,40 @@
       <name>fs.gs.reported.permissions</name>
       <value>733</value>
   </property>
+{{- if and .Values.networking.useGlobalProxyNetworking .Values.presto.spec.config.tls.enabled }}
+  <property>
+      <name>fs.s3a.proxy.host</name>
+      <value>{{ .Values.networking.proxy.config.https_proxy.hostname }}</value>
+  </property>
+  <property>
+      <name>fs.s3a.proxy.port</name>
+      <value>{{ .Values.networking.proxy.config.https_proxy.port }}</value>
+  </property>
+  <property>
+      <name>fs.s3a.proxy.username</name>
+      <value>{{ .Values.networking.proxy.config.https_proxy.username }}</value>
+  </property>
+  <property>
+      <name>fs.s3a.proxy.password</name>
+      <value>{{ .Values.networking.proxy.config.https_proxy.password }}</value>
+  </property>
+{{- else if .Values.networking.useGlobalProxyNetworking }}
+  <property>
+      <name>fs.s3a.proxy.host</name>
+      <value>{{ .Values.networking.proxy.config.http_proxy.hostname }}</value>
+  </property>
+  <property>
+      <name>fs.s3a.proxy.port</name>
+      <value>{{ .Values.networking.proxy.config.http_proxy.port }}</value>
+  </property>
+  <property>
+      <name>fs.s3a.proxy.username</name>
+      <value>{{ .Values.networking.proxy.config.http_proxy.username }}</value>
+  </property>
+  <property>
+      <name>fs.s3a.proxy.password</name>
+      <value>{{ .Values.networking.proxy.config.http_proxy.password }}</value>
+  </property>
+{{- end }}
 </configuration>
 {{- end }}
