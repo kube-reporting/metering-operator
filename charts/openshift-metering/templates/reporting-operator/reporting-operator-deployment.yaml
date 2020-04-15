@@ -447,12 +447,12 @@ spec:
 {{- end }}{{/* end of authProxy.enabled */}}
       volumes:
 {{- if and .Values.networking.useGlobalProxyNetworking .Values.networking.proxy.config.trusted_ca_bundle }}
-     - name: reporting-operator-trusted-ca-bundle
-       configMap:
-         name: reporting-operator-trusted-ca-bundle
-         items:
-         - key: ca-bundle.crt
-           path: ca-bundle.crt
+      - name: reporting-operator-trusted-ca-bundle
+        configMap:
+          name: reporting-operator-trusted-ca-bundle
+          items:
+          - key: ca-bundle.crt
+            path: ca-bundle.crt
 {{- end }}
 {{- if $operatorValues.spec.config.hive.tls.enabled }}
       - name: hive-tls
