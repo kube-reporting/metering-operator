@@ -324,7 +324,10 @@ func (op *Reporting) handleAWSBillingDataSource(logger log.FieldLogger, dataSour
 	}
 
 	logger.Debugf("querying bucket %#v for AWS Billing manifests for ReportDataSource %s", source, dataSource.Name)
-	manifestRetriever := aws.NewManifestRetriever(logger, source.Region, source.Bucket, source.Prefix)
+	manifestRetriever, err := aws.NewManifestRetriever(logger, source.Region, source.Bucket, source.Prefix, op.cfg.ProxyTrustedCABundle)
+	if err != nil {
+		return err
+	}
 	manifests, err := manifestRetriever.RetrieveManifests()
 	if err != nil {
 		return err

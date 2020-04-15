@@ -131,6 +131,8 @@ type Config struct {
 	PrometheusDataSourceMaxBackfillImportDuration time.Duration
 	PrometheusDataSourceGlobalImportFromTime      *time.Time
 
+	ProxyTrustedCABundle string
+
 	LeaderLeaseDuration time.Duration
 
 	APITLSConfig     TLSConfig

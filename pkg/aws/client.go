@@ -1,10 +1,17 @@
 package aws
 
 import (
+	"crypto/tls"
+	"crypto/x509"
 	"encoding/json"
 	"fmt"
+	"io/ioutil"
+	"net/http"
+	"net/url"
+	"os"
 	"path"
 	"strings"
+	"time"
 
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/session"
@@ -33,20 +40,94 @@ type ManifestRetriever interface {
 }
 
 type manifestRetriever struct {
-	logger         log.FieldLogger
-	s3API          s3iface.S3API
-	bucket, prefix string
+	logger log.FieldLogger
+	s3API  s3iface.S3API
+	bucket string
+	prefix string
 }
 
-func NewManifestRetriever(logger log.FieldLogger, region, bucket, prefix string) ManifestRetriever {
-	awsSession := session.Must(session.NewSession())
-	client := s3.New(awsSession, aws.NewConfig().WithRegion(region))
+func NewManifestRetriever(logger log.FieldLogger, region, bucket, prefix, caBundlePath string) (ManifestRetriever, error) {
+	var (
+		proxy                 string
+		useProxyConfiguration bool
+		transport             http.Transport
+	)
+	// check whether the @caBundlePath is non-empty, and a valid
+	// path to a CA bundle. If non-empty, we need to load that
+	// certificate bundle into the http.Transport object that
+	// we are building up. The current implementation expects
+	// that the $HTTPS_PROXY environment variable is non-empty
+	// when the @caBundlePath has been provided. In future, we
+	// most likely just want to pass something like a *ProxyConfig
+	// parameter and reference the fields from that object to
+	// do the heavy-lifting. If the @caBundlePath is empty, then
+	// check if the $HTTP_PROXY environment variable has a value,
+	// which we will use when registering the custom http client.
+	if caBundlePath != "" {
+		if _, err := os.Stat(caBundlePath); err != nil {
+			return nil, fmt.Errorf("failed to stat the %s path: %v", caBundlePath, err)
+		}
+		caBundle, err := ioutil.ReadFile(caBundlePath)
+		if err != nil {
+			return nil, fmt.Errorf("failed to load the trusted CA bundle: %v", err)
+		}
+		caRoot := x509.NewCertPool()
+		caRoot.AppendCertsFromPEM(caBundle)
+		transport.TLSClientConfig = &tls.Config{
+			RootCAs: caRoot,
+		}
+
+		proxy = os.Getenv("HTTPS_PROXY")
+		if proxy == "" {
+			return nil, fmt.Errorf("expected the $HTTPS_PROXY to be non-empty when a trustbundle has been provided")
+		}
+		useProxyConfiguration = true
+	} else {
+		proxy = os.Getenv("HTTP_PROXY")
+		if proxy != "" {
+			useProxyConfiguration = true
+		}
+	}
+
+	// start building up a barebones AWS configuration object
+	config := &aws.Config{
+		Region: aws.String(region),
+	}
+
+	// in the case where we grab a value from either of the HTTP*_PROXY
+	// environment variables, we need to register a custom http client
+	// that uses this proxy URL. We can also reasonably assume that the
+	// HTTP*_PROXY environment variables are valid as the metering-operator,
+	// which sets these values, reads directly from this cluster-scoped
+	// proxy/cluster object, and the values stored in the object are
+	// validated by the Cluster Networking Operator.
+	if useProxyConfiguration {
+		proxyURL, err := url.Parse(proxy)
+		if err != nil {
+			return nil, fmt.Errorf("failed to parse the proxy url '%s': %v", proxy, err)
+		}
+		transport.Proxy = http.ProxyURL(proxyURL)
+
+		httpClient := &http.Client{
+			Transport: &transport,
+			Timeout:   time.Second * 60,
+		}
+		config.HTTPClient = httpClient
+		logger.Debugf("registering a custom HTTP client for the AWS configuration")
+	}
+
+	session, err := session.NewSession(config)
+	if err != nil {
+		return nil, fmt.Errorf("failed to create a new aws session: %v", err)
+	}
+	client := s3.New(session)
+
 	return &manifestRetriever{
 		logger: logger,
 		s3API:  client,
 		bucket: bucket,
 		prefix: prefix,
-	}
+	}, nil
 }
 
 // RetrieveManifests downloads the billing manifest for the given bucket and
@@ -73,17 +154,17 @@ func (r *manifestRetriever) RetrieveManifests() ([]*Manifest, error) {
 	)
 	pageFn := func(out *s3.ListObjectsV2Output, lastPage bool) bool {
 		page++
-		keys := r.filterObjects(prefix, out.Contents)
-		if len(keys) == 0 {
+		filteredKeys := r.filterObjects(prefix, out.Contents)
+		if len(filteredKeys) == 0 {
 			logger.Debugf("page %d had no manifests", page)
 			return true
 		}
 
-		for _, key := range keys {
+		for _, key := range filteredKeys {
 			logger.WithField("key", key).Debugf("retrieving manifest")
 			manifest, err := retrieveManifest(r.s3API, r.bucket, key)
 			if err != nil {
-				manifestErr = fmt.Errorf("can't get manifest from bucket '%s' with key '%s': %v", r.bucket, key, err)
+				manifestErr = fmt.Errorf("failed to get the manifest from the bucket '%s' with the key '%s': %v", r.bucket, key, err)
 				return false
 			}
 			manifests = append(manifests, manifest)
@@ -99,7 +180,7 @@ func (r *manifestRetriever) RetrieveManifests() ([]*Manifest, error) {
 		MaxKeys: aws.Int64(maxS3Keys),
 	}, pageFn)
 	if err != nil {
-		return nil, fmt.Errorf("could not list retrieve AWS billing report keys: %v", err)
+		return nil, fmt.Errorf("failed to retrieve the AWS billing report keys: %v", err)
 	}
 	if manifestErr != nil {
 		return nil, manifestErr
