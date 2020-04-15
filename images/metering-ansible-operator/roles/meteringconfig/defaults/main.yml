@@ -362,9 +362,6 @@ _ocp_disabled_overrides:
         securityContext:
           fsGroup: 0
 
-_ocp_enabled_use_ipv6_networking: false
-_ocp_enabled_global_proxy_enabled: false
-
 _ocp_enabled_overrides:
   useIPV6Networking: "{{ _ocp_enabled_use_ipv6_networking }}"
   networking:
@@ -381,8 +378,8 @@ _ocp_enabled_overrides:
           port: "{{ _ocp_enabled_https_proxy_port | default ('') }}"
           username: "{{ _ocp_enabled_https_proxy_username | default ('') }}"
           password: "{{ _ocp_enabled_https_proxy_password | default ('') }}"
-        no_proxy:  "{{ _ocp_enabled_global_proxy_no_proxy | default('') }}"
-        trusted_ca_bundle: "{{ _ocp_enabled_global_proxy_trusted_ca_bundle | default ('') }}"
+        no_proxy:  "{{ _ocp_enabled_global_proxy_no_proxy }}"
+        trusted_ca_bundle: "{{ _ocp_enabled_global_proxy_trusted_ca_bundle }}"
 
   reporting-operator:
     spec:
@@ -401,6 +398,16 @@ _ocp_enabled_overrides:
 
             auth:
               bearerTokenFile: "/var/run/secrets/kubernetes.io/serviceaccount/token"
+
+#
+# Networking Configuration
+#
+_ocp_enabled_use_ipv6_networking: false
+_ocp_enabled_global_proxy_enabled: false
+_ocp_enabled_global_proxy_trusted_ca_bundle: ""
+_ocp_enabled_global_proxy_no_proxy: ""
+
+_meteringconfig_create_user_trusted_ca_bundle: "{{ _ocp_enabled_global_proxy_trusted_ca_bundle | length > 0 }}"
 
 #
 # Override the default values with _tls_overrides when spec.tls.enabled is set to true, else use values.yaml and meteringconfig_spec_overrides
