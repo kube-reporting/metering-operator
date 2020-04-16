@@ -108,7 +108,7 @@
       <name>fs.gs.reported.permissions</name>
       <value>733</value>
   </property>
-{{- if and .Values.networking.useGlobalProxyNetworking .Values.presto.spec.config.tls.enabled }}
+{{- if and .Values.networking.useGlobalProxyNetworking .Values.hive.spec.metastore.config.tls.enabled }}
   <property>
       <name>fs.s3a.proxy.host</name>
       <value>{{ .Values.networking.proxy.config.https_proxy.hostname }}</value>
