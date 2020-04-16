@@ -84,6 +84,10 @@
       - template_file: templates/reporting-operator/reporting-operator-deployment.yaml
         apis: [ {kind: deployment} ]
         prune_label_value: reporting-operator-deployment
+      - template_file: templates/reporting-operator/reporting-operator-trusted-ca-bundle-configmap.yaml
+        apis: [ {kind: ConfigMap }]
+        prune_label_value: reporting-operator-ca-bundle-configmap
+        create: "{{ _meteringconfig_create_user_trusted_ca_bundle }}"
 
 - include_tasks: update_meteringconfig_status.yml
   vars:

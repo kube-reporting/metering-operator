@@ -97,6 +97,8 @@ func init() {
 	startCmd.Flags().StringVar(&cfg.PrometheusConfig.BearerTokenFile, "prometheus-bearer-token-file", "", "File containing bearer token to authenticate against Prometheus. Takes precedence over prometheus-bearer-token.")
 	startCmd.Flags().StringVar(&cfg.PrometheusConfig.CAFile, "prometheus-ca-file", "", "The path to the certificate authority to use to connect to Prometheus. If empty, defaults to system CAs")
 
+	startCmd.Flags().StringVar(&cfg.ProxyTrustedCABundle, "proxy-trusted-ca-bundle", "", "The path to the certificate authority bundle used to connect to the cluster-wide https proxy.")
+
 	startCmd.Flags().BoolVar(&cfg.DisablePrometheusMetricsImporter, "disable-prometheus-metrics-importer", false, "disables collecting Prometheus metrics periodically")
 	startCmd.Flags().BoolVar(&cfg.LogDMLQueries, "log-dml-queries", false, "logDMLQueries controls if we log data manipulation queries made via Presto (SELECT, INSERT, etc)")
 	startCmd.Flags().BoolVar(&cfg.LogDDLQueries, "log-ddl-queries", false, "logDDLQueries controls if we log data definition language queries made via Hive (CREATE TABLE, DROP TABLE, etc)")

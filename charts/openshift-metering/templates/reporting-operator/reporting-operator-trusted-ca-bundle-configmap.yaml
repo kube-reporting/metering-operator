@@ -1,0 +1,7 @@
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: reporting-operator-trusted-ca-bundle
+  labels:
+    config.openshift.io/inject-trusted-cabundle: 'true'
+    app: reporting-operator

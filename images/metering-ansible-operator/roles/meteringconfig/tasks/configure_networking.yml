@@ -54,11 +54,13 @@
     when: _cluster_proxy_config.spec.trustedCA is defined
 
   - set_fact:
+      _ocp_enabled_http_proxy_url: "{{ _ocp_enabled_global_proxy_http_proxy }}"
       _ocp_enabled_http_proxy_hostname: "{{ _ocp_enabled_global_proxy_http_proxy | urlsplit('hostname') }}"
       _ocp_enabled_http_proxy_port: "{{ _ocp_enabled_global_proxy_http_proxy | urlsplit('port') }}"
       _ocp_enabled_http_proxy_username: "{{ _ocp_enabled_global_proxy_http_proxy | urlsplit('username') }}"
       _ocp_enabled_http_proxy_password: "{{ _ocp_enabled_global_proxy_http_proxy | urlsplit('password') }}"
 
+      _ocp_enabled_https_proxy_url: "{{ _ocp_enabled_global_proxy_https_proxy }}"
       _ocp_enabled_https_proxy_hostname: "{{ _ocp_enabled_global_proxy_https_proxy | urlsplit('hostname') }}"
       _ocp_enabled_https_proxy_port: "{{ _ocp_enabled_global_proxy_https_proxy | urlsplit('port') }}"
       _ocp_enabled_https_proxy_username: "{{ _ocp_enabled_global_proxy_https_proxy | urlsplit('username') }}"

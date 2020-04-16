@@ -248,7 +248,13 @@ func runCleanupScript(logger logrus.FieldLogger, namespace, outputPath, scriptPa
 	cleanupCmd.Env = append(os.Environ(), envVarArr...)
 	err = cleanupCmd.Run()
 	if err != nil {
-		errArr = append(errArr, fmt.Sprintf("failed to successfully run the cleanup script: %v", err))
+		// TODO(tflannag): we need to add more flexibility to this
+		// function, especially in the case where we expect that a
+		// test case will fail, and it did fail, but the gather test
+		// install artifacts scripts will return a non-zero exit code
+		// as it cannot successfully log any resources. The workaround
+		// for now is to log the error, but don't return an error.
+		logger.Infof("%v", err)
 	}
 
 	if len(errArr) != 0 {

@@ -95,6 +95,21 @@ spec:
               name: {{ $operatorValues.spec.config.aws.secretName | default "reporting-operator-aws-credentials" }}
               key: aws-secret-access-key
 {{- end }}
+{{- if and .Values.networking.useGlobalProxyNetworking }}
+        - name: HTTP_PROXY
+          value: "{{ .Values.networking.proxy.config.http_proxy.url }}"
+        - name: HTTPS_PROXY
+          value: "{{ .Values.networking.proxy.config.https_proxy.url }}"
+        - name: NO_PROXY
+          value: "{{ .Values.networking.proxy.config.no_proxy }}"
+{{- end }}
+{{- if and .Values.networking.useGlobalProxyNetworking .Values.networking.proxy.config.trusted_ca_bundle }}
+        - name: REPORTING_OPERATOR_PROXY_TRUSTED_CA_BUNDLE
+          valueFrom:
+            configMapKeyRef:
+              name: reporting-operator-config
+              key: proxy-trusted-ca-bundle
+{{- end }}
         - name: REPORTING_OPERATOR_LOG_LEVEL
           valueFrom:
             configMapKeyRef:
@@ -447,12 +462,12 @@ spec:
 {{- end }}{{/* end of authProxy.enabled */}}
       volumes:
 {{- if and .Values.networking.useGlobalProxyNetworking .Values.networking.proxy.config.trusted_ca_bundle }}
-     - name: reporting-operator-trusted-ca-bundle
-       configMap:
-         name: reporting-operator-trusted-ca-bundle
-         items:
-         - key: ca-bundle.crt
-           path: ca-bundle.crt
+      - name: reporting-operator-trusted-ca-bundle
+        configMap:
+          name: reporting-operator-trusted-ca-bundle
+          items:
+          - key: ca-bundle.crt
+            path: ca-bundle.crt
 {{- end }}
 {{- if $operatorValues.spec.config.hive.tls.enabled }}
       - name: hive-tls

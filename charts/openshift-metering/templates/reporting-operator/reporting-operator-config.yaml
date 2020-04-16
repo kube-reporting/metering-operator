@@ -34,6 +34,10 @@ data:
 {{- end }}
 {{- end }}
 
+{{- if and .Values.networking.useGlobalProxyNetworking .Values.networking.proxy.config.trusted_ca_bundle }}
+  proxy-trusted-ca-bundle: "/etc/pki/ca-trust/extracted/pem/ca-bundle.crt"
+{{- end }}
+
   prometheus-url: {{ $operatorValues.spec.config.prometheus.url | quote}}
   disable-prometheus-metrics-importer: {{ not $operatorValues.spec.config.prometheus.metricsImporter.enabled | quote}}
 {{- if $operatorValues.spec.config.prometheus.metricsImporter.config.pollInterval }}
