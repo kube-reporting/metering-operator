@@ -454,7 +454,19 @@ type PrestoConnectorHiveConfig struct {
 	TLS                    *TLSConfig `json:"tls,omitempty"`
 }
 type PrestoConnectorPrometheusConfig struct {
-	Enabled *bool `json:"enabled,omitempty"`
+	Enabled *bool                                  `json:"enabled,omitempty"`
+	Config  *PrestoConnectorPrometheusConfigConfig `json:"config,omitempty"`
+	Auth    *PrestoConnectorPrometheusConfigAuth   `json:"auth,omitempty"`
+}
+type PrestoConnectorPrometheusConfigConfig struct {
+	URI                   string         `json:"uri,omitempty"`
+	ChunkSize             *meta.Duration `json:"chunkSizeDuration,omitempty"`
+	MaxQueryRangeDuration *meta.Duration `json:"maxQueryRangeDuration,omitempty"`
+	CacheDuration         *meta.Duration `json:"cacheDuration,omitempty"`
+}
+type PrestoConnectorPrometheusConfigAuth struct {
+	BearerTokenFile        string `json:"bearerTokenFile,omitempty"`
+	UseServiceAccountTokne *bool  `json:"useServiceAccountToken,omitempty"`
 }
 type PrestoConnectorFileList struct {
 	Name    string `json:"name,omitempty"`
