@@ -212,6 +212,9 @@ metadata:
     olm.skipRange: '>=4.2.0 <4.5.0'
     operatorframework.io/cluster-monitoring: "true"
     operatorframework.io/suggested-namespace: openshift-metering
+    operators.openshift.io/capability:
+    - fips
+    - cluster-proxy
     repository: https://github.com/operator-framework/operator-metering
     support: Red Hat, Inc.
 
