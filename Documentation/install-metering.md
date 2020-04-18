@@ -12,7 +12,7 @@ Operator Metering requires the following components:
 - A Kubernetes v1.11 or newer cluster
 - A StorageClass for dynamic volume provisioning. ([See configuring metering][configuring-metering] for more information.)
 - A Prometheus installation within the cluster configured to do Kubernetes cluster-monitoring.
-    - The prometheus-operator repository's [kube-prometheus instructions][kube-prometheus] are the standard way of achieving Prometheus cluster-monitoring.
+    - The [kube-prometheus instructions][kube-prometheus] are the standard way of achieving Prometheus cluster-monitoring.
     - At a minimum, we require kube-state-metrics, node-exporter, and built-in Kubernetes target metrics.
 - 4GB Memory and 4 CPU Cores available cluster capacity.
 - Minimum resources needed for the largest single pod is 2 GB of memory and 2 CPU cores.
