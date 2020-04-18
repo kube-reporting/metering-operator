@@ -121,7 +121,7 @@ For further reading on using metering, see the [using metering documentation][us
 [configuring-metering]: metering-config.md
 [configuring-storage]: configuring-storage.md
 [configure-prometheus-url]: configuring-reporting-operator.md#prometheus-connection
-[kube-prometheus]: https://github.com/coreos/prometheus-operator/tree/master/contrib/kube-prometheus
+[kube-prometheus]: https://github.com/coreos/kube-prometheus
 [olm-install]: olm-install.md
 [manual-install]: manual-install.md
 [storage-classes]: https://kubernetes.io/docs/concepts/storage/storage-classes/
