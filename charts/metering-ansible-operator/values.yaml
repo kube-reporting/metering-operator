@@ -322,6 +322,7 @@ olm:
         version: v1
 
     annotations:
+      operators.openshift.io/capability: ['fips', 'cluster-proxy']
       operatorframework.io/suggested-namespace: openshift-metering
       operatorframework.io/cluster-monitoring: "true"
       categories: "OpenShift Optional, Monitoring"
