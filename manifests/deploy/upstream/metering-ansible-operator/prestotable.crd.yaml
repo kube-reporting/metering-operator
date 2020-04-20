@@ -23,6 +23,7 @@ spec:
     JSONPath: .status.tableName
   validation:
     openAPIV3Schema:
+      type: object
       description: |
         PrestoTable is a custom resource that represents a database table accessible from within Presto.
         When a PrestoTable resource is created, the reporting-operator creates a table within Presto according

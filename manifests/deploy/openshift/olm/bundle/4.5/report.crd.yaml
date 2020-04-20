@@ -97,28 +97,18 @@ spec:
                   properties:
                     minute:
                       type: integer
-                      minimum: 0
-                      maximum: 59
                     hour:
                       type: integer
-                      minimum: 0
-                      maximum: 23
 
                 daily:
                   type: object
                   properties:
                     second:
                       type: integer
-                      minimum: 0
-                      maximum: 60
                     minute:
                       type: integer
-                      minimum: 0
-                      maximum: 59
                     hour:
                       type: integer
-                      minimum: 0
-                      maximum: 23
 
                 weekly:
                   type: object
@@ -145,36 +135,22 @@ spec:
                       - saturday
                     second:
                       type: integer
-                      minimum: 0
-                      maximum: 60
                     minute:
                       type: integer
-                      minimum: 0
-                      maximum: 59
                     hour:
                       type: integer
-                      minimum: 0
-                      maximum: 23
 
                 monthly:
                   type: object
                   properties:
                     dayOfMonth:
                       type: integer
-                      minimum: 1
-                      maximum: 31
                     second:
                       type: integer
-                      minimum: 0
-                      maximum: 60
                     minute:
                       type: integer
-                      minimum: 0
-                      maximum: 59
                     hour:
                       type: integer
-                      minimum: 0
-                      maximum: 23
 
                 cron:
                   type: object

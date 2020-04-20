@@ -22,6 +22,7 @@ spec:
     storage: false
   validation:
     openAPIV3Schema:
+      type: object
       required:
       - spec
       properties:
@@ -1714,45 +1715,31 @@ spec:
                                 G1HeapRegionSize:
                                   anyOf:
                                   - type: integer
-                                    minimum: 0
                                   - type: string
                                     minLength: 3
                                 concGCThreads:
                                   type: integer
-                                  minimum: 0
                                 extraFlags:
                                   type: array
                                 initialRAMPercentage:
                                   type: integer
-                                  minimum: 0
-                                  maximum: 100
                                 initiatingHeapOccupancyPercent:
                                   type: integer
-                                  minimum: 0
-                                  maximum: 100
                                 maxCachedBufferSize:
                                   type: integer
-                                  minimum: 0
                                 maxDirectMemorySize:
                                   anyOf:
                                   - type: integer
-                                    minimum: 0
                                   - type: string
                                     minLength: 2
                                 maxGcPauseMillis:
                                   type: integer
-                                  minimum: 0
                                 maxRAMPercentage:
                                   type: integer
-                                  minimum: 0
-                                  maximum: 100
                                 minRAMPercentage:
                                   type: integer
-                                  minimum: 0
-                                  maximum: 100
                                 parallelGCThreads:
                                   type: integer
-                                  minimum: 0
                                 permSize:
                                   type: string
                                   minLength: 2
@@ -1865,45 +1852,31 @@ spec:
                                 G1HeapRegionSize:
                                   anyOf:
                                   - type: integer
-                                    minimum: 0
                                   - type: string
                                     minLength: 3
                                 concGCThreads:
                                   type: integer
-                                  minimum: 0
                                 extraFlags:
                                   type: array
                                 initialRAMPercentage:
                                   type: integer
-                                  minimum: 0
-                                  maximum: 100
                                 initiatingHeapOccupancyPercent:
                                   type: integer
-                                  minimum: 0
-                                  maximum: 100
                                 maxCachedBufferSize:
                                   type: integer
-                                  minimum: 0
                                 maxDirectMemorySize:
                                   anyOf:
                                   - type: integer
-                                    minimum: 0
                                   - type: string
                                     minLength: 2
                                 maxGcPauseMillis:
                                   type: integer
-                                  minimum: 0
                                 maxRAMPercentage:
                                   type: integer
-                                  minimum: 0
-                                  maximum: 100
                                 minRAMPercentage:
                                   type: integer
-                                  minimum: 0
-                                  maximum: 100
                                 parallelGCThreads:
                                   type: integer
-                                  minimum: 0
                                 permSize:
                                   type: string
                                   minLength: 2
@@ -2087,16 +2060,10 @@ spec:
                               properties:
                                 initialRAMPercentage:
                                   type: integer
-                                  minimum: 0
-                                  maximum: 100
                                 maxRAMPercentage:
                                   type: integer
-                                  minimum: 0
-                                  maximum: 100
                                 minRAMPercentage:
                                   type: integer
-                                  minimum: 0
-                                  maximum: 100
                             logLevel:
                               type: string
                             tls:
@@ -2261,16 +2228,10 @@ spec:
                               properties:
                                 initialRAMPercentage:
                                   type: integer
-                                  minimum: 0
-                                  maximum: 100
                                 maxRAMPercentage:
                                   type: integer
-                                  minimum: 0
-                                  maximum: 100
                                 minRAMPercentage:
                                   type: integer
-                                  minimum: 0
-                                  maximum: 100
                             logLevel:
                               type: string
                             metastoreTLS:
@@ -2618,16 +2579,10 @@ spec:
                                   properties:
                                     initialRAMPercentage:
                                       type: integer
-                                      minimum: 0
-                                      maximum: 100
                                     maxRAMPercentage:
                                       type: integer
-                                      minimum: 0
-                                      maximum: 100
                                     minRAMPercentage:
                                       type: integer
-                                      minimum: 0
-                                      maximum: 100
                             labels:
                               type: object
                             nodeSelector:
@@ -2711,16 +2666,10 @@ spec:
                                   properties:
                                     initialRAMPercentage:
                                       type: integer
-                                      minimum: 0
-                                      maximum: 100
                                     maxRAMPercentage:
                                       type: integer
-                                      minimum: 0
-                                      maximum: 100
                                     minRAMPercentage:
                                       type: integer
-                                      minimum: 0
-                                      maximum: 100
                             labels:
                               type: object
                             nodeSelector:

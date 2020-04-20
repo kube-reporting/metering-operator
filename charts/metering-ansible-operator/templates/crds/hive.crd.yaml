@@ -23,6 +23,7 @@ spec:
     JSONPath: .status.tableName
   validation:
     openAPIV3Schema:
+      type: object
       description: |
         HiveTable is a custom resource that represents a database table within Hive.
         When created, a HiveTable resource causes the reporting-operator to create a
@@ -143,7 +144,6 @@ spec:
                 Note: this is an optional field.
                 More info: https://cwiki.apache.org/confluence/display/Hive/LanguageManual+DDL+BucketedTables
               format: int32
-              minimum: 0
             location:
               type: string
               description: |
