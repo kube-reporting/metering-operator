@@ -35,7 +35,7 @@ spec:
           description: |
             HiveTableSpec is the desired specification of a HiveTable custom resource.
             Required fields: database, tableName, and columns.
-            More info: https://github.com/operator-framework/operator-metering/blob/master/Documentation/hivetables.md
+            More info: https://github.com/kubernetes-reporting/metering-operator/blob/master/Documentation/hivetables.md
           required:
           - databaseName
           - tableName
@@ -46,7 +46,7 @@ spec:
               description: |
                 DatabaseName is the name of the Hive database to use.
                 Generally, this field should be set to "default", or the value of the "databaseName" in a Hive StorageLocation.
-                More info: https://github.com/operator-framework/operator-metering/blob/master/Documentation/storagelocations.md
+                More info: https://github.com/kubernetes-reporting/metering-operator/blob/master/Documentation/storagelocations.md
               minLength: 1
             tableName:
               type: string

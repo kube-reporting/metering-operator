@@ -3,8 +3,8 @@ package operator
 import (
 	"fmt"
 
-	metering "github.com/operator-framework/operator-metering/pkg/apis/metering/v1"
-	cbListers "github.com/operator-framework/operator-metering/pkg/generated/listers/metering/v1"
+	metering "github.com/kubernetes-reporting/metering-operator/pkg/apis/metering/v1"
+	cbListers "github.com/kubernetes-reporting/metering-operator/pkg/generated/listers/metering/v1"
 	"k8s.io/apimachinery/pkg/labels"
 )
 

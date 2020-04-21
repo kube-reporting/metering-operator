@@ -16,12 +16,12 @@ import (
 	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/client-go/tools/cache"
 
-	metering "github.com/operator-framework/operator-metering/pkg/apis/metering/v1"
-	meteringUtil "github.com/operator-framework/operator-metering/pkg/apis/metering/v1/util"
-	"github.com/operator-framework/operator-metering/pkg/hive"
-	"github.com/operator-framework/operator-metering/pkg/operator/reporting"
-	"github.com/operator-framework/operator-metering/pkg/operator/reportingutil"
-	"github.com/operator-framework/operator-metering/pkg/util/slice"
+	metering "github.com/kubernetes-reporting/metering-operator/pkg/apis/metering/v1"
+	meteringUtil "github.com/kubernetes-reporting/metering-operator/pkg/apis/metering/v1/util"
+	"github.com/kubernetes-reporting/metering-operator/pkg/hive"
+	"github.com/kubernetes-reporting/metering-operator/pkg/operator/reporting"
+	"github.com/kubernetes-reporting/metering-operator/pkg/operator/reportingutil"
+	"github.com/kubernetes-reporting/metering-operator/pkg/util/slice"
 )
 
 const (

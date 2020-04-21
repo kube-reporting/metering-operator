@@ -37,7 +37,7 @@ spec:
             PrestoTableSpec is the desired specification of a PrestoTable custom resource.
             Required fields: unmanaged, catalog, schema, tableName, and columns.
             Optional fields: query, view, createTableAs, properties, and comment.
-            More info: https://github.com/operator-framework/operator-metering/blob/master/Documentation/prestotables.md
+            More info: https://github.com/kubernetes-reporting/metering-operator/blob/master/Documentation/prestotables.md
           required:
           - unmanaged
           - catalog

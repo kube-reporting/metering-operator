@@ -2,7 +2,7 @@ package e2e
 
 import (
 	"bytes"
-	"github.com/operator-framework/operator-metering/test/reportingframework"
+	"github.com/kubernetes-reporting/metering-operator/test/reportingframework"
 	"github.com/stretchr/testify/require"
 	"os"
 	"os/exec"

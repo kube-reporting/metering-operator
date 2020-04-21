@@ -8,7 +8,7 @@ import (
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	meta "k8s.io/apimachinery/pkg/apis/meta/v1"
 
-	"github.com/operator-framework/operator-metering/test/reportingframework"
+	"github.com/kubernetes-reporting/metering-operator/test/reportingframework"
 )
 
 func testInvalidMeteringConfigMissingStorageSpec(t *testing.T, rf *reportingframework.ReportingFramework) {

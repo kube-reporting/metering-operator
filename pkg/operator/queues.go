@@ -11,9 +11,9 @@ import (
 	"k8s.io/client-go/tools/cache"
 	"k8s.io/client-go/util/workqueue"
 
-	metering "github.com/operator-framework/operator-metering/pkg/apis/metering/v1"
-	_ "github.com/operator-framework/operator-metering/pkg/util/reflector/prometheus" // for prometheus metric registration
-	_ "github.com/operator-framework/operator-metering/pkg/util/workqueue/prometheus" // for prometheus metric registration
+	metering "github.com/kubernetes-reporting/metering-operator/pkg/apis/metering/v1"
+	_ "github.com/kubernetes-reporting/metering-operator/pkg/util/reflector/prometheus" // for prometheus metric registration
+	_ "github.com/kubernetes-reporting/metering-operator/pkg/util/workqueue/prometheus" // for prometheus metric registration
 )
 
 func (op *Reporting) shutdownQueues() {
