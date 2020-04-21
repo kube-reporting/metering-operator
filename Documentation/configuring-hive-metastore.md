@@ -1,6 +1,6 @@
 # Configuring the Hive metastore
 
-Hive metastore is responsible for storing all the metadata about the database tables we create in Presto and Hive.
+Hive metastore is responsible for storing all the [metadata](https://cwiki.apache.org/confluence/display/Hive/Design#Design-MetadataObjects) about the database tables we create in Presto and Hive.
 By default, the metastore stores this information in a local embedded Derby database in a PersistentVolume attached to the pod.
 
 Generally the default configuration of Hive metastore works for small clusters, but users may wish to improve performance or move storage requirements out of cluster by using a dedicated SQL database for storing the Hive metastore data.
