@@ -219,7 +219,7 @@ olm:
     minKubeVersion: "1.11.0"
     displayName: Metering
     description: |
-      Operator Metering is a chargeback and reporting tool to provide accountability for how resources are used across a cluster. Cluster admins can schedule reports based on historical usage data by Pod, Namespace, and Cluster wide. Operator Metering is part of the [Operator Framework](https://coreos.com/blog/introducing-operator-framework-metering).
+      The Metering Operator is a chargeback and reporting tool to provide accountability for how resources are used across a cluster. Cluster admins can schedule reports based on historical usage data by Pod, Namespace, and Cluster wide. The Metering Operator is a part of the [Kubernetes Reporting organization](https://coreos.com/blog/introducing-operator-framework-metering).
 
       Read the user guide for more details on [running and viewing your first report](https://docs.openshift.com/container-platform/4.5/metering/metering-using-metering.html).
 
@@ -332,7 +332,7 @@ olm:
       createdAt: "2019-01-01T11:59:59Z"
       containerImage: "quay.io/openshift/origin-metering-ansible-operator:4.5"
       description: 'Chargeback and reporting tool to provide accountability for how resources are used across a cluster'
-      repository: https://github.com/operator-framework/operator-metering
+      repository: https://github.com/kubernetes-reporting/metering-operator
       olm.skipRange: ">=4.2.0 <4.5.0"
       alm-examples: |-
         [

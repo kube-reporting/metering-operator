@@ -5,8 +5,8 @@ package v1
 import (
 	"time"
 
-	v1 "github.com/operator-framework/operator-metering/pkg/apis/metering/v1"
-	scheme "github.com/operator-framework/operator-metering/pkg/generated/clientset/versioned/scheme"
+	v1 "github.com/kubernetes-reporting/metering-operator/pkg/apis/metering/v1"
+	scheme "github.com/kubernetes-reporting/metering-operator/pkg/generated/clientset/versioned/scheme"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	types "k8s.io/apimachinery/pkg/types"
 	watch "k8s.io/apimachinery/pkg/watch"
