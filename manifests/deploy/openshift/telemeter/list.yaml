@@ -91,7 +91,7 @@ objects:
             description: |
               HiveTableSpec is the desired specification of a HiveTable custom resource.
               Required fields: database, tableName, and columns.
-              More info: https://github.com/operator-framework/operator-metering/blob/master/Documentation/hivetables.md
+              More info: https://github.com/kube-reporting/metering-operator/blob/master/Documentation/hivetables.md
             properties:
               clusteredBy:
                 description: |
@@ -131,7 +131,7 @@ objects:
                 description: |
                   DatabaseName is the name of the Hive database to use.
                   Generally, this field should be set to "default", or the value of the "databaseName" in a Hive StorageLocation.
-                  More info: https://github.com/operator-framework/operator-metering/blob/master/Documentation/storagelocations.md
+                  More info: https://github.com/kube-reporting/metering-operator/blob/master/Documentation/storagelocations.md
                 minLength: 1
                 type: string
               external:
@@ -3030,7 +3030,7 @@ objects:
               PrestoTableSpec is the desired specification of a PrestoTable custom resource.
               Required fields: unmanaged, catalog, schema, tableName, and columns.
               Optional fields: query, view, createTableAs, properties, and comment.
-              More info: https://github.com/operator-framework/operator-metering/blob/master/Documentation/prestotables.md
+              More info: https://github.com/kube-reporting/metering-operator/blob/master/Documentation/prestotables.md
             oneOf:
             - allOf:
               - not:
@@ -3761,7 +3761,7 @@ objects:
             description: |
               StorageLocationSpec is the desired specification of a StorageLocation custom resource.
               Required fields: databaseName, unmanagedDatabase, and location.
-              More info: https://github.com/operator-framework/operator-metering/blob/master/Documentation/storagelocations.md
+              More info: https://github.com/kube-reporting/metering-operator/blob/master/Documentation/storagelocations.md
             properties:
               hive:
                 description: |

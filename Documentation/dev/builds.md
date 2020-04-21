@@ -7,7 +7,7 @@ Each of them is built slightly differently.
   - Written in Go
   - Source is primarily in `pkg/`, and `cmd/` of this repo.
   - origin
-    - source is https://github.com/operator-framework/operator-metering
+    - source is https://github.com/kube-reporting/metering-operator
     - Dockerfile is `Dockerfile.reporting-operator`
     - Docker image is [quay.io/openshift/origin-metering-reporting-operator](https://quay.io/repository/openshift/origin-metering-reporting-operator)
     - Built by origin CI using prow/ci-operator
@@ -23,7 +23,7 @@ Each of them is built slightly differently.
   - Written using mostly bash, jq, python and helm charts.
   - Source is primarily in `charts/`, `images/helm-operator/`
   - origin
-    - Source: https://github.com/operator-framework/operator-metering
+    - Source: https://github.com/kube-reporting/metering-operator
     - Dockerfile is `Dockerfile.metering-operator`
     - Docker image is [quay.io/openshift/origin-metering-helm-operator](https://quay.io/repository/openshift/origin-metering-helm-operator)
     - Built by origin CI using prow/ci-operator
@@ -37,13 +37,13 @@ Each of them is built slightly differently.
 - helm
   - Written in Go
   - origin
-    - Source is https://github.com/operator-framework/helm/blob/master
-    - Dockerfile is https://github.com/operator-framework/helm/blob/master/Dockerfile
+    - Source is https://github.com/kube-reporting/helm/blob/master
+    - Dockerfile is https://github.com/kube-reporting/helm/blob/master/Dockerfile
     - Docker image is [quay.io/openshift/origin-metering-helm](https://quay.io/repository/openshift/origin-metering-helm)
     - Build by origin CI using prow/ci-operator
   - OCP
     - Source is  http://pkgs.devel.redhat.com/cgit/containers/ose-metering-helm/
-    - OCP Dockerfile is https://github.com/operator-framework/helm/blob/master/Dockerfile.rhel
+    - OCP Dockerfile is https://github.com/kube-reporting/helm/blob/master/Dockerfile.rhel
     - OCP Docker image is TBD
     - Built in brew by OSBS
     - brew package name: `ose-metering-helm-container`
@@ -51,13 +51,13 @@ Each of them is built slightly differently.
 - presto
   - Written in Java, uses [maven][maven] as a project build tool.
   - origin
-    - Source is https://github.com/operator-framework/presto/tree/master
-    - Dockerfile is https://github.com/operator-framework/presto/blob/master/Dockerfile
+    - Source is https://github.com/kube-reporting/presto/tree/master
+    - Dockerfile is https://github.com/kube-reporting/presto/blob/master/Dockerfile
     - Docker image is [quay.io/openshift/origin-metering-presto](https://quay.io/repository/openshift/origin-metering-presto)
     - Build by origin CI using prow/ci-operator
   - OCP
     - Source is http://pkgs.devel.redhat.com/cgit/containers/presto/
-    - OCP Dockerfile is https://github.com/operator-framework/presto/blob/master/Dockerfile.rhel
+    - OCP Dockerfile is https://github.com/kube-reporting/presto/blob/master/Dockerfile.rhel
     - OCP Docker image is TBD
     - Built in brew by OSBS
     - brew package name: `presto-container`
@@ -65,13 +65,13 @@ Each of them is built slightly differently.
 - hive
   - Written in Java, uses [maven][maven] as a project build tool.
   - origin
-    - Source is https://github.com/operator-framework/hive/tree/master
-    - Dockerfile is https://github.com/operator-framework/hive/tree/master/Dockerfile
+    - Source is https://github.com/kube-reporting/hive/tree/master
+    - Dockerfile is https://github.com/kube-reporting/hive/tree/master/Dockerfile
     - Docker image is [quay.io/openshift/origin-metering-hive](https://quay.io/repository/openshift/origin-metering-hive)
     - Build by origin CI using prow/ci-operator
   - OCP
     - Source is http://pkgs.devel.redhat.com/cgit/containers/hive/
-    - OCP Dockerfile is https://github.com/operator-framework/hive/tree/master/Dockerfile.rhel
+    - OCP Dockerfile is https://github.com/kube-reporting/hive/tree/master/Dockerfile.rhel
     - OCP Docker image is TBD
     - Built in brew by OSBS
     - brew package name: `hive-container`
@@ -79,13 +79,13 @@ Each of them is built slightly differently.
 - hadoop
   - Written in Java, uses [maven][maven] as a project build tool.
   - origin
-    - Source is https://github.com/operator-framework/hadoop/tree/master
-    - Dockerfile is https://github.com/operator-framework/hadoop/tree/master/Dockerfile
+    - Source is https://github.com/kube-reporting/hadoop/tree/master
+    - Dockerfile is https://github.com/kube-reporting/hadoop/tree/master/Dockerfile
     - Docker image is [quay.io/openshift/origin-metering-hadoop](https://quay.io/repository/openshift/origin-metering-hadoop)
     - Build by origin CI using prow/ci-operator
   - OCP
     - Source is http://pkgs.devel.redhat.com/cgit/containers/hadoop/
-    - OCP Dockerfile is https://github.com/operator-framework/hadoop/tree/master/Dockerfile.rhel
+    - OCP Dockerfile is https://github.com/kube-reporting/hadoop/tree/master/Dockerfile.rhel
     - OCP Docker image is TBD
     - Built in brew by OSBS
     - brew package name: `hadoop-container`

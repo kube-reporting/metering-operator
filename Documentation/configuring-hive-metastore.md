@@ -33,7 +33,7 @@ Use [metastore-storage.yaml][metastore-storage-config] as a template and adjust 
 ## Use MySQL for the Hive Metastore database
 
 By default to make installation easier Metering configures Hive to use an embedded Java database called [Derby](https://db.apache.org/derby/#What+is+Apache+Derby%3F), however this is unsuited for larger environments or metering installations with a lot of reports and metrics being collected.
-Currently two alternative options are available, MySQL and PostgreSQL, both of which have been tested with operator metering.
+Currently two alternative options are available, MySQL and PostgreSQL, both of which have been tested with the metering-operator.
 
 There are 4 configuration options you can use to control the database used by Hive metastore: `url` , `driver` , `username` , and `password`.
 

@@ -31,7 +31,7 @@ spec:
           description: |
             StorageLocationSpec is the desired specification of a StorageLocation custom resource.
             Required fields: databaseName, unmanagedDatabase, and location.
-            More info: https://github.com/operator-framework/operator-metering/blob/master/Documentation/storagelocations.md
+            More info: https://github.com/kube-reporting/metering-operator/blob/master/Documentation/storagelocations.md
           properties:
             hive:
               type: object

@@ -6,11 +6,11 @@ import (
 	"testing"
 	"time"
 
-	"github.com/operator-framework/operator-metering/pkg/operator/reporting"
+	"github.com/kube-reporting/metering-operator/pkg/operator/reporting"
 
-	metering "github.com/operator-framework/operator-metering/pkg/apis/metering/v1"
-	meteringUtil "github.com/operator-framework/operator-metering/pkg/apis/metering/v1/util"
-	"github.com/operator-framework/operator-metering/test/testhelpers"
+	metering "github.com/kube-reporting/metering-operator/pkg/apis/metering/v1"
+	meteringUtil "github.com/kube-reporting/metering-operator/pkg/apis/metering/v1/util"
+	"github.com/kube-reporting/metering-operator/test/testhelpers"
 	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"

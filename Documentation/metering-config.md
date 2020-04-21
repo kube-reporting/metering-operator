@@ -21,7 +21,7 @@ For details on different types of configuration read the relevant document:
 
 ## Documentation conventions
 
-This document and other documents in the operator-metering project follow the convention of describing nested fields in configuration settings using dots as separators.
+This document and other documents in the metering-operator project follow the convention of describing nested fields in configuration settings using dots as separators.
 For example:
 
 ```

@@ -3,7 +3,7 @@
 package v1
 
 import (
-	internalinterfaces "github.com/operator-framework/operator-metering/pkg/generated/informers/externalversions/internalinterfaces"
+	internalinterfaces "github.com/kube-reporting/metering-operator/pkg/generated/informers/externalversions/internalinterfaces"
 )
 
 // Interface provides access to all the informers in this group version.

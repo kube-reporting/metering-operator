@@ -7,7 +7,7 @@ import (
 	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/assert"
 
-	mockprestostore "github.com/operator-framework/operator-metering/pkg/operator/prestostore/mock"
+	mockprestostore "github.com/kube-reporting/metering-operator/pkg/operator/prestostore/mock"
 )
 
 func TestGenerateReport(t *testing.T) {

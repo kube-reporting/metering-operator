@@ -41,7 +41,7 @@ spec:
       required:
       - spec
       properties:
-        # note: see https://github.com/operator-framework/operator-metering/blob/master/Documentation/reports.md for more information
+        # note: see https://github.com/kube-reporting/metering-operator/blob/master/Documentation/reports.md for more information
         # note: apiVersion, kind, metadata is implicitly validated by API server
         spec:
           type: object

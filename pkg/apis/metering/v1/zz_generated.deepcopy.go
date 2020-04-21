@@ -7,8 +7,8 @@ package v1
 import (
 	json "encoding/json"
 
-	hive "github.com/operator-framework/operator-metering/pkg/hive"
-	presto "github.com/operator-framework/operator-metering/pkg/presto"
+	hive "github.com/kube-reporting/metering-operator/pkg/hive"
+	presto "github.com/kube-reporting/metering-operator/pkg/presto"
 	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"

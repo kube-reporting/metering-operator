@@ -6,7 +6,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/operator-framework/operator-metering/test/testhelpers"
+	"github.com/kube-reporting/metering-operator/test/testhelpers"
 	"github.com/stretchr/testify/require"
 )
 

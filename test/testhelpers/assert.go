@@ -3,7 +3,7 @@ package testhelpers
 import (
 	"testing"
 
-	"github.com/operator-framework/operator-metering/pkg/util/orderedmap"
+	"github.com/kube-reporting/metering-operator/pkg/util/orderedmap"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )

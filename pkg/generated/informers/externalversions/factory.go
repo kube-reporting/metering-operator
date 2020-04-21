@@ -7,9 +7,9 @@ import (
 	sync "sync"
 	time "time"
 
-	versioned "github.com/operator-framework/operator-metering/pkg/generated/clientset/versioned"
-	internalinterfaces "github.com/operator-framework/operator-metering/pkg/generated/informers/externalversions/internalinterfaces"
-	metering "github.com/operator-framework/operator-metering/pkg/generated/informers/externalversions/metering"
+	versioned "github.com/kube-reporting/metering-operator/pkg/generated/clientset/versioned"
+	internalinterfaces "github.com/kube-reporting/metering-operator/pkg/generated/informers/externalversions/internalinterfaces"
+	metering "github.com/kube-reporting/metering-operator/pkg/generated/informers/externalversions/metering"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	runtime "k8s.io/apimachinery/pkg/runtime"
 	schema "k8s.io/apimachinery/pkg/runtime/schema"

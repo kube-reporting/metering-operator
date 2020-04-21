@@ -34,14 +34,14 @@ It is important that you clone the project to the right location in your $GOPATH
 The repository much be located at:
 
 ```
-$GOPATH/src/github.com/operator-framework/operator-metering
+$GOPATH/src/github.com/kube-reporting/metering-operator
 ```
 
 When cloning this repository, you can run the following commands to ensure that the project files are stored in the right location:
 
 ```
-mkdir -p $GOPATH/src/github.com/operator-framework/
-git clone https://github.com/operator-framework/operator-metering $GOPATH/src/github.com/operator-framework/operator-metering
+mkdir -p $GOPATH/src/github.com/kube-reporting/
+git clone https://github.com/kube-reporting/metering-operator $GOPATH/src/github.com/kube-reporting/metering-operator
 ```
 
 ## Building

@@ -16,7 +16,7 @@ required = [
   "github.com/golang/mock/mockgen/model",
 ]
 
-ignored = ["github.com/operator-framework/operator-metering/gotools/test2json"]
+ignored = ["github.com/kube-reporting/metering-operator/gotools/test2json"]
 
 [[constraint]]
   branch = "master"

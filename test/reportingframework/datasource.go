@@ -10,7 +10,7 @@ import (
 	meta "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/util/wait"
 
-	metering "github.com/operator-framework/operator-metering/pkg/apis/metering/v1"
+	metering "github.com/kube-reporting/metering-operator/pkg/apis/metering/v1"
 )
 
 func (rf *ReportingFramework) GetMeteringReportDataSource(name string) (*metering.ReportDataSource, error) {
