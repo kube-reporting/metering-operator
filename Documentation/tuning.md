@@ -5,7 +5,7 @@ Without proper resource limits, pods are unable to correctly operate without exp
 
 Here's a common list of reasons you may need to increase your resource limits:
 
-- Larger clusters. If you're running more than 10 nodes, it's likely the defaults will insufficient. The defaults are set low to make it easier to install onto smaller clusters.
+- Larger clusters. If you're running more than 10 nodes, it's likely the defaults will be insufficient. The defaults are set low to make it easier to install onto smaller clusters.
 - Pods being OOMKilled. Check if any pod has a restart count that is increasing over time. Use `kubectl describe pod` to determine why it restarted. If it's due to OOMKilled, then this pod needs more memory.
 - High cluster activity. If you're running on a cluster with high activity in terms of pods being deleted and recreated, this will produce more metrics, and result in higher resource requirements than relatively idle/unchanging clusters.
 - Storage. By default, if you're using HDFS, the storage requested is 5Gi, which will only store a few months of data on a smaller cluster.
