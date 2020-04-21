@@ -119,6 +119,7 @@ unit-docker: metering-src-docker-build
 e2e: $(DEPLOY_METERING_BIN_OUT)
 	EXTRA_TEST_FLAGS="-run TestManualMeteringInstall" hack/e2e.sh
 
+
 # TODO: revert when https://bugzilla.redhat.com/show_bug.cgi?id=1825330 has been resolved
 e2e-upgrade: $(DEPLOY_METERING_BIN_OUT)
 	# EXTRA_TEST_FLAGS="-run TestMeteringUpgrades" ./hack/e2e.sh
