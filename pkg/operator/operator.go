@@ -38,15 +38,15 @@ import (
 	"k8s.io/client-go/transport"
 	"k8s.io/client-go/util/workqueue"
 
-	metering "github.com/operator-framework/operator-metering/pkg/apis/metering/v1"
-	"github.com/operator-framework/operator-metering/pkg/db"
-	cbClientset "github.com/operator-framework/operator-metering/pkg/generated/clientset/versioned"
-	factory "github.com/operator-framework/operator-metering/pkg/generated/informers/externalversions"
-	listers "github.com/operator-framework/operator-metering/pkg/generated/listers/metering/v1"
-	"github.com/operator-framework/operator-metering/pkg/operator/prestostore"
-	"github.com/operator-framework/operator-metering/pkg/operator/reporting"
-	_ "github.com/operator-framework/operator-metering/pkg/util/reflector/prometheus" // for prometheus metric registration
-	_ "github.com/operator-framework/operator-metering/pkg/util/workqueue/prometheus" // for prometheus metric registration
+	metering "github.com/kubernetes-reporting/metering-operator/pkg/apis/metering/v1"
+	"github.com/kubernetes-reporting/metering-operator/pkg/db"
+	cbClientset "github.com/kubernetes-reporting/metering-operator/pkg/generated/clientset/versioned"
+	factory "github.com/kubernetes-reporting/metering-operator/pkg/generated/informers/externalversions"
+	listers "github.com/kubernetes-reporting/metering-operator/pkg/generated/listers/metering/v1"
+	"github.com/kubernetes-reporting/metering-operator/pkg/operator/prestostore"
+	"github.com/kubernetes-reporting/metering-operator/pkg/operator/reporting"
+	_ "github.com/kubernetes-reporting/metering-operator/pkg/util/reflector/prometheus" // for prometheus metric registration
+	_ "github.com/kubernetes-reporting/metering-operator/pkg/util/workqueue/prometheus" // for prometheus metric registration
 )
 
 const (

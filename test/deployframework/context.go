@@ -12,10 +12,10 @@ import (
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/rest"
 
-	metering "github.com/operator-framework/operator-metering/pkg/apis/metering/v1"
-	"github.com/operator-framework/operator-metering/pkg/deploy"
-	meteringclient "github.com/operator-framework/operator-metering/pkg/generated/clientset/versioned/typed/metering/v1"
-	"github.com/operator-framework/operator-metering/test/reportingframework"
+	metering "github.com/kubernetes-reporting/metering-operator/pkg/apis/metering/v1"
+	"github.com/kubernetes-reporting/metering-operator/pkg/deploy"
+	meteringclient "github.com/kubernetes-reporting/metering-operator/pkg/generated/clientset/versioned/typed/metering/v1"
+	"github.com/kubernetes-reporting/metering-operator/test/reportingframework"
 )
 
 var (

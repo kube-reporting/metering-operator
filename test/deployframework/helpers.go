@@ -18,7 +18,7 @@ import (
 	"k8s.io/apimachinery/pkg/util/wait"
 	"k8s.io/client-go/kubernetes"
 
-	metering "github.com/operator-framework/operator-metering/pkg/apis/metering/v1"
+	metering "github.com/kubernetes-reporting/metering-operator/pkg/apis/metering/v1"
 )
 
 func checkPodStatus(pod v1.Pod) (bool, int) {

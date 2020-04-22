@@ -6,9 +6,9 @@ import (
 	"time"
 	"unicode"
 
-	metering "github.com/operator-framework/operator-metering/pkg/apis/metering/v1"
-	"github.com/operator-framework/operator-metering/pkg/hive"
-	"github.com/operator-framework/operator-metering/pkg/presto"
+	metering "github.com/kubernetes-reporting/metering-operator/pkg/apis/metering/v1"
+	"github.com/kubernetes-reporting/metering-operator/pkg/hive"
+	"github.com/kubernetes-reporting/metering-operator/pkg/presto"
 )
 
 var (

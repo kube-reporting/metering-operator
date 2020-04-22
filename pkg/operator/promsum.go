@@ -11,9 +11,9 @@ import (
 	"golang.org/x/sync/errgroup"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
-	metering "github.com/operator-framework/operator-metering/pkg/apis/metering/v1"
-	"github.com/operator-framework/operator-metering/pkg/operator/prestostore"
-	"github.com/operator-framework/operator-metering/pkg/operator/reportingutil"
+	metering "github.com/kubernetes-reporting/metering-operator/pkg/apis/metering/v1"
+	"github.com/kubernetes-reporting/metering-operator/pkg/operator/prestostore"
+	"github.com/kubernetes-reporting/metering-operator/pkg/operator/reportingutil"
 )
 
 const (
