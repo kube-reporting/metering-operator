@@ -6,10 +6,10 @@ import (
 
 	"github.com/sirupsen/logrus"
 
+	metering "github.com/kubernetes-reporting/metering-operator/pkg/apis/metering/v1"
+	meteringclient "github.com/kubernetes-reporting/metering-operator/pkg/generated/clientset/versioned/typed/metering/v1"
 	olmclientv1 "github.com/operator-framework/operator-lifecycle-manager/pkg/api/client/clientset/versioned/typed/operators/v1"
 	olmclientv1alpha1 "github.com/operator-framework/operator-lifecycle-manager/pkg/api/client/clientset/versioned/typed/operators/v1alpha1"
-	metering "github.com/operator-framework/operator-metering/pkg/apis/metering/v1"
-	meteringclient "github.com/operator-framework/operator-metering/pkg/generated/clientset/versioned/typed/metering/v1"
 	apiextv1beta1 "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1beta1"
 	apiextclientv1beta1 "k8s.io/apiextensions-apiserver/pkg/client/clientset/clientset/typed/apiextensions/v1beta1"
 

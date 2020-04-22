@@ -36,7 +36,7 @@
 		]
 	},
 	{
-		"project": "github.com/operator-framework/operator-metering",
+		"project": "github.com/kubernetes-reporting/metering-operator",
 		"licenses": [
 			{
 				"type": "Apache License 2.0",

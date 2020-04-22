@@ -8,16 +8,16 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
 
+	meteringclient "github.com/kubernetes-reporting/metering-operator/pkg/generated/clientset/versioned/typed/metering/v1"
 	olmclientv1 "github.com/operator-framework/operator-lifecycle-manager/pkg/api/client/clientset/versioned/typed/operators/v1"
 	olmclientv1alpha1 "github.com/operator-framework/operator-lifecycle-manager/pkg/api/client/clientset/versioned/typed/operators/v1alpha1"
-	meteringclient "github.com/operator-framework/operator-metering/pkg/generated/clientset/versioned/typed/metering/v1"
 	apiextclientv1beta1 "k8s.io/apiextensions-apiserver/pkg/client/clientset/clientset/typed/apiextensions/v1beta1"
 
 	"k8s.io/client-go/kubernetes"
 	_ "k8s.io/client-go/plugin/pkg/client/auth"
 	"k8s.io/client-go/tools/clientcmd"
 
-	"github.com/operator-framework/operator-metering/pkg/deploy"
+	"github.com/kubernetes-reporting/metering-operator/pkg/deploy"
 )
 
 var (

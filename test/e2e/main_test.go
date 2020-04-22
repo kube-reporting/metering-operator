@@ -18,10 +18,10 @@ import (
 	meta "k8s.io/apimachinery/pkg/apis/meta/v1"
 	_ "k8s.io/client-go/plugin/pkg/client/auth/oidc"
 
-	metering "github.com/operator-framework/operator-metering/pkg/apis/metering/v1"
-	"github.com/operator-framework/operator-metering/test/deployframework"
-	"github.com/operator-framework/operator-metering/test/reportingframework"
-	"github.com/operator-framework/operator-metering/test/testhelpers"
+	metering "github.com/kubernetes-reporting/metering-operator/pkg/apis/metering/v1"
+	"github.com/kubernetes-reporting/metering-operator/test/deployframework"
+	"github.com/kubernetes-reporting/metering-operator/test/reportingframework"
+	"github.com/kubernetes-reporting/metering-operator/test/testhelpers"
 )
 
 var (

@@ -7,9 +7,9 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	metering "github.com/operator-framework/operator-metering/pkg/apis/metering/v1"
-	"github.com/operator-framework/operator-metering/pkg/operator/reporting"
-	"github.com/operator-framework/operator-metering/test/reportingframework"
+	metering "github.com/kubernetes-reporting/metering-operator/pkg/apis/metering/v1"
+	"github.com/kubernetes-reporting/metering-operator/pkg/operator/reporting"
+	"github.com/kubernetes-reporting/metering-operator/test/reportingframework"
 )
 
 var (

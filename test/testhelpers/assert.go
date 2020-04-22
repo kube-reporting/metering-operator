@@ -4,7 +4,7 @@ import (
 	"regexp"
 	"testing"
 
-	"github.com/operator-framework/operator-metering/pkg/util/orderedmap"
+	"github.com/kubernetes-reporting/metering-operator/pkg/util/orderedmap"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -88,7 +88,7 @@ func AssertErrorContainsErrorMsgs(t *testing.T, err error, errMsgArr []string) {
 	  check makes sense going forward.
 
 	  More information:
-	  https://github.com/operator-framework/operator-metering/pull/1140#discussion_r406410209
+	  https://github.com/kubernetes-reporting/metering-operator/pull/1140#discussion_r406410209
 	*/
 
 	require.NotNil(t, err, "expected the error would not be nil")

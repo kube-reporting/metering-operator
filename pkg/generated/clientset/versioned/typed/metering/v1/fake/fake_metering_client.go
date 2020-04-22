@@ -3,7 +3,7 @@
 package fake
 
 import (
-	v1 "github.com/operator-framework/operator-metering/pkg/generated/clientset/versioned/typed/metering/v1"
+	v1 "github.com/kubernetes-reporting/metering-operator/pkg/generated/clientset/versioned/typed/metering/v1"
 	rest "k8s.io/client-go/rest"
 	testing "k8s.io/client-go/testing"
 )
