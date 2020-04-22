@@ -3,7 +3,7 @@ FROM quay.io/openshift/origin-metering-helm:latest as helm
 # final image needs kubectl, so we copy `oc` from cli image to use as kubectl.
 FROM openshift/origin-cli:latest as cli
 # real base
-FROM quay.io/openshift/origin-ansible-operator:latest
+FROM quay.io/openshift/origin-ansible-operator:4.3
 
 USER root
 RUN set -x; INSTALL_PKGS="curl bash ca-certificates less which inotify-tools openssl" \
@@ -24,8 +24,8 @@ RUN ln -f -s /usr/bin/oc /usr/bin/kubectl
 # put tini into our path
 RUN ln -f -s /tini /usr/bin/tini
 
-RUN pip install --no-cache-dir --upgrade openshift boto3 cryptography
-RUN pip install --upgrade ansible>=2.8
+RUN pip install --no-cache-dir --upgrade openshift boto3 cryptography "setuptools<=45.1.0"
+RUN pip install --upgrade ansible==2.8
 
 ENV HOME /opt/ansible
 ENV HELM_CHART_PATH ${HOME}/charts/openshift-metering
