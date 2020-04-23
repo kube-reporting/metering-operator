@@ -323,7 +323,7 @@ olm:
       createdAt: "2019-01-01T11:59:59Z"
       containerImage: "quay.io/openshift/origin-metering-ansible-operator:4.4"
       description: 'Chargeback and reporting tool to provide accountability for how resources are used across a cluster'
-      repository: https://github.com/kubernetes-reporting/metering-operator
+      repository: https://github.com/kube-reporting/metering-operator
       alm-examples: |-
         [
           {

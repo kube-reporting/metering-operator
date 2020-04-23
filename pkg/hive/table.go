@@ -4,7 +4,7 @@ import (
 	"net/url"
 	"path"
 
-	"github.com/kubernetes-reporting/metering-operator/pkg/db"
+	"github.com/kube-reporting/metering-operator/pkg/db"
 )
 
 type Column struct {

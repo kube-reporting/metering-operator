@@ -20,11 +20,11 @@ import (
 	"github.com/stretchr/testify/require"
 	"k8s.io/client-go/tools/cache"
 
-	metering "github.com/kubernetes-reporting/metering-operator/pkg/apis/metering/v1"
-	listers "github.com/kubernetes-reporting/metering-operator/pkg/generated/listers/metering/v1"
-	"github.com/kubernetes-reporting/metering-operator/pkg/operator/prestostore"
-	"github.com/kubernetes-reporting/metering-operator/pkg/presto"
-	"github.com/kubernetes-reporting/metering-operator/test/testhelpers"
+	metering "github.com/kube-reporting/metering-operator/pkg/apis/metering/v1"
+	listers "github.com/kube-reporting/metering-operator/pkg/generated/listers/metering/v1"
+	"github.com/kube-reporting/metering-operator/pkg/operator/prestostore"
+	"github.com/kube-reporting/metering-operator/pkg/presto"
+	"github.com/kube-reporting/metering-operator/test/testhelpers"
 )
 
 var (

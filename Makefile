@@ -4,7 +4,7 @@ ROOT_DIR:= $(patsubst %/,%,$(dir $(realpath $(lastword $(MAKEFILE_LIST)))))
 include build/check_defined.mk
 
 # Package
-GO_PKG := github.com/kubernetes-reporting/metering-operator
+GO_PKG := github.com/kube-reporting/metering-operator
 REPORTING_OPERATOR_PKG := $(GO_PKG)/cmd/reporting-operator
 # these are directories/files which get auto-generated or get reformated by
 # gofmt
@@ -107,8 +107,8 @@ unit-docker: metering-src-docker-build
 	docker run \
 		--rm \
 		-t \
-		-w /go/src/github.com/kubernetes-reporting/metering-operator \
-		-v $(PWD):/go/src/github.com/kubernetes-reporting/metering-operator \
+		-w /go/src/github.com/kube-reporting/metering-operator \
+		-v $(PWD):/go/src/github.com/kube-reporting/metering-operator \
 		$(METERING_SRC_IMAGE_REPO):$(METERING_SRC_IMAGE_TAG) \
 		make unit
 
@@ -133,9 +133,9 @@ e2e-docker: metering-src-docker-build
 		-e REPORTING_OPERATOR_IMAGE_REPO -e REPORTING_OPERATOR_IMAGE_TAG \
 		-e KUBECONFIG=/kubeconfig \
 		-e TEST_OUTPUT_PATH=/out \
-		-w /go/src/github.com/kubernetes-reporting/metering-operator \
+		-w /go/src/github.com/kube-reporting/metering-operator \
 		-v $(KUBECONFIG):/kubeconfig \
-		-v $(PWD):/go/src/github.com/kubernetes-reporting/metering-operator \
+		-v $(PWD):/go/src/github.com/kube-reporting/metering-operator \
 		-v /out \
 		$(METERING_SRC_IMAGE_REPO):$(METERING_SRC_IMAGE_TAG) \
 		make e2e
@@ -165,8 +165,8 @@ verify-docker: metering-src-docker-build
 	docker run \
 		--rm \
 		-t \
-		-w /go/src/github.com/kubernetes-reporting/metering-operator \
-		-v $(PWD):/go/src/github.com/kubernetes-reporting/metering-operator \
+		-w /go/src/github.com/kube-reporting/metering-operator \
+		-v $(PWD):/go/src/github.com/kube-reporting/metering-operator \
 		$(METERING_SRC_IMAGE_REPO):$(METERING_SRC_IMAGE_TAG) \
 		make verify
 

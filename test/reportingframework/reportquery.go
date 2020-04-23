@@ -9,9 +9,9 @@ import (
 	meta "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/util/wait"
 
-	metering "github.com/kubernetes-reporting/metering-operator/pkg/apis/metering/v1"
-	"github.com/kubernetes-reporting/metering-operator/pkg/operator"
-	"github.com/kubernetes-reporting/metering-operator/pkg/operator/reporting"
+	metering "github.com/kube-reporting/metering-operator/pkg/apis/metering/v1"
+	"github.com/kube-reporting/metering-operator/pkg/operator"
+	"github.com/kube-reporting/metering-operator/pkg/operator/reporting"
 )
 
 func (rf *ReportingFramework) GetMeteringReportQuery(name string) (*metering.ReportQuery, error) {
