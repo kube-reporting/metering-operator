@@ -15,14 +15,14 @@ import (
 	"k8s.io/client-go/tools/cache"
 	"k8s.io/client-go/util/retry"
 
-	metering "github.com/kubernetes-reporting/metering-operator/pkg/apis/metering/v1"
-	"github.com/kubernetes-reporting/metering-operator/pkg/aws"
-	cbInterfaces "github.com/kubernetes-reporting/metering-operator/pkg/generated/clientset/versioned/typed/metering/v1"
-	"github.com/kubernetes-reporting/metering-operator/pkg/hive"
-	"github.com/kubernetes-reporting/metering-operator/pkg/operator/prestostore"
-	"github.com/kubernetes-reporting/metering-operator/pkg/operator/reporting"
-	"github.com/kubernetes-reporting/metering-operator/pkg/operator/reportingutil"
-	"github.com/kubernetes-reporting/metering-operator/pkg/util/slice"
+	metering "github.com/kube-reporting/metering-operator/pkg/apis/metering/v1"
+	"github.com/kube-reporting/metering-operator/pkg/aws"
+	cbInterfaces "github.com/kube-reporting/metering-operator/pkg/generated/clientset/versioned/typed/metering/v1"
+	"github.com/kube-reporting/metering-operator/pkg/hive"
+	"github.com/kube-reporting/metering-operator/pkg/operator/prestostore"
+	"github.com/kube-reporting/metering-operator/pkg/operator/reporting"
+	"github.com/kube-reporting/metering-operator/pkg/operator/reportingutil"
+	"github.com/kube-reporting/metering-operator/pkg/util/slice"
 )
 
 const (

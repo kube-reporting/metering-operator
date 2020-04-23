@@ -8,10 +8,10 @@ import (
 	"github.com/sirupsen/logrus"
 	log "github.com/sirupsen/logrus"
 
-	metering "github.com/kubernetes-reporting/metering-operator/pkg/apis/metering/v1"
-	"github.com/kubernetes-reporting/metering-operator/pkg/aws"
-	"github.com/kubernetes-reporting/metering-operator/pkg/hive"
-	"github.com/kubernetes-reporting/metering-operator/pkg/operator/reportingutil"
+	metering "github.com/kube-reporting/metering-operator/pkg/apis/metering/v1"
+	"github.com/kube-reporting/metering-operator/pkg/aws"
+	"github.com/kube-reporting/metering-operator/pkg/hive"
+	"github.com/kube-reporting/metering-operator/pkg/operator/reportingutil"
 )
 
 const (

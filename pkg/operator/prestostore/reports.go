@@ -1,8 +1,8 @@
 package prestostore
 
 import (
-	"github.com/kubernetes-reporting/metering-operator/pkg/db"
-	"github.com/kubernetes-reporting/metering-operator/pkg/presto"
+	"github.com/kube-reporting/metering-operator/pkg/db"
+	"github.com/kube-reporting/metering-operator/pkg/presto"
 )
 
 type ReportResultsGetter interface {

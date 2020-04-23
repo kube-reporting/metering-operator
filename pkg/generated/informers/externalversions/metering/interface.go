@@ -3,8 +3,8 @@
 package metering
 
 import (
-	internalinterfaces "github.com/kubernetes-reporting/metering-operator/pkg/generated/informers/externalversions/internalinterfaces"
-	v1 "github.com/kubernetes-reporting/metering-operator/pkg/generated/informers/externalversions/metering/v1"
+	internalinterfaces "github.com/kube-reporting/metering-operator/pkg/generated/informers/externalversions/internalinterfaces"
+	v1 "github.com/kube-reporting/metering-operator/pkg/generated/informers/externalversions/metering/v1"
 )
 
 // Interface provides access to each of this group's versions.
