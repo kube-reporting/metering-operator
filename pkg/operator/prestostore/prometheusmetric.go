@@ -8,10 +8,10 @@ import (
 	"sync"
 	"time"
 
-	"github.com/kubernetes-reporting/metering-operator/pkg/db"
-	"github.com/kubernetes-reporting/metering-operator/pkg/hive"
-	"github.com/kubernetes-reporting/metering-operator/pkg/operator/reportingutil"
-	"github.com/kubernetes-reporting/metering-operator/pkg/presto"
+	"github.com/kube-reporting/metering-operator/pkg/db"
+	"github.com/kube-reporting/metering-operator/pkg/hive"
+	"github.com/kube-reporting/metering-operator/pkg/operator/reportingutil"
+	"github.com/kube-reporting/metering-operator/pkg/presto"
 )
 
 const (

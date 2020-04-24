@@ -213,7 +213,7 @@ metadata:
     operatorframework.io/cluster-monitoring: "true"
     operatorframework.io/suggested-namespace: openshift-metering
     operators.openshift.io/capability: '["fips", "cluster-proxy"]'
-    repository: https://github.com/kubernetes-reporting/metering-operator
+    repository: https://github.com/kube-reporting/metering-operator
     support: Red Hat, Inc.
 
 spec:
@@ -221,7 +221,7 @@ spec:
   description: |
     The Metering Operator is a chargeback and reporting tool to provide accountability for how resources are used across a cluster. Cluster admins can schedule reports based on historical usage data by Pod, Namespace, and Cluster wide. The Metering Operator is a part of the [Kubernetes Reporting organization](https://coreos.com/blog/introducing-operator-framework-metering).
 
-    Read the user guide for more details on [running and viewing your first report](https://github.com/kubernetes-reporting/metering-operator/blob/master/Documentation/using-metering.md).
+    Read the user guide for more details on [running and viewing your first report](https://github.com/kube-reporting/metering-operator/blob/master/Documentation/using-metering.md).
 
     ### Core capabilities
 
@@ -241,13 +241,13 @@ spec:
 
     ### Common Configurations
 
-    Metering works out of the box without any customizations or configuration. Read the [full documentation](https://github.com/kubernetes-reporting/metering-operator/blob/master/Documentation/metering-config.md) for more details.
+    Metering works out of the box without any customizations or configuration. Read the [full documentation](https://github.com/kube-reporting/metering-operator/blob/master/Documentation/metering-config.md) for more details.
 
-    * **Use a specific StorageClass** - Follow the example to [use your own StorageClass](https://github.com/kubernetes-reporting/metering-operator/blob/master/manifests/metering-config/shared-storage.yaml) instead of the Dynamic Provisioner.
+    * **Use a specific StorageClass** - Follow the example to [use your own StorageClass](https://github.com/kube-reporting/metering-operator/blob/master/manifests/metering-config/shared-storage.yaml) instead of the Dynamic Provisioner.
 
-    * **Store data in S3 instead of PV** - Store your report output [in an S3 bucket](https://github.com/kubernetes-reporting/metering-operator/blob/master/Documentation/configuring-storage.md#storing-data-in-s3) instead of a PersistentVolume.
+    * **Store data in S3 instead of PV** - Store your report output [in an S3 bucket](https://github.com/kube-reporting/metering-operator/blob/master/Documentation/configuring-storage.md#storing-data-in-s3) instead of a PersistentVolume.
 
-    * **Configure AWS Billing Data Source** - To assign Pod $$ costs on AWS, create a [read-only IAM user](https://github.com/kubernetes-reporting/metering-operator/blob/master/Documentation/configuring-aws-billing.md) ([example-policy](https://github.com/kubernetes-reporting/metering-operator/blob/master/Documentation/aws/read-only.json)) and [configure Metering](https://github.com/kubernetes-reporting/metering-operator/blob/master/manifests/metering-config/aws-billing.yaml) to use it.
+    * **Configure AWS Billing Data Source** - To assign Pod $$ costs on AWS, create a [read-only IAM user](https://github.com/kube-reporting/metering-operator/blob/master/Documentation/configuring-aws-billing.md) ([example-policy](https://github.com/kube-reporting/metering-operator/blob/master/Documentation/aws/read-only.json)) and [configure Metering](https://github.com/kube-reporting/metering-operator/blob/master/manifests/metering-config/aws-billing.yaml) to use it.
 
   keywords: [metering metrics reporting prometheus chargeback]
   version: "4.5.0"
@@ -259,7 +259,7 @@ spec:
 
   links:
     - name: Documentation
-      url: https://github.com/kubernetes-reporting/metering-operator/blob/master/Documentation/index.md
+      url: https://github.com/kube-reporting/metering-operator/blob/master/Documentation/index.md
 
   provider:
     name: Red Hat

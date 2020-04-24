@@ -23,15 +23,15 @@ import (
 	k8serrors "k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/labels"
 
-	metering "github.com/kubernetes-reporting/metering-operator/pkg/apis/metering/v1"
-	meteringUtil "github.com/kubernetes-reporting/metering-operator/pkg/apis/metering/v1/util"
-	listers "github.com/kubernetes-reporting/metering-operator/pkg/generated/listers/metering/v1"
-	"github.com/kubernetes-reporting/metering-operator/pkg/operator/prestostore"
-	"github.com/kubernetes-reporting/metering-operator/pkg/operator/reporting"
-	"github.com/kubernetes-reporting/metering-operator/pkg/operator/reportingutil"
-	"github.com/kubernetes-reporting/metering-operator/pkg/presto"
-	"github.com/kubernetes-reporting/metering-operator/pkg/util/chiprometheus"
-	"github.com/kubernetes-reporting/metering-operator/pkg/util/orderedmap"
+	metering "github.com/kube-reporting/metering-operator/pkg/apis/metering/v1"
+	meteringUtil "github.com/kube-reporting/metering-operator/pkg/apis/metering/v1/util"
+	listers "github.com/kube-reporting/metering-operator/pkg/generated/listers/metering/v1"
+	"github.com/kube-reporting/metering-operator/pkg/operator/prestostore"
+	"github.com/kube-reporting/metering-operator/pkg/operator/reporting"
+	"github.com/kube-reporting/metering-operator/pkg/operator/reportingutil"
+	"github.com/kube-reporting/metering-operator/pkg/presto"
+	"github.com/kube-reporting/metering-operator/pkg/util/chiprometheus"
+	"github.com/kube-reporting/metering-operator/pkg/util/orderedmap"
 )
 
 var ErrReportIsRunning = errors.New("the report is still running")

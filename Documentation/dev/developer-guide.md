@@ -32,7 +32,7 @@ $ pip3 install operator-courier
 Clone this repository:
 
 ```bash
-git clone https://github.com/kubernetes-reporting/metering-operator
+git clone https://github.com/kube-reporting/metering-operator
 ```
 
 ## Building

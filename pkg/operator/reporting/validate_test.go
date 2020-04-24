@@ -6,9 +6,9 @@ import (
 	"github.com/stretchr/testify/assert"
 	v1 "k8s.io/api/core/v1"
 
-	metering "github.com/kubernetes-reporting/metering-operator/pkg/apis/metering/v1"
-	"github.com/kubernetes-reporting/metering-operator/pkg/operator/reportingutil"
-	"github.com/kubernetes-reporting/metering-operator/test/testhelpers"
+	metering "github.com/kube-reporting/metering-operator/pkg/apis/metering/v1"
+	"github.com/kube-reporting/metering-operator/pkg/operator/reportingutil"
+	"github.com/kube-reporting/metering-operator/test/testhelpers"
 )
 
 func TestValidateQueryDependencies(t *testing.T) {

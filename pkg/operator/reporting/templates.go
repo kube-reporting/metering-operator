@@ -9,12 +9,12 @@ import (
 	"time"
 
 	"github.com/Masterminds/sprig"
-	metering "github.com/kubernetes-reporting/metering-operator/pkg/apis/metering/v1"
+	metering "github.com/kube-reporting/metering-operator/pkg/apis/metering/v1"
 	"k8s.io/apimachinery/pkg/util/sets"
 
-	"github.com/kubernetes-reporting/metering-operator/pkg/operator/prestostore"
-	"github.com/kubernetes-reporting/metering-operator/pkg/operator/reportingutil"
-	"github.com/kubernetes-reporting/metering-operator/pkg/presto"
+	"github.com/kube-reporting/metering-operator/pkg/operator/prestostore"
+	"github.com/kube-reporting/metering-operator/pkg/operator/reportingutil"
+	"github.com/kube-reporting/metering-operator/pkg/presto"
 )
 
 // ReportQueryTemplateContext is used to hold all information about a ReportQuery that will be

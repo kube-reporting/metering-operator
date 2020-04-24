@@ -1,4 +1,4 @@
-module github.com/kubernetes-reporting/metering-operator
+module github.com/kube-reporting/metering-operator
 
 go 1.13
 

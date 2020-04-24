@@ -6,7 +6,7 @@ import (
 
 	_ "github.com/prestodb/presto-go-client/presto"
 
-	"github.com/kubernetes-reporting/metering-operator/pkg/db"
+	"github.com/kube-reporting/metering-operator/pkg/db"
 )
 
 const (

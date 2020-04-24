@@ -3,9 +3,9 @@
 package fake
 
 import (
-	clientset "github.com/kubernetes-reporting/metering-operator/pkg/generated/clientset/versioned"
-	meteringv1 "github.com/kubernetes-reporting/metering-operator/pkg/generated/clientset/versioned/typed/metering/v1"
-	fakemeteringv1 "github.com/kubernetes-reporting/metering-operator/pkg/generated/clientset/versioned/typed/metering/v1/fake"
+	clientset "github.com/kube-reporting/metering-operator/pkg/generated/clientset/versioned"
+	meteringv1 "github.com/kube-reporting/metering-operator/pkg/generated/clientset/versioned/typed/metering/v1"
+	fakemeteringv1 "github.com/kube-reporting/metering-operator/pkg/generated/clientset/versioned/typed/metering/v1/fake"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/watch"
 	"k8s.io/client-go/discovery"

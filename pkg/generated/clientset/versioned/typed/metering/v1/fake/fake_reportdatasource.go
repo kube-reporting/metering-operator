@@ -3,7 +3,7 @@
 package fake
 
 import (
-	meteringv1 "github.com/kubernetes-reporting/metering-operator/pkg/apis/metering/v1"
+	meteringv1 "github.com/kube-reporting/metering-operator/pkg/apis/metering/v1"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	labels "k8s.io/apimachinery/pkg/labels"
 	schema "k8s.io/apimachinery/pkg/runtime/schema"

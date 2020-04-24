@@ -3,8 +3,8 @@
 package v1
 
 import (
-	v1 "github.com/kubernetes-reporting/metering-operator/pkg/apis/metering/v1"
-	"github.com/kubernetes-reporting/metering-operator/pkg/generated/clientset/versioned/scheme"
+	v1 "github.com/kube-reporting/metering-operator/pkg/apis/metering/v1"
+	"github.com/kube-reporting/metering-operator/pkg/generated/clientset/versioned/scheme"
 	rest "k8s.io/client-go/rest"
 )
 
