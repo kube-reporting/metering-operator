@@ -3,7 +3,7 @@ package v1
 import (
 	meta "k8s.io/apimachinery/pkg/apis/meta/v1"
 
-	"github.com/kubernetes-reporting/metering-operator/pkg/hive"
+	"github.com/kube-reporting/metering-operator/pkg/hive"
 )
 
 var HiveTableGVK = SchemeGroupVersion.WithKind("HiveTable")

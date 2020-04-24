@@ -10,7 +10,7 @@ import (
 	"github.com/davecgh/go-spew/spew"
 	"github.com/stretchr/testify/require"
 
-	"github.com/kubernetes-reporting/metering-operator/pkg/operator"
+	"github.com/kube-reporting/metering-operator/pkg/operator"
 )
 
 // collectionSize is how much data is going to be scraped from Prometheus and

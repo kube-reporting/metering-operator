@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/kubernetes-reporting/metering-operator/pkg/operator"
-	"github.com/kubernetes-reporting/metering-operator/pkg/operator/prestostore"
+	"github.com/kube-reporting/metering-operator/pkg/operator"
+	"github.com/kube-reporting/metering-operator/pkg/operator/prestostore"
 )
 
 func (rf *ReportingFramework) StoreDataSourceData(dataSourceName string, metrics []*prestostore.PrometheusMetric) error {

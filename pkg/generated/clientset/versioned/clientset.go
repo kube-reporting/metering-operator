@@ -3,7 +3,7 @@
 package versioned
 
 import (
-	meteringv1 "github.com/kubernetes-reporting/metering-operator/pkg/generated/clientset/versioned/typed/metering/v1"
+	meteringv1 "github.com/kube-reporting/metering-operator/pkg/generated/clientset/versioned/typed/metering/v1"
 	discovery "k8s.io/client-go/discovery"
 	rest "k8s.io/client-go/rest"
 	flowcontrol "k8s.io/client-go/util/flowcontrol"

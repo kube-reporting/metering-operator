@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/kubernetes-reporting/metering-operator/pkg/hive"
-	"github.com/kubernetes-reporting/metering-operator/pkg/presto"
+	"github.com/kube-reporting/metering-operator/pkg/hive"
+	"github.com/kube-reporting/metering-operator/pkg/presto"
 	"github.com/stretchr/testify/assert"
 )
 

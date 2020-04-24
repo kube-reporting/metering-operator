@@ -5,8 +5,8 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	metering "github.com/kubernetes-reporting/metering-operator/pkg/apis/metering/v1"
-	"github.com/kubernetes-reporting/metering-operator/pkg/hive"
+	metering "github.com/kube-reporting/metering-operator/pkg/apis/metering/v1"
+	"github.com/kube-reporting/metering-operator/pkg/hive"
 )
 
 func TestGetPartitionChanges(t *testing.T) {

@@ -7,7 +7,7 @@ import (
 	"strings"
 	"time"
 
-	metering "github.com/kubernetes-reporting/metering-operator/pkg/apis/metering/v1"
+	metering "github.com/kube-reporting/metering-operator/pkg/apis/metering/v1"
 )
 
 const maxDepth = 50

@@ -1,7 +1,7 @@
 package v1
 
 import (
-	presto "github.com/kubernetes-reporting/metering-operator/pkg/presto"
+	presto "github.com/kube-reporting/metering-operator/pkg/presto"
 	meta "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 

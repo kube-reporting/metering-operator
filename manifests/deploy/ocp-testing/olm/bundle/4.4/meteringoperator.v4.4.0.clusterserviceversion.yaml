@@ -211,7 +211,7 @@ metadata:
       are used across a cluster
     operatorframework.io/cluster-monitoring: "true"
     operatorframework.io/suggested-namespace: openshift-metering
-    repository: https://github.com/kubernetes-reporting/metering-operator
+    repository: https://github.com/kube-reporting/metering-operator
     support: Red Hat, Inc.
 
 spec:
