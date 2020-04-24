@@ -31,6 +31,13 @@ storage:
   type: "hive"
   hive: {}
 
+
+  config:
+    db:
+      url: ""
+      driver: ""
+      username: ""
+      password: ""
   # Below is an example of what configuring storage could look like:
   #
   # hive:
