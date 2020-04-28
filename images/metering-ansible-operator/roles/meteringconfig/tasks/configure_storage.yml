@@ -197,21 +197,3 @@
       status: "True"
       message: "Finished configuring Hive storage"
       lastTransitionTime: "{{ now(utc=False).isoformat() + 'Z' }}"
-
-- name: Log Events for Configuring Storage
-  k8s_event:
-    state: present
-    name: Configuring Storage Event
-    namespace: "{{ meta.namespace }}"
-    message: Configure Storage
-    reason: Created
-    reportingComponent: Reporting components
-    type: Normal
-    source:
-      component: Metering components
-    involvedObject:
-      apiVersion: metering.openshift.io
-      kind: MeteringConfig
-      name: "{{ meta.name }}"
-      namespace: "{{ meta.namespace }}"
-
