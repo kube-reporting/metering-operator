@@ -1,6 +1,6 @@
-# Operator Metering Architecture
+# Metering Operator Architecture
 
-Operator metering is composed of 3 major components:
+Metering Operator is composed of 3 major components:
 
 - `reporting-operator`: A Kubernetes operator written in Go that uses custom resources as the method in which users request reports.
 - [Presto][presto-overview]: A distributed SQL Database written in Java, designed for doing big data and analytical queries.
@@ -11,28 +11,28 @@ Operator metering is composed of 3 major components:
 
 At a high-level view, it may be helpful to view the reporting operator in terms of events and reactions. This is because the reporting operator's main responsibility is to interact with custom resources in Kubernetes. We can then characterize any changes made to these custom resources as an event, and the reporting operator reacts to these events as appropriate. 
 
-Internally, Operator Metering uses a database called [Presto][presto-overview] to do analytical querying on collected data using SQL.
-When we use terms like `tables`, `views`, `SQL`, `statement`, or `query` in this document, we're referring to them in the context of the Presto database, and we're using SQL as the primary method of doing analysis and reporting on the data that Operator Metering collects.
+Internally, Metering Operator  uses a database called [Presto][presto-overview] to do analytical querying on collected data using SQL.
+When we use terms like `tables`, `views`, `SQL`, `statement`, or `query` in this document, we're referring to them in the context of the Presto database, and we're using SQL as the primary method of doing analysis and reporting on the data that Metering Operator  collects.
 
 To briefly summarize how metering works, it watches for a number of custom resources for changes.
 Most of these custom resources are what you might consider configuration, and allow for developers or end-users to extend what kind of data the operator can access, collect, report on, and in the case of reports, how to calculate the reports.
 Upon being notified that a particular resource has been created, the operator uses all of these resources to create tables or views in Presto, and eventually executes user-defined SQL queries on the data it has access to, or has already collected, and stores the data for retrieval as a report in a CSV or JSON file later.
 
-The end goal of all of this is that Operator Metering provides building blocks for doing custom reporting and metering on any data that we can store into Presto.
+The end goal of all of this is that Metering Operator provides building blocks for doing custom reporting and metering on any data that we can store into Presto.
 Currently this is primarily focused on making Prometheus metrics and billing data accessible, but in the future we can expect other integrations to be added that allow accessing data stored in other locations.
 
 The rest of this document covers how each custom resource that metering consumes operates individually, and how they're related to each other.
 
 ## How the operator handles custom resources
 
-There are 6 custom resources that Operator Metering defines that you need to be aware of:
+There are 6 custom resources that Metering Operator defines that you need to be aware of:
 
 - `StorageLocations`: Provides a place to store data. Is used by `ReportDataSources`, `Reports`, `HiveTables` and `PrestoTables`.
 - `PrestoTables`: Defines a table in Presto. A PrestoTable can be "unmanaged" to expose a table that already exists, or "managed" to instruct metering to create a table as a result of the resource being created.
 - `HiveTables`: Defines a table in Hive. When created, it instructs metering to create the table in Hive which causes the table to be available to Presto.
 - `ReportDataSources`: Controls what data is available (Prometheus data, AWS billing data, Presto tables, views into other tables).
 - `ReportQueries`: Controls how we query the data available within ReportDataSources. If referenced by a `Report` it will manage what it will be reporting on when the report is run. If it's referenced by a `ReportDataSource` it will instruct metering to create a view within Presto based on the rendered query.
-- `Reports`: Causes reports to be generated using the configured `ReportQuery` resource. This is the primary resource an end-user of Operator Metering would interact with. Can be configured to run on a schedule.
+- `Reports`: Causes reports to be generated using the configured `ReportQuery` resource. This is the primary resource an end-user of Metering Operator would interact with. Can be configured to run on a schedule.
 
 In the sections below, we will cover the resources described above in more detail.
 
@@ -42,7 +42,7 @@ For user-docs containing a description of the fields, and examples, see [Storage
 
 A `StorageLocation` roughly maps to a [connector in Presto][presto-connector], which is effectively how Presto adapts to other datasources like Hive (and thus HDFS), S3 which we support. This also means we can eventually support others too, such as PostgreSQL.
 
-In terms of Operator Metering, a `StorageLocation` is intended to abstract some of those details away and expose the minimum configuration required to expose where data is actually persisted at.
+In terms of Metering Operator, a `StorageLocation` is intended to abstract some of those details away and expose the minimum configuration required to expose where data is actually persisted at.
 Today there is the concept of an default StorageLocation which is uses an HDFS cluster within the metering namespace. You can also define a custom storage location to default to S3 or a ReadWriteMany PVC.
 In both cases, the data is persisted as ORC files in either S3, HDFS, or a ReadWriteMany PVC via Presto.
 
@@ -95,7 +95,7 @@ Additionally, in the background the reporting-operator is periodically listing a
 
 This results in a table that has multiple partitions in it. There will be one partition per AWS billing period, and each partition points to an S3 directory containing the most up-to-date billing information for that billing period.
 
-By default, Operator Metering has an section in the `MeteringConfig` resource for configuring an awsBilling `ReportDataSource`, so you generally shouldn't need to create one directly.
+By default, Metering Operator has an section in the `MeteringConfig` resource for configuring an awsBilling `ReportDataSource`, so you generally shouldn't need to create one directly.
 For more details on configuring this read the [AWS billing correlation section in the Metering Configuration doc][metering-aws-billing-conf].
 
 
