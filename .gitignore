@@ -34,3 +34,4 @@ _tmp
 bin/*
 coverage.out
 junit-metering.xml
+/test/e2e/HDFS-OLM-Upgrade/pre-upgrade/logs/
