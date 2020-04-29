@@ -348,56 +348,6 @@ func TestManualMeteringInstall(t *testing.T) {
 				},
 			},
 		},
-		{
-			Name:                      "PrometheusConnectorWorks",
-			MeteringOperatorImageRepo: meteringOperatorImageRepo,
-			MeteringOperatorImageTag:  meteringOperatorImageTag,
-			Skip:                      false,
-			InstallSubTest: InstallTestCase{
-				Name:     "testPrometheusConnectorWorks",
-				TestFunc: testPrometheusConnectorWorks,
-			},
-			MeteringConfigSpec: metering.MeteringConfigSpec{
-				LogHelmTemplate: testhelpers.PtrToBool(true),
-				UnsupportedFeatures: &metering.UnsupportedFeaturesConfig{
-					EnableHDFS: testhelpers.PtrToBool(true),
-				},
-				Storage: &metering.StorageConfig{
-					Type: "hive",
-					Hive: &metering.HiveStorageConfig{
-						Type: "hdfs",
-						Hdfs: &metering.HiveHDFSConfig{
-							Namenode: "hdfs-namenode-0.hdfs-namenode:9820",
-						},
-					},
-				},
-				Presto: &metering.Presto{
-					Spec: &metering.PrestoSpec{
-						Coordinator: &metering.PrestoCoordinatorSpec{
-							Resources: &v1.ResourceRequirements{
-								Requests: v1.ResourceList{
-									v1.ResourceCPU:    resource.MustParse("1"),
-									v1.ResourceMemory: resource.MustParse("1Gi"),
-								},
-							},
-						},
-					},
-				},
-				ReportingOperator: &metering.ReportingOperator{
-					Spec: &metering.ReportingOperatorSpec{
-						Image: &metering.ImageConfig{},
-						Config: &metering.ReportingOperatorConfig{
-							LogLevel: "debug",
-							Prometheus: &metering.ReportingOperatorPrometheusConfig{
-								MetricsImporter: &metering.ReportingOperatorPrometheusMetricsImporterConfig{
-									Enabled: testhelpers.PtrToBool(false),
-								},
-							},
-						},
-					},
-				},
-			},
-		},
 	}
 
 	for _, testCase := range testInstallConfigs {
