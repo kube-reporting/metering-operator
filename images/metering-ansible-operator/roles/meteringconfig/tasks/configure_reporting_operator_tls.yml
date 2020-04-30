@@ -6,7 +6,7 @@
 - name: Check for the existence of the reporting-operator Presto TLS-related secrets
   block:
   - name: Check for the existence of the reporting-operator Presto client auth secret
-    k8s_facts:
+    k8s_info:
       api_version: v1
       kind: Secret
       name: "{{ meteringconfig_spec['reporting-operator'].spec.config.presto.auth.secretName }}"
@@ -52,7 +52,7 @@
 - name: Check for the existence of reporting-operator Hive TLS-related secrets
   block:
   - name: Check for the existence of the reporting-operator Hive client auth secret
-    k8s_facts:
+    k8s_info:
       api_version: v1
       kind: Secret
       name: "{{ meteringconfig_spec['reporting-operator'].spec.config.hive.auth.secretName }}"
@@ -92,7 +92,7 @@
 - name: Check for the existence of reporting-operator authProxy-related secret data
   block:
   - name: Check for the existence of the reporting-operator authProxy cookie seed secret
-    k8s_facts:
+    k8s_info:
       api_version: v1
       kind: Secret
       name: "{{ meteringconfig_spec['reporting-operator'].spec.authProxy.cookie.secretName }}"
