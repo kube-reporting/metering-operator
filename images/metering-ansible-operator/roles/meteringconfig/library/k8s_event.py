@@ -228,7 +228,7 @@ EVENT_ARG_SPEC = {
     "merge_type": {"type": "list", "choices": ["json", "merge", "strategic-merge"]},
     "message": {"type": "str", "required": True},
     "reason": {"type": "str", "required": True},
-    "reportingComponent": {"type": "str", "required": True},
+    "reportingComponent": {"type": "str"},
     "type": {"choices": ["Normal", "Warning"]},
     "source": {
         "type": "dict",
