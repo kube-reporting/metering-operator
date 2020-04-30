@@ -24,7 +24,7 @@
         msg: "storage.hive.s3.secretName cannot be empty"
 
     - name: Obtaining AWS credentials to configure S3 bucket
-      k8s_facts:
+      k8s_info:
         api_version: v1
         kind: Secret
         name: "{{ meteringconfig_storage_s3_aws_credentials_secret_name }}"
@@ -104,7 +104,7 @@
 - name: Get azure storage account name
   block:
     - name: Get Azure storage credentials secret
-      k8s_facts:
+      k8s_info:
         api_version: v1
         kind: Secret
         name: "{{ meteringconfig_spec.storage.hive.azure.secretName }}"
