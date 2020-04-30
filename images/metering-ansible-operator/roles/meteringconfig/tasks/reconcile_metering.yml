@@ -8,6 +8,22 @@
       message: "Reconciling Metering resources"
       lastTransitionTime: "{{ now(utc=False).isoformat() + 'Z' }}"
 
+- name: Log event for reconciling the metering resources
+  k8s_event:
+    state: present
+    name: metering-operator-reconciling-metering
+    namespace: "{{ meta.namespace }}"
+    message: Reconciling metering resources
+    reason: Reconciling
+    type: Normal
+    source:
+      component: metering-ansible-operator
+    involvedObject:
+      apiVersion: metering.openshift.io
+      kind: MeteringConfig
+      name: "{{ meta.name }}"
+      namespace: "{{ meta.namespace }}"
+
 - name: Deploy metering resources
   include_tasks: deploy_resources.yml
   vars:
@@ -31,20 +47,3 @@
       status: "True"
       message: "Finished reconciling Metering resources"
       lastTransitionTime: "{{ now(utc=False).isoformat() + 'Z' }}"
-
-- name: Log Events for Reconciling Metering
-  k8s_event:
-    state: present
-    name: Reconcile Metering Event
-    namespace: "{{ meta.namespace }}"
-    message: Reconcile Metering
-    reason: Created
-    reportingComponent: Reporting components
-    type: Normal
-    source:
-      component: Metering components
-    involvedObject:
-      apiVersion: metering.openshift.io
-      kind: MeteringConfig
-      name: "{{ meta.name }}"
-      namespace: "{{ meta.namespace }}"

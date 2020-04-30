@@ -9,6 +9,25 @@
     conditions: "{{ [ current_conditions ] }}"
   when: current_conditions is defined
 
-- fail:
-    msg: "Failing role execution after updating the MeteringConfig.Status"
+- block:
+  - name: Log event for role failure
+    k8s_event:
+      state: present
+      name: metering-operator-failing-role-event
+      namespace: "{{ meta.namespace }}"
+      message: "Error reconciling: {{ ansible_failed_result.msg }}"
+      reason: FailedRole
+      type: Warning
+      source:
+        component: metering-ansible-operator
+      involvedObject:
+        apiVersion: metering.openshift.io
+        kind: MeteringConfig
+        name: "{{ meta.name }}"
+        namespace: "{{ meta.namespace }}"
+    when: ansible_failed_result is defined and ansible_failed_result.msg | length > 0
+
+  - name: Fail role execution after encountering an error
+    fail:
+      msg: "Failing role execution after updating the MeteringConfig.Status"
   when: end_play_after_updating_status is defined and end_play_after_updating_status

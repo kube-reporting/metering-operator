@@ -8,6 +8,22 @@
       message: "Reconciling Presto resources"
       lastTransitionTime: "{{ now(utc=False).isoformat() + 'Z' }}"
 
+- name: Log event for reconciling the Presto resources
+  k8s_event:
+    state: present
+    name: metering-operator-reconciling-presto
+    namespace: "{{ meta.namespace }}"
+    message: Reconciling Presto resources
+    reason: Reconciling
+    type: Normal
+    source:
+      component: metering-ansible-operator
+    involvedObject:
+      apiVersion: metering.openshift.io
+      kind: MeteringConfig
+      name: "{{ meta.name }}"
+      namespace: "{{ meta.namespace }}"
+
 - name: Deploy presto resources
   include_tasks: deploy_resources.yml
   vars:
@@ -84,20 +100,3 @@
       status: "True"
       message: "Finished reconciling Presto resources"
       lastTransitionTime: "{{ now(utc=False).isoformat() + 'Z' }}"
-
-- name: Log Events for Reconciling Presto
-  k8s_event:
-    state: present
-    name: Reconcile Presto Event
-    namespace: "{{ meta.namespace }}"
-    message: Reconcile Presto
-    reason: Created
-    reportingComponent: Reporting components
-    type: Normal
-    source:
-      component: Metering components
-    involvedObject:
-      apiVersion: metering.openshift.io
-      kind: MeteringConfig
-      name: "{{ meta.name }}"
-      namespace: "{{ meta.namespace }}"

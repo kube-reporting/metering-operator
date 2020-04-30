@@ -8,6 +8,22 @@
       message: "Starting the validation process"
       lastTransitionTime: "{{ now(utc=False).isoformat() + 'Z' }}"
 
+- name: Log event for validating MeteringConfig configuration
+  k8s_event:
+    state: present
+    name: metering-operator-validating-configuration
+    namespace: "{{ meta.namespace }}"
+    message: Validating the user-provided configuration
+    reason: Validating
+    type: Normal
+    source:
+      component: metering-ansible-operator
+    involvedObject:
+      apiVersion: metering.openshift.io
+      kind: MeteringConfig
+      name: "{{ meta.name }}"
+      namespace: "{{ meta.namespace }}"
+
 #
 # Validate OCP-only features were properly disabled
 #
@@ -91,20 +107,3 @@
       status: "True"
       message: "Finished the validation process"
       lastTransitionTime: "{{ now(utc=False).isoformat() + 'Z' }}"
-
-- name: Log Events for validating configurations
-  k8s_event:
-    state: present
-    name: Validate Configuration
-    namespace: "{{ meta.namespace }}"
-    message: Validate Configurations
-    reason: Created
-    reportingComponent: Reporting components
-    type: Normal
-    source:
-      component: Metering components
-    involvedObject:
-      apiVersion: metering.openshift.io
-      kind: MeteringConfig
-      name: "{{ meta.name }}"
-      namespace: "{{ meta.namespace }}"
