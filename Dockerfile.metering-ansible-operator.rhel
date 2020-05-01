@@ -3,7 +3,7 @@ FROM openshift/ose-metering-helm:latest as helm
 # final image needs kubectl, so we copy `oc` from cli image to use as kubectl.
 FROM openshift/ose-cli:latest as cli
 # real base
-FROM openshift/ose-ansible-operator:latest
+FROM openshift/ose-ansible-operator:4.5
 
 USER root
 RUN set -x; INSTALL_PKGS="curl bash ca-certificates less which inotify-tools tini python-netaddr python2-botocore python2-boto3 python2-openshift python2-cryptography openssl" \
@@ -16,7 +16,7 @@ COPY --from=helm /usr/local/bin/helm /usr/local/bin/helm
 COPY --from=cli /usr/bin/oc /usr/bin/oc
 RUN ln -f -s /usr/bin/oc /usr/bin/kubectl
 
-RUN yum -y update python2-openshift python2-cryptography
+RUN yum -y update python2-openshift python2-cryptography ansible~=2.9
 
 ENV HOME /opt/ansible
 ENV HELM_CHART_PATH ${HOME}/charts/openshift-metering
