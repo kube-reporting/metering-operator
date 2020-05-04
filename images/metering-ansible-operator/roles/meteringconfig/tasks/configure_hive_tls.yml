@@ -4,7 +4,21 @@
 # Validate user-provided Hive TLS configuration when top-level spec.tls.enabled is set to false
 #
 - name: Validate the user-provided Hive TLS configuration
-  include_tasks: validate_hive_tls.yml
+  block:
+  - include_tasks: validate_hive_tls.yml
+  rescue:
+  - include_tasks: update_meteringconfig_status.yml
+    vars:
+      end_play_after_updating_status: true
+      current_conditions:
+        type: "Invalid"
+        status: "True"
+        message: |
+          "{{ ansible_failed_result.msg }}"
+        lastTransitionTime: "{{ now(utc=False).isoformat() + 'Z' }}"
+    when:
+    - ansible_failed_result is defined
+    - ansible_failed_result.msg | length > 0
   when: not meteringconfig_tls_enabled
 
 #

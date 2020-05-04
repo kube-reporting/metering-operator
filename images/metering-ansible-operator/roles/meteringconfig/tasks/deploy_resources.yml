@@ -11,18 +11,20 @@
     no_log: "{{ not meteringconfig_log_helm_template }}"
     register: template_results
   rescue:
-    - include_tasks: update_meteringconfig_status.yml
-      vars:
-        failed_result: "{{ ansible_failed_result.results | first }}"
-        end_play_after_updating_status: true
-        current_conditions:
-          type: "Invalid"
-          status: "True"
-          message: |
-            "Failed command: {{ failed_result.cmd | replace('...', '') | to_nice_yaml(indent=8, width=1337) }} "
-            "Error message: {{ failed_result.stderr_lines | to_nice_yaml }}"
-          lastTransitionTime: "{{ now(utc=False).isoformat() + 'Z' }}"
-      when: ansible_failed_result and ansible_failed_result.results and (ansible_failed_result.results | length > 0)
+  - include_tasks: update_meteringconfig_status.yml
+    vars:
+      failed_result: "{{ ansible_failed_result.results | first }}"
+      end_play_after_updating_status: true
+      current_conditions:
+        type: "Invalid"
+        status: "True"
+        message: |-
+          "{{ failed_result.stderr | to_nice_yaml }}"
+        lastTransitionTime: "{{ now(utc=False).isoformat() + 'Z' }}"
+    when:
+    - ansible_failed_result is defined
+    - ansible_failed_result.results is defined
+    - ansible_failed_result.results | length > 0
 
 - name: Add prune label to resources
   vars:
@@ -62,19 +64,21 @@
       definition: "{{ updated_template_results | flatten }}"
       merge_type: ['merge', 'strategic-merge']
   rescue:
-      # Note for ansible_failed_return:
-      # there's no guarantee that more fields besides msg will be available
-      # as the return object varies depending on the type of error encountered
-    - include_tasks: update_meteringconfig_status.yml
-      vars:
-        end_play_after_updating_status: true
-        current_conditions:
-          type: "Invalid"
-          status: "True"
-          message: |
-            "{{ ansible_failed_result.msg }}"
-          lastTransitionTime: "{{ now(utc=False).isoformat() + 'Z' }}"
-      when: ansible_failed_result is defined and (ansible_failed_result.msg | length > 0)
+    # Note for ansible_failed_return:
+    # there's no guarantee that more fields besides msg will be available
+    # as the return object varies depending on the type of error encountered
+  - include_tasks: update_meteringconfig_status.yml
+    vars:
+      current_conditions:
+        type: "Invalid"
+        status: "True"
+        message: |
+          "{{ ansible_failed_result.msg }}"
+        lastTransitionTime: "{{ now(utc=False).isoformat() + 'Z' }}"
+      end_play_after_updating_status: true
+    when:
+    - ansible_failed_result is defined
+    - ansible_failed_result.msg | length > 0
   when: template_results.changed and resource is not none
 
 - name: Prune resources
@@ -87,13 +91,16 @@
       loop_var: resource
       label: "{{ resource.template_file }}"
   rescue:
-    - include_tasks: update_meteringconfig_status.yml
-      vars:
-        end_play_after_updating_status: true
-        current_conditions:
-          type: "Invalid"
-          status: "True"
-          message: |
-            "{{ ansible_failed_result }}"
-          lastTransitionTime: "{{ now(utc=False).isoformat() + 'Z' }}"
+  - include_tasks: update_meteringconfig_status.yml
+    vars:
+      current_conditions:
+        type: "Invalid"
+        status: "True"
+        message: |
+          "{{ ansible_failed_result.msg }}"
+        lastTransitionTime: "{{ now(utc=False).isoformat() + 'Z' }}"
+      end_play_after_updating_status: true
+    when:
+    - ansible_failed_result is defined
+    - ansible_failed_result.msg | length > 0
   when: not (resource.create | default(true))
