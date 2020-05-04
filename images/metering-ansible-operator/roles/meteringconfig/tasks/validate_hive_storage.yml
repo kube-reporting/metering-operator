@@ -36,14 +36,16 @@
   rescue:
   - include_tasks: update_meteringconfig_status.yml
     vars:
-      end_play_after_updating_status: true
       current_conditions:
         type: "Invalid"
         status: "True"
         message: |
-          "Failed task name: {{ ansible_failed_task.name }}"
-          "Failed task message: {{ ansible_failed_result.msg }}"
+          "{{ ansible_failed_result.msg }}"
         lastTransitionTime: "{{ now(utc=False).isoformat() + 'Z' }}"
+      end_play_after_updating_status: true
+    when:
+    - ansible_failed_result is defined
+    - ansible_failed_result.msg | length > 0
   when: hiveStorageType == 'gcs'
 
 #
@@ -66,14 +68,16 @@
   rescue:
   - include_tasks: update_meteringconfig_status.yml
     vars:
-      end_play_after_updating_status: true
       current_conditions:
         type: "Invalid"
         status: "True"
         message: |
-          "Failed task name: {{ ansible_failed_task.name }}"
-          "Failed task message: {{ ansible_failed_result.msg }}"
+          "{{ ansible_failed_result.msg }}"
         lastTransitionTime: "{{ now(utc=False).isoformat() + 'Z' }}"
+      end_play_after_updating_status: true
+    when:
+    - ansible_failed_result is defined
+    - ansible_failed_result.msg | length > 0
   when: hiveStorageType == 'azure' and not meteringconfig_storage_azure_create_secret
 
 #
@@ -109,12 +113,14 @@
   rescue:
   - include_tasks: update_meteringconfig_status.yml
     vars:
-      end_play_after_updating_status: true
       current_conditions:
         type: "Invalid"
         status: "True"
         message: |
-          "Failed task name: {{ ansible_failed_task.name }}"
-          "Failed task message: {{ ansible_failed_result.msg }}"
+          "{{ ansible_failed_result.msg }}"
         lastTransitionTime: "{{ now(utc=False).isoformat() + 'Z' }}"
+      end_play_after_updating_status: true
+    when:
+    - ansible_failed_result is defined
+    - ansible_failed_result.msg | length > 0
   when: hiveStorageType == 's3Compatible'

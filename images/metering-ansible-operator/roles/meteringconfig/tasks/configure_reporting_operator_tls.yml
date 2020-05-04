@@ -86,7 +86,21 @@
 # Reporting Operator Openshift Auth-Proxy
 #
 - name: Validate the user-provided authProxy configuration
-  include_tasks: validate_reporting_operator_tls.yml
+  block:
+  - include_tasks: validate_reporting_operator_tls.yml
+  rescue:
+  - include_tasks: update_meteringconfig_status.yml
+    vars:
+      end_play_after_updating_status: true
+      current_conditions:
+        type: "Invalid"
+        status: "True"
+        message: |
+          "{{ ansible_failed_result.msg }}"
+        lastTransitionTime: "{{ now(utc=False).isoformat() + 'Z' }}"
+    when:
+    - ansible_failed_result is defined
+    - ansible_failed_result.msg | length > 0
   when: not meteringconfig_tls_enabled
 
 - name: Check for the existence of reporting-operator authProxy-related secret data
