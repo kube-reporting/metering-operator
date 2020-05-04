@@ -466,7 +466,7 @@ type PrestoConnectorPrometheusConfigConfig struct {
 }
 type PrestoConnectorPrometheusConfigAuth struct {
 	BearerTokenFile        string `json:"bearerTokenFile,omitempty"`
-	UseServiceAccountTokne *bool  `json:"useServiceAccountToken,omitempty"`
+	UseServiceAccountToken *bool  `json:"useServiceAccountToken,omitempty"`
 }
 type PrestoConnectorFileList struct {
 	Name    string `json:"name,omitempty"`
