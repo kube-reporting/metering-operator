@@ -20,6 +20,11 @@
 - name: Configure Reporting
   include_tasks: configure_reporting.yml
 
+- name: Finalize the set of overall meteringconfig values
+  set_fact:
+    meteringconfig_spec: "{{ meteringconfig_spec }}"
+  no_log: true
+
 - name: Store MeteringConfig spec into values file
   copy: content="{{ meteringconfig_spec }}" dest=/tmp/metering-values.yaml
 
