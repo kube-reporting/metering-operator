@@ -3,6 +3,7 @@
 - name: Finalize the set of meteringconfig default values
   set_fact:
     meteringconfig_default_values: "{{ meteringconfig_default_values }}"
+  no_log: true
 
 - name: Validate Configurations
   include_tasks: validate.yml
