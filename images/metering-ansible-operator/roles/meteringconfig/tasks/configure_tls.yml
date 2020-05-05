@@ -10,6 +10,22 @@
         message: "Configuring TLS"
         lastTransitionTime: "{{ now(utc=False).isoformat() + 'Z' }}"
 
+  - name: Log event for configuring the TLS-related tasks
+    k8s_event:
+      state: present
+      name: metering-operator-configuring-tls
+      namespace: "{{ meta.namespace }}"
+      message: Configuring TLS for the metering-ansible-operator
+      reason: Started
+      type: Normal
+      source:
+        component: metering-ansible-operator
+      involvedObject:
+        apiVersion: metering.openshift.io
+        kind: MeteringConfig
+        name: "{{ meta.name }}"
+        namespace: "{{ meta.namespace }}"
+
   - name: Create temporary directory to store all the necessary certificates/keys
     tempfile:
       suffix: certificates
@@ -53,21 +69,3 @@
       status: "True"
       message: "Finished configuring TLS"
       lastTransitionTime: "{{ now(utc=False).isoformat() + 'Z' }}"
-
-- name: Log Events for validating TLS
-  k8s_event:
-    state: present
-    name: Validate TLS
-    namespace: "{{ meta.namespace }}"
-    message: Validating TLS
-    reason: Created
-    reportingComponent: Reporting components
-    type: Normal
-    source:
-      component: Metering components
-    involvedObject:
-      apiVersion: metering.openshift.io
-      kind: MeteringConfig
-      name: "{{ meta.name }}"
-      namespace: "{{ meta.namespace }}"
-

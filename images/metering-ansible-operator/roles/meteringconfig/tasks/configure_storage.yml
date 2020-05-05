@@ -8,6 +8,22 @@
       message: "Configuring Hive storage"
       lastTransitionTime: "{{ now(utc=False).isoformat() + 'Z' }}"
 
+- name: Log event for configuring storage
+  k8s_event:
+    state: present
+    name: metering-operator-configuring-storage
+    namespace: "{{ meta.namespace }}"
+    message: Configuring storage for the metering-ansible-operator
+    reason: Started
+    type: Normal
+    source:
+      component: metering-ansible-operator
+    involvedObject:
+      apiVersion: metering.openshift.io
+      kind: MeteringConfig
+      name: "{{ meta.name }}"
+      namespace: "{{ meta.namespace }}"
+
 #
 # Configure S3 section
 #
@@ -225,21 +241,3 @@
       status: "True"
       message: "Finished configuring Hive storage"
       lastTransitionTime: "{{ now(utc=False).isoformat() + 'Z' }}"
-
-- name: Log Events for Configuring Storage
-  k8s_event:
-    state: present
-    name: Configuring Storage Event
-    namespace: "{{ meta.namespace }}"
-    message: Configure Storage
-    reason: Created
-    reportingComponent: Reporting components
-    type: Normal
-    source:
-      component: Metering components
-    involvedObject:
-      apiVersion: metering.openshift.io
-      kind: MeteringConfig
-      name: "{{ meta.name }}"
-      namespace: "{{ meta.namespace }}"
-
