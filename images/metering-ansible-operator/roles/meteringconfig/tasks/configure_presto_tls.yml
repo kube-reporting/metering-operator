@@ -13,7 +13,7 @@
 - name: Check for the existence of Presto TLS-related secrets
   block:
   - name: Check for the existence of the Presto TLS secret
-    k8s_facts:
+    k8s_info:
       api_version: v1
       kind: Secret
       name: "{{ meteringconfig_spec.presto.spec.config.tls.secretName }}"
@@ -22,7 +22,7 @@
     register: presto_secret_tls_buf
 
   - name: Check for the existence of the Presto Auth secret
-    k8s_facts:
+    k8s_info:
       api_version: v1
       kind: Secret
       name: "{{ meteringconfig_spec.presto.spec.config.auth.secretName }}"
@@ -31,7 +31,7 @@
     register: presto_secret_auth_buf
 
   - name: Check for the existence of the Presto-Hive client TLS secret
-    k8s_facts:
+    k8s_info:
       api_version: v1
       kind: Secret
       name: "{{ meteringconfig_spec.presto.spec.config.connectors.hive.tls.secretName }}"

@@ -7,7 +7,7 @@
 - name: Check for the existence of the Metering Root CA secret
   block:
   - name: Check if Root CA secret already exists
-    k8s_facts:
+    k8s_info:
       api_version: v1
       kind: Secret
       name: "{{ meteringconfig_spec.tls.secretName }}"
