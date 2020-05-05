@@ -90,7 +90,7 @@
       assert:
         that:
           - meteringconfig_storage_s3Compatible_credentials_secret_name != ""
-        msg: "storage.hive.s3Compatible.secretName is used to reference existing secrets, must not be empty if creatSecret is set to false"
+        msg: "storage.hive.s3Compatible.secretName is used to reference existing secrets and must not be empty if createSecret is set to false"
       when: not meteringconfig_storage_s3Compatible_create_secret
   rescue:
     - include_tasks: update_meteringconfig_status.yml
@@ -181,14 +181,14 @@
       assert:
         that:
           - meteringconfig_storage_gcs_credentials_secret_name == ""
-        msg: "storage.hive.gcs.secretName is only used to reference existing secrets, must be empty if creating new secrets"
+        msg: "storage.hive.gcs.secretName is only used to reference existing secrets and must be empty if creating new secrets"
       when: meteringconfig_storage_gcs_create_secret
 
     - name: Validate Metering gcs credentials
       assert:
         that:
           - meteringconfig_storage_gcs_credentials_secret_name != ""
-        msg: "storage.hive.gcs.secretName is used to reference existing secrets, must not be empty if creatSecret is set to false"
+        msg: "storage.hive.gcs.secretName is used to reference existing secrets and must be non-empty if createSecret is set to false"
       when: not meteringconfig_storage_gcs_create_secret
   rescue:
     - include_tasks: update_meteringconfig_status.yml
