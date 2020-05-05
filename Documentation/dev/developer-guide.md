@@ -5,10 +5,9 @@ This document describes setting up your environment, as well as installing Meter
 ## Development Dependencies
 
 - Go 1.13 or higher
-- Helm CLI 2.6.2 or higher
+- Helm CLI up to 2.8.1
 - Make
 - Docker
-- Dep
 - jq
 - [faq](https://github.com/jzelinskie/faq) 0.0.5 or newer
   - For Fedora 29, Rawhide, and CentOS 7 you can use the following copr repo: https://copr.fedorainfracloud.org/coprs/ecnahc515/faq/
@@ -23,8 +22,9 @@ following:
 
 ```bash
 $ brew tap jzelinskie/faq
-$ brew install go kubernetes-helm make docker dep coreutils jq faq python@3
+$ brew install go make docker coreutils jq faq python@3
 $ pip3 install operator-courier
+[ and install helm 2.8.1 in your path from https://kubernetes-helm.storage.googleapis.com/helm-v2.8.1-darwin-amd64.tar.gz ]
 ```
 
 ## Setup
