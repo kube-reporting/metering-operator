@@ -38,6 +38,7 @@ storage:
       driver: ""
       username: ""
       password: ""
+      secret: ""
   # Below is an example of what configuring storage could look like:
   #
   # hive:
