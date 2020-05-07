@@ -519,7 +519,7 @@ type HiveDBConfig struct {
 	Password                          string `json:"password,omitempty"`
 	URL                               string `json:"url,omitempty"`
 	Username                          string `json:"username,omitempty"`
-	Secret                            string `json:"secret,omitempty"`
+	SecretName                            string `json:"secretName,omitempty"`
 }
 type HiveSharedVolumeConfig struct {
 	CreatePVC    *bool  `json:"createPVC,omitempty"`

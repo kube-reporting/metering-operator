@@ -694,6 +694,7 @@ hive:
         password: null
         url: jdbc:derby:;databaseName=/var/lib/hive/data;create=true
         username: null
+        secretName: ""
 
         autoCreateMetastoreSchema: true
         enableMetastoreSchemaVerification: false
