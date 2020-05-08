@@ -30,7 +30,7 @@ const (
 	catalogSourceNamespace = "openshift-marketplace"
 
 	crdPollTimeout = 5 * time.Minute
-	crdInitialPoll = 3 * time.Second
+	crdInitialPoll = 1 * time.Second
 
 	hivetableFile         = "hive.crd.yaml"
 	prestotableFile       = "prestotable.crd.yaml"
