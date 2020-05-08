@@ -6,7 +6,7 @@
 - name: Check for the existence of the reporting-operator Presto TLS-related secrets
   block:
   - name: Check for the existence of the reporting-operator Presto client auth secret
-    k8s_facts:
+    k8s_info:
       api_version: v1
       kind: Secret
       name: "{{ meteringconfig_spec['reporting-operator'].spec.config.presto.auth.secretName }}"
@@ -52,7 +52,7 @@
 - name: Check for the existence of reporting-operator Hive TLS-related secrets
   block:
   - name: Check for the existence of the reporting-operator Hive client auth secret
-    k8s_facts:
+    k8s_info:
       api_version: v1
       kind: Secret
       name: "{{ meteringconfig_spec['reporting-operator'].spec.config.hive.auth.secretName }}"
@@ -86,13 +86,27 @@
 # Reporting Operator Openshift Auth-Proxy
 #
 - name: Validate the user-provided authProxy configuration
-  include_tasks: validate_reporting_operator_tls.yml
+  block:
+  - include_tasks: validate_reporting_operator_tls.yml
+  rescue:
+  - include_tasks: update_meteringconfig_status.yml
+    vars:
+      current_conditions:
+        type: "Invalid"
+        status: "True"
+        message: |
+          "{{ ansible_failed_result.msg }}"
+        lastTransitionTime: "{{ now(utc=False).isoformat() + 'Z' }}"
+      end_play_after_updating_status: true
+    when:
+    - ansible_failed_result is defined
+    - ansible_failed_result.msg | length > 0
   when: not meteringconfig_tls_enabled
 
 - name: Check for the existence of reporting-operator authProxy-related secret data
   block:
   - name: Check for the existence of the reporting-operator authProxy cookie seed secret
-    k8s_facts:
+    k8s_info:
       api_version: v1
       kind: Secret
       name: "{{ meteringconfig_spec['reporting-operator'].spec.authProxy.cookie.secretName }}"

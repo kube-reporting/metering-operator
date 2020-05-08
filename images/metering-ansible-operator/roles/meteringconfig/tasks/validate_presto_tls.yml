@@ -1,4 +1,7 @@
 ---
+#
+# Note: all of these tasks are wrapped in a block/rescue at the task file call site
+#
 
 #
 # Validate the user-provided cert/key/caCert fields are non-empty when top-level spec.tls.enabled is false
@@ -22,17 +25,6 @@
       that:
         - meteringconfig_spec.presto.spec.config.tls.key != ""
       msg: "presto.spec.config.tls.key cannot be empty if createSecret: true and secretName != ''"
-  rescue:
-  - include_tasks: update_meteringconfig_status.yml
-    vars:
-      end_play_after_updating_status: true
-      current_conditions:
-        type: "Invalid"
-        status: "True"
-        message: |
-          "Failed task name: {{ ansible_failed_task.name }}"
-          "Failed task message: {{ ansible_failed_result.msg }}"
-        lastTransitionTime: "{{ now(utc=False).isoformat() + 'Z' }}"
   when: meteringconfig_template_presto_tls_secret
 
 - name: Validate that the user-provided Presto client Auth fields are not empty
@@ -60,17 +52,6 @@
       that:
         - meteringconfig_spec.presto.spec.config.tls.enabled and meteringconfig_spec.presto.spec.config.auth.enabled
       msg: "Invalid configuration: you cannot enable auth but disable TLS."
-  rescue:
-  - include_tasks: update_meteringconfig_status.yml
-    vars:
-      end_play_after_updating_status: true
-      current_conditions:
-        type: "Invalid"
-        status: "True"
-        message: |
-          "Failed task name: {{ ansible_failed_task.name }}"
-          "Failed task message: {{ ansible_failed_result.msg }}"
-        lastTransitionTime: "{{ now(utc=False).isoformat() + 'Z' }}"
   when: meteringconfig_template_presto_auth_secret
 
 - name: Validate that the user provided Presto/Hive client TLS fields are not empty
@@ -92,15 +73,4 @@
       that:
         - meteringconfig_spec.presto.spec.config.connectors.hive.tls.caCertificate != ""
       msg: "spec.presto.spec.config.connectors.hive.tls.caCertificate cannot be empty when createSecret is set to true"
-  rescue:
-  - include_tasks: update_meteringconfig_status.yml
-    vars:
-      end_play_after_updating_status: true
-      current_conditions:
-        type: "Invalid"
-        status: "True"
-        message: |
-          "Failed task name: {{ ansible_failed_task.name }}"
-          "Failed task message: {{ ansible_failed_result.msg }}"
-        lastTransitionTime: "{{ now(utc=False).isoformat() + 'Z' }}"
   when: meteringconfig_template_presto_hive_tls_secret

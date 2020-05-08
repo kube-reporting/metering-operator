@@ -24,7 +24,7 @@
         msg: "storage.hive.s3.secretName cannot be empty"
 
     - name: Obtaining AWS credentials to configure S3 bucket
-      k8s_facts:
+      k8s_info:
         api_version: v1
         kind: Secret
         name: "{{ meteringconfig_storage_s3_aws_credentials_secret_name }}"
@@ -53,10 +53,13 @@
         current_conditions:
           type: "Invalid"
           status: "True"
-          message: "The task \"{{ ansible_failed_task.name }}\" failed with the following message: {{ ansible_failed_result.msg }}"
+          message: |
+            "{{ ansible_failed_result.msg }}"
           lastTransitionTime: "{{ now(utc=False).isoformat() + 'Z' }}"
         end_play_after_updating_status: true
-      when: ansible_failed_result and (ansible_failed_result.msg | length > 0)
+      when:
+      - ansible_failed_result is defined
+      - ansible_failed_result.msg | length > 0
   vars:
     s3_credentials_secret_exists: "{{ operator_s3_credentials_secret.resources and operator_s3_credentials_secret.resources | length > 0 }}"
     s3_use_dualstack_endpoint: "{{ _ocp_enabled_use_ipv6_networking }}"
@@ -87,7 +90,7 @@
       assert:
         that:
           - meteringconfig_storage_s3Compatible_credentials_secret_name != ""
-        msg: "storage.hive.s3Compatible.secretName is used to reference existing secrets, must not be empty if creatSecret is set to false"
+        msg: "storage.hive.s3Compatible.secretName is used to reference existing secrets and must not be empty if createSecret is set to false"
       when: not meteringconfig_storage_s3Compatible_create_secret
   rescue:
     - include_tasks: update_meteringconfig_status.yml
@@ -95,16 +98,19 @@
         current_conditions:
           type: "Invalid"
           status: "True"
-          message: "The task \"{{ ansible_failed_task.name }}\" failed with the following message: {{ ansible_failed_result.msg }}"
+          message: |
+            "{{ ansible_failed_result.msg }}"
           lastTransitionTime: "{{ now(utc=False).isoformat() + 'Z' }}"
         end_play_after_updating_status: true
-      when: ansible_failed_result and (ansible_failed_result.msg | length > 0)
+      when:
+      - ansible_failed_result is defined
+      - ansible_failed_result.msg | length > 0
   when: meteringconfig_storage_hive_storage_type == 's3Compatible'
 
 - name: Get azure storage account name
   block:
     - name: Get Azure storage credentials secret
-      k8s_facts:
+      k8s_info:
         api_version: v1
         kind: Secret
         name: "{{ meteringconfig_spec.storage.hive.azure.secretName }}"
@@ -125,10 +131,13 @@
         current_conditions:
           type: "Invalid"
           status: "True"
-          message: "The task \"{{ ansible_failed_task.name }}\" failed with the following message: {{ ansible_failed_result.msg }}"
+          message: |
+            "{{ ansible_failed_result.msg }}"
           lastTransitionTime: "{{ now(utc=False).isoformat() + 'Z' }}"
         end_play_after_updating_status: true
-      when: ansible_failed_result and (ansible_failed_result.msg | length > 0)
+      when:
+      - ansible_failed_result is defined
+      - ansible_failed_result.msg | length > 0
   when: meteringconfig_storage_hive_storage_type == 'azure' and not meteringconfig_storage_azure_create_secret
 
 - name: Configure Azure Storage
@@ -151,10 +160,13 @@
         current_conditions:
           type: "Invalid"
           status: "True"
-          message: "The task \"{{ ansible_failed_task.name }}\" failed with the following message: {{ ansible_failed_result.msg }}"
+          message: |
+            "{{ ansible_failed_result.msg }}"
           lastTransitionTime: "{{ now(utc=False).isoformat() + 'Z' }}"
         end_play_after_updating_status: true
-      when: ansible_failed_result and (ansible_failed_result.msg | length > 0)
+      when:
+      - ansible_failed_result is defined
+      - ansible_failed_result.msg | length > 0
   when: meteringconfig_storage_hive_storage_type == 'azure' and meteringconfig_storage_azure_create_secret
 
 - name: Configure GCS Storage
@@ -169,14 +181,14 @@
       assert:
         that:
           - meteringconfig_storage_gcs_credentials_secret_name == ""
-        msg: "storage.hive.gcs.secretName is only used to reference existing secrets, must be empty if creating new secrets"
+        msg: "storage.hive.gcs.secretName is only used to reference existing secrets and must be empty if creating new secrets"
       when: meteringconfig_storage_gcs_create_secret
 
     - name: Validate Metering gcs credentials
       assert:
         that:
           - meteringconfig_storage_gcs_credentials_secret_name != ""
-        msg: "storage.hive.gcs.secretName is used to reference existing secrets, must not be empty if creatSecret is set to false"
+        msg: "storage.hive.gcs.secretName is used to reference existing secrets and must be non-empty if createSecret is set to false"
       when: not meteringconfig_storage_gcs_create_secret
   rescue:
     - include_tasks: update_meteringconfig_status.yml
@@ -184,10 +196,13 @@
         current_conditions:
           type: "Invalid"
           status: "True"
-          message: "The task \"{{ ansible_failed_task.name }}\" failed with the following message: {{ ansible_failed_result.msg }}"
+          message: |
+            "{{ ansible_failed_result.msg }}"
           lastTransitionTime: "{{ now(utc=False).isoformat() + 'Z' }}"
         end_play_after_updating_status: true
-      when: ansible_failed_result and (ansible_failed_result.msg | length > 0)
+      when:
+      - ansible_failed_result is defined
+      - ansible_failed_result.msg | length > 0
   when: meteringconfig_storage_hive_storage_type == 'gcs'
 
 - include_tasks: update_meteringconfig_status.yml

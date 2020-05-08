@@ -4,7 +4,21 @@
 # Validate user-provided Hive TLS configuration when top-level spec.tls.enabled is set to false
 #
 - name: Validate the user-provided Hive TLS configuration
-  include_tasks: validate_hive_tls.yml
+  block:
+  - include_tasks: validate_hive_tls.yml
+  rescue:
+  - include_tasks: update_meteringconfig_status.yml
+    vars:
+      current_conditions:
+        type: "Invalid"
+        status: "True"
+        message: |
+          "{{ ansible_failed_result.msg }}"
+        lastTransitionTime: "{{ now(utc=False).isoformat() + 'Z' }}"
+      end_play_after_updating_status: true
+    when:
+    - ansible_failed_result is defined
+    - ansible_failed_result.msg | length > 0
   when: not meteringconfig_tls_enabled
 
 #
@@ -13,7 +27,7 @@
 - name: Check for the existence of Hive TLS-related secrets
   block:
   - name: Check for the existence of the Hive Metastore TLS secret
-    k8s_facts:
+    k8s_info:
       api_version: v1
       kind: Secret
       name: "{{ meteringconfig_spec.hive.spec.metastore.config.tls.secretName }}"
@@ -22,7 +36,7 @@
     register: hive_metastore_tls_buf
 
   - name: Check for the existence of the Hive Server Metastore TLS secret
-    k8s_facts:
+    k8s_info:
       api_version: v1
       kind: Secret
       name: "{{ meteringconfig_spec.hive.spec.server.config.metastoreTLS.secretName }}"
@@ -31,7 +45,7 @@
     register: hive_server_client_tls_buf
 
   - name: Check for the existence of the Hive Server TLS secret
-    k8s_facts:
+    k8s_info:
       api_version: v1
       kind: Secret
       name: "{{ meteringconfig_spec.hive.spec.server.config.tls.secretName }}"
