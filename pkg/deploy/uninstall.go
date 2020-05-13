@@ -74,7 +74,6 @@ func (deploy *Deployer) uninstallMeteringCSV() error {
 	// and hope that the user is re-running the olm-uninstall command.
 	sub, err := deploy.olmV1Alpha1Client.Subscriptions(deploy.config.Namespace).Get(deploy.config.SubscriptionName, metav1.GetOptions{})
 	if apierrors.IsNotFound(err) {
-		deploy.logger.Warnf("The metering subscription does not exist")
 		return nil
 	} else if err != nil {
 		return fmt.Errorf("failed to get the metering subscription: %v", err)
