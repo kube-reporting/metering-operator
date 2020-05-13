@@ -12,37 +12,41 @@ if [ "$METERING_NAMESPACE" != "openshift-metering" ]; then
 
     "$FAQ_BIN" -f yaml -o yaml -M -c -r \
         --kwargs "namespace=$METERING_NAMESPACE" \
-        '.spec.targetNamespace=$namespace' \
-        "$OLM_MANIFESTS_DIR/metering.catalogsourceconfig.yaml" \
-        > "$TMPDIR/metering.catalogsourceconfig.yaml"
+        '.metadata.namespace=$namespace' \
+        "$OLM_MANIFESTS_DIR/metering.catalogsource.yaml" \
+        > "$TMPDIR/metering.catalogsource.yaml"
 
     "$FAQ_BIN" -f yaml -o yaml -M -c -r \
         --kwargs "namespace=$METERING_NAMESPACE" \
-        '.spec.targetNamespaces[0]=$namespace | .metadata.name=$namespace + "-" + .metadata.name' \
+        '.spec.targetNamespaces[0]=$namespace | .metadata.namespace=$namespace | .metadata.name=$namespace + "-" + .metadata.name' \
         "$OLM_MANIFESTS_DIR/metering.operatorgroup.yaml" \
         > "$TMPDIR/metering.operatorgroup.yaml"
 
     "$FAQ_BIN" -f yaml -o yaml -M -c -r \
         --kwargs "namespace=$METERING_NAMESPACE" \
-        '.spec.sourceNamespace=$namespace' \
+        '.spec.sourceNamespace=$namespace | .metadata.namespace=$namespace' \
         "$OLM_MANIFESTS_DIR/metering.subscription.yaml" \
         > "$TMPDIR/metering.subscription.yaml"
 
-        export OLM_MANIFESTS_DIR="$TMPDIR"
+    export OLM_MANIFESTS_DIR="$TMPDIR"
+    export NAMESPACE=$METERING_NAMESPACE
 fi
 
-msg "Installing Metering Catalog Source Config"
+msg "Creating the Metering ConfigMap"
+"$ROOT_DIR/hack/create-upgrade-configmap.sh"
+
+msg "Installing Metering Catalog Source"
 kubectl apply -f \
-    "$OLM_MANIFESTS_DIR/metering.catalogsourceconfig.yaml"
+    "$OLM_MANIFESTS_DIR/metering.catalogsource.yaml"
 
 msg "Installing Metering Operator Group"
-kube-install \
+kubectl apply -f \
     "$OLM_MANIFESTS_DIR/metering.operatorgroup.yaml"
 
 msg "Installing Metering Subscription"
-kube-install \
+kubectl apply -f \
     "$OLM_MANIFESTS_DIR/metering.subscription.yaml"
 
 msg "Installing Metering Resource"
-kube-install \
+kubectl apply -f \
     "$METERING_CR_FILE"

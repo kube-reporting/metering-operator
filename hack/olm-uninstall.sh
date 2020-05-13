@@ -12,19 +12,19 @@ if [ "$METERING_NAMESPACE" != "openshift-metering" ]; then
 
     "$FAQ_BIN" -f yaml -o yaml -M -c -r \
         --kwargs "namespace=$METERING_NAMESPACE" \
-        '.spec.targetNamespace=$namespace' \
-        "$OLM_MANIFESTS_DIR/metering.catalogsourceconfig.yaml" \
-        > "$TMPDIR/metering.catalogsourceconfig.yaml"
+        '.metadata.namespace=$namespace' \
+        "$OLM_MANIFESTS_DIR/metering.catalogsource.yaml" \
+        > "$TMPDIR/metering.catalogsource.yaml"
 
     "$FAQ_BIN" -f yaml -o yaml -M -c -r \
         --kwargs "namespace=$METERING_NAMESPACE" \
-        '.spec.targetNamespaces[0]=$namespace | .metadata.name=$namespace + "-" + .metadata.name' \
+        '.spec.targetNamespaces[0]=$namespace | .metadata.namespace=$namespace | .metadata.name=$namespace + "-" + .metadata.name' \
         "$OLM_MANIFESTS_DIR/metering.operatorgroup.yaml" \
         > "$TMPDIR/metering.operatorgroup.yaml"
 
     "$FAQ_BIN" -f yaml -o yaml -M -c -r \
         --kwargs "namespace=$METERING_NAMESPACE" \
-        '.spec.sourceNamespace=$namespace' \
+        '.spec.sourceNamespace=$namespace | .metadata.namespace=$namespace' \
         "$OLM_MANIFESTS_DIR/metering.subscription.yaml" \
         > "$TMPDIR/metering.subscription.yaml"
 
@@ -35,20 +35,23 @@ SUBSCRIPTION_NAME="$(faq -f yaml '.metadata.name' "$OLM_MANIFESTS_DIR/metering.s
 CSV_NAME="$(kubectl -n $METERING_NAMESPACE get subscriptions $SUBSCRIPTION_NAME -o yaml | faq -f yaml '.status.currentCSV')"
 
 msg "Removing Metering Resource"
-kube-remove \
+kubectl delete -f \
     "$METERING_CR_FILE"
 
 msg "Removing Metering Subscription"
-kube-remove \
+kubectl delete -f \
     "$OLM_MANIFESTS_DIR/metering.subscription.yaml"
 
 msg "Removing Metering Operator Group"
-kube-remove \
+kubectl delete -f \
     "$OLM_MANIFESTS_DIR/metering.operatorgroup.yaml"
 
-msg "Removing Metering Catalog Source Config"
+msg "Removing Metering Catalog Source"
 kubectl delete -f \
-    "$OLM_MANIFESTS_DIR/metering.catalogsourceconfig.yaml"
+    "$OLM_MANIFESTS_DIR/metering.catalogsource.yaml"
+
+msg "Removing Metering ConfigMap"
+kubectl -n $METERING_NAMESPACE delete configmap metering-ocp
 
 msg "Removing Metering Catalog Source Version"
 kubectl -n $METERING_NAMESPACE delete csv $CSV_NAME
