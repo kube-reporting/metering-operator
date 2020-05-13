@@ -534,11 +534,13 @@ olm:
         ]
 
   subscriptionName: metering-ocp
-  subscriptionChannel: stable
-  catalogSourceConfigName: installed-redhat-metering-operators-openshift-metering
-  catalogSourceConfigNamespace: openshift-marketplace
-  catalogSourceConfigTargetNamespace: openshift-metering
-
+  subscriptionChannel: "4.5"
+  subscriptionNamespace: openshift-metering
+  catalogSourceConfigMapName: metering-ocp
+  catalogSourceName: metering-ocp-dev
+  catalogSourceNamespace: openshift-metering
+  catalogSourceTargetNamespace: openshift-metering
   operatorGroupName: metering-operators
+  operatorGroupNamespace: openshift-metering
   operatorGroupTargetNamespaces: ["openshift-metering"]
   telemeterManifestGeneration: false

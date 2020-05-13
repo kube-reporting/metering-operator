@@ -1,0 +1,11 @@
+apiVersion: operators.coreos.com/v1alpha1
+kind: CatalogSource
+metadata:
+  name: metering-upstream-dev
+  namespace: marketplace
+spec:
+  configMap: metering-upstream
+  sourceType: internal
+  publisher: metering
+  displayName: Metering Operator Testing
+

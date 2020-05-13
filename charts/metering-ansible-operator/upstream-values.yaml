@@ -99,13 +99,12 @@ olm:
       containerImage: "quay.io/coreos/metering-ansible-operator:4.5"
 
   subscriptionName: metering
-  subscriptionChannel: stable
-
-  catalogSourceConfigName: installed-upstream-metering-operators-metering
-  catalogSourceConfigNamespace: marketplace
-  catalogSourceConfigTargetNamespace: metering
-  catalogSourceConfigOperatorSource: upstream-community-operators
-
+  subscriptionChannel: "4.5"
+  catalogSourceConfigMapName: metering-upstream
+  catalogSourceName: metering-upstream-dev
+  catalogSourceNamespace: marketplace
+  catalogSourceTargetNamespace: metering
   operatorGroupName: metering-operators
+  operatorGroupNamespace: metering
   operatorGroupTargetNamespaces: ["metering"]
   telemeterManifestGeneration: false

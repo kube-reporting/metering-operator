@@ -1,0 +1,11 @@
+apiVersion: operators.coreos.com/v1alpha1
+kind: CatalogSource
+metadata:
+  name: metering-ocp-dev
+  namespace: openshift-metering
+spec:
+  configMap: metering-ocp
+  sourceType: internal
+  publisher: metering
+  displayName: Metering Operator Testing
+
