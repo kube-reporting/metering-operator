@@ -234,14 +234,10 @@ func runCleanupScript(logger logrus.FieldLogger, namespace, outputPath, scriptPa
 		errArr = append(errArr, fmt.Sprintf("failed to create a pipe from command output to stdout: %v", err))
 	}
 
+	scanner := bufio.NewScanner(cleanupStdout)
 	go func() {
-		scanner := bufio.NewScanner(cleanupStdout)
 		for scanner.Scan() {
-			line := scanner.Text()
-			logger.Infof(line)
-		}
-		if err := scanner.Err(); err != nil {
-			errArr = append(errArr, fmt.Sprintf("failed to read the command output: %v", err))
+			logger.Infof(scanner.Text())
 		}
 	}()
 
