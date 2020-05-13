@@ -2,10 +2,10 @@ apiVersion: operators.coreos.com/v1alpha1
 kind: Subscription
 metadata:
   name: metering
-  namespace: metering
+  namespace: openshift-metering
 spec:
-  channel: stable
+  channel: "4.5"
   name: metering-upstream
-  source: installed-upstream-metering-operators-metering
+  source: metering-upstream-dev
   sourceNamespace: metering
 

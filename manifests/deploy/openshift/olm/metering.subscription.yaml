@@ -4,8 +4,8 @@ metadata:
   name: metering-ocp
   namespace: openshift-metering
 spec:
-  channel: stable
+  channel: "4.5"
   name: metering-ocp
-  source: installed-redhat-metering-operators-openshift-metering
+  source: metering-ocp-dev
   sourceNamespace: openshift-metering
 
