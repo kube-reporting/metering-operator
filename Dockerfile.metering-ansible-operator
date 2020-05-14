@@ -7,7 +7,8 @@ FROM quay.io/openshift/origin-ansible-operator:4.4
 
 USER root
 RUN set -x; INSTALL_PKGS="curl bash ca-certificates less which inotify-tools openssl" \
-    && yum clean all && rm -rf /var/cache/yum/* \
+    && yum clean all \
+    && rm -rf /var/cache/yum/* \
     && yum -y install epel-release \
     && yum install --setopt=skip_missing_names_on_install=False -y \
         $INSTALL_PKGS  \
@@ -42,10 +43,6 @@ COPY images/metering-ansible-operator/ansible.cfg /etc/ansible/ansible.cfg
 COPY charts/openshift-metering ${HELM_CHART_PATH}
 
 COPY manifests/deploy/openshift/olm/bundle /manifests
-
-# to allow running as non-root
-RUN chown -R 1001:0 $HOME && \
-    chmod -R 774 $HOME /etc/passwd
 
 USER 1001
 
