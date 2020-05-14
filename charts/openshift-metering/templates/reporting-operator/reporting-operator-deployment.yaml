@@ -447,6 +447,11 @@ spec:
         resources:
 {{ toYaml $operatorValues.spec.authProxy.resources | indent 10 }}
         volumeMounts:
+{{- if and .Values.networking.useGlobalProxyNetworking .Values.networking.proxy.config.trusted_ca_bundle }}
+        - mountPath: /etc/pki/ca-trust/extracted/pem
+          name: reporting-operator-trusted-ca-bundle
+          readOnly: true
+{{- end }}
 {{- if $operatorValues.spec.config.tls.api.enabled }}
         - mountPath: /etc/tls
           name: api-tls
