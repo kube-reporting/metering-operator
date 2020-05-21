@@ -2,6 +2,7 @@ package deploy
 
 import (
 	"fmt"
+	"time"
 
 	olmv1 "github.com/operator-framework/operator-lifecycle-manager/pkg/api/apis/operators/v1"
 	olmv1alpha1 "github.com/operator-framework/operator-lifecycle-manager/pkg/api/apis/operators/v1alpha1"
@@ -99,10 +100,23 @@ func (deploy *Deployer) installMeteringConfig() error {
 
 	mc, err := deploy.meteringClient.MeteringConfigs(deploy.config.Namespace).Get(deploy.config.MeteringConfig.Name, metav1.GetOptions{})
 	if apierrors.IsNotFound(err) {
-		_, err = deploy.meteringClient.MeteringConfigs(deploy.config.Namespace).Create(deploy.config.MeteringConfig)
+		// This was needed to fix https://bugzilla.redhat.com/show_bug.cgi?id=1838652
+		// In short, despite checking if the MeteringConfig CRD exists before creating the CR,
+		// we were still getting the occasionally apiserver error. If we instead attempt
+		// to create this CR over the course of the next minute, we reduce the number
+		// of apiserver (and overall e2e suite) flakes dramatically.
+		err := wait.PollImmediate(time.Second, time.Minute, func() (done bool, err error) {
+			_, err = deploy.meteringClient.MeteringConfigs(deploy.config.Namespace).Create(deploy.config.MeteringConfig)
+			deploy.logger.Infof("Waiting the MeteringConfig CR to be created")
+			if err != nil {
+				return false, nil
+			}
+			return true, nil
+		})
 		if err != nil {
 			return err
 		}
+
 		deploy.logger.Infof("Created the MeteringConfig resource")
 	} else if err == nil {
 		mc.Spec = deploy.config.MeteringConfig.Spec
