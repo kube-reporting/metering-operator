@@ -26,9 +26,32 @@ func (deploy *Deployer) installNamespace() error {
 			deploy.logger.Infof("Labeling the %s namespace with '%s=%s'", deploy.config.Namespace, key, val)
 		}
 
+		/*
+			In the case where the platform is set to Openshift (the default value),
+			we need to make a few modifications to the namespace metadata.
+
+			The 'openshift.io/cluster-monitoring' labels tells the cluster-monitoring
+			operator to scrape Prometheus metrics for the installed Metering namespace.
+
+			The 'openshift.io/node-selector' annotation is a way to control where Pods
+			get scheduled in a specific namespace. If this annotation is set to an empty
+			label, that means that Pods for this namespace can be scheduled on any nodes.
+
+			In the case where a cluster administrator has configured a value for the
+			defaultNodeSelector field in the cluster's Scheduler object, we need to set
+			this namespace annotation in order to avoid a collision with what the user
+			has supplied in their MeteringConfig custom resource. This implies that whenever
+			a cluster has been configured to schedule Pods using a default node selector,
+			those changes must also be propogated to the MeteringConfig custom resource, else
+			the Pods in Metering namespace will be scheduled on any available node.
+		*/
 		if deploy.config.Platform == "openshift" {
 			labels["openshift.io/cluster-monitoring"] = "true"
 			deploy.logger.Infof("Labeling the %s namespace with 'openshift.io/cluster-monitoring=true'", deploy.config.Namespace)
+			namespaceObjectMeta.Annotations = map[string]string{
+				"openshift.io/node-selector": "",
+			}
+			deploy.logger.Infof("Annotating the %s namespace with 'openshift.io/node-selector=''", deploy.config.Namespace)
 		}
 
 		namespaceObjectMeta.Labels = labels
@@ -52,6 +75,15 @@ func (deploy *Deployer) installNamespace() error {
 					"openshift.io/cluster-monitoring": "true",
 				}
 				deploy.logger.Infof("Added the 'openshift.io/cluster-monitoring' label to the %s namespace", deploy.config.Namespace)
+			}
+			if namespace.ObjectMeta.Annotations != nil {
+				namespace.ObjectMeta.Annotations["openshift.io/node-selector"] = ""
+				deploy.logger.Infof("Updated the 'openshift.io/node-selector' annotation to the %s namespace", deploy.config.Namespace)
+			} else {
+				namespace.ObjectMeta.Annotations = map[string]string{
+					"openshift.io/node-selector": "",
+				}
+				deploy.logger.Infof("Added the empty 'openshift.io/node-selector' annotation to the %s namespace", deploy.config.Namespace)
 			}
 
 			_, err := deploy.client.CoreV1().Namespaces().Update(namespace)
