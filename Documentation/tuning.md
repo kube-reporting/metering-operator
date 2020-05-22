@@ -23,7 +23,7 @@ Besides the default limits example, we also provide guidelines and examples of w
 
 Here are a few guidelines:
 
-- Presto, hive, and hdfs are all written in Java, and thus tend to consume more memory than other applications.
+- Presto, Hive, and HDFS are all written in Java, and thus tend to consume more memory than other applications.
 - Metering is naturally batch oriented and can be bursty in resources, and thus there are many idle periods. Without proper autoscaling, it may be necessary to over-provision resources if you want optimal performance, or find that applications crash without more resources.
 - Metering is designed to run at even the largest scale environments like Openshift online, which has clusters with over 5000 namespaces, and over 10,000 pods. It works well on smaller clusters too, but the cost of being able to running at these larger scales can mean the metering stack isn't as easily tuned for a smaller footprint.
 
