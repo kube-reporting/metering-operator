@@ -1550,22 +1550,6 @@ spec:
                                       type: boolean
                             prometheus:
                               type: object
-                              oneOf:
-                              - required:
-                                - enabled
-                                - uri
-                                properties:
-                                  enabled:
-                                    enum:
-                                    - true
-                              - properties:
-                                  enabled:
-                                    enum:
-                                    - false
-                                allOf:
-                                - not:
-                                    required:
-                                      - uri
                               properties:
                                 enabled:
                                   description: Whether or not to enable the Presto-Prometheus connector.

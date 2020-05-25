@@ -394,10 +394,13 @@ _ocp_enabled_overrides:
       config:
         connectors:
           prometheus:
-            enabled: true
+            # Re-enable by default for OCP installs once we resolved
+            # https://bugzilla.redhat.com/show_bug.cgi?id=1829446
+            enabled: false
             config:
-              uri: "https://thanos-querier.openshift-monitoring.svc:9091/"
-
+              # TODO: uncomment once the above BZ is resolved
+              # uri: "https://thanos-querier.openshift-monitoring.svc:9091/"
+              uri: ""
             auth:
               bearerTokenFile: "/var/run/secrets/kubernetes.io/serviceaccount/token"
 

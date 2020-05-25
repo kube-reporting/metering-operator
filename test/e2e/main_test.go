@@ -587,6 +587,19 @@ func TestManualMeteringInstall(t *testing.T) {
 								},
 							},
 						},
+						Config: &metering.PrestoConfig{
+							Connectors: &metering.PrestoConnectorConfig{
+								Prometheus: &metering.PrestoConnectorPrometheusConfig{
+									Enabled: testhelpers.PtrToBool(true),
+									Config: &metering.PrestoConnectorPrometheusConfigConfig{
+										URI: "https://thanos-querier.openshift-monitoring.svc:9091/",
+									},
+									Auth: &metering.PrestoConnectorPrometheusConfigAuth{
+										BearerTokenFile: "/var/run/secrets/kubernetes.io/serviceaccount/token",
+									},
+								},
+							},
+						},
 					},
 				},
 				ReportingOperator: &metering.ReportingOperator{
