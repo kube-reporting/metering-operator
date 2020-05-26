@@ -109,6 +109,7 @@ func (deploy *Deployer) installMeteringConfig() error {
 			_, err = deploy.meteringClient.MeteringConfigs(deploy.config.Namespace).Create(deploy.config.MeteringConfig)
 			deploy.logger.Infof("Waiting the MeteringConfig CR to be created")
 			if err != nil {
+				deploy.logger.Infof("Encountered an error while waiting for the MeteringConfig CR to be created: %+v", err)
 				return false, nil
 			}
 			return true, nil
