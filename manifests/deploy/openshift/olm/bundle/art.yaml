@@ -8,6 +8,8 @@ updates:
     # replace spec.version value
     - search: 'version: "4.4.0"'
       replace: 'version: {FULL_VER}'
+    - search: 'olm.skipRange: ">=4.2.0 <{MAJOR}.{MINOR}.0"'
+      replace: 'olm.skipRange: ">=4.2.0 <{FULL_VER}"'
   - file: "metering.package.yaml"
     update_list:
     - search: "currentCSV: metering-operator.v{MAJOR}.{MINOR}.0"
