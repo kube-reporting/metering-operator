@@ -4,6 +4,7 @@ metadata:
   name: metering-operator.v4.4.0
   namespace: placeholder
   annotations:
+    olm.skipRange: ">=4.2.0 <4.4.0"
     alm-examples: |-
       [
         {
@@ -202,7 +203,7 @@ metadata:
           }
         }
       ]
-    capabilities: Basic Install
+    capabilities: Seamless Upgrades
     categories: OpenShift Optional, Monitoring
     certified: "false"
     containerImage: quay.io/openshift/origin-metering-ansible-operator:4.4

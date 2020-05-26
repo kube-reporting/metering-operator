@@ -208,6 +208,7 @@ olm:
   csv:
     name : metering-operator.v4.4.0
     version: "4.4.0"
+    skipRange: ">=4.2.0 <4.4.0"
     minKubeVersion: "1.11.0"
     displayName: Metering
     description: |
@@ -318,7 +319,7 @@ olm:
       operatorframework.io/cluster-monitoring: "true"
       categories: "OpenShift Optional, Monitoring"
       certified: "false"
-      capabilities: Basic Install
+      capabilities: Seamless Upgrades
       support: Red Hat, Inc.
       createdAt: "2019-01-01T11:59:59Z"
       containerImage: "quay.io/openshift/origin-metering-ansible-operator:4.4"
