@@ -1,1 +1,32 @@
-[{"namespace":"metering-chancez","period_end":"2019-03-18T16:05:00Z","period_start":"2019-03-18T16:00:00Z","persistentvolumeclaim_usage_bytes":41467084.8},{"namespace":"metering-ci2-openshift-continuous-upgrade-master","period_end":"2019-03-18T16:05:00Z","period_start":"2019-03-18T16:00:00Z","persistentvolumeclaim_usage_bytes":873716394.6666666},{"namespace":"metering-tschuy","period_end":"2019-03-18T16:05:00Z","period_start":"2019-03-18T16:00:00Z","persistentvolumeclaim_usage_bytes":239100450.13333333},{"namespace":"openshift-monitoring","period_end":"2019-03-18T16:05:00Z","period_start":"2019-03-18T16:00:00Z","persistentvolumeclaim_usage_bytes":2256873062.4},{"namespace":"telemeter-tschuy","period_end":"2019-03-18T16:05:00Z","period_start":"2019-03-18T16:00:00Z","persistentvolumeclaim_usage_bytes":266761011.2}]
+[
+  {
+    "namespace": "metering-chancez",
+    "period_end": "2019-03-18T16:05:00Z",
+    "period_start": "2019-03-18T16:00:00Z",
+    "persistentvolumeclaim_usage_bytes": 41467084.8
+  },
+  {
+    "namespace": "metering-ci2-openshift-continuous-upgrade-master",
+    "period_end": "2019-03-18T16:05:00Z",
+    "period_start": "2019-03-18T16:00:00Z",
+    "persistentvolumeclaim_usage_bytes": 873716394.6666666
+  },
+  {
+    "namespace": "metering-tschuy",
+    "period_end": "2019-03-18T16:05:00Z",
+    "period_start": "2019-03-18T16:00:00Z",
+    "persistentvolumeclaim_usage_bytes": 239100450.13333333
+  },
+  {
+    "namespace": "openshift-monitoring",
+    "period_end": "2019-03-18T16:05:00Z",
+    "period_start": "2019-03-18T16:00:00Z",
+    "persistentvolumeclaim_usage_bytes": 2256873062.4
+  },
+  {
+    "namespace": "telemeter-tschuy",
+    "period_end": "2019-03-18T16:05:00Z",
+    "period_start": "2019-03-18T16:00:00Z",
+    "persistentvolumeclaim_usage_bytes": 266761011.2
+  }
+]
