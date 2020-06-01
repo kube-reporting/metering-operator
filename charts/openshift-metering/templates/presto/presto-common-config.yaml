@@ -59,9 +59,9 @@ data:
       importCert /s3-compatible-ca/ca-bundle.crt changeit $JAVA_HOME/lib/security/cacerts
     fi
     # always add the openshift service-ca.crt if it exists
-    if [ -a /var/run/secrets/kubernetes.io/serviceaccount/service-ca.crt ]; then
-      echo "Adding /var/run/secrets/kubernetes.io/serviceaccount/service-ca.crt to $JAVA_HOME/lib/security/cacerts"
-      importCert /var/run/secrets/kubernetes.io/serviceaccount/service-ca.crt changeit $JAVA_HOME/lib/security/cacerts
+    if [ -a /var/run/configmaps/service-ca-bundle/service-ca.crt ]; then
+      echo "Adding /var/run/configmaps/service-ca-bundle/service-ca.crt to $JAVA_HOME/lib/security/cacerts"
+      importCert /var/run/configmaps/service-ca-bundle/service-ca.crt changeit $JAVA_HOME/lib/security/cacerts
     fi
 
     # add node id to node config
