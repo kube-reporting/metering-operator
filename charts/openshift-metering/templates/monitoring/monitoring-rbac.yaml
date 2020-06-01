@@ -29,6 +29,6 @@ roleRef:
   name: metering-prometheus-k8s
 subjects:
 - kind: ServiceAccount
-  name: thanos-querier
+  name: prometheus-k8s
   namespace: {{ .Values.monitoring.namespace }}
 {{- end }}
