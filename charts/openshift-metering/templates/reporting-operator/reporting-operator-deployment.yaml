@@ -202,7 +202,7 @@ spec:
     {{ fail "Cannot both use serviceAccount CA and CA from configMap" }}
   {{- end }}
         - name: REPORTING_OPERATOR_PROMETHEUS_CA_FILE
-          value: "/var/run/secrets/kubernetes.io/serviceaccount/service-ca.crt"
+          value: "/var/run/configmaps/service-ca-bundle/service-ca.crt"
 {{- end }}
 {{- if $operatorValues.spec.config.prometheus.certificateAuthority.configMap.enabled }}
         - name: REPORTING_OPERATOR_PROMETHEUS_CA_FILE
@@ -353,6 +353,9 @@ spec:
 {{ toYaml $operatorValues.spec.livenessProbe | indent 10 }}
 {{- end }}
         volumeMounts:
+        - name: reporting-operator-service-ca-bundle
+          mountPath: /var/run/configmaps/service-ca-bundle
+          readOnly: true
 {{- if $operatorValues.spec.config.hive.tls.enabled }}
         - name: hive-tls
           mountPath: /var/run/secrets/hive-tls
@@ -447,6 +450,9 @@ spec:
         resources:
 {{ toYaml $operatorValues.spec.authProxy.resources | indent 10 }}
         volumeMounts:
+        - name: reporting-operator-service-ca-bundle
+          mountPath: /var/run/configmaps/service-ca-bundle
+          readOnly: true
 {{- if and .Values.networking.useGlobalProxyNetworking .Values.networking.proxy.config.trusted_ca_bundle }}
         - mountPath: /etc/pki/ca-trust/extracted/pem
           name: reporting-operator-trusted-ca-bundle
@@ -474,6 +480,10 @@ spec:
           - key: ca-bundle.crt
             path: ca-bundle.crt
 {{- end }}
+      - name: reporting-operator-service-ca-bundle
+        configMap:
+          name: service-ca-bundle
+          optional: true
 {{- if $operatorValues.spec.config.hive.tls.enabled }}
       - name: hive-tls
         secret:
