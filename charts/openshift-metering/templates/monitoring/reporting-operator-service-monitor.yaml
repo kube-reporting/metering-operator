@@ -12,7 +12,7 @@ spec:
     scheme: "https"
     interval: 30s
     tlsConfig:
-      caFile: /var/run/secrets/kubernetes.io/serviceaccount/service-ca.crt
+      caFile: /etc/prometheus/configmaps/serving-certs-ca-bundle/service-ca.crt
       serverName: reporting-operator.{{ .Release.Namespace }}.svc
     bearerTokenFile: /var/run/secrets/kubernetes.io/serviceaccount/token
   selector:
