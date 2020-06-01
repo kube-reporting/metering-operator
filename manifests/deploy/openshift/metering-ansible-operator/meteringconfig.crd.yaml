@@ -22,6 +22,7 @@ spec:
     storage: false
   validation:
     openAPIV3Schema:
+      type: object
       required:
       - spec
       properties:
@@ -763,6 +764,8 @@ spec:
                               minLength: 1
                             pullSecrets:
                               type: array
+                              items:
+                                type: string
                             repository:
                               type: string
                               minLength: 1
@@ -1226,6 +1229,8 @@ spec:
                           type: string
                         pullSecrets:
                           type: array
+                          items:
+                            type: string
                         repository:
                           type: string
                         tag:
@@ -1454,6 +1459,13 @@ spec:
                           properties:
                             extraConnectorFiles:
                               type: array
+                              items:
+                                type: object
+                                properties:
+                                  name:
+                                    type: string
+                                  content:
+                                    type: string
                             hive:
                               type: object
                               properties:
@@ -1695,16 +1707,17 @@ spec:
                               type: object
                               properties:
                                 G1HeapRegionSize:
+                                  x-kubernetes-int-or-string: true
                                   anyOf:
                                   - type: integer
-                                    minimum: 0
                                   - type: string
-                                    minLength: 3
                                 concGCThreads:
                                   type: integer
                                   minimum: 0
                                 extraFlags:
                                   type: array
+                                  items:
+                                    type: string
                                 initialRAMPercentage:
                                   type: integer
                                   minimum: 0
@@ -1717,11 +1730,10 @@ spec:
                                   type: integer
                                   minimum: 0
                                 maxDirectMemorySize:
+                                  x-kubernetes-int-or-string: true
                                   anyOf:
                                   - type: integer
-                                    minimum: 0
                                   - type: string
-                                    minLength: 2
                                 maxGcPauseMillis:
                                   type: integer
                                   minimum: 0
@@ -1846,16 +1858,17 @@ spec:
                               type: object
                               properties:
                                 G1HeapRegionSize:
+                                  x-kubernetes-int-or-string: true
                                   anyOf:
                                   - type: integer
-                                    minimum: 0
                                   - type: string
-                                    minLength: 3
                                 concGCThreads:
                                   type: integer
                                   minimum: 0
                                 extraFlags:
                                   type: array
+                                  items:
+                                    type: string
                                 initialRAMPercentage:
                                   type: integer
                                   minimum: 0
@@ -1868,11 +1881,10 @@ spec:
                                   type: integer
                                   minimum: 0
                                 maxDirectMemorySize:
+                                  x-kubernetes-int-or-string: true
                                   anyOf:
                                   - type: integer
-                                    minimum: 0
                                   - type: string
-                                    minLength: 2
                                 maxGcPauseMillis:
                                   type: integer
                                   minimum: 0
@@ -2046,6 +2058,8 @@ spec:
                           type: string
                         pullSecrets:
                           type: array
+                          items:
+                            type: string
                         repository:
                           type: string
                         tag:
@@ -2760,7 +2774,9 @@ spec:
                         pullPolicy:
                           type: string
                         pullSecrets:
-                          type: string
+                          type: array
+                          items:
+                            type: string
                         repository:
                           type: string
                         tag:
