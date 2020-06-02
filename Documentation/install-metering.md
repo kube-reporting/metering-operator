@@ -42,7 +42,7 @@ There are multiple installation methods depending on your Kubernetes platform an
 
 Using OLM is the recommended option as it ensures you are getting a stable release that we have tested.
 
-OLM is currently only supported on Openshift 4.2 or newer.
+OLM is currently only supported on Openshift 4.3 or newer.
 For instructions on installing using OLM follow the [OLM install guide][olm-install].
 
 ### Manual install scripts

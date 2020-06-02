@@ -3,7 +3,7 @@ FROM openshift/ose-metering-helm:latest as helm
 # final image needs kubectl, so we copy `oc` from cli image to use as kubectl.
 FROM openshift/ose-cli:latest as cli
 # real base
-FROM openshift/ose-ansible-operator:4.5
+FROM openshift/ose-ansible-operator:4.6
 
 USER root
 RUN set -x; \

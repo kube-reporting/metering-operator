@@ -1,7 +1,7 @@
 apiVersion: operators.coreos.com/v1alpha1
 kind: ClusterServiceVersion
 metadata:
-  name: metering-operator.v4.5.0
+  name: metering-operator.v4.6.0
   namespace: placeholder
   annotations:
     alm-examples: |-
@@ -205,11 +205,11 @@ metadata:
     capabilities: Seamless Upgrades
     categories: OpenShift Optional, Monitoring
     certified: "false"
-    containerImage: quay.io/openshift/origin-metering-ansible-operator:4.5
+    containerImage: quay.io/openshift/origin-metering-ansible-operator:4.6
     createdAt: 2019-01-01T11:59:59Z
     description: Chargeback and reporting tool to provide accountability for how resources
       are used across a cluster
-    olm.skipRange: '>=4.2.0 <4.5.0'
+    olm.skipRange: '>=4.2.0 <4.6.0'
     operatorframework.io/cluster-monitoring: "true"
     operatorframework.io/suggested-namespace: openshift-metering
     operators.openshift.io/capability: '["fips", "cluster-proxy"]'
@@ -221,7 +221,7 @@ spec:
   description: |
     The Metering Operator is a chargeback and reporting tool to provide accountability for how resources are used across a cluster. Cluster admins can schedule reports based on historical usage data by Pod, Namespace, and Cluster wide. The Metering Operator is a part of the [Kubernetes Reporting organization](https://coreos.com/blog/introducing-operator-framework-metering).
 
-    Read the user guide for more details on [running and viewing your first report](https://docs.openshift.com/container-platform/4.5/metering/metering-using-metering.html).
+    Read the user guide for more details on [running and viewing your first report](https://docs.openshift.com/container-platform/4.6/metering/metering-using-metering.html).
 
     ### Core capabilities
 
@@ -241,18 +241,18 @@ spec:
     At least one Node should have 2GB of RAM and 2 CPU cores.
     Memory and CPU consumption may often be lower, but will spike when running reports, or collecting data for larger clusters.
 
-    Metering requires configuring storage, please review the [configuring persistent storage documentation](https://docs.openshift.com/container-platform/4.5/metering/configuring-metering/metering-configure-persistent-storage.html) before proceeding.
+    Metering requires configuring storage, please review the [configuring persistent storage documentation](https://docs.openshift.com/container-platform/4.6/metering/configuring-metering/metering-configure-persistent-storage.html) before proceeding.
 
     ### Common Configurations
 
-    * **Store data in object storage or in a PersistentVolume** - Store your report output [in an object storage bucket or in a PersistentVolume](https://docs.openshift.com/container-platform/4.5/metering/configuring-metering/metering-configure-persistent-storage.html).
+    * **Store data in object storage or in a PersistentVolume** - Store your report output [in an object storage bucket or in a PersistentVolume](https://docs.openshift.com/container-platform/4.6/metering/configuring-metering/metering-configure-persistent-storage.html).
 
-    * **Configure AWS Billing Data Source** - Assign Pod $$ costs on using your [AWS billing reports stored in S3](https://docs.openshift.com/container-platform/4.5/metering/configuring-metering/metering-configure-aws-billing-correlation.html).
+    * **Configure AWS Billing Data Source** - Assign Pod $$ costs on using your [AWS billing reports stored in S3](https://docs.openshift.com/container-platform/4.6/metering/configuring-metering/metering-configure-aws-billing-correlation.html).
 
-    * **Use Reports** - Customize what how you process data. [Specify what you want to report on, set the schedule, and reporting time period](https://docs.openshift.com/container-platform/4.5/metering/reports/metering-about-reports.html#metering-reports_metering-about-reports).
+    * **Use Reports** - Customize what how you process data. [Specify what you want to report on, set the schedule, and reporting time period](https://docs.openshift.com/container-platform/4.6/metering/reports/metering-about-reports.html#metering-reports_metering-about-reports).
 
   keywords: [metering metrics reporting prometheus chargeback]
-  version: "4.5.0"
+  version: "4.6.0"
   minKubeVersion: "1.11.0"
   maturity: stable
   maintainers:
@@ -261,7 +261,7 @@ spec:
 
   links:
     - name: Documentation
-      url: https://docs.openshift.com/container-platform/4.5/metering/metering-about-metering.html
+      url: https://docs.openshift.com/container-platform/4.6/metering/metering-about-metering.html
 
   provider:
     name: Red Hat
@@ -466,14 +466,14 @@ spec:
                   - /opt/ansible/scripts/ansible-logs.sh
                   - /tmp/ansible-operator/runner
                   - stdout
-                  image: "quay.io/openshift/origin-metering-ansible-operator:4.5"
+                  image: "quay.io/openshift/origin-metering-ansible-operator:4.6"
                   imagePullPolicy: Always
                   volumeMounts:
                   - mountPath: /tmp/ansible-operator/runner
                     name: runner
                     readOnly: true
                 - name: operator
-                  image: "quay.io/openshift/origin-metering-ansible-operator:4.5"
+                  image: "quay.io/openshift/origin-metering-ansible-operator:4.6"
                   imagePullPolicy: Always
                   env:
                   - name: OPERATOR_NAME
@@ -489,19 +489,19 @@ spec:
                       fieldRef:
                         fieldPath: metadata.name
                   - name: METERING_ANSIBLE_OPERATOR_IMAGE
-                    value: "quay.io/openshift/origin-metering-ansible-operator:4.5"
+                    value: "quay.io/openshift/origin-metering-ansible-operator:4.6"
                   - name: METERING_REPORTING_OPERATOR_IMAGE
-                    value: "quay.io/openshift/origin-metering-reporting-operator:4.5"
+                    value: "quay.io/openshift/origin-metering-reporting-operator:4.6"
                   - name: METERING_PRESTO_IMAGE
-                    value: "quay.io/openshift/origin-metering-presto:4.5"
+                    value: "quay.io/openshift/origin-metering-presto:4.6"
                   - name: METERING_HIVE_IMAGE
-                    value: "quay.io/openshift/origin-metering-hive:4.5"
+                    value: "quay.io/openshift/origin-metering-hive:4.6"
                   - name: METERING_HADOOP_IMAGE
-                    value: "quay.io/openshift/origin-metering-hadoop:4.5"
+                    value: "quay.io/openshift/origin-metering-hadoop:4.6"
                   - name: GHOSTUNNEL_IMAGE
-                    value: "quay.io/openshift/origin-ghostunnel:4.5"
+                    value: "quay.io/openshift/origin-ghostunnel:4.6"
                   - name: OAUTH_PROXY_IMAGE
-                    value: "quay.io/openshift/origin-oauth-proxy:4.5"
+                    value: "quay.io/openshift/origin-oauth-proxy:4.6"
                   volumeMounts:
                   - mountPath: /tmp/ansible-operator/runner
                     name: runner

@@ -4,7 +4,7 @@ metadata:
   name: metering
   namespace: openshift-metering
 spec:
-  channel: "4.5"
+  channel: "4.6"
   name: metering-upstream
   source: metering-upstream-dev
   sourceNamespace: metering
