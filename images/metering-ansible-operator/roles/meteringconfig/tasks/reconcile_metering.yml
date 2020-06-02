@@ -32,6 +32,9 @@
       - template_file: templates/metering/metering-roles.yaml
         apis: [ {kind: role, api_version: 'rbac.authorization.k8s.io/v1'} ]
         prune_label_value: openshift-metering-roles
+      - template_file: templates/metering/metering-service-ca-crt.yaml
+        apis: [ {kind: ConfigMap} ]
+        prune_label_value: openshift-metering-service-ca-crt
       - template_file: templates/metering/metering-rolebindings.yaml
         apis: [ {kind: rolebindings, api_version: 'rbac.authorization.k8s.io/v1'} ]
         prune_label_value: openshift-metering-rolebindings
