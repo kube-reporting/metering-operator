@@ -105,7 +105,7 @@ The major components are:
 - [Project New Castle (pnc)][pnc]
   - Builds Java projects that use [maven][maven].
 - [Brew (koji)][brew]
-  - Builds, Images, rpms, java artifacts, etc all get pushed here.
+  - Builds, Images, rpms, Java artifacts, etc all get pushed here.
 - [dist-git][dist-git]
   - Holds copies of our repos that are synced and managed by the Automated Release Team (ART).
   - Contains modified Dockerfiles: They use a tool [OIT][oit] that adds some additional changes to the repo before syncing it to dist-git.
