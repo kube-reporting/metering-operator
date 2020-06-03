@@ -296,6 +296,13 @@ spec:
           - apiGroups:
             - ""
             resources:
+            - services/finalizers
+            - deployments/finalizers
+            verbs:
+            - update
+          - apiGroups:
+            - ""
+            resources:
             - namespaces
             verbs:
             - get
