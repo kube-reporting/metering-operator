@@ -1,8 +1,9 @@
 ---
 
-- name: Finalize the set of meteringconfig default values
+- name: Finalize the set of meteringconfig static dictionaries
   set_fact:
     meteringconfig_default_values: "{{ meteringconfig_default_values }}"
+    meteringconfig_spec_overrides: "{{ meteringconfig_spec_overrides }}"
   no_log: true
 
 - name: Validate Configurations
