@@ -257,6 +257,15 @@ func (deploy *Deployer) uninstallMeteringClusterRole() error {
 		return err
 	}
 
+	// attempt to delete any of the clusterroles the reporting-operator creates
+	err = deploy.client.RbacV1().ClusterRoles().DeleteCollection(&metav1.DeleteOptions{}, metav1.ListOptions{
+		LabelSelector: "app=reporting-operator",
+	})
+	if err != nil {
+		return fmt.Errorf("failed to list all the reporting-operator clusterroles in the %s namespace: %v", deploy.config.Namespace, err)
+	}
+	deploy.logger.Infof("Deleted the 'app=reporting-operator' cluster roles")
+
 	return nil
 }
 
@@ -278,6 +287,15 @@ func (deploy *Deployer) uninstallMeteringClusterRoleBinding() error {
 	} else {
 		return err
 	}
+
+	// attempt to delete any of the clusterrolebindings the reporting-operator creates
+	err = deploy.client.RbacV1().ClusterRoleBindings().DeleteCollection(&metav1.DeleteOptions{}, metav1.ListOptions{
+		LabelSelector: "app=reporting-operator",
+	})
+	if err != nil {
+		return fmt.Errorf("failed to list all the reporting-operator clusterrolebindings in the %s namespace: %v", deploy.config.Namespace, err)
+	}
+	deploy.logger.Infof("Deleted the 'app=reporting-operator' cluster role bindings")
 
 	return nil
 }
