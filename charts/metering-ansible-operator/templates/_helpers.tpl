@@ -12,6 +12,7 @@ template:
   metadata:
     labels:
       app: {{ .Values.operator.name }}
+      name: {{ .Values.operator.name }}
 {{- if .Values.operator.labels }}
 {{ toYaml .Values.operator.labels | indent 6 }}
 {{- end }}
@@ -39,7 +40,7 @@ template:
       imagePullPolicy: {{ .Values.operator.image.pullPolicy }}
       env:
       - name: OPERATOR_NAME
-        value: "metering-ansible-operator"
+        value: "{{ .Values.operator.name }}"
       - name: DISABLE_OCP_FEATURES
         value: "{{ .Values.operator.disableOCPFeatures }}"
       - name: WATCH_NAMESPACE
@@ -62,6 +63,11 @@ template:
       - name: {{ $item.name | replace "-" "_" | upper | printf "%s_IMAGE" }}
         value: "{{ $item.from.name }}"
 {{- end }}
+      ports:
+      - name: http-metrics
+        containerPort: 8383
+      - name: cr-metrics
+        containerPort: 8686
       volumeMounts:
       - mountPath: /tmp/ansible-operator/runner
         name: runner

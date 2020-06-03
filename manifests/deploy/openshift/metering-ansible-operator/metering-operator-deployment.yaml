@@ -15,6 +15,7 @@ spec:
     metadata:
       labels:
         app: metering-operator
+        name: metering-operator
     spec:
       securityContext:
         runAsNonRoot: true
@@ -35,7 +36,7 @@ spec:
         imagePullPolicy: Always
         env:
         - name: OPERATOR_NAME
-          value: "metering-ansible-operator"
+          value: "metering-operator"
         - name: DISABLE_OCP_FEATURES
           value: "false"
         - name: WATCH_NAMESPACE
@@ -60,6 +61,11 @@ spec:
           value: "quay.io/openshift/origin-ghostunnel:4.6"
         - name: OAUTH_PROXY_IMAGE
           value: "quay.io/openshift/origin-oauth-proxy:4.6"
+        ports:
+        - name: http-metrics
+          containerPort: 8383
+        - name: cr-metrics
+          containerPort: 8686
         volumeMounts:
         - mountPath: /tmp/ansible-operator/runner
           name: runner
