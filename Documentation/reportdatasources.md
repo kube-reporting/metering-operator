@@ -78,7 +78,7 @@ spec:
 ## ReportQuery View Datasource
 
 For ReportDataSources with a `spec.reportQueryView` present, a Presto view will be created using the rendered output of a specified [ReportQuery][reportquery]'s `spec.query` field.
-This enables abstracting away the details of more complex queries by exposing them as a database table whose content is based on the result of of the query the view is based on.
+This enables abstracting away the details of more complex queries by exposing them as a database table whose content is based on the result of the query the view is based on.
 It also enables re-use by allowing you to create a view containing the complexities of a query allowing other queries to simply query it as a regular table.
 
 ### Example ReportQuery View Datasource
