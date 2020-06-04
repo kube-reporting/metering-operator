@@ -28,6 +28,13 @@ operator:
   rbac:
     clusterRoleName: metering-operator
     clusterRoleRules:
+    # grants access to the metering-ansible-operator to create a servicemonitor
+    - apiGroups: [""]
+      resources:
+      - services/finalizers
+      - deployments/finalizers
+      verbs:
+      - update
     # grants access to metrics data
     - apiGroups:
       - ""
