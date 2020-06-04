@@ -5,12 +5,10 @@ Without proper resource limits, pods are unable to correctly operate without exp
 
 Here's a common list of reasons you may need to increase your resource limits:
 
-- Larger clusters. If you're running more than 10 nodes, it's likely the defaults will be insufficient. The defaults are set low to make it easier to install onto smaller clusters.
+- Larger clusters. If you're running more than ten nodes, it's likely the defaults will be insufficient. The defaults are set low to make it easier to install onto smaller clusters.
 - Pods being OOMKilled. Check if any pod has a restart count that is increasing over time. Use `kubectl describe pod` to determine why it restarted. If it's due to OOMKilled, then this pod needs more memory.
 - High cluster activity. If you're running on a cluster with high activity in terms of pods being deleted and recreated, this will produce more metrics, and result in higher resource requirements than relatively idle/unchanging clusters.
-- Storage. By default, if you're using HDFS, the storage requested is 5Gi, which will only store a few months of data on a smaller cluster.
 - Performance. More memory for most of these components means they can do more work at once. Additionally, additional replicas of specific components can decrease the time it takes to perform specific tasks such as generating a report.
-
 
 ## Default resource requests and limits
 
@@ -23,7 +21,7 @@ Besides the default limits example, we also provide guidelines and examples of w
 
 Here are a few guidelines:
 
-- Presto, Hive, and HDFS are all written in Java, and thus tend to consume more memory than other applications.
+- Presto and Hive are both written in Java, and thus tend to consume more memory than other applications.
 - Metering is naturally batch oriented and can be bursty in resources, and thus there are many idle periods. Without proper autoscaling, it may be necessary to over-provision resources if you want optimal performance, or find that applications crash without more resources.
 - Metering is designed to run at even the largest scale environments like Openshift online, which has clusters with over 5000 namespaces, and over 10,000 pods. It works well on smaller clusters too, but the cost of being able to running at these larger scales can mean the metering stack isn't as easily tuned for a smaller footprint.
 
@@ -63,7 +61,7 @@ The Hive server component is very lightly used and is only interacted with when 
 
 ### HDFS
 
-By default, Metering installs HDFS for storage in development. While the amount of data isn't large in most cases, you do want to consider running multiple HDFS datanode replicas for redundancy. HDFS is not recommended for any other use than development as it is hard to maintain.
+Metering installs HDFS for storage in development. While the amount of data isn't large in most cases, you may want to consider running multiple HDFS datanode replicas for redundancy. That said, HDFS is not recommended for any other use than development as it is difficult to maintain.
 
 For this reason, we support using Amazon S3 or a compatible S3 storage, Google Cloud Storage, Azure Blob Storage and others to alleviate the need to scale HDFS.
 

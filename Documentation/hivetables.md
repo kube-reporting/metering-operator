@@ -7,13 +7,17 @@ When a `HiveTable` resource is created, the reporting-operator creates a table w
 A `HiveTable` resource is also implicitly created when a `PrometheusMetricsImporter` ReportDataSource is defined, and the `status.tableRef` field is empty. The reporting-operator then creates a `HiveTable` resource, and once that table has been created, the `statue.tableRef` field is updated and references the newly created table within Hive.
 
 ## Fields
-##### Required fields:
+
+### Required fields
+
 - `databaseName`: The name of the Hive database to use. This generally should be `default` or the value of the databaseName in a `Hive` [StorageLocation][storage-locations].
 - `tableName`: The name of the table to create in Hive.
 - `columns`: A list of columns that match the schema of the of the HiveTable. Columns in `partitionedBy` and `columns` must not overlap.
   - `name`: The name of the column.
   - `type`: The column data type. [See the Hive Language Manual section on types for more details][hiveTypes]. Currently the only complex types supported are map's of primitive types.
-##### Optional fields:
+
+### Optional fields
+
 - `partitionedBy`: A list of columns that are used as partition columns for [partitioned tables][hivePartitionedTables]. Columns in `partitionedBy` and `columns` must not overlap.
   - `name`: The name of the column.
   - `type`: The column data type. [See the Hive Language Manual section on types for more details][hiveTypes]. Currently the only complex types supported are map's of primitive types.
@@ -33,8 +37,10 @@ A `HiveTable` resource is also implicitly created when a `PrometheusMetricsImpor
   - `location`: Specifies where the data for this partition is stored. This should be a sub-directory of `spec.location`.
 
 ## Example HiveTables
-##### Minimal HiveTable:
-```
+
+### Minimal HiveTable
+
+```yaml
 apiVersion: metering.openshift.io/v1
 kind: HiveTable
 metadata:
@@ -53,8 +59,9 @@ spec:
   tableName: example_hive_table_namespace_cpu_request
 ```
 
-##### HiveTable created from a `PrometheusMetricsImporter` ReportDataSource:
-```
+### HiveTable created from a `PrometheusMetricsImporter` ReportDataSource
+
+```yaml
 apiVersion: metering.openshift.io/v1
 kind: HiveTable
 metadata:
@@ -78,8 +85,9 @@ spec:
   tableName: example_node_allocatable_cpu_cores
 ```
 
-##### Specifying a SerDe row format and a HDFS storage location:
-```
+### Specifying a SerDe row format and a HDFS storage location
+
+```yaml
 apiVersion: metering.openshift.io/v1
 kind: HiveTable
 metadata:
@@ -127,4 +135,3 @@ spec:
 [hiveTableProperties]: https://cwiki.apache.org/confluence/display/Hive/LanguageManual+DDL#LanguageManualDDL-listTableProperties
 [hiveExternalTable]: https://cwiki.apache.org/confluence/display/Hive/LanguageManual+DDL#LanguageManualDDL-ExternalTables
 [hivePartitionedTables]: https://cwiki.apache.org/confluence/display/Hive/LanguageManual+DDL#LanguageManualDDL-PartitionedTables
-

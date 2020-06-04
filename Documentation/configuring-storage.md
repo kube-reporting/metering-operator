@@ -9,7 +9,9 @@ Additionally, Hive metastore requires storage for it's database containing metad
 > Changing these settings after installation will result in broken and unexpected behavior.
 
 ## Storing data in Amazon S3
+
 ### Create a S3 bucket
+
 To use Amazon S3 for storage, edit the `spec.storage` section in the example [s3-storage.yaml][s3-storage-config] configuration.
 Set the `spec.storage.hive.s3.bucket`, `spec.storage.hive.s3.region` and `spec.storage.hive.s3.secretName` values.
 
@@ -19,7 +21,8 @@ The `bucket` field defines the bucket name, and if desired, the path for storing
 > **Note**: The values of the `aws-access-key-id` and `aws-secret-access-key` must be base64 encoded.
 
 For example, a file to be loaded with `kubectl -n $METERING_NAMESPACE create -f <aws-secret-file.yaml>`:
-```
+
+```yaml
 apiVersion: v1
 kind: Secret
 metadata:
@@ -28,7 +31,9 @@ data:
   aws-access-key-id: "dGVzdAo="
   aws-secret-access-key: "c2VjcmV0Cg=="
 ```
+
 `spec.storage.hive.s3.secretName` must then be set to: `metadata.name` from the Secret.
+
 ### Using an existing S3 bucket
 
 If you want to provide an existing S3 bucket, or do not want to provide IAM credentials that have CreateBucket permissions, set `spec.storage.hive.s3.createBucket` to `false` and provide the name of a pre-existing bucket for `spec.storage.hive.s3.bucket`.
@@ -52,7 +57,8 @@ The `spec.storage.hive.s3Compatible.secretName` should be the name of a secret i
 > **Note**: The values of the `aws-access-key-id` and `aws-secret-access-key` must be base64 encoded.
 
 For example:
-```
+
+```yaml
 apiVersion: v1
 kind: Secret
 metadata:
@@ -77,7 +83,7 @@ The `spec.storage.hive.azure.secretName` should be the name of a secret in the M
 
 For example:
 
-```
+```yaml
 apiVersion: v1
 kind: Secret
 metadata:
@@ -104,7 +110,7 @@ The `spec.storage.hive.gcs.secretName` should be the name of a secret in the Met
 
 For example:
 
-```
+```yaml
 apiVersion: v1
 kind: Secret
 metadata:
@@ -115,7 +121,7 @@ data:
 
 To create this secret from a file using `kubectl`, ensure that `$METERING_NAMESPACE` is set to your Metering namespace and run:
 
-```
+```bash
 kubectl -n $METERING_NAMESPACE create secret generic your-gcs-secret --from-file gcs-service-account.json=/path/to/your/service-account-key.json
 ```
 
