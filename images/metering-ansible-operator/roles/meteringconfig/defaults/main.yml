@@ -405,6 +405,17 @@ _ocp_enabled_overrides:
               bearerTokenFile: "/var/run/secrets/kubernetes.io/serviceaccount/token"
 
 #
+# Hive Metastore Database Configuration
+#
+_hive_metastore_db_overrides:
+  hive:
+    spec:
+      config:
+        db:
+          username: "{{ _hive_metastore_db_username | default('') }}"
+          password: "{{ _hive_metastore_db_password | default('') }}"
+
+#
 # Networking Configuration
 #
 _ocp_enabled_use_ipv6_networking: false
