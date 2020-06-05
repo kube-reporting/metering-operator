@@ -120,12 +120,19 @@
     - name: Generate a 32-character random string
       command: openssl rand -base64 32
       register: cookie_seed_random_string
-      when: not reporting_operator_auth_proxy_cookie_secret_exists
 
     - name: Configure authProxy cookie seed secret
       set_fact:
         _meteringconfig_reporting_operator_auth_proxy_cookie_seed: "{{ cookie_seed_random_string.stdout }}"
       no_log: true
+      when: cookie_seed_random_string is defined
+
+    - name: Verify the randomly generated string is at least 32 characters in length
+      assert:
+        that:
+        - _meteringconfig_reporting_operator_auth_proxy_cookie_seed | length >= 32
+        msg: "Invalid cookie seed generated: the length of the string is less than 32 characters"
+      when: cookie_seed_random_string is defined
     when: not reporting_operator_auth_proxy_cookie_secret_exists
 
   - name: Configure authProxy cookie seed secret to use pre-existing secret data
