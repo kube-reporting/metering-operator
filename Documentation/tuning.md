@@ -65,7 +65,7 @@ The Hive server component is very lightly used and is only interacted with when 
 
 By default, Metering installs HDFS for storage in development. While the amount of data isn't large in most cases, you do want to consider running multiple HDFS datanode replicas for redundancy. HDFS is not recommended for any other use than development as it is hard to maintain.
 
-For this reason, we support using Amazon S3, Google Cloud Storage, Azure Blob Storage to alleviate the need to scale HDFS.
+For this reason, we support using Amazon S3 or a compatible S3 storage, Google Cloud Storage, Azure Blob Storage and others to alleviate the need to scale HDFS.
 
 [default-resource-limits]: ../manifests/metering-config/default-resource-limits.yaml
 [recommended-resource-limits]: ../manifests/metering-config/recommended-resource-limits.yaml
