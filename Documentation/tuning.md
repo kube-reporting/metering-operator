@@ -63,11 +63,9 @@ The Hive server component is very lightly used and is only interacted with when 
 
 ### HDFS
 
-By default, Metering installs HDFS for storage. While the amount of data isn't large in most cases, you do want to consider running multiple HDFS datanode replicas for redundancy.
-Because HDFS is commonly accessed by Presto when data is being stored and queried, it's also typically a component which consumes more resources over time.
-As the amount of data stored in HDFS grows, the overhead for the hdfs-namenode is increased as it must maintain more metadata about all blocks stored in the HDFS cluster.
+By default, Metering installs HDFS for storage in development. While the amount of data isn't large in most cases, you do want to consider running multiple HDFS datanode replicas for redundancy. HDFS is not recommended for any other use than development as it is hard to maintain.
 
-For this reason, we often support using Amazon S3 for storage to alleviate the need to scale HDFS.
+For this reason, we support using Amazon S3 or a compatible S3 storage, Google Cloud Storage, Azure Blob Storage and others to alleviate the need to scale HDFS.
 
 [default-resource-limits]: ../manifests/metering-config/default-resource-limits.yaml
 [recommended-resource-limits]: ../manifests/metering-config/recommended-resource-limits.yaml
