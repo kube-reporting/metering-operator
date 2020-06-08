@@ -811,6 +811,7 @@ k8s.io/kube-proxy v0.0.0-20191114110717-50a77e50d7d9/go.mod h1:HTBohWmrysPQ20NEC
 k8s.io/kube-scheduler v0.0.0-20191114111229-2e90afcb56c7/go.mod h1:GGBuzn2uP9d8InjDSXHKMRB19MToTafRo+BnMLF2QWk=
 k8s.io/kubectl v0.0.0-20191114113550-6123e1c827f7/go.mod h1:MYrMrU6JgEeGVz2sFggJizAfyoRjwsP4iTQcP8iQS00=
 k8s.io/kubelet v0.0.0-20191114110954-d67a8e7e2200/go.mod h1:BJl+6D6pGeUm+/uJfOWrPouIq05g/TCiKXc/Bxw+ZYw=
+k8s.io/kubernetes v1.16.0 h1:WPaqle2JWogVzLxhN6IK67u62IHKKrtYF7MS4FVR4/E=
 k8s.io/kubernetes v1.16.0/go.mod h1:nlP2zevWKRGKuaaVbKIwozU0Rjg9leVDXkL4YTtjmVs=
 k8s.io/legacy-cloud-providers v0.0.0-20191114112655-db9be3e678bb/go.mod h1:LwtW+cUPHdurdbed4pXQiAWcjYg9XkwxPO8NOX0qeQA=
 k8s.io/metrics v0.0.0-20191114105837-a4a2842dc51b/go.mod h1:+OP14I2yuLAiYCsEB4pC2101W6tZ2rC9uSZFvR3DEJg=
