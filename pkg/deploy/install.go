@@ -111,15 +111,19 @@ func (deploy *Deployer) installMeteringConfig() error {
 	// ensure the MeteringConfig CRD has already been created to avoid
 	// any errors while instantiating a MeteringConfig custom resource
 	err := wait.Poll(crdInitialPoll, crdPollTimeout, func() (done bool, err error) {
-		deploy.logger.Infof("Waiting for the MeteringConfig CRD to be created")
-
-		_, err = deploy.apiExtClient.CustomResourceDefinitions().Get(meteringconfigCRDName, metav1.GetOptions{})
+		mc, err := deploy.apiExtClient.CustomResourceDefinitions().Get(meteringconfigCRDName, metav1.GetOptions{})
 		if apierrors.IsNotFound(err) {
-			// re-poll as the MeteringConfig CRD does not already exist
+			deploy.logger.Infof("Waiting for the MeteringConfig CRD to be created")
 			return false, nil
 		}
 		if err != nil {
 			return false, err
+		}
+		// in order to handle the following error, ensure the Status field has a populated entry for the "plural" CRD name:
+		// the server could not find the requested resource (post meteringconfigs.metering.openshift.io)
+		if mc.Status.AcceptedNames.Plural != "meteringconfigs" {
+			deploy.logger.Infof("Waiting for the MeteringConfig CRD to be ready")
+			return false, nil
 		}
 
 		return true, nil
