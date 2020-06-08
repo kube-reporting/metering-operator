@@ -35,9 +35,14 @@ Use [metastore-storage.yaml][metastore-storage-config] as a template and adjust 
 By default to make installation easier Metering configures Hive to use an embedded Java database called [Derby](https://db.apache.org/derby/#What+is+Apache+Derby%3F), however this is unsuited for larger environments or metering installations with a lot of reports and metrics being collected.
 Currently two alternative options are available, MySQL and PostgreSQL, both of which have been tested with the metering-operator.
 
-There are 4 configuration options you can use to control the database used by Hive metastore: `url` , `driver` , `username` , and `password`.
+There are three configuration options you can use to control the database used by Hive metastore: `url` , `driver` , and `secretName` .
+The `url` is the url of the MySQL instance, port followed by the database name.
+The `driver` configures the javax.jdo.option.ConnectionDriverName, which is the class name for the jdbc driver that will be used to store hive metadata.
+The `secretName` is the name assigned to the secret which contains the base64 encrypted username and password for the database.
 
-Using MySQL:
+### Using MySQL
+
+To use MySQL create a secret in your namespace and then add the following to your Metering CR under the top level `spec`:
 
 ```
 spec:
@@ -47,8 +52,7 @@ spec:
         db:
           url: "jdbc:mysql://mysql.example.com:3306/hive_metastore"
           driver: "com.mysql.jdbc.Driver"
-          username: "REPLACEME"
-          password: "REPLACEME"
+          secretName: "REPLACEME"
 ```
 
 You can pass additional JDBC parameters using the `spec.hive.spec.config.db.url`, for more details see [the MySQL Connector/J documentation](https://dev.mysql.com/doc/connector-j/5.1/en/connector-j-reference-configuration-properties.html).
@@ -63,8 +67,7 @@ spec:
         db:
           url: "jdbc:postgresql://postgresql.example.com:5432/hive_metastore"
           driver: "org.postgresql.Driver"
-          username: "REPLACEME"
-          password: "REPLACEME"
+          secretName: "REPLACEME"
 ```
 
 You can pass additional JDBC parameters using the `url`, for more details see [the PostgreSQL JDBC driver documentation](https://jdbc.postgresql.org/documentation/head/connect.html#connection-parameters).

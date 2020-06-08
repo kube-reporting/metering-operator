@@ -21,6 +21,9 @@
 - name: Configure Reporting
   include_tasks: configure_reporting.yml
 
+- name: Configure Hive Metastore
+  include_tasks: configure_hive_metastore.yml
+
 - name: Finalize the set of overall meteringconfig values
   set_fact:
     meteringconfig_spec: "{{ meteringconfig_spec }}"
