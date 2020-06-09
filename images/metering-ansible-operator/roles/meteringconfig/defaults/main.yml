@@ -616,7 +616,7 @@ meteringconfig_reporting_overrides:
           enabled: "{{ meteringconfig_reporting_enable_post_kube_1_14_datasources }}"
 
 # combine the _meteringconfig_tls_overrides dictionary last to enforce when spec.tls.enabled is specified and set to true
-meteringconfig_spec: "{{ meteringconfig_default_values | combine(meteringconfig_default_image_overrides, meteringconfig_storage_overrides, meteringconfig_reporting_overrides, _meteringconfig_root_ca_overrides, _meteringconfig_tls_overrides, _meteringconfig_ocp_disabled_overrides, meteringconfig_spec_overrides, recursive=True) }}"
+meteringconfig_spec: "{{ meteringconfig_default_values | combine(meteringconfig_default_image_overrides, meteringconfig_storage_overrides, _hive_metastore_db_overrides, meteringconfig_reporting_overrides, _meteringconfig_root_ca_overrides, _meteringconfig_tls_overrides, _meteringconfig_ocp_disabled_overrides, meteringconfig_spec_overrides, recursive=True) }}"
 
 meteringconfig_storage_s3_create_bucket: "{{ meteringconfig_spec | json_query('storage.hive.s3.createBucket') }}"
 meteringconfig_storage_s3_bucket_name: "{{ (meteringconfig_spec | json_query('storage.hive.s3.bucket') | default('', true)).split('/')[0] }}"

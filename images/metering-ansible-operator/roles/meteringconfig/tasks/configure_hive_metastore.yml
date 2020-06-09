@@ -15,10 +15,6 @@
     when:
     - hive_metastore_db_secret_buf is defined
     - _hive_metastore_db_secret_buf_resources_first_index | length > 0
-
-  - name: Merge the two dictionaries together
-    set_fact:
-      meteringconfig_spec: "{{ meteringconfig_spec | combine(_hive_metastore_db_overrides, recursive=True) }}"
   vars:
     _hive_metastore_db_secret_buf_resources_first_index: "{{ hive_metastore_db_secret_buf.resources | first }}"
     _hive_metastore_db_secretName: "{{ meteringconfig_spec_overrides | json_query('hive.spec.config.db.secretName') }}"
