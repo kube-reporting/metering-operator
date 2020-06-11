@@ -189,7 +189,7 @@ func (df *DeployFramework) NewDeployerConfig(
 		SubscriptionName: defaultSubscriptionName,
 		Channel:          defaultSubscriptionChannel,
 		ExtraNamespaceLabels: map[string]string{
-			"name": testNamespaceLabel,
+			"name": df.NamespacePrefix + "-" + testNamespaceLabel,
 		},
 		OperatorResources:        df.OperatorResources,
 		RunMeteringOperatorLocal: df.RunLocal,
