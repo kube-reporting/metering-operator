@@ -7,18 +7,15 @@ import (
 	"path/filepath"
 	"strings"
 	"testing"
-	"time"
 
 	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	v1 "k8s.io/api/core/v1"
-	"k8s.io/apimachinery/pkg/api/resource"
-	meta "k8s.io/apimachinery/pkg/apis/meta/v1"
+	metering "github.com/kube-reporting/metering-operator/pkg/apis/metering/v1"
+	"k8s.io/apimachinery/pkg/util/yaml"
 	_ "k8s.io/client-go/plugin/pkg/client/auth/oidc"
 
-	metering "github.com/kube-reporting/metering-operator/pkg/apis/metering/v1"
 	"github.com/kube-reporting/metering-operator/test/deployframework"
 	"github.com/kube-reporting/metering-operator/test/reportingframework"
 	"github.com/kube-reporting/metering-operator/test/testhelpers"
@@ -41,12 +38,13 @@ var (
 	repoPath                   string
 	repoVersion                string
 
-	kubeNamespaceCharLimit    = 63
-	namespacePrefixCharLimit  = 10
-	packageName               = "metering-ocp"
-	preUpgradeTestDirName     = "pre-upgrade"
-	postUpgradeTestDirName    = "post-upgrade"
-	gatherTestArtifactsScript = "gather-test-install-artifacts.sh"
+	kubeNamespaceCharLimit          = 63
+	namespacePrefixCharLimit        = 10
+	packageName                     = "metering-ocp"
+	preUpgradeTestDirName           = "pre-upgrade"
+	postUpgradeTestDirName          = "post-upgrade"
+	gatherTestArtifactsScript       = "gather-test-install-artifacts.sh"
+	testMeteringConfigManifestsPath = "/test/e2e/testdata/meteringconfigs/"
 )
 
 func init() {
@@ -98,16 +96,16 @@ type InstallTestCase struct {
 
 func TestMeteringUpgrades(t *testing.T) {
 	tt := []struct {
-		Name                      string
-		MeteringOperatorImageRepo string
-		MeteringOperatorImageTag  string
-		Skip                      bool
-		PurgeReports              bool
-		PurgeReportDataSources    bool
-		ExpectInstallErr          bool
-		ExpectInstallErrMsg       []string
-		InstallSubTest            InstallTestCase
-		MeteringConfigSpec        metering.MeteringConfigSpec
+		Name                           string
+		MeteringOperatorImageRepo      string
+		MeteringOperatorImageTag       string
+		Skip                           bool
+		PurgeReports                   bool
+		PurgeReportDataSources         bool
+		ExpectInstallErr               bool
+		ExpectInstallErrMsg            []string
+		InstallSubTest                 InstallTestCase
+		MeteringConfigManifestFilename string
 	}{
 		{
 			Name:                      "HDFS-OLM-Upgrade",
@@ -115,6 +113,7 @@ func TestMeteringUpgrades(t *testing.T) {
 			MeteringOperatorImageTag:  meteringOperatorImageTag,
 			PurgeReports:              true,
 			PurgeReportDataSources:    true,
+			Skip:                      false,
 			ExpectInstallErrMsg:       []string{},
 			InstallSubTest: InstallTestCase{
 				Name:     "testReportingProducesData",
@@ -127,58 +126,7 @@ func TestMeteringUpgrades(t *testing.T) {
 					"REPORTING_OPERATOR_PROMETHEUS_METRICS_IMPORTER_STEP_SIZE=60s",
 				},
 			},
-			MeteringConfigSpec: metering.MeteringConfigSpec{
-				LogHelmTemplate: testhelpers.PtrToBool(true),
-				UnsupportedFeatures: &metering.UnsupportedFeaturesConfig{
-					EnableHDFS: testhelpers.PtrToBool(true),
-				},
-				Storage: &metering.StorageConfig{
-					Type: "hive",
-					Hive: &metering.HiveStorageConfig{
-						Type: "hdfs",
-						Hdfs: &metering.HiveHDFSConfig{
-							Namenode: "hdfs-namenode-0.hdfs-namenode:9820",
-						},
-					},
-				},
-				ReportingOperator: &metering.ReportingOperator{
-					Spec: &metering.ReportingOperatorSpec{
-						Resources: &v1.ResourceRequirements{
-							Requests: v1.ResourceList{
-								v1.ResourceCPU:    resource.MustParse("1"),
-								v1.ResourceMemory: resource.MustParse("250Mi"),
-							},
-						},
-						Image: &metering.ImageConfig{},
-						Config: &metering.ReportingOperatorConfig{
-							LogLevel: "debug",
-							Prometheus: &metering.ReportingOperatorPrometheusConfig{
-								MetricsImporter: &metering.ReportingOperatorPrometheusMetricsImporterConfig{
-									Config: &metering.ReportingOperatorPrometheusMetricsImporterConfigSpec{
-										ChunkSize:                 &meta.Duration{Duration: 5 * time.Minute},
-										PollInterval:              &meta.Duration{Duration: 30 * time.Second},
-										StepSize:                  &meta.Duration{Duration: 1 * time.Minute},
-										MaxImportBackfillDuration: &meta.Duration{Duration: 15 * time.Minute},
-										MaxQueryRangeDuration:     &meta.Duration{Duration: 5 * time.Minute},
-									},
-								},
-							},
-						},
-					},
-				},
-				Presto: &metering.Presto{
-					Spec: &metering.PrestoSpec{
-						Coordinator: &metering.PrestoCoordinatorSpec{
-							Resources: &v1.ResourceRequirements{
-								Requests: v1.ResourceList{
-									v1.ResourceCPU:    resource.MustParse("1"),
-									v1.ResourceMemory: resource.MustParse("1Gi"),
-								},
-							},
-						},
-					},
-				},
-			},
+			MeteringConfigManifestFilename: "prometheus-metrics-importer-enabled.yaml",
 		},
 	}
 
@@ -197,13 +145,13 @@ func TestMeteringUpgrades(t *testing.T) {
 				namespacePrefix,
 				testCase.MeteringOperatorImageRepo,
 				testCase.MeteringOperatorImageTag,
+				testCase.MeteringConfigManifestFilename,
 				testOutputPath,
 				testCase.ExpectInstallErrMsg,
 				testCase.ExpectInstallErr,
 				testCase.PurgeReports,
 				testCase.PurgeReportDataSources,
 				testCase.InstallSubTest,
-				testCase.MeteringConfigSpec,
 			)
 		})
 	}
@@ -215,13 +163,13 @@ func testManualOLMUpgradeInstall(
 	namespacePrefix,
 	meteringOperatorImageRepo,
 	meteringOperatorImageTag,
+	manifestFilename,
 	testOutputPath string,
 	expectInstallErrMsg []string,
 	expectInstallErr,
 	purgeReports,
 	purgeReportDataSources bool,
 	testInstallFunction InstallTestCase,
-	testMeteringConfigSpec metering.MeteringConfigSpec,
 ) {
 	// create a directory used to store the @testCaseName container and resource logs
 	testCaseOutputBaseDir := filepath.Join(testOutputPath, testCaseName)
@@ -238,6 +186,15 @@ func testManualOLMUpgradeInstall(
 		require.Fail(t, "The length of the test function namespace exceeded the kube namespace limit of %d characters", kubeNamespaceCharLimit)
 	}
 
+	manifestFullPath := filepath.Join(repoPath, testMeteringConfigManifestsPath, manifestFilename)
+	file, err := os.Open(manifestFullPath)
+	require.NoError(t, err, "failed to open manifest file")
+
+	mc := &metering.MeteringConfig{}
+	err = yaml.NewYAMLOrJSONDecoder(file, 100).Decode(&mc)
+	require.NoError(t, err, "failed to decode the yaml meteringconfig manifest")
+	require.NotNil(t, mc, "the decoded meteringconfig object is nil")
+
 	deployerCtx, err := df.NewDeployerCtx(
 		testFuncNamespace,
 		meteringOperatorImageRepo,
@@ -246,7 +203,7 @@ func testManualOLMUpgradeInstall(
 		reportingOperatorImageTag,
 		preUpgradeTestOutputDir,
 		expectInstallErrMsg,
-		testMeteringConfigSpec,
+		mc.Spec,
 	)
 	require.NoError(t, err, "creating a new deployer context should produce no error")
 	deployerCtx.Logger.Infof("DeployerCtx: %+v", deployerCtx)
@@ -298,14 +255,14 @@ func testManualOLMUpgradeInstall(
 
 func TestManualMeteringInstall(t *testing.T) {
 	testInstallConfigs := []struct {
-		Name                      string
-		MeteringOperatorImageRepo string
-		MeteringOperatorImageTag  string
-		Skip                      bool
-		ExpectInstallErr          bool
-		ExpectInstallErrMsg       []string
-		InstallSubTest            InstallTestCase
-		MeteringConfigSpec        metering.MeteringConfigSpec
+		Name                           string
+		MeteringOperatorImageRepo      string
+		MeteringOperatorImageTag       string
+		Skip                           bool
+		ExpectInstallErr               bool
+		ExpectInstallErrMsg            []string
+		InstallSubTest                 InstallTestCase
+		MeteringConfigManifestFilename string
 	}{
 		{
 			Name:                      "InvalidHDFS-MissingStorageSpec",
@@ -322,9 +279,18 @@ func TestManualMeteringInstall(t *testing.T) {
 				Name:     "testInvalidMeteringConfigMissingStorageSpec",
 				TestFunc: testInvalidMeteringConfigMissingStorageSpec,
 			},
-			MeteringConfigSpec: metering.MeteringConfigSpec{
-				LogHelmTemplate: testhelpers.PtrToBool(true),
+			MeteringConfigManifestFilename: "missing-storage.yaml",
+		},
+		{
+			Name:                      "PrometheusConnectorWorks",
+			MeteringOperatorImageRepo: meteringOperatorImageRepo,
+			MeteringOperatorImageTag:  meteringOperatorImageTag,
+			Skip:                      false,
+			InstallSubTest: InstallTestCase{
+				Name:     "testPrometheusConnectorWorks",
+				TestFunc: testPrometheusConnectorWorks,
 			},
+			MeteringConfigManifestFilename: "prometheus-metrics-importer-disabled.yaml",
 		},
 		{
 			Name:                      "ValidHDFS-ReportDynamicInputData",
@@ -342,108 +308,7 @@ func TestManualMeteringInstall(t *testing.T) {
 					"REPORTING_OPERATOR_PROMETHEUS_METRICS_IMPORTER_STEP_SIZE=60s",
 				},
 			},
-			MeteringConfigSpec: metering.MeteringConfigSpec{
-				LogHelmTemplate: testhelpers.PtrToBool(true),
-				UnsupportedFeatures: &metering.UnsupportedFeaturesConfig{
-					EnableHDFS: testhelpers.PtrToBool(true),
-				},
-				Storage: &metering.StorageConfig{
-					Type: "hive",
-					Hive: &metering.HiveStorageConfig{
-						Type: "hdfs",
-						Hdfs: &metering.HiveHDFSConfig{
-							Namenode: "hdfs-namenode-0.hdfs-namenode:9820",
-						},
-					},
-				},
-				ReportingOperator: &metering.ReportingOperator{
-					Spec: &metering.ReportingOperatorSpec{
-						Resources: &v1.ResourceRequirements{
-							Requests: v1.ResourceList{
-								v1.ResourceCPU:    resource.MustParse("1"),
-								v1.ResourceMemory: resource.MustParse("250Mi"),
-							},
-						},
-						Image: &metering.ImageConfig{},
-						Config: &metering.ReportingOperatorConfig{
-							LogLevel: "debug",
-							Prometheus: &metering.ReportingOperatorPrometheusConfig{
-								MetricsImporter: &metering.ReportingOperatorPrometheusMetricsImporterConfig{
-									Config: &metering.ReportingOperatorPrometheusMetricsImporterConfigSpec{
-										ChunkSize:                 &meta.Duration{Duration: 5 * time.Minute},
-										PollInterval:              &meta.Duration{Duration: 30 * time.Second},
-										StepSize:                  &meta.Duration{Duration: 1 * time.Minute},
-										MaxImportBackfillDuration: &meta.Duration{Duration: 15 * time.Minute},
-										MaxQueryRangeDuration:     &meta.Duration{Duration: 5 * time.Minute},
-									},
-								},
-							},
-						},
-					},
-				},
-				Presto: &metering.Presto{
-					Spec: &metering.PrestoSpec{
-						Coordinator: &metering.PrestoCoordinatorSpec{
-							Resources: &v1.ResourceRequirements{
-								Requests: v1.ResourceList{
-									v1.ResourceCPU:    resource.MustParse("1"),
-									v1.ResourceMemory: resource.MustParse("1Gi"),
-								},
-							},
-						},
-					},
-				},
-				Hive: &metering.Hive{
-					Spec: &metering.HiveSpec{
-						Metastore: &metering.HiveMetastoreSpec{
-							Resources: &v1.ResourceRequirements{
-								Requests: v1.ResourceList{
-									v1.ResourceCPU:    resource.MustParse("1"),
-									v1.ResourceMemory: resource.MustParse("650Mi"),
-								},
-							},
-							Storage: &metering.HiveMetastoreStorageConfig{
-								Size: "5Gi",
-							},
-						},
-						Server: &metering.HiveServerSpec{
-							Resources: &v1.ResourceRequirements{
-								Requests: v1.ResourceList{
-									v1.ResourceCPU:    resource.MustParse("500m"),
-									v1.ResourceMemory: resource.MustParse("650Mi"),
-								},
-							},
-						},
-					},
-				},
-				Hadoop: &metering.Hadoop{
-					Spec: &metering.HadoopSpec{
-						HDFS: &metering.HadoopHDFS{
-							Enabled: testhelpers.PtrToBool(true),
-							Datanode: &metering.HadoopHDFSDatanodeSpec{
-								Resources: &v1.ResourceRequirements{
-									Requests: v1.ResourceList{
-										v1.ResourceMemory: resource.MustParse("500Mi"),
-									},
-								},
-								Storage: &metering.HadoopHDFSStorageConfig{
-									Size: "5Gi",
-								},
-							},
-							Namenode: &metering.HadoopHDFSNamenodeSpec{
-								Resources: &v1.ResourceRequirements{
-									Requests: v1.ResourceList{
-										v1.ResourceMemory: resource.MustParse("500Mi"),
-									},
-								},
-								Storage: &metering.HadoopHDFSStorageConfig{
-									Size: "5Gi",
-								},
-							},
-						},
-					},
-				},
-			},
+			MeteringConfigManifestFilename: "prometheus-metrics-importer-enabled.yaml",
 		},
 		{
 			Name:                      "ValidHDFS-ReportStaticInputData",
@@ -457,165 +322,7 @@ func TestManualMeteringInstall(t *testing.T) {
 					"REPORTING_OPERATOR_DISABLE_PROMETHEUS_METRICS_IMPORTER=true",
 				},
 			},
-			MeteringConfigSpec: metering.MeteringConfigSpec{
-				LogHelmTemplate: testhelpers.PtrToBool(true),
-				UnsupportedFeatures: &metering.UnsupportedFeaturesConfig{
-					EnableHDFS: testhelpers.PtrToBool(true),
-				},
-				Storage: &metering.StorageConfig{
-					Type: "hive",
-					Hive: &metering.HiveStorageConfig{
-						Type: "hdfs",
-						Hdfs: &metering.HiveHDFSConfig{
-							Namenode: "hdfs-namenode-0.hdfs-namenode:9820",
-						},
-					},
-				},
-				ReportingOperator: &metering.ReportingOperator{
-					Spec: &metering.ReportingOperatorSpec{
-						Resources: &v1.ResourceRequirements{
-							Requests: v1.ResourceList{
-								v1.ResourceCPU:    resource.MustParse("1"),
-								v1.ResourceMemory: resource.MustParse("250Mi"),
-							},
-						},
-						Image: &metering.ImageConfig{},
-						Config: &metering.ReportingOperatorConfig{
-							LogLevel: "debug",
-							Prometheus: &metering.ReportingOperatorPrometheusConfig{
-								MetricsImporter: &metering.ReportingOperatorPrometheusMetricsImporterConfig{
-									Enabled: testhelpers.PtrToBool(false),
-								},
-							},
-						},
-					},
-				},
-				Presto: &metering.Presto{
-					Spec: &metering.PrestoSpec{
-						Coordinator: &metering.PrestoCoordinatorSpec{
-							Resources: &v1.ResourceRequirements{
-								Requests: v1.ResourceList{
-									v1.ResourceCPU:    resource.MustParse("1"),
-									v1.ResourceMemory: resource.MustParse("1Gi"),
-								},
-							},
-						},
-					},
-				},
-				Hive: &metering.Hive{
-					Spec: &metering.HiveSpec{
-						Metastore: &metering.HiveMetastoreSpec{
-							Resources: &v1.ResourceRequirements{
-								Requests: v1.ResourceList{
-									v1.ResourceCPU:    resource.MustParse("1"),
-									v1.ResourceMemory: resource.MustParse("650Mi"),
-								},
-							},
-							Storage: &metering.HiveMetastoreStorageConfig{
-								Size: "5Gi",
-							},
-						},
-						Server: &metering.HiveServerSpec{
-							Resources: &v1.ResourceRequirements{
-								Requests: v1.ResourceList{
-									v1.ResourceCPU:    resource.MustParse("500m"),
-									v1.ResourceMemory: resource.MustParse("650Mi"),
-								},
-							},
-						},
-					},
-				},
-				Hadoop: &metering.Hadoop{
-					Spec: &metering.HadoopSpec{
-						HDFS: &metering.HadoopHDFS{
-							Enabled: testhelpers.PtrToBool(true),
-							Datanode: &metering.HadoopHDFSDatanodeSpec{
-								Resources: &v1.ResourceRequirements{
-									Requests: v1.ResourceList{
-										v1.ResourceMemory: resource.MustParse("500Mi"),
-									},
-								},
-								Storage: &metering.HadoopHDFSStorageConfig{
-									Size: "5Gi",
-								},
-							},
-							Namenode: &metering.HadoopHDFSNamenodeSpec{
-								Resources: &v1.ResourceRequirements{
-									Requests: v1.ResourceList{
-										v1.ResourceMemory: resource.MustParse("500Mi"),
-									},
-								},
-								Storage: &metering.HadoopHDFSStorageConfig{
-									Size: "5Gi",
-								},
-							},
-						},
-					},
-				},
-			},
-		},
-		{
-			Name:                      "PrometheusConnectorWorks",
-			MeteringOperatorImageRepo: meteringOperatorImageRepo,
-			MeteringOperatorImageTag:  meteringOperatorImageTag,
-			Skip:                      false,
-			InstallSubTest: InstallTestCase{
-				Name:     "testPrometheusConnectorWorks",
-				TestFunc: testPrometheusConnectorWorks,
-			},
-			MeteringConfigSpec: metering.MeteringConfigSpec{
-				LogHelmTemplate: testhelpers.PtrToBool(true),
-				UnsupportedFeatures: &metering.UnsupportedFeaturesConfig{
-					EnableHDFS: testhelpers.PtrToBool(true),
-				},
-				Storage: &metering.StorageConfig{
-					Type: "hive",
-					Hive: &metering.HiveStorageConfig{
-						Type: "hdfs",
-						Hdfs: &metering.HiveHDFSConfig{
-							Namenode: "hdfs-namenode-0.hdfs-namenode:9820",
-						},
-					},
-				},
-				Presto: &metering.Presto{
-					Spec: &metering.PrestoSpec{
-						Coordinator: &metering.PrestoCoordinatorSpec{
-							Resources: &v1.ResourceRequirements{
-								Requests: v1.ResourceList{
-									v1.ResourceCPU:    resource.MustParse("1"),
-									v1.ResourceMemory: resource.MustParse("1Gi"),
-								},
-							},
-						},
-						Config: &metering.PrestoConfig{
-							Connectors: &metering.PrestoConnectorConfig{
-								Prometheus: &metering.PrestoConnectorPrometheusConfig{
-									Enabled: testhelpers.PtrToBool(true),
-									Config: &metering.PrestoConnectorPrometheusConfigConfig{
-										URI: "https://thanos-querier.openshift-monitoring.svc:9091/",
-									},
-									Auth: &metering.PrestoConnectorPrometheusConfigAuth{
-										BearerTokenFile: "/var/run/secrets/kubernetes.io/serviceaccount/token",
-									},
-								},
-							},
-						},
-					},
-				},
-				ReportingOperator: &metering.ReportingOperator{
-					Spec: &metering.ReportingOperatorSpec{
-						Image: &metering.ImageConfig{},
-						Config: &metering.ReportingOperatorConfig{
-							LogLevel: "debug",
-							Prometheus: &metering.ReportingOperatorPrometheusConfig{
-								MetricsImporter: &metering.ReportingOperatorPrometheusMetricsImporterConfig{
-									Enabled: testhelpers.PtrToBool(false),
-								},
-							},
-						},
-					},
-				},
-			},
+			MeteringConfigManifestFilename: "prometheus-metrics-importer-disabled.yaml",
 		},
 	}
 
@@ -634,11 +341,11 @@ func TestManualMeteringInstall(t *testing.T) {
 				namespacePrefix,
 				testCase.MeteringOperatorImageRepo,
 				testCase.MeteringOperatorImageTag,
+				testCase.MeteringConfigManifestFilename,
 				testOutputPath,
 				testCase.ExpectInstallErrMsg,
 				testCase.ExpectInstallErr,
 				testCase.InstallSubTest,
-				testCase.MeteringConfigSpec,
 			)
 		})
 	}
@@ -650,11 +357,11 @@ func testManualMeteringInstall(
 	namespacePrefix,
 	meteringOperatorImageRepo,
 	meteringOperatorImageTag,
+	manifestFilename,
 	testOutputPath string,
 	expectInstallErrMsg []string,
 	expectInstallErr bool,
 	testInstallFunction InstallTestCase,
-	testMeteringConfigSpec metering.MeteringConfigSpec,
 ) {
 	// create a directory used to store the @testCaseName container and resource logs
 	testCaseOutputBaseDir := filepath.Join(testOutputPath, testCaseName)
@@ -666,6 +373,15 @@ func testManualMeteringInstall(
 		require.Fail(t, "The length of the test function namespace exceeded the kube namespace limit of %d characters", kubeNamespaceCharLimit)
 	}
 
+	manifestFullPath := filepath.Join(repoPath, testMeteringConfigManifestsPath, manifestFilename)
+	file, err := os.Open(manifestFullPath)
+	require.NoError(t, err, "failed to open manifest file")
+
+	mc := &metering.MeteringConfig{}
+	err = yaml.NewYAMLOrJSONDecoder(file, 100).Decode(&mc)
+	require.NoError(t, err, "failed to decode the yaml meteringconfig manifest")
+	require.NotNil(t, mc, "the decoded meteringconfig object is nil")
+
 	deployerCtx, err := df.NewDeployerCtx(
 		testFuncNamespace,
 		meteringOperatorImageRepo,
@@ -674,7 +390,7 @@ func testManualMeteringInstall(
 		reportingOperatorImageTag,
 		testCaseOutputBaseDir,
 		testInstallFunction.ExtraEnvVars,
-		testMeteringConfigSpec,
+		mc.Spec,
 	)
 	require.NoError(t, err, "creating a new deployer context should produce no error")
 
