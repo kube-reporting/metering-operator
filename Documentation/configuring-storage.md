@@ -130,8 +130,6 @@ You have two options:
 1) Set `storage.hive.sharedPVC.createPVC` to true and set the `storage.hive.sharedPVC.storageClass` to the name of a StorageClass with ReadWriteMany access mode. This will use dynamic volume provisioning to have a volume created automatically.
 2) Set `storage.hive.sharedPVC.claimName` to the name of an existing ReadWriteMany PVC. This is necessary if you don't have dynamic volume provisioning, or wish to have more control over how the PersistentVolume is created.
 
-> **Note**: NFS is not recommended to use with Metering.
-
 ## Using HDFS for storage (unsupported)
 
 If you do not have access to S3, or storage provisioner that supports ReadWriteMany PVCs, you may also test using HDFS.
