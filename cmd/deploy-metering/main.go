@@ -98,7 +98,7 @@ func init() {
 	installCmd.Flags().BoolVar(&cfg.RunMeteringOperatorLocal, "run-metering-operator-local", false, "If true, skip installing the metering deployment. This can also be specified through the $SKIP_METERING_OPERATOR_DEPLOYMENT ENV var.")
 
 	olmInstallCmd.Flags().StringVar(&cfg.SubscriptionName, "subscription", "metering-ocp", "The name of the metering subscription that gets created.")
-	olmInstallCmd.Flags().StringVar(&cfg.Channel, "channel", "4.2", "The metering channel to subscribe to. Examples: 4.2, 4.3, etc.")
+	olmInstallCmd.Flags().StringVar(&cfg.Channel, "channel", "4.4", "The metering channel to subscribe to. Examples: 4.2, 4.3, 4.4, etc.")
 
 	if err := initFlagsFromEnv(); err != nil {
 		log.WithError(err).Fatalf("Failed to update flags from ENV vars: %v", err)
