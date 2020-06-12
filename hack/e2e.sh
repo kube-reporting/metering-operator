@@ -12,8 +12,8 @@ function cleanup() {
     exit_status=$?
 
     if [[ "${METERING_RUN_DEV_TEST_SETUP}" = false ]]; then
-        echo "Removing namespaces with the 'name=metering-testing-ns' label"
-        kubectl delete ns -l "name=metering-testing-ns" || true
+        echo "Removing namespaces with the 'name=${METERING_NAMESPACE}-metering-testing-ns' label"
+        kubectl delete ns -l "name=${METERING_NAMESPACE}-metering-testing-ns" --wait=false || true
     else
         echo "Skipping the namespace deletion"
     fi

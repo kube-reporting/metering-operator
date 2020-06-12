@@ -51,6 +51,7 @@ type DeployFramework struct {
 	RunLocal          bool
 	RunDevSetup       bool
 	KubeConfigPath    string
+	NamespacePrefix   string
 	RepoDir           string
 	RepoVersion       string
 	OperatorResources *deploy.OperatorResources
@@ -114,6 +115,7 @@ func New(logger logrus.FieldLogger, runLocal, runDevSetup bool, nsPrefix, repoDi
 		KubeConfigPath:    kubeconfig,
 		RepoDir:           repoDir,
 		RepoVersion:       repoVersion,
+		NamespacePrefix:   nsPrefix,
 		RunLocal:          runLocal,
 		RunDevSetup:       runDevSetup,
 		Logger:            logger,
@@ -187,7 +189,7 @@ func (df *DeployFramework) NewDeployerConfig(
 		SubscriptionName: defaultSubscriptionName,
 		Channel:          defaultSubscriptionChannel,
 		ExtraNamespaceLabels: map[string]string{
-			"name": testNamespaceLabel,
+			"name": df.NamespacePrefix + "-" + testNamespaceLabel,
 		},
 		OperatorResources:        df.OperatorResources,
 		RunMeteringOperatorLocal: df.RunLocal,
