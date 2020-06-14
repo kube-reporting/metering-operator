@@ -38,11 +38,14 @@ METERING_OPERATOR_IMAGE_REPO=$(DOCKER_BASE_URL)/origin-metering-ansible-operator
 METERING_OPERATOR_IMAGE_TAG=4.6
 
 REPORTING_OPERATOR_DOCKERFILE=Dockerfile.reporting-operator
-METERING_ANSIBLE_OPERATOR_DOCKERFILE=Dockerfile.metering-ansible-operator
+# TODO: need to point to the .okd Dockerfile for now until we consolidate
+# the remaining Dockerfiles.
+METERING_ANSIBLE_OPERATOR_DOCKERFILE=Dockerfile.metering-ansible-operator.okd
 
 ifeq ($(OKD_BUILD), true)
 	DOCKER_BUILD_CMD=imagebuilder -mount $(REPO_DIR):/etc/yum.repos.d/ -mount $(SUB_MGR_FILE):/etc/yum/pluginconf.d/subscription-manager.conf
 	REPORTING_OPERATOR_DOCKERFILE=Dockerfile.reporting-operator.okd
+	METERING_ANSIBLE_OPERATOR_DOCKERFILE=Dockerfie.metering-ansible-operator.okd
 endif
 
 ifeq ($(OCP_BUILD), true)
