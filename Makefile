@@ -176,8 +176,12 @@ verify-olm-manifests: metering-manifests
 	@echo Generating metering manifests
 	$(MAKE) metering-manifests
 	@echo Verifying metering manifests
-	operator-courier verify --ui_validate_io ./manifests/deploy/openshift/olm/bundle
-	operator-courier verify --ui_validate_io ./manifests/deploy/upstream/olm/bundle
+	# # Note: verify is incompatible with the v1 CRDs formatting.
+	# # See: https://github.com/operator-framework/operator-courier/issues/163
+	# # TODO: replace `operator-courier verify` with `operator-sdk bundle validate` once
+	# # there's a pipeline in place for the new bundle format
+	# operator-courier verify --ui_validate_io ./manifests/deploy/openshift/olm/bundle
+	# operator-courier verify --ui_validate_io ./manifests/deploy/upstream/olm/bundle
 
 push-olm-manifests: verify-olm-manifests
 	./hack/push-olm-manifests.sh $(OLM_PACKAGE_ORG) metering-ocp $(OLM_PACKAGE_VERSION)
