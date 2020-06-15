@@ -102,7 +102,7 @@ func TestManualMeteringInstall(t *testing.T) {
 			Name:                      "InvalidHDFS-MissingStorageSpec",
 			MeteringOperatorImageRepo: meteringOperatorImageRepo,
 			MeteringOperatorImageTag:  meteringOperatorImageTag,
-			Skip:                      true,
+			Skip:                      false,
 			ExpectInstallErr:          true,
 			ExpectInstallErrMsg: []string{
 				"failed to install metering",
@@ -119,7 +119,7 @@ func TestManualMeteringInstall(t *testing.T) {
 			Name:                      "PrometheusConnectorWorks",
 			MeteringOperatorImageRepo: meteringOperatorImageRepo,
 			MeteringOperatorImageTag:  meteringOperatorImageTag,
-			Skip:                      true,
+			Skip:                      false,
 			InstallSubTest: InstallTestCase{
 				Name:     "testPrometheusConnectorWorks",
 				TestFunc: testPrometheusConnectorWorks,
@@ -130,7 +130,7 @@ func TestManualMeteringInstall(t *testing.T) {
 			Name:                      "ValidHDFS-ReportDynamicInputData",
 			MeteringOperatorImageRepo: meteringOperatorImageRepo,
 			MeteringOperatorImageTag:  meteringOperatorImageTag,
-			Skip:                      true,
+			Skip:                      false,
 			InstallSubTest: InstallTestCase{
 				Name:     "testReportingProducesData",
 				TestFunc: testReportingProducesData,
