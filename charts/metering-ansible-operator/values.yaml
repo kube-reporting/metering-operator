@@ -223,6 +223,7 @@ olm:
   csv:
     name : metering-operator.v4.6.0
     version: "4.6.0"
+    skipRange: ">=4.3.0 <4.6.0"
     minKubeVersion: "1.11.0"
     displayName: Metering
     description: |
@@ -340,7 +341,6 @@ olm:
       containerImage: "quay.io/openshift/origin-metering-ansible-operator:4.6"
       description: 'Chargeback and reporting tool to provide accountability for how resources are used across a cluster'
       repository: https://github.com/kube-reporting/metering-operator
-      olm.skipRange: ">=4.3.0 <4.6.0"
       alm-examples: |-
         [
           {
