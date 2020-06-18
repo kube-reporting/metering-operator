@@ -78,7 +78,6 @@ func ImportFromTimeRange(logger logrus.FieldLogger, clock clock.Clock, promConn 
 		})
 
 		promLogger.Debugf("querying Prometheus using range %s to %s", timeRange.Start, timeRange.End)
-		promLogger.Debugf("Prometheus query is: %s", cfg.PrometheusQuery)
 
 		queryStart := clock.Now()
 		pVal, err := promConn.QueryRange(ctx, cfg.PrometheusQuery, timeRange)
