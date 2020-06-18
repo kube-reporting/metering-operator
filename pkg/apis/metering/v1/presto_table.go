@@ -49,7 +49,7 @@ type PrestoTableStatus struct {
 	Catalog   string          `json:"catalog"`
 	Schema    string          `json:"schema"`
 	TableName string          `json:"tableName"`
-	Columns   []presto.Column `json:"columns"`
+	Columns   []presto.Column `json:"columns,omitempty"`
 
 	Properties map[string]string `json:"properties,omitempty"`
 	Comment    string            `json:"comment,string"`
