@@ -1,28 +1,90 @@
-- name: Get metastore secret
+#
+# Configure the Hive Metastore
+#
+# Note: in the case where any of the username/password/secretName
+# configurations have been provided, set hive.spec.metastore.storage.create
+# to false as we can make a relatively safe assumption they're providing a
+# non-default database configuration.
+#
+# Note: for the top-level condition for this block, because json_query will
+# return an empty string when an object is defined, we need to ensure that
+# object is defined and non-empty before we can check if the database dictionary
+# contains any keys.
+- name: Configure and validate the user-provided Hive metastore configuration
   block:
-  - name: Get Metastore storage credentials secret
-    k8s_info:
-      api_version: v1
-      kind: Secret
-      name: "{{ _hive_metastore_db_secretName }}"
-      namespace: "{{ meta.namespace }}"
-    register: hive_metastore_db_secret_buf
+  - include_tasks: update_meteringconfig_status.yml
+    vars:
+      current_conditions:
+        type: "Running"
+        status: "True"
+        message: "Configuring hive metastore"
+        lastTransitionTime: "{{ now(utc=False).isoformat() + 'Z' }}"
 
-  - name: Create variables for the decoded username and password data
+  - name: Override the default hive.spec.metastore.storage.create option to false
     set_fact:
-      _hive_metastore_db_username: "{{ _hive_metastore_db_secret_buf_resources_first_index.data.username | b64decode }}"
-      _hive_metastore_db_password: "{{ _hive_metastore_db_secret_buf_resources_first_index.data.password | b64decode }}"
+      _hive_metastore_create_default_storage: false
     when:
-    - hive_metastore_db_secret_buf is defined
-    - _hive_metastore_db_secret_buf_resources_first_index | length > 0
+    - _meteringconfig_hive_metastore_db_username is defined and _meteringconfig_hive_metastore_db_username | length > 0
+    - _meteringconfig_hive_metastore_db_password is defined and _meteringconfig_hive_metastore_db_password | length > 0
 
-  - name: Merge the two dictionaries together
-    set_fact:
-      meteringconfig_spec: "{{ meteringconfig_spec | combine(_hive_metastore_db_overrides, recursive=True) }}"
+  - name: Manage username and password data when secretName is not empty
+    block:
+    - name: Validate the username and password fields are undefined when secretName is not empty
+      assert:
+        that:
+        - _meteringconfig_hive_metastore_db_username is not defined or _meteringconfig_hive_metastore_db_username | length == 0
+        - _meteringconfig_hive_metastore_db_password is not defined or _meteringconfig_hive_metastore_db_password | length == 0
+        msg: "Invalid configuration for hive.spec.config.db: the username and password fields must be empty when secretName has been specified"
+
+    - name: Query k8s for the user-provided secretName object
+      k8s_info:
+        api_version: v1
+        kind: Secret
+        name: "{{ _meteringconfig_hive_metastore_db_secretName }}"
+        namespace: "{{ meta.namespace }}"
+      register: hive_metastore_db_secret_buf
+
+    - name: Create variables from the decoded username and password data
+      set_fact:
+        _hive_metastore_db_username: "{{ _hive_metastore_db_secret_buf_resources_first_index.data.username | b64decode }}"
+        _hive_metastore_db_password: "{{ _hive_metastore_db_secret_buf_resources_first_index.data.password | b64decode }}"
+        _hive_metastore_create_default_storage: false
+      when:
+      - hive_metastore_db_secret_buf is defined
+      - _hive_metastore_db_secret_buf_resources_first_index | length > 0
+    vars:
+      _hive_metastore_db_secret_buf_resources_first_index: "{{ hive_metastore_db_secret_buf.resources | first }}"
+    when:
+    - _meteringconfig_hive_metastore_db_secretName is defined
+    - _meteringconfig_hive_metastore_db_secretName | length > 0
+
+  - include_tasks: update_meteringconfig_status.yml
+    vars:
+      current_conditions:
+        type: "Running"
+        status: "True"
+        message: "Finished configuring the hive metastore"
+        lastTransitionTime: "{{ now(utc=False).isoformat() + 'Z' }}"
   vars:
-    _hive_metastore_db_secret_buf_resources_first_index: "{{ hive_metastore_db_secret_buf.resources | first }}"
-    _hive_metastore_db_secretName: "{{ meteringconfig_spec_overrides | json_query('hive.spec.config.db.secretName') }}"
-  no_log: true
+    _meteringconfig_hive_metastore_db_secretName: "{{ meteringconfig_spec_overrides | json_query('hive.spec.config.db.secretName') }}"
+    _meteringconfig_hive_metastore_db_username: "{{ meteringconfig_spec_overrides | json_query('hive.spec.config.db.username') }}"
+    _meteringconfig_hive_metastore_db_password: "{{ meteringconfig_spec_overrides | json_query('hive.spec.config.db.password') }}"
+    _meteringconfig_hive_metastore_db_configuration: "{{ meteringconfig_spec_overrides | json_query('hive.spec.config.db') }}"
+  no_log: false
+  rescue:
+  - include_tasks: update_meteringconfig_status.yml
+    vars:
+      end_play_after_updating_status: true
+      current_conditions:
+        type: "Invalid"
+        status: "True"
+        message: |
+          "{{ ansible_failed_result.msg }}"
+        lastTransitionTime: "{{ now(utc=False).isoformat() + 'Z' }}"
+    when:
+    - ansible_failed_result is defined
+    - ansible_failed_result.msg | length > 0
   when:
-  - _hive_metastore_db_secretName is defined
-  - _hive_metastore_db_secretName | length > 0
+  - _meteringconfig_hive_metastore_db_configuration is defined
+  - _meteringconfig_hive_metastore_db_configuration | length > 0
+  - _meteringconfig_hive_metastore_db_configuration.keys() | length > 0

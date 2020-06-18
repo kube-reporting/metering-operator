@@ -5,6 +5,7 @@
 - [#1214](https://github.com/kube-reporting/metering-operator/pull/1214) Add initial support for configuring the Hive Metastore database to reference a secret containing the base64 encrypted username and password credentials.
 - [#1224](https://github.com/kube-reporting/metering-operator/pull/1224) Improve performance of the metering-ansible-operator by "finalizing" the `meteringconfig_spec_overrides` dictionary.
 - [#1226](https://github.com/kube-reporting/metering-operator/pull/1226) Re-generate assets and YAML manifests to point to the 4.6 images.
+- [#1245](https://github.com/kube-reporting/metering-operator/pull/1245) Consolidate Hive Metastore configurable fields. You no longer need to specify `spec.hive.spec.metastore.storage.create: false` when using a non-default database for Hive Metastore.
 
 ### Bug Fixes
 
