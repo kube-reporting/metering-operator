@@ -213,3 +213,23 @@ It can be helpful to view the `.status` field of your `MeteringConfig` custom re
 ```bash
 kubectl -n $METERING_NAMESPACE get meteringconfig operator-metering -o json | jq '.status'
 ```
+
+### Checking the metering-ansible-operator events
+
+In order to view the progress of the metering-ansible-operator, like where in the reconciliation process is the operator currently at, or checking if an error was encountered, you can run the following:
+
+```bash
+kubectl -n $METERING_NAMESPACE get events --field-selector involvedObject.kind=MeteringConfig --sort-by='.lastTimestamp'
+```
+
+If you're in the process of upgrading Metering, and you want to monitor those events more closely, you can prepend the `watch` command:
+
+```bash
+$ watch kubectl -n $METERING_NAMESPACE get events --field-selector involvedObject.kind=MeteringConfig --sort-by='.lastTimestamp'
+Every 2.0s: kubectl -n tflannag get events --field-selector involvedObject.kind=MeteringConfig --sort-by=.lastTimestamp                   localhost.localdomain: Thu Jun  4 11:16:35 2020
+
+LAST SEEN   TYPE     REASON       OBJECT                             MESSAGE
+16s         Normal   Validating   meteringconfig/operator-metering   Validating the user-provided configuration
+8s          Normal   Started      meteringconfig/operator-metering   Configuring storage for the metering-ansible-operator
+5s          Normal   Started      meteringconfig/operator-metering   Configuring TLS for the metering-ansible-operator
+```

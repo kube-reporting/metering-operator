@@ -16,26 +16,28 @@ Please ensure you have the following tools installed before running the install 
 
 - bash
 - [faq](https://github.com/jzelinskie/faq) 0.0.5 or newer
-  - For Fedora 29, Rawhide, and CentOS 7 you can use the following copr repo: https://copr.fedorainfracloud.org/coprs/ecnahc515/faq/
+  - For Fedora 29, Rawhide, and CentOS 7 you can use the following copr repo: <https://copr.fedorainfracloud.org/coprs/ecnahc515/faq/>
   - For mac: `brew tap jzelinskie/faq && brew install faq`
-  - Or you can download the release binaries directly from Github: https://github.com/jzelinskie/faq/releases
+  - Or you can download the release binaries directly from Github: <https://github.com/jzelinskie/faq/releases>
 
 ## Install
+
+**Note**: Before installing Metering, you need to configure long-term storage for the stack. Follow the instructions for [configuring storage](configuring-storage.md) before proceeding.
 
 Depending on your Kubernetes platform (regular Kubernetes, or Openshift)
 
 For a standard Kubernetes cluster:
 
-```
-$ export METERING_NAMESPACE=metering-$USER
-$ ./hack/install.sh
+```bash
+export METERING_NAMESPACE=metering-$USER
+./hack/install.sh
 ```
 
 If you're using Openshift, use openshift-install.sh:
 
-```
-$ export METERING_NAMESPACE=metering-$USER
-$ ./hack/openshift-install.sh
+```bash
+export METERING_NAMESPACE=metering-$USER
+./hack/openshift-install.sh
 ```
 
 ## Uninstall
@@ -44,28 +46,26 @@ To uninstall the process is the same, pick the right uninstall script for your p
 
 For a standard Kubernetes cluster:
 
-```
-$ export METERING_NAMESPACE=metering-$USER
-$ ./hack/uninstall.sh
+```bash
+export METERING_NAMESPACE=metering-$USER
+./hack/uninstall.sh
 ```
 
 If you're using Openshift, use openshift-uninstall.sh:
 
+```bash
+export METERING_NAMESPACE=metering-$USER
+./hack/openshift-uninstall.sh
 ```
-$ export METERING_NAMESPACE=metering-$USER
-$ ./hack/openshift-uninstall.sh
-```
 
-## Customize installation
+## Customizing the installation
 
-
-If you wish to customize the installation, such as to modify configuration
-options, change the image tag or repository, then you can use a custom
-`metering` resource. To start, copy the default metering resource to a
+If you wish to further customize the installation, such as modifying the default reporting-operator image tag or repository,
+then you can use a custom `metering` resource. To start, copy the default metering resource to a
 separate file that we can modify:
 
-```
-$ cp manifests/metering-config/default.yaml metering-custom.yaml
+```bash
+cp manifests/metering-config/default.yaml metering-custom.yaml
 ```
 
 For developers, the most common change is modifying the image tag, config, and resource limits.
@@ -74,9 +74,9 @@ idea of what you can modify that relates to configuration and resource limits, a
 `manifests/metering-config/latest-versions.yaml` to see how to change the
 image tag of each component.
 
-```
-$ export METERING_NAMESPACE=metering-$USER
-$ export METERING_CR_FILE=metering-custom.yaml
+```bash
+export METERING_NAMESPACE=metering-$USER
+export METERING_CR_FILE=metering-custom.yaml
 ```
 
 Then run the installation script for your platform:
@@ -95,7 +95,7 @@ If you only want to change the image tag, then leave `METERING_OPERATOR_IMAGE_RE
 
 For example:
 
-```
+```bash
 export METERING_OPERATOR_IMAGE_REPO=internal-registry.example.org:6443/someorg/metering-helm-operator
 export METERING_OPERATOR_IMAGE_TAG=0.13.0
 ./hack/openshift-install.sh
@@ -103,20 +103,20 @@ export METERING_OPERATOR_IMAGE_TAG=0.13.0
 
 You can also it in a single line:
 
-```
+```bash
 METERING_OPERATOR_IMAGE_TAG=pr-123 ./hack/openshift-install.sh
 ```
 
 ## Run reporting operator locally
 
 It's also possible to run the operator locally.
-To simplify this, we've got a few `Makefile` targets to handle the building and running of the operator.
+To simplify this, we've got a few `Makefile` targets to handle the process of building and running the operator.
 
-First, we still need to run Presto, Hive, and HDFS in the cluster, and also set reporting-operator replicas to 0 so that our local operator can obtain the leader election lease when we start it.
+First, we still need to ensure that Presto and Hive are running in the cluster, and then set reporting-operator replicas to zero so that our local operator can obtain the leader election lease when we start it.
 
 To do this, update your `metering-custom.yaml` to set `spec.reporting-operator.replicas` to `0` like so:
 
-```
+```yaml
 spec:
   reporting-operator:
     replicas: 0
@@ -130,24 +130,25 @@ By default the `run-reporting-operator-local` Makefile target assumes that the p
 If your Prometheus is located somewhere else, you can override the defaults using the environment variables `METERING_PROMETHEUS_NAMESPACE` and `METERING_PROMTHEUS_LABEL_SELECTOR` to the namespace your Prometheus pod is in, and the label selector for querying Prometheus. Alternatively, if you wish to specify your Prometheus with a host, set `METERING_PROMETHEUS_PORT_FORWARD` to false and `METERING_PROMETHEUS_HOST` to the host/port of your instance.
 
 Ex (these are the defaults):
-```
+
+```bash
 export METERING_PROMETHEUS_NAMESPACE=openshift-monitoring
 export METERING_PROMTHEUS_LABEL_SELECTOR=app=prometheus
 ```
 
 Finally, use the following command to build & run the operator:
 
-```
+```bash
 make run-reporting-operator-local
 ```
 
-The above command builds the operator for your local OS (by default it only builds for Linux), uses kubectl port-forward to make Prometheus, Presto, and Hive available locally for your operator to communicate with, and then starts the operator with configuration set to use these local port-forwards.
+The above command builds the operator for your local OS (by default it only builds for Linux), uses `kubectl port-forward` to make Prometheus, Presto, and Hive available locally for your operator to communicate with, and then starts the operator with the configuration set to use these local port-forwards.
 Lastly, the operator automatically uses your `$KUBECONFIG` to connect and authenticate to your cluster and perform Kubernetes API calls.
 
 ## Run metering operator locally
 
-The metering operator is the top-level operator which deploys other components using helm charts.
-It's possible to also run this locally so you can iterate on charts and test them with the metering-operator before they're built and pushed to Quay for CI.
+The metering operator is the top-level operator which deploys other components using Ansible and helm charts.
+It's possible to also run this locally so you can iterate on changes made to the Ansible role or charts and test them with the metering-operator before they're built and pushed to Quay for CI.
 
 To run it locally you need to have the following:
 
@@ -155,9 +156,9 @@ To run it locally you need to have the following:
 - Your `$KUBECONFIG` environment variable must be set and accessible to your Docker daemon.
 - Your `$METERING_NAMESPACE` environment variable must be set, and unless `$LOCAL_METERING_OPERATOR_RUN_INSTALL` to `true`, the namespace must already exist.
 
-This will just build and run the metering-operator docker image, which will watch for `Metering` resources in the namespace specified by `$METERING_NAMESPACE`, using your `$KUBECONFIG` to communicate with the API server.
+The following command will build and run the metering-operator container image, which will watch for Metering resources in the namespace specified by `$METERING_NAMESPACE`, using your `$KUBECONFIG` to communicate with the API server.
 
-```
+```bash
 make run-metering-operator-local
 ```
 
@@ -168,17 +169,17 @@ These scripts work similarly to the `hack/install.sh` and `hack/uninstall.sh` sc
 
 Set your `METERING_NAMESPACE` and `METERING_CR_FILE` then run the script:
 
-```
+```bash
 ./hack/olm-install.sh
 ```
 
 To uninstall:
 
-```
+```bash
 ./hack/olm-uninstall.sh
 ```
 
-> *Note*: You must run the olm-uninstall.sh script to uninstall. Not doing may result in inability to re-install correctly.
+**Note**: You must run the olm-uninstall.sh script to uninstall. Not doing may result in inability to re-install Metering correctly.
 
 For more details on what this is doing, see the [OLM install guide][olm-install]
 
