@@ -10,12 +10,12 @@ import (
 	meteringclient "github.com/kube-reporting/metering-operator/pkg/generated/clientset/versioned/typed/metering/v1"
 	olmclientv1 "github.com/operator-framework/operator-lifecycle-manager/pkg/api/client/clientset/versioned/typed/operators/v1"
 	olmclientv1alpha1 "github.com/operator-framework/operator-lifecycle-manager/pkg/api/client/clientset/versioned/typed/operators/v1alpha1"
-	apiextv1beta1 "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1beta1"
-	apiextclientv1beta1 "k8s.io/apiextensions-apiserver/pkg/client/clientset/clientset/typed/apiextensions/v1beta1"
 
 	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
 	rbacv1 "k8s.io/api/rbac/v1"
+	apiextv1 "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1"
+	apiextclientv1 "k8s.io/apiextensions-apiserver/pkg/client/clientset/clientset/typed/apiextensions/v1"
 	"k8s.io/client-go/kubernetes"
 )
 
@@ -55,7 +55,7 @@ const (
 type CRD struct {
 	Name string
 	Path string
-	CRD  *apiextv1beta1.CustomResourceDefinition
+	CRD  *apiextv1.CustomResourceDefinition
 }
 
 // Config contains all the information needed to handle different
@@ -101,7 +101,7 @@ type Deployer struct {
 	config            Config
 	logger            logrus.FieldLogger
 	client            kubernetes.Interface
-	apiExtClient      apiextclientv1beta1.CustomResourceDefinitionsGetter
+	apiExtClient      apiextclientv1.CustomResourceDefinitionsGetter
 	meteringClient    meteringclient.MeteringV1Interface
 	olmV1Client       olmclientv1.OperatorsV1Interface
 	olmV1Alpha1Client olmclientv1alpha1.OperatorsV1alpha1Interface
@@ -115,7 +115,7 @@ func NewDeployer(
 	cfg Config,
 	logger logrus.FieldLogger,
 	client kubernetes.Interface,
-	apiextClient apiextclientv1beta1.CustomResourceDefinitionsGetter,
+	apiextClient apiextclientv1.CustomResourceDefinitionsGetter,
 	meteringClient meteringclient.MeteringV1Interface,
 	olmV1Client olmclientv1.OperatorsV1Interface,
 	olmV1Alpha1Client olmclientv1alpha1.OperatorsV1alpha1Interface,
