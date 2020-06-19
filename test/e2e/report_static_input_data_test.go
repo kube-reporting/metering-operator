@@ -1,6 +1,7 @@
 package e2e
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
@@ -9,6 +10,7 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/require"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
 
 	"github.com/kube-reporting/metering-operator/pkg/operator/prestostore"
@@ -283,7 +285,7 @@ func testReportingProducesCorrectDataForInput(t *testing.T, testReportingFramewo
 				jsonPatch := []byte(fmt.Sprintf(
 					`[{ "op": "add", "path": "/status/prometheusMetricsImportStatus", "value": { "importDataStartTime": "%s", "importDataEndTime": "%s", "earliestImportedMetricTime": "%s", "newestImportedMetricTime": "%s", "lastImportTime": "%s" } } ]`,
 					reportStartStr, reportEndStr, reportStartStr, reportEndStr, nowStr))
-				_, err = testReportingFramework.MeteringClient.ReportDataSources(testReportingFramework.Namespace).Patch(dataSource.DatasourceName, types.JSONPatchType, jsonPatch)
+				_, err = testReportingFramework.MeteringClient.ReportDataSources(testReportingFramework.Namespace).Patch(context.TODO(), dataSource.DatasourceName, types.JSONPatchType, jsonPatch, metav1.PatchOptions{})
 				require.NoError(t, err)
 
 				dataSourcesSubmitted[dataSource.DatasourceName] = struct{}{}

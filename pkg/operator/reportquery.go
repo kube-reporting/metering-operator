@@ -1,6 +1,8 @@
 package operator
 
 import (
+	"context"
+
 	log "github.com/sirupsen/logrus"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -56,7 +58,7 @@ func (op *Reporting) uninitialiedDependendenciesHandler() *reporting.Uninitialie
 
 func (op *Reporting) queueDependentReportDataSourcesForQuery(query *metering.ReportQuery) error {
 	reportDataSourceLister := op.meteringClient.MeteringV1().ReportDataSources(query.Namespace)
-	reportDataSources, err := reportDataSourceLister.List(metav1.ListOptions{})
+	reportDataSources, err := reportDataSourceLister.List(context.TODO(), metav1.ListOptions{})
 	if err != nil {
 		return err
 	}

@@ -3,6 +3,8 @@
 package fake
 
 import (
+	"context"
+
 	meteringv1 "github.com/kube-reporting/metering-operator/pkg/apis/metering/v1"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	labels "k8s.io/apimachinery/pkg/labels"
@@ -23,7 +25,7 @@ var storagelocationsResource = schema.GroupVersionResource{Group: "metering.open
 var storagelocationsKind = schema.GroupVersionKind{Group: "metering.openshift.io", Version: "v1", Kind: "StorageLocation"}
 
 // Get takes name of the storageLocation, and returns the corresponding storageLocation object, and an error if there is any.
-func (c *FakeStorageLocations) Get(name string, options v1.GetOptions) (result *meteringv1.StorageLocation, err error) {
+func (c *FakeStorageLocations) Get(ctx context.Context, name string, options v1.GetOptions) (result *meteringv1.StorageLocation, err error) {
 	obj, err := c.Fake.
 		Invokes(testing.NewGetAction(storagelocationsResource, c.ns, name), &meteringv1.StorageLocation{})
 
@@ -34,7 +36,7 @@ func (c *FakeStorageLocations) Get(name string, options v1.GetOptions) (result *
 }
 
 // List takes label and field selectors, and returns the list of StorageLocations that match those selectors.
-func (c *FakeStorageLocations) List(opts v1.ListOptions) (result *meteringv1.StorageLocationList, err error) {
+func (c *FakeStorageLocations) List(ctx context.Context, opts v1.ListOptions) (result *meteringv1.StorageLocationList, err error) {
 	obj, err := c.Fake.
 		Invokes(testing.NewListAction(storagelocationsResource, storagelocationsKind, c.ns, opts), &meteringv1.StorageLocationList{})
 
@@ -56,14 +58,14 @@ func (c *FakeStorageLocations) List(opts v1.ListOptions) (result *meteringv1.Sto
 }
 
 // Watch returns a watch.Interface that watches the requested storageLocations.
-func (c *FakeStorageLocations) Watch(opts v1.ListOptions) (watch.Interface, error) {
+func (c *FakeStorageLocations) Watch(ctx context.Context, opts v1.ListOptions) (watch.Interface, error) {
 	return c.Fake.
 		InvokesWatch(testing.NewWatchAction(storagelocationsResource, c.ns, opts))
 
 }
 
 // Create takes the representation of a storageLocation and creates it.  Returns the server's representation of the storageLocation, and an error, if there is any.
-func (c *FakeStorageLocations) Create(storageLocation *meteringv1.StorageLocation) (result *meteringv1.StorageLocation, err error) {
+func (c *FakeStorageLocations) Create(ctx context.Context, storageLocation *meteringv1.StorageLocation, opts v1.CreateOptions) (result *meteringv1.StorageLocation, err error) {
 	obj, err := c.Fake.
 		Invokes(testing.NewCreateAction(storagelocationsResource, c.ns, storageLocation), &meteringv1.StorageLocation{})
 
@@ -74,7 +76,7 @@ func (c *FakeStorageLocations) Create(storageLocation *meteringv1.StorageLocatio
 }
 
 // Update takes the representation of a storageLocation and updates it. Returns the server's representation of the storageLocation, and an error, if there is any.
-func (c *FakeStorageLocations) Update(storageLocation *meteringv1.StorageLocation) (result *meteringv1.StorageLocation, err error) {
+func (c *FakeStorageLocations) Update(ctx context.Context, storageLocation *meteringv1.StorageLocation, opts v1.UpdateOptions) (result *meteringv1.StorageLocation, err error) {
 	obj, err := c.Fake.
 		Invokes(testing.NewUpdateAction(storagelocationsResource, c.ns, storageLocation), &meteringv1.StorageLocation{})
 
@@ -86,7 +88,7 @@ func (c *FakeStorageLocations) Update(storageLocation *meteringv1.StorageLocatio
 
 // UpdateStatus was generated because the type contains a Status member.
 // Add a +genclient:noStatus comment above the type to avoid generating UpdateStatus().
-func (c *FakeStorageLocations) UpdateStatus(storageLocation *meteringv1.StorageLocation) (*meteringv1.StorageLocation, error) {
+func (c *FakeStorageLocations) UpdateStatus(ctx context.Context, storageLocation *meteringv1.StorageLocation, opts v1.UpdateOptions) (*meteringv1.StorageLocation, error) {
 	obj, err := c.Fake.
 		Invokes(testing.NewUpdateSubresourceAction(storagelocationsResource, "status", c.ns, storageLocation), &meteringv1.StorageLocation{})
 
@@ -97,7 +99,7 @@ func (c *FakeStorageLocations) UpdateStatus(storageLocation *meteringv1.StorageL
 }
 
 // Delete takes name of the storageLocation and deletes it. Returns an error if one occurs.
-func (c *FakeStorageLocations) Delete(name string, options *v1.DeleteOptions) error {
+func (c *FakeStorageLocations) Delete(ctx context.Context, name string, opts v1.DeleteOptions) error {
 	_, err := c.Fake.
 		Invokes(testing.NewDeleteAction(storagelocationsResource, c.ns, name), &meteringv1.StorageLocation{})
 
@@ -105,15 +107,15 @@ func (c *FakeStorageLocations) Delete(name string, options *v1.DeleteOptions) er
 }
 
 // DeleteCollection deletes a collection of objects.
-func (c *FakeStorageLocations) DeleteCollection(options *v1.DeleteOptions, listOptions v1.ListOptions) error {
-	action := testing.NewDeleteCollectionAction(storagelocationsResource, c.ns, listOptions)
+func (c *FakeStorageLocations) DeleteCollection(ctx context.Context, opts v1.DeleteOptions, listOpts v1.ListOptions) error {
+	action := testing.NewDeleteCollectionAction(storagelocationsResource, c.ns, listOpts)
 
 	_, err := c.Fake.Invokes(action, &meteringv1.StorageLocationList{})
 	return err
 }
 
 // Patch applies the patch and returns the patched storageLocation.
-func (c *FakeStorageLocations) Patch(name string, pt types.PatchType, data []byte, subresources ...string) (result *meteringv1.StorageLocation, err error) {
+func (c *FakeStorageLocations) Patch(ctx context.Context, name string, pt types.PatchType, data []byte, opts v1.PatchOptions, subresources ...string) (result *meteringv1.StorageLocation, err error) {
 	obj, err := c.Fake.
 		Invokes(testing.NewPatchSubresourceAction(storagelocationsResource, c.ns, name, pt, data, subresources...), &meteringv1.StorageLocation{})
 

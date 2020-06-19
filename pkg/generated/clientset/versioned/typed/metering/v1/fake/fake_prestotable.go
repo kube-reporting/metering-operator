@@ -3,6 +3,8 @@
 package fake
 
 import (
+	"context"
+
 	meteringv1 "github.com/kube-reporting/metering-operator/pkg/apis/metering/v1"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	labels "k8s.io/apimachinery/pkg/labels"
@@ -23,7 +25,7 @@ var prestotablesResource = schema.GroupVersionResource{Group: "metering.openshif
 var prestotablesKind = schema.GroupVersionKind{Group: "metering.openshift.io", Version: "v1", Kind: "PrestoTable"}
 
 // Get takes name of the prestoTable, and returns the corresponding prestoTable object, and an error if there is any.
-func (c *FakePrestoTables) Get(name string, options v1.GetOptions) (result *meteringv1.PrestoTable, err error) {
+func (c *FakePrestoTables) Get(ctx context.Context, name string, options v1.GetOptions) (result *meteringv1.PrestoTable, err error) {
 	obj, err := c.Fake.
 		Invokes(testing.NewGetAction(prestotablesResource, c.ns, name), &meteringv1.PrestoTable{})
 
@@ -34,7 +36,7 @@ func (c *FakePrestoTables) Get(name string, options v1.GetOptions) (result *mete
 }
 
 // List takes label and field selectors, and returns the list of PrestoTables that match those selectors.
-func (c *FakePrestoTables) List(opts v1.ListOptions) (result *meteringv1.PrestoTableList, err error) {
+func (c *FakePrestoTables) List(ctx context.Context, opts v1.ListOptions) (result *meteringv1.PrestoTableList, err error) {
 	obj, err := c.Fake.
 		Invokes(testing.NewListAction(prestotablesResource, prestotablesKind, c.ns, opts), &meteringv1.PrestoTableList{})
 
@@ -56,14 +58,14 @@ func (c *FakePrestoTables) List(opts v1.ListOptions) (result *meteringv1.PrestoT
 }
 
 // Watch returns a watch.Interface that watches the requested prestoTables.
-func (c *FakePrestoTables) Watch(opts v1.ListOptions) (watch.Interface, error) {
+func (c *FakePrestoTables) Watch(ctx context.Context, opts v1.ListOptions) (watch.Interface, error) {
 	return c.Fake.
 		InvokesWatch(testing.NewWatchAction(prestotablesResource, c.ns, opts))
 
 }
 
 // Create takes the representation of a prestoTable and creates it.  Returns the server's representation of the prestoTable, and an error, if there is any.
-func (c *FakePrestoTables) Create(prestoTable *meteringv1.PrestoTable) (result *meteringv1.PrestoTable, err error) {
+func (c *FakePrestoTables) Create(ctx context.Context, prestoTable *meteringv1.PrestoTable, opts v1.CreateOptions) (result *meteringv1.PrestoTable, err error) {
 	obj, err := c.Fake.
 		Invokes(testing.NewCreateAction(prestotablesResource, c.ns, prestoTable), &meteringv1.PrestoTable{})
 
@@ -74,7 +76,7 @@ func (c *FakePrestoTables) Create(prestoTable *meteringv1.PrestoTable) (result *
 }
 
 // Update takes the representation of a prestoTable and updates it. Returns the server's representation of the prestoTable, and an error, if there is any.
-func (c *FakePrestoTables) Update(prestoTable *meteringv1.PrestoTable) (result *meteringv1.PrestoTable, err error) {
+func (c *FakePrestoTables) Update(ctx context.Context, prestoTable *meteringv1.PrestoTable, opts v1.UpdateOptions) (result *meteringv1.PrestoTable, err error) {
 	obj, err := c.Fake.
 		Invokes(testing.NewUpdateAction(prestotablesResource, c.ns, prestoTable), &meteringv1.PrestoTable{})
 
@@ -86,7 +88,7 @@ func (c *FakePrestoTables) Update(prestoTable *meteringv1.PrestoTable) (result *
 
 // UpdateStatus was generated because the type contains a Status member.
 // Add a +genclient:noStatus comment above the type to avoid generating UpdateStatus().
-func (c *FakePrestoTables) UpdateStatus(prestoTable *meteringv1.PrestoTable) (*meteringv1.PrestoTable, error) {
+func (c *FakePrestoTables) UpdateStatus(ctx context.Context, prestoTable *meteringv1.PrestoTable, opts v1.UpdateOptions) (*meteringv1.PrestoTable, error) {
 	obj, err := c.Fake.
 		Invokes(testing.NewUpdateSubresourceAction(prestotablesResource, "status", c.ns, prestoTable), &meteringv1.PrestoTable{})
 
@@ -97,7 +99,7 @@ func (c *FakePrestoTables) UpdateStatus(prestoTable *meteringv1.PrestoTable) (*m
 }
 
 // Delete takes name of the prestoTable and deletes it. Returns an error if one occurs.
-func (c *FakePrestoTables) Delete(name string, options *v1.DeleteOptions) error {
+func (c *FakePrestoTables) Delete(ctx context.Context, name string, opts v1.DeleteOptions) error {
 	_, err := c.Fake.
 		Invokes(testing.NewDeleteAction(prestotablesResource, c.ns, name), &meteringv1.PrestoTable{})
 
@@ -105,15 +107,15 @@ func (c *FakePrestoTables) Delete(name string, options *v1.DeleteOptions) error 
 }
 
 // DeleteCollection deletes a collection of objects.
-func (c *FakePrestoTables) DeleteCollection(options *v1.DeleteOptions, listOptions v1.ListOptions) error {
-	action := testing.NewDeleteCollectionAction(prestotablesResource, c.ns, listOptions)
+func (c *FakePrestoTables) DeleteCollection(ctx context.Context, opts v1.DeleteOptions, listOpts v1.ListOptions) error {
+	action := testing.NewDeleteCollectionAction(prestotablesResource, c.ns, listOpts)
 
 	_, err := c.Fake.Invokes(action, &meteringv1.PrestoTableList{})
 	return err
 }
 
 // Patch applies the patch and returns the patched prestoTable.
-func (c *FakePrestoTables) Patch(name string, pt types.PatchType, data []byte, subresources ...string) (result *meteringv1.PrestoTable, err error) {
+func (c *FakePrestoTables) Patch(ctx context.Context, name string, pt types.PatchType, data []byte, opts v1.PatchOptions, subresources ...string) (result *meteringv1.PrestoTable, err error) {
 	obj, err := c.Fake.
 		Invokes(testing.NewPatchSubresourceAction(prestotablesResource, c.ns, name, pt, data, subresources...), &meteringv1.PrestoTable{})
 

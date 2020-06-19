@@ -1,12 +1,13 @@
 package reportingframework
 
 import (
+	"context"
 	"testing"
 	"time"
 
 	"github.com/stretchr/testify/require"
 	"k8s.io/apimachinery/pkg/api/errors"
-	meta "k8s.io/apimachinery/pkg/apis/meta/v1"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/util/wait"
 
 	metering "github.com/kube-reporting/metering-operator/pkg/apis/metering/v1"
@@ -15,7 +16,7 @@ import (
 )
 
 func (rf *ReportingFramework) GetMeteringReportQuery(name string) (*metering.ReportQuery, error) {
-	return rf.MeteringClient.ReportQueries(rf.Namespace).Get(name, meta.GetOptions{})
+	return rf.MeteringClient.ReportQueries(rf.Namespace).Get(context.TODO(), name, metav1.GetOptions{})
 }
 
 func (rf *ReportingFramework) WaitForMeteringReportQuery(t *testing.T, name string, pollInterval, timeout time.Duration) (*metering.ReportQuery, error) {

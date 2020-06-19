@@ -3,6 +3,7 @@
 package v1
 
 import (
+	"context"
 	"time"
 
 	v1 "github.com/kube-reporting/metering-operator/pkg/apis/metering/v1"
@@ -21,15 +22,15 @@ type StorageLocationsGetter interface {
 
 // StorageLocationInterface has methods to work with StorageLocation resources.
 type StorageLocationInterface interface {
-	Create(*v1.StorageLocation) (*v1.StorageLocation, error)
-	Update(*v1.StorageLocation) (*v1.StorageLocation, error)
-	UpdateStatus(*v1.StorageLocation) (*v1.StorageLocation, error)
-	Delete(name string, options *metav1.DeleteOptions) error
-	DeleteCollection(options *metav1.DeleteOptions, listOptions metav1.ListOptions) error
-	Get(name string, options metav1.GetOptions) (*v1.StorageLocation, error)
-	List(opts metav1.ListOptions) (*v1.StorageLocationList, error)
-	Watch(opts metav1.ListOptions) (watch.Interface, error)
-	Patch(name string, pt types.PatchType, data []byte, subresources ...string) (result *v1.StorageLocation, err error)
+	Create(ctx context.Context, storageLocation *v1.StorageLocation, opts metav1.CreateOptions) (*v1.StorageLocation, error)
+	Update(ctx context.Context, storageLocation *v1.StorageLocation, opts metav1.UpdateOptions) (*v1.StorageLocation, error)
+	UpdateStatus(ctx context.Context, storageLocation *v1.StorageLocation, opts metav1.UpdateOptions) (*v1.StorageLocation, error)
+	Delete(ctx context.Context, name string, opts metav1.DeleteOptions) error
+	DeleteCollection(ctx context.Context, opts metav1.DeleteOptions, listOpts metav1.ListOptions) error
+	Get(ctx context.Context, name string, opts metav1.GetOptions) (*v1.StorageLocation, error)
+	List(ctx context.Context, opts metav1.ListOptions) (*v1.StorageLocationList, error)
+	Watch(ctx context.Context, opts metav1.ListOptions) (watch.Interface, error)
+	Patch(ctx context.Context, name string, pt types.PatchType, data []byte, opts metav1.PatchOptions, subresources ...string) (result *v1.StorageLocation, err error)
 	StorageLocationExpansion
 }
 
@@ -48,20 +49,20 @@ func newStorageLocations(c *MeteringV1Client, namespace string) *storageLocation
 }
 
 // Get takes name of the storageLocation, and returns the corresponding storageLocation object, and an error if there is any.
-func (c *storageLocations) Get(name string, options metav1.GetOptions) (result *v1.StorageLocation, err error) {
+func (c *storageLocations) Get(ctx context.Context, name string, options metav1.GetOptions) (result *v1.StorageLocation, err error) {
 	result = &v1.StorageLocation{}
 	err = c.client.Get().
 		Namespace(c.ns).
 		Resource("storagelocations").
 		Name(name).
 		VersionedParams(&options, scheme.ParameterCodec).
-		Do().
+		Do(ctx).
 		Into(result)
 	return
 }
 
 // List takes label and field selectors, and returns the list of StorageLocations that match those selectors.
-func (c *storageLocations) List(opts metav1.ListOptions) (result *v1.StorageLocationList, err error) {
+func (c *storageLocations) List(ctx context.Context, opts metav1.ListOptions) (result *v1.StorageLocationList, err error) {
 	var timeout time.Duration
 	if opts.TimeoutSeconds != nil {
 		timeout = time.Duration(*opts.TimeoutSeconds) * time.Second
@@ -72,13 +73,13 @@ func (c *storageLocations) List(opts metav1.ListOptions) (result *v1.StorageLoca
 		Resource("storagelocations").
 		VersionedParams(&opts, scheme.ParameterCodec).
 		Timeout(timeout).
-		Do().
+		Do(ctx).
 		Into(result)
 	return
 }
 
 // Watch returns a watch.Interface that watches the requested storageLocations.
-func (c *storageLocations) Watch(opts metav1.ListOptions) (watch.Interface, error) {
+func (c *storageLocations) Watch(ctx context.Context, opts metav1.ListOptions) (watch.Interface, error) {
 	var timeout time.Duration
 	if opts.TimeoutSeconds != nil {
 		timeout = time.Duration(*opts.TimeoutSeconds) * time.Second
@@ -89,87 +90,90 @@ func (c *storageLocations) Watch(opts metav1.ListOptions) (watch.Interface, erro
 		Resource("storagelocations").
 		VersionedParams(&opts, scheme.ParameterCodec).
 		Timeout(timeout).
-		Watch()
+		Watch(ctx)
 }
 
 // Create takes the representation of a storageLocation and creates it.  Returns the server's representation of the storageLocation, and an error, if there is any.
-func (c *storageLocations) Create(storageLocation *v1.StorageLocation) (result *v1.StorageLocation, err error) {
+func (c *storageLocations) Create(ctx context.Context, storageLocation *v1.StorageLocation, opts metav1.CreateOptions) (result *v1.StorageLocation, err error) {
 	result = &v1.StorageLocation{}
 	err = c.client.Post().
 		Namespace(c.ns).
 		Resource("storagelocations").
+		VersionedParams(&opts, scheme.ParameterCodec).
 		Body(storageLocation).
-		Do().
+		Do(ctx).
 		Into(result)
 	return
 }
 
 // Update takes the representation of a storageLocation and updates it. Returns the server's representation of the storageLocation, and an error, if there is any.
-func (c *storageLocations) Update(storageLocation *v1.StorageLocation) (result *v1.StorageLocation, err error) {
+func (c *storageLocations) Update(ctx context.Context, storageLocation *v1.StorageLocation, opts metav1.UpdateOptions) (result *v1.StorageLocation, err error) {
 	result = &v1.StorageLocation{}
 	err = c.client.Put().
 		Namespace(c.ns).
 		Resource("storagelocations").
 		Name(storageLocation.Name).
+		VersionedParams(&opts, scheme.ParameterCodec).
 		Body(storageLocation).
-		Do().
+		Do(ctx).
 		Into(result)
 	return
 }
 
 // UpdateStatus was generated because the type contains a Status member.
 // Add a +genclient:noStatus comment above the type to avoid generating UpdateStatus().
-
-func (c *storageLocations) UpdateStatus(storageLocation *v1.StorageLocation) (result *v1.StorageLocation, err error) {
+func (c *storageLocations) UpdateStatus(ctx context.Context, storageLocation *v1.StorageLocation, opts metav1.UpdateOptions) (result *v1.StorageLocation, err error) {
 	result = &v1.StorageLocation{}
 	err = c.client.Put().
 		Namespace(c.ns).
 		Resource("storagelocations").
 		Name(storageLocation.Name).
 		SubResource("status").
+		VersionedParams(&opts, scheme.ParameterCodec).
 		Body(storageLocation).
-		Do().
+		Do(ctx).
 		Into(result)
 	return
 }
 
 // Delete takes name of the storageLocation and deletes it. Returns an error if one occurs.
-func (c *storageLocations) Delete(name string, options *metav1.DeleteOptions) error {
+func (c *storageLocations) Delete(ctx context.Context, name string, opts metav1.DeleteOptions) error {
 	return c.client.Delete().
 		Namespace(c.ns).
 		Resource("storagelocations").
 		Name(name).
-		Body(options).
-		Do().
+		Body(&opts).
+		Do(ctx).
 		Error()
 }
 
 // DeleteCollection deletes a collection of objects.
-func (c *storageLocations) DeleteCollection(options *metav1.DeleteOptions, listOptions metav1.ListOptions) error {
+func (c *storageLocations) DeleteCollection(ctx context.Context, opts metav1.DeleteOptions, listOpts metav1.ListOptions) error {
 	var timeout time.Duration
-	if listOptions.TimeoutSeconds != nil {
-		timeout = time.Duration(*listOptions.TimeoutSeconds) * time.Second
+	if listOpts.TimeoutSeconds != nil {
+		timeout = time.Duration(*listOpts.TimeoutSeconds) * time.Second
 	}
 	return c.client.Delete().
 		Namespace(c.ns).
 		Resource("storagelocations").
-		VersionedParams(&listOptions, scheme.ParameterCodec).
+		VersionedParams(&listOpts, scheme.ParameterCodec).
 		Timeout(timeout).
-		Body(options).
-		Do().
+		Body(&opts).
+		Do(ctx).
 		Error()
 }
 
 // Patch applies the patch and returns the patched storageLocation.
-func (c *storageLocations) Patch(name string, pt types.PatchType, data []byte, subresources ...string) (result *v1.StorageLocation, err error) {
+func (c *storageLocations) Patch(ctx context.Context, name string, pt types.PatchType, data []byte, opts metav1.PatchOptions, subresources ...string) (result *v1.StorageLocation, err error) {
 	result = &v1.StorageLocation{}
 	err = c.client.Patch(pt).
 		Namespace(c.ns).
 		Resource("storagelocations").
-		SubResource(subresources...).
 		Name(name).
+		SubResource(subresources...).
+		VersionedParams(&opts, scheme.ParameterCodec).
 		Body(data).
-		Do().
+		Do(ctx).
 		Into(result)
 	return
 }

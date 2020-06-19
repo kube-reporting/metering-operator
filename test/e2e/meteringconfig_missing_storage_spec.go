@@ -1,6 +1,7 @@
 package e2e
 
 import (
+	"context"
 	"testing"
 
 	"github.com/stretchr/testify/require"
@@ -16,6 +17,6 @@ func testInvalidMeteringConfigMissingStorageSpec(t *testing.T, rf *reportingfram
 	require.NotNil(t, rf.MeteringClient, "expected the reportingframework.MeteringClient field would not be nil")
 	require.NotEmpty(t, rf.Namespace, "expected the reportingframework.Namespace field would not be empty")
 
-	mc, err := rf.MeteringClient.MeteringConfigs(rf.Namespace).Get("operator-metering", meta.GetOptions{})
+	mc, err := rf.MeteringClient.MeteringConfigs(rf.Namespace).Get(context.TODO(), "operator-metering", meta.GetOptions{})
 	require.Truef(t, apierrors.IsNotFound(err), "expected the MeteringConfig to not exist, got: %v, err: %v", mc, err)
 }

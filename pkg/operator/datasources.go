@@ -371,7 +371,7 @@ func (op *Reporting) handleAWSBillingDataSource(logger log.FieldLogger, dataSour
 		if err != nil {
 			// if not found, try for the uncached copy
 			if apierrors.IsNotFound(err) {
-				hiveTable, err = op.meteringClient.MeteringV1().HiveTables(dataSource.Namespace).Get(hiveTableResourceName, metav1.GetOptions{})
+				hiveTable, err = op.meteringClient.MeteringV1().HiveTables(dataSource.Namespace).Get(context.TODO(), hiveTableResourceName, metav1.GetOptions{})
 				if err != nil {
 					return err
 				}
@@ -648,7 +648,7 @@ func (op *Reporting) handleReportQueryViewDataSource(logger log.FieldLogger, dat
 
 func (op *Reporting) addReportDataSourceFinalizer(ds *metering.ReportDataSource) (*metering.ReportDataSource, error) {
 	ds.Finalizers = append(ds.Finalizers, reportDataSourceFinalizer)
-	newReportDataSource, err := op.meteringClient.MeteringV1().ReportDataSources(ds.Namespace).Update(ds)
+	newReportDataSource, err := op.meteringClient.MeteringV1().ReportDataSources(ds.Namespace).Update(context.TODO(), ds, metav1.UpdateOptions{})
 	logger := op.logger.WithFields(log.Fields{"reportDataSource": ds.Name, "namespace": ds.Namespace})
 	if err != nil {
 		logger.WithError(err).Errorf("error adding %s finalizer to ReportDataSource: %s/%s", reportDataSourceFinalizer, ds.Namespace, ds.Name)
@@ -663,7 +663,7 @@ func (op *Reporting) removeReportDataSourceFinalizer(ds *metering.ReportDataSour
 		return ds, nil
 	}
 	ds.Finalizers = slice.RemoveString(ds.Finalizers, reportDataSourceFinalizer, nil)
-	newReportDataSource, err := op.meteringClient.MeteringV1().ReportDataSources(ds.Namespace).Update(ds)
+	newReportDataSource, err := op.meteringClient.MeteringV1().ReportDataSources(ds.Namespace).Update(context.TODO(), ds, metav1.UpdateOptions{})
 	logger := op.logger.WithFields(log.Fields{"reportDataSource": ds.Name, "namespace": ds.Namespace})
 	if err != nil {
 		logger.WithError(err).Errorf("error removing %s finalizer from ReportDataSource: %s/%s", reportDataSourceFinalizer, ds.Namespace, ds.Name)
@@ -754,12 +754,12 @@ func (op *Reporting) queueDependentReportsForDataSource(dataSource *metering.Rep
 func updateReportDataSource(dsClient cbInterfaces.ReportDataSourceInterface, dsName string, updateFunc func(*metering.ReportDataSource)) (*metering.ReportDataSource, error) {
 	var ds *metering.ReportDataSource
 	if err := retry.RetryOnConflict(retry.DefaultBackoff, func() error {
-		newDS, err := dsClient.Get(dsName, metav1.GetOptions{})
+		newDS, err := dsClient.Get(context.TODO(), dsName, metav1.GetOptions{})
 		if err != nil {
 			return err
 		}
 		updateFunc(newDS)
-		ds, err = dsClient.Update(newDS)
+		ds, err = dsClient.Update(context.TODO(), newDS, metav1.UpdateOptions{})
 		return err
 	}); err != nil {
 		return nil, err

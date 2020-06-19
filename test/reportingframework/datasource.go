@@ -1,20 +1,21 @@
 package reportingframework
 
 import (
+	"context"
 	"fmt"
 	"testing"
 	"time"
 
 	"github.com/stretchr/testify/require"
 	"k8s.io/apimachinery/pkg/api/errors"
-	meta "k8s.io/apimachinery/pkg/apis/meta/v1"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/util/wait"
 
 	metering "github.com/kube-reporting/metering-operator/pkg/apis/metering/v1"
 )
 
 func (rf *ReportingFramework) GetMeteringReportDataSource(name string) (*metering.ReportDataSource, error) {
-	return rf.MeteringClient.ReportDataSources(rf.Namespace).Get(name, meta.GetOptions{})
+	return rf.MeteringClient.ReportDataSources(rf.Namespace).Get(context.TODO(), name, metav1.GetOptions{})
 }
 
 func (rf *ReportingFramework) WaitForMeteringReportDataSourceTable(t *testing.T, name string, pollInterval, timeout time.Duration) (*metering.ReportDataSource, error) {
@@ -42,7 +43,7 @@ func (rf *ReportingFramework) WaitForAllMeteringReportDataSourceTables(t *testin
 	t.Helper()
 	var reportDataSources []*metering.ReportDataSource
 	return reportDataSources, wait.PollImmediate(pollInterval, timeout, func() (bool, error) {
-		reportDataSourcesList, err := rf.MeteringClient.ReportDataSources(rf.Namespace).List(meta.ListOptions{})
+		reportDataSourcesList, err := rf.MeteringClient.ReportDataSources(rf.Namespace).List(context.TODO(), metav1.ListOptions{})
 		require.NoError(t, err, "should not have errors querying API for list of ReportDataSources")
 		reportDataSources = reportDataSourcesList.Items
 

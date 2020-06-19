@@ -162,7 +162,7 @@ type prometheusImportResults struct {
 }
 
 func (op *Reporting) importPrometheusForTimeRange(ctx context.Context, namespace, dsName string, start, end time.Time) ([]*prometheusImportResults, error) {
-	reportDataSources, err := op.meteringClient.MeteringV1().ReportDataSources(namespace).List(metav1.ListOptions{})
+	reportDataSources, err := op.meteringClient.MeteringV1().ReportDataSources(namespace).List(context.TODO(), metav1.ListOptions{})
 	if err != nil {
 		return nil, err
 	}

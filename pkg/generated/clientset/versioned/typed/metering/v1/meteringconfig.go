@@ -3,6 +3,7 @@
 package v1
 
 import (
+	"context"
 	"time"
 
 	v1 "github.com/kube-reporting/metering-operator/pkg/apis/metering/v1"
@@ -21,15 +22,15 @@ type MeteringConfigsGetter interface {
 
 // MeteringConfigInterface has methods to work with MeteringConfig resources.
 type MeteringConfigInterface interface {
-	Create(*v1.MeteringConfig) (*v1.MeteringConfig, error)
-	Update(*v1.MeteringConfig) (*v1.MeteringConfig, error)
-	UpdateStatus(*v1.MeteringConfig) (*v1.MeteringConfig, error)
-	Delete(name string, options *metav1.DeleteOptions) error
-	DeleteCollection(options *metav1.DeleteOptions, listOptions metav1.ListOptions) error
-	Get(name string, options metav1.GetOptions) (*v1.MeteringConfig, error)
-	List(opts metav1.ListOptions) (*v1.MeteringConfigList, error)
-	Watch(opts metav1.ListOptions) (watch.Interface, error)
-	Patch(name string, pt types.PatchType, data []byte, subresources ...string) (result *v1.MeteringConfig, err error)
+	Create(ctx context.Context, meteringConfig *v1.MeteringConfig, opts metav1.CreateOptions) (*v1.MeteringConfig, error)
+	Update(ctx context.Context, meteringConfig *v1.MeteringConfig, opts metav1.UpdateOptions) (*v1.MeteringConfig, error)
+	UpdateStatus(ctx context.Context, meteringConfig *v1.MeteringConfig, opts metav1.UpdateOptions) (*v1.MeteringConfig, error)
+	Delete(ctx context.Context, name string, opts metav1.DeleteOptions) error
+	DeleteCollection(ctx context.Context, opts metav1.DeleteOptions, listOpts metav1.ListOptions) error
+	Get(ctx context.Context, name string, opts metav1.GetOptions) (*v1.MeteringConfig, error)
+	List(ctx context.Context, opts metav1.ListOptions) (*v1.MeteringConfigList, error)
+	Watch(ctx context.Context, opts metav1.ListOptions) (watch.Interface, error)
+	Patch(ctx context.Context, name string, pt types.PatchType, data []byte, opts metav1.PatchOptions, subresources ...string) (result *v1.MeteringConfig, err error)
 	MeteringConfigExpansion
 }
 
@@ -48,20 +49,20 @@ func newMeteringConfigs(c *MeteringV1Client, namespace string) *meteringConfigs 
 }
 
 // Get takes name of the meteringConfig, and returns the corresponding meteringConfig object, and an error if there is any.
-func (c *meteringConfigs) Get(name string, options metav1.GetOptions) (result *v1.MeteringConfig, err error) {
+func (c *meteringConfigs) Get(ctx context.Context, name string, options metav1.GetOptions) (result *v1.MeteringConfig, err error) {
 	result = &v1.MeteringConfig{}
 	err = c.client.Get().
 		Namespace(c.ns).
 		Resource("meteringconfigs").
 		Name(name).
 		VersionedParams(&options, scheme.ParameterCodec).
-		Do().
+		Do(ctx).
 		Into(result)
 	return
 }
 
 // List takes label and field selectors, and returns the list of MeteringConfigs that match those selectors.
-func (c *meteringConfigs) List(opts metav1.ListOptions) (result *v1.MeteringConfigList, err error) {
+func (c *meteringConfigs) List(ctx context.Context, opts metav1.ListOptions) (result *v1.MeteringConfigList, err error) {
 	var timeout time.Duration
 	if opts.TimeoutSeconds != nil {
 		timeout = time.Duration(*opts.TimeoutSeconds) * time.Second
@@ -72,13 +73,13 @@ func (c *meteringConfigs) List(opts metav1.ListOptions) (result *v1.MeteringConf
 		Resource("meteringconfigs").
 		VersionedParams(&opts, scheme.ParameterCodec).
 		Timeout(timeout).
-		Do().
+		Do(ctx).
 		Into(result)
 	return
 }
 
 // Watch returns a watch.Interface that watches the requested meteringConfigs.
-func (c *meteringConfigs) Watch(opts metav1.ListOptions) (watch.Interface, error) {
+func (c *meteringConfigs) Watch(ctx context.Context, opts metav1.ListOptions) (watch.Interface, error) {
 	var timeout time.Duration
 	if opts.TimeoutSeconds != nil {
 		timeout = time.Duration(*opts.TimeoutSeconds) * time.Second
@@ -89,87 +90,90 @@ func (c *meteringConfigs) Watch(opts metav1.ListOptions) (watch.Interface, error
 		Resource("meteringconfigs").
 		VersionedParams(&opts, scheme.ParameterCodec).
 		Timeout(timeout).
-		Watch()
+		Watch(ctx)
 }
 
 // Create takes the representation of a meteringConfig and creates it.  Returns the server's representation of the meteringConfig, and an error, if there is any.
-func (c *meteringConfigs) Create(meteringConfig *v1.MeteringConfig) (result *v1.MeteringConfig, err error) {
+func (c *meteringConfigs) Create(ctx context.Context, meteringConfig *v1.MeteringConfig, opts metav1.CreateOptions) (result *v1.MeteringConfig, err error) {
 	result = &v1.MeteringConfig{}
 	err = c.client.Post().
 		Namespace(c.ns).
 		Resource("meteringconfigs").
+		VersionedParams(&opts, scheme.ParameterCodec).
 		Body(meteringConfig).
-		Do().
+		Do(ctx).
 		Into(result)
 	return
 }
 
 // Update takes the representation of a meteringConfig and updates it. Returns the server's representation of the meteringConfig, and an error, if there is any.
-func (c *meteringConfigs) Update(meteringConfig *v1.MeteringConfig) (result *v1.MeteringConfig, err error) {
+func (c *meteringConfigs) Update(ctx context.Context, meteringConfig *v1.MeteringConfig, opts metav1.UpdateOptions) (result *v1.MeteringConfig, err error) {
 	result = &v1.MeteringConfig{}
 	err = c.client.Put().
 		Namespace(c.ns).
 		Resource("meteringconfigs").
 		Name(meteringConfig.Name).
+		VersionedParams(&opts, scheme.ParameterCodec).
 		Body(meteringConfig).
-		Do().
+		Do(ctx).
 		Into(result)
 	return
 }
 
 // UpdateStatus was generated because the type contains a Status member.
 // Add a +genclient:noStatus comment above the type to avoid generating UpdateStatus().
-
-func (c *meteringConfigs) UpdateStatus(meteringConfig *v1.MeteringConfig) (result *v1.MeteringConfig, err error) {
+func (c *meteringConfigs) UpdateStatus(ctx context.Context, meteringConfig *v1.MeteringConfig, opts metav1.UpdateOptions) (result *v1.MeteringConfig, err error) {
 	result = &v1.MeteringConfig{}
 	err = c.client.Put().
 		Namespace(c.ns).
 		Resource("meteringconfigs").
 		Name(meteringConfig.Name).
 		SubResource("status").
+		VersionedParams(&opts, scheme.ParameterCodec).
 		Body(meteringConfig).
-		Do().
+		Do(ctx).
 		Into(result)
 	return
 }
 
 // Delete takes name of the meteringConfig and deletes it. Returns an error if one occurs.
-func (c *meteringConfigs) Delete(name string, options *metav1.DeleteOptions) error {
+func (c *meteringConfigs) Delete(ctx context.Context, name string, opts metav1.DeleteOptions) error {
 	return c.client.Delete().
 		Namespace(c.ns).
 		Resource("meteringconfigs").
 		Name(name).
-		Body(options).
-		Do().
+		Body(&opts).
+		Do(ctx).
 		Error()
 }
 
 // DeleteCollection deletes a collection of objects.
-func (c *meteringConfigs) DeleteCollection(options *metav1.DeleteOptions, listOptions metav1.ListOptions) error {
+func (c *meteringConfigs) DeleteCollection(ctx context.Context, opts metav1.DeleteOptions, listOpts metav1.ListOptions) error {
 	var timeout time.Duration
-	if listOptions.TimeoutSeconds != nil {
-		timeout = time.Duration(*listOptions.TimeoutSeconds) * time.Second
+	if listOpts.TimeoutSeconds != nil {
+		timeout = time.Duration(*listOpts.TimeoutSeconds) * time.Second
 	}
 	return c.client.Delete().
 		Namespace(c.ns).
 		Resource("meteringconfigs").
-		VersionedParams(&listOptions, scheme.ParameterCodec).
+		VersionedParams(&listOpts, scheme.ParameterCodec).
 		Timeout(timeout).
-		Body(options).
-		Do().
+		Body(&opts).
+		Do(ctx).
 		Error()
 }
 
 // Patch applies the patch and returns the patched meteringConfig.
-func (c *meteringConfigs) Patch(name string, pt types.PatchType, data []byte, subresources ...string) (result *v1.MeteringConfig, err error) {
+func (c *meteringConfigs) Patch(ctx context.Context, name string, pt types.PatchType, data []byte, opts metav1.PatchOptions, subresources ...string) (result *v1.MeteringConfig, err error) {
 	result = &v1.MeteringConfig{}
 	err = c.client.Patch(pt).
 		Namespace(c.ns).
 		Resource("meteringconfigs").
-		SubResource(subresources...).
 		Name(name).
+		SubResource(subresources...).
+		VersionedParams(&opts, scheme.ParameterCodec).
 		Body(data).
-		Do().
+		Do(ctx).
 		Into(result)
 	return
 }

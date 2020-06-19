@@ -1,6 +1,7 @@
 package deploy
 
 import (
+	"context"
 	"fmt"
 
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
@@ -8,7 +9,7 @@ import (
 )
 
 func (deploy *Deployer) uninstallNamespace() error {
-	err := deploy.client.CoreV1().Namespaces().Delete(deploy.config.Namespace, &metav1.DeleteOptions{})
+	err := deploy.client.CoreV1().Namespaces().Delete(context.TODO(), deploy.config.Namespace, metav1.DeleteOptions{})
 	if apierrors.IsNotFound(err) {
 		deploy.logger.Warnf("The %s namespace doesn't exist", deploy.config.Namespace)
 	} else if err == nil {
@@ -21,7 +22,7 @@ func (deploy *Deployer) uninstallNamespace() error {
 }
 
 func (deploy *Deployer) uninstallMeteringConfig() error {
-	err := deploy.meteringClient.MeteringConfigs(deploy.config.Namespace).Delete(deploy.config.MeteringConfig.Name, &metav1.DeleteOptions{})
+	err := deploy.meteringClient.MeteringConfigs(deploy.config.Namespace).Delete(context.TODO(), deploy.config.MeteringConfig.Name, metav1.DeleteOptions{})
 	if apierrors.IsNotFound(err) {
 		deploy.logger.Warnf("The MeteringConfig resource doesn't exist")
 	} else if err == nil {
@@ -34,11 +35,11 @@ func (deploy *Deployer) uninstallMeteringConfig() error {
 }
 
 func (deploy *Deployer) uninstallMeteringOperatorGroup() error {
-	opgrp, err := deploy.olmV1Client.OperatorGroups(deploy.config.Namespace).Get(deploy.config.Namespace, metav1.GetOptions{})
+	opgrp, err := deploy.olmV1Client.OperatorGroups(deploy.config.Namespace).Get(context.TODO(), deploy.config.Namespace, metav1.GetOptions{})
 	if apierrors.IsNotFound(err) {
 		deploy.logger.Warnf("The metering OperatorGroup resource does not exist")
 	} else if err == nil {
-		err := deploy.olmV1Client.OperatorGroups(deploy.config.Namespace).Delete(opgrp.Name, &metav1.DeleteOptions{})
+		err := deploy.olmV1Client.OperatorGroups(deploy.config.Namespace).Delete(context.TODO(), opgrp.Name, metav1.DeleteOptions{})
 		if err != nil {
 			return fmt.Errorf("failed to delete the metering OperatorGroup resource: %v", err)
 		}
@@ -51,11 +52,11 @@ func (deploy *Deployer) uninstallMeteringOperatorGroup() error {
 }
 
 func (deploy *Deployer) uninstallMeteringSubscription() error {
-	sub, err := deploy.olmV1Alpha1Client.Subscriptions(deploy.config.Namespace).Get("metering-ocp", metav1.GetOptions{})
+	sub, err := deploy.olmV1Alpha1Client.Subscriptions(deploy.config.Namespace).Get(context.TODO(), "metering-ocp", metav1.GetOptions{})
 	if apierrors.IsNotFound(err) {
 		deploy.logger.Warnf("The metering Subscription does not exist")
 	} else if err == nil {
-		err := deploy.olmV1Alpha1Client.Subscriptions(deploy.config.Namespace).Delete(sub.Name, &metav1.DeleteOptions{})
+		err := deploy.olmV1Alpha1Client.Subscriptions(deploy.config.Namespace).Delete(context.TODO(), sub.Name, metav1.DeleteOptions{})
 		if err != nil {
 			return fmt.Errorf("failed to delete the metering Subscription: %v", err)
 		}
@@ -72,7 +73,7 @@ func (deploy *Deployer) uninstallMeteringCSV() error {
 	// what the CSV's name is beforehand without exposing more configurable flags.
 	// in the case where the subscription resource does not already exist, exit early
 	// and hope that the user is re-running the olm-uninstall command.
-	sub, err := deploy.olmV1Alpha1Client.Subscriptions(deploy.config.Namespace).Get(deploy.config.SubscriptionName, metav1.GetOptions{})
+	sub, err := deploy.olmV1Alpha1Client.Subscriptions(deploy.config.Namespace).Get(context.TODO(), deploy.config.SubscriptionName, metav1.GetOptions{})
 	if apierrors.IsNotFound(err) {
 		return nil
 	} else if err != nil {
@@ -85,11 +86,11 @@ func (deploy *Deployer) uninstallMeteringCSV() error {
 	csvName := sub.Status.CurrentCSV
 	deploy.logger.Infof("Found existing metering subscription, attempting to delete the %s CSV", csvName)
 
-	csv, err := deploy.olmV1Alpha1Client.ClusterServiceVersions(deploy.config.Namespace).Get(csvName, metav1.GetOptions{})
+	csv, err := deploy.olmV1Alpha1Client.ClusterServiceVersions(deploy.config.Namespace).Get(context.TODO(), csvName, metav1.GetOptions{})
 	if apierrors.IsNotFound(err) {
 		deploy.logger.Warnf("The metering CSV does not exist")
 	} else if err == nil {
-		err := deploy.olmV1Alpha1Client.ClusterServiceVersions(deploy.config.Namespace).Delete(csv.Name, &metav1.DeleteOptions{})
+		err := deploy.olmV1Alpha1Client.ClusterServiceVersions(deploy.config.Namespace).Delete(context.TODO(), csv.Name, metav1.DeleteOptions{})
 		if err != nil {
 			return fmt.Errorf("failed to delete the metering Subscription: %v", err)
 		}
@@ -152,7 +153,7 @@ func (deploy *Deployer) uninstallMeteringResources() error {
 // pods in the $METERING_NAMESPACE namespace, and attempts to delete all the PVCs that match that list criteria
 func (deploy *Deployer) uninstallMeteringPVCs() error {
 	// Attempt to get a list of PVCs that match the hdfs or hive labels
-	pvcs, err := deploy.client.CoreV1().PersistentVolumeClaims(deploy.config.Namespace).List(metav1.ListOptions{
+	pvcs, err := deploy.client.CoreV1().PersistentVolumeClaims(deploy.config.Namespace).List(context.TODO(), metav1.ListOptions{
 		LabelSelector: "app in (hdfs,hive-metastore)",
 	})
 	if err != nil {
@@ -165,7 +166,7 @@ func (deploy *Deployer) uninstallMeteringPVCs() error {
 	}
 
 	for _, pvc := range pvcs.Items {
-		err = deploy.client.CoreV1().PersistentVolumeClaims(deploy.config.Namespace).Delete(pvc.Name, &metav1.DeleteOptions{})
+		err = deploy.client.CoreV1().PersistentVolumeClaims(deploy.config.Namespace).Delete(context.TODO(), pvc.Name, metav1.DeleteOptions{})
 		if err != nil {
 			return fmt.Errorf("failed to delete the %s PVC: %v", pvc.Name, err)
 		}
@@ -177,7 +178,7 @@ func (deploy *Deployer) uninstallMeteringPVCs() error {
 }
 
 func (deploy *Deployer) uninstallMeteringDeployment() error {
-	err := deploy.client.AppsV1().Deployments(deploy.config.Namespace).Delete(deploy.config.OperatorResources.Deployment.Name, &metav1.DeleteOptions{})
+	err := deploy.client.AppsV1().Deployments(deploy.config.Namespace).Delete(context.TODO(), deploy.config.OperatorResources.Deployment.Name, metav1.DeleteOptions{})
 	if apierrors.IsNotFound(err) {
 		deploy.logger.Warnf("The metering deployment doesn't exist")
 	} else if err == nil {
@@ -190,7 +191,7 @@ func (deploy *Deployer) uninstallMeteringDeployment() error {
 }
 
 func (deploy *Deployer) uninstallMeteringServiceAccount() error {
-	err := deploy.client.CoreV1().ServiceAccounts(deploy.config.Namespace).Delete(deploy.config.OperatorResources.ServiceAccount.Name, &metav1.DeleteOptions{})
+	err := deploy.client.CoreV1().ServiceAccounts(deploy.config.Namespace).Delete(context.TODO(), deploy.config.OperatorResources.ServiceAccount.Name, metav1.DeleteOptions{})
 	if apierrors.IsNotFound(err) {
 		deploy.logger.Warnf("The metering service account doesn't exist")
 	} else if err == nil {
@@ -213,7 +214,7 @@ func (deploy *Deployer) uninstallMeteringRoleBinding() error {
 		res.Subjects[index].Namespace = deploy.config.Namespace
 	}
 
-	err := deploy.client.RbacV1().RoleBindings(deploy.config.Namespace).Delete(res.Name, &metav1.DeleteOptions{})
+	err := deploy.client.RbacV1().RoleBindings(deploy.config.Namespace).Delete(context.TODO(), res.Name, metav1.DeleteOptions{})
 	if apierrors.IsNotFound(err) {
 		deploy.logger.Warnf("The metering role binding doesn't exist")
 	} else if err == nil {
@@ -231,7 +232,7 @@ func (deploy *Deployer) uninstallMeteringRole() error {
 	res.Name = deploy.config.Namespace + "-" + res.Name
 	res.Namespace = deploy.config.Namespace
 
-	err := deploy.client.RbacV1().Roles(deploy.config.Namespace).Delete(res.Name, &metav1.DeleteOptions{})
+	err := deploy.client.RbacV1().Roles(deploy.config.Namespace).Delete(context.TODO(), res.Name, metav1.DeleteOptions{})
 	if apierrors.IsNotFound(err) {
 		deploy.logger.Warnf("The metering role doesn't exist")
 	} else if err == nil {
@@ -248,7 +249,7 @@ func (deploy *Deployer) uninstallMeteringClusterRole() error {
 
 	res.Name = deploy.config.Namespace + "-" + res.Name
 
-	err := deploy.client.RbacV1().ClusterRoles().Delete(res.Name, &metav1.DeleteOptions{})
+	err := deploy.client.RbacV1().ClusterRoles().Delete(context.TODO(), res.Name, metav1.DeleteOptions{})
 	if apierrors.IsNotFound(err) {
 		deploy.logger.Warnf("The metering cluster role doesn't exist")
 	} else if err == nil {
@@ -258,7 +259,7 @@ func (deploy *Deployer) uninstallMeteringClusterRole() error {
 	}
 
 	// attempt to delete any of the clusterroles the reporting-operator creates
-	err = deploy.client.RbacV1().ClusterRoles().DeleteCollection(&metav1.DeleteOptions{}, metav1.ListOptions{
+	err = deploy.client.RbacV1().ClusterRoles().DeleteCollection(context.TODO(), metav1.DeleteOptions{}, metav1.ListOptions{
 		LabelSelector: "app=reporting-operator",
 	})
 	if err != nil {
@@ -279,7 +280,7 @@ func (deploy *Deployer) uninstallMeteringClusterRoleBinding() error {
 		res.Subjects[index].Namespace = deploy.config.Namespace
 	}
 
-	err := deploy.client.RbacV1().ClusterRoleBindings().Delete(res.Name, &metav1.DeleteOptions{})
+	err := deploy.client.RbacV1().ClusterRoleBindings().Delete(context.TODO(), res.Name, metav1.DeleteOptions{})
 	if apierrors.IsNotFound(err) {
 		deploy.logger.Warnf("The metering cluster role binding doesn't exist")
 	} else if err == nil {
@@ -289,7 +290,7 @@ func (deploy *Deployer) uninstallMeteringClusterRoleBinding() error {
 	}
 
 	// attempt to delete any of the clusterrolebindings the reporting-operator creates
-	err = deploy.client.RbacV1().ClusterRoleBindings().DeleteCollection(&metav1.DeleteOptions{}, metav1.ListOptions{
+	err = deploy.client.RbacV1().ClusterRoleBindings().DeleteCollection(context.TODO(), metav1.DeleteOptions{}, metav1.ListOptions{
 		LabelSelector: "app=reporting-operator",
 	})
 	if err != nil {
@@ -312,7 +313,7 @@ func (deploy *Deployer) uninstallMeteringCRDs() error {
 }
 
 func (deploy *Deployer) uninstallMeteringCRD(resource CRD) error {
-	err := deploy.apiExtClient.CustomResourceDefinitions().Delete(resource.Name, &metav1.DeleteOptions{})
+	err := deploy.apiExtClient.CustomResourceDefinitions().Delete(context.TODO(), resource.Name, metav1.DeleteOptions{})
 	if apierrors.IsNotFound(err) {
 		deploy.logger.Warnf("The %s CRD doesn't exist", resource.Name)
 	} else if err == nil {

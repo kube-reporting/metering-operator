@@ -3,6 +3,7 @@
 package v1
 
 import (
+	"context"
 	time "time"
 
 	meteringv1 "github.com/kube-reporting/metering-operator/pkg/apis/metering/v1"
@@ -45,13 +46,13 @@ func NewFilteredReportInformer(client versioned.Interface, namespace string, res
 				if tweakListOptions != nil {
 					tweakListOptions(&options)
 				}
-				return client.MeteringV1().Reports(namespace).List(options)
+				return client.MeteringV1().Reports(namespace).List(context.TODO(), options)
 			},
 			WatchFunc: func(options metav1.ListOptions) (watch.Interface, error) {
 				if tweakListOptions != nil {
 					tweakListOptions(&options)
 				}
-				return client.MeteringV1().Reports(namespace).Watch(options)
+				return client.MeteringV1().Reports(namespace).Watch(context.TODO(), options)
 			},
 		},
 		&meteringv1.Report{},

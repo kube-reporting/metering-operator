@@ -1,6 +1,7 @@
 package operator
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"strings"
@@ -150,7 +151,7 @@ func (op *Reporting) handleHiveTable(logger log.FieldLogger, hiveTable *metering
 		hiveTable.Status.TableProperties = hiveTable.Spec.TableProperties
 		hiveTable.Status.External = hiveTable.Spec.External
 		hiveTable.Status.Partitions = hiveTable.Spec.Partitions
-		hiveTable, err = op.meteringClient.MeteringV1().HiveTables(hiveTable.Namespace).Update(hiveTable)
+		hiveTable, err = op.meteringClient.MeteringV1().HiveTables(hiveTable.Namespace).Update(context.TODO(), hiveTable, metav1.UpdateOptions{})
 		if err != nil {
 			return err
 		}
@@ -183,7 +184,7 @@ func (op *Reporting) handleHiveTable(logger log.FieldLogger, hiveTable *metering
 				Columns:   prestoColumns,
 			},
 		}
-		prestoTable, err = op.meteringClient.MeteringV1().PrestoTables(hiveTable.Namespace).Create(prestoTable)
+		prestoTable, err = op.meteringClient.MeteringV1().PrestoTables(hiveTable.Namespace).Create(context.TODO(), prestoTable, metav1.CreateOptions{})
 		if err != nil {
 			if apierrors.IsAlreadyExists(err) && prestoTable.Status.TableName != "" {
 				logger.Infof("PrestoTable %s already exists", prestoTable.Name)
@@ -264,7 +265,7 @@ func (op *Reporting) handleHiveTable(logger log.FieldLogger, hiveTable *metering
 
 		hiveTable.Status.Partitions = desiredPartitions
 		var err error
-		_, err = op.meteringClient.MeteringV1().HiveTables(hiveTable.Namespace).Update(hiveTable)
+		_, err = op.meteringClient.MeteringV1().HiveTables(hiveTable.Namespace).Update(context.TODO(), hiveTable, metav1.UpdateOptions{})
 		if err != nil {
 			return err
 		}
@@ -276,7 +277,7 @@ func (op *Reporting) handleHiveTable(logger log.FieldLogger, hiveTable *metering
 
 func (op *Reporting) addHiveTableFinalizer(hiveTable *metering.HiveTable) (*metering.HiveTable, error) {
 	hiveTable.Finalizers = append(hiveTable.Finalizers, hiveTableFinalizer)
-	newHiveTable, err := op.meteringClient.MeteringV1().HiveTables(hiveTable.Namespace).Update(hiveTable)
+	newHiveTable, err := op.meteringClient.MeteringV1().HiveTables(hiveTable.Namespace).Update(context.TODO(), hiveTable, metav1.UpdateOptions{})
 	logger := op.logger.WithFields(log.Fields{"hiveTable": hiveTable.Name, "namespace": hiveTable.Namespace})
 	if err != nil {
 		logger.WithError(err).Errorf("error adding %s finalizer to HiveTable: %s/%s", hiveTableFinalizer, hiveTable.Namespace, hiveTable.Name)
@@ -292,7 +293,7 @@ func (op *Reporting) removeHiveTableFinalizer(hiveTable *metering.HiveTable) (*m
 	}
 	hiveTable.Finalizers = slice.RemoveString(hiveTable.Finalizers, hiveTableFinalizer, nil)
 	logger := op.logger.WithFields(log.Fields{"hiveTable": hiveTable.Name, "namespace": hiveTable.Namespace})
-	newHiveTable, err := op.meteringClient.MeteringV1().HiveTables(hiveTable.Namespace).Update(hiveTable)
+	newHiveTable, err := op.meteringClient.MeteringV1().HiveTables(hiveTable.Namespace).Update(context.TODO(), hiveTable, metav1.UpdateOptions{})
 	if err != nil {
 		logger.WithError(err).Errorf("error removing %s finalizer from HiveTable: %s/%s", hiveTableFinalizer, hiveTable.Namespace, hiveTable.Name)
 		return nil, err
@@ -363,7 +364,7 @@ func (op *Reporting) createHiveTableCR(obj metav1.Object, gvk schema.GroupVersio
 		},
 	}
 	var err error
-	hiveTable, err := op.meteringClient.MeteringV1().HiveTables(namespace).Create(newHiveTable)
+	hiveTable, err := op.meteringClient.MeteringV1().HiveTables(namespace).Create(context.TODO(), newHiveTable, metav1.CreateOptions{})
 	switch {
 	case apierrors.IsAlreadyExists(err):
 		op.logger.Warnf("HiveTable %s already exists", resourceName)
@@ -381,7 +382,7 @@ func (op *Reporting) waitForHiveTable(namespace, name string, pollInterval, time
 	var hiveTable *metering.HiveTable
 	err := wait.Poll(pollInterval, timeout, func() (bool, error) {
 		var err error
-		hiveTable, err = op.meteringClient.MeteringV1().HiveTables(namespace).Get(name, metav1.GetOptions{})
+		hiveTable, err = op.meteringClient.MeteringV1().HiveTables(namespace).Get(context.TODO(), name, metav1.GetOptions{})
 		if apierrors.IsNotFound(err) {
 			return false, nil
 		}
