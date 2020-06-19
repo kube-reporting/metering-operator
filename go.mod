@@ -20,9 +20,9 @@ require (
 	github.com/prometheus/common v0.7.0
 	github.com/robfig/cron v1.1.0
 	github.com/sirupsen/logrus v1.4.2
-	github.com/spf13/cobra v0.0.5
+	github.com/spf13/cobra v0.0.6
 	github.com/spf13/pflag v1.0.5
-	github.com/stretchr/testify v1.4.0
+	github.com/stretchr/testify v1.5.1
 	github.com/taozle/go-hive-driver v0.0.0-20181206100408-79951111cb07
 	golang.org/x/net v0.0.0-20200324143707-d3edc9973b7e // indirect
 	golang.org/x/sync v0.0.0-20190911185100-cd5d95a43a6e
@@ -34,11 +34,11 @@ require (
 	github.com/go-openapi/swag v0.19.8 // indirect
 	github.com/json-iterator/go v1.1.9 // indirect
 	github.com/mailru/easyjson v0.7.1 // indirect
-	github.com/onsi/gomega v1.9.0 // indirect
+	github.com/operator-framework/api v0.3.7
 	github.com/operator-framework/operator-lifecycle-manager v0.0.0-20191115003340-16619cd27fa5
 	golang.org/x/tools v0.0.0-20200331202046-9d5940d49312 // indirect
 	k8s.io/api v0.18.3
-	k8s.io/apiextensions-apiserver v0.0.0
+	k8s.io/apiextensions-apiserver v0.18.2
 	k8s.io/apimachinery v0.18.3
 	k8s.io/client-go v8.0.0+incompatible
 	k8s.io/code-generator v0.18.3
