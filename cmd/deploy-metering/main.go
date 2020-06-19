@@ -11,7 +11,7 @@ import (
 	meteringclient "github.com/kube-reporting/metering-operator/pkg/generated/clientset/versioned/typed/metering/v1"
 	olmclientv1 "github.com/operator-framework/operator-lifecycle-manager/pkg/api/client/clientset/versioned/typed/operators/v1"
 	olmclientv1alpha1 "github.com/operator-framework/operator-lifecycle-manager/pkg/api/client/clientset/versioned/typed/operators/v1alpha1"
-	apiextclientv1beta1 "k8s.io/apiextensions-apiserver/pkg/client/clientset/clientset/typed/apiextensions/v1beta1"
+	apiextclientv1 "k8s.io/apiextensions-apiserver/pkg/client/clientset/clientset/typed/apiextensions/v1"
 
 	"k8s.io/client-go/kubernetes"
 	_ "k8s.io/client-go/plugin/pkg/client/auth"
@@ -148,7 +148,7 @@ func runDeployMetering(cmd *cobra.Command, args []string) error {
 		return fmt.Errorf("failed to initialize the kubernetes clientset: %v", err)
 	}
 
-	apiextClient, err := apiextclientv1beta1.NewForConfig(restconfig)
+	apiextClient, err := apiextclientv1.NewForConfig(restconfig)
 	if err != nil {
 		return fmt.Errorf("failed to initialize the apiextensions clientset: %v", err)
 	}

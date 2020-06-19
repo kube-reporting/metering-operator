@@ -57,8 +57,8 @@ type HiveTableSpec struct {
 
 type HiveTableStatus struct {
 	DatabaseName  string        `json:"databaseName,omitempty"`
-	TableName     string        `json:"tableName"`
-	Columns       []hive.Column `json:"columns"`
+	TableName     string        `json:"tableName,omitempty"`
+	Columns       []hive.Column `json:"columns,omitempty"`
 	PartitionedBy []hive.Column `json:"partitionedBy,omitempty"`
 	ClusteredBy   []string      `json:"clusteredBy,omitempty"`
 	SortedBy      []SortColumn  `json:"sortedBy,omitempty"`
@@ -70,5 +70,5 @@ type HiveTableStatus struct {
 	TableProperties map[string]string `json:"tableProperties,omitempty"`
 	External        bool              `json:"external,omitempty"`
 
-	Partitions []HiveTablePartition `json:"partitions"`
+	Partitions []HiveTablePartition `json:"partitions,omitempty"`
 }

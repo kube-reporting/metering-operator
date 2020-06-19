@@ -6,7 +6,7 @@ import (
 	"path/filepath"
 	"strings"
 
-	apiextv1beta1 "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1beta1"
+	apiextv1 "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1"
 	"k8s.io/apimachinery/pkg/util/yaml"
 )
 
@@ -36,37 +36,37 @@ func InitMeteringCRDSlice(manifestDir string, pathToCRDMap map[string]string) []
 	crds = append(crds, CRD{
 		Name: "hivetables.metering.openshift.io",
 		Path: filepath.Join(manifestDir, pathToCRDMap["hiveTable"]),
-		CRD:  new(apiextv1beta1.CustomResourceDefinition),
+		CRD:  new(apiextv1.CustomResourceDefinition),
 	})
 	crds = append(crds, CRD{
 		Name: "prestotables.metering.openshift.io",
 		Path: filepath.Join(manifestDir, pathToCRDMap["prestoTable"]),
-		CRD:  new(apiextv1beta1.CustomResourceDefinition),
+		CRD:  new(apiextv1.CustomResourceDefinition),
 	})
 	crds = append(crds, CRD{
 		Name: "storagelocations.metering.openshift.io",
 		Path: filepath.Join(manifestDir, pathToCRDMap["storageLocation"]),
-		CRD:  new(apiextv1beta1.CustomResourceDefinition),
+		CRD:  new(apiextv1.CustomResourceDefinition),
 	})
 	crds = append(crds, CRD{
 		Name: "reports.metering.openshift.io",
 		Path: filepath.Join(manifestDir, pathToCRDMap["report"]),
-		CRD:  new(apiextv1beta1.CustomResourceDefinition),
+		CRD:  new(apiextv1.CustomResourceDefinition),
 	})
 	crds = append(crds, CRD{
 		Name: "reportqueries.metering.openshift.io",
 		Path: filepath.Join(manifestDir, pathToCRDMap["reportQuery"]),
-		CRD:  new(apiextv1beta1.CustomResourceDefinition),
+		CRD:  new(apiextv1.CustomResourceDefinition),
 	})
 	crds = append(crds, CRD{
 		Name: "reportdatasources.metering.openshift.io",
 		Path: filepath.Join(manifestDir, pathToCRDMap["reportDataSource"]),
-		CRD:  new(apiextv1beta1.CustomResourceDefinition),
+		CRD:  new(apiextv1.CustomResourceDefinition),
 	})
 	crds = append(crds, CRD{
 		Name: "meteringconfigs.metering.openshift.io",
 		Path: filepath.Join(manifestDir, pathToCRDMap["meteringConfig"]),
-		CRD:  new(apiextv1beta1.CustomResourceDefinition),
+		CRD:  new(apiextv1.CustomResourceDefinition),
 	})
 
 	return crds

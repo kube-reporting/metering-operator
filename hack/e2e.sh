@@ -59,7 +59,6 @@ set -x
 echo "Running E2E Tests"
 
 go test \
-    -mod=vendor \
     -test.short="${METERING_SHORT_TESTS}" \
     -test.v \
     -parallel 10 \

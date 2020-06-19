@@ -10,7 +10,7 @@ import (
 	olmclientv1 "github.com/operator-framework/operator-lifecycle-manager/pkg/api/client/clientset/versioned/typed/operators/v1"
 	olmclientv1alpha1 "github.com/operator-framework/operator-lifecycle-manager/pkg/api/client/clientset/versioned/typed/operators/v1alpha1"
 	"github.com/sirupsen/logrus"
-	apiextclientv1beta1 "k8s.io/apiextensions-apiserver/pkg/client/clientset/clientset/typed/apiextensions/v1beta1"
+	apiextclientv1 "k8s.io/apiextensions-apiserver/pkg/client/clientset/clientset/typed/apiextensions/v1"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/rest"
 
@@ -66,7 +66,7 @@ type DeployerCtx struct {
 	Logger                    logrus.FieldLogger
 	Config                    *rest.Config
 	Client                    kubernetes.Interface
-	APIExtClient              apiextclientv1beta1.CustomResourceDefinitionsGetter
+	APIExtClient              apiextclientv1.CustomResourceDefinitionsGetter
 	MeteringClient            meteringclient.MeteringV1Interface
 	OLMV1Client               olmclientv1.OperatorsV1Interface
 	OLMV1Alpha1Client         olmclientv1alpha1.OperatorsV1alpha1Interface

@@ -6,6 +6,8 @@
 - [#1224](https://github.com/kube-reporting/metering-operator/pull/1224) Improve performance of the metering-ansible-operator by "finalizing" the `meteringconfig_spec_overrides` dictionary.
 - [#1226](https://github.com/kube-reporting/metering-operator/pull/1226) Re-generate assets and YAML manifests to point to the 4.6 images.
 - [#1245](https://github.com/kube-reporting/metering-operator/pull/1245) Consolidate Hive Metastore configurable fields. You no longer need to specify `spec.hive.spec.metastore.storage.create: false` when using a non-default database for Hive Metastore.
+- [#1253](https://github.com/kube-reporting/metering-operator/pull/1253) Bumped the Metering-related CRD versioning from v1beta1 to v1. The minimum kubernetes version in the Metering CSV manifest is now set to 1.18.
+- [#1264](https://github.com/kube-reporting/metering-operator/pull/1264) Bumped the Kubernetes-related dependencies to 1.18.x.
 
 ### Bug Fixes
 
