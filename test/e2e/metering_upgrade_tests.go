@@ -2,6 +2,7 @@ package e2e
 
 import (
 	"fmt"
+	"github.com/kube-reporting/metering-operator/test/deployframework"
 	"os"
 	"path/filepath"
 	"strings"
@@ -29,6 +30,7 @@ func testManualOLMUpgradeInstall(
 	purgeReports,
 	purgeReportDataSources bool,
 	testInstallFunction InstallTestCase,
+	df *deployframework.DeployFramework,
 ) {
 	// create a directory used to store the @testCaseName container and resource logs
 	testCaseOutputBaseDir := filepath.Join(testOutputPath, testCaseName)

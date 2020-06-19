@@ -15,8 +15,6 @@ import (
 )
 
 var (
-	df *deployframework.DeployFramework
-
 	kubeConfig    string
 	logLevel      string
 	runTestsLocal bool
@@ -38,6 +36,8 @@ var (
 	postUpgradeTestDirName          = "post-upgrade"
 	gatherTestArtifactsScript       = "gather-test-install-artifacts.sh"
 	testMeteringConfigManifestsPath = "/test/e2e/testdata/meteringconfigs/"
+
+	logger logrus.FieldLogger
 )
 
 type InstallTestCase struct {
@@ -73,15 +73,10 @@ func TestMain(m *testing.M) {
 	flag.StringVar(&testOutputPath, "test-output-path", "", "The absolute/relative path that you want to store test logs within.")
 	flag.Parse()
 
-	logger := testhelpers.SetupLogger(logLevel)
+	logger = testhelpers.SetupLogger(logLevel)
 
 	if len(namespacePrefix) > namespacePrefixCharLimit {
 		logger.Fatalf("Error: the --namespace-prefix exceeds the limit of %d characters", namespacePrefixCharLimit)
-	}
-
-	var err error
-	if df, err = deployframework.New(logger, runTestsLocal, runDevSetup, namespacePrefix, repoPath, repoVersion, kubeConfig); err != nil {
-		logger.Fatalf("Failed to create a new deploy framework: %v", err)
 	}
 
 	os.Exit(m.Run())
@@ -161,7 +156,6 @@ func TestManualMeteringInstall(t *testing.T) {
 	}
 
 	for _, testCase := range testInstallConfigs {
-		t := t
 		testCase := testCase
 
 		if testCase.Skip {
@@ -169,6 +163,14 @@ func TestManualMeteringInstall(t *testing.T) {
 		}
 
 		t.Run(testCase.Name, func(t *testing.T) {
+			t.Parallel()
+			var err error
+			var df *deployframework.DeployFramework
+
+			if df, err = deployframework.New(logger, runTestsLocal, runDevSetup, namespacePrefix, repoPath, repoVersion,
+				kubeConfig); err != nil {
+				logger.Fatalf("Failed to create a new deploy framework: %v", err)
+			}
 			testManualMeteringInstall(
 				t,
 				testCase.Name,
@@ -180,12 +182,14 @@ func TestManualMeteringInstall(t *testing.T) {
 				testCase.ExpectInstallErrMsg,
 				testCase.ExpectInstallErr,
 				testCase.InstallSubTest,
+				df,
 			)
 		})
 	}
 }
 
 func TestMeteringUpgrades(t *testing.T) {
+	t.Parallel()
 	tt := []struct {
 		Name                           string
 		MeteringOperatorImageRepo      string
@@ -230,6 +234,12 @@ func TestMeteringUpgrades(t *testing.T) {
 		}
 
 		t.Run(testCase.Name, func(t *testing.T) {
+			var err error
+			var df *deployframework.DeployFramework
+
+			if df, err = deployframework.New(logger, runTestsLocal, runDevSetup, namespacePrefix, repoPath, repoVersion, kubeConfig); err != nil {
+				logger.Fatalf("Failed to create a new deploy framework: %v", err)
+			}
 			testManualOLMUpgradeInstall(
 				t,
 				testCase.Name,
@@ -243,6 +253,7 @@ func TestMeteringUpgrades(t *testing.T) {
 				testCase.PurgeReports,
 				testCase.PurgeReportDataSources,
 				testCase.InstallSubTest,
+				df,
 			)
 		})
 	}
