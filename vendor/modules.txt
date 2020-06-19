@@ -153,7 +153,7 @@ github.com/matttproud/golang_protobuf_extensions/pbutil
 github.com/modern-go/concurrent
 # github.com/modern-go/reflect2 v1.0.1
 github.com/modern-go/reflect2
-# github.com/openshift/api v3.9.1-0.20190924102528-32369d4db2ad+incompatible
+# github.com/openshift/api v0.0.0-20200605231317-fb2a6ca106ae
 github.com/openshift/api/route/v1
 # github.com/openshift/client-go v0.0.0-20200608144219-584632b8fc73
 github.com/openshift/client-go/route/clientset/versioned/scheme
@@ -163,14 +163,11 @@ github.com/operator-framework/api/pkg/lib/version
 github.com/operator-framework/api/pkg/operators
 github.com/operator-framework/api/pkg/operators/v1
 github.com/operator-framework/api/pkg/operators/v1alpha1
-# github.com/operator-framework/operator-lifecycle-manager v0.0.0-20191115003340-16619cd27fa5
-github.com/operator-framework/operator-lifecycle-manager/pkg/api/apis/operators
-github.com/operator-framework/operator-lifecycle-manager/pkg/api/apis/operators/v1
-github.com/operator-framework/operator-lifecycle-manager/pkg/api/apis/operators/v1alpha1
+github.com/operator-framework/api/pkg/operators/v2alpha1
+# github.com/operator-framework/operator-lifecycle-manager v0.0.0-20200521062108-408ca95d458f
 github.com/operator-framework/operator-lifecycle-manager/pkg/api/client/clientset/versioned/scheme
 github.com/operator-framework/operator-lifecycle-manager/pkg/api/client/clientset/versioned/typed/operators/v1
 github.com/operator-framework/operator-lifecycle-manager/pkg/api/client/clientset/versioned/typed/operators/v1alpha1
-github.com/operator-framework/operator-lifecycle-manager/pkg/lib/version
 # github.com/pkg/errors v0.9.1
 github.com/pkg/errors
 # github.com/pmezard/go-difflib v1.0.0
@@ -196,7 +193,7 @@ github.com/prometheus/procfs/internal/util
 github.com/robfig/cron
 # github.com/sirupsen/logrus v1.4.2
 github.com/sirupsen/logrus
-# github.com/spf13/cobra v0.0.6
+# github.com/spf13/cobra v1.0.0
 github.com/spf13/cobra
 # github.com/spf13/pflag v1.0.5
 github.com/spf13/pflag
@@ -238,7 +235,7 @@ golang.org/x/text/transform
 golang.org/x/text/unicode/bidi
 golang.org/x/text/unicode/norm
 golang.org/x/text/width
-# golang.org/x/time v0.0.0-20190308202827-9d24e82272b4
+# golang.org/x/time v0.0.0-20191024005414-555d28b269f0
 golang.org/x/time/rate
 # golang.org/x/tools v0.0.0-20200331202046-9d5940d49312
 golang.org/x/tools/go/ast/astutil
@@ -501,6 +498,8 @@ k8s.io/utils/buffer
 k8s.io/utils/integer
 k8s.io/utils/pointer
 k8s.io/utils/trace
+# sigs.k8s.io/controller-runtime v0.6.0
+sigs.k8s.io/controller-runtime/pkg/scheme
 # sigs.k8s.io/structured-merge-diff/v3 v3.0.0
 sigs.k8s.io/structured-merge-diff/v3/value
 # sigs.k8s.io/yaml v1.2.0

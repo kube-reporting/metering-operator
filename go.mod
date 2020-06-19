@@ -20,7 +20,7 @@ require (
 	github.com/prometheus/common v0.7.0
 	github.com/robfig/cron v1.1.0
 	github.com/sirupsen/logrus v1.4.2
-	github.com/spf13/cobra v0.0.6
+	github.com/spf13/cobra v1.0.0
 	github.com/spf13/pflag v1.0.5
 	github.com/stretchr/testify v1.5.1
 	github.com/taozle/go-hive-driver v0.0.0-20181206100408-79951111cb07
@@ -35,7 +35,7 @@ require (
 	github.com/json-iterator/go v1.1.9 // indirect
 	github.com/mailru/easyjson v0.7.1 // indirect
 	github.com/operator-framework/api v0.3.7
-	github.com/operator-framework/operator-lifecycle-manager v0.0.0-20191115003340-16619cd27fa5
+	github.com/operator-framework/operator-lifecycle-manager v0.0.0-20200521062108-408ca95d458f
 	golang.org/x/tools v0.0.0-20200331202046-9d5940d49312 // indirect
 	k8s.io/api v0.18.3
 	k8s.io/apiextensions-apiserver v0.18.2
@@ -63,7 +63,6 @@ replace (
 	k8s.io/kube-controller-manager => k8s.io/kube-controller-manager v0.18.3
 	k8s.io/kube-proxy => k8s.io/kube-proxy v0.18.3
 	k8s.io/kube-scheduler => k8s.io/kube-scheduler v0.18.3
-	// Pin to kube 1.13 because of OLM
 	k8s.io/kubectl => k8s.io/kubectl v0.18.3
 	k8s.io/kubelet => k8s.io/kubelet v0.18.3
 	k8s.io/legacy-cloud-providers => k8s.io/legacy-cloud-providers v0.18.3
@@ -76,6 +75,7 @@ replace (
 
 replace (
 	git.apache.org/thrift.git v0.0.0-20171203172758-327ebb6c2b6d => github.com/apache/thrift v0.0.0-20171203172758-327ebb6c2b6d
+	github.com/Azure/go-autorest => github.com/Azure/go-autorest v13.3.2+incompatible // Required by OLM
 	// Required by Helm
 	github.com/docker/docker => github.com/moby/moby v0.7.3-0.20190826074503-38ab9da00309
 	github.com/prometheus/client_golang => github.com/prometheus/client_golang v0.9.0-pre1
