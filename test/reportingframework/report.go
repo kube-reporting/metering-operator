@@ -1,6 +1,7 @@
 package reportingframework
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
@@ -15,7 +16,7 @@ import (
 	"github.com/stretchr/testify/require"
 	v1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
-	meta "k8s.io/apimachinery/pkg/apis/meta/v1"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/util/wait"
 
 	metering "github.com/kube-reporting/metering-operator/pkg/apis/metering/v1"
@@ -23,24 +24,24 @@ import (
 )
 
 func (rf *ReportingFramework) CreateMeteringReport(report *metering.Report) error {
-	_, err := rf.MeteringClient.Reports(rf.Namespace).Create(report)
+	_, err := rf.MeteringClient.Reports(rf.Namespace).Create(context.TODO(), report, metav1.CreateOptions{})
 	return err
 }
 
 func (rf *ReportingFramework) GetMeteringReport(name string) (*metering.Report, error) {
-	return rf.MeteringClient.Reports(rf.Namespace).Get(name, meta.GetOptions{})
+	return rf.MeteringClient.Reports(rf.Namespace).Get(context.TODO(), name, metav1.GetOptions{})
 }
 
 func (rf *ReportingFramework) NewSimpleReport(name, queryName string, schedule *metering.ReportSchedule, reportingStart, reportingEnd *time.Time) *metering.Report {
-	var start, end *meta.Time
+	var start, end *metav1.Time
 	if reportingStart != nil {
-		start = &meta.Time{Time: *reportingStart}
+		start = &metav1.Time{Time: *reportingStart}
 	}
 	if reportingEnd != nil {
-		end = &meta.Time{Time: *reportingEnd}
+		end = &metav1.Time{Time: *reportingEnd}
 	}
 	return &metering.Report{
-		ObjectMeta: meta.ObjectMeta{
+		ObjectMeta: metav1.ObjectMeta{
 			Name:      name,
 			Namespace: rf.Namespace,
 		},
@@ -55,7 +56,7 @@ func (rf *ReportingFramework) NewSimpleReport(name, queryName string, schedule *
 
 func (rf *ReportingFramework) RequireReportSuccessfullyRuns(t *testing.T, report *metering.Report, waitTimeout time.Duration) {
 	t.Helper()
-	err := rf.MeteringClient.Reports(rf.Namespace).Delete(report.Name, nil)
+	err := rf.MeteringClient.Reports(rf.Namespace).Delete(context.TODO(), report.Name, metav1.DeleteOptions{})
 	assert.Condition(t, func() bool {
 		return err == nil || errors.IsNotFound(err)
 	}, "failed to ensure Report doesn't exist before creating")

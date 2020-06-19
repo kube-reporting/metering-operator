@@ -1,6 +1,7 @@
 package operator
 
 import (
+	"context"
 	"fmt"
 	"strings"
 	"time"
@@ -12,6 +13,7 @@ import (
 	"github.com/kube-reporting/metering-operator/pkg/aws"
 	"github.com/kube-reporting/metering-operator/pkg/hive"
 	"github.com/kube-reporting/metering-operator/pkg/operator/reportingutil"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
 const (
@@ -130,7 +132,7 @@ func (op *Reporting) updateAWSBillingPartitions(logger log.FieldLogger, dataSour
 		return err
 	}
 
-	_, err = op.meteringClient.MeteringV1().HiveTables(hiveTable.Namespace).Update(hiveTable)
+	_, err = op.meteringClient.MeteringV1().HiveTables(hiveTable.Namespace).Update(context.TODO(), hiveTable, metav1.UpdateOptions{})
 	if err != nil {
 		logger.WithError(err).Errorf("failed to update HiveTable %s partitions for ReportDataSource %s: %s", hiveTable.Name, dataSource.Name, err)
 		return err

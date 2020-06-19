@@ -3,6 +3,8 @@
 package fake
 
 import (
+	"context"
+
 	meteringv1 "github.com/kube-reporting/metering-operator/pkg/apis/metering/v1"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	labels "k8s.io/apimachinery/pkg/labels"
@@ -23,7 +25,7 @@ var reportsResource = schema.GroupVersionResource{Group: "metering.openshift.io"
 var reportsKind = schema.GroupVersionKind{Group: "metering.openshift.io", Version: "v1", Kind: "Report"}
 
 // Get takes name of the report, and returns the corresponding report object, and an error if there is any.
-func (c *FakeReports) Get(name string, options v1.GetOptions) (result *meteringv1.Report, err error) {
+func (c *FakeReports) Get(ctx context.Context, name string, options v1.GetOptions) (result *meteringv1.Report, err error) {
 	obj, err := c.Fake.
 		Invokes(testing.NewGetAction(reportsResource, c.ns, name), &meteringv1.Report{})
 
@@ -34,7 +36,7 @@ func (c *FakeReports) Get(name string, options v1.GetOptions) (result *meteringv
 }
 
 // List takes label and field selectors, and returns the list of Reports that match those selectors.
-func (c *FakeReports) List(opts v1.ListOptions) (result *meteringv1.ReportList, err error) {
+func (c *FakeReports) List(ctx context.Context, opts v1.ListOptions) (result *meteringv1.ReportList, err error) {
 	obj, err := c.Fake.
 		Invokes(testing.NewListAction(reportsResource, reportsKind, c.ns, opts), &meteringv1.ReportList{})
 
@@ -56,14 +58,14 @@ func (c *FakeReports) List(opts v1.ListOptions) (result *meteringv1.ReportList, 
 }
 
 // Watch returns a watch.Interface that watches the requested reports.
-func (c *FakeReports) Watch(opts v1.ListOptions) (watch.Interface, error) {
+func (c *FakeReports) Watch(ctx context.Context, opts v1.ListOptions) (watch.Interface, error) {
 	return c.Fake.
 		InvokesWatch(testing.NewWatchAction(reportsResource, c.ns, opts))
 
 }
 
 // Create takes the representation of a report and creates it.  Returns the server's representation of the report, and an error, if there is any.
-func (c *FakeReports) Create(report *meteringv1.Report) (result *meteringv1.Report, err error) {
+func (c *FakeReports) Create(ctx context.Context, report *meteringv1.Report, opts v1.CreateOptions) (result *meteringv1.Report, err error) {
 	obj, err := c.Fake.
 		Invokes(testing.NewCreateAction(reportsResource, c.ns, report), &meteringv1.Report{})
 
@@ -74,7 +76,7 @@ func (c *FakeReports) Create(report *meteringv1.Report) (result *meteringv1.Repo
 }
 
 // Update takes the representation of a report and updates it. Returns the server's representation of the report, and an error, if there is any.
-func (c *FakeReports) Update(report *meteringv1.Report) (result *meteringv1.Report, err error) {
+func (c *FakeReports) Update(ctx context.Context, report *meteringv1.Report, opts v1.UpdateOptions) (result *meteringv1.Report, err error) {
 	obj, err := c.Fake.
 		Invokes(testing.NewUpdateAction(reportsResource, c.ns, report), &meteringv1.Report{})
 
@@ -86,7 +88,7 @@ func (c *FakeReports) Update(report *meteringv1.Report) (result *meteringv1.Repo
 
 // UpdateStatus was generated because the type contains a Status member.
 // Add a +genclient:noStatus comment above the type to avoid generating UpdateStatus().
-func (c *FakeReports) UpdateStatus(report *meteringv1.Report) (*meteringv1.Report, error) {
+func (c *FakeReports) UpdateStatus(ctx context.Context, report *meteringv1.Report, opts v1.UpdateOptions) (*meteringv1.Report, error) {
 	obj, err := c.Fake.
 		Invokes(testing.NewUpdateSubresourceAction(reportsResource, "status", c.ns, report), &meteringv1.Report{})
 
@@ -97,7 +99,7 @@ func (c *FakeReports) UpdateStatus(report *meteringv1.Report) (*meteringv1.Repor
 }
 
 // Delete takes name of the report and deletes it. Returns an error if one occurs.
-func (c *FakeReports) Delete(name string, options *v1.DeleteOptions) error {
+func (c *FakeReports) Delete(ctx context.Context, name string, opts v1.DeleteOptions) error {
 	_, err := c.Fake.
 		Invokes(testing.NewDeleteAction(reportsResource, c.ns, name), &meteringv1.Report{})
 
@@ -105,15 +107,15 @@ func (c *FakeReports) Delete(name string, options *v1.DeleteOptions) error {
 }
 
 // DeleteCollection deletes a collection of objects.
-func (c *FakeReports) DeleteCollection(options *v1.DeleteOptions, listOptions v1.ListOptions) error {
-	action := testing.NewDeleteCollectionAction(reportsResource, c.ns, listOptions)
+func (c *FakeReports) DeleteCollection(ctx context.Context, opts v1.DeleteOptions, listOpts v1.ListOptions) error {
+	action := testing.NewDeleteCollectionAction(reportsResource, c.ns, listOpts)
 
 	_, err := c.Fake.Invokes(action, &meteringv1.ReportList{})
 	return err
 }
 
 // Patch applies the patch and returns the patched report.
-func (c *FakeReports) Patch(name string, pt types.PatchType, data []byte, subresources ...string) (result *meteringv1.Report, err error) {
+func (c *FakeReports) Patch(ctx context.Context, name string, pt types.PatchType, data []byte, opts v1.PatchOptions, subresources ...string) (result *meteringv1.Report, err error) {
 	obj, err := c.Fake.
 		Invokes(testing.NewPatchSubresourceAction(reportsResource, c.ns, name, pt, data, subresources...), &meteringv1.Report{})
 

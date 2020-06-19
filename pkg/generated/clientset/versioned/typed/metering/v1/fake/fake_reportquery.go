@@ -3,6 +3,8 @@
 package fake
 
 import (
+	"context"
+
 	meteringv1 "github.com/kube-reporting/metering-operator/pkg/apis/metering/v1"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	labels "k8s.io/apimachinery/pkg/labels"
@@ -23,7 +25,7 @@ var reportqueriesResource = schema.GroupVersionResource{Group: "metering.openshi
 var reportqueriesKind = schema.GroupVersionKind{Group: "metering.openshift.io", Version: "v1", Kind: "ReportQuery"}
 
 // Get takes name of the reportQuery, and returns the corresponding reportQuery object, and an error if there is any.
-func (c *FakeReportQueries) Get(name string, options v1.GetOptions) (result *meteringv1.ReportQuery, err error) {
+func (c *FakeReportQueries) Get(ctx context.Context, name string, options v1.GetOptions) (result *meteringv1.ReportQuery, err error) {
 	obj, err := c.Fake.
 		Invokes(testing.NewGetAction(reportqueriesResource, c.ns, name), &meteringv1.ReportQuery{})
 
@@ -34,7 +36,7 @@ func (c *FakeReportQueries) Get(name string, options v1.GetOptions) (result *met
 }
 
 // List takes label and field selectors, and returns the list of ReportQueries that match those selectors.
-func (c *FakeReportQueries) List(opts v1.ListOptions) (result *meteringv1.ReportQueryList, err error) {
+func (c *FakeReportQueries) List(ctx context.Context, opts v1.ListOptions) (result *meteringv1.ReportQueryList, err error) {
 	obj, err := c.Fake.
 		Invokes(testing.NewListAction(reportqueriesResource, reportqueriesKind, c.ns, opts), &meteringv1.ReportQueryList{})
 
@@ -56,14 +58,14 @@ func (c *FakeReportQueries) List(opts v1.ListOptions) (result *meteringv1.Report
 }
 
 // Watch returns a watch.Interface that watches the requested reportQueries.
-func (c *FakeReportQueries) Watch(opts v1.ListOptions) (watch.Interface, error) {
+func (c *FakeReportQueries) Watch(ctx context.Context, opts v1.ListOptions) (watch.Interface, error) {
 	return c.Fake.
 		InvokesWatch(testing.NewWatchAction(reportqueriesResource, c.ns, opts))
 
 }
 
 // Create takes the representation of a reportQuery and creates it.  Returns the server's representation of the reportQuery, and an error, if there is any.
-func (c *FakeReportQueries) Create(reportQuery *meteringv1.ReportQuery) (result *meteringv1.ReportQuery, err error) {
+func (c *FakeReportQueries) Create(ctx context.Context, reportQuery *meteringv1.ReportQuery, opts v1.CreateOptions) (result *meteringv1.ReportQuery, err error) {
 	obj, err := c.Fake.
 		Invokes(testing.NewCreateAction(reportqueriesResource, c.ns, reportQuery), &meteringv1.ReportQuery{})
 
@@ -74,7 +76,7 @@ func (c *FakeReportQueries) Create(reportQuery *meteringv1.ReportQuery) (result 
 }
 
 // Update takes the representation of a reportQuery and updates it. Returns the server's representation of the reportQuery, and an error, if there is any.
-func (c *FakeReportQueries) Update(reportQuery *meteringv1.ReportQuery) (result *meteringv1.ReportQuery, err error) {
+func (c *FakeReportQueries) Update(ctx context.Context, reportQuery *meteringv1.ReportQuery, opts v1.UpdateOptions) (result *meteringv1.ReportQuery, err error) {
 	obj, err := c.Fake.
 		Invokes(testing.NewUpdateAction(reportqueriesResource, c.ns, reportQuery), &meteringv1.ReportQuery{})
 
@@ -86,7 +88,7 @@ func (c *FakeReportQueries) Update(reportQuery *meteringv1.ReportQuery) (result 
 
 // UpdateStatus was generated because the type contains a Status member.
 // Add a +genclient:noStatus comment above the type to avoid generating UpdateStatus().
-func (c *FakeReportQueries) UpdateStatus(reportQuery *meteringv1.ReportQuery) (*meteringv1.ReportQuery, error) {
+func (c *FakeReportQueries) UpdateStatus(ctx context.Context, reportQuery *meteringv1.ReportQuery, opts v1.UpdateOptions) (*meteringv1.ReportQuery, error) {
 	obj, err := c.Fake.
 		Invokes(testing.NewUpdateSubresourceAction(reportqueriesResource, "status", c.ns, reportQuery), &meteringv1.ReportQuery{})
 
@@ -97,7 +99,7 @@ func (c *FakeReportQueries) UpdateStatus(reportQuery *meteringv1.ReportQuery) (*
 }
 
 // Delete takes name of the reportQuery and deletes it. Returns an error if one occurs.
-func (c *FakeReportQueries) Delete(name string, options *v1.DeleteOptions) error {
+func (c *FakeReportQueries) Delete(ctx context.Context, name string, opts v1.DeleteOptions) error {
 	_, err := c.Fake.
 		Invokes(testing.NewDeleteAction(reportqueriesResource, c.ns, name), &meteringv1.ReportQuery{})
 
@@ -105,15 +107,15 @@ func (c *FakeReportQueries) Delete(name string, options *v1.DeleteOptions) error
 }
 
 // DeleteCollection deletes a collection of objects.
-func (c *FakeReportQueries) DeleteCollection(options *v1.DeleteOptions, listOptions v1.ListOptions) error {
-	action := testing.NewDeleteCollectionAction(reportqueriesResource, c.ns, listOptions)
+func (c *FakeReportQueries) DeleteCollection(ctx context.Context, opts v1.DeleteOptions, listOpts v1.ListOptions) error {
+	action := testing.NewDeleteCollectionAction(reportqueriesResource, c.ns, listOpts)
 
 	_, err := c.Fake.Invokes(action, &meteringv1.ReportQueryList{})
 	return err
 }
 
 // Patch applies the patch and returns the patched reportQuery.
-func (c *FakeReportQueries) Patch(name string, pt types.PatchType, data []byte, subresources ...string) (result *meteringv1.ReportQuery, err error) {
+func (c *FakeReportQueries) Patch(ctx context.Context, name string, pt types.PatchType, data []byte, opts v1.PatchOptions, subresources ...string) (result *meteringv1.ReportQuery, err error) {
 	obj, err := c.Fake.
 		Invokes(testing.NewPatchSubresourceAction(reportqueriesResource, c.ns, name, pt, data, subresources...), &meteringv1.ReportQuery{})
 

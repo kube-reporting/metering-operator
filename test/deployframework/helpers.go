@@ -2,6 +2,7 @@ package deployframework
 
 import (
 	"bufio"
+	"context"
 	"fmt"
 	"net/http"
 	"net/url"
@@ -120,7 +121,7 @@ func (pw *PodWaiter) WaitForPods(namespace string, targetPodsCount int) error {
 		var readyPods []string
 		var unreadyPods []podStat
 
-		pods, err := pw.Client.CoreV1().Pods(namespace).List(meta.ListOptions{})
+		pods, err := pw.Client.CoreV1().Pods(namespace).List(context.TODO(), meta.ListOptions{})
 		if err != nil {
 			return false, err
 		}
@@ -160,7 +161,7 @@ func GetServiceAccountToken(client kubernetes.Interface, initialDelay, timeoutPe
 		err error
 	)
 	err = wait.Poll(initialDelay, timeoutPeriod, func() (done bool, err error) {
-		sa, err = client.CoreV1().ServiceAccounts(namespace).Get(serviceAccountName, meta.GetOptions{})
+		sa, err = client.CoreV1().ServiceAccounts(namespace).Get(context.TODO(), serviceAccountName, meta.GetOptions{})
 		if err != nil {
 			if apierrors.IsNotFound(err) {
 				return false, nil
@@ -189,7 +190,7 @@ func GetServiceAccountToken(client kubernetes.Interface, initialDelay, timeoutPe
 		return "", fmt.Errorf("%s service account has no token", serviceAccountName)
 	}
 
-	secret, err := client.CoreV1().Secrets(namespace).Get(secretName, meta.GetOptions{})
+	secret, err := client.CoreV1().Secrets(namespace).Get(context.TODO(), secretName, meta.GetOptions{})
 	if err != nil {
 		return "", fmt.Errorf("failed getting %s service account token secret: %v", serviceAccountName, err)
 	}
@@ -291,7 +292,7 @@ func CreateCatalogSource(logger logrus.FieldLogger, name, namespace, configMapNa
 	// check if the @name CatalogSource already exists and if true, exit early.
 	// If no CatalogSource exists by that name, start building up that object
 	// and attempt to create it through the OLM v1alpha1 client.
-	_, err := client.CatalogSources(namespace).Get(name, meta.GetOptions{})
+	_, err := client.CatalogSources(namespace).Get(context.TODO(), name, meta.GetOptions{})
 	if apierrors.IsNotFound(err) {
 		catsrc := &olmv1alpha1.CatalogSource{
 			ObjectMeta: meta.ObjectMeta{
@@ -305,7 +306,7 @@ func CreateCatalogSource(logger logrus.FieldLogger, name, namespace, configMapNa
 				Publisher:   "Red Hat",
 			},
 		}
-		_, err := client.CatalogSources(namespace).Create(catsrc)
+		_, err := client.CatalogSources(namespace).Create(context.TODO(), catsrc, meta.CreateOptions{})
 		if err != nil {
 			return fmt.Errorf("failed to create the %s CatalogSource for metering: %v", name, err)
 		}
@@ -325,7 +326,7 @@ func VerifyCatalogSourcePod(logger logrus.FieldLogger, client kubernetes.Interfa
 	// Continue polling until a single Pod is returned by that label selector query
 	// and that Pod is reporting a Ready stauts, or stop when the timeout period is reached.
 	err := wait.Poll(3*time.Second, 1*time.Minute, func() (done bool, err error) {
-		pods, err := client.CoreV1().Pods(namespace).List(meta.ListOptions{
+		pods, err := client.CoreV1().Pods(namespace).List(context.TODO(), meta.ListOptions{
 			LabelSelector: fmt.Sprintf("olm.catalogSource=%s", packageName),
 		})
 		if err != nil {
@@ -422,7 +423,7 @@ func CreateUpgradeConfigMap(logger logrus.FieldLogger, name, namespace, scriptPa
 // has been created in the @namespace namespace.
 func VerifyConfigMap(logger logrus.FieldLogger, client kubernetes.Interface, name, namespace string) error {
 	err := wait.Poll(1*time.Second, 45*time.Second, func() (done bool, err error) {
-		_, err = client.CoreV1().ConfigMaps(namespace).Get(name, meta.GetOptions{})
+		_, err = client.CoreV1().ConfigMaps(namespace).Get(context.TODO(), name, meta.GetOptions{})
 		if apierrors.IsNotFound(err) {
 			return false, nil
 		}
@@ -443,7 +444,7 @@ func VerifyConfigMap(logger logrus.FieldLogger, client kubernetes.Interface, nam
 // UpdateExistingSubscription is a helper function responsible for upgrading an existing metering-ocp Subscription
 // to use the newest payload and verify that the Subscription object is reporting a successful upgrade status.
 func UpdateExistingSubscription(logger logrus.FieldLogger, client olmclientv1alpha1.OperatorsV1alpha1Interface, name, upgradeChannel, namespace string) error {
-	sub, err := client.Subscriptions(namespace).Get(name, meta.GetOptions{})
+	sub, err := client.Subscriptions(namespace).Get(context.TODO(), name, meta.GetOptions{})
 	if apierrors.IsNotFound(err) {
 		return fmt.Errorf("the %s subscription does not exist", name)
 	}
@@ -456,7 +457,7 @@ func UpdateExistingSubscription(logger logrus.FieldLogger, client olmclientv1alp
 	sub.Spec.CatalogSource = name
 	sub.Spec.CatalogSourceNamespace = namespace
 	sub.Spec.Channel = upgradeChannel
-	_, err = client.Subscriptions(namespace).Update(sub)
+	_, err = client.Subscriptions(namespace).Update(context.TODO(), sub, meta.UpdateOptions{})
 	if err != nil {
 		return err
 	}
@@ -466,7 +467,7 @@ func UpdateExistingSubscription(logger logrus.FieldLogger, client olmclientv1alp
 	// wait until this object is reporting a successful upgrade state before
 	// transferring control back to the function call site.
 	err = wait.Poll(3*time.Second, 1*time.Minute, func() (done bool, err error) {
-		sub, err := client.Subscriptions(namespace).Get(name, meta.GetOptions{})
+		sub, err := client.Subscriptions(namespace).Get(context.TODO(), name, meta.GetOptions{})
 		if apierrors.IsNotFound(err) {
 			return false, nil
 		}
@@ -498,7 +499,7 @@ func UpdateExistingSubscription(logger logrus.FieldLogger, client olmclientv1alp
 // indicate a successful upgrade status.
 func WaitForMeteringOperatorDeployment(logger logrus.FieldLogger, client kubernetes.Interface, name, namespace string) error {
 	err := wait.Poll(10*time.Second, 10*time.Minute, func() (done bool, err error) {
-		deployment, err := client.AppsV1().Deployments(namespace).Get(name, meta.GetOptions{})
+		deployment, err := client.AppsV1().Deployments(namespace).Get(context.TODO(), name, meta.GetOptions{})
 		if apierrors.IsNotFound(err) {
 			return false, nil
 		}
@@ -525,7 +526,7 @@ func WaitForMeteringOperatorDeployment(logger logrus.FieldLogger, client kuberne
 // polling until there's a single replica.
 func WaitForReportingOperatorDeployment(logger logrus.FieldLogger, client kubernetes.Interface, name, namespace string) error {
 	err := wait.Poll(20*time.Second, 10*time.Minute, func() (done bool, err error) {
-		deployment, err := client.AppsV1().Deployments(namespace).Get(name, meta.GetOptions{})
+		deployment, err := client.AppsV1().Deployments(namespace).Get(context.TODO(), name, meta.GetOptions{})
 		if apierrors.IsNotFound(err) {
 			return false, nil
 		}
@@ -546,7 +547,7 @@ func WaitForReportingOperatorDeployment(logger logrus.FieldLogger, client kubern
 
 func WaitForReportDataSources(logger logrus.FieldLogger, client meteringclient.MeteringV1Interface, namespace string) error {
 	err := wait.Poll(10*time.Second, 5*time.Minute, func() (done bool, err error) {
-		dataSources, err := client.ReportDataSources(namespace).List(meta.ListOptions{})
+		dataSources, err := client.ReportDataSources(namespace).List(context.TODO(), meta.ListOptions{})
 		if err != nil {
 			return false, err
 		}
@@ -563,7 +564,7 @@ func WaitForReportDataSources(logger logrus.FieldLogger, client meteringclient.M
 }
 
 func DeleteAllTestReports(logger logrus.FieldLogger, client meteringclient.MeteringV1Interface, namespace string) error {
-	err := client.Reports(namespace).DeleteCollection(&meta.DeleteOptions{}, meta.ListOptions{})
+	err := client.Reports(namespace).DeleteCollection(context.TODO(), meta.DeleteOptions{}, meta.ListOptions{})
 	if err != nil {
 		return fmt.Errorf("failed to delete all the Reports in the %s namespace: %v", namespace, err)
 	}
@@ -573,7 +574,7 @@ func DeleteAllTestReports(logger logrus.FieldLogger, client meteringclient.Meter
 }
 
 func DeleteAllReportDataSources(logger logrus.FieldLogger, client meteringclient.MeteringV1Interface, namespace string) error {
-	err := client.ReportDataSources(namespace).DeleteCollection(&meta.DeleteOptions{}, meta.ListOptions{})
+	err := client.ReportDataSources(namespace).DeleteCollection(context.TODO(), meta.DeleteOptions{}, meta.ListOptions{})
 	if err != nil {
 		return fmt.Errorf("failed to delete all the ReportDataSources in the %s namespace: %v", namespace, err)
 	}

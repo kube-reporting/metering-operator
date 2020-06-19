@@ -3,6 +3,7 @@
 package v1
 
 import (
+	"context"
 	"time"
 
 	v1 "github.com/kube-reporting/metering-operator/pkg/apis/metering/v1"
@@ -21,15 +22,15 @@ type ReportQueriesGetter interface {
 
 // ReportQueryInterface has methods to work with ReportQuery resources.
 type ReportQueryInterface interface {
-	Create(*v1.ReportQuery) (*v1.ReportQuery, error)
-	Update(*v1.ReportQuery) (*v1.ReportQuery, error)
-	UpdateStatus(*v1.ReportQuery) (*v1.ReportQuery, error)
-	Delete(name string, options *metav1.DeleteOptions) error
-	DeleteCollection(options *metav1.DeleteOptions, listOptions metav1.ListOptions) error
-	Get(name string, options metav1.GetOptions) (*v1.ReportQuery, error)
-	List(opts metav1.ListOptions) (*v1.ReportQueryList, error)
-	Watch(opts metav1.ListOptions) (watch.Interface, error)
-	Patch(name string, pt types.PatchType, data []byte, subresources ...string) (result *v1.ReportQuery, err error)
+	Create(ctx context.Context, reportQuery *v1.ReportQuery, opts metav1.CreateOptions) (*v1.ReportQuery, error)
+	Update(ctx context.Context, reportQuery *v1.ReportQuery, opts metav1.UpdateOptions) (*v1.ReportQuery, error)
+	UpdateStatus(ctx context.Context, reportQuery *v1.ReportQuery, opts metav1.UpdateOptions) (*v1.ReportQuery, error)
+	Delete(ctx context.Context, name string, opts metav1.DeleteOptions) error
+	DeleteCollection(ctx context.Context, opts metav1.DeleteOptions, listOpts metav1.ListOptions) error
+	Get(ctx context.Context, name string, opts metav1.GetOptions) (*v1.ReportQuery, error)
+	List(ctx context.Context, opts metav1.ListOptions) (*v1.ReportQueryList, error)
+	Watch(ctx context.Context, opts metav1.ListOptions) (watch.Interface, error)
+	Patch(ctx context.Context, name string, pt types.PatchType, data []byte, opts metav1.PatchOptions, subresources ...string) (result *v1.ReportQuery, err error)
 	ReportQueryExpansion
 }
 
@@ -48,20 +49,20 @@ func newReportQueries(c *MeteringV1Client, namespace string) *reportQueries {
 }
 
 // Get takes name of the reportQuery, and returns the corresponding reportQuery object, and an error if there is any.
-func (c *reportQueries) Get(name string, options metav1.GetOptions) (result *v1.ReportQuery, err error) {
+func (c *reportQueries) Get(ctx context.Context, name string, options metav1.GetOptions) (result *v1.ReportQuery, err error) {
 	result = &v1.ReportQuery{}
 	err = c.client.Get().
 		Namespace(c.ns).
 		Resource("reportqueries").
 		Name(name).
 		VersionedParams(&options, scheme.ParameterCodec).
-		Do().
+		Do(ctx).
 		Into(result)
 	return
 }
 
 // List takes label and field selectors, and returns the list of ReportQueries that match those selectors.
-func (c *reportQueries) List(opts metav1.ListOptions) (result *v1.ReportQueryList, err error) {
+func (c *reportQueries) List(ctx context.Context, opts metav1.ListOptions) (result *v1.ReportQueryList, err error) {
 	var timeout time.Duration
 	if opts.TimeoutSeconds != nil {
 		timeout = time.Duration(*opts.TimeoutSeconds) * time.Second
@@ -72,13 +73,13 @@ func (c *reportQueries) List(opts metav1.ListOptions) (result *v1.ReportQueryLis
 		Resource("reportqueries").
 		VersionedParams(&opts, scheme.ParameterCodec).
 		Timeout(timeout).
-		Do().
+		Do(ctx).
 		Into(result)
 	return
 }
 
 // Watch returns a watch.Interface that watches the requested reportQueries.
-func (c *reportQueries) Watch(opts metav1.ListOptions) (watch.Interface, error) {
+func (c *reportQueries) Watch(ctx context.Context, opts metav1.ListOptions) (watch.Interface, error) {
 	var timeout time.Duration
 	if opts.TimeoutSeconds != nil {
 		timeout = time.Duration(*opts.TimeoutSeconds) * time.Second
@@ -89,87 +90,90 @@ func (c *reportQueries) Watch(opts metav1.ListOptions) (watch.Interface, error) 
 		Resource("reportqueries").
 		VersionedParams(&opts, scheme.ParameterCodec).
 		Timeout(timeout).
-		Watch()
+		Watch(ctx)
 }
 
 // Create takes the representation of a reportQuery and creates it.  Returns the server's representation of the reportQuery, and an error, if there is any.
-func (c *reportQueries) Create(reportQuery *v1.ReportQuery) (result *v1.ReportQuery, err error) {
+func (c *reportQueries) Create(ctx context.Context, reportQuery *v1.ReportQuery, opts metav1.CreateOptions) (result *v1.ReportQuery, err error) {
 	result = &v1.ReportQuery{}
 	err = c.client.Post().
 		Namespace(c.ns).
 		Resource("reportqueries").
+		VersionedParams(&opts, scheme.ParameterCodec).
 		Body(reportQuery).
-		Do().
+		Do(ctx).
 		Into(result)
 	return
 }
 
 // Update takes the representation of a reportQuery and updates it. Returns the server's representation of the reportQuery, and an error, if there is any.
-func (c *reportQueries) Update(reportQuery *v1.ReportQuery) (result *v1.ReportQuery, err error) {
+func (c *reportQueries) Update(ctx context.Context, reportQuery *v1.ReportQuery, opts metav1.UpdateOptions) (result *v1.ReportQuery, err error) {
 	result = &v1.ReportQuery{}
 	err = c.client.Put().
 		Namespace(c.ns).
 		Resource("reportqueries").
 		Name(reportQuery.Name).
+		VersionedParams(&opts, scheme.ParameterCodec).
 		Body(reportQuery).
-		Do().
+		Do(ctx).
 		Into(result)
 	return
 }
 
 // UpdateStatus was generated because the type contains a Status member.
 // Add a +genclient:noStatus comment above the type to avoid generating UpdateStatus().
-
-func (c *reportQueries) UpdateStatus(reportQuery *v1.ReportQuery) (result *v1.ReportQuery, err error) {
+func (c *reportQueries) UpdateStatus(ctx context.Context, reportQuery *v1.ReportQuery, opts metav1.UpdateOptions) (result *v1.ReportQuery, err error) {
 	result = &v1.ReportQuery{}
 	err = c.client.Put().
 		Namespace(c.ns).
 		Resource("reportqueries").
 		Name(reportQuery.Name).
 		SubResource("status").
+		VersionedParams(&opts, scheme.ParameterCodec).
 		Body(reportQuery).
-		Do().
+		Do(ctx).
 		Into(result)
 	return
 }
 
 // Delete takes name of the reportQuery and deletes it. Returns an error if one occurs.
-func (c *reportQueries) Delete(name string, options *metav1.DeleteOptions) error {
+func (c *reportQueries) Delete(ctx context.Context, name string, opts metav1.DeleteOptions) error {
 	return c.client.Delete().
 		Namespace(c.ns).
 		Resource("reportqueries").
 		Name(name).
-		Body(options).
-		Do().
+		Body(&opts).
+		Do(ctx).
 		Error()
 }
 
 // DeleteCollection deletes a collection of objects.
-func (c *reportQueries) DeleteCollection(options *metav1.DeleteOptions, listOptions metav1.ListOptions) error {
+func (c *reportQueries) DeleteCollection(ctx context.Context, opts metav1.DeleteOptions, listOpts metav1.ListOptions) error {
 	var timeout time.Duration
-	if listOptions.TimeoutSeconds != nil {
-		timeout = time.Duration(*listOptions.TimeoutSeconds) * time.Second
+	if listOpts.TimeoutSeconds != nil {
+		timeout = time.Duration(*listOpts.TimeoutSeconds) * time.Second
 	}
 	return c.client.Delete().
 		Namespace(c.ns).
 		Resource("reportqueries").
-		VersionedParams(&listOptions, scheme.ParameterCodec).
+		VersionedParams(&listOpts, scheme.ParameterCodec).
 		Timeout(timeout).
-		Body(options).
-		Do().
+		Body(&opts).
+		Do(ctx).
 		Error()
 }
 
 // Patch applies the patch and returns the patched reportQuery.
-func (c *reportQueries) Patch(name string, pt types.PatchType, data []byte, subresources ...string) (result *v1.ReportQuery, err error) {
+func (c *reportQueries) Patch(ctx context.Context, name string, pt types.PatchType, data []byte, opts metav1.PatchOptions, subresources ...string) (result *v1.ReportQuery, err error) {
 	result = &v1.ReportQuery{}
 	err = c.client.Patch(pt).
 		Namespace(c.ns).
 		Resource("reportqueries").
-		SubResource(subresources...).
 		Name(name).
+		SubResource(subresources...).
+		VersionedParams(&opts, scheme.ParameterCodec).
 		Body(data).
-		Do().
+		Do(ctx).
 		Into(result)
 	return
 }

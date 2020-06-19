@@ -3,6 +3,7 @@
 package v1
 
 import (
+	"context"
 	"time"
 
 	v1 "github.com/kube-reporting/metering-operator/pkg/apis/metering/v1"
@@ -21,15 +22,15 @@ type PrestoTablesGetter interface {
 
 // PrestoTableInterface has methods to work with PrestoTable resources.
 type PrestoTableInterface interface {
-	Create(*v1.PrestoTable) (*v1.PrestoTable, error)
-	Update(*v1.PrestoTable) (*v1.PrestoTable, error)
-	UpdateStatus(*v1.PrestoTable) (*v1.PrestoTable, error)
-	Delete(name string, options *metav1.DeleteOptions) error
-	DeleteCollection(options *metav1.DeleteOptions, listOptions metav1.ListOptions) error
-	Get(name string, options metav1.GetOptions) (*v1.PrestoTable, error)
-	List(opts metav1.ListOptions) (*v1.PrestoTableList, error)
-	Watch(opts metav1.ListOptions) (watch.Interface, error)
-	Patch(name string, pt types.PatchType, data []byte, subresources ...string) (result *v1.PrestoTable, err error)
+	Create(ctx context.Context, prestoTable *v1.PrestoTable, opts metav1.CreateOptions) (*v1.PrestoTable, error)
+	Update(ctx context.Context, prestoTable *v1.PrestoTable, opts metav1.UpdateOptions) (*v1.PrestoTable, error)
+	UpdateStatus(ctx context.Context, prestoTable *v1.PrestoTable, opts metav1.UpdateOptions) (*v1.PrestoTable, error)
+	Delete(ctx context.Context, name string, opts metav1.DeleteOptions) error
+	DeleteCollection(ctx context.Context, opts metav1.DeleteOptions, listOpts metav1.ListOptions) error
+	Get(ctx context.Context, name string, opts metav1.GetOptions) (*v1.PrestoTable, error)
+	List(ctx context.Context, opts metav1.ListOptions) (*v1.PrestoTableList, error)
+	Watch(ctx context.Context, opts metav1.ListOptions) (watch.Interface, error)
+	Patch(ctx context.Context, name string, pt types.PatchType, data []byte, opts metav1.PatchOptions, subresources ...string) (result *v1.PrestoTable, err error)
 	PrestoTableExpansion
 }
 
@@ -48,20 +49,20 @@ func newPrestoTables(c *MeteringV1Client, namespace string) *prestoTables {
 }
 
 // Get takes name of the prestoTable, and returns the corresponding prestoTable object, and an error if there is any.
-func (c *prestoTables) Get(name string, options metav1.GetOptions) (result *v1.PrestoTable, err error) {
+func (c *prestoTables) Get(ctx context.Context, name string, options metav1.GetOptions) (result *v1.PrestoTable, err error) {
 	result = &v1.PrestoTable{}
 	err = c.client.Get().
 		Namespace(c.ns).
 		Resource("prestotables").
 		Name(name).
 		VersionedParams(&options, scheme.ParameterCodec).
-		Do().
+		Do(ctx).
 		Into(result)
 	return
 }
 
 // List takes label and field selectors, and returns the list of PrestoTables that match those selectors.
-func (c *prestoTables) List(opts metav1.ListOptions) (result *v1.PrestoTableList, err error) {
+func (c *prestoTables) List(ctx context.Context, opts metav1.ListOptions) (result *v1.PrestoTableList, err error) {
 	var timeout time.Duration
 	if opts.TimeoutSeconds != nil {
 		timeout = time.Duration(*opts.TimeoutSeconds) * time.Second
@@ -72,13 +73,13 @@ func (c *prestoTables) List(opts metav1.ListOptions) (result *v1.PrestoTableList
 		Resource("prestotables").
 		VersionedParams(&opts, scheme.ParameterCodec).
 		Timeout(timeout).
-		Do().
+		Do(ctx).
 		Into(result)
 	return
 }
 
 // Watch returns a watch.Interface that watches the requested prestoTables.
-func (c *prestoTables) Watch(opts metav1.ListOptions) (watch.Interface, error) {
+func (c *prestoTables) Watch(ctx context.Context, opts metav1.ListOptions) (watch.Interface, error) {
 	var timeout time.Duration
 	if opts.TimeoutSeconds != nil {
 		timeout = time.Duration(*opts.TimeoutSeconds) * time.Second
@@ -89,87 +90,90 @@ func (c *prestoTables) Watch(opts metav1.ListOptions) (watch.Interface, error) {
 		Resource("prestotables").
 		VersionedParams(&opts, scheme.ParameterCodec).
 		Timeout(timeout).
-		Watch()
+		Watch(ctx)
 }
 
 // Create takes the representation of a prestoTable and creates it.  Returns the server's representation of the prestoTable, and an error, if there is any.
-func (c *prestoTables) Create(prestoTable *v1.PrestoTable) (result *v1.PrestoTable, err error) {
+func (c *prestoTables) Create(ctx context.Context, prestoTable *v1.PrestoTable, opts metav1.CreateOptions) (result *v1.PrestoTable, err error) {
 	result = &v1.PrestoTable{}
 	err = c.client.Post().
 		Namespace(c.ns).
 		Resource("prestotables").
+		VersionedParams(&opts, scheme.ParameterCodec).
 		Body(prestoTable).
-		Do().
+		Do(ctx).
 		Into(result)
 	return
 }
 
 // Update takes the representation of a prestoTable and updates it. Returns the server's representation of the prestoTable, and an error, if there is any.
-func (c *prestoTables) Update(prestoTable *v1.PrestoTable) (result *v1.PrestoTable, err error) {
+func (c *prestoTables) Update(ctx context.Context, prestoTable *v1.PrestoTable, opts metav1.UpdateOptions) (result *v1.PrestoTable, err error) {
 	result = &v1.PrestoTable{}
 	err = c.client.Put().
 		Namespace(c.ns).
 		Resource("prestotables").
 		Name(prestoTable.Name).
+		VersionedParams(&opts, scheme.ParameterCodec).
 		Body(prestoTable).
-		Do().
+		Do(ctx).
 		Into(result)
 	return
 }
 
 // UpdateStatus was generated because the type contains a Status member.
 // Add a +genclient:noStatus comment above the type to avoid generating UpdateStatus().
-
-func (c *prestoTables) UpdateStatus(prestoTable *v1.PrestoTable) (result *v1.PrestoTable, err error) {
+func (c *prestoTables) UpdateStatus(ctx context.Context, prestoTable *v1.PrestoTable, opts metav1.UpdateOptions) (result *v1.PrestoTable, err error) {
 	result = &v1.PrestoTable{}
 	err = c.client.Put().
 		Namespace(c.ns).
 		Resource("prestotables").
 		Name(prestoTable.Name).
 		SubResource("status").
+		VersionedParams(&opts, scheme.ParameterCodec).
 		Body(prestoTable).
-		Do().
+		Do(ctx).
 		Into(result)
 	return
 }
 
 // Delete takes name of the prestoTable and deletes it. Returns an error if one occurs.
-func (c *prestoTables) Delete(name string, options *metav1.DeleteOptions) error {
+func (c *prestoTables) Delete(ctx context.Context, name string, opts metav1.DeleteOptions) error {
 	return c.client.Delete().
 		Namespace(c.ns).
 		Resource("prestotables").
 		Name(name).
-		Body(options).
-		Do().
+		Body(&opts).
+		Do(ctx).
 		Error()
 }
 
 // DeleteCollection deletes a collection of objects.
-func (c *prestoTables) DeleteCollection(options *metav1.DeleteOptions, listOptions metav1.ListOptions) error {
+func (c *prestoTables) DeleteCollection(ctx context.Context, opts metav1.DeleteOptions, listOpts metav1.ListOptions) error {
 	var timeout time.Duration
-	if listOptions.TimeoutSeconds != nil {
-		timeout = time.Duration(*listOptions.TimeoutSeconds) * time.Second
+	if listOpts.TimeoutSeconds != nil {
+		timeout = time.Duration(*listOpts.TimeoutSeconds) * time.Second
 	}
 	return c.client.Delete().
 		Namespace(c.ns).
 		Resource("prestotables").
-		VersionedParams(&listOptions, scheme.ParameterCodec).
+		VersionedParams(&listOpts, scheme.ParameterCodec).
 		Timeout(timeout).
-		Body(options).
-		Do().
+		Body(&opts).
+		Do(ctx).
 		Error()
 }
 
 // Patch applies the patch and returns the patched prestoTable.
-func (c *prestoTables) Patch(name string, pt types.PatchType, data []byte, subresources ...string) (result *v1.PrestoTable, err error) {
+func (c *prestoTables) Patch(ctx context.Context, name string, pt types.PatchType, data []byte, opts metav1.PatchOptions, subresources ...string) (result *v1.PrestoTable, err error) {
 	result = &v1.PrestoTable{}
 	err = c.client.Patch(pt).
 		Namespace(c.ns).
 		Resource("prestotables").
-		SubResource(subresources...).
 		Name(name).
+		SubResource(subresources...).
+		VersionedParams(&opts, scheme.ParameterCodec).
 		Body(data).
-		Do().
+		Do(ctx).
 		Into(result)
 	return
 }

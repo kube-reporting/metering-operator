@@ -3,6 +3,8 @@
 package fake
 
 import (
+	"context"
+
 	meteringv1 "github.com/kube-reporting/metering-operator/pkg/apis/metering/v1"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	labels "k8s.io/apimachinery/pkg/labels"
@@ -23,7 +25,7 @@ var hivetablesResource = schema.GroupVersionResource{Group: "metering.openshift.
 var hivetablesKind = schema.GroupVersionKind{Group: "metering.openshift.io", Version: "v1", Kind: "HiveTable"}
 
 // Get takes name of the hiveTable, and returns the corresponding hiveTable object, and an error if there is any.
-func (c *FakeHiveTables) Get(name string, options v1.GetOptions) (result *meteringv1.HiveTable, err error) {
+func (c *FakeHiveTables) Get(ctx context.Context, name string, options v1.GetOptions) (result *meteringv1.HiveTable, err error) {
 	obj, err := c.Fake.
 		Invokes(testing.NewGetAction(hivetablesResource, c.ns, name), &meteringv1.HiveTable{})
 
@@ -34,7 +36,7 @@ func (c *FakeHiveTables) Get(name string, options v1.GetOptions) (result *meteri
 }
 
 // List takes label and field selectors, and returns the list of HiveTables that match those selectors.
-func (c *FakeHiveTables) List(opts v1.ListOptions) (result *meteringv1.HiveTableList, err error) {
+func (c *FakeHiveTables) List(ctx context.Context, opts v1.ListOptions) (result *meteringv1.HiveTableList, err error) {
 	obj, err := c.Fake.
 		Invokes(testing.NewListAction(hivetablesResource, hivetablesKind, c.ns, opts), &meteringv1.HiveTableList{})
 
@@ -56,14 +58,14 @@ func (c *FakeHiveTables) List(opts v1.ListOptions) (result *meteringv1.HiveTable
 }
 
 // Watch returns a watch.Interface that watches the requested hiveTables.
-func (c *FakeHiveTables) Watch(opts v1.ListOptions) (watch.Interface, error) {
+func (c *FakeHiveTables) Watch(ctx context.Context, opts v1.ListOptions) (watch.Interface, error) {
 	return c.Fake.
 		InvokesWatch(testing.NewWatchAction(hivetablesResource, c.ns, opts))
 
 }
 
 // Create takes the representation of a hiveTable and creates it.  Returns the server's representation of the hiveTable, and an error, if there is any.
-func (c *FakeHiveTables) Create(hiveTable *meteringv1.HiveTable) (result *meteringv1.HiveTable, err error) {
+func (c *FakeHiveTables) Create(ctx context.Context, hiveTable *meteringv1.HiveTable, opts v1.CreateOptions) (result *meteringv1.HiveTable, err error) {
 	obj, err := c.Fake.
 		Invokes(testing.NewCreateAction(hivetablesResource, c.ns, hiveTable), &meteringv1.HiveTable{})
 
@@ -74,7 +76,7 @@ func (c *FakeHiveTables) Create(hiveTable *meteringv1.HiveTable) (result *meteri
 }
 
 // Update takes the representation of a hiveTable and updates it. Returns the server's representation of the hiveTable, and an error, if there is any.
-func (c *FakeHiveTables) Update(hiveTable *meteringv1.HiveTable) (result *meteringv1.HiveTable, err error) {
+func (c *FakeHiveTables) Update(ctx context.Context, hiveTable *meteringv1.HiveTable, opts v1.UpdateOptions) (result *meteringv1.HiveTable, err error) {
 	obj, err := c.Fake.
 		Invokes(testing.NewUpdateAction(hivetablesResource, c.ns, hiveTable), &meteringv1.HiveTable{})
 
@@ -86,7 +88,7 @@ func (c *FakeHiveTables) Update(hiveTable *meteringv1.HiveTable) (result *meteri
 
 // UpdateStatus was generated because the type contains a Status member.
 // Add a +genclient:noStatus comment above the type to avoid generating UpdateStatus().
-func (c *FakeHiveTables) UpdateStatus(hiveTable *meteringv1.HiveTable) (*meteringv1.HiveTable, error) {
+func (c *FakeHiveTables) UpdateStatus(ctx context.Context, hiveTable *meteringv1.HiveTable, opts v1.UpdateOptions) (*meteringv1.HiveTable, error) {
 	obj, err := c.Fake.
 		Invokes(testing.NewUpdateSubresourceAction(hivetablesResource, "status", c.ns, hiveTable), &meteringv1.HiveTable{})
 
@@ -97,7 +99,7 @@ func (c *FakeHiveTables) UpdateStatus(hiveTable *meteringv1.HiveTable) (*meterin
 }
 
 // Delete takes name of the hiveTable and deletes it. Returns an error if one occurs.
-func (c *FakeHiveTables) Delete(name string, options *v1.DeleteOptions) error {
+func (c *FakeHiveTables) Delete(ctx context.Context, name string, opts v1.DeleteOptions) error {
 	_, err := c.Fake.
 		Invokes(testing.NewDeleteAction(hivetablesResource, c.ns, name), &meteringv1.HiveTable{})
 
@@ -105,15 +107,15 @@ func (c *FakeHiveTables) Delete(name string, options *v1.DeleteOptions) error {
 }
 
 // DeleteCollection deletes a collection of objects.
-func (c *FakeHiveTables) DeleteCollection(options *v1.DeleteOptions, listOptions v1.ListOptions) error {
-	action := testing.NewDeleteCollectionAction(hivetablesResource, c.ns, listOptions)
+func (c *FakeHiveTables) DeleteCollection(ctx context.Context, opts v1.DeleteOptions, listOpts v1.ListOptions) error {
+	action := testing.NewDeleteCollectionAction(hivetablesResource, c.ns, listOpts)
 
 	_, err := c.Fake.Invokes(action, &meteringv1.HiveTableList{})
 	return err
 }
 
 // Patch applies the patch and returns the patched hiveTable.
-func (c *FakeHiveTables) Patch(name string, pt types.PatchType, data []byte, subresources ...string) (result *meteringv1.HiveTable, err error) {
+func (c *FakeHiveTables) Patch(ctx context.Context, name string, pt types.PatchType, data []byte, opts v1.PatchOptions, subresources ...string) (result *meteringv1.HiveTable, err error) {
 	obj, err := c.Fake.
 		Invokes(testing.NewPatchSubresourceAction(hivetablesResource, c.ns, name, pt, data, subresources...), &meteringv1.HiveTable{})
 

@@ -1,11 +1,13 @@
 package operator
 
 import (
+	"context"
 	"fmt"
 	"strings"
 
 	log "github.com/sirupsen/logrus"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/client-go/tools/cache"
 
@@ -120,7 +122,7 @@ func (op *Reporting) handleStorageLocation(logger log.FieldLogger, storageLocati
 
 	if needsUpdate {
 		var err error
-		storageLocation, err = op.meteringClient.MeteringV1().StorageLocations(storageLocation.Namespace).Update(storageLocation)
+		storageLocation, err = op.meteringClient.MeteringV1().StorageLocations(storageLocation.Namespace).Update(context.TODO(), storageLocation, metav1.UpdateOptions{})
 		if err != nil {
 			return fmt.Errorf("unable to update StorageLocation %s status: %s", storageLocation.Name, err)
 		}
@@ -134,7 +136,7 @@ func (op *Reporting) handleStorageLocation(logger log.FieldLogger, storageLocati
 
 func (op *Reporting) addStorageLocationFinalizer(storageLocation *metering.StorageLocation) (*metering.StorageLocation, error) {
 	storageLocation.Finalizers = append(storageLocation.Finalizers, storageLocationFinalizer)
-	newStorageLocation, err := op.meteringClient.MeteringV1().StorageLocations(storageLocation.Namespace).Update(storageLocation)
+	newStorageLocation, err := op.meteringClient.MeteringV1().StorageLocations(storageLocation.Namespace).Update(context.TODO(), storageLocation, metav1.UpdateOptions{})
 	logger := op.logger.WithFields(log.Fields{"storageLocation": storageLocation.Name, "namespace": storageLocation.Namespace})
 	if err != nil {
 		logger.WithError(err).Errorf("error adding %s finalizer to StorageLocation: %s/%s", storageLocationFinalizer, storageLocation.Namespace, storageLocation.Name)
@@ -149,7 +151,7 @@ func (op *Reporting) removeStorageLocationFinalizer(storageLocation *metering.St
 		return storageLocation, nil
 	}
 	storageLocation.Finalizers = slice.RemoveString(storageLocation.Finalizers, storageLocationFinalizer, nil)
-	newStorageLocation, err := op.meteringClient.MeteringV1().StorageLocations(storageLocation.Namespace).Update(storageLocation)
+	newStorageLocation, err := op.meteringClient.MeteringV1().StorageLocations(storageLocation.Namespace).Update(context.TODO(), storageLocation, metav1.UpdateOptions{})
 	logger := op.logger.WithFields(log.Fields{"storageLocation": storageLocation.Name, "namespace": storageLocation.Namespace})
 	if err != nil {
 		logger.WithError(err).Errorf("error removing %s finalizer from StorageLocation: %s/%s", storageLocationFinalizer, storageLocation.Namespace, storageLocation.Name)

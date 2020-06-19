@@ -1,6 +1,8 @@
 package reporting
 
 import (
+	"context"
+
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
 	metering "github.com/kube-reporting/metering-operator/pkg/apis/metering/v1"
@@ -26,7 +28,7 @@ func NewReportDataSourceListerGetter(lister meteringListers.ReportDataSourceList
 
 func NewReportDataSourceClientGetter(getter meteringClient.ReportDataSourcesGetter) ReportDataSourceGetter {
 	return ReportDataSourceGetterFunc(func(namespace, name string) (*metering.ReportDataSource, error) {
-		return getter.ReportDataSources(namespace).Get(name, metav1.GetOptions{})
+		return getter.ReportDataSources(namespace).Get(context.TODO(), name, metav1.GetOptions{})
 	})
 }
 
@@ -48,7 +50,7 @@ func NewReportListerGetter(lister meteringListers.ReportLister) ReportGetter {
 
 func NewReportClientGetter(getter meteringClient.ReportsGetter) ReportGetter {
 	return ReportGetterFunc(func(namespace, name string) (*metering.Report, error) {
-		return getter.Reports(namespace).Get(name, metav1.GetOptions{})
+		return getter.Reports(namespace).Get(context.TODO(), name, metav1.GetOptions{})
 	})
 }
 
@@ -70,6 +72,6 @@ func NewReportQueryListerGetter(lister meteringListers.ReportQueryLister) Report
 
 func NewReportQueryClientGetter(getter meteringClient.ReportQueriesGetter) ReportQueryGetter {
 	return ReportQueryGetterFunc(func(namespace, name string) (*metering.ReportQuery, error) {
-		return getter.ReportQueries(namespace).Get(name, metav1.GetOptions{})
+		return getter.ReportQueries(namespace).Get(context.TODO(), name, metav1.GetOptions{})
 	})
 }
