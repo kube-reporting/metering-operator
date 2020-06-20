@@ -390,6 +390,8 @@ spec:
           name: reporting-operator-trusted-ca-bundle
           readOnly: true
 {{- end }}
+        - mountPath: /var/nfs
+          name: nfs-storage
 {{- if $operatorValues.spec.authProxy.enabled }}
       - name: reporting-operator-auth-proxy
         image: "{{ include "reporting-operator-auth-proxy-image" . }}"
