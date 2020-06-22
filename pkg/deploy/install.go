@@ -432,7 +432,7 @@ func (deploy *Deployer) installMeteringCRD(resource CRD) error {
 			return err
 		}
 		deploy.logger.Infof("Created the %s CRD", resource.Name)
-	} else if err == nil {
+	} else if apierrors.IsAlreadyExists(err) {
 		crd.Spec = resource.CRD.Spec
 
 		_, err := deploy.apiExtClient.CustomResourceDefinitions().Update(context.TODO(), crd, metav1.UpdateOptions{})
