@@ -71,7 +71,7 @@
     _ocp_enabled_global_proxy_https_proxy: "{{ _cluster_proxy_config.status.httpsProxy }}"
   no_log: true
   when:
-  - cluster_proxy_config is defined
+  - cluster_proxy.config.resources is defined
   - cluster_proxy_config.resources | length > 0
   - _cluster_proxy_config.status is defined
   - _cluster_proxy_config.status | length > 0
