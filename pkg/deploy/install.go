@@ -164,65 +164,68 @@ func (deploy *Deployer) installMeteringConfig() error {
 }
 
 func (deploy *Deployer) installMeteringOperatorGroup() error {
-	opgrp, err := deploy.olmV1Client.OperatorGroups(deploy.config.Namespace).Get(context.TODO(), deploy.config.Namespace, metav1.GetOptions{})
+	deployNamespace := deploy.config.Namespace
+
+	opgrp, err := deploy.olmV1Client.OperatorGroups(deployNamespace).Get(context.TODO(), deployNamespace, metav1.GetOptions{})
 	if apierrors.IsNotFound(err) {
 		opgrp := &olmv1.OperatorGroup{
 			ObjectMeta: metav1.ObjectMeta{
-				Name:      deploy.config.Namespace,
-				Namespace: deploy.config.Namespace,
+				Name:      deployNamespace,
+				Namespace: deployNamespace,
 			},
 			Spec: olmv1.OperatorGroupSpec{
 				TargetNamespaces: []string{
-					deploy.config.Namespace,
+					deployNamespace,
 				},
 			},
 		}
 
-		_, err = deploy.olmV1Client.OperatorGroups(deploy.config.Namespace).Create(context.TODO(), opgrp, metav1.CreateOptions{})
+		_, err = deploy.olmV1Client.OperatorGroups(deployNamespace).Create(context.TODO(), opgrp, metav1.CreateOptions{})
 		if err != nil {
 			return err
 		}
-		deploy.logger.Infof("Created the %s metering OperatorGroup", opgrp.Name)
+		deploy.logger.Infof("Created the %s metering OperatorGroup in the %s namespace", opgrp.Name, deployNamespace)
 		return nil
 	}
 	if err != nil && !apierrors.IsAlreadyExists(err) {
 		return err
 	}
-
 	deploy.logger.Infof("The %s metering OperatorGroup resource already exists", opgrp.Name)
 
 	return nil
 }
 
 func (deploy *Deployer) installMeteringSubscription() error {
-	_, err := deploy.olmV1Alpha1Client.Subscriptions(deploy.config.Namespace).Get(context.TODO(), deploy.config.SubscriptionName, metav1.GetOptions{})
+	deployNamespace := deploy.config.Namespace
+	subName := deploy.config.SubscriptionName
+
+	_, err := deploy.olmV1Alpha1Client.Subscriptions(deployNamespace).Get(context.TODO(), subName, metav1.GetOptions{})
 	if apierrors.IsNotFound(err) {
 		sub := &olmv1alpha1.Subscription{
 			ObjectMeta: metav1.ObjectMeta{
-				Name:      deploy.config.SubscriptionName,
-				Namespace: deploy.config.Namespace,
+				Name:      subName,
+				Namespace: deployNamespace,
 			},
 			Spec: &olmv1alpha1.SubscriptionSpec{
-				CatalogSource:          catalogSourceName,
-				CatalogSourceNamespace: catalogSourceNamespace,
-				Package:                packageName,
+				CatalogSource:          deploy.config.CatalogSourceName,
+				CatalogSourceNamespace: deploy.config.CatalogSourceNamespace,
+				Package:                deploy.config.PackageName,
 				Channel:                deploy.config.Channel,
 				InstallPlanApproval:    olmv1alpha1.ApprovalAutomatic,
 			},
 		}
 
-		_, err := deploy.olmV1Alpha1Client.Subscriptions(deploy.config.Namespace).Create(context.TODO(), sub, metav1.CreateOptions{})
+		_, err := deploy.olmV1Alpha1Client.Subscriptions(deployNamespace).Create(context.TODO(), sub, metav1.CreateOptions{})
 		if err != nil {
-			return fmt.Errorf("failed to create the %s Subscription: %v", deploy.config.SubscriptionName, err)
+			return err
 		}
-		deploy.logger.Infof("Created the metering Subscription")
+		deploy.logger.Infof("Created the %s metering Subscription in the %s namespace", subName, deployNamespace)
 		return nil
 	}
 	if err != nil && !apierrors.IsAlreadyExists(err) {
 		return err
 	}
-
-	deploy.logger.Infof("The metering Subscription already exists")
+	deploy.logger.Infof("The %s metering Subscription in the %s namespace already exists", subName, deployNamespace)
 
 	return nil
 }

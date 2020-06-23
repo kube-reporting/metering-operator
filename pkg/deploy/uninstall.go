@@ -52,16 +52,20 @@ func (deploy *Deployer) uninstallMeteringOperatorGroup() error {
 }
 
 func (deploy *Deployer) uninstallMeteringSubscription() error {
-	// TODO: add configuration flag for setting the subscription name instead of hardcoding the openshift package name
-	err := deploy.olmV1Alpha1Client.Subscriptions(deploy.config.Namespace).Delete(context.TODO(), "metering-ocp", metav1.DeleteOptions{})
+	_, err := deploy.olmV1Alpha1Client.Subscriptions(deploy.config.Namespace).Get(context.TODO(), deploy.config.SubscriptionName, metav1.GetOptions{})
 	if apierrors.IsNotFound(err) {
-		deploy.logger.Warnf("The metering Subscription resource does not exist")
+		deploy.logger.Warnf("The %s metering Subscription in the %s namespace does not exist", deploy.config.SubscriptionName, deploy.config.Namespace)
 		return nil
 	}
 	if err != nil {
-		return fmt.Errorf("failed to delete the metering Subscription: %v", err)
+		return err
 	}
-	deploy.logger.Infof("Deleted the metering Subscription resource")
+
+	err = deploy.olmV1Alpha1Client.Subscriptions(deploy.config.Namespace).Delete(context.TODO(), deploy.config.SubscriptionName, metav1.DeleteOptions{})
+	if err != nil {
+		return fmt.Errorf("failed to delete the %s metering Subscription in the %s namespace: %v", deploy.config.SubscriptionName, deploy.config.Namespace, err)
+	}
+	deploy.logger.Infof("Deleted the %s metering Subscription resource in the %s namespace", deploy.config.SubscriptionName, deploy.config.Namespace)
 
 	return nil
 }
@@ -81,14 +85,15 @@ func (deploy *Deployer) uninstallMeteringCSV() error {
 	}
 
 	if sub.Status.CurrentCSV == "" {
-		return fmt.Errorf("failed to get the currentCSV stored in the %s metering Subscription", deploy.config.SubscriptionName)
+		return fmt.Errorf("failed to get the 'status.currentCSV' stored in the %s metering Subscription resource", deploy.config.SubscriptionName)
 	}
+
 	csvName := sub.Status.CurrentCSV
-	deploy.logger.Infof("Found existing metering subscription, attempting to delete the %s CSV", csvName)
+	deploy.logger.Infof("Found an existing metering subscription, attempting to delete the %s CSV", csvName)
 
 	csv, err := deploy.olmV1Alpha1Client.ClusterServiceVersions(deploy.config.Namespace).Get(context.TODO(), csvName, metav1.GetOptions{})
 	if apierrors.IsNotFound(err) {
-		deploy.logger.Warnf("The metering CSV does not exist")
+		deploy.logger.Warnf("The %s metering CSV resource does not exist", csvName)
 		return nil
 	}
 	if err != nil && !apierrors.IsAlreadyExists(err) {
@@ -97,9 +102,9 @@ func (deploy *Deployer) uninstallMeteringCSV() error {
 
 	err = deploy.olmV1Alpha1Client.ClusterServiceVersions(deploy.config.Namespace).Delete(context.TODO(), csv.Name, metav1.DeleteOptions{})
 	if err != nil {
-		return fmt.Errorf("failed to delete the metering Subscription: %v", err)
+		return fmt.Errorf("failed to delete the %s metering CSV resource: %v", csvName, err)
 	}
-	deploy.logger.Infof("Deleted the metering Subscription resource")
+	deploy.logger.Infof("Deleted the %s metering CSV resource in the %s namespace", csvName, deploy.config.Namespace)
 
 	return nil
 }
