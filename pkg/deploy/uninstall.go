@@ -246,7 +246,6 @@ func (deploy *Deployer) uninstallMeteringRole() error {
 
 func (deploy *Deployer) uninstallMeteringClusterRole() error {
 	res := deploy.config.OperatorResources.ClusterRole
-
 	res.Name = deploy.config.Namespace + "-" + res.Name
 
 	err := deploy.client.RbacV1().ClusterRoles().Delete(context.TODO(), res.Name, metav1.DeleteOptions{})
@@ -258,9 +257,10 @@ func (deploy *Deployer) uninstallMeteringClusterRole() error {
 		return err
 	}
 
+	labelSelector := fmt.Sprintf("app=reporting-operator,metering.openshift.io/ns-prune=%s", deploy.config.Namespace)
 	// attempt to delete any of the clusterroles the reporting-operator creates
 	err = deploy.client.RbacV1().ClusterRoles().DeleteCollection(context.TODO(), metav1.DeleteOptions{}, metav1.ListOptions{
-		LabelSelector: "app=reporting-operator",
+		LabelSelector: labelSelector,
 	})
 	if err != nil {
 		return fmt.Errorf("failed to list all the reporting-operator clusterroles in the %s namespace: %v", deploy.config.Namespace, err)
@@ -289,9 +289,10 @@ func (deploy *Deployer) uninstallMeteringClusterRoleBinding() error {
 		return err
 	}
 
+	labelSelector := fmt.Sprintf("app=reporting-operator,metering.openshift.io/ns-prune=%s", deploy.config.Namespace)
 	// attempt to delete any of the clusterrolebindings the reporting-operator creates
 	err = deploy.client.RbacV1().ClusterRoleBindings().DeleteCollection(context.TODO(), metav1.DeleteOptions{}, metav1.ListOptions{
-		LabelSelector: "app=reporting-operator",
+		LabelSelector: labelSelector,
 	})
 	if err != nil {
 		return fmt.Errorf("failed to list all the reporting-operator clusterrolebindings in the %s namespace: %v", deploy.config.Namespace, err)
