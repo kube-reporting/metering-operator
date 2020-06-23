@@ -441,6 +441,7 @@ func (deploy *Deployer) installMeteringCRD(resource CRD) error {
 		}
 		deploy.logger.Infof("Updated the %s CRD", resource.CRD.Name)
 	} else {
+		deploy.logger.Infof("ReasonForError: %+v", apierrors.ReasonForError(err))
 		return err
 	}
 
