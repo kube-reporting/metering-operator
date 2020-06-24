@@ -165,18 +165,23 @@ func (deploy *Deployer) uninstallMeteringResources() error {
 	return nil
 }
 
-// uninstallMeteringPVCs gets a list of all the PVCs associated with the hdfs and hive-metastore
-// pods in the $METERING_NAMESPACE namespace, and attempts to delete all the PVCs that match that list criteria
+// uninstallMeteringPVCs queries the namespace where Metering is
+// currently deployed and searches for any of the HDFS PVCs using
+// the 'app=hdfs' label selector. Note: we currently spin up those
+// PVCs as a volumeClaimTemplate in the datanode/namenode templates
+// so that means the StatefulSets aren't setting any owner references
+// and the metering-ansible-operator isn't reconciling those resources
+// so we need to explicitly delete them during cleanup.
 func (deploy *Deployer) uninstallMeteringPVCs() error {
 	// Attempt to get a list of PVCs that match the hdfs or hive labels
 	pvcs, err := deploy.client.CoreV1().PersistentVolumeClaims(deploy.config.Namespace).List(context.TODO(), metav1.ListOptions{
-		LabelSelector: "app in (hdfs,hive-metastore)",
+		LabelSelector: "app=hdfs",
 	})
 	if err != nil {
 		return fmt.Errorf("failed to list all the metering PVCs in the %s namespace: %v", deploy.config.Namespace, err)
 	}
 	if len(pvcs.Items) == 0 {
-		deploy.logger.Warnf("The Hive/HDFS PVCs don't exist")
+		deploy.logger.Warnf("The HDFS PVCs don't exist")
 		return nil
 	}
 
@@ -190,8 +195,8 @@ func (deploy *Deployer) uninstallMeteringPVCs() error {
 			// TODO: we should be returning an array of errors instead of a single err
 			return fmt.Errorf("failed to delete the %s PVC: %v", pvc.Name, err)
 		}
+		deploy.logger.Infof("Deleted the %s PVC in the %s namespace", pvc.Name, deploy.config.Namespace)
 	}
-	deploy.logger.Infof("Deleted the PVCs managed by metering")
 
 	return nil
 }
