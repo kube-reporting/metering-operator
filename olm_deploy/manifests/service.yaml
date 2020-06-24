@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: metering-ansible-operator-registry
+  labels:
+    registry.operator.metering-ansible: "true"
+spec:
+  type: ClusterIP
+  selector:
+    registry.operator.metering-ansible: "true"
+  ports:
+  - name: grpc
+    port: 50051
+    protocol: TCP
+    targetPort: 50051
+  sessionAffinity: None

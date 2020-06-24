@@ -1,0 +1,17 @@
+FROM quay.io/operator-framework/upstream-registry-builder:latest as builder
+FROM registry.svc.ci.openshift.org/openshift/release:golang-1.13
+
+WORKDIR /
+ARG MANIFEST_BUNDLE
+COPY ${MANIFEST_BUNDLE} /manifests
+
+# Need to remove the art.yaml and image-references files from the list of OLM
+# manifests as those are invalid in a manifest bundle
+RUN chmod -R g+w /manifests && rm /manifests/art.yaml /manifests/*/image-references
+COPY olm_deploy/scripts/ /scripts/
+
+COPY --from=builder /bin/initializer /usr/bin/initializer
+COPY --from=builder /bin/registry-server /usr/bin/registry-server
+COPY --from=builder /bin/grpc_health_probe /usr/bin/grpc_health_probe
+
+WORKDIR /bundle
