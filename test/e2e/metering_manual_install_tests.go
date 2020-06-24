@@ -30,6 +30,7 @@ func testManualMeteringInstall(
 	expectInstallErr bool,
 	testInstallFunction InstallTestCase,
 ) {
+	t.Parallel()
 	// create a directory used to store the @testCaseName container and resource logs
 	testCaseOutputBaseDir := filepath.Join(testOutputPath, testCaseName)
 	err := os.Mkdir(testCaseOutputBaseDir, 0777)
