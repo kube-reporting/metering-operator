@@ -139,7 +139,6 @@ func NewDeployer(
 		deploy.config.DeleteCRB = true
 		deploy.config.DeleteCRDs = true
 	}
-
 	if deploy.config.Namespace == "" {
 		return deploy, fmt.Errorf("failed to set $METERING_NAMESPACE or --namespace flag")
 	}
