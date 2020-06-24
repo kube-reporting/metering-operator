@@ -3,6 +3,7 @@ package deploy
 import (
 	"context"
 	"fmt"
+	"strings"
 
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -51,16 +52,20 @@ func (deploy *Deployer) uninstallMeteringOperatorGroup() error {
 }
 
 func (deploy *Deployer) uninstallMeteringSubscription() error {
-	// TODO: add configuration flag for setting the subscription name instead of hardcoding the openshift package name
-	err := deploy.olmV1Alpha1Client.Subscriptions(deploy.config.Namespace).Delete(context.TODO(), "metering-ocp", metav1.DeleteOptions{})
+	_, err := deploy.olmV1Alpha1Client.Subscriptions(deploy.config.Namespace).Get(context.TODO(), deploy.config.SubscriptionName, metav1.GetOptions{})
 	if apierrors.IsNotFound(err) {
-		deploy.logger.Warnf("The metering Subscription resource does not exist")
+		deploy.logger.Warnf("The %s metering Subscription in the %s namespace does not exist", deploy.config.SubscriptionName, deploy.config.Namespace)
 		return nil
 	}
 	if err != nil {
-		return fmt.Errorf("failed to delete the metering Subscription: %v", err)
+		return err
 	}
-	deploy.logger.Infof("Deleted the metering Subscription resource")
+
+	err = deploy.olmV1Alpha1Client.Subscriptions(deploy.config.Namespace).Delete(context.TODO(), deploy.config.SubscriptionName, metav1.DeleteOptions{})
+	if err != nil {
+		return fmt.Errorf("failed to delete the %s metering Subscription in the %s namespace: %v", deploy.config.SubscriptionName, deploy.config.Namespace, err)
+	}
+	deploy.logger.Infof("Deleted the %s metering Subscription resource in the %s namespace", deploy.config.SubscriptionName, deploy.config.Namespace)
 
 	return nil
 }
@@ -80,14 +85,15 @@ func (deploy *Deployer) uninstallMeteringCSV() error {
 	}
 
 	if sub.Status.CurrentCSV == "" {
-		return fmt.Errorf("failed to get the currentCSV stored in the %s metering Subscription", deploy.config.SubscriptionName)
+		return fmt.Errorf("failed to get the 'status.currentCSV' stored in the %s metering Subscription resource", deploy.config.SubscriptionName)
 	}
+
 	csvName := sub.Status.CurrentCSV
-	deploy.logger.Infof("Found existing metering subscription, attempting to delete the %s CSV", csvName)
+	deploy.logger.Infof("Found an existing metering subscription, attempting to delete the %s CSV", csvName)
 
 	csv, err := deploy.olmV1Alpha1Client.ClusterServiceVersions(deploy.config.Namespace).Get(context.TODO(), csvName, metav1.GetOptions{})
 	if apierrors.IsNotFound(err) {
-		deploy.logger.Warnf("The metering CSV does not exist")
+		deploy.logger.Warnf("The %s metering CSV resource does not exist", csvName)
 		return nil
 	}
 	if err != nil && !apierrors.IsAlreadyExists(err) {
@@ -96,9 +102,9 @@ func (deploy *Deployer) uninstallMeteringCSV() error {
 
 	err = deploy.olmV1Alpha1Client.ClusterServiceVersions(deploy.config.Namespace).Delete(context.TODO(), csv.Name, metav1.DeleteOptions{})
 	if err != nil {
-		return fmt.Errorf("failed to delete the metering Subscription: %v", err)
+		return fmt.Errorf("failed to delete the %s metering CSV resource: %v", csvName, err)
 	}
-	deploy.logger.Infof("Deleted the metering Subscription resource")
+	deploy.logger.Infof("Deleted the %s metering CSV resource in the %s namespace", csvName, deploy.config.Namespace)
 
 	return nil
 }
@@ -133,6 +139,15 @@ func (deploy *Deployer) uninstallMeteringResources() error {
 		err = deploy.uninstallMeteringClusterRoleBinding()
 		if err != nil {
 			return fmt.Errorf("failed to delete the metering cluster role binding: %v", err)
+		}
+		err = deploy.uninstallReportingOperatorClusterRole()
+		if err != nil {
+			return fmt.Errorf("failed to delete the reporting-operator ClusterRole resources: %v", err)
+		}
+
+		err = deploy.uninstallReportingOperatorClusterRoleBinding()
+		if err != nil {
+			return fmt.Errorf("failed to delete the reporting-operator ClusterRoleBinding resources: %v", err)
 		}
 	} else {
 		deploy.logger.Infof("Skipped deleting the metering cluster role resources")
@@ -264,15 +279,37 @@ func (deploy *Deployer) uninstallMeteringClusterRole() error {
 	}
 	deploy.logger.Infof("Deleted the metering cluster role")
 
+	return nil
+}
+
+func (deploy *Deployer) uninstallReportingOperatorClusterRole() error {
 	labelSelector := fmt.Sprintf("app=reporting-operator,metering.openshift.io/ns-prune=%s", deploy.config.Namespace)
+
 	// attempt to delete any of the clusterroles the reporting-operator creates
-	err = deploy.client.RbacV1().ClusterRoles().DeleteCollection(context.TODO(), metav1.DeleteOptions{}, metav1.ListOptions{
+	crs, err := deploy.client.RbacV1().ClusterRoles().List(context.TODO(), metav1.ListOptions{
 		LabelSelector: labelSelector,
 	})
 	if err != nil {
-		return fmt.Errorf("failed to list all the reporting-operator clusterroles in the %s namespace: %v", deploy.config.Namespace, err)
+		return fmt.Errorf("failed to list all the reporting-operator ClusterRoles resources: %v", err)
 	}
-	deploy.logger.Infof("Deleted the 'app=reporting-operator' cluster roles")
+
+	if len(crs.Items) == 0 {
+		deploy.logger.Warnf("Failed to find any 'app=reporting-operator' ClusterRole resources")
+		return nil
+	}
+
+	var errArr []string
+	for _, cr := range crs.Items {
+		err = deploy.client.RbacV1().ClusterRoles().Delete(context.TODO(), cr.Name, metav1.DeleteOptions{})
+		if err != nil {
+			errArr = append(errArr, fmt.Sprintf("failed to delete the %s ClusterRole resource: %v", cr.Name, err))
+		}
+		deploy.logger.Infof("Deleted the %s ClusterRole resource", cr.Name)
+	}
+
+	if len(errArr) != 0 {
+		return fmt.Errorf(strings.Join(errArr, "\n"))
+	}
 
 	return nil
 }
@@ -305,6 +342,37 @@ func (deploy *Deployer) uninstallMeteringClusterRoleBinding() error {
 		return fmt.Errorf("failed to list all the reporting-operator clusterrolebindings in the %s namespace: %v", deploy.config.Namespace, err)
 	}
 	deploy.logger.Infof("Deleted the 'app=reporting-operator' cluster role bindings")
+
+	return nil
+}
+
+func (deploy *Deployer) uninstallReportingOperatorClusterRoleBinding() error {
+	labelSelector := fmt.Sprintf("app=reporting-operator,metering.openshift.io/ns-prune=%s", deploy.config.Namespace)
+
+	// attempt to delete any of the clusterroles the reporting-operator creates
+	crbs, err := deploy.client.RbacV1().ClusterRoleBindings().List(context.TODO(), metav1.ListOptions{
+		LabelSelector: labelSelector,
+	})
+	if err != nil {
+		return fmt.Errorf("failed to list all the 'app=reporting-operator' ClusterRoleBindings: %v", err)
+	}
+
+	if len(crbs.Items) == 0 {
+		deploy.logger.Warnf("Failed to find any 'app=reporting-operator' ClusterRoleBinding resources")
+		return nil
+	}
+
+	var errArr []string
+	for _, crb := range crbs.Items {
+		err = deploy.client.RbacV1().ClusterRoleBindings().Delete(context.TODO(), crb.Name, metav1.DeleteOptions{})
+		if err != nil {
+			errArr = append(errArr, fmt.Sprintf("failed to delete the %s ClusterRoleBinding resource: %v", crb.Name, err))
+		}
+		deploy.logger.Infof("Deleted the %s ClusterRoleBinding resource", crb.Name)
+	}
+	if len(errArr) != 0 {
+		return fmt.Errorf(strings.Join(errArr, "\n"))
+	}
 
 	return nil
 }

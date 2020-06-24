@@ -89,8 +89,14 @@ func init() {
 	uninstallCmd.Flags().BoolVar(&cfg.DeletePVCs, "delete-pvc", true, "If true, this would delete the PVCs used by metering resources during an uninstall. This can also be specified through the METERING_DELETE_PVCS ENV var.")
 	uninstallCmd.Flags().BoolVar(&cfg.DeleteAll, "delete-all", false, "If true, this would delete the all metering resources during an uninstall. This can also be specified through the METERING_DELETE_ALL ENV var.")
 
+	// TODO: probably need to refactor this structure as the uninstallCmd and olmUninstallCmd
+	// are both using the same flagset. We could switch to an installCmd and uninstallCmd, and
+	// have a --olm sub-command configuration so we could share flags between install/uninstall.
 	olmUninstallCmd.Flags().BoolVar(&cfg.DeleteCRDs, "delete-crd", false, "If true, this would delete the metering CRDs during an uninstall. This can also be specified through the METERING_DELETE_CRDS ENV var.")
+	olmUninstallCmd.Flags().BoolVar(&cfg.DeleteCRB, "delete-crb", false, "If true, this would delete the metering cluster role bindings during an uninstall. This can also be specified through METERING_DELETE_CRB ENV var.")
 	olmUninstallCmd.Flags().BoolVar(&cfg.DeleteNamespace, "delete-namespace", false, "If true, this would delete the namespace during an uninstall. This can also be specified through the METERING_DELETE_NAMESPACE ENV var.")
+	olmUninstallCmd.Flags().BoolVar(&cfg.DeletePVCs, "delete-pvc", true, "If true, this would delete the PVCs used by metering resources during an uninstall. This can also be specified through the METERING_DELETE_PVCS ENV var.")
+	olmUninstallCmd.Flags().BoolVar(&cfg.DeleteAll, "delete-all", false, "If true, this would delete the all metering resources during an uninstall. This can also be specified through the METERING_DELETE_ALL ENV var.")
 
 	installCmd.Flags().StringVar(&cfg.Repo, "repo", "", "The name of the metering-ansible-operator image repository. This can also be specified through the METERING_OPERATOR_IMAGE_REPO ENV var.")
 	installCmd.Flags().StringVar(&cfg.Tag, "tag", "", "The name of the metering-ansible-operator image tag. This can also be specified through the METERING_OPERATOR_IMAGE_TAG ENV var.")
@@ -98,6 +104,9 @@ func init() {
 	installCmd.Flags().BoolVar(&cfg.RunMeteringOperatorLocal, "run-metering-operator-local", false, "If true, skip installing the metering deployment. This can also be specified through the $SKIP_METERING_OPERATOR_DEPLOYMENT ENV var.")
 
 	olmInstallCmd.Flags().StringVar(&cfg.SubscriptionName, "subscription", "metering-ocp", "The name of the metering subscription that gets created.")
+	olmInstallCmd.Flags().StringVar(&cfg.CatalogSourceName, "catalog-source", "redhat-operators", "The name of the metering subscription that gets created.")
+	olmInstallCmd.Flags().StringVar(&cfg.CatalogSourceNamespace, "catalog-source-namespace", "openshift-marketplace", "The name of the metering subscription that gets created.")
+	olmInstallCmd.Flags().StringVar(&cfg.PackageName, "package", "metering-ocp", "The name of an existing package manifest from a CatalogSource.")
 	olmInstallCmd.Flags().StringVar(&cfg.Channel, "channel", "4.4", "The metering channel to subscribe to. Examples: 4.2, 4.3, 4.4, etc.")
 
 	if err := initFlagsFromEnv(); err != nil {
@@ -256,12 +265,32 @@ func initFlagsFromEnv() error {
 			},
 		},
 		{
+			cmd: olmUninstallCmd,
+			env: map[string]string{
+				"METERING_DELETE_CRB":       "delete-crb",
+				"METERING_DELETE_CRDS":      "delete-crd",
+				"METERING_DELETE_PVCS":      "delete-pvc",
+				"METERING_DELETE_NAMESPACE": "delete-namespace",
+				"METERING_DELETE_ALL":       "delete-all",
+			},
+		},
+		{
 			cmd: installCmd,
 			env: map[string]string{
 				"SKIP_METERING_OPERATOR_DEPLOYMENT": "skip-metering-operator-deployment",
 				"METERING_OPERATOR_IMAGE_REPO":      "repo",
 				"METERING_OPERATOR_IMAGE_TAG":       "tag",
 				"DEPLOY_METERING_OPERATOR_LOCAL":    "run-metering-operator-local",
+			},
+		},
+		{
+			cmd: olmInstallCmd,
+			env: map[string]string{
+				"METERING_OLM_SUBSCRIPTION":             "subscription",
+				"METERING_OLM_CATALOG_SOURCE":           "catalog-source",
+				"METERING_OLM_CATALOG_SOURCE_NAMESPACE": "catalog-source-namespace",
+				"METERING_OLM_PACKAGE":                  "package",
+				"METERING_OLM_CHANNEL":                  "channel",
 			},
 		},
 	}

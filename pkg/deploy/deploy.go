@@ -75,6 +75,9 @@ type Config struct {
 	Repo                     string
 	Tag                      string
 	Channel                  string
+	PackageName              string
+	CatalogSourceName        string
+	CatalogSourceNamespace   string
 	SubscriptionName         string
 	ExtraNamespaceLabels     map[string]string
 	OperatorResources        *OperatorResources
@@ -228,6 +231,12 @@ func (deploy *Deployer) UninstallOLM() error {
 		return fmt.Errorf("failed to uninstall the metering OperatorGroup: %v", err)
 	}
 
+	if deploy.config.DeletePVCs {
+		err = deploy.uninstallMeteringPVCs()
+		if err != nil {
+			return fmt.Errorf("failed to uninstall the Metering PVCs: %v", err)
+		}
+	}
 	if deploy.config.DeleteCRDs {
 		err = deploy.uninstallMeteringCRDs()
 		if err != nil {
@@ -238,6 +247,17 @@ func (deploy *Deployer) UninstallOLM() error {
 		err = deploy.uninstallNamespace()
 		if err != nil {
 			return fmt.Errorf("failed to uninstall the %s metering namespace: %v", deploy.config.Namespace, err)
+		}
+	}
+	if deploy.config.DeleteCRB {
+		err = deploy.uninstallReportingOperatorClusterRole()
+		if err != nil {
+			return fmt.Errorf("failed to delete the reporting-operator ClusterRole resources: %v", err)
+		}
+
+		err = deploy.uninstallReportingOperatorClusterRoleBinding()
+		if err != nil {
+			return fmt.Errorf("failed to delete the reporting-operator ClusterRoleBinding resources: %v", err)
 		}
 	}
 
