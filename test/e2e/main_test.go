@@ -56,6 +56,21 @@ func init() {
 }
 
 func TestMain(m *testing.M) {
+	os.Exit(testMainWrapper(m))
+}
+
+// testMainWrapper is a wrapper function around the
+// top-level TestMain function and this pattern is
+// needed as os.Exit() doesn't respect any defer calls
+// that may occur during the TestMain workflow. If we
+// we instead doing the heavy-lifting in this function,
+// and then return an integer code that os.Exit can correctly
+// interpret, then the defer call will work.
+//
+// See the following references for more information:
+// - https://golang.org/pkg/os/#Exit
+// - http://blog.englund.nu/golang,/testing/2017/03/12/using-defer-in-testmain.html
+func testMainWrapper(m *testing.M) int {
 	flag.StringVar(&kubeConfig, "kubeconfig", "", "kube config path, e.g. $HOME/.kube/config")
 	flag.StringVar(&logLevel, "log-level", logrus.DebugLevel.String(), "The log level")
 	flag.BoolVar(&runTestsLocal, "run-tests-local", false, "Controls whether the metering and reporting operators are run locally during tests")
@@ -84,7 +99,7 @@ func TestMain(m *testing.M) {
 		logger.Fatalf("Failed to create a new deploy framework: %v", err)
 	}
 
-	os.Exit(m.Run())
+	return m.Run()
 }
 
 func TestManualMeteringInstall(t *testing.T) {
