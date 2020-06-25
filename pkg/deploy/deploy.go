@@ -149,10 +149,9 @@ func NewDeployer(
 	return deploy, nil
 }
 
-// InstallOLM is the drive function that manages the process of creating
-// all of the OLM-related resources that is needed to deploy a Metering
-// installation. Note: the Subscription created uses the redhat-operators
-// CatalogSource in the openshift-marketplace namespace.
+// InstallOLM is the driver function that manages the process of creating
+// all of the OLM-related resources that are needed to deploy a Metering
+// installation.
 func (deploy *Deployer) InstallOLM() error {
 	err := deploy.installNamespace()
 	if err != nil {
@@ -167,34 +166,6 @@ func (deploy *Deployer) InstallOLM() error {
 	err = deploy.installMeteringSubscription()
 	if err != nil {
 		return fmt.Errorf("failed to create the metering Subscription: %v", err)
-	}
-
-	err = deploy.installMeteringConfig()
-	if err != nil {
-		return fmt.Errorf("failed to create the MeteringConfig resource: %v", err)
-	}
-
-	return nil
-}
-
-// Install is the driver function that manages the process of creating all
-// the resources that metering needs to install: namespace, CRDs, etc.
-func (deploy *Deployer) Install() error {
-	err := deploy.installNamespace()
-	if err != nil {
-		return fmt.Errorf("failed to create the %s namespace: %v", deploy.config.Namespace, err)
-	}
-
-	err = deploy.installMeteringCRDs()
-	if err != nil {
-		return fmt.Errorf("failed to create the Metering CRDs: %v", err)
-	}
-
-	if !deploy.config.SkipMeteringDeployment {
-		err = deploy.installMeteringResources()
-		if err != nil {
-			return fmt.Errorf("failed to create the metering resources: %v", err)
-		}
 	}
 
 	err = deploy.installMeteringConfig()
@@ -254,11 +225,38 @@ func (deploy *Deployer) UninstallOLM() error {
 		if err != nil {
 			return fmt.Errorf("failed to delete the reporting-operator ClusterRole resources: %v", err)
 		}
-
 		err = deploy.uninstallReportingOperatorClusterRoleBinding()
 		if err != nil {
 			return fmt.Errorf("failed to delete the reporting-operator ClusterRoleBinding resources: %v", err)
 		}
+	}
+
+	return nil
+}
+
+// Install is the driver function that manages the process of creating all
+// the resources that metering needs to install: namespace, CRDs, etc.
+func (deploy *Deployer) Install() error {
+	err := deploy.installNamespace()
+	if err != nil {
+		return fmt.Errorf("failed to create the %s namespace: %v", deploy.config.Namespace, err)
+	}
+
+	err = deploy.installMeteringCRDs()
+	if err != nil {
+		return fmt.Errorf("failed to create the Metering CRDs: %v", err)
+	}
+
+	if !deploy.config.SkipMeteringDeployment {
+		err = deploy.installMeteringResources()
+		if err != nil {
+			return fmt.Errorf("failed to create the metering resources: %v", err)
+		}
+	}
+
+	err = deploy.installMeteringConfig()
+	if err != nil {
+		return fmt.Errorf("failed to create the MeteringConfig resource: %v", err)
 	}
 
 	return nil
