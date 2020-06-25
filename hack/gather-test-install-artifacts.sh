@@ -1,167 +1,60 @@
 #! /bin/bash
 
-echo "Performing cleanup"
-echo "Storing pod descriptions and logs at $LOG_DIR"
+# TODO: adapt to make this more general for debugging support cases
+METERING_TEST_NAMESPACE="${METERING_TEST_NAMESPACE:=$METERING_NAMESPACE}"
+METERING_GATHER_OLM_RESOURCES="${METERING_GATHER_OLM_RESOURCES:=true}"
 
-echo "Capturing pod descriptions"
-PODS="$(kubectl get pods --no-headers --namespace "$METERING_TEST_NAMESPACE" -o name | cut -d/ -f2)"
-while read -r pod; do
-    if [[ -n "$pod" ]]; then
-        echo "Capturing pod $pod description"
-        if ! kubectl describe pod --namespace "$METERING_TEST_NAMESPACE" "$pod" > "$LOG_DIR/${pod}-description.txt"; then
-            echo "Error capturing pod $pod description"
-        fi
-    fi
-done <<< "$PODS"
+LOG_DIR="${LOG_DIR:=$PWD/must-gather}"
+POD_LOG_PATH=${POD_LOG_PATH:="${LOG_DIR}/pod_logs"}
+mkdir -p ${POD_LOG_PATH}/
 
-echo "Capturing pod logs"
-while read -r pod; do
-    if [[ -z "$pod" ]]; then
-        continue
-    fi
-    # There can be multiple containers within a pod. We need to iterate
-    # over each of those
-    containers=$(kubectl get pods -o jsonpath="{.spec.containers[*].name}" --namespace "$METERING_TEST_NAMESPACE" "$pod")
-    for container in $containers; do
-        echo "Capturing pod $pod container $container logs"
-        if ! kubectl logs --namespace "$METERING_TEST_NAMESPACE" -c "$container" "$pod" > "$LOG_DIR/${pod}-${container}.log"; then
+resources=()
+resources+=(pods)
+resources+=(deployments)
+resources+=(statefulsets)
+resources+=(services)
+resources+=(hivetables)
+resources+=(prestotables)
+resources+=(storagelocations)
+resources+=(meteringconfigs)
+resources+=(reportdatasources)
+resources+=(reportqueries)
+resources+=(reports)
+
+if [[ ${METERING_GATHER_OLM_RESOURCES} == "true" ]]; then
+    resources+=(subscriptions)
+    resources+=(operatorgroups)
+    resources+=(clusterserviceversions)
+fi
+
+echo "Storing the must-gather output at $LOG_DIR"
+for resource in "${resources[@]}"; do
+    echo "Collecting dump of ${resource} in the ${METERING_TEST_NAMESPACE} namespace" | tee -a  ${LOG_DIR}/gather-debug.log
+    { timeout 120 oc adm --namespace ${METERING_TEST_NAMESPACE} --dest-dir=${LOG_DIR} inspect "${resource}"; } >> ${LOG_DIR}/gather-debug.log 2>&1
+done
+
+commands=()
+commands+=("get pods -o wide")
+commands+=("get reportdatasources")
+commands+=("get reports")
+commands+=("get prestotables")
+commands+=("get events")
+
+for command in "${commands[@]}"; do
+     echo "Collecting output of the following oc command: 'oc ${command}'" | tee -a ${LOG_DIR}/gather-debug.log
+     COMMAND_OUTPUT_FILE=${POD_LOG_PATH}/${command// /_}
+     timeout 120 oc -n ${METERING_TEST_NAMESPACE} ${command} >> "${COMMAND_OUTPUT_FILE}"
+done
+
+for pod in $(oc --namespace $METERING_TEST_NAMESPACE get pods --no-headers -o name | cut -d/ -f2); do
+    for container in $(oc --namespace $METERING_TEST_NAMESPACE get pods -o jsonpath="{.spec.containers[*].name}" "$pod"); do
+        echo "Capturing Pod $pod container $container logs"
+        if ! oc logs --namespace "$METERING_TEST_NAMESPACE" -c "$container" "$pod" >> "${POD_LOG_PATH}/${pod}-${container}.log"; then
             echo "Error capturing pod $pod container $container logs"
         fi
     done
-done <<< "$PODS"
+done
 
-echo "Capturing deployment descriptions"
-DEPLOYMENTS=$(kubectl get deployments --namespace "$METERING_TEST_NAMESPACE"  -o name | cut -d/ -f2)
-while read -r deployment; do
-    if [[ -z $deployment ]]; then
-        continue
-    fi
-
-    kubectl describe deployment "$deployment" --namespace "$METERING_TEST_NAMESPACE" > "$LOG_DIR/deployment-${deployment}-description.log"
-done <<< "$DEPLOYMENTS"
-
-echo "Capturing statefulset descriptions"
-STATEFULSETS=$(kubectl get statefulsets --namespace "$METERING_TEST_NAMESPACE" -o name | cut -d/ -f2)
-while read -r statefulset; do
-    if [[ -z $statefulset ]]; then
-        continue
-    fi
-
-    kubectl describe statefulset "$statefulset" --namespace "$METERING_TEST_NAMESPACE" > "$LOG_DIR/statefulset-${statefulset}-description.log"
-done <<< "$STATEFULSETS"
-
-echo "Capturing MeteringConfigs"
-METERINGCONFIGS="$(kubectl get meteringconfigs --no-headers --namespace "$METERING_TEST_NAMESPACE" -o name | cut -d/ -f2)"
-while read -r meteringconfig; do
-    if [[ -n "$meteringconfig" ]]; then
-        echo "Capturing MeteringConfig $meteringconfig as json"
-        if ! kubectl get meteringconfig "$meteringconfig" --namespace "$METERING_TEST_NAMESPACE" -o json > "$METERINGCONFIGS_DIR/${meteringconfig}.json"; then
-            echo "Error getting $meteringconfig as json"
-        fi
-    fi
-done <<< "$METERINGCONFIGS"
-
-echo "Capturing Metering StorageLocations"
-STORAGELOCATIONS="$(kubectl get storagelocations --no-headers --namespace "$METERING_TEST_NAMESPACE" -o name | cut -d/ -f2)"
-while read -r storagelocation; do
-    if [[ -n "$storagelocation" ]]; then
-        echo "Capturing StorageLocation $storagelocation as json"
-        if ! kubectl get storagelocation "$storagelocation" --namespace "$METERING_TEST_NAMESPACE" -o json > "$STORAGELOCATIONS_DIR/${storagelocation}.json"; then
-            echo "Error getting $storagelocation as json"
-        fi
-    fi
-done <<< "$STORAGELOCATIONS"
-
-echo "Capturing Metering PrestoTables"
-PRESTOTABLES="$(kubectl get prestotables --no-headers --namespace "$METERING_TEST_NAMESPACE" -o name | cut -d/ -f2)"
-while read -r prestotable; do
-    if [[ -n "$prestotable" ]]; then
-        echo "Capturing PrestoTable $prestotable as json"
-        if ! kubectl get prestotable "$prestotable" --namespace "$METERING_TEST_NAMESPACE" -o json > "$PRESTOTABLES_DIR/${prestotable}.json"; then
-            echo "Error getting $prestotable as json"
-        fi
-    fi
-done <<< "$PRESTOTABLES"
-
-echo "Capturing Metering HiveTables"
-HIVETABLES="$(kubectl get hivetables --no-headers --namespace "$METERING_TEST_NAMESPACE" -o name | cut -d/ -f2)"
-while read -r hivetable; do
-    if [[ -n "$hivetable" ]]; then
-        echo "Capturing HiveTable $hivetable as json"
-        if ! kubectl get hivetable "$hivetable" --namespace "$METERING_TEST_NAMESPACE" -o json > "$HIVETABLES_DIR/${hivetable}.json"; then
-            echo "Error getting $hivetable as json"
-        fi
-    fi
-done <<< "$HIVETABLES"
-
-echo "Capturing Metering ReportDataSources"
-DATASOURCES="$(kubectl get reportdatasources --no-headers --namespace "$METERING_TEST_NAMESPACE" -o name | cut -d/ -f2)"
-while read -r datasource; do
-    if [[ -n "$datasource" ]]; then
-        echo "Capturing ReportDataSource $datasource as json"
-        if ! kubectl get reportdatasource "$datasource" --namespace "$METERING_TEST_NAMESPACE" -o json > "$DATASOURCES_DIR/${datasource}.json"; then
-            echo "Error getting $datasource as json"
-        fi
-    fi
-done <<< "$DATASOURCES"
-
-echo "Capturing Metering ReportQueries"
-RGQS="$(kubectl get reportqueries --no-headers --namespace "$METERING_TEST_NAMESPACE" -o name | cut -d/ -f2)"
-while read -r rgq; do
-    if [[ -n "$rgq" ]]; then
-        echo "Capturing ReportQuery $rgq as json"
-        if ! kubectl get reportquery "$rgq" --namespace "$METERING_TEST_NAMESPACE" -o json > "$REPORTQUERIES_DIR/${rgq}.json"; then
-            echo "Error getting $rgq as json"
-        fi
-    fi
-done <<< "$RGQS"
-
-echo "Capturing Metering Reports"
-REPORTS="$(kubectl get reports --no-headers --namespace "$METERING_TEST_NAMESPACE" -o name | cut -d/ -f2)"
-while read -r report; do
-    if [[ -n "$report" ]]; then
-        echo "Capturing Report $report as json"
-        if ! kubectl get report "$report" --namespace "$METERING_TEST_NAMESPACE" -o json > "$REPORTS_DIR/${report}.json"; then
-            echo "Error getting $report as json"
-        fi
-    fi
-done <<< "$REPORTS"
-
-echo "Capturing reportdatasources listing"
-kubectl --namespace "$METERING_TEST_NAMESPACE" get reportdatasources > "$LOG_DIR/reportdatasources-metrics.log"
-
-#
-# OLM-specific resources
-#
-echo "Capturing subscription descriptions"
-SUBSCRIPTIONS=$(kubectl get subscriptions --namespace "$METERING_TEST_NAMESPACE" -o name | cut -d/ -f2)
-while read -r subscription; do
-    if [[ -z $subscription ]]; then
-        continue
-    fi
-
-    kubectl describe subscription "$subscription" --namespace "$METERING_TEST_NAMESPACE" > "$LOG_DIR/subscription-${subscription}-description.log"
-done <<< "$SUBSCRIPTIONS"
-
-echo "Capturing clusterserviceversion descriptions"
-CSVS=$(kubectl get csv --namespace "$METERING_TEST_NAMESPACE" -o name | cut -d/ -f2)
-while read -r csv; do
-    if [[ -z $csv ]]; then
-        continue
-    fi
-
-    kubectl describe csv "$csv" --namespace "$METERING_TEST_NAMESPACE" > "$LOG_DIR/csv-${csv}-description.log"
-done <<< "$CSVS"
-
-echo "Capturing operatorgroup descriptions"
-OPERATORGROUPS=$(kubectl get operatorgroups --namespace "$METERING_TEST_NAMESPACE" -o name | cut -d/ -f2)
-while read -r operatorgroups; do
-    if [[ -z $operatorgroups ]]; then
-        continue
-    fi
-
-    kubectl describe operatorgroups "$operatorgroups" --namespace "$METERING_TEST_NAMESPACE"> "$LOG_DIR/operatorgroups-${operatorgroups}-description.log"
-done <<< "$OPERATORGROUPS"
-
-echo "Capturing metering-ocp packagemanifest description"
-kubectl describe packagemanifests metering-ocp --namespace openshift-marketplace > "$LOG_DIR/packagemanifest-metering-ocp-description.log"
+echo "Deleting any empty test artifact files" >> ${LOG_DIR}/gather-debug.log
+find "${LOG_DIR}" -empty -delete >> ${LOG_DIR}/gather-debug.log 2>&1
+exit 0
