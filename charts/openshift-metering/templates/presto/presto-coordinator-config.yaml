@@ -22,6 +22,7 @@ data:
     http-server.https.enabled=true
     http-server.https.port=8080
 #   TODO revisit this once we move our forked Presto past v330 as there are security changes there that may effect this
+#    Presto as of v228 requires a non-null keystore password
     http-server.https.keystore.key=changeit
     http-server.https.keystore.path=/opt/presto/tls/keystore.pem
     http-server.https.truststore.path=/opt/presto/tls/truststore.pem
