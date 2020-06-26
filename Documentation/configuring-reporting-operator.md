@@ -163,7 +163,7 @@ Be sure to replace `testuser:password123` with a valid username and password com
 
 ### Manual Setup
 
-In order to manually configure, or disable OAuth in the reporting-operator, you need to set `spec.tls.enabled: false` in your `MeteringConfig` CR. Warning: this also disables all TLS/authentication between the reporting-operator, presto, and hive. You would need to manually configure these resources yourself.
+In order to manually configure, or disable OAuth in the reporting-operator, you need to set `spec.tls.enabled: false` in your `MeteringConfig` CR. **Warning:** this also disables all TLS/authentication between the reporting-operator, presto, and hive. You would need to manually configure these resources yourself.
 
 Authentication can be enabled by configuring the options below.
 Enabling authentication configures the reporting-operator pod to run the Openshift auth-proxy as a sidecar container in the pod.
