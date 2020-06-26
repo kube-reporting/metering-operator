@@ -25,7 +25,7 @@ func (rf *ReportingFramework) doRequest(endpoint, method string, body []byte, qu
 
 	if rf.UseRouteForReportingAPI {
 		// query all routes for the metering route
-		meteringRoute, err := rf.RouteClient.Routes(rf.Namespace).Get(context.TODO(), meteringRouteName, metav1.GetOptions{})
+		meteringRoute, err := rf.RouteClient.Routes(rf.Namespace).Get(context.Background(), meteringRouteName, metav1.GetOptions{})
 		if err != nil {
 			return nil, 0, fmt.Errorf("query for metering route failed, err: %v", err)
 		}

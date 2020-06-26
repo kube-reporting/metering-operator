@@ -15,7 +15,7 @@ import (
 )
 
 func (rf *ReportingFramework) GetMeteringReportDataSource(name string) (*metering.ReportDataSource, error) {
-	return rf.MeteringClient.ReportDataSources(rf.Namespace).Get(context.TODO(), name, metav1.GetOptions{})
+	return rf.MeteringClient.ReportDataSources(rf.Namespace).Get(context.Background(), name, metav1.GetOptions{})
 }
 
 func (rf *ReportingFramework) WaitForMeteringReportDataSourceTable(t *testing.T, name string, pollInterval, timeout time.Duration) (*metering.ReportDataSource, error) {
@@ -43,7 +43,7 @@ func (rf *ReportingFramework) WaitForAllMeteringReportDataSourceTables(t *testin
 	t.Helper()
 	var reportDataSources []*metering.ReportDataSource
 	return reportDataSources, wait.PollImmediate(pollInterval, timeout, func() (bool, error) {
-		reportDataSourcesList, err := rf.MeteringClient.ReportDataSources(rf.Namespace).List(context.TODO(), metav1.ListOptions{})
+		reportDataSourcesList, err := rf.MeteringClient.ReportDataSources(rf.Namespace).List(context.Background(), metav1.ListOptions{})
 		require.NoError(t, err, "should not have errors querying API for list of ReportDataSources")
 		reportDataSources = reportDataSourcesList.Items
 

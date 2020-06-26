@@ -16,7 +16,7 @@ import (
 )
 
 func (rf *ReportingFramework) GetMeteringReportQuery(name string) (*metering.ReportQuery, error) {
-	return rf.MeteringClient.ReportQueries(rf.Namespace).Get(context.TODO(), name, metav1.GetOptions{})
+	return rf.MeteringClient.ReportQueries(rf.Namespace).Get(context.Background(), name, metav1.GetOptions{})
 }
 
 func (rf *ReportingFramework) WaitForMeteringReportQuery(t *testing.T, name string, pollInterval, timeout time.Duration) (*metering.ReportQuery, error) {
