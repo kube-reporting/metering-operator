@@ -24,12 +24,12 @@ import (
 )
 
 func (rf *ReportingFramework) CreateMeteringReport(report *metering.Report) error {
-	_, err := rf.MeteringClient.Reports(rf.Namespace).Create(context.TODO(), report, metav1.CreateOptions{})
+	_, err := rf.MeteringClient.Reports(rf.Namespace).Create(context.Background(), report, metav1.CreateOptions{})
 	return err
 }
 
 func (rf *ReportingFramework) GetMeteringReport(name string) (*metering.Report, error) {
-	return rf.MeteringClient.Reports(rf.Namespace).Get(context.TODO(), name, metav1.GetOptions{})
+	return rf.MeteringClient.Reports(rf.Namespace).Get(context.Background(), name, metav1.GetOptions{})
 }
 
 func (rf *ReportingFramework) NewSimpleReport(name, queryName string, schedule *metering.ReportSchedule, reportingStart, reportingEnd *time.Time) *metering.Report {
@@ -56,7 +56,7 @@ func (rf *ReportingFramework) NewSimpleReport(name, queryName string, schedule *
 
 func (rf *ReportingFramework) RequireReportSuccessfullyRuns(t *testing.T, report *metering.Report, waitTimeout time.Duration) {
 	t.Helper()
-	err := rf.MeteringClient.Reports(rf.Namespace).Delete(context.TODO(), report.Name, metav1.DeleteOptions{})
+	err := rf.MeteringClient.Reports(rf.Namespace).Delete(context.Background(), report.Name, metav1.DeleteOptions{})
 	assert.Condition(t, func() bool {
 		return err == nil || errors.IsNotFound(err)
 	}, "failed to ensure Report doesn't exist before creating")

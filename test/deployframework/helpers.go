@@ -13,20 +13,22 @@ import (
 	"time"
 
 	"github.com/sirupsen/logrus"
-	v1 "k8s.io/api/core/v1"
+	appsv1 "k8s.io/api/apps/v1"
+	corev1 "k8s.io/api/core/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
-	meta "k8s.io/apimachinery/pkg/apis/meta/v1"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/util/wait"
 	"k8s.io/client-go/kubernetes"
 
 	metering "github.com/kube-reporting/metering-operator/pkg/apis/metering/v1"
+	"github.com/kube-reporting/metering-operator/pkg/deploy"
 	meteringclient "github.com/kube-reporting/metering-operator/pkg/generated/clientset/versioned/typed/metering/v1"
 	olmv1alpha1 "github.com/operator-framework/api/pkg/operators/v1alpha1"
 	olmclientv1alpha1 "github.com/operator-framework/operator-lifecycle-manager/pkg/api/client/clientset/versioned/typed/operators/v1alpha1"
 )
 
-func checkPodStatus(pod v1.Pod) (bool, int) {
-	if pod.Status.Phase != v1.PodRunning {
+func checkPodStatus(pod corev1.Pod) (bool, int) {
+	if pod.Status.Phase != corev1.PodRunning {
 		return false, 0
 	}
 
@@ -116,12 +118,12 @@ type podStat struct {
 // the polling loop, the number of pods listed must match the expected number
 // of targetPodsCount, and all pod containers listed must report a ready status.
 func (pw *PodWaiter) WaitForPods(namespace string, targetPodsCount int) error {
-	// TODO: generalize this more and pass a meta.ListOptions parameter
+	// TODO: generalize this more and pass a metav1.ListOptions parameter
 	err := wait.Poll(pw.InitialDelay, pw.TimeoutPeriod, func() (done bool, err error) {
 		var readyPods []string
 		var unreadyPods []podStat
 
-		pods, err := pw.Client.CoreV1().Pods(namespace).List(context.TODO(), meta.ListOptions{})
+		pods, err := pw.Client.CoreV1().Pods(namespace).List(context.TODO(), metav1.ListOptions{})
 		if err != nil {
 			return false, err
 		}
@@ -157,11 +159,11 @@ func (pw *PodWaiter) WaitForPods(namespace string, targetPodsCount int) error {
 // to find the secret that contains the serviceAccount token and return it.
 func GetServiceAccountToken(client kubernetes.Interface, initialDelay, timeoutPeriod time.Duration, namespace, serviceAccountName string) (string, error) {
 	var (
-		sa  *v1.ServiceAccount
+		sa  *corev1.ServiceAccount
 		err error
 	)
 	err = wait.Poll(initialDelay, timeoutPeriod, func() (done bool, err error) {
-		sa, err = client.CoreV1().ServiceAccounts(namespace).Get(context.TODO(), serviceAccountName, meta.GetOptions{})
+		sa, err = client.CoreV1().ServiceAccounts(namespace).Get(context.TODO(), serviceAccountName, metav1.GetOptions{})
 		if err != nil {
 			if apierrors.IsNotFound(err) {
 				return false, nil
@@ -190,7 +192,7 @@ func GetServiceAccountToken(client kubernetes.Interface, initialDelay, timeoutPe
 		return "", fmt.Errorf("%s service account has no token", serviceAccountName)
 	}
 
-	secret, err := client.CoreV1().Secrets(namespace).Get(context.TODO(), secretName, meta.GetOptions{})
+	secret, err := client.CoreV1().Secrets(namespace).Get(context.TODO(), secretName, metav1.GetOptions{})
 	if err != nil {
 		return "", fmt.Errorf("failed getting %s service account token secret: %v", serviceAccountName, err)
 	}
@@ -292,10 +294,10 @@ func CreateCatalogSource(logger logrus.FieldLogger, name, namespace, configMapNa
 	// check if the @name CatalogSource already exists and if true, exit early.
 	// If no CatalogSource exists by that name, start building up that object
 	// and attempt to create it through the OLM v1alpha1 client.
-	_, err := client.CatalogSources(namespace).Get(context.TODO(), name, meta.GetOptions{})
+	_, err := client.CatalogSources(namespace).Get(context.TODO(), name, metav1.GetOptions{})
 	if apierrors.IsNotFound(err) {
 		catsrc := &olmv1alpha1.CatalogSource{
-			ObjectMeta: meta.ObjectMeta{
+			ObjectMeta: metav1.ObjectMeta{
 				Name:      name,
 				Namespace: namespace,
 			},
@@ -306,7 +308,7 @@ func CreateCatalogSource(logger logrus.FieldLogger, name, namespace, configMapNa
 				Publisher:   "Red Hat",
 			},
 		}
-		_, err := client.CatalogSources(namespace).Create(context.TODO(), catsrc, meta.CreateOptions{})
+		_, err := client.CatalogSources(namespace).Create(context.TODO(), catsrc, metav1.CreateOptions{})
 		if err != nil {
 			return fmt.Errorf("failed to create the %s CatalogSource for metering: %v", name, err)
 		}
@@ -326,7 +328,7 @@ func VerifyCatalogSourcePod(logger logrus.FieldLogger, client kubernetes.Interfa
 	// Continue polling until a single Pod is returned by that label selector query
 	// and that Pod is reporting a Ready stauts, or stop when the timeout period is reached.
 	err := wait.Poll(3*time.Second, 1*time.Minute, func() (done bool, err error) {
-		pods, err := client.CoreV1().Pods(namespace).List(context.TODO(), meta.ListOptions{
+		pods, err := client.CoreV1().Pods(namespace).List(context.TODO(), metav1.ListOptions{
 			LabelSelector: fmt.Sprintf("olm.catalogSource=%s", packageName),
 		})
 		if err != nil {
@@ -423,7 +425,7 @@ func CreateUpgradeConfigMap(logger logrus.FieldLogger, name, namespace, scriptPa
 // has been created in the @namespace namespace.
 func VerifyConfigMap(logger logrus.FieldLogger, client kubernetes.Interface, name, namespace string) error {
 	err := wait.Poll(1*time.Second, 45*time.Second, func() (done bool, err error) {
-		_, err = client.CoreV1().ConfigMaps(namespace).Get(context.TODO(), name, meta.GetOptions{})
+		_, err = client.CoreV1().ConfigMaps(namespace).Get(context.TODO(), name, metav1.GetOptions{})
 		if apierrors.IsNotFound(err) {
 			return false, nil
 		}
@@ -444,7 +446,7 @@ func VerifyConfigMap(logger logrus.FieldLogger, client kubernetes.Interface, nam
 // UpdateExistingSubscription is a helper function responsible for upgrading an existing metering-ocp Subscription
 // to use the newest payload and verify that the Subscription object is reporting a successful upgrade status.
 func UpdateExistingSubscription(logger logrus.FieldLogger, client olmclientv1alpha1.OperatorsV1alpha1Interface, name, upgradeChannel, namespace string) error {
-	sub, err := client.Subscriptions(namespace).Get(context.TODO(), name, meta.GetOptions{})
+	sub, err := client.Subscriptions(namespace).Get(context.TODO(), name, metav1.GetOptions{})
 	if apierrors.IsNotFound(err) {
 		return fmt.Errorf("the %s subscription does not exist", name)
 	}
@@ -457,7 +459,7 @@ func UpdateExistingSubscription(logger logrus.FieldLogger, client olmclientv1alp
 	sub.Spec.CatalogSource = name
 	sub.Spec.CatalogSourceNamespace = namespace
 	sub.Spec.Channel = upgradeChannel
-	_, err = client.Subscriptions(namespace).Update(context.TODO(), sub, meta.UpdateOptions{})
+	_, err = client.Subscriptions(namespace).Update(context.TODO(), sub, metav1.UpdateOptions{})
 	if err != nil {
 		return err
 	}
@@ -467,7 +469,7 @@ func UpdateExistingSubscription(logger logrus.FieldLogger, client olmclientv1alp
 	// wait until this object is reporting a successful upgrade state before
 	// transferring control back to the function call site.
 	err = wait.Poll(3*time.Second, 1*time.Minute, func() (done bool, err error) {
-		sub, err := client.Subscriptions(namespace).Get(context.TODO(), name, meta.GetOptions{})
+		sub, err := client.Subscriptions(namespace).Get(context.TODO(), name, metav1.GetOptions{})
 		if apierrors.IsNotFound(err) {
 			return false, nil
 		}
@@ -499,7 +501,7 @@ func UpdateExistingSubscription(logger logrus.FieldLogger, client olmclientv1alp
 // indicate a successful upgrade status.
 func WaitForMeteringOperatorDeployment(logger logrus.FieldLogger, client kubernetes.Interface, name, namespace string) error {
 	err := wait.Poll(10*time.Second, 10*time.Minute, func() (done bool, err error) {
-		deployment, err := client.AppsV1().Deployments(namespace).Get(context.TODO(), name, meta.GetOptions{})
+		deployment, err := client.AppsV1().Deployments(namespace).Get(context.TODO(), name, metav1.GetOptions{})
 		if apierrors.IsNotFound(err) {
 			return false, nil
 		}
@@ -526,7 +528,7 @@ func WaitForMeteringOperatorDeployment(logger logrus.FieldLogger, client kuberne
 // polling until there's a single replica.
 func WaitForReportingOperatorDeployment(logger logrus.FieldLogger, client kubernetes.Interface, name, namespace string) error {
 	err := wait.Poll(20*time.Second, 10*time.Minute, func() (done bool, err error) {
-		deployment, err := client.AppsV1().Deployments(namespace).Get(context.TODO(), name, meta.GetOptions{})
+		deployment, err := client.AppsV1().Deployments(namespace).Get(context.TODO(), name, metav1.GetOptions{})
 		if apierrors.IsNotFound(err) {
 			return false, nil
 		}
@@ -547,7 +549,7 @@ func WaitForReportingOperatorDeployment(logger logrus.FieldLogger, client kubern
 
 func WaitForReportDataSources(logger logrus.FieldLogger, client meteringclient.MeteringV1Interface, namespace string) error {
 	err := wait.Poll(10*time.Second, 5*time.Minute, func() (done bool, err error) {
-		dataSources, err := client.ReportDataSources(namespace).List(context.TODO(), meta.ListOptions{})
+		dataSources, err := client.ReportDataSources(namespace).List(context.TODO(), metav1.ListOptions{})
 		if err != nil {
 			return false, err
 		}
@@ -564,7 +566,7 @@ func WaitForReportDataSources(logger logrus.FieldLogger, client meteringclient.M
 }
 
 func DeleteAllTestReports(logger logrus.FieldLogger, client meteringclient.MeteringV1Interface, namespace string) error {
-	err := client.Reports(namespace).DeleteCollection(context.TODO(), meta.DeleteOptions{}, meta.ListOptions{})
+	err := client.Reports(namespace).DeleteCollection(context.TODO(), metav1.DeleteOptions{}, metav1.ListOptions{})
 	if err != nil {
 		return fmt.Errorf("failed to delete all the Reports in the %s namespace: %v", namespace, err)
 	}
@@ -574,11 +576,193 @@ func DeleteAllTestReports(logger logrus.FieldLogger, client meteringclient.Meter
 }
 
 func DeleteAllReportDataSources(logger logrus.FieldLogger, client meteringclient.MeteringV1Interface, namespace string) error {
-	err := client.ReportDataSources(namespace).DeleteCollection(context.TODO(), meta.DeleteOptions{}, meta.ListOptions{})
+	err := client.ReportDataSources(namespace).DeleteCollection(context.TODO(), metav1.DeleteOptions{}, metav1.ListOptions{})
 	if err != nil {
 		return fmt.Errorf("failed to delete all the ReportDataSources in the %s namespace: %v", namespace, err)
 	}
 	logger.Infof("Deleted all of the ReportDataSources in the %s namespace", namespace)
+
+	return nil
+}
+
+// CreateRegistryDeployment is a helper function responsible for building up
+// and creating a local registry Deployment based on the @manifestPath YAML manifest
+// object. In the case where the metering-operator or reporting-operator images have
+// been overrided, we need to do some manipulation of the decoded deployment object
+// to ensure we propagate those custom images when manipulating the CSV images.
+func CreateRegistryDeployment(
+	logger logrus.FieldLogger,
+	client kubernetes.Interface,
+	namespacePrefix,
+	manifestPath,
+	registryImage,
+	meteringOperatorImage,
+	reportingOperatorImage,
+	namespace string,
+) error {
+	if registryImage == "" {
+		return fmt.Errorf("error: the registry image parameter is empty")
+	}
+
+	var deployment *appsv1.Deployment
+	err := deploy.DecodeYAMLManifestToObject(manifestPath, &deployment)
+	if err != nil {
+		return fmt.Errorf("failed to decode the %s YAML deployment manifest: %v", manifestPath, err)
+	}
+
+	// Add a namespace prefix to the decoded object to avoid any collisions with other e2e instances
+	deployment.Name = namespacePrefix + "-" + deployment.Name
+	deployment.Namespace = namespace
+	if deployment.Labels != nil {
+		deployment.Labels["name"] = namespacePrefix + "-" + testNamespaceLabel
+	}
+
+	// Update the invalid manifest registry image with the @registryImage provided
+	deployment.Spec.Template.Spec.Containers[0].Image = registryImage
+	deployment.Spec.Template.Spec.InitContainers[0].Image = registryImage
+
+	/*
+		In the case where we're running the testing suite in CI,
+		or if a dev has specified the METERING_OPERATOR_IMAGE_* or
+		REPORTING_OPERATOR_IMAGE_* environment variables, then update
+		the deployment manifest with these values.
+
+		Note: we can somewhat safely make the assumption that the environment
+		variable for the metering-operator is going to be at the first
+		index in that initContainer .Env array, and the reporting-operator
+		is going to be in the second index, but this is a bit gross, so we
+		need to figure out a better way of manipulating this manifest without
+		blindly indexing into this the environment array.
+	*/
+	if meteringOperatorImage != "" {
+		logger.Infof("Overriding the default metering-ansible-operator image with %s", meteringOperatorImage)
+		deployment.Spec.Template.Spec.InitContainers[0].Env[0].Value = meteringOperatorImage
+	}
+	if reportingOperatorImage != "" {
+		logger.Infof("Overriding the default metering-reporting-operator image with %s", reportingOperatorImage)
+		deployment.Spec.Template.Spec.InitContainers[0].Env[1].Value = reportingOperatorImage
+	}
+
+	_, err = client.AppsV1().Deployments(namespace).Get(context.TODO(), deployment.Name, metav1.GetOptions{})
+	if err != nil && !apierrors.IsNotFound(err) {
+		return err
+	}
+	if apierrors.IsNotFound(err) {
+		deployment, err := client.AppsV1().Deployments(namespace).Create(context.TODO(), deployment, metav1.CreateOptions{})
+		if err != nil {
+			return err
+		}
+		logger.Infof("Created the %s registry deployment in the %s namespace", deployment.Name, deployment.Namespace)
+	}
+
+	return nil
+}
+
+// CreateRegistryService is a helper function responsible for decoding the
+// @manifestPath registry Service YAML manifest into a Go object, which we
+// then attempt to create in the @namespace. We're namely interested in the
+// spec.ClusterIP that gets populated once the service object has been created,
+// which we can then reference in a CatalogSource custom resource (`spec.addr`).
+func CreateRegistryService(logger logrus.FieldLogger, client kubernetes.Interface, namespacePrefix, manifestPath, namespace string) (string, error) {
+	var service *corev1.Service
+	err := deploy.DecodeYAMLManifestToObject(manifestPath, &service)
+	if err != nil {
+		return "", fmt.Errorf("failed to decode the %s YAML service manifest: %v", manifestPath, err)
+	}
+
+	// Add a namespace prefix to the decoded object to avoid any collisions with other e2e instances
+	service.Name = namespacePrefix + "-" + service.Name
+	service.Namespace = namespace
+	if service.Labels != nil {
+		service.Labels["name"] = namespacePrefix + "-" + testNamespaceLabel
+	}
+
+	svc, err := client.CoreV1().Services(namespace).Get(context.TODO(), service.Name, metav1.GetOptions{})
+	if err != nil && !apierrors.IsNotFound(err) {
+		return "", err
+	}
+	if apierrors.IsNotFound(err) {
+		svc, err = client.CoreV1().Services(namespace).Create(context.TODO(), service, metav1.CreateOptions{})
+		if err != nil {
+			return "", err
+		}
+		logger.Infof("Created the %s registry service in the %s namespace", service.Name, service.Namespace)
+	}
+
+	// Check if the Spec.ClusterIP has been populated yet, and if not, continue to poll
+	// until that string is non-empty before returning control back to the call site
+	if svc.Spec.ClusterIP == "" {
+		err := wait.Poll(time.Second, 10*time.Second, func() (done bool, err error) {
+			svc, err := client.CoreV1().Services(namespace).Get(context.TODO(), service.Name, metav1.GetOptions{})
+			if err != nil {
+				return false, err
+			}
+
+			return svc.Spec.ClusterIP != "", nil
+		})
+		if err != nil {
+			return "", fmt.Errorf("failed to wait for the %s registry service in the %s namespace to have a populated ClusterIP field: %v", service.Name, service.Namespace, err)
+		}
+	}
+
+	return svc.Spec.ClusterIP, nil
+}
+
+// DeleteRegistryService is a helper function responsible for listing
+// all of the registry services in the @namespace that match the
+// @labelSelector parameters, and deleting any services that get
+// returned from that list
+func DeleteRegistryService(logger logrus.FieldLogger, client kubernetes.Interface, namespace, labelSelector string) error {
+	var errArr []string
+
+	services, err := client.CoreV1().Services(namespace).List(context.TODO(), metav1.ListOptions{
+		LabelSelector: labelSelector,
+	})
+	if len(services.Items) == 0 {
+		errArr = append(errArr, fmt.Sprintf("failed to list the registry service: %v", err))
+	}
+	for _, service := range services.Items {
+		err = client.CoreV1().Services(service.Namespace).Delete(context.TODO(), service.Name, metav1.DeleteOptions{})
+		if err != nil {
+			errArr = append(errArr, fmt.Sprintf("failed to successfully delete the %s registry service: %v", service.Name, err))
+		}
+		logger.Infof("Deleted the %s registry service in the %s namespace", service.Name, service.Namespace)
+	}
+
+	if len(errArr) != 0 {
+		return fmt.Errorf(strings.Join(errArr, "\n"))
+	}
+
+	return nil
+}
+
+// DeleteRegistryDeployment is a helper function responsible for listing
+// all of the registry deployments in the @namespace that match the
+// @labelSelector label selector, and deleting any deployments that get
+// returned from that list.
+func DeleteRegistryDeployment(logger logrus.FieldLogger, client kubernetes.Interface, namespace, labelSelector string) error {
+	var errArr []string
+
+	deployments, err := client.AppsV1().Deployments(namespace).List(context.TODO(), metav1.ListOptions{
+		LabelSelector: labelSelector,
+	})
+	if err != nil {
+		errArr = append(errArr, fmt.Sprintf("failed to successfully delete the the registry deployment: %v", err))
+	}
+	if len(deployments.Items) == 0 {
+		errArr = append(errArr, fmt.Sprintf("failed to list the registry deployment: %v", err))
+	}
+	for _, deployment := range deployments.Items {
+		err = client.AppsV1().Deployments(namespace).Delete(context.TODO(), deployment.Name, metav1.DeleteOptions{})
+		if err != nil {
+			errArr = append(errArr, fmt.Sprintf("failed to successfully delete the %s registry deployment in the %s namespace: %v", deployment.Name, deployment.Namespace, err))
+		}
+		logger.Infof("Deleted the %s registry deployment in the %s namespace", deployment.Name, deployment.Namespace)
+	}
+
+	if len(errArr) != 0 {
+		return fmt.Errorf(strings.Join(errArr, "\n"))
+	}
 
 	return nil
 }

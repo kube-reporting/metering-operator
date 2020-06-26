@@ -22,6 +22,10 @@ func testManualMeteringInstall(
 	meteringOperatorImageRepo,
 	meteringOperatorImageTag,
 	manifestFilename,
+	catalogSourceName,
+	catalogSourceNamespace,
+	subscriptionChannel,
+	installationMethod,
 	testOutputPath string,
 	expectInstallErrMsg []string,
 	expectInstallErr bool,
@@ -52,14 +56,17 @@ func testManualMeteringInstall(
 		meteringOperatorImageTag,
 		reportingOperatorImageRepo,
 		reportingOperatorImageTag,
+		catalogSourceName,
+		catalogSourceNamespace,
+		subscriptionChannel,
 		testCaseOutputBaseDir,
 		testInstallFunction.ExtraEnvVars,
 		mc.Spec,
 	)
 	require.NoError(t, err, "creating a new deployer context should produce no error")
-
 	deployerCtx.Logger.Infof("DeployerCtx: %+v", deployerCtx)
-	rf, err := deployerCtx.Setup(deployerCtx.Deployer.Install, expectInstallErr)
+
+	rf, err := deployerCtx.Setup(deployerCtx.Deployer.InstallOLM, expectInstallErr)
 
 	canSafelyRunTest := testhelpers.AssertCanSafelyRunReportingTests(t, err, expectInstallErr, expectInstallErrMsg)
 	if canSafelyRunTest {
@@ -70,6 +77,6 @@ func testManualMeteringInstall(
 		deployerCtx.Logger.Infof("The %s test has finished running", testInstallFunction.Name)
 	}
 
-	err = deployerCtx.Teardown(deployerCtx.Deployer.Uninstall)
+	err = deployerCtx.Teardown(deployerCtx.Deployer.UninstallOLM)
 	assert.NoError(t, err, "capturing logs and uninstalling metering should produce no error")
 }
