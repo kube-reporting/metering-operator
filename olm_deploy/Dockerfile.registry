@@ -2,7 +2,7 @@ FROM quay.io/operator-framework/upstream-registry-builder:latest as builder
 FROM registry.svc.ci.openshift.org/openshift/release:golang-1.13
 
 WORKDIR /
-ARG MANIFEST_BUNDLE
+ARG MANIFEST_BUNDLE=manifests/deploy/openshift/olm/bundle
 COPY ${MANIFEST_BUNDLE} /manifests
 
 # Need to remove the art.yaml and image-references files from the list of OLM
