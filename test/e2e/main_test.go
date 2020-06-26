@@ -26,10 +26,17 @@ var (
 	meteringOperatorImageTag   string
 	reportingOperatorImageRepo string
 	reportingOperatorImageTag  string
-	namespacePrefix            string
-	testOutputPath             string
-	repoPath                   string
-	repoVersion                string
+	meteringOperatorImage      string
+	reportingOperatorImage     string
+
+	namespacePrefix        string
+	testOutputPath         string
+	repoPath               string
+	repoVersion            string
+	registryImage          string
+	subscriptionChannel    string
+	catalogSourceName      string
+	catalogSourceNamespace string
 
 	kubeNamespaceCharLimit          = 63
 	namespacePrefixCharLimit        = 10
@@ -38,6 +45,7 @@ var (
 	postUpgradeTestDirName          = "post-upgrade"
 	gatherTestArtifactsScript       = "gather-test-install-artifacts.sh"
 	testMeteringConfigManifestsPath = "/test/e2e/testdata/meteringconfigs/"
+	installationMethod              = "manual"
 )
 
 type InstallTestCase struct {
@@ -86,6 +94,9 @@ func testMainWrapper(m *testing.M) int {
 	flag.StringVar(&repoPath, "repo-path", "../../", "The absolute path to the operator-metering directory.")
 	flag.StringVar(&repoVersion, "repo-version", "", "The current version of the repository, e.g. 4.4, 4.5, etc.")
 	flag.StringVar(&testOutputPath, "test-output-path", "", "The absolute/relative path that you want to store test logs within.")
+
+	flag.StringVar(&registryImage, "registry-image", "", "The name of an existing registry image containing a manifest bundle.")
+	flag.StringVar(&subscriptionChannel, "subscription-channel", "", "The name of an existing channel in the registry image you want to subscribe to.")
 	flag.Parse()
 
 	logger := testhelpers.SetupLogger(logLevel)
@@ -93,10 +104,33 @@ func testMainWrapper(m *testing.M) int {
 	if len(namespacePrefix) > namespacePrefixCharLimit {
 		logger.Fatalf("Error: the --namespace-prefix exceeds the limit of %d characters", namespacePrefixCharLimit)
 	}
+	if registryImage == "" {
+		logger.Fatalf("Error: the --registry-image field is empty and that field is required")
+	}
 
 	var err error
 	if df, err = deployframework.New(logger, runTestsLocal, runDevSetup, namespacePrefix, repoPath, repoVersion, kubeConfig); err != nil {
 		logger.Fatalf("Failed to create a new deploy framework: %v", err)
+	}
+
+	// Check if any of the operator image variables are non-empty.
+	// In the case where one or both are non-empty, we need to pass any
+	// of the overriden operator images so that we can manipulate
+	// the default images in the metering CSV. In the case where
+	// some version of the `make e2e-dev` has been provided, skip
+	// the deletion the local registry resources and CatalogSource CR.
+	if meteringOperatorImageRepo != "" {
+		meteringOperatorImage = meteringOperatorImageRepo + ":" + meteringOperatorImageTag
+	}
+	if reportingOperatorImageRepo != "" {
+		reportingOperatorImage = reportingOperatorImageRepo + ":" + reportingOperatorImageTag
+	}
+	catalogSourceName, catalogSourceNamespace, err = df.CreateRegistryResources(registryImage, meteringOperatorImage, reportingOperatorImage)
+	if err != nil {
+		logger.Fatalf("Failed to create the CatalogSource custom resource using the %s registry image: %v", registryImage, err)
+	}
+	if !df.RunDevSetup {
+		defer df.DeleteRegistryResources(catalogSourceName, catalogSourceNamespace)
 	}
 
 	return m.Run()
@@ -191,6 +225,10 @@ func TestManualMeteringInstall(t *testing.T) {
 				testCase.MeteringOperatorImageRepo,
 				testCase.MeteringOperatorImageTag,
 				testCase.MeteringConfigManifestFilename,
+				catalogSourceName,
+				catalogSourceNamespace,
+				subscriptionChannel,
+				installationMethod,
 				testOutputPath,
 				testCase.ExpectInstallErrMsg,
 				testCase.ExpectInstallErr,
@@ -252,6 +290,9 @@ func TestMeteringUpgrades(t *testing.T) {
 				testCase.MeteringOperatorImageRepo,
 				testCase.MeteringOperatorImageTag,
 				testCase.MeteringConfigManifestFilename,
+				catalogSourceName,
+				catalogSourceNamespace,
+				subscriptionChannel,
 				testOutputPath,
 				testCase.ExpectInstallErrMsg,
 				testCase.ExpectInstallErr,

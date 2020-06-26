@@ -79,11 +79,24 @@ func (df *DeployFramework) NewDeployerCtx(
 	meteringOperatorImageTag,
 	reportingOperatorImageRepo,
 	reportingOperatorImageTag,
+	catalogSourceName,
+	catalogSourceNamespace,
+	subscriptionChannel,
 	outputPath string,
 	extraLocalEnvVars []string,
 	spec metering.MeteringConfigSpec,
 ) (*DeployerCtx, error) {
-	cfg, err := df.NewDeployerConfig(namespace, meteringOperatorImageRepo, meteringOperatorImageTag, reportingOperatorImageRepo, reportingOperatorImageTag, spec)
+	cfg, err := df.NewDeployerConfig(
+		namespace,
+		meteringOperatorImageRepo,
+		meteringOperatorImageTag,
+		reportingOperatorImageRepo,
+		reportingOperatorImageTag,
+		catalogSourceName,
+		catalogSourceNamespace,
+		subscriptionChannel,
+		spec,
+	)
 	if err != nil {
 		return nil, err
 	}
