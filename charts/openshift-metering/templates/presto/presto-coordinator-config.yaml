@@ -21,6 +21,7 @@ data:
     http-server.http.enabled=false
     http-server.https.enabled=true
     http-server.https.port=8080
+    http-server.https.keystore.key=notnull
     http-server.https.keystore.path=/opt/presto/tls/keystore.pem
     http-server.https.truststore.path=/opt/presto/tls/truststore.pem
     node.internal-address-source=FQDN
