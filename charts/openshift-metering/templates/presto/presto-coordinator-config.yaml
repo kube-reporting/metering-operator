@@ -21,7 +21,8 @@ data:
     http-server.http.enabled=false
     http-server.https.enabled=true
     http-server.https.port=8080
-    http-server.https.keystore.key=notnull
+#   TODO revisit this once we move our forked Presto past v330 as there are security changes there that may effect this
+    http-server.https.keystore.key=changeit
     http-server.https.keystore.path=/opt/presto/tls/keystore.pem
     http-server.https.truststore.path=/opt/presto/tls/truststore.pem
     node.internal-address-source=FQDN
