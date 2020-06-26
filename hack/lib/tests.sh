@@ -10,6 +10,7 @@ if [ -n "${IMAGE_FORMAT:-}" ]; then
     TEST_IMAGE_REPO="${IMAGE_FORMAT%:*}"
     export METERING_OPERATOR_IMAGE_REPO="$TEST_IMAGE_REPO"
     export REPORTING_OPERATOR_IMAGE_REPO="$TEST_IMAGE_REPO"
+    export METERING_ANSIBLE_OPERATOR_IMAGE_REGISTRY="${TEST_IMAGE_REPO}:metering-ansible-operator-registry"
 
     # image tags are the ${component} in the $IMAGE_FORMAT: registry.svc.ci.openshift.org/ci-op-<input-hash>/stable:${component}
     # for metering-operator and reporting-operator being tested in ci, these are unchanging
@@ -21,4 +22,5 @@ else
     export REPORTING_OPERATOR_IMAGE_REPO="${REPORTING_OPERATOR_IMAGE_REPO:-""}"
     export METERING_OPERATOR_IMAGE_TAG="${METERING_OPERATOR_IMAGE_TAG:-""}"
     export REPORTING_OPERATOR_IMAGE_TAG="${REPORTING_OPERATOR_IMAGE_TAG:-""}"
+    export METERING_ANSIBLE_OPERATOR_IMAGE_REGISTRY="${METERING_ANSIBLE_OPERATOR_IMAGE_REGISTRY:-""}"
 fi
