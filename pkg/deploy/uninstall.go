@@ -85,7 +85,8 @@ func (deploy *Deployer) uninstallMeteringCSV() error {
 	}
 
 	if sub.Status.CurrentCSV == "" {
-		return fmt.Errorf("failed to get the 'status.currentCSV' stored in the %s metering Subscription resource", deploy.config.SubscriptionName)
+		deploy.logger.Warnf("Failed to get the 'status.currentCSV' stored in the %s metering Subscription resource", deploy.config.SubscriptionName)
+		return nil
 	}
 
 	csvName := sub.Status.CurrentCSV
