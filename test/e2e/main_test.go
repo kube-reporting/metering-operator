@@ -45,7 +45,6 @@ var (
 	postUpgradeTestDirName          = "post-upgrade"
 	gatherTestArtifactsScript       = "gather-test-install-artifacts.sh"
 	testMeteringConfigManifestsPath = "/test/e2e/testdata/meteringconfigs/"
-	installationMethod              = "manual"
 )
 
 type InstallTestCase struct {
@@ -228,7 +227,6 @@ func TestManualMeteringInstall(t *testing.T) {
 				catalogSourceName,
 				catalogSourceNamespace,
 				subscriptionChannel,
-				installationMethod,
 				testOutputPath,
 				testCase.ExpectInstallErrMsg,
 				testCase.ExpectInstallErr,
