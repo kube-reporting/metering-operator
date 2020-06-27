@@ -14,8 +14,13 @@ function cleanup() {
     if [[ "${METERING_RUN_DEV_TEST_SETUP}" = false ]]; then
         echo "Removing namespaces with the 'name=${METERING_NAMESPACE}-metering-testing-ns' label"
         kubectl delete ns -l "name=${METERING_NAMESPACE}-metering-testing-ns" --wait=false || true
+
+        # Note: the `openshift-marketplace` namespace is hardcoded for now until we have the need
+        # to create the registry-related resources in another namespace (e.g. testing upstream manifests).
+        echo "Removing the local registry resources with the 'name=${METERING_NAMESPACE}-metering-testing-ns' label"
+        kubectl -n openshift-marketplace delete catsrc,deployment,service -l "name=${METERING_NAMESPACE}-metering-testing-ns" --wait=false || true
     else
-        echo "Skipping the namespace deletion"
+        echo "Skipping the deletion of the metering testing namespaces and the local registry resources"
     fi
 
     echo "Exiting hack/e2e.sh"
