@@ -126,10 +126,15 @@ func testMainWrapper(m *testing.M) int {
 	}
 	catalogSourceName, catalogSourceNamespace, err = df.CreateRegistryResources(registryImage, meteringOperatorImage, reportingOperatorImage)
 	if err != nil {
-		logger.Fatalf("Failed to create the CatalogSource custom resource using the %s registry image: %v", registryImage, err)
+		df.Logger.Fatalf("Failed to create the CatalogSource custom resource using the %s registry image: %v", registryImage, err)
 	}
 	if !df.RunDevSetup {
 		defer df.DeleteRegistryResources(catalogSourceName, catalogSourceNamespace)
+	}
+
+	err = df.WaitForPackageManifest(catalogSourceName, catalogSourceNamespace, subscriptionChannel)
+	if err != nil {
+		df.Logger.Fatalf("Failed to wait for the metering-ocp packagemanifest to become ready: %v", err)
 	}
 
 	return m.Run()
