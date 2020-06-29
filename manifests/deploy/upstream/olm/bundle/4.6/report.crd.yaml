@@ -85,14 +85,14 @@ spec:
                   hourly:
                     type: object
                     properties:
+                      second:
+                        type: integer
+                        minimum: 0
+                        maximum: 60
                       minute:
                         type: integer
                         minimum: 0
                         maximum: 59
-                      hour:
-                        type: integer
-                        minimum: 0
-                        maximum: 23
                   daily:
                     type: object
                     properties:
@@ -143,6 +143,8 @@ spec:
                         type: integer
                         minimum: 0
                         maximum: 23
+                      dayOfWeek:
+                        type: string
                   monthly:
                     type: object
                     properties:
