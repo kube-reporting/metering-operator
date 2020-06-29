@@ -44,6 +44,7 @@ const (
 	defaultTargetPods        = 7
 	defaultPlatform          = "openshift"
 	defaultDeleteNamespace   = true
+	defaultDeleteCRB         = true
 	defaultSubscriptionName  = "metering-ocp"
 	defaultCatalogSourceName = "metering-dev-catalogsource"
 	defaultPackageName       = "metering-ocp"
@@ -203,6 +204,7 @@ func (df *DeployFramework) NewDeployerConfig(
 		Tag:                    meteringOperatorImageTag,
 		Platform:               defaultPlatform,
 		DeleteNamespace:        defaultDeleteNamespace,
+		DeleteCRB:              defaultDeleteCRB,
 		SubscriptionName:       defaultSubscriptionName,
 		PackageName:            defaultPackageName,
 		CatalogSourceName:      catalogSourceName,
