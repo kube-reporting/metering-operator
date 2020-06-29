@@ -783,8 +783,10 @@ spec:
                             properties:
                               limits:
                                 type: object
+                                x-kubernetes-preserve-unknown-fields: true
                               requests:
                                 type: object
+                                x-kubernetes-preserve-unknown-fields: true
                           subjectAccessReview:
                             type: object
                             required:
@@ -1253,8 +1255,10 @@ spec:
                         properties:
                           limits:
                             type: object
+                            x-kubernetes-preserve-unknown-fields: true
                           requests:
                             type: object
+                            x-kubernetes-preserve-unknown-fields: true
                       route:
                         type: object
                         required:
@@ -1766,8 +1770,10 @@ spec:
                             properties:
                               limits:
                                 type: object
+                                x-kubernetes-preserve-unknown-fields: true
                               requests:
                                 type: object
+                                x-kubernetes-preserve-unknown-fields: true
                           terminationGracePeriodSeconds:
                             type: integer
                           tolerations:
@@ -1920,8 +1926,10 @@ spec:
                             properties:
                               limits:
                                 type: object
+                                x-kubernetes-preserve-unknown-fields: true
                               requests:
                                 type: object
+                                x-kubernetes-preserve-unknown-fields: true
                           terminationGracePeriodSeconds:
                             type: integer
                           tolerations:
@@ -2198,8 +2206,10 @@ spec:
                             properties:
                               limits:
                                 type: object
+                                x-kubernetes-preserve-unknown-fields: true
                               requests:
                                 type: object
+                                x-kubernetes-preserve-unknown-fields: true
                           storage:
                             type: object
                             properties:
@@ -2453,8 +2463,10 @@ spec:
                             properties:
                               limits:
                                 type: object
+                                x-kubernetes-preserve-unknown-fields: true
                               requests:
                                 type: object
+                                x-kubernetes-preserve-unknown-fields: true
                           tolerations:
                             type: array
                             items:
@@ -2636,8 +2648,10 @@ spec:
                                 properties:
                                   limits:
                                     type: object
+                                    x-kubernetes-preserve-unknown-fields: true
                                   requests:
                                     type: object
+                                    x-kubernetes-preserve-unknown-fields: true
                               storage:
                                 type: object
                                 properties:
@@ -2726,8 +2740,10 @@ spec:
                                 properties:
                                   limits:
                                     type: object
+                                    x-kubernetes-preserve-unknown-fields: true
                                   requests:
                                     type: object
+                                    x-kubernetes-preserve-unknown-fields: true
                               storage:
                                 type: object
                                 properties:
