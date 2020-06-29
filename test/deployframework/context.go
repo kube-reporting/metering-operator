@@ -195,7 +195,7 @@ func (ctx *DeployerCtx) Setup(installFunc func() error, expectInstallErr bool) (
 			}
 		}
 
-		ctx.Logger.Infof("Waiting for the metering pods to be ready")
+		ctx.Logger.Infof("Waiting for the metering pods in the %s namespace to be ready", ctx.Namespace)
 		start := time.Now()
 		initialDelay := 10 * time.Second
 		if ctx.RunDevSetup {

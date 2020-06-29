@@ -25,7 +25,6 @@ func testManualMeteringInstall(
 	catalogSourceName,
 	catalogSourceNamespace,
 	subscriptionChannel,
-	installationMethod,
 	testOutputPath string,
 	expectInstallErrMsg []string,
 	expectInstallErr bool,

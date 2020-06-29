@@ -6,15 +6,18 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+	"time"
 
 	"github.com/sirupsen/logrus"
 
 	olmv1alpha1 "github.com/operator-framework/api/pkg/operators/v1alpha1"
 	olmclientv1 "github.com/operator-framework/operator-lifecycle-manager/pkg/api/client/clientset/versioned/typed/operators/v1"
 	olmclientv1alpha1 "github.com/operator-framework/operator-lifecycle-manager/pkg/api/client/clientset/versioned/typed/operators/v1alpha1"
+	packageManifestClientV1 "github.com/operator-framework/operator-lifecycle-manager/pkg/package-server/client/clientset/versioned/typed/operators/v1"
 	apiextclientv1 "k8s.io/apiextensions-apiserver/pkg/client/clientset/clientset/typed/apiextensions/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/util/wait"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/clientcmd"
@@ -313,6 +316,50 @@ func (df *DeployFramework) DeleteRegistryResources(name, namespace string) error
 	if len(errArr) != 0 {
 		return fmt.Errorf(strings.Join(errArr, "\n"))
 	}
+
+	return nil
+}
+
+// WaitForPackageManifest is a deployframework method responsible for ensuring
+// the packagemanifest that gets created as a result of df.CreateRegistryResources.
+// We can define "readiness" here by polling until the metering-ocp packagemanifest
+// has the @subscriptionChannel present in one of the channels listed in the package.
+// Note: in the case where an invalid subscription channel has been passed to the e2e
+// suite, this would essentially act as a verification check as well.
+func (df *DeployFramework) WaitForPackageManifest(name, namespace, subscriptionChannel string) error {
+	// Start build up the packagemanifest typed clientset so we can
+	// list off any packagemanifests that match our label selector
+	packageClient, err := packageManifestClientV1.NewForConfig(df.Config)
+	if err != nil {
+		return fmt.Errorf("failed to initialize the packagemanifest clientset: %v", err)
+	}
+
+	labelSelector := fmt.Sprintf("catalog=%s,catalog-namespace=%s", name, namespace)
+	err = wait.Poll(3*time.Second, 5*time.Minute, func() (done bool, err error) {
+		df.Logger.Infof("Waiting for the metering-ocp packagemanifest to become ready")
+		packages, err := packageClient.PackageManifests(namespace).List(context.TODO(), metav1.ListOptions{
+			LabelSelector: labelSelector,
+		})
+		if len(packages.Items) == 0 {
+			df.Logger.Debugf("No packages matched the %s label selector, re-polling...", labelSelector)
+			return false, nil
+		}
+
+		var ready bool
+		for _, p := range packages.Items {
+			for _, channel := range p.Status.Channels {
+				if channel.Name == subscriptionChannel {
+					ready = true
+				}
+			}
+		}
+
+		return ready, nil
+	})
+	if err != nil {
+		return err
+	}
+	df.Logger.Infof("The metering-ocp packagemanifest is ready")
 
 	return nil
 }
