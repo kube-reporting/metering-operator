@@ -213,14 +213,20 @@ func TestManualMeteringInstall(t *testing.T) {
 	}
 
 	for _, testCase := range testInstallConfigs {
-		t := t
+		// capture the range variables
 		testCase := testCase
+		t := t
 
 		if testCase.Skip {
 			continue
 		}
 
 		t.Run(testCase.Name, func(t *testing.T) {
+			// If we call t.Parallel() here, the top-level test will
+			// blocked from returning until all of the goroutines that
+			// t.Run spawns have completed.
+			t.Parallel()
+
 			testManualMeteringInstall(
 				t,
 				testCase.Name,
