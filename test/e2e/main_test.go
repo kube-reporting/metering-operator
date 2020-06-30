@@ -148,7 +148,7 @@ func TestManualMeteringInstall(t *testing.T) {
 		Skip                           bool
 		ExpectInstallErr               bool
 		ExpectInstallErrMsg            []string
-		InstallSubTest                 InstallTestCase
+		InstallSubTests                []InstallTestCase
 		MeteringConfigManifestFilename string
 	}{
 		{
@@ -162,37 +162,30 @@ func TestManualMeteringInstall(t *testing.T) {
 				"failed to create the MeteringConfig resource",
 				"spec.storage in body is required|spec.storage: Required value",
 			},
-			InstallSubTest: InstallTestCase{
-				Name:     "testInvalidMeteringConfigMissingStorageSpec",
-				TestFunc: testInvalidMeteringConfigMissingStorageSpec,
+			InstallSubTests: []InstallTestCase{
+				{
+					Name:     "testInvalidMeteringConfigMissingStorageSpec",
+					TestFunc: testInvalidMeteringConfigMissingStorageSpec,
+				},
 			},
 			MeteringConfigManifestFilename: "missing-storage.yaml",
-		},
-		{
-			Name:                      "PrometheusConnectorWorks",
-			MeteringOperatorImageRepo: meteringOperatorImageRepo,
-			MeteringOperatorImageTag:  meteringOperatorImageTag,
-			Skip:                      false,
-			InstallSubTest: InstallTestCase{
-				Name:     "testPrometheusConnectorWorks",
-				TestFunc: testPrometheusConnectorWorks,
-			},
-			MeteringConfigManifestFilename: "prometheus-metrics-importer-disabled.yaml",
 		},
 		{
 			Name:                      "ValidHDFS-ReportDynamicInputData",
 			MeteringOperatorImageRepo: meteringOperatorImageRepo,
 			MeteringOperatorImageTag:  meteringOperatorImageTag,
 			Skip:                      false,
-			InstallSubTest: InstallTestCase{
-				Name:     "testReportingProducesData",
-				TestFunc: testReportingProducesData,
-				ExtraEnvVars: []string{
-					"REPORTING_OPERATOR_PROMETHEUS_DATASOURCE_MAX_IMPORT_BACKFILL_DURATION=15m",
-					"REPORTING_OPERATOR_PROMETHEUS_METRICS_IMPORTER_INTERVAL=30s",
-					"REPORTING_OPERATOR_PROMETHEUS_METRICS_IMPORTER_CHUNK_SIZE=5m",
-					"REPORTING_OPERATOR_PROMETHEUS_METRICS_IMPORTER_INTERVAL=5m",
-					"REPORTING_OPERATOR_PROMETHEUS_METRICS_IMPORTER_STEP_SIZE=60s",
+			InstallSubTests: []InstallTestCase{
+				{
+					Name:     "testReportingProducesData",
+					TestFunc: testReportingProducesData,
+					ExtraEnvVars: []string{
+						"REPORTING_OPERATOR_PROMETHEUS_DATASOURCE_MAX_IMPORT_BACKFILL_DURATION=15m",
+						"REPORTING_OPERATOR_PROMETHEUS_METRICS_IMPORTER_INTERVAL=30s",
+						"REPORTING_OPERATOR_PROMETHEUS_METRICS_IMPORTER_CHUNK_SIZE=5m",
+						"REPORTING_OPERATOR_PROMETHEUS_METRICS_IMPORTER_INTERVAL=5m",
+						"REPORTING_OPERATOR_PROMETHEUS_METRICS_IMPORTER_STEP_SIZE=60s",
+					},
 				},
 			},
 			MeteringConfigManifestFilename: "prometheus-metrics-importer-enabled.yaml",
@@ -202,11 +195,17 @@ func TestManualMeteringInstall(t *testing.T) {
 			MeteringOperatorImageRepo: meteringOperatorImageRepo,
 			MeteringOperatorImageTag:  meteringOperatorImageTag,
 			Skip:                      false,
-			InstallSubTest: InstallTestCase{
-				Name:     "testReportingProducesCorrectDataForInput",
-				TestFunc: testReportingProducesCorrectDataForInput,
-				ExtraEnvVars: []string{
-					"REPORTING_OPERATOR_DISABLE_PROMETHEUS_METRICS_IMPORTER=true",
+			InstallSubTests: []InstallTestCase{
+				{
+					Name:     "testReportingProducesCorrectDataForInput",
+					TestFunc: testReportingProducesCorrectDataForInput,
+					ExtraEnvVars: []string{
+						"REPORTING_OPERATOR_DISABLE_PROMETHEUS_METRICS_IMPORTER=true",
+					},
+				},
+				{
+					Name:     "testPrometheusConnectorWorks",
+					TestFunc: testPrometheusConnectorWorks,
 				},
 			},
 			MeteringConfigManifestFilename: "prometheus-metrics-importer-disabled.yaml",
@@ -235,7 +234,7 @@ func TestManualMeteringInstall(t *testing.T) {
 				testOutputPath,
 				testCase.ExpectInstallErrMsg,
 				testCase.ExpectInstallErr,
-				testCase.InstallSubTest,
+				testCase.InstallSubTests,
 			)
 		})
 	}

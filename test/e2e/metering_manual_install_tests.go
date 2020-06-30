@@ -28,7 +28,7 @@ func testManualMeteringInstall(
 	testOutputPath string,
 	expectInstallErrMsg []string,
 	expectInstallErr bool,
-	testInstallFunction InstallTestCase,
+	testInstallFunctions []InstallTestCase,
 ) {
 	// create a directory used to store the @testCaseName container and resource logs
 	testCaseOutputBaseDir := filepath.Join(testOutputPath, testCaseName)
@@ -43,10 +43,12 @@ func testManualMeteringInstall(
 	mc, err := DecodeMeteringConfigManifest(repoPath, testMeteringConfigManifestsPath, manifestFilename)
 	require.NoError(t, err, "failed to successfully decode the YAML MeteringConfig manifest")
 
-	mc := &metering.MeteringConfig{}
-	err = yaml.NewYAMLOrJSONDecoder(file, 100).Decode(&mc)
-	require.NoError(t, err, "failed to decode the yaml meteringconfig manifest")
-	require.NotNil(t, mc, "the decoded meteringconfig object is nil")
+	var envVars []string
+	for _, installFunc := range testInstallFunctions {
+		if len(installFunc.ExtraEnvVars) != 0 {
+			envVars = append(envVars, installFunc.ExtraEnvVars...)
+		}
+	}
 
 	deployerCtx, err := df.NewDeployerCtx(
 		testFuncNamespace,
@@ -58,7 +60,7 @@ func testManualMeteringInstall(
 		catalogSourceNamespace,
 		subscriptionChannel,
 		testCaseOutputBaseDir,
-		testInstallFunction.ExtraEnvVars,
+		envVars,
 		mc.Spec,
 	)
 	require.NoError(t, err, "creating a new deployer context should produce no error")
@@ -68,11 +70,18 @@ func testManualMeteringInstall(
 
 	canSafelyRunTest := testhelpers.AssertCanSafelyRunReportingTests(t, err, expectInstallErr, expectInstallErrMsg)
 	if canSafelyRunTest {
-		t.Run(testInstallFunction.Name, func(t *testing.T) {
-			testInstallFunction.TestFunc(t, rf)
-		})
+		for _, installFunc := range testInstallFunctions {
+			installFunc := installFunc
+			t := t
 
-		deployerCtx.Logger.Infof("The %s test has finished running", testInstallFunction.Name)
+			// namespace got deleted early when running t.Parallel()
+			// so re-running without that specified
+			t.Run(installFunc.Name, func(t *testing.T) {
+				installFunc.TestFunc(t, rf)
+			})
+
+			deployerCtx.Logger.Infof("The %s test has finished running", installFunc.Name)
+		}
 	}
 
 	err = deployerCtx.Teardown(deployerCtx.Deployer.UninstallOLM)
