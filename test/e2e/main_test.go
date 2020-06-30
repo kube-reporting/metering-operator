@@ -2,13 +2,20 @@ package e2e
 
 import (
 	"flag"
+	"fmt"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
+	"k8s.io/apimachinery/pkg/util/yaml"
 	"os"
+	"path/filepath"
+	"strings"
 	"testing"
 
 	"github.com/sirupsen/logrus"
 
 	_ "k8s.io/client-go/plugin/pkg/client/auth/oidc"
 
+	metering "github.com/kube-reporting/metering-operator/pkg/apis/metering/v1"
 	"github.com/kube-reporting/metering-operator/test/deployframework"
 	"github.com/kube-reporting/metering-operator/test/reportingframework"
 	"github.com/kube-reporting/metering-operator/test/testhelpers"
@@ -221,9 +228,44 @@ func TestManualMeteringInstall(t *testing.T) {
 			continue
 		}
 
+		// create a directory used to store the @testCaseName container and resource logs
+		testCaseOutputBaseDir := filepath.Join(testOutputPath, testCase.Name)
+		err := os.Mkdir(testCaseOutputBaseDir, 0777)
+		assert.NoError(t, err, "creating the test case output directory should produce no error")
+
+		testFuncNamespace := fmt.Sprintf("%s-%s", namespacePrefix, strings.ToLower(testCase.Name))
+		if len(testFuncNamespace) > kubeNamespaceCharLimit {
+			require.Fail(t, "The length of the test function namespace exceeded the kube namespace limit of %d characters", kubeNamespaceCharLimit)
+		}
+
+		manifestFullPath := filepath.Join(repoPath, testMeteringConfigManifestsPath, testCase.MeteringConfigManifestFilename)
+		file, err := os.Open(manifestFullPath)
+		require.NoError(t, err, "failed to open manifest file")
+
+		mc := &metering.MeteringConfig{}
+		err = yaml.NewYAMLOrJSONDecoder(file, 100).Decode(&mc)
+		require.NoError(t, err, "failed to decode the yaml meteringconfig manifest")
+		require.NotNil(t, mc, "the decoded meteringconfig object is nil")
+
+		deployerCtx, err := df.NewDeployerCtx(
+			testFuncNamespace,
+			meteringOperatorImageRepo,
+			meteringOperatorImageTag,
+			reportingOperatorImageRepo,
+			reportingOperatorImageTag,
+			catalogSourceName,
+			catalogSourceNamespace,
+			subscriptionChannel,
+			testCaseOutputBaseDir,
+			testCase.InstallSubTest.ExtraEnvVars,
+			mc.Spec,
+		)
+		require.NoError(t, err, "creating a new deployer context should produce no error")
+
 		t.Run(testCase.Name, func(t *testing.T) {
 			testManualMeteringInstall(
 				t,
+				deployerCtx,
 				testCase.Name,
 				namespacePrefix,
 				testCase.MeteringOperatorImageRepo,
