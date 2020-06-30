@@ -40,9 +40,8 @@ func testManualMeteringInstall(
 		require.Fail(t, "The length of the test function namespace exceeded the kube namespace limit of %d characters", kubeNamespaceCharLimit)
 	}
 
-	manifestFullPath := filepath.Join(repoPath, testMeteringConfigManifestsPath, manifestFilename)
-	file, err := os.Open(manifestFullPath)
-	require.NoError(t, err, "failed to open manifest file")
+	mc, err := DecodeMeteringConfigManifest(repoPath, testMeteringConfigManifestsPath, manifestFilename)
+	require.NoError(t, err, "failed to successfully decode the YAML MeteringConfig manifest")
 
 	mc := &metering.MeteringConfig{}
 	err = yaml.NewYAMLOrJSONDecoder(file, 100).Decode(&mc)
@@ -78,4 +77,24 @@ func testManualMeteringInstall(
 
 	err = deployerCtx.Teardown(deployerCtx.Deployer.UninstallOLM)
 	assert.NoError(t, err, "capturing logs and uninstalling metering should produce no error")
+}
+
+func DecodeMeteringConfigManifest(basePath, manifestPath, manifestFilename string) (*metering.MeteringConfig, error) {
+	manifestFullPath := filepath.Join(basePath, manifestPath, manifestFilename)
+	file, err := os.Open(manifestFullPath)
+	if err != nil {
+		return nil, fmt.Errorf("failed to open the %s manifest file: %v", manifestFullPath, err)
+	}
+
+	mc := &metering.MeteringConfig{}
+	err = yaml.NewYAMLOrJSONDecoder(file, 100).Decode(&mc)
+	if err != nil {
+		return nil, err
+	}
+
+	if mc == nil {
+		return nil, fmt.Errorf("error: the decoded MeteringConfig object is nil")
+	}
+
+	return mc, nil
 }
