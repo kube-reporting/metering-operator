@@ -63,7 +63,7 @@ func testManualMeteringInstall(
 		mc.Spec,
 	)
 	require.NoError(t, err, "creating a new deployer context should produce no error")
-	deployerCtx.Logger.Infof("DeployerCtx: %+v", deployerCtx)
+	defer deployerCtx.LoggerOutFile.Close()
 
 	rf, err := deployerCtx.Setup(deployerCtx.Deployer.InstallOLM, expectInstallErr)
 

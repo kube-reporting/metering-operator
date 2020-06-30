@@ -18,6 +18,7 @@ import (
 	"github.com/kube-reporting/metering-operator/pkg/deploy"
 	meteringclient "github.com/kube-reporting/metering-operator/pkg/generated/clientset/versioned/typed/metering/v1"
 	"github.com/kube-reporting/metering-operator/test/reportingframework"
+	"github.com/kube-reporting/metering-operator/test/testhelpers"
 )
 
 var (
@@ -46,6 +47,7 @@ const (
 
 	cleanupScriptName                = "gather-test-install-artifacts.sh"
 	createUpgradeConfigMapScriptName = "create-upgrade-configmap.sh"
+	defaultContextFilename           = "test_output.log"
 )
 
 // DeployerCtx contains all the information needed to manage the
@@ -64,6 +66,7 @@ type DeployerCtx struct {
 	LocalCtx                  *LocalCtx
 	Deployer                  *deploy.Deployer
 	Logger                    logrus.FieldLogger
+	LoggerOutFile             *os.File
 	Config                    *rest.Config
 	Client                    kubernetes.Interface
 	APIExtClient              apiextclientv1.CustomResourceDefinitionsGetter
@@ -120,8 +123,14 @@ func (df *DeployFramework) NewDeployerCtx(
 		targetPodCount -= 2
 	}
 
-	df.Logger.Debugf("Deployer config: %+v", cfg)
-	deployer, err := deploy.NewDeployer(*cfg, df.Logger, df.Client, df.APIExtClient, df.MeteringClient, df.OLMV1Client, df.OLMV1Alpha1Client)
+	// Instantiate a logrus instance that directs its output to a file instead of os.Stdout
+	logger, file, err := testhelpers.SetupLoggerToFile(filepath.Join(outputPath, defaultContextFilename), "debug", logrus.Fields{"context": namespace})
+	if err != nil {
+		return nil, fmt.Errorf("failed to create a new context logger: %v", err)
+	}
+
+	logger.Debugf("Deployer config: %+v", cfg)
+	deployer, err := deploy.NewDeployer(*cfg, logger, df.Client, df.APIExtClient, df.MeteringClient, df.OLMV1Client, df.OLMV1Alpha1Client)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create a new deployer instance: %v", err)
 	}
@@ -138,7 +147,8 @@ func (df *DeployFramework) NewDeployerCtx(
 		RunTestLocal:              df.RunLocal,
 		RunDevSetup:               df.RunDevSetup,
 		KubeConfigPath:            df.KubeConfigPath,
-		Logger:                    df.Logger,
+		Logger:                    logger,
+		LoggerOutFile:             file,
 		Config:                    df.Config,
 		Client:                    df.Client,
 		APIExtClient:              df.APIExtClient,
