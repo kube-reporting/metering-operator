@@ -1,8 +1,11 @@
 package testhelpers
 
 import (
-	"github.com/sirupsen/logrus"
+	"fmt"
+	"os"
 	"time"
+
+	"github.com/sirupsen/logrus"
 
 	"k8s.io/apimachinery/pkg/api/errors"
 	meta "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -156,4 +159,33 @@ func SetupLogger(logLevelStr string) logrus.FieldLogger {
 	logger.Logger.Level = logLevel
 
 	return logger
+}
+
+// SetupLoggerToFile is a helper function that initializes and returns a logrus
+// FieldLogger instance that directs its output to the @path file instead of
+// os.Stdout.
+func SetupLoggerToFile(path, logLevel string, fields logrus.Fields) (logrus.FieldLogger, *os.File, error) {
+	logger := logrus.New()
+
+	if logLevel == "" {
+		logLevel = "debug"
+	}
+	level, err := logrus.ParseLevel(logLevel)
+	if err != nil {
+		return nil, nil, fmt.Errorf("failed to parse the %s log level: %v", logLevel, err)
+	}
+
+	logger.SetLevel(level)
+	logger.SetFormatter(&logrus.TextFormatter{
+		FullTimestamp:   true,
+		TimestampFormat: "01-02-2006 15:04:05",
+	})
+
+	file, err := os.OpenFile(path, os.O_WRONLY|os.O_CREATE|os.O_APPEND, 0755)
+	if err != nil {
+		return nil, nil, fmt.Errorf("failed to open the %s file path: %v", err)
+	}
+	logger.SetOutput(file)
+
+	return logger.WithFields(fields), file, nil
 }

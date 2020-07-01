@@ -28,7 +28,7 @@ func testManualMeteringInstall(
 	testOutputPath string,
 	expectInstallErrMsg []string,
 	expectInstallErr bool,
-	testInstallFunction InstallTestCase,
+	testInstallFunctions []InstallTestCase,
 ) {
 	// create a directory used to store the @testCaseName container and resource logs
 	testCaseOutputBaseDir := filepath.Join(testOutputPath, testCaseName)
@@ -40,14 +40,15 @@ func testManualMeteringInstall(
 		require.Fail(t, "The length of the test function namespace exceeded the kube namespace limit of %d characters", kubeNamespaceCharLimit)
 	}
 
-	manifestFullPath := filepath.Join(repoPath, testMeteringConfigManifestsPath, manifestFilename)
-	file, err := os.Open(manifestFullPath)
-	require.NoError(t, err, "failed to open manifest file")
+	mc, err := DecodeMeteringConfigManifest(repoPath, testMeteringConfigManifestsPath, manifestFilename)
+	require.NoError(t, err, "failed to successfully decode the YAML MeteringConfig manifest")
 
-	mc := &metering.MeteringConfig{}
-	err = yaml.NewYAMLOrJSONDecoder(file, 100).Decode(&mc)
-	require.NoError(t, err, "failed to decode the yaml meteringconfig manifest")
-	require.NotNil(t, mc, "the decoded meteringconfig object is nil")
+	var envVars []string
+	for _, installFunc := range testInstallFunctions {
+		if len(installFunc.ExtraEnvVars) != 0 {
+			envVars = append(envVars, installFunc.ExtraEnvVars...)
+		}
+	}
 
 	deployerCtx, err := df.NewDeployerCtx(
 		testFuncNamespace,
@@ -59,23 +60,50 @@ func testManualMeteringInstall(
 		catalogSourceNamespace,
 		subscriptionChannel,
 		testCaseOutputBaseDir,
-		testInstallFunction.ExtraEnvVars,
+		envVars,
 		mc.Spec,
 	)
 	require.NoError(t, err, "creating a new deployer context should produce no error")
-	deployerCtx.Logger.Infof("DeployerCtx: %+v", deployerCtx)
+	defer deployerCtx.LoggerOutFile.Close()
 
 	rf, err := deployerCtx.Setup(deployerCtx.Deployer.InstallOLM, expectInstallErr)
 
 	canSafelyRunTest := testhelpers.AssertCanSafelyRunReportingTests(t, err, expectInstallErr, expectInstallErrMsg)
 	if canSafelyRunTest {
-		t.Run(testInstallFunction.Name, func(t *testing.T) {
-			testInstallFunction.TestFunc(t, rf)
-		})
+		for _, installFunc := range testInstallFunctions {
+			installFunc := installFunc
+			t := t
 
-		deployerCtx.Logger.Infof("The %s test has finished running", testInstallFunction.Name)
+			// namespace got deleted early when running t.Parallel()
+			// so re-running without that specified
+			t.Run(installFunc.Name, func(t *testing.T) {
+				installFunc.TestFunc(t, rf)
+			})
+
+			deployerCtx.Logger.Infof("The %s test has finished running", installFunc.Name)
+		}
 	}
 
 	err = deployerCtx.Teardown(deployerCtx.Deployer.UninstallOLM)
 	assert.NoError(t, err, "capturing logs and uninstalling metering should produce no error")
+}
+
+func DecodeMeteringConfigManifest(basePath, manifestPath, manifestFilename string) (*metering.MeteringConfig, error) {
+	manifestFullPath := filepath.Join(basePath, manifestPath, manifestFilename)
+	file, err := os.Open(manifestFullPath)
+	if err != nil {
+		return nil, fmt.Errorf("failed to open the %s manifest file: %v", manifestFullPath, err)
+	}
+
+	mc := &metering.MeteringConfig{}
+	err = yaml.NewYAMLOrJSONDecoder(file, 100).Decode(&mc)
+	if err != nil {
+		return nil, err
+	}
+
+	if mc == nil {
+		return nil, fmt.Errorf("error: the decoded MeteringConfig object is nil")
+	}
+
+	return mc, nil
 }
