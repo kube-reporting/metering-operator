@@ -207,6 +207,10 @@ func TestManualMeteringInstall(t *testing.T) {
 					Name:     "testPrometheusConnectorWorks",
 					TestFunc: testPrometheusConnectorWorks,
 				},
+				{
+					Name:     "testReportingOperatorServiceCABundleExists",
+					TestFunc: testReportingOperatorServiceCABundleExists,
+				},
 			},
 			MeteringConfigManifestFilename: "prometheus-metrics-importer-disabled.yaml",
 		},
