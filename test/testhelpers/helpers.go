@@ -1,14 +1,20 @@
 package testhelpers
 
 import (
+	"bytes"
 	"fmt"
 	"os"
 	"time"
 
 	"github.com/sirupsen/logrus"
 
+	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
 	meta "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/client-go/kubernetes"
+	"k8s.io/client-go/kubernetes/scheme"
+	"k8s.io/client-go/rest"
+	"k8s.io/client-go/tools/remotecommand"
 
 	metering "github.com/kube-reporting/metering-operator/pkg/apis/metering/v1"
 	"github.com/kube-reporting/metering-operator/pkg/operator/reportingutil"
@@ -188,4 +194,62 @@ func SetupLoggerToFile(path, logLevel string, fields logrus.Fields) (logrus.Fiel
 	logger.SetOutput(file)
 
 	return logger.WithFields(fields), file, nil
+}
+
+// ExecActionOptions holds all the metadata required to fire off a
+// Pod exec REST API call. This is mainly a wrapper around the
+// corev1.ExecAction type: https://pkg.go.dev/k8s.io/api/core/v1?tab=doc#ExecAction
+type ExecActionOptions struct {
+	Name      string
+	Namespace string
+	Container string
+	Command   []string
+	UseTTY    bool
+}
+
+func NewExecOptions(name, namespace, container string, useTTY bool, cmd []string) *ExecActionOptions {
+	return &ExecActionOptions{
+		Name:      name,
+		Namespace: namespace,
+		Container: container,
+		UseTTY:    useTTY,
+		Command:   cmd,
+	}
+}
+
+func ExecPodCommandWithOptions(config *rest.Config, client kubernetes.Interface, options *ExecActionOptions) (bytes.Buffer, bytes.Buffer, error) {
+	var stdoutBuf, stderrBuf bytes.Buffer
+
+	req := client.CoreV1().
+		RESTClient().
+		Post().
+		Resource("pods").
+		Name(options.Name).
+		Namespace(options.Namespace).
+		SubResource("exec").
+		VersionedParams(&corev1.PodExecOptions{
+			Container: options.Container,
+			Command:   options.Command,
+			TTY:       options.UseTTY,
+			Stdin:     false,
+			Stdout:    true,
+			Stderr:    true,
+		}, scheme.ParameterCodec)
+
+	exec, err := remotecommand.NewSPDYExecutor(config, "POST", req.URL())
+	if err != nil {
+		return stdoutBuf, stderrBuf, err
+	}
+
+	err = exec.Stream(remotecommand.StreamOptions{
+		Stdin:  nil,
+		Stdout: &stdoutBuf,
+		Stderr: &stderrBuf,
+		Tty:    options.UseTTY,
+	})
+	if err != nil {
+		return stdoutBuf, stderrBuf, err
+	}
+
+	return stdoutBuf, stderrBuf, nil
 }

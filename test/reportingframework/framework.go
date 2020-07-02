@@ -19,23 +19,24 @@ import (
 )
 
 type ReportingFramework struct {
-	MeteringClient        metering.MeteringV1Interface
-	KubeClient            kubernetes.Interface
-	HTTPClient            *http.Client
-	RouteClient           routev1client.RouteV1Client
-	Namespace             string
-	DefaultTimeout        time.Duration
-	ReportOutputDirectory string
+	MeteringClient metering.MeteringV1Interface
+	KubeClient     kubernetes.Interface
+	RouteClient    routev1client.RouteV1Client
+	KubeConfig     *rest.Config
+	HTTPClient     *http.Client
 
-	KubeAPIURL  *url.URL
-	KubeAPIPath string
+	Namespace             string
+	KubeAPIPath           string
+	RouteBearerToken      string
+	ReportOutputDirectory string
 
 	UseKubeProxyForReportingAPI bool
 	UseRouteForReportingAPI     bool
-	RouteBearerToken            string
-	ReportingAPIURL             *url.URL
 	HTTPSAPI                    bool
+	KubeAPIURL                  *url.URL
+	ReportingAPIURL             *url.URL
 
+	DefaultTimeout                       time.Duration
 	collectOnce                          sync.Once
 	reportStart                          time.Time
 	reportEnd                            time.Time
@@ -94,6 +95,7 @@ func New(
 
 	rf := &ReportingFramework{
 		KubeClient:                  kubeClient,
+		KubeConfig:                  kubeconfig,
 		MeteringClient:              meteringClient,
 		HTTPClient:                  httpc,
 		RouteClient:                 *routeClient,
