@@ -189,7 +189,7 @@ func SetupLoggerToFile(path, logLevel string, fields logrus.Fields) (logrus.Fiel
 
 	file, err := os.OpenFile(path, os.O_WRONLY|os.O_CREATE|os.O_APPEND, 0755)
 	if err != nil {
-		return nil, nil, fmt.Errorf("failed to open the %s file path: %v", err)
+		return nil, nil, fmt.Errorf("failed to open the %s file path: %v", path, err)
 	}
 	logger.SetOutput(file)
 

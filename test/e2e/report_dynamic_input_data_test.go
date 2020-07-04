@@ -96,9 +96,10 @@ type reportProducesDataTestCase struct {
 
 func testReportsProduceData(t *testing.T, testReportingFramework *reportingframework.ReportingFramework, testCases []reportProducesDataTestCase) {
 	for _, test := range testCases {
-		name := test.name
 		// Fix closure captures
+		name := test.name
 		test := test
+
 		t.Run(name, func(t *testing.T) {
 			if test.skip {
 				t.Skip("test configured to be skipped")

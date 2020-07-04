@@ -431,6 +431,10 @@ func (ctx *DeployerCtx) Teardown(uninstallFunc func() error) error {
 			errArr = append(errArr, fmt.Sprintf("failed to uninstall metering: %v", err))
 		}
 	}
+	err = ctx.LoggerOutFile.Close()
+	if err != nil {
+		errArr = append(errArr, fmt.Sprintf("failed to close the context logger file descriptor: %v", err))
+	}
 
 	if len(errArr) != 0 {
 		return fmt.Errorf(strings.Join(errArr, "\n"))

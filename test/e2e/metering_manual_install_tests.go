@@ -64,28 +64,47 @@ func testManualMeteringInstall(
 		mc.Spec,
 	)
 	require.NoError(t, err, "creating a new deployer context should produce no error")
-	defer deployerCtx.LoggerOutFile.Close()
 
 	rf, err := deployerCtx.Setup(deployerCtx.Deployer.InstallOLM, expectInstallErr)
+	defer func() {
+		t.Logf("The defer closure was called on the %s test case", testCaseName)
+		err = deployerCtx.Teardown(deployerCtx.Deployer.UninstallOLM)
+		assert.NoError(t, err, "expected uninstall Metering would produce no error")
+	}()
 
 	canSafelyRunTest := testhelpers.AssertCanSafelyRunReportingTests(t, err, expectInstallErr, expectInstallErrMsg)
 	if canSafelyRunTest {
 		for _, installFunc := range testInstallFunctions {
+			// capture range variables
 			installFunc := installFunc
 			t := t
 
-			// namespace got deleted early when running t.Parallel()
-			// so re-running without that specified
-			t.Run(installFunc.Name, func(t *testing.T) {
-				installFunc.TestFunc(t, rf)
-			})
+			/*
+				Note on the following code block:
 
-			deployerCtx.Logger.Infof("The %s test has finished running", installFunc.Name)
+				t.Run will run the test closure as a subtest of `t` and will
+				block until all parallel sub-tests have been completed, when
+				specified.
+
+				In order to achieve running these sub-tests in parallel, and
+				respect the defer closure, we need to wrap the t.Run call site
+				that's responsible for running the installFunc closure in a parent
+				t.Run which provides a way to cleanup all parallel sub-tests.
+			*/
+			t.Run("group", func(t *testing.T) {
+				t.Run(installFunc.Name, func(t *testing.T) {
+					t.Parallel()
+
+					installFunc.TestFunc(t, rf)
+				})
+
+				deployerCtx.Logger.Infof("The %s test has finished running", installFunc.Name)
+			})
 		}
 	}
 
-	err = deployerCtx.Teardown(deployerCtx.Deployer.UninstallOLM)
-	assert.NoError(t, err, "capturing logs and uninstalling metering should produce no error")
+	// err = deployerCtx.Teardown(deployerCtx.Deployer.UninstallOLM)
+	// assert.NoError(t, err, "capturing logs and uninstalling metering should produce no error")
 }
 
 func DecodeMeteringConfigManifest(basePath, manifestPath, manifestFilename string) (*metering.MeteringConfig, error) {
