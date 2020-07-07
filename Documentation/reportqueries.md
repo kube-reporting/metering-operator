@@ -1,13 +1,13 @@
 # Report Queries
 
-Customizing how Operator Metering generates reports is done using a custom resource called a `ReportQuery`.
+Customizing how Metering Operator generates reports is done using a custom resource called a `ReportQuery`.
 
 These `ReportQuery` resources control the SQL queries that can be used to produce a report.
 When writing a [report](reports.md) you can specify the query it will use by setting the `spec.query` field to `metadata.name` of any `ReportQuery` in the reporting-operator's namespace.
 
 ## Fields
 
-- `query`: A [SQL SELECT statement][presto-select]. This SQL statement supports [go templates][go-templates] and provides additional custom functions specific to Operator Metering (defined in the [templating](#templating) section below).
+- `query`: A [SQL SELECT statement][presto-select]. This SQL statement supports [go templates][go-templates] and provides additional custom functions specific to Metering Operator (defined in the [templating](#templating) section below).
 - `columns`: A list of columns that match the schema of the results of the query. The order of these columns must match the order of the columns returned by the SELECT statement. Columns have 3 fields, `name`, `type`, and `unit`. Each field is covered in more detail below.
   - `name`: This is the name of the column returned in the `SELECT` statement.
   - `type`: This is the [Presto][presto-types] column type.
@@ -21,8 +21,8 @@ When writing a [report](reports.md) you can specify the query it will use by set
 
 ## Templating
 
-Because much of the type of analysis being done depends on user-input, and because we want to enable users to re-use queries with copying & pasting things around, Operator Metering supports the [go templating language][go-templates] to dynamically generate the SQL statements contained within the `spec.query` field of `ReportQuery`.
-For example, when generating a report, the query needs to know what time range to consider when producing a report, so this is information exposed within the template context as variables you can use and reference with various [template functions](#template-functions).
+Because much of the type of analysis being done depends on user-input, and because we want to enable users to re-use queries with copying & pasting things around, Metering Operator supports the [go templating language][go-templates] to dynamically generate the SQL statements contained within the `spec.query` field of `ReportQuery`.
+For example, when generating a report, the query needs to know what time range to consider when producing a report, so this is information is exposed within the template context as variables you can use and reference with various [template functions](#template-functions).
 Most of these functions are for referring to other resources such as `ReportDataSources` or `ReportQueries` as either tables, views, or sub-queries, and for formatting various types for use within the SQL query.
 
 ### Template variables
@@ -51,7 +51,7 @@ If left empty, it defaults to `varchar`.
 For each of these types, the behavior varies:
 
 - `string`: A string value is passed through as a Go [string](https://golang.org/pkg/builtin/#string).
-- `time`: A string value is parsed as an RFC3339 timestamp. Within the template context, the variable will be treated as a Go [time.Time][go-time] object.
+- `time`: A string value is parsed as an RFC3339 timestamp. Within the template context, the variable with be a Go [time.Time][go-time] object.
 - `int`: An int value is passed through as a Go [int](https://golang.org/pkg/builtin/#int).
 - `ReportDataSource`: A string value referencing the name of a [ReportDataSource][reportdatasources] within the same namespace as the query. When this query is referenced by a Report or ReportDataSource, all `ReportDataSource` inputs are validated by checking that all the ReportDataSources specified exist.
 - `ReportQuery`: A string value referencing the name of a [ReportQuery][reportqueries] within the same namespace as the query. When this query is referenced by a Report or ReportDataSource, all `ReportQuery` inputs are validated by checking that all the ReportQueries specified exist.
@@ -117,7 +117,7 @@ These queries are not intended to be used by Reports, but are intended to be pur
 Currently, these queries suffixed with `-raw` in their name are generally have no filtering and are used by [ReportDataSources to create views][view-datasources].
 Additionally, `-raw` queries often expose complex types (array, maps) which are incompatible with `Reports`, which is why the `ReportQueries` that are _not_ suffixed in `-raw` never expose those types in their columns list.
 
-The example below is a built-in `ReportQuery` that is installed with Operator Metering by default.
+The example below is a built-in `ReportQuery` that is installed with Metering Operator by default.
 The query is not intended to be used by Reports, but instead is intended to be re-used by other `ReportQueries`, which is why it only does simple extraction of fields, and calculations.
 
 The important things to note with this query is that it's querying a database table containing Prometheus metric data for the `pod-request-memory-bytes` `ReportDataSource`, and it's getting the table name using the `dataSourceTableName` template function.
