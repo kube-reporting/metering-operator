@@ -51,7 +51,7 @@ If left empty, it defaults to `varchar`.
 For each of these types, the behavior varies:
 
 - `string`: A string value is passed through as a Go [string](https://golang.org/pkg/builtin/#string).
-- `time`: A string value is parsed as an RFC3339 timestamp. Within the template context, the variable with be a Go [time.Time][go-time] object.
+- `time`: A string value is parsed as an RFC3339 timestamp. Within the template context, the variable will be treated as a Go [time.Time][go-time] object.
 - `int`: An int value is passed through as a Go [int](https://golang.org/pkg/builtin/#int).
 - `ReportDataSource`: A string value referencing the name of a [ReportDataSource][reportdatasources] within the same namespace as the query. When this query is referenced by a Report or ReportDataSource, all `ReportDataSource` inputs are validated by checking that all the ReportDataSources specified exist.
 - `ReportQuery`: A string value referencing the name of a [ReportQuery][reportqueries] within the same namespace as the query. When this query is referenced by a Report or ReportDataSource, all `ReportQuery` inputs are validated by checking that all the ReportQueries specified exist.
