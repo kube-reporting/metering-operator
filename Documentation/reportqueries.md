@@ -22,7 +22,7 @@ When writing a [report](reports.md) you can specify the query it will use by set
 ## Templating
 
 Because much of the type of analysis being done depends on user-input, and because we want to enable users to re-use queries with copying & pasting things around, Operator Metering supports the [go templating language][go-templates] to dynamically generate the SQL statements contained within the `spec.query` field of `ReportQuery`.
-For example, when generating a report, the query needs to know what time range to consider when producing a report, so this is information is exposed within the template context as variables you can use and reference with various [template functions](#template-functions).
+For example, when generating a report, the query needs to know what time range to consider when producing a report, so this is information exposed within the template context as variables you can use and reference with various [template functions](#template-functions).
 Most of these functions are for referring to other resources such as `ReportDataSources` or `ReportQueries` as either tables, views, or sub-queries, and for formatting various types for use within the SQL query.
 
 ### Template variables
