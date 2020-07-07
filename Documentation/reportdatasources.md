@@ -43,7 +43,7 @@ For ReportDataSources with a `spec.prometheusMetricsImporter` present, their tab
 
 ### Example PrometheusMetricsImporter Datasource
 
-Below is an example of one of the built-in `ReportDataSource` resources that is installed with Operator Metering by default.
+Below is an example of one of the built-in `ReportDataSource` resources that is installed with Metering Operator by default.
 
 ```
 apiVersion: metering.openshift.io/v1
