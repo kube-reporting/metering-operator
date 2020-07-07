@@ -112,9 +112,9 @@ In addition to the above functions, the reporting-operator includes all of the f
 
 Before going into examples, there's an important convention that all the built-in `ReportQueries` follow that is worth calling out, as these examples will demonstrate them heavily.
 
-The convention I am referring to is the fact that there are quite a few ReportQueries suffixed with `-raw` in their `metadata.name`.
+The convention referred to is that several ReportQueries are suffixed with `-raw` in their `metadata.name`.
 These queries are not intended to be used by Reports, but are intended to be purely for re-use.
-Currently, these queries suffixed with `-raw` in their name are generally have no filtering and are used by [ReportDataSources to create views][view-datasources].
+Currently, these queries suffixed with `-raw` in their name generally have no filtering and are used by [ReportDataSources to create views][view-datasources].
 Additionally, `-raw` queries often expose complex types (array, maps) which are incompatible with `Reports`, which is why the `ReportQueries` that are _not_ suffixed in `-raw` never expose those types in their columns list.
 
 The example below is a built-in `ReportQuery` that is installed with Metering Operator by default.
