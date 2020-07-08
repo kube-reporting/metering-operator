@@ -126,7 +126,7 @@ func TestIsReportFinished(t *testing.T) {
 	}{
 		{
 			name:           "new report returns false",
-			report:         testhelpers.NewReport(testReportName, testNamespace, testQueryName, reportStart, reportEnd, metering.ReportStatus{}, nil, false),
+			report:         testhelpers.NewReport(testReportName, testNamespace, testQueryName, reportStart, reportEnd, metering.ReportStatus{}, nil, false, nil),
 			expectFinished: false,
 		},
 		{
@@ -135,7 +135,7 @@ func TestIsReportFinished(t *testing.T) {
 				Conditions: []metering.ReportCondition{
 					*meteringUtil.NewReportCondition(metering.ReportRunning, v1.ConditionFalse, meteringUtil.ReportFinishedReason, testReportMessage),
 				},
-			}, nil, false),
+			}, nil, false, nil),
 			expectFinished: true,
 		},
 		{
@@ -144,7 +144,7 @@ func TestIsReportFinished(t *testing.T) {
 				Conditions: []metering.ReportCondition{
 					*meteringUtil.NewReportCondition(metering.ReportRunning, v1.ConditionFalse, meteringUtil.ReportFinishedReason, testReportMessage),
 				},
-			}, schedule, false),
+			}, schedule, false, nil),
 			expectFinished: false,
 		},
 		{
@@ -154,7 +154,7 @@ func TestIsReportFinished(t *testing.T) {
 					*meteringUtil.NewReportCondition(metering.ReportRunning, v1.ConditionFalse, meteringUtil.ReportFinishedReason, testReportMessage),
 				},
 				LastReportTime: &metav1.Time{Time: reportStart.AddDate(0, 0, 0)},
-			}, schedule, false),
+			}, schedule, false, nil),
 			expectFinished: false,
 		},
 		{
@@ -164,7 +164,7 @@ func TestIsReportFinished(t *testing.T) {
 					*meteringUtil.NewReportCondition(metering.ReportRunning, v1.ConditionFalse, meteringUtil.ReportFinishedReason, testReportMessage),
 				},
 				LastReportTime: &metav1.Time{Time: reportStart.AddDate(0, 2, 0)},
-			}, schedule, false),
+			}, schedule, false, nil),
 			expectFinished: true,
 		},
 		{
@@ -173,7 +173,7 @@ func TestIsReportFinished(t *testing.T) {
 				Conditions: []metering.ReportCondition{
 					*meteringUtil.NewReportCondition(metering.ReportRunning, v1.ConditionFalse, meteringUtil.ScheduledReason, testReportMessage),
 				},
-			}, schedule, false),
+			}, schedule, false, nil),
 			expectFinished: false,
 		},
 		{
@@ -182,7 +182,7 @@ func TestIsReportFinished(t *testing.T) {
 				Conditions: []metering.ReportCondition{
 					*meteringUtil.NewReportCondition(metering.ReportRunning, v1.ConditionTrue, meteringUtil.ScheduledReason, testReportMessage),
 				},
-			}, schedule, false),
+			}, schedule, false, nil),
 			expectFinished: false,
 		},
 		{
@@ -191,7 +191,7 @@ func TestIsReportFinished(t *testing.T) {
 				Conditions: []metering.ReportCondition{
 					*meteringUtil.NewReportCondition(metering.ReportRunning, v1.ConditionFalse, meteringUtil.InvalidReportReason, testReportMessage),
 				},
-			}, schedule, false),
+			}, schedule, false, nil),
 			expectFinished: false,
 		},
 		{
@@ -200,7 +200,7 @@ func TestIsReportFinished(t *testing.T) {
 				Conditions: []metering.ReportCondition{
 					*meteringUtil.NewReportCondition(metering.ReportRunning, v1.ConditionTrue, meteringUtil.InvalidReportReason, testReportMessage),
 				},
-			}, schedule, false),
+			}, schedule, false, nil),
 			expectFinished: false,
 		},
 		{
@@ -209,7 +209,7 @@ func TestIsReportFinished(t *testing.T) {
 				Conditions: []metering.ReportCondition{
 					*meteringUtil.NewReportCondition(metering.ReportRunning, v1.ConditionFalse, meteringUtil.RunImmediatelyReason, testReportMessage),
 				},
-			}, schedule, false),
+			}, schedule, false, nil),
 			expectFinished: false,
 		},
 		{
@@ -218,7 +218,7 @@ func TestIsReportFinished(t *testing.T) {
 				Conditions: []metering.ReportCondition{
 					*meteringUtil.NewReportCondition(metering.ReportRunning, v1.ConditionTrue, meteringUtil.RunImmediatelyReason, testReportMessage),
 				},
-			}, schedule, false),
+			}, schedule, false, nil),
 			expectFinished: false,
 		},
 	}
@@ -322,43 +322,43 @@ func TestValidateReport(t *testing.T) {
 	}{
 		{
 			name:         "empty spec.query returns err",
-			report:       testhelpers.NewReport(testReportName, testNamespace, "", reportStart, reportEnd, metering.ReportStatus{}, nil, false),
+			report:       testhelpers.NewReport(testReportName, testNamespace, "", reportStart, reportEnd, metering.ReportStatus{}, nil, false, nil),
 			expectErr:    true,
 			expectErrMsg: "must set spec.query",
 		},
 		{
 			name:         "spec.ReportingStart > spec.ReportingEnd returns err",
-			report:       testhelpers.NewReport(testReportName, testNamespace, testNonExistentQueryName, reportEnd, reportStart, metering.ReportStatus{}, nil, false),
+			report:       testhelpers.NewReport(testReportName, testNamespace, testNonExistentQueryName, reportEnd, reportStart, metering.ReportStatus{}, nil, false, nil),
 			expectErr:    true,
 			expectErrMsg: fmt.Sprintf("spec.reportingEnd (%s) must be after spec.reportingStart (%s)", reportStart.String(), reportEnd.String()),
 		},
 		{
 			name:         "spec.ReportingEnd is unset and spec.RunImmediately is set returns err",
-			report:       testhelpers.NewReport(testReportName, testNamespace, testNonExistentQueryName, reportStart, nil, metering.ReportStatus{}, nil, true),
+			report:       testhelpers.NewReport(testReportName, testNamespace, testNonExistentQueryName, reportStart, nil, metering.ReportStatus{}, nil, true, nil),
 			expectErr:    true,
 			expectErrMsg: "spec.reportingEnd must be set if report.spec.runImmediately is true",
 		},
 		{
 			name:         "spec.QueryName does not exist returns err",
-			report:       testhelpers.NewReport(testReportName, testNamespace, testNonExistentQueryName, reportStart, reportEnd, metering.ReportStatus{}, nil, false),
+			report:       testhelpers.NewReport(testReportName, testNamespace, testNonExistentQueryName, reportStart, reportEnd, metering.ReportStatus{}, nil, false, nil),
 			expectErr:    true,
 			expectErrMsg: fmt.Sprintf("ReportQuery (%s) does not exist", testNonExistentQueryName),
 		},
 		{
 			name:         "valid report with missing DataSource returns error",
-			report:       testhelpers.NewReport(testReportName, testNamespace, testInvalidQueryName, reportStart, reportEnd, metering.ReportStatus{}, nil, true),
+			report:       testhelpers.NewReport(testReportName, testNamespace, testInvalidQueryName, reportStart, reportEnd, metering.ReportStatus{}, nil, true, nil),
 			expectErr:    true,
 			expectErrMsg: fmt.Sprintf("failed to resolve ReportQuery dependencies %s: %s", testInvalidQueryName, "ReportDataSource.metering.openshift.io \"this-does-not-exist\" not found"),
 		},
 		{
 			name:         "valid report with uninitalized DataSource returns error",
-			report:       testhelpers.NewReport(testReportName, testNamespace, testInvalidQueryName2, reportStart, reportEnd, metering.ReportStatus{}, nil, true),
+			report:       testhelpers.NewReport(testReportName, testNamespace, testInvalidQueryName2, reportStart, reportEnd, metering.ReportStatus{}, nil, true, nil),
 			expectErr:    true,
 			expectErrMsg: fmt.Sprintf("failed to validate ReportQuery dependencies %s: ReportQueryDependencyValidationError: uninitialized ReportDataSource dependencies: %s", testInvalidQueryName2, ds2.Name),
 		},
 		{
 			name:         "valid report with valid DataSource returns nil",
-			report:       testhelpers.NewReport(testReportName, testNamespace, testQueryName, reportStart, reportEnd, metering.ReportStatus{}, nil, true),
+			report:       testhelpers.NewReport(testReportName, testNamespace, testQueryName, reportStart, reportEnd, metering.ReportStatus{}, nil, true, nil),
 			expectErr:    false,
 			expectErrMsg: "",
 		},
@@ -411,47 +411,47 @@ func TestGetReportPeriod(t *testing.T) {
 	}{
 		{
 			name:      "invalid report with an unset spec.Schedule field returns an error",
-			report:    testhelpers.NewReport(testReportName, testNamespace, testQueryName, nil, nil, metering.ReportStatus{}, nil, false),
+			report:    testhelpers.NewReport(testReportName, testNamespace, testQueryName, nil, nil, metering.ReportStatus{}, nil, false, nil),
 			expectErr: true,
 		},
 		{
 			name:      "valid report with an unset spec.Schedule field returns nil",
-			report:    testhelpers.NewReport(testReportName, testNamespace, testQueryName, reportStart, reportEnd, metering.ReportStatus{}, nil, false),
+			report:    testhelpers.NewReport(testReportName, testNamespace, testQueryName, reportStart, reportEnd, metering.ReportStatus{}, nil, false, nil),
 			expectErr: false,
 		},
 		{
 			name:      "invalid schedule with a set spec.Schedule field returns error",
-			report:    testhelpers.NewReport(testReportName, testNamespace, testQueryName, reportStart, reportEnd, metering.ReportStatus{}, invalidSchedule, false),
+			report:    testhelpers.NewReport(testReportName, testNamespace, testQueryName, reportStart, reportEnd, metering.ReportStatus{}, invalidSchedule, false, nil),
 			expectErr: true,
 		},
 		{
 			name:      "valid schedule with a set spec.Schedule field and an unset Spec.Status.LastReportTime returns nil",
-			report:    testhelpers.NewReport(testReportName, testNamespace, testQueryName, reportStart, reportEnd, metering.ReportStatus{}, validSchedule, false),
+			report:    testhelpers.NewReport(testReportName, testNamespace, testQueryName, reportStart, reportEnd, metering.ReportStatus{}, validSchedule, false, nil),
 			expectErr: false,
 		},
 		{
 			name:      "valid schedule with a set spec.Schedule field and a set Spec.Status.LastReportTime returns nil",
-			report:    testhelpers.NewReport(testReportName, testNamespace, testQueryName, reportStart, reportEnd, metering.ReportStatus{LastReportTime: lastReportTime}, validSchedule, false),
+			report:    testhelpers.NewReport(testReportName, testNamespace, testQueryName, reportStart, reportEnd, metering.ReportStatus{LastReportTime: lastReportTime}, validSchedule, false, nil),
 			expectErr: false,
 		},
 		{
 			name:      "valid schedule with a set spec.Schedule field and an unset Spec.Status.LastReportTime and a set Spec.ReportingStart returns nil",
-			report:    testhelpers.NewReport(testReportName, testNamespace, testQueryName, reportStart, reportEnd, metering.ReportStatus{}, validSchedule, false),
+			report:    testhelpers.NewReport(testReportName, testNamespace, testQueryName, reportStart, reportEnd, metering.ReportStatus{}, validSchedule, false, nil),
 			expectErr: false,
 		},
 		{
 			name:      "valid schedule with a set spec.Schedule field and an unset Spec.Status.LastReportTime and an unset Spec.ReportingStart returns nil",
-			report:    testhelpers.NewReport(testReportName, testNamespace, testQueryName, nil, reportEnd, metering.ReportStatus{}, validSchedule, false),
+			report:    testhelpers.NewReport(testReportName, testNamespace, testQueryName, nil, reportEnd, metering.ReportStatus{}, validSchedule, false, nil),
 			expectErr: false,
 		},
 		{
 			name:      "valid schedule with a set spec.Schedule field and an unset Spec.Status.LastReportTime and a set Spec.NextReportTime returns nil",
-			report:    testhelpers.NewReport(testReportName, testNamespace, testQueryName, nil, reportEnd, metering.ReportStatus{NextReportTime: nextReportTime}, validSchedule, false),
+			report:    testhelpers.NewReport(testReportName, testNamespace, testQueryName, nil, reportEnd, metering.ReportStatus{NextReportTime: nextReportTime}, validSchedule, false, nil),
 			expectErr: false,
 		},
 		{
 			name:        "unset Spec.Schedule with reportPeriod.periodStart > reportPeriod.periodEnd returns panic",
-			report:      testhelpers.NewReport(testReportName, testNamespace, testQueryName, reportEnd, reportStart, metering.ReportStatus{NextReportTime: nextReportTime}, nil, false),
+			report:      testhelpers.NewReport(testReportName, testNamespace, testQueryName, reportEnd, reportStart, metering.ReportStatus{NextReportTime: nextReportTime}, nil, false, nil),
 			expectErr:   false,
 			expectPanic: true,
 		},
@@ -472,6 +472,41 @@ func TestGetReportPeriod(t *testing.T) {
 					assert.Nil(t, err, "expected that getting the report period would return a nil error")
 				}
 			}
+		})
+	}
+}
+
+func TestReportsExpireAsExpected(t *testing.T) {
+	const (
+		testNamespace  = "default"
+		testReportName = "test-report"
+		testQueryName  = "test-query"
+	)
+
+	testTable := []struct {
+		name     string
+		nowAdder int
+		report   *metering.Report
+	}{
+		{
+			name:     "expired report should be deleted",
+			report:   testhelpers.NewReport(testReportName, testNamespace, testQueryName, nil, nil, metering.ReportStatus{}, nil, false, &metav1.Duration{Duration: 1 * time.Minute}),
+			nowAdder: 1,
+		},
+		{
+			name:     "not expired report should not be deleted",
+			report:   testhelpers.NewReport(testReportName, testNamespace, testQueryName, nil, nil, metering.ReportStatus{}, nil, false, &metav1.Duration{Duration: 1 * time.Minute}),
+			nowAdder: -1,
+		},
+	}
+
+	for _, testCase := range testTable {
+		var mockLogger = logrus.New()
+		testCase := testCase
+
+		t.Run(testCase.name, func(t *testing.T) {
+			result := isReportExpired(mockLogger, testCase.report, time.Now().Add(time.Minute*1).Add(time.Second*time.Duration(testCase.nowAdder)))
+			assert.True(t, result, "report should expire as expected")
 		})
 	}
 }

@@ -3057,6 +3057,11 @@ func (in *ReportSpec) DeepCopyInto(out *ReportSpec) {
 		*out = new(ReportSchedule)
 		(*in).DeepCopyInto(*out)
 	}
+	if in.Expiration != nil {
+		in, out := &in.Expiration, &out.Expiration
+		*out = new(metav1.Duration)
+		**out = **in
+	}
 	if in.ReportingStart != nil {
 		in, out := &in.ReportingStart, &out.ReportingStart
 		*out = (*in).DeepCopy()

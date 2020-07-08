@@ -34,6 +34,9 @@ type ReportSpec struct {
 	// Schedule configures when the report runs.
 	Schedule *ReportSchedule `json:"schedule,omitempty"`
 
+	// Expiration of the report. Report will be deleted once Report creation time + this retention period is reached, if no deps found
+	Expiration *meta.Duration `json:"expiration,omitempty"`
+
 	// ReportingStart specifies the time this Report should start from
 	// instead of the current time.
 	// This is intended for allowing a Report to start from the past

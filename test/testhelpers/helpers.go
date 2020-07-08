@@ -24,7 +24,7 @@ import (
 )
 
 // NewReport creates a mock report used for testing purposes.
-func NewReport(name, namespace, testQueryName string, reportStart, reportEnd *time.Time, status metering.ReportStatus, schedule *metering.ReportSchedule, runImmediately bool) *metering.Report {
+func NewReport(name, namespace, testQueryName string, reportStart, reportEnd *time.Time, status metering.ReportStatus, schedule *metering.ReportSchedule, runImmediately bool, expiration *meta.Duration) *metering.Report {
 	var start, end *meta.Time
 	if reportStart != nil {
 		start = &meta.Time{Time: *reportStart}
@@ -43,6 +43,7 @@ func NewReport(name, namespace, testQueryName string, reportStart, reportEnd *ti
 			ReportingEnd:   end,
 			Schedule:       schedule,
 			RunImmediately: runImmediately,
+			Expiration:     expiration,
 		},
 		Status: status,
 	}
