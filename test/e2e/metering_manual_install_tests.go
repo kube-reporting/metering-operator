@@ -28,6 +28,7 @@ func testManualMeteringInstall(
 	testOutputPath string,
 	expectInstallErrMsg []string,
 	expectInstallErr bool,
+	preInstallFunc PreInstallFunc,
 	testInstallFunctions []InstallTestCase,
 ) {
 	// create a directory used to store the @testCaseName container and resource logs
@@ -65,6 +66,11 @@ func testManualMeteringInstall(
 	)
 	require.NoError(t, err, "creating a new deployer context should produce no error")
 	defer deployerCtx.LoggerOutFile.Close()
+
+	if preInstallFunc != nil {
+		err = preInstallFunc(deployerCtx)
+		require.NoError(t, err, "expected no error while running any pre-install functions")
+	}
 
 	rf, err := deployerCtx.Setup(deployerCtx.Deployer.InstallOLM, expectInstallErr)
 

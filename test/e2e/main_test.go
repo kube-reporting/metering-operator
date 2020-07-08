@@ -47,12 +47,6 @@ var (
 	testMeteringConfigManifestsPath = "/test/e2e/testdata/meteringconfigs/"
 )
 
-type InstallTestCase struct {
-	Name         string
-	ExtraEnvVars []string
-	TestFunc     func(t *testing.T, testReportingFramework *reportingframework.ReportingFramework)
-}
-
 func init() {
 	runAWSBillingTests = os.Getenv("ENABLE_AWS_BILLING_TESTS") == "true"
 
@@ -140,6 +134,14 @@ func testMainWrapper(m *testing.M) int {
 	return m.Run()
 }
 
+type InstallTestCase struct {
+	Name         string
+	ExtraEnvVars []string
+	TestFunc     func(t *testing.T, testReportingFramework *reportingframework.ReportingFramework)
+}
+
+type PreInstallFunc func(ctx *deployframework.DeployerCtx) error
+
 func TestManualMeteringInstall(t *testing.T) {
 	testInstallConfigs := []struct {
 		Name                           string
@@ -149,6 +151,7 @@ func TestManualMeteringInstall(t *testing.T) {
 		ExpectInstallErr               bool
 		ExpectInstallErrMsg            []string
 		InstallSubTests                []InstallTestCase
+		PreInstallFunc                 PreInstallFunc
 		MeteringConfigManifestFilename string
 	}{
 		{
@@ -244,6 +247,7 @@ func TestManualMeteringInstall(t *testing.T) {
 				testOutputPath,
 				testCase.ExpectInstallErrMsg,
 				testCase.ExpectInstallErr,
+				testCase.PreInstallFunc,
 				testCase.InstallSubTests,
 			)
 		})
