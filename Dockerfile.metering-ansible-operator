@@ -9,7 +9,7 @@ FROM registry.svc.ci.openshift.org/ocp/4.6:ansible-operator
 
 USER root
 RUN set -x;
-ARG INSTALL_PKGS="less python2-botocore python2-boto3 openssl tini"
+ARG INSTALL_PKGS="less openssl tini"
 
 COPY --from=helm /usr/local/bin/helm /usr/local/bin/helm
 COPY --from=cli /usr/bin/oc /usr/bin/oc
@@ -24,7 +24,7 @@ RUN yum install --verbose --allowerasing --setopt=skip_missing_names_on_install=
 RUN ln -f -s /usr/bin/oc /usr/bin/kubectl
 
 # netaddr is needed to use the ipv4/ipv6 jinja filter
-RUN pip install --no-cache-dir --upgrade netaddr
+RUN pip install --no-cache-dir --upgrade netaddr botocore boto3
 
 ENV HOME /opt/ansible
 ENV HELM_CHART_PATH ${HOME}/charts/openshift-metering
