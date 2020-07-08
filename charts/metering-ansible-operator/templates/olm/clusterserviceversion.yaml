@@ -5,6 +5,7 @@ metadata:
   namespace: placeholder
 {{- if .Values.olm.csv.annotations }}
   annotations:
+    olm.skipRange: {{ .Values.olm.csv.skipRange | quote }}
 {{ toYaml .Values.olm.csv.annotations | indent 4 }}
 {{- end }}
 {{- if .Values.olm.labels }}
