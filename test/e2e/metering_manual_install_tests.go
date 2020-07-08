@@ -1,6 +1,7 @@
 package e2e
 
 import (
+	"context"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -9,10 +10,21 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	corev1 "k8s.io/api/core/v1"
+	apierrors "k8s.io/apimachinery/pkg/api/errors"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/util/yaml"
 
 	metering "github.com/kube-reporting/metering-operator/pkg/apis/metering/v1"
+	"github.com/kube-reporting/metering-operator/test/deployframework"
 	"github.com/kube-reporting/metering-operator/test/testhelpers"
+)
+
+const (
+	nonHDFSTargetPodCount = 5
+
+	secretName            = "aws-creds"
+	testingNamespaceLabel = "metering-testing-ns"
 )
 
 func testManualMeteringInstall(
@@ -112,4 +124,82 @@ func DecodeMeteringConfigManifest(basePath, manifestPath, manifestFilename strin
 	}
 
 	return mc, nil
+}
+
+func s3InstallFunc(ctx *deployframework.DeployerCtx) error {
+	// The default ctx.TargetPodsCount value assumes that HDFS
+	// is being used a storage backend, so we need to decrement
+	// that value to ensure we're not going to poll forever waiting
+	// for Pods that will not be created by the metering-ansible-operator
+	ctx.TargetPodsCount = nonHDFSTargetPodCount
+
+	// Before we can create the AWS credentials secret in the ctx.Namespace, we need to ensure
+	// that namespace has been created before attempting to query for a resource that does not exist.
+	_, err := ctx.Client.CoreV1().Namespaces().Get(context.Background(), ctx.Namespace, metav1.GetOptions{})
+	if err != nil && !apierrors.IsNotFound(err) {
+		return nil
+	}
+	if apierrors.IsNotFound(err) {
+		n := &corev1.Namespace{
+			ObjectMeta: metav1.ObjectMeta{
+				Name: ctx.Namespace,
+				Labels: map[string]string{
+					"name": ctx.Namespace + "-" + testingNamespaceLabel,
+				},
+			},
+		}
+		_, err = ctx.Client.CoreV1().Namespaces().Create(context.Background(), n, metav1.CreateOptions{})
+		if err != nil {
+			return err
+		}
+		ctx.Logger.Debugf("Created the %s namespace", ctx.Namespace)
+	}
+
+	// Attempt to mirror the AWS credentials used to provision the IPI-based AWS cluster
+	// from the kube-system namespace, to the ctx.Namespace that the test context is configured
+	// to use. In the case where this secret containing the base64-encrypted access key id and
+	// secret access key does not exist, replace all instances of the `_` delimiter with `_`,
+	// and create that Secret resource in the ctx.Namespace. In the case where the secret already
+	// exists, exit early.
+	_, err = ctx.Client.CoreV1().Secrets(ctx.Namespace).Get(context.Background(), secretName, metav1.GetOptions{})
+	if err != nil && !apierrors.IsNotFound(err) {
+		return nil
+	}
+	if apierrors.IsNotFound(err) {
+		s, err := ctx.Client.CoreV1().Secrets("kube-system").Get(context.Background(), secretName, metav1.GetOptions{})
+		if err != nil {
+			return err
+		}
+
+		key, ok := s.Data["aws_access_key_id"]
+		if !ok {
+			return fmt.Errorf("failed to retrieve the AWS access key ID from the secret data")
+		}
+		access, ok := s.Data["aws_secret_access_key"]
+		if !ok {
+			return fmt.Errorf("failed to retrieve the AWS secret access key from the secret data")
+		}
+
+		// Note: we need to do some light translation of data keys as the helm charts
+		// expect the data keys to use the `-` delimiter, e.g. `data["aws_access_key_id"]`
+		// becomes `data["aws-access-key-id"]`.
+		secret := &corev1.Secret{
+			ObjectMeta: metav1.ObjectMeta{
+				Name:      secretName,
+				Namespace: ctx.Namespace,
+			},
+			Data: map[string][]byte{
+				"aws-access-key-id":     key,
+				"aws-secret-access-key": access,
+			},
+		}
+
+		_, err = ctx.Client.CoreV1().Secrets(ctx.Namespace).Create(context.Background(), secret, metav1.CreateOptions{})
+		if err != nil {
+			return err
+		}
+		ctx.Logger.Debugf("Created the %s AWS credentials secret in the %s namespace", secretName, ctx.Namespace)
+	}
+
+	return nil
 }
