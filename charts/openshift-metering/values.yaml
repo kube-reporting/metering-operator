@@ -277,6 +277,10 @@ reporting-operator:
     updateStrategy:
       type: RollingUpdate
 
+    podDisruptionBudget:
+      minAvailable: 1
+      enabled: true
+
     resources:
       limits:
         cpu: 1
@@ -592,6 +596,10 @@ presto:
       tolerations: []
       terminationGracePeriodSeconds: 30
 
+      podDisruptionBudget:
+        minAvailable: 1
+        enabled: true
+
       config:
         jvm:
           G1HeapRegionSize: null
@@ -638,6 +646,10 @@ presto:
       nodeSelector: {}
       terminationGracePeriodSeconds: 30
       tolerations: []
+
+      podDisruptionBudget:
+        minAvailable: 0
+        enabled: false
 
       config:
         jvm:
@@ -742,6 +754,10 @@ hive:
       nodeSelector: {}
       tolerations: []
 
+      podDisruptionBudget:
+        minAvailable: 1
+        enabled: true
+
       config:
         logLevel: info
         jvm:
@@ -798,6 +814,10 @@ hive:
       affinity: {}
       nodeSelector: {}
       tolerations: []
+
+      podDisruptionBudget:
+        minAvailable: 1
+        enabled: true
 
       config:
         logLevel: info

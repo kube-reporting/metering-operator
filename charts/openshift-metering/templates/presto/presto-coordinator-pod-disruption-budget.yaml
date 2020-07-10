@@ -1,0 +1,12 @@
+{{- if .Values.presto.spec.coordinator.podDisruptionBudget.enabled  }}
+apiVersion: policy/v1beta1
+kind: PodDisruptionBudget
+metadata:
+  name: presto-coordinator-pdb
+spec:
+  minAvailable: {{ .Values.presto.spec.coordinator.podDisruptionBudget.minAvailable }}
+  selector:
+    matchLabels:
+      app: presto
+      presto: coordinator
+{{- end }}

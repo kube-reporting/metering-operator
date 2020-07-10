@@ -1,0 +1,12 @@
+{{- if .Values.presto.spec.worker.podDisruptionBudget.enabled  }}
+apiVersion: policy/v1beta1
+kind: PodDisruptionBudget
+metadata:
+  name: presto-worker-pdb
+spec:
+  minAvailable: {{ .Values.presto.spec.worker.podDisruptionBudget.minAvailable }}
+  selector:
+    matchLabels:
+      app: presto
+      presto: worker
+{{- end }}

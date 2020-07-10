@@ -1,0 +1,12 @@
+{{- if .Values.hive.spec.metastore.podDisruptionBudget.enabled  }}
+apiVersion: policy/v1beta1
+kind: PodDisruptionBudget
+metadata:
+  name: hive-metastore-pdb
+spec:
+  minAvailable: {{ .Values.hive.spec.metastore.podDisruptionBudget.minAvailable }}
+  selector:
+    matchLabels:
+      app: hive
+      hive: metastore
+{{- end }}

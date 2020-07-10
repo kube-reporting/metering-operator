@@ -1241,6 +1241,18 @@ spec:
                         type: object
                       nodeSelector:
                         type: object
+                      podDisruptionBudget:
+                        type: object
+                        description: |
+                          PodDisruptionBudget is an object that controls the PodDisruptionBudget resource
+                          that gets created for the reporting-operator. By default, it's configured to set
+                          the minimum available replicas to one.
+                        properties:
+                          minAvailable:
+                            type: integer
+                            format: int32
+                          enabled:
+                            type: boolean
                       rbac:
                         type: object
                         required:
@@ -1766,6 +1778,18 @@ spec:
                                 type: integer
                           nodeSelector:
                             type: object
+                          podDisruptionBudget:
+                            type: object
+                            description: |
+                              PodDisruptionBudget is an object that controls the PodDisruptionBudget resource
+                              that gets created for the Presto coordinator. By default, it's configured to set
+                              the minimum available replicas to one.
+                            properties:
+                              minAvailable:
+                                type: integer
+                                format: int32
+                              enabled:
+                                type: boolean
                           resources:
                             type: object
                             properties:
@@ -1919,6 +1943,18 @@ spec:
                                 type: integer
                           nodeSelector:
                             type: object
+                          podDisruptionBudget:
+                            type: object
+                            description: |
+                              PodDisruptionBudget is an object that controls the PodDisruptionBudget resource
+                              that gets created for the Presto worker. By default, it's configured to set
+                              the minimum available replicas to one.
+                            properties:
+                              minAvailable:
+                                type: integer
+                                format: int32
+                              enabled:
+                                type: boolean
                           replicas:
                             type: integer
                             format: int32
@@ -2202,6 +2238,18 @@ spec:
                                 type: integer
                           nodeSelector:
                             type: object
+                          podDisruptionBudget:
+                            type: object
+                            description: |
+                              PodDisruptionBudget is an object that controls the PodDisruptionBudget resource
+                              that gets created for Hive metastore. By default, it's configured to set
+                              the minimum available replicas to one.
+                            properties:
+                              minAvailable:
+                                type: integer
+                                format: int32
+                              enabled:
+                                type: boolean
                           resources:
                             type: object
                             properties:
@@ -2459,6 +2507,18 @@ spec:
                                 type: integer
                           nodeSelector:
                             type: object
+                          podDisruptionBudget:
+                            type: object
+                            description: |
+                              PodDisruptionBudget is an object that controls the PodDisruptionBudget resource
+                              that gets created for Hive server. By default, it's configured to set
+                              the minimum available replicas to one.
+                            properties:
+                              minAvailable:
+                                type: integer
+                                format: int32
+                              enabled:
+                                type: boolean
                           resources:
                             type: object
                             properties:

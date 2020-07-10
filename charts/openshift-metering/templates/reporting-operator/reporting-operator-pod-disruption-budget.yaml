@@ -1,0 +1,12 @@
+{{- $operatorValues :=  index .Values "reporting-operator" -}}
+{{- if $operatorValues.spec.podDisruptionBudget.enabled  }}
+apiVersion: policy/v1beta1
+kind: PodDisruptionBudget
+metadata:
+  name: reporting-operator-pdb
+spec:
+  minAvailable: {{ $operatorValues.spec.podDisruptionBudget.minAvailable }}
+  selector:
+    matchLabels:
+      app: reporting-operator
+{{- end }}
