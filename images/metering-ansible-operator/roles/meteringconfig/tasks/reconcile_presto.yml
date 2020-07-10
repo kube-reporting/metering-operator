@@ -92,6 +92,14 @@
       - template_file: templates/presto/presto-worker-statefulset.yaml
         apis: [ {kind: statefulset} ]
         prune_label_value: presto-worker-statefulset
+      - template_file: templates/presto/presto-coordinator-pod-disruption-budget.yaml
+        apis: [ {kind: PodDisruptionBudget, api_version: 'policy/v1beta1'} ]
+        prune_label_value: "presto-coordinator-pod-disruption-budget"
+        create: "{{ _meteringconfig_create_presto_coordinator_pod_disruption_budget }}"
+      - template_file: templates/presto/presto-worker-pod-disruption-budget.yaml
+        apis: [ {kind: PodDisruptionBudget, api_version: 'policy/v1beta1'} ]
+        prune_label_value: "presto-worker-pod-disruption-budget"
+        create: "{{ _meteringconfig_create_presto_worker_pod_disruption_budget }}"
 
 - include_tasks: update_meteringconfig_status.yml
   vars:

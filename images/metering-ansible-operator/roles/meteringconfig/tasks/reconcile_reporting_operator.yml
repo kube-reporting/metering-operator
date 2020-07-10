@@ -104,6 +104,10 @@
         apis: [ {kind: ConfigMap }]
         prune_label_value: reporting-operator-ca-bundle-configmap
         create: "{{ _meteringconfig_create_user_trusted_ca_bundle }}"
+      - template_file: templates/reporting-operator/reporting-operator-pod-disruption-budget.yaml
+        apis: [ {kind: PodDisruptionBudget, api_version: 'policy/v1beta1'} ]
+        prune_label_value: "reporting-operator-pod-disruption-budget"
+        create: "{{ _meteringconfig_create_reporting_operator_pod_disruption_budget }}"
 
 - include_tasks: update_meteringconfig_status.yml
   vars:

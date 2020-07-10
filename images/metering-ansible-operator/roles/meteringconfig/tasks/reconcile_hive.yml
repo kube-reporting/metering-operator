@@ -93,6 +93,14 @@
       - template_file: templates/hive/hive-server-statefulset.yaml
         apis: [ {kind: statefulset, api_version: 'apps/v1'} ]
         prune_label_value: hive-server-statefulset
+      - template_file: templates/hive/hive-metastore-pod-disruption-budget.yaml
+        apis: [ {kind: PodDisruptionBudget, api_version: 'policy/v1beta1'} ]
+        prune_label_value: "hive-metastore-pod-disruption-budget"
+        create: "{{ _meteringconfig_create_hive_metastore_pod_disruption_budget }}"
+      - template_file: templates/hive/hive-server-pod-disruption-budget.yaml
+        apis: [ {kind: PodDisruptionBudget, api_version: 'policy/v1beta1'} ]
+        prune_label_value: "hive-server-pod-disruption-budget"
+        create: "{{ _meteringconfig_create_hive_server_pod_disruption_budget }}"
 
 - include_tasks: update_meteringconfig_status.yml
   vars:

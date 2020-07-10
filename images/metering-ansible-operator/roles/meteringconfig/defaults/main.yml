@@ -667,6 +667,8 @@ meteringconfig_create_hive_s3_compatible_ca: "{{ _hive_spec.config.s3Compatible.
 meteringconfig_create_hive_metastore_tls_secrets: "{{ _hive_spec.metastore.config.tls.enabled and _hive_spec.metastore.config.tls.createSecret | default(false) }}"
 meteringconfig_create_hive_server_metastore_tls_secrets: "{{ _hive_spec.server.config.metastoreTLS.enabled and _hive_spec.server.config.metastoreTLS.createSecret | default(false) }}"
 meteringconfig_create_hive_server_tls_secrets: "{{ _hive_spec.server.config.tls.enabled and _hive_spec.server.config.tls.createSecret | default(false) }}"
+_meteringconfig_create_hive_metastore_pod_disruption_budget: "{{ _hive_spec.metastore.podDisruptionBudget.enabled | default(true) }}"
+_meteringconfig_create_hive_server_pod_disruption_budget: "{{ _hive_spec.server.podDisruptionBudget.enabled | default(true) }}"
 
 meteringconfig_create_presto_aws_credentials: "{{ _presto_spec.config.aws.createSecret | default(false) }}"
 meteringconfig_create_presto_azure_credentials: "{{ _presto_spec.config.azure.createSecret | default(false) }}"
@@ -674,6 +676,8 @@ meteringconfig_create_presto_hive_metastore_tls_secrets: "{{ _presto_spec.config
 meteringconfig_create_presto_gcs_credentials: "{{ _presto_spec.config.gcs.createSecret | default(false) }}"
 meteringconfig_create_presto_s3_compatible_credentials: "{{ _presto_spec.config.s3Compatible.createSecret | default(false) }}"
 meteringconfig_create_presto_s3_compatible_ca: "{{ _presto_spec.config.s3Compatible.ca.createSecret | default(false) }}"
+_meteringconfig_create_presto_coordinator_pod_disruption_budget: "{{ _presto_spec.coordinator.podDisruptionBudget.enabled | default(true) }}"
+_meteringconfig_create_presto_worker_pod_disruption_budget: "{{ _presto_spec.worker.podDisruptionBudget.enabled and (_presto_spec.worker.replicas > 0) | default(false) }}"
 
 
 meteringconfig_template_hive_metastore_tls_secret: "{{ _hive_spec.metastore.config.tls.enabled and _hive_spec.metastore.config.tls.createSecret and _hive_spec.metastore.config.tls.secretName != 'hive-metastore-server-tls'}}"
@@ -707,3 +711,4 @@ meteringconfig_create_reporting_operator_hive_auth_secrets: "{{ _reporting_op_sp
 meteringconfig_create_reporting_operator_tls_secrets: "{{ _reporting_op_spec.config.tls.api.createSecret | default(false) }}"
 meteringconfig_create_reporting_operator_route: "{{ _reporting_op_spec.route.enabled | default(false) }}"
 meteringconfig_create_reporting_operator_cluster_monitoring_view_rbac: "{{ _reporting_op_spec.rbac.createClusterMonitoringViewRBAC | default(true) }}"
+_meteringconfig_create_reporting_operator_pod_disruption_budget: "{{ _reporting_op_spec.podDisruptionBudget.enabled | default(true) }}"
