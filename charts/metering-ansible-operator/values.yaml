@@ -84,6 +84,19 @@ operator:
 
     roleName: metering-operator
     rules:
+    # grant access to the policy resources
+    - apiGroups:
+      - policy
+      resources:
+      - poddisruptionbudgets
+      verbs:
+      - get
+      - list
+      - watch
+      - create
+      - delete
+      - update
+      - patch
     # grant access to metering resources
     - apiGroups: ["metering.openshift.io"]
       resources: ["*"]

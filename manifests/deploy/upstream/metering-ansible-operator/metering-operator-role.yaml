@@ -4,6 +4,18 @@ metadata:
   name: metering-operator
 rules:
   - apiGroups:
+    - policy
+    resources:
+    - poddisruptionbudgets
+    verbs:
+    - get
+    - list
+    - watch
+    - create
+    - delete
+    - update
+    - patch
+  - apiGroups:
     - metering.openshift.io
     resources:
     - '*'
