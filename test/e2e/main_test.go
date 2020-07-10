@@ -214,6 +214,10 @@ func TestManualMeteringInstall(t *testing.T) {
 					Name:     "testReportingOperatorServiceCABundleExists",
 					TestFunc: testReportingOperatorServiceCABundleExists,
 				},
+				{
+					Name:     "testEnsurePodDisruptionBudgetsExist",
+					TestFunc: testEnsurePodDisruptionBudgetsExist,
+				},
 			},
 			MeteringConfigManifestFilename: "prometheus-metrics-importer-disabled.yaml",
 		},
@@ -236,9 +240,8 @@ func TestManualMeteringInstall(t *testing.T) {
 					},
 				},
 				{
-					Name:         "testEnsureS3BucketIsDeleted",
-					TestFunc:     testEnsureS3BucketIsDeleted,
-					ExtraEnvVars: []string{},
+					Name:     "testEnsureS3BucketIsDeleted",
+					TestFunc: testEnsureS3BucketIsDeleted,
 				},
 			},
 			MeteringConfigManifestFilename: "s3.yaml",
