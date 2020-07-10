@@ -99,22 +99,28 @@ type JVMConfig struct {
 End of structures re-used throughout the top-level keys
 */
 
+type PodDisruptionBudget struct {
+	Enabled      *bool `json:"enabled,omitempty"`
+	MinAvailable *bool `json:"minAvailable,omitempty"`
+}
+
 type ReportingOperator struct {
 	Spec *ReportingOperatorSpec `json:"spec,omitempty"`
 }
 type ReportingOperatorSpec struct {
-	Replicas       *int32                             `json:"replicas,omitempty"`
-	Annotations    map[string]string                  `json:"annotations,omitempty"`
-	Labels         map[string]string                  `json:"labels,omitempty"`
-	NodeSelector   map[string]string                  `json:"nodeSelector,omitempty"`
-	Affinity       *corev1.Affinity                   `json:"affinity,omitempty"`
-	Resources      *corev1.ResourceRequirements       `json:"resources,omitempty"`
-	UpdateStrategy *appsv1.DeploymentStrategy         `json:"updateStrategy,omitempty"`
-	Image          *ImageConfig                       `json:"image,omitempty"`
-	Config         *ReportingOperatorConfig           `json:"config,omitempty"`
-	APIService     *ReportingOperatorAPIServiceConfig `json:"apiService,omitempty"`
-	Route          *ReportingOperatorRouteConfig      `json:"route,omitempty"`
-	AuthProxy      *ReportingOperatorAuthProxyConfig  `json:"authProxy,omitempty"`
+	Replicas            *int32                             `json:"replicas,omitempty"`
+	Annotations         map[string]string                  `json:"annotations,omitempty"`
+	Labels              map[string]string                  `json:"labels,omitempty"`
+	NodeSelector        map[string]string                  `json:"nodeSelector,omitempty"`
+	PodDisruptionBudget *PodDisruptionBudget               `json:"podDisruptionBudget,omitempty"`
+	Affinity            *corev1.Affinity                   `json:"affinity,omitempty"`
+	Resources           *corev1.ResourceRequirements       `json:"resources,omitempty"`
+	UpdateStrategy      *appsv1.DeploymentStrategy         `json:"updateStrategy,omitempty"`
+	Image               *ImageConfig                       `json:"image,omitempty"`
+	Config              *ReportingOperatorConfig           `json:"config,omitempty"`
+	APIService          *ReportingOperatorAPIServiceConfig `json:"apiService,omitempty"`
+	Route               *ReportingOperatorRouteConfig      `json:"route,omitempty"`
+	AuthProxy           *ReportingOperatorAuthProxyConfig  `json:"authProxy,omitempty"`
 }
 type ReportingOperatorConfig struct {
 	AllNamespaces       *bool                              `json:"allNamespaces,omitempty"`
@@ -427,6 +433,7 @@ type PrestoConfig struct {
 type PrestoCoordinatorSpec struct {
 	TerminationGracePeriodSeconds *int64                       `json:"terminationGracePeriodSeconds,omitempty"`
 	NodeSelector                  map[string]string            `json:"nodeSelector,omitempty"`
+	PodDisruptionBudget           *PodDisruptionBudget         `json:"podDisruptionBudget,omitempty"`
 	Affinity                      *corev1.Affinity             `json:"affinity,omitempty"`
 	Resources                     *corev1.ResourceRequirements `json:"resources,omitempty"`
 	Tolerations                   []corev1.Toleration          `json:"tolerations,omitempty"`
@@ -436,6 +443,7 @@ type PrestoWorkerSpec struct {
 	Replicas                      *int32                       `json:"replicas,omitempty"`
 	TerminationGracePeriodSeconds *int64                       `json:"terminationGracePeriodSeconds,omitempty"`
 	NodeSelector                  map[string]string            `json:"nodeSelector,omitempty"`
+	PodDisruptionBudget           *PodDisruptionBudget         `json:"podDisruptionBudget,omitempty"`
 	Affinity                      *corev1.Affinity             `json:"affinity,omitempty"`
 	Resources                     *corev1.ResourceRequirements `json:"resources,omitempty"`
 	Tolerations                   []corev1.Toleration          `json:"tolerations,omitempty"`
@@ -530,14 +538,15 @@ type HiveSharedVolumeConfig struct {
 	StorageClass string `json:"storageClass,omitempty"`
 }
 type HiveMetastoreSpec struct {
-	NodeSelector   map[string]string            `json:"nodeSelector,omitempty"`
-	Affinity       *corev1.Affinity             `json:"affinity,omitempty"`
-	LivenessProbe  *corev1.Probe                `json:"livenessProbe,omitempty"`
-	ReadinessProbe *corev1.Probe                `json:"readinessProbe,omitempty"`
-	Resources      *corev1.ResourceRequirements `json:"resources,omitempty"`
-	Tolerations    []corev1.Toleration          `json:"tolerations,omitempty"`
-	Config         *HiveMetastoreSpecConfig     `json:"config,omitempty"`
-	Storage        *HiveMetastoreStorageConfig  `json:"storage,omitempty"`
+	NodeSelector        map[string]string            `json:"nodeSelector,omitempty"`
+	PodDisruptionBudget *PodDisruptionBudget         `json:"podDisruptionBudget,omitempty"`
+	Affinity            *corev1.Affinity             `json:"affinity,omitempty"`
+	LivenessProbe       *corev1.Probe                `json:"livenessProbe,omitempty"`
+	ReadinessProbe      *corev1.Probe                `json:"readinessProbe,omitempty"`
+	Resources           *corev1.ResourceRequirements `json:"resources,omitempty"`
+	Tolerations         []corev1.Toleration          `json:"tolerations,omitempty"`
+	Config              *HiveMetastoreSpecConfig     `json:"config,omitempty"`
+	Storage             *HiveMetastoreStorageConfig  `json:"storage,omitempty"`
 }
 type HiveMetastoreSpecConfig struct {
 	LogLevel string                  `json:"logLevel,omitempty"`
@@ -554,13 +563,14 @@ type HiveMetastoreStorageConfig struct {
 	Size   string `json:"size,omitempty"`
 }
 type HiveServerSpec struct {
-	NodeSelector   map[string]string            `json:"nodeSelector,omitempty"`
-	Affinity       *corev1.Affinity             `json:"affinity,omitempty"`
-	LivenessProbe  *corev1.Probe                `json:"livenessProbe,omitempty"`
-	ReadinessProbe *corev1.Probe                `json:"readinessProbe,omitempty"`
-	Resources      *corev1.ResourceRequirements `json:"resources,omitempty"`
-	Tolerations    []corev1.Toleration          `json:"tolerations,omitempty"`
-	Config         *HiveServerSpecConfig        `json:"config,omitempty"`
+	NodeSelector        map[string]string            `json:"nodeSelector,omitempty"`
+	PodDisruptionBudget *PodDisruptionBudget         `json:"podDisruptionBudget,omitempty"`
+	Affinity            *corev1.Affinity             `json:"affinity,omitempty"`
+	LivenessProbe       *corev1.Probe                `json:"livenessProbe,omitempty"`
+	ReadinessProbe      *corev1.Probe                `json:"readinessProbe,omitempty"`
+	Resources           *corev1.ResourceRequirements `json:"resources,omitempty"`
+	Tolerations         []corev1.Toleration          `json:"tolerations,omitempty"`
+	Config              *HiveServerSpecConfig        `json:"config,omitempty"`
 }
 type HiveServerSpecConfig struct {
 	LogLevel     string                  `json:"logLevel,omitempty"`
