@@ -224,7 +224,7 @@ func TestManualMeteringInstall(t *testing.T) {
 			Name:                      "S3-ReportDynamicInputData",
 			MeteringOperatorImageRepo: meteringOperatorImageRepo,
 			MeteringOperatorImageTag:  meteringOperatorImageTag,
-			Skip:                      false,
+			Skip:                      runAllInstallTests,
 			PreInstallFunc:            s3InstallFunc,
 			InstallSubTests: []InstallTestCase{
 				{
