@@ -9,9 +9,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"k8s.io/apimachinery/pkg/util/yaml"
 
-	metering "github.com/kube-reporting/metering-operator/pkg/apis/metering/v1"
 	"github.com/kube-reporting/metering-operator/test/reportingframework"
 	"github.com/kube-reporting/metering-operator/test/testhelpers"
 )
@@ -48,14 +46,8 @@ func testManualOLMUpgradeInstall(
 		require.Fail(t, "The length of the test function namespace exceeded the kube namespace limit of %d characters", kubeNamespaceCharLimit)
 	}
 
-	manifestFullPath := filepath.Join(repoPath, testMeteringConfigManifestsPath, manifestFilename)
-	file, err := os.Open(manifestFullPath)
-	require.NoError(t, err, "failed to open manifest file")
-
-	mc := &metering.MeteringConfig{}
-	err = yaml.NewYAMLOrJSONDecoder(file, 100).Decode(&mc)
-	require.NoError(t, err, "failed to decode the yaml meteringconfig manifest")
-	require.NotNil(t, mc, "the decoded meteringconfig object is nil")
+	mc, err := testhelpers.DecodeMeteringConfigManifest(repoPath, testMeteringConfigManifestsPath, manifestFilename)
+	require.NoError(t, err, "failed to successfully decode the YAML MeteringConfig manifest")
 
 	deployerCtx, err := df.NewDeployerCtx(
 		testFuncNamespace,
