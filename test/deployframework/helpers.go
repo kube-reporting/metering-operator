@@ -445,7 +445,7 @@ func VerifyConfigMap(logger logrus.FieldLogger, client kubernetes.Interface, nam
 
 // UpdateExistingSubscription is a helper function responsible for upgrading an existing metering-ocp Subscription
 // to use the newest payload and verify that the Subscription object is reporting a successful upgrade status.
-func UpdateExistingSubscription(logger logrus.FieldLogger, client olmclientv1alpha1.OperatorsV1alpha1Interface, name, upgradeChannel, namespace string) error {
+func UpdateExistingSubscription(logger logrus.FieldLogger, client olmclientv1alpha1.OperatorsV1alpha1Interface, name, namespace, catalogSourceName, catalogSourceNamespace, upgradeSubscriptionChannel string) error {
 	sub, err := client.Subscriptions(namespace).Get(context.TODO(), name, metav1.GetOptions{})
 	if apierrors.IsNotFound(err) {
 		return fmt.Errorf("the %s subscription does not exist", name)
@@ -456,14 +456,14 @@ func UpdateExistingSubscription(logger logrus.FieldLogger, client olmclientv1alp
 
 	// update the Subscription to use the most recent channel listed in the package.yaml
 	// and change the Subscription source type to use the contents of a CatalogSource.
-	sub.Spec.CatalogSource = name
-	sub.Spec.CatalogSourceNamespace = namespace
-	sub.Spec.Channel = upgradeChannel
+	sub.Spec.CatalogSource = catalogSourceName
+	sub.Spec.CatalogSourceNamespace = catalogSourceNamespace
+	sub.Spec.Channel = upgradeSubscriptionChannel
 	_, err = client.Subscriptions(namespace).Update(context.TODO(), sub, metav1.UpdateOptions{})
 	if err != nil {
 		return err
 	}
-	logger.Infof("Updated the %s Subscription to use the %s channel", name, upgradeChannel)
+	logger.Infof("Updated the %s Subscription to use the %s channel", name, upgradeSubscriptionChannel)
 
 	// after updating the metering-ocp Subscription to use a newer channel,
 	// wait until this object is reporting a successful upgrade state before
@@ -478,8 +478,8 @@ func UpdateExistingSubscription(logger logrus.FieldLogger, client olmclientv1alp
 		}
 
 		logger.Infof("Waiting for the %s Subscription to finish upgrading", name)
-		if !strings.Contains(sub.Status.CurrentCSV, upgradeChannel) {
-			logger.Infof("Subscription status does not report metering-operator-v%s as the currentCSV", upgradeChannel)
+		if !strings.Contains(sub.Status.CurrentCSV, upgradeSubscriptionChannel) {
+			logger.Infof("Subscription status does not report metering-operator-v%s as the currentCSV", upgradeSubscriptionChannel)
 			return false, nil
 		}
 		if sub.Status.State != olmv1alpha1.SubscriptionStateAtLatest {

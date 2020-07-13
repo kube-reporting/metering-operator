@@ -14,6 +14,14 @@ import (
 	"github.com/kube-reporting/metering-operator/test/testhelpers"
 )
 
+const (
+	// TODO: support upgrading from a custom registry image instead
+	// of defaulting to the redhat-operators CatalogSource and waiting
+	// for GA-ed channels to be exposed.
+	upgradeFromCatalogSource          = "redhat-operators"
+	upgradeFromCatalogSourceNamespace = "openshift-marketplace"
+)
+
 func testManualOLMUpgradeInstall(
 	t *testing.T,
 	testCaseName,
@@ -23,7 +31,8 @@ func testManualOLMUpgradeInstall(
 	manifestFilename,
 	catalogSourceName,
 	catalogSourceNamespace,
-	subscriptionName,
+	upgradeFromSubscriptionChannel,
+	subscriptionChannel,
 	testOutputPath string,
 	expectInstallErrMsg []string,
 	expectInstallErr,
@@ -55,11 +64,11 @@ func testManualOLMUpgradeInstall(
 		meteringOperatorImageTag,
 		reportingOperatorImageRepo,
 		reportingOperatorImageTag,
-		catalogSourceName,
-		catalogSourceNamespace,
-		subscriptionName,
+		upgradeFromCatalogSource,
+		upgradeFromCatalogSourceNamespace,
+		upgradeFromSubscriptionChannel,
 		preUpgradeTestOutputDir,
-		expectInstallErrMsg,
+		testInstallFunction.ExtraEnvVars,
 		mc.Spec,
 	)
 	require.NoError(t, err, "creating a new deployer context should produce no error")
@@ -92,7 +101,7 @@ func testManualOLMUpgradeInstall(
 	assert.NoError(t, err, "creating the test case output directory should produce no error")
 
 	deployerCtx.TestCaseOutputPath = postUpgradeTestOutputDir
-	rf, err = deployerCtx.Upgrade(packageName, df.RepoVersion, purgeReports, purgeReportDataSources)
+	rf, err = deployerCtx.Upgrade(catalogSourceName, catalogSourceNamespace, subscriptionChannel, purgeReports, purgeReportDataSources)
 	if canSafelyRunTest = testhelpers.AssertCanSafelyRunReportingTests(t, err, expectInstallErr, expectInstallErrMsg); !canSafelyRunTest {
 		err = deployerCtx.MustGatherMeteringResources(gatherTestArtifactsScript)
 		assert.NoError(t, err, "gathering metering resources should produce no error")

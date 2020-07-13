@@ -296,7 +296,7 @@ func (ctx *DeployerCtx) Setup(installFunc func() error, expectInstallErr bool) (
 // metering-operator and it's operands (namely the reporting-operator)
 // have reported a "Ready" status that we define, before we start
 // constructing and returning a reportingframework object.
-func (ctx *DeployerCtx) Upgrade(packageName, repoVersion string, purgeReports, purgeReportDataSources bool) (*reportingframework.ReportingFramework, error) {
+func (ctx *DeployerCtx) Upgrade(catalogSourceName, catalogSourceNamespace, upgradeChannel string, purgeReports, purgeReportDataSources bool) (*reportingframework.ReportingFramework, error) {
 	var err error
 	if purgeReports {
 		err = DeleteAllTestReports(ctx.Logger, ctx.MeteringClient, ctx.Namespace)
@@ -311,30 +311,10 @@ func (ctx *DeployerCtx) Upgrade(packageName, repoVersion string, purgeReports, p
 		}
 	}
 
-	err = CreateUpgradeConfigMap(ctx.Logger, packageName, ctx.Namespace, ctx.HackScriptPath)
-	if err != nil {
-		return nil, fmt.Errorf("failed to create the %s ConfigMap: %v", packageName, err)
-	}
-
-	err = VerifyConfigMap(ctx.Logger, ctx.Client, packageName, ctx.Namespace)
-	if err != nil {
-		return nil, fmt.Errorf("failed to verify the %s ConfigMap was successfully created: %v", packageName, err)
-	}
-
-	err = CreateCatalogSource(ctx.Logger, packageName, ctx.Namespace, packageName, ctx.OLMV1Alpha1Client)
-	if err != nil {
-		return nil, fmt.Errorf("failed to create the %s CatalogSource: %v", packageName, err)
-	}
-
-	err = VerifyCatalogSourcePod(ctx.Logger, ctx.Client, packageName, ctx.Namespace)
-	if err != nil {
-		return nil, fmt.Errorf("failed to verify the %s CatalogSource was successfully created: %v", packageName, err)
-	}
-
 	start := time.Now()
-	err = UpdateExistingSubscription(ctx.Logger, ctx.OLMV1Alpha1Client, packageName, repoVersion, ctx.Namespace)
+	err = UpdateExistingSubscription(ctx.Logger, ctx.OLMV1Alpha1Client, defaultSubscriptionName, ctx.Namespace, catalogSourceName, catalogSourceNamespace, upgradeChannel)
 	if err != nil {
-		return nil, fmt.Errorf("failed to upgrade the existing %s Subscription: %v", packageName, err)
+		return nil, fmt.Errorf("failed to upgrade the existing %s Subscription: %v", defaultSubscriptionName, err)
 	}
 
 	err = WaitForMeteringOperatorDeployment(ctx.Logger, ctx.Client, meteringOperatorDeploymentName, ctx.Namespace)
