@@ -17,10 +17,11 @@ import (
 var (
 	df *deployframework.DeployFramework
 
-	kubeConfig    string
-	logLevel      string
-	runTestsLocal bool
-	runDevSetup   bool
+	kubeConfig         string
+	logLevel           string
+	runTestsLocal      bool
+	runDevSetup        bool
+	runAllInstallTests bool
 
 	meteringOperatorImageRepo  string
 	meteringOperatorImageTag   string
@@ -74,8 +75,10 @@ func TestMain(m *testing.M) {
 func testMainWrapper(m *testing.M) int {
 	flag.StringVar(&kubeConfig, "kubeconfig", "", "kube config path, e.g. $HOME/.kube/config")
 	flag.StringVar(&logLevel, "log-level", logrus.DebugLevel.String(), "The log level")
+
 	flag.BoolVar(&runTestsLocal, "run-tests-local", false, "Controls whether the metering and reporting operators are run locally during tests")
 	flag.BoolVar(&runDevSetup, "run-dev-setup", false, "Controls whether the e2e suite uses the dev-friendly configuration")
+	flag.BoolVar(&runAllInstallTests, "test-run-all-install-tests", true, "Controls whether or not the e2e suite installs all of the tests listed in the TestManualMeteringInstall function")
 	flag.BoolVar(&runAWSBillingTests, "run-aws-billing-tests", runAWSBillingTests, "")
 
 	flag.StringVar(&meteringOperatorImageRepo, "metering-operator-image-repo", meteringOperatorImageRepo, "")
@@ -221,7 +224,7 @@ func TestManualMeteringInstall(t *testing.T) {
 			Name:                      "S3-ReportDynamicInputData",
 			MeteringOperatorImageRepo: meteringOperatorImageRepo,
 			MeteringOperatorImageTag:  meteringOperatorImageTag,
-			Skip:                      false,
+			Skip:                      runAllInstallTests,
 			PreInstallFunc:            s3InstallFunc,
 			InstallSubTests: []InstallTestCase{
 				{
