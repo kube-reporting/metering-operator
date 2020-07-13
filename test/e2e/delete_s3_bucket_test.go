@@ -19,10 +19,12 @@ import (
 )
 
 func testEnsureS3BucketIsDeleted(t *testing.T, rf *reportingframework.ReportingFramework) {
+	// query the rf.Namespace for the bucket and region specification
 	mc, err := rf.MeteringClient.MeteringConfigs(rf.Namespace).Get(context.Background(), "operator-metering", metav1.GetOptions{})
 	require.False(t, apierrors.IsNotFound(err), "expected querying for the operator-metering MeteringConfig custom resource in the %s namespace would produce no error", rf.Namespace)
 
-	s, err := rf.KubeClient.CoreV1().Secrets(rf.Namespace).Get(context.Background(), "aws-creds", metav1.GetOptions{})
+	// query the rf.Namespace for the secretName specified in the MeteringConfig configuration
+	s, err := rf.KubeClient.CoreV1().Secrets(rf.Namespace).Get(context.Background(), mc.Spec.Storage.Hive.S3.SecretName, metav1.GetOptions{})
 	require.NoErrorf(t, err, "expected querying for the aws-creds secret in the %s namespace would produce no error", rf.Namespace)
 
 	region := mc.Spec.Storage.Hive.S3.Region
@@ -40,7 +42,7 @@ func testEnsureS3BucketIsDeleted(t *testing.T, rf *reportingframework.ReportingF
 	err = s3manager.NewBatchDeleteWithClient(client).Delete(aws.BackgroundContext(), iter)
 	require.NoError(t, err, "expected deleting the objects in an s3 bucket would produce no error")
 
-	_, err = client.DeleteBucket(&s3.DeleteBucketInput{Bucket: aws.String(bucket)})
+	err = client.WaitUntilBucketNotExists(&s3.HeadBucketInput{Bucket: aws.String(bucket)})
 	require.NoErrorf(t, err, "failed to delete the %s bucket", bucket)
 	t.Logf("Deleted the %s bucket in the %s region", bucket, region)
 }
