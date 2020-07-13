@@ -117,10 +117,10 @@ func testMainWrapper(m *testing.M) int {
 	// the default images in the metering CSV. In the case where
 	// some version of the `make e2e-dev` has been provided, skip
 	// the deletion the local registry resources and CatalogSource CR.
-	if meteringOperatorImageRepo != "" {
+	if meteringOperatorImageRepo != "" && meteringOperatorImageTag != "" {
 		meteringOperatorImage = meteringOperatorImageRepo + ":" + meteringOperatorImageTag
 	}
-	if reportingOperatorImageRepo != "" {
+	if reportingOperatorImageRepo != "" && reportingOperatorImageTag != "" {
 		reportingOperatorImage = reportingOperatorImageRepo + ":" + reportingOperatorImageTag
 	}
 	catalogSourceName, catalogSourceNamespace, err = df.CreateRegistryResources(registryImage, meteringOperatorImage, reportingOperatorImage)
