@@ -219,21 +219,25 @@ metadata:
 spec:
   displayName: Metering
   description: |
-    The Metering Operator is a chargeback and reporting tool to provide accountability for how resources are used across a cluster. Cluster admins can schedule reports based on historical usage data by Pod, Namespace, and Cluster wide. The Metering Operator is a part of the [Kubernetes Reporting organization](https://coreos.com/blog/introducing-operator-framework-metering).
+    The Metering Operator is a generic reporting tool to provide accountability for how resources are used across a cluster cherry picking and storing information from different sources. Cluster admins can schedule reports based on historical usage data by Pod, Namespace, and Cluster for storage. The Metering Operator is a part of the [Kubernetes Reporting organization](https://github.com/kube-reporting).
 
     Read the user guide for more details on [running and viewing your first report](https://docs.openshift.com/container-platform/4.6/metering/metering-using-metering.html).
 
     ### Core capabilities
 
-    * **Chargeback/Showback** - Break down the reserved and utlized resources requested by applications.
+    * **Long term storage** - Break down the reserved and utlized resources requested by applications and store the information as long as needed.
 
     * **Pod, Namespace & Cluster Reports** - Built in reports exist to break down CPU and RAM in any way you desire.
 
-    * **Scheduled Reports** - Schedule reports to run on a standard interval, eg. daily or monthly
+    * **Scheduled Reports** - Schedule reports to run on a standard interval, eg. daily or monthly. Use this reports, for intance, as the basis for chargeback and showback.
 
     * **Post-Processing** - Reports are generated in CSV format and stored in persistent storage for further post-processing. Use this to send reminder emails, integrate into your ERP system, or graph on a dashboard.
 
+    * **Roll-up reports** - Reports can be used as a source for other reports, allowing for more complex queries that span longer periods than those supported by the data source.
+
     * **HTTP API** - Reports can be queried from an in-cluster HTTP API in addition to reading from persistent storage.
+
+    * **Integration with AWS EC2 billing** - Connect operator metering to AWS to calculate EC2 costs of your resources.
 
     ### Before you start
 
