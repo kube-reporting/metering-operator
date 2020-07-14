@@ -161,7 +161,7 @@ func TestManualMeteringInstall(t *testing.T) {
 			Name:                      "InvalidHDFS-MissingStorageSpec",
 			MeteringOperatorImageRepo: meteringOperatorImageRepo,
 			MeteringOperatorImageTag:  meteringOperatorImageTag,
-			Skip:                      false,
+			Skip:                      runAllInstallTests,
 			ExpectInstallErr:          true,
 			ExpectInstallErrMsg: []string{
 				"failed to install metering",
@@ -180,7 +180,7 @@ func TestManualMeteringInstall(t *testing.T) {
 			Name:                      "ValidHDFS-ReportDynamicInputData",
 			MeteringOperatorImageRepo: meteringOperatorImageRepo,
 			MeteringOperatorImageTag:  meteringOperatorImageTag,
-			Skip:                      false,
+			Skip:                      runAllInstallTests,
 			InstallSubTests: []InstallTestCase{
 				{
 					Name:     "testReportingProducesData",
@@ -200,7 +200,7 @@ func TestManualMeteringInstall(t *testing.T) {
 			Name:                      "ValidHDFS-ReportStaticInputData",
 			MeteringOperatorImageRepo: meteringOperatorImageRepo,
 			MeteringOperatorImageTag:  meteringOperatorImageTag,
-			Skip:                      false,
+			Skip:                      runAllInstallTests,
 			InstallSubTests: []InstallTestCase{
 				{
 					Name:     "testReportingProducesCorrectDataForInput",
@@ -224,7 +224,7 @@ func TestManualMeteringInstall(t *testing.T) {
 			Name:                      "S3-ReportDynamicInputData",
 			MeteringOperatorImageRepo: meteringOperatorImageRepo,
 			MeteringOperatorImageTag:  meteringOperatorImageTag,
-			Skip:                      runAllInstallTests,
+			Skip:                      !runAllInstallTests,
 			PreInstallFunc:            s3InstallFunc,
 			InstallSubTests: []InstallTestCase{
 				{
