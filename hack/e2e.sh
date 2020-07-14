@@ -15,6 +15,14 @@ function cleanup() {
         echo "Removing namespaces with the 'name=${METERING_NAMESPACE}-metering-testing-ns' label"
         kubectl delete ns -l "name=${METERING_NAMESPACE}-metering-testing-ns" --wait=false || true
 
+        # Remove any testing labels that may have been added during tests
+        echo "Removing any testing labels that were added to the cluster's nodes"
+        nodes=( $(kubectl get nodes -l metering-node-testing-label="true" --no-headers | awk '{ print $1 }') )
+        for i in "${nodes[@]}"
+        do
+            kubectl label node "$i" metering-node-testing-label- 2>/dev/null
+        done
+
         # Note: the `openshift-marketplace` namespace is hardcoded for now until we have the need
         # to create the registry-related resources in another namespace (e.g. testing upstream manifests).
         echo "Removing the local registry resources with the 'name=${METERING_NAMESPACE}-metering-testing-ns' label"
