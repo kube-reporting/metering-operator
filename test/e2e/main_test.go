@@ -223,6 +223,37 @@ func TestManualMeteringInstall(t *testing.T) {
 			MeteringConfigManifestFilename: "prometheus-metrics-importer-disabled.yaml",
 		},
 		{
+			Name:                      "ValidHDFS-ValidNodeSelector",
+			MeteringOperatorImageRepo: meteringOperatorImageRepo,
+			MeteringOperatorImageTag:  meteringOperatorImageTag,
+			// TODO: transistion this to a periodic test and
+			// update the `Skip` condition to !runAllInstallTests
+			Skip:           false,
+			PreInstallFunc: customNodeSelectorFunc,
+			InstallSubTests: []InstallTestCase{
+				{
+					Name:     "testNodeSelectorConfigurationWorks",
+					TestFunc: testNodeSelectorConfigurationWorks,
+				},
+				{
+					Name:     "testReportingProducesCorrectDataForInput",
+					TestFunc: testReportingProducesCorrectDataForInput,
+					ExtraEnvVars: []string{
+						"REPORTING_OPERATOR_DISABLE_PROMETHEUS_METRICS_IMPORTER=true",
+					},
+				},
+				{
+					Name:     "testPrometheusConnectorWorks",
+					TestFunc: testPrometheusConnectorWorks,
+				},
+				{
+					Name:     "testReportingOperatorServiceCABundleExists",
+					TestFunc: testReportingOperatorServiceCABundleExists,
+				},
+			},
+			MeteringConfigManifestFilename: "node-selector-prometheus-importer-disabled.yaml",
+		},
+		{
 			Name:                      "S3-ReportDynamicInputData",
 			MeteringOperatorImageRepo: meteringOperatorImageRepo,
 			MeteringOperatorImageTag:  meteringOperatorImageTag,

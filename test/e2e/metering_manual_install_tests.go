@@ -181,3 +181,34 @@ func s3InstallFunc(ctx *deployframework.DeployerCtx) error {
 
 	return nil
 }
+
+// customNodeSelectorFunc is a test helper function that adds a
+// custom testing label to all of the worker nodes in a particular
+// cluster. This is intended to be run prior to firing off any
+// Metering installations, or running any post-install tests,
+// that require testing this kind of configuration.
+func customNodeSelectorFunc(ctx *deployframework.DeployerCtx) error {
+	nodes, err := ctx.Client.CoreV1().Nodes().List(context.Background(), metav1.ListOptions{
+		LabelSelector: "node-role.kubernetes.io/worker=",
+	})
+	if err != nil || len(nodes.Items) == 0 {
+		return fmt.Errorf("Failed to list the worker nodes in the cluster: %v", err)
+	}
+
+	nodeTestingLabelKey := "metering-node-testing-label"
+	for _, node := range nodes.Items {
+		// we can make the safe assumption that the nodes were iterating
+		// over already have an initialized labels dictionary, so this only
+		// requires indexing into this dictionary and adding the node testing
+		// label key and value.
+		node.Labels[nodeTestingLabelKey] = "true"
+
+		_, err = ctx.Client.CoreV1().Nodes().Update(context.Background(), &node, metav1.UpdateOptions{})
+		if err != nil {
+			return fmt.Errorf("Failed to apply the %s testing label to the %s node: %v", nodeTestingLabelKey, node.Name, err)
+		}
+		ctx.Logger.Infof("Labeled the %s node with the %s node label", node.Name, nodeTestingLabelKey)
+	}
+
+	return nil
+}
