@@ -13,9 +13,7 @@ import (
 	corev1 "k8s.io/api/core/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/apimachinery/pkg/util/yaml"
 
-	metering "github.com/kube-reporting/metering-operator/pkg/apis/metering/v1"
 	"github.com/kube-reporting/metering-operator/test/deployframework"
 	"github.com/kube-reporting/metering-operator/test/testhelpers"
 )
@@ -53,7 +51,7 @@ func testManualMeteringInstall(
 		require.Fail(t, "The length of the test function namespace exceeded the kube namespace limit of %d characters", kubeNamespaceCharLimit)
 	}
 
-	mc, err := DecodeMeteringConfigManifest(repoPath, testMeteringConfigManifestsPath, manifestFilename)
+	mc, err := testhelpers.DecodeMeteringConfigManifest(repoPath, testMeteringConfigManifestsPath, manifestFilename)
 	require.NoError(t, err, "failed to successfully decode the YAML MeteringConfig manifest")
 
 	var envVars []string
@@ -85,8 +83,8 @@ func testManualMeteringInstall(
 	}
 
 	rf, err := deployerCtx.Setup(deployerCtx.Deployer.InstallOLM, expectInstallErr)
-
 	canSafelyRunTest := testhelpers.AssertCanSafelyRunReportingTests(t, err, expectInstallErr, expectInstallErrMsg)
+
 	if canSafelyRunTest {
 		for _, installFunc := range testInstallFunctions {
 			installFunc := installFunc
@@ -104,26 +102,6 @@ func testManualMeteringInstall(
 
 	err = deployerCtx.Teardown(deployerCtx.Deployer.UninstallOLM)
 	assert.NoError(t, err, "capturing logs and uninstalling metering should produce no error")
-}
-
-func DecodeMeteringConfigManifest(basePath, manifestPath, manifestFilename string) (*metering.MeteringConfig, error) {
-	manifestFullPath := filepath.Join(basePath, manifestPath, manifestFilename)
-	file, err := os.Open(manifestFullPath)
-	if err != nil {
-		return nil, fmt.Errorf("failed to open the %s manifest file: %v", manifestFullPath, err)
-	}
-
-	mc := &metering.MeteringConfig{}
-	err = yaml.NewYAMLOrJSONDecoder(file, 100).Decode(&mc)
-	if err != nil {
-		return nil, err
-	}
-
-	if mc == nil {
-		return nil, fmt.Errorf("error: the decoded MeteringConfig object is nil")
-	}
-
-	return mc, nil
 }
 
 func s3InstallFunc(ctx *deployframework.DeployerCtx) error {

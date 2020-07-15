@@ -9,11 +9,17 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"k8s.io/apimachinery/pkg/util/yaml"
 
-	metering "github.com/kube-reporting/metering-operator/pkg/apis/metering/v1"
 	"github.com/kube-reporting/metering-operator/test/reportingframework"
 	"github.com/kube-reporting/metering-operator/test/testhelpers"
+)
+
+const (
+	// TODO: support upgrading from a custom registry image instead
+	// of defaulting to the redhat-operators CatalogSource and waiting
+	// for GA-ed channels to be exposed.
+	upgradeFromCatalogSource          = "redhat-operators"
+	upgradeFromCatalogSourceNamespace = "openshift-marketplace"
 )
 
 func testManualOLMUpgradeInstall(
@@ -25,7 +31,8 @@ func testManualOLMUpgradeInstall(
 	manifestFilename,
 	catalogSourceName,
 	catalogSourceNamespace,
-	subscriptionName,
+	upgradeFromSubscriptionChannel,
+	subscriptionChannel,
 	testOutputPath string,
 	expectInstallErrMsg []string,
 	expectInstallErr,
@@ -48,14 +55,8 @@ func testManualOLMUpgradeInstall(
 		require.Fail(t, "The length of the test function namespace exceeded the kube namespace limit of %d characters", kubeNamespaceCharLimit)
 	}
 
-	manifestFullPath := filepath.Join(repoPath, testMeteringConfigManifestsPath, manifestFilename)
-	file, err := os.Open(manifestFullPath)
-	require.NoError(t, err, "failed to open manifest file")
-
-	mc := &metering.MeteringConfig{}
-	err = yaml.NewYAMLOrJSONDecoder(file, 100).Decode(&mc)
-	require.NoError(t, err, "failed to decode the yaml meteringconfig manifest")
-	require.NotNil(t, mc, "the decoded meteringconfig object is nil")
+	mc, err := testhelpers.DecodeMeteringConfigManifest(repoPath, testMeteringConfigManifestsPath, manifestFilename)
+	require.NoError(t, err, "failed to successfully decode the YAML MeteringConfig manifest")
 
 	deployerCtx, err := df.NewDeployerCtx(
 		testFuncNamespace,
@@ -63,11 +64,11 @@ func testManualOLMUpgradeInstall(
 		meteringOperatorImageTag,
 		reportingOperatorImageRepo,
 		reportingOperatorImageTag,
-		catalogSourceName,
-		catalogSourceNamespace,
-		subscriptionName,
+		upgradeFromCatalogSource,
+		upgradeFromCatalogSourceNamespace,
+		upgradeFromSubscriptionChannel,
 		preUpgradeTestOutputDir,
-		expectInstallErrMsg,
+		testInstallFunction.ExtraEnvVars,
 		mc.Spec,
 	)
 	require.NoError(t, err, "creating a new deployer context should produce no error")
@@ -100,7 +101,7 @@ func testManualOLMUpgradeInstall(
 	assert.NoError(t, err, "creating the test case output directory should produce no error")
 
 	deployerCtx.TestCaseOutputPath = postUpgradeTestOutputDir
-	rf, err = deployerCtx.Upgrade(packageName, df.RepoVersion, purgeReports, purgeReportDataSources)
+	rf, err = deployerCtx.Upgrade(catalogSourceName, catalogSourceNamespace, subscriptionChannel, purgeReports, purgeReportDataSources)
 	if canSafelyRunTest = testhelpers.AssertCanSafelyRunReportingTests(t, err, expectInstallErr, expectInstallErrMsg); !canSafelyRunTest {
 		err = deployerCtx.MustGatherMeteringResources(gatherTestArtifactsScript)
 		assert.NoError(t, err, "gathering metering resources should produce no error")

@@ -30,14 +30,15 @@ var (
 	meteringOperatorImage      string
 	reportingOperatorImage     string
 
-	namespacePrefix        string
-	testOutputPath         string
-	repoPath               string
-	repoVersion            string
-	registryImage          string
-	subscriptionChannel    string
-	catalogSourceName      string
-	catalogSourceNamespace string
+	namespacePrefix                string
+	testOutputPath                 string
+	repoPath                       string
+	repoVersion                    string
+	registryImage                  string
+	subscriptionChannel            string
+	upgradeFromSubscriptionChannel string
+	catalogSourceName              string
+	catalogSourceNamespace         string
 
 	kubeNamespaceCharLimit          = 63
 	namespacePrefixCharLimit        = 10
@@ -92,7 +93,8 @@ func testMainWrapper(m *testing.M) int {
 	flag.StringVar(&testOutputPath, "test-output-path", "", "The absolute/relative path that you want to store test logs within.")
 
 	flag.StringVar(&registryImage, "registry-image", "", "The name of an existing registry image containing a manifest bundle.")
-	flag.StringVar(&subscriptionChannel, "subscription-channel", "", "The name of an existing channel in the registry image you want to subscribe to.")
+	flag.StringVar(&subscriptionChannel, "subscription-channel", "4.6", "The name of an existing channel in the registry image you want to subscribe to.")
+	flag.StringVar(&upgradeFromSubscriptionChannel, "upgrade-from-subscription-channel", "4.5", "The name of an existing channel in a catalog source that you want to upgrade from.")
 	flag.Parse()
 
 	logger := testhelpers.SetupLogger(logLevel)
@@ -115,10 +117,10 @@ func testMainWrapper(m *testing.M) int {
 	// the default images in the metering CSV. In the case where
 	// some version of the `make e2e-dev` has been provided, skip
 	// the deletion the local registry resources and CatalogSource CR.
-	if meteringOperatorImageRepo != "" {
+	if meteringOperatorImageRepo != "" && meteringOperatorImageTag != "" {
 		meteringOperatorImage = meteringOperatorImageRepo + ":" + meteringOperatorImageTag
 	}
-	if reportingOperatorImageRepo != "" {
+	if reportingOperatorImageRepo != "" && reportingOperatorImageTag != "" {
 		reportingOperatorImage = reportingOperatorImageRepo + ":" + reportingOperatorImageTag
 	}
 	catalogSourceName, catalogSourceNamespace, err = df.CreateRegistryResources(registryImage, meteringOperatorImage, reportingOperatorImage)
@@ -337,6 +339,7 @@ func TestMeteringUpgrades(t *testing.T) {
 				testCase.MeteringConfigManifestFilename,
 				catalogSourceName,
 				catalogSourceNamespace,
+				upgradeFromSubscriptionChannel,
 				subscriptionChannel,
 				testOutputPath,
 				testCase.ExpectInstallErrMsg,

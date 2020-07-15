@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"fmt"
 	"os"
+	"path/filepath"
 	"time"
 
 	"github.com/sirupsen/logrus"
@@ -11,6 +12,7 @@ import (
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
 	meta "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/util/yaml"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/kubernetes/scheme"
 	"k8s.io/client-go/rest"
@@ -194,6 +196,26 @@ func SetupLoggerToFile(path, logLevel string, fields logrus.Fields) (logrus.Fiel
 	logger.SetOutput(file)
 
 	return logger.WithFields(fields), file, nil
+}
+
+func DecodeMeteringConfigManifest(basePath, manifestPath, manifestFilename string) (*metering.MeteringConfig, error) {
+	manifestFullPath := filepath.Join(basePath, manifestPath, manifestFilename)
+	file, err := os.Open(manifestFullPath)
+	if err != nil {
+		return nil, fmt.Errorf("failed to open the %s manifest file: %v", manifestFullPath, err)
+	}
+
+	mc := &metering.MeteringConfig{}
+	err = yaml.NewYAMLOrJSONDecoder(file, 100).Decode(&mc)
+	if err != nil {
+		return nil, err
+	}
+
+	if mc == nil {
+		return nil, fmt.Errorf("error: the decoded MeteringConfig object is nil")
+	}
+
+	return mc, nil
 }
 
 // ExecActionOptions holds all the metadata required to fire off a
