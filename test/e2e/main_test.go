@@ -254,6 +254,27 @@ func TestManualMeteringInstall(t *testing.T) {
 			MeteringConfigManifestFilename: "node-selector-prometheus-importer-disabled.yaml",
 		},
 		{
+			Name:                      "ValidHDFS-MySQLDatabase",
+			MeteringOperatorImageRepo: meteringOperatorImageRepo,
+			MeteringOperatorImageTag:  meteringOperatorImageTag,
+			Skip:                      false,
+			PreInstallFunc:            createMySQLDatabase,
+			InstallSubTests: []InstallTestCase{
+				{
+					Name:     "testReportingProducesData",
+					TestFunc: testReportingProducesData,
+					ExtraEnvVars: []string{
+						"REPORTING_OPERATOR_PROMETHEUS_DATASOURCE_MAX_IMPORT_BACKFILL_DURATION=15m",
+						"REPORTING_OPERATOR_PROMETHEUS_METRICS_IMPORTER_INTERVAL=30s",
+						"REPORTING_OPERATOR_PROMETHEUS_METRICS_IMPORTER_CHUNK_SIZE=5m",
+						"REPORTING_OPERATOR_PROMETHEUS_METRICS_IMPORTER_INTERVAL=5m",
+						"REPORTING_OPERATOR_PROMETHEUS_METRICS_IMPORTER_STEP_SIZE=60s",
+					},
+				},
+			},
+			MeteringConfigManifestFilename: "mysql.yaml",
+		},
+		{
 			Name:                      "S3-ReportDynamicInputData",
 			MeteringOperatorImageRepo: meteringOperatorImageRepo,
 			MeteringOperatorImageTag:  meteringOperatorImageTag,

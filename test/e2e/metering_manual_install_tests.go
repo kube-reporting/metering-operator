@@ -4,15 +4,18 @@ import (
 	"context"
 	"fmt"
 	"os"
+	"os/exec"
 	"path/filepath"
 	"strings"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	corev1 "k8s.io/api/core/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/util/wait"
 
 	"github.com/kube-reporting/metering-operator/test/deployframework"
 	"github.com/kube-reporting/metering-operator/test/testhelpers"
@@ -209,6 +212,79 @@ func customNodeSelectorFunc(ctx *deployframework.DeployerCtx) error {
 		}
 		ctx.Logger.Infof("Labeled the %s node with the %s node label", node.Name, nodeTestingLabelKey)
 	}
+
+	return nil
+}
+
+// createMySQLDatabase is a test helper function that is
+// responsible for initializing an ephemeral mysql database
+// that will be used as the underlying Hive metastore database
+// for an individual Metering test installation.
+func createMySQLDatabase(ctx *deployframework.DeployerCtx) error {
+	const (
+		mysqlNamespace     = "mysql"
+		mysqlLabelSelector = "db=mysql"
+	)
+	_, err := ctx.Client.CoreV1().Namespaces().Get(context.Background(), mysqlNamespace, metav1.GetOptions{})
+	if err != nil && !apierrors.IsNotFound(err) {
+		return nil
+	}
+	if apierrors.IsNotFound(err) {
+		n := &corev1.Namespace{
+			ObjectMeta: metav1.ObjectMeta{
+				Name: mysqlNamespace,
+				Labels: map[string]string{
+					"name": ctx.Namespace + "-" + testingNamespaceLabel,
+				},
+			},
+		}
+		_, err = ctx.Client.CoreV1().Namespaces().Create(context.Background(), n, metav1.CreateOptions{})
+		if err != nil {
+			return err
+		}
+		ctx.Logger.Debugf("Created the %s namespace", mysqlNamespace)
+	}
+
+	cmd := exec.Command(
+		"oc",
+		"-n", mysqlNamespace,
+		"new-app",
+		"--image-stream", "mysql:5.7",
+		"MYSQL_USER=testuser",
+		"MYSQL_PASSWORD=testpass",
+		"MYSQL_DATABASE=metastore",
+		"-l", mysqlLabelSelector,
+	)
+	cmd.Stdout = ctx.LoggerOutFile
+	cmd.Stderr = ctx.LoggerOutFile
+
+	err = cmd.Run()
+	if err != nil {
+		return fmt.Errorf("Failed to run the cmd: %v", err)
+	}
+
+	err = wait.Poll(5*time.Second, 5*time.Minute, func() (done bool, err error) {
+		ctx.Logger.Debugf("Waiting for the db=mysql Pod to report a Ready status...")
+
+		pods, err := ctx.Client.CoreV1().Pods(mysqlNamespace).List(context.Background(), metav1.ListOptions{
+			LabelSelector: mysqlLabelSelector,
+		})
+		if err != nil || len(pods.Items) == 0 {
+			return false, err
+		}
+
+		for _, pod := range pods.Items {
+			if pod.Status.Phase != corev1.PodRunning {
+				return false, nil
+			}
+		}
+
+		return true, nil
+	})
+	if err != nil {
+		return fmt.Errorf("failed to wait for the MySQL database instance to be created: %v", err)
+	}
+	ctx.Logger.Infof("The %s MySQL database instance is ready in the %s namespace", mysqlLabelSelector, mysqlNamespace)
 
 	return nil
 }

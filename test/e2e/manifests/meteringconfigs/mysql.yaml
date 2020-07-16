@@ -1,0 +1,78 @@
+apiVersion: metering.openshift.io/v1
+kind: MeteringConfig
+metadata:
+  name: operator-metering
+spec:
+  logHelmTemplate: true
+
+  unsupportedFeatures:
+    enableHDFS: true
+
+  storage:
+    type: hive
+    hive:
+      type: hdfs
+      hdfs:
+        namenode: hdfs-namenode-0.hdfs-namenode:9820
+
+  reporting-operator:
+    spec:
+      resources:
+        requests:
+          cpu: 1
+          memory: 250Mi
+      config:
+        logLevel: debug
+        prometheus:
+          metricsImporter:
+            config:
+              chunkSize: 5m
+              pollInterval: 30s
+              stepSize: 60s
+              maxImportBackfillDuration: 15m
+              maxQueryRangeDuration: 5m
+
+  presto:
+    spec:
+      coordinator:
+        resources:
+          requests:
+            cpu: 1
+            memory: 1Gi
+
+  hive:
+    spec:
+      metastore:
+        resources:
+          requests:
+            cpu: 1
+            memory: 650Mi
+        storage:
+          size: 5Gi
+      server:
+        resources:
+          requests:
+            cpu: 500m
+            memory: 650Mi
+      config:
+        db:
+          driver: com.mysql.jdbc.Driver
+          username: testuser
+          password: testpass
+          url: jdbc:mysql://mysql.mysql.svc.cluster.local:3306/metastore
+  hadoop:
+    spec:
+      hdfs:
+        enabled: true
+        datanode:
+          resources:
+            requests:
+              memory: 500Mi
+          storage:
+            size: 5Gi
+        namenode:
+          resources:
+            requests:
+              memory: 500Mi
+          storage:
+            size: 5Gi
