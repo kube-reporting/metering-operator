@@ -46,7 +46,7 @@ var (
 	preUpgradeTestDirName           = "pre-upgrade"
 	postUpgradeTestDirName          = "post-upgrade"
 	gatherTestArtifactsScript       = "gather-test-install-artifacts.sh"
-	testMeteringConfigManifestsPath = "/test/e2e/testdata/meteringconfigs/"
+	testMeteringConfigManifestsPath = "/test/e2e/manifests/meteringconfigs/"
 )
 
 func init() {
