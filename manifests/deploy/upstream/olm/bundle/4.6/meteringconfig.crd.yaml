@@ -619,6 +619,8 @@ spec:
                         type: object
                       annotations:
                         type: object
+                        additionalProperties:
+                          type: string
                       apiService:
                         type: object
                         properties:
@@ -1238,8 +1240,12 @@ spec:
                             type: string
                       labels:
                         type: object
+                        additionalProperties:
+                          type: string
                       nodeSelector:
                         type: object
+                        additionalProperties:
+                          type: string
                       rbac:
                         type: object
                         required:
@@ -1316,6 +1322,8 @@ spec:
                     properties:
                       annotations:
                         type: object
+                        additionalProperties:
+                          type: string
                       terminationGracePeriodSeconds:
                         type: integer
                       config:
@@ -1765,6 +1773,8 @@ spec:
                                 type: integer
                           nodeSelector:
                             type: object
+                            additionalProperties:
+                              type: string
                           resources:
                             type: object
                             properties:
@@ -1803,6 +1813,8 @@ spec:
                             type: string
                       labels:
                         type: object
+                        additionalProperties:
+                          type: string
                       securityContext:
                         type: object
                         properties:
@@ -1918,6 +1930,8 @@ spec:
                                 type: integer
                           nodeSelector:
                             type: object
+                            additionalProperties:
+                              type: string
                           replicas:
                             type: integer
                             format: int32
@@ -1959,6 +1973,8 @@ spec:
                     properties:
                       annotations:
                         type: object
+                        additionalProperties:
+                          type: string
                       config:
                         type: object
                         properties:
@@ -2073,6 +2089,8 @@ spec:
                             type: string
                       labels:
                         type: object
+                        additionalProperties:
+                          type: string
                       metastore:
                         type: object
                         properties:
@@ -2201,6 +2219,8 @@ spec:
                                 type: integer
                           nodeSelector:
                             type: object
+                            additionalProperties:
+                              type: string
                           resources:
                             type: object
                             properties:
@@ -2458,6 +2478,8 @@ spec:
                                 type: integer
                           nodeSelector:
                             type: object
+                            additionalProperties:
+                              type: string
                           resources:
                             type: object
                             properties:
@@ -2618,6 +2640,8 @@ spec:
                                               type: string
                               annotations:
                                 type: object
+                                additionalProperties:
+                                  type: string
                               config:
                                 type: object
                                 properties:
@@ -2638,8 +2662,12 @@ spec:
                                         maximum: 100
                               labels:
                                 type: object
+                                additionalProperties:
+                                  type: string
                               nodeSelector:
                                 type: object
+                                additionalProperties:
+                                  type: string
                               replicas:
                                 type: integer
                                 format: int32
@@ -2713,6 +2741,8 @@ spec:
                                               type: string
                               annotations:
                                 type: object
+                                additionalProperties:
+                                  type: string
                               config:
                                 type: object
                                 properties:
@@ -2733,8 +2763,12 @@ spec:
                                         maximum: 100
                               labels:
                                 type: object
+                                additionalProperties:
+                                  type: string
                               nodeSelector:
                                 type: object
+                                additionalProperties:
+                                  type: string
                               resources:
                                 type: object
                                 properties:
