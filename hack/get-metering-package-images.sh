@@ -1,8 +1,10 @@
 #!/bin/bash
 
-# kubectl -n openshift-marketplace port-forward svc/art-applications 50051
+# Note: before running, ensure that the correct registry service is exposed
+# The following would expose the redhat-operators CatalogSource service:
+# kubectl -n openshift-marketplace port-forward svc/redhat-operators 50051
 
-CHANNEL="${CHANNEL:-"4.4"}"
+CHANNEL="${CHANNEL:-"4.6"}"
 
 read -r -d '' JQ_PROGRAM << EOM
  .spec.install.spec.deployments[0].spec.template.spec.containers[]
