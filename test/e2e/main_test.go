@@ -92,7 +92,7 @@ func testMainWrapper(m *testing.M) int {
 	flag.StringVar(&repoVersion, "repo-version", "", "The current version of the repository, e.g. 4.4, 4.5, etc.")
 	flag.StringVar(&testOutputPath, "test-output-path", "", "The absolute/relative path that you want to store test logs within.")
 
-	flag.StringVar(&registryImage, "registry-image", "", "The name of an existing registry image containing a manifest bundle.")
+	flag.StringVar(&registryImage, "registry-image", "registry.svc.ci.openshift.org/ocp/4.6:metering-ansible-operator-registry", "The name of an existing registry image containing a manifest bundle.")
 	flag.StringVar(&subscriptionChannel, "subscription-channel", "4.6", "The name of an existing channel in the registry image you want to subscribe to.")
 	flag.StringVar(&upgradeFromSubscriptionChannel, "upgrade-from-subscription-channel", "4.5", "The name of an existing channel in a catalog source that you want to upgrade from.")
 	flag.Parse()
