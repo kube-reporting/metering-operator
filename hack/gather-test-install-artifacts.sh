@@ -25,6 +25,7 @@ if [[ ${METERING_GATHER_OLM_RESOURCES} == "true" ]]; then
     resources+=(subscriptions)
     resources+=(operatorgroups)
     resources+=(clusterserviceversions)
+    resources+=(installplans)
 fi
 
 echo "Storing the must-gather output at $LOG_DIR"
