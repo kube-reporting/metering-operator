@@ -5,7 +5,7 @@ This document describes setting up your environment, as well as installing Meter
 ## Development Dependencies
 
 - Go 1.13 or higher
-- Helm CLI up to 2.8.1
+- Helm CLI up to [2.8.1](https://github.com/helm/helm/releases/tag/v2.8.1)
 - Make
 - Docker
 - jq
