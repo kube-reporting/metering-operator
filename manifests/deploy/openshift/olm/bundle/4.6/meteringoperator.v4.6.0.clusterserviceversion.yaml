@@ -253,7 +253,7 @@ spec:
 
   keywords: [metering metrics reporting prometheus chargeback]
   version: "4.6.0"
-  minKubeVersion: "1.18.0"
+  minKubeVersion: "1.17.0"
   maturity: stable
   maintainers:
     - email: sd-operator-metering@redhat.com
