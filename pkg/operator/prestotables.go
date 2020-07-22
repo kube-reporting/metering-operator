@@ -258,20 +258,20 @@ func prestoTableNeedsFinalizer(prestoTable *metering.PrestoTable) bool {
 }
 
 func (op *Reporting) dropPrestoTable(prestoTable *metering.PrestoTable) error {
-	if !prestoTable.Spec.Unmanaged {
-		if prestoTable.Status.TableName == "" {
-			return nil
-		}
-		if prestoTable.Status.View {
-			return op.prestoTableManager.DropView(prestoTable.Status.Catalog, prestoTable.Status.Schema, prestoTable.Status.TableName, true)
-		} else {
-			return op.prestoTableManager.DropTable(prestoTable.Status.Catalog, prestoTable.Status.Schema, prestoTable.Status.TableName, true)
-		}
-	}
+	// check if the current PrestoTable we're processing is marked as an
+	// unmanaged table. If true, return an error, else attempt to drop
+	// that table in Presto.
 	if prestoTable.Spec.Unmanaged {
-		return errors.New("cannot drop unmanaged PrestoTable")
+		return errors.New("cannot drop an unmanaged PrestoTable")
 	}
-	return errors.New("dropping PrestoTables is currently unsupported")
+	if prestoTable.Status.TableName == "" {
+		return nil
+	}
+	if prestoTable.Status.View {
+		return op.prestoTableManager.DropView(prestoTable.Status.Catalog, prestoTable.Status.Schema, prestoTable.Status.TableName, true)
+	}
+
+	return op.prestoTableManager.DropTable(prestoTable.Status.Catalog, prestoTable.Status.Schema, prestoTable.Status.TableName, true)
 }
 
 func (op *Reporting) createPrestoTableCR(obj metav1.Object, gvk schema.GroupVersionKind, catalog, schema, tableName string, columns []presto.Column, unmanaged, view bool, query string) (*metering.PrestoTable, error) {
