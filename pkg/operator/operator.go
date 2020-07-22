@@ -16,12 +16,12 @@ import (
 
 	"github.com/davecgh/go-spew/spew"
 	"github.com/prestodb/presto-go-client/presto"
-	_ "github.com/prestodb/presto-go-client/presto"
 	promapi "github.com/prometheus/client_golang/api"
 	prom "github.com/prometheus/client_golang/api/prometheus/v1"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
-	log "github.com/sirupsen/logrus"
+	logrus "github.com/sirupsen/logrus"
 	hive "github.com/taozle/go-hive-driver"
+
 	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/util/clock"
@@ -39,9 +39,9 @@ import (
 	"k8s.io/client-go/transport"
 	"k8s.io/client-go/util/workqueue"
 
-	metering "github.com/kube-reporting/metering-operator/pkg/apis/metering/v1"
+	meteringv1 "github.com/kube-reporting/metering-operator/pkg/apis/metering/v1"
 	"github.com/kube-reporting/metering-operator/pkg/db"
-	cbClientset "github.com/kube-reporting/metering-operator/pkg/generated/clientset/versioned"
+	meteringClient "github.com/kube-reporting/metering-operator/pkg/generated/clientset/versioned"
 	factory "github.com/kube-reporting/metering-operator/pkg/generated/informers/externalversions"
 	listers "github.com/kube-reporting/metering-operator/pkg/generated/listers/metering/v1"
 	"github.com/kube-reporting/metering-operator/pkg/operator/prestostore"
@@ -51,11 +51,12 @@ import (
 )
 
 const (
-	defaultResyncPeriod = time.Minute * 15
-	prestoUsername      = "reporting-operator"
+	defaultResyncPeriod              = 15 * time.Minute
+	defaultLeaderElectionRetryPeriod = 2 * time.Second
+	prestoUsername                   = "reporting-operator"
 
-	DefaultPrometheusQueryInterval                       = time.Minute * 5  // Query Prometheus every 5 minutes
 	DefaultPrometheusQueryStepSize                       = time.Minute      // Query data from Prometheus at a 60 second resolution (one data point per minute max)
+	DefaultPrometheusQueryInterval                       = 5 * time.Minute  // Query Prometheus every 5 minutes
 	DefaultPrometheusQueryChunkSize                      = 5 * time.Minute  // the default value for how much data we will insert into Presto per Prometheus query.
 	DefaultPrometheusDataSourceMaxQueryRangeDuration     = 10 * time.Minute // how much data we will query from Prometheus at once
 	DefaultPrometheusDataSourceMaxBackfillImportDuration = 2 * time.Hour    // how far we will query for backlogged data.
@@ -67,18 +68,6 @@ type TLSConfig struct {
 	TLSKey  string
 }
 
-func (cfg *TLSConfig) Valid() error {
-	if cfg.UseTLS {
-		if cfg.TLSCert == "" {
-			return fmt.Errorf("Must set TLS certificate if TLS is enabled")
-		}
-		if cfg.TLSKey == "" {
-			return fmt.Errorf("Must set TLS private key if TLS is enabled")
-		}
-	}
-	return nil
-}
-
 type PrometheusConfig struct {
 	Address         string
 	SkipTLSVerify   bool
@@ -88,13 +77,13 @@ type PrometheusConfig struct {
 }
 
 type Config struct {
-	Hostname     string
-	OwnNamespace string
+	Hostname             string
+	OwnNamespace         string
+	ProxyTrustedCABundle string
 
 	AllNamespaces    bool
 	TargetNamespaces []string
-
-	Kubeconfig string
+	Kubeconfig       string
 
 	APIListen     string
 	MetricsListen string
@@ -104,34 +93,28 @@ type Config struct {
 	HiveUseTLS                bool
 	HiveCAFile                string
 	HiveTLSInsecureSkipVerify bool
-
-	HiveUseClientCertAuth bool
-	HiveClientCertFile    string
-	HiveClientKeyFile     string
+	HiveUseClientCertAuth     bool
+	HiveClientCertFile        string
+	HiveClientKeyFile         string
 
 	PrestoHost                  string
 	PrestoUseTLS                bool
 	PrestoCAFile                string
 	PrestoTLSInsecureSkipVerify bool
-
-	PrestoUseClientCertAuth bool
-	PrestoClientCertFile    string
-	PrestoClientKeyFile     string
-
-	PrestoMaxQueryLength int
+	PrestoUseClientCertAuth     bool
+	PrestoClientCertFile        string
+	PrestoClientKeyFile         string
+	PrestoMaxQueryLength        int
 
 	DisablePrometheusMetricsImporter bool
 	EnableFinalizers                 bool
+	LogDMLQueries                    bool
+	LogDDLQueries                    bool
 
-	LogDMLQueries bool
-	LogDDLQueries bool
-
-	PrometheusQueryConfig                         metering.PrometheusQueryConfig
+	PrometheusQueryConfig                         meteringv1.PrometheusQueryConfig
 	PrometheusDataSourceMaxQueryRangeDuration     time.Duration
 	PrometheusDataSourceMaxBackfillImportDuration time.Duration
 	PrometheusDataSourceGlobalImportFromTime      *time.Time
-
-	ProxyTrustedCABundle string
 
 	LeaderLeaseDuration time.Duration
 
@@ -141,12 +124,12 @@ type Config struct {
 }
 
 type Reporting struct {
-	cfg        Config
-	kubeConfig *rest.Config
+	cfg Config
 
+	kubeConfig        *rest.Config
 	kubeClient        corev1.CoreV1Interface
 	coordinatorClient coordinatorv1.CoordinationV1Interface
-	meteringClient    cbClientset.Interface
+	meteringClient    meteringClient.Interface
 
 	informerFactory factory.SharedInformerFactory
 
@@ -182,7 +165,7 @@ type Reporting struct {
 	clock clock.Clock
 	rand  *rand.Rand
 
-	logger log.FieldLogger
+	logger logrus.FieldLogger
 
 	initializedMu sync.Mutex
 	initialized   bool
@@ -191,7 +174,15 @@ type Reporting struct {
 	importers   map[string]*prestostore.PrometheusImporter
 }
 
-func New(logger log.FieldLogger, cfg Config) (*Reporting, error) {
+// DependencyResolver is an interface that provides a wrapper
+// around resolving dependencies for a particular ReportQuery
+// or Report custom resource.
+type DependencyResolver interface {
+	ResolveDependencies(namespace string, inputDefs []meteringv1.ReportQueryInputDefinition, inputVals []meteringv1.ReportQueryInputValue) (*reporting.DependencyResolutionResult, error)
+}
+
+// New returns an instantiated reporting-operator controller
+func New(logger logrus.FieldLogger, cfg Config) (*Reporting, error) {
 	if err := cfg.APITLSConfig.Valid(); err != nil {
 		return nil, err
 	}
@@ -239,7 +230,7 @@ func New(logger log.FieldLogger, cfg Config) (*Reporting, error) {
 	}
 
 	logger.Debugf("setting up Metering client...")
-	meteringClient, err := cbClientset.NewForConfig(kubeConfig)
+	meteringClient, err := meteringClient.NewForConfig(kubeConfig)
 	if err != nil {
 		return nil, fmt.Errorf("Unable to create Metering client: %v", err)
 	}
@@ -264,14 +255,14 @@ func New(logger log.FieldLogger, cfg Config) (*Reporting, error) {
 }
 
 func newReportingOperator(
-	logger log.FieldLogger,
+	logger logrus.FieldLogger,
 	clock clock.Clock,
 	rand *rand.Rand,
 	cfg Config,
 	kubeConfig *rest.Config,
 	kubeClient corev1.CoreV1Interface,
 	coordinatorClient coordinatorv1.CoordinationV1Interface,
-	meteringClient cbClientset.Interface,
+	meteringClient meteringClient.Interface,
 	informerNamespace string,
 ) *Reporting {
 	informerFactory := factory.NewFilteredSharedInformerFactory(meteringClient, defaultResyncPeriod, informerNamespace, nil)
@@ -381,6 +372,9 @@ func newReportingOperator(
 	return op
 }
 
+// Run is responsible for starting the main goroutine which
+// will setup event handlers for the various metering-related
+// types, setting up an informer cache, and managing the workers.
 func (op *Reporting) Run(ctx context.Context) error {
 	var wg sync.WaitGroup
 	// buffered big enough to hold the errs of each server we start.
@@ -621,16 +615,17 @@ func (op *Reporting) Run(ctx context.Context) error {
 	lostLeaderCtx, leaderCancel := context.WithCancel(context.Background())
 	defer leaderCancel()
 
+	// TODO: this could be a helper function
 	leader, err := leaderelection.NewLeaderElector(leaderelection.LeaderElectionConfig{
 		Lock:          rl,
 		LeaseDuration: op.cfg.LeaderLeaseDuration,
 		RenewDeadline: op.cfg.LeaderLeaseDuration / 2,
-		RetryPeriod:   2 * time.Second,
+		RetryPeriod:   defaultLeaderElectionRetryPeriod,
 		Callbacks: leaderelection.LeaderCallbacks{
 			OnStartedLeading: func(ctx context.Context) {
-				op.logger.Infof("became leader")
+				op.logger.Info("leader election gained")
 				op.logger.Info("starting Metering workers")
-				op.startWorkers(&wg, ctx)
+				op.startWorkers(ctx, &wg)
 				op.logger.Infof("Metering workers started, watching for reports...")
 			},
 			OnStoppedLeading: func() {
@@ -700,46 +695,13 @@ func (op *Reporting) Run(ctx context.Context) error {
 	return nil
 }
 
-func (op *Reporting) newPrometheusConnFromURL(url string) (prom.API, error) {
-	transportConfig := &transport.Config{}
-	if op.cfg.PrometheusConfig.CAFile != "" {
-		if _, err := os.Stat(op.cfg.PrometheusConfig.CAFile); err == nil {
-			// Use the configured CA for communicating to Prometheus
-			transportConfig.TLS.CAFile = op.cfg.PrometheusConfig.CAFile
-			op.logger.Infof("using %s as CA for Prometheus", op.cfg.PrometheusConfig.CAFile)
-		} else {
-			return nil, err
-		}
-	} else {
-		op.logger.Infof("using system CAs for Prometheus")
-		transportConfig.TLS.CAData = nil
-		transportConfig.TLS.CAFile = ""
-	}
-
-	if op.cfg.PrometheusConfig.SkipTLSVerify {
-		transportConfig.TLS.Insecure = op.cfg.PrometheusConfig.SkipTLSVerify
-		transportConfig.TLS.CAData = nil
-		transportConfig.TLS.CAFile = ""
-	}
-	if op.cfg.PrometheusConfig.BearerToken != "" {
-		transportConfig.BearerToken = op.cfg.PrometheusConfig.BearerToken
-	}
-	if op.cfg.PrometheusConfig.BearerTokenFile != "" {
-		transportConfig.BearerTokenFile = op.cfg.PrometheusConfig.BearerTokenFile
-	}
-
-	roundTripper, err := transport.New(transportConfig)
-	if err != nil {
-		return nil, err
-	}
-
-	return op.newPrometheusConn(promapi.Config{
-		Address:      url,
-		RoundTripper: roundTripper,
-	})
-}
-
-func (op *Reporting) startWorkers(wg *sync.WaitGroup, ctx context.Context) {
+// startWorkers is responsible for launching the workers
+// that will be processing the various metering-related
+// resources. A worker for a particular resource will
+// continue processing resources in the workqueue until
+// the stopCh channel has been closed, and block until
+// that worker has finished processing it's current work item.
+func (op *Reporting) startWorkers(ctx context.Context, wg *sync.WaitGroup) {
 	stopCh := ctx.Done()
 
 	startWorker := func(threads int, workerFunc func(id int)) {
@@ -791,6 +753,53 @@ func (op *Reporting) startWorkers(wg *sync.WaitGroup, ctx context.Context) {
 	})
 }
 
+func (op *Reporting) newPrometheusConnFromURL(url string) (prom.API, error) {
+	transportConfig := &transport.Config{}
+	if op.cfg.PrometheusConfig.CAFile != "" {
+		if _, err := os.Stat(op.cfg.PrometheusConfig.CAFile); err == nil {
+			// Use the configured CA for communicating to Prometheus
+			transportConfig.TLS.CAFile = op.cfg.PrometheusConfig.CAFile
+			op.logger.Infof("using %s as CA for Prometheus", op.cfg.PrometheusConfig.CAFile)
+		} else {
+			return nil, err
+		}
+	} else {
+		op.logger.Infof("using system CAs for Prometheus")
+		transportConfig.TLS.CAData = nil
+		transportConfig.TLS.CAFile = ""
+	}
+
+	if op.cfg.PrometheusConfig.SkipTLSVerify {
+		transportConfig.TLS.Insecure = op.cfg.PrometheusConfig.SkipTLSVerify
+		transportConfig.TLS.CAData = nil
+		transportConfig.TLS.CAFile = ""
+	}
+	if op.cfg.PrometheusConfig.BearerToken != "" {
+		transportConfig.BearerToken = op.cfg.PrometheusConfig.BearerToken
+	}
+	if op.cfg.PrometheusConfig.BearerTokenFile != "" {
+		transportConfig.BearerTokenFile = op.cfg.PrometheusConfig.BearerTokenFile
+	}
+
+	roundTripper, err := transport.New(transportConfig)
+	if err != nil {
+		return nil, err
+	}
+
+	return op.newPrometheusConn(promapi.Config{
+		Address:      url,
+		RoundTripper: roundTripper,
+	})
+}
+
+func (op *Reporting) newPrometheusConn(promConfig promapi.Config) (prom.API, error) {
+	client, err := promapi.NewClient(promConfig)
+	if err != nil {
+		return nil, fmt.Errorf("can't connect to prometheus: %v", err)
+	}
+	return prom.NewAPI(client), nil
+}
+
 func (op *Reporting) setInitialized() {
 	op.initializedMu.Lock()
 	op.initialized = true
@@ -804,14 +813,16 @@ func (op *Reporting) isInitialized() bool {
 	return initialized
 }
 
-func (op *Reporting) newPrometheusConn(promConfig promapi.Config) (prom.API, error) {
-	client, err := promapi.NewClient(promConfig)
-	if err != nil {
-		return nil, fmt.Errorf("can't connect to prometheus: %v", err)
+// Valid is a TLSConfig method responsible for validating
+// the configuration structure has been correctly populated.
+func (cfg *TLSConfig) Valid() error {
+	if cfg.UseTLS {
+		if cfg.TLSCert == "" {
+			return fmt.Errorf("Must set TLS certificate if TLS is enabled")
+		}
+		if cfg.TLSKey == "" {
+			return fmt.Errorf("Must set TLS private key if TLS is enabled")
+		}
 	}
-	return prom.NewAPI(client), nil
-}
-
-type DependencyResolver interface {
-	ResolveDependencies(namespace string, inputDefs []metering.ReportQueryInputDefinition, inputVals []metering.ReportQueryInputValue) (*reporting.DependencyResolutionResult, error)
+	return nil
 }
