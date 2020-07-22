@@ -245,7 +245,7 @@ olm:
 
       * **HTTP API** - Reports can be queried from an in-cluster HTTP API in addition to reading from persistent storage.
       
-      * **Integration with AWS EC2 billing** - Connect operator metering to AWS to calculate EC2 costs of your resources.
+      * **Integration with AWS EC2 billing** - Connect metering to AWS to calculate EC2 costs of your resources.
 
       ### Before you start
 
