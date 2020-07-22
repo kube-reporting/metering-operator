@@ -237,7 +237,7 @@ olm:
 
       * **Pod, Namespace & Cluster Reports** - Built in reports exist to break down CPU and RAM in any way you desire.
  
-      * **Scheduled Reports** - Schedule reports to run on a standard interval, eg. daily or monthly. Use this reports, for intance, as the basis for chargeback and showback.
+      * **Scheduled Reports** - Schedule reports to run on a standard interval, eg. daily or monthly. Use these reports, for instance, as the basis for chargeback and showback.
 
       * **Post-Processing** - Reports are generated in CSV format and stored in persistent storage for further post-processing. Use this to send reminder emails, integrate into your ERP system, or graph on a dashboard.
       
