@@ -274,7 +274,7 @@ func newReportingOperator(
 	meteringClient cbClientset.Interface,
 	informerNamespace string,
 ) *Reporting {
-	informerFactory := factory.NewFilteredSharedInformerFactory(meteringClient, defaultResyncPeriod, informerNamespace, nil)
+	informerFactory := factory.NewSharedInformerFactoryWithOptions(meteringClient, defaultResyncPeriod, factory.WithNamespace(informerNamespace), factory.WithTweakListOptions(nil))
 
 	prestoTableInformer := informerFactory.Metering().V1().PrestoTables()
 	hiveTableInformer := informerFactory.Metering().V1().HiveTables()
