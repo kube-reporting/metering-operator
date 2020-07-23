@@ -180,17 +180,35 @@ When debugging a failed Metering install, it can be helpful to view the Ansible 
 
 ### Accessing Ansible Logs
 
-There are a couple of ways of accessing the Ansible logs depending on how you installed the Metering resources.
+There are a couple of ways of accessing the Ansible logs depending on how you installed the Metering.
+
+By default, the Ansible logs are merged with the internal ansible-operator logs, so it can be a difficult to parse at times.
+
+#### Viewing Ansible logs from the metering operator Pod
 
 In a typical install, the Metering operator is deployed as a pod. In this case, we can simply check the logs of the `ansible` container within this pod:
 
 ```bash
-kubectl -n $METERING_NAMESPACE logs $(kubectl -n $METERING_NAMESPACE get pods -l app=metering-operator -o name | cut -d/ -f2) -c ansible
+kubectl -n $METERING_NAMESPACE logs $(kubectl -n $METERING_NAMESPACE get pods -l app=metering-operator -o name | cut -d/ -f2)
 ```
+
+To alleviate the increased verbosity and suppress the internal ansible-operator logs, you can edit the metering-operator deployment, and add the following argument to the `operator` container:
+
+```yaml
+...
+spec:
+  container:
+  - name: operator
+    args:
+    - "--zap-level=error"
+...
+```
+
+#### Viewing Ansible logs from the operator container
 
 Alternatively, you can view the logs of the `operator` container (replace `-c ansible` with `-c operator`) for less verbose, condensed output.
 
-If you are running the Metering operator locally (i.e. `make run-metering-operator-local`), there won't be a dedicated pod and you would need to check the local docker container logs:
+If you are running the Metering operator locally (i.e. via `make run-metering-operator-local`), then there won't be a dedicated pod and you would need to check the local container logs. Run the following, replacing `docker` with the container runtime that created the metering container:
 
 ```bash
 docker exec -it metering-operator bash -c 'tail -n +1 -f /tmp/ansible-operator/runner/metering.openshift.io/v1/MeteringConfig/*/*/artifacts/*/stdout'
