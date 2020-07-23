@@ -110,7 +110,7 @@ METERING_OPERATOR_IMAGE_TAG=pr-123 ./hack/openshift-install.sh
 ## Run reporting operator locally
 
 It's also possible to run the operator locally.
-To simplify this, we've got a few `Makefile` targets to handle the process of building and running the operator.
+To simplify this, we have a few `Makefile` targets to handle the process of building and running the operator.
 
 First, we still need to ensure that Presto and Hive are running in the cluster, and then set reporting-operator replicas to zero so that our local operator can obtain the leader election lease when we start it.
 
@@ -164,7 +164,7 @@ make run-metering-operator-local
 
 ## Install the most recent version available in OLM
 
-There is set of scripts for install/uninstall that automate using the latest version of the `metering` package in OLM: `hack/olm-install.sh` and `hack/olm-uninstall.sh`.
+There is a set of scripts for install/uninstall that automates using the latest version of the `metering` package in OLM: `hack/olm-install.sh` and `hack/olm-uninstall.sh`.
 These scripts work similarly to the `hack/install.sh` and `hack/uninstall.sh` scripts, except they install using OLM.
 
 Set your `METERING_NAMESPACE` and `METERING_CR_FILE` then run the script:
@@ -179,7 +179,7 @@ To uninstall:
 ./hack/olm-uninstall.sh
 ```
 
-**Note**: You must run the olm-uninstall.sh script to uninstall. Not doing may result in inability to re-install Metering correctly.
+**Note**: You must run the olm-uninstall.sh script to uninstall. Not doing so may result in inability to re-install Metering correctly.
 
 For more details on what this is doing, see the [OLM install guide][olm-install]
 
