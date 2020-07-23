@@ -35,7 +35,6 @@ ENV HELM_CHART_PATH ${HOME}/charts/openshift-metering
 
 COPY images/metering-ansible-operator/roles/ ${HOME}/roles/
 COPY images/metering-ansible-operator/watches.yaml ${HOME}/watches.yaml
-COPY images/metering-ansible-operator/scripts ${HOME}/scripts
 COPY images/metering-ansible-operator/ansible.cfg /etc/ansible/ansible.cfg
 COPY charts/openshift-metering ${HELM_CHART_PATH}
 
