@@ -20,21 +20,14 @@ spec:
       securityContext:
         runAsNonRoot: true
       containers:
-      - name: ansible
-        command:
-        - /opt/ansible/scripts/ansible-logs.sh
-        - /tmp/ansible-operator/runner
-        - stdout
-        image: "quay.io/coreos/metering-ansible-operator:release-4.6"
-        imagePullPolicy: Always
-        volumeMounts:
-        - mountPath: /tmp/ansible-operator/runner
-          name: runner
-          readOnly: true
       - name: operator
         image: "quay.io/coreos/metering-ansible-operator:release-4.6"
         imagePullPolicy: Always
         env:
+        - name: ANSIBLE_DEBUG_LOGS
+          value: "True"
+        - name: ANSIBLE_VERBOSITY_METERINGCONFIG_METERING_OPENSHIFT_IO
+          value: "1"
         - name: OPERATOR_NAME
           value: "metering-operator"
         - name: DISABLE_OCP_FEATURES

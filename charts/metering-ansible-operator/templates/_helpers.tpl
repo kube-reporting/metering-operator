@@ -24,21 +24,14 @@ template:
     securityContext:
       runAsNonRoot: true
     containers:
-    - name: ansible
-      command:
-      - /opt/ansible/scripts/ansible-logs.sh
-      - /tmp/ansible-operator/runner
-      - stdout
-      image: "{{ .Values.operator.image.repository }}:{{ .Values.operator.image.tag }}"
-      imagePullPolicy: {{ .Values.operator.image.pullPolicy }}
-      volumeMounts:
-      - mountPath: /tmp/ansible-operator/runner
-        name: runner
-        readOnly: true
     - name: operator
       image: "{{ .Values.operator.image.repository }}:{{ .Values.operator.image.tag }}"
       imagePullPolicy: {{ .Values.operator.image.pullPolicy }}
       env:
+      - name: ANSIBLE_DEBUG_LOGS
+        value: "True"
+      - name: ANSIBLE_VERBOSITY_METERINGCONFIG_METERING_OPENSHIFT_IO
+        value: "1"
       - name: OPERATOR_NAME
         value: "{{ .Values.operator.name }}"
       - name: DISABLE_OCP_FEATURES
@@ -86,7 +79,6 @@ template:
 {{ toYaml .Values.operator.imagePullSecrets | indent 4 }}
 {{- end }}
 {{ end }}
-
 
 {{- define "cluster-service-version-deployment-spec" -}}
 {{- $ctxCopy := merge (dict "Values" (dict "operator" (dict "useTargetNamespacesDownwardAPIValueFrom" true))) . -}}
