@@ -90,8 +90,10 @@ func TestGetReportCondition(t *testing.T) {
 }
 
 func TestSetReportCondition(t *testing.T) {
-	// shouldn't fail with nil
-	SetReportCondition(nil, v1.ReportCondition{})
+	err := SetReportCondition(nil, v1.ReportCondition{})
+	if err == nil {
+		t.Error("expected error when using nil report status but received none")
+	}
 
 	// this is a helper method to allow setting a time.  Also dereferences the pointer so the value can be used
 	// in structs to make the tests easier to define.
@@ -143,7 +145,10 @@ func TestSetReportCondition(t *testing.T) {
 
 	for name, test := range tests {
 		originalCondition := GetReportCondition(*test.status, test.cond.Type)
-		SetReportCondition(test.status, test.cond)
+		err := SetReportCondition(test.status, test.cond)
+		if err != nil {
+			t.Errorf("%s returned unexpected error %#v", name, err)
+		}
 		newCondition := GetReportCondition(*test.status, test.cond.Type)
 
 		if newCondition == nil {
@@ -169,7 +174,10 @@ func TestSetReportCondition(t *testing.T) {
 
 func TestRemoveReportCondition(t *testing.T) {
 	// shouldn't fail with nil
-	RemoveReportCondition(nil, v1.ReportConditionType("foo"))
+	err := RemoveReportCondition(nil, v1.ReportConditionType("foo"))
+	if err == nil {
+		t.Error("expected error when using nil report status but received none")
+	}
 
 	status := &v1.ReportStatus{
 		Conditions: []v1.ReportCondition{
@@ -179,7 +187,10 @@ func TestRemoveReportCondition(t *testing.T) {
 	}
 
 	originalLength := len(status.Conditions)
-	RemoveReportCondition(status, v1.ReportRunning)
+	err = RemoveReportCondition(status, v1.ReportRunning)
+	if err != nil {
+		t.Fatalf("received unexpected error from RemoveReportCondition: %#v", err)
+	}
 
 	if len(status.Conditions) != originalLength-1 {
 		t.Errorf("expected a condition to be removed but found invalid remaining condition length: %d, %d", originalLength, len(status.Conditions))

@@ -1,6 +1,7 @@
 package util
 
 import (
+	"errors"
 	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
@@ -70,15 +71,13 @@ func GetReportCondition(status metering.ReportStatus, condType metering.ReportCo
 
 // SetReportCondition updates the report to include the provided condition. If the condition that
 // we are about to add already exists and has the same status and reason then we are not going to update.
-func SetReportCondition(status *metering.ReportStatus, condition metering.ReportCondition) {
-	// TODO we accept a pointer but do not account for nil.  This seems like a programmatic error, should we
-	// throw an error rather than return since the caller is definitely expecting an action to happen?
+func SetReportCondition(status *metering.ReportStatus, condition metering.ReportCondition) error {
 	if status == nil {
-		return
+		return errors.New("cannot add condition to nil status")
 	}
 	currentCond := GetReportCondition(*status, condition.Type)
 	if currentCond != nil && currentCond.Status == condition.Status && currentCond.Reason == condition.Reason {
-		return
+		return nil
 	}
 	// Do not update lastTransitionTime if the status of the condition doesn't change.
 	if currentCond != nil && currentCond.Status == condition.Status {
@@ -86,16 +85,17 @@ func SetReportCondition(status *metering.ReportStatus, condition metering.Report
 	}
 	newConditions := filterOutCondition(status.Conditions, condition.Type)
 	status.Conditions = append(newConditions, condition)
+
+	return nil
 }
 
 // RemoveReportCondition removes the report condition with the provided type.
-func RemoveReportCondition(status *metering.ReportStatus, condType metering.ReportConditionType) {
-	// TODO we accept a pointer but do not account for nil.  This seems like a programmatic error, should we
-	// throw an error rather than return since the caller is definitely expecting an action to happen?
+func RemoveReportCondition(status *metering.ReportStatus, condType metering.ReportConditionType) error {
 	if status == nil {
-		return
+		return errors.New("cannot remove condition from nil status")
 	}
 	status.Conditions = filterOutCondition(status.Conditions, condType)
+	return nil
 }
 
 // filterOutCondition returns a new slice of report conditions without conditions with the provided type.
