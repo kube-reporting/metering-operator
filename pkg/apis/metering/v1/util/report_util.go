@@ -71,6 +71,11 @@ func GetReportCondition(status metering.ReportStatus, condType metering.ReportCo
 // SetReportCondition updates the report to include the provided condition. If the condition that
 // we are about to add already exists and has the same status and reason then we are not going to update.
 func SetReportCondition(status *metering.ReportStatus, condition metering.ReportCondition) {
+	// TODO we accept a pointer but do not account for nil.  This seems like a programmatic error, should we
+	// throw an error rather than return since the caller is definitely expecting an action to happen?
+	if status == nil {
+		return
+	}
 	currentCond := GetReportCondition(*status, condition.Type)
 	if currentCond != nil && currentCond.Status == condition.Status && currentCond.Reason == condition.Reason {
 		return
@@ -85,6 +90,11 @@ func SetReportCondition(status *metering.ReportStatus, condition metering.Report
 
 // RemoveReportCondition removes the report condition with the provided type.
 func RemoveReportCondition(status *metering.ReportStatus, condType metering.ReportConditionType) {
+	// TODO we accept a pointer but do not account for nil.  This seems like a programmatic error, should we
+	// throw an error rather than return since the caller is definitely expecting an action to happen?
+	if status == nil {
+		return
+	}
 	status.Conditions = filterOutCondition(status.Conditions, condType)
 }
 
