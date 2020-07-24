@@ -212,6 +212,10 @@ func TestManualMeteringInstall(t *testing.T) {
 					},
 				},
 				{
+					Name:     "testMeteringAnsibleOperatorMetricsWork",
+					TestFunc: testMeteringAnsibleOperatorMetricsWork,
+				},
+				{
 					Name:     "testPrometheusConnectorWorks",
 					TestFunc: testPrometheusConnectorWorks,
 				},
