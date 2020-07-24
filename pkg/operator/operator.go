@@ -16,12 +16,11 @@ import (
 
 	"github.com/davecgh/go-spew/spew"
 	"github.com/prestodb/presto-go-client/presto"
-	_ "github.com/prestodb/presto-go-client/presto"
 	promapi "github.com/prometheus/client_golang/api"
 	prom "github.com/prometheus/client_golang/api/prometheus/v1"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	log "github.com/sirupsen/logrus"
-	hive "github.com/taozle/go-hive-driver"
+	"github.com/taozle/go-hive-driver"
 	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/util/clock"
