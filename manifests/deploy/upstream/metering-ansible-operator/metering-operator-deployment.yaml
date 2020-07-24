@@ -23,6 +23,8 @@ spec:
       - name: operator
         image: "quay.io/coreos/metering-ansible-operator:release-4.6"
         imagePullPolicy: Always
+        args:
+        - "--zap-level=info"
         env:
         - name: ANSIBLE_DEBUG_LOGS
           value: "True"

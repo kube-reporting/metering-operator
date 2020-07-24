@@ -23,6 +23,8 @@ spec:
       - name: operator
         image: "quay.io/openshift/origin-metering-ansible-operator:4.6"
         imagePullPolicy: Always
+        args:
+        - "--zap-level=info"
         env:
         - name: ANSIBLE_DEBUG_LOGS
           value: "True"
