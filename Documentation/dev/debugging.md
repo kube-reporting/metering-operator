@@ -18,6 +18,33 @@ The command below will follow the logs of the reporting-operator.
 kubectl -n $METERING_NAMESPACE logs "$(kubectl -n $METERING_NAMESPACE get pods -l app=reporting-operator -o name | cut -c 5-)" -c reporting-operator
 ```
 
+## Transferring host binaries to an operand container
+
+**Note**: the following assumes the host has the openshift client binary (`which oc`) in their path.
+
+It can be helpful to copy a host binary to a container in one of the metering operand Pods, especially when debugging networking.
+
+The following is an example for how to add the `netstat` binary to the reporting-operator container, using the openshift client:
+
+```bash
+oc -n $METERING_NAMESPACE cp /usr/bin/netstat $(oc -n $METERING_NAMESPACE get pods -l app=reporting-operator --no-headers | awk '{ print $1 }'):/tmp/
+```
+
+Due to potential permissions errors, placing the resultant binary in the /tmp/ directory is typically the easiest. In order to interact with the `netstat` binary, you could run the following:
+
+```bash
+$ oc -n $METERING_NAMESPACE exec -it $(oc -n $METERING_NAMESPACE get pods -l app=reporting-operator --no-headers | awk '{ print $1 }') -- /tmp/netstat -tupln
+
+Defaulting container name to reporting-operator.
+Use 'oc describe pod/reporting-operator-55f78fbc57-98mqp -n openshift-metering' to see all of the containers in this pod.
+Active Internet connections (only servers)
+Proto Recv-Q Send-Q Local Address           Foreign Address         State       PID/Program name
+tcp        0      0 127.0.0.1:6060          0.0.0.0:*               LISTEN      1/reporting-operato
+tcp        0      0 127.0.0.1:8080          0.0.0.0:*               LISTEN      1/reporting-operato
+tcp6       0      0 :::8081                 :::*                    LISTEN      -
+tcp6       0      0 :::8082                 :::*                    LISTEN      1/reporting-operato
+```
+
 ## Query Presto using presto-cli
 
 The following will open up an interactive [presto-cli](https://prestosql.io/docs/current/installation/cli.html) session where you can interactively query Presto. One thing to note is that this runs in the same container as Presto and launches an additional Java instance, meaning you may run into memory limits for the pod. If this occurs, you should increase the memory request & limits of the Presto pod. By default, Presto is configured to communicate using TLS, and you would need to run the following command in order to run Presto queries:
