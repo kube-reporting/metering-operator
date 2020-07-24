@@ -179,6 +179,43 @@ func TestManualMeteringInstall(t *testing.T) {
 			MeteringConfigManifestFilename: "missing-storage.yaml",
 		},
 		{
+			Name:                      "ValidHDFS-ValidNodeSelector",
+			MeteringOperatorImageRepo: meteringOperatorImageRepo,
+			MeteringOperatorImageTag:  meteringOperatorImageTag,
+			// TODO: transistion this to a periodic test and
+			// update the `Skip` condition to !runAllInstallTests
+			// TODO: disabling this test for the time being as
+			// we're labeling nodes and firing off this metering
+			// installation before the machineautoscaler has provisioned
+			// any new machine. The result is the new machines that get
+			// provisioned, don't have this custom node label we added in
+			// the preInstallFunc closure.
+			Skip:           true,
+			PreInstallFunc: customNodeSelectorFunc,
+			InstallSubTests: []InstallTestCase{
+				{
+					Name:     "testNodeSelectorConfigurationWorks",
+					TestFunc: testNodeSelectorConfigurationWorks,
+				},
+				{
+					Name:     "testReportingProducesCorrectDataForInput",
+					TestFunc: testReportingProducesCorrectDataForInput,
+					ExtraEnvVars: []string{
+						"REPORTING_OPERATOR_DISABLE_PROMETHEUS_METRICS_IMPORTER=true",
+					},
+				},
+				{
+					Name:     "testPrometheusConnectorWorks",
+					TestFunc: testPrometheusConnectorWorks,
+				},
+				{
+					Name:     "testReportingOperatorServiceCABundleExists",
+					TestFunc: testReportingOperatorServiceCABundleExists,
+				},
+			},
+			MeteringConfigManifestFilename: "node-selector-prometheus-importer-disabled.yaml",
+		},
+		{
 			Name:                      "ValidHDFS-ReportDynamicInputData",
 			MeteringOperatorImageRepo: meteringOperatorImageRepo,
 			MeteringOperatorImageTag:  meteringOperatorImageTag,
@@ -221,37 +258,6 @@ func TestManualMeteringInstall(t *testing.T) {
 				},
 			},
 			MeteringConfigManifestFilename: "prometheus-metrics-importer-disabled.yaml",
-		},
-		{
-			Name:                      "ValidHDFS-ValidNodeSelector",
-			MeteringOperatorImageRepo: meteringOperatorImageRepo,
-			MeteringOperatorImageTag:  meteringOperatorImageTag,
-			// TODO: transistion this to a periodic test and
-			// update the `Skip` condition to !runAllInstallTests
-			Skip:           false,
-			PreInstallFunc: customNodeSelectorFunc,
-			InstallSubTests: []InstallTestCase{
-				{
-					Name:     "testNodeSelectorConfigurationWorks",
-					TestFunc: testNodeSelectorConfigurationWorks,
-				},
-				{
-					Name:     "testReportingProducesCorrectDataForInput",
-					TestFunc: testReportingProducesCorrectDataForInput,
-					ExtraEnvVars: []string{
-						"REPORTING_OPERATOR_DISABLE_PROMETHEUS_METRICS_IMPORTER=true",
-					},
-				},
-				{
-					Name:     "testPrometheusConnectorWorks",
-					TestFunc: testPrometheusConnectorWorks,
-				},
-				{
-					Name:     "testReportingOperatorServiceCABundleExists",
-					TestFunc: testReportingOperatorServiceCABundleExists,
-				},
-			},
-			MeteringConfigManifestFilename: "node-selector-prometheus-importer-disabled.yaml",
 		},
 		{
 			Name:                      "ValidHDFS-MySQLDatabase",
