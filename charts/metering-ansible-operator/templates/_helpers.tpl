@@ -27,6 +27,8 @@ template:
     - name: operator
       image: "{{ .Values.operator.image.repository }}:{{ .Values.operator.image.tag }}"
       imagePullPolicy: {{ .Values.operator.image.pullPolicy }}
+      args:
+      - "--zap-level=info"
       env:
       - name: ANSIBLE_DEBUG_LOGS
         value: "True"
