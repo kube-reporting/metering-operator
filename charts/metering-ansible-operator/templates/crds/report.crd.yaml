@@ -54,6 +54,8 @@ spec:
                 format: date-time
               runImmediately:
                 type: boolean
+              overwriteExistingData:
+                type: boolean
               inputs:
                 type: array
                 minItems: 1
