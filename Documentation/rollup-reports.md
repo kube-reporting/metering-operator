@@ -31,7 +31,7 @@ It contains a few a custom inputs: most importantly, `NamespaceCPUUsageReportNam
 apiVersion: metering.openshift.io/v1
 kind: ReportQuery
 metadata:
-  name: namespace-cpu-usage
+  name: custom-namespace-cpu-usage
   labels:
     operator-metering: "true"
 spec:
@@ -94,7 +94,7 @@ kind: Report
 metadata:
   name: namespace-cpu-usage-daily
 spec:
-  query: "namespace-cpu-usage"
+  query: "custom-namespace-cpu-usage"
   inputs:
   - name: "NamespaceCPUUsageReportName"
     value: "namespace-cpu-usage-hourly"
