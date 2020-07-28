@@ -8,6 +8,7 @@
 - [#1245](https://github.com/kube-reporting/metering-operator/pull/1245) Consolidate Hive Metastore configurable fields. You no longer need to specify `spec.hive.spec.metastore.storage.create: false` when using a non-default database for Hive Metastore.
 - [#1253](https://github.com/kube-reporting/metering-operator/pull/1253) Bumped the Metering-related CRD versioning from v1beta1 to v1. The minimum kubernetes version in the Metering CSV manifest is now set to 1.18.
 - [#1264](https://github.com/kube-reporting/metering-operator/pull/1264) Bumped the Kubernetes-related dependencies to 1.18.x.
+- [#1330](https://github.com/kube-reporting/metering-operator/pull/1330) Updated the metering-ansible-operator to use the operator-sdk 0.19.x version. As part of that process, we removed the Ansible sidecar container and the Ansible logs are now viewable in the `operator` container. For more information, see the removal notice in the [0.18.0 migration guide](https://sdk.operatorframework.io/docs/migration/v0.18.0/#remove-the-file-binao-logs-for-ansible-based-operators).
 
 ### Bug Fixes
 

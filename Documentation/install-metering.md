@@ -56,7 +56,7 @@ For instructions on installing using our manual install scripts follow the [manu
 First, wait until the Metering Ansible operator deploys all of the Metering components:
 
 ```
-kubectl get pods -n $METERING_NAMESPACE -l app=metering-operator -o name | cut -d/ -f2 | xargs -I{} kubectl -n $METERING_NAMESPACE logs -f {} -c operator
+kubectl get pods -n $METERING_NAMESPACE -l app=metering-operator -o name | cut -d/ -f2 | xargs -I{} kubectl -n $METERING_NAMESPACE logs -f {}
 ```
 
 This can potentially take a minute or two to complete, but when it's done, you should see log output similar the following:
