@@ -146,6 +146,7 @@ type Reporting struct {
 	kubeClient        corev1.CoreV1Interface
 	coordinatorClient coordinatorv1.CoordinationV1Interface
 	meteringClient    cbClientset.Interface
+	eventRecorder     record.EventRecorder
 
 	informerFactory factory.SharedInformerFactory
 
@@ -602,12 +603,12 @@ func (op *Reporting) Run(ctx context.Context) error {
 	eventBroadcaster := record.NewBroadcaster()
 	eventBroadcaster.StartLogging(op.logger.Infof)
 	eventBroadcaster.StartRecordingToSink(&corev1.EventSinkImpl{Interface: op.kubeClient.Events(op.cfg.OwnNamespace)})
-	eventRecorder := eventBroadcaster.NewRecorder(scheme.Scheme, v1.EventSource{Component: op.cfg.Hostname})
+	op.eventRecorder = eventBroadcaster.NewRecorder(scheme.Scheme, v1.EventSource{Component: op.cfg.Hostname})
 
 	rl, err := resourcelock.New(resourcelock.ConfigMapsResourceLock, op.cfg.OwnNamespace, "reporting-operator-leader-lease", op.kubeClient, op.coordinatorClient,
 		resourcelock.ResourceLockConfig{
 			Identity:      op.cfg.Hostname,
-			EventRecorder: eventRecorder,
+			EventRecorder: op.eventRecorder,
 		},
 	)
 	if err != nil {
