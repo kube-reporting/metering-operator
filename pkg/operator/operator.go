@@ -25,6 +25,9 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/util/clock"
 	"k8s.io/apimachinery/pkg/util/wait"
+
+	meteringv1scheme "github.com/kube-reporting/metering-operator/pkg/generated/clientset/versioned/scheme"
+	utilruntime "k8s.io/apimachinery/pkg/util/runtime"
 	"k8s.io/client-go/kubernetes/scheme"
 	coordinatorv1 "k8s.io/client-go/kubernetes/typed/coordination/v1"
 	corev1 "k8s.io/client-go/kubernetes/typed/core/v1"
@@ -305,6 +308,8 @@ func newReportingOperator(
 		reporting.NewReportListerGetter(reportInformer.Lister()),
 	)
 
+	logger.Infof("setting up event broadcasters")
+	utilruntime.Must(meteringv1scheme.AddToScheme(scheme.Scheme))
 	eventBroadcaster := record.NewBroadcaster()
 	eventBroadcaster.StartLogging(logger.Infof)
 	eventBroadcaster.StartRecordingToSink(&corev1.EventSinkImpl{Interface: kubeClient.Events(cfg.OwnNamespace)})
