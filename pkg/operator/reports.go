@@ -691,7 +691,11 @@ func (op *Reporting) runReport(logger log.FieldLogger, report *metering.Report) 
 	if report.Spec.ReportingEnd != nil && report.Status.LastReportTime.Time.Equal(report.Spec.ReportingEnd.Time) {
 		msg := fmt.Sprintf("Report has finished reporting. Report has reached the configured spec.reportingEnd: %s", report.Spec.ReportingEnd.Time)
 		runningCond := meteringUtil.NewReportCondition(metering.ReportRunning, v1.ConditionFalse, meteringUtil.ReportFinishedReason, msg)
-		meteringUtil.SetReportCondition(&report.Status, *runningCond)
+
+		if condErr := meteringUtil.SetReportCondition(&report.Status, *runningCond); condErr != nil {
+			return condErr
+		}
+
 		logger.Infof(msg)
 	} else if report.Spec.Schedule != nil {
 		// determine the next reportTime, if it's not a run-once report and then
@@ -713,7 +717,11 @@ func (op *Reporting) runReport(logger log.FieldLogger, report *metering.Report) 
 
 		waitMsg := fmt.Sprintf("Next scheduled report period is [%s to %s]. next run time is %s.", reportPeriod.periodStart, reportPeriod.periodEnd, nextRunTime)
 		runningCond := meteringUtil.NewReportCondition(metering.ReportRunning, v1.ConditionFalse, meteringUtil.ReportingPeriodWaitingReason, waitMsg)
-		meteringUtil.SetReportCondition(&report.Status, *runningCond)
+
+		if condErr := meteringUtil.SetReportCondition(&report.Status, *runningCond); condErr != nil {
+			return condErr
+		}
+
 		logger.Infof(waitMsg+". waiting %s", waitTime)
 		op.enqueueReportAfter(report, waitTime)
 	}
@@ -806,7 +814,9 @@ func reportNeedsFinalizer(report *metering.Report) bool {
 }
 
 func (op *Reporting) updateReportStatus(report *metering.Report, cond *metering.ReportCondition) (*metering.Report, error) {
-	meteringUtil.SetReportCondition(&report.Status, *cond)
+	if condErr := meteringUtil.SetReportCondition(&report.Status, *cond); condErr != nil {
+		return report, condErr
+	}
 	return op.meteringClient.MeteringV1().Reports(report.Namespace).Update(context.TODO(), report, metav1.UpdateOptions{})
 }
 
