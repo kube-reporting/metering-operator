@@ -230,6 +230,7 @@ func (op *Reporting) handlePrometheusMetricsDataSource(logger log.FieldLogger, d
 	// run the import
 	results, err := importer.ImportFromLastTimestamp(context.Background())
 	if err != nil {
+		op.eventRecorder.Event(dataSource, v1.EventTypeWarning, "FailedPrometheusQuery", "Unable to import metrics after Prometheus query failure. Check the reporting-operator container logs for more information.")
 		return fmt.Errorf("ImportFromLastTimestamp errored: %v", err)
 	}
 
