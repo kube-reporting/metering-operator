@@ -92,6 +92,11 @@ func testManualOLMUpgradeInstall(
 		testInstallFunction.TestFunc(t, rf)
 	})
 
+	if t.Failed() {
+		t.Logf("The pre-upgrade tests failed. Skipping.")
+		t.Skip()
+	}
+
 	err = deployerCtx.MustGatherMeteringResources(gatherTestArtifactsScript)
 	assert.NoError(t, err, "gathering metering resources should produce no error")
 
