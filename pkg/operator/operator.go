@@ -305,6 +305,11 @@ func newReportingOperator(
 		reporting.NewReportListerGetter(reportInformer.Lister()),
 	)
 
+	eventBroadcaster := record.NewBroadcaster()
+	eventBroadcaster.StartLogging(logger.Infof)
+	eventBroadcaster.StartRecordingToSink(&corev1.EventSinkImpl{Interface: kubeClient.Events(cfg.OwnNamespace)})
+	eventRecorder := eventBroadcaster.NewRecorder(scheme.Scheme, v1.EventSource{Component: cfg.Hostname})
+
 	op := &Reporting{
 		logger:            logger,
 		cfg:               cfg,
@@ -312,6 +317,7 @@ func newReportingOperator(
 		kubeClient:        kubeClient,
 		coordinatorClient: coordinatorClient,
 		meteringClient:    meteringClient,
+		eventRecorder:     eventRecorder,
 
 		informerFactory: informerFactory,
 
@@ -599,11 +605,6 @@ func (op *Reporting) Run(ctx context.Context) error {
 			return fmt.Errorf("cache for %s not synced in time", t)
 		}
 	}
-
-	eventBroadcaster := record.NewBroadcaster()
-	eventBroadcaster.StartLogging(op.logger.Infof)
-	eventBroadcaster.StartRecordingToSink(&corev1.EventSinkImpl{Interface: op.kubeClient.Events(op.cfg.OwnNamespace)})
-	op.eventRecorder = eventBroadcaster.NewRecorder(scheme.Scheme, v1.EventSource{Component: op.cfg.Hostname})
 
 	rl, err := resourcelock.New(resourcelock.ConfigMapsResourceLock, op.cfg.OwnNamespace, "reporting-operator-leader-lease", op.kubeClient, op.coordinatorClient,
 		resourcelock.ResourceLockConfig{
