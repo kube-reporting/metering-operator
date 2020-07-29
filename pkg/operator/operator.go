@@ -25,6 +25,9 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/util/clock"
 	"k8s.io/apimachinery/pkg/util/wait"
+
+	meteringv1scheme "github.com/kube-reporting/metering-operator/pkg/generated/clientset/versioned/scheme"
+	utilruntime "k8s.io/apimachinery/pkg/util/runtime"
 	"k8s.io/client-go/kubernetes/scheme"
 	coordinatorv1 "k8s.io/client-go/kubernetes/typed/coordination/v1"
 	corev1 "k8s.io/client-go/kubernetes/typed/core/v1"
@@ -305,6 +308,13 @@ func newReportingOperator(
 		reporting.NewReportListerGetter(reportInformer.Lister()),
 	)
 
+	logger.Infof("setting up event broadcasters")
+	utilruntime.Must(meteringv1scheme.AddToScheme(scheme.Scheme))
+	eventBroadcaster := record.NewBroadcaster()
+	eventBroadcaster.StartLogging(logger.Infof)
+	eventBroadcaster.StartRecordingToSink(&corev1.EventSinkImpl{Interface: kubeClient.Events(cfg.OwnNamespace)})
+	eventRecorder := eventBroadcaster.NewRecorder(scheme.Scheme, v1.EventSource{Component: cfg.Hostname})
+
 	op := &Reporting{
 		logger:            logger,
 		cfg:               cfg,
@@ -312,6 +322,7 @@ func newReportingOperator(
 		kubeClient:        kubeClient,
 		coordinatorClient: coordinatorClient,
 		meteringClient:    meteringClient,
+		eventRecorder:     eventRecorder,
 
 		informerFactory: informerFactory,
 
@@ -599,11 +610,6 @@ func (op *Reporting) Run(ctx context.Context) error {
 			return fmt.Errorf("cache for %s not synced in time", t)
 		}
 	}
-
-	eventBroadcaster := record.NewBroadcaster()
-	eventBroadcaster.StartLogging(op.logger.Infof)
-	eventBroadcaster.StartRecordingToSink(&corev1.EventSinkImpl{Interface: op.kubeClient.Events(op.cfg.OwnNamespace)})
-	op.eventRecorder = eventBroadcaster.NewRecorder(scheme.Scheme, v1.EventSource{Component: op.cfg.Hostname})
 
 	rl, err := resourcelock.New(resourcelock.ConfigMapsResourceLock, op.cfg.OwnNamespace, "reporting-operator-leader-lease", op.kubeClient, op.coordinatorClient,
 		resourcelock.ResourceLockConfig{

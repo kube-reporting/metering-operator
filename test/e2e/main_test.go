@@ -260,6 +260,10 @@ func TestManualMeteringInstall(t *testing.T) {
 					Name:     "testReportingOperatorServiceCABundleExists",
 					TestFunc: testReportingOperatorServiceCABundleExists,
 				},
+				{
+					Name:     "testLeaderElectionEventIsCreated",
+					TestFunc: testLeaderElectionEventIsCreated,
+				},
 			},
 			MeteringConfigManifestFilename: "prometheus-metrics-importer-disabled.yaml",
 		},
