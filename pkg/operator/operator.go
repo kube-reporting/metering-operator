@@ -348,6 +348,7 @@ func newReportingOperator(
 		importers: make(map[string]*prestostore.PrometheusImporter),
 	}
 
+	op.logger.Info("setting the informers")
 	// all eventHandlers are wrapped in an
 	// inTargetNamespaceResourceEventHandler which verifies the resources
 	// passed to the eventHandler functions have a metadata.namespace contained
@@ -397,7 +398,7 @@ func (op *Reporting) Run(ctx context.Context) error {
 	// buffered big enough to hold the errs of each server we start.
 	srvErrChan := make(chan error, 3)
 
-	op.logger.Info("starting Metering operator")
+	op.logger.Info("starting the Metering operator")
 
 	promServer := &http.Server{
 		Addr:    op.cfg.MetricsListen,
@@ -407,7 +408,7 @@ func (op *Reporting) Run(ctx context.Context) error {
 
 	// start these servers at the beginning some pprof and metrics are
 	// available before the reporting operator is ready
-	op.logger.Info("starting Prometheus metrics & pprof servers")
+	op.logger.Info("starting the Prometheus metrics & pprof servers")
 	wg.Add(2)
 	go func() {
 		defer wg.Done()
@@ -430,7 +431,7 @@ func (op *Reporting) Run(ctx context.Context) error {
 		srvErrChan <- fmt.Errorf("pprof server error: %v", srvErr)
 	}()
 
-	op.logger.Infof("setting up DB clients")
+	op.logger.Infof("setting up Hive and Presto database clients")
 	var hiveDialer hive.Dialer = hive.DialWrapper{}
 	if op.cfg.HiveUseTLS {
 		rootCert, err := ioutil.ReadFile(op.cfg.HiveCAFile)
@@ -598,10 +599,36 @@ func (op *Reporting) Run(ctx context.Context) error {
 	}
 	op.logger.Info("writes to Presto are succeeding")
 
+	// In the case where the Prometheus metrics importer configuration has not
+	// been disabled, try to fire off a test Prometheus query against the `up`
+	// metric. This should weed out any invalid Prometheus configurations, e.g.
+	// the service account token or CA passed to the reporting-operator is invalid,
+	// and we should complain about that, but not require this as part of the
+	// reporting-operator health checks. Note: in the case where we encounter
+	// something like a timeout error while polling, just log the message
+	// indicating there was a problem and ignore the error.
+	if !op.cfg.DisablePrometheusMetricsImporter {
+		op.logger.Info("testing the ability to query from Prometheus")
+
+		err = wait.Poll(3*time.Second, 15*time.Second, func() (bool, error) {
+			_, err := op.promConn.Query(context.TODO(), "up", time.Now())
+			if err != nil {
+				op.logger.Warnf("failed to succesfully query Prometheus: %v", err)
+				return false, nil
+			}
+
+			op.logger.Infof("queries from Prometheus are succeeding")
+			return true, nil
+		})
+		if err != nil {
+			op.logger.Warnf("queries from Prometheus are failing: %v", err)
+		}
+	}
+
 	op.logger.Info("basic initialization completed")
 	op.setInitialized()
 
-	op.logger.Info("starting informers")
+	op.logger.Info("starting the informers")
 	go op.informerFactory.Start(ctx.Done())
 
 	op.logger.Info("waiting for caches to sync")
