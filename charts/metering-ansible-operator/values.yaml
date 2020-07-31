@@ -224,10 +224,7 @@ olm:
     name : metering-operator.v4.6.0
     version: "4.6.0"
     skipRange: ">=4.3.0 <4.6.0"
-    # FIXME: revert once the apiserver issues have been resolved on 4.6.
-    # This is needed as a 4.6 cluster's server version is being interpreted
-    # as 1.17.0 instead of 1.18.3.
-    minKubeVersion: "1.17.0"
+    minKubeVersion: 1.18.3
     displayName: Metering
     description: |
       The Metering Operator is a generic reporting tool to provide accountability for how resources are used across a cluster cherry-picking and storing information from different sources. Cluster admins can schedule reports based on historical usage data by Pod, Namespace, and Cluster for storage. The Metering Operator is a part of the [Kubernetes Reporting organization](https://github.com/kube-reporting).

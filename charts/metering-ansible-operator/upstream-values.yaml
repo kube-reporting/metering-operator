@@ -47,7 +47,7 @@ olm:
   csv:
     name : metering-operator-upstream.v4.6.0
     version: "4.6.0"
-    minKubeVersion: "1.18.0"
+    minKubeVersion: 1.18.3
 
     description: |
       The Metering Operator is a generic reporting tool to provide accountability for how resources are used across a cluster cherry-picking and storing information from different sources. Cluster admins can schedule reports based on historical usage data by Pod, Namespace, and Cluster for storage. The Metering Operator is a part of the [Kubernetes Reporting organization](https://github.com/kube-reporting).
