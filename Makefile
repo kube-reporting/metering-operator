@@ -11,7 +11,10 @@ DEPLOY_METERING_PKG := $(GO_PKG)/cmd/deploy-metering
 # gofmt
 VERIFY_FILE_PATHS := cmd pkg test manifests
 
-DOCKER_BUILD_CMD = docker build
+# CONTAINER_RUNTIME_CMD can be docker or podman.
+CONTAINER_RUNTIME_CMD = docker
+IMAGE_BUILD_CMD = $(CONTAINER_RUNTIME_CMD) build
+
 OKD_BUILD = false
 OCP_BUILD = false
 REPO_DIR = $(ROOT_DIR)/hack/ocp-util/repos
@@ -19,7 +22,7 @@ SUB_MGR_FILE = $(ROOT_DIR)/hack/ocp-util/subscription-manager.conf
 
 IMAGE_REPOSITORY = quay.io
 IMAGE_ORG = openshift
-DOCKER_BASE_URL = $(IMAGE_REPOSITORY)/$(IMAGE_ORG)
+IMAGE_BASE_URL = $(IMAGE_REPOSITORY)/$(IMAGE_ORG)
 
 GIT_REVISION = $(shell git rev-list --count HEAD)
 OLM_PACKAGE_MAJOR_MINOR_PATCH_VERSION = 4.6.0
@@ -29,12 +32,12 @@ OLM_PACKAGE_BUILD_META = $(shell hack/date.sh +%s)
 OLM_PACKAGE_VERSION=$(OLM_PACKAGE_MAJOR_MINOR_PATCH_VERSION)-$(OLM_PACKAGE_PRE_RELEASE_VERSION)+$(OLM_PACKAGE_BUILD_META)
 OLM_PACKAGE_ORG = coreos
 
-METERING_SRC_IMAGE_REPO=$(DOCKER_BASE_URL)/metering-src
+METERING_SRC_IMAGE_REPO=$(IMAGE_BASE_URL)/metering-src
 METERING_SRC_IMAGE_TAG=latest
 
-REPORTING_OPERATOR_IMAGE_REPO=$(DOCKER_BASE_URL)/origin-metering-reporting-operator
+REPORTING_OPERATOR_IMAGE_REPO=$(IMAGE_BASE_URL)/origin-metering-reporting-operator
 REPORTING_OPERATOR_IMAGE_TAG=4.6
-METERING_OPERATOR_IMAGE_REPO=$(DOCKER_BASE_URL)/origin-metering-ansible-operator
+METERING_OPERATOR_IMAGE_REPO=$(IMAGE_BASE_URL)/origin-metering-ansible-operator
 METERING_OPERATOR_IMAGE_TAG=4.6
 
 REPORTING_OPERATOR_DOCKERFILE=Dockerfile.reporting-operator
@@ -43,13 +46,13 @@ REPORTING_OPERATOR_DOCKERFILE=Dockerfile.reporting-operator
 METERING_ANSIBLE_OPERATOR_DOCKERFILE=Dockerfile.metering-ansible-operator.okd
 
 ifeq ($(OKD_BUILD), true)
-	DOCKER_BUILD_CMD=imagebuilder -mount $(REPO_DIR):/etc/yum.repos.d/ -mount $(SUB_MGR_FILE):/etc/yum/pluginconf.d/subscription-manager.conf
+	IMAGE_BUILD_CMD=imagebuilder -mount $(REPO_DIR):/etc/yum.repos.d/ -mount $(SUB_MGR_FILE):/etc/yum/pluginconf.d/subscription-manager.conf
 	REPORTING_OPERATOR_DOCKERFILE=Dockerfile.reporting-operator.okd
 	METERING_ANSIBLE_OPERATOR_DOCKERFILE=Dockerfie.metering-ansible-operator.okd
 endif
 
 ifeq ($(OCP_BUILD), true)
-	DOCKER_BUILD_CMD=imagebuilder -mount $(REPO_DIR):/etc/yum.repos.d/ -mount $(SUB_MGR_FILE):/etc/yum/pluginconf.d/subscription-manager.conf
+	IMAGE_BUILD_CMD=imagebuilder -mount $(REPO_DIR):/etc/yum.repos.d/ -mount $(SUB_MGR_FILE):/etc/yum/pluginconf.d/subscription-manager.conf
 	REPORTING_OPERATOR_DOCKERFILE=Dockerfile.reporting-operator.rhel
 	METERING_ANSIBLE_OPERATOR_DOCKERFILE=Dockerfile.metering-ansible-operator.rhel
 endif
@@ -86,13 +89,13 @@ all: fmt unit verify docker-build-all
 docker-build-all: reporting-operator-docker-build metering-ansible-operator-docker-build
 
 reporting-operator-docker-build: $(REPORTING_OPERATOR_DOCKERFILE)
-	$(DOCKER_BUILD_CMD) -f $< -t $(REPORTING_OPERATOR_IMAGE_REPO):$(REPORTING_OPERATOR_IMAGE_TAG) $(ROOT_DIR)
+	$(IMAGE_BUILD_CMD) -f $< -t $(REPORTING_OPERATOR_IMAGE_REPO):$(REPORTING_OPERATOR_IMAGE_TAG) $(ROOT_DIR)
 
 metering-src-docker-build: Dockerfile.src
-	$(DOCKER_BUILD_CMD) -f $< -t $(METERING_SRC_IMAGE_REPO):$(METERING_SRC_IMAGE_TAG) $(ROOT_DIR)
+	$(IMAGE_BUILD_CMD) -f $< -t $(METERING_SRC_IMAGE_REPO):$(METERING_SRC_IMAGE_TAG) $(ROOT_DIR)
 
 metering-ansible-operator-docker-build: $(METERING_ANSIBLE_OPERATOR_DOCKERFILE)
-	$(DOCKER_BUILD_CMD) -f $< -t $(METERING_OPERATOR_IMAGE_REPO):$(METERING_OPERATOR_IMAGE_TAG) $(ROOT_DIR)
+	$(IMAGE_BUILD_CMD) -f $< -t $(METERING_OPERATOR_IMAGE_REPO):$(METERING_OPERATOR_IMAGE_TAG) $(ROOT_DIR)
 
 # Runs gofmt on all files in project except vendored source
 fmt:
@@ -111,7 +114,7 @@ unit:
 	hack/unit.sh
 
 unit-docker: metering-src-docker-build
-	docker run \
+	$(CONTAINER_RUNTIME_CMD) run \
 		--rm \
 		-t \
 		-w /go/src/github.com/kube-reporting/metering-operator \
@@ -135,7 +138,7 @@ e2e-dev-local:
 	$(MAKE) e2e-local METERING_RUN_DEV_TEST_SETUP=true
 
 e2e-docker: metering-src-docker-build
-	docker run \
+	$(CONTAINER_RUNTIME_CMD) run \
 		--name metering-e2e-docker \
 		-t \
 		-e METERING_NAMESPACE \
@@ -150,8 +153,8 @@ e2e-docker: metering-src-docker-build
 		$(METERING_SRC_IMAGE_REPO):$(METERING_SRC_IMAGE_TAG) \
 		make e2e
 	rm -rf bin/e2e-docker-test-output
-	docker cp metering-e2e-docker:/out bin/e2e-docker-test-output
-	docker rm metering-e2e-docker
+	$(CONTAINER_RUNTIME_CMD) cp metering-e2e-docker:/out bin/e2e-docker-test-output
+	$(CONTAINER_RUNTIME_CMD) rm metering-e2e-docker
 
 metering-manifests:
 	export \
@@ -190,7 +193,7 @@ push-olm-manifests: verify-olm-manifests
 	./hack/push-olm-manifests.sh $(OLM_PACKAGE_ORG) metering-ocp $(OLM_PACKAGE_VERSION)
 
 verify-docker: metering-src-docker-build
-	docker run \
+	$(CONTAINER_RUNTIME_CMD) run \
 		--rm \
 		-t \
 		-w /go/src/github.com/kube-reporting/metering-operator \
