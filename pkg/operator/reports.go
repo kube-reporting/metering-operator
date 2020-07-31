@@ -936,7 +936,7 @@ func (op *Reporting) queueDependentReportsForReport(report *metering.Report) err
 
 // for each report in the namespace, find ones that depend on the report passed into the function
 func (op *Reporting) reportsDependOnThisReport(report *metering.Report, reports []*metering.Report) (bool, string) {
-	var depReportName = ""
+	var depReportName string
 	for _, otherReport := range reports {
 		deps, err := op.getReportDependencies(otherReport)
 		if err != nil {
@@ -946,17 +946,16 @@ func (op *Reporting) reportsDependOnThisReport(report *metering.Report, reports 
 		// If a Report has a dependency on the passed in report, we're done
 		for _, dep := range deps.Reports {
 			if dep.Name == report.Name {
-				depReportName = dep.Name
-				return true, depReportName
+				return true, dep.Name
 			}
 		}
 	}
 	return false, depReportName
 }
 
-// Look for all ReportQueries in the namespace
+// for each ReportQuery in the namespace, find ones that depend on the report passed into the function
 func (op *Reporting) reportQueriesDependOnThisReport(report *metering.Report, reportQueries []*metering.ReportQuery) (bool, string) {
-	var depQueryName = ""
+	var depQueryName string
 	// for each report in the namespace, find queries that depend on the report passed into the function.
 	for _, reportQuery := range reportQueries {
 		deps, err := op.getQueryDependencies(reportQuery.Namespace, reportQuery.Name, nil)
@@ -967,8 +966,7 @@ func (op *Reporting) reportQueriesDependOnThisReport(report *metering.Report, re
 		// If this ReportQuery has a dependency on the passed in report, we're done
 		for _, dep := range deps.Reports {
 			if dep.Name == report.Name {
-				depQueryName = dep.Name
-				return true, depQueryName
+				return true, dep.Name
 			}
 		}
 	}
