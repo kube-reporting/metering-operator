@@ -17,10 +17,10 @@ func TestValidateQueryDependencies(t *testing.T) {
 	dataSourceTableSet := testhelpers.NewReportDataSource("initialized-datasource", "default")
 	dataSourceTableSet.Status.TableRef.Name = reportingutil.DataSourceTableName("test-ns", "initialized-datasource")
 
-	reportTableUnset := testhelpers.NewReport("uninitialized-report", "default", "some-query", nil, nil, metering.ReportStatus{}, nil, false)
+	reportTableUnset := testhelpers.NewReport("uninitialized-report", "default", "some-query", nil, nil, metering.ReportStatus{}, nil, false, nil)
 	reportTableSet := testhelpers.NewReport("initialized-report", "default", "some-query", nil, nil, metering.ReportStatus{
 		TableRef: v1.LocalObjectReference{Name: reportingutil.ReportTableName("test-ns", "initialized-report")},
-	}, nil, false)
+	}, nil, false, nil)
 
 	uninitializedDataSources := []*metering.ReportDataSource{
 		dataSourceTableUnset,

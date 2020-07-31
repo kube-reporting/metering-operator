@@ -91,7 +91,13 @@ func (op *Reporting) syncReport(logger log.FieldLogger, key string) error {
 		}
 		return err
 	}
+
 	sr := report.DeepCopy()
+
+	err = op.handleExpiredReport(sr, time.Now())
+	if err != nil {
+		return err
+	}
 
 	if report.DeletionTimestamp != nil {
 		_, err = op.removeReportFinalizer(sr)
@@ -347,6 +353,11 @@ func getReportPeriod(now time.Time, logger log.FieldLogger, report *metering.Rep
 func (op *Reporting) runReport(logger log.FieldLogger, report *metering.Report) error {
 	// check if the report was previously finished; store result in bool
 	if reportFinished := isReportFinished(logger, report); reportFinished {
+		return nil
+	}
+
+	// check if report is expired (CreationTime + expiration). If true, stop processing and exit early.
+	if reportExpired := isReportExpired(logger, report, time.Now()); reportExpired {
 		return nil
 	}
 
@@ -742,6 +753,60 @@ func (op *Reporting) runReport(logger log.FieldLogger, report *metering.Report) 
 	return nil
 }
 
+// We check first for Reports depending on this Report, return if any, and then check ReportQueries depending on Report
+func isReportNotUsedAsInput(report *metering.Report, op *Reporting) bool {
+	// Consider Reports referencing this report in the namespace of this report
+	reports, err := op.reportLister.Reports(report.Namespace).List(labels.Everything())
+	if err != nil {
+		op.logger.Errorf("unable to determine list of reports that might be input for report: %s", report.Name)
+		return false
+	}
+	for _, report := range reports {
+		// If Report has no spec.inputs it can't be depending on this report.
+		if report.Spec.Inputs == nil {
+			continue
+		}
+		if does, depReport := op.reportsDependOnThisReport(report, reports); does {
+			op.logger.Infof(
+				"report %s exists that uses report %s as input, "+
+					"will not delete though retention period has expired", depReport, report.Name)
+			return false
+		}
+	}
+	// Consider ReportQueries referencing this report in the namespace of this report
+	reportQueries, err := op.reportQueryLister.ReportQueries(report.Namespace).List(labels.Everything())
+	if err != nil {
+		op.logger.Errorf("unable to determine list of ReportQueries that might be input for report: %s", report.Name)
+		return false
+	}
+	for _, reportQuery := range reportQueries {
+		// If ReportQuery has no spec.inputs it can't be depending on this report.
+		if reportQuery.Spec.Inputs == nil {
+			continue
+		}
+
+		if does, depQuery := op.reportQueriesDependOnThisReport(report, reportQueries); does {
+			op.logger.Infof("ReportQuery, %s exists that uses report %s as input, " +
+				"will not delete though retention period has expired", depQuery, report.Name)
+			return false
+		}
+	}
+	return true
+}
+
+func isReportExpired(logger log.FieldLogger, report *metering.Report, currentTime time.Time) bool {
+	if report.Spec.Expiration != nil {
+		currentTimeNano := currentTime.UTC().Truncate(time.Millisecond).UnixNano()
+		reportCreationNano := report.ObjectMeta.CreationTimestamp.UTC().Truncate(time.Millisecond).UnixNano()
+		retentionAmountNano := report.Spec.Expiration.Nanoseconds()
+		if currentTimeNano > (reportCreationNano + retentionAmountNano) {
+			return true
+		}
+		logger.Infof("curr: %d, creat: %d, retain: %d", currentTimeNano, reportCreationNano, retentionAmountNano)
+	}
+	return false
+}
+
 func getRunOnceReportPeriod(report *metering.Report) (*reportPeriod, error) {
 	if report.Spec.ReportingEnd == nil || report.Spec.ReportingStart == nil {
 		return nil, fmt.Errorf("run-once reports must have both ReportingEnd and ReportingStart")
@@ -867,6 +932,45 @@ func (op *Reporting) queueDependentReportsForReport(report *metering.Report) err
 		}
 	}
 	return nil
+}
+
+// for each report in the namespace, find ones that depend on the report passed into the function
+func (op *Reporting) reportsDependOnThisReport(report *metering.Report, reports []*metering.Report) (bool, string) {
+	var depReportName string
+	for _, otherReport := range reports {
+		deps, err := op.getReportDependencies(otherReport)
+		if err != nil {
+			op.logger.Errorf("was unable to get dependencies for report: %s, while looking for dependent reports", report.Name)
+			return true, depReportName
+		}
+		// If a Report has a dependency on the passed in report, we're done
+		for _, dep := range deps.Reports {
+			if dep.Name == report.Name {
+				return true, dep.Name
+			}
+		}
+	}
+	return false, depReportName
+}
+
+// for each ReportQuery in the namespace, find ones that depend on the report passed into the function
+func (op *Reporting) reportQueriesDependOnThisReport(report *metering.Report, reportQueries []*metering.ReportQuery) (bool, string) {
+	var depQueryName string
+	// for each report in the namespace, find queries that depend on the report passed into the function.
+	for _, reportQuery := range reportQueries {
+		deps, err := op.getQueryDependencies(reportQuery.Namespace, reportQuery.Name, nil)
+		if err != nil {
+			op.logger.Errorf("was unable to get dependencies for report: %s, while looking for dependent queries")
+			return true, ""
+		}
+		// If this ReportQuery has a dependency on the passed in report, we're done
+		for _, dep := range deps.Reports {
+			if dep.Name == report.Name {
+				return true, dep.Name
+			}
+		}
+	}
+	return false, depQueryName
 }
 
 // queueDependentReportQueriesForReport will queue all

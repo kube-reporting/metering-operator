@@ -180,7 +180,7 @@ func TestRenderQuery(t *testing.T) {
 				Query:          "SELECT * FROM {| reportTableName .Report.Inputs.MissingReportNameInReportsField |}",
 				RequiredInputs: []string{"MissingReportNameInReportsField"},
 				Reports: []*metering.Report{
-					testhelpers.NewReport("", testNamespace, testReportQuery, reportStart, reportEnd, metering.ReportStatus{}, nil, false),
+					testhelpers.NewReport("", testNamespace, testReportQuery, reportStart, reportEnd, metering.ReportStatus{}, nil, false, nil),
 				},
 				PrestoTables: []*metering.PrestoTable{
 					newTestPrestoTable(ds1.Status.TableRef.Name, testNamespace, testCatalogName, testCatalogName, nil),
@@ -198,7 +198,7 @@ func TestRenderQuery(t *testing.T) {
 			name: "Report dependency was not found (due to Report.Name not matching name) returns error",
 			reportTemplate: &ReportQueryTemplateContext{
 				Reports: []*metering.Report{
-					testhelpers.NewReport(testReportName, testNamespace, testReportQuery, reportStart, reportEnd, metering.ReportStatus{}, nil, false),
+					testhelpers.NewReport(testReportName, testNamespace, testReportQuery, reportStart, reportEnd, metering.ReportStatus{}, nil, false, nil),
 				},
 				Query:             "SELECT * FROM {| reportTableName .Report.Inputs.ReportNameDoesNotMatchInputName |}",
 				RequiredInputs:    []string{"ReportNameDoesNotMatchInputName"},
@@ -223,7 +223,7 @@ func TestRenderQuery(t *testing.T) {
 				Reports: []*metering.Report{
 					testhelpers.NewReport(testReportName, testNamespace, testReportQuery, reportStart, reportEnd, metering.ReportStatus{
 						TableRef: v1.LocalObjectReference{Name: ""},
-					}, nil, false),
+					}, nil, false, nil),
 				},
 			},
 			templateContext: TemplateContext{
@@ -242,7 +242,7 @@ func TestRenderQuery(t *testing.T) {
 				Reports: []*metering.Report{
 					testhelpers.NewReport(testReportName, testNamespace, testReportQuery, reportStart, reportEnd, metering.ReportStatus{
 						TableRef: v1.LocalObjectReference{Name: testReportName},
-					}, nil, false),
+					}, nil, false, nil),
 				},
 				PrestoTables: []*metering.PrestoTable{
 					newTestPrestoTable(ds1.Status.TableRef.Name, testNamespace, testSchemaName, testCatalogName, nil),
@@ -264,7 +264,7 @@ func TestRenderQuery(t *testing.T) {
 				Reports: []*metering.Report{
 					testhelpers.NewReport(testReportName, testNamespace, testReportQuery, reportStart, reportEnd, metering.ReportStatus{
 						TableRef: v1.LocalObjectReference{Name: testReportName},
-					}, nil, false),
+					}, nil, false, nil),
 				},
 				PrestoTables: []*metering.PrestoTable{
 					newTestPrestoTable(testReportName, testNamespace, testSchemaName, testCatalogName, nil),
@@ -532,7 +532,7 @@ func TestRenderQuery(t *testing.T) {
 				Reports: []*metering.Report{
 					testhelpers.NewReport(testReportName, testNamespace, testReportQuery, reportStart, reportEnd, metering.ReportStatus{
 						TableRef: v1.LocalObjectReference{Name: ds1.Status.TableRef.Name},
-					}, nil, false),
+					}, nil, false, nil),
 				},
 				PrestoTables: []*metering.PrestoTable{
 					newTestPrestoTable(ds1.Status.TableRef.Name, testNamespace, testCatalogName, testCatalogName, nil),

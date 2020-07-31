@@ -52,6 +52,9 @@ spec:
               reportingEnd:
                 type: string
                 format: date-time
+              expiration:
+                type: string
+                format: duration
               runImmediately:
                 type: boolean
               overwriteExistingData:
