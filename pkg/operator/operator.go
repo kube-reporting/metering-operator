@@ -800,9 +800,9 @@ func (op *Reporting) startWorkers(ctx context.Context, wg *sync.WaitGroup) {
 	})
 
 	startWorker(10, func(i int) {
-		op.logger.Infof("starting PrestoTable worker")
+		op.logger.Infof("starting PrestoTable worker #%d", i)
 		wait.Until(op.runPrestoTableWorker, time.Second, stopCh)
-		op.logger.Infof("PrestoTable worker stopped")
+		op.logger.Infof("PrestoTable worker #%d stopped", i)
 	})
 
 	startWorker(8, func(i int) {
