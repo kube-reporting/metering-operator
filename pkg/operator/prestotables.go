@@ -264,9 +264,8 @@ func (op *Reporting) dropPrestoTable(prestoTable *metering.PrestoTable) error {
 		}
 		if prestoTable.Status.View {
 			return op.prestoTableManager.DropView(prestoTable.Status.Catalog, prestoTable.Status.Schema, prestoTable.Status.TableName, true)
-		} else {
-			return op.prestoTableManager.DropTable(prestoTable.Status.Catalog, prestoTable.Status.Schema, prestoTable.Status.TableName, true)
 		}
+		return op.prestoTableManager.DropTable(prestoTable.Status.Catalog, prestoTable.Status.Schema, prestoTable.Status.TableName, true)
 	}
 	if prestoTable.Spec.Unmanaged {
 		return errors.New("cannot drop unmanaged PrestoTable")
