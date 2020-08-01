@@ -346,6 +346,44 @@ func getReportPeriod(now time.Time, logger log.FieldLogger, report *metering.Rep
 	return reportPeriod, nil
 }
 
+func (op *Reporting) handleExpiredReport(report *metering.Report, now time.Time) error {
+	// check if the Report is being deleted already
+	if report.DeletionTimestamp != nil {
+		op.logger.Warnf("report was already marked for deletion")
+		return nil
+	}
+	// check if the Report is past its retention time
+	if reportExpired := isReportExpired(op.logger, report, now); !reportExpired {
+		op.logger.Debugf("the %s Report in the %s namespace has not yet reached the expiration date", report.Name, report.Namespace)
+		return nil
+	}
+	// check if the Report is used by any other Report or ReportQuery, if not delete it
+	if reportIsNotInput := isReportNotUsedAsInput(report, op); reportIsNotInput {
+		newDeletionTimestamp := metav1.Now()
+		report.SetDeletionTimestamp(&newDeletionTimestamp)
+		err := op.meteringClient.MeteringV1().Reports(report.Namespace).
+			Delete(context.TODO(), report.Name, metav1.DeleteOptions{})
+		if apierrors.IsNotFound(err) {
+			op.logger.Infof("report: %s, not deleted because it was not found at time delete attempted", report.Name)
+			return nil
+		}
+		if err != nil {
+			return fmt.Errorf("failed to delete the expired report: %s. err: %s", report.Name, err)
+		}
+		op.logger.Infof("deleted Report: %s in the Namespace: %s because it reached the expiration time",
+			report.Name, report.Namespace)
+		op.eventRecorder.Event(report, v1.EventTypeNormal, "ExpiredReportHasBeenDeleted",
+			"Deleted the %s Report as the configured expiration date has passed")
+		return nil
+	}
+	// if here, warn about dependency before return
+	op.logger.Warnf("report: %s, would be deleted because expired, but is depended on", report.Name)
+	op.eventRecorder.Event(report, v1.EventTypeWarning, "ExpiredReportHasDependencies",
+		"Skipping the deletion of the %s Report as other resources are dependent on it, "+
+			"despite reaching the desired expiration date.")
+	return nil
+}
+
 // runReport takes a report, and generates reporting data
 // according the report's schedule. If the next scheduled reporting period
 // hasn't elapsed, runReport will requeue the resource for a time when
