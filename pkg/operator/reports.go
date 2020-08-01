@@ -354,38 +354,68 @@ func getReportPeriod(now time.Time, logger log.FieldLogger, report *metering.Rep
 	return reportPeriod, nil
 }
 
+// handleExpiredReport is responsible for determining if the @report object we're
+// currently processing has reached it's configured retention period. In the case
+// where the Report object hasn't been configured with an expiration, exit early,
+// else attempt to determine if we can safely delete this object without breaking
+// other Report custom resources that rely on this particular Report.
 func (op *Reporting) handleExpiredReport(logger log.FieldLogger, report *metering.Report, now time.Time) error {
-	// check if the Report is being deleted already
+	// check if the Report deletion timestamp has already been set, exit early.
 	if report.DeletionTimestamp != nil {
-		logger.Warnf("report was already marked for deletion")
+		// TODO: should we be requeuing here?
+		logger.Warnf("the %s Report in the %s namespace was already marked for deletion", report.Name, report.Namespace)
 		return nil
 	}
-	// check if the Report is past its retention time
-	if reportExpired := isReportExpired(op.logger, report, now); !reportExpired {
+
+	// check if the report we're currently processing has reached the
+	// user-provided retention period. If it hasn't, exit early and
+	// let the call site determine how to handle this Report object.
+	if reportExpired := isReportExpired(logger, report, now); !reportExpired {
 		logger.Debugf("the %s Report in the %s namespace has not yet reached the expiration date", report.Name, report.Namespace)
 		return nil
 	}
-	// check if the Report is used by any other Report or ReportQuery, if not delete it
-	if reportIsNotInput := isReportNotUsedAsInput(logger, report, op); reportIsNotInput {
+	// Determine whether this Report object can be safely deleted.
+	// In the case of something like a roll-up Report, where an
+	// aggregate Report uses another Report object as an input,
+	// we need to ensure that we're not deleting any Report that's
+	// listed as a dependency, even if the user-provided retention
+	// period has passed.
+	reportIsNotInput, err := op.isReportNotUsedAsInput(logger, report)
+	if err != nil {
+		logger.Warnf("failed to determine if the %s Report is listed as a dependency: %v", report.Name, err)
+		return nil
+	}
+	// If the Report is not listed as a dependency for another
+	// custom resource, then attempt to make the client-go API
+	// call to delete this resource. Deleting this resource will
+	// result in the informer picking up this deletion event and will run
+	// op.deleteReport once that event has been picked up in the cache.
+	if reportIsNotInput {
 		newDeletionTimestamp := metav1.Now()
 		report.SetDeletionTimestamp(&newDeletionTimestamp)
-		err := op.meteringClient.MeteringV1().Reports(report.Namespace).
-			Delete(context.TODO(), report.Name, metav1.DeleteOptions{})
+
+		err := op.meteringClient.MeteringV1().Reports(report.Namespace).Delete(context.TODO(), report.Name, metav1.DeleteOptions{})
 		if apierrors.IsNotFound(err) {
-			logger.Infof("report: %s, not deleted because it was not found at time delete attempted", report.Name)
+			logger.Infof("failed to delete the %s Report in the %s namespace but it does not exist anymore", report.Name, report.Namespace)
 			return nil
 		}
 		if err != nil {
-			return fmt.Errorf("failed to delete the expired report: %s. err: %s", report.Name, err)
+			return fmt.Errorf("failed to delete the %s expired report: %v", report.Name, err)
 		}
-		logger.Infof("deleted Report: %s in the Namespace: %s because it reached the expiration time",
+
+		logger.Infof("deleted the Report: %s in the Namespace: %s because it reached the expiration time",
 			report.Name, report.Namespace)
 		op.eventRecorder.Event(report, v1.EventTypeNormal, "ExpiredReportHasBeenDeleted",
 			fmt.Sprintf("Deleted the %s Report as the configured expiration date has passed", report.Name))
 
 		return nil
 	}
-	// if here, warn about dependency before return
+
+	// If we reach this part of the function, we have a good idea that
+	// we're processing an "expired" Report, but we cannot safely delete
+	// this object as it's listed as a dependent for another custom resource,
+	// so we log and fire an event describing this scenario but don't take any
+	// further action.
 	logger.Warnf("report: %s, would be deleted because expired, but is depended on", report.Name)
 	op.eventRecorder.Event(report, v1.EventTypeWarning, "ExpiredReportHasDependencies",
 		fmt.Sprintf("Skipping the deletion of the %s Report as other resources are dependent on it, "+
@@ -810,30 +840,30 @@ func (op *Reporting) runReport(logger log.FieldLogger, report *metering.Report) 
 }
 
 // We check first for Reports depending on this Report, return if any, and then check ReportQueries depending on Report
-func isReportNotUsedAsInput(logger log.FieldLogger, report *metering.Report, op *Reporting) bool {
+func (op *Reporting) isReportNotUsedAsInput(logger log.FieldLogger, report *metering.Report) (bool, error) {
 	// Consider Reports referencing this report in the namespace of this report
 	reports, err := op.reportLister.Reports(report.Namespace).List(labels.Everything())
 	if err != nil {
-		logger.Errorf("unable to determine list of reports that might be input for report: %s", report.Name)
-		return false
+		logger.Errorf("unable to determine the list of reports that might be input for report: %s", report.Name)
+		return false, err
 	}
+
 	for _, report := range reports {
 		// If Report has no spec.inputs it can't be depending on this report.
 		if report.Spec.Inputs == nil {
 			continue
 		}
 		if does, depReport := op.reportsDependOnThisReport(logger, report, reports); does {
-			logger.Infof(
-				"report %s exists that uses report %s as input, "+
-					"will not delete though retention period has expired", depReport, report.Name)
-			return false
+			logger.Infof("report %s exists that uses report %s as input, "+
+				"will not delete though retention period has expired", depReport, report.Name)
+			return false, nil
 		}
 	}
 	// Consider ReportQueries referencing this report in the namespace of this report
 	reportQueries, err := op.reportQueryLister.ReportQueries(report.Namespace).List(labels.Everything())
 	if err != nil {
-		logger.Errorf("unable to determine list of ReportQueries that might be input for report: %s", report.Name)
-		return false
+		logger.Errorf("unable to determine the list of ReportQueries that might be input for report: %s", report.Name)
+		return false, err
 	}
 	for _, reportQuery := range reportQueries {
 		// If ReportQuery has no spec.inputs it can't be depending on this report.
@@ -844,21 +874,31 @@ func isReportNotUsedAsInput(logger log.FieldLogger, report *metering.Report, op 
 		if does, depQuery := op.reportQueriesDependOnThisReport(logger, report, reportQueries); does {
 			logger.Infof("ReportQuery, %s exists that uses report %s as input, "+
 				"will not delete though retention period has expired", depQuery, report.Name)
-			return false
+
+			return false, nil
 		}
 	}
-	return true
+	return true, nil
 }
 
+// isReportExpired is a helper function that is responsible for inspecting
+// the @report custom resource and checking whether the user has provided
+// a retention period. In the case that field has been populated, check
+// if we're currently processing an "expired" report and return true,
+// else return false. We define "expired" here using the following calculation:
+// time.Now() > report.Metadata.CreationTimestamp + report.Spec.Expiration.
 func isReportExpired(logger log.FieldLogger, report *metering.Report, currentTime time.Time) bool {
+	// TODO: should this be contingent on the Report object reporting
+	// a "finished" status?
 	if report.Spec.Expiration != nil {
 		currentTimeNano := currentTime.UTC().Truncate(time.Millisecond).UnixNano()
 		reportCreationNano := report.ObjectMeta.CreationTimestamp.UTC().Truncate(time.Millisecond).UnixNano()
 		retentionAmountNano := report.Spec.Expiration.Nanoseconds()
+
 		if currentTimeNano > (reportCreationNano + retentionAmountNano) {
 			return true
 		}
-		logger.Infof("curr: %d, creat: %d, retain: %d", currentTimeNano, reportCreationNano, retentionAmountNano)
+		logger.Debugf("current timestamp: %d, creation timestamp: %d, retention timestamp: %d", currentTimeNano, reportCreationNano, retentionAmountNano)
 	}
 	return false
 }
@@ -992,12 +1032,13 @@ func (op *Reporting) queueDependentReportsForReport(report *metering.Report) err
 
 // for each report in the namespace, find ones that depend on the report passed into the function
 func (op *Reporting) reportsDependOnThisReport(logger log.FieldLogger, report *metering.Report, reports []*metering.Report) (bool, string) {
-	var depReportName string
+	// iterate over the @reports list of reports and attempt to determine
+	// if there are any reports that list the @report report as an input.
 	for _, otherReport := range reports {
 		deps, err := op.getReportDependencies(otherReport)
 		if err != nil {
-			logger.Errorf("was unable to get dependencies for report: %s, while looking for dependent reports", report.Name)
-			return true, depReportName
+			logger.Errorf("failed to determine the Report dependencies for the %s Report", report.Name)
+			return true, ""
 		}
 		// If a Report has a dependency on the passed in report, we're done
 		for _, dep := range deps.Reports {
@@ -1006,17 +1047,16 @@ func (op *Reporting) reportsDependOnThisReport(logger log.FieldLogger, report *m
 			}
 		}
 	}
-	return false, depReportName
+	return false, ""
 }
 
 // for each ReportQuery in the namespace, find ones that depend on the report passed into the function
 func (op *Reporting) reportQueriesDependOnThisReport(logger log.FieldLogger, report *metering.Report, reportQueries []*metering.ReportQuery) (bool, string) {
-	var depQueryName string
 	// for each report in the namespace, find queries that depend on the report passed into the function.
 	for _, reportQuery := range reportQueries {
 		deps, err := op.getQueryDependencies(reportQuery.Namespace, reportQuery.Name, nil)
 		if err != nil {
-			logger.Errorf("was unable to get dependencies for report: %s, while looking for dependent queries")
+			logger.Errorf("failed to determine the ReportQuery dependencies for the %s Report", report.Name)
 			return true, ""
 		}
 		// If this ReportQuery has a dependency on the passed in report, we're done
@@ -1026,7 +1066,7 @@ func (op *Reporting) reportQueriesDependOnThisReport(logger log.FieldLogger, rep
 			}
 		}
 	}
-	return false, depQueryName
+	return false, ""
 }
 
 // queueDependentReportQueriesForReport will queue all
