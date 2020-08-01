@@ -92,6 +92,14 @@ func (op *Reporting) syncReport(logger log.FieldLogger, key string) error {
 		return err
 	}
 
+	if report.Spec.Expiration != nil {
+		logger = logger.WithFields(log.Fields{"expiration": report.Spec.Expiration.Duration})
+	}
+
+	// TODO: we may want to move some of the validation checks that are
+	// in op.handleExpiredReport and op.handleReport such that we're not
+	// performing an expensive operation like creating a deep copy if we
+	// know that we're not going to be potentially modifying anything.
 	sr := report.DeepCopy()
 
 	err = op.handleExpiredReport(logger, sr, time.Now())
