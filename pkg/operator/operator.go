@@ -873,14 +873,14 @@ func (op *Reporting) handleExpiredReport(report *metering.Report, now time.Time)
 		op.logger.Infof("deleted Report: %s in the Namespace: %s because it reached the expiration time",
 			report.Name, report.Namespace)
 		op.eventRecorder.Event(report, v1.EventTypeNormal, "ExpiredReportHasBeenDeleted",
-			"Deleted the %s Report as the configured expiration date has passed")
+			fmt.Sprintf("Deleted the %s Report as the configured expiration date has passed", report.Name))
 		return nil
 	}
 	// if here, warn about dependency before return
 	op.logger.Warnf("report: %s, would be deleted because expired, but is depended on", report.Name)
 	op.eventRecorder.Event(report, v1.EventTypeWarning, "ExpiredReportHasDependencies",
-		"Skipping the deletion of the %s Report as other resources are dependent on it, "+
-			"despite reaching the desired expiration date.")
+		fmt.Sprintf("Skipping the deletion of the %s Report as other resources are dependent on it, "+
+			"despite reaching the desired expiration date.", report.Name))
 	return nil
 }
 
