@@ -786,7 +786,7 @@ func isReportNotUsedAsInput(report *metering.Report, op *Reporting) bool {
 		}
 
 		if does, depQuery := op.reportQueriesDependOnThisReport(report, reportQueries); does {
-			op.logger.Infof("ReportQuery, %s exists that uses report %s as input, " +
+			op.logger.Infof("ReportQuery, %s exists that uses report %s as input, "+
 				"will not delete though retention period has expired", depQuery, report.Name)
 			return false
 		}
