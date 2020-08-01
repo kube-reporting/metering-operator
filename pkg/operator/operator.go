@@ -22,7 +22,6 @@ import (
 	log "github.com/sirupsen/logrus"
 	"github.com/taozle/go-hive-driver"
 	v1 "k8s.io/api/core/v1"
-	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/util/clock"
 	"k8s.io/apimachinery/pkg/util/wait"
@@ -664,7 +663,7 @@ func (op *Reporting) Run(ctx context.Context) error {
 			OnStartedLeading: func(ctx context.Context) {
 				op.logger.Infof("became leader")
 				op.logger.Info("starting Metering workers")
-				op.startWorkers(&wg, ctx)
+				op.startWorkers(ctx, &wg)
 				op.logger.Infof("Metering workers started, watching for reports...")
 			},
 			OnStoppedLeading: func() {
@@ -773,7 +772,7 @@ func (op *Reporting) newPrometheusConnFromURL(url string) (prom.API, error) {
 	})
 }
 
-func (op *Reporting) startWorkers(wg *sync.WaitGroup, ctx context.Context) {
+func (op *Reporting) startWorkers(ctx context.Context, wg *sync.WaitGroup) {
 	stopCh := ctx.Done()
 
 	startWorker := func(threads int, workerFunc func(id int)) {
@@ -801,9 +800,9 @@ func (op *Reporting) startWorkers(wg *sync.WaitGroup, ctx context.Context) {
 	})
 
 	startWorker(10, func(i int) {
-		op.logger.Infof("starting PrestoTable worker")
+		op.logger.Infof("starting PrestoTable worker #%d", i)
 		wait.Until(op.runPrestoTableWorker, time.Second, stopCh)
-		op.logger.Infof("PrestoTable worker stopped")
+		op.logger.Infof("PrestoTable worker #%d stopped", i)
 	})
 
 	startWorker(8, func(i int) {
@@ -844,44 +843,6 @@ func (op *Reporting) newPrometheusConn(promConfig promapi.Config) (prom.API, err
 		return nil, fmt.Errorf("can't connect to prometheus: %v", err)
 	}
 	return prom.NewAPI(client), nil
-}
-
-func (op *Reporting) handleExpiredReport(report *metering.Report, now time.Time) error {
-	// check if the Report is being deleted already
-	if report.DeletionTimestamp != nil {
-		op.logger.Warnf("report was already marked for deletion")
-		return nil
-	}
-	// check if the Report is past its retention time
-	if reportExpired := isReportExpired(op.logger, report, now); !reportExpired {
-		op.logger.Debugf("the %s Report in the %s namespace has not yet reached the expiration date", report.Name, report.Namespace)
-		return nil
-	}
-	// check if the Report is used by any other Report or ReportQuery, if not delete it
-	if reportIsNotInput := isReportNotUsedAsInput(report, op); reportIsNotInput {
-		newDeletionTimestamp := metav1.Now()
-		report.SetDeletionTimestamp(&newDeletionTimestamp)
-		err := op.meteringClient.MeteringV1().Reports(report.Namespace).
-			Delete(context.TODO(), report.Name, metav1.DeleteOptions{})
-		if apierrors.IsNotFound(err) {
-			op.logger.Infof("report: %s, not deleted because it was not found at time delete attempted", report.Name)
-			return nil
-		}
-		if err != nil {
-			return fmt.Errorf("failed to delete the expired report: %s. err: %s", report.Name, err)
-		}
-		op.logger.Infof("deleted Report: %s in the Namespace: %s because it reached the expiration time",
-			report.Name, report.Namespace)
-		op.eventRecorder.Event(report, v1.EventTypeNormal, "ExpiredReportHasBeenDeleted",
-			fmt.Sprintf("Deleted the %s Report as the configured expiration date has passed", report.Name))
-		return nil
-	}
-	// if here, warn about dependency before return
-	op.logger.Warnf("report: %s, would be deleted because expired, but is depended on", report.Name)
-	op.eventRecorder.Event(report, v1.EventTypeWarning, "ExpiredReportHasDependencies",
-		fmt.Sprintf("Skipping the deletion of the %s Report as other resources are dependent on it, "+
-			"despite reaching the desired expiration date.", report.Name))
-	return nil
 }
 
 type DependencyResolver interface {
