@@ -399,17 +399,20 @@ func (op *Reporting) handleExpiredReport(logger log.FieldLogger, report *meterin
 // hasn't elapsed, runReport will requeue the resource for a time when
 // the period has elapsed.
 func (op *Reporting) runReport(logger log.FieldLogger, report *metering.Report) error {
+	// check if the report we're currently processing is considered
+	// "expired". If true, exit early and requeue that object so
+	// op.syncReport calls the proper handler for this resource.
+	if reportExpired := isReportExpired(logger, report, time.Now()); reportExpired {
+		logger.Infof("requeueing report that has reached its expiration date during the op.runReport method")
+		op.enqueueReport(report)
+		return nil
+	}
+
 	// check if the report was previously finished; store result in bool
 	if reportFinished := isReportFinished(logger, report); reportFinished {
 		return nil
 	}
 
-	// check if report is expired (CreationTime + expiration). If true, stop processing and exit early.
-	if reportExpired := isReportExpired(logger, report, time.Now()); reportExpired {
-		return nil
-	}
-
-	runningCond := meteringUtil.GetReportCondition(report.Status, metering.ReportRunning)
 	queryGetter := reporting.NewReportQueryListerGetter(op.reportQueryLister)
 
 	// validate that Report contains valid Spec fields
@@ -544,7 +547,12 @@ func (op *Reporting) runReport(logger log.FieldLogger, report *metering.Report) 
 		}
 	}
 
-	var runningMsg, runningReason string
+	runningCond := meteringUtil.GetReportCondition(report.Status, metering.ReportRunning)
+
+	var (
+		runningMsg    string
+		runningReason string
+	)
 	if report.Spec.RunImmediately {
 		runningReason = meteringUtil.RunImmediatelyReason
 		runningMsg = fmt.Sprintf("Report %s scheduled: runImmediately=true and reporting period [%s to %s].", report.Name, reportPeriod.periodStart, reportPeriod.periodEnd)
