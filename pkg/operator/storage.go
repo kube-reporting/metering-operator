@@ -8,7 +8,7 @@ import (
 	"k8s.io/apimachinery/pkg/labels"
 )
 
-func (op *Reporting) getDefaultStorageLocation(lister cbListers.StorageLocationLister, namespace string) (*metering.StorageLocation, error) {
+func (op *defaultReportingOperator) getDefaultStorageLocation(lister cbListers.StorageLocationLister, namespace string) (*metering.StorageLocation, error) {
 	storageLocations, err := lister.StorageLocations(namespace).List(labels.Everything())
 	if err != nil {
 		return nil, err
@@ -35,7 +35,7 @@ func (op *Reporting) getDefaultStorageLocation(lister cbListers.StorageLocationL
 
 }
 
-func (op *Reporting) getStorage(storage *metering.StorageLocationRef, namespace string) (*metering.StorageLocation, error) {
+func (op *defaultReportingOperator) getStorage(storage *metering.StorageLocationRef, namespace string) (*metering.StorageLocation, error) {
 	// Nothing specified, try to use default storage location
 	if storage == nil || storage.StorageLocationName == "" {
 		storageLocation, err := op.getDefaultStorageLocation(op.storageLocationLister, namespace)
@@ -52,7 +52,7 @@ func (op *Reporting) getStorage(storage *metering.StorageLocationRef, namespace 
 	return nil, fmt.Errorf("no default storageLocation and storageLocationName is empty")
 }
 
-func (op *Reporting) getHiveStorage(storageRef *metering.StorageLocationRef, namespace string) (*metering.StorageLocation, error) {
+func (op *defaultReportingOperator) getHiveStorage(storageRef *metering.StorageLocationRef, namespace string) (*metering.StorageLocation, error) {
 	storageLocation, err := op.getStorage(storageRef, namespace)
 	if err != nil {
 		return nil, err

@@ -1,11 +1,16 @@
 package operator
 
 import (
+	"context"
 	"time"
 
 	metering "github.com/kube-reporting/metering-operator/pkg/apis/metering/v1"
 	"github.com/kube-reporting/metering-operator/pkg/operator/reporting"
 )
+
+type ReportingOperator interface {
+	Run(ctx context.Context) error
+}
 
 // DependencyResolver analyzes report dependencies for reports, report queries, and data sources.
 type DependencyResolver interface {

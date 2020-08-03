@@ -12,7 +12,7 @@ import (
 	"github.com/kube-reporting/metering-operator/pkg/operator/reporting"
 )
 
-func (op *Reporting) runReportQueryWorker() {
+func (op *defaultReportingOperator) runReportQueryWorker() {
 	logger := op.logger.WithField("component", "reportQueryWorker")
 	logger.Infof("ReportQuery worker started")
 	// 10 requeues compared to the 5 others have because
@@ -23,7 +23,7 @@ func (op *Reporting) runReportQueryWorker() {
 	}
 }
 
-func (op *Reporting) syncReportQuery(logger log.FieldLogger, key string) error {
+func (op *defaultReportingOperator) syncReportQuery(logger log.FieldLogger, key string) error {
 	namespace, name, err := cache.SplitMetaNamespaceKey(key)
 	if err != nil {
 		logger.WithError(err).Errorf("invalid resource key :%s", key)
@@ -45,18 +45,18 @@ func (op *Reporting) syncReportQuery(logger log.FieldLogger, key string) error {
 	return op.handleReportQuery(logger, q)
 }
 
-func (op *Reporting) handleReportQuery(logger log.FieldLogger, query *metering.ReportQuery) error {
+func (op *defaultReportingOperator) handleReportQuery(logger log.FieldLogger, query *metering.ReportQuery) error {
 	// queue any reportDataSources using this query to create views
 	return op.queueDependentReportDataSourcesForQuery(query)
 }
 
-func (op *Reporting) uninitialiedDependendenciesHandler() *reporting.UninitialiedDependendenciesHandler {
+func (op *defaultReportingOperator) uninitialiedDependendenciesHandler() *reporting.UninitialiedDependendenciesHandler {
 	return &reporting.UninitialiedDependendenciesHandler{
 		HandleUninitializedReportDataSource: op.enqueueReportDataSource,
 	}
 }
 
-func (op *Reporting) queueDependentReportDataSourcesForQuery(query *metering.ReportQuery) error {
+func (op *defaultReportingOperator) queueDependentReportDataSourcesForQuery(query *metering.ReportQuery) error {
 	reportDataSourceLister := op.meteringClient.MeteringV1().ReportDataSources(query.Namespace)
 	reportDataSources, err := reportDataSourceLister.List(context.TODO(), metav1.ListOptions{})
 	if err != nil {

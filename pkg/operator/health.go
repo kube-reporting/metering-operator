@@ -12,7 +12,7 @@ type statusResponse struct {
 // healthinessHandler is the readiness check for the metering operator. If this
 // no requests will be sent to this pod, and rolling updates will not proceed
 // until the checks succeed.
-func (op *Reporting) readinessHandler(w http.ResponseWriter, r *http.Request) {
+func (op *defaultReportingOperator) readinessHandler(w http.ResponseWriter, r *http.Request) {
 	logger := newRequestLogger(op.logger, r, op.rand)
 	if !op.isInitialized() {
 		logger.Debugf("not ready: operator is not yet initialized")

@@ -52,7 +52,7 @@ import (
 )
 
 // defaultReportingOperator is the concrete implementation of a ReportingOperator.
-type Reporting struct {
+type defaultReportingOperator struct {
 	cfg        Config
 	kubeConfig *rest.Config
 
@@ -116,7 +116,7 @@ func (cfg *TLSConfig) Valid() error {
 	return nil
 }
 
-func New(logger log.FieldLogger, cfg Config) (*Reporting, error) {
+func New(logger log.FieldLogger, cfg Config) (ReportingOperator, error) {
 	if err := cfg.APITLSConfig.Valid(); err != nil {
 		return nil, err
 	}
@@ -198,7 +198,7 @@ func newReportingOperator(
 	coordinatorClient coordinatorv1.CoordinationV1Interface,
 	meteringClient cbClientset.Interface,
 	informerNamespace string,
-) *Reporting {
+) ReportingOperator {
 	informerFactory := factory.NewSharedInformerFactoryWithOptions(meteringClient, defaultResyncPeriod, factory.WithNamespace(informerNamespace), factory.WithTweakListOptions(nil))
 
 	prestoTableInformer := informerFactory.Metering().V1().PrestoTables()
@@ -237,7 +237,7 @@ func newReportingOperator(
 	eventBroadcaster.StartRecordingToSink(&corev1.EventSinkImpl{Interface: kubeClient.Events(cfg.OwnNamespace)})
 	eventRecorder := eventBroadcaster.NewRecorder(scheme.Scheme, v1.EventSource{Component: cfg.Hostname})
 
-	op := &Reporting{
+	op := &defaultReportingOperator{
 		logger:            logger,
 		cfg:               cfg,
 		kubeConfig:        kubeConfig,
@@ -315,7 +315,7 @@ func newReportingOperator(
 	return op
 }
 
-func (op *Reporting) Run(ctx context.Context) error {
+func (op *defaultReportingOperator) Run(ctx context.Context) error {
 	var wg sync.WaitGroup
 	// buffered big enough to hold the errs of each server we start.
 	srvErrChan := make(chan error, 3)
@@ -655,7 +655,7 @@ func (op *Reporting) Run(ctx context.Context) error {
 	return nil
 }
 
-func (op *Reporting) newPrometheusConnFromURL(url string) (prom.API, error) {
+func (op *defaultReportingOperator) newPrometheusConnFromURL(url string) (prom.API, error) {
 	transportConfig := &transport.Config{}
 	if op.cfg.PrometheusConfig.CAFile != "" {
 		if _, err := os.Stat(op.cfg.PrometheusConfig.CAFile); err == nil {
@@ -694,7 +694,7 @@ func (op *Reporting) newPrometheusConnFromURL(url string) (prom.API, error) {
 	})
 }
 
-func (op *Reporting) startWorkers(ctx context.Context, wg *sync.WaitGroup) {
+func (op *defaultReportingOperator) startWorkers(ctx context.Context, wg *sync.WaitGroup) {
 	stopCh := ctx.Done()
 
 	startWorker := func(threads int, workerFunc func(id int)) {
@@ -746,20 +746,20 @@ func (op *Reporting) startWorkers(ctx context.Context, wg *sync.WaitGroup) {
 	})
 }
 
-func (op *Reporting) setInitialized() {
+func (op *defaultReportingOperator) setInitialized() {
 	op.initializedMu.Lock()
 	op.initialized = true
 	op.initializedMu.Unlock()
 }
 
-func (op *Reporting) isInitialized() bool {
+func (op *defaultReportingOperator) isInitialized() bool {
 	op.initializedMu.Lock()
 	initialized := op.initialized
 	op.initializedMu.Unlock()
 	return initialized
 }
 
-func (op *Reporting) newPrometheusConn(promConfig promapi.Config) (prom.API, error) {
+func (op *defaultReportingOperator) newPrometheusConn(promConfig promapi.Config) (prom.API, error) {
 	client, err := promapi.NewClient(promConfig)
 	if err != nil {
 		return nil, fmt.Errorf("can't connect to prometheus: %v", err)

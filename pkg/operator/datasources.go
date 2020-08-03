@@ -34,7 +34,7 @@ const (
 	expectedArrSplitElementsFQTN = 3
 )
 
-func (op *Reporting) runReportDataSourceWorker() {
+func (op *defaultReportingOperator) runReportDataSourceWorker() {
 	logger := op.logger.WithField("component", "reportDataSourceWorker")
 	logger.Infof("ReportDataSource worker started")
 	const maxRequeues = 20
@@ -42,7 +42,7 @@ func (op *Reporting) runReportDataSourceWorker() {
 	}
 }
 
-func (op *Reporting) syncReportDataSource(logger log.FieldLogger, key string) error {
+func (op *defaultReportingOperator) syncReportDataSource(logger log.FieldLogger, key string) error {
 	namespace, name, err := cache.SplitMetaNamespaceKey(key)
 	if err != nil {
 		logger.WithError(err).Errorf("invalid resource key :%s", key)
@@ -70,7 +70,7 @@ func (op *Reporting) syncReportDataSource(logger log.FieldLogger, key string) er
 	return op.handleReportDataSource(logger, ds)
 }
 
-func (op *Reporting) handleReportDataSource(logger log.FieldLogger, dataSource *metering.ReportDataSource) error {
+func (op *defaultReportingOperator) handleReportDataSource(logger log.FieldLogger, dataSource *metering.ReportDataSource) error {
 	if op.cfg.EnableFinalizers && reportDataSourceNeedsFinalizer(dataSource) {
 		var err error
 		dataSource, err = op.addReportDataSourceFinalizer(dataSource)
@@ -98,7 +98,7 @@ func (op *Reporting) handleReportDataSource(logger log.FieldLogger, dataSource *
 
 }
 
-func (op *Reporting) handlePrometheusMetricsDataSource(logger log.FieldLogger, dataSource *metering.ReportDataSource) error {
+func (op *defaultReportingOperator) handlePrometheusMetricsDataSource(logger log.FieldLogger, dataSource *metering.ReportDataSource) error {
 	if dataSource.Spec.PrometheusMetricsImporter == nil {
 		return fmt.Errorf("%s is not a PrometheusMetricsImporter ReportDataSource", dataSource.Name)
 	}
@@ -318,7 +318,7 @@ func (op *Reporting) handlePrometheusMetricsDataSource(logger log.FieldLogger, d
 	return nil
 }
 
-func (op *Reporting) handleAWSBillingDataSource(logger log.FieldLogger, dataSource *metering.ReportDataSource) error {
+func (op *defaultReportingOperator) handleAWSBillingDataSource(logger log.FieldLogger, dataSource *metering.ReportDataSource) error {
 	source := dataSource.Spec.AWSBilling.Source
 	if source == nil {
 		return fmt.Errorf("ReportDataSource %q: improperly configured datasource, source is empty", dataSource.Name)
@@ -410,7 +410,7 @@ func (op *Reporting) handleAWSBillingDataSource(logger log.FieldLogger, dataSour
 	return nil
 }
 
-func (op *Reporting) handlePrestoTableDataSource(logger log.FieldLogger, dataSource *metering.ReportDataSource) error {
+func (op *defaultReportingOperator) handlePrestoTableDataSource(logger log.FieldLogger, dataSource *metering.ReportDataSource) error {
 	if dataSource.Spec.PrestoTable == nil {
 		return fmt.Errorf("%s is not a PrestoTable ReportDataSource", dataSource.Name)
 	}
@@ -457,7 +457,7 @@ func (op *Reporting) handlePrestoTableDataSource(logger log.FieldLogger, dataSou
 // processed this resource before, query the Presto table's metadata and then create an unmanaged
 // PrestoTable custom resource with the columns returned from the query. Once the PrestoTable resource
 // has been created, update the @dataSource Status field to refer to the name of the created PrestoTable.
-func (op *Reporting) handleLinkExistingTable(logger log.FieldLogger, dataSource *metering.ReportDataSource) error {
+func (op *defaultReportingOperator) handleLinkExistingTable(logger log.FieldLogger, dataSource *metering.ReportDataSource) error {
 	if dataSource.Spec.LinkExistingTable.TableName == "" {
 		return fmt.Errorf("invalid configuration passed: spec.linkExistingTable.tableName field cannot be empty")
 	}
@@ -520,7 +520,7 @@ func (op *Reporting) handleLinkExistingTable(logger log.FieldLogger, dataSource 
 	return nil
 }
 
-func (op *Reporting) handleReportQueryViewDataSource(logger log.FieldLogger, dataSource *metering.ReportDataSource) error {
+func (op *defaultReportingOperator) handleReportQueryViewDataSource(logger log.FieldLogger, dataSource *metering.ReportDataSource) error {
 	if dataSource.Spec.ReportQueryView == nil {
 		return fmt.Errorf("%s is not a ReportQueryView ReportDataSource", dataSource.Name)
 	}
@@ -647,7 +647,7 @@ func (op *Reporting) handleReportQueryViewDataSource(logger log.FieldLogger, dat
 	return nil
 }
 
-func (op *Reporting) addReportDataSourceFinalizer(ds *metering.ReportDataSource) (*metering.ReportDataSource, error) {
+func (op *defaultReportingOperator) addReportDataSourceFinalizer(ds *metering.ReportDataSource) (*metering.ReportDataSource, error) {
 	ds.Finalizers = append(ds.Finalizers, reportDataSourceFinalizer)
 	newReportDataSource, err := op.meteringClient.MeteringV1().ReportDataSources(ds.Namespace).Update(context.TODO(), ds, metav1.UpdateOptions{})
 	logger := op.logger.WithFields(log.Fields{"reportDataSource": ds.Name, "namespace": ds.Namespace})
@@ -659,7 +659,7 @@ func (op *Reporting) addReportDataSourceFinalizer(ds *metering.ReportDataSource)
 	return newReportDataSource, nil
 }
 
-func (op *Reporting) removeReportDataSourceFinalizer(ds *metering.ReportDataSource) (*metering.ReportDataSource, error) {
+func (op *defaultReportingOperator) removeReportDataSourceFinalizer(ds *metering.ReportDataSource) (*metering.ReportDataSource, error) {
 	if !slice.ContainsString(ds.ObjectMeta.Finalizers, reportDataSourceFinalizer, nil) {
 		return ds, nil
 	}
@@ -678,7 +678,7 @@ func reportDataSourceNeedsFinalizer(ds *metering.ReportDataSource) bool {
 	return ds.ObjectMeta.DeletionTimestamp == nil && !slice.ContainsString(ds.ObjectMeta.Finalizers, reportDataSourceFinalizer, nil)
 }
 
-func (op *Reporting) getQueryDependencies(namespace, name string, inputVals []metering.ReportQueryInputValue) (*reporting.ReportQueryDependencies, error) {
+func (op *defaultReportingOperator) getQueryDependencies(namespace, name string, inputVals []metering.ReportQueryInputValue) (*reporting.ReportQueryDependencies, error) {
 	queryGetter := reporting.NewReportQueryListerGetter(op.reportQueryLister)
 	query, err := queryGetter.GetReportQuery(namespace, name)
 	if err != nil {
@@ -691,7 +691,7 @@ func (op *Reporting) getQueryDependencies(namespace, name string, inputVals []me
 	return result.Dependencies, nil
 }
 
-func (op *Reporting) queueDependentReportDataSourcesForDataSource(dataSource *metering.ReportDataSource) error {
+func (op *defaultReportingOperator) queueDependentReportDataSourcesForDataSource(dataSource *metering.ReportDataSource) error {
 	// Look at reportDataSources in the namespace of this dataSource
 	reportDataSources, err := op.reportDataSourceLister.ReportDataSources(dataSource.Namespace).List(labels.Everything())
 	if err != nil {
@@ -724,7 +724,7 @@ func (op *Reporting) queueDependentReportDataSourcesForDataSource(dataSource *me
 	return nil
 }
 
-func (op *Reporting) queueDependentReportsForDataSource(dataSource *metering.ReportDataSource) error {
+func (op *defaultReportingOperator) queueDependentReportsForDataSource(dataSource *metering.ReportDataSource) error {
 	// Look at reports in the namespace of this dataSource
 	reports, err := op.reportLister.Reports(dataSource.Namespace).List(labels.Everything())
 	if err != nil {

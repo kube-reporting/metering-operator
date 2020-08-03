@@ -26,7 +26,7 @@ const (
 	prestoTableFinalizer = metering.GroupName + "/prestotable"
 )
 
-func (op *Reporting) runPrestoTableWorker() {
+func (op *defaultReportingOperator) runPrestoTableWorker() {
 	logger := op.logger.WithField("component", "prestoTableWorker")
 	logger.Infof("PrestoTable worker started")
 	const maxRequeues = 10
@@ -34,7 +34,7 @@ func (op *Reporting) runPrestoTableWorker() {
 	}
 }
 
-func (op *Reporting) processPrestoTable(logger log.FieldLogger) bool {
+func (op *defaultReportingOperator) processPrestoTable(logger log.FieldLogger) bool {
 	obj, quit := op.prestoTableQueue.Get()
 	if quit {
 		logger.Infof("queue is shutting down, exiting PrestoTable worker")
@@ -51,7 +51,7 @@ func (op *Reporting) processPrestoTable(logger log.FieldLogger) bool {
 	return true
 }
 
-func (op *Reporting) syncPrestoTable(logger log.FieldLogger, key string) error {
+func (op *defaultReportingOperator) syncPrestoTable(logger log.FieldLogger, key string) error {
 	namespace, name, err := cache.SplitMetaNamespaceKey(key)
 	if err != nil {
 		logger.WithError(err).Errorf("invalid resource key :%s", key)
@@ -93,7 +93,7 @@ func (op *Reporting) syncPrestoTable(logger log.FieldLogger, key string) error {
 	return nil
 }
 
-func (op *Reporting) handlePrestoTable(logger log.FieldLogger, prestoTable *metering.PrestoTable) error {
+func (op *defaultReportingOperator) handlePrestoTable(logger log.FieldLogger, prestoTable *metering.PrestoTable) error {
 	if op.cfg.EnableFinalizers && prestoTableNeedsFinalizer(prestoTable) {
 		var err error
 		prestoTable, err = op.addPrestoTableFinalizer(prestoTable)
@@ -226,7 +226,7 @@ func copyPrestoTableSpecToStatus(prestoTable *metering.PrestoTable) bool {
 	return needsUpdate
 }
 
-func (op *Reporting) addPrestoTableFinalizer(prestoTable *metering.PrestoTable) (*metering.PrestoTable, error) {
+func (op *defaultReportingOperator) addPrestoTableFinalizer(prestoTable *metering.PrestoTable) (*metering.PrestoTable, error) {
 	prestoTable.Finalizers = append(prestoTable.Finalizers, prestoTableFinalizer)
 	newPrestoTable, err := op.meteringClient.MeteringV1().PrestoTables(prestoTable.Namespace).Update(context.TODO(), prestoTable, metav1.UpdateOptions{})
 	logger := op.logger.WithFields(log.Fields{"prestoTable": prestoTable.Name, "namespace": prestoTable.Namespace})
@@ -238,7 +238,7 @@ func (op *Reporting) addPrestoTableFinalizer(prestoTable *metering.PrestoTable) 
 	return newPrestoTable, nil
 }
 
-func (op *Reporting) removePrestoTableFinalizer(prestoTable *metering.PrestoTable) (*metering.PrestoTable, error) {
+func (op *defaultReportingOperator) removePrestoTableFinalizer(prestoTable *metering.PrestoTable) (*metering.PrestoTable, error) {
 	if !slice.ContainsString(prestoTable.ObjectMeta.Finalizers, prestoTableFinalizer, nil) {
 		return prestoTable, nil
 	}
@@ -257,7 +257,7 @@ func prestoTableNeedsFinalizer(prestoTable *metering.PrestoTable) bool {
 	return prestoTable.ObjectMeta.DeletionTimestamp == nil && !slice.ContainsString(prestoTable.ObjectMeta.Finalizers, prestoTableFinalizer, nil)
 }
 
-func (op *Reporting) dropPrestoTable(prestoTable *metering.PrestoTable) error {
+func (op *defaultReportingOperator) dropPrestoTable(prestoTable *metering.PrestoTable) error {
 	if !prestoTable.Spec.Unmanaged {
 		if prestoTable.Status.TableName == "" {
 			return nil
@@ -273,7 +273,7 @@ func (op *Reporting) dropPrestoTable(prestoTable *metering.PrestoTable) error {
 	return errors.New("dropping PrestoTables is currently unsupported")
 }
 
-func (op *Reporting) createPrestoTableCR(obj metav1.Object, gvk schema.GroupVersionKind, catalog, schema, tableName string, columns []presto.Column, unmanaged, view bool, query string) (*metering.PrestoTable, error) {
+func (op *defaultReportingOperator) createPrestoTableCR(obj metav1.Object, gvk schema.GroupVersionKind, catalog, schema, tableName string, columns []presto.Column, unmanaged, view bool, query string) (*metering.PrestoTable, error) {
 	apiVersion := gvk.GroupVersion().String()
 	kind := gvk.Kind
 	name := obj.GetName()
@@ -326,7 +326,7 @@ func (op *Reporting) createPrestoTableCR(obj metav1.Object, gvk schema.GroupVers
 	return prestoTable, nil
 }
 
-func (op *Reporting) waitForPrestoTable(namespace, name string, pollInterval, timeout time.Duration) (*metering.PrestoTable, error) {
+func (op *defaultReportingOperator) waitForPrestoTable(namespace, name string, pollInterval, timeout time.Duration) (*metering.PrestoTable, error) {
 	var prestoTable *metering.PrestoTable
 	err := wait.Poll(pollInterval, timeout, func() (bool, error) {
 		var err error
@@ -351,7 +351,7 @@ func (op *Reporting) waitForPrestoTable(namespace, name string, pollInterval, ti
 	return prestoTable, nil
 }
 
-func (op *Reporting) queueDependentsOfPrestoTable(prestoTable *metering.PrestoTable) error {
+func (op *defaultReportingOperator) queueDependentsOfPrestoTable(prestoTable *metering.PrestoTable) error {
 	reports, err := op.reportLister.Reports(prestoTable.Namespace).List(labels.Everything())
 	if err != nil {
 		return err

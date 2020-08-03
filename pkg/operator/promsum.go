@@ -161,7 +161,7 @@ type prometheusImportResults struct {
 	MetricsImportedCount int    `json:"metricsImportedCount"`
 }
 
-func (op *Reporting) importPrometheusForTimeRange(ctx context.Context, namespace, dsName string, start, end time.Time) ([]*prometheusImportResults, error) {
+func (op *defaultReportingOperator) importPrometheusForTimeRange(ctx context.Context, namespace, dsName string, start, end time.Time) ([]*prometheusImportResults, error) {
 	reportDataSources, err := op.meteringClient.MeteringV1().ReportDataSources(namespace).List(context.TODO(), metav1.ListOptions{})
 	if err != nil {
 		return nil, err
@@ -263,7 +263,7 @@ func (op *Reporting) importPrometheusForTimeRange(ctx context.Context, namespace
 	return results, g.Wait()
 }
 
-func (op *Reporting) getQueryIntervalForReportDataSource(reportDataSource *metering.ReportDataSource) time.Duration {
+func (op *defaultReportingOperator) getQueryIntervalForReportDataSource(reportDataSource *metering.ReportDataSource) time.Duration {
 	queryConf := reportDataSource.Spec.PrometheusMetricsImporter.QueryConfig
 	queryInterval := op.cfg.PrometheusQueryConfig.QueryInterval.Duration
 	if queryConf != nil {
@@ -274,7 +274,7 @@ func (op *Reporting) getQueryIntervalForReportDataSource(reportDataSource *meter
 	return queryInterval
 }
 
-func (op *Reporting) newPromImporterCfg(reportDataSource *metering.ReportDataSource, query string, prestoTable *metering.PrestoTable) (prestostore.Config, error) {
+func (op *defaultReportingOperator) newPromImporterCfg(reportDataSource *metering.ReportDataSource, query string, prestoTable *metering.PrestoTable) (prestostore.Config, error) {
 	chunkSize := op.cfg.PrometheusQueryConfig.ChunkSize.Duration
 	stepSize := op.cfg.PrometheusQueryConfig.StepSize.Duration
 
@@ -322,7 +322,7 @@ func (op *Reporting) newPromImporterCfg(reportDataSource *metering.ReportDataSou
 	}, nil
 }
 
-func (op *Reporting) newPromImporter(logger logrus.FieldLogger, reportDataSource *metering.ReportDataSource, prestoTable *metering.PrestoTable, cfg prestostore.Config) (*prestostore.PrometheusImporter, error) {
+func (op *defaultReportingOperator) newPromImporter(logger logrus.FieldLogger, reportDataSource *metering.ReportDataSource, prestoTable *metering.PrestoTable, cfg prestostore.Config) (*prestostore.PrometheusImporter, error) {
 	metricsCollectors := op.newPromImporterMetricsCollectors(reportDataSource, prestoTable, cfg)
 	var promConn prom.API
 	var err error
@@ -338,7 +338,7 @@ func (op *Reporting) newPromImporter(logger logrus.FieldLogger, reportDataSource
 	return prestostore.NewPrometheusImporter(logger, promConn, op.prometheusMetricsRepo, op.clock, cfg, metricsCollectors), nil
 }
 
-func (op *Reporting) newPromImporterMetricsCollectors(reportDataSource *metering.ReportDataSource, prestoTable *metering.PrestoTable, cfg prestostore.Config) prestostore.ImporterMetricsCollectors {
+func (op *defaultReportingOperator) newPromImporterMetricsCollectors(reportDataSource *metering.ReportDataSource, prestoTable *metering.PrestoTable, cfg prestostore.Config) prestostore.ImporterMetricsCollectors {
 	promLabels := prometheus.Labels{
 		"reportdatasource": reportDataSource.Name,
 		"namespace":        reportDataSource.Namespace,
