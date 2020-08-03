@@ -14,20 +14,21 @@ import (
 	"sync"
 	"time"
 
-	"github.com/davecgh/go-spew/spew"
-	"github.com/prestodb/presto-go-client/presto"
-	promapi "github.com/prometheus/client_golang/api"
-	prom "github.com/prometheus/client_golang/api/prometheus/v1"
-	"github.com/prometheus/client_golang/prometheus/promhttp"
-	log "github.com/sirupsen/logrus"
-	"github.com/taozle/go-hive-driver"
+	"github.com/kube-reporting/metering-operator/pkg/db"
+	cbClientset "github.com/kube-reporting/metering-operator/pkg/generated/clientset/versioned"
+	meteringv1scheme "github.com/kube-reporting/metering-operator/pkg/generated/clientset/versioned/scheme"
+	factory "github.com/kube-reporting/metering-operator/pkg/generated/informers/externalversions"
+	listers "github.com/kube-reporting/metering-operator/pkg/generated/listers/metering/v1"
+	"github.com/kube-reporting/metering-operator/pkg/operator/prestostore"
+	"github.com/kube-reporting/metering-operator/pkg/operator/reporting"
+	_ "github.com/kube-reporting/metering-operator/pkg/util/reflector/prometheus" // for prometheus metric registration
+	_ "github.com/kube-reporting/metering-operator/pkg/util/workqueue/prometheus" // for prometheus metric registration
+
 	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/util/clock"
-	"k8s.io/apimachinery/pkg/util/wait"
-
-	meteringv1scheme "github.com/kube-reporting/metering-operator/pkg/generated/clientset/versioned/scheme"
 	utilruntime "k8s.io/apimachinery/pkg/util/runtime"
+	"k8s.io/apimachinery/pkg/util/wait"
 	"k8s.io/client-go/kubernetes/scheme"
 	coordinatorv1 "k8s.io/client-go/kubernetes/typed/coordination/v1"
 	corev1 "k8s.io/client-go/kubernetes/typed/core/v1"
@@ -41,107 +42,16 @@ import (
 	"k8s.io/client-go/transport"
 	"k8s.io/client-go/util/workqueue"
 
-	metering "github.com/kube-reporting/metering-operator/pkg/apis/metering/v1"
-	"github.com/kube-reporting/metering-operator/pkg/db"
-	cbClientset "github.com/kube-reporting/metering-operator/pkg/generated/clientset/versioned"
-	factory "github.com/kube-reporting/metering-operator/pkg/generated/informers/externalversions"
-	listers "github.com/kube-reporting/metering-operator/pkg/generated/listers/metering/v1"
-	"github.com/kube-reporting/metering-operator/pkg/operator/prestostore"
-	"github.com/kube-reporting/metering-operator/pkg/operator/reporting"
-	_ "github.com/kube-reporting/metering-operator/pkg/util/reflector/prometheus" // for prometheus metric registration
-	_ "github.com/kube-reporting/metering-operator/pkg/util/workqueue/prometheus" // for prometheus metric registration
+	"github.com/davecgh/go-spew/spew"
+	"github.com/prestodb/presto-go-client/presto"
+	promapi "github.com/prometheus/client_golang/api"
+	prom "github.com/prometheus/client_golang/api/prometheus/v1"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
+	log "github.com/sirupsen/logrus"
+	"github.com/taozle/go-hive-driver"
 )
 
-const (
-	defaultResyncPeriod = time.Minute * 15
-	prestoUsername      = "reporting-operator"
-
-	DefaultPrometheusQueryInterval                       = time.Minute * 5  // Query Prometheus every 5 minutes
-	DefaultPrometheusQueryStepSize                       = time.Minute      // Query data from Prometheus at a 60 second resolution (one data point per minute max)
-	DefaultPrometheusQueryChunkSize                      = 5 * time.Minute  // the default value for how much data we will insert into Presto per Prometheus query.
-	DefaultPrometheusDataSourceMaxQueryRangeDuration     = 10 * time.Minute // how much data we will query from Prometheus at once
-	DefaultPrometheusDataSourceMaxBackfillImportDuration = 2 * time.Hour    // how far we will query for backlogged data.
-)
-
-type TLSConfig struct {
-	UseTLS  bool
-	TLSCert string
-	TLSKey  string
-}
-
-func (cfg *TLSConfig) Valid() error {
-	if cfg.UseTLS {
-		if cfg.TLSCert == "" {
-			return fmt.Errorf("Must set TLS certificate if TLS is enabled")
-		}
-		if cfg.TLSKey == "" {
-			return fmt.Errorf("Must set TLS private key if TLS is enabled")
-		}
-	}
-	return nil
-}
-
-type PrometheusConfig struct {
-	Address         string
-	SkipTLSVerify   bool
-	BearerToken     string
-	BearerTokenFile string
-	CAFile          string
-}
-
-type Config struct {
-	Hostname     string
-	OwnNamespace string
-
-	AllNamespaces    bool
-	TargetNamespaces []string
-
-	Kubeconfig string
-
-	APIListen     string
-	MetricsListen string
-	PprofListen   string
-
-	HiveHost                  string
-	HiveUseTLS                bool
-	HiveCAFile                string
-	HiveTLSInsecureSkipVerify bool
-
-	HiveUseClientCertAuth bool
-	HiveClientCertFile    string
-	HiveClientKeyFile     string
-
-	PrestoHost                  string
-	PrestoUseTLS                bool
-	PrestoCAFile                string
-	PrestoTLSInsecureSkipVerify bool
-
-	PrestoUseClientCertAuth bool
-	PrestoClientCertFile    string
-	PrestoClientKeyFile     string
-
-	PrestoMaxQueryLength int
-
-	DisablePrometheusMetricsImporter bool
-	EnableFinalizers                 bool
-
-	LogDMLQueries bool
-	LogDDLQueries bool
-
-	PrometheusQueryConfig                         metering.PrometheusQueryConfig
-	PrometheusDataSourceMaxQueryRangeDuration     time.Duration
-	PrometheusDataSourceMaxBackfillImportDuration time.Duration
-	PrometheusDataSourceGlobalImportFromTime      *time.Time
-
-	ProxyTrustedCABundle string
-
-	LeaderLeaseDuration time.Duration
-
-	APITLSConfig     TLSConfig
-	MetricsTLSConfig TLSConfig
-	PrometheusConfig PrometheusConfig
-}
-
+// defaultReportingOperator is the concrete implementation of a ReportingOperator.
 type Reporting struct {
 	cfg        Config
 	kubeConfig *rest.Config
@@ -192,6 +102,18 @@ type Reporting struct {
 
 	importersMu sync.Mutex
 	importers   map[string]*prestostore.PrometheusImporter
+}
+
+func (cfg *TLSConfig) Valid() error {
+	if cfg.UseTLS {
+		if cfg.TLSCert == "" {
+			return fmt.Errorf("Must set TLS certificate if TLS is enabled")
+		}
+		if cfg.TLSKey == "" {
+			return fmt.Errorf("Must set TLS private key if TLS is enabled")
+		}
+	}
+	return nil
 }
 
 func New(logger log.FieldLogger, cfg Config) (*Reporting, error) {
@@ -843,8 +765,4 @@ func (op *Reporting) newPrometheusConn(promConfig promapi.Config) (prom.API, err
 		return nil, fmt.Errorf("can't connect to prometheus: %v", err)
 	}
 	return prom.NewAPI(client), nil
-}
-
-type DependencyResolver interface {
-	ResolveDependencies(namespace string, inputDefs []metering.ReportQueryInputDefinition, inputVals []metering.ReportQueryInputValue) (*reporting.DependencyResolutionResult, error)
 }
