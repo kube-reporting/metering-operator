@@ -10,7 +10,6 @@ import (
 	"math/rand"
 	"net/http"
 	"net/url"
-	"os"
 	"sync"
 	"time"
 
@@ -104,24 +103,10 @@ type defaultReportingOperator struct {
 	importers   map[string]*prestostore.PrometheusImporter
 }
 
-func (cfg *TLSConfig) Valid() error {
-	if cfg.UseTLS {
-		if cfg.TLSCert == "" {
-			return fmt.Errorf("Must set TLS certificate if TLS is enabled")
-		}
-		if cfg.TLSKey == "" {
-			return fmt.Errorf("Must set TLS private key if TLS is enabled")
-		}
-	}
-	return nil
-}
-
 func New(logger log.FieldLogger, cfg Config) (ReportingOperator, error) {
-	if err := cfg.APITLSConfig.Valid(); err != nil {
-		return nil, err
-	}
-	if err := cfg.MetricsTLSConfig.Valid(); err != nil {
-		return nil, err
+	errs := IsValidConfig(&cfg)
+	if errs != nil {
+		return nil, errs
 	}
 
 	logger.Debugf("config: %s", spew.Sprintf("%+v", cfg))
@@ -169,15 +154,11 @@ func New(logger log.FieldLogger, cfg Config) (ReportingOperator, error) {
 		return nil, fmt.Errorf("Unable to create Metering client: %v", err)
 	}
 
-	var informerNamespace string
+	informerNamespace := cfg.OwnNamespace
 	if cfg.AllNamespaces {
 		informerNamespace = metav1.NamespaceAll
 	} else if len(cfg.TargetNamespaces) == 1 {
 		informerNamespace = cfg.TargetNamespaces[0]
-	} else if len(cfg.TargetNamespaces) > 1 && !cfg.AllNamespaces {
-		return nil, fmt.Errorf("must set --all-namespaces if more than one namespace is passed to --target-namespaces")
-	} else {
-		informerNamespace = cfg.OwnNamespace
 	}
 
 	clock := clock.RealClock{}
@@ -658,13 +639,9 @@ func (op *defaultReportingOperator) Run(ctx context.Context) error {
 func (op *defaultReportingOperator) newPrometheusConnFromURL(url string) (prom.API, error) {
 	transportConfig := &transport.Config{}
 	if op.cfg.PrometheusConfig.CAFile != "" {
-		if _, err := os.Stat(op.cfg.PrometheusConfig.CAFile); err == nil {
-			// Use the configured CA for communicating to Prometheus
-			transportConfig.TLS.CAFile = op.cfg.PrometheusConfig.CAFile
-			op.logger.Infof("using %s as CA for Prometheus", op.cfg.PrometheusConfig.CAFile)
-		} else {
-			return nil, err
-		}
+		// Use the configured CA for communicating to Prometheus
+		transportConfig.TLS.CAFile = op.cfg.PrometheusConfig.CAFile
+		op.logger.Infof("using %s as CA for Prometheus", op.cfg.PrometheusConfig.CAFile)
 	} else {
 		op.logger.Infof("using system CAs for Prometheus")
 		transportConfig.TLS.CAData = nil
