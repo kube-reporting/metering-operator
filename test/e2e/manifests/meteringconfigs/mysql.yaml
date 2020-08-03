@@ -59,7 +59,7 @@ spec:
           driver: com.mysql.jdbc.Driver
           username: testuser
           password: testpass
-          url: jdbc:mysql://mysql.mysql.svc.cluster.local:3306/metastore
+          url: jdbc:mysql://mariadb.mysql.svc.cluster.local:3306/metastore
   hadoop:
     spec:
       hdfs:

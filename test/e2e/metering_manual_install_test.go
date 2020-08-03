@@ -357,7 +357,7 @@ func createMySQLDatabase(ctx *deployframework.DeployerCtx) error {
 		"oc",
 		"-n", mysqlNamespace,
 		"new-app",
-		"--image-stream", "mysql:5.7",
+		"--image-stream", "mariadb:10.2",
 		"MYSQL_USER=testuser",
 		"MYSQL_PASSWORD=testpass",
 		"MYSQL_DATABASE=metastore",
