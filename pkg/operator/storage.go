@@ -4,11 +4,11 @@ import (
 	"fmt"
 
 	metering "github.com/kube-reporting/metering-operator/pkg/apis/metering/v1"
-	cbListers "github.com/kube-reporting/metering-operator/pkg/generated/listers/metering/v1"
+	listers "github.com/kube-reporting/metering-operator/pkg/generated/listers/metering/v1"
 	"k8s.io/apimachinery/pkg/labels"
 )
 
-func (op *defaultReportingOperator) getDefaultStorageLocation(lister cbListers.StorageLocationLister, namespace string) (*metering.StorageLocation, error) {
+func (op *defaultReportingOperator) getDefaultStorageLocation(lister listers.StorageLocationLister, namespace string) (*metering.StorageLocation, error) {
 	storageLocations, err := lister.StorageLocations(namespace).List(labels.Everything())
 	if err != nil {
 		return nil, err

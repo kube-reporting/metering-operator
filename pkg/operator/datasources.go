@@ -17,7 +17,7 @@ import (
 
 	metering "github.com/kube-reporting/metering-operator/pkg/apis/metering/v1"
 	"github.com/kube-reporting/metering-operator/pkg/aws"
-	cbInterfaces "github.com/kube-reporting/metering-operator/pkg/generated/clientset/versioned/typed/metering/v1"
+	clientset "github.com/kube-reporting/metering-operator/pkg/generated/clientset/versioned/typed/metering/v1"
 	"github.com/kube-reporting/metering-operator/pkg/hive"
 	"github.com/kube-reporting/metering-operator/pkg/operator/prestostore"
 	"github.com/kube-reporting/metering-operator/pkg/operator/reporting"
@@ -752,7 +752,7 @@ func (op *defaultReportingOperator) queueDependentReportsForDataSource(dataSourc
 	return nil
 }
 
-func updateReportDataSource(dsClient cbInterfaces.ReportDataSourceInterface, dsName string, updateFunc func(*metering.ReportDataSource)) (*metering.ReportDataSource, error) {
+func updateReportDataSource(dsClient clientset.ReportDataSourceInterface, dsName string, updateFunc func(*metering.ReportDataSource)) (*metering.ReportDataSource, error) {
 	var ds *metering.ReportDataSource
 	if err := retry.RetryOnConflict(retry.DefaultBackoff, func() error {
 		newDS, err := dsClient.Get(context.TODO(), dsName, metav1.GetOptions{})

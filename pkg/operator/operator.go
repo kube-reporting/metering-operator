@@ -14,7 +14,7 @@ import (
 	"time"
 
 	"github.com/kube-reporting/metering-operator/pkg/db"
-	cbClientset "github.com/kube-reporting/metering-operator/pkg/generated/clientset/versioned"
+	clientset "github.com/kube-reporting/metering-operator/pkg/generated/clientset/versioned"
 	meteringv1scheme "github.com/kube-reporting/metering-operator/pkg/generated/clientset/versioned/scheme"
 	factory "github.com/kube-reporting/metering-operator/pkg/generated/informers/externalversions"
 	listers "github.com/kube-reporting/metering-operator/pkg/generated/listers/metering/v1"
@@ -57,7 +57,7 @@ type defaultReportingOperator struct {
 
 	kubeClient        corev1.CoreV1Interface
 	coordinatorClient coordinatorv1.CoordinationV1Interface
-	meteringClient    cbClientset.Interface
+	meteringClient    clientset.Interface
 	eventRecorder     record.EventRecorder
 
 	informerFactory factory.SharedInformerFactory
@@ -149,7 +149,7 @@ func New(logger log.FieldLogger, cfg Config) (ReportingOperator, error) {
 	}
 
 	logger.Debugf("setting up Metering client...")
-	meteringClient, err := cbClientset.NewForConfig(kubeConfig)
+	meteringClient, err := clientset.NewForConfig(kubeConfig)
 	if err != nil {
 		return nil, fmt.Errorf("Unable to create Metering client: %v", err)
 	}
@@ -177,7 +177,7 @@ func newReportingOperator(
 	kubeConfig *rest.Config,
 	kubeClient corev1.CoreV1Interface,
 	coordinatorClient coordinatorv1.CoordinationV1Interface,
-	meteringClient cbClientset.Interface,
+	meteringClient clientset.Interface,
 	informerNamespace string,
 ) ReportingOperator {
 	informerFactory := factory.NewSharedInformerFactoryWithOptions(meteringClient, defaultResyncPeriod, factory.WithNamespace(informerNamespace), factory.WithTweakListOptions(nil))
