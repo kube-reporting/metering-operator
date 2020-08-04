@@ -283,8 +283,13 @@ func TestManualMeteringInstall(t *testing.T) {
 			Name:                      "ValidHDFS-MySQLDatabase",
 			MeteringOperatorImageRepo: meteringOperatorImageRepo,
 			MeteringOperatorImageTag:  meteringOperatorImageTag,
-			Skip:                      false,
-			PreInstallFunc:            createMySQLDatabase,
+			// TODO: disable this for now as the mysql:5.7 image
+			// stream was recently removed from 4.6 and there are
+			// some issues with using mariadb as a direct replacement
+			// as Hive server hangs during the create table call
+			// and requires a restart to work properly.
+			Skip:           true,
+			PreInstallFunc: createMySQLDatabase,
 			InstallSubTests: []InstallTestCase{
 				{
 					Name:     "testReportingProducesData",
