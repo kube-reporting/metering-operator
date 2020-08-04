@@ -308,8 +308,13 @@ func TestManualMeteringInstall(t *testing.T) {
 			Name:                      "S3-ReportDynamicInputData",
 			MeteringOperatorImageRepo: meteringOperatorImageRepo,
 			MeteringOperatorImageTag:  meteringOperatorImageTag,
-			Skip:                      !runAllInstallTests,
-			PreInstallFunc:            s3InstallFunc,
+			// TODO: disabling this for now as we work towards
+			// migrating a subset of all tests to periodic jobs.
+			// We should check-in with DPTP to make sure they're
+			// aware we're creating a s3 bucket in their CI account
+			// so their pruner is aware of this bucket location.
+			Skip:           true,
+			PreInstallFunc: s3InstallFunc,
 			InstallSubTests: []InstallTestCase{
 				{
 					Name:     "testReportingProducesData",
