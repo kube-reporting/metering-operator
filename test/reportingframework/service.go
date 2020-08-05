@@ -100,10 +100,14 @@ func (rf *ReportingFramework) doRequest(endpoint, method string, body []byte, qu
 	return respBody, resp.StatusCode, nil
 }
 
-func (rf *ReportingFramework) ReportingOperatorRequest(endpoint string, query map[string]string) (respBody []byte, code int, err error) {
+// ReportingOperatorGetRequest is a reportingframework method that performs
+// a single GET request to the metering API.
+func (rf *ReportingFramework) ReportingOperatorGetRequest(endpoint string, query map[string]string) (respBody []byte, code int, err error) {
 	return rf.doRequest(endpoint, "GET", nil, query)
 }
 
+// ReportingOperatorPOSTRequest is a reportingframework method that performs
+// a single POST request to the metering API.
 func (rf *ReportingFramework) ReportingOperatorPOSTRequest(endpoint string, body []byte) (respBody []byte, code int, err error) {
 	return rf.doRequest(endpoint, "POST", body, nil)
 }

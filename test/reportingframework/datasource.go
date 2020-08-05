@@ -14,12 +14,20 @@ import (
 	metering "github.com/kube-reporting/metering-operator/pkg/apis/metering/v1"
 )
 
+// GetMeteringReportDataSource is a helper method that is responsible
+// for making the API call querying for the @name reportdatsource in
+// the rf.Namespace namespace.
 func (rf *ReportingFramework) GetMeteringReportDataSource(name string) (*metering.ReportDataSource, error) {
 	return rf.MeteringClient.ReportDataSources(rf.Namespace).Get(context.Background(), name, metav1.GetOptions{})
 }
 
+// WaitForMeteringReportDataSourceTable is a helper method responsible
+// for ensuring that the @name reportdatasource custom resource in the
+// rf.Namespace testing namespace is reporting a ready status. We define
+// "ready" here as having a populated PrestoTable object reference.
 func (rf *ReportingFramework) WaitForMeteringReportDataSourceTable(t *testing.T, name string, pollInterval, timeout time.Duration) (*metering.ReportDataSource, error) {
 	t.Helper()
+
 	ds, err := rf.WaitForMeteringReportDataSource(t, name, pollInterval, timeout, func(ds *metering.ReportDataSource) (bool, error) {
 		exists, err := rf.WaitForReportDataSourcePrestoTable(t, ds, pollInterval, timeout)
 		if err != nil {
@@ -36,18 +44,23 @@ func (rf *ReportingFramework) WaitForMeteringReportDataSourceTable(t *testing.T,
 		}
 		return nil, err
 	}
+
 	return ds, nil
 }
 
+// WaitForAllMeteringReportDataSourceTables is a helper method responsible for
+// ensuring that all of the reportdatasource custom resources in the rf.Namespace
+// are ready to run
 func (rf *ReportingFramework) WaitForAllMeteringReportDataSourceTables(t *testing.T, pollInterval, timeout time.Duration) ([]*metering.ReportDataSource, error) {
 	t.Helper()
-	var reportDataSources []*metering.ReportDataSource
-	return reportDataSources, wait.PollImmediate(pollInterval, timeout, func() (bool, error) {
-		reportDataSourcesList, err := rf.MeteringClient.ReportDataSources(rf.Namespace).List(context.Background(), metav1.ListOptions{})
-		require.NoError(t, err, "should not have errors querying API for list of ReportDataSources")
-		reportDataSources = reportDataSourcesList.Items
 
-		for _, ds := range reportDataSources {
+	var rds []*metering.ReportDataSource
+	return rds, wait.PollImmediate(pollInterval, timeout, func() (bool, error) {
+		rds, err := rf.MeteringClient.ReportDataSources(rf.Namespace).List(context.Background(), metav1.ListOptions{})
+		require.NoError(t, err, "should not have errors querying API for list of ReportDataSources")
+		require.NotEmpty(t, rds.Items, "failed to list the reportdatasource custom resources in the testing namespace")
+
+		for _, ds := range rds.Items {
 			exists, err := rf.WaitForReportDataSourcePrestoTable(t, ds, pollInterval, timeout)
 			if err != nil {
 				return false, err
@@ -62,6 +75,7 @@ func (rf *ReportingFramework) WaitForAllMeteringReportDataSourceTables(t *testin
 
 func (rf *ReportingFramework) WaitForMeteringReportDataSource(t *testing.T, name string, pollInterval, timeout time.Duration, dsFunc func(ds *metering.ReportDataSource) (bool, error)) (*metering.ReportDataSource, error) {
 	t.Helper()
+
 	var ds *metering.ReportDataSource
 	return ds, wait.PollImmediate(pollInterval, timeout, func() (bool, error) {
 		var err error
