@@ -3,6 +3,8 @@ package e2e
 import (
 	"context"
 	"fmt"
+	"github.com/kube-reporting/metering-operator/pkg/deploy"
+	"k8s.io/client-go/kubernetes"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -10,15 +12,15 @@ import (
 	"testing"
 	"time"
 
+	"github.com/kube-reporting/metering-operator/test/deployframework"
+	"github.com/kube-reporting/metering-operator/test/testhelpers"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	corev1 "k8s.io/api/core/v1"
+	storagev1beta1 "k8s.io/api/storage/v1beta1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/util/wait"
-
-	"github.com/kube-reporting/metering-operator/test/deployframework"
-	"github.com/kube-reporting/metering-operator/test/testhelpers"
 )
 
 const (
@@ -26,6 +28,7 @@ const (
 
 	secretName            = "aws-creds"
 	testingNamespaceLabel = "metering-testing-ns"
+	nfsTestingNamespace   = "nfs"
 )
 
 func testManualMeteringInstall(
@@ -86,8 +89,8 @@ func testManualMeteringInstall(
 	}
 
 	rf, err := deployerCtx.Setup(deployerCtx.Deployer.InstallOLM, expectInstallErr)
-	canSafelyRunTest := testhelpers.AssertCanSafelyRunReportingTests(t, err, expectInstallErr, expectInstallErrMsg)
 
+	canSafelyRunTest := testhelpers.AssertCanSafelyRunReportingTests(t, err, expectInstallErr, expectInstallErrMsg)
 	if canSafelyRunTest {
 		for _, installFunc := range testInstallFunctions {
 			installFunc := installFunc
@@ -105,6 +108,111 @@ func testManualMeteringInstall(
 
 	err = deployerCtx.Teardown(deployerCtx.Deployer.UninstallOLM)
 	assert.NoError(t, err, "capturing logs and uninstalling metering should produce no error")
+}
+
+func createNFSProvisioner(ctx *deployframework.DeployerCtx) error {
+	//Waiting for Metering pods
+	ctx.TargetPodsCount = nonHDFSTargetPodCount
+
+	_, err := createTestingNamespace(ctx.Client, nfsTestingNamespace)
+	if err != nil {
+		return err
+	}
+
+	files := map[string]string{
+		"pod":          "server.yaml",
+		"service":      "service.yaml",
+		"storageClass": "storageclass.yaml",
+	}
+	server := &corev1.Pod{}
+	service := &corev1.Service{}
+	storageClass := &storagev1beta1.StorageClass{}
+	for name, file := range files {
+		absFile := filepath.Join(repoPath, testNFSManifestPath, file)
+		switch name {
+		case "pod":
+			if err := deploy.DecodeYAMLManifestToObject(absFile, server); err != nil {
+				return err
+			}
+			ctx.Client.CoreV1().Pods(nfsTestingNamespace).Create(context.TODO(), server, metav1.CreateOptions{})
+			if err != nil && !apierrors.IsAlreadyExists(err) {
+				return err
+			}
+		case "service":
+			if err := deploy.DecodeYAMLManifestToObject(absFile, service); err != nil {
+				return err
+			}
+			ctx.Client.CoreV1().Services(nfsTestingNamespace).Create(context.TODO(), service, metav1.CreateOptions{})
+			if err != nil && !apierrors.IsAlreadyExists(err) {
+				return err
+			}
+		case "storageClass":
+			if err := deploy.DecodeYAMLManifestToObject(absFile, storageClass); err != nil {
+				return err
+			}
+			ctx.Client.StorageV1beta1().StorageClasses().Create(context.TODO(), storageClass, metav1.CreateOptions{})
+			if err != nil && !apierrors.IsAlreadyExists(err) {
+				return err
+			}
+		}
+	}
+
+	svc, err := ctx.Client.CoreV1().Services(nfsTestingNamespace).Get(context.TODO(), "nfs-service", metav1.GetOptions{})
+	if apierrors.IsNotFound(err) {
+		return err
+	}
+	if err != nil || svc.Spec.ClusterIP == "" {
+		err = wait.Poll(3*time.Second, 5*time.Minute, func() (bool, error) {
+			svc, err = ctx.Client.CoreV1().Services(ctx.Namespace).Get(context.TODO(), "nfs-service", metav1.GetOptions{})
+			if apierrors.IsNotFound(err) {
+				return false, err
+			}
+			if err != nil {
+				return false, nil
+			}
+			return svc.Spec.ClusterIP != "" , nil
+		})
+		if err != nil {
+			return err
+		}
+	}
+
+	nfsFile := "persistentvolume.yaml"
+	nfsPv := &corev1.PersistentVolume{}
+	absFile := filepath.Join(repoPath, testNFSManifestPath, nfsFile)
+	//decode pvc
+	if err := deploy.DecodeYAMLManifestToObject(absFile, nfsPv); err != nil {
+		return err
+	}
+
+	nfsPv.Spec.NFS.Server = svc.Spec.ClusterIP
+	_, err = ctx.Client.CoreV1().PersistentVolumes().Create(context.TODO(), nfsPv, metav1.CreateOptions{})
+	if err != nil && !apierrors.IsAlreadyExists(err) {
+		return err
+	}
+	return nil
+}
+
+func createTestingNamespace(client kubernetes.Interface, namespace string) (*corev1.Namespace, error) {
+	ns, err := client.CoreV1().Namespaces().Get(context.Background(), namespace, metav1.GetOptions{})
+	if err != nil && !apierrors.IsNotFound(err) {
+		return nil, err
+	}
+	if apierrors.IsNotFound(err) {
+		ns := &corev1.Namespace{
+			ObjectMeta: metav1.ObjectMeta{
+				Name: namespace,
+				Labels: map[string]string{
+					"name": namespace + "-" + testingNamespaceLabel,
+				},
+			},
+		}
+		_, err = client.CoreV1().Namespaces().Create(context.Background(), ns, metav1.CreateOptions{})
+		if err != nil {
+			return ns, nil
+		}
+	}
+	return ns, nil
 }
 
 func s3InstallFunc(ctx *deployframework.DeployerCtx) error {
