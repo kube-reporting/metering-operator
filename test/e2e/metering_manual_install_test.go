@@ -170,7 +170,7 @@ func createNFSProvisioner(ctx *deployframework.DeployerCtx) error {
 			if err != nil {
 				return false, nil
 			}
-			return svc.Spec.ClusterIP != "" , nil
+			return svc.Spec.ClusterIP != "", nil
 		})
 		if err != nil {
 			return err
