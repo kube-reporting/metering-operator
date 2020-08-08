@@ -47,6 +47,7 @@ var (
 	postUpgradeTestDirName          = "post-upgrade"
 	gatherTestArtifactsScript       = "gather-test-install-artifacts.sh"
 	testMeteringConfigManifestsPath = "/test/e2e/manifests/meteringconfigs/"
+	testNFSManifestPath             = "/test/e2e/manifests/nfs/"
 )
 
 func init() {
@@ -343,6 +344,27 @@ func TestManualMeteringInstall(t *testing.T) {
 				},
 			},
 			MeteringConfigManifestFilename: "s3.yaml",
+		},
+		{
+			Name:                      "ValidateNFS-ReportDynamicInputData",
+			MeteringOperatorImageRepo: meteringOperatorImageRepo,
+			MeteringOperatorImageTag:  meteringOperatorImageTag,
+			Skip:                      false,
+			PreInstallFunc:            createNFSProvisioner,
+			InstallSubTests: []InstallTestCase{
+				{
+					Name:     "testReportingProducesData",
+					TestFunc: testReportingProducesData,
+					ExtraEnvVars: []string{
+						"REPORTING_OPERATOR_PROMETHEUS_DATASOURCE_MAX_IMPORT_BACKFILL_DURATION=15m",
+						"REPORTING_OPERATOR_PROMETHEUS_METRICS_IMPORTER_INTERVAL=30s",
+						"REPORTING_OPERATOR_PROMETHEUS_METRICS_IMPORTER_CHUNK_SIZE=5m",
+						"REPORTING_OPERATOR_PROMETHEUS_METRICS_IMPORTER_INTERVAL=5m",
+						"REPORTING_OPERATOR_PROMETHEUS_METRICS_IMPORTER_STEP_SIZE=60s",
+					},
+				},
+			},
+			MeteringConfigManifestFilename: "nfs.yaml",
 		},
 	}
 
