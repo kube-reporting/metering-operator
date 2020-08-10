@@ -32,7 +32,7 @@ func (rf *ReportingFramework) GetMeteringReport(name string) (*metering.Report, 
 	return rf.MeteringClient.Reports(rf.Namespace).Get(context.Background(), name, metav1.GetOptions{})
 }
 
-func (rf *ReportingFramework) NewSimpleReport(name, queryName string, schedule *metering.ReportSchedule, reportingStart, reportingEnd *time.Time) *metering.Report {
+func (rf *ReportingFramework) NewSimpleReport(name, queryName string, schedule *metering.ReportSchedule, reportingStart, reportingEnd *time.Time, expiration *metav1.Duration) *metering.Report {
 	var start, end *metav1.Time
 	if reportingStart != nil {
 		start = &metav1.Time{Time: *reportingStart}
@@ -50,6 +50,7 @@ func (rf *ReportingFramework) NewSimpleReport(name, queryName string, schedule *
 			Schedule:       schedule,
 			ReportingStart: start,
 			ReportingEnd:   end,
+			Expiration:     expiration,
 		},
 	}
 }

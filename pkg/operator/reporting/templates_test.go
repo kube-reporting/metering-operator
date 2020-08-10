@@ -180,7 +180,7 @@ func TestRenderQuery(t *testing.T) {
 				Query:          "SELECT * FROM {| reportTableName .Report.Inputs.MissingReportNameInReportsField |}",
 				RequiredInputs: []string{"MissingReportNameInReportsField"},
 				Reports: []*metering.Report{
-					testhelpers.NewReport("", testNamespace, testReportQuery, reportStart, reportEnd, metering.ReportStatus{}, nil, false, nil),
+					testhelpers.NewReport("", testNamespace, testReportQuery, nil, reportStart, reportEnd, metering.ReportStatus{}, nil, false, nil),
 				},
 				PrestoTables: []*metering.PrestoTable{
 					newTestPrestoTable(ds1.Status.TableRef.Name, testNamespace, testCatalogName, testCatalogName, nil),
@@ -198,7 +198,7 @@ func TestRenderQuery(t *testing.T) {
 			name: "Report dependency was not found (due to Report.Name not matching name) returns error",
 			reportTemplate: &ReportQueryTemplateContext{
 				Reports: []*metering.Report{
-					testhelpers.NewReport(testReportName, testNamespace, testReportQuery, reportStart, reportEnd, metering.ReportStatus{}, nil, false, nil),
+					testhelpers.NewReport(testReportName, testNamespace, testReportQuery, nil, reportStart, reportEnd, metering.ReportStatus{}, nil, false, nil),
 				},
 				Query:             "SELECT * FROM {| reportTableName .Report.Inputs.ReportNameDoesNotMatchInputName |}",
 				RequiredInputs:    []string{"ReportNameDoesNotMatchInputName"},
@@ -221,7 +221,7 @@ func TestRenderQuery(t *testing.T) {
 				Query:          "SELECT * FROM {| reportTableName .Report.Inputs.MissingReportStatusTableRef|}",
 				RequiredInputs: []string{"MissingReportStatusTableRef"},
 				Reports: []*metering.Report{
-					testhelpers.NewReport(testReportName, testNamespace, testReportQuery, reportStart, reportEnd, metering.ReportStatus{
+					testhelpers.NewReport(testReportName, testNamespace, testReportQuery, nil, reportStart, reportEnd, metering.ReportStatus{
 						TableRef: v1.LocalObjectReference{Name: ""},
 					}, nil, false, nil),
 				},
@@ -240,7 +240,7 @@ func TestRenderQuery(t *testing.T) {
 				Query:          "SELECT * FROM {| reportTableName .Report.Inputs.EmptyReportStatusTableRef |}",
 				RequiredInputs: []string{"EmptyReportStatusTableRef"},
 				Reports: []*metering.Report{
-					testhelpers.NewReport(testReportName, testNamespace, testReportQuery, reportStart, reportEnd, metering.ReportStatus{
+					testhelpers.NewReport(testReportName, testNamespace, testReportQuery, nil, reportStart, reportEnd, metering.ReportStatus{
 						TableRef: v1.LocalObjectReference{Name: testReportName},
 					}, nil, false, nil),
 				},
@@ -262,7 +262,7 @@ func TestRenderQuery(t *testing.T) {
 				Query:          "SELECT * FROM {| reportTableName .Report.Inputs.ValidReportTableNameQuery |}",
 				RequiredInputs: []string{"ValidReportTableNameQuery"},
 				Reports: []*metering.Report{
-					testhelpers.NewReport(testReportName, testNamespace, testReportQuery, reportStart, reportEnd, metering.ReportStatus{
+					testhelpers.NewReport(testReportName, testNamespace, testReportQuery, nil, reportStart, reportEnd, metering.ReportStatus{
 						TableRef: v1.LocalObjectReference{Name: testReportName},
 					}, nil, false, nil),
 				},
@@ -530,7 +530,7 @@ func TestRenderQuery(t *testing.T) {
 				Query:          "SELECT * FROM {| reportTableName .Report.Inputs.NamespaceCpuUsage |} WHERE namespace = {| .Report.Inputs.Namespace |}",
 				RequiredInputs: []string{"NamespaceCpuUsage", "Namespace"},
 				Reports: []*metering.Report{
-					testhelpers.NewReport(testReportName, testNamespace, testReportQuery, reportStart, reportEnd, metering.ReportStatus{
+					testhelpers.NewReport(testReportName, testNamespace, testReportQuery, nil, reportStart, reportEnd, metering.ReportStatus{
 						TableRef: v1.LocalObjectReference{Name: ds1.Status.TableRef.Name},
 					}, nil, false, nil),
 				},

@@ -39,6 +39,8 @@ spec:
           requests:
             cpu: 1
             memory: 1Gi
+      image:
+        tag: "4.5"
 
   hive:
     spec:
