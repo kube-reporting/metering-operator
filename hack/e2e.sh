@@ -18,7 +18,7 @@ function cleanup() {
         # Remove any testing labels that may have been added during tests
         echo "Removing any testing labels that were added to the cluster's nodes"
         nodes=( $(kubectl get nodes -l metering-node-testing-label="true" --no-headers | awk '{ print $1 }') )
-        for i in "${nodes[@]}"
+        for i in ${nodes[@]+"${nodes[@]}"}
         do
             kubectl label node "$i" metering-node-testing-label- 2>/dev/null
         done
