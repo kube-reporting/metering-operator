@@ -290,7 +290,7 @@ func cleanupLocalCmds(logger logrus.FieldLogger, commands ...exec.Cmd) error {
 	return nil
 }
 
-func CreateCatalogSource(logger logrus.FieldLogger, name, namespace, configMapName string, client olmclientv1alpha1.OperatorsV1alpha1Interface) error {
+func CreateCatalogSourceFromConfigMap(logger logrus.FieldLogger, name, namespace, configMapName string, client olmclientv1alpha1.OperatorsV1alpha1Interface) error {
 	// check if the @name CatalogSource already exists and if true, exit early.
 	// If no CatalogSource exists by that name, start building up that object
 	// and attempt to create it through the OLM v1alpha1 client.
@@ -318,6 +318,44 @@ func CreateCatalogSource(logger logrus.FieldLogger, name, namespace, configMapNa
 	}
 
 	return nil
+}
+
+// CreateCatalogSourceFromImage is responsible for attempting to create a
+// CatalogSource custom resource based on an index image source type.
+func CreateCatalogSourceFromImage(logger logrus.FieldLogger, client olmclientv1alpha1.OperatorsV1alpha1Interface, name, namespace, imageName string) (*olmv1alpha1.CatalogSource, error) {
+	// check if the @name CatalogSource already exists and if true, exit early.
+	// If no CatalogSource exists by that name, start building up that object
+	// and attempt to create it through the OLM v1alpha1 client.
+	catsrc, err := client.CatalogSources(namespace).Get(context.TODO(), name, metav1.GetOptions{})
+	if err != nil && !apierrors.IsNotFound(err) {
+		return nil, err
+	}
+	if apierrors.IsNotFound(err) {
+		catsrc := &olmv1alpha1.CatalogSource{
+			ObjectMeta: metav1.ObjectMeta{
+				Name:      name,
+				Namespace: namespace,
+				Labels: map[string]string{
+					"name": fmt.Sprintf("%s-%s", namespace, testNamespaceLabel),
+				},
+			},
+			Spec: olmv1alpha1.CatalogSourceSpec{
+				SourceType:  olmv1alpha1.SourceTypeGrpc,
+				Image:       imageName,
+				DisplayName: "Custom metering-ansible-operator",
+				Publisher:   "Metering Dev",
+			},
+		}
+		_, err := client.CatalogSources(namespace).Create(context.TODO(), catsrc, metav1.CreateOptions{})
+		if err != nil {
+			return nil, fmt.Errorf("failed to create the %s CatalogSource for metering: %v", name, err)
+		}
+		logger.Infof("Created the %s CatalogSource", name)
+
+		return catsrc, nil
+	}
+
+	return catsrc, err
 }
 
 // VerifyCatalogSourcePod is a deployframework helper function that checks the @namespace
