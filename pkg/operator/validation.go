@@ -46,8 +46,6 @@ func IsValidListenConfig(cfg *Config) error {
 	errs := []error{}
 
 	errs = append(errs, isValidHostPort(cfg.APIListen, "apiListen"))
-	errs = append(errs, isValidHostPort(cfg.MetricsListen, "metricsListen"))
-	errs = append(errs, isValidHostPort(cfg.PprofListen, "pprofListen"))
 
 	if len(errs) > 0 {
 		return errors.NewAggregate(errs)
@@ -58,8 +56,6 @@ func IsValidListenConfig(cfg *Config) error {
 // IsValidPrestoConfig ensure all Presto* fields are valid if provided.
 func IsValidPrestoConfig(cfg *Config) error {
 	errs := []error{}
-
-	errs = append(errs, isValidHostPort(cfg.PrestoHost, "prestoHost"))
 
 	if !cfg.PrestoUseTLS {
 		if cfg.PrestoUseClientCertAuth {
@@ -91,8 +87,6 @@ func IsValidPrestoConfig(cfg *Config) error {
 // IsValidHiveConfig ensure all Hive* fields are valid if provided.
 func IsValidHiveConfig(cfg *Config) error {
 	errs := []error{}
-
-	errs = append(errs, isValidHostPort(cfg.HiveHost, "hiveHost"))
 
 	if !cfg.HiveUseTLS {
 		if cfg.HiveUseClientCertAuth {

@@ -27,8 +27,6 @@ func TestIsValidConfig(t *testing.T) {
 			makeCfg: func() *Config {
 				cfg := validConfig()
 				cfg.APIListen = "foo:8080"
-				cfg.MetricsListen = "foo:443"
-				cfg.PprofListen = ":8080"
 				return cfg
 			},
 		},
@@ -39,22 +37,6 @@ func TestIsValidConfig(t *testing.T) {
 				return cfg
 			},
 			expectedErr: "invalid apiListen",
-		},
-		"listen config - invalid metrics listen": {
-			makeCfg: func() *Config {
-				cfg := validConfig()
-				cfg.MetricsListen = "foo"
-				return cfg
-			},
-			expectedErr: "invalid metricsListen",
-		},
-		"listen config - invalid pprof listen": {
-			makeCfg: func() *Config {
-				cfg := validConfig()
-				cfg.PprofListen = "foo"
-				return cfg
-			},
-			expectedErr: "invalid pprofListen",
 		},
 		"presto config - valid": {
 			makeCfg: func() *Config {
