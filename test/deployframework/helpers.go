@@ -615,6 +615,7 @@ func CreateRegistryDeployment(
 	deployment.Namespace = namespace
 	if deployment.Labels != nil {
 		deployment.Labels["name"] = namespacePrefix + "-" + testNamespaceLabel
+		deployment.Labels["tenant"] = namespacePrefix
 	}
 
 	// Update the invalid manifest registry image with the @registryImage provided
@@ -642,6 +643,11 @@ func CreateRegistryDeployment(
 		logger.Infof("Overriding the default metering-reporting-operator image with %s", reportingOperatorImage)
 		deployment.Spec.Template.Spec.InitContainers[0].Env[1].Value = reportingOperatorImage
 	}
+	// Populate the tenant label throughout the deployment manifest
+	// that we're currently build up. By default, that label's value
+	// is set to "", so we're injecting the namespacePrefix before creation.
+	deployment.Spec.Selector.MatchLabels["tenant"] = namespacePrefix
+	deployment.Spec.Template.ObjectMeta.Labels["tenant"] = namespacePrefix
 
 	_, err = client.AppsV1().Deployments(namespace).Get(context.TODO(), deployment.Name, metav1.GetOptions{})
 	if err != nil && !apierrors.IsNotFound(err) {
@@ -682,6 +688,11 @@ func CreateRegistryService(logger logrus.FieldLogger, client kubernetes.Interfac
 		return "", err
 	}
 	if apierrors.IsNotFound(err) {
+		// Add tenancy to the label selector to ensure we're only targeting a
+		// single metering installation. Note: we can make the assumption
+		// that we're indexing into a populated selector map as we decoded
+		// the service YAML manifest, which already contains a label selector.
+		service.Spec.Selector["tenant"] = namespacePrefix
 		svc, err = client.CoreV1().Services(namespace).Create(context.TODO(), service, metav1.CreateOptions{})
 		if err != nil {
 			return "", err
