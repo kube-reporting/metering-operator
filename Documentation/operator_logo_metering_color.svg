@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="146px" height="146px" viewBox="0 0 146 146" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>Artboard</title>
+    <g id="Artboard" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <circle id="Oval" stroke="#408091" stroke-width="4" fill="#3A414A" cx="73" cy="73" r="55"></circle>
+        <g id="Group-2" transform="translate(36.000000, 46.000000)">
+            <polyline id="Path-2" stroke="#FBCB7E" stroke-width="4" points="70.0737208 12.3892383 56.8974734 27.6640237 38.047367 -5.26896486e-14 -7.10542736e-15 53.1723268 11.3908828 53.1723268 38.047367 16.0215 56.8974734 42.6228804 70.0737208 27.6640237"></polyline>
+            <g id="Group" transform="translate(66.000000, 7.000000)" fill="#FBCB7E">
+                <path d="M5,10 C7.76142375,10 10,7.76142375 10,5 C10,2.23857625 7.76142375,0 5,0 C2.23857625,0 0,2.23857625 0,5 C0,7.76142375 2.23857625,10 5,10 Z" id="Oval"></path>
+                <circle id="Oval" cx="5" cy="20" r="5"></circle>
+            </g>
+        </g>
+    </g>
+</svg>
