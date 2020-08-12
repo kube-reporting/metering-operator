@@ -34,6 +34,11 @@ for resource in "${resources[@]}"; do
     { timeout 120 oc adm --namespace ${METERING_TEST_NAMESPACE} --dest-dir=${LOG_DIR} inspect "${resource}"; } >> ${LOG_DIR}/gather-debug.log 2>&1
 done
 
+echo "Collecting the metering-related CRDs from the cluster"
+for resource in $(oc get crd | grep metering | awk '{ print $1 }'); do
+    timeout 120 oc adm --dest-dir=${LOG_DIR} inspect "crd/$resource" >> ${LOG_DIR}/gather-debug.log 2>&1
+done
+
 commands=()
 commands+=("get pods -o wide")
 commands+=("get reportdatasources")
