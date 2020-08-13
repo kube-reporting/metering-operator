@@ -34,7 +34,7 @@ var (
 )
 
 var rootCmd = &cobra.Command{
-	Use:   "metering",
+	Use:   "reporting-operator",
 	Short: "",
 	RunE: func(cmd *cobra.Command, _ []string) error {
 		return cmd.Help()
@@ -43,7 +43,7 @@ var rootCmd = &cobra.Command{
 
 var startCmd = &cobra.Command{
 	Use:   "start",
-	Short: "starts the Metering operator",
+	Short: "starts the metering reporting operator",
 	Run:   startReporting,
 }
 
