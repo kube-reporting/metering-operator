@@ -10,24 +10,24 @@ import (
 	"math/rand"
 	"net/http"
 	"net/url"
-	"os"
 	"sync"
 	"time"
 
-	"github.com/davecgh/go-spew/spew"
-	"github.com/prestodb/presto-go-client/presto"
-	promapi "github.com/prometheus/client_golang/api"
-	prom "github.com/prometheus/client_golang/api/prometheus/v1"
-	"github.com/prometheus/client_golang/prometheus/promhttp"
-	log "github.com/sirupsen/logrus"
-	"github.com/taozle/go-hive-driver"
+	"github.com/kube-reporting/metering-operator/pkg/db"
+	clientset "github.com/kube-reporting/metering-operator/pkg/generated/clientset/versioned"
+	meteringv1scheme "github.com/kube-reporting/metering-operator/pkg/generated/clientset/versioned/scheme"
+	factory "github.com/kube-reporting/metering-operator/pkg/generated/informers/externalversions"
+	listers "github.com/kube-reporting/metering-operator/pkg/generated/listers/metering/v1"
+	"github.com/kube-reporting/metering-operator/pkg/operator/prestostore"
+	"github.com/kube-reporting/metering-operator/pkg/operator/reporting"
+	_ "github.com/kube-reporting/metering-operator/pkg/util/reflector/prometheus" // for prometheus metric registration
+	_ "github.com/kube-reporting/metering-operator/pkg/util/workqueue/prometheus" // for prometheus metric registration
+
 	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/util/clock"
-	"k8s.io/apimachinery/pkg/util/wait"
-
-	meteringv1scheme "github.com/kube-reporting/metering-operator/pkg/generated/clientset/versioned/scheme"
 	utilruntime "k8s.io/apimachinery/pkg/util/runtime"
+	"k8s.io/apimachinery/pkg/util/wait"
 	"k8s.io/client-go/kubernetes/scheme"
 	coordinatorv1 "k8s.io/client-go/kubernetes/typed/coordination/v1"
 	corev1 "k8s.io/client-go/kubernetes/typed/core/v1"
@@ -41,114 +41,23 @@ import (
 	"k8s.io/client-go/transport"
 	"k8s.io/client-go/util/workqueue"
 
-	metering "github.com/kube-reporting/metering-operator/pkg/apis/metering/v1"
-	"github.com/kube-reporting/metering-operator/pkg/db"
-	cbClientset "github.com/kube-reporting/metering-operator/pkg/generated/clientset/versioned"
-	factory "github.com/kube-reporting/metering-operator/pkg/generated/informers/externalversions"
-	listers "github.com/kube-reporting/metering-operator/pkg/generated/listers/metering/v1"
-	"github.com/kube-reporting/metering-operator/pkg/operator/prestostore"
-	"github.com/kube-reporting/metering-operator/pkg/operator/reporting"
-	_ "github.com/kube-reporting/metering-operator/pkg/util/reflector/prometheus" // for prometheus metric registration
-	_ "github.com/kube-reporting/metering-operator/pkg/util/workqueue/prometheus" // for prometheus metric registration
+	"github.com/davecgh/go-spew/spew"
+	"github.com/prestodb/presto-go-client/presto"
+	promapi "github.com/prometheus/client_golang/api"
+	prom "github.com/prometheus/client_golang/api/prometheus/v1"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
+	log "github.com/sirupsen/logrus"
+	"github.com/taozle/go-hive-driver"
 )
 
-const (
-	defaultResyncPeriod = time.Minute * 15
-	prestoUsername      = "reporting-operator"
-
-	DefaultPrometheusQueryInterval                       = time.Minute * 5  // Query Prometheus every 5 minutes
-	DefaultPrometheusQueryStepSize                       = time.Minute      // Query data from Prometheus at a 60 second resolution (one data point per minute max)
-	DefaultPrometheusQueryChunkSize                      = 5 * time.Minute  // the default value for how much data we will insert into Presto per Prometheus query.
-	DefaultPrometheusDataSourceMaxQueryRangeDuration     = 10 * time.Minute // how much data we will query from Prometheus at once
-	DefaultPrometheusDataSourceMaxBackfillImportDuration = 2 * time.Hour    // how far we will query for backlogged data.
-)
-
-type TLSConfig struct {
-	UseTLS  bool
-	TLSCert string
-	TLSKey  string
-}
-
-func (cfg *TLSConfig) Valid() error {
-	if cfg.UseTLS {
-		if cfg.TLSCert == "" {
-			return fmt.Errorf("Must set TLS certificate if TLS is enabled")
-		}
-		if cfg.TLSKey == "" {
-			return fmt.Errorf("Must set TLS private key if TLS is enabled")
-		}
-	}
-	return nil
-}
-
-type PrometheusConfig struct {
-	Address         string
-	SkipTLSVerify   bool
-	BearerToken     string
-	BearerTokenFile string
-	CAFile          string
-}
-
-type Config struct {
-	Hostname     string
-	OwnNamespace string
-
-	AllNamespaces    bool
-	TargetNamespaces []string
-
-	Kubeconfig string
-
-	APIListen     string
-	MetricsListen string
-	PprofListen   string
-
-	HiveHost                  string
-	HiveUseTLS                bool
-	HiveCAFile                string
-	HiveTLSInsecureSkipVerify bool
-
-	HiveUseClientCertAuth bool
-	HiveClientCertFile    string
-	HiveClientKeyFile     string
-
-	PrestoHost                  string
-	PrestoUseTLS                bool
-	PrestoCAFile                string
-	PrestoTLSInsecureSkipVerify bool
-
-	PrestoUseClientCertAuth bool
-	PrestoClientCertFile    string
-	PrestoClientKeyFile     string
-
-	PrestoMaxQueryLength int
-
-	DisablePrometheusMetricsImporter bool
-	EnableFinalizers                 bool
-
-	LogDMLQueries bool
-	LogDDLQueries bool
-
-	PrometheusQueryConfig                         metering.PrometheusQueryConfig
-	PrometheusDataSourceMaxQueryRangeDuration     time.Duration
-	PrometheusDataSourceMaxBackfillImportDuration time.Duration
-	PrometheusDataSourceGlobalImportFromTime      *time.Time
-
-	ProxyTrustedCABundle string
-
-	LeaderLeaseDuration time.Duration
-
-	APITLSConfig     TLSConfig
-	MetricsTLSConfig TLSConfig
-	PrometheusConfig PrometheusConfig
-}
-
-type Reporting struct {
+// defaultReportingOperator is the concrete implementation of a ReportingOperator.
+type defaultReportingOperator struct {
 	cfg        Config
 	kubeConfig *rest.Config
 
 	kubeClient        corev1.CoreV1Interface
 	coordinatorClient coordinatorv1.CoordinationV1Interface
-	meteringClient    cbClientset.Interface
+	meteringClient    clientset.Interface
 	eventRecorder     record.EventRecorder
 
 	informerFactory factory.SharedInformerFactory
@@ -194,12 +103,10 @@ type Reporting struct {
 	importers   map[string]*prestostore.PrometheusImporter
 }
 
-func New(logger log.FieldLogger, cfg Config) (*Reporting, error) {
-	if err := cfg.APITLSConfig.Valid(); err != nil {
-		return nil, err
-	}
-	if err := cfg.MetricsTLSConfig.Valid(); err != nil {
-		return nil, err
+func New(logger log.FieldLogger, cfg Config) (ReportingOperator, error) {
+	errs := IsValidConfig(&cfg)
+	if errs != nil {
+		return nil, errs
 	}
 
 	logger.Debugf("config: %s", spew.Sprintf("%+v", cfg))
@@ -242,20 +149,16 @@ func New(logger log.FieldLogger, cfg Config) (*Reporting, error) {
 	}
 
 	logger.Debugf("setting up Metering client...")
-	meteringClient, err := cbClientset.NewForConfig(kubeConfig)
+	meteringClient, err := clientset.NewForConfig(kubeConfig)
 	if err != nil {
 		return nil, fmt.Errorf("Unable to create Metering client: %v", err)
 	}
 
-	var informerNamespace string
+	informerNamespace := cfg.OwnNamespace
 	if cfg.AllNamespaces {
 		informerNamespace = metav1.NamespaceAll
 	} else if len(cfg.TargetNamespaces) == 1 {
 		informerNamespace = cfg.TargetNamespaces[0]
-	} else if len(cfg.TargetNamespaces) > 1 && !cfg.AllNamespaces {
-		return nil, fmt.Errorf("must set --all-namespaces if more than one namespace is passed to --target-namespaces")
-	} else {
-		informerNamespace = cfg.OwnNamespace
 	}
 
 	clock := clock.RealClock{}
@@ -274,9 +177,9 @@ func newReportingOperator(
 	kubeConfig *rest.Config,
 	kubeClient corev1.CoreV1Interface,
 	coordinatorClient coordinatorv1.CoordinationV1Interface,
-	meteringClient cbClientset.Interface,
+	meteringClient clientset.Interface,
 	informerNamespace string,
-) *Reporting {
+) ReportingOperator {
 	informerFactory := factory.NewSharedInformerFactoryWithOptions(meteringClient, defaultResyncPeriod, factory.WithNamespace(informerNamespace), factory.WithTweakListOptions(nil))
 
 	prestoTableInformer := informerFactory.Metering().V1().PrestoTables()
@@ -315,7 +218,7 @@ func newReportingOperator(
 	eventBroadcaster.StartRecordingToSink(&corev1.EventSinkImpl{Interface: kubeClient.Events(cfg.OwnNamespace)})
 	eventRecorder := eventBroadcaster.NewRecorder(scheme.Scheme, v1.EventSource{Component: cfg.Hostname})
 
-	op := &Reporting{
+	op := &defaultReportingOperator{
 		logger:            logger,
 		cfg:               cfg,
 		kubeConfig:        kubeConfig,
@@ -393,7 +296,7 @@ func newReportingOperator(
 	return op
 }
 
-func (op *Reporting) Run(ctx context.Context) error {
+func (op *defaultReportingOperator) Run(ctx context.Context) error {
 	var wg sync.WaitGroup
 	// buffered big enough to hold the errs of each server we start.
 	srvErrChan := make(chan error, 3)
@@ -733,16 +636,12 @@ func (op *Reporting) Run(ctx context.Context) error {
 	return nil
 }
 
-func (op *Reporting) newPrometheusConnFromURL(url string) (prom.API, error) {
+func (op *defaultReportingOperator) newPrometheusConnFromURL(url string) (prom.API, error) {
 	transportConfig := &transport.Config{}
 	if op.cfg.PrometheusConfig.CAFile != "" {
-		if _, err := os.Stat(op.cfg.PrometheusConfig.CAFile); err == nil {
-			// Use the configured CA for communicating to Prometheus
-			transportConfig.TLS.CAFile = op.cfg.PrometheusConfig.CAFile
-			op.logger.Infof("using %s as CA for Prometheus", op.cfg.PrometheusConfig.CAFile)
-		} else {
-			return nil, err
-		}
+		// Use the configured CA for communicating to Prometheus
+		transportConfig.TLS.CAFile = op.cfg.PrometheusConfig.CAFile
+		op.logger.Infof("using %s as CA for Prometheus", op.cfg.PrometheusConfig.CAFile)
 	} else {
 		op.logger.Infof("using system CAs for Prometheus")
 		transportConfig.TLS.CAData = nil
@@ -772,7 +671,7 @@ func (op *Reporting) newPrometheusConnFromURL(url string) (prom.API, error) {
 	})
 }
 
-func (op *Reporting) startWorkers(ctx context.Context, wg *sync.WaitGroup) {
+func (op *defaultReportingOperator) startWorkers(ctx context.Context, wg *sync.WaitGroup) {
 	stopCh := ctx.Done()
 
 	startWorker := func(threads int, workerFunc func(id int)) {
@@ -824,27 +723,23 @@ func (op *Reporting) startWorkers(ctx context.Context, wg *sync.WaitGroup) {
 	})
 }
 
-func (op *Reporting) setInitialized() {
+func (op *defaultReportingOperator) setInitialized() {
 	op.initializedMu.Lock()
 	op.initialized = true
 	op.initializedMu.Unlock()
 }
 
-func (op *Reporting) isInitialized() bool {
+func (op *defaultReportingOperator) isInitialized() bool {
 	op.initializedMu.Lock()
 	initialized := op.initialized
 	op.initializedMu.Unlock()
 	return initialized
 }
 
-func (op *Reporting) newPrometheusConn(promConfig promapi.Config) (prom.API, error) {
+func (op *defaultReportingOperator) newPrometheusConn(promConfig promapi.Config) (prom.API, error) {
 	client, err := promapi.NewClient(promConfig)
 	if err != nil {
 		return nil, fmt.Errorf("can't connect to prometheus: %v", err)
 	}
 	return prom.NewAPI(client), nil
-}
-
-type DependencyResolver interface {
-	ResolveDependencies(namespace string, inputDefs []metering.ReportQueryInputDefinition, inputVals []metering.ReportQueryInputValue) (*reporting.DependencyResolutionResult, error)
 }

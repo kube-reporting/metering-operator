@@ -16,13 +16,13 @@ import (
 	_ "github.com/kube-reporting/metering-operator/pkg/util/workqueue/prometheus" // for prometheus metric registration
 )
 
-func (op *Reporting) shutdownQueues() {
+func (op *defaultReportingOperator) shutdownQueues() {
 	for _, queue := range op.queueList {
 		queue.ShutDown()
 	}
 }
 
-func (op *Reporting) addReport(obj interface{}) {
+func (op *defaultReportingOperator) addReport(obj interface{}) {
 	report := obj.(*metering.Report)
 	if report.DeletionTimestamp != nil {
 		op.deleteReport(report)
@@ -32,7 +32,7 @@ func (op *Reporting) addReport(obj interface{}) {
 	op.enqueueReport(report)
 }
 
-func (op *Reporting) updateReport(prev, cur interface{}) {
+func (op *defaultReportingOperator) updateReport(prev, cur interface{}) {
 	prevReport := prev.(*metering.Report)
 	curReport := cur.(*metering.Report)
 	if curReport.DeletionTimestamp != nil {
@@ -57,7 +57,7 @@ func (op *Reporting) updateReport(prev, cur interface{}) {
 	op.enqueueReport(curReport)
 }
 
-func (op *Reporting) deleteReport(obj interface{}) {
+func (op *defaultReportingOperator) deleteReport(obj interface{}) {
 	report, ok := obj.(*metering.Report)
 	if !ok {
 		tombstone, ok := obj.(cache.DeletedFinalStateUnknown)
@@ -79,7 +79,7 @@ func (op *Reporting) deleteReport(obj interface{}) {
 	op.reportQueue.Add(key)
 }
 
-func (op *Reporting) enqueueReport(report *metering.Report) {
+func (op *defaultReportingOperator) enqueueReport(report *metering.Report) {
 	key, err := cache.MetaNamespaceKeyFunc(report)
 	if err != nil {
 		op.logger.WithError(err).Errorf("Couldn't get key for object %#v: %v", report, err)
@@ -88,7 +88,7 @@ func (op *Reporting) enqueueReport(report *metering.Report) {
 	op.reportQueue.Add(key)
 }
 
-func (op *Reporting) enqueueReportAfter(report *metering.Report, duration time.Duration) {
+func (op *defaultReportingOperator) enqueueReportAfter(report *metering.Report, duration time.Duration) {
 	key, err := cache.MetaNamespaceKeyFunc(report)
 	if err != nil {
 		op.logger.WithError(err).Errorf("Couldn't get key for object %#v: %v", report, err)
@@ -97,7 +97,7 @@ func (op *Reporting) enqueueReportAfter(report *metering.Report, duration time.D
 	op.reportQueue.AddAfter(key, duration)
 }
 
-func (op *Reporting) addReportDataSource(obj interface{}) {
+func (op *defaultReportingOperator) addReportDataSource(obj interface{}) {
 	ds := obj.(*metering.ReportDataSource)
 	if ds.DeletionTimestamp != nil {
 		op.deleteReportDataSource(ds)
@@ -107,7 +107,7 @@ func (op *Reporting) addReportDataSource(obj interface{}) {
 	op.enqueueReportDataSource(ds)
 }
 
-func (op *Reporting) updateReportDataSource(prev, cur interface{}) {
+func (op *defaultReportingOperator) updateReportDataSource(prev, cur interface{}) {
 	curReportDataSource := cur.(*metering.ReportDataSource)
 	prevReportDataSource := prev.(*metering.ReportDataSource)
 	if curReportDataSource.DeletionTimestamp != nil {
@@ -134,7 +134,7 @@ func (op *Reporting) updateReportDataSource(prev, cur interface{}) {
 	op.enqueueReportDataSource(curReportDataSource)
 }
 
-func (op *Reporting) deleteReportDataSource(obj interface{}) {
+func (op *defaultReportingOperator) deleteReportDataSource(obj interface{}) {
 	dataSource, ok := obj.(*metering.ReportDataSource)
 	if !ok {
 		tombstone, ok := obj.(cache.DeletedFinalStateUnknown)
@@ -156,7 +156,7 @@ func (op *Reporting) deleteReportDataSource(obj interface{}) {
 	op.reportDataSourceQueue.Add(key)
 }
 
-func (op *Reporting) enqueueReportDataSource(ds *metering.ReportDataSource) {
+func (op *defaultReportingOperator) enqueueReportDataSource(ds *metering.ReportDataSource) {
 	key, err := cache.MetaNamespaceKeyFunc(ds)
 	if err != nil {
 		op.logger.WithFields(log.Fields{"reportDataSource": ds.Name, "namespace": ds.Namespace}).WithError(err).Errorf("couldn't get key for object: %#v", ds)
@@ -165,7 +165,7 @@ func (op *Reporting) enqueueReportDataSource(ds *metering.ReportDataSource) {
 	op.reportDataSourceQueue.Add(key)
 }
 
-func (op *Reporting) enqueueReportDataSourceAfter(ds *metering.ReportDataSource, duration time.Duration) {
+func (op *defaultReportingOperator) enqueueReportDataSourceAfter(ds *metering.ReportDataSource, duration time.Duration) {
 	key, err := cache.MetaNamespaceKeyFunc(ds)
 	if err != nil {
 		op.logger.WithFields(log.Fields{"reportDataSource": ds.Name, "namespace": ds.Namespace}).WithError(err).Errorf("couldn't get key for object: %#v", ds)
@@ -174,13 +174,13 @@ func (op *Reporting) enqueueReportDataSourceAfter(ds *metering.ReportDataSource,
 	op.reportDataSourceQueue.AddAfter(key, duration)
 }
 
-func (op *Reporting) addReportQuery(obj interface{}) {
+func (op *defaultReportingOperator) addReportQuery(obj interface{}) {
 	query := obj.(*metering.ReportQuery)
 	op.logger.Infof("adding ReportQuery %s/%s", query.Namespace, query.Name)
 	op.enqueueReportQuery(query)
 }
 
-func (op *Reporting) updateReportQuery(prev, cur interface{}) {
+func (op *defaultReportingOperator) updateReportQuery(prev, cur interface{}) {
 	curReportQuery := cur.(*metering.ReportQuery)
 	prevReportQuery := prev.(*metering.ReportQuery)
 	logger := op.logger.WithFields(log.Fields{"reportQuery": curReportQuery.Name, "namespace": curReportQuery.Namespace})
@@ -202,7 +202,7 @@ func (op *Reporting) updateReportQuery(prev, cur interface{}) {
 	op.enqueueReportQuery(curReportQuery)
 }
 
-func (op *Reporting) enqueueReportQuery(query *metering.ReportQuery) {
+func (op *defaultReportingOperator) enqueueReportQuery(query *metering.ReportQuery) {
 	key, err := cache.MetaNamespaceKeyFunc(query)
 	if err != nil {
 		op.logger.WithFields(log.Fields{"reportQuery": query.Name, "namespace": query.Namespace}).WithError(err).Errorf("couldn't get key for object: %#v", query)
@@ -211,7 +211,7 @@ func (op *Reporting) enqueueReportQuery(query *metering.ReportQuery) {
 	op.reportQueryQueue.Add(key)
 }
 
-func (op *Reporting) addPrestoTable(obj interface{}) {
+func (op *defaultReportingOperator) addPrestoTable(obj interface{}) {
 	table := obj.(*metering.PrestoTable)
 	if table.DeletionTimestamp != nil {
 		op.deletePrestoTable(table)
@@ -222,7 +222,7 @@ func (op *Reporting) addPrestoTable(obj interface{}) {
 	op.enqueuePrestoTable(table)
 }
 
-func (op *Reporting) updatePrestoTable(_, cur interface{}) {
+func (op *defaultReportingOperator) updatePrestoTable(_, cur interface{}) {
 	curPrestoTable := cur.(*metering.PrestoTable)
 	if curPrestoTable.DeletionTimestamp != nil {
 		op.deletePrestoTable(curPrestoTable)
@@ -233,7 +233,7 @@ func (op *Reporting) updatePrestoTable(_, cur interface{}) {
 	op.enqueuePrestoTable(curPrestoTable)
 }
 
-func (op *Reporting) deletePrestoTable(obj interface{}) {
+func (op *defaultReportingOperator) deletePrestoTable(obj interface{}) {
 	prestoTable, ok := obj.(*metering.PrestoTable)
 	if !ok {
 		tombstone, ok := obj.(cache.DeletedFinalStateUnknown)
@@ -271,7 +271,7 @@ func (op *Reporting) deletePrestoTable(obj interface{}) {
 	op.prestoTableQueue.Add(key)
 }
 
-func (op *Reporting) enqueuePrestoTable(table *metering.PrestoTable) {
+func (op *defaultReportingOperator) enqueuePrestoTable(table *metering.PrestoTable) {
 	key, err := cache.MetaNamespaceKeyFunc(table)
 	if err != nil {
 		op.logger.WithFields(log.Fields{"prestoTable": table.Name, "namespace": table.Namespace}).WithError(err).Errorf("couldn't get key for object: %#v", table)
@@ -280,7 +280,7 @@ func (op *Reporting) enqueuePrestoTable(table *metering.PrestoTable) {
 	op.prestoTableQueue.Add(key)
 }
 
-func (op *Reporting) addHiveTable(obj interface{}) {
+func (op *defaultReportingOperator) addHiveTable(obj interface{}) {
 	table := obj.(*metering.HiveTable)
 	if table.DeletionTimestamp != nil {
 		op.deleteHiveTable(table)
@@ -291,7 +291,7 @@ func (op *Reporting) addHiveTable(obj interface{}) {
 	op.enqueueHiveTable(table)
 }
 
-func (op *Reporting) updateHiveTable(_, cur interface{}) {
+func (op *defaultReportingOperator) updateHiveTable(_, cur interface{}) {
 	curHiveTable := cur.(*metering.HiveTable)
 	if curHiveTable.DeletionTimestamp != nil {
 		op.deleteHiveTable(curHiveTable)
@@ -302,7 +302,7 @@ func (op *Reporting) updateHiveTable(_, cur interface{}) {
 	op.enqueueHiveTable(curHiveTable)
 }
 
-func (op *Reporting) deleteHiveTable(obj interface{}) {
+func (op *defaultReportingOperator) deleteHiveTable(obj interface{}) {
 	hiveTable, ok := obj.(*metering.HiveTable)
 	if !ok {
 		tombstone, ok := obj.(cache.DeletedFinalStateUnknown)
@@ -340,7 +340,7 @@ func (op *Reporting) deleteHiveTable(obj interface{}) {
 	op.hiveTableQueue.Add(key)
 }
 
-func (op *Reporting) enqueueHiveTable(table *metering.HiveTable) {
+func (op *defaultReportingOperator) enqueueHiveTable(table *metering.HiveTable) {
 	key, err := cache.MetaNamespaceKeyFunc(table)
 	if err != nil {
 		op.logger.WithFields(log.Fields{"hiveTable": table.Name, "namespace": table.Namespace}).WithError(err).Errorf("couldn't get key for object: %#v", table)
@@ -349,7 +349,7 @@ func (op *Reporting) enqueueHiveTable(table *metering.HiveTable) {
 	op.hiveTableQueue.Add(key)
 }
 
-func (op *Reporting) addStorageLocation(obj interface{}) {
+func (op *defaultReportingOperator) addStorageLocation(obj interface{}) {
 	storageLocation := obj.(*metering.StorageLocation)
 	if storageLocation.DeletionTimestamp != nil {
 		op.deleteStorageLocation(storageLocation)
@@ -360,7 +360,7 @@ func (op *Reporting) addStorageLocation(obj interface{}) {
 	op.enqueueStorageLocation(storageLocation)
 }
 
-func (op *Reporting) updateStorageLocation(_, cur interface{}) {
+func (op *defaultReportingOperator) updateStorageLocation(_, cur interface{}) {
 	curStorageLocation := cur.(*metering.StorageLocation)
 	if curStorageLocation.DeletionTimestamp != nil {
 		op.deleteStorageLocation(curStorageLocation)
@@ -371,7 +371,7 @@ func (op *Reporting) updateStorageLocation(_, cur interface{}) {
 	op.enqueueStorageLocation(curStorageLocation)
 }
 
-func (op *Reporting) deleteStorageLocation(obj interface{}) {
+func (op *defaultReportingOperator) deleteStorageLocation(obj interface{}) {
 	storageLocation, ok := obj.(*metering.StorageLocation)
 	if !ok {
 		tombstone, ok := obj.(cache.DeletedFinalStateUnknown)
@@ -410,7 +410,7 @@ func (op *Reporting) deleteStorageLocation(obj interface{}) {
 	op.storageLocationQueue.Add(key)
 }
 
-func (op *Reporting) enqueueStorageLocation(storageLocation *metering.StorageLocation) {
+func (op *defaultReportingOperator) enqueueStorageLocation(storageLocation *metering.StorageLocation) {
 	key, err := cache.MetaNamespaceKeyFunc(storageLocation)
 	if err != nil {
 		op.logger.WithFields(log.Fields{"storageLocation": storageLocation.Name, "namespace": storageLocation.Namespace}).WithError(err).Errorf("couldn't get key for object: %#v", storageLocation)
@@ -421,7 +421,7 @@ func (op *Reporting) enqueueStorageLocation(storageLocation *metering.StorageLoc
 
 type workerProcessFunc func(logger log.FieldLogger) bool
 
-func (op *Reporting) processResource(logger log.FieldLogger, handlerFunc syncHandler, objType string, queue workqueue.RateLimitingInterface, maxRequeues int) bool {
+func (op *defaultReportingOperator) processResource(logger log.FieldLogger, handlerFunc syncHandler, objType string, queue workqueue.RateLimitingInterface, maxRequeues int) bool {
 	obj, quit := queue.Get()
 	if quit {
 		logger.Infof("queue is shutting down, exiting %s worker", objType)
@@ -435,7 +435,7 @@ func (op *Reporting) processResource(logger log.FieldLogger, handlerFunc syncHan
 
 type syncHandler func(logger log.FieldLogger, key string) error
 
-func (op *Reporting) runHandler(logger log.FieldLogger, handlerFunc syncHandler, objType string, obj interface{}, queue workqueue.RateLimitingInterface, maxRequeues int) {
+func (op *defaultReportingOperator) runHandler(logger log.FieldLogger, handlerFunc syncHandler, objType string, obj interface{}, queue workqueue.RateLimitingInterface, maxRequeues int) {
 	logger = logger.WithFields(newLogIdentifier(op.rand))
 	if key, ok := op.getKeyFromQueueObj(logger, objType, obj, queue); ok {
 		logger.Infof("syncing %s %s", objType, key)
@@ -452,7 +452,7 @@ func (op *Reporting) runHandler(logger log.FieldLogger, handlerFunc syncHandler,
 // workqueue means the items in the informer cache may actually be
 // more up to date that when the item was initially put onto the
 // workqueue.
-func (op *Reporting) getKeyFromQueueObj(logger log.FieldLogger, objType string, obj interface{}, queue workqueue.RateLimitingInterface) (string, bool) {
+func (op *defaultReportingOperator) getKeyFromQueueObj(logger log.FieldLogger, objType string, obj interface{}, queue workqueue.RateLimitingInterface) (string, bool) {
 	if key, ok := obj.(string); ok {
 		return key, ok
 	}
@@ -462,7 +462,7 @@ func (op *Reporting) getKeyFromQueueObj(logger log.FieldLogger, objType string, 
 }
 
 // handleErr checks if an error happened and makes sure we will retry later.
-func (op *Reporting) handleErr(logger log.FieldLogger, err error, objType string, obj interface{}, queue workqueue.RateLimitingInterface, maxRequeues int) {
+func (op *defaultReportingOperator) handleErr(logger log.FieldLogger, err error, objType string, obj interface{}, queue workqueue.RateLimitingInterface, maxRequeues int) {
 	logger = logger.WithField(objType, obj)
 
 	if err == nil {

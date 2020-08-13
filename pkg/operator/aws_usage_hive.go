@@ -41,7 +41,7 @@ var (
 )
 
 // CreateAWSUsageTable instantiates a new external HiveTable CR for AWS Billing/Usage reports stored in S3.
-func (op *Reporting) createAWSUsageHiveTableCR(logger logrus.FieldLogger, dataSource *metering.ReportDataSource, tableName, bucket, prefix string, manifests []*aws.Manifest) (*metering.HiveTable, error) {
+func (op *defaultReportingOperator) createAWSUsageHiveTableCR(logger logrus.FieldLogger, dataSource *metering.ReportDataSource, tableName, bucket, prefix string, manifests []*aws.Manifest) (*metering.HiveTable, error) {
 	location, err := hive.S3Location(bucket, prefix)
 	if err != nil {
 		return nil, err
@@ -118,7 +118,7 @@ func (op *Reporting) createAWSUsageHiveTableCR(logger logrus.FieldLogger, dataSo
 	return hiveTable, nil
 }
 
-func (op *Reporting) updateAWSBillingPartitions(logger log.FieldLogger, dataSource *metering.ReportDataSource, source *metering.S3Bucket, hiveTable *metering.HiveTable, manifests []*aws.Manifest) error {
+func (op *defaultReportingOperator) updateAWSBillingPartitions(logger log.FieldLogger, dataSource *metering.ReportDataSource, source *metering.S3Bucket, hiveTable *metering.HiveTable, manifests []*aws.Manifest) error {
 	logger.Infof("updating partitions for Hive table %s", hiveTable.Name)
 	// Fetch the billing manifests
 	if len(manifests) == 0 {

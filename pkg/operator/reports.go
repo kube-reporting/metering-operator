@@ -67,7 +67,7 @@ func init() {
 	prometheus.MustRegister(generateReportDurationHistogram)
 }
 
-func (op *Reporting) runReportWorker() {
+func (op *defaultReportingOperator) runReportWorker() {
 	logger := op.logger.WithField("component", "reportWorker")
 	logger.Infof("Report worker started")
 	const maxRequeues = 5
@@ -75,7 +75,7 @@ func (op *Reporting) runReportWorker() {
 	}
 }
 
-func (op *Reporting) syncReport(logger log.FieldLogger, key string) error {
+func (op *defaultReportingOperator) syncReport(logger log.FieldLogger, key string) error {
 	namespace, name, err := cache.SplitMetaNamespaceKey(key)
 	if err != nil {
 		logger.WithError(err).Errorf("invalid resource key :%s", key)
@@ -207,7 +207,7 @@ func getSchedule(reportSched *metering.ReportSchedule) (reportSchedule, error) {
 	return cron.Parse(cronSpec)
 }
 
-func (op *Reporting) handleReport(logger log.FieldLogger, report *metering.Report) error {
+func (op *defaultReportingOperator) handleReport(logger log.FieldLogger, report *metering.Report) error {
 	if op.cfg.EnableFinalizers && reportNeedsFinalizer(report) {
 		var err error
 		report, err = op.addReportFinalizer(report)
@@ -354,7 +354,7 @@ func getReportPeriod(now time.Time, logger log.FieldLogger, report *metering.Rep
 	return reportPeriod, nil
 }
 
-func (op *Reporting) handleExpiredReport(logger log.FieldLogger, report *metering.Report, now time.Time) error {
+func (op *defaultReportingOperator) handleExpiredReport(logger log.FieldLogger, report *metering.Report, now time.Time) error {
 	// check if the Report is being deleted already
 	if report.DeletionTimestamp != nil {
 		logger.Warnf("report was already marked for deletion")
@@ -398,7 +398,7 @@ func (op *Reporting) handleExpiredReport(logger log.FieldLogger, report *meterin
 // according the report's schedule. If the next scheduled reporting period
 // hasn't elapsed, runReport will requeue the resource for a time when
 // the period has elapsed.
-func (op *Reporting) runReport(logger log.FieldLogger, report *metering.Report) error {
+func (op *defaultReportingOperator) runReport(logger log.FieldLogger, report *metering.Report) error {
 	// check if the report we're currently processing is considered
 	// "expired". If true, exit early and requeue that object so
 	// op.syncReport calls the proper handler for this resource.
@@ -810,7 +810,7 @@ func (op *Reporting) runReport(logger log.FieldLogger, report *metering.Report) 
 }
 
 // We check first for Reports depending on this Report, return if any, and then check ReportQueries depending on Report
-func isReportNotUsedAsInput(logger log.FieldLogger, report *metering.Report, op *Reporting) bool {
+func isReportNotUsedAsInput(logger log.FieldLogger, report *metering.Report, op *defaultReportingOperator) bool {
 	// Consider Reports referencing this report in the namespace of this report
 	reports, err := op.reportLister.Reports(report.Namespace).List(labels.Everything())
 	if err != nil {
@@ -903,7 +903,7 @@ func convertDayOfWeek(dow string) (int, error) {
 	return 0, fmt.Errorf("invalid day of week: %s", dow)
 }
 
-func (op *Reporting) addReportFinalizer(report *metering.Report) (*metering.Report, error) {
+func (op *defaultReportingOperator) addReportFinalizer(report *metering.Report) (*metering.Report, error) {
 	report.Finalizers = append(report.Finalizers, reportFinalizer)
 	newReport, err := op.meteringClient.MeteringV1().Reports(report.Namespace).Update(context.TODO(), report, metav1.UpdateOptions{})
 	logger := op.logger.WithFields(log.Fields{"report": report.Name, "namespace": report.Namespace})
@@ -915,7 +915,7 @@ func (op *Reporting) addReportFinalizer(report *metering.Report) (*metering.Repo
 	return newReport, nil
 }
 
-func (op *Reporting) removeReportFinalizer(report *metering.Report) (*metering.Report, error) {
+func (op *defaultReportingOperator) removeReportFinalizer(report *metering.Report) (*metering.Report, error) {
 	if !slice.ContainsString(report.ObjectMeta.Finalizers, reportFinalizer, nil) {
 		return report, nil
 	}
@@ -934,14 +934,14 @@ func reportNeedsFinalizer(report *metering.Report) bool {
 	return report.ObjectMeta.DeletionTimestamp == nil && !slice.ContainsString(report.ObjectMeta.Finalizers, reportFinalizer, nil)
 }
 
-func (op *Reporting) updateReportStatus(report *metering.Report, cond *metering.ReportCondition) (*metering.Report, error) {
+func (op *defaultReportingOperator) updateReportStatus(report *metering.Report, cond *metering.ReportCondition) (*metering.Report, error) {
 	if condErr := meteringUtil.SetReportCondition(&report.Status, *cond); condErr != nil {
 		return report, condErr
 	}
 	return op.meteringClient.MeteringV1().Reports(report.Namespace).Update(context.TODO(), report, metav1.UpdateOptions{})
 }
 
-func (op *Reporting) setReportStatusInvalidReport(report *metering.Report, msg string) error {
+func (op *defaultReportingOperator) setReportStatusInvalidReport(report *metering.Report, msg string) error {
 	logger := op.logger.WithFields(log.Fields{"report": report.Name, "namespace": report.Namespace})
 	// don't update unless the validation error changes
 	if runningCond := meteringUtil.GetReportCondition(report.Status, metering.ReportRunning); runningCond != nil && runningCond.Status == v1.ConditionFalse && runningCond.Reason == meteringUtil.InvalidReportReason && runningCond.Message == msg {
@@ -960,11 +960,11 @@ func GetReportQueryForReport(report *metering.Report, queryGetter reporting.Repo
 	return queryGetter.GetReportQuery(report.Namespace, report.Spec.QueryName)
 }
 
-func (op *Reporting) getReportDependencies(report *metering.Report) (*reporting.ReportQueryDependencies, error) {
+func (op *defaultReportingOperator) getReportDependencies(report *metering.Report) (*reporting.ReportQueryDependencies, error) {
 	return op.getQueryDependencies(report.Namespace, report.Spec.QueryName, report.Spec.Inputs)
 }
 
-func (op *Reporting) queueDependentReportsForReport(report *metering.Report) error {
+func (op *defaultReportingOperator) queueDependentReportsForReport(report *metering.Report) error {
 	// Look for all reports in the namespace
 	reports, err := op.reportLister.Reports(report.Namespace).List(labels.Everything())
 	if err != nil {
@@ -991,7 +991,7 @@ func (op *Reporting) queueDependentReportsForReport(report *metering.Report) err
 }
 
 // for each report in the namespace, find ones that depend on the report passed into the function
-func (op *Reporting) reportsDependOnThisReport(logger log.FieldLogger, report *metering.Report, reports []*metering.Report) (bool, string) {
+func (op *defaultReportingOperator) reportsDependOnThisReport(logger log.FieldLogger, report *metering.Report, reports []*metering.Report) (bool, string) {
 	var depReportName string
 	for _, otherReport := range reports {
 		deps, err := op.getReportDependencies(otherReport)
@@ -1010,7 +1010,7 @@ func (op *Reporting) reportsDependOnThisReport(logger log.FieldLogger, report *m
 }
 
 // for each ReportQuery in the namespace, find ones that depend on the report passed into the function
-func (op *Reporting) reportQueriesDependOnThisReport(logger log.FieldLogger, report *metering.Report, reportQueries []*metering.ReportQuery) (bool, string) {
+func (op *defaultReportingOperator) reportQueriesDependOnThisReport(logger log.FieldLogger, report *metering.Report, reportQueries []*metering.ReportQuery) (bool, string) {
 	var depQueryName string
 	// for each report in the namespace, find queries that depend on the report passed into the function.
 	for _, reportQuery := range reportQueries {
@@ -1032,7 +1032,7 @@ func (op *Reporting) reportQueriesDependOnThisReport(logger log.FieldLogger, rep
 // queueDependentReportQueriesForReport will queue all
 // ReportQueries in the namespace which have a dependency on the
 // report
-func (op *Reporting) queueDependentReportQueriesForReport(report *metering.Report) error {
+func (op *defaultReportingOperator) queueDependentReportQueriesForReport(report *metering.Report) error {
 	queryLister := op.meteringClient.MeteringV1().ReportQueries(report.Namespace)
 	queries, err := queryLister.List(context.TODO(), metav1.ListOptions{})
 	if err != nil {

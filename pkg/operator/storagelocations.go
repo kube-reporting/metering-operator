@@ -21,7 +21,7 @@ const (
 	storageLocationFinalizer = metering.GroupName + "/storagelocation"
 )
 
-func (op *Reporting) runStorageLocationWorker() {
+func (op *defaultReportingOperator) runStorageLocationWorker() {
 	logger := op.logger.WithField("component", "storageLocationWorker")
 	logger.Infof("StorageLocation worker started")
 	const maxRequeues = -1
@@ -29,7 +29,7 @@ func (op *Reporting) runStorageLocationWorker() {
 	}
 }
 
-func (op *Reporting) syncStorageLocation(logger log.FieldLogger, key string) error {
+func (op *defaultReportingOperator) syncStorageLocation(logger log.FieldLogger, key string) error {
 	namespace, name, err := cache.SplitMetaNamespaceKey(key)
 	if err != nil {
 		logger.WithError(err).Errorf("invalid resource key :%s", key)
@@ -70,7 +70,7 @@ func (op *Reporting) syncStorageLocation(logger log.FieldLogger, key string) err
 	return nil
 }
 
-func (op *Reporting) handleStorageLocation(logger log.FieldLogger, storageLocation *metering.StorageLocation) error {
+func (op *defaultReportingOperator) handleStorageLocation(logger log.FieldLogger, storageLocation *metering.StorageLocation) error {
 	if op.cfg.EnableFinalizers && storageLocationNeedsFinalizer(storageLocation) {
 		var err error
 		storageLocation, err = op.addStorageLocationFinalizer(storageLocation)
@@ -134,7 +134,7 @@ func (op *Reporting) handleStorageLocation(logger log.FieldLogger, storageLocati
 	return nil
 }
 
-func (op *Reporting) addStorageLocationFinalizer(storageLocation *metering.StorageLocation) (*metering.StorageLocation, error) {
+func (op *defaultReportingOperator) addStorageLocationFinalizer(storageLocation *metering.StorageLocation) (*metering.StorageLocation, error) {
 	storageLocation.Finalizers = append(storageLocation.Finalizers, storageLocationFinalizer)
 	newStorageLocation, err := op.meteringClient.MeteringV1().StorageLocations(storageLocation.Namespace).Update(context.TODO(), storageLocation, metav1.UpdateOptions{})
 	logger := op.logger.WithFields(log.Fields{"storageLocation": storageLocation.Name, "namespace": storageLocation.Namespace})
@@ -146,7 +146,7 @@ func (op *Reporting) addStorageLocationFinalizer(storageLocation *metering.Stora
 	return newStorageLocation, nil
 }
 
-func (op *Reporting) removeStorageLocationFinalizer(storageLocation *metering.StorageLocation) (*metering.StorageLocation, error) {
+func (op *defaultReportingOperator) removeStorageLocationFinalizer(storageLocation *metering.StorageLocation) (*metering.StorageLocation, error) {
 	if !slice.ContainsString(storageLocation.ObjectMeta.Finalizers, storageLocationFinalizer, nil) {
 		return storageLocation, nil
 	}
@@ -165,7 +165,7 @@ func storageLocationNeedsFinalizer(storageLocation *metering.StorageLocation) bo
 	return storageLocation.ObjectMeta.DeletionTimestamp == nil && !slice.ContainsString(storageLocation.ObjectMeta.Finalizers, storageLocationFinalizer, nil)
 }
 
-func (op *Reporting) deleteStorage(storageLocation *metering.StorageLocation) error {
+func (op *defaultReportingOperator) deleteStorage(storageLocation *metering.StorageLocation) error {
 	if storageLocation.Spec.Hive != nil {
 		if !storageLocation.Spec.Hive.UnmanagedDatabase && storageLocation.Status.Hive.DatabaseName != "" {
 			return op.hiveDatabaseManager.DropDatabase(storageLocation.Status.Hive.DatabaseName, true, false)
@@ -174,7 +174,7 @@ func (op *Reporting) deleteStorage(storageLocation *metering.StorageLocation) er
 	return nil
 }
 
-func (op *Reporting) queueDependentsOfStorageLocation(storageLocation *metering.StorageLocation) error {
+func (op *defaultReportingOperator) queueDependentsOfStorageLocation(storageLocation *metering.StorageLocation) error {
 	reports, err := op.reportLister.Reports(storageLocation.Namespace).List(labels.Everything())
 	if err != nil {
 		return err

@@ -42,7 +42,7 @@ func init() {
 	prometheus.MustRegister(hiveTablePartitionsGauge)
 }
 
-func (op *Reporting) runHiveTableWorker() {
+func (op *defaultReportingOperator) runHiveTableWorker() {
 	logger := op.logger.WithField("component", "hiveTableWorker")
 	logger.Infof("HiveTable worker started")
 	const maxRequeues = 10
@@ -50,7 +50,7 @@ func (op *Reporting) runHiveTableWorker() {
 	}
 }
 
-func (op *Reporting) syncHiveTable(logger log.FieldLogger, key string) error {
+func (op *defaultReportingOperator) syncHiveTable(logger log.FieldLogger, key string) error {
 	namespace, name, err := cache.SplitMetaNamespaceKey(key)
 	if err != nil {
 		logger.WithError(err).Errorf("invalid resource key :%s", key)
@@ -90,7 +90,7 @@ func (op *Reporting) syncHiveTable(logger log.FieldLogger, key string) error {
 	return nil
 }
 
-func (op *Reporting) handleHiveTable(logger log.FieldLogger, hiveTable *metering.HiveTable) error {
+func (op *defaultReportingOperator) handleHiveTable(logger log.FieldLogger, hiveTable *metering.HiveTable) error {
 	if op.cfg.EnableFinalizers && hiveTableNeedsFinalizer(hiveTable) {
 		var err error
 		hiveTable, err = op.addHiveTableFinalizer(hiveTable)
@@ -275,7 +275,7 @@ func (op *Reporting) handleHiveTable(logger log.FieldLogger, hiveTable *metering
 	return nil
 }
 
-func (op *Reporting) addHiveTableFinalizer(hiveTable *metering.HiveTable) (*metering.HiveTable, error) {
+func (op *defaultReportingOperator) addHiveTableFinalizer(hiveTable *metering.HiveTable) (*metering.HiveTable, error) {
 	hiveTable.Finalizers = append(hiveTable.Finalizers, hiveTableFinalizer)
 	newHiveTable, err := op.meteringClient.MeteringV1().HiveTables(hiveTable.Namespace).Update(context.TODO(), hiveTable, metav1.UpdateOptions{})
 	logger := op.logger.WithFields(log.Fields{"hiveTable": hiveTable.Name, "namespace": hiveTable.Namespace})
@@ -287,7 +287,7 @@ func (op *Reporting) addHiveTableFinalizer(hiveTable *metering.HiveTable) (*mete
 	return newHiveTable, nil
 }
 
-func (op *Reporting) removeHiveTableFinalizer(hiveTable *metering.HiveTable) (*metering.HiveTable, error) {
+func (op *defaultReportingOperator) removeHiveTableFinalizer(hiveTable *metering.HiveTable) (*metering.HiveTable, error) {
 	if !slice.ContainsString(hiveTable.ObjectMeta.Finalizers, hiveTableFinalizer, nil) {
 		return hiveTable, nil
 	}
@@ -306,7 +306,7 @@ func hiveTableNeedsFinalizer(hiveTable *metering.HiveTable) bool {
 	return hiveTable.ObjectMeta.DeletionTimestamp == nil && !slice.ContainsString(hiveTable.ObjectMeta.Finalizers, hiveTableFinalizer, nil)
 }
 
-func (op *Reporting) createHiveTableCR(obj metav1.Object, gvk schema.GroupVersionKind, params hive.TableParameters, managePartitions bool, partitions []hive.TablePartition) (*metering.HiveTable, error) {
+func (op *defaultReportingOperator) createHiveTableCR(obj metav1.Object, gvk schema.GroupVersionKind, params hive.TableParameters, managePartitions bool, partitions []hive.TablePartition) (*metering.HiveTable, error) {
 	apiVersion := gvk.GroupVersion().String()
 	kind := gvk.Kind
 	name := obj.GetName()
@@ -378,7 +378,7 @@ func (op *Reporting) createHiveTableCR(obj metav1.Object, gvk schema.GroupVersio
 	return hiveTable, nil
 }
 
-func (op *Reporting) waitForHiveTable(namespace, name string, pollInterval, timeout time.Duration) (*metering.HiveTable, error) {
+func (op *defaultReportingOperator) waitForHiveTable(namespace, name string, pollInterval, timeout time.Duration) (*metering.HiveTable, error) {
 	var hiveTable *metering.HiveTable
 	err := wait.Poll(pollInterval, timeout, func() (bool, error) {
 		var err error
@@ -403,7 +403,7 @@ func (op *Reporting) waitForHiveTable(namespace, name string, pollInterval, time
 	return hiveTable, nil
 }
 
-func (op *Reporting) dropHiveTable(hiveTable *metering.HiveTable) error {
+func (op *defaultReportingOperator) dropHiveTable(hiveTable *metering.HiveTable) error {
 	tableName := hiveTable.Status.TableName
 	databaseName := hiveTable.Status.DatabaseName
 	if tableName == "" {
