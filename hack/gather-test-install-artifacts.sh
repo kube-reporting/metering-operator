@@ -44,6 +44,7 @@ commands+=("get pods -o wide")
 commands+=("get reportdatasources")
 commands+=("get reports")
 commands+=("get prestotables")
+commands+=("get hivetables")
 commands+=("get events")
 
 for command in "${commands[@]}"; do
