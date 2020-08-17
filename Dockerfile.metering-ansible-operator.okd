@@ -6,7 +6,7 @@ FROM openshift/origin-cli:latest as cli
 FROM quay.io/openshift/origin-ansible-operator:4.6
 
 USER root
-RUN set -x; INSTALL_PKGS="curl bash ca-certificates less which inotify-tools openssl" \
+RUN set -x; INSTALL_PKGS="curl bash ca-certificates less which openssl" \
     && yum clean all && rm -rf /var/cache/yum/* \
     && yum install -y https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm  \
     && yum install --setopt=skip_missing_names_on_install=False -y \
