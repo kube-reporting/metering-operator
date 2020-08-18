@@ -32,7 +32,7 @@ COPY charts/openshift-metering ${HELM_CHART_PATH}
 
 COPY manifests/deploy/openshift/olm/bundle /manifests
 
-ENTRYPOINT ["tini", "--", "/usr/local/bin/ansible-operator", "exec-entrypoint", "ansible", "--watches-file", "/opt/ansible/watches.yaml"]
+ENTRYPOINT ["tini", "--", "/usr/local/bin/ansible-operator", "--watches-file", "/opt/ansible/watches.yaml"]
 
 USER 1001
 
