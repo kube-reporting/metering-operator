@@ -83,3 +83,5 @@ replace (
 	github.com/taozle/go-hive-driver => github.com/chancez/go-hive-driver v0.0.0-20190516203049-b3c680b33c4f
 	sigs.k8s.io/structured-merge-diff => sigs.k8s.io/structured-merge-diff v1.0.2
 )
+
+replace golang.org/x/text => golang.org/x/text v0.3.3
