@@ -42,6 +42,7 @@ ENTRYPOINT ["tini", "--", "/usr/local/bin/ansible-operator", "exec-entrypoint", 
 
 LABEL io.k8s.display-name="OpenShift metering-ansible-operator" \
       io.k8s.description="This is a component of OpenShift Container Platform and manages installation and configuration of all other metering components." \
+      summary="This is a component of OpenShift Container Platform and manages installation and configuration of all other metering components." \
       io.openshift.tags="openshift" \
       com.redhat.delivery.appregistry=true \
       maintainer="<metering-team@redhat.com>"
