@@ -15,12 +15,12 @@ RUN yum clean all && rm -rf /var/cache/yum/* && \
 
 COPY --from=build /go/src/github.com/kube-reporting/metering-operator/bin/reporting-operator /usr/local/bin/reporting-operator
 
-LABEL io.k8s.display-name="OpenShift metering-reporting-operator" \
-      io.k8s.description="This is a component of OpenShift Container Platform and manages collecting data from monitoring and running reports." \
-      io.openshift.tags="openshift" \
-      maintainer="sd-operator-metering@redhat.com"
-
+USER 3001
 ENTRYPOINT ["reporting-operator"]
 CMD ["start"]
 
-USER 3001
+LABEL io.k8s.display-name="OpenShift metering-reporting-operator" \
+    io.k8s.description="This is a component of OpenShift Container Platform and manages collecting data from monitoring and running reports." \
+    summary="This is a component of OpenShift Container Platform and manages collecting data from monitoring and running reports." \
+    io.openshift.tags="openshift" \
+    maintainer="<metering-team@redhat.com>"
