@@ -8,6 +8,7 @@ spec:
   type: ClusterIP
   selector:
     registry.operator.metering-ansible: "true"
+    tenant: ""
   ports:
   - name: grpc
     port: 50051
