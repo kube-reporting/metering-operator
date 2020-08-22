@@ -1,6 +1,7 @@
 package deployframework
 
 import (
+	"fmt"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -12,24 +13,36 @@ import (
 )
 
 func TestNewDeployerConfig(t *testing.T) {
-	df := &DeployFramework{}
+	df := &DeployFramework{
+		NamespacePrefix: "metering-dev",
+	}
 	spec := metering.MeteringConfigSpec{}
 	testNamespace := "test-ns"
 	testMeteringOpRepo := "test-repo-1"
 	testMeteringOpTag := "test-tag-1"
 	testReportingOpRepo := "test-repo-2"
 	testReportingOpTag := "test-tag-2"
-	cfg, err := df.NewDeployerConfig(testNamespace, testMeteringOpRepo, testMeteringOpTag, testReportingOpRepo, testReportingOpTag, spec)
+	testCatalogSourceName := "test-catalogsource"
+	testCatalogSourceNamespace := "marketplace"
+	testSubscriptionChannel := "v0.0.1"
+
+	cfg, err := df.NewDeployerConfig(testNamespace, testMeteringOpRepo, testMeteringOpTag, testReportingOpRepo, testReportingOpTag, testCatalogSourceName, testCatalogSourceNamespace, testSubscriptionChannel, spec)
 	require.NoError(t, err)
 
 	expectedCfg := &deploy.Config{
-		Namespace:       testNamespace,
-		Repo:            testMeteringOpRepo,
-		Tag:             testMeteringOpTag,
-		Platform:        defaultPlatform,
-		DeleteNamespace: defaultDeleteNamespace,
+		Namespace:              testNamespace,
+		Repo:                   testMeteringOpRepo,
+		Tag:                    testMeteringOpTag,
+		Platform:               defaultPlatform,
+		SubscriptionName:       defaultSubscriptionName,
+		PackageName:            defaultPackageName,
+		CatalogSourceName:      testCatalogSourceName,
+		CatalogSourceNamespace: testCatalogSourceNamespace,
+		Channel:                testSubscriptionChannel,
+		DeleteCRB:              defaultDeleteCRB,
+		DeleteNamespace:        defaultDeleteNamespace,
 		ExtraNamespaceLabels: map[string]string{
-			"name": testNamespaceLabel,
+			"name": fmt.Sprintf("%s-%s", df.NamespacePrefix, testNamespaceLabel),
 		},
 		OperatorResources: nil,
 		MeteringConfig: &metering.MeteringConfig{
