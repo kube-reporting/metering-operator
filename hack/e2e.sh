@@ -109,6 +109,12 @@ go test \
     ${EXTRA_TEST_FLAGS} \
     2>&1 | tee "$TEST_LOG_FILE_PATH" ; TEST_EXIT_CODE=${PIPESTATUS[0]}
 
+go test \
+    -timeout 30s \
+    -test.v \
+    "./test/deployframework" \
+    2>&1 | tee "$TEST_LOG_FILE_PATH" ; TEST_EXIT_CODE=${PIPESTATUS[0]}
+
 # if go-junit-report is installed, create a junit report also
 if command -v go-junit-report >/dev/null 2>&1; then
     go-junit-report < "$TEST_LOG_FILE_PATH" > "${TEST_JUNIT_REPORT_FILE_PATH}"
