@@ -1,9 +1,9 @@
 # need the helm-cli from the helm image
-FROM openshift/ose-metering-helm:latest as helm
+FROM registry.svc.ci.openshift.org/ocp/4.6:metering-helm as helm
 # final image needs kubectl, so we copy `oc` from cli image to use as kubectl.
-FROM openshift/ose-cli:latest as cli
+FROM registry.svc.ci.openshift.org/ocp/4.6:cli as cli
 # real base
-FROM openshift/ose-ansible-operator:4.6
+FROM registry.svc.ci.openshift.org/ocp/4.6:ansible-operator
 
 USER root
 RUN set -x; \
