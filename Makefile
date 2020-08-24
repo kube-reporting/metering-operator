@@ -126,7 +126,7 @@ e2e: $(DEPLOY_METERING_BIN_OUT)
 	hack/e2e.sh
 
 e2e-upgrade: $(DEPLOY_METERING_BIN_OUT)
-	EXTRA_TEST_FLAGS="-run TestMeteringUpgrades" ./hack/e2e.sh
+	$(MAKE) e2e EXTRA_TEST_FLAGS="-run TestMeteringUpgrades"
 
 e2e-local: reporting-operator-local metering-ansible-operator-docker-build
 	$(MAKE) e2e METERING_RUN_TESTS_LOCALLY=true METERING_OPERATOR_IMAGE_REPO=$(METERING_OPERATOR_IMAGE_REPO) METERING_OPERATOR_IMAGE_TAG=$(METERING_OPERATOR_IMAGE_TAG)
