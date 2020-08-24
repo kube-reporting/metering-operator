@@ -219,8 +219,32 @@ var (
 	}
 )
 
+type testDatasource struct {
+	DatasourceName string
+	FileName       string
+}
+
+type reportsProduceCorrectDataForInputTestCase struct {
+	name                         string
+	queryName                    string
+	dataSources                  []testDatasource
+	expectedReportOutputFileName string
+	comparisonColumnNames        []string
+	timeout                      time.Duration
+	parallel                     bool
+}
+
+// testReportingProducesCorrectDataForInput is a helper function that
+// attempts to inject static testing data into the database tables for the
+// ReportDataSource custom resources in the rf.Namespace testing namespace.
+// In order to do that, we use the metering push API for the ReportDataSource
+// endpoint, injecting decoded json data into this prestostore.PrometheusMetric
+// type the API is expecting. This function is a precursor to the actual testing
+// function, testReportsProduceCorrectDataForInput, which will ensure the data
+// injecting into the ReportDataSource tables match the expect report results.
 func testReportingProducesCorrectDataForInput(t *testing.T, testReportingFramework *reportingframework.ReportingFramework) {
 	t.Logf("Waiting for ReportDataSources tables to be created")
+
 	_, err := testReportingFramework.WaitForAllMeteringReportDataSourceTables(t, time.Second*5, 5*time.Minute)
 	require.NoError(t, err, "should not error when waiting for all ReportDataSource tables to be created")
 
@@ -234,7 +258,10 @@ func testReportingProducesCorrectDataForInput(t *testing.T, testReportingFramewo
 	t.Logf("Waiting for ReportQueries tables to become ready")
 	testReportingFramework.RequireReportQueriesReady(t, queries, time.Second*5, 5*time.Minute)
 
-	var reportStart, reportEnd time.Time
+	var (
+		reportStart time.Time
+		reportEnd   time.Time
+	)
 	dataSourcesSubmitted := make(map[string]struct{})
 	t.Logf("Pushing fixture metrics required for tests into metering")
 
@@ -248,7 +275,6 @@ func testReportingProducesCorrectDataForInput(t *testing.T, testReportingFramewo
 
 				metricsFile, err := os.Open(dataSource.FileName)
 				require.NoError(t, err)
-
 				decoder := json.NewDecoder(metricsFile)
 
 				_, err = decoder.Token()
@@ -259,6 +285,7 @@ func testReportingProducesCorrectDataForInput(t *testing.T, testReportingFramewo
 					var metric prestostore.PrometheusMetric
 					err = decoder.Decode(&metric)
 					require.NoError(t, err)
+
 					if reportStart.IsZero() || metric.Timestamp.Before(reportStart) {
 						reportStart = metric.Timestamp
 					}
@@ -266,6 +293,7 @@ func testReportingProducesCorrectDataForInput(t *testing.T, testReportingFramewo
 						reportEnd = metric.Timestamp
 					}
 					metrics = append(metrics, &metric)
+
 					// batch store metrics in amounts of 100
 					if len(metrics) >= 100 {
 						err := testReportingFramework.StoreDataSourceData(dataSource.DatasourceName, metrics)
@@ -282,9 +310,11 @@ func testReportingProducesCorrectDataForInput(t *testing.T, testReportingFramewo
 				reportEndStr := reportEnd.UTC().Format(time.RFC3339)
 				reportStartStr := reportStart.UTC().Format(time.RFC3339)
 				nowStr := time.Now().UTC().Format(time.RFC3339)
+
 				jsonPatch := []byte(fmt.Sprintf(
 					`[{ "op": "add", "path": "/status/prometheusMetricsImportStatus", "value": { "importDataStartTime": "%s", "importDataEndTime": "%s", "earliestImportedMetricTime": "%s", "newestImportedMetricTime": "%s", "lastImportTime": "%s" } } ]`,
 					reportStartStr, reportEndStr, reportStartStr, reportEndStr, nowStr))
+
 				_, err = testReportingFramework.MeteringClient.ReportDataSources(testReportingFramework.Namespace).Patch(context.TODO(), dataSource.DatasourceName, types.JSONPatchType, jsonPatch, metav1.PatchOptions{})
 				require.NoError(t, err)
 
@@ -293,24 +323,19 @@ func testReportingProducesCorrectDataForInput(t *testing.T, testReportingFramewo
 		}
 	}
 
+	require.NotZero(t, reportStart, "reportStart should not be zero")
+	require.NotZero(t, reportEnd, "reportEnd should not be zero")
+
 	testReportsProduceCorrectDataForInput(t, testReportingFramework, reportStart, reportEnd, testReportsProduceCorrectDataForInputTestCases)
 }
 
-type testDatasource struct {
-	DatasourceName string
-	FileName       string
-}
-
-type reportsProduceCorrectDataForInputTestCase struct {
-	name                         string
-	queryName                    string
-	dataSources                  []testDatasource
-	expectedReportOutputFileName string
-	comparisonColumnNames        []string
-	timeout                      time.Duration
-	parallel                     bool
-}
-
+// testReportsProduceCorrectDataForInput is a post-install testing
+// function that ensures that the static data injected into the
+// ReportDataSource database tables matches the expected report
+// results. This helps ensure that the queries used throughout
+// any of the ReportQuery custom resources we instantiate throughout
+// a particular test, correctly generate the expected, static output,
+// based on a known set of inputs.
 func testReportsProduceCorrectDataForInput(
 	t *testing.T,
 	testReportingFramework *reportingframework.ReportingFramework,
@@ -318,13 +343,13 @@ func testReportsProduceCorrectDataForInput(
 	reportEnd time.Time,
 	testCases []reportsProduceCorrectDataForInputTestCase,
 ) {
-	require.NotZero(t, reportStart, "reportStart should not be zero")
-	require.NotZero(t, reportEnd, "reportEnd should not be zero")
 	t.Logf("reportStart: %s, reportEnd: %s", reportStart, reportEnd)
+
 	for _, test := range testCases {
 		// Fix closure captures
 		name := test.name
 		test := test
+
 		t.Run(name, func(t *testing.T) {
 			if test.parallel {
 				t.Parallel()

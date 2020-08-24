@@ -9,6 +9,11 @@ import (
 	"github.com/kube-reporting/metering-operator/pkg/operator/prestostore"
 )
 
+const prometheusDataSourceAPIEndpointPrefix = "/api/v1/datasources/prometheus/store/"
+
+// StoreDataSourceData is a reportingframework method responsible for making
+// the metering push API call to inject the list of @metrics prometheus metrics
+// into a particular ReportDatasource custom resource database table.
 func (rf *ReportingFramework) StoreDataSourceData(dataSourceName string, metrics []*prestostore.PrometheusMetric) error {
 	params := operator.StorePrometheusMetricsDataRequest(metrics)
 	body, err := json.Marshal(params)
@@ -16,7 +21,9 @@ func (rf *ReportingFramework) StoreDataSourceData(dataSourceName string, metrics
 		return err
 	}
 
-	url := fmt.Sprintf("/api/v1/datasources/prometheus/store/%s/%s", rf.Namespace, dataSourceName)
+	// build up the URL the post api request is expecting.
+	// ex: $HOST/api/v1/datasources/prometheus/store/tflannag/namespace-cpu-request
+	url := fmt.Sprintf("%s/%s/%s", prometheusDataSourceAPIEndpointPrefix, rf.Namespace, dataSourceName)
 	respBody, respCode, err := rf.ReportingOperatorPOSTRequest(url, body)
 	if err != nil {
 		return fmt.Errorf("error storing datasource data: %s", err)

@@ -98,7 +98,7 @@ func (rf *ReportingFramework) GetReportResults(t *testing.T, report *metering.Re
 		"format":    "json",
 	}
 	err := wait.Poll(time.Second*5, waitTimeout, func() (bool, error) {
-		respBody, respCode, err := rf.ReportingOperatorRequest("/api/v1/reports/get", queryParams)
+		respBody, respCode, err := rf.ReportingOperatorGetRequest("/api/v1/reports/get", queryParams)
 		require.NoError(t, err, "fetching Report results should be successful")
 
 		if respCode == http.StatusAccepted {

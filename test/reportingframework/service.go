@@ -20,35 +20,44 @@ const (
 	meteringRouteName                = "metering"
 )
 
-func (rf *ReportingFramework) doRequest(endpoint, method string, body []byte, query map[string]string) (respBody []byte, code int, err error) {
-	var u *url.URL
+func (rf *ReportingFramework) determineMeteringAPIUrl(endpoint string) (*url.URL, error) {
+	u := rf.ReportingAPIURL
 
 	if rf.UseRouteForReportingAPI {
-		// query all routes for the metering route
 		meteringRoute, err := rf.RouteClient.Routes(rf.Namespace).Get(context.Background(), meteringRouteName, metav1.GetOptions{})
 		if err != nil {
-			return nil, 0, fmt.Errorf("query for metering route failed, err: %v", err)
+			return nil, err
 		}
 
-		u = &url.URL{
+		return &url.URL{
 			Scheme: "https",
 			Host:   meteringRoute.Spec.Host,
 			Path:   endpoint,
-		}
-	} else if rf.UseKubeProxyForReportingAPI {
+		}, nil
+	}
+	if rf.UseKubeProxyForReportingAPI {
 		u = rf.KubeAPIURL
-		proto := "http"
+		scheme := "http"
+
 		if rf.HTTPSAPI {
-			proto = "https"
+			scheme = "https"
 		}
-		apiProxyPath := fmt.Sprintf("/api/v1/namespaces/%s/services/%s/proxy/", rf.Namespace, net.JoinSchemeNamePort(proto, reportingOperatorServiceName, reportingOperatorServicePortName))
+		apiProxyPath := fmt.Sprintf("/api/v1/namespaces/%s/services/%s/proxy/", rf.Namespace, net.JoinSchemeNamePort(scheme, reportingOperatorServiceName, reportingOperatorServicePortName))
 		u.Path = path.Join(apiProxyPath, endpoint)
-	} else {
-		u = rf.ReportingAPIURL
-		if rf.HTTPSAPI {
-			u.Scheme = "https"
-		}
-		u.Path = endpoint
+		return u, nil
+	}
+	if rf.HTTPSAPI {
+		u.Scheme = "https"
+	}
+	u.Path = endpoint
+
+	return u, nil
+}
+
+func (rf *ReportingFramework) doRequest(endpoint, method string, body []byte, query map[string]string) (respBody []byte, code int, err error) {
+	u, err := rf.determineMeteringAPIUrl(endpoint)
+	if err != nil {
+		return nil, 0, fmt.Errorf("failed to successfully return an initialized url.URL object: %v", err)
 	}
 
 	req := &http.Request{
@@ -91,10 +100,14 @@ func (rf *ReportingFramework) doRequest(endpoint, method string, body []byte, qu
 	return respBody, resp.StatusCode, nil
 }
 
-func (rf *ReportingFramework) ReportingOperatorRequest(endpoint string, query map[string]string) (respBody []byte, code int, err error) {
+// ReportingOperatorGetRequest is a reportingframework method that performs
+// a single GET request to the metering API.
+func (rf *ReportingFramework) ReportingOperatorGetRequest(endpoint string, query map[string]string) (respBody []byte, code int, err error) {
 	return rf.doRequest(endpoint, "GET", nil, query)
 }
 
+// ReportingOperatorPOSTRequest is a reportingframework method that performs
+// a single POST request to the metering API.
 func (rf *ReportingFramework) ReportingOperatorPOSTRequest(endpoint string, body []byte) (respBody []byte, code int, err error) {
 	return rf.doRequest(endpoint, "POST", body, nil)
 }

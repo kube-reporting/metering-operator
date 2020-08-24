@@ -13,13 +13,16 @@ import (
 	_ "k8s.io/client-go/plugin/pkg/client/auth/oidc"
 	"k8s.io/client-go/rest"
 
-	metering "github.com/kube-reporting/metering-operator/pkg/generated/clientset/versioned/typed/metering/v1"
+	meteringv1 "github.com/kube-reporting/metering-operator/pkg/generated/clientset/versioned/typed/metering/v1"
 	"github.com/kube-reporting/metering-operator/pkg/operator"
 	routev1client "github.com/openshift/client-go/route/clientset/versioned/typed/route/v1"
 )
 
+// ReportingFramework is a type responsible for storing all
+// of the state necessary to perform post-install tests
+// against a particular metering installation.
 type ReportingFramework struct {
-	MeteringClient metering.MeteringV1Interface
+	MeteringClient meteringv1.MeteringV1Interface
 	KubeClient     kubernetes.Interface
 	RouteClient    routev1client.RouteV1Client
 	KubeConfig     *rest.Config
@@ -54,7 +57,7 @@ func New(
 	reportOutputDir string,
 	kubeconfig *rest.Config,
 	kubeClient kubernetes.Interface,
-	meteringClient metering.MeteringV1Interface,
+	meteringClient meteringv1.MeteringV1Interface,
 ) (*ReportingFramework, error) {
 	kubeAPIURL, kubeAPIPath, err := rest.DefaultServerURL(kubeconfig.Host, kubeconfig.APIPath, schema.GroupVersion{}, true)
 	if err != nil {
