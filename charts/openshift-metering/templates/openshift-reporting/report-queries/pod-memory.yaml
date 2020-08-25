@@ -371,13 +371,11 @@ spec:
       usage.pod_usage_memory_byte_seconds / capacity.total_cluster_capacity_memory_byte_seconds AS pod_memory_usage_percent,
       request.pod_request_memory_byte_seconds / capacity.total_cluster_capacity_memory_byte_seconds AS pod_memory_request_percent,
       capacity.total_cluster_capacity_memory_byte_seconds
-    FROM namespace_memory_request as request
-    JOIN namespace_memory_usage as usage
-      ON request.period_start = usage.period_start
-      AND request.period_end = usage.period_end
-      AND request.namespace = usage.namespace
+    FROM namespace_memory_usage as usage
     JOIN cluster_memory_capacity as capacity
-      ON capacity.period_start = request.period_start
-      AND capacity.period_end = request.period_end
-      AND capacity.period_start = usage.period_start
+      ON capacity.period_start = usage.period_start
       AND capacity.period_end = usage.period_end
+    LEFT JOIN namespace_memory_request as request
+      ON usage.period_start = request.period_start
+      AND usage.period_end = request.period_end
+      AND usage.namespace = request.namespace
