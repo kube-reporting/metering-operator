@@ -56,10 +56,10 @@ spec:
             memory: 650Mi
       config:
         db:
-          driver: com.mysql.jdbc.Driver
+          driver: org.mariadb.jdbc.Driver
           username: testuser
           password: testpass
-          url: jdbc:mysql://mariadb.mysql.svc.cluster.local:3306/metastore
+          url: jdbc:mariadb://mariadb.mysql.svc.cluster.local:3306/metastore
   hadoop:
     spec:
       hdfs:

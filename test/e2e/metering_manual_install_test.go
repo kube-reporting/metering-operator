@@ -3,14 +3,15 @@ package e2e
 import (
 	"context"
 	"fmt"
-	"github.com/kube-reporting/metering-operator/pkg/deploy"
-	"k8s.io/client-go/kubernetes"
 	"os"
 	"os/exec"
 	"path/filepath"
 	"strings"
 	"testing"
 	"time"
+
+	"github.com/kube-reporting/metering-operator/pkg/deploy"
+	"k8s.io/client-go/kubernetes"
 
 	"github.com/kube-reporting/metering-operator/test/deployframework"
 	"github.com/kube-reporting/metering-operator/test/testhelpers"
@@ -357,7 +358,7 @@ func createMySQLDatabase(ctx *deployframework.DeployerCtx) error {
 		"oc",
 		"-n", mysqlNamespace,
 		"new-app",
-		"--image-stream", "mariadb:10.2",
+		"--image-stream", "mariadb:latest",
 		"MYSQL_USER=testuser",
 		"MYSQL_PASSWORD=testpass",
 		"MYSQL_DATABASE=metastore",

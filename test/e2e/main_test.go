@@ -289,7 +289,7 @@ func TestManualMeteringInstall(t *testing.T) {
 			// some issues with using mariadb as a direct replacement
 			// as Hive server hangs during the create table call
 			// and requires a restart to work properly.
-			Skip:           true,
+			Skip:           false,
 			PreInstallFunc: createMySQLDatabase,
 			InstallSubTests: []InstallTestCase{
 				{
