@@ -9,7 +9,7 @@ FROM registry.svc.ci.openshift.org/ocp/4.6:ansible-operator
 
 USER root
 RUN set -x;
-ARG INSTALL_PKGS="less openssl tini"
+ARG INSTALL_PKGS="less openssl tini python3-pip"
 
 COPY --from=helm /usr/local/bin/helm /usr/local/bin/helm
 COPY --from=cli /usr/bin/oc /usr/bin/oc
@@ -24,7 +24,7 @@ RUN yum install --verbose --allowerasing --setopt=skip_missing_names_on_install=
 RUN ln -f -s /usr/bin/oc /usr/bin/kubectl
 
 # netaddr is needed to use the ipv4/ipv6 jinja filter
-RUN pip install --no-cache-dir --upgrade netaddr botocore boto3
+RUN pip3 install --no-cache-dir --upgrade netaddr botocore boto3
 
 ENV HOME /opt/ansible
 ENV HELM_CHART_PATH ${HOME}/charts/openshift-metering
@@ -41,8 +41,8 @@ USER 1001
 ENTRYPOINT ["tini", "--", "/usr/local/bin/ansible-operator", "exec-entrypoint", "ansible", "--watches-file", "/opt/ansible/watches.yaml"]
 
 LABEL io.k8s.display-name="OpenShift metering-ansible-operator" \
-      io.k8s.description="This is a component of OpenShift Container Platform and manages installation and configuration of all other metering components." \
-      summary="This is a component of OpenShift Container Platform and manages installation and configuration of all other metering components." \
-      io.openshift.tags="openshift" \
-      com.redhat.delivery.appregistry=true \
-      maintainer="<metering-team@redhat.com>"
+    io.k8s.description="This is a component of OpenShift Container Platform and manages installation and configuration of all other metering components." \
+    summary="This is a component of OpenShift Container Platform and manages installation and configuration of all other metering components." \
+    io.openshift.tags="openshift" \
+    com.redhat.delivery.appregistry=true \
+    maintainer="<metering-team@redhat.com>"
