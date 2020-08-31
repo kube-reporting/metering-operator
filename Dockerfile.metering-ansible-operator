@@ -24,7 +24,9 @@ RUN yum install --verbose --allowerasing --setopt=skip_missing_names_on_install=
 RUN ln -f -s /usr/bin/oc /usr/bin/kubectl
 
 # netaddr is needed to use the ipv4/ipv6 jinja filter
-RUN pip3 install --no-cache-dir --upgrade netaddr botocore boto3
+# Need to pip the urllib3 to a specific version to ensure that we meet the
+# botocore dependency requirements.
+RUN pip3 install --no-cache-dir --upgrade netaddr botocore boto3 "urllib3==1.24"
 
 ENV HOME /opt/ansible
 ENV HELM_CHART_PATH ${HOME}/charts/openshift-metering
