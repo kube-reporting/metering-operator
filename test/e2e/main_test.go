@@ -20,11 +20,10 @@ import (
 var (
 	df *deployframework.DeployFramework
 
-	kubeConfig         string
-	logLevel           string
-	runTestsLocal      bool
-	runDevSetup        bool
-	runAllInstallTests bool
+	kubeConfig    string
+	logLevel      string
+	runTestsLocal bool
+	runDevSetup   bool
 
 	meteringOperatorImageRepo  string
 	meteringOperatorImageTag   string
@@ -90,7 +89,6 @@ func testMainWrapper(m *testing.M) int {
 
 	flag.BoolVar(&runTestsLocal, "run-tests-local", false, "Controls whether the metering and reporting operators are run locally during tests")
 	flag.BoolVar(&runDevSetup, "run-dev-setup", false, "Controls whether the e2e suite uses the dev-friendly configuration")
-	flag.BoolVar(&runAllInstallTests, "test-run-all-install-tests", true, "Controls whether or not the e2e suite installs all of the tests listed in the TestManualMeteringInstall function")
 	flag.BoolVar(&runAWSBillingTests, "run-aws-billing-tests", runAWSBillingTests, "")
 
 	flag.StringVar(&meteringOperatorImageRepo, "metering-operator-image-repo", meteringOperatorImageRepo, "")
@@ -191,7 +189,7 @@ func TestManualMeteringInstall(t *testing.T) {
 			MeteringOperatorImageRepo: meteringOperatorImageRepo,
 			MeteringOperatorImageTag:  meteringOperatorImageTag,
 			// TODO: transistion this to a periodic test and
-			// update the `Skip` condition to !runAllInstallTests
+			// update the `Skip` condition to !testing.Short()
 			// TODO: disabling this test for the time being as
 			// we're labeling nodes and firing off this metering
 			// installation before the machineautoscaler has provisioned
@@ -368,7 +366,7 @@ func TestManualMeteringInstall(t *testing.T) {
 			Name:                      "NFS-ReportDynamicInputData",
 			MeteringOperatorImageRepo: meteringOperatorImageRepo,
 			MeteringOperatorImageTag:  meteringOperatorImageTag,
-			Skip:                      !runAllInstallTests,
+			Skip:                      !testing.Short(),
 			PreInstallFunc:            createNFSProvisioner,
 			InstallSubTests: []InstallTestCase{
 				{
