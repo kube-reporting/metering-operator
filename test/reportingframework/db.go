@@ -9,7 +9,7 @@ import (
 	"github.com/kube-reporting/metering-operator/pkg/operator/prestostore"
 )
 
-const prometheusDataSourceAPIEndpointPrefix = "/api/v1/datasources/prometheus/store/"
+const prometheusDataSourceAPIEndpointPrefix = "/api/v1/datasources/prometheus/store"
 
 // StoreDataSourceData is a reportingframework method responsible for making
 // the metering push API call to inject the list of @metrics prometheus metrics
