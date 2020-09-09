@@ -46,7 +46,7 @@ spec:
         resources:
           requests:
             cpu: 1
-            memory: 650Mi
+            memory: 2Gi
         storage:
           size: 5Gi
       server:
