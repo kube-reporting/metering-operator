@@ -105,33 +105,26 @@ func testMainWrapper(m *testing.M) int {
 	if len(namespacePrefix) > namespacePrefixCharLimit {
 		logger.Fatalf("Error: the --namespace-prefix exceeds the limit of %d characters", namespacePrefixCharLimit)
 	}
-	if registryImage == "" {
-		logger.Fatalf("Error: the --registry-image field is empty and that field is required")
-	}
 
 	var err error
 	if df, err = deployframework.New(logger, runTestsLocal, runDevSetup, namespacePrefix, repoPath, repoVersion, kubeConfig); err != nil {
 		logger.Fatalf("Failed to create a new deploy framework: %v", err)
 	}
 
-	// Check if any of the operator image variables are non-empty.
-	// In the case where one or both are non-empty, we need to pass any
-	// of the overriden operator images so that we can manipulate
-	// the default images in the metering CSV. In the case where
-	// some version of the `make e2e-dev` has been provided, skip
-	// the deletion the local registry resources and CatalogSource CR.
-	if meteringOperatorImageRepo != "" && meteringOperatorImageTag != "" {
-		meteringOperatorImage = meteringOperatorImageRepo + ":" + meteringOperatorImageTag
+	if indexImage == "" {
+		logger.Fatalf("You need to specify a non-empty --index-image flag value")
 	}
-	if reportingOperatorImageRepo != "" && reportingOperatorImageTag != "" {
-		reportingOperatorImage = reportingOperatorImageRepo + ":" + reportingOperatorImageTag
-	}
-	catalogSourceName, catalogSourceNamespace, err = df.CreateRegistryResources(registryImage, meteringOperatorImage, reportingOperatorImage)
+
+	// TODO: determine whether it makes sense to have a toggle for creating
+	// either a registry containing the old packagemanifest format vs.
+	// always using an index image. For now, always use the index image.
+	var registryProvisioned bool
+	catalogSourceName, catalogSourceNamespace, err = df.CreateCatalogSourceFromIndex(indexImage)
 	if err != nil {
-		df.Logger.Fatalf("Failed to create the CatalogSource custom resource using the %s registry image: %v", registryImage, err)
+		df.Logger.Fatalf("Failed to create the CatalogSource custom resource using the %s index image: %v", indexImage, err)
 	}
 	if !df.RunDevSetup {
-		defer df.DeleteRegistryResources(catalogSourceName, catalogSourceNamespace)
+		defer df.DeleteRegistryResources(registryProvisioned, catalogSourceName, catalogSourceNamespace)
 	}
 
 	err = df.WaitForPackageManifest(catalogSourceName, catalogSourceNamespace, subscriptionChannel)
