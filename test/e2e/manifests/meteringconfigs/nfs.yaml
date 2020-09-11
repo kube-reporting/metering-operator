@@ -18,7 +18,7 @@ spec:
     spec:
       resources:
         requests:
-          cpu: 1
+          cpu: 500m
           memory: 250Mi
       config:
         logLevel: debug
