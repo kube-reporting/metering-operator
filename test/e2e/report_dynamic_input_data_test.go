@@ -228,7 +228,7 @@ func testReportIsNotDeletedWhenReportDependsOnIt(t *testing.T, testReportingFram
 			Expression: "*/1 * * * *",
 		},
 	}
-	var foundOnce = false
+	var foundOnce bool
 	expiration := &metav1.Duration{Duration: 30.0 * time.Second}
 	// If a subReport is in dependency unmet state it won't be deleted and it can take awhile for import to happen.
 	// 4 minutes seems to be enough time for that setup, and the delete, to reliably happen.
