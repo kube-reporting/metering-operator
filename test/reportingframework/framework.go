@@ -14,8 +14,8 @@ import (
 	"k8s.io/client-go/tools/clientcmd"
 
 	routev1client "github.com/openshift/client-go/route/clientset/versioned/typed/route/v1"
-	metering "github.com/operator-framework/operator-metering/pkg/generated/clientset/versioned/typed/metering/v1"
-	"github.com/operator-framework/operator-metering/pkg/operator"
+	metering "github.com/kube-reporting/metering-operator/pkg/generated/clientset/versioned/typed/metering/v1"
+	"github.com/kube-reporting/metering-operator/pkg/operator"
 )
 
 type ReportingFramework struct {

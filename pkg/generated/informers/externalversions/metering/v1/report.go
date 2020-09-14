@@ -5,10 +5,10 @@ package v1
 import (
 	time "time"
 
-	meteringv1 "github.com/operator-framework/operator-metering/pkg/apis/metering/v1"
-	versioned "github.com/operator-framework/operator-metering/pkg/generated/clientset/versioned"
-	internalinterfaces "github.com/operator-framework/operator-metering/pkg/generated/informers/externalversions/internalinterfaces"
-	v1 "github.com/operator-framework/operator-metering/pkg/generated/listers/metering/v1"
+	meteringv1 "github.com/kube-reporting/metering-operator/pkg/apis/metering/v1"
+	versioned "github.com/kube-reporting/metering-operator/pkg/generated/clientset/versioned"
+	internalinterfaces "github.com/kube-reporting/metering-operator/pkg/generated/informers/externalversions/internalinterfaces"
+	v1 "github.com/kube-reporting/metering-operator/pkg/generated/listers/metering/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	runtime "k8s.io/apimachinery/pkg/runtime"
 	watch "k8s.io/apimachinery/pkg/watch"

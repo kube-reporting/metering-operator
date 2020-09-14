@@ -5,7 +5,7 @@ package externalversions
 import (
 	"fmt"
 
-	v1 "github.com/operator-framework/operator-metering/pkg/apis/metering/v1"
+	v1 "github.com/kube-reporting/metering-operator/pkg/apis/metering/v1"
 	schema "k8s.io/apimachinery/pkg/runtime/schema"
 	cache "k8s.io/client-go/tools/cache"
 )

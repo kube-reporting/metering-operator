@@ -3,7 +3,7 @@
 package v1
 
 import (
-	v1 "github.com/operator-framework/operator-metering/pkg/apis/metering/v1"
+	v1 "github.com/kube-reporting/metering-operator/pkg/apis/metering/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/client-go/tools/cache"

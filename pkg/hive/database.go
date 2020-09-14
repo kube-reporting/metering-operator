@@ -1,6 +1,6 @@
 package hive
 
-import "github.com/operator-framework/operator-metering/pkg/db"
+import "github.com/kube-reporting/metering-operator/pkg/db"
 
 type DatabaseParameters struct {
 	Name     string `json:"name"`
