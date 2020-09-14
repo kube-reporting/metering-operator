@@ -1,10 +1,9 @@
 # need helm CLI for final image
-FROM quay.io/openshift/origin-metering-helm:latest as helm
-
+FROM registry.svc.ci.openshift.org/ocp/4.6:metering-helm as helm
 # image needs kubectl, so we copy `oc` from cli image to use as kubectl.
-FROM openshift/origin-cli:latest as cli
-
-FROM openshift/origin-release:golang-1.13
+FROM registry.svc.ci.openshift.org/ocp/4.6:cli as cli
+# need golang for the unit/vendor/verify CI checks
+FROM registry.svc.ci.openshift.org/ocp/builder:rhel-8-golang-openshift-4.6
 
 # go get faq via static Linux binary approach
 ARG LATEST_RELEASE=0.0.6
@@ -25,7 +24,7 @@ RUN scl enable rh-python36 'pip install operator-courier'
 COPY hack/scl-operator-courier.sh /usr/local/bin/operator-courier
 RUN chmod +x /usr/local/bin/operator-courier
 
-COPY --from=cli /usr/bin/oc /usr/bin/oc
+COPY --from=cli /usr/bin/oc /usr/bin/
 RUN ln -s /usr/bin/oc /usr/bin/kubectl
 
 COPY --from=helm /usr/local/bin/helm /usr/local/bin/helm
