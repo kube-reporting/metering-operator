@@ -161,7 +161,7 @@ func TestManualMeteringInstall(t *testing.T) {
 		MeteringConfigManifestFilename string
 	}{
 		{
-			Name:                      "InvalidHDFS-MissingStorageSpec",
+			Name:                      "HDFS-MissingStorageSpec",
 			MeteringOperatorImageRepo: meteringOperatorImageRepo,
 			MeteringOperatorImageTag:  meteringOperatorImageTag,
 			Skip:                      false,
@@ -180,7 +180,7 @@ func TestManualMeteringInstall(t *testing.T) {
 			MeteringConfigManifestFilename: "missing-storage.yaml",
 		},
 		{
-			Name:                      "ValidHDFS-ValidNodeSelector",
+			Name:                      "HDFS-ValidNodeSelector",
 			MeteringOperatorImageRepo: meteringOperatorImageRepo,
 			MeteringOperatorImageTag:  meteringOperatorImageTag,
 			// TODO: transistion this to a periodic test and
@@ -225,7 +225,7 @@ func TestManualMeteringInstall(t *testing.T) {
 			MeteringConfigManifestFilename: "node-selector-prometheus-importer-disabled.yaml",
 		},
 		{
-			Name:                      "ValidHDFS-ReportDynamicInputData",
+			Name:                      "HDFS-ReportDynamicInputData",
 			MeteringOperatorImageRepo: meteringOperatorImageRepo,
 			MeteringOperatorImageTag:  meteringOperatorImageTag,
 			Skip:                      false,
@@ -249,7 +249,7 @@ func TestManualMeteringInstall(t *testing.T) {
 			MeteringConfigManifestFilename: "prometheus-metrics-importer-enabled.yaml",
 		},
 		{
-			Name:                      "ValidHDFS-ReportStaticInputData",
+			Name:                      "HDFS-ReportStaticInputData",
 			MeteringOperatorImageRepo: meteringOperatorImageRepo,
 			MeteringOperatorImageTag:  meteringOperatorImageTag,
 			Skip:                      false,
@@ -281,7 +281,7 @@ func TestManualMeteringInstall(t *testing.T) {
 			MeteringConfigManifestFilename: "prometheus-metrics-importer-disabled.yaml",
 		},
 		{
-			Name:                      "ValidHDFS-MySQLDatabase",
+			Name:                      "HDFS-MySQLDatabase",
 			MeteringOperatorImageRepo: meteringOperatorImageRepo,
 			MeteringOperatorImageTag:  meteringOperatorImageTag,
 			// TODO: disable this for now as the mysql:5.7 image
@@ -346,10 +346,10 @@ func TestManualMeteringInstall(t *testing.T) {
 			MeteringConfigManifestFilename: "s3.yaml",
 		},
 		{
-			Name:                      "ValidateNFS-ReportDynamicInputData",
+			Name:                      "NFS-ReportDynamicInputData",
 			MeteringOperatorImageRepo: meteringOperatorImageRepo,
 			MeteringOperatorImageTag:  meteringOperatorImageTag,
-			Skip:                      false,
+			Skip:                      !runAllInstallTests,
 			PreInstallFunc:            createNFSProvisioner,
 			InstallSubTests: []InstallTestCase{
 				{
