@@ -355,7 +355,7 @@ func testReportsProduceCorrectDataForInput(
 				t.Parallel()
 			}
 
-			report := testReportingFramework.NewSimpleReport(test.name, test.queryName, nil, &reportStart, &reportEnd)
+			report := testReportingFramework.NewSimpleReport(test.name, test.queryName, nil, &reportStart, &reportEnd, nil)
 
 			reportRunTimeout := 10 * time.Minute
 			t.Logf("creating report %s and waiting %s to finish", report.Name, reportRunTimeout)

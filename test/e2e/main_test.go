@@ -277,6 +277,16 @@ func TestManualMeteringInstall(t *testing.T) {
 					Name:     "testFailedPrometheusQueryEvents",
 					TestFunc: testFailedPrometheusQueryEvents,
 				},
+				{
+					Name:         "testReportIsDeletedWhenNoDeps",
+					TestFunc:     testReportIsDeletedWhenNoDeps,
+					ExtraEnvVars: []string{},
+				},
+				{
+					Name:         "testReportIsNotDeletedWhenReportDependsOnIt",
+					TestFunc:     testReportIsNotDeletedWhenReportDependsOnIt,
+					ExtraEnvVars: []string{},
+				},
 			},
 			MeteringConfigManifestFilename: "prometheus-metrics-importer-disabled.yaml",
 		},
