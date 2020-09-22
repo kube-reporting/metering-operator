@@ -197,7 +197,7 @@ openshift-reporting:
             spec:
               prometheusMetricsImporter:
                 query: |
-                  max(kube_persistentvolumeclaim_resource_requests_storage_bytes) by (namespace, persistentvolumeclaim) + on (namespace, persistentvolumeclaim) group_left(storageclass, volumename) sum(kube_persistentvolumeclaim_info) by (namespace, persistentvolumeclaim, storageclass, volumename) * 0
+                  max(kube_persistentvolumeclaim_resource_requests_storage_bytes) by (namespace, persistentvolumeclaim) + on (namespace, persistentvolumeclaim) group_left(storageclass, volumename) sum(kube_persistentvolumeclaim_info{volumename!=""}) by (namespace, persistentvolumeclaim, storageclass, volumename) * 0
           - name: persistentvolumeclaim-usage-bytes
             spec:
               prometheusMetricsImporter:
