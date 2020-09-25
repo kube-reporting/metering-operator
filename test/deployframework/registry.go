@@ -15,6 +15,44 @@ import (
 	"k8s.io/apimachinery/pkg/util/wait"
 )
 
+func (df *DeployFramework) CreateCatalogSourceFromIndex(indexImage string) (string, string, error) {
+	catalogSourceName := df.NamespacePrefix + "-" + defaultCatalogSourceName
+
+	catalogSource, err := df.OLMV1Alpha1Client.CatalogSources(registryDeployNamespace).Get(context.TODO(), catalogSourceName, metav1.GetOptions{})
+	if err != nil && !apierrors.IsNotFound(err) {
+		return "", "", err
+	}
+	if apierrors.IsNotFound(err) {
+		catsrc := &olmv1alpha1.CatalogSource{
+			ObjectMeta: metav1.ObjectMeta{
+				Name:      catalogSourceName,
+				Namespace: registryDeployNamespace,
+				Labels: map[string]string{
+					"name": df.NamespacePrefix + "-" + testNamespaceLabel,
+				},
+			},
+			Spec: olmv1alpha1.CatalogSourceSpec{
+				SourceType:  olmv1alpha1.SourceTypeGrpc,
+				Image:       indexImage,
+				Publisher:   "Red Hat",
+				DisplayName: "Metering Dev",
+			},
+		}
+
+		catalogSource, err = df.OLMV1Alpha1Client.CatalogSources(registryDeployNamespace).Create(context.TODO(), catsrc, metav1.CreateOptions{})
+		if err != nil {
+			return "", "", err
+		}
+		df.Logger.Infof("Created the metering CatalogSource using the %s index image in the %s namespace", indexImage, registryDeployNamespace)
+	}
+
+	if catalogSource.ObjectMeta.Name == "" || catalogSource.ObjectMeta.Namespace == "" {
+		return "", "", fmt.Errorf("failed to get a non-empty catalogsource name and namespace")
+	}
+
+	return catalogSource.ObjectMeta.Name, catalogSource.ObjectMeta.Namespace, nil
+}
+
 // CreateRegistryResources is a deployframework method responsible
 // for instantiating a new CatalogSource that can be used
 // throughout individual Metering installations.
@@ -81,23 +119,25 @@ func (df *DeployFramework) CreateRegistryResources(registryImage, meteringOperat
 // service and deployment manifests to help distinguish between resources
 // created by a particular developer, which is reflected in the label
 // selector that we pass to the helper functions that do the heavy-lifting.
-func (df *DeployFramework) DeleteRegistryResources(name, namespace string) error {
+func (df *DeployFramework) DeleteRegistryResources(registryProvisioned bool, name, namespace string) error {
 	var errArr []string
 
-	// Start building up the label selectors for searching for the registry
-	// resources that we created. We inject a testing label to both of those
-	// resources, e.g. `name=tflannag-metering-testing-ns`.
-	testingRegistryLabelSelector := fmt.Sprintf("name=%s-%s", df.NamespacePrefix, testNamespaceLabel)
-	registryLabelSelector := fmt.Sprintf("%s,%s", registryLabelSelector, testingRegistryLabelSelector)
+	if registryProvisioned {
+		// Start building up the label selectors for searching for the registry
+		// resources that we created. We inject a testing label to both of those
+		// resources, e.g. `name=tflannag-metering-testing-ns`.
+		testingRegistryLabelSelector := fmt.Sprintf("name=%s-%s", df.NamespacePrefix, testNamespaceLabel)
+		registryLabelSelector := fmt.Sprintf("%s,%s", registryLabelSelector, testingRegistryLabelSelector)
 
-	err := DeleteRegistryDeployment(df.Logger, df.Client, namespace, registryLabelSelector)
-	if err != nil {
-		errArr = append(errArr, fmt.Sprintf("failed to successfully delete the registry deployments(s): %v", err))
-	}
+		err := DeleteRegistryDeployment(df.Logger, df.Client, namespace, registryLabelSelector)
+		if err != nil {
+			errArr = append(errArr, fmt.Sprintf("failed to successfully delete the registry deployments(s): %v", err))
+		}
 
-	err = DeleteRegistryService(df.Logger, df.Client, namespace, registryLabelSelector)
-	if err != nil {
-		errArr = append(errArr, fmt.Sprintf("failed to successfully delete the registry service(s): %v", err))
+		err = DeleteRegistryService(df.Logger, df.Client, namespace, registryLabelSelector)
+		if err != nil {
+			errArr = append(errArr, fmt.Sprintf("failed to successfully delete the registry service(s): %v", err))
+		}
 	}
 
 	catsrc, err := df.OLMV1Alpha1Client.CatalogSources(namespace).Get(context.TODO(), name, metav1.GetOptions{})

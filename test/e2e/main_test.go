@@ -35,6 +35,7 @@ var (
 	repoPath                       string
 	repoVersion                    string
 	registryImage                  string
+	indexImage                     string
 	subscriptionChannel            string
 	upgradeFromSubscriptionChannel string
 	catalogSourceName              string
@@ -94,6 +95,7 @@ func testMainWrapper(m *testing.M) int {
 	flag.StringVar(&testOutputPath, "test-output-path", "", "The absolute/relative path that you want to store test logs within.")
 
 	flag.StringVar(&registryImage, "registry-image", "registry.svc.ci.openshift.org/ocp/4.6:metering-ansible-operator-registry", "The name of an existing registry image containing a manifest bundle.")
+	flag.StringVar(&indexImage, "index-image", "", "The name of the index image containing a metering bundle. Note: this flag take precedence over the --registry-image flag.")
 	flag.StringVar(&subscriptionChannel, "subscription-channel", "4.6", "The name of an existing channel in the registry image you want to subscribe to.")
 	flag.StringVar(&upgradeFromSubscriptionChannel, "upgrade-from-subscription-channel", "4.5", "The name of an existing channel in a catalog source that you want to upgrade from.")
 	flag.Parse()
@@ -103,33 +105,26 @@ func testMainWrapper(m *testing.M) int {
 	if len(namespacePrefix) > namespacePrefixCharLimit {
 		logger.Fatalf("Error: the --namespace-prefix exceeds the limit of %d characters", namespacePrefixCharLimit)
 	}
-	if registryImage == "" {
-		logger.Fatalf("Error: the --registry-image field is empty and that field is required")
-	}
 
 	var err error
 	if df, err = deployframework.New(logger, runTestsLocal, runDevSetup, namespacePrefix, repoPath, repoVersion, kubeConfig); err != nil {
 		logger.Fatalf("Failed to create a new deploy framework: %v", err)
 	}
 
-	// Check if any of the operator image variables are non-empty.
-	// In the case where one or both are non-empty, we need to pass any
-	// of the overriden operator images so that we can manipulate
-	// the default images in the metering CSV. In the case where
-	// some version of the `make e2e-dev` has been provided, skip
-	// the deletion the local registry resources and CatalogSource CR.
-	if meteringOperatorImageRepo != "" && meteringOperatorImageTag != "" {
-		meteringOperatorImage = meteringOperatorImageRepo + ":" + meteringOperatorImageTag
+	if indexImage == "" {
+		logger.Fatalf("You need to specify a non-empty --index-image flag value")
 	}
-	if reportingOperatorImageRepo != "" && reportingOperatorImageTag != "" {
-		reportingOperatorImage = reportingOperatorImageRepo + ":" + reportingOperatorImageTag
-	}
-	catalogSourceName, catalogSourceNamespace, err = df.CreateRegistryResources(registryImage, meteringOperatorImage, reportingOperatorImage)
+
+	// TODO: determine whether it makes sense to have a toggle for creating
+	// either a registry containing the old packagemanifest format vs.
+	// always using an index image. For now, always use the index image.
+	var registryProvisioned bool
+	catalogSourceName, catalogSourceNamespace, err = df.CreateCatalogSourceFromIndex(indexImage)
 	if err != nil {
-		df.Logger.Fatalf("Failed to create the CatalogSource custom resource using the %s registry image: %v", registryImage, err)
+		df.Logger.Fatalf("Failed to create the CatalogSource custom resource using the %s index image: %v", indexImage, err)
 	}
 	if !df.RunDevSetup {
-		defer df.DeleteRegistryResources(catalogSourceName, catalogSourceNamespace)
+		defer df.DeleteRegistryResources(registryProvisioned, catalogSourceName, catalogSourceNamespace)
 	}
 
 	err = df.WaitForPackageManifest(catalogSourceName, catalogSourceNamespace, subscriptionChannel)
