@@ -50,19 +50,19 @@ tcp6       0      0 :::8082                 :::*                    LISTEN      
 The following will open up an interactive [presto-cli](https://prestosql.io/docs/current/installation/cli.html) session where you can interactively query Presto. One thing to note is that this runs in the same container as Presto and launches an additional Java instance, meaning you may run into memory limits for the pod. If this occurs, you should increase the memory request & limits of the Presto pod. By default, Presto is configured to communicate using TLS, and you would need to run the following command in order to run Presto queries:
 
 ```bash
-kubectl -n $METERING_NAMESPACE exec -it "$(kubectl -n $METERING_NAMESPACE get pods -l app=presto,presto=coordinator -o name | cut -d/ -f2)"  -- /usr/local/bin/presto-cli --server https://presto:8080 --catalog hive --schema default --user root --keystore-path /opt/presto/tls/keystore.pem
+kubectl -n $METERING_NAMESPACE exec -it "$(kubectl -n $METERING_NAMESPACE get pods -l app=presto,presto=coordinator -o name | cut -d/ -f2)"  -- /usr/local/bin/presto-cli --server https://presto:8080 --catalog hive --schema metering --user root --keystore-path /opt/presto/tls/keystore.pem
 ```
 
 In the case where you disabled the top-level `spec.tls.enabled` key, you would need to run the command below:
 
 ```bash
-kubectl -n $METERING_NAMESPACE exec -it "$(kubectl -n $METERING_NAMESPACE get pods -l app=presto,presto=coordinator -o name | cut -d/ -f2)"  -- /usr/local/bin/presto-cli --server localhost:8080 --catalog hive --schema default --user root
+kubectl -n $METERING_NAMESPACE exec -it "$(kubectl -n $METERING_NAMESPACE get pods -l app=presto,presto=coordinator -o name | cut -d/ -f2)"  -- /usr/local/bin/presto-cli --server localhost:8080 --catalog hive --schema metering --user root
 ```
 
-After running the above command, you should be given a prompt where you can run queries. Use the `show tables from hive.metering;` query to view the list of available tables from the `metering` hive catalog:
+After running the above command, you should be given a prompt where you can run queries. Use the `show tables;` query to view the list of available tables from the `metering` hive catalog:
 
 ```bash
-presto:default> show tables from hive.metering;
+presto:metering> show tables;
                                  Table
 ------------------------------------------------------------------------
  datasource_your_namespace_cluster_cpu_capacity_raw
@@ -103,7 +103,7 @@ Query 20190503_175727_00107_3venm, FINISHED, 1 node
 Splits: 19 total, 19 done (100.00%)
 0:02 [32 rows, 2.23KB] [19 rows/s, 1.37KB/s]
 
-presto:default>
+presto:metering>
 ```
 
 ## Query Hive using beeline
@@ -111,51 +111,51 @@ presto:default>
 The following will open up an interactive [beeline](https://cwiki.apache.org/confluence/display/Hive/HiveServer2+Clients#HiveServer2Clients-Beeline%E2%80%93CommandLineShell) session where you can interactively query Hive. One thing to note is that this runs in the same container as Hive and launches an additional Java instance, meaning you may run into memory limits for the pod. If this occurs, you should increase the memory request and limits of the Hive server Pod.
 
 ```bash
-kubectl -n $METERING_NAMESPACE exec -it $(kubectl -n $METERING_NAMESPACE get pods -l app=hive,hive=server -o name | cut -d/ -f2) -c hiveserver2 -- beeline -u 'jdbc:hive2://127.0.0.1:10000/default;auth=noSasl'
+kubectl -n $METERING_NAMESPACE exec -it $(kubectl -n $METERING_NAMESPACE get pods -l app=hive,hive=server -o name | cut -d/ -f2) -c hiveserver2 -- beeline -u 'jdbc:hive2://127.0.0.1:10000/metering;auth=noSasl'
 ```
 
 After running the above command, you should be given a prompt where you can run queries. Use the `show tables;` query to view the list of tables:
 
 ```bash
-0: jdbc:hive2://127.0.0.1:10000/default> show tables from metering;
+0: jdbc:hive2://127.0.0.1:10000/metering> show tables;
 +----------------------------------------------------+
 |                      tab_name                      |
 +----------------------------------------------------+
-| datasource_your_namespace_cluster_cpu_capacity_raw |
-| datasource_your_namespace_cluster_cpu_usage_raw  |
-| datasource_your_namespace_cluster_memory_capacity_raw |
-| datasource_your_namespace_cluster_memory_usage_raw |
-| datasource_your_namespace_node_allocatable_cpu_cores |
-| datasource_your_namespace_node_allocatable_memory_bytes |
-| datasource_your_namespace_node_capacity_cpu_cores |
-| datasource_your_namespace_node_capacity_memory_bytes |
-| datasource_your_namespace_node_cpu_allocatable_raw |
-| datasource_your_namespace_node_cpu_capacity_raw  |
-| datasource_your_namespace_node_memory_allocatable_raw |
-| datasource_your_namespace_node_memory_capacity_raw |
+| datasource_your_namespace_cluster_cpu_capacity_raw         |
+| datasource_your_namespace_cluster_cpu_usage_raw            |
+| datasource_your_namespace_cluster_memory_capacity_raw      |
+| datasource_your_namespace_cluster_memory_usage_raw         |
+| datasource_your_namespace_node_allocatable_cpu_cores       |
+| datasource_your_namespace_node_allocatable_memory_bytes    |
+| datasource_your_namespace_node_capacity_cpu_cores          |
+| datasource_your_namespace_node_capacity_memory_bytes       |
+| datasource_your_namespace_node_cpu_allocatable_raw         |
+| datasource_your_namespace_node_cpu_capacity_raw            |
+| datasource_your_namespace_node_memory_allocatable_raw      |
+| datasource_your_namespace_node_memory_capacity_raw         |
 | datasource_your_namespace_persistentvolumeclaim_capacity_bytes |
 | datasource_your_namespace_persistentvolumeclaim_capacity_raw |
-| datasource_your_namespace_persistentvolumeclaim_phase |
-| datasource_your_namespace_persistentvolumeclaim_phase_raw |
+| datasource_your_namespace_persistentvolumeclaim_phase      |
+| datasource_your_namespace_persistentvolumeclaim_phase_raw  |
 | datasource_your_namespace_persistentvolumeclaim_request_bytes |
 | datasource_your_namespace_persistentvolumeclaim_request_raw |
 | datasource_your_namespace_persistentvolumeclaim_usage_bytes |
-| datasource_your_namespace_persistentvolumeclaim_usage_raw |
+| datasource_your_namespace_persistentvolumeclaim_usage_raw  |
 | datasource_your_namespace_persistentvolumeclaim_usage_with_phase_raw |
-| datasource_your_namespace_pod_cpu_request_raw    |
-| datasource_your_namespace_pod_cpu_usage_raw      |
-| datasource_your_namespace_pod_limit_cpu_cores    |
-| datasource_your_namespace_pod_limit_memory_bytes |
-| datasource_your_namespace_pod_memory_request_raw |
-| datasource_your_namespace_pod_memory_usage_raw   |
+| datasource_your_namespace_pod_cpu_request_raw              |
+| datasource_your_namespace_pod_cpu_usage_raw                |
+| datasource_your_namespace_pod_limit_cpu_cores              |
+| datasource_your_namespace_pod_limit_memory_bytes           |
+| datasource_your_namespace_pod_memory_request_raw           |
+| datasource_your_namespace_pod_memory_usage_raw             |
 | datasource_your_namespace_pod_persistentvolumeclaim_request_info |
-| datasource_your_namespace_pod_request_cpu_cores  |
-| datasource_your_namespace_pod_request_memory_bytes |
-| datasource_your_namespace_pod_usage_cpu_cores    |
-| datasource_your_namespace_pod_usage_memory_bytes |
+| datasource_your_namespace_pod_request_cpu_cores            |
+| datasource_your_namespace_pod_request_memory_bytes         |
+| datasource_your_namespace_pod_usage_cpu_cores              |
+| datasource_your_namespace_pod_usage_memory_bytes           |
 +----------------------------------------------------+
-32 rows selected (13.101 seconds)
-0: jdbc:hive2://127.0.0.1:10000/default>
+32 rows selected (0.127 seconds)
+0: jdbc:hive2://127.0.0.1:10000/metering>
 ```
 
 ## Port-forward to Presto web UI
