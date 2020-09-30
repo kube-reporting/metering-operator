@@ -4,16 +4,17 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
-	"github.com/kube-reporting/metering-operator/test/testhelpers"
-	apierrors "k8s.io/apimachinery/pkg/api/errors"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/apimachinery/pkg/util/wait"
 	"strings"
 	"testing"
 	"time"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+
+	"github.com/kube-reporting/metering-operator/test/testhelpers"
+	apierrors "k8s.io/apimachinery/pkg/api/errors"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/util/wait"
 
 	metering "github.com/kube-reporting/metering-operator/pkg/apis/metering/v1"
 	"github.com/kube-reporting/metering-operator/pkg/operator/reporting"
@@ -181,7 +182,6 @@ func testReportIsDeletedWhenNoDeps(t *testing.T, testReportingFramework *reporti
 			Expression: "*/1 * * * *",
 		},
 	}
-	var foundOnce bool
 	expiration := &metav1.Duration{Duration: 30.0 * time.Second}
 	// If a report is in dependency unmet state it won't be deleted and it can take awhile for import to happen.
 	// 4 minutes seems to be enough time for that setup, and the delete, to reliably happen.
@@ -196,13 +196,15 @@ func testReportIsDeletedWhenNoDeps(t *testing.T, testReportingFramework *reporti
 		expiration,
 	)
 	t.Logf("creating report %s and waiting %s to finish", report.Name, waitTimeWhileCheckDeletion)
+
 	createErr := testReportingFramework.CreateMeteringReport(report)
 	assert.NoError(t, createErr, "creating report should produce no error")
 
+	var foundOnce bool
 	err := wait.Poll(time.Second*5, waitTimeWhileCheckDeletion, func() (bool, error) {
 		_, err := testReportingFramework.GetMeteringReport(reportName)
 		// `foundOnce` provides a latch that allows us to wait for report creation then exit on deletion
-		if err == nil {
+		if apierrors.IsAlreadyExists(err) {
 			foundOnce = true
 		}
 		if err != nil {
@@ -228,7 +230,6 @@ func testReportIsNotDeletedWhenReportDependsOnIt(t *testing.T, testReportingFram
 			Expression: "*/1 * * * *",
 		},
 	}
-	var foundOnce bool
 	expiration := &metav1.Duration{Duration: 30.0 * time.Second}
 	// If a subReport is in dependency unmet state it won't be deleted and it can take awhile for import to happen.
 	// 4 minutes seems to be enough time for that setup, and the delete, to reliably happen.
@@ -257,7 +258,7 @@ func testReportIsNotDeletedWhenReportDependsOnIt(t *testing.T, testReportingFram
 		testReportingFramework.Namespace,
 		testQueryName,
 		[]metering.ReportQueryInputValue{
-			metering.ReportQueryInputValue{
+			{
 				Name:  "Report",
 				Value: newDefault(`"` + subReportName + `"`),
 			},
@@ -273,10 +274,11 @@ func testReportIsNotDeletedWhenReportDependsOnIt(t *testing.T, testReportingFram
 	createErr = testReportingFramework.CreateMeteringReport(report)
 	assert.NoError(t, createErr, "creating report should produce no error")
 
+	var foundOnce bool
 	err := wait.Poll(time.Second*5, waitTimeWhileCheckDeletion, func() (bool, error) {
 		_, err := testReportingFramework.GetMeteringReport(subReportName)
 		// `foundOnce` provides a latch that allows us to wait for subReport creation then exit on deletion
-		if err == nil {
+		if apierrors.IsAlreadyExists(err) {
 			foundOnce = true
 		}
 		if err != nil {
@@ -292,12 +294,12 @@ func testReportIsNotDeletedWhenReportDependsOnIt(t *testing.T, testReportingFram
 		"timed out waiting",
 		"should have timed out waiting on subReport expiration as subReport should not have been deleted",
 	)
-	listOptions := metav1.ListOptions{}
 	events, err := testReportingFramework.KubeClient.CoreV1().Events(testReportingFramework.Namespace).List(
 		context.Background(),
-		listOptions,
+		metav1.ListOptions{},
 	)
 	require.NoError(t, err, "failed to list the events in the test namespace")
+
 	var found bool
 	for _, event := range events.Items {
 		if strings.Contains(event.InvolvedObject.Name, "subreport-should-not-delete") {
