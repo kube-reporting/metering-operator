@@ -2,10 +2,7 @@
 
 # Overview
 
-This project is a component of the [Kubernetes Reporting organization](https://github.com/kube-reporting), an open source toolkit to manage Kubernetes native applications, called Operators, in an effective, automated, and scalable way.
-Read more in the [introduction blog post](https://coreos.com/blog/introducing-operator-framework-metering).
-
-Metering records historical cluster usage and can generate usage reports showing usage breakdowns by pod or namespace over arbitrary time periods.
+The Metering Operator records historical cluster usage and can generate usage reports showing usage breakdowns by pod or namespace over arbitrary time periods.
 
 ## Project Status: Generally Available
 
