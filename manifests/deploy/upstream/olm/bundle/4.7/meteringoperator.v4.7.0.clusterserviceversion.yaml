@@ -4,7 +4,7 @@ metadata:
   name: metering-operator-upstream.v4.7.0
   namespace: placeholder
   annotations:
-    olm.skipRange: ">=4.3.0 <4.7.0"
+    olm.skipRange: ">=4.4.0 <4.7.0"
     alm-examples: |-
       [
         {
