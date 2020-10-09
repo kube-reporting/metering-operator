@@ -4,7 +4,7 @@
 # The following would expose the redhat-operators CatalogSource service:
 # kubectl -n openshift-marketplace port-forward svc/redhat-operators 50051
 
-CHANNEL="${CHANNEL:-"4.6"}"
+CHANNEL="${CHANNEL:-"4.7"}"
 
 read -r -d '' JQ_PROGRAM << EOM
  .spec.install.spec.deployments[0].spec.template.spec.containers[]

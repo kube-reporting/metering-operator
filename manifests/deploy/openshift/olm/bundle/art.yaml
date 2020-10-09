@@ -6,7 +6,7 @@ updates:
     - search: "name: metering-operator.v{MAJOR}.{MINOR}.0"
       replace: "name: metering-operator.{FULL_VER}"
     # replace spec.version value
-    - search: 'version: "4.6.0"'
+    - search: 'version: "4.7.0"'
       replace: 'version: {FULL_VER}'
     - search: 'olm.skipRange: ">=4.3.0 <{MAJOR}.{MINOR}.0"'
       replace: 'olm.skipRange: ">=4.3.0 <{FULL_VER}"'
