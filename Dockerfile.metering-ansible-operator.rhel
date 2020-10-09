@@ -8,7 +8,7 @@ FROM openshift/ose-ansible-operator:4.6
 USER root
 RUN set -x; \
     INSTALL_PKGS="curl bash ca-certificates \
-    less which inotify-tools tini \
+    less which tini \
     python-netaddr python2-botocore \
     python2-boto3 python2-openshift \
     python2-cryptography ansible openssl" \
