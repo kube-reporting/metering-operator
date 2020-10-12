@@ -21,7 +21,7 @@ spec:
         runAsNonRoot: true
       containers:
       - name: operator
-        image: "quay.io/openshift/origin-metering-ansible-operator:4.6"
+        image: "quay.io/openshift/origin-metering-ansible-operator:4.7"
         imagePullPolicy: Always
         args:
         - "--zap-level=info"
@@ -43,19 +43,19 @@ spec:
             fieldRef:
               fieldPath: metadata.name
         - name: METERING_ANSIBLE_OPERATOR_IMAGE
-          value: "quay.io/openshift/origin-metering-ansible-operator:4.6"
+          value: "quay.io/openshift/origin-metering-ansible-operator:4.7"
         - name: METERING_REPORTING_OPERATOR_IMAGE
-          value: "quay.io/openshift/origin-metering-reporting-operator:4.6"
+          value: "quay.io/openshift/origin-metering-reporting-operator:4.7"
         - name: METERING_PRESTO_IMAGE
-          value: "quay.io/openshift/origin-metering-presto:4.6"
+          value: "quay.io/openshift/origin-metering-presto:4.7"
         - name: METERING_HIVE_IMAGE
-          value: "quay.io/openshift/origin-metering-hive:4.6"
+          value: "quay.io/openshift/origin-metering-hive:4.7"
         - name: METERING_HADOOP_IMAGE
-          value: "quay.io/openshift/origin-metering-hadoop:4.6"
+          value: "quay.io/openshift/origin-metering-hadoop:4.7"
         - name: GHOSTUNNEL_IMAGE
-          value: "quay.io/openshift/origin-ghostunnel:4.6"
+          value: "quay.io/openshift/origin-ghostunnel:4.7"
         - name: OAUTH_PROXY_IMAGE
-          value: "quay.io/openshift/origin-oauth-proxy:4.6"
+          value: "quay.io/openshift/origin-oauth-proxy:4.7"
         ports:
         - name: http-metrics
           containerPort: 8383

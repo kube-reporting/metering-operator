@@ -31,19 +31,19 @@ spec:
           mountPath: /bundle
         env:
         - name: IMAGE_METERING_ANSIBLE_OPERATOR
-          value: registry.svc.ci.openshift.org/ocp/4.6:metering-ansible-operator
+          value: registry.svc.ci.openshift.org/ocp/4.7:metering-ansible-operator
         - name: IMAGE_METERING_REPORTING_OPERATOR
-          value: registry.svc.ci.openshift.org/ocp/4.6:metering-reporting-operator
+          value: registry.svc.ci.openshift.org/ocp/4.7:metering-reporting-operator
         - name: IMAGE_METERING_PRESTO
-          value: registry.svc.ci.openshift.org/ocp/4.6:metering-presto
+          value: registry.svc.ci.openshift.org/ocp/4.7:metering-presto
         - name: IMAGE_METERING_HIVE
-          value: registry.svc.ci.openshift.org/ocp/4.6:metering-hive
+          value: registry.svc.ci.openshift.org/ocp/4.7:metering-hive
         - name: IMAGE_METERING_HADOOP
-          value: registry.svc.ci.openshift.org/ocp/4.6:metering-hadoop
+          value: registry.svc.ci.openshift.org/ocp/4.7:metering-hadoop
         - name: IMAGE_GHOSTUNNEL
-          value: registry.svc.ci.openshift.org/ocp/4.6:ghostunnel
+          value: registry.svc.ci.openshift.org/ocp/4.7:ghostunnel
         - name: IMAGE_OAUTH_PROXY
-          value: registry.svc.ci.openshift.org/ocp/4.6:oauth-proxy
+          value: registry.svc.ci.openshift.org/ocp/4.7:oauth-proxy
 
       containers:
       - name: metering-ansible-operator-registry

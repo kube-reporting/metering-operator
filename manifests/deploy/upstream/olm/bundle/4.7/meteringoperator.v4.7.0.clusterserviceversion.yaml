@@ -1,10 +1,10 @@
 apiVersion: operators.coreos.com/v1alpha1
 kind: ClusterServiceVersion
 metadata:
-  name: metering-operator.v4.6.0
+  name: metering-operator-upstream.v4.7.0
   namespace: placeholder
   annotations:
-    olm.skipRange: ">=4.3.0 <4.6.0"
+    olm.skipRange: ">=4.4.0 <4.7.0"
     alm-examples: |-
       [
         {
@@ -203,10 +203,10 @@ metadata:
           }
         }
       ]
-    capabilities: Seamless Upgrades
+    capabilities: Basic Install
     categories: OpenShift Optional, Monitoring
     certified: "false"
-    containerImage: quay.io/openshift/origin-metering-ansible-operator:4.6
+    containerImage: quay.io/coreos/metering-ansible-operator:4.7
     createdAt: 2019-01-01T11:59:59Z
     description: Chargeback and reporting tool to provide accountability for how resources
       are used across a cluster
@@ -221,7 +221,7 @@ spec:
   description: |
     The Metering Operator is a generic reporting tool to provide accountability for how resources are used across a cluster cherry-picking and storing information from different sources. Cluster admins can schedule reports based on historical usage data by Pod, Namespace, and Cluster for storage. The Metering Operator is a part of the [Kubernetes Reporting organization](https://github.com/kube-reporting).
 
-    Read the user guide for more details on [running and viewing your first report](https://docs.openshift.com/container-platform/4.6/metering/metering-using-metering.html).
+    Read the user guide for more details on [running and viewing your first report](https://docs.openshift.com/container-platform/4.7/metering/metering-using-metering.html).
 
     ### Core capabilities
 
@@ -245,18 +245,18 @@ spec:
     At least one Node should have 2GB of RAM and 2 CPU cores.
     Memory and CPU consumption may often be lower, but will spike when running reports, or collecting data for larger clusters.
 
-    Metering requires configuring storage, please review the [configuring persistent storage documentation](https://docs.openshift.com/container-platform/4.6/metering/configuring-metering/metering-configure-persistent-storage.html) before proceeding.
+    Metering requires configuring storage, please review the [configuring persistent storage documentation](https://docs.openshift.com/container-platform/4.7/metering/configuring-metering/metering-configure-persistent-storage.html) before proceeding.
 
     ### Common Configurations
 
-    * **Store data in object storage or in a PersistentVolume** - Store your report output [in an object storage bucket or in a PersistentVolume](https://docs.openshift.com/container-platform/4.6/metering/configuring-metering/metering-configure-persistent-storage.html).
+    * **Store data in object storage or in a PersistentVolume** - Store your report output [in an object storage bucket or in a PersistentVolume](https://docs.openshift.com/container-platform/4.7/metering/configuring-metering/metering-configure-persistent-storage.html).
 
-    * **Configure AWS Billing Data Source** - Assign Pod $$ costs on using your [AWS billing reports stored in S3](https://docs.openshift.com/container-platform/4.6/metering/configuring-metering/metering-configure-aws-billing-correlation.html).
+    * **Configure AWS Billing Data Source** - Assign Pod $$ costs on using your [AWS billing reports stored in S3](https://docs.openshift.com/container-platform/4.7/metering/configuring-metering/metering-configure-aws-billing-correlation.html).
 
-    * **Use Reports** - Customize what how you process data. [Specify what you want to report on, set the schedule, and reporting time period](https://docs.openshift.com/container-platform/4.6/metering/reports/metering-about-reports.html#metering-reports_metering-about-reports).
+    * **Use Reports** - Customize what how you process data. [Specify what you want to report on, set the schedule, and reporting time period](https://docs.openshift.com/container-platform/4.7/metering/reports/metering-about-reports.html#metering-reports_metering-about-reports).
 
   keywords: [metering metrics reporting prometheus chargeback]
-  version: "4.6.0"
+  version: "4.7.0"
   minKubeVersion: "1.18.3"
   maturity: stable
   maintainers:
@@ -265,13 +265,13 @@ spec:
 
   links:
     - name: Documentation
-      url: https://docs.openshift.com/container-platform/4.6/metering/metering-about-metering.html
+      url: https://github.com/kube-reporting/metering-operator/blob/master/Documentation/index.md
 
   provider:
     name: Red Hat
 
   icon:
-    - base64data: PHN2ZyBpZD0iYmI5OWY3NGMtM2VkOS00OWU2LWE0OWQtNDI3ODA5NWU5ZWI4IiBkYXRhLW5hbWU9IkxheWVyIDEiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgdmlld0JveD0iMCAwIDcyMS4xNSA3MjEuMTUiPgogIDxkZWZzPgogICAgPHN0eWxlPgogICAgICAuYjdmMDIwYzgtMjFkMS00NWVmLWE0NTktNzJhNWE0MmE5MjJlIHsKICAgICAgICBmaWxsOiAjZGIzOTI3OwogICAgICB9CgogICAgICAuZjM0NTNmYmYtODk1My00NjE3LWJlNTEtMWZkZDJiOTdiMDBlIHsKICAgICAgICBmaWxsOiAjY2IzNjI4OwogICAgICB9CgogICAgICAuYjFhNGZjNTMtYWFlNS00ZWI5LTliN2ItYTAxYmMxYTU0ZmFjIHsKICAgICAgICBmaWxsOiAjZmZmOwogICAgICB9CgogICAgICAuYTc4NTliZDQtYjA1My00YzVmLTk5MGQtYzRmNzFkNDgwZTM4IHsKICAgICAgICBmaWxsOiAjZTNlM2UyOwogICAgICB9CiAgICA8L3N0eWxlPgogIDwvZGVmcz4KICA8dGl0bGU+UHJvZHVjdF9JY29uLVJlZF9IYXQtTWV0ZXJpbmctUkdCPC90aXRsZT4KICA8Y2lyY2xlIGNsYXNzPSJiN2YwMjBjOC0yMWQxLTQ1ZWYtYTQ1OS03MmE1YTQyYTkyMmUiIGN4PSIzNjAuNTc1IiBjeT0iMzYwLjU3NSIgcj0iMzU4LjU3NiIvPgogIDxwYXRoIGNsYXNzPSJmMzQ1M2ZiZi04OTUzLTQ2MTctYmU1MS0xZmRkMmI5N2IwMGUiIGQ9Ik02MTUuNTMsMTA4LjkxNiwxMDguNDY0LDYxNS45ODNjMTQwLjE0MywxMzguNjE3LDM2Ni4xMTEsMTM4LjE2NCw1MDUuNjcxLTEuNFM3NTQuMTQ5LDI0OS4wNTksNjE1LjUzLDEwOC45MTZaIi8+CiAgPHBhdGggY2xhc3M9ImIxYTRmYzUzLWFhZTUtNGViOS05YjdiLWEwMWJjMWE1NGZhYyIgZD0iTTM3MC4xMzEsMTYzLjkzMmwxNzAuMyw5OC4zMjFWNDU4LjlsLTE3MC4zLDk4LjMyMUwxOTkuODMzLDQ1OC45VjI2Mi4yNTNsMTcwLjMtOTguMzIxbTAtMjMuMDk0LTEwLDUuNzczLTE3MC4zLDk4LjMyMi0xMCw1Ljc3M1Y0NzAuNDQ0bDEwLDUuNzczLDE3MC4zLDk4LjMyMiwxMCw1Ljc3MywxMC01Ljc3MywxNzAuMy05OC4zMjIsMTAtNS43NzNWMjUwLjcwNmwtMTAtNS43NzMtMTcwLjMtOTguMzIyLTEwLTUuNzczWiIvPgogIDxwb2x5Z29uIGNsYXNzPSJiMWE0ZmM1My1hYWU1LTRlYjktOWI3Yi1hMDFiYzFhNTRmYWMiIHBvaW50cz0iMzU0LjE2NyA1MTMuMjQyIDIyNi43NjggNDM5LjY4OCAyMjYuNzY4IDI5NS4yMjQgMzU0LjE2NyAzNjguNzc4IDM1NC4xNjcgNTEzLjI0MiIvPgogIDxwb2x5Z29uIGNsYXNzPSJhNzg1OWJkNC1iMDUzLTRjNWYtOTkwZC1jNGY3MWQ0ODBlMzgiIHBvaW50cz0iMzg2LjAxNyA1MTMuMjQyIDUxMy40MTYgNDM5LjY4OCA1MTMuNDE2IDI5NS4yMjQgMzg2LjAxNyAzNjguNzc4IDM4Ni4wMTcgNTEzLjI0MiIvPgogIDxwb2x5Z29uIGNsYXNzPSJiMWE0ZmM1My1hYWU1LTRlYjktOWI3Yi1hMDFiYzFhNTRmYWMiIHBvaW50cz0iMjQyLjY5MyAyNjcuOTcyIDM3MC4wOTIgMTk0LjQxOCA0OTcuNDkxIDI2Ny45NzIgMzcwLjA5MiAzNDEuNTI2IDI0Mi42OTMgMjY3Ljk3MiIvPgogIDxwb2x5Z29uIGNsYXNzPSJiN2YwMjBjOC0yMWQxLTQ1ZWYtYTQ1OS03MmE1YTQyYTkyMmUiIHBvaW50cz0iMjg2LjQ4OCAyNjkuMTM0IDI5My4zMDQgMjY0LjczMiAzNzMuOTAxIDMxMS4yNjUgMzY3LjA4NSAzMTUuNjY3IDI4Ni40ODggMjY5LjEzNCIvPgogIDxwb2x5Z29uIGNsYXNzPSJiN2YwMjBjOC0yMWQxLTQ1ZWYtYTQ1OS03MmE1YTQyYTkyMmUiIHBvaW50cz0iMzAwLjIyNSAyNjkuMTM0IDM0NS43OTIgMjQyLjA3NCAzNjAuNTgxIDI1MC42OTkgMzE1LjAxNCAyNzcuNzU4IDMwMC4yMjUgMjY5LjEzNCIvPgogIDxwb2x5Z29uIGNsYXNzPSJiN2YwMjBjOC0yMWQxLTQ1ZWYtYTQ1OS03MmE1YTQyYTkyMmUiIHBvaW50cz0iMzIzLjAwOCAyODIuMTYgMzk4LjU2MyAyMzUuODY2IDQxMy4zNTIgMjQ0LjQ5IDMzNy43OTggMjkwLjc4NSAzMjMuMDA4IDI4Mi4xNiIvPgogIDxwb2x5Z29uIGNsYXNzPSJiN2YwMjBjOC0yMWQxLTQ1ZWYtYTQ1OS03MmE1YTQyYTkyMmUiIHBvaW50cz0iMzQ1Ljc5MiAyOTUuMTg3IDQwNi44NCAyNTkuMzQ3IDQyMS42MyAyNjcuOTcyIDM2MC41ODEgMzAzLjgxMSAzNDUuNzkyIDI5NS4xODciLz4KPC9zdmc+Cg==
+    - base64data: PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz4KPHN2ZyB3aWR0aD0iMTQ2cHgiIGhlaWdodD0iMTQ2cHgiIHZpZXdCb3g9IjAgMCAxNDYgMTQ2IiB2ZXJzaW9uPSIxLjEiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiPgogICAgPHRpdGxlPkFydGJvYXJkPC90aXRsZT4KICAgIDxnIGlkPSJBcnRib2FyZCIgc3Ryb2tlPSJub25lIiBzdHJva2Utd2lkdGg9IjEiIGZpbGw9Im5vbmUiIGZpbGwtcnVsZT0iZXZlbm9kZCI+CiAgICAgICAgPGNpcmNsZSBpZD0iT3ZhbCIgc3Ryb2tlPSIjNDA4MDkxIiBzdHJva2Utd2lkdGg9IjQiIGZpbGw9IiMzQTQxNEEiIGN4PSI3MyIgY3k9IjczIiByPSI1NSI+PC9jaXJjbGU+CiAgICAgICAgPGcgaWQ9Ikdyb3VwLTIiIHRyYW5zZm9ybT0idHJhbnNsYXRlKDM2LjAwMDAwMCwgNDYuMDAwMDAwKSI+CiAgICAgICAgICAgIDxwb2x5bGluZSBpZD0iUGF0aC0yIiBzdHJva2U9IiNGQkNCN0UiIHN0cm9rZS13aWR0aD0iNCIgcG9pbnRzPSI3MC4wNzM3MjA4IDEyLjM4OTIzODMgNTYuODk3NDczNCAyNy42NjQwMjM3IDM4LjA0NzM2NyAtNS4yNjg5NjQ4NmUtMTQgLTcuMTA1NDI3MzZlLTE1IDUzLjE3MjMyNjggMTEuMzkwODgyOCA1My4xNzIzMjY4IDM4LjA0NzM2NyAxNi4wMjE1IDU2Ljg5NzQ3MzQgNDIuNjIyODgwNCA3MC4wNzM3MjA4IDI3LjY2NDAyMzciPjwvcG9seWxpbmU+CiAgICAgICAgICAgIDxnIGlkPSJHcm91cCIgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoNjYuMDAwMDAwLCA3LjAwMDAwMCkiIGZpbGw9IiNGQkNCN0UiPgogICAgICAgICAgICAgICAgPHBhdGggZD0iTTUsMTAgQzcuNzYxNDIzNzUsMTAgMTAsNy43NjE0MjM3NSAxMCw1IEMxMCwyLjIzODU3NjI1IDcuNzYxNDIzNzUsMCA1LDAgQzIuMjM4NTc2MjUsMCAwLDIuMjM4NTc2MjUgMCw1IEMwLDcuNzYxNDIzNzUgMi4yMzg1NzYyNSwxMCA1LDEwIFoiIGlkPSJPdmFsIj48L3BhdGg+CiAgICAgICAgICAgICAgICA8Y2lyY2xlIGlkPSJPdmFsIiBjeD0iNSIgY3k9IjIwIiByPSI1Ij48L2NpcmNsZT4KICAgICAgICAgICAgPC9nPgogICAgICAgIDwvZz4KICAgIDwvZz4KPC9zdmc+
       mediatype: image/svg+xml
 
   labels:
@@ -474,7 +474,7 @@ spec:
                   runAsNonRoot: true
                 containers:
                 - name: operator
-                  image: "quay.io/openshift/origin-metering-ansible-operator:4.6"
+                  image: "quay.io/coreos/metering-ansible-operator:release-4.7"
                   imagePullPolicy: Always
                   args:
                   - "--zap-level=info"
@@ -486,7 +486,7 @@ spec:
                   - name: OPERATOR_NAME
                     value: "metering-operator"
                   - name: DISABLE_OCP_FEATURES
-                    value: "false"
+                    value: "true"
                   - name: WATCH_NAMESPACE
                     valueFrom:
                       fieldRef:
@@ -496,19 +496,17 @@ spec:
                       fieldRef:
                         fieldPath: metadata.name
                   - name: METERING_ANSIBLE_OPERATOR_IMAGE
-                    value: "quay.io/openshift/origin-metering-ansible-operator:4.6"
+                    value: "quay.io/coreos/metering-ansible-operator:release-4.7"
                   - name: METERING_REPORTING_OPERATOR_IMAGE
-                    value: "quay.io/openshift/origin-metering-reporting-operator:4.6"
+                    value: "quay.io/coreos/metering-reporting-operator:release-4.7"
                   - name: METERING_PRESTO_IMAGE
-                    value: "quay.io/openshift/origin-metering-presto:4.6"
+                    value: "quay.io/coreos/presto:release-4.7"
                   - name: METERING_HIVE_IMAGE
-                    value: "quay.io/openshift/origin-metering-hive:4.6"
+                    value: "quay.io/coreos/hive:release-4.7"
                   - name: METERING_HADOOP_IMAGE
-                    value: "quay.io/openshift/origin-metering-hadoop:4.6"
+                    value: "quay.io/coreos/hadoop:release-4.7"
                   - name: GHOSTUNNEL_IMAGE
-                    value: "quay.io/openshift/origin-ghostunnel:4.6"
-                  - name: OAUTH_PROXY_IMAGE
-                    value: "quay.io/openshift/origin-oauth-proxy:4.6"
+                    value: "quay.io/coreos/metering-ghostunnel:release-4.7"
                   ports:
                   - name: http-metrics
                     containerPort: 8383

@@ -1,11 +1,11 @@
 # need the helm-cli from the helm image
-FROM registry.svc.ci.openshift.org/ocp/4.6:metering-helm as helm
+FROM registry.svc.ci.openshift.org/ocp/4.7:metering-helm as helm
 # final image needs kubectl, so we copy `oc` from cli image to use as kubectl.
-FROM registry.svc.ci.openshift.org/ocp/4.6:cli as cli
+FROM registry.svc.ci.openshift.org/ocp/4.7:cli as cli
 # need base-4.4 repo for boto python packages
 FROM registry.svc.ci.openshift.org/ocp/4.4:base as base-4-4
 # the base image is the ansible-operator's origin images
-FROM registry.svc.ci.openshift.org/ocp/4.6:ansible-operator
+FROM registry.svc.ci.openshift.org/ocp/4.7:ansible-operator
 
 USER root
 RUN set -x;

@@ -3,7 +3,7 @@ FROM quay.io/openshift/origin-metering-helm:latest as helm
 # final image needs kubectl, so we copy `oc` from cli image to use as kubectl.
 FROM openshift/origin-cli:latest as cli
 # the base image is the ansible-operator's origin images
-FROM quay.io/openshift/origin-ansible-operator:4.6
+FROM quay.io/openshift/origin-ansible-operator:4.7
 
 USER root
 RUN set -x; INSTALL_PKGS="curl bash ca-certificates less which openssl" \
