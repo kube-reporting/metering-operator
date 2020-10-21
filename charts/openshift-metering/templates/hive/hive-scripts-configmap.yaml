@@ -107,6 +107,6 @@ data:
     export HIVE_LOGLEVEL="${HIVE_LOGLEVEL:-INFO}"
     export HADOOP_OPTS="${HADOOP_OPTS} ${VM_OPTIONS} ${GC_SETTINGS} ${JMX_OPTIONS}"
     export HIVE_METASTORE_HADOOP_OPTS=" -Dhive.log.level=${HIVE_LOGLEVEL} "
-    export HIVE_OPTS="${HIVE_OPTS} --hiveconf hive.root.logger=${HIVE_LOGLEVEL},console "
+    export HIVE_OPTS="${HIVE_OPTS} "
 
     exec $@
