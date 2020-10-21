@@ -24,32 +24,29 @@ var (
 	defaultPrestoHost    = "presto:8080"
 	defaultPromHost      = "http://thanos-querier-openshift-monitoring.svc:9091/"
 	defaultLeaseDuration = time.Second * 60
-	// cfg is the config for our operator
+
 	cfg                            operator.Config
+	pathToNamespaceInContainer     = "/var/run/secrets/kubernetes.io/serviceaccount/namespace"
 	prometheusDataSourceImportFrom string
 
 	logLevelStr         string
 	logFullTimestamp    bool
 	logDisableTimestamp bool
+
+	rootCmd = &cobra.Command{
+		Use:   "reporting-operator",
+		Short: "",
+		RunE: func(cmd *cobra.Command, _ []string) error {
+			return cmd.Help()
+		},
+	}
+
+	startCmd = &cobra.Command{
+		Use:   "start",
+		Short: "starts the metering reporting operator",
+		Run:   startReporting,
+	}
 )
-
-var rootCmd = &cobra.Command{
-	Use:   "reporting-operator",
-	Short: "",
-	RunE: func(cmd *cobra.Command, _ []string) error {
-		return cmd.Help()
-	},
-}
-
-var startCmd = &cobra.Command{
-	Use:   "start",
-	Short: "starts the metering reporting operator",
-	Run:   startReporting,
-}
-
-func AddCommands() {
-	rootCmd.AddCommand(startCmd)
-}
 
 func init() {
 	// globally set time to UTC
@@ -133,8 +130,7 @@ func main() {
 		DisableTimestamp: logDisableTimestamp,
 	})
 
-	AddCommands()
-
+	rootCmd.AddCommand(startCmd)
 	rootCmd.ParseFlags(os.Args[1:])
 
 	if err := SetFlagsFromEnv(startCmd.Flags(), "REPORTING_OPERATOR"); err != nil {
@@ -148,8 +144,9 @@ func main() {
 
 func startReporting(cmd *cobra.Command, args []string) {
 	logger := newLogger()
+
 	if cfg.OwnNamespace == "" {
-		namespace, err := ioutil.ReadFile("/var/run/secrets/kubernetes.io/serviceaccount/namespace")
+		namespace, err := ioutil.ReadFile(pathToNamespaceInContainer)
 		if err != nil {
 			logger.WithError(err).Fatal("could not determine namespace")
 		}
@@ -171,10 +168,10 @@ func startReporting(cmd *cobra.Command, args []string) {
 	}
 
 	signalStopCtx := setupSignals()
-	runReporting(logger, cfg, signalStopCtx)
+	runReporting(signalStopCtx, logger, cfg)
 }
 
-func runReporting(logger log.FieldLogger, cfg operator.Config, ctx context.Context) {
+func runReporting(ctx context.Context, logger log.FieldLogger, cfg operator.Config) {
 	op, err := operator.New(logger, cfg)
 	if err != nil {
 		logger.WithError(err).Fatal("unable to setup reporting-operator")
