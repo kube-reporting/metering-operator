@@ -9,7 +9,11 @@ data:
     cp -v -L -r -f /hadoop-starting-config/* /hadoop-config/
     cd /hadoop-config/
     faq '.configuration.property+=[{name: ("fs.azure.account.key." + env.AZURE_STORAGE_ACCOUNT_NAME + ".blob.core.windows.net"), value: env.AZURE_SECRET_ACCESS_KEY }]' core-site.xml > core-site.xml.temp
-    cp core-site.xml.temp core-site.xml
+    mv -f core-site.xml.temp core-site.xml
+    faq '.configuration.property+=[{name: ("hadoop.proxyuser.hadoop.hosts"), value: ("*")}]' core-site.xml > core-site.xml.temp
+    mv -f core-site.xml.temp core-site.xml
+    faq '.configuration.property+=[{name: ("hadoop.proxyuser.hadoop.groups"), value: ("*")}]' core-site.xml > core-site.xml.temp
+    mv -f core-site.xml.temp core-site.xml
     if [ -a /gcs-json/gcs-service-account.json ]; then
       faq '.configuration.property+=[{name: "fs.gs.auth.service.account.json.keyfile" , value: "/gcs-json/gcs-service-account.json" }]' core-site.xml > core-site.xml.temp.temp
       cp core-site.xml.temp.temp core-site.xml
