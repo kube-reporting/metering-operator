@@ -353,32 +353,32 @@ spec:
 {{ toYaml $operatorValues.spec.livenessProbe | indent 10 }}
 {{- end }}
         volumeMounts:
-        - name: reporting-operator-service-ca-bundle
-          mountPath: /var/run/configmaps/service-ca-bundle
+        - mountPath: /var/run/configmaps/service-ca-bundle
+          name: reporting-operator-service-ca-bundleF
           readOnly: true
 {{- if $operatorValues.spec.config.hive.tls.enabled }}
-        - name: hive-tls
-          mountPath: /var/run/secrets/hive-tls
+        - mountPath: /var/run/secrets/hive-tls
+          name: hive-tls
 {{- if $operatorValues.spec.config.hive.auth.enabled }}
-        - name: hive-auth
-          mountPath: /var/run/secrets/hive-auth
+        - mountPath: /var/run/secrets/hive-auth
+          name: hive-auth
 {{- end }}
 {{- end }}
 {{- if $operatorValues.spec.config.presto.tls.enabled }}
-        - name: presto-tls
-          mountPath: /var/run/secrets/presto-tls
+        - mountPath: /var/run/secrets/presto-tls
+          name: presto-tls
 {{- if $operatorValues.spec.config.presto.auth.enabled }}
-        - name: presto-auth
-          mountPath: /var/run/secrets/presto-auth
+        - mountPath: /var/run/secrets/presto-auth
+          name: presto-auth
 {{- end }}
 {{- end }}
 {{- if $operatorValues.spec.config.tls.api.enabled }}
-        - name: api-tls
-          mountPath: /tls
+        - mountPath: /tls
+          name: api-tls
 {{- end }}
 {{- if $operatorValues.spec.config.prometheus.certificateAuthority.configMap.enabled }}
-        - name: prometheus-certificate-authority
-          mountPath: /var/run/reporting-operator/ca/
+        - mountPath: /var/run/reporting-operator/ca/
+          name: prometheus-certificate-authority
 {{- end }}
 {{- if $operatorValues.spec.config.prometheus.metricsImporter.auth.tokenSecret.enabled }}
         - mountPath: /var/run/reporting-operator/token
@@ -450,8 +450,8 @@ spec:
         resources:
 {{ toYaml $operatorValues.spec.authProxy.resources | indent 10 }}
         volumeMounts:
-        - name: reporting-operator-service-ca-bundle
-          mountPath: /var/run/configmaps/service-ca-bundle
+        - mountPath: /var/run/configmaps/service-ca-bundle
+          name: reporting-operator-service-ca-bundle
           readOnly: true
 {{- if and .Values.networking.useGlobalProxyNetworking .Values.networking.proxy.config.trusted_ca_bundle }}
         - mountPath: /etc/pki/ca-trust/extracted/pem
