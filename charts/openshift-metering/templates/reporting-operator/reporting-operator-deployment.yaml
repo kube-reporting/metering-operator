@@ -386,8 +386,8 @@ spec:
           subPath: token
 {{- end }}
 {{- if and .Values.networking.useGlobalProxyNetworking .Values.networking.proxy.config.trusted_ca_bundle }}
-        - mountPath: /etc/pki/ca-trust/extracted/pem
-          name: reporting-operator-trusted-ca-bundle
+        - name: reporting-operator-trusted-ca-bundle
+          mountPath: /etc/pki/ca-trust/extracted/pem
           readOnly: true
 {{- end }}
 {{- if $operatorValues.spec.authProxy.enabled }}
@@ -454,8 +454,8 @@ spec:
           mountPath: /var/run/configmaps/service-ca-bundle
           readOnly: true
 {{- if and .Values.networking.useGlobalProxyNetworking .Values.networking.proxy.config.trusted_ca_bundle }}
-        - mountPath: /etc/pki/ca-trust/extracted/pem
-          name: reporting-operator-trusted-ca-bundle
+        - name: reporting-operator-trusted-ca-bundle
+          mountPath: /etc/pki/ca-trust/extracted/pem
           readOnly: true
 {{- end }}
 {{- if $operatorValues.spec.config.tls.api.enabled }}
@@ -478,7 +478,7 @@ spec:
           name: reporting-operator-trusted-ca-bundle
           items:
           - key: ca-bundle.crt
-            path: ca-bundle.crt
+            path: tls-ca-bundle.pem
 {{- end }}
       - name: reporting-operator-service-ca-bundle
         configMap:
