@@ -354,7 +354,7 @@ spec:
 {{- end }}
         volumeMounts:
         - mountPath: /var/run/configmaps/service-ca-bundle
-          name: reporting-operator-service-ca-bundleF
+          name: reporting-operator-service-ca-bundle
           readOnly: true
 {{- if $operatorValues.spec.config.hive.tls.enabled }}
         - mountPath: /var/run/secrets/hive-tls
