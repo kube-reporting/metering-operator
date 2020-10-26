@@ -23,6 +23,9 @@ function cleanup() {
             kubectl label node "$i" metering-node-testing-label- 2>/dev/null
         done
 
+        echo "Collecting the metering-ocp PackageManifest"
+        kubectl -n openshift-marketplace get packagemanifest -l "name=${METERING_NAMESPACE}-metering-testing-ns" -o yaml > ${TEST_OUTPUT_DIR}/packagemanifests.yaml
+
         # Note: the `openshift-marketplace` namespace is hardcoded for now until we have the need
         # to create the registry-related resources in another namespace (e.g. testing upstream manifests).
         echo "Removing the local registry resources with the 'name=${METERING_NAMESPACE}-metering-testing-ns' label"
