@@ -8,11 +8,15 @@ LOG_DIR="${LOG_DIR:=$PWD/must-gather}"
 POD_LOG_PATH=${POD_LOG_PATH:="${LOG_DIR}/pod_logs"}
 mkdir -p ${POD_LOG_PATH}/
 
+# General namespace resources
 resources=()
 resources+=(pods)
 resources+=(deployments)
 resources+=(statefulsets)
 resources+=(services)
+resources+=(serviceaccounts)
+
+# Metering-specific namespaced resources
 resources+=(hivetables)
 resources+=(prestotables)
 resources+=(storagelocations)
