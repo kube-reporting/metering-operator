@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"fmt"
 	"os"
+	"os/exec"
 	"path/filepath"
 	"time"
 
@@ -288,4 +289,33 @@ func ExecPodCommandWithOptions(config *rest.Config, client kubernetes.Interface,
 	}
 
 	return stdoutBuf, stderrBuf, nil
+}
+
+// GatherRegistryResources is a test helper function responsible for providing inputs
+// and executing the @scriptPath bash script, which dumps out the YAML manifest for the
+// CatalogSource and the corresponding PackageManifest resources that were used to deploy
+// a custom version of Metering.
+func GatherRegistryResources(outputPath, scriptPath, name, namespace string) error {
+	path, err := exec.LookPath(scriptPath)
+	if err != nil {
+		return err
+	}
+
+	cmd := exec.Cmd{
+		Path:   path,
+		Stdout: os.Stdout,
+		Stderr: os.Stderr,
+
+		Env: []string{
+			fmt.Sprintf("OUTPUT_DIRECTORY=%s", outputPath),
+			fmt.Sprintf("CATALOG_SOURCE_NAME=%s", name),
+			fmt.Sprintf("CATALOG_SOURCE_NAMESPACE=%s", namespace),
+		},
+	}
+	cmd.Env = append(cmd.Env, os.Environ()...)
+	if err := cmd.Run(); err != nil {
+		return err
+	}
+
+	return nil
 }

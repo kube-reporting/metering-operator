@@ -2,7 +2,10 @@ package e2e
 
 import (
 	"flag"
+	"fmt"
 	"os"
+	"path/filepath"
+	"strings"
 	"testing"
 
 	"github.com/sirupsen/logrus"
@@ -41,14 +44,20 @@ var (
 	catalogSourceName              string
 	catalogSourceNamespace         string
 
-	kubeNamespaceCharLimit          = 63
-	namespacePrefixCharLimit        = 10
-	packageName                     = "metering-ocp"
-	preUpgradeTestDirName           = "pre-upgrade"
-	postUpgradeTestDirName          = "post-upgrade"
-	gatherTestArtifactsScript       = "gather-test-install-artifacts.sh"
+	kubeNamespaceCharLimit   = 63
+	namespacePrefixCharLimit = 10
+
+	packageName            = "metering-ocp"
+	preUpgradeTestDirName  = "pre-upgrade"
+	postUpgradeTestDirName = "post-upgrade"
+
+	hackScriptDirName               = "hack"
+	registryArtifactsDirName        = "registry"
 	testMeteringConfigManifestsPath = "/test/e2e/manifests/meteringconfigs/"
 	testNFSManifestPath             = "/test/e2e/manifests/nfs/"
+
+	gatherTestArtifactsScript         = "gather-test-install-artifacts.sh"
+	registryGatherTestArtifactsScript = "gather-registry-artifacts.sh"
 )
 
 func init() {
@@ -124,7 +133,26 @@ func testMainWrapper(m *testing.M) int {
 		df.Logger.Fatalf("Failed to create the CatalogSource custom resource using the %s index image: %v", indexImage, err)
 	}
 	if !df.RunDevSetup {
-		defer df.DeleteRegistryResources(registryProvisioned, catalogSourceName, catalogSourceNamespace)
+		var (
+			errors []string
+			err    error
+		)
+		defer func() {
+			resourceOutputPath := filepath.Join(testOutputPath, registryArtifactsDirName)
+			registryArtifactsGatherScript := filepath.Join(repoPath, hackScriptDirName, registryGatherTestArtifactsScript)
+
+			err = testhelpers.GatherRegistryResources(resourceOutputPath, registryArtifactsGatherScript, catalogSourceName, catalogSourceNamespace)
+			if err != nil {
+				errors = append(errors, fmt.Sprintf("failed to gather the OLM registry resources: %v", err))
+			}
+			err = df.DeleteRegistryResources(registryProvisioned, catalogSourceName, catalogSourceNamespace)
+			if err != nil {
+				errors = append(errors, fmt.Sprintf("failed to delete the registry resources: %v", err))
+			}
+		}()
+		if len(errors) != 0 {
+			df.Logger.Fatalf(strings.Join(errors, "\n"))
+		}
 	}
 
 	err = df.WaitForPackageManifest(catalogSourceName, catalogSourceNamespace, subscriptionChannel)
