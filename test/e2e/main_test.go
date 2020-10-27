@@ -156,25 +156,6 @@ func TestManualMeteringInstall(t *testing.T) {
 		MeteringConfigManifestFilename string
 	}{
 		{
-			Name:                      "HDFS-MissingStorageSpec",
-			MeteringOperatorImageRepo: meteringOperatorImageRepo,
-			MeteringOperatorImageTag:  meteringOperatorImageTag,
-			Skip:                      false,
-			ExpectInstallErr:          true,
-			ExpectInstallErrMsg: []string{
-				"failed to install metering",
-				"failed to create the MeteringConfig resource",
-				"spec.storage in body is required|spec.storage: Required value",
-			},
-			InstallSubTests: []InstallTestCase{
-				{
-					Name:     "testInvalidMeteringConfigMissingStorageSpec",
-					TestFunc: testInvalidMeteringConfigMissingStorageSpec,
-				},
-			},
-			MeteringConfigManifestFilename: "missing-storage.yaml",
-		},
-		{
 			Name:                      "HDFS-ValidNodeSelector",
 			MeteringOperatorImageRepo: meteringOperatorImageRepo,
 			MeteringOperatorImageTag:  meteringOperatorImageTag,
