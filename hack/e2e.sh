@@ -23,6 +23,9 @@ function cleanup() {
             kubectl label node "$i" metering-node-testing-label- 2>/dev/null
         done
 
+        echo "Dumping all packagemanifests available"
+        kubectl -n openshift-marketplace get packagemanifest --show-labels | grep metering
+
         echo "Collecting the metering-ocp PackageManifest"
         kubectl -n openshift-marketplace get packagemanifest -l "name=${METERING_NAMESPACE}-metering-testing-ns" -o yaml > ${TEST_OUTPUT_DIR}/packagemanifests.yaml
 
