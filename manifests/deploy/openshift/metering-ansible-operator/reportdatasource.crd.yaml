@@ -177,4 +177,3 @@ spec:
                   newestImportedMetricTime:
                     type: string
                     format: date-time
-

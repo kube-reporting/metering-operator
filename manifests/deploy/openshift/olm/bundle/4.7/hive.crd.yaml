@@ -278,4 +278,3 @@ spec:
                       type: object
                       additionalProperties:
                         type: string
-

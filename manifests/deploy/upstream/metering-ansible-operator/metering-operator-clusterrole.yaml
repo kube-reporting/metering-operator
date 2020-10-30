@@ -50,4 +50,3 @@ rules:
     - clusterroles
     verbs:
     - '*'
-

@@ -8,4 +8,3 @@ spec:
   name: metering-upstream
   source: metering-upstream-dev
   sourceNamespace: metering
-

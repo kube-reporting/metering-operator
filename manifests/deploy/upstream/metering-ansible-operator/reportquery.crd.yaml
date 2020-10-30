@@ -148,4 +148,3 @@ spec:
                 type: string
                 pattern: '[Ss][Ee][Ll][Ee][Cc][Tt]\s'
                 minLength: 1
-

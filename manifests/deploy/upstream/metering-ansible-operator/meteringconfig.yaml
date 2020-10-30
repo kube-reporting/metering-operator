@@ -3,4 +3,3 @@ kind: MeteringConfig
 metadata:
   name: operator-metering
 spec: {}
-
