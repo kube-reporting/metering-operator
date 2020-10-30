@@ -45,6 +45,7 @@ METERING_NAMESPACE=$(sanetize_namespace "${METERING_NAMESPACE:-metering}")
 : "${METERING_INSTALL_CLUSTERROLEBINDING:=true}"
 
 : "${FAQ_BIN:=faq}"
+: "${HELM_BIN:=helm}"
 : "${DEPLOY_REPORTING_OPERATOR_LOCAL:=false}"
 : "${DEPLOY_METERING_OPERATOR_LOCAL:=false}"
 : "${REPORTING_OPERATOR_PID_FILE:="/tmp/${METERING_NAMESPACE}-reporting-operator.pid"}"

@@ -39,43 +39,43 @@ TMPDIR="$(mktemp -d)"
 trap 'rm -rf $TMPDIR' EXIT SIGINT
 CHART="$ROOT_DIR/charts/metering-ansible-operator"
 
-helm template "$CHART" \
+${HELM_BIN} template "$CHART" \
     ${VALUES_ARGS[@]+"${VALUES_ARGS[@]}"} \
     -x "templates/operator/role.yaml" \
     | sed -f "$ROOT_DIR/hack/remove-helm-template-header.sed" \
     > "$METERING_OPERATOR_OUTPUT_DIR/metering-operator-role.yaml"
 
-helm template "$CHART" \
+${HELM_BIN} template "$CHART" \
     ${VALUES_ARGS[@]+"${VALUES_ARGS[@]}"} \
     -x "templates/operator/rolebinding.yaml" \
     | sed -f "$ROOT_DIR/hack/remove-helm-template-header.sed" \
     > "$METERING_OPERATOR_OUTPUT_DIR/metering-operator-rolebinding.yaml"
 
-helm template "$CHART" \
+${HELM_BIN} template "$CHART" \
     ${VALUES_ARGS[@]+"${VALUES_ARGS[@]}"} \
     -x "templates/operator/clusterrole.yaml" \
     | sed -f "$ROOT_DIR/hack/remove-helm-template-header.sed" \
     > "$METERING_OPERATOR_OUTPUT_DIR/metering-operator-clusterrole.yaml"
 
-helm template "$CHART" \
+${HELM_BIN} template "$CHART" \
     ${VALUES_ARGS[@]+"${VALUES_ARGS[@]}"} \
     -x "templates/operator/clusterrolebinding.yaml" \
     | sed -f "$ROOT_DIR/hack/remove-helm-template-header.sed" \
     > "$METERING_OPERATOR_OUTPUT_DIR/metering-operator-clusterrolebinding.yaml"
 
-helm template "$CHART" \
+${HELM_BIN} template "$CHART" \
     ${VALUES_ARGS[@]+"${VALUES_ARGS[@]}"} \
     -x "templates/operator/deployment.yaml" \
     | sed -f "$ROOT_DIR/hack/remove-helm-template-header.sed" \
     > "$METERING_OPERATOR_OUTPUT_DIR/metering-operator-deployment.yaml"
 
-helm template "$CHART" \
+${HELM_BIN} template "$CHART" \
     ${VALUES_ARGS[@]+"${VALUES_ARGS[@]}"} \
     -x "templates/operator/service-account.yaml" \
     | sed -f "$ROOT_DIR/hack/remove-helm-template-header.sed" \
     > "$METERING_OPERATOR_OUTPUT_DIR/metering-operator-service-account.yaml"
 
-helm template "$CHART" \
+${HELM_BIN} template "$CHART" \
     ${VALUES_ARGS[@]+"${VALUES_ARGS[@]}"} \
     -x "templates/operator/meteringconfig.yaml" \
     | sed -f "$ROOT_DIR/hack/remove-helm-template-header.sed" \
@@ -84,7 +84,7 @@ helm template "$CHART" \
 # Render the CSV to a temporary location, so we can add the version into it's
 # filename after it's been rendered
 TMP_CSV="$TMPDIR/metering.clusterserviceversion.yaml"
-helm template "$CHART" \
+${HELM_BIN} template "$CHART" \
     ${VALUES_ARGS[@]+"${VALUES_ARGS[@]}"} \
     -x "templates/olm/clusterserviceversion.yaml" \
     | sed -f "$ROOT_DIR/hack/remove-helm-template-header.sed" \
@@ -118,15 +118,15 @@ mkdir -p "$CSV_BUNDLE_DIR"
 # Rename the file with it's version in it, and move it to the final destination
 mv -f "$TMP_CSV" "$CSV_MANIFEST_DESTINATION"
 
-helm template "$CHART" \
+${HELM_BIN} template "$CHART" \
     ${VALUES_ARGS[@]+"${VALUES_ARGS[@]}"} \
     -x "templates/olm/package.yaml" \
     | sed -f "$ROOT_DIR/hack/remove-helm-template-header.sed" \
     > "$PACKAGE_MANIFEST_DESTINATION"
 
-# We don't always want to generate an ART package, so check if the helm template
+# We don't always want to generate an ART package, so check if the ${HELM_BIN} template
 # output is empty before redirecting output to a file
-HELM_ART_PKG_OUTPUT="$(helm template "$CHART" \
+HELM_ART_PKG_OUTPUT="$(${HELM_BIN} template "$CHART" \
     ${VALUES_ARGS[@]+"${VALUES_ARGS[@]}"} \
     -x "templates/olm/art.yaml" \
     | sed -f "$ROOT_DIR/hack/remove-helm-template-header.sed")"
@@ -137,68 +137,68 @@ else
     echo "$HELM_ART_PKG_OUTPUT" > "$ART_CONFIG_DESTINATION"
 fi
 
-helm template "$CHART" \
+${HELM_BIN} template "$CHART" \
     ${VALUES_ARGS[@]+"${VALUES_ARGS[@]}"} \
     -x "templates/olm/image-references" \
     | sed -f "$ROOT_DIR/hack/remove-helm-template-header.sed" \
     > "$IMAGE_REFERENCES_MANIFEST_DESTINATION"
 
-helm template "$CHART" \
+${HELM_BIN} template "$CHART" \
     ${VALUES_ARGS[@]+"${VALUES_ARGS[@]}"} \
     -x "templates/olm/subscription.yaml" \
     | sed -f "$ROOT_DIR/hack/remove-helm-template-header.sed" \
     > "$SUBSCRIPTION_MANIFEST_DESTINATION"
 
-helm template "$CHART" \
+${HELM_BIN} template "$CHART" \
     ${VALUES_ARGS[@]+"${VALUES_ARGS[@]}"} \
     -x "templates/olm/catalogsource.yaml" \
     | sed -f "$ROOT_DIR/hack/remove-helm-template-header.sed" \
     > "$CATALOGSOURCE_MANIFEST_DESTINATION"
 
-helm template "$CHART" \
+${HELM_BIN} template "$CHART" \
     ${VALUES_ARGS[@]+"${VALUES_ARGS[@]}"} \
     -x "templates/olm/operatorgroup.yaml" \
     | sed -f "$ROOT_DIR/hack/remove-helm-template-header.sed" \
     > "$OPERATORGROUP_MANIFEST_DESTINATION"
 
 for CRD_DIR in "$METERING_OPERATOR_OUTPUT_DIR" "$CSV_BUNDLE_DIR"; do
-    helm template "$CHART" \
+    ${HELM_BIN} template "$CHART" \
         ${VALUES_ARGS[@]+"${VALUES_ARGS[@]}"} \
         -x "templates/crds/meteringconfig.crd.yaml" \
         | sed -f "$ROOT_DIR/hack/remove-helm-template-header.sed" \
         > "$CRD_DIR/meteringconfig.crd.yaml"
 
-    helm template "$CHART" \
+    ${HELM_BIN} template "$CHART" \
         ${VALUES_ARGS[@]+"${VALUES_ARGS[@]}"} \
         -x "templates/crds/report.crd.yaml" \
         | sed -f "$ROOT_DIR/hack/remove-helm-template-header.sed" \
         > "$CRD_DIR/report.crd.yaml"
 
-    helm template "$CHART" \
+    ${HELM_BIN} template "$CHART" \
         ${VALUES_ARGS[@]+"${VALUES_ARGS[@]}"} \
         -x "templates/crds/reportdatasource.crd.yaml" \
         | sed -f "$ROOT_DIR/hack/remove-helm-template-header.sed" \
         > "$CRD_DIR/reportdatasource.crd.yaml"
 
-    helm template "$CHART" \
+    ${HELM_BIN} template "$CHART" \
         ${VALUES_ARGS[@]+"${VALUES_ARGS[@]}"} \
         -x "templates/crds/reportquery.crd.yaml" \
         | sed -f "$ROOT_DIR/hack/remove-helm-template-header.sed" \
         > "$CRD_DIR/reportquery.crd.yaml"
 
-    helm template "$CHART" \
+    ${HELM_BIN} template "$CHART" \
         ${VALUES_ARGS[@]+"${VALUES_ARGS[@]}"} \
         -x "templates/crds/hive.crd.yaml" \
         | sed -f "$ROOT_DIR/hack/remove-helm-template-header.sed" \
         > "$CRD_DIR/hive.crd.yaml"
 
-    helm template "$CHART" \
+    ${HELM_BIN} template "$CHART" \
         ${VALUES_ARGS[@]+"${VALUES_ARGS[@]}"} \
         -x "templates/crds/prestotable.crd.yaml" \
         | sed -f "$ROOT_DIR/hack/remove-helm-template-header.sed" \
         > "$CRD_DIR/prestotable.crd.yaml"
 
-    helm template "$CHART" \
+    ${HELM_BIN} template "$CHART" \
         ${VALUES_ARGS[@]+"${VALUES_ARGS[@]}"} \
         -x "templates/crds/storagelocation.crd.yaml" \
         | sed -f "$ROOT_DIR/hack/remove-helm-template-header.sed" \
