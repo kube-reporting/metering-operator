@@ -1,38 +1,30 @@
 #!/bin/bash
-# If $CUSTOM_HELM_OPERATOR_OVERRIDE_VALUES and
-# $CUSTOM_HELM_OPERATOR_OVERRIDE_VALUES are set, will be used as the paths to
-# files containing override values for rendering the manifests to the output
-# directory.
 
-set -e
-set -o pipefail
+set -euo pipefail
 
 ROOT_DIR=$(dirname "${BASH_SOURCE}")/..
 source "${ROOT_DIR}/hack/common.sh"
 
-VALUES_ARGS=()
-
-if [[ $# -ge 2 ]] ; then
-    METERING_OPERATOR_OUTPUT_DIR=$1
-    echo "metering-operator manifest output directory: ${METERING_OPERATOR_OUTPUT_DIR}"
-    mkdir -p "${METERING_OPERATOR_OUTPUT_DIR}"
-    shift
-
-    OLM_OUTPUT_DIR=$1
-    echo "OLM manifest output directory: ${OLM_OUTPUT_DIR}"
-    mkdir -p "${OLM_OUTPUT_DIR}"
-    shift
-
-    echo "Values files: [$*]"
-    # prepends -f to each argument passed in, and stores the list of arguments
-    # (-f $arg1 -f $arg2) in VALUES_ARGS
-    while (($# > 0)); do
-        VALUES_ARGS+=(-f "$1")
-        shift
-    done
-else
+if [[ $# -lt 2 ]] ; then
     echo "Must specify output directory and values files"
     exit 1
+fi
+
+METERING_OPERATOR_OUTPUT_DIR=$1
+echo "Metering Operator manifest output directory: ${METERING_OPERATOR_OUTPUT_DIR}"
+mkdir -p "${METERING_OPERATOR_OUTPUT_DIR}"
+shift
+
+OLM_OUTPUT_DIR=$1
+echo "OLM manifest output directory: ${OLM_OUTPUT_DIR}"
+mkdir -p "${OLM_OUTPUT_DIR}"
+shift
+
+VALUES_ARGS=()
+if [[ $# -gt 0 ]]; then
+    echo "Values files: [$*]"
+    CHART_VALUES=$1
+    VALUES_ARGS+=(-f "$1")
 fi
 
 TMPDIR="$(mktemp -d)"
@@ -124,17 +116,22 @@ ${HELM_BIN} template "$CHART" \
     | sed -f "$ROOT_DIR/hack/remove-helm-template-header.sed" \
     > "$PACKAGE_MANIFEST_DESTINATION"
 
-# We don't always want to generate an ART package, so check if the ${HELM_BIN} template
-# output is empty before redirecting output to a file
-HELM_ART_PKG_OUTPUT="$(${HELM_BIN} template "$CHART" \
-    ${VALUES_ARGS[@]+"${VALUES_ARGS[@]}"} \
-    -s "templates/olm/art.yaml" \
-    | sed -f "$ROOT_DIR/hack/remove-helm-template-header.sed")"
+HELM_ART_CONDITIONAL_TOGGLE=".olm.skipARTPackage"
+HELM_SKIP_ART_PACKAGE="$(cat $CHART_VALUES | ${FAQ_BIN} -f yaml ${HELM_ART_CONDITIONAL_TOGGLE})"
 
-if [[ -z "$HELM_ART_PKG_OUTPUT" ]]; then
-    echo "Skipping generating an ART package for $BUNDLE_DIR"
+# We don't always want to generate an ART package, so check if the values file
+# we're currently processing has that templating toggling set to true as helm template
+# `-s` behaves differently than `-x` as an error is produced when templating empty files.
+if [[ $HELM_SKIP_ART_PACKAGE != "true" ]]; then
+    echo "Generating an ART package for $BUNDLE_DIR"
+
+    ${HELM_BIN} template "$CHART" \
+        ${VALUES_ARGS[@]+"${VALUES_ARGS[@]}"} \
+        -s "templates/olm/art.yaml" \
+        | sed -f "$ROOT_DIR/hack/remove-helm-template-header.sed" \
+        > "$ART_CONFIG_DESTINATION"
 else
-    echo "$HELM_ART_PKG_OUTPUT" > "$ART_CONFIG_DESTINATION"
+    echo "Skipping generating an ART package for $BUNDLE_DIR"
 fi
 
 ${HELM_BIN} template "$CHART" \
