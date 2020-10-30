@@ -1,4 +1,4 @@
-{{ if not .Values.olm.skipARTPackage }}
+{{ if (default .Values.olm.skipARTPackage true) }}
 updates:
   # files are relative to art.yaml
   - file: "{MAJOR}.{MINOR}/meteringoperator.v{MAJOR}.{MINOR}.0.clusterserviceversion.yaml"
