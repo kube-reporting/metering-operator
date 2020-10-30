@@ -25,12 +25,8 @@ COPY hack/scl-operator-courier.sh /usr/local/bin/operator-courier
 RUN chmod +x /usr/local/bin/operator-courier
 
 COPY --from=cli /usr/bin/oc /usr/bin/
-RUN ln -s /usr/bin/oc /usr/bin/kubectl
-
 COPY --from=helm /usr/local/bin/helm /usr/local/bin/helm
-
-RUN helm init --client-only --skip-refresh && helm repo remove stable || true
-
+RUN ln -s /usr/bin/oc /usr/bin/kubectl
 RUN go get -u github.com/jstemmer/go-junit-report
 
 ENV GOCACHE='/tmp'
