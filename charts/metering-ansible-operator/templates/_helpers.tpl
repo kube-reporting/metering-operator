@@ -28,14 +28,15 @@ template:
       image: "{{ .Values.operator.image.repository }}:{{ .Values.operator.image.tag }}"
       imagePullPolicy: {{ .Values.operator.image.pullPolicy }}
       args:
-      - "--zap-level=info"
+      - "--zap-log-level=info"
+      - "--metrics-addr=:{{ .Values.operator.metricsPort }}"
+      - "--leader-election-id={{ .Values.operator.name }}"
+      - "--enable-leader-election=true"
       env:
       - name: ANSIBLE_DEBUG_LOGS
         value: "True"
       - name: ANSIBLE_VERBOSITY_METERINGCONFIG_METERING_OPENSHIFT_IO
         value: "1"
-      - name: OPERATOR_NAME
-        value: "{{ .Values.operator.name }}"
       - name: DISABLE_OCP_FEATURES
         value: "{{ .Values.operator.disableOCPFeatures }}"
       - name: WATCH_NAMESPACE
@@ -50,10 +51,6 @@ template:
           fieldRef:
             fieldPath: metadata.namespace
 {{- end }}
-      - name: POD_NAME
-        valueFrom:
-          fieldRef:
-            fieldPath: metadata.name
 {{- range $index, $item := .Values.olm.imageTags }}
       - name: {{ $item.name | replace "-" "_" | upper | printf "%s_IMAGE" }}
         value: "{{ $item.from.name }}"

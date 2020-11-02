@@ -2,6 +2,7 @@ operator:
   name: metering-operator
 
   disableOCPFeatures: false
+  metricsPort: 8383
 
   reconcileIntervalSeconds: 30
   targetNamespace: ""
