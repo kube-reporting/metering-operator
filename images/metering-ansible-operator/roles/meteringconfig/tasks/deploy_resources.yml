@@ -2,7 +2,7 @@
 
 - name: Helm template resources
   block:
-  - shell: helm template {{ meteringconfig_chart_path }} --name {{ meta.name }} --namespace {{ meta.namespace}} -x {{ resource.template_file }} -f {{ values_file }}
+  - shell: helm template {{ meteringconfig_chart_path }} --namespace {{ meta.namespace}} -s {{ resource.template_file }} -f {{ values_file }}
     loop: "{{ resources }}"
     loop_control:
       loop_var: resource

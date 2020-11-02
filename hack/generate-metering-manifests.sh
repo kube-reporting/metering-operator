@@ -8,10 +8,10 @@ TMPDIR="$(mktemp -d)"
 trap "rm -rf $TMPDIR" EXIT
 
 msg "Generating Openshift Manifests"
-
 "$ROOT_DIR/hack/create-metering-manifests.sh" \
     "$OCP_INSTALLER_MANIFESTS_DIR" \
     "$OCP_OLM_MANIFESTS_DIR" \
+    "$ROOT_DIR/charts/metering-ansible-operator/values.yaml"
 
 msg "Generating Upstream Manifests"
 "$ROOT_DIR/hack/create-metering-manifests.sh" \

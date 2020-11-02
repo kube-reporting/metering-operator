@@ -69,11 +69,9 @@ spec:
           requests:
             cpu: 750m
             memory: 400Mi
-
       volumes:
         - name: runner
           emptyDir: {}
       restartPolicy: Always
       terminationGracePeriodSeconds: 30
       serviceAccount: metering-operator
-
