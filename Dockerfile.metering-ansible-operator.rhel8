@@ -34,9 +34,8 @@ COPY charts/openshift-metering ${HELM_CHART_PATH}
 
 COPY manifests/deploy/openshift/olm/bundle /manifests
 
-ENTRYPOINT ["tini", "--", "/usr/local/bin/ansible-operator", "--watches-file", "/opt/ansible/watches.yaml"]
-
 USER 1001
+ENTRYPOINT ["tini", "--", "/usr/local/bin/ansible-operator", "run", "--watches-file", "/opt/ansible/watches.yaml"]
 
 LABEL io.k8s.display-name="OpenShift metering-ansible-operator" \
     io.k8s.description="This is a component of OpenShift Container Platform and manages installation and configuration of all other metering components." \

@@ -3,7 +3,7 @@ FROM quay.io/openshift/origin-metering-helm:latest as helm
 # final image needs kubectl, so we copy `oc` from cli image to use as kubectl.
 FROM quay.io/openshift/origin-cli:latest as cli
 # the base image is the ansible-operator's origin images
-FROM quay.io/operator-framework/ansible-operator:v0.19.4
+FROM quay.io/operator-framework/ansible-operator:v1.0.1
 
 USER root
 RUN set -x; INSTALL_PKGS="curl bash ca-certificates less which openssl" \
@@ -47,7 +47,7 @@ COPY charts/openshift-metering ${HELM_CHART_PATH}
 COPY manifests/deploy/openshift/olm/bundle /manifests
 
 USER 1001
-ENTRYPOINT ["tini", "--", "/usr/local/bin/ansible-operator", "--watches-file", "/opt/ansible/watches.yaml"]
+ENTRYPOINT ["tini", "--", "/usr/local/bin/ansible-operator", "run", "--watches-file", "/opt/ansible/watches.yaml"]
 
 LABEL io.k8s.display-name="OpenShift metering-ansible-operator" \
       io.k8s.description="This is a component of OpenShift Container Platform and manages installation and configuration of all other metering components." \
