@@ -1,9 +1,9 @@
 # need the helm-cli from the helm image
 FROM quay.io/openshift/origin-metering-helm:latest as helm
 # final image needs kubectl, so we copy `oc` from cli image to use as kubectl.
-FROM openshift/origin-cli:latest as cli
+FROM quay.io/openshift/origin-cli:latest as cli
 # the base image is the ansible-operator's origin images
-FROM quay.io/openshift/origin-ansible-operator:4.7
+FROM quay.io/operator-framework/ansible-operator:v0.19.4
 
 USER root
 RUN set -x; INSTALL_PKGS="curl bash ca-certificates less which openssl" \
@@ -20,6 +20,7 @@ RUN chmod +x /tini
 
 COPY --from=helm /usr/local/bin/helm /usr/local/bin/helm
 COPY --from=cli /usr/bin/oc /usr/bin/oc
+
 # put tini and kubectl into our path
 RUN ln -f -s /usr/bin/oc /usr/bin/kubectl
 RUN ln -f -s /tini /usr/bin/tini
@@ -28,7 +29,7 @@ RUN ln -f -s /tini /usr/bin/tini
 # 1. botocore and boto3 are used by the aws-related modules (aws_s3)
 # 2. netaddr is needed to use the ipv4/ipv6 jinja filter
 # 3. cryptography is used by the openssl_* modules for TLS/authentication purposes
-RUN pip install --no-cache-dir --upgrade ansible~=2.9 openshift botocore boto3 cryptography netaddr
+RUN pip3 install --no-cache-dir --upgrade openshift botocore boto3 cryptography netaddr
 
 ENV HOME /opt/ansible
 ENV HELM_CHART_PATH ${HOME}/charts/openshift-metering
@@ -41,7 +42,6 @@ COPY charts/openshift-metering ${HELM_CHART_PATH}
 COPY manifests/deploy/openshift/olm/bundle /manifests
 
 USER 1001
-
 ENTRYPOINT ["tini", "--", "/usr/local/bin/ansible-operator", "--watches-file", "/opt/ansible/watches.yaml"]
 
 LABEL io.k8s.display-name="OpenShift metering-ansible-operator" \
