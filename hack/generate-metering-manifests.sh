@@ -4,6 +4,8 @@ set -e
 ROOT_DIR=$(dirname "${BASH_SOURCE}")/..
 source "${ROOT_DIR}/hack/common.sh"
 
+current_version=${1:-4.7}
+
 TMPDIR="$(mktemp -d)"
 trap "rm -rf $TMPDIR" EXIT
 
@@ -18,3 +20,13 @@ msg "Generating Upstream Manifests"
     "$UPSTREAM_INSTALLER_MANIFESTS_DIR" \
     "$UPSTREAM_OLM_MANIFESTS_DIR" \
     "$ROOT_DIR/charts/metering-ansible-operator/upstream-values.yaml"
+
+msg "Generating Openshift Bundle"
+${OPM_BIN} alpha bundle generate \
+    --directory="${OCP_OLM_BUNDLE_DIR}/${current_version}" \
+    --output-dir="${OCP_BUNDLE_DIR}" \
+    --default=${current_version} \
+    --channels ${current_version} \
+    --package metering-ocp &&
+    mv bundle.Dockerfile Dockerfile.bundle &&
+    find ${OCP_BUNDLE_DIR} -type f ! -name '*.yaml' -delete
