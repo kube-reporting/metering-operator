@@ -2049,6 +2049,13 @@ spec:
                                 type: string
                               username:
                                 type: string
+                              secretName:
+                                type: string
+                                description: |
+                                  secretName is a reference to an existing secret containing
+                                  the base64 encrypted username and password credentials that
+                                  will be used for hive metastore to authenticate to the database
+                                  instance metering is configured to use.
                           defaultFileFormat:
                             type: string
                           hadoopConfigSecretName:
@@ -2830,4 +2837,3 @@ spec:
                             type: string
                           tag:
                             type: string
-
