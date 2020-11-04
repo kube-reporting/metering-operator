@@ -39,6 +39,7 @@ REPORTING_OPERATOR_IMAGE_REPO=$(IMAGE_BASE_URL)/origin-metering-reporting-operat
 REPORTING_OPERATOR_IMAGE_TAG=4.7
 METERING_OPERATOR_IMAGE_REPO=$(IMAGE_BASE_URL)/origin-metering-ansible-operator
 METERING_OPERATOR_IMAGE_TAG=4.7
+METERING_OPERATOR_CURRENT_RELEASE=4.7
 
 REPORTING_OPERATOR_DOCKERFILE=Dockerfile.reporting-operator
 # TODO: need to point to the .okd Dockerfile for now until we consolidate
@@ -181,13 +182,6 @@ verify-helm-templates:
 verify-olm-manifests: metering-manifests
 	@echo Generating metering manifests
 	$(MAKE) metering-manifests
-	@echo Verifying metering manifests
-	# # Note: verify is incompatible with the v1 CRDs formatting.
-	# # See: https://github.com/operator-framework/operator-courier/issues/163
-	# # TODO: replace `operator-courier verify` with `operator-sdk bundle validate` once
-	# # there's a pipeline in place for the new bundle format
-	# operator-courier verify --ui_validate_io ./manifests/deploy/openshift/olm/bundle
-	# operator-courier verify --ui_validate_io ./manifests/deploy/upstream/olm/bundle
 
 push-olm-manifests: verify-olm-manifests
 	./hack/push-olm-manifests.sh $(OLM_PACKAGE_ORG) metering-ocp $(OLM_PACKAGE_VERSION)
@@ -206,7 +200,7 @@ run-metering-operator-local: $(DEPLOY_METERING_BIN_OUT) metering-ansible-operato
 	export \
 		METERING_OPERATOR_IMAGE_REPO=$(METERING_OPERATOR_IMAGE_REPO) \
 		METERING_OPERATOR_IMAGE_TAG=$(METERING_OPERATOR_IMAGE_TAG); \
-	./hack/run-metering-operator-local.sh
+	./hack/run-metering-operator-local.sh $(METERING_OPERATOR_CURRENT_RELEASE)
 
 reporting-operator-bin: $(REPORTING_OPERATOR_BIN_OUT)
 

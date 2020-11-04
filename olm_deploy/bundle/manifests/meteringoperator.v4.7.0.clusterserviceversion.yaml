@@ -207,7 +207,7 @@ metadata:
     categories: OpenShift Optional, Monitoring
     certified: "false"
     containerImage: quay.io/openshift/origin-metering-ansible-operator:4.7
-    createdAt: 2019-01-01T11:59:59Z
+    createdAt: "2019-01-01T11:59:59Z"
     description: Chargeback and reporting tool to provide accountability for how resources
       are used across a cluster
     operatorframework.io/cluster-monitoring: "true"
@@ -215,7 +215,6 @@ metadata:
     operators.openshift.io/capability: '["fips", "cluster-proxy"]'
     repository: https://github.com/kube-reporting/metering-operator
     support: Red Hat, Inc.
-
 spec:
   displayName: Metering
   description: |
@@ -262,25 +261,19 @@ spec:
   maintainers:
     - email: sd-operator-metering@redhat.com
       name: Red Hat
-
   links:
     - name: Documentation
       url: https://docs.openshift.com/container-platform/4.7/metering/metering-about-metering.html
-
   provider:
     name: Red Hat
-
   icon:
     - base64data: PHN2ZyBpZD0iYmI5OWY3NGMtM2VkOS00OWU2LWE0OWQtNDI3ODA5NWU5ZWI4IiBkYXRhLW5hbWU9IkxheWVyIDEiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgdmlld0JveD0iMCAwIDcyMS4xNSA3MjEuMTUiPgogIDxkZWZzPgogICAgPHN0eWxlPgogICAgICAuYjdmMDIwYzgtMjFkMS00NWVmLWE0NTktNzJhNWE0MmE5MjJlIHsKICAgICAgICBmaWxsOiAjZGIzOTI3OwogICAgICB9CgogICAgICAuZjM0NTNmYmYtODk1My00NjE3LWJlNTEtMWZkZDJiOTdiMDBlIHsKICAgICAgICBmaWxsOiAjY2IzNjI4OwogICAgICB9CgogICAgICAuYjFhNGZjNTMtYWFlNS00ZWI5LTliN2ItYTAxYmMxYTU0ZmFjIHsKICAgICAgICBmaWxsOiAjZmZmOwogICAgICB9CgogICAgICAuYTc4NTliZDQtYjA1My00YzVmLTk5MGQtYzRmNzFkNDgwZTM4IHsKICAgICAgICBmaWxsOiAjZTNlM2UyOwogICAgICB9CiAgICA8L3N0eWxlPgogIDwvZGVmcz4KICA8dGl0bGU+UHJvZHVjdF9JY29uLVJlZF9IYXQtTWV0ZXJpbmctUkdCPC90aXRsZT4KICA8Y2lyY2xlIGNsYXNzPSJiN2YwMjBjOC0yMWQxLTQ1ZWYtYTQ1OS03MmE1YTQyYTkyMmUiIGN4PSIzNjAuNTc1IiBjeT0iMzYwLjU3NSIgcj0iMzU4LjU3NiIvPgogIDxwYXRoIGNsYXNzPSJmMzQ1M2ZiZi04OTUzLTQ2MTctYmU1MS0xZmRkMmI5N2IwMGUiIGQ9Ik02MTUuNTMsMTA4LjkxNiwxMDguNDY0LDYxNS45ODNjMTQwLjE0MywxMzguNjE3LDM2Ni4xMTEsMTM4LjE2NCw1MDUuNjcxLTEuNFM3NTQuMTQ5LDI0OS4wNTksNjE1LjUzLDEwOC45MTZaIi8+CiAgPHBhdGggY2xhc3M9ImIxYTRmYzUzLWFhZTUtNGViOS05YjdiLWEwMWJjMWE1NGZhYyIgZD0iTTM3MC4xMzEsMTYzLjkzMmwxNzAuMyw5OC4zMjFWNDU4LjlsLTE3MC4zLDk4LjMyMUwxOTkuODMzLDQ1OC45VjI2Mi4yNTNsMTcwLjMtOTguMzIxbTAtMjMuMDk0LTEwLDUuNzczLTE3MC4zLDk4LjMyMi0xMCw1Ljc3M1Y0NzAuNDQ0bDEwLDUuNzczLDE3MC4zLDk4LjMyMiwxMCw1Ljc3MywxMC01Ljc3MywxNzAuMy05OC4zMjIsMTAtNS43NzNWMjUwLjcwNmwtMTAtNS43NzMtMTcwLjMtOTguMzIyLTEwLTUuNzczWiIvPgogIDxwb2x5Z29uIGNsYXNzPSJiMWE0ZmM1My1hYWU1LTRlYjktOWI3Yi1hMDFiYzFhNTRmYWMiIHBvaW50cz0iMzU0LjE2NyA1MTMuMjQyIDIyNi43NjggNDM5LjY4OCAyMjYuNzY4IDI5NS4yMjQgMzU0LjE2NyAzNjguNzc4IDM1NC4xNjcgNTEzLjI0MiIvPgogIDxwb2x5Z29uIGNsYXNzPSJhNzg1OWJkNC1iMDUzLTRjNWYtOTkwZC1jNGY3MWQ0ODBlMzgiIHBvaW50cz0iMzg2LjAxNyA1MTMuMjQyIDUxMy40MTYgNDM5LjY4OCA1MTMuNDE2IDI5NS4yMjQgMzg2LjAxNyAzNjguNzc4IDM4Ni4wMTcgNTEzLjI0MiIvPgogIDxwb2x5Z29uIGNsYXNzPSJiMWE0ZmM1My1hYWU1LTRlYjktOWI3Yi1hMDFiYzFhNTRmYWMiIHBvaW50cz0iMjQyLjY5MyAyNjcuOTcyIDM3MC4wOTIgMTk0LjQxOCA0OTcuNDkxIDI2Ny45NzIgMzcwLjA5MiAzNDEuNTI2IDI0Mi42OTMgMjY3Ljk3MiIvPgogIDxwb2x5Z29uIGNsYXNzPSJiN2YwMjBjOC0yMWQxLTQ1ZWYtYTQ1OS03MmE1YTQyYTkyMmUiIHBvaW50cz0iMjg2LjQ4OCAyNjkuMTM0IDI5My4zMDQgMjY0LjczMiAzNzMuOTAxIDMxMS4yNjUgMzY3LjA4NSAzMTUuNjY3IDI4Ni40ODggMjY5LjEzNCIvPgogIDxwb2x5Z29uIGNsYXNzPSJiN2YwMjBjOC0yMWQxLTQ1ZWYtYTQ1OS03MmE1YTQyYTkyMmUiIHBvaW50cz0iMzAwLjIyNSAyNjkuMTM0IDM0NS43OTIgMjQyLjA3NCAzNjAuNTgxIDI1MC42OTkgMzE1LjAxNCAyNzcuNzU4IDMwMC4yMjUgMjY5LjEzNCIvPgogIDxwb2x5Z29uIGNsYXNzPSJiN2YwMjBjOC0yMWQxLTQ1ZWYtYTQ1OS03MmE1YTQyYTkyMmUiIHBvaW50cz0iMzIzLjAwOCAyODIuMTYgMzk4LjU2MyAyMzUuODY2IDQxMy4zNTIgMjQ0LjQ5IDMzNy43OTggMjkwLjc4NSAzMjMuMDA4IDI4Mi4xNiIvPgogIDxwb2x5Z29uIGNsYXNzPSJiN2YwMjBjOC0yMWQxLTQ1ZWYtYTQ1OS03MmE1YTQyYTkyMmUiIHBvaW50cz0iMzQ1Ljc5MiAyOTUuMTg3IDQwNi44NCAyNTkuMzQ3IDQyMS42MyAyNjcuOTcyIDM2MC41ODEgMzAzLjgxMSAzNDUuNzkyIDI5NS4xODciLz4KPC9zdmc+Cg==
       mediatype: image/svg+xml
-
   labels:
     operator-metering: "true"
-
   selector:
     matchLabels:
       operator-metering: "true"
-
   installModes:
   - supported: true
     type: OwnNamespace
@@ -290,7 +283,6 @@ spec:
     type: MultiNamespace
   - supported: false
     type: AllNamespaces
-
   install:
     strategy: deployment
     spec:
@@ -344,7 +336,6 @@ spec:
             - clusterroles
             verbs:
             - '*'
-
       permissions:
         - serviceAccountName: metering-operator
           rules:
@@ -454,7 +445,6 @@ spec:
             - routes
             verbs:
             - '*'
-
       deployments:
         - name: metering-operator
           spec:
@@ -524,7 +514,6 @@ spec:
                     requests:
                       cpu: 750m
                       memory: 400Mi
-
                 volumes:
                   - name: runner
                     emptyDir: {}
