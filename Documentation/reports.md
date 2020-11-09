@@ -241,7 +241,33 @@ spec:
   reportingEnd: "2019-07-31T00:00:00Z"
 ```
 
+### expiration 
+
+Add the expiration field to set a retention period on a scheduled metering Report. You can avoid manually removing the Report by setting the expiration duration value. The retention period is equal to the Report creationDate plus the `expiration` duration. The Report is removed from the cluster at the end of the retention period if no other Reports or ReportQueries depend on the expiring Report. Deleting the Report from the cluster can take several minutes.
+	
+Setting the expiration field is not recommended for roll-up or aggregated reports. If a Report is depended upon by other Reports or ReportQueries, then the Report is not removed at the end of the retention period. You can view the reporting-operator logs at debug level for the timing output around a Report retention decision.
+
+For example, the following scheduled Report is deleted 30 minutes after the `metadata.creationDate` of the Report:
+
+```yaml
+apiVersion: metering.openshift.io/v1
+kind: Report
+metadata:
+  name: pod-cpu-request-hourly
+spec:
+  query: "pod-cpu-request"
+  schedule:
+    period: "weekly"
+  reportingStart: "2020-09-01T00:00:00Z"
+  expiration: "30m" 
+```
+
+Valid time units for the expiration duration are ns, us (or µs), ms, s, m, and h.	
+
+The expiration retention period for a Report is not precise and works on the order of several minutes, not nanoseconds.
+
 ### runImmediately
+
 When `runImmediately` is set to `true`, the report will be run immediately. This behavior ensures that the report is immediately processed and queued without requiring additional scheduling parameters.
 
 > *Note*: When `runImmediately` is set to `true` you must set a `reportingEnd` and `reportingStart` value.
@@ -252,7 +278,7 @@ The `spec.inputs` field of a Report can be used to override or set values define
 
 It is a list of name-value pairs:
 
-```
+```yaml
 spec:
   inputs:
   - name: "NamespaceCPUUsageReportName"
@@ -272,7 +298,7 @@ Report data is stored in the database much like metrics themselves, and can thus
 A custom roll-up report requires a custom report query.
 The ReportQuery template processor provides a function: `reportTableName` that can get the necessary table name [from a report name](rollup-reports.md#2-create-the-aggregation-query).
 
-Below is an snippet taken from a built-in query:
+Below is a snippet taken from a built-in query:
 
 ```
 # Taken from pod-cpu.yaml
