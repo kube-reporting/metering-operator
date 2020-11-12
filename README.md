@@ -4,7 +4,7 @@
 
 The Metering Operator records historical cluster usage and can generate usage reports showing usage breakdowns by pod or namespace over arbitrary time periods.
 
-## Project Status: Generally Available
+## Project Status: Beta
 
 Read more about the implemented and planned features in the documentation:
 
