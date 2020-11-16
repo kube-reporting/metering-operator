@@ -96,7 +96,7 @@ olm:
 
     maintainers:
     - name: Red Hat
-      email: sd-operator-metering@redhat.com
+      email: metering-team@redhat.com
     provider:
       name: Red Hat
 

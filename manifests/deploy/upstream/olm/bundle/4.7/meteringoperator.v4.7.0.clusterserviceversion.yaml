@@ -259,7 +259,7 @@ spec:
   minKubeVersion: "1.18.3"
   maturity: stable
   maintainers:
-    - email: sd-operator-metering@redhat.com
+    - email: metering-team@redhat.com
       name: Red Hat
   links:
     - name: Documentation
