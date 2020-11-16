@@ -130,7 +130,8 @@ func testMainWrapper(m *testing.M) int {
 	var registryProvisioned bool
 	catalogSourceName, catalogSourceNamespace, err = df.CreateCatalogSourceFromIndex(indexImage)
 	if err != nil {
-		df.Logger.Fatalf("Failed to create the CatalogSource custom resource using the %s index image: %v", indexImage, err)
+		df.Logger.Errorf("Failed to create the CatalogSource custom resource using the %s index image: %v", indexImage, err)
+		return 1
 	}
 	if !df.RunDevSetup {
 		var (
@@ -151,13 +152,15 @@ func testMainWrapper(m *testing.M) int {
 			}
 		}()
 		if len(errors) != 0 {
-			df.Logger.Fatalf(strings.Join(errors, "\n"))
+			df.Logger.Errorf(strings.Join(errors, "\n"))
+			return 1
 		}
 	}
 
 	err = df.WaitForPackageManifest(catalogSourceName, catalogSourceNamespace, subscriptionChannel)
 	if err != nil {
-		df.Logger.Fatalf("Failed to wait for the metering-ocp packagemanifest to become ready: %v", err)
+		df.Logger.Errorf("Failed to wait for the metering-ocp packagemanifest to become ready: %v", err)
+		return 1
 	}
 
 	return m.Run()
