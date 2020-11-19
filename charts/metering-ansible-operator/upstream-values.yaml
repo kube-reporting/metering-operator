@@ -96,7 +96,7 @@ olm:
 
     maintainers:
     - name: Red Hat
-      email: sd-operator-metering@redhat.com
+      email: metering-team@redhat.com
     provider:
       name: Red Hat
 
@@ -106,7 +106,7 @@ olm:
       capabilities: Basic Install
       support: Red Hat, Inc.
       createdAt: "2019-01-01T11:59:59Z"
-      containerImage: "quay.io/coreos/metering-ansible-operator:4.7"
+      containerImage: "quay.io/coreos/metering-ansible-operator:release-4.7"
 
   subscriptionName: metering
   subscriptionChannel: "4.7"

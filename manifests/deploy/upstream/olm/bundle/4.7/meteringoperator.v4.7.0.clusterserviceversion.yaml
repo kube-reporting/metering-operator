@@ -206,7 +206,7 @@ metadata:
     capabilities: Basic Install
     categories: OpenShift Optional, Monitoring
     certified: "false"
-    containerImage: quay.io/coreos/metering-ansible-operator:4.7
+    containerImage: quay.io/coreos/metering-ansible-operator:release-4.7
     createdAt: "2019-01-01T11:59:59Z"
     description: Chargeback and reporting tool to provide accountability for how resources
       are used across a cluster
@@ -259,7 +259,7 @@ spec:
   minKubeVersion: "1.18.3"
   maturity: stable
   maintainers:
-    - email: sd-operator-metering@redhat.com
+    - email: metering-team@redhat.com
       name: Red Hat
   links:
     - name: Documentation
