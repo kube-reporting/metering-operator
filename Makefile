@@ -171,7 +171,7 @@ update-codegen: $(CODEGEN_OUTPUT_GO_FILES)
 verify-codegen:
 	SCRIPT_PACKAGE=$(GO_PKG) ./hack/verify-codegen.sh
 
-verify: update-codegen verify-olm-manifests verify-helm-templates fmt
+verify: update-codegen verify-olm-manifests verify-bundle verify-helm-templates fmt
 	@echo Checking for unstaged changes
 	# validates no unstaged changes exist in $(VERIFY_FILE_PATHS)
 	git diff --stat HEAD --ignore-submodules --exit-code -- $(VERIFY_FILE_PATHS)
@@ -179,12 +179,12 @@ verify: update-codegen verify-olm-manifests verify-helm-templates fmt
 verify-helm-templates:
 	helm template ./charts/openshift-metering > /dev/null
 
+verify-bundle:
+	operator-sdk bundle validate $(ROOT_DIR)/bundle
+
 verify-olm-manifests: metering-manifests
 	@echo Generating metering manifests
 	$(MAKE) metering-manifests
-
-push-olm-manifests: verify-olm-manifests
-	./hack/push-olm-manifests.sh $(OLM_PACKAGE_ORG) metering-ocp $(OLM_PACKAGE_VERSION)
 
 verify-docker: metering-src-docker-build
 	$(CONTAINER_RUNTIME_CMD) run \
@@ -194,6 +194,9 @@ verify-docker: metering-src-docker-build
 		-v $(PWD):/go/src/github.com/kube-reporting/metering-operator \
 		$(METERING_SRC_IMAGE_REPO):$(METERING_SRC_IMAGE_TAG) \
 		make verify
+
+push-olm-manifests: verify-olm-manifests
+	./hack/push-olm-manifests.sh $(OLM_PACKAGE_ORG) metering-ocp $(OLM_PACKAGE_VERSION)
 
 .PHONY: run-metering-operator-local
 run-metering-operator-local: $(DEPLOY_METERING_BIN_OUT) metering-ansible-operator-docker-build
