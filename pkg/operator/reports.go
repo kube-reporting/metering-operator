@@ -224,34 +224,48 @@ type reportPeriod struct {
 	periodStart time.Time
 }
 
-// isReportFinished checks the running condition of the report parameter and returns true if the report has previously run
+// isReportFinished is responsible for determing whether the @report Report
+// custom resource is currently processing is reporting a Finished status by
+// investigating that object's .Status field. If the Report has finished running,
+// return true, else return false. Note: at a minimum, we define "Finished" here
+// as a Report that has been processing in the queue before (i.e. has non-empty
+// conditions in the status array) and contains the "Finished" and "True" conditions
+// in the status. If a Report matches those conditions, and we're processing a run-once
+// Report, exit early. Else, for scheduled Reports, investigate the spec/ReportingEnd and
+// status.LastReportTime for futher analysis.
 func isReportFinished(logger log.FieldLogger, report *metering.Report) bool {
-	// check if this report was previously finished
 	runningCond := meteringUtil.GetReportCondition(report.Status, metering.ReportRunning)
 
 	if runningCond == nil {
-		logger.Infof("new report, validating report")
-	} else if runningCond.Reason == meteringUtil.ReportFinishedReason && runningCond.Status != v1.ConditionTrue {
-		// Found an already finished runOnce report. Log that we're not
-		// re-processing runOnce reports after they're previously finished
+		logger.Infof("validating new report")
+		return false
+	}
+	if runningCond.Reason == meteringUtil.ReportFinishedReason && runningCond.Status != v1.ConditionTrue {
+		// Check if we're processing a run-once report that has already
+		// finished running. If true, log that we're not re-processing
+		// run-once reports after they're previously finished and exit early.
 		if report.Spec.Schedule == nil {
 			logger.Infof("Report %s is a previously finished run-once report, not re-processing", report.Name)
 			return true
 		}
-		// log some messages to indicate we're processing what was a previously finished report
 
-		// if the report's reportingEnd is unset or after the lastReportTime
-		// then the report was updated since it last finished and we should
-		// consider it something to be reprocessed
+		// Check if the report's reportingEnd is unset or after the
+		// lastReportTime. If either of those conditions are met, then
+		// we can make the assumption that the report has been updated
+		// since it last finished and this should be recognized as a
+		// candidate for re-processing again.
 		if report.Spec.ReportingEnd == nil {
 			logger.Infof("previously finished report's spec.reportingEnd is unset: beginning processing of report")
-		} else if report.Status.LastReportTime != nil && report.Spec.ReportingEnd.Time.After(report.Status.LastReportTime.Time) {
-			logger.Infof("previously finished report's spec.reportingEnd (%s) is now after lastReportTime (%s): beginning processing of report", report.Spec.ReportingEnd.Time, report.Status.LastReportTime.Time)
-		} else {
-			// return without processing because the report is complete
-			logger.Infof("Report %s is already finished: %s", report.Name, runningCond.Message)
-			return true
+			return false
 		}
+		if report.Status.LastReportTime != nil && report.Spec.ReportingEnd.Time.After(report.Status.LastReportTime.Time) {
+			logger.Infof("previously finished report's spec.reportingEnd (%s) is now after lastReportTime (%s): beginning processing of report", report.Spec.ReportingEnd.Time, report.Status.LastReportTime.Time)
+			return false
+		}
+
+		// return without processing because the report is complete
+		logger.Infof("Report %s is already finished: %s", report.Name, runningCond.Message)
+		return true
 	}
 
 	return false
