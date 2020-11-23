@@ -30,6 +30,11 @@ RUN ln -f -s /tini /usr/bin/tini
 # 2. netaddr is needed to use the ipv4/ipv6 jinja filter
 # 3. cryptography is used by the openssl_* modules for TLS/authentication purposes
 RUN pip3 install --no-cache-dir --upgrade openshift botocore boto3 cryptography netaddr
+# The ansible-operator base image will have Ansible installed by default and there's
+# problems with running `pip install --upgrade` for upgrading to Ansible 2.10 from 2.9.
+# This will ensure that we're always using a version of Ansible we've tested and contains
+# the crypto.py FIPS fix as outlined in https://github.com/kube-reporting/metering-operator/issues/1444
+RUN pip3 install --upgrade 'ansible>=2.9.6,<2.10'
 
 ENV HOME /opt/ansible
 ENV HELM_CHART_PATH ${HOME}/charts/openshift-metering
