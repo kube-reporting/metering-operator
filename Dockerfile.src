@@ -1,5 +1,5 @@
 # need helm CLI for final image
-FROM quay.io/openshift/origin-metering-helm:latest as helm
+FROM quay.io/openshift/origin-metering-helm:4.5 as helm
 
 # image needs kubectl, so we copy `oc` from cli image to use as kubectl.
 FROM openshift/origin-cli:latest as cli
