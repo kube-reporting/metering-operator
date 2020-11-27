@@ -39,7 +39,7 @@ type AdditionalArtifact struct {
 	Name         string `json:"name"`
 }
 
-// Paths returns the directories containing usage data. The result will be free of duplicates.
+// DataDirectory returns the directories containing usage data. The result will be free of duplicates.
 func (m Manifest) DataDirectory() string {
 	paths := m.paths()
 	pathsLen := len(paths)

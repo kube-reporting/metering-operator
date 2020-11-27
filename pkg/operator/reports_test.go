@@ -464,14 +464,15 @@ func TestGetReportPeriod(t *testing.T) {
 		t.Run(testCase.name, func(t *testing.T) {
 			if testCase.expectPanic {
 				assert.Panics(t, func() { getReportPeriod(time.Now(), mockLogger, testCase.report) }, "expected the test case would panic, but it did not")
-			} else {
-				_, err := getReportPeriod(time.Now(), mockLogger, testCase.report)
-				if testCase.expectErr {
-					assert.Error(t, err, "expected that getting the report period  would return a non-nil error")
-				} else {
-					assert.Nil(t, err, "expected that getting the report period would return a nil error")
-				}
+				return
 			}
+
+			_, err := getReportPeriod(time.Now(), mockLogger, testCase.report)
+			if testCase.expectErr {
+				assert.Error(t, err, "expected that getting the report period  would return a non-nil error")
+				return
+			}
+			assert.Nil(t, err, "expected that getting the report period would return a nil error")
 		})
 	}
 }

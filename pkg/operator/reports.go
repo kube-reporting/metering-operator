@@ -823,6 +823,8 @@ func (op *defaultReportingOperator) runReport(logger log.FieldLogger, report *me
 	return nil
 }
 
+// isReportNotUsedAsInput is responsible for checking if the @report Report
+// is being used as an input to another Report or ReportQuery custom resource.
 // We check first for Reports depending on this Report, return if any, and then check ReportQueries depending on Report
 func isReportNotUsedAsInput(logger log.FieldLogger, report *metering.Report, op *defaultReportingOperator) bool {
 	// Consider Reports referencing this report in the namespace of this report

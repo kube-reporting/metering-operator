@@ -258,9 +258,10 @@ func (srv *server) getReport(logger log.FieldLogger, name, namespace, format str
 
 	if useNewFormat {
 		writeResultsResponseV2(logger, full, format, reportQuery.Name, reportQuery.Spec.Columns, results, w, r)
-	} else {
-		writeResultsResponseV1(logger, format, reportQuery.Name, reportQuery.Spec.Columns, results, w, r)
+		return
 	}
+
+	writeResultsResponseV1(logger, format, reportQuery.Name, reportQuery.Spec.Columns, results, w, r)
 }
 
 func writeResultsResponseAsCSV(logger log.FieldLogger, name string, columns []metering.ReportQueryColumn, results []presto.Row, w http.ResponseWriter, r *http.Request) {

@@ -89,6 +89,7 @@ type prometheusMetricRepo struct {
 	queryBufferPool *sync.Pool
 }
 
+// NewPrometheusMetricsRepo constructs an initialized prometheusMetricRepo instance.
 func NewPrometheusMetricsRepo(queryer db.Queryer, queryBufferPool *sync.Pool) *prometheusMetricRepo {
 	if queryBufferPool == nil {
 		queryBufferPool = &defaultQueryBufferPool
@@ -103,7 +104,7 @@ func (r *prometheusMetricRepo) StorePrometheusMetrics(ctx context.Context, table
 	queryBuf := r.queryBufferPool.Get().(*bytes.Buffer)
 	queryBuf.Reset()
 	defer r.queryBufferPool.Put(queryBuf)
-	return StorePrometheusMetricsWithBuffer(queryBuf, ctx, r.queryer, tableName, metrics)
+	return StorePrometheusMetricsWithBuffer(ctx, queryBuf, r.queryer, tableName, metrics)
 }
 
 func (r *prometheusMetricRepo) GetPrometheusMetrics(tableName string, start, end time.Time) ([]*PrometheusMetric, error) {
@@ -139,9 +140,9 @@ type PrometheusMetric struct {
 	Dt        string            `json:"dt"`
 }
 
-// storePrometheusMetricsWithBuffer handles storing Prometheus metrics into the
+// StorePrometheusMetricsWithBuffer handles storing Prometheus metrics into the
 // specified Presto table.
-func StorePrometheusMetricsWithBuffer(queryBuf *bytes.Buffer, ctx context.Context, queryer db.Queryer, tableName string, metrics []*PrometheusMetric) error {
+func StorePrometheusMetricsWithBuffer(ctx context.Context, queryBuf *bytes.Buffer, queryer db.Queryer, tableName string, metrics []*PrometheusMetric) error {
 	bufferCapacity := queryBuf.Cap()
 
 	insertStatementLength := len(presto.FormatInsertQuery(tableName, ""))

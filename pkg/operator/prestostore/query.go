@@ -17,14 +17,14 @@ type PrometheusImportResults struct {
 	Metrics             []*PrometheusMetric
 }
 
-// importFromTimeRange executes a promQL query over the interval between start
+// ImportFromTimeRange executes a promQL query over the interval between start
 // and end, performing multiple Prometheus query_range queries of chunkSize.
 // Returns the time ranges queried and any errors encountered. Stops after the
 // first error, consult timeRanges to determine how many chunks were queried.
 //
 // If the number of queries exceeds maxTimeRanges, then the timeRanges
 // exceeding that count will be skipped.
-func ImportFromTimeRange(logger logrus.FieldLogger, clock clock.Clock, promConn prom.API, prometheusMetricsStorer PrometheusMetricsStorer, metricsCollectors ImporterMetricsCollectors, ctx context.Context, startTime, endTime time.Time, cfg Config) (PrometheusImportResults, error) {
+func ImportFromTimeRange(ctx context.Context, logger logrus.FieldLogger, clock clock.Clock, promConn prom.API, prometheusMetricsStorer PrometheusMetricsStorer, metricsCollectors ImporterMetricsCollectors, startTime, endTime time.Time, cfg Config) (PrometheusImportResults, error) {
 	metricsCollectors.ImportsRunningGauge.Inc()
 
 	queryRangeDuration := endTime.Sub(startTime)
@@ -146,10 +146,11 @@ func ImportFromTimeRange(logger logrus.FieldLogger, clock clock.Clock, promConn 
 		end := importResults.ProcessedTimeRanges[len(timeRanges)-1].End.UTC()
 		logger.Infof("stored a total of %d metrics for data between %s and %s into %s", metricsCount, begin, end, cfg.PrestoTableName)
 		return importResults, nil
-	} else {
-		logger.Infof("no time ranges processed for %s", cfg.PrestoTableName)
-		return importResults, nil
 	}
+
+	logger.Infof("no time ranges processed for %s", cfg.PrestoTableName)
+	return importResults, nil
+
 }
 
 func getTimeRangesChunked(beginTime, endTime time.Time, chunkSize, stepSize time.Duration, maxTimeRanges int64) []prom.Range {

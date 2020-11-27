@@ -237,7 +237,7 @@ func (op *defaultReportingOperator) importPrometheusForTimeRange(ctx context.Con
 				promConn = op.promConn
 			}
 
-			importResults, err := prestostore.ImportFromTimeRange(dataSourceLogger, op.clock, promConn, op.prometheusMetricsRepo, metricsCollectors, ctx, start, end, importCfg)
+			importResults, err := prestostore.ImportFromTimeRange(ctx, dataSourceLogger, op.clock, promConn, op.prometheusMetricsRepo, metricsCollectors, start, end, importCfg)
 			if err != nil {
 				return fmt.Errorf("error importing Prometheus data for ReportDataSource %s: %v", reportDataSource.Name, err)
 			}
@@ -274,7 +274,11 @@ func (op *defaultReportingOperator) getQueryIntervalForReportDataSource(reportDa
 	return queryInterval
 }
 
-func (op *defaultReportingOperator) newPromImporterCfg(reportDataSource *metering.ReportDataSource, query string, prestoTable *metering.PrestoTable) (prestostore.Config, error) {
+func (op *defaultReportingOperator) newPromImporterCfg(
+	reportDataSource *metering.ReportDataSource,
+	query string,
+	prestoTable *metering.PrestoTable,
+) (prestostore.Config, error) {
 	chunkSize := op.cfg.PrometheusQueryConfig.ChunkSize.Duration
 	stepSize := op.cfg.PrometheusQueryConfig.StepSize.Duration
 
@@ -322,23 +326,34 @@ func (op *defaultReportingOperator) newPromImporterCfg(reportDataSource *meterin
 	}, nil
 }
 
-func (op *defaultReportingOperator) newPromImporter(logger logrus.FieldLogger, reportDataSource *metering.ReportDataSource, prestoTable *metering.PrestoTable, cfg prestostore.Config) (*prestostore.PrometheusImporter, error) {
-	metricsCollectors := op.newPromImporterMetricsCollectors(reportDataSource, prestoTable, cfg)
-	var promConn prom.API
-	var err error
-	if (reportDataSource.Spec.PrometheusMetricsImporter.PrometheusConfig != nil) && (reportDataSource.Spec.PrometheusMetricsImporter.PrometheusConfig.URL != "") {
+func (op *defaultReportingOperator) newPromImporter(
+	logger logrus.FieldLogger,
+	reportDataSource *metering.ReportDataSource,
+	prestoTable *metering.PrestoTable,
+	cfg prestostore.Config,
+) (*prestostore.PrometheusImporter, error) {
+	// Determine the URL needed to connect to a running Prometheus instance.
+	// Check if the user has explicitly configured a Prometheus configuration
+	// themselves, and if true, use that user-provided configuration. Else,
+	// use the default connection stored in the reporting-operator.
+	promConn := op.promConn
+	if reportDataSource.Spec.PrometheusMetricsImporter.PrometheusConfig != nil && reportDataSource.Spec.PrometheusMetricsImporter.PrometheusConfig.URL != "" {
+		var err error
 		promConn, err = op.newPrometheusConnFromURL(reportDataSource.Spec.PrometheusMetricsImporter.PrometheusConfig.URL)
 		if err != nil {
 			return nil, err
 		}
-	} else {
-		promConn = op.promConn
 	}
 
+	metricsCollectors := op.newPromImporterMetricsCollectors(reportDataSource, prestoTable, cfg)
 	return prestostore.NewPrometheusImporter(logger, promConn, op.prometheusMetricsRepo, op.clock, cfg, metricsCollectors), nil
 }
 
-func (op *defaultReportingOperator) newPromImporterMetricsCollectors(reportDataSource *metering.ReportDataSource, prestoTable *metering.PrestoTable, cfg prestostore.Config) prestostore.ImporterMetricsCollectors {
+func (op *defaultReportingOperator) newPromImporterMetricsCollectors(
+	reportDataSource *metering.ReportDataSource,
+	prestoTable *metering.PrestoTable,
+	cfg prestostore.Config,
+) prestostore.ImporterMetricsCollectors {
 	promLabels := prometheus.Labels{
 		"reportdatasource": reportDataSource.Name,
 		"namespace":        reportDataSource.Namespace,

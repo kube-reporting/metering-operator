@@ -139,21 +139,29 @@ func generateColumnDefinitionListSQL(columns []Column) string {
 func GenerateOrderBySQL(columns []Column) string {
 	var quotedColumns []string
 	for _, col := range columns {
-		colName := col.Name
 		// if we detect a map(...) in the column, use map_entries to do
 		// ordering. we detect a map column using a best effort approach by
 		// checking if the column type contains the string "map(" , and is
 		// followed by a ")" after that string.
+		colName := col.Name
 		colType := strings.ToLower(col.Type)
-		if mapIndex := strings.Index(colType, "map("); mapIndex != -1 && strings.Index(colType, ")") > mapIndex {
+
+		mapIndex := strings.Index(colType, "map(")
+		if mapIndex != -1 && strings.Index(colType, ")") > mapIndex {
 			quotedColumns = append(quotedColumns, fmt.Sprintf(`map_entries("%s")`, colName))
-		} else {
-			quotedColumns = append(quotedColumns, quoteColumn(col))
+			continue
 		}
+		quotedColumns = append(quotedColumns, quoteColumn(col))
 	}
+
 	return fmt.Sprintf("%s ASC", strings.Join(quotedColumns, ", "))
 }
 
+// FullyQualifiedTableName is a helper function that returns
+// the fully-qualified table name based on the catalog, schema,
+// and table name in Presto. This is needed to address tables
+// in Presto, e.g., `hive.metering.test` where Hive is the catalog,
+// metering is the schema name, and test is the name of an existing table.
 func FullyQualifiedTableName(catalog, schema, tableName string) string {
 	return fmt.Sprintf("%s.%s.%s", catalog, schema, tableName)
 }
@@ -245,7 +253,7 @@ type TablePartition struct {
 	PartitionSpec PartitionSpec `json:"partitionSpec"`
 }
 
-// ExecuteSelectQuery performs the query on the table target. It's expected
+// ExecuteSelect performs the query on the table target. It's expected
 // target has the correct schema.
 func ExecuteSelect(queryer db.Queryer, query string) ([]Row, error) {
 	rows, err := queryer.Query(query)
