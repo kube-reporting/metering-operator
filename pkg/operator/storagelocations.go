@@ -70,6 +70,53 @@ func (op *defaultReportingOperator) syncStorageLocation(logger log.FieldLogger, 
 	return nil
 }
 
+// UpdateStorageLocation is responsible for determining if the StorageLocation
+// the Reporting Operator is currently processing needs to be updated in
+// some capacity and performing the manipulations of those fields. Note:
+// the actual call to the k8s client to update this resource needs to be
+// made at the call site of this method.
+func (op *defaultReportingOperator) UpdateStorageLocation(logger log.FieldLogger, storageLocation *metering.StorageLocation) (bool, error) {
+	if storageLocation.Spec.Hive == nil {
+		return false, fmt.Errorf("only Hive storage is currently supported")
+	}
+	if storageLocation.Spec.Hive.DatabaseName == "" {
+		return false, fmt.Errorf("spec.hive.databaseName is required if spec.hive is set")
+	}
+	if !reportingutil.IsValidSQLIdentifier(storageLocation.Spec.Hive.DatabaseName) {
+		return false, fmt.Errorf("spec.hive.databaseName %s is invalid, must contain only alpha numeric values, underscores, and start with a letter or underscore", storageLocation.Spec.Hive.DatabaseName)
+	}
+
+	if storageLocation.Spec.Hive.UnmanagedDatabase {
+		logger.Infof("StorageLocation %s is unmanaged", storageLocation.Name)
+
+		if storageLocation.Status.Hive.DatabaseName != storageLocation.Spec.Hive.DatabaseName {
+			storageLocation.Status.Hive.DatabaseName = storageLocation.Spec.Hive.DatabaseName
+			return true, nil
+		}
+		if storageLocation.Status.Hive.Location != storageLocation.Spec.Hive.Location {
+			storageLocation.Status.Hive.Location = storageLocation.Spec.Hive.Location
+			return true, nil
+		}
+	}
+	if storageLocation.Status.Hive.DatabaseName == "" {
+		logger.Infof("creating database %s for StorageLocation %s", storageLocation.Spec.Hive.DatabaseName, storageLocation.Name)
+		err := op.hiveDatabaseManager.CreateDatabase(hive.DatabaseParameters{
+			Name:     storageLocation.Spec.Hive.DatabaseName,
+			Location: storageLocation.Spec.Hive.Location,
+		})
+		if err != nil {
+			return false, fmt.Errorf("error creating database %s: %s", storageLocation.Spec.Hive.DatabaseName, err)
+		}
+
+		logger.Infof("successfully created database %s", storageLocation.Spec.Hive.DatabaseName)
+		storageLocation.Status.Hive.DatabaseName = storageLocation.Spec.Hive.DatabaseName
+		storageLocation.Status.Hive.Location = storageLocation.Spec.Hive.Location
+		return true, nil
+	}
+
+	return false, nil
+}
+
 func (op *defaultReportingOperator) handleStorageLocation(logger log.FieldLogger, storageLocation *metering.StorageLocation) error {
 	if op.cfg.EnableFinalizers && storageLocationNeedsFinalizer(storageLocation) {
 		var err error
@@ -78,46 +125,9 @@ func (op *defaultReportingOperator) handleStorageLocation(logger log.FieldLogger
 			return err
 		}
 	}
-
-	var needsUpdate bool
-
-	switch {
-	case storageLocation.Spec.Hive != nil:
-		if storageLocation.Spec.Hive.UnmanagedDatabase {
-			logger.Infof("StorageLocation %s is unmanaged", storageLocation.Name)
-			if storageLocation.Status.Hive.DatabaseName != storageLocation.Spec.Hive.DatabaseName {
-				storageLocation.Status.Hive.DatabaseName = storageLocation.Spec.Hive.DatabaseName
-				needsUpdate = true
-			}
-			if storageLocation.Status.Hive.Location != storageLocation.Spec.Hive.Location {
-				storageLocation.Status.Hive.Location = storageLocation.Spec.Hive.Location
-				needsUpdate = true
-			}
-		} else {
-			if storageLocation.Spec.Hive.DatabaseName == "" {
-				return fmt.Errorf("spec.hive.databaseName is required if spec.hive is set")
-			}
-			if !reportingutil.IsValidSQLIdentifier(storageLocation.Spec.Hive.DatabaseName) {
-				return fmt.Errorf("spec.hive.databaseName %s is invalid, must contain only alpha numeric values, underscores, and start with a letter or underscore", storageLocation.Spec.Hive.DatabaseName)
-			}
-			if storageLocation.Status.Hive.DatabaseName == "" {
-				logger.Infof("creating database %s for StorageLocation %s", storageLocation.Spec.Hive.DatabaseName, storageLocation.Name)
-				err := op.hiveDatabaseManager.CreateDatabase(hive.DatabaseParameters{
-					Name:     storageLocation.Spec.Hive.DatabaseName,
-					Location: storageLocation.Spec.Hive.Location,
-				})
-				if err != nil {
-					return fmt.Errorf("error creating database %s: %s", storageLocation.Spec.Hive.DatabaseName, err)
-				}
-				logger.Infof("successfully created database %s", storageLocation.Spec.Hive.DatabaseName)
-				storageLocation.Status.Hive.DatabaseName = storageLocation.Spec.Hive.DatabaseName
-				storageLocation.Status.Hive.Location = storageLocation.Spec.Hive.Location
-				needsUpdate = true
-			}
-		}
-
-	default:
-		return fmt.Errorf("only Hive storage is supported currently")
+	needsUpdate, err := op.UpdateStorageLocation(logger, storageLocation)
+	if err != nil {
+		return err
 	}
 
 	if needsUpdate {
@@ -126,7 +136,6 @@ func (op *defaultReportingOperator) handleStorageLocation(logger log.FieldLogger
 		if err != nil {
 			return fmt.Errorf("unable to update StorageLocation %s status: %s", storageLocation.Name, err)
 		}
-
 		if err = op.queueDependentsOfStorageLocation(storageLocation); err != nil {
 			logger.WithError(err).Errorf("error queuing dependents of StorageLocation %s", storageLocation.Name)
 		}
