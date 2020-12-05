@@ -6,3 +6,5 @@
   watchDependentResources: false
   reconcilePeriod: 5m
   manageStatus: false
+  vars:
+    meta: '{{ ansible_operator_meta }}'
