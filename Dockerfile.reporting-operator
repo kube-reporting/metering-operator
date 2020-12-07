@@ -1,4 +1,4 @@
-FROM openshift/origin-release:golang-1.13 as build
+FROM registry.svc.ci.openshift.org/ocp/builder:golang-1.13 as build
 
 COPY . /go/src/github.com/kube-reporting/metering-operator
 WORKDIR /go/src/github.com/kube-reporting/metering-operator
