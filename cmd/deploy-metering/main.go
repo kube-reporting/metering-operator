@@ -2,12 +2,11 @@ package main
 
 import (
 	"fmt"
-	"os"
 
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
-	"github.com/spf13/pflag"
 
+	"github.com/kube-reporting/metering-operator/cmd/helpers"
 	meteringclient "github.com/kube-reporting/metering-operator/pkg/generated/clientset/versioned/typed/metering/v1"
 	olmclientv1 "github.com/operator-framework/operator-lifecycle-manager/pkg/api/client/clientset/versioned/typed/operators/v1"
 	olmclientv1alpha1 "github.com/operator-framework/operator-lifecycle-manager/pkg/api/client/clientset/versioned/typed/operators/v1alpha1"
@@ -123,13 +122,13 @@ func main() {
 	}
 }
 
+// runDeployMetering is the driver function responsible for installing,
+// uninstalling, or updating an individual Metering installation.
+// Note: only OLM and manual deploying methods are supported.
 func runDeployMetering(cmd *cobra.Command, args []string) error {
-	logger := setupLogger(logLevel)
-
 	if meteringConfigCRFile == "" {
 		return fmt.Errorf("failed to set the $METERING_CR_FILE or --meteringconfig flag")
 	}
-
 	err := deploy.DecodeYAMLManifestToObject(meteringConfigCRFile, &cfg.MeteringConfig)
 	if err != nil {
 		return fmt.Errorf("failed to read MeteringConfig: %v", err)
@@ -137,41 +136,38 @@ func runDeployMetering(cmd *cobra.Command, args []string) error {
 
 	cfg.OperatorResources, err = deploy.ReadMeteringAnsibleOperatorManifests(deployManifestsDir, cfg.Platform)
 	if err != nil {
-		return fmt.Errorf("failed to read metering-ansible-operator manifests: %v", err)
+		return fmt.Errorf("failed to read the metering-ansible-operator manifests: %v", err)
 	}
 
+	logger := helpers.SetupLogger(logLevel, true, log.Fields{
+		"app": "deploy",
+	})
 	logger.Debugf("Metering Deploy Config: %#v", cfg)
 
 	kubeconfig := clientcmd.NewNonInteractiveDeferredLoadingClientConfig(
 		clientcmd.NewDefaultClientConfigLoadingRules(),
 		&clientcmd.ConfigOverrides{},
 	)
-
 	restconfig, err := kubeconfig.ClientConfig()
 	if err != nil {
 		return fmt.Errorf("failed to initialize the kubernetes client config: %v", err)
 	}
-
 	client, err := kubernetes.NewForConfig(restconfig)
 	if err != nil {
 		return fmt.Errorf("failed to initialize the kubernetes clientset: %v", err)
 	}
-
 	apiextClient, err := apiextclientv1.NewForConfig(restconfig)
 	if err != nil {
 		return fmt.Errorf("failed to initialize the apiextensions clientset: %v", err)
 	}
-
 	meteringClient, err := meteringclient.NewForConfig(restconfig)
 	if err != nil {
 		return fmt.Errorf("failed to initialize the metering clientset: %v", err)
 	}
-
 	olmV1Client, err := olmclientv1.NewForConfig(restconfig)
 	if err != nil {
 		return fmt.Errorf("failed to initialize the v1 OLM clientset: %v", err)
 	}
-
 	olmV1Alpha1Client, err := olmclientv1alpha1.NewForConfig(restconfig)
 	if err != nil {
 		return fmt.Errorf("failed to initialize the v1alpha OLM clientset: %v", err)
@@ -216,27 +212,6 @@ func runDeployMetering(cmd *cobra.Command, args []string) error {
 	}
 
 	return nil
-}
-
-func setupLogger(logLevelStr string) log.FieldLogger {
-	var err error
-
-	log.SetFormatter(&log.TextFormatter{
-		FullTimestamp:   true,
-		TimestampFormat: "01-02-2006 15:04:05",
-	})
-
-	logger := log.WithFields(log.Fields{
-		"app": "deploy",
-	})
-	logLevel, err := log.ParseLevel(logLevelStr)
-	if err != nil {
-		logger.WithError(err).Fatalf("invalid log level: %s", logLevel)
-	}
-	logger.Infof("Setting the log level to %s", logLevel.String())
-	logger.Logger.Level = logLevel
-
-	return logger
 }
 
 func initFlagsFromEnv() error {
@@ -302,30 +277,9 @@ func initFlagsFromEnv() error {
 			flagSet = flagConf.cmd.PersistentFlags()
 		}
 
-		if err := mapEnvVarToFlag(flagConf.env, flagSet); err != nil {
+		if err := helpers.MapEnvVarToFlag(flagConf.env, flagSet); err != nil {
 			log.WithError(err).Fatalf("Failed to update flags from ENV vars (%s): %v", flagConf.cmd.Name(), err)
 		}
-	}
-
-	return nil
-}
-
-// mapEnvVarToFlag takes a mapping of ENV var names to flag names and iterates
-// over that mapping attempting to set the flag value with the ENV var key name.
-// see: https://github.com/spf13/viper/issues/461
-func mapEnvVarToFlag(vars map[string]string, flagset *pflag.FlagSet) error {
-	for env, flag := range vars {
-		flagObj := flagset.Lookup(flag)
-		if flagObj == nil {
-			return fmt.Errorf("the %s flag doesn't exist", flag)
-		}
-
-		if val := os.Getenv(env); val != "" {
-			if err := flagObj.Value.Set(val); err != nil {
-				return fmt.Errorf("failed to set the %s flag: %v", flag, err)
-			}
-		}
-
 	}
 
 	return nil

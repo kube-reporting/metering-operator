@@ -3,19 +3,17 @@ package main
 import (
 	"context"
 	goflag "flag"
-	"fmt"
 	"io/ioutil"
 	"os"
 	"os/signal"
-	"strings"
 	"syscall"
 	"time"
 
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
-	"github.com/spf13/pflag"
 	meta "k8s.io/apimachinery/pkg/apis/meta/v1"
 
+	"github.com/kube-reporting/metering-operator/cmd/helpers"
 	"github.com/kube-reporting/metering-operator/pkg/operator"
 )
 
@@ -133,7 +131,7 @@ func main() {
 	rootCmd.AddCommand(startCmd)
 	rootCmd.ParseFlags(os.Args[1:])
 
-	if err := SetFlagsFromEnv(startCmd.Flags(), "REPORTING_OPERATOR"); err != nil {
+	if err := helpers.SetFlagsFromEnv(startCmd.Flags(), "REPORTING_OPERATOR"); err != nil {
 		log.WithError(err).Fatalf("error setting flags from environment variables: %v", err)
 	}
 
@@ -143,7 +141,9 @@ func main() {
 }
 
 func startReporting(cmd *cobra.Command, args []string) {
-	logger := newLogger()
+	logger := helpers.SetupLogger(logLevelStr, false, log.Fields{
+		"app": "metering",
+	})
 
 	if cfg.OwnNamespace == "" {
 		namespace, err := ioutil.ReadFile(pathToNamespaceInContainer)
@@ -182,31 +182,6 @@ func runReporting(ctx context.Context, logger log.FieldLogger, cfg operator.Conf
 	logger.Infof("reporting-operator has stopped")
 }
 
-// SetFlagsFromEnv parses all registered flags in the given flagset,
-// and if they are not already set it attempts to set their values from
-// environment variables. Environment variables take the name of the flag but
-// are UPPERCASE, and any dashes are replaced by underscores. Environment
-// variables additionally are prefixed by the given string followed by
-// and underscore. For example, if prefix=PREFIX: some-flag => PREFIX_SOME_FLAG
-func SetFlagsFromEnv(fs *pflag.FlagSet, prefix string) (err error) {
-	alreadySet := make(map[string]bool)
-	fs.Visit(func(f *pflag.Flag) {
-		alreadySet[f.Name] = true
-	})
-	fs.VisitAll(func(f *pflag.Flag) {
-		if !alreadySet[f.Name] {
-			key := prefix + "_" + strings.ToUpper(strings.Replace(f.Name, "-", "_", -1))
-			val := os.Getenv(key)
-			if val != "" {
-				if serr := fs.Set(f.Name, val); serr != nil {
-					err = fmt.Errorf("invalid value %q for %s: %v", val, key, serr)
-				}
-			}
-		}
-	})
-	return err
-}
-
 func setupSignals() context.Context {
 	sigs := make(chan os.Signal, 1)
 	signal.Notify(sigs, syscall.SIGINT, syscall.SIGTERM)
@@ -218,18 +193,4 @@ func setupSignals() context.Context {
 		cancel()
 	}()
 	return ctx
-}
-
-func newLogger() log.FieldLogger {
-	logger := log.WithFields(log.Fields{
-		"app": "metering",
-	})
-	logLevel, err := log.ParseLevel(logLevelStr)
-	if err != nil {
-		logger.WithError(err).Fatalf("invalid log level: %s", logLevelStr)
-	}
-	logger.Infof("setting log level to %s", logLevel.String())
-	logger.Logger.Level = logLevel
-	return logger
-
 }
