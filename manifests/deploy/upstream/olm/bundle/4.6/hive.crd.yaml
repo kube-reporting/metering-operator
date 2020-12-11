@@ -268,14 +268,7 @@ spec:
                 additionalProperties:
                   type: string
               partitions:
-                type: array
-                items:
-                  type: object
-                  properties:
-                    location:
-                      type: string
-                    partitionSpec:
-                      type: object
-                      additionalProperties:
-                        type: string
+                # https://bugzilla.redhat.com/show_bug.cgi?id=1897379
+                x-kubernetes-preserve-unknown-fields: true
+                nullable: true
 
