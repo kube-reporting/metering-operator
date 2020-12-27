@@ -151,7 +151,7 @@ curl -H "Authorization: Bearer $TOKEN" -k "https://$METERING_ROUTE_HOSTNAME/api/
 Be sure to replace the `name=[Report Name]` and `format=[Format]` parameters in the URL above.
 
 ##### Authenticate using a username and password
-We are able to do basic authentication using a username and password combination, which is specified in the contents of a htpasswd file. We, by default, create a secret containing an empty htpasswd data. You can, however, configure the `reporting-operator.spec.authProxy.htpasswd.data` and `reporting-operator.spec.authProxy.htpasswd.createSecret` keys to use this method. See the [basic authentication](#basic-authentication-usernamepassword) section for more information.
+We are able to do basic authentication using a username and password combination, which is specified in the contents of a htpasswd file. We, by default, create a secret containing an empty htpasswd data. You can, however, configure the `reporting-operator.spec.authProxy.htpasswd.data` and `reporting-operator.spec.authProxy.htpasswd.createSecret: true` keys to use this method. See the [basic authentication](#basic-authentication-usernamepassword) section for more information.
 
 Once you have specified the above in your `MeteringConfig` CR, you can run the following command:
 
@@ -206,7 +206,39 @@ In this document, most examples will prefer this method.
 #### Basic Authentication (username/password)
 
 If `reporting-operator.spec.authProxy.htpasswd.data` is non-empty, its contents must be that of an [htpasswd file](https://httpd.apache.org/docs/2.4/programs/htpasswd.html).
-When set, you can use [HTTP basic authentication][basic-auth-rfc] to provide your username and password that has a corresponding entry in the `htpasswdData` contents.
+When set, you can use [HTTP basic authentication][basic-auth-rfc] to provide your username and password that has a corresponding entry in the `htpasswd.data` contents.
+
+Consider the following example as reference:
+
+```yaml
+apiVersion: metering.openshift.io/v1
+kind: MeteringConfig
+metadata:
+  name: "operator-metering"
+spec:
+  reporting-operator:
+    spec:
+      authProxy:
+        enabled: true
+        
+        # htpasswd.data can contain htpasswd file contents for allowing auth
+        # using a static list of usernames and their password hashes.
+        #
+        # username is 'testuser' password is 'password123'
+        # generated htpasswdData using: `htpasswd -nb -s testuser password123`
+        # htpasswd:
+        #   data: |
+        #     testuser:{SHA}y/2sYAj5yrQIN4TL0YdPdmGNKpc=
+        #
+        # change REPLACEME to the output of your htpasswd command
+        #
+        # Set createSecret to TRUE which is mandatory if data is set
+        htpasswd:
+          createSecret: true
+          data: |
+            REPLACEME
+```
+
 
 [route]: https://docs.openshift.com/container-platform/3.11/dev_guide/routes.html
 [kube-svc]: https://kubernetes.io/docs/concepts/services-networking/service/
