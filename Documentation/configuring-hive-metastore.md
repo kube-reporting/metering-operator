@@ -52,8 +52,6 @@ kubectl -n $METERING_NAMESPACE create secret generic <name of the secret> --from
 
 ### Using MySQL for the Hive Metastore database
 
-**Note**: Metering cannot work with more recent versions of MySQL, which is being tracking in [BZ #1838802](https://bugzilla.redhat.com/show_bug.cgi?id=1838802). Instead, use the 5.7 version which has been tested.
-
 ```yaml
 spec:
   hive:
