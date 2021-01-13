@@ -414,6 +414,7 @@ _hive_metastore_db_overrides:
         db:
           username: "{{ _hive_metastore_db_username | default('') }}"
           password: "{{ _hive_metastore_db_password | default('') }}"
+          type: "{{ _hive_metastore_db_type | default('derby') }}"
       metastore:
         storage:
           create: "{{ _hive_metastore_create_default_storage | default(true) }}"
