@@ -67,8 +67,6 @@ You can pass additional JDBC parameters using the `spec.hive.spec.config.db.url`
 
 ## Using PostgreSQL for the Hive Metastore database
 
-**Note**:  Metering cannot work with more recent versions of PostgreSQL, which is being tracking in [BZ #1838845](https://bugzilla.redhat.com/show_bug.cgi?id=1838845).
-
 ```yaml
 spec:
   hive:
@@ -78,6 +76,7 @@ spec:
           url: "jdbc:postgresql://postgresql.example.com:5432/hive_metastore"
           driver: "org.postgresql.Driver"
           secretName: "REPLACEME"
+          autoCreateMetastoreSchema: false
 ```
 
 You can pass additional JDBC parameters using the `url`, for more details see [the PostgreSQL JDBC driver documentation](https://jdbc.postgresql.org/documentation/head/connect.html#connection-parameters).
