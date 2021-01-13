@@ -3,14 +3,15 @@ package e2e
 import (
 	"context"
 	"fmt"
-	"github.com/kube-reporting/metering-operator/pkg/deploy"
-	"k8s.io/client-go/kubernetes"
 	"os"
 	"os/exec"
 	"path/filepath"
 	"strings"
 	"testing"
 	"time"
+
+	"github.com/kube-reporting/metering-operator/pkg/deploy"
+	"k8s.io/client-go/kubernetes"
 
 	"github.com/kube-reporting/metering-operator/test/deployframework"
 	"github.com/kube-reporting/metering-operator/test/testhelpers"
@@ -357,7 +358,7 @@ func createMySQLDatabase(ctx *deployframework.DeployerCtx) error {
 		"oc",
 		"-n", mysqlNamespace,
 		"new-app",
-		"--image-stream", "mysql:5.7",
+		"--image-stream", "mysql:8.0",
 		"MYSQL_USER=testuser",
 		"MYSQL_PASSWORD=testpass",
 		"MYSQL_DATABASE=metastore",
@@ -365,7 +366,6 @@ func createMySQLDatabase(ctx *deployframework.DeployerCtx) error {
 	)
 	cmd.Stdout = ctx.LoggerOutFile
 	cmd.Stderr = ctx.LoggerOutFile
-
 	err = cmd.Run()
 	if err != nil {
 		return fmt.Errorf("Failed to run the cmd: %v", err)
