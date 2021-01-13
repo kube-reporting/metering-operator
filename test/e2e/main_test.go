@@ -320,6 +320,10 @@ func TestManualMeteringInstall(t *testing.T) {
 					Name:     "testFailedPrometheusQueryEvents",
 					TestFunc: testFailedPrometheusQueryEvents,
 				},
+				{
+					Name:     "testEnsurePostgresParametersAreMissing",
+					TestFunc: testEnsurePostgresParametersAreMissing,
+				},
 			},
 			MeteringConfigManifestFilename: "mysql.yaml",
 		},
