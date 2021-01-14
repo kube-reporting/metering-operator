@@ -109,4 +109,16 @@ data:
     export HIVE_METASTORE_HADOOP_OPTS=" -Dhive.log.level=${HIVE_LOGLEVEL} "
     export HIVE_OPTS="${HIVE_OPTS} --hiveconf hive.root.logger=${HIVE_LOGLEVEL},console "
 
+    SCHEMATOOL_BIN="${SCHEMATOOL_BIN:=${HIVE_HOME}/bin/schematool}"
+    # In the case of non-derby underlying databases been configured
+    # for Hive metastore, attempt to determine if there's already
+    # an initialized schema running the `schematool` CLI with the
+    # `-info` option. If that command fails, then we can make the
+    # reasonable assumption that schema doesn't already exist,
+    # and we can initialize it ourselves before starting Hive.
+    echo "Deploying Hive using ${HIVE_UNDERLYING_DATABASE} as the underlying database"
+    if [[ $HIVE_UNDERLYING_DATABASE != "derby" ]]; then
+      "${SCHEMATOOL_BIN}" -dbType "${HIVE_UNDERLYING_DATABASE}" -info || "${SCHEMATOOL_BIN}" -dbType "${HIVE_UNDERLYING_DATABASE}" -initSchema
+    fi
+
     exec $@

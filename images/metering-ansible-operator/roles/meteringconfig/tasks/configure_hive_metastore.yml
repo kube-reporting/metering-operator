@@ -20,6 +20,28 @@
         message: "Configuring hive metastore"
         lastTransitionTime: "{{ now(utc=False).isoformat() + 'Z' }}"
 
+  - name: Determine the Hive underlying database
+    block:
+    - name: Split the hive.spec.config.db.url into an array
+      set_fact:
+        _url_array: "{{ _meteringconfig_hive_metastore_db_url.split(':') }}"
+
+    - name: Verify the JDBC URL is valid before parsing
+      assert:
+        that:
+        - '{{ _url_array[0] == "jdbc" }}'
+        - '{{ _url_array[1] in ["mysql", "postgresql", "derby"] }}'
+        msg: "Invalid JDBC URL {{ _meteringconfig_hive_metastore_db_url }} passed in the MeteringConfig.Spec"
+
+    # Note: the `schematool -dbType` option expects either `mysql`,
+    # `derby`, `oracle` and `postgres` as valid options. In the case
+    # of the JDBC URL, only `postgresql` is valid, so we need to do
+    # some re-mapping of naming if that is what has been specified
+    # in the hive.spec.config.db.url field in the MeteringConfig CR.
+    - name: Override the default hive metastore database type
+      set_fact:
+        _hive_metastore_db_type: "{{ 'postgres' if _url_array[1] == 'postgresql' else _url_array[1] }}"
+
   - name: Override the default hive.spec.metastore.storage.create option to false
     set_fact:
       _hive_metastore_create_default_storage: false
@@ -69,6 +91,7 @@
     _meteringconfig_hive_metastore_db_secretName: "{{ meteringconfig_spec_overrides | json_query('hive.spec.config.db.secretName') }}"
     _meteringconfig_hive_metastore_db_username: "{{ meteringconfig_spec_overrides | json_query('hive.spec.config.db.username') }}"
     _meteringconfig_hive_metastore_db_password: "{{ meteringconfig_spec_overrides | json_query('hive.spec.config.db.password') }}"
+    _meteringconfig_hive_metastore_db_url: "{{ meteringconfig_spec_overrides | json_query('hive.spec.config.db.url') }}"
     _meteringconfig_hive_metastore_db_configuration: "{{ meteringconfig_spec_overrides | json_query('hive.spec.config.db') }}"
   no_log: false
   rescue:

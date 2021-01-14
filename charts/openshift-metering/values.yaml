@@ -690,6 +690,7 @@ hive:
 
         autoCreateMetastoreSchema: true
         enableMetastoreSchemaVerification: false
+        type: derby
 
       aws:
         accessKeyID: ""
