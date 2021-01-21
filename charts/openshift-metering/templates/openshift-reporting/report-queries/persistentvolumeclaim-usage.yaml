@@ -123,7 +123,7 @@ spec:
       phase.persistentvolumeclaim AS persistentvolumeclaim,
       min(persistentvolumeclaim_usage_bytes) AS persistentvolumeclaim_usage_bytes
     FROM {| dataSourceTableName .Report.Inputs.PersistentvolumeclaimPhaseRawDataSourceName |} AS phase
-    FULL OUTER JOIN {| dataSourceTableName .Report.Inputs.PersistentvolumeclaimUsageRawDataSourceName |} AS usage
+    LEFT OUTER JOIN {| dataSourceTableName .Report.Inputs.PersistentvolumeclaimUsageRawDataSourceName |} AS usage
     ON phase.namespace=usage.namespace
     AND phase.persistentvolumeclaim=usage.persistentvolumeclaim
     AND phase.timestamp=usage.timestamp
