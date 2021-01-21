@@ -203,14 +203,25 @@ spec:
     type: ReportDataSource
     default: persistentvolumeclaim-usage-with-phase-raw
   query: |
+    WITH averaged_persistentvolumeclaim_usage_per_pvc AS (
+      SELECT
+        timestamp '{| default .Report.ReportingStart .Report.Inputs.ReportingStart| prestoTimestamp |}' AS period_start,
+        timestamp '{| default .Report.ReportingEnd .Report.Inputs.ReportingEnd | prestoTimestamp |}' AS period_end,
+        namespace,
+        persistentvolumeclaim,
+        avg(persistentvolumeclaim_usage_bytes) as avg_persistentvolumeclaim_usage_bytes
+      FROM {| dataSourceTableName .Report.Inputs.PersistentvolumeclaimUsageWithPhaseRawDataSourceName |}
+      WHERE
+        "timestamp" >= timestamp '{| default .Report.ReportingStart .Report.Inputs.ReportingStart | prestoTimestamp |}'
+        AND "timestamp" < timestamp '{| default .Report.ReportingEnd .Report.Inputs.ReportingEnd | prestoTimestamp |}'
+        AND dt >= '{| default .Report.ReportingStart .Report.Inputs.ReportingStart | prometheusMetricPartitionFormat |}'
+        AND dt <= '{| default .Report.ReportingEnd .Report.Inputs.ReportingEnd | prometheusMetricPartitionFormat |}'
+      GROUP BY namespace, persistentvolumeclaim
+    )
     SELECT
       timestamp '{| default .Report.ReportingStart .Report.Inputs.ReportingStart| prestoTimestamp |}' AS period_start,
       timestamp '{| default .Report.ReportingEnd .Report.Inputs.ReportingEnd | prestoTimestamp |}' AS period_end,
       namespace,
-      sum(persistentvolumeclaim_usage_bytes) AS persistentvolumeclaim_usage_bytes
-    FROM {| dataSourceTableName .Report.Inputs.PersistentvolumeclaimUsageWithPhaseRawDataSourceName |}
-    WHERE "timestamp" >= timestamp '{| default .Report.ReportingStart .Report.Inputs.ReportingStart | prestoTimestamp |}'
-    AND "timestamp" < timestamp '{| default .Report.ReportingEnd .Report.Inputs.ReportingEnd | prestoTimestamp |}'
-    AND dt >= '{| default .Report.ReportingStart .Report.Inputs.ReportingStart | prometheusMetricPartitionFormat |}'
-    AND dt <= '{| default .Report.ReportingEnd .Report.Inputs.ReportingEnd | prometheusMetricPartitionFormat |}'
+      sum(avg_persistentvolumeclaim_usage_bytes) as persistentvolumeclaim_usage_bytes
+    FROM averaged_persistentvolumeclaim_usage_per_pvc
     GROUP BY namespace
