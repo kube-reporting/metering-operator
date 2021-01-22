@@ -7,6 +7,7 @@ import (
 	"path/filepath"
 	"strings"
 	"testing"
+	"time"
 
 	"github.com/sirupsen/logrus"
 
@@ -391,6 +392,8 @@ func TestManualMeteringInstall(t *testing.T) {
 		if testCase.Skip {
 			continue
 		}
+
+		time.Sleep(3 * time.Second)
 
 		t.Run(testCase.Name, func(t *testing.T) {
 			// If we call t.Parallel() here, the top-level test will
