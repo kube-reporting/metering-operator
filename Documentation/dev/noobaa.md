@@ -20,7 +20,7 @@ You have a few choices:
 
 Before we can start, we need to create the namespace so that we can create the secret containing our NooBaa credentials:
 
-```
+```bash
 kubectl create ns $METERING_NAMESPACE
 ```
 
@@ -28,13 +28,13 @@ kubectl create ns $METERING_NAMESPACE
 
 Run the following command to print our your credentials:
 
-```
+```bash
 noobaa status 2>&1 | grep AWS_
 ```
 
 Create a secret storing your NooBaa AWS credentials:
 
-```
+```bash
 kubectl -n $METERING_NAMESPACE create secret generic my-noobaa-secret --from-literal=aws-access-key-id=your-access-key  --from-literal=aws-secret-access-key=your-secret-key
 ```
 
@@ -47,7 +47,7 @@ It is recommended you create a bucket in the NooBaa UI or using the AWS CLI dedi
 
 When using NooBaa without TLS you need to set the `spec.storage.hive.s3Compatible.endpoint` value to `http://s3.noobaa.svc:80`.
 
-```
+```yaml
 apiVersion: metering.openshift.io/v1
 kind: MeteringConfig
 metadata:
@@ -67,7 +67,7 @@ spec:
 
 When using NooBaa with TLS you need to set the `spec.storage.hive.s3Compatible.endpoint` value to `https://s3.noobaa.svc:443` and set the `spec.storage.hive.s3Compatible.ca` fields.
 
-```
+```yaml
 apiVersion: metering.openshift.io/v1
 kind: MeteringConfig
 metadata:

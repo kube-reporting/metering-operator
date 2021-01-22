@@ -33,4 +33,3 @@ Custom Resources:
 - [ReportQueries](reportqueries.md)
 - [ReportDataSources](reportdatasources.md)
 - [StorageLocations](storagelocations.md)
-

@@ -138,7 +138,8 @@ Also, make sure the `METERING_NAMESPACE` environment variable is set before cont
 
 To authenticate and access the reporting API, you can do one of two options:
 
-##### Authenticate using a service account token
+#### Authenticate using a service account token
+
 See the [token authentication](#token-authentication) section for more information on how to extend the capabilities of this method using permissions.
 
 With this method, we use the token in the reporting operator's service account, and pass that bearer token to the Authorization header in the following command:
@@ -150,7 +151,8 @@ curl -H "Authorization: Bearer $TOKEN" -k "https://$METERING_ROUTE_HOSTNAME/api/
 
 Be sure to replace the `name=[Report Name]` and `format=[Format]` parameters in the URL above.
 
-##### Authenticate using a username and password
+#### Authenticate using a username and password
+
 We are able to do basic authentication using a username and password combination, which is specified in the contents of a htpasswd file. We, by default, create a secret containing an empty htpasswd data. You can, however, configure the `reporting-operator.spec.authProxy.htpasswd.data` and `reporting-operator.spec.authProxy.htpasswd.createSecret: true` keys to use this method. See the [basic authentication](#basic-authentication-usernamepassword) section for more information.
 
 Once you have specified the above in your `MeteringConfig` CR, you can run the following command:
@@ -220,7 +222,7 @@ spec:
     spec:
       authProxy:
         enabled: true
-        
+
         # htpasswd.data can contain htpasswd file contents for allowing auth
         # using a static list of usernames and their password hashes.
         #
@@ -238,7 +240,6 @@ spec:
           data: |
             REPLACEME
 ```
-
 
 [route]: https://docs.openshift.com/container-platform/3.11/dev_guide/routes.html
 [kube-svc]: https://kubernetes.io/docs/concepts/services-networking/service/

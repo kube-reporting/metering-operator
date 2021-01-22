@@ -9,7 +9,7 @@ Metering Operator is composed of 3 major components:
 
 ## How it works
 
-At a high-level view, it may be helpful to view the reporting operator in terms of events and reactions. This is because the reporting operator's main responsibility is to interact with custom resources in Kubernetes. We can then characterize any changes made to these custom resources as an event, and the reporting operator reacts to these events as appropriate. 
+At a high-level view, it may be helpful to view the reporting operator in terms of events and reactions. This is because the reporting operator's main responsibility is to interact with custom resources in Kubernetes. We can then characterize any changes made to these custom resources as an event, and the reporting operator reacts to these events as appropriate.
 
 Internally, Metering Operator  uses a database called [Presto][presto-overview] to do analytical querying on collected data using SQL.
 When we use terms like `tables`, `views`, `SQL`, `statement`, or `query` in this document, we're referring to them in the context of the Presto database, and we're using SQL as the primary method of doing analysis and reporting on the data that Metering Operator  collects.
@@ -57,7 +57,6 @@ A PrometheusMetricsImporter ReportDataSource instructs the reporting-operator to
 You can also define a AWSBilling ReportDataSource to create table pointing at an existing S3 bucket containing AWS Cost and Usage reports.
 Additionally, there are ReportQueryView ReportDataSource's which create views in Presto, and PrestoTable ReportDataSource's which just expose an existing PrestoTable as a ReportDataSource.
 
-
 #### PrometheusMetricsImporter ReportDataSources
 
 A `PrometheusMetricsImporter` ReportDataSource configures the reporting-operator to periodically poll Prometheus for metrics.
@@ -97,7 +96,6 @@ This results in a table that has multiple partitions in it. There will be one pa
 
 By default, Metering Operator has an section in the `MeteringConfig` resource for configuring an awsBilling `ReportDataSource`, so you generally shouldn't need to create one directly.
 For more details on configuring this read the [AWS billing correlation section in the Metering Configuration doc][metering-aws-billing-conf].
-
 
 #### ReportQueryView View ReportDataSources
 

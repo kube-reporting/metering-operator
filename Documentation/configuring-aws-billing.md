@@ -12,7 +12,7 @@ The `spec.reporting-operator.spec.config.aws.secretName` and `spec.presto.spec.c
 
 For example:
 
-```
+```yaml
 apiVersion: v1
 kind: Secret
 metadata:

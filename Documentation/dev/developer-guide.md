@@ -89,6 +89,7 @@ For more information on the operator-registry binaries we utilize, check out the
 In the testing suite, we deploy all Metering instances using OLM, which requires building and pushing the latest version of the metering-ansible-operator's manifest bundle.
 
 Define your CONTAINER_RUNTIME, for instance:
+
 ```bash
 export CONTAINER_RUNTIME=docker
 ```

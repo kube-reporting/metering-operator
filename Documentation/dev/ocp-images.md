@@ -4,6 +4,7 @@ Building OCP images requires being on the Red Hat network so you can access our 
 Additionally, because the images are generally built using automation thats already setup correctly for these builds, we need to use some additional tools to make building images based on RHEL succeed.
 
 Pre-reqs:
+
 - All the regular developer tools
 - Docker
 - [imagebuilder](https://github.com/openshift/imagebuilder)
@@ -13,7 +14,7 @@ Pre-reqs:
 
 Run the following script to setup the base images we need locally:
 
-```
+```bash
 hack/ocp-util/ocp-image-pull-and-rename.sh
 ```
 
@@ -23,6 +24,6 @@ Passing `OCP_BUILD=true` to our make invocation will tell it to build our images
 Passing `USE_IMAGEBUILDER=true` tells it to use `imagebuilder` instead of `docker` as a Docker client, allowing us to override the RPM repos and subscription-manager configuration inside the image build to allow installing packages without needing to build on a RHEL machine by using yum composes that the regular OCP release pipeline does.
 Passing `RELEASE_TAG=v4.0` overrides using the version in the `VERSION` file so that we can tag our images using the OCP release version.
 
-```
+```bash
 make docker-build-all OCP_BUILD=true USE_IMAGEBUILDER=true RELEASE_TAG=v4.0
 ```

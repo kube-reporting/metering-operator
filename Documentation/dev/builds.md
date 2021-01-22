@@ -91,12 +91,13 @@ Each of them is built slightly differently.
     - brew package name: `hadoop-container`
     - url: https://brewweb.engineering.redhat.com/brew/packageinfo?packageID=70822
 
-# OCP builds
+## OCP builds
 
 OCP builds are done by a combination of systems within the Red Hat internal network.
 Many links below will require you to be on the Red Hat network in some form (the VPN is a good option).
 
 The major components are:
+
 - [Openshift Build System (OSBS)][osbs]
   - This builds docker images in brew/pulp in an isolated build environment.
   - OSBS builds for OCP are managed by Automated Release Team (ART).

@@ -4,6 +4,7 @@ Currently, installing Metering via OLM is only supported on OpenShift 4.3 and ne
 If you want to install Metering into a non-OpenShift Kubernetes cluster, use the [manual installation documentation][manual-install].
 
 This procedure covers:
+
 - Installing the metering-operator using the OperatorHub within the OpenShift web console
 - Creating a Metering resource that defines the installation configuration for the rest of the Metering stack
 
@@ -13,7 +14,7 @@ Create a dedicated OpenShift project for Metering, and then install the Metering
 
 1. Create a new project/namespace called *openshift-metering* using the OpenShift web console (navigate to **Administration > Namespaces > Create Namespace**) or the `oc` command:
 
-```
+```bash
 oc create namespace openshift-metering
 ```
 
@@ -50,7 +51,7 @@ All supported configuration options are documented in [configuring metering][con
 
 5. Next, verify that the ReportDataSources are beginning to import data, indicated by a valid timestamp in the `EARLIEST METRIC` column (this may take a few minutes). We filter out the "-raw" ReportDataSources which don't import data:
 
-```
+```bash
 $ kubectl get reportdatasources -n $METERING_NAMESPACE | grep -v raw
 NAME                                         EARLIEST METRIC        NEWEST METRIC          IMPORT START           IMPORT END             LAST IMPORT TIME       AGE
 node-allocatable-cpu-cores                   2019-08-05T16:52:00Z   2019-08-05T18:52:00Z   2019-08-05T16:52:00Z   2019-08-05T18:52:00Z   2019-08-05T18:54:45Z   9m50s
@@ -69,7 +70,6 @@ pod-request-memory-bytes                     2019-08-05T16:52:00Z   2019-08-05T1
 pod-usage-cpu-cores                          2019-08-05T16:52:00Z   2019-08-05T17:57:00Z   2019-08-05T16:52:00Z   2019-08-05T17:57:00Z   2019-08-05T18:54:10Z   9m49s
 pod-usage-memory-bytes                       2019-08-05T16:52:00Z   2019-08-05T18:08:00Z   2019-08-05T16:52:00Z   2019-08-05T18:08:00Z   2019-08-05T18:54:20Z   9m49s
 ```
-
 
 Once all pods are ready and you have verified that data is being imported, you can begin using Metering to collect and Report on your cluster.
 For further reading on using metering, see the [using metering documentation][using-metering].

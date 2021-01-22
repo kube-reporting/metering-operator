@@ -12,11 +12,11 @@ Operator Metering requires the following components:
 - A Kubernetes v1.11 or newer cluster
 - A StorageClass for dynamic volume provisioning. ([See configuring metering][configuring-metering] for more information.)
 - A Prometheus installation within the cluster configured to do Kubernetes cluster-monitoring.
-    - The [kube-prometheus instructions][kube-prometheus] are the standard way of achieving Prometheus cluster-monitoring.
-    - At a minimum, we require [kube-state-metrics][kube-state-metrics], node-exporter, and built-in Kubernetes target metrics.
+  - The [kube-prometheus instructions][kube-prometheus] are the standard way of achieving Prometheus cluster-monitoring.
+  - At a minimum, we require [kube-state-metrics][kube-state-metrics], node-exporter, and built-in Kubernetes target metrics.
 - 4GB Memory and 4 CPU Cores available cluster capacity.
 - Minimum resources needed for the largest single pod is 2 GB of memory and 2 CPU cores.
-    - Memory and CPU consumption may often be lower, but will spike when running reports, or collecting data for larger clusters.
+  - Memory and CPU consumption may often be lower, but will spike when running reports, or collecting data for larger clusters.
 - A properly configured [kubectl][kubectl-install] to access the Kubernetes cluster.
 
 In addition, Metering **storage must be configured before proceeding**.
@@ -55,13 +55,13 @@ For instructions on installing using our manual install scripts follow the [manu
 
 First, wait until the Metering Ansible operator deploys all of the Metering components:
 
-```
+```bash
 kubectl get pods -n $METERING_NAMESPACE -l app=metering-operator -o name | cut -d/ -f2 | xargs -I{} kubectl -n $METERING_NAMESPACE logs -f {}
 ```
 
 This can potentially take a minute or two to complete, but when it's done, you should see log output similar the following:
 
-```
+```json
 {"level":"info","ts":1560984641.7900484,"logger":"runner","msg":"Ansible-runner exited successfully","job":"7911455193145848968","name":"operator-metering","namespace":"metering"}
 ```
 
@@ -69,13 +69,13 @@ If you see any failures, check out [debugging the Metering Ansible operator][ans
 
 Next, get the list of pods:
 
-```
+```bash
 kubectl -n $METERING_NAMESPACE get pods
 ```
 
 It may take a couple of minutes, but eventually all pods should have a status of `Running`:
 
-```
+```bash
 NAME                                  READY   STATUS    RESTARTS   AGE
 hive-metastore-0                      2/2     Running   0          3m
 hive-server-0                         3/3     Running   0          3m
@@ -86,14 +86,14 @@ reporting-operator-6fd758c9c7-crjsw   2/2     Running   0          3m
 
 Check the logs of the `reporting-operator` pod for signs of any persistent errors:
 
-```
-$ kubectl get pods -n $METERING_NAMESPACE -l app=reporting-operator -o name | cut -d/ -f2 | xargs -I{} kubectl -n $METERING_NAMESPACE logs {} -f -c reporting-operator
+```bash
+kubectl get pods -n $METERING_NAMESPACE -l app=reporting-operator -o name | cut -d/ -f2 | xargs -I{} kubectl -n $METERING_NAMESPACE logs {} -f -c reporting-operator
 ```
 
 Next, verify that the ReportDataSources are beginning to import data, indicated by a valid timestamp in the `EARLIEST METRIC` column (this may take a few minutes).
 We filter out the "-raw" ReportDataSources which don't import data:
 
-```
+```bash
 $ kubectl get reportdatasources -n $METERING_NAMESPACE | grep -v raw
 NAME                                         EARLIEST METRIC        NEWEST METRIC          IMPORT START           IMPORT END             LAST IMPORT TIME       AGE
 node-allocatable-cpu-cores                   2019-08-05T16:52:00Z   2019-08-05T18:52:00Z   2019-08-05T16:52:00Z   2019-08-05T18:52:00Z   2019-08-05T18:54:45Z   9m50s
