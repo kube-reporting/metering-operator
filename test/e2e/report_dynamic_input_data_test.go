@@ -9,7 +9,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	metering "github.com/kube-reporting/metering-operator/pkg/apis/metering/v1"
+	meteringv1 "github.com/kube-reporting/metering-operator/pkg/apis/metering/v1"
 	"github.com/kube-reporting/metering-operator/pkg/operator/reporting"
 	"github.com/kube-reporting/metering-operator/test/reportingframework"
 )
@@ -20,9 +20,9 @@ var (
 
 func testReportingProducesData(t *testing.T, testReportingFramework *reportingframework.ReportingFramework) {
 	// cron schedule to run every minute
-	cronSchedule := &metering.ReportSchedule{
-		Period: metering.ReportPeriodCron,
-		Cron: &metering.ReportScheduleCron{
+	cronSchedule := &meteringv1.ReportSchedule{
+		Period: meteringv1.ReportPeriodCron,
+		Cron: &meteringv1.ReportScheduleCron{
 			Expression: "*/1 * * * *",
 		},
 	}
@@ -90,8 +90,8 @@ func testReportingProducesData(t *testing.T, testReportingFramework *reportingfr
 type reportProducesDataTestCase struct {
 	name          string
 	queryName     string
-	schedule      *metering.ReportSchedule
-	newReportFunc func(name, queryName string, schedule *metering.ReportSchedule, start, end *time.Time, expiration *metav1.Duration) *metering.Report
+	schedule      *meteringv1.ReportSchedule
+	newReportFunc func(name, queryName string, schedule *meteringv1.ReportSchedule, start, end *time.Time, expiration *metav1.Duration) *meteringv1.Report
 	skip          bool
 	parallel      bool
 }
@@ -125,7 +125,7 @@ func testReportsProduceData(t *testing.T, testReportingFramework *reportingframe
 			var reportStart time.Time
 			// for each datasource, wait until it's EarliestImportedMetricTime is set
 			for _, ds := range dependencies.ReportDataSources {
-				_, err := testReportingFramework.WaitForMeteringReportDataSource(t, ds.Name, 5*time.Second, 5*time.Minute, func(dataSource *metering.ReportDataSource) (bool, error) {
+				_, err := testReportingFramework.WaitForMeteringReportDataSource(t, ds.Name, 5*time.Second, 5*time.Minute, func(dataSource *meteringv1.ReportDataSource) (bool, error) {
 					if dataSource.Spec.PrometheusMetricsImporter == nil {
 						return true, nil
 					}

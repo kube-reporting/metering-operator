@@ -15,7 +15,7 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/util/wait"
 
-	metering "github.com/kube-reporting/metering-operator/pkg/apis/metering/v1"
+	meteringv1 "github.com/kube-reporting/metering-operator/pkg/apis/metering/v1"
 	"github.com/kube-reporting/metering-operator/test/reportingframework"
 	"github.com/kube-reporting/metering-operator/test/testhelpers"
 )
@@ -23,9 +23,9 @@ import (
 func testReportIsDeletedWhenNoDeps(t *testing.T, testReportingFramework *reportingframework.ReportingFramework) {
 	reportName := "report-should-delete"
 	// cron schedule to run every minute
-	cronSchedule := &metering.ReportSchedule{
-		Period: metering.ReportPeriodCron,
-		Cron: &metering.ReportScheduleCron{
+	cronSchedule := &meteringv1.ReportSchedule{
+		Period: meteringv1.ReportPeriodCron,
+		Cron: &meteringv1.ReportScheduleCron{
 			Expression: "*/1 * * * *",
 		},
 	}
@@ -70,9 +70,9 @@ func testReportIsNotDeletedWhenReportDependsOnIt(t *testing.T, testReportingFram
 	testQueryName := "namespace-cpu-usage"
 	subReportName := "subreport-should-not-delete"
 	// cron schedule to run every minute
-	cronSchedule := &metering.ReportSchedule{
-		Period: metering.ReportPeriodCron,
-		Cron: &metering.ReportScheduleCron{
+	cronSchedule := &meteringv1.ReportSchedule{
+		Period: meteringv1.ReportPeriodCron,
+		Cron: &meteringv1.ReportScheduleCron{
 			Expression: "*/1 * * * *",
 		},
 	}
@@ -104,15 +104,15 @@ func testReportIsNotDeletedWhenReportDependsOnIt(t *testing.T, testReportingFram
 		"report-depends-on-subreport",
 		testReportingFramework.Namespace,
 		testQueryName,
-		[]metering.ReportQueryInputValue{
-			metering.ReportQueryInputValue{
+		[]meteringv1.ReportQueryInputValue{
+			meteringv1.ReportQueryInputValue{
 				Name:  "Report",
 				Value: newDefault(`"` + subReportName + `"`),
 			},
 		},
 		nil,
 		nil,
-		metering.ReportStatus{},
+		meteringv1.ReportStatus{},
 		cronSchedule,
 		false,
 		nil,
