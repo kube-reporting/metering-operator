@@ -23,6 +23,20 @@ import (
 	meteringUtil "github.com/kube-reporting/metering-operator/pkg/apis/metering/v1/util"
 )
 
+// CreateReportQuery is a helper method that creates the
+// @rq ReportQuery using the interal Meteringv1 clientset.
+func (rf *ReportingFramework) CreateReportQuery(rq *metering.ReportQuery) error {
+	_, err := rf.MeteringClient.ReportQueries(rf.Namespace).Create(context.Background(), rq, metav1.CreateOptions{})
+	return err
+}
+
+// CreateReportQueryWithContext is a helper method that creates the
+// @rq ReportQuery using context provided to the interal Meteringv1 clientset.
+func (rf *ReportingFramework) CreateReportQueryWithContext(ctx context.Context, rq *metering.ReportQuery) error {
+	_, err := rf.MeteringClient.ReportQueries(rf.Namespace).Create(ctx, rq, metav1.CreateOptions{})
+	return err
+}
+
 func (rf *ReportingFramework) CreateMeteringReport(report *metering.Report) error {
 	_, err := rf.MeteringClient.Reports(rf.Namespace).Create(context.Background(), report, metav1.CreateOptions{})
 	return err
