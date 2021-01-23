@@ -61,7 +61,7 @@ For each of these types, the behavior varies:
 
 Below is an example of a ReportQuery `spec.inputs` input definitions configuration.
 
-```
+```yaml
 inputs:
 - name: a_string_input
   type: string
@@ -79,7 +79,7 @@ inputs:
 
 Next is an example of specifying input values for the definitions above that might be specified in a `Report`'s `spec.inputs` or from a `ReportDataSource`'s `spec.reportQueryView.inputs`:
 
-```
+```yaml
 inputs:
 - name: a_string_input
   value: "helloworld"
@@ -186,8 +186,10 @@ To query report results using the reporting-operator API for full endpoint the a
 This example is showing the `namespace-cpu-request` query in JSON format.
 
 To use the TableHidden display feature:
-- enter `TableHidden` field in query as true or false. In `node-cpu-capacity` the `labels` tableHidden value is set to `true`.
+
+- Specify the `TableHidden` field in the query as true or false. In `node-cpu-capacity` the `labels` tableHidden value is set to `true`.
 - Next run a report.
+
 To query report results using the reporting-operator API for tableHidden endpoint the api call is:
 `http://127.0.0.1:8001/api/v1/namespaces/metering/services/http:reporting-operator:api/proxy/api/v2/reports/metering/namespace-cpu-request/table?format=json`
 

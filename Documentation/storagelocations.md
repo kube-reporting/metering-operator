@@ -10,6 +10,7 @@ The Operator Metering default installation provides a few ways of configuring th
 Refer to the [Metering Configuration doc](metering-config.md#storing-data-in-s3) for details on using the `Metering` resource to set your default StorageLocation.
 
 ## Fields
+
 - `hive`: If this section is present, then the `StorageLocation` will be configured to store data in Presto by creating the table using Hive server. Note: only `databaseName` and `unmanagedDatabase` are required fields.
   - `databaseName`: The name of the database within hive.
   - `unmanagedDatabase`: If true, then this StorageLocation will not be actively managed, and the databaseName is expected to already exist in Hive. If false, this will cause the reporting-operator to create the Database in Hive.

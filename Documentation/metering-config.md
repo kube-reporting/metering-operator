@@ -24,13 +24,13 @@ For details on different types of configuration read the relevant document:
 This document and other documents in the metering-operator project follow the convention of describing nested fields in configuration settings using dots as separators.
 For example:
 
-```
+```yaml
 spec.reporting-operator.spec.config.awsAccessKeyID
 ```
 
 Refers to the following YAML structure and value:
 
-```
+```yaml
 spec:
   reporting-operator:
     spec:
@@ -44,6 +44,6 @@ spec:
 
 To install the custom configuration file, run the following command:
 
-```
+```bash
 kubectl -n $METERING_NAMESPACE apply -f manifests/metering-config/default.yaml
 ```

@@ -57,19 +57,26 @@ The `spec.storage.hive.s3Compatible.secretName` should be the name of a secret i
 > **Note**: The values of the `aws-access-key-id` and `aws-secret-access-key` must be base64 encoded.
 
 Noobaa installation example:
+
 1. Get noobaa CLI.
-     * Download [noobaa CLI tool](https://github.com/noobaa/noobaa-core) and put it into your bin PATH.
-2. Install noobaa into your cluster.
+   * Download [noobaa CLI tool](https://github.com/noobaa/noobaa-core) and put it into your bin PATH.
+
+2. Install noobaa into your cluster
+
 ```bash
 oc create ns noobaa
 oc project noobaa
 noobaa install
 ```
-3. After a successful noobaa installation, we create a bucket to store the reporting data.
+
+3. After a successful noobaa installation, we create a bucket to store the reporting data
+
 ```bash
 noobaa bucket create foobar
 ```
-4. Extract the AWS access information from the noobaa secret.
+
+4. Extract the AWS access information from the noobaa secret
+
 ```bash
 $ oc get secret noobaa-admin -n noobaa -o json | jq '.data|map_values(@base64)'
 {
@@ -80,7 +87,9 @@ $ oc get secret noobaa-admin -n noobaa -o json | jq '.data|map_values(@base64)'
   "system": "<BASE64_ENCODED_VALUE>"
 }
 ```
-5. Create Secret based on Step 4.
+
+5. Create Secret based on Step 4
+
 ```yaml
 apiVersion: v1
 kind: Secret
@@ -90,9 +99,11 @@ data:
   aws-access-key-id: "<BASE64_ENCODED_KEY_ID_FROM_STEP_4>"
   aws-secret-access-key: "<BASE64_ENCODED_ACCESS_KEY_FROM_SETP_4>"
 ```
+
 To store data in S3 compatible storage, the `aws-access-key-id` and `aws-secret-access-key` credentials must have read and write access to the bucket.
 
-6. Create the MeteringConfig custom resource.
+6. Create the MeteringConfig custom resource
+
 ```yaml
 apiVersion: metering.openshift.io/v1
 kind: MeteringConfig
@@ -108,7 +119,9 @@ spec:
         endpoint: "http://s3.noobaa:80"
         secretName: "noobaa-aws-secret"
 ```
-7. Create the MeteringConfig and Secret resources.
+
+7. Create the MeteringConfig and Secret resources
+
 ``` bash
 oc apply -f meteringconfig-noobaa.yaml -n openshift-metering
 oc apply -f secret-noobaa.yaml -n openshift-metering

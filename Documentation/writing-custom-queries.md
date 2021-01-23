@@ -24,7 +24,7 @@ Below is a command that will open up a port-forward, exposing Prometheus on `127
 
 First, set the `PROMETHEUS_NAMESPACE` environment variable to the Kubernetes namespace where your Prometheus pod is running, and the run the following:
 
-```
+```bash
 export PROMETHEUS_NAMESPACE=monitoring
 kubectl -n $PROMETHEUS_NAMESPACE get pods -l app=prometheus -o name | cut -d/ -f2 | xargs -I{} kubectl -n $PROMETHEUS_NAMESPACE port-forward {} 9090:9090
 ```
@@ -51,7 +51,7 @@ The most relevant information available in this metric is the `namespace`, `depl
 
 To strip out everything besides this information, the following Prometheus query [sums](https://prometheus.io/docs/prometheus/latest/querying/operators/#aggregation-operators) the value of the metric grouped by the `namespace` and `deployment`.
 
-```
+```sql
 sum(kube_deployment_status_replicas_unavailable) by (namespace, deployment)
 ```
 
@@ -62,7 +62,7 @@ Try the above query in the Prometheus UI to get an idea of what this changes fro
 To configure a Metric to be collected, you need to create a [ReportDataSource][reportdatasources] with a `spec.prometheusMetricsImporter` section configured to use the Prometheus query of your choice.
 Save the snippet below into a file named `unready-deployment-replicas-reportdatasource.yaml`:
 
-```
+```yaml
 apiVersion: metering.openshift.io/v1
 kind: ReportDataSource
 metadata:
@@ -75,7 +75,7 @@ spec:
 
 Creating the ReportDataSource will cause the metering operator to create a table in Presto and begin collecting metrics using the Prometheus query in the `spec.prometheusMetricsImporter.query` field, so let's create it:
 
-```
+```yaml
 kubectl create -n "$METERING_NAMESPACE" -f unready-deployment-replicas-reportdatasource.yaml
 ```
 
@@ -88,7 +88,7 @@ The other way however is to exec into the Presto pod and open up a Presto-cli se
 Open up a Presto-cli session by following the [Query Presto using presto-cli developer documentation][presto-cli-exec].
 After you have a session, set the schema to `metering`, and run the following query:
 
-```
+```sql
 use metering;
 show tables;
 ```
@@ -100,13 +100,13 @@ In this case, you should [check the metering operator logs][reporting-operator-l
 If the table does exist, it may take up to 5 minutes (the default collection interval) before any data exists in the table.
 To check if our data has started getting collected, we can check by issuing a `SELECT` query on our table to see if any rows exist:
 
-```
+```sql
 SELECT * FROM datasource_your_namespace_unready_deployment_replicas LIMIT 10;
 ```
 
 If at least one row shows up, then everything is working correctly, an example of the output expected is shown below:
 
-```
+```sql
 presto:metering> SELECT * FROM datasource_your_namespace_unready_deployment_replicas LIMIT 10;
  amount |        timestamp        | timeprecision |                              labels                              |     dt
 --------+-------------------------+---------------+------------------------------------------------------------------+------------
@@ -133,6 +133,7 @@ Now that we have a database table that we can experiment with, we can begin to a
 > What is the average and total amount of time that a particular deployment's replicas are unready?
 
 To answer this, we need to do a few things:
+
 - for each timestamp, find the time each individual pod was unready.
 - divide up, or group the results by the deployment.
 - find the average and total duration pods are unready for each deployment.
@@ -140,7 +141,7 @@ To answer this, we need to do a few things:
 We'll start with getting the unready time at an individual metric level for each timestamp.
 Since the `amount` corresponds to the number of unready pods at that moment in time, and the `timeprecision` gives how long the metric was that value, we just need to multiply the `amount` (number of pods) by the `timeprecision` (length of time it was at that value):
 
-```
+```sql
 SELECT
     "timestamp",
     labels['namespace'] as namespace,
@@ -158,7 +159,7 @@ Of course we include timestamp again so we can get the value at each time.
 
 The query below uses the `GROUP BY` clause to create a list of deployments by namespace from the metric:
 
-```
+```sql
 SELECT
     "timestamp",
     labels['namespace'] as namespace,
@@ -175,7 +176,7 @@ Before we can take the average and sum however, we need to figure out what we're
 
 Our final query is the following:
 
-```
+```sql
 SELECT
     "timestamp",
     labels['namespace'] as namespace,
@@ -204,7 +205,7 @@ One thing to note is we replaced `FROM datasource_your_namespace_unready_deploym
 By using inputs, we can override the default ReportDataSource used and by marking it as `type: ReportDataSource`, it will be considered a dependency and will ensure it exists before running.
 The format of the table names could change in the future, so always use the `dataSourceTableName` template function to ensure it's always using the correct table name.
 
-```
+```yaml
 apiVersion: metering.openshift.io/v1
 kind: ReportQuery
 metadata:
@@ -243,7 +244,7 @@ We can use these variables in a `WHERE` clause within our query to filter the re
 
 The `WHERE` clause generally looks the same for all `ReportQueries` that expect to be used by a Report:
 
-```
+```sql
 WHERE "timestamp" >= timestamp '{| default .Report.ReportingStart .Report.Inputs.ReportingStart | prestoTimestamp |}'
 AND "timestamp" < timestamp '{| default .Report.ReportingEnd .Report.Inputs.ReportingEnd | prestoTimestamp |}'
 ```
@@ -253,7 +254,7 @@ Queries should be [left-closed and right-open](https://en.wikipedia.org/wiki/Int
 In addition to the query time constraints, we often want to be able to track the time period for each row of data. In order to do this, we can append two columns to the above schema definition: `period_start` and `period_end` and remove "timestamp", since we're looking at a range of time rather than an instant in time. Both of these columns will be of type `timestamp`, which requires us to add an additional field, `spec.input`, to our `ReportQuery` as this is a custom input. To see more about `spec.inputs`, `ReportingStart`, and `ReportingEnd` see [reports.md.](https://github.com/kube-reporting/metering-operator/blob/master/Documentation/reports.md#reportingstart)
 Lastly, we need to update the SELECT portion of the `spec.query` field:
 
-```
+```sql
 query: |
   SELECT
     timestamp '{| default .Report.ReportingStart .Report.Inputs.ReportingStart | prestoTimestamp |}' AS period_start,
@@ -265,7 +266,7 @@ query: |
 Once we add these columns filters to our query we get the final version of our ReportQuery.
 Save the snippet below into a file named `unready-deployment-replicas-reportquery.yaml`:
 
-```
+```yaml
 apiVersion: metering.openshift.io/v1
 kind: ReportQuery
 metadata:
@@ -309,7 +310,7 @@ spec:
 
 Next, let's create the `ReportQuery` so it can be used by Reports:
 
-```
+```bash
 kubectl create -n "$METERING_NAMESPACE" -f unready-deployment-replicas-reportquery.yaml
 ```
 
@@ -317,7 +318,7 @@ kubectl create -n "$METERING_NAMESPACE" -f unready-deployment-replicas-reportque
 
 Save the snippet below into a file named `unready-deployment-replicas-report.yaml`:
 
-```
+```yaml
 apiVersion: metering.openshift.io/v1
 kind: Report
 metadata:
@@ -331,19 +332,19 @@ spec:
 
 Next, let's create the report and let the operator generate the results:
 
-```
+```bash
 kubectl create -n "$METERING_NAMESPACE" -f unready-deployment-replicas-report.yaml
 ```
 
 Creating a report may take a while, but you can check on the report's status by reading the `status` field from output of the command below:
 
-```
+```kubectl
 kubectl -n $METERING_NAMESPACE get report unready-deployment-replicas -o json
 ```
 
 Once the Report's status has changed to `Finished` (this can take a few minutes depending on cluster size and amount of data collected), we can query the operator's HTTP API for the results:
 
-```
+```kubectl
 METERING_ROUTE_HOSTNAME=$(oc -n $METERING_NAMESPACE get routes metering -o json | jq -r '.status.ingress[].host')
 TOKEN=$(oc -n $METERING_NAMESPACE serviceaccounts get-token reporting-operator)
 curl -H "Authorization: Bearer $TOKEN" -k "https://$METERING_ROUTE_HOSTNAME/api/v1/reports/get?name=unready-deployment-replicas&namespace=$METERING_NAMESPACE&format=csv"
@@ -353,7 +354,7 @@ If you aren't using Openshift, or have disabled `spec.tls.enabled` top-level key
 
 This should output a CSV report that looks similar to this:
 
-```
+```csv
 period_start,period_end,namespace,deployment,total_replica_unready_seconds,avg_replica_unready_seconds
 2019-01-01 00:00:00 +0000 UTC,2019-12-31 23:59:59 +0000 UTC,kube-system,tiller-deploy,0.000000,0.000000
 2019-01-01 00:00:00 +0000 UTC,2019-12-31 23:59:59 +0000 UTC,metering-chancez,metering-operator,120.000000,1.000000

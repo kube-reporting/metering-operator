@@ -15,7 +15,7 @@ Currently we require that metering is installed into its own namespace which req
 
 First, start by creating the `openshift-metering` namespace:
 
-```
+```bash
 kubectl create ns openshift-metering
 ```
 
@@ -24,22 +24,22 @@ This results in a `CatalogSource` containing the `metering` OLM package being cr
 
 Download the `metering-operators` [metering.catalogsourceconfig.yaml][metering-catalogsourceconfig] and install it into the `openshift-marketplace` namespace:
 
-```
+```bash
 kubectl apply -n openshift-marketplace -f metering.catalogsourceconfig.yaml
 ```
 
 After it is created, confirm a new `CatalogSource` is created in the `openshift-metering` namespace:
 
-```
-kubectl -n openshift-metering get catalogsources
+```bash
+$ kubectl -n openshift-metering get catalogsources
 NAME                                                     NAME     TYPE   PUBLISHER   AGE
 installed-redhat-metering-operators-openshift-metering   Custom   grpc   Custom      2m56s
 ```
 
 You should also see a pod with a name resembling `metering-operators-12345` in the `openshift-marketplace` namespace, this pod is the package registry pod OLM will use to get the `metering` package contents:
 
-```
-kubectl -n openshift-marketplace get pods
+```bash
+$ kubectl -n openshift-marketplace get pods
 NAME                                                              READY   STATUS    RESTARTS   AGE
 certified-operators-7f89948b85-mpzw6                              1/1     Running   0          3h36m
 community-operators-7c7b9447cf-gzp78                              1/1     Running   0          3h36m
@@ -52,7 +52,7 @@ Next, you will create an `OperatorGroup` in your namespace that restricts the na
 
 Download the `metering-operators` [metering.operatorgroup.yaml][metering-operatorgroup] and install it into the `openshift-metering` namespace:
 
-```
+```bash
 kubectl -n openshift-metering apply -f metering.operatorgroup.yaml
 ```
 
@@ -60,8 +60,7 @@ Lastly, create a `Subscription` to install the metering-operator.
 
 Download the [metering.subscription.yaml][metering-subscription] and install it into the `openshift-metering` namespace:
 
-
-```
+```bash
 kubectl -n openshift-metering apply -f metering.subscription.yaml
 ```
 
@@ -69,8 +68,8 @@ Once the subscription is created, OLM will create all the required resources for
 This step takes a bit longer than others, within a few minutes the metering-operator pod should be created.
 Verify the metering-operator has been created and is running:
 
-```
-kubectl -n openshift-metering get pods
+```bash
+$ kubectl -n openshift-metering get pods
 NAME                                READY   STATUS    RESTARTS   AGE
 metering-operator-c7545d555-h5m6x   2/2     Running   0          32s
 ```
@@ -90,14 +89,14 @@ To start, download the example [default.yaml][default-config] `MeteringConfig` r
 
 To install all the components that make up Metering, install your `metering.yaml` into the cluster:
 
-```
+```bash
 kubectl -n openshift-metering apply -f metering.yaml
 ```
 
 Within a minute you should see resources being created in your namespace:
 
-```
-kubectl -n openshift-metering get pods
+```bash
+$ kubectl -n openshift-metering get pods
 NAME                                  READY   STATUS              RESTARTS   AGE
 hive-metastore-0                      1/2     Running             0          52s
 hive-server-0                         2/3     Running             0          52s
@@ -112,7 +111,7 @@ Some pods may restart if other pods take too long to start, this is okay and can
 
 Eventually your pod output should look like this:
 
-```
+```bash
 NAME                                  READY   STATUS    RESTARTS   AGE
 hive-metastore-0                      2/2     Running   0          3m28s
 hive-server-0                         3/3     Running   0          3m28s
@@ -124,7 +123,7 @@ reporting-operator-5588964bf8-x2tkn   2/2     Running   0          2m40s
 Next, verify that the ReportDataSources are beginning to import data, indicated by a valid timestamp in the `EARLIEST METRIC` column (this may take a few minutes).
 We filter out the "-raw" ReportDataSources which don't import data:
 
-```
+```bash
 $ kubectl get reportdatasources -n $METERING_NAMESPACE | grep -v raw
 NAME                                         EARLIEST METRIC        NEWEST METRIC          IMPORT START           IMPORT END             LAST IMPORT TIME       AGE
 node-allocatable-cpu-cores                   2019-08-05T16:52:00Z   2019-08-05T18:52:00Z   2019-08-05T16:52:00Z   2019-08-05T18:52:00Z   2019-08-05T18:54:45Z   9m50s

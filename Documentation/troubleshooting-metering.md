@@ -19,7 +19,6 @@ Metering requires that a default Storage Class be configured for dynamic provisi
 
 See [configuring metering][configuring-metering-storage] for information on how to check if there are any StorageClasses configured for the cluster, how to set the default, and how to configure Metering to use a StorageClass other than the default.
 
-
 [resource-troubleshooting]: https://kubernetes.io/docs/concepts/configuration/manage-compute-resources-container/#troubleshooting
 [prerequisites]: install-metering.md#prerequisites
 [configuring-metering-storage]: metering-config.md#dynamically-provisioning-persistent-volumes-using-storage-classes

@@ -15,7 +15,7 @@ If the report has a schedule, it will wait until the period currently being proc
 
 The following example Report will contain information on every Pod's CPU requests, and will run every hour, adding the last hours worth of data each time it runs.
 
-```
+```yaml
 apiVersion: metering.openshift.io/v1
 kind: Report
 metadata:
@@ -35,7 +35,7 @@ spec:
 The following example report will contain information on every Pod's CPU requests for all of July.
 After completion it does not run again.
 
-```
+```yaml
 apiVersion: metering.openshift.io/v1
 kind: Report
 metadata:
@@ -55,8 +55,8 @@ The report query controls the schema of the report as well how the results are p
 
 Use `kubectl` to obtain a list of available `ReportQuery` objects:
 
- ```
- kubectl -n $METERING_NAMESPACE get reportqueries
+ ```bash
+$ kubectl -n $METERING_NAMESPACE get reportqueries
 NAME                                         AGE
 cluster-cpu-capacity                         23m
 cluster-cpu-capacity-raw                     23m
@@ -119,8 +119,8 @@ The `aws-ec2-billing-data` report is used by other queries, and should not be us
 
 For a complete list of fields each report query produces, use `kubectl` to get the object as YAML, and check the `columns` field:
 
-```
-kubectl -n $METERING_NAMESPACE get reportqueries namespace-memory-request -o yaml
+```bash
+$ kubectl -n $METERING_NAMESPACE get reportqueries namespace-memory-request -o yaml
 
 apiVersion: metering.openshift.io/v1
 kind: ReportQuery
@@ -150,7 +150,7 @@ The schedule block defines when the report runs. The main fields in the `schedul
 
 For example, if `period` is set to `weekly`, you can add a `weekly` key to the `schedule` block. The following example will run once a week on Wednesday, at 1 PM.
 
-```
+```yaml
 ...
   schedule:
     period: "weekly"
@@ -206,7 +206,7 @@ If `reportingStart` is left unset, the Report will run at the next full reportin
 
 As an example of how to use this field, if you had data already collected dating back to January 1st, 2019 which you wanted to be included in your Report, you could create a report with the following values:
 
-```
+```yaml
 apiVersion: metering.openshift.io/v1
 kind: Report
 metadata:
@@ -218,7 +218,6 @@ spec:
   reportingStart: "2019-01-01T00:00:00Z"
 ```
 
-
 ### reportingEnd
 
 To configure a Report to only run until a specified time, you can set the `spec.reportingEnd` field to an [RFC3339][rfc3339] timestamp.
@@ -228,7 +227,7 @@ If left unset, then the Report will run forever, or until a `reportingEnd` is se
 
 For example, if you wanted to create a report that runs once a week for the month of July:
 
-```
+```yaml
 apiVersion: metering.openshift.io/v1
 kind: Report
 metadata:
@@ -241,10 +240,10 @@ spec:
   reportingEnd: "2019-07-31T00:00:00Z"
 ```
 
-### expiration 
+### expiration
 
 Add the expiration field to set a retention period on a scheduled metering Report. You can avoid manually removing the Report by setting the expiration duration value. The retention period is equal to the Report creationDate plus the `expiration` duration. The Report is removed from the cluster at the end of the retention period if no other Reports or ReportQueries depend on the expiring Report. Deleting the Report from the cluster can take several minutes.
-	
+
 Setting the expiration field is not recommended for roll-up or aggregated reports. If a Report is depended upon by other Reports or ReportQueries, then the Report is not removed at the end of the retention period. You can view the reporting-operator logs at debug level for the timing output around a Report retention decision.
 
 For example, the following scheduled Report is deleted 30 minutes after the `metadata.creationDate` of the Report:
@@ -259,10 +258,10 @@ spec:
   schedule:
     period: "weekly"
   reportingStart: "2020-09-01T00:00:00Z"
-  expiration: "30m" 
+  expiration: "30m"
 ```
 
-Valid time units for the expiration duration are ns, us (or µs), ms, s, m, and h.	
+Valid time units for the expiration duration are ns, us (or µs), ms, s, m, and h.
 
 The expiration retention period for a Report is not precise and works on the order of several minutes, not nanoseconds.
 
@@ -300,7 +299,7 @@ The ReportQuery template processor provides a function: `reportTableName` that c
 
 Below is a snippet taken from a built-in query:
 
-```
+```yaml
 # Taken from pod-cpu.yaml
 spec:
 ...
@@ -325,7 +324,7 @@ spec:
 ...
 ```
 
-```
+```yaml
 # aggregated-report.yaml
 spec:
   query: "namespace-cpu-usage"

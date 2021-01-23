@@ -36,7 +36,7 @@ To read more details on how the different ReportDataSources work, read the [mete
 For ReportDataSources with a `spec.prometheusMetricsImporter` present, their tables have the following database table schema:
 
 - `timestamp`: The type of this column is `timestamp`. This is the time which the metric was collected.
-   - Note: `timestamp` is also a reserved keyword (for the column type) in Presto, meaning any queries using it must use quotes to refer to the column, like so: `SELECT "timestamp" FROM datasource_unready_deployment_replicas LIMIT 1;`
+  - Note: `timestamp` is also a reserved keyword (for the column type) in Presto, meaning any queries using it must use quotes to refer to the column, like so: `SELECT "timestamp" FROM datasource_unready_deployment_replicas LIMIT 1;`
 - `timeprecision`: The type of this column is a `double`. This is "query resolution step width" used to query this metric from Prometheus. This defines how accurate the data is. The bigger the value, the less accurate. This value is controlled globally by the operator, and has a default value of 60.
 - `labels`: The type of this column is a `map(varchar, varchar)`. This is the set of Prometheus labels and their values for the metric.
 - `amount`: The type of this column is a `double`. Amount is the value of the metric at that `timestamp`
@@ -45,7 +45,7 @@ For ReportDataSources with a `spec.prometheusMetricsImporter` present, their tab
 
 Below is an example of one of the built-in `ReportDataSource` resources that is installed with Metering Operator by default.
 
-```
+```yaml
 apiVersion: metering.openshift.io/v1
 kind: ReportDataSource
 metadata:
@@ -60,7 +60,7 @@ spec:
 
 If the data to be scraped is on a non-default Prometheus instance:
 
-```
+```yaml
 apiVersion: metering.openshift.io/v1
 kind: ReportDataSource
 metadata:
@@ -86,7 +86,7 @@ It also enables re-use by allowing you to create a view containing the complexit
 This example exposes the `pod-memory-request-raw` ReportQuery as a view.
 The schema is based on the `spec.columns` of the ReportQuery.
 
-```
+```yaml
 apiVersion: metering.openshift.io/v1
 kind: ReportDataSource
 metadata:
@@ -100,7 +100,7 @@ spec:
 
 If you wanted to specify some inputs to a [ReportQuery that accepts inputs][query-inputs], you can set them in the `spec.reportQueryView.inputs`:
 
-```
+```yaml
 apiVersion: metering.openshift.io/v1
 kind: ReportDataSource
 metadata:
@@ -123,7 +123,7 @@ For ReportDataSources with a `spec.awsBilling` present, see [here](aws-billing-d
 
 ### Example AWS Billing Datasource
 
-```
+```yaml
 apiVersion: metering.openshift.io/v1
 kind: ReportDataSource
 metadata:
@@ -146,7 +146,7 @@ A PrestoTable ReportDataSource is merely a way to expose an arbitrary table to t
 
 ### Example PrestoTable Datasource
 
-```
+```yaml
 apiVersion: metering.openshift.io/v1
 kind: ReportDataSource
 metadata:
