@@ -230,10 +230,10 @@ func TestManualMeteringInstall(t *testing.T) {
 			MeteringConfigManifestFilename: "node-selector-prometheus-importer-disabled.yaml",
 		},
 		{
-			Name:                      "HDFS-ReportDynamicInputData",
+			Name:                      "HDFS-MYSQL-ReportDynamicInputData",
 			MeteringOperatorImageRepo: meteringOperatorImageRepo,
 			MeteringOperatorImageTag:  meteringOperatorImageTag,
-			Skip:                      false,
+			PreInstallFunc:            createMySQLDatabase,
 			InstallSubTests: []InstallTestCase{
 				{
 					Name:     "testReportingProducesData",
@@ -250,8 +250,12 @@ func TestManualMeteringInstall(t *testing.T) {
 					Name:     "testFailedPrometheusQueryEvents",
 					TestFunc: testFailedPrometheusQueryEvents,
 				},
+				{
+					Name:     "testEnsurePostgresParametersAreMissing",
+					TestFunc: testEnsurePostgresParametersAreMissing,
+				},
 			},
-			MeteringConfigManifestFilename: "prometheus-metrics-importer-enabled.yaml",
+			MeteringConfigManifestFilename: "mysql.yaml",
 		},
 		{
 			Name:                      "HDFS-ReportStaticInputData",
@@ -294,36 +298,12 @@ func TestManualMeteringInstall(t *testing.T) {
 					Name:     "testReportIsNotDeletedWhenReportDependsOnIt",
 					TestFunc: testReportIsNotDeletedWhenReportDependsOnIt,
 				},
-			},
-			MeteringConfigManifestFilename: "prometheus-metrics-importer-disabled.yaml",
-		},
-		{
-			Name:                      "HDFS-MySQLDatabase",
-			MeteringOperatorImageRepo: meteringOperatorImageRepo,
-			MeteringOperatorImageTag:  meteringOperatorImageTag,
-			PreInstallFunc:            createMySQLDatabase,
-			InstallSubTests: []InstallTestCase{
-				{
-					Name:     "testReportingProducesData",
-					TestFunc: testReportingProducesData,
-					ExtraEnvVars: []string{
-						"REPORTING_OPERATOR_PROMETHEUS_DATASOURCE_MAX_IMPORT_BACKFILL_DURATION=15m",
-						"REPORTING_OPERATOR_PROMETHEUS_METRICS_IMPORTER_INTERVAL=30s",
-						"REPORTING_OPERATOR_PROMETHEUS_METRICS_IMPORTER_CHUNK_SIZE=5m",
-						"REPORTING_OPERATOR_PROMETHEUS_METRICS_IMPORTER_INTERVAL=5m",
-						"REPORTING_OPERATOR_PROMETHEUS_METRICS_IMPORTER_STEP_SIZE=60s",
-					},
-				},
-				{
-					Name:     "testFailedPrometheusQueryEvents",
-					TestFunc: testFailedPrometheusQueryEvents,
-				},
 				{
 					Name:     "testEnsurePostgresParametersAreMissing",
 					TestFunc: testEnsurePostgresParametersAreMissing,
 				},
 			},
-			MeteringConfigManifestFilename: "mysql.yaml",
+			MeteringConfigManifestFilename: "prometheus-metrics-importer-disabled.yaml",
 		},
 		{
 			Name:                      "S3-ReportDynamicInputData",
@@ -349,9 +329,8 @@ func TestManualMeteringInstall(t *testing.T) {
 					},
 				},
 				{
-					Name:         "testEnsureS3BucketIsDeleted",
-					TestFunc:     testEnsureS3BucketIsDeleted,
-					ExtraEnvVars: []string{},
+					Name:     "testEnsureS3BucketIsDeleted",
+					TestFunc: testEnsureS3BucketIsDeleted,
 				},
 				{
 					Name:     "testFailedPrometheusQueryEvents",

@@ -60,6 +60,7 @@ spec:
           username: testuser
           password: testpass
           url: jdbc:mysql://mysql.mysql.svc.cluster.local:3306/metastore
+
   hadoop:
     spec:
       hdfs:
