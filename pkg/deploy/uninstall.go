@@ -131,7 +131,7 @@ func (deploy *Deployer) uninstallMeteringResources() error {
 		return fmt.Errorf("failed to delete the metering role binding: %v", err)
 	}
 
-	if deploy.config.DeleteCRB {
+	if deploy.config.DeleteCRBs {
 		err = deploy.uninstallMeteringClusterRole()
 		if err != nil {
 			return fmt.Errorf("failed to delete the metering cluster role: %v", err)

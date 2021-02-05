@@ -66,7 +66,7 @@ type Config struct {
 	SkipMeteringDeployment   bool
 	RunMeteringOperatorLocal bool
 	DeleteCRDs               bool
-	DeleteCRB                bool
+	DeleteCRBs               bool
 	DeleteNamespace          bool
 	DeletePVCs               bool
 	DeleteAll                bool
@@ -139,7 +139,7 @@ func NewDeployer(
 	if deploy.config.DeleteAll {
 		deploy.config.DeletePVCs = true
 		deploy.config.DeleteNamespace = true
-		deploy.config.DeleteCRB = true
+		deploy.config.DeleteCRBs = true
 		deploy.config.DeleteCRDs = true
 	}
 	if deploy.config.Namespace == "" {
@@ -220,7 +220,7 @@ func (deploy *Deployer) UninstallOLM() error {
 			return fmt.Errorf("failed to uninstall the %s metering namespace: %v", deploy.config.Namespace, err)
 		}
 	}
-	if deploy.config.DeleteCRB {
+	if deploy.config.DeleteCRBs {
 		err = deploy.uninstallReportingOperatorClusterRole()
 		if err != nil {
 			return fmt.Errorf("failed to delete the reporting-operator ClusterRole resources: %v", err)
