@@ -10,7 +10,6 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/kube-reporting/metering-operator/test/deployframework"
 	"github.com/kube-reporting/metering-operator/test/reportingframework"
 	"github.com/kube-reporting/metering-operator/test/testhelpers"
 )
@@ -19,9 +18,8 @@ const (
 	// TODO: support upgrading from a custom registry image instead
 	// of defaulting to the redhat-operators CatalogSource and waiting
 	// for GA-ed channels to be exposed.
-	upgradeFromCatalogSource          = "custom-metering-image"
+	upgradeFromCatalogSource          = "redhat-operators"
 	upgradeFromCatalogSourceNamespace = "openshift-marketplace"
-	upgradeFromImage                  = "quay.io/tflannag/metering-index:4.5"
 )
 
 func testManualOLMUpgradeInstall(
@@ -59,9 +57,6 @@ func testManualOLMUpgradeInstall(
 
 	mc, err := testhelpers.DecodeMeteringConfigManifest(repoPath, testMeteringConfigManifestsPath, manifestFilename)
 	require.NoError(t, err, "failed to successfully decode the YAML MeteringConfig manifest")
-
-	_, err = deployframework.CreateCatalogSourceFromImage(df.Logger, df.OLMV1Alpha1Client, upgradeFromCatalogSource, upgradeFromCatalogSourceNamespace, upgradeFromImage)
-	require.NoError(t, err, "failed to create a custom catalogsource")
 
 	deployerCtx, err := df.NewDeployerCtx(
 		testFuncNamespace,
