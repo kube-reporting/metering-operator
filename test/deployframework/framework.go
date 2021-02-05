@@ -36,11 +36,14 @@ const (
 
 	defaultTargetPods        = 7
 	defaultPlatform          = "openshift"
-	defaultDeleteNamespace   = true
-	defaultDeleteCRB         = true
 	defaultSubscriptionName  = "metering-ocp"
 	defaultCatalogSourceName = "metering-dev-catalogsource"
 	defaultPackageName       = "metering-ocp"
+
+	DefaultDeleteNamespace = true
+	DefaultDeleteCRB       = true
+	DefaultDeletePVC       = true
+	DefaultDeleteCRD       = false
 
 	manifestsDeployDir = "manifests/deploy"
 	olmManifestsDir    = "olm_deploy/manifests/"
@@ -149,6 +152,10 @@ func (df *DeployFramework) NewDeployerConfig(
 	catalogSourceName,
 	catalogSourceNamespace,
 	subscriptionChannel string,
+	deleteNamespace,
+	deleteCRDs,
+	deleteCRBs,
+	deletePVCs bool,
 	spec metering.MeteringConfigSpec,
 ) (*deploy.Config, error) {
 	meteringConfig := &metering.MeteringConfig{
@@ -196,8 +203,10 @@ func (df *DeployFramework) NewDeployerConfig(
 		Repo:                   meteringOperatorImageRepo,
 		Tag:                    meteringOperatorImageTag,
 		Platform:               defaultPlatform,
-		DeleteNamespace:        defaultDeleteNamespace,
-		DeleteCRB:              defaultDeleteCRB,
+		DeleteNamespace:        deleteNamespace,
+		DeleteCRDs:             deleteCRDs,
+		DeleteCRBs:             deleteCRBs,
+		DeletePVCs:             deletePVCs,
 		SubscriptionName:       defaultSubscriptionName,
 		PackageName:            defaultPackageName,
 		CatalogSourceName:      catalogSourceName,

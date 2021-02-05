@@ -87,6 +87,10 @@ func (df *DeployFramework) NewDeployerCtx(
 	subscriptionChannel,
 	outputPath string,
 	extraLocalEnvVars []string,
+	deleteNamespace,
+	deleteCRD,
+	deleteCRB,
+	deletePVC bool,
 	spec metering.MeteringConfigSpec,
 ) (*DeployerCtx, error) {
 	cfg, err := df.NewDeployerConfig(
@@ -98,6 +102,10 @@ func (df *DeployFramework) NewDeployerCtx(
 		catalogSourceName,
 		catalogSourceNamespace,
 		subscriptionChannel,
+		deleteNamespace,
+		deleteCRD,
+		deleteCRB,
+		deletePVC,
 		spec,
 	)
 	if err != nil {

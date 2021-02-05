@@ -74,6 +74,10 @@ func testManualOLMUpgradeInstall(
 		upgradeFromSubscriptionChannel,
 		preUpgradeTestOutputDir,
 		testInstallFunction.ExtraEnvVars,
+		deployframework.DefaultDeleteNamespace,
+		deployframework.DefaultDeleteCRD,
+		deployframework.DefaultDeleteCRB,
+		deployframework.DefaultDeletePVC,
 		mc.Spec,
 	)
 	require.NoError(t, err, "creating a new deployer context should produce no error")
