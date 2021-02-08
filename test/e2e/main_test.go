@@ -112,14 +112,20 @@ func testMainWrapper(m *testing.M) int {
 	if len(namespacePrefix) > namespacePrefixCharLimit {
 		logger.Fatalf("Error: the --namespace-prefix exceeds the limit of %d characters", namespacePrefixCharLimit)
 	}
-
-	var err error
-	if df, err = deployframework.New(logger, runTestsLocal, runDevSetup, namespacePrefix, repoPath, repoVersion, kubeConfig); err != nil {
-		logger.Fatalf("Failed to create a new deploy framework: %v", err)
-	}
-
 	if indexImage == "" {
 		logger.Fatalf("You need to specify a non-empty --index-image flag value")
+	}
+	if testOutputPath == "" {
+		logger.Fatalf("You need to specify a non-empty --test-output-path flag value")
+	}
+	_, err := os.Stat(testOutputPath)
+	if err != nil {
+		logger.Fatal(err)
+	}
+
+	df, err := deployframework.New(logger, runTestsLocal, runDevSetup, namespacePrefix, repoPath, repoVersion, kubeConfig)
+	if err != nil {
+		logger.Fatalf("Failed to create a new deploy framework: %v", err)
 	}
 
 	// TODO: determine whether it makes sense to have a toggle for creating
