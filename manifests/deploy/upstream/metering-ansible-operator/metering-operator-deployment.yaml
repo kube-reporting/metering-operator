@@ -21,7 +21,7 @@ spec:
         runAsNonRoot: true
       containers:
       - name: operator
-        image: "quay.io/coreos/metering-ansible-operator:release-4.7"
+        image: "quay.io/coreos/metering-ansible-operator:release-4.8"
         imagePullPolicy: Always
         args:
         - "--zap-log-level=info"
@@ -40,17 +40,17 @@ spec:
             fieldRef:
               fieldPath: metadata.namespace
         - name: METERING_ANSIBLE_OPERATOR_IMAGE
-          value: "quay.io/coreos/metering-ansible-operator:release-4.7"
+          value: "quay.io/coreos/metering-ansible-operator:release-4.8"
         - name: METERING_REPORTING_OPERATOR_IMAGE
-          value: "quay.io/coreos/metering-reporting-operator:release-4.7"
+          value: "quay.io/coreos/metering-reporting-operator:release-4.8"
         - name: METERING_PRESTO_IMAGE
-          value: "quay.io/coreos/presto:release-4.7"
+          value: "quay.io/coreos/presto:release-4.8"
         - name: METERING_HIVE_IMAGE
-          value: "quay.io/coreos/hive:release-4.7"
+          value: "quay.io/coreos/hive:release-4.8"
         - name: METERING_HADOOP_IMAGE
-          value: "quay.io/coreos/hadoop:release-4.7"
+          value: "quay.io/coreos/hadoop:release-4.8"
         - name: GHOSTUNNEL_IMAGE
-          value: "quay.io/coreos/metering-ghostunnel:release-4.7"
+          value: "quay.io/coreos/metering-ghostunnel:release-4.8"
         ports:
         - name: http-metrics
           containerPort: 8383

@@ -1,4 +1,4 @@
 packageName: metering-ocp
 channels:
-- currentCSV: metering-operator.v4.7.0
-  name: "4.7"
+- currentCSV: metering-operator.v4.8.0
+  name: "4.8"
