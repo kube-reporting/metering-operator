@@ -51,7 +51,7 @@ func testManualMeteringInstall(
 	// create a directory used to store the @testCaseName container and resource logs
 	testCaseOutputBaseDir := filepath.Join(testOutputPath, testCaseName)
 	err := os.Mkdir(testCaseOutputBaseDir, 0777)
-	assert.NoError(t, err, "creating the test case output directory should produce no error")
+	require.NoError(t, err, "creating the test case output directory should produce no error")
 
 	testFuncNamespace := fmt.Sprintf("%s-%s", namespacePrefix, strings.ToLower(testCaseName))
 	if len(testFuncNamespace) > kubeNamespaceCharLimit {
