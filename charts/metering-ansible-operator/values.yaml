@@ -224,7 +224,7 @@ olm:
   csv:
     name : metering-operator.v4.8.0
     version: "4.8.0"
-    skipRange: ">=4.4.0 <4.8.0"
+    skipRange: ">=4.5.0 <4.8.0"
     minKubeVersion: 1.18.3
     displayName: Metering
     description: |

@@ -106,7 +106,7 @@ func init() {
 	olmInstallCmd.Flags().StringVar(&cfg.CatalogSourceName, "catalog-source", "redhat-operators", "The name of the metering subscription that gets created.")
 	olmInstallCmd.Flags().StringVar(&cfg.CatalogSourceNamespace, "catalog-source-namespace", "openshift-marketplace", "The name of the metering subscription that gets created.")
 	olmInstallCmd.Flags().StringVar(&cfg.PackageName, "package", "metering-ocp", "The name of an existing package manifest from a CatalogSource.")
-	olmInstallCmd.Flags().StringVar(&cfg.Channel, "channel", "4.4", "The metering channel to subscribe to. Examples: 4.2, 4.3, 4.4, etc.")
+	olmInstallCmd.Flags().StringVar(&cfg.Channel, "channel", "4.6", "The metering channel to subscribe to. Examples: 4.2, 4.3, 4.4, etc.")
 
 	if err := initFlagsFromEnv(); err != nil {
 		log.WithError(err).Fatalf("Failed to update flags from ENV vars: %v", err)
