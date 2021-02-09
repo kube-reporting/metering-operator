@@ -4,7 +4,7 @@ set -e
 ROOT_DIR=$(dirname "${BASH_SOURCE}")/..
 source "${ROOT_DIR}/hack/common.sh"
 
-current_version=${1:-4.7}
+current_version=${1:-4.8}
 
 TMPDIR="$(mktemp -d)"
 trap "rm -rf $TMPDIR" EXIT

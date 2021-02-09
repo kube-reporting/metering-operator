@@ -5,25 +5,25 @@ spec:
   tags:
   - from:
       kind: DockerImage
-      name: quay.io/coreos/metering-ansible-operator:release-4.7
+      name: quay.io/coreos/metering-ansible-operator:release-4.8
     name: metering-ansible-operator
   - from:
       kind: DockerImage
-      name: quay.io/coreos/metering-reporting-operator:release-4.7
+      name: quay.io/coreos/metering-reporting-operator:release-4.8
     name: metering-reporting-operator
   - from:
       kind: DockerImage
-      name: quay.io/coreos/presto:release-4.7
+      name: quay.io/coreos/presto:release-4.8
     name: metering-presto
   - from:
       kind: DockerImage
-      name: quay.io/coreos/hive:release-4.7
+      name: quay.io/coreos/hive:release-4.8
     name: metering-hive
   - from:
       kind: DockerImage
-      name: quay.io/coreos/hadoop:release-4.7
+      name: quay.io/coreos/hadoop:release-4.8
     name: metering-hadoop
   - from:
       kind: DockerImage
-      name: quay.io/coreos/metering-ghostunnel:release-4.7
+      name: quay.io/coreos/metering-ghostunnel:release-4.8
     name: ghostunnel

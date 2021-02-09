@@ -5,29 +5,29 @@ spec:
   tags:
   - from:
       kind: DockerImage
-      name: quay.io/openshift/origin-metering-ansible-operator:4.7
+      name: quay.io/openshift/origin-metering-ansible-operator:4.8
     name: metering-ansible-operator
   - from:
       kind: DockerImage
-      name: quay.io/openshift/origin-metering-reporting-operator:4.7
+      name: quay.io/openshift/origin-metering-reporting-operator:4.8
     name: metering-reporting-operator
   - from:
       kind: DockerImage
-      name: quay.io/openshift/origin-metering-presto:4.7
+      name: quay.io/openshift/origin-metering-presto:4.8
     name: metering-presto
   - from:
       kind: DockerImage
-      name: quay.io/openshift/origin-metering-hive:4.7
+      name: quay.io/openshift/origin-metering-hive:4.8
     name: metering-hive
   - from:
       kind: DockerImage
-      name: quay.io/openshift/origin-metering-hadoop:4.7
+      name: quay.io/openshift/origin-metering-hadoop:4.8
     name: metering-hadoop
   - from:
       kind: DockerImage
-      name: quay.io/openshift/origin-ghostunnel:4.7
+      name: quay.io/openshift/origin-ghostunnel:4.8
     name: ghostunnel
   - from:
       kind: DockerImage
-      name: quay.io/openshift/origin-oauth-proxy:4.7
+      name: quay.io/openshift/origin-oauth-proxy:4.8
     name: oauth-proxy

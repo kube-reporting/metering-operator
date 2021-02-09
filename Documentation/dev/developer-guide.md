@@ -133,7 +133,7 @@ When interacting with these Makefile targets, we expose several variables to hel
 
 - `$TEST_OUTPUT_PATH`: Controls where all of the testing artifacts are stored. Defaults to a /tmp/ directory that gets created.
 - `$TEST_LOG_LEVEL`: Controls the log verbosity that gets logged to files and stdout. Defaults to "debug".
-- `$METERING_OLM_SUBSCRIPTION_CHANNEL`: Specifies what channel of Metering should be deployed when creating Subscription custom resources. Defaults to the "4.7" channel.
+- `$METERING_OLM_SUBSCRIPTION_CHANNEL`: Specifies what channel of Metering should be deployed when creating Subscription custom resources. Defaults to the "4.8" channel.
 - `$EXTRA_TEST_FLAGS`: Specifies any additional `go test` flags that should be run. Useful for when you want to only run the manual metering tests, or just the upgrade ones.
 
 For a full list, check out the [./hack/e2e.sh bash script](https://github.com/kube-reporting/metering-operator/blob/master/hack/e2e.sh).
