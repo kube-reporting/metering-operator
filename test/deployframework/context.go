@@ -176,7 +176,7 @@ func (ctx *DeployerCtx) NewLocalCtx() *LocalCtx {
 // Setup handles the process of deploying metering, and waiting for all the necessary
 // resources to become ready in order to proceeed with running the reporting tests.
 // This returns an initialized reportingframework object, or an error if there is any.
-func (ctx *DeployerCtx) Setup(installFunc func() error, expectInstallErr bool) (*reportingframework.ReportingFramework, error) {
+func (ctx *DeployerCtx) Setup(installFunc func() error) (*reportingframework.ReportingFramework, error) {
 	var (
 		installErrMsg    string
 		routeBearerToken string
@@ -187,13 +187,9 @@ func (ctx *DeployerCtx) Setup(installFunc func() error, expectInstallErr bool) (
 	// that error message until after the reportingframework has been constructed.
 	err := installFunc()
 	if err != nil {
-		installErr = true
 		installErrMsg = fmt.Sprintf("failed to install metering: %v", err)
 		ctx.Logger.Infof(installErrMsg)
-
-		if !expectInstallErr {
-			return nil, fmt.Errorf(installErrMsg)
-		}
+		return nil, fmt.Errorf(installErrMsg)
 	}
 
 	if !installErr {

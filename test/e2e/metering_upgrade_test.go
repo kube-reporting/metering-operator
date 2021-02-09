@@ -75,14 +75,8 @@ func testManualOLMUpgradeInstall(
 		canSafelyRunTest bool
 		rf               *reportingframework.ReportingFramework
 	)
-	rf, err = deployerCtx.Setup(deployerCtx.Deployer.InstallOLM, expectInstallErr)
-	if canSafelyRunTest = testhelpers.AssertCanSafelyRunReportingTests(t, err, expectInstallErr, expectInstallErrMsg); !canSafelyRunTest {
-		// if we encounter an unexpected Setup error, fail this test case
-		// early and gather the metering and OLM resource logs we care about.
-		err = deployerCtx.MustGatherMeteringResources(gatherTestArtifactsScript)
-		assert.NoError(t, err, "gathering metering resources should produce no error")
-		t.Fatal("Exiting test case early as the pre-upgrade tests failed")
-	}
+	rf, err = deployerCtx.Setup(deployerCtx.Deployer.InstallOLM)
+	require.NoError(t, err, "failed to successfully the pre-upgrade metering installation")
 
 	preUpgradeTestName := fmt.Sprintf("pre-upgrade-%s", testInstallFunction.Name)
 	t.Run(preUpgradeTestName, func(t *testing.T) {
