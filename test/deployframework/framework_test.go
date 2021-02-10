@@ -39,7 +39,7 @@ func TestNewDeployerConfig(t *testing.T) {
 		CatalogSourceName:      testCatalogSourceName,
 		CatalogSourceNamespace: testCatalogSourceNamespace,
 		Channel:                testSubscriptionChannel,
-		DeleteCRB:              defaultDeleteCRB,
+		DeleteCRBs:             defaultDeleteCRB,
 		DeleteNamespace:        defaultDeleteNamespace,
 		ExtraNamespaceLabels: map[string]string{
 			"name": fmt.Sprintf("%s-%s", df.NamespacePrefix, testNamespaceLabel),
