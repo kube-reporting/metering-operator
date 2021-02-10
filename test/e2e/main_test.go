@@ -178,8 +178,6 @@ func TestManualMeteringInstall(t *testing.T) {
 		MeteringOperatorImageRepo      string
 		MeteringOperatorImageTag       string
 		Skip                           bool
-		ExpectInstallErr               bool
-		ExpectInstallErrMsg            []string
 		InstallSubTests                []InstallTestCase
 		PreInstallFunc                 PreInstallFunc
 		MeteringConfigManifestFilename string
@@ -388,8 +386,6 @@ func TestManualMeteringInstall(t *testing.T) {
 				catalogSourceNamespace,
 				subscriptionChannel,
 				testOutputPath,
-				testCase.ExpectInstallErrMsg,
-				testCase.ExpectInstallErr,
 				testCase.PreInstallFunc,
 				testCase.InstallSubTests,
 			)

@@ -44,8 +44,6 @@ func testManualMeteringInstall(
 	catalogSourceNamespace,
 	subscriptionChannel,
 	testOutputPath string,
-	expectInstallErrMsg []string,
-	expectInstallErr bool,
 	preInstallFunc PreInstallFunc,
 	testInstallFunctions []InstallTestCase,
 ) {
@@ -90,19 +88,18 @@ func testManualMeteringInstall(
 		require.NoError(t, err, "expected no error while running any pre-install functions")
 	}
 
-	rf, err := deployerCtx.Setup(deployerCtx.Deployer.InstallOLM, expectInstallErr)
-	canSafelyRunTest := testhelpers.AssertCanSafelyRunReportingTests(t, err, expectInstallErr, expectInstallErrMsg)
-	if canSafelyRunTest {
-		for _, installFunc := range testInstallFunctions {
-			installFunc := installFunc
-			t := t
+	rf, err := deployerCtx.Setup(deployerCtx.Deployer.InstallOLM)
+	require.NoError(t, err, "expected there would be no error while installing metering")
 
-			t.Run(installFunc.Name, func(t *testing.T) {
-				installFunc.TestFunc(t, rf)
-			})
+	for _, installFunc := range testInstallFunctions {
+		installFunc := installFunc
+		t := t
 
-			deployerCtx.Logger.Infof("The %s test has finished running", installFunc.Name)
-		}
+		t.Run(installFunc.Name, func(t *testing.T) {
+			installFunc.TestFunc(t, rf)
+		})
+
+		deployerCtx.Logger.Infof("The %s test has finished running", installFunc.Name)
 	}
 
 	err = deployerCtx.Teardown(deployerCtx.Deployer.UninstallOLM)
