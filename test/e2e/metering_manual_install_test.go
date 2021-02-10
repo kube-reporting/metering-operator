@@ -113,12 +113,13 @@ func testManualMeteringInstall(
 // namespaces that match that label. Note: manually running the e2e suite
 // specifying a list of go test flags does not ensure proper cleanup.
 func createTestingNamespace(client kubernetes.Interface, namespace string) (*corev1.Namespace, error) {
+	var ns *corev1.Namespace
 	ns, err := client.CoreV1().Namespaces().Get(context.Background(), namespace, metav1.GetOptions{})
 	if err != nil && !apierrors.IsNotFound(err) {
 		return nil, err
 	}
 	if apierrors.IsNotFound(err) {
-		ns := &corev1.Namespace{
+		ns = &corev1.Namespace{
 			ObjectMeta: metav1.ObjectMeta{
 				Name: namespace,
 				Labels: map[string]string{
@@ -126,9 +127,9 @@ func createTestingNamespace(client kubernetes.Interface, namespace string) (*cor
 				},
 			},
 		}
-		_, err = client.CoreV1().Namespaces().Create(context.Background(), ns, metav1.CreateOptions{})
+		ns, err = client.CoreV1().Namespaces().Create(context.Background(), ns, metav1.CreateOptions{})
 		if err != nil {
-			return ns, nil
+			return nil, err
 		}
 	}
 	return ns, nil
