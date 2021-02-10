@@ -197,7 +197,7 @@ func (df *DeployFramework) NewDeployerConfig(
 		Tag:                    meteringOperatorImageTag,
 		Platform:               defaultPlatform,
 		DeleteNamespace:        defaultDeleteNamespace,
-		DeleteCRB:              defaultDeleteCRB,
+		DeleteCRBs:             defaultDeleteCRB,
 		SubscriptionName:       defaultSubscriptionName,
 		PackageName:            defaultPackageName,
 		CatalogSourceName:      catalogSourceName,
