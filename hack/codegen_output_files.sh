@@ -14,6 +14,6 @@ ROOT_DIR="$SCRIPT_DIR/.."
 DIRS=("${ROOT_DIR}/pkg/generated" "./pkg/operator/prestostore/mock")
 
 for DIR in "${DIRS[@]}"; do
-    OUTPUT=$(find "$(realpath ${DIR})" -type f -name '*.go')
+    OUTPUT=$(find "$(realpath "${DIR}")" -type f -name '*.go')
     echo "$OUTPUT"
 done

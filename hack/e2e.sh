@@ -5,7 +5,9 @@ set -e
 : "${KUBECONFIG:?}"
 
 ROOT_DIR=$(dirname "${BASH_SOURCE[0]}")/..
+# shellcheck disable=SC1090
 source "${ROOT_DIR}/hack/common.sh"
+# shellcheck disable=SC1090
 source "${ROOT_DIR}/hack/lib/tests.sh"
 
 function cleanup() {
@@ -41,7 +43,7 @@ EXTRA_TEST_FLAGS="${EXTRA_TEST_FLAGS:=""}"
 MANIFESTS_BASE_DIR="${MANIFESTS_BASE_DIR:=manifests/deploy}"
 METERING_SHORT_TESTS="${METERING_SHORT_TESTS:=false}"
 METERING_REPO_PATH="${METERING_REPO_PATH:=${ROOT_DIR}}"
-METERING_REPO_VERSION="$(basename $(find $MANIFESTS_BASE_DIR -type d | sort -r | head -n 1))"
+METERING_REPO_VERSION="$(basename "$(find $MANIFESTS_BASE_DIR -type d | sort -r | head -n 1)")"
 METERING_RUN_TESTS_LOCALLY="${METERING_RUN_TESTS_LOCALLY:=false}"
 METERING_OLM_SUBSCRIPTION_CHANNEL="${METERING_OLM_SUBSCRIPTION_CHANNEL:="4.8"}"
 METERING_OLM_UPGRADE_FROM_SUBSCRIPTION_CHANNEL="${METERING_OLM_UPGRADE_FROM_SUBSCRIPTION_CHANNEL:="4.6"}"

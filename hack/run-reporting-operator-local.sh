@@ -1,6 +1,7 @@
 #!/bin/bash
 
-ROOT_DIR=$(dirname "${BASH_SOURCE}")/..
+ROOT_DIR=$(dirname "${BASH_SOURCE[0]}")/..
+# shellcheck disable=SC1090
 source "${ROOT_DIR}/hack/common.sh"
 
 : "${REPORTING_OPERATOR_BIN_OUT:=$ROOT_DIR/bin/reporting-operator-local}"
@@ -35,8 +36,9 @@ function cleanup() {
 
     echo "Stopping background jobs"
     # kill any background jobs
-    local pids=$(jobs -pr)
-    [ -n "$pids" ] && kill $pids
+    pids=$(jobs -pr)
+    local pids
+    [ -n "$pids" ] && kill "$pids"
     # Wait for any jobs
     wait 2>/dev/null
 

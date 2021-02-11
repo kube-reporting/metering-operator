@@ -8,5 +8,5 @@ set -o pipefail
 ROOT_DIR=$(cd "$(dirname "${BASH_SOURCE[0]}")"/.. && pwd -P)
 
 # Sets up all common environment variables/functions
-# shellcheck source=hack/lib/init.sh
+# shellcheck disable=SC1090
 source "${ROOT_DIR}/hack/lib/init.sh"

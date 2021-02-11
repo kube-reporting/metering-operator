@@ -1,7 +1,8 @@
 #!/bin/bash
 set -e
 
-ROOT_DIR=$(dirname "${BASH_SOURCE}")/..
+ROOT_DIR=$(dirname "${BASH_SOURCE[0]}")/..
+# shellcheck disable=SC1090
 source "${ROOT_DIR}/hack/common.sh"
 
 : "${TEST_OUTPUT_DIR:="."}"
@@ -9,8 +10,7 @@ source "${ROOT_DIR}/hack/common.sh"
 : "${JUNIT_REPORT_OUTFILE:="$TEST_OUTPUT_DIR/junit-metering.xml"}"
 
 TMP_DIR="$(mktemp -d)"
-
-trap "rm -rf $TMP_DIR" exit
+trap 'rm -rf "$TMP_DIR"' exit
 
 mkdir -p "$TEST_OUTPUT_DIR"
 go test -v -coverprofile="$COVERAGE_OUTFILE" ./test/deployframework/... ./pkg/... 2>&1 | tee "$TMP_DIR/metering-test-output.txt"
