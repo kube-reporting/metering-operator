@@ -78,6 +78,10 @@ func testManualMeteringInstall(
 		subscriptionChannel,
 		testCaseOutputBaseDir,
 		envVars,
+		deployframework.DefaultDeleteNamespace,
+		deployframework.DefaultDeleteCRD,
+		deployframework.DefaultDeleteCRB,
+		deployframework.DefaultDeletePVC,
 		mc.Spec,
 	)
 	require.NoError(t, err, "creating a new deployer context should produce no error")
@@ -89,7 +93,18 @@ func testManualMeteringInstall(
 	}
 
 	rf, err := deployerCtx.Setup(deployerCtx.Deployer.InstallOLM)
-	require.NoError(t, err, "expected there would be no error while installing metering")
+	if err != nil {
+		if err != deployframework.ErrInstallPlanFailed {
+			require.NoError(t, err, "expected installing metering would produce no error")
+		}
+		t.Logf("Recreating the %s metering installation as a failed InstallPlan has been detected", deployerCtx.Namespace)
+		deployerCtx.Deployer.Config.DeleteNamespace = false
+
+		err = deployerCtx.Deployer.UninstallOLM()
+		assert.NoError(t, err, "failed to uninstall metering after encountering a failed installation")
+		rf, err = deployerCtx.Setup(deployerCtx.Deployer.InstallOLM)
+		require.NoError(t, err, "expected installing metering would produce no error")
+	}
 
 	for _, installFunc := range testInstallFunctions {
 		installFunc := installFunc
@@ -102,6 +117,7 @@ func testManualMeteringInstall(
 		deployerCtx.Logger.Infof("The %s test has finished running", installFunc.Name)
 	}
 
+	deployerCtx.Deployer.Config.DeleteNamespace = deployframework.DefaultDeleteNamespace
 	err = deployerCtx.Teardown(deployerCtx.Deployer.UninstallOLM)
 	assert.NoError(t, err, "capturing logs and uninstalling metering should produce no error")
 }

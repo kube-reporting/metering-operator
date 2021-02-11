@@ -3,6 +3,7 @@ package deployframework
 import (
 	"bufio"
 	"context"
+	"errors"
 	"fmt"
 	"net/http"
 	"net/url"
@@ -105,12 +106,77 @@ type PodWaiter struct {
 	TimeoutPeriod time.Duration
 	Logger        logrus.FieldLogger
 	Client        kubernetes.Interface
+	OLMClient     olmclientv1alpha1.OperatorsV1alpha1Interface
 }
 
 type podStat struct {
 	PodName string
 	Ready   int
 	Total   int
+}
+
+// ErrInstallPlanFailed represents a failing InstallPlan during an
+// individual metering installation instantiated by OLM.
+var ErrInstallPlanFailed = errors.New("detected failing InstallPlan")
+
+// handleInstallPlanFailures is a helper function responsible for managing
+// any potential InstallPlan custom resources that are "problematic" to avoid
+// unnecessary e2e testing flakes. We define "problematic" here as any InstallPlan
+// custom resource that is reporting a `Failed` status, in addition to containing
+// at least one conditions index message alluding to limitations outside of our
+// control. This is a workaround for the https://bugzilla.redhat.com/show_bug.cgi?id=1923111
+// OLM bug, where any failure in an InstallPlan is treated as a terminal error,
+// regardless of the context of the error.
+//
+// TODO(tflannag): This function will no longer be necessary once that above BZ
+// is addressed and backported to the release branches we care about.
+func handleInstallPlanFailures(client olmclientv1alpha1.OperatorsV1alpha1Interface, logger logrus.FieldLogger, namespace string) error {
+	ips, err := client.InstallPlans(namespace).List(context.Background(), metav1.ListOptions{
+		LabelSelector: fmt.Sprintf("operators.coreos.com/metering-ocp.%s=", namespace),
+	})
+	if err != nil {
+		return nil
+	}
+
+	// Handle the potential case where no InstallPlan has been created yet, e.g.
+	// we just created the Subscription for the metering-* package.
+	if len(ips.Items) == 0 {
+		return nil
+	}
+	// Handle case where there's multiple InstallPlans in a single namespace
+	// and exit early. We can make a relatively safe assumption that we'll
+	// likely only encounter a single replica for failed installations.
+	if len(ips.Items) != 1 {
+		logger.Info("skipping any potential InstallPlan failures as there are multiple replicas in the %s namespace", namespace)
+		return nil
+	}
+
+	// Continue filtering out any non-problematic, at least currently,
+	// InstallPlan custom resources and check again at the next poll.
+	ip := ips.Items[0]
+	if ip.Status.Phase != olmv1alpha1.InstallPlanPhaseFailed {
+		return nil
+	}
+
+	var olmBugDetected bool
+	for _, condition := range ip.Status.Conditions {
+		if strings.Contains(condition.Message, "object has been modified") {
+			olmBugDetected = true
+			break
+		}
+	}
+	if !olmBugDetected {
+		return nil
+	}
+
+	logger.Infof("Identified the failing %s InstallPlan due to object modification", ip.Name)
+	err = client.InstallPlans(namespace).Delete(context.Background(), ip.Name, metav1.DeleteOptions{})
+	if err != nil {
+		return err
+	}
+	logger.Infof("Deleted the failing %s InstallPlan due to object modification", ip.Name)
+
+	return ErrInstallPlanFailed
 }
 
 // WaitForPods periodically polls the list of pods in the namespace
@@ -141,14 +207,37 @@ func (pw *PodWaiter) WaitForPods(namespace string, targetPodsCount int) error {
 				Total:   len(pod.Status.ContainerStatuses),
 			})
 		}
-
 		if pw.Logger != nil {
 			logPollingSummary(pw.Logger, targetPodsCount, readyPods, unreadyPods)
 		}
 
-		return len(pods.Items) == targetPodsCount && len(unreadyPods) == 0, nil
+		// Check if all of the Pods are reporting a Ready status, exit early.
+		// In the case where there are still unready Pods, but there's at least a single
+		// Pod that's ready, we can reasonable assume that we aren't dealing with a failed
+		// metering installation, at least in the context of an OLM deployment, so aavoid
+		// checking if there are any problematic InstallPlan custom resources. Else, we
+		// do need to list and filter any InstallPlan(s) that are reporting a failed status,
+		// and that failed status is due to something out of our control, like object modification
+		// being reported by the apiserver and OLM not handling that error correctly.
+		ready := len(pods.Items) == targetPodsCount && len(unreadyPods) == 0
+		if ready {
+			return ready, nil
+		}
+		if len(unreadyPods) > 0 {
+			return false, nil
+		}
+		err = handleInstallPlanFailures(pw.OLMClient, pw.Logger, namespace)
+		if err != nil {
+			return false, err
+		}
+
+		return ready, nil
 	})
 	if err != nil {
+		if err == ErrInstallPlanFailed {
+			pw.Logger.Infof("Encountered failing installation -- requeuing")
+			return ErrInstallPlanFailed
+		}
 		return fmt.Errorf("the pods failed to report a ready status before the timeout period occurred: %v", err)
 	}
 

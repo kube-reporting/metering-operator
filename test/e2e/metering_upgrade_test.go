@@ -10,6 +10,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
+	"github.com/kube-reporting/metering-operator/test/deployframework"
 	"github.com/kube-reporting/metering-operator/test/reportingframework"
 	"github.com/kube-reporting/metering-operator/test/testhelpers"
 )
@@ -66,6 +67,10 @@ func testManualOLMUpgradeInstall(
 		upgradeFromSubscriptionChannel,
 		preUpgradeTestOutputDir,
 		testInstallFunction.ExtraEnvVars,
+		deployframework.DefaultDeleteNamespace,
+		deployframework.DefaultDeleteCRD,
+		deployframework.DefaultDeleteCRB,
+		deployframework.DefaultDeletePVC,
 		mc.Spec,
 	)
 	require.NoError(t, err, "creating a new deployer context should produce no error")

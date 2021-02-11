@@ -87,6 +87,10 @@ func (df *DeployFramework) NewDeployerCtx(
 	subscriptionChannel,
 	outputPath string,
 	extraLocalEnvVars []string,
+	deleteNamespace,
+	deleteCRD,
+	deleteCRB,
+	deletePVC bool,
 	spec metering.MeteringConfigSpec,
 ) (*DeployerCtx, error) {
 	cfg, err := df.NewDeployerConfig(
@@ -98,6 +102,10 @@ func (df *DeployFramework) NewDeployerCtx(
 		catalogSourceName,
 		catalogSourceNamespace,
 		subscriptionChannel,
+		deleteNamespace,
+		deleteCRD,
+		deleteCRB,
+		deletePVC,
 		spec,
 	)
 	if err != nil {
@@ -113,7 +121,7 @@ func (df *DeployFramework) NewDeployerCtx(
 		return nil, fmt.Errorf("failed to successfully stat the %s path to the hack script directory: %v", hackScriptDir, err)
 	}
 
-	targetPodCount := defaultTargetPods
+	targetPodCount := DefaultTargetPods
 	if df.RunLocal {
 		var replicas int32
 
@@ -212,10 +220,14 @@ func (ctx *DeployerCtx) Setup(installFunc func() error) (*reportingframework.Rep
 			InitialDelay:  initialDelay,
 			TimeoutPeriod: waitingForPodsTimeoutPeriod,
 			Client:        ctx.Client,
+			OLMClient:     ctx.OLMV1Alpha1Client,
 			Logger:        ctx.Logger.WithField("component", "podWaiter"),
 		}
-		err = pw.WaitForPods(ctx.Namespace, ctx.TargetPodsCount)
+		err := pw.WaitForPods(ctx.Namespace, ctx.TargetPodsCount)
 		if err != nil {
+			if err == ErrInstallPlanFailed {
+				return nil, ErrInstallPlanFailed
+			}
 			return nil, fmt.Errorf("error waiting for metering pods to become ready: %v", err)
 		}
 
@@ -308,9 +320,9 @@ func (ctx *DeployerCtx) Upgrade(catalogSourceName, catalogSourceNamespace, upgra
 	}
 
 	start := time.Now()
-	err = UpdateExistingSubscription(ctx.Logger, ctx.OLMV1Alpha1Client, defaultSubscriptionName, ctx.Namespace, catalogSourceName, catalogSourceNamespace, upgradeChannel)
+	err = UpdateExistingSubscription(ctx.Logger, ctx.OLMV1Alpha1Client, DefaultSubscriptionName, ctx.Namespace, catalogSourceName, catalogSourceNamespace, upgradeChannel)
 	if err != nil {
-		return nil, fmt.Errorf("failed to upgrade the existing %s Subscription: %v", defaultSubscriptionName, err)
+		return nil, fmt.Errorf("failed to upgrade the existing %s Subscription: %v", DefaultSubscriptionName, err)
 	}
 
 	err = WaitForMeteringOperatorDeployment(ctx.Logger, ctx.Client, meteringOperatorDeploymentName, ctx.Namespace)
