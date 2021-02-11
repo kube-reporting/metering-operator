@@ -6,7 +6,7 @@ METERING_GATHER_OLM_RESOURCES="${METERING_GATHER_OLM_RESOURCES:=true}"
 
 LOG_DIR="${LOG_DIR:=$PWD/must-gather}"
 POD_LOG_PATH=${POD_LOG_PATH:="${LOG_DIR}/pod_logs"}
-mkdir -p ${POD_LOG_PATH}/
+mkdir -p "${POD_LOG_PATH}"/
 
 # General namespace resources
 resources=()

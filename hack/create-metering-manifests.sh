@@ -2,7 +2,8 @@
 
 set -euo pipefail
 
-ROOT_DIR=$(dirname "${BASH_SOURCE}")/..
+ROOT_DIR=$(dirname "${BASH_SOURCE[0]}")/..
+# shellcheck disable=SC1090
 source "${ROOT_DIR}/hack/common.sh"
 
 if [[ $# -lt 2 ]] ; then

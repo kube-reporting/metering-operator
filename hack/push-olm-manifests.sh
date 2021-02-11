@@ -2,7 +2,8 @@
 set -e
 set -o pipefail
 
-ROOT_DIR=$(dirname "${BASH_SOURCE}")/..
+ROOT_DIR=$(dirname "${BASH_SOURCE[0]}")/..
+# shellcheck disable=SC1090
 source "${ROOT_DIR}/hack/common.sh"
 
 IMAGE_METERING_ANSIBLE_OPERATOR_REGISTRY="${1:?}"

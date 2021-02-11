@@ -1,14 +1,15 @@
 #!/bin/bash -e
 
-ROOT_DIR=$(dirname "${BASH_SOURCE}")/..
+ROOT_DIR=$(dirname "${BASH_SOURCE[0]}")/..
+# shellcheck disable=SC1090
 source "${ROOT_DIR}/hack/common.sh"
+# shellcheck disable=SC1090
 source "${ROOT_DIR}/hack/lib/customize-manifests.sh"
 
 set +e
 
 TMPDIR="$(mktemp -d)"
-# shellcheck disable=SC2064
-trap "rm -rf $TMPDIR" EXIT SIGINT
+trap 'rm -rf "$TMPDIR"' EXIT SIGINT
 
 cp -r "$INSTALLER_MANIFESTS_DIR" "$TMPDIR"
 customizeMeteringInstallManifests "$TMPDIR"

@@ -1,7 +1,5 @@
 #!/bin/bash -e
 
-ROOT_DIR=$(dirname "${BASH_SOURCE}")/..
-
 if [ $# -ne 5 ]; then
     echo "usage: reporting_operator_base_url namespace data_start data_end out_dir"
     exit 1

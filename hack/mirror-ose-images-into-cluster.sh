@@ -1,6 +1,9 @@
+#! /bin/bash
+
 set -x
 set -e
 
+# shellcheck disable=SC1090
 ROOT_DIR=$(dirname "${BASH_SOURCE}")/..
 
 REPO_NAMESPACE="${REPO_NAMESPACE:-"openshift"}"

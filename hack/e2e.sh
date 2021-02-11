@@ -5,7 +5,9 @@ set -e
 : "${KUBECONFIG:?}"
 
 ROOT_DIR=$(dirname "${BASH_SOURCE[0]}")/..
+# shellcheck disable=SC1090
 source "${ROOT_DIR}/hack/common.sh"
+# shellcheck disable=SC1090
 source "${ROOT_DIR}/hack/lib/tests.sh"
 
 function cleanup() {
