@@ -117,7 +117,7 @@ ${HELM_BIN} template "$CHART" \
     > "$PACKAGE_MANIFEST_DESTINATION"
 
 HELM_ART_CONDITIONAL_TOGGLE=".olm.skipARTPackage"
-HELM_SKIP_ART_PACKAGE="$(cat $CHART_VALUES | ${FAQ_BIN} -f yaml ${HELM_ART_CONDITIONAL_TOGGLE})"
+HELM_SKIP_ART_PACKAGE="$(${FAQ_BIN} -f yaml ${HELM_ART_CONDITIONAL_TOGGLE} <"$CHART_VALUES")"
 
 # We don't always want to generate an ART package, so check if the values file
 # we're currently processing has that templating toggling set to true as helm template
