@@ -259,10 +259,6 @@ func TestManualMeteringInstall(t *testing.T) {
 					TestFunc: testMeteringAnsibleOperatorMetricsWork,
 				},
 				{
-					Name:     "testPrometheusConnectorWorks",
-					TestFunc: testPrometheusConnectorWorks,
-				},
-				{
 					Name:     "testReportingOperatorServiceCABundleExists",
 					TestFunc: testReportingOperatorServiceCABundleExists,
 				},
