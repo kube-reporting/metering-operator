@@ -16,7 +16,7 @@ import (
 )
 
 func (df *DeployFramework) CreateCatalogSourceFromIndex(indexImage string) (string, string, error) {
-	catalogSourceName := df.NamespacePrefix + "-" + defaultCatalogSourceName
+	catalogSourceName := df.NamespacePrefix + "-" + DefaultCatalogSourceName
 
 	catalogSource, err := df.OLMV1Alpha1Client.CatalogSources(registryDeployNamespace).Get(context.TODO(), catalogSourceName, metav1.GetOptions{})
 	if err != nil && !apierrors.IsNotFound(err) {
@@ -76,7 +76,7 @@ func (df *DeployFramework) CreateRegistryResources(registryImage, meteringOperat
 	}
 
 	var catalogSource *olmv1alpha1.CatalogSource
-	catalogSourceName := df.NamespacePrefix + "-" + defaultCatalogSourceName
+	catalogSourceName := df.NamespacePrefix + "-" + DefaultCatalogSourceName
 
 	catalogSource, err = df.OLMV1Alpha1Client.CatalogSources(registryDeployNamespace).Get(context.TODO(), catalogSourceName, metav1.GetOptions{})
 	if err != nil && !apierrors.IsNotFound(err) {

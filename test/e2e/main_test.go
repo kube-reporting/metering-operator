@@ -387,8 +387,9 @@ func TestManualMeteringInstall(t *testing.T) {
 			Name:                      "NFS-ReportDynamicInputData",
 			MeteringOperatorImageRepo: meteringOperatorImageRepo,
 			MeteringOperatorImageTag:  meteringOperatorImageTag,
-			Skip:                      !testing.Short(),
-			PreInstallFunc:            createNFSProvisioner,
+			Skip:                      false,
+			// Skip:                      !testing.Short(),
+			PreInstallFunc: createNFSProvisioner,
 			InstallSubTests: []InstallTestCase{
 				{
 					Name:     "testReportingProducesData",
@@ -459,7 +460,6 @@ func TestMeteringUpgrades(t *testing.T) {
 			PurgeReports:              true,
 			PurgeReportDataSources:    true,
 			Skip:                      false,
-			ExpectInstallErrMsg:       []string{},
 			InstallSubTest: InstallTestCase{
 				Name:     "testReportingProducesData",
 				TestFunc: testReportingProducesData,
