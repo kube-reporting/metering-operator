@@ -34,13 +34,13 @@ fi
 
 echo "Storing the must-gather output at $LOG_DIR"
 for resource in "${resources[@]}"; do
-    echo "Collecting dump of ${resource} in the ${METERING_TEST_NAMESPACE} namespace" | tee -a  ${LOG_DIR}/gather-debug.log
-    { timeout 120 oc adm --namespace ${METERING_TEST_NAMESPACE} --dest-dir=${LOG_DIR} inspect "${resource}"; } >> ${LOG_DIR}/gather-debug.log 2>&1
+    echo "Collecting dump of ${resource} in the ${METERING_TEST_NAMESPACE} namespace" | tee -a  "${LOG_DIR}"/gather-debug.log
+    { timeout 120 oc adm --namespace "${METERING_TEST_NAMESPACE}" --dest-dir="${LOG_DIR}" inspect "${resource}"; } >> "${LOG_DIR}"/gather-debug.log 2>&1
 done
 
 echo "Collecting the metering-related CRDs from the cluster"
 for resource in $(oc get crd | grep metering | awk '{ print $1 }'); do
-    timeout 120 oc adm --dest-dir=${LOG_DIR} inspect "crd/$resource" >> ${LOG_DIR}/gather-debug.log 2>&1
+    timeout 120 oc adm --dest-dir="${LOG_DIR}" inspect "crd/$resource" >> "${LOG_DIR}"/gather-debug.log 2>&1
 done
 
 commands=()
@@ -52,13 +52,13 @@ commands+=("get hivetables")
 commands+=("get events")
 
 for command in "${commands[@]}"; do
-     echo "Collecting output of the following oc command: 'oc ${command}'" | tee -a ${LOG_DIR}/gather-debug.log
+     echo "Collecting output of the following oc command: 'oc ${command}'" | tee -a "${LOG_DIR}"/gather-debug.log
      COMMAND_OUTPUT_FILE=${POD_LOG_PATH}/${command// /_}
-     timeout 120 oc -n ${METERING_TEST_NAMESPACE} ${command} >> "${COMMAND_OUTPUT_FILE}"
+     timeout 120 oc -n "${METERING_TEST_NAMESPACE}" "${command}" >> "${COMMAND_OUTPUT_FILE}"
 done
 
-for pod in $(oc --namespace $METERING_TEST_NAMESPACE get pods --no-headers -o name | cut -d/ -f2); do
-    for container in $(oc --namespace $METERING_TEST_NAMESPACE get pods -o jsonpath="{.spec.containers[*].name}" "$pod"); do
+for pod in $(oc --namespace "$METERING_TEST_NAMESPACE" get pods --no-headers -o name | cut -d/ -f2); do
+    for container in $(oc --namespace "$METERING_TEST_NAMESPACE" get pods -o jsonpath="{.spec.containers[*].name}" "$pod"); do
         echo "Capturing Pod $pod container $container logs"
         if ! oc logs --namespace "$METERING_TEST_NAMESPACE" -c "$container" "$pod" >> "${POD_LOG_PATH}/${pod}-${container}.log"; then
             echo "Error capturing pod $pod container $container logs"
@@ -66,6 +66,6 @@ for pod in $(oc --namespace $METERING_TEST_NAMESPACE get pods --no-headers -o na
     done
 done
 
-echo "Deleting any empty test artifact files" >> ${LOG_DIR}/gather-debug.log
-find "${LOG_DIR}" -empty -delete >> ${LOG_DIR}/gather-debug.log 2>&1
+echo "Deleting any empty test artifact files" >> "${LOG_DIR}"/gather-debug.log
+find "${LOG_DIR}" -empty -delete >> "${LOG_DIR}"/gather-debug.log 2>&1
 exit 0

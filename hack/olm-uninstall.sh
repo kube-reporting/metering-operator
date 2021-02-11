@@ -33,7 +33,7 @@ if [ "$METERING_NAMESPACE" != "openshift-metering" ]; then
 fi
 
 SUBSCRIPTION_NAME="$(faq -f yaml '.metadata.name' "$OLM_MANIFESTS_DIR/metering.subscription.yaml")"
-CSV_NAME="$(kubectl -n $METERING_NAMESPACE get subscriptions $SUBSCRIPTION_NAME -o yaml | faq -f yaml '.status.currentCSV')"
+CSV_NAME="$(kubectl -n "$METERING_NAMESPACE" get subscriptions "$SUBSCRIPTION_NAME" -o yaml | faq -f yaml '.status.currentCSV')"
 
 msg "Removing Metering Resource"
 kubectl delete -f \
@@ -52,7 +52,7 @@ kubectl delete -f \
     "$OLM_MANIFESTS_DIR/metering.catalogsource.yaml"
 
 msg "Removing Metering ConfigMap"
-kubectl -n $METERING_NAMESPACE delete configmap metering-ocp
+kubectl -n "$METERING_NAMESPACE" delete configmap metering-ocp
 
 msg "Removing Metering Catalog Source Version"
-kubectl -n $METERING_NAMESPACE delete csv $CSV_NAME
+kubectl -n "$METERING_NAMESPACE" delete csv "$CSV_NAME"

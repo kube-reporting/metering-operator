@@ -36,8 +36,9 @@ function cleanup() {
 
     echo "Stopping background jobs"
     # kill any background jobs
-    local pids=$(jobs -pr)
-    [ -n "$pids" ] && kill $pids
+    pids=$(jobs -pr)
+    local pids
+    [ -n "$pids" ] && kill "$pids"
     # Wait for any jobs
     wait 2>/dev/null
 
