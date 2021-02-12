@@ -64,6 +64,8 @@ for pod in $(oc --namespace "$METERING_TEST_NAMESPACE" get pods --no-headers -o 
             echo "Error capturing pod $pod container $container logs"
         fi
     done
+
+    oc --namespace "$METERING_TEST_NAMESPACE" describe "$pod" >> "${POD_LOG_PATH}/${pod}-describe.log"
 done
 
 echo "Deleting any empty test artifact files" >> "${LOG_DIR}"/gather-debug.log
