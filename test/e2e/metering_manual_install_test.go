@@ -10,18 +10,19 @@ import (
 	"testing"
 	"time"
 
-	"github.com/kube-reporting/metering-operator/pkg/deploy"
-	"k8s.io/client-go/kubernetes"
-
-	"github.com/kube-reporting/metering-operator/test/deployframework"
-	"github.com/kube-reporting/metering-operator/test/testhelpers"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+
 	corev1 "k8s.io/api/core/v1"
 	storagev1beta1 "k8s.io/api/storage/v1beta1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/util/wait"
+	"k8s.io/client-go/kubernetes"
+
+	"github.com/kube-reporting/metering-operator/pkg/deploy"
+	"github.com/kube-reporting/metering-operator/test/deployframework"
+	"github.com/kube-reporting/metering-operator/test/testhelpers"
 )
 
 const (
@@ -43,15 +44,13 @@ func testManualMeteringInstall(
 	catalogSourceNamespace,
 	subscriptionChannel,
 	testOutputPath string,
-	expectInstallErrMsg []string,
-	expectInstallErr bool,
 	preInstallFunc PreInstallFunc,
 	testInstallFunctions []InstallTestCase,
 ) {
 	// create a directory used to store the @testCaseName container and resource logs
 	testCaseOutputBaseDir := filepath.Join(testOutputPath, testCaseName)
 	err := os.Mkdir(testCaseOutputBaseDir, 0777)
-	assert.NoError(t, err, "creating the test case output directory should produce no error")
+	require.NoError(t, err, "creating the test case output directory should produce no error")
 
 	testFuncNamespace := fmt.Sprintf("%s-%s", namespacePrefix, strings.ToLower(testCaseName))
 	if len(testFuncNamespace) > kubeNamespaceCharLimit {
@@ -79,6 +78,10 @@ func testManualMeteringInstall(
 		subscriptionChannel,
 		testCaseOutputBaseDir,
 		envVars,
+		deployframework.DefaultDeleteNamespace,
+		deployframework.DefaultDeleteCRD,
+		deployframework.DefaultDeleteCRB,
+		deployframework.DefaultDeletePVC,
 		mc.Spec,
 	)
 	require.NoError(t, err, "creating a new deployer context should produce no error")
@@ -89,37 +92,77 @@ func testManualMeteringInstall(
 		require.NoError(t, err, "expected no error while running any pre-install functions")
 	}
 
-	rf, err := deployerCtx.Setup(deployerCtx.Deployer.InstallOLM, expectInstallErr)
-
-	canSafelyRunTest := testhelpers.AssertCanSafelyRunReportingTests(t, err, expectInstallErr, expectInstallErrMsg)
-	if canSafelyRunTest {
-		for _, installFunc := range testInstallFunctions {
-			installFunc := installFunc
-			t := t
-
-			// namespace got deleted early when running t.Parallel()
-			// so re-running without that specified
-			t.Run(installFunc.Name, func(t *testing.T) {
-				installFunc.TestFunc(t, rf)
-			})
-
-			deployerCtx.Logger.Infof("The %s test has finished running", installFunc.Name)
+	rf, err := deployerCtx.Setup(deployerCtx.Deployer.InstallOLM)
+	if err != nil {
+		if err != deployframework.ErrInstallPlanFailed {
+			gatherErr := deployerCtx.MustGatherMeteringResources(gatherTestArtifactsScript)
+			assert.NoError(t, gatherErr, "gathering metering resources should produce no error")
+			require.NoError(t, err, "expected installing metering would produce no error")
 		}
+		t.Logf("Recreating the %s metering installation as a failed InstallPlan has been detected", deployerCtx.Namespace)
+		deployerCtx.Deployer.Config.DeleteNamespace = false
+		// TODO(tflannag): this is ugly and we should aim for a better implementation,
+		// but in the meantime this will get CI back working again.
+		err = nil
+
+		err = deployerCtx.Deployer.UninstallOLM()
+		assert.NoError(t, err, "failed to uninstall metering after encountering a failed installation")
+		rf, err = deployerCtx.Setup(deployerCtx.Deployer.InstallOLM)
+		require.NoError(t, err, "expected installing metering would produce no error")
 	}
 
+	for _, installFunc := range testInstallFunctions {
+		installFunc := installFunc
+		t := t
+
+		t.Run(installFunc.Name, func(t *testing.T) {
+			installFunc.TestFunc(t, rf)
+		})
+
+		deployerCtx.Logger.Infof("The %s test has finished running", installFunc.Name)
+	}
+
+	deployerCtx.Deployer.Config.DeleteNamespace = deployframework.DefaultDeleteNamespace
 	err = deployerCtx.Teardown(deployerCtx.Deployer.UninstallOLM)
 	assert.NoError(t, err, "capturing logs and uninstalling metering should produce no error")
 }
 
-func createNFSProvisioner(ctx *deployframework.DeployerCtx) error {
-	//Waiting for Metering pods
-	ctx.TargetPodsCount = nonHDFSTargetPodCount
+// createTestingNamespace is a helper function that is responsible
+// for creating a namespace with the @namespace metadata.name and
+// contains the `name: "<namespace_prefix>-metering-testing-ns` label.
+// During the teardown function of the hack/e2e.sh script, we search for any
+// namespaces that match that label. Note: manually running the e2e suite
+// specifying a list of go test flags does not ensure proper cleanup.
+func createTestingNamespace(client kubernetes.Interface, namespace string) (*corev1.Namespace, error) {
+	var ns *corev1.Namespace
+	ns, err := client.CoreV1().Namespaces().Get(context.Background(), namespace, metav1.GetOptions{})
+	if err != nil && !apierrors.IsNotFound(err) {
+		return nil, err
+	}
+	if apierrors.IsNotFound(err) {
+		ns = &corev1.Namespace{
+			ObjectMeta: metav1.ObjectMeta{
+				Name: namespace,
+				Labels: map[string]string{
+					"name": namespacePrefix + "-" + testingNamespaceLabel,
+				},
+			},
+		}
+		ns, err = client.CoreV1().Namespaces().Create(context.Background(), ns, metav1.CreateOptions{})
+		if err != nil {
+			return nil, err
+		}
+	}
+	return ns, nil
+}
 
+func createNFSProvisioner(ctx *deployframework.DeployerCtx) error {
 	_, err := createTestingNamespace(ctx.Client, nfsTestingNamespace)
 	if err != nil {
 		return err
 	}
 
+	ctx.TargetPodsCount = nonHDFSTargetPodCount
 	files := map[string]string{
 		"pod":          "server.yaml",
 		"service":      "service.yaml",
@@ -128,6 +171,7 @@ func createNFSProvisioner(ctx *deployframework.DeployerCtx) error {
 	server := &corev1.Pod{}
 	service := &corev1.Service{}
 	storageClass := &storagev1beta1.StorageClass{}
+
 	for name, file := range files {
 		absFile := filepath.Join(repoPath, testNFSManifestPath, file)
 		switch name {
@@ -181,7 +225,6 @@ func createNFSProvisioner(ctx *deployframework.DeployerCtx) error {
 	nfsFile := "persistentvolume.yaml"
 	nfsPv := &corev1.PersistentVolume{}
 	absFile := filepath.Join(repoPath, testNFSManifestPath, nfsFile)
-	//decode pvc
 	if err := deploy.DecodeYAMLManifestToObject(absFile, nfsPv); err != nil {
 		return err
 	}
@@ -194,28 +237,6 @@ func createNFSProvisioner(ctx *deployframework.DeployerCtx) error {
 	return nil
 }
 
-func createTestingNamespace(client kubernetes.Interface, namespace string) (*corev1.Namespace, error) {
-	ns, err := client.CoreV1().Namespaces().Get(context.Background(), namespace, metav1.GetOptions{})
-	if err != nil && !apierrors.IsNotFound(err) {
-		return nil, err
-	}
-	if apierrors.IsNotFound(err) {
-		ns := &corev1.Namespace{
-			ObjectMeta: metav1.ObjectMeta{
-				Name: namespace,
-				Labels: map[string]string{
-					"name": namespace + "-" + testingNamespaceLabel,
-				},
-			},
-		}
-		_, err = client.CoreV1().Namespaces().Create(context.Background(), ns, metav1.CreateOptions{})
-		if err != nil {
-			return ns, nil
-		}
-	}
-	return ns, nil
-}
-
 func s3InstallFunc(ctx *deployframework.DeployerCtx) error {
 	// The default ctx.TargetPodsCount value assumes that HDFS
 	// is being used a storage backend, so we need to decrement
@@ -223,28 +244,10 @@ func s3InstallFunc(ctx *deployframework.DeployerCtx) error {
 	// for Pods that will not be created by the metering-ansible-operator
 	ctx.TargetPodsCount = nonHDFSTargetPodCount
 
-	// Before we can create the AWS credentials secret in the ctx.Namespace, we need to ensure
-	// that namespace has been created before attempting to query for a resource that does not exist.
-	_, err := ctx.Client.CoreV1().Namespaces().Get(context.Background(), ctx.Namespace, metav1.GetOptions{})
-	if err != nil && !apierrors.IsNotFound(err) {
-		return nil
+	_, err := createTestingNamespace(ctx.Client, ctx.Namespace)
+	if err != nil {
+		return err
 	}
-	if apierrors.IsNotFound(err) {
-		n := &corev1.Namespace{
-			ObjectMeta: metav1.ObjectMeta{
-				Name: ctx.Namespace,
-				Labels: map[string]string{
-					"name": ctx.Namespace + "-" + testingNamespaceLabel,
-				},
-			},
-		}
-		_, err = ctx.Client.CoreV1().Namespaces().Create(context.Background(), n, metav1.CreateOptions{})
-		if err != nil {
-			return err
-		}
-		ctx.Logger.Debugf("Created the %s namespace", ctx.Namespace)
-	}
-
 	// Attempt to mirror the AWS credentials used to provision the IPI-based AWS cluster
 	// from the kube-system namespace, to the ctx.Namespace that the test context is configured
 	// to use. In the case where this secret containing the base64-encrypted access key id and
@@ -334,24 +337,9 @@ func createMySQLDatabase(ctx *deployframework.DeployerCtx) error {
 		mysqlNamespace     = "mysql"
 		mysqlLabelSelector = "db=mysql"
 	)
-	_, err := ctx.Client.CoreV1().Namespaces().Get(context.Background(), mysqlNamespace, metav1.GetOptions{})
-	if err != nil && !apierrors.IsNotFound(err) {
-		return nil
-	}
-	if apierrors.IsNotFound(err) {
-		n := &corev1.Namespace{
-			ObjectMeta: metav1.ObjectMeta{
-				Name: mysqlNamespace,
-				Labels: map[string]string{
-					"name": ctx.Namespace + "-" + testingNamespaceLabel,
-				},
-			},
-		}
-		_, err = ctx.Client.CoreV1().Namespaces().Create(context.Background(), n, metav1.CreateOptions{})
-		if err != nil {
-			return err
-		}
-		ctx.Logger.Debugf("Created the %s namespace", mysqlNamespace)
+	_, err := createTestingNamespace(ctx.Client, mysqlNamespace)
+	if err != nil {
+		return err
 	}
 
 	cmd := exec.Command(
