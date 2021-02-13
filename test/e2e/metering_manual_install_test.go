@@ -95,6 +95,8 @@ func testManualMeteringInstall(
 	rf, err := deployerCtx.Setup(deployerCtx.Deployer.InstallOLM)
 	if err != nil {
 		if err != deployframework.ErrInstallPlanFailed {
+			gatherErr := deployerCtx.MustGatherMeteringResources(gatherTestArtifactsScript)
+			assert.NoError(t, gatherErr, "gathering metering resources should produce no error")
 			require.NoError(t, err, "expected installing metering would produce no error")
 		}
 		t.Logf("Recreating the %s metering installation as a failed InstallPlan has been detected", deployerCtx.Namespace)
