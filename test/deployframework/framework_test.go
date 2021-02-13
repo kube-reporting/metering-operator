@@ -26,21 +26,36 @@ func TestNewDeployerConfig(t *testing.T) {
 	testCatalogSourceNamespace := "marketplace"
 	testSubscriptionChannel := "v0.0.1"
 
-	cfg, err := df.NewDeployerConfig(testNamespace, testMeteringOpRepo, testMeteringOpTag, testReportingOpRepo, testReportingOpTag, testCatalogSourceName, testCatalogSourceNamespace, testSubscriptionChannel, spec)
+	cfg, err := df.NewDeployerConfig(
+		testNamespace,
+		testMeteringOpRepo,
+		testMeteringOpTag,
+		testReportingOpRepo,
+		testReportingOpTag,
+		testCatalogSourceName,
+		testCatalogSourceNamespace,
+		testSubscriptionChannel,
+		DefaultDeleteNamespace,
+		DefaultDeleteCRD,
+		DefaultDeleteCRB,
+		DefaultDeletePVC,
+		spec)
 	require.NoError(t, err)
 
 	expectedCfg := &deploy.Config{
 		Namespace:              testNamespace,
 		Repo:                   testMeteringOpRepo,
 		Tag:                    testMeteringOpTag,
-		Platform:               defaultPlatform,
-		SubscriptionName:       defaultSubscriptionName,
-		PackageName:            defaultPackageName,
+		Platform:               DefaultPlatform,
+		SubscriptionName:       DefaultSubscriptionName,
+		PackageName:            DefaultPackageName,
 		CatalogSourceName:      testCatalogSourceName,
 		CatalogSourceNamespace: testCatalogSourceNamespace,
 		Channel:                testSubscriptionChannel,
-		DeleteCRB:              defaultDeleteCRB,
-		DeleteNamespace:        defaultDeleteNamespace,
+		DeleteNamespace:        DefaultDeleteNamespace,
+		DeleteCRDs:             DefaultDeleteCRD,
+		DeleteCRBs:             DefaultDeleteCRB,
+		DeletePVCs:             DefaultDeletePVC,
 		ExtraNamespaceLabels: map[string]string{
 			"name": fmt.Sprintf("%s-%s", df.NamespacePrefix, testNamespaceLabel),
 		},

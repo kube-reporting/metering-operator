@@ -84,7 +84,7 @@ func init() {
 	rootCmd.PersistentFlags().StringVar(&deployManifestsDir, "deploy-manifests-dir", "manifests/deploy", "The absolute/relative path to the metering manifest directory. This can also be specified through the INSTALLER_MANIFESTS_DIR.")
 
 	uninstallCmd.Flags().BoolVar(&cfg.DeleteCRDs, "delete-crd", false, "If true, this would delete the metering CRDs during an uninstall. This can also be specified through the METERING_DELETE_CRDS ENV var.")
-	uninstallCmd.Flags().BoolVar(&cfg.DeleteCRB, "delete-crb", false, "If true, this would delete the metering cluster role bindings during an uninstall. This can also be specified through METERING_DELETE_CRB ENV var.")
+	uninstallCmd.Flags().BoolVar(&cfg.DeleteCRBs, "delete-crb", false, "If true, this would delete the metering cluster role bindings during an uninstall. This can also be specified through METERING_DELETE_CRB ENV var.")
 	uninstallCmd.Flags().BoolVar(&cfg.DeleteNamespace, "delete-namespace", false, "If true, this would delete the namespace during an uninstall. This can also be specified through the METERING_DELETE_NAMESPACE ENV var.")
 	uninstallCmd.Flags().BoolVar(&cfg.DeletePVCs, "delete-pvc", true, "If true, this would delete the PVCs used by metering resources during an uninstall. This can also be specified through the METERING_DELETE_PVCS ENV var.")
 	uninstallCmd.Flags().BoolVar(&cfg.DeleteAll, "delete-all", false, "If true, this would delete the all metering resources during an uninstall. This can also be specified through the METERING_DELETE_ALL ENV var.")
@@ -93,7 +93,7 @@ func init() {
 	// are both using the same flagset. We could switch to an installCmd and uninstallCmd, and
 	// have a --olm sub-command configuration so we could share flags between install/uninstall.
 	olmUninstallCmd.Flags().BoolVar(&cfg.DeleteCRDs, "delete-crd", false, "If true, this would delete the metering CRDs during an uninstall. This can also be specified through the METERING_DELETE_CRDS ENV var.")
-	olmUninstallCmd.Flags().BoolVar(&cfg.DeleteCRB, "delete-crb", false, "If true, this would delete the metering cluster role bindings during an uninstall. This can also be specified through METERING_DELETE_CRB ENV var.")
+	olmUninstallCmd.Flags().BoolVar(&cfg.DeleteCRBs, "delete-crb", false, "If true, this would delete the metering cluster role bindings during an uninstall. This can also be specified through METERING_DELETE_CRB ENV var.")
 	olmUninstallCmd.Flags().BoolVar(&cfg.DeleteNamespace, "delete-namespace", false, "If true, this would delete the namespace during an uninstall. This can also be specified through the METERING_DELETE_NAMESPACE ENV var.")
 	olmUninstallCmd.Flags().BoolVar(&cfg.DeletePVCs, "delete-pvc", true, "If true, this would delete the PVCs used by metering resources during an uninstall. This can also be specified through the METERING_DELETE_PVCS ENV var.")
 	olmUninstallCmd.Flags().BoolVar(&cfg.DeleteAll, "delete-all", false, "If true, this would delete the all metering resources during an uninstall. This can also be specified through the METERING_DELETE_ALL ENV var.")
