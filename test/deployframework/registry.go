@@ -191,6 +191,9 @@ func (df *DeployFramework) WaitForPackageManifest(name, namespace, subscriptionC
 				}
 			}
 		}
+		if !ready {
+			df.Logger.Warnf("The metering-ocp packagemanifest is present but the %s channel is not present", subscriptionChannel)
+		}
 
 		return ready, nil
 	})

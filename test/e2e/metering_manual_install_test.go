@@ -95,10 +95,15 @@ func testManualMeteringInstall(
 	rf, err := deployerCtx.Setup(deployerCtx.Deployer.InstallOLM)
 	if err != nil {
 		if err != deployframework.ErrInstallPlanFailed {
+			gatherErr := deployerCtx.MustGatherMeteringResources(gatherTestArtifactsScript)
+			assert.NoError(t, gatherErr, "gathering metering resources should produce no error")
 			require.NoError(t, err, "expected installing metering would produce no error")
 		}
 		t.Logf("Recreating the %s metering installation as a failed InstallPlan has been detected", deployerCtx.Namespace)
 		deployerCtx.Deployer.Config.DeleteNamespace = false
+		// TODO(tflannag): this is ugly and we should aim for a better implementation,
+		// but in the meantime this will get CI back working again.
+		err = nil
 
 		err = deployerCtx.Deployer.UninstallOLM()
 		assert.NoError(t, err, "failed to uninstall metering after encountering a failed installation")
