@@ -1,7 +1,7 @@
 # need helm CLI for final image
-FROM registry.svc.ci.openshift.org/ocp/4.6:metering-helm as helm
+FROM registry.ci.openshift.org/ocp/4.6:metering-helm as helm
 # image needs kubectl, so we copy `oc` from cli image to use as kubectl.
-FROM registry.svc.ci.openshift.org/ocp/4.6:cli as cli
+FROM registry.ci.openshift.org/ocp/4.6:cli as cli
 # need golang for the unit/vendor/verify CI checks
 FROM registry.svc.ci.openshift.org/ocp/builder:golang-1.13
 
@@ -12,17 +12,11 @@ RUN chmod +x /usr/local/bin/faq
 
 # ensure fresh metadata rather than cached metadata in the base by running
 # yum clean all && rm -rf /var/yum/cache/* first
-RUN INSTALL_PKGS="rh-python36" && \
-    yum clean all && rm -rf /var/cache/yum/* && \
+RUN yum clean all && \
+    rm -rf /var/cache/yum/* && \
     yum -y install centos-release-scl && \
-    yum install --setopt=skip_missing_names_on_install=False -y $INSTALL_PKGS && \
     yum clean all && \
     rm -rf /var/cache/yum
-
-RUN scl enable rh-python36 'pip install operator-courier'
-
-COPY hack/scl-operator-courier.sh /usr/local/bin/operator-courier
-RUN chmod +x /usr/local/bin/operator-courier
 
 COPY --from=cli /usr/bin/oc /usr/bin/
 RUN ln -s /usr/bin/oc /usr/bin/kubectl
