@@ -10,8 +10,10 @@ import (
 )
 
 // PrestoTableLister helps list PrestoTables.
+// All objects returned here must be treated as read-only.
 type PrestoTableLister interface {
 	// List lists all PrestoTables in the indexer.
+	// Objects returned here must be treated as read-only.
 	List(selector labels.Selector) (ret []*v1.PrestoTable, err error)
 	// PrestoTables returns an object that can list and get PrestoTables.
 	PrestoTables(namespace string) PrestoTableNamespaceLister
@@ -42,10 +44,13 @@ func (s *prestoTableLister) PrestoTables(namespace string) PrestoTableNamespaceL
 }
 
 // PrestoTableNamespaceLister helps list and get PrestoTables.
+// All objects returned here must be treated as read-only.
 type PrestoTableNamespaceLister interface {
 	// List lists all PrestoTables in the indexer for a given namespace.
+	// Objects returned here must be treated as read-only.
 	List(selector labels.Selector) (ret []*v1.PrestoTable, err error)
 	// Get retrieves the PrestoTable from the indexer for a given namespace and name.
+	// Objects returned here must be treated as read-only.
 	Get(name string) (*v1.PrestoTable, error)
 	PrestoTableNamespaceListerExpansion
 }

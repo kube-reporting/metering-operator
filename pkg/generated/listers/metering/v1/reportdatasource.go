@@ -10,8 +10,10 @@ import (
 )
 
 // ReportDataSourceLister helps list ReportDataSources.
+// All objects returned here must be treated as read-only.
 type ReportDataSourceLister interface {
 	// List lists all ReportDataSources in the indexer.
+	// Objects returned here must be treated as read-only.
 	List(selector labels.Selector) (ret []*v1.ReportDataSource, err error)
 	// ReportDataSources returns an object that can list and get ReportDataSources.
 	ReportDataSources(namespace string) ReportDataSourceNamespaceLister
@@ -42,10 +44,13 @@ func (s *reportDataSourceLister) ReportDataSources(namespace string) ReportDataS
 }
 
 // ReportDataSourceNamespaceLister helps list and get ReportDataSources.
+// All objects returned here must be treated as read-only.
 type ReportDataSourceNamespaceLister interface {
 	// List lists all ReportDataSources in the indexer for a given namespace.
+	// Objects returned here must be treated as read-only.
 	List(selector labels.Selector) (ret []*v1.ReportDataSource, err error)
 	// Get retrieves the ReportDataSource from the indexer for a given namespace and name.
+	// Objects returned here must be treated as read-only.
 	Get(name string) (*v1.ReportDataSource, error)
 	ReportDataSourceNamespaceListerExpansion
 }

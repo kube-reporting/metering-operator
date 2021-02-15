@@ -10,8 +10,10 @@ import (
 )
 
 // HiveTableLister helps list HiveTables.
+// All objects returned here must be treated as read-only.
 type HiveTableLister interface {
 	// List lists all HiveTables in the indexer.
+	// Objects returned here must be treated as read-only.
 	List(selector labels.Selector) (ret []*v1.HiveTable, err error)
 	// HiveTables returns an object that can list and get HiveTables.
 	HiveTables(namespace string) HiveTableNamespaceLister
@@ -42,10 +44,13 @@ func (s *hiveTableLister) HiveTables(namespace string) HiveTableNamespaceLister 
 }
 
 // HiveTableNamespaceLister helps list and get HiveTables.
+// All objects returned here must be treated as read-only.
 type HiveTableNamespaceLister interface {
 	// List lists all HiveTables in the indexer for a given namespace.
+	// Objects returned here must be treated as read-only.
 	List(selector labels.Selector) (ret []*v1.HiveTable, err error)
 	// Get retrieves the HiveTable from the indexer for a given namespace and name.
+	// Objects returned here must be treated as read-only.
 	Get(name string) (*v1.HiveTable, error)
 	HiveTableNamespaceListerExpansion
 }
