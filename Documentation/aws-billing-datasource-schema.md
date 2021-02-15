@@ -1,6 +1,8 @@
+# Overview
+
 The schema below was obtained from Presto by running `describe datasource_aws_billing;` via Presto-cli.
 
-```
+```sql
                           Column                           |   Type    |     Extra     | Comment
 -----------------------------------------------------------+-----------+---------------+---------
  identity_lineitemid                                       | varchar   |               |
