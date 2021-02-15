@@ -240,7 +240,7 @@ func TestManualMeteringInstall(t *testing.T) {
 			// any new machine. The result is the new machines that get
 			// provisioned, don't have this custom node label we added in
 			// the preInstallFunc closure.
-			Skip:           true,
+			Skip:           !testing.Short(),
 			PreInstallFunc: customNodeSelectorFunc,
 			InstallSubTests: []InstallTestCase{
 				{
@@ -257,10 +257,6 @@ func TestManualMeteringInstall(t *testing.T) {
 				{
 					Name:     "testMeteringAnsibleOperatorMetricsWork",
 					TestFunc: testMeteringAnsibleOperatorMetricsWork,
-				},
-				{
-					Name:     "testPrometheusConnectorWorks",
-					TestFunc: testPrometheusConnectorWorks,
 				},
 				{
 					Name:     "testReportingOperatorServiceCABundleExists",
@@ -387,9 +383,8 @@ func TestManualMeteringInstall(t *testing.T) {
 			Name:                      "NFS-ReportDynamicInputData",
 			MeteringOperatorImageRepo: meteringOperatorImageRepo,
 			MeteringOperatorImageTag:  meteringOperatorImageTag,
-			Skip:                      false,
-			// Skip:                      !testing.Short(),
-			PreInstallFunc: createNFSProvisioner,
+			Skip:                      !testing.Short(),
+			PreInstallFunc:            createNFSProvisioner,
 			InstallSubTests: []InstallTestCase{
 				{
 					Name:     "testReportingProducesData",
