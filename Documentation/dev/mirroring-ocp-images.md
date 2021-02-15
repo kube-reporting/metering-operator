@@ -9,7 +9,7 @@ This guide will walk through:
 ## Configure access to your cluster's in-cluster image registry
 
 First, you need to ensure your registry is accessible outside the cluster so we can push images into it.
-Follow https://docs.openshift.com/container-platform/4.1/registry/securing-exposing-registry.html to do this.
+Follow <https://docs.openshift.com/container-platform/4.1/registry/securing-exposing-registry.html> to do this.
 
 The short version is to run the following command:
 
@@ -28,7 +28,7 @@ Get your registry hostname by running the following:
 oc get route default-route -n openshift-image-registry --template='{{ .spec.host }}'
 ```
 
-And then follow the instructions in https://docs.docker.com/registry/insecure/ to add the registry to your insecure registry list.
+And then follow the instructions in <https://docs.docker.com/registry/insecure/> to add the registry to your insecure registry list.
 You can also copy the cluster's CA into the correct directory within `/etc/docker/certs.d/` by following the instructions in the same page.
 
 ## Mirror images from Brew into your cluster's in-cluster image registry

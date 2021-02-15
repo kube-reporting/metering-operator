@@ -1,6 +1,6 @@
 # Installing NooBaa
 
-Follow the instructions on https://github.com/noobaa/noobaa-operator/ for installing NooBaa.
+Follow the instructions on <https://github.com/noobaa/noobaa-operator/> for installing NooBaa.
 
 If you have an existing noobaa install, the management UI and S3 connection information can be found by running `noobaa status`.
 

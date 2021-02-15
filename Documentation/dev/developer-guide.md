@@ -10,9 +10,9 @@ This document describes setting up your environment, as well as installing Meter
 - Docker
 - jq
 - [faq](https://github.com/jzelinskie/faq) 0.0.5 or newer
-  - For Fedora 29, Rawhide, and CentOS 7 you can use the following copr repo: https://copr.fedorainfracloud.org/coprs/ecnahc515/faq/
+  - For Fedora 29, Rawhide, and CentOS 7 you can use the following copr repo: <https://copr.fedorainfracloud.org/coprs/ecnahc515/faq/>
   - For mac: `brew tap jzelinskie/faq && brew install faq`
-  - Or you can download the release binaries directly from Github: https://github.com/jzelinskie/faq/releases
+  - Or you can download the release binaries directly from Github: <https://github.com/jzelinskie/faq/releases>
 - realpath
 
 If you're using MacOS with homebrew you can install all of these using the following:

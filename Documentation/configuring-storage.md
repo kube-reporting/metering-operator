@@ -59,7 +59,8 @@ The `spec.storage.hive.s3Compatible.secretName` should be the name of a secret i
 Noobaa installation example:
 
 1. Get noobaa CLI.
-   * Download [noobaa CLI tool](https://github.com/noobaa/noobaa-core) and put it into your bin PATH.
+
+Download [noobaa CLI tool](https://github.com/noobaa/noobaa-core) and put it into your bin PATH.
 
 2. Install noobaa into your cluster
 
