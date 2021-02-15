@@ -192,9 +192,9 @@ github.com/onsi/gomega/gstruct/errors
 github.com/onsi/gomega/types
 # github.com/opencontainers/runc v1.0.0-rc92
 ## explicit
-# github.com/openshift/api v0.0.0-20200331152225-585af27e34fd
+# github.com/openshift/api v0.0.0-20210105115604-44119421ec6b
 github.com/openshift/api/route/v1
-# github.com/openshift/client-go v3.9.0+incompatible
+# github.com/openshift/client-go v0.0.0-20210112165513-ebc401615f47
 ## explicit
 github.com/openshift/client-go/route/clientset/versioned/scheme
 github.com/openshift/client-go/route/clientset/versioned/typed/route/v1

@@ -37,7 +37,7 @@ require (
 	github.com/gorilla/mux v1.8.0 // indirect
 	github.com/mailru/easyjson v0.7.1 // indirect
 	github.com/opencontainers/runc v1.0.0-rc92 // indirect
-	github.com/openshift/client-go v3.9.0+incompatible
+	github.com/openshift/client-go v0.0.0-20210112165513-ebc401615f47
 	github.com/operator-framework/api v0.5.3
 	github.com/operator-framework/operator-lifecycle-manager v0.17.0
 	k8s.io/api v0.20.2
