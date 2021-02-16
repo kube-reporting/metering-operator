@@ -21,7 +21,7 @@ require (
 	github.com/spf13/pflag v1.0.5
 	github.com/stretchr/testify v1.6.1
 	github.com/taozle/go-hive-driver v0.0.0-20181206100408-79951111cb07
-	golang.org/x/sync v0.0.0-20190911185100-cd5d95a43a6e
+	golang.org/x/sync v0.0.0-20201020160332-67f06af15bc9
 )
 
 require (
@@ -34,6 +34,7 @@ require (
 	github.com/emicklei/go-restful v2.12.0+incompatible // indirect
 	github.com/go-openapi/spec v0.19.7 // indirect
 	github.com/go-openapi/swag v0.19.8 // indirect
+	github.com/gogo/protobuf v1.3.2 // indirect
 	github.com/gorilla/mux v1.8.0 // indirect
 	github.com/mailru/easyjson v0.7.1 // indirect
 	github.com/opencontainers/runc v1.0.0-rc92 // indirect
@@ -82,6 +83,7 @@ replace (
 	git.apache.org/thrift.git v0.0.0-20171203172758-327ebb6c2b6d => github.com/apache/thrift v0.0.0-20171203172758-327ebb6c2b6d
 	// Required by Helm
 	github.com/docker/docker => github.com/moby/moby v0.7.3-0.20190826074503-38ab9da00309
+	github.com/gogo/protobuf => github.com/gogo/protobuf v1.3.2
 	github.com/prometheus/client_golang => github.com/prometheus/client_golang v0.9.0-pre1
 	// required by operator-metering
 	github.com/taozle/go-hive-driver => github.com/chancez/go-hive-driver v0.0.0-20190516203049-b3c680b33c4f
