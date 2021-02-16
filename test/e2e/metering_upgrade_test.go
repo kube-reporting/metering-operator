@@ -11,7 +11,6 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/kube-reporting/metering-operator/test/deployframework"
-	"github.com/kube-reporting/metering-operator/test/reportingframework"
 	"github.com/kube-reporting/metering-operator/test/testhelpers"
 )
 
@@ -36,8 +35,6 @@ func testManualOLMUpgradeInstall(
 	upgradeFromSubscriptionChannel,
 	subscriptionChannel,
 	testOutputPath string,
-	expectInstallErrMsg []string,
-	expectInstallErr,
 	purgeReports,
 	purgeReportDataSources bool,
 	testInstallFunction InstallTestCase,
@@ -83,12 +80,8 @@ func testManualOLMUpgradeInstall(
 	require.NoError(t, err, "creating a new deployer context should produce no error")
 	deployerCtx.Logger.Infof("DeployerCtx: %+v", deployerCtx)
 
-	var (
-		canSafelyRunTest bool
-		rf               *reportingframework.ReportingFramework
-	)
-	rf, err = deployerCtx.Setup(deployerCtx.Deployer.InstallOLM)
-	require.NoError(t, err, "failed to successfully the pre-upgrade metering installation")
+	rf, err := deployerCtx.Setup(deployerCtx.Deployer.InstallOLM)
+	require.NoError(t, err, "installing metering should produce no error")
 
 	preUpgradeTestName := fmt.Sprintf("pre-upgrade-%s", testInstallFunction.Name)
 	t.Run(preUpgradeTestName, func(t *testing.T) {
@@ -105,18 +98,13 @@ func testManualOLMUpgradeInstall(
 
 	deployerCtx.TestCaseOutputPath = postUpgradeTestOutputDir
 	rf, err = deployerCtx.Upgrade(catalogSourceName, catalogSourceNamespace, subscriptionChannel, purgeReports, purgeReportDataSources)
-	if canSafelyRunTest = testhelpers.AssertCanSafelyRunReportingTests(t, err, expectInstallErr, expectInstallErrMsg); !canSafelyRunTest {
-		err = deployerCtx.MustGatherMeteringResources(gatherTestArtifactsScript)
-		assert.NoError(t, err, "gathering metering resources should produce no error")
-	}
+	require.NoError(t, err, "upgrading metering should produce no error")
 
-	if canSafelyRunTest {
-		// run tests against the upgraded installation
-		postUpgradeTestName := fmt.Sprintf("post-upgrade-%s", testInstallFunction.Name)
-		t.Run(postUpgradeTestName, func(t *testing.T) {
-			testInstallFunction.TestFunc(t, rf)
-		})
-	}
+	// run tests against the upgraded installation
+	postUpgradeTestName := fmt.Sprintf("post-upgrade-%s", testInstallFunction.Name)
+	t.Run(postUpgradeTestName, func(t *testing.T) {
+		testInstallFunction.TestFunc(t, rf)
+	})
 
 	err = deployerCtx.Teardown(deployerCtx.Deployer.UninstallOLM)
 	require.NoError(t, err, "capturing logs and uninstalling metering should produce no error")
