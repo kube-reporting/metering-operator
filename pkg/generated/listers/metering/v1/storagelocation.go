@@ -10,8 +10,10 @@ import (
 )
 
 // StorageLocationLister helps list StorageLocations.
+// All objects returned here must be treated as read-only.
 type StorageLocationLister interface {
 	// List lists all StorageLocations in the indexer.
+	// Objects returned here must be treated as read-only.
 	List(selector labels.Selector) (ret []*v1.StorageLocation, err error)
 	// StorageLocations returns an object that can list and get StorageLocations.
 	StorageLocations(namespace string) StorageLocationNamespaceLister
@@ -42,10 +44,13 @@ func (s *storageLocationLister) StorageLocations(namespace string) StorageLocati
 }
 
 // StorageLocationNamespaceLister helps list and get StorageLocations.
+// All objects returned here must be treated as read-only.
 type StorageLocationNamespaceLister interface {
 	// List lists all StorageLocations in the indexer for a given namespace.
+	// Objects returned here must be treated as read-only.
 	List(selector labels.Selector) (ret []*v1.StorageLocation, err error)
 	// Get retrieves the StorageLocation from the indexer for a given namespace and name.
+	// Objects returned here must be treated as read-only.
 	Get(name string) (*v1.StorageLocation, error)
 	StorageLocationNamespaceListerExpansion
 }

@@ -10,8 +10,10 @@ import (
 )
 
 // MeteringConfigLister helps list MeteringConfigs.
+// All objects returned here must be treated as read-only.
 type MeteringConfigLister interface {
 	// List lists all MeteringConfigs in the indexer.
+	// Objects returned here must be treated as read-only.
 	List(selector labels.Selector) (ret []*v1.MeteringConfig, err error)
 	// MeteringConfigs returns an object that can list and get MeteringConfigs.
 	MeteringConfigs(namespace string) MeteringConfigNamespaceLister
@@ -42,10 +44,13 @@ func (s *meteringConfigLister) MeteringConfigs(namespace string) MeteringConfigN
 }
 
 // MeteringConfigNamespaceLister helps list and get MeteringConfigs.
+// All objects returned here must be treated as read-only.
 type MeteringConfigNamespaceLister interface {
 	// List lists all MeteringConfigs in the indexer for a given namespace.
+	// Objects returned here must be treated as read-only.
 	List(selector labels.Selector) (ret []*v1.MeteringConfig, err error)
 	// Get retrieves the MeteringConfig from the indexer for a given namespace and name.
+	// Objects returned here must be treated as read-only.
 	Get(name string) (*v1.MeteringConfig, error)
 	MeteringConfigNamespaceListerExpansion
 }

@@ -10,8 +10,10 @@ import (
 )
 
 // ReportQueryLister helps list ReportQueries.
+// All objects returned here must be treated as read-only.
 type ReportQueryLister interface {
 	// List lists all ReportQueries in the indexer.
+	// Objects returned here must be treated as read-only.
 	List(selector labels.Selector) (ret []*v1.ReportQuery, err error)
 	// ReportQueries returns an object that can list and get ReportQueries.
 	ReportQueries(namespace string) ReportQueryNamespaceLister
@@ -42,10 +44,13 @@ func (s *reportQueryLister) ReportQueries(namespace string) ReportQueryNamespace
 }
 
 // ReportQueryNamespaceLister helps list and get ReportQueries.
+// All objects returned here must be treated as read-only.
 type ReportQueryNamespaceLister interface {
 	// List lists all ReportQueries in the indexer for a given namespace.
+	// Objects returned here must be treated as read-only.
 	List(selector labels.Selector) (ret []*v1.ReportQuery, err error)
 	// Get retrieves the ReportQuery from the indexer for a given namespace and name.
+	// Objects returned here must be treated as read-only.
 	Get(name string) (*v1.ReportQuery, error)
 	ReportQueryNamespaceListerExpansion
 }

@@ -10,8 +10,10 @@ import (
 )
 
 // ReportLister helps list Reports.
+// All objects returned here must be treated as read-only.
 type ReportLister interface {
 	// List lists all Reports in the indexer.
+	// Objects returned here must be treated as read-only.
 	List(selector labels.Selector) (ret []*v1.Report, err error)
 	// Reports returns an object that can list and get Reports.
 	Reports(namespace string) ReportNamespaceLister
@@ -42,10 +44,13 @@ func (s *reportLister) Reports(namespace string) ReportNamespaceLister {
 }
 
 // ReportNamespaceLister helps list and get Reports.
+// All objects returned here must be treated as read-only.
 type ReportNamespaceLister interface {
 	// List lists all Reports in the indexer for a given namespace.
+	// Objects returned here must be treated as read-only.
 	List(selector labels.Selector) (ret []*v1.Report, err error)
 	// Get retrieves the Report from the indexer for a given namespace and name.
+	// Objects returned here must be treated as read-only.
 	Get(name string) (*v1.Report, error)
 	ReportNamespaceListerExpansion
 }
