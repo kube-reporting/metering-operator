@@ -484,8 +484,6 @@ func TestMeteringUpgrades(t *testing.T) {
 				upgradeFromSubscriptionChannel,
 				subscriptionChannel,
 				testOutputPath,
-				testCase.ExpectInstallErrMsg,
-				testCase.ExpectInstallErr,
 				testCase.PurgeReports,
 				testCase.PurgeReportDataSources,
 				testCase.InstallSubTest,
