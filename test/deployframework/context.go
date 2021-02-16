@@ -187,7 +187,7 @@ func (ctx *DeployerCtx) NewLocalCtx() *LocalCtx {
 func (ctx *DeployerCtx) Setup(installFunc func() error) (*reportingframework.ReportingFramework, error) {
 	err := installFunc()
 	if err != nil {
-		installErrMsg = fmt.Sprintf("failed to install metering: %v", err)
+		installErrMsg := fmt.Sprintf("failed to install metering: %v", err)
 		ctx.Logger.Infof(installErrMsg)
 		return nil, fmt.Errorf(installErrMsg)
 	}
@@ -214,16 +214,17 @@ func (ctx *DeployerCtx) Setup(installFunc func() error) (*reportingframework.Rep
 		OLMClient:     ctx.OLMV1Alpha1Client,
 		Logger:        ctx.Logger.WithField("component", "podWaiter"),
 	}
-	err := pw.WaitForPods(ctx.Namespace, ctx.TargetPodsCount)
+	err = pw.WaitForPods(ctx.Namespace, ctx.TargetPodsCount)
 	if err != nil {
 		if err == ErrInstallPlanFailed {
 			return nil, ErrInstallPlanFailed
 		}
 		return nil, fmt.Errorf("error waiting for metering pods to become ready: %v", err)
 	}
-	ctx.Logger.Infof("Installing metering took %v", time.Since(start))
 
+	ctx.Logger.Infof("Installing metering took %v", time.Since(start))
 	ctx.Logger.Infof("Getting the service account %s", reportingOperatorServiceAccountName)
+
 	routeBearerToken, err := GetServiceAccountToken(
 		ctx.Client,
 		initialDelay,
@@ -273,10 +274,6 @@ func (ctx *DeployerCtx) Setup(installFunc func() error) (*reportingframework.Rep
 	)
 	if err != nil {
 		return nil, fmt.Errorf("failed to construct a reportingframework: %v", err)
-	}
-
-	if installErrMsg != "" {
-		return rf, fmt.Errorf(installErrMsg)
 	}
 
 	return rf, nil
