@@ -13,6 +13,11 @@ VERIFY_FILE_PATHS := cmd pkg test manifests
 
 # CONTAINER_RUNTIME_CMD can be docker or podman.
 CONTAINER_RUNTIME_CMD = docker
+# CONTAINER_RUNTIME_RUN_OPTS allows you to specify a list of
+# $(CONTAINER_RUNTIME_CMD) run flags. In the case you're getting
+# errors reading from mounted volumes, try disabling selinux permissions
+# by running `make <target> CONTAINER_RUNTIME_RUN_OPTS="--security-opt label=disable"
+CONTAINER_RUNTIME_RUN_OPTS = ""
 IMAGE_BUILD_CMD = $(CONTAINER_RUNTIME_CMD) build
 
 OKD_BUILD = false
@@ -116,6 +121,7 @@ unit:
 
 unit-docker: metering-src-docker-build
 	$(CONTAINER_RUNTIME_CMD) run \
+		$(CONTAINER_RUNTIME_RUN_OPTS) \
 		--rm \
 		-t \
 		-w /go/src/github.com/kube-reporting/metering-operator \
@@ -140,6 +146,7 @@ e2e-dev-local:
 
 e2e-docker: metering-src-docker-build
 	$(CONTAINER_RUNTIME_CMD) run \
+		$(CONTAINER_RUNTIME_RUN_OPTS) \
 		--name metering-e2e-docker \
 		-t \
 		-e METERING_NAMESPACE \
@@ -188,6 +195,7 @@ verify-olm-manifests: metering-manifests
 
 verify-docker: metering-src-docker-build
 	$(CONTAINER_RUNTIME_CMD) run \
+		$(CONTAINER_RUNTIME_RUN_OPTS) \
 		--rm \
 		-t \
 		-w /go/src/github.com/kube-reporting/metering-operator \
