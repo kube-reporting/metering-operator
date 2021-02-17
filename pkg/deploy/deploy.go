@@ -66,7 +66,7 @@ type Config struct {
 	SkipMeteringDeployment   bool
 	RunMeteringOperatorLocal bool
 	DeleteCRDs               bool
-	DeleteCRB                bool
+	DeleteCRBs               bool
 	DeleteNamespace          bool
 	DeletePVCs               bool
 	DeleteAll                bool
@@ -101,13 +101,13 @@ type OperatorResources struct {
 // to provision and remove all the metering resources, and a customized
 // deployment configuration.
 type Deployer struct {
-	config            Config
-	logger            logrus.FieldLogger
-	client            kubernetes.Interface
-	apiExtClient      apiextclientv1.CustomResourceDefinitionsGetter
-	meteringClient    meteringclient.MeteringV1Interface
-	olmV1Client       olmclientv1.OperatorsV1Interface
-	olmV1Alpha1Client olmclientv1alpha1.OperatorsV1alpha1Interface
+	Config            Config
+	Logger            logrus.FieldLogger
+	Client            kubernetes.Interface
+	APIExtClient      apiextclientv1.CustomResourceDefinitionsGetter
+	MeteringClient    meteringclient.MeteringV1Interface
+	OLMV1Client       olmclientv1.OperatorsV1Interface
+	OLMV1Alpha1Client olmclientv1alpha1.OperatorsV1alpha1Interface
 }
 
 // NewDeployer creates a new reference to a deploy structure, and then calls helper
@@ -124,25 +124,25 @@ func NewDeployer(
 	olmV1Alpha1Client olmclientv1alpha1.OperatorsV1alpha1Interface,
 ) (*Deployer, error) {
 	deploy := &Deployer{
-		client:            client,
-		apiExtClient:      apiextClient,
-		meteringClient:    meteringClient,
-		olmV1Client:       olmV1Client,
-		olmV1Alpha1Client: olmV1Alpha1Client,
-		logger:            logger,
-		config:            cfg,
+		Client:            client,
+		APIExtClient:      apiextClient,
+		MeteringClient:    meteringClient,
+		OLMV1Client:       olmV1Client,
+		OLMV1Alpha1Client: olmV1Alpha1Client,
+		Logger:            logger,
+		Config:            cfg,
 	}
 
-	deploy.logger.Infof("Metering Deploy Namespace: %s", deploy.config.Namespace)
-	deploy.logger.Infof("Metering Deploy Platform: %s", deploy.config.Platform)
+	deploy.Logger.Infof("Metering Deploy Namespace: %s", deploy.Config.Namespace)
+	deploy.Logger.Infof("Metering Deploy Platform: %s", deploy.Config.Platform)
 
-	if deploy.config.DeleteAll {
-		deploy.config.DeletePVCs = true
-		deploy.config.DeleteNamespace = true
-		deploy.config.DeleteCRB = true
-		deploy.config.DeleteCRDs = true
+	if deploy.Config.DeleteAll {
+		deploy.Config.DeletePVCs = true
+		deploy.Config.DeleteNamespace = true
+		deploy.Config.DeleteCRBs = true
+		deploy.Config.DeleteCRDs = true
 	}
-	if deploy.config.Namespace == "" {
+	if deploy.Config.Namespace == "" {
 		return deploy, fmt.Errorf("failed to set $METERING_NAMESPACE or --namespace flag")
 	}
 
@@ -155,7 +155,7 @@ func NewDeployer(
 func (deploy *Deployer) InstallOLM() error {
 	err := deploy.installNamespace()
 	if err != nil {
-		return fmt.Errorf("failed to create the %s namespace: %v", deploy.config.Namespace, err)
+		return fmt.Errorf("failed to create the %s namespace: %v", deploy.Config.Namespace, err)
 	}
 
 	err = deploy.installMeteringOperatorGroup()
@@ -202,25 +202,25 @@ func (deploy *Deployer) UninstallOLM() error {
 		return fmt.Errorf("failed to uninstall the metering OperatorGroup: %v", err)
 	}
 
-	if deploy.config.DeletePVCs {
+	if deploy.Config.DeletePVCs {
 		err = deploy.uninstallMeteringPVCs()
 		if err != nil {
 			return fmt.Errorf("failed to uninstall the Metering PVCs: %v", err)
 		}
 	}
-	if deploy.config.DeleteCRDs {
+	if deploy.Config.DeleteCRDs {
 		err = deploy.uninstallMeteringCRDs()
 		if err != nil {
 			return fmt.Errorf("failed to uninstall the metering-related CRDs: %v", err)
 		}
 	}
-	if deploy.config.DeleteNamespace {
+	if deploy.Config.DeleteNamespace {
 		err = deploy.uninstallNamespace()
 		if err != nil {
-			return fmt.Errorf("failed to uninstall the %s metering namespace: %v", deploy.config.Namespace, err)
+			return fmt.Errorf("failed to uninstall the %s metering namespace: %v", deploy.Config.Namespace, err)
 		}
 	}
-	if deploy.config.DeleteCRB {
+	if deploy.Config.DeleteCRBs {
 		err = deploy.uninstallReportingOperatorClusterRole()
 		if err != nil {
 			return fmt.Errorf("failed to delete the reporting-operator ClusterRole resources: %v", err)
@@ -239,7 +239,7 @@ func (deploy *Deployer) UninstallOLM() error {
 func (deploy *Deployer) Install() error {
 	err := deploy.installNamespace()
 	if err != nil {
-		return fmt.Errorf("failed to create the %s namespace: %v", deploy.config.Namespace, err)
+		return fmt.Errorf("failed to create the %s namespace: %v", deploy.Config.Namespace, err)
 	}
 
 	err = deploy.installMeteringCRDs()
@@ -247,7 +247,7 @@ func (deploy *Deployer) Install() error {
 		return fmt.Errorf("failed to create the Metering CRDs: %v", err)
 	}
 
-	if !deploy.config.SkipMeteringDeployment {
+	if !deploy.Config.SkipMeteringDeployment {
 		err = deploy.installMeteringResources()
 		if err != nil {
 			return fmt.Errorf("failed to create the metering resources: %v", err)
@@ -276,22 +276,22 @@ func (deploy *Deployer) Uninstall() error {
 		return fmt.Errorf("failed to delete the metering resources: %v", err)
 	}
 
-	if deploy.config.DeleteCRDs {
+	if deploy.Config.DeleteCRDs {
 		err = deploy.uninstallMeteringCRDs()
 		if err != nil {
 			return fmt.Errorf("failed to delete the Metering CRDs: %v", err)
 		}
 	} else {
-		deploy.logger.Infof("Skipped deleting the metering CRDs")
+		deploy.Logger.Infof("Skipped deleting the metering CRDs")
 	}
 
-	if deploy.config.DeleteNamespace {
+	if deploy.Config.DeleteNamespace {
 		err = deploy.uninstallNamespace()
 		if err != nil {
-			return fmt.Errorf("failed to delete the %s namespace: %v", deploy.config.Namespace, err)
+			return fmt.Errorf("failed to delete the %s namespace: %v", deploy.Config.Namespace, err)
 		}
 	} else {
-		deploy.logger.Infof("Skipped deleting the %s namespace", deploy.config.Namespace)
+		deploy.Logger.Infof("Skipped deleting the %s namespace", deploy.Config.Namespace)
 	}
 
 	return nil

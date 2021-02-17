@@ -1,6 +1,7 @@
 package e2e
 
 import (
+	"context"
 	"flag"
 	"fmt"
 	"os"
@@ -9,7 +10,9 @@ import (
 	"testing"
 
 	"github.com/sirupsen/logrus"
+	"github.com/stretchr/testify/require"
 
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	_ "k8s.io/client-go/plugin/pkg/client/auth/oidc"
 
 	"github.com/kube-reporting/metering-operator/test/deployframework"
@@ -172,14 +175,55 @@ type InstallTestCase struct {
 
 type PreInstallFunc func(ctx *deployframework.DeployerCtx) error
 
+func TestInvalidMeteringConfigs(t *testing.T) {
+	namespace := fmt.Sprintf("%s-invalid-meteringconfigs", namespacePrefix)
+	ns, err := createTestingNamespace(df.Client, namespace)
+	require.NoError(t, err, "failed to successfully create the %s testing namespace", namespace)
+	require.NotEmpty(t, ns.Name, "expected the testing namespace would not be nil")
+
+	tt := []struct {
+		Name                           string
+		ExpectInstallErrMsg            []string
+		MeteringConfigManifestFileName string
+	}{
+		{
+			Name: "missing-storage-spec",
+			ExpectInstallErrMsg: []string{
+				"spec.storage in body is required|spec.storage: Required value",
+			},
+			MeteringConfigManifestFileName: "missing-storage.yaml",
+		},
+	}
+
+	for _, tc := range tt {
+		tc := tc
+		t := t
+
+		mc, err := testhelpers.DecodeMeteringConfigManifest(repoPath, testMeteringConfigManifestsPath, tc.MeteringConfigManifestFileName)
+		require.NoError(t, err, "failed to successfully decode the YAML MeteringConfig manifest")
+
+		_, err = df.MeteringClient.MeteringConfigs(ns.Name).Create(context.Background(), mc, metav1.CreateOptions{})
+		testhelpers.AssertErrorContainsErrorMsgs(t, err, tc.ExpectInstallErrMsg)
+	}
+
+	// In the case that `make e2e-dev` has been specified, avoid
+	// deleting the testing namespace used to validate the MC's.
+	if runDevSetup {
+		return
+	}
+
+	// May need to account for apierrors.IsNotFound(err) just to reduce
+	// any potential e2e flakes and return w/o an error
+	err = df.Client.CoreV1().Namespaces().Delete(context.Background(), ns.Name, metav1.DeleteOptions{})
+	require.NoError(t, err, "failed to delete the %s testing namespace", ns.Name)
+}
+
 func TestManualMeteringInstall(t *testing.T) {
 	testInstallConfigs := []struct {
 		Name                           string
 		MeteringOperatorImageRepo      string
 		MeteringOperatorImageTag       string
 		Skip                           bool
-		ExpectInstallErr               bool
-		ExpectInstallErrMsg            []string
 		InstallSubTests                []InstallTestCase
 		PreInstallFunc                 PreInstallFunc
 		MeteringConfigManifestFilename string
@@ -196,7 +240,7 @@ func TestManualMeteringInstall(t *testing.T) {
 			// any new machine. The result is the new machines that get
 			// provisioned, don't have this custom node label we added in
 			// the preInstallFunc closure.
-			Skip:           true,
+			Skip:           !testing.Short(),
 			PreInstallFunc: customNodeSelectorFunc,
 			InstallSubTests: []InstallTestCase{
 				{
@@ -213,10 +257,6 @@ func TestManualMeteringInstall(t *testing.T) {
 				{
 					Name:     "testMeteringAnsibleOperatorMetricsWork",
 					TestFunc: testMeteringAnsibleOperatorMetricsWork,
-				},
-				{
-					Name:     "testPrometheusConnectorWorks",
-					TestFunc: testPrometheusConnectorWorks,
 				},
 				{
 					Name:     "testReportingOperatorServiceCABundleExists",
@@ -388,8 +428,6 @@ func TestManualMeteringInstall(t *testing.T) {
 				catalogSourceNamespace,
 				subscriptionChannel,
 				testOutputPath,
-				testCase.ExpectInstallErrMsg,
-				testCase.ExpectInstallErr,
 				testCase.PreInstallFunc,
 				testCase.InstallSubTests,
 			)
@@ -417,7 +455,6 @@ func TestMeteringUpgrades(t *testing.T) {
 			PurgeReports:              true,
 			PurgeReportDataSources:    true,
 			Skip:                      false,
-			ExpectInstallErrMsg:       []string{},
 			InstallSubTest: InstallTestCase{
 				Name:     "testReportingProducesData",
 				TestFunc: testReportingProducesData,
@@ -454,8 +491,6 @@ func TestMeteringUpgrades(t *testing.T) {
 				upgradeFromSubscriptionChannel,
 				subscriptionChannel,
 				testOutputPath,
-				testCase.ExpectInstallErrMsg,
-				testCase.ExpectInstallErr,
 				testCase.PurgeReports,
 				testCase.PurgeReportDataSources,
 				testCase.InstallSubTest,
