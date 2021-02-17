@@ -34,13 +34,16 @@ const (
 	meteringconfigMetadataName          = "operator-metering"
 	reportingOperatorServiceAccountName = "reporting-operator"
 
-	defaultTargetPods        = 7
-	defaultPlatform          = "openshift"
-	defaultDeleteNamespace   = true
-	defaultDeleteCRB         = true
-	defaultSubscriptionName  = "metering-ocp"
-	defaultCatalogSourceName = "metering-dev-catalogsource"
-	defaultPackageName       = "metering-ocp"
+	DefaultTargetPods        = 7
+	DefaultPlatform          = "openshift"
+	DefaultSubscriptionName  = "metering-ocp"
+	DefaultCatalogSourceName = "metering-dev-catalogsource"
+	DefaultPackageName       = "metering-ocp"
+
+	DefaultDeleteNamespace = true
+	DefaultDeleteCRB       = true
+	DefaultDeletePVC       = true
+	DefaultDeleteCRD       = false
 
 	manifestsDeployDir = "manifests/deploy"
 	olmManifestsDir    = "olm_deploy/manifests/"
@@ -113,7 +116,7 @@ func New(logger logrus.FieldLogger, runLocal, runDevSetup bool, nsPrefix, repoDi
 		return nil, fmt.Errorf("failed to stat the %s path to the manifest/deploy directory: %v", manifestsDir, err)
 	}
 
-	operatorResources, err := deploy.ReadMeteringAnsibleOperatorManifests(manifestsDir, defaultPlatform)
+	operatorResources, err := deploy.ReadMeteringAnsibleOperatorManifests(manifestsDir, DefaultPlatform)
 	if err != nil {
 		return nil, fmt.Errorf("failed to initialize objects from manifests: %v", err)
 	}
@@ -149,6 +152,10 @@ func (df *DeployFramework) NewDeployerConfig(
 	catalogSourceName,
 	catalogSourceNamespace,
 	subscriptionChannel string,
+	deleteNamespace,
+	deleteCRDs,
+	deleteCRBs,
+	deletePVCs bool,
 	spec metering.MeteringConfigSpec,
 ) (*deploy.Config, error) {
 	meteringConfig := &metering.MeteringConfig{
@@ -195,11 +202,13 @@ func (df *DeployFramework) NewDeployerConfig(
 		Namespace:              namespace,
 		Repo:                   meteringOperatorImageRepo,
 		Tag:                    meteringOperatorImageTag,
-		Platform:               defaultPlatform,
-		DeleteNamespace:        defaultDeleteNamespace,
-		DeleteCRB:              defaultDeleteCRB,
-		SubscriptionName:       defaultSubscriptionName,
-		PackageName:            defaultPackageName,
+		Platform:               DefaultPlatform,
+		DeleteNamespace:        deleteNamespace,
+		DeleteCRDs:             deleteCRDs,
+		DeleteCRBs:             deleteCRBs,
+		DeletePVCs:             deletePVCs,
+		SubscriptionName:       DefaultSubscriptionName,
+		PackageName:            DefaultPackageName,
 		CatalogSourceName:      catalogSourceName,
 		CatalogSourceNamespace: catalogSourceNamespace,
 		Channel:                subscriptionChannel,

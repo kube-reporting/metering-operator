@@ -1,9 +1,9 @@
 # need the helm-cli from the helm image
-FROM registry.svc.ci.openshift.org/ocp/4.6:metering-helm as helm
+FROM registry.ci.openshift.org/ocp/4.6:metering-helm AS helm
 # final image needs kubectl, so we copy `oc` from cli image to use as kubectl.
-FROM registry.svc.ci.openshift.org/ocp/4.6:cli as cli
+FROM registry.ci.openshift.org/ocp/4.6:cli AS cli
 # real base
-FROM registry.svc.ci.openshift.org/ocp/4.6:ansible-operator
+FROM registry.ci.openshift.org/ocp/4.6:ansible-operator
 
 USER root
 RUN set -x; \
@@ -20,7 +20,9 @@ COPY --from=helm /usr/local/bin/helm /usr/local/bin/helm
 COPY --from=cli /usr/bin/oc /usr/bin/oc
 RUN ln -f -s /usr/bin/oc /usr/bin/kubectl
 
-RUN yum -y update python3-openshift python3-cryptography
+# Ansible 2.9.6 and above is required due to the crypto.py FIPS fix
+# being patched upstream: https://bugzilla.redhat.com/show_bug.cgi?id=1899136
+RUN yum -y update python3-openshift python3-cryptography 'ansible>=2.9.6'
 
 ENV HOME /opt/ansible
 ENV HELM_CHART_PATH ${HOME}/charts/openshift-metering
