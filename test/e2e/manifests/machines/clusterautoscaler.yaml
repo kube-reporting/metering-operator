@@ -13,8 +13,4 @@ spec:
       max: 256
       min: 16
   scaleDown:
-    delayAfterAdd: 2m
-    delayAfterDelete: 2m
-    delayAfterFailure: 30s
-    enabled: true
-    unneededTime: 60s
+    enabled: false
