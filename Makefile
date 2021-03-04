@@ -108,7 +108,7 @@ fmt:
 	@echo path: $(shell pwd)
 	find . -name '*.go' -not -path "./vendor/*" | xargs gofmt -w
 
-# Update dependencies
+.PHONY: vendor
 vendor:
 	go mod tidy
 	go mod vendor
