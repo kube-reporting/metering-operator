@@ -52,6 +52,10 @@ kubectl -n $METERING_NAMESPACE create secret generic <name of the secret> --from
 
 ### Using MySQL for the Hive Metastore database
 
+Metering supports configuring the internal Hive Metastore to use [MySQL 5.6, 5.7, and 8.0 server versions](https://dev.mysql.com/doc/connector-j/8.0/en/connector-j-versions.html).
+
+The following `MeteringConfig` snippet serves as a minimal setup to configure the Hive Metastore with an existing MySQL instance:
+
 ```yaml
 spec:
   hive:
@@ -59,11 +63,26 @@ spec:
       config:
         db:
           url: "jdbc:mysql://mysql.example.com:3306/hive_metastore"
-          driver: "com.mysql.jdbc.Driver"
+          driver: "com.mysql.cj.jdbc.Driver"
           secretName: "REPLACEME"
 ```
 
-You can pass additional JDBC parameters using the `spec.hive.spec.config.db.url`, for more details see [the MySQL Connector/J documentation](https://dev.mysql.com/doc/connector-j/5.1/en/connector-j-reference-configuration-properties.html).
+You can pass additional JDBC parameters using the `spec.hive.spec.config.db.url`. For more details see [the MySQL Connector/J 8.0 documentation](https://dev.mysql.com/doc/connector-j/8.0/en/connector-j-reference-configuration-properties.html).
+
+**Note**: When configuring Metering to work with older MySQL server versions, like 5.6 or 5.7, you may need to add the [`enabledTLSProtocols` JDBC URL parameter](https://dev.mysql.com/doc/connector-j/8.0/en/connector-j-usagenotes-known-issues-limitations.html) when configuring the internal Hive metastore.
+
+For example, in order to use the TLS v1.2 cipher suite, you can use the following snippet as a reference:
+
+```yaml
+...
+spec:
+  hive:
+    spec:
+      config:
+        db:
+          url: "jdbc:mysql://<hostname>:<port>/<schema>?enabledTLSProtocols=TLSv1.2"
+...
+```
 
 ## Using PostgreSQL for the Hive Metastore database
 
