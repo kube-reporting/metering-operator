@@ -208,16 +208,24 @@ metadata:
     certified: "false"
     containerImage: quay.io/openshift/origin-metering-ansible-operator:4.7
     createdAt: "2019-01-01T11:59:59Z"
-    description: Chargeback and reporting tool to provide accountability for how resources
-      are used across a cluster
+    description: The Metering Operator is deprecated and will be removed in a future release.
     operatorframework.io/cluster-monitoring: "true"
     operatorframework.io/suggested-namespace: openshift-metering
     operators.openshift.io/capability: '["fips", "cluster-proxy"]'
     repository: https://github.com/kube-reporting/metering-operator
     support: Red Hat, Inc.
 spec:
-  displayName: Metering
+  displayName: Metering (Deprecated)
   description: |
+    # Deprecation Notice
+
+    The Metering Operator was **deprecated** in the [OpenShift 4.6 release](https://docs.openshift.com/container-platform/4.6/release_notes/ocp-4-6-release-notes.html#ocp-4-6-metering-operator-deprecated).
+
+    In the future, this version of the Metering package may be removed, so please
+    plan accordingly.
+
+    ## Summary
+
     The Metering Operator is a generic reporting tool to provide accountability for how resources are used across a cluster cherry-picking and storing information from different sources. Cluster admins can schedule reports based on historical usage data by Pod, Namespace, and Cluster for storage. The Metering Operator is a part of the [Kubernetes Reporting organization](https://github.com/kube-reporting).
 
     Read the user guide for more details on [running and viewing your first report](https://docs.openshift.com/container-platform/4.7/metering/metering-using-metering.html).
@@ -257,7 +265,7 @@ spec:
   keywords: [metering metrics reporting prometheus chargeback]
   version: "4.7.0"
   minKubeVersion: "1.18.3"
-  maturity: stable
+  maturity: deprecated
   maintainers:
     - email: metering-team@redhat.com
       name: Red Hat
