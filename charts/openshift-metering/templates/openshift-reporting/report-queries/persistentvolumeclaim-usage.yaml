@@ -32,14 +32,14 @@ spec:
     default: persistentvolumeclaim-phase
   query: |
     SELECT
-        labels['namespace'] as namespace,
-        labels['persistentvolumeclaim'] as persistentvolumeclaim,
-        labels,
-        amount as value,
-        labels['phase'] as phase,
-        timeprecision,
-        "timestamp",
-        dt
+      labels['namespace'] as namespace,
+      labels['persistentvolumeclaim'] as persistentvolumeclaim,
+      labels,
+      amount as value,
+      labels['phase'] as phase,
+      timeprecision,
+      "timestamp",
+      dt
     FROM {| dataSourceTableName .Report.Inputs.PersistentvolumeclaimPhaseDataSourceName |}
 ---
 apiVersion: metering.openshift.io/v1
@@ -77,14 +77,14 @@ spec:
     default: persistentvolumeclaim-usage-bytes
   query: |
     SELECT
-        coalesce(element_at(labels, 'exported_namespace'), element_at(labels, 'namespace')) as namespace,
-        labels['persistentvolumeclaim'] as persistentvolumeclaim,
-        labels,
-        amount as persistentvolumeclaim_usage_bytes,
-        timeprecision,
-        amount * timeprecision as persistentvolumeclaim_usage_byte_seconds,
-        "timestamp",
-        dt
+      coalesce(element_at(labels, 'exported_namespace'), element_at(labels, 'namespace')) as namespace,
+      labels['persistentvolumeclaim'] as persistentvolumeclaim,
+      labels,
+      amount as persistentvolumeclaim_usage_bytes,
+      timeprecision,
+      amount * timeprecision as persistentvolumeclaim_usage_byte_seconds,
+      "timestamp",
+      dt
     FROM {| dataSourceTableName .Report.Inputs.PersistentvolumeclaimUsageBytesDataSourceName |}
 ---
 apiVersion: metering.openshift.io/v1
@@ -117,13 +117,13 @@ spec:
     default: persistentvolumeclaim-phase-raw
   query: |
     SELECT
+      phase.dt AS dt,
       phase.namespace AS namespace,
       phase.timestamp AS timestamp,
       phase.persistentvolumeclaim AS persistentvolumeclaim,
-      min(persistentvolumeclaim_usage_bytes) AS persistentvolumeclaim_usage_bytes,
-      phase.dt AS dt
+      min(persistentvolumeclaim_usage_bytes) AS persistentvolumeclaim_usage_bytes
     FROM {| dataSourceTableName .Report.Inputs.PersistentvolumeclaimPhaseRawDataSourceName |} AS phase
-    FULL OUTER JOIN {| dataSourceTableName .Report.Inputs.PersistentvolumeclaimUsageRawDataSourceName |} AS usage
+    LEFT OUTER JOIN {| dataSourceTableName .Report.Inputs.PersistentvolumeclaimUsageRawDataSourceName |} AS usage
     ON phase.namespace=usage.namespace
     AND phase.persistentvolumeclaim=usage.persistentvolumeclaim
     AND phase.timestamp=usage.timestamp
@@ -196,19 +196,32 @@ spec:
     unit: bytes
   inputs:
   - name: ReportingStart
+    type: time
   - name: ReportingEnd
+    type: time
   - name: PersistentvolumeclaimUsageWithPhaseRawDataSourceName
     type: ReportDataSource
     default: persistentvolumeclaim-usage-with-phase-raw
   query: |
+    WITH averaged_persistentvolumeclaim_usage_per_pvc AS (
+      SELECT
+        timestamp '{| default .Report.ReportingStart .Report.Inputs.ReportingStart| prestoTimestamp |}' AS period_start,
+        timestamp '{| default .Report.ReportingEnd .Report.Inputs.ReportingEnd | prestoTimestamp |}' AS period_end,
+        namespace,
+        persistentvolumeclaim,
+        avg(persistentvolumeclaim_usage_bytes) as avg_persistentvolumeclaim_usage_bytes
+      FROM {| dataSourceTableName .Report.Inputs.PersistentvolumeclaimUsageWithPhaseRawDataSourceName |}
+      WHERE
+        "timestamp" >= timestamp '{| default .Report.ReportingStart .Report.Inputs.ReportingStart | prestoTimestamp |}'
+        AND "timestamp" < timestamp '{| default .Report.ReportingEnd .Report.Inputs.ReportingEnd | prestoTimestamp |}'
+        AND dt >= '{| default .Report.ReportingStart .Report.Inputs.ReportingStart | prometheusMetricPartitionFormat |}'
+        AND dt <= '{| default .Report.ReportingEnd .Report.Inputs.ReportingEnd | prometheusMetricPartitionFormat |}'
+      GROUP BY namespace, persistentvolumeclaim
+    )
     SELECT
       timestamp '{| default .Report.ReportingStart .Report.Inputs.ReportingStart| prestoTimestamp |}' AS period_start,
       timestamp '{| default .Report.ReportingEnd .Report.Inputs.ReportingEnd | prestoTimestamp |}' AS period_end,
       namespace,
-      sum(persistentvolumeclaim_usage_bytes)
-    FROM {| dataSourceTableName .Report.Inputs.PersistentvolumeclaimUsageWithPhaseRawDataSourceName |}
-    WHERE "timestamp" >= timestamp '{| default .Report.ReportingStart .Report.Inputs.ReportingStart | prestoTimestamp |}'
-    AND "timestamp" < timestamp '{| default .Report.ReportingEnd .Report.Inputs.ReportingEnd | prestoTimestamp |}'
-    AND dt >= '{| default .Report.ReportingStart .Report.Inputs.ReportingStart | prometheusMetricPartitionFormat |}'
-    AND dt <= '{| default .Report.ReportingEnd .Report.Inputs.ReportingEnd | prometheusMetricPartitionFormat |}'
+      sum(avg_persistentvolumeclaim_usage_bytes) as persistentvolumeclaim_usage_bytes
+    FROM averaged_persistentvolumeclaim_usage_per_pvc
     GROUP BY namespace
