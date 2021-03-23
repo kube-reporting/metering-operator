@@ -1,4 +1,4 @@
-FROM registry.ci.openshift.org/ocp/builder:rhel-8-golang-1.15-openshift-4.8 AS build
+FROM registry.ci.openshift.org/ocp/builder:rhel-8-golang-1.16-openshift-4.8 AS build
 
 COPY . /go/src/github.com/kube-reporting/metering-operator
 WORKDIR /go/src/github.com/kube-reporting/metering-operator
