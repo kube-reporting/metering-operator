@@ -346,7 +346,7 @@ func createMySQLDatabase(ctx *deployframework.DeployerCtx) error {
 		"oc",
 		"-n", mysqlNamespace,
 		"new-app",
-		"--image-stream", "mysql:5.7",
+		"--image-stream", "mysql:8.0",
 		"MYSQL_USER=testuser",
 		"MYSQL_PASSWORD=testpass",
 		"MYSQL_DATABASE=metastore",
@@ -354,7 +354,6 @@ func createMySQLDatabase(ctx *deployframework.DeployerCtx) error {
 	)
 	cmd.Stdout = ctx.LoggerOutFile
 	cmd.Stderr = ctx.LoggerOutFile
-
 	err = cmd.Run()
 	if err != nil {
 		return fmt.Errorf("Failed to run the cmd: %v", err)

@@ -158,6 +158,8 @@ spec:
         env:
         - name: HIVE_LOGLEVEL
           value: {{ upper .Values.hive.spec.server.config.logLevel | quote}}
+        - name: HIVE_UNDERLYING_DATABASE
+          value: "{{ .Values.hive.spec.config.db.type }}"
 {{- if .Values.hive.spec.server.config.jvm.initialRAMPercentage }}
         - name: JVM_INITIAL_RAM_PERCENTAGE
           value: "{{ .Values.hive.spec.server.config.jvm.initialRAMPercentage }}"
