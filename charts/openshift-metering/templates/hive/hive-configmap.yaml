@@ -13,6 +13,16 @@ data:
         <name>hive.server2.use.SSL</name>
         <value>false</value>
       </property>
+{{- if eq .Values.hive.spec.config.db.type "postgres" -}}
+      <property>
+        <name>hive.metastore.transactional.event.listeners</name>
+        <value></value>
+      </property>
+      <property>
+        <name>hive.metastore.event.listeners</name>
+        <value>org.apache.hive.hcatalog.listener.DbNotificationListener</value>
+      </property>
+{{- end }}
       <property>
         <name>hive.server2.authentication</name>
         <value>NOSASL</value>
