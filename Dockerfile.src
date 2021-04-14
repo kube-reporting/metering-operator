@@ -1,9 +1,9 @@
 # need helm CLI for final image
-FROM registry.svc.ci.openshift.org/ocp/4.7:metering-helm as helm
+FROM registry.ci.openshift.org/ocp/4.7:metering-helm as helm
 # image needs kubectl, so we copy `oc` from cli image to use as kubectl.
-FROM registry.svc.ci.openshift.org/ocp/4.7:cli as cli
+FROM registry.ci.openshift.org/ocp/4.7:cli as cli
 # need golang for the unit/vendor/verify CI checks
-FROM registry.svc.ci.openshift.org/ocp/builder:golang-1.15
+FROM registry.ci.openshift.org/ocp/builder:golang-1.15
 
 # go get faq via static Linux binary approach
 ARG LATEST_RELEASE=0.0.6
