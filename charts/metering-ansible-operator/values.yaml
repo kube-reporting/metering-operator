@@ -12,7 +12,7 @@ operator:
 
   image:
     repository: quay.io/openshift/origin-metering-ansible-operator
-    tag: "4.8"
+    tag: "4.9"
     pullPolicy: Always
 
   imagePullSecrets: []
@@ -186,8 +186,8 @@ operator:
 olm:
   packageName: metering-ocp
   channels:
-  - name: "4.8"
-    currentCSV: metering-operator.v4.8.0
+  - name: "4.9"
+    currentCSV: metering-operator.v4.9.0
 
   skipARTPackage: false
 
@@ -195,36 +195,36 @@ olm:
   - name: metering-ansible-operator
     from:
       kind: DockerImage
-      name: quay.io/openshift/origin-metering-ansible-operator:4.8
+      name: quay.io/openshift/origin-metering-ansible-operator:4.9
   - name: metering-reporting-operator
     from:
       kind: DockerImage
-      name: quay.io/openshift/origin-metering-reporting-operator:4.8
+      name: quay.io/openshift/origin-metering-reporting-operator:4.9
   - name: metering-presto
     from:
       kind: DockerImage
-      name: quay.io/openshift/origin-metering-presto:4.8
+      name: quay.io/openshift/origin-metering-presto:4.9
   - name: metering-hive
     from:
       kind: DockerImage
-      name: quay.io/openshift/origin-metering-hive:4.8
+      name: quay.io/openshift/origin-metering-hive:4.9
   - name: metering-hadoop
     from:
       kind: DockerImage
-      name: quay.io/openshift/origin-metering-hadoop:4.8
+      name: quay.io/openshift/origin-metering-hadoop:4.9
   - name: ghostunnel
     from:
       kind: DockerImage
-      name: quay.io/openshift/origin-ghostunnel:4.8
+      name: quay.io/openshift/origin-ghostunnel:4.9
   - name: oauth-proxy
     from:
       kind: DockerImage
-      name: quay.io/openshift/origin-oauth-proxy:4.8
+      name: quay.io/openshift/origin-oauth-proxy:4.9
 
   csv:
-    name : metering-operator.v4.8.0
-    version: "4.8.0"
-    skipRange: ">=4.5.0 <4.8.0"
+    name : metering-operator.v4.9.0
+    version: "4.9.0"
+    skipRange: ">=4.5.0 <4.9.0"
     minKubeVersion: 1.18.3
     displayName: Metering (Deprecated)
     description: |
@@ -239,7 +239,7 @@ olm:
 
       The Metering Operator is a generic reporting tool to provide accountability for how resources are used across a cluster cherry-picking and storing information from different sources. Cluster admins can schedule reports based on historical usage data by Pod, Namespace, and Cluster for storage. The Metering Operator is a part of the [Kubernetes Reporting organization](https://github.com/kube-reporting).
 
-      Read the user guide for more details on [running and viewing your first report](https://docs.openshift.com/container-platform/4.8/metering/metering-using-metering.html).
+      Read the user guide for more details on [running and viewing your first report](https://docs.openshift.com/container-platform/4.9/metering/metering-using-metering.html).
 
       ### Core capabilities
 
@@ -263,15 +263,15 @@ olm:
       At least one Node should have 2GB of RAM and 2 CPU cores.
       Memory and CPU consumption may often be lower, but will spike when running reports, or collecting data for larger clusters.
 
-      Metering requires configuring storage, please review the [configuring persistent storage documentation](https://docs.openshift.com/container-platform/4.8/metering/configuring-metering/metering-configure-persistent-storage.html) before proceeding.
+      Metering requires configuring storage, please review the [configuring persistent storage documentation](https://docs.openshift.com/container-platform/4.9/metering/configuring-metering/metering-configure-persistent-storage.html) before proceeding.
 
       ### Common Configurations
 
-      * **Store data in object storage or in a PersistentVolume** - Store your report output [in an object storage bucket or in a PersistentVolume](https://docs.openshift.com/container-platform/4.8/metering/configuring-metering/metering-configure-persistent-storage.html).
+      * **Store data in object storage or in a PersistentVolume** - Store your report output [in an object storage bucket or in a PersistentVolume](https://docs.openshift.com/container-platform/4.9/metering/configuring-metering/metering-configure-persistent-storage.html).
 
-      * **Configure AWS Billing Data Source** - Assign Pod $$ costs on using your [AWS billing reports stored in S3](https://docs.openshift.com/container-platform/4.8/metering/configuring-metering/metering-configure-aws-billing-correlation.html).
+      * **Configure AWS Billing Data Source** - Assign Pod $$ costs on using your [AWS billing reports stored in S3](https://docs.openshift.com/container-platform/4.9/metering/configuring-metering/metering-configure-aws-billing-correlation.html).
 
-      * **Use Reports** - Customize what how you process data. [Specify what you want to report on, set the schedule, and reporting time period](https://docs.openshift.com/container-platform/4.8/metering/reports/metering-about-reports.html#metering-reports_metering-about-reports).
+      * **Use Reports** - Customize what how you process data. [Specify what you want to report on, set the schedule, and reporting time period](https://docs.openshift.com/container-platform/4.9/metering/reports/metering-about-reports.html#metering-reports_metering-about-reports).
 
     keywords: ['metering', 'metrics', 'reporting', 'prometheus', 'chargeback']
     icon:
@@ -285,7 +285,7 @@ olm:
       name: Red Hat
     links:
     - name: Documentation
-      url: https://docs.openshift.com/container-platform/4.8/metering/metering-about-metering.html
+      url: https://docs.openshift.com/container-platform/4.9/metering/metering-about-metering.html
     labels:
       operator-metering: "true"
     matchLabels:
@@ -352,7 +352,7 @@ olm:
       capabilities: Seamless Upgrades
       support: Red Hat, Inc.
       createdAt: "2019-01-01T11:59:59Z"
-      containerImage: "quay.io/openshift/origin-metering-ansible-operator:4.8"
+      containerImage: "quay.io/openshift/origin-metering-ansible-operator:4.9"
       description: 'The Metering Operator is deprecated and will be removed in a future release.'
       repository: https://github.com/kube-reporting/metering-operator
       alm-examples: |-
@@ -555,7 +555,7 @@ olm:
         ]
 
   subscriptionName: metering-ocp
-  subscriptionChannel: "4.8"
+  subscriptionChannel: "4.9"
   subscriptionNamespace: openshift-metering
   catalogSourceConfigMapName: metering-ocp
   catalogSourceName: metering-ocp-dev

@@ -1,4 +1,4 @@
 packageName: metering-upstream
 channels:
-- currentCSV: metering-operator-upstream.v4.8.0
-  name: "4.8"
+- currentCSV: metering-operator-upstream.v4.9.0
+  name: "4.9"

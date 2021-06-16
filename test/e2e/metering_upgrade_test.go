@@ -37,7 +37,7 @@ func NewInstallConfig(name, namespace, packageName, channel string) *InstallConf
 		packageName = "metering-ocp"
 	}
 	if channel == "" {
-		channel = "4.8"
+		channel = "4.9"
 	}
 
 	return &InstallConfig{

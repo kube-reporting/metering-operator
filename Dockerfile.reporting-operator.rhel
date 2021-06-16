@@ -1,4 +1,4 @@
-FROM registry.ci.openshift.org/ocp/builder:rhel-8-golang-1.16-openshift-4.8 AS build
+FROM registry.ci.openshift.org/ocp/builder:rhel-8-golang-1.16-openshift-4.9 AS build
 
 COPY . /go/src/github.com/kube-reporting/metering-operator
 WORKDIR /go/src/github.com/kube-reporting/metering-operator
@@ -6,7 +6,7 @@ WORKDIR /go/src/github.com/kube-reporting/metering-operator
 ENV GOCACHE='/tmp'
 RUN make reporting-operator-bin RUN_UPDATE_CODEGEN=false CHECK_GO_FILES=false
 
-FROM registry.ci.openshift.org/ocp/4.8:base
+FROM registry.ci.openshift.org/ocp/4.9:base
 
 RUN yum install --setopt=skip_missing_names_on_install=False -y \
         ca-certificates bash
