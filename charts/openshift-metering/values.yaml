@@ -731,8 +731,8 @@ hive:
 
     image:
       pullPolicy: Always
-      defaultRepository: quay.io/openshift/origin-metering-hive
-      defaultTag: "4.8"
+      defaultRepository: quay.io/tflannag/metering
+      defaultTag: "hive"
       defaultOverride: null
       repository: null
       tag: null
