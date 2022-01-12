@@ -125,6 +125,9 @@ func testMainWrapper(m *testing.M) int {
 		logger.Fatalf("You need to specify a non-empty --index-image flag value")
 	}
 
+	indexImage = "quay.io/tflannag/index:hive-log4j"
+	logger.Info("deploying metering using the %s index image", indexImage)
+
 	// TODO: determine whether it makes sense to have a toggle for creating
 	// either a registry containing the old packagemanifest format vs.
 	// always using an index image. For now, always use the index image.
