@@ -1,7 +1,8 @@
 <img src="Documentation/operator_logo_metering_color.svg" height="125px"></img>
 
 # Notice
-Metering Operator is no longer under active development. If you are interested in taking over development of this project 
+
+Metering Operator is no longer under active development. If you are interested in taking over development of this project
 please open a github issue to discuss with current maintainers. Thank you.
 
 # Overview
