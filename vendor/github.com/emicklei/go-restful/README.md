@@ -4,9 +4,10 @@ package for building REST-style Web Services using Google Go
 
 [![Build Status](https://travis-ci.org/emicklei/go-restful.png)](https://travis-ci.org/emicklei/go-restful)
 [![Go Report Card](https://goreportcard.com/badge/github.com/emicklei/go-restful)](https://goreportcard.com/report/github.com/emicklei/go-restful)
-[![GoDoc](https://godoc.org/github.com/emicklei/go-restful?status.svg)](https://godoc.org/github.com/emicklei/go-restful)
+[![GoDoc](https://godoc.org/github.com/emicklei/go-restful?status.svg)](https://pkg.go.dev/github.com/emicklei/go-restful)
+[![codecov](https://codecov.io/gh/emicklei/go-restful/branch/master/graph/badge.svg)](https://codecov.io/gh/emicklei/go-restful)
 
-- [Code examples](https://github.com/emicklei/go-restful/tree/master/examples)
+- [Code examples using v3](https://github.com/emicklei/go-restful/tree/master/examples)
 
 REST asks developers to use HTTP methods explicitly and in a way that's consistent with the protocol definition. This basic REST design principle establishes a one-to-one mapping between create, read, update, and delete (CRUD) operations and HTTP methods. According to this mapping:
 
@@ -20,16 +21,6 @@ REST asks developers to use HTTP methods explicitly and in a way that's consiste
     
 ### Usage
 
-#### Without Go Modules
-
-All versions up to `v2.*.*` (on the master) are not supporting Go modules.
-
-```
-import (
-	restful "github.com/emicklei/go-restful"
-)
-```
-
 #### Using Go Modules
 
 As of version `v3.0.0` (on the v3 branch), this package supports Go modules.
@@ -37,6 +28,16 @@ As of version `v3.0.0` (on the v3 branch), this package supports Go modules.
 ```
 import (
 	restful "github.com/emicklei/go-restful/v3"
+)
+```
+
+#### Without Go Modules
+
+All versions up to `v2.*.*` (on the master) are not supporting Go modules.
+
+```
+import (
+	restful "github.com/emicklei/go-restful"
 )
 ```
 
@@ -60,9 +61,9 @@ func (u UserResource) findUser(request *restful.Request, response *restful.Respo
 	...
 }
 ```
-	
-[Full API of a UserResource](https://github.com/emicklei/go-restful/tree/master/examples/restful-user-resource.go) 
-		
+
+[Full API of a UserResource](https://github.com/emicklei/go-restful/tree/master/examples/user-resource/restful-user-resource.go)
+
 ### Features
 
 - Routes for request &#8594; function mapping with path parameter (e.g. {id} but also prefix_{var} and {var}_suffix) support
