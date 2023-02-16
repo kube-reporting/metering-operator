@@ -7,7 +7,6 @@ require (
 	github.com/Masterminds/sprig v2.16.0+incompatible
 	github.com/aokoli/goutils v1.0.1 // indirect
 	github.com/aws/aws-sdk-go v1.35.24
-	github.com/beorn7/perks v1.0.1 // indirect
 	github.com/davecgh/go-spew v1.1.1
 	github.com/go-chi/chi v3.3.2+incompatible
 	github.com/golang/mock v1.4.3
@@ -16,35 +15,29 @@ require (
 	github.com/prometheus/client_golang v1.7.1
 	github.com/prometheus/common v0.10.0
 	github.com/robfig/cron v1.1.0
-	github.com/sirupsen/logrus v1.6.0
+	github.com/sirupsen/logrus v1.8.1
 	github.com/spf13/cobra v1.1.1
 	github.com/spf13/pflag v1.0.5
-	github.com/stretchr/testify v1.6.1
+	github.com/stretchr/testify v1.7.0
 	github.com/taozle/go-hive-driver v0.0.0-20181206100408-79951111cb07
-	golang.org/x/sync v0.0.0-20201020160332-67f06af15bc9
+	golang.org/x/sync v0.0.0-20210220032951-036812b2e83c
 )
 
 require (
-	github.com/Microsoft/go-winio v0.4.15 // indirect
-	github.com/Microsoft/hcsshim v0.8.10-0.20200715222032-5eafd1556990 // indirect
-	github.com/containerd/containerd v1.4.1 // indirect
-	github.com/containerd/ttrpc v1.0.2 // indirect
-	github.com/containerd/typeurl v1.0.1 // indirect
+	github.com/containerd/containerd v1.5.18 // indirect
 	github.com/docker/docker v17.12.0-ce-rc1.0.20200916142827-bd33bbf0497b+incompatible // indirect
 	github.com/emicklei/go-restful v2.12.0+incompatible // indirect
 	github.com/go-openapi/spec v0.19.7 // indirect
 	github.com/go-openapi/swag v0.19.8 // indirect
-	github.com/gogo/protobuf v1.3.2 // indirect
 	github.com/gorilla/mux v1.8.0 // indirect
 	github.com/mailru/easyjson v0.7.1 // indirect
-	github.com/opencontainers/runc v1.0.0-rc92 // indirect
 	github.com/openshift/client-go v0.0.0-20210112165513-ebc401615f47
 	github.com/operator-framework/api v0.5.3
 	github.com/operator-framework/operator-lifecycle-manager v0.17.0
-	k8s.io/api v0.20.2
+	k8s.io/api v0.20.6
 	k8s.io/apiextensions-apiserver v0.20.1
-	k8s.io/apimachinery v0.20.2
-	k8s.io/client-go v0.20.2
+	k8s.io/apimachinery v0.20.6
+	k8s.io/client-go v0.20.6
 	k8s.io/code-generator v0.20.2
 	k8s.io/klog v1.0.0
 )
