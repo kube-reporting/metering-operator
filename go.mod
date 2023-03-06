@@ -16,7 +16,7 @@ require (
 	github.com/prometheus/client_golang v1.7.1
 	github.com/prometheus/common v0.10.0
 	github.com/robfig/cron v1.1.0
-	github.com/sirupsen/logrus v1.6.0
+	github.com/sirupsen/logrus v1.8.1
 	github.com/spf13/cobra v1.1.1
 	github.com/spf13/pflag v1.0.5
 	github.com/stretchr/testify v1.6.1
@@ -37,7 +37,7 @@ require (
 	github.com/gogo/protobuf v1.3.2 // indirect
 	github.com/gorilla/mux v1.8.0 // indirect
 	github.com/mailru/easyjson v0.7.1 // indirect
-	github.com/opencontainers/runc v1.0.0-rc92 // indirect
+	github.com/opencontainers/runc v1.1.2 // indirect
 	github.com/openshift/client-go v0.0.0-20210112165513-ebc401615f47
 	github.com/operator-framework/api v0.5.3
 	github.com/operator-framework/operator-lifecycle-manager v0.17.0
